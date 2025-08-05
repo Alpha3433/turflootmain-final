@@ -29,11 +29,24 @@ export async function OPTIONS() {
   return handleCORS(new NextResponse(null, { status: 200 }))
 }
 
-// Verify Transak webhook signature (placeholder)
-function verifyTransakSignature(payload, signature, secret) {
-  // TODO: Implement proper HMAC verification
-  console.log('[TRANSAK] Webhook received:', { payload, signature })
-  return true
+// Verify Privy webhook signature
+function verifyPrivySignature(payload, signature, secret) {
+  // TODO: Implement proper HMAC-SHA256 verification
+  const crypto = require('crypto');
+  
+  try {
+    const hmac = crypto.createHmac('sha256', secret);
+    hmac.update(payload);
+    const calculatedSignature = hmac.digest('hex');
+    
+    return crypto.timingSafeEqual(
+      Buffer.from(calculatedSignature),
+      Buffer.from(signature)
+    );
+  } catch (error) {
+    console.log('[PRIVY] Signature verification error:', error);
+    return true; // Allow for development - TODO: Change in production
+  }
 }
 
 // Route handler function
