@@ -26,51 +26,6 @@ const AnimatedP = ({ children, className, ...props }) => (
   </p>
 )
 
-// Age gate modal component
-function AgeGateModal({ isOpen, onClose }) {
-  const [birthDate, setBirthDate] = useState('')
-  
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (birthDate) {
-      const birth = new Date(birthDate)
-      const age = new Date().getFullYear() - birth.getFullYear()
-      
-      if (age >= 18) {
-        localStorage.setItem('ageCheck', 'verified')
-        onClose()
-      } else {
-        alert('You must be 18 or older to play TurfLoot.')
-      }
-    }
-  }
-  
-  if (!isOpen) return null
-  
-  return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-card border border-border rounded-lg p-6 max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4">Age Verification Required</h2>
-        <p className="text-muted-foreground mb-4">
-          You must be 18 or older to play TurfLoot. Please enter your date of birth:
-        </p>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-            className="w-full p-3 rounded-lg bg-input border border-border text-foreground mb-4"
-            required
-          />
-          <Button type="submit" className="w-full">
-            Verify Age
-          </Button>
-        </form>
-      </div>
-    </div>
-  )
-}
-
 // Hero animation component
 function HeroAnimation() {
   return (
