@@ -32,16 +32,16 @@ const motion = {
     <div className={className} {...props}>{children}</div>
 }
 
-// Dynamic imports to avoid SSR issues
-const WalletMultiButton = dynamic(
-  () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
-  { ssr: false }
-)
+// Dynamic imports to avoid SSR issues - simplified
+// const WalletMultiButton = dynamic(
+//   () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
+//   { ssr: false }
+// )
 
-const WalletProvider = dynamic(
-  () => import('@/components/wallet/WalletProvider'),
-  { ssr: false }
-)
+// const WalletProvider = dynamic(
+//   () => import('@/components/wallet/WalletProvider'),
+//   { ssr: false }
+// )
 
 // Privy on-ramp component
 function PrivyOnRampWidget() {
