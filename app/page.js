@@ -73,7 +73,7 @@ function WalletConnect({ onWalletConnect, walletAddress }) {
   )
 }
 
-// Modern leaderboard component
+// Ultra-modern leaderboard component with enhanced glassmorphism
 function Leaderboard() {
   const [leaders, setLeaders] = useState([
     { rank: 1, name: 'CryptoKing', winnings: '$1,247.89', trend: '+15.2%' },
@@ -82,55 +82,66 @@ function Leaderboard() {
   ])
   
   return (
-    <Card className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+    <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#FFD54F]/10 transition-all duration-500 group">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#FFD54F] to-[#FFA726] flex items-center justify-center mr-3">
-              <Trophy className="w-5 h-5 text-black" />
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-r from-[#FFD54F] to-[#FFA726] flex items-center justify-center mr-3">
+                <Trophy className="w-5 h-5 text-black" />
+              </div>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Leaderboard</h3>
-              <p className="text-xs text-gray-400">Top performers</p>
+              <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Leaderboard</h3>
+              <p className="text-xs text-gray-400">Top earners today</p>
             </div>
           </div>
-          <Badge className="bg-[#14F195]/20 text-[#14F195] border-[#14F195]/30">
-            Live
-          </Badge>
+          <div className="relative">
+            <div className="absolute inset-0 bg-[#14F195]/20 blur rounded-full"></div>
+            <Badge className="relative bg-[#14F195]/20 text-[#14F195] border-[#14F195]/30 backdrop-blur-sm px-3 py-1">
+              Live
+            </Badge>
+          </div>
         </div>
         
-        <div className="space-y-4">
-          {leaders.map((leader) => (
-            <div key={leader.rank} className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-white/5 to-white/2 hover:from-white/10 hover:to-white/5 transition-all duration-300">
-              <div className="flex items-center space-x-3">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
-                  leader.rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black' :
-                  leader.rank === 2 ? 'bg-gradient-to-r from-gray-300 to-gray-500 text-black' :
-                  'bg-gradient-to-r from-amber-600 to-amber-800 text-white'
-                }`}>
-                  {leader.rank}
-                </div>
-                <div>
-                  <div className="text-white font-medium">{leader.name}</div>
-                  <div className="text-xs text-gray-400 flex items-center">
-                    <TrendingUp className="w-3 h-3 mr-1" />
-                    {leader.trend}
+        <div className="space-y-3">
+          {leaders.map((leader, index) => (
+            <div key={leader.rank} className="group/item relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent rounded-xl opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-white/[0.02] to-white/[0.01] backdrop-blur-sm border border-white/[0.05] hover:border-white/20 transition-all duration-300">
+                <div className="flex items-center space-x-4">
+                  <div className={`relative w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shadow-lg transition-transform duration-300 group-hover/item:scale-110 ${
+                    leader.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black shadow-yellow-400/30' :
+                    leader.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-black shadow-gray-400/30' :
+                    'bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-amber-600/30'
+                  }`}>
+                    {leader.rank}
+                    <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  <div>
+                    <div className="text-white font-semibold">{leader.name}</div>
+                    <div className="text-xs text-gray-400 flex items-center">
+                      <TrendingUp className="w-3 h-3 mr-1 text-green-400" />
+                      <span className="text-green-400">{leader.trend}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-[#FFD54F] font-bold">{leader.winnings}</div>
+                <div className="text-right">
+                  <div className="text-[#FFD54F] font-bold text-lg">{leader.winnings}</div>
+                </div>
               </div>
             </div>
           ))}
         </div>
         
         <Button 
+          className="w-full mt-6 group relative overflow-hidden bg-gradient-to-r from-[#14F195]/15 via-[#14F195]/10 to-[#14F195]/5 border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/25 hover:to-[#14F195]/15 rounded-xl backdrop-blur-sm font-medium transition-all duration-300"
           variant="outline" 
           size="sm" 
-          className="w-full mt-4 bg-gradient-to-r from-[#14F195]/10 to-[#14F195]/5 border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/20 rounded-xl"
         >
-          View Full Rankings
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+          <span className="relative z-10">View Full Rankings</span>
         </Button>
       </CardContent>
     </Card>
