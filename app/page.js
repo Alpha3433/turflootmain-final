@@ -319,6 +319,6 @@ export default function HomePage() {
           </div>
         </footer>
       </div>
-    </>
+    </div>
   )
 }
