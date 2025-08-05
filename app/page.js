@@ -372,18 +372,27 @@ export default function HomePage() {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0F0F0F] relative overflow-hidden">
-      {/* Modern grid background */}
-      <div className="absolute inset-0 opacity-10">
+      {/* Enhanced grid background with dynamic elements */}
+      <div className="absolute inset-0 opacity-[0.07]">
         <div className="grid grid-cols-32 grid-rows-24 h-full w-full">
           {Array.from({ length: 768 }).map((_, i) => (
-            <div key={i} className="border border-white/5" />
+            <div 
+              key={i} 
+              className={`border border-white/10 ${i % 47 === 0 ? 'bg-[#14F195]/5 animate-pulse' : ''} ${i % 73 === 0 ? 'bg-[#FFD54F]/3' : ''}`} 
+            />
           ))}
         </div>
       </div>
       
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#14F195]/5 via-transparent to-[#FFD54F]/5" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+      {/* Enhanced gradient overlays with more depth */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#14F195]/8 via-transparent to-[#FFD54F]/8" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#14F195]/3 to-black/30" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.8)_70%)]" />
+      
+      {/* Floating ambient elements */}
+      <div className="absolute top-20 left-20 w-2 h-2 bg-[#14F195] rounded-full animate-ping" />
+      <div className="absolute top-40 right-32 w-1 h-1 bg-[#FFD54F] rounded-full animate-pulse" />
+      <div className="absolute bottom-32 left-16 w-1.5 h-1.5 bg-[#14F195]/60 rounded-full animate-bounce" />
       
       {/* Modern header */}
       <header className="relative z-10 flex items-center justify-between p-6 backdrop-blur-sm">
