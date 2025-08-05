@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+// import { motion } from 'framer-motion' // TODO: Add back when framer-motion is installed
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -25,6 +25,12 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+
+// Temporary motion replacement
+const motion = {
+  div: ({ children, initial, animate, transition, className, ...props }) => 
+    <div className={className} {...props}>{children}</div>
+}
 
 // Dynamic imports to avoid SSR issues
 const WalletMultiButton = dynamic(
