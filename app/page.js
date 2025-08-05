@@ -309,12 +309,9 @@ export default function HomePage() {
                   icon: DollarSign
                 }
               ].map((item, index) => (
-                <motion.div
+                <div
                   key={item.step}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
+                  className="opacity-100"
                 >
                   <Card className="bg-card/50 border-border h-full">
                     <CardContent className="p-6 text-center">
@@ -326,7 +323,7 @@ export default function HomePage() {
                       <p className="text-muted-foreground">{item.description}</p>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
