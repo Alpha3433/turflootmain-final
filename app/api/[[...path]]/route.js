@@ -29,6 +29,13 @@ export async function OPTIONS() {
   return handleCORS(new NextResponse(null, { status: 200 }))
 }
 
+// Verify Transak webhook signature (placeholder)
+function verifyTransakSignature(payload, signature, secret) {
+  // TODO: Implement proper HMAC verification
+  console.log('[TRANSAK] Webhook received:', { payload, signature })
+  return true
+}
+
 // Route handler function
 async function handleRoute(request, { params }) {
   const { path = [] } = params
@@ -38,47 +45,191 @@ async function handleRoute(request, { params }) {
   try {
     const db = await connectToMongo()
 
-    // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
-    if (route === '/root' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
-    }
-    // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
+    // Root endpoint
     if (route === '/' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
+      return handleCORS(NextResponse.json({ 
+        message: "TurfLoot API v1.0",
+        service: "Skill-based crypto land battles" 
+      }))
     }
 
-    // Status endpoints - POST /api/status
-    if (route === '/status' && method === 'POST') {
+    // GET /api/pots - Returns current game pot values
+    if (route === '/pots' && method === 'GET') {
+      const pots = [
+        { table: '$1', pot: 24.50, players: 8 },
+        { table: '$5', pot: 87.25, players: 12 },
+        { table: '$20', pot: 340.00, players: 15 }
+      ]
+      
+      return handleCORS(NextResponse.json(pots))
+    }
+
+    // POST /api/withdraw - Handle SOL cash-out requests
+    if (route === '/withdraw' && method === 'POST') {
       const body = await request.json()
       
-      if (!body.client_name) {
+      if (!body.wallet_address || !body.amount) {
         return handleCORS(NextResponse.json(
-          { error: "client_name is required" }, 
+          { error: "wallet_address and amount are required" }, 
           { status: 400 }
         ))
       }
 
-      const statusObj = {
-        id: uuidv4(),
-        client_name: body.client_name,
-        timestamp: new Date()
+      // TODO: Implement Solana Anchor program call
+      const withdrawalId = uuidv4()
+      const withdrawal = {
+        id: withdrawalId,
+        wallet_address: body.wallet_address,
+        amount: body.amount,
+        status: 'pending',
+        timestamp: new Date(),
+        tx_hash: null // Will be populated after blockchain transaction
       }
 
-      await db.collection('status_checks').insertOne(statusObj)
-      return handleCORS(NextResponse.json(statusObj))
+      await db.collection('withdrawals').insertOne(withdrawal)
+      
+      // Simulate withdrawal processing (TODO: Replace with real Solana transaction)
+      console.log(`[SOLANA] Processing withdrawal: ${body.amount} SOL to ${body.wallet_address}`)
+      
+      return handleCORS(NextResponse.json({
+        message: "Withdrawal request submitted",
+        withdrawal_id: withdrawalId,
+        status: "pending"
+      }))
     }
 
-    // Status endpoints - GET /api/status
-    if (route === '/status' && method === 'GET') {
-      const statusChecks = await db.collection('status_checks')
-        .find({})
-        .limit(1000)
-        .toArray()
-
-      // Remove MongoDB's _id field from response
-      const cleanedStatusChecks = statusChecks.map(({ _id, ...rest }) => rest)
+    // POST /api/onramp/webhook - Transak webhook handler
+    if (route === '/onramp/webhook' && method === 'POST') {
+      const body = await request.text()
+      const signature = request.headers.get('x-transak-signature')
       
-      return handleCORS(NextResponse.json(cleanedStatusChecks))
+      if (!verifyTransakSignature(body, signature, process.env.TRANSAK_SECRET)) {
+        return handleCORS(NextResponse.json(
+          { error: "Invalid signature" }, 
+          { status: 401 }
+        ))
+      }
+
+      const webhookData = JSON.parse(body)
+      console.log('[TRANSAK] Webhook processed:', webhookData)
+      
+      // TODO: Credit user balance based on webhook data
+      const webhookRecord = {
+        id: uuidv4(),
+        event_type: webhookData.eventType,
+        user_id: webhookData.userData?.id,
+        amount: webhookData.cryptoAmount,
+        currency: webhookData.cryptoCurrency,
+        status: webhookData.status,
+        timestamp: new Date(),
+        raw_data: webhookData
+      }
+
+      await db.collection('onramp_events').insertOne(webhookRecord)
+      
+      return handleCORS(NextResponse.json({ message: "Webhook processed" }))
+    }
+
+    // POST /api/users - Create or update user profile
+    if (route === '/users' && method === 'POST') {
+      const body = await request.json()
+      
+      if (!body.wallet_address) {
+        return handleCORS(NextResponse.json(
+          { error: "wallet_address is required" }, 
+          { status: 400 }
+        ))
+      }
+
+      const existingUser = await db.collection('users').findOne({
+        wallet_address: body.wallet_address
+      })
+
+      if (existingUser) {
+        return handleCORS(NextResponse.json(existingUser))
+      }
+
+      const newUser = {
+        id: uuidv4(),
+        wallet_address: body.wallet_address,
+        balance_sol: 0,
+        total_winnings: 0,
+        games_played: 0,
+        created_at: new Date(),
+        updated_at: new Date()
+      }
+
+      await db.collection('users').insertOne(newUser)
+      return handleCORS(NextResponse.json(newUser))
+    }
+
+    // GET /api/users/:wallet - Get user profile
+    if (route.startsWith('/users/') && method === 'GET') {
+      const walletAddress = route.split('/')[2]
+      
+      const user = await db.collection('users').findOne({
+        wallet_address: walletAddress
+      })
+
+      if (!user) {
+        return handleCORS(NextResponse.json(
+          { error: "User not found" }, 
+          { status: 404 }
+        ))
+      }
+
+      return handleCORS(NextResponse.json(user))
+    }
+
+    // POST /api/games - Create new game session
+    if (route === '/games' && method === 'POST') {
+      const body = await request.json()
+      
+      if (!body.wallet_address || !body.stake_amount) {
+        return handleCORS(NextResponse.json(
+          { error: "wallet_address and stake_amount are required" }, 
+          { status: 400 }
+        ))
+      }
+
+      const gameSession = {
+        id: uuidv4(),
+        wallet_address: body.wallet_address,
+        stake_amount: body.stake_amount,
+        territory_percent: 0,
+        status: 'active',
+        started_at: new Date(),
+        ended_at: null,
+        final_winnings: null
+      }
+
+      await db.collection('games').insertOne(gameSession)
+      return handleCORS(NextResponse.json(gameSession))
+    }
+
+    // PUT /api/games/:id - Update game progress
+    if (route.startsWith('/games/') && method === 'PUT') {
+      const gameId = route.split('/')[2]
+      const body = await request.json()
+      
+      const updateData = {
+        ...body,
+        updated_at: new Date()
+      }
+
+      const result = await db.collection('games').updateOne(
+        { id: gameId },
+        { $set: updateData }
+      )
+
+      if (result.matchedCount === 0) {
+        return handleCORS(NextResponse.json(
+          { error: "Game not found" }, 
+          { status: 404 }
+        ))
+      }
+
+      return handleCORS(NextResponse.json({ message: "Game updated successfully" }))
     }
 
     // Route not found
