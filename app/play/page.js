@@ -224,221 +224,71 @@ function PaperIOGame({ onGameUpdate, onCashOut }) {
   const gameRef = useRef(null)
   
   useEffect(() => {
-    if (!window.Phaser) {
-      // Load Phaser dynamically
-      const script = document.createElement('script')
-      script.src = 'https://cdn.jsdelivr.net/npm/phaser@3.85.2/dist/phaser.min.js'
-      script.onload = initGame
-      document.head.appendChild(script)
-    } else {
-      initGame()
-    }
+    let gameInstance = null
     
-    function initGame() {
-      const config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 800,
-        parent: 'turfloot-canvas',
-        backgroundColor: '#000000',
-        scene: {
-          preload: preload,
-          create: create,
-          update: update
-        },
-        physics: {
-          default: 'arcade',
-          arcade: {
-            debug: false
-          }
+    // Load Phaser and TurfLoot game
+    const loadGame = () => {
+      if (typeof window !== 'undefined') {
+        // Load Phaser if not already loaded
+        if (!window.Phaser) {
+          const script = document.createElement('script')
+          script.src = 'https://cdn.jsdelivr.net/npm/phaser@3.85.2/dist/phaser.min.js'
+          script.onload = () => loadTurfLootGame()
+          document.head.appendChild(script)
+        } else {
+          loadTurfLootGame()
         }
       }
-      
-      gameRef.current = new Phaser.Game(config)
     }
     
-    let player
-    let cursors
-    let gridSize = 20
-    let grid = []
-    let playerTrail = []
-    let territory = []
-    let gameActive = true
-    
-    function preload() {
-      // Create colored rectangles for the game
-      this.add.graphics()
-        .fillStyle(0x14F195)
-        .fillRect(0, 0, gridSize, gridSize)
-        .generateTexture('player', gridSize, gridSize)
-      
-      this.add.graphics()
-        .fillStyle(0x14F195, 0.5)
-        .fillRect(0, 0, gridSize, gridSize)
-        .generateTexture('trail', gridSize, gridSize)
-      
-      this.add.graphics()
-        .fillStyle(0x14F195, 0.8)
-        .fillRect(0, 0, gridSize, gridSize)
-        .generateTexture('territory', gridSize, gridSize)
-    }
-    
-    function create() {
-      // Initialize grid
-      const cols = config.width / gridSize
-      const rows = config.height / gridSize
-      
-      for (let x = 0; x < cols; x++) {
-        grid[x] = []
-        for (let y = 0; y < rows; y++) {
-          grid[x][y] = 0 // 0 = empty, 1 = territory, 2 = trail
-        }
+    const loadTurfLootGame = () => {
+      // Load TurfLoot game script
+      if (!window.TurfLootGame) {
+        const gameScript = document.createElement('script')
+        gameScript.src = '/game/turfloot-game.js'
+        gameScript.onload = () => initGame()
+        document.head.appendChild(gameScript)
+      } else {
+        initGame()
       }
-      
-      // Create player
-      player = this.add.sprite(400, 400, 'player')
-      player.gridX = Math.floor(player.x / gridSize)
-      player.gridY = Math.floor(player.y / gridSize)
-      
-      // Set initial territory
-      for (let x = player.gridX - 2; x <= player.gridX + 2; x++) {
-        for (let y = player.gridY - 2; y <= player.gridY + 2; y++) {
-          if (x >= 0 && x < cols && y >= 0 && y < rows) {
-            grid[x][y] = 1
-            const territorySprite = this.add.sprite(x * gridSize + gridSize/2, y * gridSize + gridSize/2, 'territory')
-            territory.push(territorySprite)
-          }
-        }
-      }
-      
-      // Controls
-      cursors = this.input.keyboard.createCursorKeys()
-      const wasd = this.input.keyboard.addKeys('W,S,A,D,Q')
-      
-      // Movement with WASD
-      this.input.keyboard.on('keydown-W', () => movePlayer(0, -1))
-      this.input.keyboard.on('keydown-S', () => movePlayer(0, 1))
-      this.input.keyboard.on('keydown-A', () => movePlayer(-1, 0))
-      this.input.keyboard.on('keydown-D', () => movePlayer(1, 0))
-      
-      // Cash out with Q
-      this.input.keyboard.on('keydown-Q', () => {
-        if (gameActive) {
-          onCashOut()
-        }
-      })
     }
     
-    function movePlayer(dx, dy) {
-      if (!gameActive) return
-      
-      const newX = player.gridX + dx
-      const newY = player.gridY + dy
-      const cols = config.width / gridSize
-      const rows = config.height / gridSize
-      
-      if (newX >= 0 && newX < cols && newY >= 0 && newY < rows) {
-        player.gridX = newX
-        player.gridY = newY
-        player.x = newX * gridSize + gridSize/2
-        player.y = newY * gridSize + gridSize/2
+    const initGame = () => {
+      if (window.TurfLootGame) {
+        gameInstance = new window.TurfLootGame()
+        gameRef.current = gameInstance
         
-        // Add to trail if not in own territory
-        if (grid[newX][newY] !== 1) {
-          grid[newX][newY] = 2
-          const trailSprite = gameRef.current.scene.scenes[0].add.sprite(
-            newX * gridSize + gridSize/2, 
-            newY * gridSize + gridSize/2, 
-            'trail'
-          )
-          playerTrail.push({ sprite: trailSprite, x: newX, y: newY })
-        } else if (playerTrail.length > 0) {
-          // Returned to territory - convert trail to territory
-          convertTrailToTerritory()
-        }
-        
-        updateGameStats()
-      }
-    }
-    
-    function convertTrailToTerritory() {
-      playerTrail.forEach(trailPoint => {
-        grid[trailPoint.x][trailPoint.y] = 1
-        trailPoint.sprite.setTexture('territory')
-        territory.push(trailPoint.sprite)
-      })
-      
-      // Fill enclosed areas (simplified flood fill)
-      fillEnclosedAreas()
-      
-      playerTrail = []
-      updateGameStats()
-    }
-    
-    function fillEnclosedAreas() {
-      // Simplified area filling - in a real game this would be more sophisticated
-      const cols = config.width / gridSize
-      const rows = config.height / gridSize
-      
-      for (let x = 1; x < cols - 1; x++) {
-        for (let y = 1; y < rows - 1; y++) {
-          if (grid[x][y] === 0) {
-            // Check if surrounded by territory
-            let surrounded = true
-            for (let dx = -1; dx <= 1; dx++) {
-              for (let dy = -1; dy <= 1; dy++) {
-                if (grid[x + dx] && grid[x + dx][y + dy] !== 1) {
-                  surrounded = false
-                  break
-                }
-              }
-              if (!surrounded) break
-            }
-            
-            if (surrounded) {
-              grid[x][y] = 1
-              const territorySprite = gameRef.current.scene.scenes[0].add.sprite(
-                x * gridSize + gridSize/2, 
-                y * gridSize + gridSize/2, 
-                'territory'
-              )
-              territory.push(territorySprite)
+        // Listen for messages from the game
+        const handleMessage = (event) => {
+          if (event.data && event.data.type) {
+            switch (event.data.type) {
+              case 'update':
+                onGameUpdate({
+                  territoryPercent: event.data.territoryPercent,
+                  usdValue: event.data.usdValue
+                })
+                break
+              case 'cashout':
+                onCashOut()
+                break
             }
           }
         }
-      }
-    }
-    
-    function updateGameStats() {
-      const cols = config.width / gridSize
-      const rows = config.height / gridSize
-      const totalCells = cols * rows
-      let territoryCount = 0
-      
-      for (let x = 0; x < cols; x++) {
-        for (let y = 0; y < rows; y++) {
-          if (grid[x][y] === 1) {
-            territoryCount++
-          }
+        
+        window.addEventListener('message', handleMessage)
+        
+        // Cleanup function
+        return () => {
+          window.removeEventListener('message', handleMessage)
         }
       }
-      
-      const territoryPercent = (territoryCount / totalCells) * 100
-      const usdValue = territoryPercent * 0.2 // $0.20 per percent for $1 game
-      
-      onGameUpdate({
-        territoryPercent,
-        usdValue
-      })
     }
     
-    function update() {
-      // Game loop - can add enemy AI, power-ups, etc.
-    }
+    loadGame()
     
     return () => {
       if (gameRef.current) {
-        gameRef.current.destroy(true)
+        gameRef.current.destroy()
         gameRef.current = null
       }
     }
@@ -447,13 +297,21 @@ function PaperIOGame({ onGameUpdate, onCashOut }) {
   return (
     <div className="flex-1 flex items-center justify-center bg-black p-4">
       <div className="relative">
-        <div id="turfloot-canvas" className="game-canvas" />
+        <div id="turfloot-canvas" className="game-canvas border-2 border-[#14F195] rounded-lg" />
         
         {/* Game instructions overlay */}
-        <div className="absolute top-4 left-4 bg-black/80 text-white p-3 rounded-lg text-sm">
-          <div className="font-bold mb-1">Controls:</div>
-          <div>WASD - Move player</div>
-          <div>Q - Cash out</div>
+        <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded-lg text-sm backdrop-blur">
+          <div className="font-bold mb-2 text-[#14F195]">🎮 Controls:</div>
+          <div>• <span className="text-[#FFD54F]">WASD</span> - Move player</div>
+          <div>• <span className="text-[#FFD54F]">Q</span> - Cash out winnings</div>
+          <div className="mt-2 text-xs text-gray-400">Capture territory by returning to your base!</div>
+        </div>
+        
+        {/* Game status */}
+        <div className="absolute top-4 right-4 bg-black/90 text-white p-3 rounded-lg text-sm backdrop-blur">
+          <div className="font-bold mb-1 text-[#14F195]">🏆 Objective:</div>
+          <div className="text-xs">Capture <span className="text-[#FFD54F]">maximum territory</span></div>
+          <div className="text-xs">without hitting your trail!</div>
         </div>
       </div>
     </div>
