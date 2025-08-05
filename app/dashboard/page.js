@@ -469,6 +469,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </WalletProvider>
+    </div>
   )
 }
