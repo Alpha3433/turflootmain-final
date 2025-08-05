@@ -1,12 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+// import { motion } from 'framer-motion' // TODO: Add back when framer-motion is installed
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Play, Shield, DollarSign, Trophy, Users, Zap } from 'lucide-react'
 import Link from 'next/link'
+
+// Temporary motion replacement
+const motion = {
+  div: ({ children, initial, animate, transition, whileInView, viewport, className, ...props }) => 
+    <div className={className} {...props}>{children}</div>,
+  h1: ({ children, initial, animate, transition, className, ...props }) => 
+    <h1 className={className} {...props}>{children}</h1>,
+  p: ({ children, initial, animate, transition, className, ...props }) => 
+    <p className={className} {...props}>{children}</p>
+}
 
 // Age gate modal component
 function AgeGateModal({ isOpen, onClose }) {
