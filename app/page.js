@@ -473,7 +473,7 @@ export default function HomePage() {
           <GameLobby onGameStart={handleGameStart} />
         </div>
         
-        {/* Right sidebar */}
+        {/* Enhanced right sidebar with ultra-modern design */}
         <div className="col-span-3 space-y-6">
           <WalletInfo 
             walletAddress={walletAddress} 
@@ -481,35 +481,40 @@ export default function HomePage() {
             onRefresh={handleRefreshBalance}
           />
           
-          {/* Modern player stats */}
-          <Card className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+          {/* Ultra-modern player stats with enhanced glassmorphism */}
+          <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#FFD54F]/10 transition-all duration-500 group">
             <CardContent className="p-6">
               <div className="flex items-center mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mr-3">
-                  <TrendingUp className="w-5 h-5 text-white" />
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
+                  <div className="relative w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mr-3">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Your Stats</h3>
-                  <p className="text-xs text-gray-400">Performance metrics</p>
+                  <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Your Stats</h3>
+                  <p className="text-xs text-gray-400">Performance analytics</p>
                 </div>
               </div>
               <PlayerStats />
             </CardContent>
           </Card>
           
-          {/* Modern action buttons */}
+          {/* Ultra-modern action buttons with enhanced effects */}
           <div className="space-y-3">
             <Button 
-              className="w-full bg-gradient-to-r from-[#14F195]/20 to-[#14F195]/10 border border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/20 rounded-xl backdrop-blur-sm"
+              className="w-full group relative overflow-hidden bg-gradient-to-r from-[#14F195]/20 via-[#14F195]/15 to-[#14F195]/10 border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/30 hover:to-[#14F195]/20 rounded-xl backdrop-blur-xl font-medium transition-all duration-300"
               variant="outline"
             >
-              <Settings className="w-4 h-4 mr-2" />
-              Customize Profile
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+              <Settings className="w-4 h-4 mr-2 relative z-10" />
+              <span className="relative z-10">Customize Profile</span>
             </Button>
             <Button 
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl shadow-lg"
+              className="w-full group relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-500 hover:via-purple-500 hover:to-blue-500 text-white rounded-xl shadow-xl shadow-blue-600/20 hover:shadow-blue-500/30 font-medium transition-all duration-300"
             >
-              Join Discord Community
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+              <span className="relative z-10">Join Discord Community</span>
             </Button>
           </div>
         </div>
