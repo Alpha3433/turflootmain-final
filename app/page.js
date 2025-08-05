@@ -145,31 +145,25 @@ function LivePotTicker() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {pots.map((pot, index) => (
-        <motion.div
+        <div
           key={pot.table}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          whileHover={{ scale: 1.02 }}
+          className="animate-slide-up transform transition-all duration-300 hover:scale-105"
+          style={{ animationDelay: `${index * 0.1}s` }}
         >
           <Card className="bg-card/50 border-border hover:border-primary/50 transition-colors">
             <CardContent className="p-4 text-center">
               <Badge variant="outline" className="mb-2 border-primary text-primary">
                 {pot.table}
               </Badge>
-              <motion.div 
-                className="text-2xl font-bold text-[#FFD54F]"
-                animate={{ opacity: [1, 0.7, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
+              <div className="text-2xl font-bold text-[#FFD54F] animate-pulse-glow">
                 ${pot.pot.toFixed(2)}
-              </motion.div>
+              </div>
               <div className="text-sm text-muted-foreground">
                 {pot.players} players
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       ))}
     </div>
   )
