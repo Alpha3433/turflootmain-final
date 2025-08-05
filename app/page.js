@@ -1,12 +1,29 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Play, Shield, DollarSign, Trophy, Users, Zap } from 'lucide-react'
 import Link from 'next/link'
+
+// Dynamic import framer-motion to avoid SSR issues
+const motion = dynamic(
+  () => import('framer-motion').then(mod => ({ 
+    div: mod.motion.div,
+    h1: mod.motion.h1,
+    p: mod.motion.p
+  })),
+  { 
+    ssr: false,
+    loading: () => ({ 
+      div: 'div',
+      h1: 'h1', 
+      p: 'p'
+    })
+  }
+)
 
 // Age gate modal component
 function AgeGateModal({ isOpen, onClose }) {
