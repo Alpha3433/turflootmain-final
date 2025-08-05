@@ -30,11 +30,7 @@ function AgeGateModal({ isOpen, onClose }) {
   
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="bg-card border border-border rounded-lg p-6 max-w-md w-full"
-      >
+      <div className="bg-card border border-border rounded-lg p-6 max-w-md w-full">
         <h2 className="text-xl font-bold mb-4">Age Verification Required</h2>
         <p className="text-muted-foreground mb-4">
           You must be 18 or older to play TurfLoot. Please enter your date of birth:
