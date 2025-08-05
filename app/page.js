@@ -213,16 +213,10 @@ export default function HomePage() {
                   <Trophy className="w-5 h-5 mr-2" />
                   Watch Demo
                 </Button>
-              </motion.div>
+              </div>
             </div>
             
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
-              <HeroAnimation />
-            </motion.div>
+            <HeroAnimation />
           </div>
         </section>
 
