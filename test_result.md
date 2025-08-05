@@ -107,99 +107,123 @@ user_problem_statement: "Test the updated TurfLoot backend APIs with Privy integ
 backend:
   - task: "Root endpoint (GET /api/)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Initial testing setup - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Returns correct TurfLoot API message with proper CORS headers. Status 200, response includes message and service fields."
 
   - task: "Game pots endpoint (GET /api/pots)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Initial testing setup - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Returns correct pot data for all tables ($1, $5, $20) with pot amounts and player counts. Proper JSON array structure."
 
   - task: "Create user (POST /api/users)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Initial testing setup - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Creates user with valid UUID ID, stores wallet_address correctly, initializes balance and stats to 0. Validation works for missing wallet_address (400 error)."
 
   - task: "Get user profile (GET /api/users/{wallet})"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Initial testing setup - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Retrieves user by wallet address correctly, returns all required fields. Returns 404 for non-existent users with proper error message."
 
   - task: "Create game session (POST /api/games)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Initial testing setup - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Creates game sessions for all stake amounts (1.0, 5.0, 20.0) with valid UUID IDs. Initializes territory_percent to 0, status to 'active'. Validation works for missing required fields."
 
   - task: "Update game progress (PUT /api/games/{id})"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Initial testing setup - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Updates game progress successfully, returns success message. Returns 404 for non-existent game IDs with proper error message."
 
   - task: "Withdrawal request (POST /api/withdraw)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Initial testing setup - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Creates withdrawal requests with valid UUID IDs, stores in database with pending status. Validation works for missing wallet_address and amount fields."
 
   - task: "Privy webhook (POST /api/onramp/webhook)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "NEW Privy webhook integration - needs testing with sample data"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - All Privy webhook event types working correctly (fiat_onramp.created, fiat_onramp.completed, fiat_onramp.failed). Events stored in privy_onramp_events collection with UUID IDs. Signature validation implemented (currently allows development mode). Database verified with 4 webhook events stored correctly."
 
 frontend:
   - task: "Frontend integration"
