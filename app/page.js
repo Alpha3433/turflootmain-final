@@ -223,14 +223,9 @@ export default function HomePage() {
         {/* How Skill Wins Section */}
         <section className="py-16 bg-muted/5">
           <div className="container mx-auto px-4">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold text-center mb-12"
-            >
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               How Skill Wins
-            </motion.h2>
+            </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               {[
@@ -252,11 +247,8 @@ export default function HomePage() {
                   description: "Press Q to cash out your winnings in SOL",
                   icon: DollarSign
                 }
-              ].map((item, index) => (
-                <div
-                  key={item.step}
-                  className="opacity-100"
-                >
+              ].map((item) => (
+                <div key={item.step}>
                   <Card className="bg-card/50 border-border h-full">
                     <CardContent className="p-6 text-center">
                       <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
