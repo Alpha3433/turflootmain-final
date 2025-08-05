@@ -101,3 +101,139 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Test the updated TurfLoot backend APIs with Privy integration"
+
+backend:
+  - task: "Root endpoint (GET /api/)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial testing setup - needs verification"
+
+  - task: "Game pots endpoint (GET /api/pots)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial testing setup - needs verification"
+
+  - task: "Create user (POST /api/users)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial testing setup - needs verification"
+
+  - task: "Get user profile (GET /api/users/{wallet})"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial testing setup - needs verification"
+
+  - task: "Create game session (POST /api/games)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial testing setup - needs verification"
+
+  - task: "Update game progress (PUT /api/games/{id})"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial testing setup - needs verification"
+
+  - task: "Withdrawal request (POST /api/withdraw)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Initial testing setup - needs verification"
+
+  - task: "Privy webhook (POST /api/onramp/webhook)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW Privy webhook integration - needs testing with sample data"
+
+frontend:
+  - task: "Frontend integration"
+    implemented: false
+    working: "NA"
+    file: "/app/app/page.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Frontend testing not required per instructions"
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Root endpoint (GET /api/)"
+    - "Game pots endpoint (GET /api/pots)"
+    - "Create user (POST /api/users)"
+    - "Get user profile (GET /api/users/{wallet})"
+    - "Create game session (POST /api/games)"
+    - "Update game progress (PUT /api/games/{id})"
+    - "Withdrawal request (POST /api/withdraw)"
+    - "Privy webhook (POST /api/onramp/webhook)"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "testing"
+    message: "Starting comprehensive backend API testing for TurfLoot with Privy integration. Focus on new Privy webhook endpoint and existing API functionality."
