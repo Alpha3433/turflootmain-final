@@ -111,12 +111,12 @@ async function handleRoute(request, { params }) {
       }))
     }
 
-    // POST /api/onramp/webhook - Transak webhook handler
+    // POST /api/onramp/webhook - Privy webhook handler
     if (route === '/onramp/webhook' && method === 'POST') {
       const body = await request.text()
-      const signature = request.headers.get('x-transak-signature')
+      const signature = request.headers.get('x-privy-signature')
       
-      if (!verifyTransakSignature(body, signature, process.env.TRANSAK_SECRET)) {
+      if (!verifyPrivySignature(body, signature, process.env.PRIVY_APP_SECRET)) {
         return handleCORS(NextResponse.json(
           { error: "Invalid signature" }, 
           { status: 401 }
@@ -124,21 +124,37 @@ async function handleRoute(request, { params }) {
       }
 
       const webhookData = JSON.parse(body)
-      console.log('[TRANSAK] Webhook processed:', webhookData)
+      console.log('[PRIVY] Webhook processed:', webhookData)
       
       // TODO: Credit user balance based on webhook data
       const webhookRecord = {
         id: uuidv4(),
-        event_type: webhookData.eventType,
-        user_id: webhookData.userData?.id,
-        amount: webhookData.cryptoAmount,
-        currency: webhookData.cryptoCurrency,
-        status: webhookData.status,
+        event_type: webhookData.event_type || webhookData.eventType,
+        user_id: webhookData.user?.id || webhookData.data?.user_id,
+        amount: webhookData.data?.crypto_amount || webhookData.cryptoAmount,
+        currency: webhookData.data?.crypto_currency || webhookData.cryptoCurrency,
+        status: webhookData.data?.status || webhookData.status,
         timestamp: new Date(),
         raw_data: webhookData
       }
 
-      await db.collection('onramp_events').insertOne(webhookRecord)
+      await db.collection('privy_onramp_events').insertOne(webhookRecord)
+      
+      // Handle different event types
+      switch (webhookData.event_type) {
+        case 'fiat_onramp.created':
+          console.log('[PRIVY] On-ramp created:', webhookData.data?.id)
+          break
+        case 'fiat_onramp.completed':
+          console.log('[PRIVY] On-ramp completed:', webhookData.data?.id)
+          // TODO: Credit user SOL balance
+          break
+        case 'fiat_onramp.failed':
+          console.log('[PRIVY] On-ramp failed:', webhookData.data?.id)
+          break
+        default:
+          console.log('[PRIVY] Unhandled event type:', webhookData.event_type)
+      }
       
       return handleCORS(NextResponse.json({ message: "Webhook processed" }))
     }
