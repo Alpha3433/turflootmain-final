@@ -394,23 +394,34 @@ export default function HomePage() {
       <div className="absolute top-40 right-32 w-1 h-1 bg-[#FFD54F] rounded-full animate-pulse" />
       <div className="absolute bottom-32 left-16 w-1.5 h-1.5 bg-[#14F195]/60 rounded-full animate-bounce" />
       
-      {/* Modern header */}
-      <header className="relative z-10 flex items-center justify-between p-6 backdrop-blur-sm">
+      {/* Ultra-modern header with enhanced glassmorphism */}
+      <header className="relative z-20 flex items-center justify-between p-6">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#14F195] to-[#0EA876] flex items-center justify-center shadow-lg shadow-[#14F195]/30">
-            <Zap className="w-6 h-6 text-black" />
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] via-[#FFD54F] to-[#14F195] rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+            <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[#14F195] to-[#0EA876] flex items-center justify-center shadow-2xl shadow-[#14F195]/30 group-hover:scale-105 transition-all duration-300">
+              <Zap className="w-7 h-7 text-black" />
+            </div>
           </div>
           <div>
-            <div className="text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <div className="text-3xl font-black bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent drop-shadow-lg">
               TurfLoot
             </div>
-            <div className="text-xs text-gray-400 font-medium">
-              Next-gen skill gaming
+            <div className="text-sm text-gray-400 font-medium tracking-wide">
+              Next-gen skill gaming platform
             </div>
           </div>
         </div>
         
-        <WalletConnect onWalletConnect={handleWalletConnect} walletAddress={walletAddress} />
+        <div className="flex items-center space-x-4">
+          {/* Modern notification indicator */}
+          <div className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/20">
+            <div className="w-2 h-2 bg-[#14F195] rounded-full animate-pulse" />
+            <span className="text-sm text-[#14F195] font-medium">Live Tournament</span>
+          </div>
+          
+          <WalletConnect onWalletConnect={handleWalletConnect} walletAddress={walletAddress} />
+        </div>
       </header>
       
       {/* Modern main content grid */}
