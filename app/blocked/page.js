@@ -1,10 +1,16 @@
 'use client'
 
-import { motion } from 'framer-motion'
+// import { motion } from 'framer-motion' // TODO: Add back when framer-motion is installed
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ShieldX, Home, Mail } from 'lucide-react'
 import Link from 'next/link'
+
+// Temporary motion replacement
+const motion = {
+  div: ({ children, initial, animate, className, ...props }) => 
+    <div className={className} {...props}>{children}</div>
+}
 
 export default function BlockedPage() {
   return (
