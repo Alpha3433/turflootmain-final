@@ -47,7 +47,7 @@ function AgeGateModal({ isOpen, onClose }) {
             Verify Age
           </Button>
         </form>
-      </motion.div>
+      </div>
     </div>
   )
 }
