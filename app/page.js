@@ -268,14 +268,9 @@ export default function HomePage() {
         {/* Live Pot Ticker */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold text-center mb-12"
-            >
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Live Game Pots
-            </motion.h2>
+            </h2>
             
             <LivePotTicker />
           </div>
