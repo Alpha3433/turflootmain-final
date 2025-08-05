@@ -371,34 +371,33 @@ export default function DashboardPage() {
   }
   
   return (
-    <WalletProvider>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border bg-background/95 backdrop-blur">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                  <Trophy className="w-5 h-5 text-black" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold">TurfLoot</h1>
-                  <p className="text-xs text-muted-foreground">Dashboard</p>
-                </div>
-              </Link>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <Button asChild variant="outline">
-                <Link href="/play">
-                  <Play className="w-4 h-4 mr-2" />
-                  Play Game
-                </Link>
-              </Button>
-              <WalletMultiButton />
-            </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border bg-background/95 backdrop-blur">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-black" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold">TurfLoot</h1>
+                <p className="text-xs text-muted-foreground">Dashboard</p>
+              </div>
+            </Link>
           </div>
-        </header>
+          
+          <div className="flex items-center space-x-4">
+            <Button asChild variant="outline">
+              <Link href="/play">
+                <Play className="w-4 h-4 mr-2" />
+                Play Game
+              </Link>
+            </Button>
+            <Button variant="outline">Connect Wallet</Button>
+          </div>
+        </div>
+      </header>
         
         <div className="container mx-auto px-4 py-8">
           {/* Balance and Quick Actions */}
