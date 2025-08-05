@@ -63,7 +63,7 @@
     background: #000;
   }
   
-  /* Grid background for modern lobby */
+  /* Enhanced grid background for ultra-modern lobby */
   .grid-cols-20 {
     grid-template-columns: repeat(20, minmax(0, 1fr));
   }
@@ -80,7 +80,7 @@
     grid-template-rows: repeat(24, minmax(0, 1fr));
   }
   
-  /* Custom animations to replace framer-motion */
+  /* Ultra-modern animations and effects */
   .animate-fade-in {
     animation: fadeIn 0.8s ease-out forwards;
   }
@@ -104,6 +104,54 @@
   
   .animate-grid-fill {
     animation: gridFill 3s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite alternate;
+  }
+  
+  /* Ultra-modern glassmorphism utilities */
+  .glass-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  .glass-card-dark {
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Enhanced button effects */
+  .btn-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-shimmer:hover::before {
+    left: 100%;
   }
 }
 
