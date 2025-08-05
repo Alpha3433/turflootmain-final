@@ -77,40 +77,25 @@ function HeroAnimation() {
     <div className="relative w-full h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden bg-gradient-to-br from-[#14F195]/20 to-[#FFD54F]/20 border border-[#14F195]/30">
       <div className="absolute inset-0 grid grid-cols-8 grid-rows-6 gap-1 p-4">
         {Array.from({ length: 48 }).map((_, i) => (
-          <motion.div
+          <div
             key={i}
-            className="bg-[#14F195]/10 rounded-sm"
-            animate={{
-              backgroundColor: [
-                'rgba(20, 241, 149, 0.1)',
-                'rgba(255, 213, 79, 0.3)',
-                'rgba(20, 241, 149, 0.2)',
-              ],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              delay: i * 0.1,
-              ease: 'easeInOut',
+            className="bg-[#14F195]/10 rounded-sm animate-grid-fill"
+            style={{
+              animationDelay: `${i * 0.1}s`
             }}
           />
         ))}
       </div>
       
       <div className="absolute inset-0 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1, duration: 0.8, ease: 'easeOut' }}
-          className="text-center text-white"
-        >
+        <div className="text-center text-white animate-scale-in">
           <div className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2">
             100% <span className="turfloot-gradient bg-clip-text text-transparent">skill</span>
           </div>
           <div className="text-xl md:text-2xl text-muted-foreground">
             0% luck
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )
