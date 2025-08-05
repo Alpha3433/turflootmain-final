@@ -1,28 +1,29 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Play, Shield, DollarSign, Trophy, Users, Zap } from 'lucide-react'
 import Link from 'next/link'
 
-// Dynamic import framer-motion to avoid SSR issues
-const motion = dynamic(
-  () => import('framer-motion').then(mod => ({ 
-    div: mod.motion.div,
-    h1: mod.motion.h1,
-    p: mod.motion.p
-  })),
-  { 
-    ssr: false,
-    loading: () => ({ 
-      div: 'div',
-      h1: 'h1', 
-      p: 'p'
-    })
-  }
+// Simple animation replacements using CSS classes
+const AnimatedDiv = ({ children, className, ...props }) => (
+  <div className={`${className} transition-all duration-500 hover:scale-105`} {...props}>
+    {children}
+  </div>
+)
+
+const AnimatedH1 = ({ children, className, ...props }) => (
+  <h1 className={`${className} animate-fade-in`} {...props}>
+    {children}
+  </h1>
+)
+
+const AnimatedP = ({ children, className, ...props }) => (
+  <p className={`${className} animate-fade-in-delay`} {...props}>
+    {children}
+  </p>
 )
 
 // Age gate modal component
