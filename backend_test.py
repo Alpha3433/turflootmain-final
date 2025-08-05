@@ -14,7 +14,8 @@ from typing import Dict, Any, Optional
 class TurfLootAPITester:
     def __init__(self):
         # Get base URL from environment or use default
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://e5d8d9b7-5c3d-4314-a5cf-e029726b6a78.preview.emergentagent.com')
+        # Use localhost for testing since external URL has ingress issues
+        self.base_url = "http://localhost:3000"
         self.api_url = f"{self.base_url}/api"
         
         # Test data
