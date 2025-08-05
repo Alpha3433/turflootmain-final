@@ -125,46 +125,34 @@ function LivePotTicker() {
 }
 
 export default function HomePage() {
-  const [showAgeGate, setShowAgeGate] = useState(false)
-  
-  useEffect(() => {
-    const ageCheck = localStorage.getItem('ageCheck')
-    if (!ageCheck) {
-      setShowAgeGate(true)
-    }
-  }, [])
-  
   return (
-    <>
-      <AgeGateModal isOpen={showAgeGate} onClose={() => setShowAgeGate(false)} />
-      
-      <div className="min-h-screen">
-        {/* Header */}
-        <header className="border-b border-border bg-background/95 backdrop-blur">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#14F195] to-[#FFD54F] flex items-center justify-center">
-                <Zap className="w-5 h-5 text-black" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold">TurfLoot</h1>
-                <p className="text-xs text-muted-foreground">Capture with skill. Cash-out in crypto.</p>
-              </div>
+    <div className="min-h-screen">
+      {/* Header */}
+      <header className="border-b border-border bg-background/95 backdrop-blur">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#14F195] to-[#FFD54F] flex items-center justify-center">
+              <Zap className="w-5 h-5 text-black" />
             </div>
-            
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link href="/play" className="text-muted-foreground hover:text-foreground transition-colors">
-                Play
-              </Link>
-              <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
-                Dashboard
-              </Link>
-              <Link href="/legal" className="text-muted-foreground hover:text-foreground transition-colors">
-                Legal
-              </Link>
-            </nav>
+            <div>
+              <h1 className="text-xl font-bold">TurfLoot</h1>
+              <p className="text-xs text-muted-foreground">Capture with skill. Cash-out in crypto.</p>
+            </div>
           </div>
-        </header>
+          
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link href="/play" className="text-muted-foreground hover:text-foreground transition-colors">
+              Play
+            </Link>
+            <Link href="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+              Dashboard
+            </Link>
+            <Link href="/legal" className="text-muted-foreground hover:text-foreground transition-colors">
+              Legal
+            </Link>
+          </nav>
+        </div>
+      </header>
 
         {/* Hero Section */}
         <section className="py-12 md:py-20">
