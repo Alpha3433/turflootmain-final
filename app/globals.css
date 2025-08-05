@@ -63,13 +63,21 @@
     background: #000;
   }
   
-  /* Grid background for game lobby */
+  /* Grid background for modern lobby */
   .grid-cols-20 {
     grid-template-columns: repeat(20, minmax(0, 1fr));
   }
   
   .grid-rows-20 {
     grid-template-rows: repeat(20, minmax(0, 1fr));
+  }
+  
+  .grid-cols-32 {
+    grid-template-columns: repeat(32, minmax(0, 1fr));
+  }
+  
+  .grid-rows-24 {
+    grid-template-rows: repeat(24, minmax(0, 1fr));
   }
   
   /* Custom animations to replace framer-motion */
