@@ -225,89 +225,151 @@ function WalletInfo({ walletAddress, balance, onRefresh }) {
   )
 }
 
-// Modern game lobby component
+// Ultra-modern game lobby component with enhanced effects
 function GameLobby({ onGameStart }) {
   const [selectedAmount, setSelectedAmount] = useState(1)
   const [currentPot, setCurrentPot] = useState(1247)
   
   const gameAmounts = [
-    { value: 1, label: '$1', subtitle: 'Quick Play' },
-    { value: 5, label: '$5', subtitle: 'Standard' },
-    { value: 20, label: '$20', subtitle: 'High Stakes' }
+    { value: 1, label: '$1', subtitle: 'Quick Play', color: 'from-blue-500 to-blue-600' },
+    { value: 5, label: '$5', subtitle: 'Standard', color: 'from-purple-500 to-purple-600' },
+    { value: 20, label: '$20', subtitle: 'High Stakes', color: 'from-red-500 to-red-600' }
   ]
   
   return (
     <div className="text-center">
-      {/* Modern status indicator */}
-      <div className="flex items-center justify-center mb-8">
-        <div className="flex items-center space-x-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#14F195]/20 to-[#14F195]/10 backdrop-blur-sm border border-[#14F195]/30 shadow-lg">
-          <div className="w-3 h-3 rounded-full bg-[#14F195] animate-pulse shadow-lg shadow-[#14F195]/50" />
-          <span className="text-sm font-bold text-[#14F195] tracking-wide">LIVE GAMES</span>
-          <div className="w-2 h-2 rounded-full bg-[#FFD54F] animate-pulse" />
+      {/* Ultra-modern status indicator with enhanced effects */}
+      <div className="flex items-center justify-center mb-10">
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] via-[#FFD54F] to-[#14F195] rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+          <div className="relative flex items-center space-x-4 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#14F195]/15 via-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/30 shadow-2xl">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-[#14F195] animate-pulse shadow-lg shadow-[#14F195]/50" />
+              <span className="text-sm font-bold text-[#14F195] tracking-wide">LIVE GAMES</span>
+            </div>
+            <div className="w-px h-6 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
+            <div className="flex items-center space-x-2">
+              <Users className="w-4 h-4 text-[#FFD54F]" />
+              <span className="text-sm font-bold text-[#FFD54F]">127 Active</span>
+            </div>
+            <div className="w-2 h-2 rounded-full bg-[#FFD54F] animate-pulse" />
+          </div>
         </div>
       </div>
       
-      {/* Modern pot display */}
-      <div className="mb-12">
-        <div className="mb-4">
-          <div className="text-7xl font-black bg-gradient-to-r from-[#FFD54F] via-[#FFA726] to-[#FF9800] bg-clip-text text-transparent drop-shadow-lg">
-            ${currentPot.toLocaleString()}
+      {/* Ultra-modern pot display with enhanced gradients */}
+      <div className="mb-14">
+        <div className="mb-6">
+          <div className="relative inline-block">
+            <div className="absolute -inset-2 bg-gradient-to-r from-[#FFD54F]/20 via-[#FFA726]/30 to-[#FFD54F]/20 blur-2xl rounded-full"></div>
+            <div className="relative text-8xl font-black bg-gradient-to-r from-[#FFD54F] via-[#FFA726] to-[#FF9800] bg-clip-text text-transparent drop-shadow-2xl">
+              ${currentPot.toLocaleString()}
+            </div>
           </div>
-          <div className="flex items-center justify-center mt-2">
-            <Star className="w-4 h-4 text-[#FFD54F] mr-2" />
-            <span className="text-lg text-gray-300 font-medium">Total Prize Pool</span>
-            <Star className="w-4 h-4 text-[#FFD54F] ml-2" />
+          <div className="flex items-center justify-center mt-4 space-x-3">
+            <div className="w-px h-6 bg-gradient-to-b from-transparent via-[#FFD54F]/50 to-transparent"></div>
+            <Star className="w-5 h-5 text-[#FFD54F] animate-pulse" />
+            <span className="text-xl text-gray-200 font-semibold tracking-wide">Total Prize Pool</span>
+            <Star className="w-5 h-5 text-[#FFD54F] animate-pulse" />
+            <div className="w-px h-6 bg-gradient-to-b from-transparent via-[#FFD54F]/50 to-transparent"></div>
           </div>
         </div>
-        <div className="text-sm text-gray-400">
-          <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400">
+        <div className="flex items-center justify-center space-x-2">
+          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <span className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500/20 to-green-400/10 border border-green-500/30 text-green-400 text-sm font-medium backdrop-blur-sm">
             +$89 in the last hour
           </span>
+          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         </div>
       </div>
       
-      {/* Modern game selection */}
-      <div className="mb-10">
-        <h3 className="text-xl font-bold text-white mb-6">Choose Your Game</h3>
-        <div className="flex justify-center space-x-4">
+      {/* Ultra-modern game selection with enhanced interactions */}
+      <div className="mb-12">
+        <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-8">Choose Your Stakes</h3>
+        <div className="flex justify-center space-x-6">
           {gameAmounts.map((amount) => (
             <button
               key={amount.value}
               onClick={() => setSelectedAmount(amount.value)}
-              className={`p-6 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 ${
+              className={`group relative p-8 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-105 ${
                 selectedAmount === amount.value
-                  ? 'bg-gradient-to-br from-[#FFD54F] to-[#FFA726] text-black shadow-2xl shadow-[#FFD54F]/30 scale-110'
-                  : 'bg-gradient-to-br from-black/60 to-black/40 text-white border border-white/20 hover:border-[#14F195]/50 backdrop-blur-sm'
+                  ? 'scale-110 shadow-2xl shadow-[#FFD54F]/40'
+                  : 'hover:shadow-xl hover:shadow-white/10'
               }`}
             >
-              <div className="text-2xl mb-1">{amount.label}</div>
-              <div className="text-xs opacity-70">{amount.subtitle}</div>
+              {/* Background with conditional styling */}
+              <div className={`absolute inset-0 rounded-2xl transition-all duration-500 ${
+                selectedAmount === amount.value
+                  ? 'bg-gradient-to-br from-[#FFD54F] to-[#FFA726] opacity-100'
+                  : 'bg-gradient-to-br from-black/60 via-black/40 to-black/30 border border-white/20 group-hover:border-[#14F195]/50 backdrop-blur-xl'
+              }`}></div>
+              
+              {/* Glow effect for selected */}
+              {selectedAmount === amount.value && (
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-2xl blur opacity-60"></div>
+              )}
+              
+              {/* Content */}
+              <div className="relative z-10">
+                <div className={`text-3xl mb-2 transition-colors duration-300 ${
+                  selectedAmount === amount.value ? 'text-black' : 'text-white'
+                }`}>
+                  {amount.label}
+                </div>
+                <div className={`text-xs opacity-80 transition-colors duration-300 ${
+                  selectedAmount === amount.value ? 'text-black/80' : 'text-gray-400'
+                }`}>
+                  {amount.subtitle}
+                </div>
+              </div>
+              
+              {/* Hover effect overlay */}
+              <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </button>
           ))}
         </div>
       </div>
       
-      {/* Modern play button */}
-      <div className="mb-8">
-        <Button
-          onClick={() => onGameStart(selectedAmount)}
-          size="lg"
-          className="w-80 h-16 text-xl font-bold bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black rounded-2xl shadow-2xl shadow-[#14F195]/30 transform hover:scale-105 transition-all duration-300"
-        >
-          <Play className="w-6 h-6 mr-3" />
-          START GAME - ${selectedAmount}
-        </Button>
-        <p className="text-xs text-gray-400 mt-3">
-          <Shield className="w-3 h-3 inline mr-1" />
-          100% skill-based • Instant payouts • Provably fair
-        </p>
+      {/* Ultra-modern play button with enhanced effects */}
+      <div className="mb-10">
+        <div className="relative group">
+          <div className="absolute -inset-2 bg-gradient-to-r from-[#14F195] via-[#0EA876] to-[#14F195] rounded-2xl blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
+          <Button
+            onClick={() => onGameStart(selectedAmount)}
+            size="lg"
+            className="relative w-96 h-18 text-2xl font-bold bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black rounded-2xl shadow-2xl shadow-[#14F195]/40 transform hover:scale-105 transition-all duration-300 group overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <Play className="w-7 h-7 mr-4 relative z-10" />
+            <span className="relative z-10">START GAME - ${selectedAmount}</span>
+          </Button>
+        </div>
+        <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-300">
+          <div className="flex items-center">
+            <Shield className="w-4 h-4 text-[#14F195] mr-2" />
+            <span>100% skill-based</span>
+          </div>
+          <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
+          <span>Instant payouts</span>
+          <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
+          <span>Provably fair</span>
+        </div>
       </div>
       
-      {/* Modern server status */}
+      {/* Ultra-modern server status with enhanced design */}
       <div className="text-center">
-        <div className="inline-flex items-center space-x-3 px-4 py-2 rounded-xl bg-gradient-to-r from-green-500/20 to-green-400/10 border border-green-500/30">
-          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-sm font-medium text-green-400">All Systems Operational</span>
+        <div className="relative group inline-flex">
+          <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-green-400 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
+          <div className="relative inline-flex items-center space-x-3 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500/15 via-green-400/10 to-green-500/5 border border-green-500/30 backdrop-blur-sm">
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50" />
+            <span className="text-sm font-semibold text-green-400">All Systems Operational</span>
+            <div className="flex space-x-1">
+              <div className="w-1 h-4 bg-green-400 rounded animate-pulse"></div>
+              <div className="w-1 h-3 bg-green-400 rounded animate-pulse" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-1 h-5 bg-green-400 rounded animate-pulse" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-1 h-2 bg-green-400 rounded animate-pulse" style={{animationDelay: '0.3s'}}></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
