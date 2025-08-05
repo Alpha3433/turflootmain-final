@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-// Modern wallet connection component
+// Ultra-modern wallet connection component with enhanced effects
 function WalletConnect({ onWalletConnect, walletAddress }) {
   const [isConnecting, setIsConnecting] = useState(false)
   
@@ -40,36 +40,48 @@ function WalletConnect({ onWalletConnect, walletAddress }) {
   if (walletAddress) {
     return (
       <div className="flex items-center space-x-3">
-        <div className="px-4 py-2 bg-gradient-to-r from-[#14F195]/20 to-[#14F195]/10 backdrop-blur-sm border border-[#14F195]/30 rounded-xl text-[#14F195] text-sm font-mono">
-          {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+        <div className="group relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] to-[#0EA876] rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
+          <div className="relative px-6 py-3 bg-gradient-to-r from-[#14F195]/15 via-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/30 rounded-xl text-[#14F195] text-sm font-mono shadow-lg">
+            {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+          </div>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleDisconnect}
-          className="hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
-        >
-          <LogOut className="w-4 h-4" />
-        </Button>
+        <div className="group relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-red-500 to-red-600 rounded-lg blur opacity-0 group-hover:opacity-40 transition duration-300"></div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleDisconnect}
+            className="relative hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 border border-transparent hover:border-red-500/30 rounded-lg backdrop-blur-sm"
+          >
+            <LogOut className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     )
   }
   
   return (
-    <Button 
-      onClick={handleConnect} 
-      disabled={isConnecting} 
-      className="bg-gradient-to-r from-[#FFD54F] to-[#FFA726] hover:from-[#FFD54F]/90 hover:to-[#FFA726]/90 text-black font-bold px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-    >
-      {isConnecting ? (
-        <>
-          <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin mr-2" />
-          Connecting...
-        </>
-      ) : (
-        'Connect Wallet'
-      )}
-    </Button>
+    <div className="relative group">
+      <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-xl blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
+      <Button 
+        onClick={handleConnect} 
+        disabled={isConnecting} 
+        className="relative bg-gradient-to-r from-[#FFD54F] to-[#FFA726] hover:from-[#FFD54F]/90 hover:to-[#FFA726]/90 text-black font-bold px-8 py-3 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+      >
+        {isConnecting ? (
+          <>
+            <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin mr-3" />
+            <span className="relative z-10">Connecting...</span>
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <span className="relative z-10">Connect Wallet</span>
+          </>
+        )}
+      </Button>
+    </div>
   )
 }
 
