@@ -221,70 +221,47 @@ export default function HomePage() {
         <section className="py-12 md:py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6"
-              >
+              <AnimatedH1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
                 <span className="turfloot-gradient bg-clip-text text-transparent">
                   TurfLoot
                 </span>
-              </motion.h1>
+              </AnimatedH1>
               
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto"
-              >
+              <AnimatedP className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
                 Skill-based, Paper-io-style land-grab game that pays out in SOL on the Solana blockchain.
-              </motion.p>
+              </AnimatedP>
               
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-              >
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button asChild size="lg" className="turfloot-glow bg-primary hover:bg-primary/90 text-primary-foreground">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <div className="transform transition-all duration-200 hover:scale-105 active:scale-95 turfloot-glow">
+                  <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                     <Link href="/play">
                       <Play className="w-5 h-5 mr-2" />
                       Play for $1
                     </Link>
                   </Button>
-                </motion.div>
+                </div>
                 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <div className="transform transition-all duration-200 hover:scale-105 active:scale-95">
                   <Button variant="outline" size="lg" className="border-border hover:bg-muted">
                     <Trophy className="w-5 h-5 mr-2" />
                     Watch Demo
                   </Button>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </div>
             
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-            >
+            <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
               <HeroAnimation />
-            </motion.div>
+            </div>
           </div>
         </section>
 
         {/* How Skill Wins Section */}
         <section className="py-16 bg-muted/5">
           <div className="container mx-auto px-4">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold text-center mb-12"
-            >
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-fade-in">
               How Skill Wins
-            </motion.h2>
+            </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               {[
@@ -307,29 +284,22 @@ export default function HomePage() {
                   icon: DollarSign
                 }
               ].map((item, index) => (
-                <motion.div
+                <div
                   key={item.step}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  className="animate-slide-up transform transition-all duration-300 hover:-translate-y-2"
+                  style={{ animationDelay: `${index * 0.2}s` }}
                 >
                   <Card className="bg-card/50 border-border h-full hover:border-primary/50 transition-colors">
                     <CardContent className="p-6 text-center">
-                      <motion.div 
-                        className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4"
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.5 }}
-                      >
+                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 transform transition-transform duration-300 hover:rotate-12">
                         <item.icon className="w-6 h-6 text-primary" />
-                      </motion.div>
+                      </div>
                       <div className="text-primary font-bold text-sm mb-2">STEP {item.step}</div>
                       <h3 className="text-xl font-bold mb-3">{item.title}</h3>
                       <p className="text-muted-foreground">{item.description}</p>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -338,14 +308,9 @@ export default function HomePage() {
         {/* Live Pot Ticker */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold text-center mb-12"
-            >
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 animate-fade-in">
               Live Game Pots
-            </motion.h2>
+            </h2>
             
             <LivePotTicker />
           </div>
