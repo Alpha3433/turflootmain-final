@@ -773,7 +773,10 @@ class TurfLootAPITester:
             ("Update Game Not Found", self.test_update_game_not_found),
             ("Withdraw", self.test_withdraw),
             ("Withdraw Validation", self.test_withdraw_validation),
-            ("Onramp Webhook", self.test_onramp_webhook)
+            ("Privy Webhook - Created", self.test_privy_webhook_created),
+            ("Privy Webhook - Completed", self.test_privy_webhook_completed),
+            ("Privy Webhook - Failed", self.test_privy_webhook_failed),
+            ("Privy Webhook - Signature", self.test_privy_webhook_signature_validation)
         ]
         
         # Run each test
