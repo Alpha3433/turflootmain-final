@@ -424,37 +424,44 @@ export default function HomePage() {
         </div>
       </header>
       
-      {/* Modern main content grid */}
-      <div className="relative z-10 grid grid-cols-12 gap-8 p-6 h-[calc(100vh-120px)]">
-        {/* Left sidebar */}
+      {/* Ultra-modern main content grid with enhanced glassmorphism */}
+      <div className="relative z-10 grid grid-cols-12 gap-6 p-6 h-[calc(100vh-140px)]">
+        {/* Enhanced left sidebar */}
         <div className="col-span-3 space-y-6">
           <Leaderboard />
           
-          {/* Modern friends section */}
-          <Card className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+          {/* Ultra-modern community section with enhanced glass effect */}
+          <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#14F195]/10 transition-all duration-500 group">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-3">
-                    <Users className="w-5 h-5 text-white" />
+                  <div className="relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
+                    <div className="relative w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-3">
+                      <Users className="w-5 h-5 text-white" />
+                    </div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">Community</h3>
-                    <p className="text-xs text-gray-400">0 online friends</p>
+                    <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Community</h3>
+                    <p className="text-xs text-gray-400">1.2k online players</p>
                   </div>
                 </div>
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" />
               </div>
               <div className="text-center py-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-600/30 to-gray-700/30 mx-auto mb-4 flex items-center justify-center">
-                  <Users className="w-8 h-8 text-gray-500" />
+                <div className="relative w-16 h-16 mx-auto mb-4">
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-600/20 to-gray-700/20 rounded-2xl backdrop-blur-sm"></div>
+                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-gray-600/30 to-gray-700/30 flex items-center justify-center border border-white/10">
+                    <Users className="w-8 h-8 text-gray-400" />
+                  </div>
                 </div>
-                <div className="text-sm text-gray-400 mb-4">Connect with other players</div>
+                <div className="text-sm text-gray-300 mb-4 font-medium">Join the action</div>
                 <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/10 rounded-xl"
+                  className="bg-gradient-to-r from-[#14F195]/20 to-[#14F195]/10 border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/30 hover:to-[#14F195]/20 rounded-xl backdrop-blur-sm font-medium transition-all duration-300"
+                  variant="outline"
+                  size="sm"
                 >
-                  Find Players
+                  Connect Discord
                 </Button>
               </div>
             </CardContent>
