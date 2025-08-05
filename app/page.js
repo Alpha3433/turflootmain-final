@@ -148,7 +148,7 @@ function Leaderboard() {
   )
 }
 
-// Modern wallet info component
+// Ultra-modern wallet info component with enhanced glassmorphism
 function WalletInfo({ walletAddress, balance, onRefresh }) {
   const copyAddress = () => {
     if (walletAddress) {
@@ -157,55 +157,67 @@ function WalletInfo({ walletAddress, balance, onRefresh }) {
   }
   
   return (
-    <Card className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-xl border border-white/10 shadow-2xl">
+    <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#14F195]/10 transition-all duration-500 group">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#14F195] to-[#0EA876] flex items-center justify-center mr-3">
-              <Wallet className="w-5 h-5 text-black" />
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] to-[#0EA876] rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-r from-[#14F195] to-[#0EA876] flex items-center justify-center mr-3">
+                <Wallet className="w-5 h-5 text-black" />
+              </div>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Wallet</h3>
-              <p className="text-xs text-gray-400">Your balance</p>
+              <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Wallet</h3>
+              <p className="text-xs text-gray-400">Solana balance</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <button 
               onClick={copyAddress} 
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200"
+              className="group/btn relative p-2 rounded-lg bg-white/[0.02] hover:bg-white/10 border border-white/[0.05] hover:border-[#14F195]/30 transition-all duration-300"
             >
-              <Copy className="w-4 h-4 text-gray-400 hover:text-[#14F195]" />
+              <Copy className="w-4 h-4 text-gray-400 group-hover/btn:text-[#14F195] transition-colors duration-300" />
+              <div className="absolute inset-0 bg-[#14F195]/10 rounded-lg opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
             </button>
             <button 
               onClick={onRefresh}
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200"
+              className="group/btn relative p-2 rounded-lg bg-white/[0.02] hover:bg-white/10 border border-white/[0.05] hover:border-[#14F195]/30 transition-all duration-300"
             >
-              <RefreshCw className="w-4 h-4 text-gray-400 hover:text-[#14F195]" />
+              <RefreshCw className="w-4 h-4 text-gray-400 group-hover/btn:text-[#14F195] group-hover/btn:rotate-180 transition-all duration-500" />
+              <div className="absolute inset-0 bg-[#14F195]/10 rounded-lg opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
             </button>
           </div>
         </div>
         
-        <div className="text-center mb-6">
-          <div className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-2">
-            ${balance.toFixed(2)}
+        <div className="text-center mb-8">
+          <div className="relative inline-block">
+            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 blur-xl rounded-lg"></div>
+            <div className="relative text-5xl font-black bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent drop-shadow-2xl">
+              ${balance.toFixed(2)}
+            </div>
           </div>
-          <div className="text-sm text-gray-400 mb-1">
-            {(balance / 210).toFixed(4)} SOL
-          </div>
-          <div className="text-xs text-gray-500">
-            ≈ ${(balance * 1.02).toFixed(2)} USD
+          <div className="mt-3 space-y-1">
+            <div className="text-sm text-gray-300 font-medium">
+              {(balance / 210).toFixed(4)} SOL
+            </div>
+            <div className="text-xs text-gray-500">
+              ≈ ${(balance * 1.02).toFixed(2)} USD
+            </div>
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-3">
-          <Button className="bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black font-medium rounded-xl shadow-lg">
-            Add Funds
+        <div className="grid grid-cols-2 gap-4">
+          <Button className="group relative overflow-hidden bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black font-semibold rounded-xl shadow-lg shadow-[#14F195]/20 hover:shadow-[#14F195]/30 transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <span className="relative z-10">Add Funds</span>
           </Button>
           <Button 
+            className="group relative overflow-hidden bg-gradient-to-r from-[#14F195]/10 via-[#14F195]/5 to-transparent border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/20 hover:to-[#14F195]/10 rounded-xl backdrop-blur-sm font-semibold transition-all duration-300"
             variant="outline" 
-            className="border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/10 rounded-xl"
           >
-            Cash Out
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <span className="relative z-10">Cash Out</span>
           </Button>
         </div>
       </CardContent>
