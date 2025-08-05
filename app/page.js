@@ -191,31 +191,17 @@ export default function HomePage() {
         <section className="py-12 md:py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6"
-              >
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
                 <span className="turfloot-gradient bg-clip-text text-transparent">
                   TurfLoot
                 </span>
-              </motion.h1>
+              </h1>
               
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto"
-              >
+              <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
                 Skill-based, Paper-io-style land-grab game that pays out in SOL on the Solana blockchain.
-              </motion.p>
+              </p>
               
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
-              >
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
                 <Button asChild size="lg" className="turfloot-glow bg-primary hover:bg-primary/90 text-primary-foreground">
                   <Link href="/play">
                     <Play className="w-5 h-5 mr-2" />
