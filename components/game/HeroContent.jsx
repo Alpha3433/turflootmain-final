@@ -117,14 +117,6 @@ const HeroContent = ({
           <span>Real-Time Multiplayer</span>
         </div>
       </div>
-
-      {/* Scroll hint */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full relative">
-          <div className="w-1 h-3 bg-white/50 rounded-full absolute top-2 left-1/2 transform -translate-x-1/2 animate-pulse"></div>
-        </div>
-        <p className="text-xs text-gray-400 mt-2">Scroll for more</p>
-      </div>
     </div>
   )
 }
