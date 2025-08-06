@@ -5,69 +5,24 @@ import { useRef, useEffect, useState } from 'react'
 const InteractiveGridCanvas = () => {
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
-  const [trails, setTrails] = useState([])
-  const [isVisible, setIsVisible] = useState(true)
+  const [gridCells, setGridCells] = useState(new Map())
   
-  // Debug: Add visible indicator
-  useEffect(() => {
-    console.log('🎮 InteractiveGridCanvas mounted!')
-    setIsVisible(true)
-  }, [])
+  const GRID_SIZE = 40
+  const CELL_LIFETIME = 4000 // 4 seconds as requested
+  const TRAIL_WIDTH = 2
   
   // Setup canvas
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) {
-      console.log('❌ Canvas ref is null')
-      return
-    }
-    
-    console.log('🎨 Setting up canvas...')
+    if (!canvas) return
     
     const setupCanvas = () => {
       const rect = canvas.getBoundingClientRect()
-      console.log('📐 Canvas dimensions:', rect.width, 'x', rect.height)
-      
       canvas.width = rect.width
       canvas.height = rect.height
       
-      // Test draw immediately
-      const ctx = canvas.getContext('2d')
-      
-      // Clear and draw test pattern
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
-      // Draw visible test elements
-      ctx.fillStyle = '#14F195'
-      ctx.fillRect(50, 50, 100, 100)
-      
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-      ctx.fillRect(200, 50, 100, 100)
-      
-      // Draw grid
-      const gridSize = 30
-      const cellWidth = canvas.width / gridSize
-      const cellHeight = canvas.height / gridSize
-      
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
-      ctx.lineWidth = 1
-      
-      for (let i = 0; i <= gridSize; i++) {
-        const x = i * cellWidth
-        const y = i * cellHeight
-        
-        ctx.beginPath()
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, canvas.height)
-        ctx.stroke()
-        
-        ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(canvas.width, y)
-        ctx.stroke()
-      }
-      
-      console.log('✅ Test pattern drawn')
+      // Initial draw
+      drawGrid()
     }
     
     setupCanvas()
@@ -78,7 +33,102 @@ const InteractiveGridCanvas = () => {
     }
   }, [])
   
-  // Handle mouse movement
+  // Animation loop for fading effects
+  useEffect(() => {
+    const animate = () => {
+      cleanupExpiredCells()
+      drawGrid()
+      animationRef.current = requestAnimationFrame(animate)
+    }
+    
+    animationRef.current = requestAnimationFrame(animate)
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [])
+  
+  // Remove expired cells
+  const cleanupExpiredCells = () => {
+    const now = Date.now()
+    const newGridCells = new Map()
+    
+    gridCells.forEach((cell, key) => {
+      if (now - cell.timestamp < CELL_LIFETIME) {
+        newGridCells.set(key, cell)
+      }
+    })
+    
+    if (newGridCells.size !== gridCells.size) {
+      setGridCells(newGridCells)
+    }
+  }
+  
+  // Draw the grid and active cells
+  const drawGrid = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    
+    const ctx = canvas.getContext('2d')
+    const cellWidth = canvas.width / GRID_SIZE
+    const cellHeight = canvas.height / GRID_SIZE
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    
+    // Draw subtle background grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)'
+    ctx.lineWidth = 0.5
+    
+    for (let i = 0; i <= GRID_SIZE; i++) {
+      const x = i * cellWidth
+      const y = i * cellHeight
+      
+      // Vertical lines
+      ctx.beginPath()
+      ctx.moveTo(x, 0)
+      ctx.lineTo(x, canvas.height)
+      ctx.stroke()
+      
+      // Horizontal lines
+      ctx.beginPath()
+      ctx.moveTo(0, y)
+      ctx.lineTo(canvas.width, y)
+      ctx.stroke()
+    }
+    
+    // Draw active trail cells with fading effect
+    const currentTime = Date.now()
+    
+    gridCells.forEach((cell) => {
+      const age = currentTime - cell.timestamp
+      const ageRatio = age / CELL_LIFETIME
+      
+      if (ageRatio < 1) {
+        // Calculate fade out alpha (start fading after 70% of lifetime)
+        let alpha = cell.intensity
+        if (ageRatio > 0.7) {
+          alpha *= (1 - (ageRatio - 0.7) / 0.3)
+        }
+        
+        const cellX = cell.x * cellWidth
+        const cellY = cell.y * cellHeight
+        
+        // Fill with Solana green (#14F195) as requested
+        ctx.fillStyle = `rgba(20, 241, 149, ${alpha * 0.6})`
+        ctx.fillRect(cellX, cellY, cellWidth, cellHeight)
+        
+        // Stroke with white outline as requested
+        ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.25})`
+        ctx.lineWidth = 1
+        ctx.strokeRect(cellX, cellY, cellWidth, cellHeight)
+      }
+    })
+  }
+  
+  // Handle mouse movement - create Paper-io style trail
   const handleMouseMove = (e) => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -87,66 +137,67 @@ const InteractiveGridCanvas = () => {
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     
-    console.log('🖱️  Mouse move:', x, y)
-    
-    // Add trail
-    const newTrail = {
-      x,
-      y,
-      timestamp: Date.now(),
-      id: Math.random()
-    }
-    
-    setTrails(prev => [...prev.slice(-50), newTrail])
-    
-    // Draw immediately
-    const ctx = canvas.getContext('2d')
-    
-    // Draw trail point
-    ctx.fillStyle = 'rgba(20, 241, 149, 0.8)'
-    ctx.beginPath()
-    ctx.arc(x, y, 8, 0, 2 * Math.PI)
-    ctx.fill()
-    
-    // Draw grid cell
-    const gridSize = 30
-    const cellWidth = canvas.width / gridSize
-    const cellHeight = canvas.height / gridSize
+    // Convert to grid coordinates
+    const cellWidth = canvas.width / GRID_SIZE
+    const cellHeight = canvas.height / GRID_SIZE
     const gridX = Math.floor(x / cellWidth)
     const gridY = Math.floor(y / cellHeight)
     
-    ctx.fillStyle = 'rgba(20, 241, 149, 0.3)'
-    ctx.fillRect(gridX * cellWidth, gridY * cellHeight, cellWidth, cellHeight)
-    
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'
-    ctx.strokeRect(gridX * cellWidth, gridY * cellHeight, cellWidth, cellHeight)
+    if (gridX >= 0 && gridX < GRID_SIZE && gridY >= 0 && gridY < GRID_SIZE) {
+      const timestamp = Date.now()
+      const newCells = new Map(gridCells)
+      
+      // Create trail area around mouse position (Paper-io style)
+      for (let dx = -TRAIL_WIDTH; dx <= TRAIL_WIDTH; dx++) {
+        for (let dy = -TRAIL_WIDTH; dy <= TRAIL_WIDTH; dy++) {
+          const tx = gridX + dx
+          const ty = gridY + dy
+          
+          if (tx >= 0 && tx < GRID_SIZE && ty >= 0 && ty < GRID_SIZE) {
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            if (distance <= TRAIL_WIDTH) {
+              const key = `${tx},${ty}`
+              newCells.set(key, {
+                x: tx,
+                y: ty,
+                timestamp,
+                intensity: Math.max(0.3, 1 - distance / TRAIL_WIDTH)
+              })
+            }
+          }
+        }
+      }
+      
+      setGridCells(newCells)
+    }
+  }
+  
+  // Handle touch movement for mobile
+  const handleTouchMove = (e) => {
+    e.preventDefault()
+    const touch = e.touches[0]
+    if (touch) {
+      handleMouseMove(touch)
+    }
   }
   
   return (
-    <>
-      {/* Debug indicator */}
-      {isVisible && (
-        <div 
-          className="absolute top-4 left-4 bg-green-500 text-black px-2 py-1 text-xs font-bold rounded z-50"
-        >
-          CANVAS ACTIVE
-        </div>
-      )}
-      
-      {/* Canvas */}
-      <div className="absolute inset-0 w-full h-full" style={{ zIndex: 15 }}>
-        <canvas
-          ref={canvasRef}
-          className="w-full h-full cursor-crosshair"
-          onMouseMove={handleMouseMove}
-          style={{
-            display: 'block',
-            background: 'rgba(0, 255, 0, 0.05)' // Slight green tint to see canvas bounds
-          }}
-        />
-      </div>
-    </>
+    <div className="absolute inset-0 w-full h-full" style={{ zIndex: 15 }}>
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full cursor-crosshair"
+        onMouseMove={handleMouseMove}
+        onTouchMove={handleTouchMove}
+        style={{
+          display: 'block',
+          background: 'transparent'
+        }}
+      />
+    </div>
   )
+}
+
+export default InteractiveGridCanvas
 }
 
 export default InteractiveGridCanvas
