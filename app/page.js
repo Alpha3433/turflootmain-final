@@ -6,275 +6,351 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { 
   Play, 
-  Zap, 
   Trophy, 
   Users, 
-  Copy,
-  RefreshCw,
   Settings,
   LogOut,
   TrendingUp,
   Star,
   Shield,
   Wallet,
-  CheckCircle
+  CheckCircle,
+  Plus,
+  Gamepad2,
+  Copy,
+  RefreshCw,
+  Crown,
+  Zap,
+  DollarSign,
+  UserPlus
 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Home() {
-  const [livePot, setLivePot] = useState(0)
+  const [livePot, setLivePot] = useState(156.78)
+  const [globalWinnings, setGlobalWinnings] = useState(76628)
+  const [playersInGame, setPlayersInGame] = useState(33)
   const [isConnected, setIsConnected] = useState(false)
   const [balance, setBalance] = useState(0)
+  const [selectedStake, setSelectedStake] = useState(5)
+  const [username, setUsername] = useState('')
+
+  const leaderboardData = [
+    { rank: 1, name: 'TL', winnings: 1589.14 },
+    { rank: 2, name: 'RageStreet', winnings: 1245.25 },
+    { rank: 3, name: 'Xzibit', winnings: 1101.88 }
+  ]
 
   useEffect(() => {
-    // Simulate live pot updates
+    // Simulate live data updates
     const interval = setInterval(() => {
-      setLivePot(prev => prev + Math.random() * 0.1)
-    }, 1000)
+      setLivePot(prev => prev + Math.random() * 0.5)
+      setGlobalWinnings(prev => prev + Math.floor(Math.random() * 10))
+      setPlayersInGame(prev => Math.max(20, prev + Math.floor(Math.random() * 3 - 1)))
+    }, 2000)
     return () => clearInterval(interval)
   }, [])
 
   const handleWalletConnect = () => {
-    // TODO: Implement wallet connection when providers are restored
     setIsConnected(!isConnected)
-    setBalance(5.25) // Mock balance
+    setBalance(isConnected ? 0 : 25.50)
+    setUsername(isConnected ? '' : 'bruh!')
   }
 
+  const stakeAmounts = [1, 5, 20, 50]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1E1E1E] via-[#2A2A2A] to-[#1E1E1E] text-white overflow-hidden">
-      {/* Animated background grid */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute inset-0 bg-grid-pattern animate-pulse"></div>
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Animated grid background */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="grid grid-cols-12 h-full">
+          {Array.from({ length: 144 }).map((_, i) => (
+            <div key={i} className="border border-yellow-500/20 animate-pulse" style={{ animationDelay: `${i * 0.1}s` }}></div>
+          ))}
+        </div>
       </div>
-      
-      {/* Main container */}
-      <div className="relative z-10 container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-12">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-gradient-to-r from-[#14F195] to-[#9945FF] rounded-lg flex items-center justify-center">
-              <span className="text-lg font-bold text-black">T</span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-dm-sans">TurfLoot</h1>
-              <p className="text-sm text-gray-400">Skill-based territory battles</p>
+
+      {/* Top header */}
+      <header className="relative z-10 flex items-center justify-between p-6 bg-black/80 backdrop-blur-sm border-b border-yellow-500/20">
+        <div className="flex items-center space-x-4">
+          <div className="text-orange-400 text-lg">🔥</div>
+          <span className="text-lg font-medium">
+            Welcome, {isConnected ? username : 'player'}!
+          </span>
+        </div>
+        <Button 
+          className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6"
+          onClick={() => setUsername('Enter username')}
+        >
+          {isConnected ? 'Profile' : 'Login'}
+        </Button>
+      </header>
+
+      <div className="relative z-10 flex h-[calc(100vh-80px)]">
+        {/* Left sidebar */}
+        <div className="w-80 bg-black/60 backdrop-blur-sm border-r border-yellow-500/20 p-6 space-y-6">
+          {/* Leaderboard */}
+          <Card className="bg-gray-900/80 border-yellow-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Trophy className="w-4 h-4 text-yellow-500" />
+                  <span className="font-bold">Leaderboard</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-500">LIVE</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {leaderboardData.map((player) => (
+                  <div key={player.rank} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-yellow-500 font-bold w-4">{player.rank}.</span>
+                      <span className="text-sm">{player.name}</span>
+                    </div>
+                    <span className="text-yellow-500 font-bold">${player.winnings.toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full mt-4 border-gray-700 text-gray-300 hover:bg-gray-800"
+                size="sm"
+              >
+                View Full Leaderboard
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Friends */}
+          <Card className="bg-gray-900/80 border-yellow-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-blue-400" />
+                  <span className="font-bold">Friends</span>
+                  <Badge variant="secondary" className="bg-blue-900/50 text-blue-400">
+                    Online
+                  </Badge>
+                </div>
+                <span className="text-sm text-gray-400">0 playing</span>
+              </div>
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <UserPlus className="w-5 h-5 text-gray-500" />
+                </div>
+                <p className="text-sm text-gray-500 mb-3">No friends... add some!</p>
+              </div>
+              <Button 
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white"
+                size="sm"
+              >
+                Add Friends
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Center content */}
+        <div className="flex-1 flex flex-col items-center justify-center p-8 space-y-8">
+          {/* Main branding */}
+          <div className="text-center space-y-4">
+            <div className="relative">
+              <h1 className="text-6xl font-black tracking-wider">
+                <span className="text-white">TURF</span>
+                <span className="text-yellow-500 drop-shadow-lg">LOOT</span>
+              </h1>
+              <p className="text-xl font-bold text-yellow-500 tracking-wide mt-2">
+                SKILL-BASED TERRITORY BATTLES
+              </p>
             </div>
           </div>
 
-          {/* Wallet Connection */}
-          <div className="flex items-center space-x-4">
-            {isConnected ? (
-              <div className="flex items-center space-x-3">
-                <Card className="glass-card border-[#14F195]/20">
-                  <CardContent className="px-4 py-2">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-[#14F195] rounded-full animate-pulse"></div>
-                      <span className="text-sm">{balance.toFixed(2)} SOL</span>
-                    </div>
-                  </CardContent>
-                </Card>
+          {/* Stake selection */}
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-semibold mr-4">Select Stake:</span>
+            {stakeAmounts.map((amount) => (
+              <Button
+                key={amount}
+                variant={selectedStake === amount ? "default" : "outline"}
+                className={`w-16 h-12 font-bold text-lg ${
+                  selectedStake === amount 
+                    ? "bg-yellow-500 hover:bg-yellow-400 text-black" 
+                    : "border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/20"
+                }`}
+                onClick={() => setSelectedStake(amount)}
+              >
+                ${amount}
+              </Button>
+            ))}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-yellow-500 hover:bg-yellow-500/20 ml-4"
+            >
+              ?
+            </Button>
+          </div>
+
+          {/* Main join button */}
+          <Button 
+            className="w-80 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-black text-xl tracking-wide shadow-lg transform hover:scale-105 transition-all duration-200"
+            disabled={!isConnected}
+          >
+            <Play className="w-6 h-6 mr-3" />
+            {isConnected ? `JOIN GAME` : 'CONNECT WALLET FIRST'}
+          </Button>
+
+          {/* Quick actions */}
+          <div className="flex space-x-4">
+            <Button 
+              variant="outline"
+              className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              size="lg"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              UI
+            </Button>
+            <Button 
+              variant="outline"
+              className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              size="lg"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Browse Lobbies
+            </Button>
+          </div>
+
+          {/* Stats */}
+          <div className="flex items-center space-x-12 text-center">
+            <div>
+              <div className="text-3xl font-bold text-yellow-500">{playersInGame}</div>
+              <div className="text-sm text-gray-400">Players in Game</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-yellow-500">${globalWinnings.toLocaleString()}</div>
+              <div className="text-sm text-gray-400">Global Player Winnings</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right sidebar */}
+        <div className="w-80 bg-black/60 backdrop-blur-sm border-l border-yellow-500/20 p-6 space-y-6">
+          {/* Wallet section */}
+          <Card className="bg-gray-900/80 border-yellow-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Wallet className="w-4 h-4 text-green-400" />
+                  <span className="font-bold">Wallet</span>
+                </div>
+                <div className="flex space-x-2">
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <Copy className="w-3 h-3" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="p-1">
+                    <RefreshCw className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="text-center mb-6">
+                <div className="text-4xl font-bold text-yellow-500">${balance.toFixed(2)}</div>
+                <div className="text-sm text-gray-400">{(balance / 200).toFixed(4)} SOL</div>
+              </div>
+
+              {isConnected ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <Button className="bg-green-600 hover:bg-green-500 text-white">
+                    Add Funds
+                  </Button>
+                  <Button variant="outline" className="border-blue-500 text-blue-400 hover:bg-blue-500/20">
+                    Cash Out
+                  </Button>
+                </div>
+              ) : (
                 <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/10"
+                  className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 text-white font-bold"
                   onClick={handleWalletConnect}
                 >
                   <Wallet className="w-4 h-4 mr-2" />
-                  Connected
+                  Connect Wallet
                 </Button>
-              </div>
-            ) : (
-              <Button 
-                className="btn-shimmer bg-gradient-to-r from-[#14F195] to-[#9945FF] text-black font-semibold"
-                onClick={handleWalletConnect}
-              >
-                <Wallet className="w-4 h-4 mr-2" />
-                Connect Wallet
-              </Button>
-            )}
-          </div>
-        </header>
+              )}
+            </CardContent>
+          </Card>
 
-        {/* Main game lobby */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-8">
-          {/* Left column - Game info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Live pot ticker */}
-            <Card className="glass-card border-[#14F195]/20 overflow-hidden">
-              <CardContent className="p-0">
-                <div className="bg-gradient-to-r from-[#14F195]/10 to-[#9945FF]/10 px-6 py-4 border-b border-[#14F195]/20">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-3 h-3 bg-[#14F195] rounded-full animate-pulse"></div>
-                      <span className="font-semibold">LIVE POT</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <TrendingUp className="w-4 h-4 text-[#14F195]" />
-                      <span className="text-2xl font-bold text-[#14F195]">
-                        {livePot.toFixed(2)} SOL
-                      </span>
-                    </div>
+          {/* User profile/login */}
+          {isConnected && (
+            <Card className="bg-gray-900/80 border-yellow-500/30">
+              <CardContent className="p-4">
+                <div className="text-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <span className="font-bold text-black">B</span>
                   </div>
+                  <h3 className="font-bold">{username}</h3>
+                  <p className="text-sm text-gray-400">Connected</p>
                 </div>
-                <div className="px-6 py-4">
-                  <p className="text-sm text-gray-400">
-                    Real-time prize pool from all active games. Winner takes all based on territory control.
-                  </p>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Games Won:</span>
+                    <span className="font-semibold">0</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Win Rate:</span>
+                    <span className="font-semibold">0%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Total Winnings:</span>
+                    <span className="font-semibold text-yellow-500">$0.00</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
+          )}
 
-            {/* Game modes */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card className="glass-card border-[#14F195]/20 hover:border-[#14F195]/40 transition-all cursor-pointer group">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="bg-[#14F195]/20 text-[#14F195]">
-                      <Zap className="w-3 h-3 mr-1" />
-                      Quick Match
-                    </Badge>
-                    <span className="text-sm text-gray-400">2-4 players</span>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Instant Battle</h3>
-                  <p className="text-sm text-gray-400 mb-4">
-                    Jump into a game immediately. Stakes: 0.1-1 SOL
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#14F195]">Avg. duration: 3-5min</span>
-                    <Play className="w-4 h-4 text-[#14F195] group-hover:scale-110 transition-transform" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card border-[#9945FF]/20 hover:border-[#9945FF]/40 transition-all cursor-pointer group">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="bg-[#9945FF]/20 text-[#9945FF]">
-                      <Trophy className="w-3 h-3 mr-1" />
-                      Tournament
-                    </Badge>
-                    <span className="text-sm text-gray-400">8-16 players</span>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Championship</h3>
-                  <p className="text-sm text-gray-400 mb-4">
-                    Elimination rounds. Stakes: 1-5 SOL entry
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#9945FF]">Next starts: 2min</span>
-                    <Trophy className="w-4 h-4 text-[#9945FF] group-hover:scale-110 transition-transform" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Right column - Player stats & actions */}
-          <div className="space-y-6">
-            {/* Player profile */}
-            {isConnected ? (
-              <Card className="glass-card border-[#14F195]/20">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-[#14F195] to-[#9945FF] rounded-full flex items-center justify-center">
-                      <span className="font-bold text-black">P</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Player_7xKX...</h3>
-                      <p className="text-sm text-gray-400">Connected wallet</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Games Won</span>
-                      <span className="font-semibold">0</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Win Rate</span>
-                      <span className="font-semibold">0%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-400">Total Winnings</span>
-                      <span className="font-semibold text-[#14F195]">0 SOL</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="glass-card border-orange-500/20">
-                <CardContent className="p-6 text-center">
-                  <Shield className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-                  <h3 className="font-semibold mb-2">Connect Wallet</h3>
-                  <p className="text-sm text-gray-400 mb-4">
-                    Connect your Solana wallet to start playing and earning
-                  </p>
-                  <Button 
-                    className="w-full btn-shimmer bg-gradient-to-r from-[#14F195] to-[#9945FF] text-black font-semibold"
-                    onClick={handleWalletConnect}
-                  >
-                    Get Started
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Quick actions */}
-            <div className="space-y-3">
-              <Link href="/play">
-                <Button className="w-full h-12 btn-shimmer bg-gradient-to-r from-[#14F195] to-[#9945FF] text-black font-bold text-lg">
-                  <Play className="w-5 h-5 mr-2" />
-                  PLAY NOW
+          {/* Customize */}
+          <Card className="bg-gray-900/80 border-purple-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                <span className="font-bold">Customize</span>
+              </div>
+              <div className="space-y-3">
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Daily Crate
                 </Button>
-              </Link>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <Link href="/dashboard">
-                  <Button variant="outline" className="w-full border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/10">
-                    <Trophy className="w-4 h-4 mr-1" />
-                    Stats
-                  </Button>
-                </Link>
-                <Button variant="outline" className="border-[#9945FF]/30 text-[#9945FF] hover:bg-[#9945FF]/10">
-                  <Users className="w-4 h-4 mr-1" />
-                  Lobby
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                  <Star className="w-4 h-4 mr-2" />
+                  Affiliate
+                </Button>
+                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Change Appearance
                 </Button>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom stats bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="glass-card border-[#14F195]/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-[#14F195] mb-1">24</div>
-              <div className="text-xs text-gray-400">Players Online</div>
             </CardContent>
           </Card>
-          <Card className="glass-card border-[#14F195]/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-[#14F195] mb-1">8</div>
-              <div className="text-xs text-gray-400">Active Games</div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card border-[#14F195]/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-[#14F195] mb-1">156.7</div>
-              <div className="text-xs text-gray-400">SOL Won Today</div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card border-[#14F195]/20">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-[#14F195] mb-1">2.3s</div>
-              <div className="text-xs text-gray-400">Avg Match Time</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Footer note */}
-        <div className="text-center mt-8 text-xs text-gray-500">
-          <p>⚠️ Backend fully functional with Solana integration, authentication & multiplayer | Wallet providers temporarily disabled for performance optimization</p>
         </div>
       </div>
+
+      {/* Decorative game elements */}
+      <div className="absolute bottom-8 right-8 z-10">
+        <div className="w-32 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full opacity-80 animate-pulse"></div>
+      </div>
+      <div className="absolute bottom-16 right-32 z-10">
+        <div className="w-24 h-6 bg-gradient-to-r from-green-500 to-blue-500 rounded-full opacity-60 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+      </div>
+
+      {/* Discord button */}
+      <Button 
+        className="absolute bottom-6 left-6 bg-indigo-600 hover:bg-indigo-500"
+        size="sm"
+      >
+        Join Discord
+      </Button>
     </div>
   )
 }
