@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Test Suite
-Tests all backend APIs for the TurfLoot skill-based crypto land battles game.
+TurfLoot Backend API Test Suite - NEW FEATURES TESTING
+Tests NEW backend features: Solana wallet auth, User profiles, Solana balance, WebSocket multiplayer
 """
 
 import requests
@@ -13,9 +13,8 @@ from typing import Dict, Any, Optional
 
 class TurfLootAPITester:
     def __init__(self):
-        # Get base URL from environment or use default
-        # Use localhost for testing since external URL has ingress issues
-        self.base_url = "http://localhost:3000"
+        # Get base URL from environment - use external URL for testing
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://14b606ac-994f-4799-a20a-dbd6731e5a52.preview.emergentagent.com')
         self.api_url = f"{self.base_url}/api"
         
         # Test data
