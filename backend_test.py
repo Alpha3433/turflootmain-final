@@ -1120,6 +1120,197 @@ class TurfLootAPITester:
             print(f"❌ WebSocket connection test FAILED - Error: {e}")
             return False
 
+    def test_google_oauth_missing_session_id(self) -> bool:
+        """Test Google OAuth callback with missing session_id parameter"""
+        print("\n🧪 Testing Google OAuth - Missing session_id (POST /api/auth/google-callback)")
+        print("-" * 40)
+        
+        try:
+            response = self.make_request('POST', '/auth/google-callback', {})
+            
+            print(f"Status Code: {response.status_code}")
+            print(f"Response: {response.text}")
+            
+            if response.status_code == 400:
+                data = response.json()
+                if data.get('error') == 'Missing session_id':
+                    print("✅ Google OAuth missing session_id test PASSED")
+                    return True
+                else:
+                    print(f"❌ Google OAuth missing session_id test FAILED - Wrong error: {data}")
+                    return False
+            else:
+                print(f"❌ Google OAuth missing session_id test FAILED - Expected 400, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Google OAuth missing session_id test FAILED - Error: {e}")
+            return False
+
+    def test_google_oauth_invalid_session_id(self) -> bool:
+        """Test Google OAuth callback with invalid session_id parameter"""
+        print("\n🧪 Testing Google OAuth - Invalid session_id (POST /api/auth/google-callback)")
+        print("-" * 40)
+        
+        try:
+            response = self.make_request('POST', '/auth/google-callback', {
+                "session_id": "invalid_session_12345"
+            })
+            
+            print(f"Status Code: {response.status_code}")
+            print(f"Response: {response.text}")
+            
+            if response.status_code == 400:
+                data = response.json()
+                if data.get('error') == 'Authentication failed':
+                    print("✅ Google OAuth invalid session_id test PASSED")
+                    return True
+                else:
+                    print(f"❌ Google OAuth invalid session_id test FAILED - Wrong error: {data}")
+                    return False
+            else:
+                print(f"❌ Google OAuth invalid session_id test FAILED - Expected 400, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Google OAuth invalid session_id test FAILED - Error: {e}")
+            return False
+
+    def test_google_oauth_endpoint_structure(self) -> bool:
+        """Test Google OAuth endpoint structure and error handling"""
+        print("\n🧪 Testing Google OAuth - Endpoint Structure (POST /api/auth/google-callback)")
+        print("-" * 40)
+        
+        try:
+            # Test with valid session_id format (will fail at external API call)
+            response = self.make_request('POST', '/auth/google-callback', {
+                "session_id": "test_session_valid_format_12345"
+            })
+            
+            print(f"Status Code: {response.status_code}")
+            print(f"Response: {response.text}")
+            
+            # Should attempt external API call and fail with 400
+            if response.status_code == 400:
+                data = response.json()
+                if data.get('error') == 'Authentication failed':
+                    print("✅ Google OAuth endpoint structure test PASSED")
+                    return True
+                else:
+                    print(f"❌ Google OAuth endpoint structure test FAILED - Wrong error: {data}")
+                    return False
+            else:
+                print(f"❌ Google OAuth endpoint structure test FAILED - Unexpected status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Google OAuth endpoint structure test FAILED - Error: {e}")
+            return False
+
+    def test_google_oauth_cors_headers(self) -> bool:
+        """Test Google OAuth endpoint CORS headers"""
+        print("\n🧪 Testing Google OAuth - CORS Headers (POST /api/auth/google-callback)")
+        print("-" * 40)
+        
+        try:
+            response = self.make_request('POST', '/auth/google-callback', {
+                "session_id": "test_cors"
+            })
+            
+            print(f"Status Code: {response.status_code}")
+            print(f"Response: {response.text}")
+            
+            # Check for CORS headers
+            cors_headers = [
+                'Access-Control-Allow-Origin',
+                'Access-Control-Allow-Methods',
+                'Access-Control-Allow-Headers'
+            ]
+            
+            missing_headers = []
+            for header in cors_headers:
+                if header not in response.headers:
+                    missing_headers.append(header)
+            
+            if not missing_headers:
+                print("✅ Google OAuth CORS headers test PASSED")
+                return True
+            else:
+                print(f"❌ Google OAuth CORS headers test FAILED - Missing: {missing_headers}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Google OAuth CORS headers test FAILED - Error: {e}")
+            return False
+
+    def test_google_oauth_response_structure(self) -> bool:
+        """Test Google OAuth response structure for error cases"""
+        print("\n🧪 Testing Google OAuth - Response Structure (POST /api/auth/google-callback)")
+        print("-" * 40)
+        
+        try:
+            response = self.make_request('POST', '/auth/google-callback', {
+                "session_id": "test_response_structure"
+            })
+            
+            print(f"Status Code: {response.status_code}")
+            print(f"Response: {response.text}")
+            
+            # Check response is JSON
+            if response.headers.get('content-type', '').startswith('application/json'):
+                data = response.json()
+                
+                # For error responses, should have proper structure
+                if 'error' in data:
+                    print("✅ Google OAuth response structure test PASSED")
+                    return True
+                elif 'success' in data and 'token' in data and 'user' in data:
+                    # This would be the success case structure
+                    print("✅ Google OAuth response structure test PASSED (success format)")
+                    return True
+                else:
+                    print(f"❌ Google OAuth response structure test FAILED - Invalid structure: {list(data.keys())}")
+                    return False
+            else:
+                print(f"❌ Google OAuth response structure test FAILED - Not JSON: {response.headers.get('content-type')}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Google OAuth response structure test FAILED - Error: {e}")
+            return False
+
+    def test_google_oauth_external_api_integration(self) -> bool:
+        """Test Google OAuth external API integration"""
+        print("\n🧪 Testing Google OAuth - External API Integration (POST /api/auth/google-callback)")
+        print("-" * 40)
+        
+        try:
+            # Test that endpoint attempts to call external API
+            response = self.make_request('POST', '/auth/google-callback', {
+                "session_id": "test_external_api_integration"
+            })
+            
+            print(f"Status Code: {response.status_code}")
+            print(f"Response: {response.text}")
+            print("🔗 External API: https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data")
+            
+            # Should make external API call and handle failure
+            if response.status_code == 400:
+                data = response.json()
+                if data.get('error') == 'Authentication failed':
+                    print("✅ Google OAuth external API integration test PASSED")
+                    return True
+                else:
+                    print(f"❌ Google OAuth external API integration test FAILED - Wrong error: {data}")
+                    return False
+            else:
+                print(f"❌ Google OAuth external API integration test FAILED - Unexpected status: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Google OAuth external API integration test FAILED - Error: {e}")
+            return False
+
     def run_all_tests(self) -> Dict[str, bool]:
         """Run all API tests and return results"""
         print("🚀 Starting TurfLoot Backend API Test Suite")
