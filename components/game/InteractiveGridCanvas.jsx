@@ -202,7 +202,7 @@ const InteractiveGridCanvas = () => {
   }
   
   return (
-    <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+    <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 10 }}>
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-crosshair pointer-events-auto"
