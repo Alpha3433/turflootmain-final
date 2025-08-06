@@ -1,8 +1,8 @@
 import { Inter, DM_Sans } from 'next/font/google'
 import './globals.css'
-import { EnhancedWalletProvider } from '@/components/wallet/EnhancedWalletProvider'
-import { AuthProvider } from '@/components/providers/AuthProvider'
-import { PrivyProvider } from '@/components/providers/PrivyProvider'
+// import { EnhancedWalletProvider } from '@/components/wallet/EnhancedWalletProvider'
+// import { AuthProvider } from '@/components/providers/AuthProvider'
+// import { PrivyProvider } from '@/components/providers/PrivyProvider'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
