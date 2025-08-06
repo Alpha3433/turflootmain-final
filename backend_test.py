@@ -1144,7 +1144,15 @@ class TurfLootAPITester:
             ("Privy Webhook - Created", self.test_privy_webhook_created),
             ("Privy Webhook - Completed", self.test_privy_webhook_completed),
             ("Privy Webhook - Failed", self.test_privy_webhook_failed),
-            ("Privy Webhook - Signature", self.test_privy_webhook_signature_validation)
+            ("Privy Webhook - Signature", self.test_privy_webhook_signature_validation),
+            ("Solana Wallet Auth", self.test_solana_wallet_auth),
+            ("Solana Wallet Auth Validation", self.test_solana_wallet_auth_validation),
+            ("Solana Balance Check", self.test_solana_balance_check),
+            ("Solana Token Accounts", self.test_solana_token_accounts),
+            ("Enhanced User Profile", self.test_enhanced_user_profile),
+            ("User Profile Update", self.test_user_profile_update),
+            ("Auth Me Endpoint", self.test_auth_me_endpoint),
+            ("WebSocket Connection", self.test_websocket_connection)
         ]
         
         # Run each test
