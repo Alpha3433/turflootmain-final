@@ -64,9 +64,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white relative">
-      {/* Interactive Hero Section */}
-      <section className="relative h-screen overflow-hidden">
+    <div className="h-screen bg-black text-white relative overflow-hidden">
+      {/* Interactive Hero Section - Full Screen */}
+      <section className="relative h-full overflow-hidden">
         {/* Interactive Grid Canvas - Background Layer */}
         <InteractiveGridCanvas />
         
