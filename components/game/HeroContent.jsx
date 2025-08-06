@@ -50,7 +50,7 @@ const HeroContent = ({
         <div className="w-full max-w-7xl grid grid-cols-12 gap-8 items-center pointer-events-none">
           
           {/* Left Section - Leaderboard */}
-          <div className="col-span-3">
+          <div className="col-span-3 pointer-events-auto">
             <Card className="bg-black/40 backdrop-blur-sm border-yellow-500/30">
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2 mb-4">
