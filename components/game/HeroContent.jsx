@@ -28,9 +28,9 @@ const HeroContent = ({
   }
 
   return (
-    <div className="relative z-10 h-full flex flex-col">
+    <div className="relative z-20 h-full flex flex-col pointer-events-none">
       {/* Top Header */}
-      <header className="flex items-center justify-between p-6">
+      <header className="flex items-center justify-between p-6 pointer-events-auto">
         <div className="flex items-center space-x-3">
           <div className="text-orange-400 text-lg">🔥</div>
           <span className="text-lg font-medium text-white">
