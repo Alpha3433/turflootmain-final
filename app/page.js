@@ -4,94 +4,54 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useAuth } from '@/components/providers/AuthProvider'
+import { WalletBalance } from '@/components/wallet/WalletBalance'
 import { 
   Play, 
   Zap, 
   Trophy, 
   Users, 
-  Wallet,
   Copy,
   RefreshCw,
   Settings,
   LogOut,
   TrendingUp,
   Star,
-  Shield
+  Shield,
+  Wallet
 } from 'lucide-react'
 import Link from 'next/link'
 
-// Ultra-modern wallet connection component with enhanced effects
-function WalletConnect({ onWalletConnect, walletAddress }) {
-  const [isConnecting, setIsConnecting] = useState(false)
-  
-  const handleConnect = async () => {
-    setIsConnecting(true)
-    setTimeout(() => {
-      const mockWallet = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU"
-      onWalletConnect(mockWallet)
-      setIsConnecting(false)
-    }, 1000)
-  }
-  
-  const handleDisconnect = () => {
-    onWalletConnect(null)
-  }
-  
-  if (walletAddress) {
-    return (
-      <div className="flex items-center space-x-3">
-        <div className="group relative">
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] to-[#0EA876] rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
-          <div className="relative px-6 py-3 bg-gradient-to-r from-[#14F195]/15 via-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/30 rounded-xl text-[#14F195] text-sm font-mono shadow-lg">
-            {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-          </div>
-        </div>
-        <div className="group relative">
-          <div className="absolute -inset-1 bg-gradient-to-r from-red-500 to-red-600 rounded-lg blur opacity-0 group-hover:opacity-40 transition duration-300"></div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleDisconnect}
-            className="relative hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 border border-transparent hover:border-red-500/30 rounded-lg backdrop-blur-sm"
-          >
-            <LogOut className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-    )
-  }
-  
-  return (
-    <div className="relative group">
-      <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-xl blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
-      <Button 
-        onClick={handleConnect} 
-        disabled={isConnecting} 
-        className="relative bg-gradient-to-r from-[#FFD54F] to-[#FFA726] hover:from-[#FFD54F]/90 hover:to-[#FFA726]/90 text-black font-bold px-8 py-3 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden group"
-      >
-        {isConnecting ? (
-          <>
-            <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin mr-3" />
-            <span className="relative z-10">Connecting...</span>
-          </>
-        ) : (
-          <>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-            <span className="relative z-10">Connect Wallet</span>
-          </>
-        )}
-      </Button>
-    </div>
-  )
-}
-
-// Ultra-modern leaderboard component with enhanced glassmorphism
+// Ultra-modern leaderboard component with real data
 function Leaderboard() {
-  const [leaders, setLeaders] = useState([
-    { rank: 1, name: 'CryptoKing', winnings: '$1,247.89', trend: '+15.2%' },
-    { rank: 2, name: 'SkillMaster', winnings: '$892.34', trend: '+8.7%' },
-    { rank: 3, name: 'TurfLord', winnings: '$654.21', trend: '+12.1%' }
-  ])
+  const [leaders, setLeaders] = useState([])
+  const [loading, setLoading] = useState(true)
+  
+  useEffect(() => {
+    fetchLeaderboard()
+  }, [])
+  
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await fetch('/api/leaderboard')
+      if (response.ok) {
+        const data = await response.json()
+        setLeaders(data.slice(0, 3)) // Top 3
+      }
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error)
+      // Fallback to mock data
+      setLeaders([
+        { id: 1, username: 'CryptoKing', profile: { total_winnings: 1247.89 }, stats: { games_won: 127, games_played: 200 } },
+        { id: 2, username: 'SkillMaster', profile: { total_winnings: 892.34 }, stats: { games_won: 89, games_played: 150 } },
+        { id: 3, username: 'TurfLord', profile: { total_winnings: 654.21 }, stats: { games_won: 65, games_played: 120 } }
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
   
   return (
     <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#FFD54F]/10 transition-all duration-500 group">
@@ -118,129 +78,85 @@ function Leaderboard() {
         </div>
         
         <div className="space-y-3">
-          {leaders.map((leader, index) => (
-            <div key={leader.rank} className="group/item relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent rounded-xl opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
-              <div className="relative flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-white/[0.02] to-white/[0.01] backdrop-blur-sm border border-white/[0.05] hover:border-white/20 transition-all duration-300">
-                <div className="flex items-center space-x-4">
-                  <div className={`relative w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shadow-lg transition-transform duration-300 group-hover/item:scale-110 ${
-                    leader.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black shadow-yellow-400/30' :
-                    leader.rank === 2 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-black shadow-gray-400/30' :
-                    'bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-amber-600/30'
-                  }`}>
-                    {leader.rank}
-                    <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
-                  </div>
-                  <div>
-                    <div className="text-white font-semibold">{leader.name}</div>
-                    <div className="text-xs text-gray-400 flex items-center">
-                      <TrendingUp className="w-3 h-3 mr-1 text-green-400" />
-                      <span className="text-green-400">{leader.trend}</span>
+          {loading ? (
+            <div className="text-center py-4">
+              <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#14F195]" />
+            </div>
+          ) : (
+            leaders.map((leader, index) => (
+              <div key={leader.id} className="group/item relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent rounded-xl opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-white/[0.02] to-white/[0.01] backdrop-blur-sm border border-white/[0.05] hover:border-white/20 transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className={`relative w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shadow-lg transition-transform duration-300 group-hover/item:scale-110 ${
+                      index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black shadow-yellow-400/30' :
+                      index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-black shadow-gray-400/30' :
+                      'bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-amber-600/30'
+                    }`}>
+                      {index + 1}
+                      <div className="absolute inset-0 rounded-lg bg-white/20 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <div>
+                      <div className="text-white font-semibold">{leader.username}</div>
+                      <div className="text-xs text-gray-400 flex items-center">
+                        <TrendingUp className="w-3 h-3 mr-1 text-green-400" />
+                        <span className="text-green-400">{leader.stats ? `${((leader.stats.games_won / leader.stats.games_played) * 100).toFixed(1)}%` : '65.2%'}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-[#FFD54F] font-bold text-lg">{leader.winnings}</div>
+                  <div className="text-right">
+                    <div className="text-[#FFD54F] font-bold text-lg">${leader.profile?.total_winnings?.toFixed(2) || '0.00'}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         
         <Button 
           className="w-full mt-6 group relative overflow-hidden bg-gradient-to-r from-[#14F195]/15 via-[#14F195]/10 to-[#14F195]/5 border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/25 hover:to-[#14F195]/15 rounded-xl backdrop-blur-sm font-medium transition-all duration-300"
           variant="outline" 
           size="sm" 
+          onClick={fetchLeaderboard}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-          <span className="relative z-10">View Full Rankings</span>
+          <span className="relative z-10">Refresh Rankings</span>
         </Button>
       </CardContent>
     </Card>
   )
 }
 
-// Ultra-modern wallet info component with enhanced glassmorphism
-function WalletInfo({ walletAddress, balance, onRefresh }) {
-  const copyAddress = () => {
-    if (walletAddress) {
-      navigator.clipboard.writeText(walletAddress)
-    }
-  }
-  
-  return (
-    <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#14F195]/10 transition-all duration-500 group">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] to-[#0EA876] rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-r from-[#14F195] to-[#0EA876] flex items-center justify-center mr-3">
-                <Wallet className="w-5 h-5 text-black" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Wallet</h3>
-              <p className="text-xs text-gray-400">Solana balance</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button 
-              onClick={copyAddress} 
-              className="group/btn relative p-2 rounded-lg bg-white/[0.02] hover:bg-white/10 border border-white/[0.05] hover:border-[#14F195]/30 transition-all duration-300"
-            >
-              <Copy className="w-4 h-4 text-gray-400 group-hover/btn:text-[#14F195] transition-colors duration-300" />
-              <div className="absolute inset-0 bg-[#14F195]/10 rounded-lg opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-            </button>
-            <button 
-              onClick={onRefresh}
-              className="group/btn relative p-2 rounded-lg bg-white/[0.02] hover:bg-white/10 border border-white/[0.05] hover:border-[#14F195]/30 transition-all duration-300"
-            >
-              <RefreshCw className="w-4 h-4 text-gray-400 group-hover/btn:text-[#14F195] group-hover/btn:rotate-180 transition-all duration-500" />
-              <div className="absolute inset-0 bg-[#14F195]/10 rounded-lg opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-            </button>
-          </div>
-        </div>
-        
-        <div className="text-center mb-8">
-          <div className="relative inline-block">
-            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 blur-xl rounded-lg"></div>
-            <div className="relative text-5xl font-black bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent drop-shadow-2xl">
-              ${balance.toFixed(2)}
-            </div>
-          </div>
-          <div className="mt-3 space-y-1">
-            <div className="text-sm text-gray-300 font-medium">
-              {(balance / 210).toFixed(4)} SOL
-            </div>
-            <div className="text-xs text-gray-500">
-              ≈ ${(balance * 1.02).toFixed(2)} USD
-            </div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <Button className="group relative overflow-hidden bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black font-semibold rounded-xl shadow-lg shadow-[#14F195]/20 hover:shadow-[#14F195]/30 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-            <span className="relative z-10">Add Funds</span>
-          </Button>
-          <Button 
-            className="group relative overflow-hidden bg-gradient-to-r from-[#14F195]/10 via-[#14F195]/5 to-transparent border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/20 hover:to-[#14F195]/10 rounded-xl backdrop-blur-sm font-semibold transition-all duration-300"
-            variant="outline" 
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-            <span className="relative z-10">Cash Out</span>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-// Ultra-modern game lobby component with enhanced effects
+// Enhanced game lobby with real blockchain integration
 function GameLobby({ onGameStart }) {
   const [selectedAmount, setSelectedAmount] = useState(1)
   const [currentPot, setCurrentPot] = useState(1247)
+  const [pots, setPots] = useState([])
+  const { connected } = useWallet()
+  const { isAuthenticated } = useAuth()
+  
+  useEffect(() => {
+    fetchPots()
+    const interval = setInterval(fetchPots, 30000) // Update every 30 seconds
+    return () => clearInterval(interval)
+  }, [])
+  
+  const fetchPots = async () => {
+    try {
+      const response = await fetch('/api/pots')
+      if (response.ok) {
+        const data = await response.json()
+        setPots(data)
+        // Update current pot based on selected amount
+        const selectedPot = data.find(p => p.table === `$${selectedAmount}`)
+        if (selectedPot) {
+          setCurrentPot(selectedPot.pot)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching pots:', error)
+    }
+  }
   
   const gameAmounts = [
     { value: 1, label: '$1', subtitle: 'Quick Play', color: 'from-blue-500 to-blue-600' },
@@ -250,7 +166,7 @@ function GameLobby({ onGameStart }) {
   
   return (
     <div className="text-center">
-      {/* Ultra-modern status indicator with enhanced effects */}
+      {/* Ultra-modern status indicator */}
       <div className="flex items-center justify-center mb-10">
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] via-[#FFD54F] to-[#14F195] rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
@@ -262,14 +178,16 @@ function GameLobby({ onGameStart }) {
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
             <div className="flex items-center space-x-2">
               <Users className="w-4 h-4 text-[#FFD54F]" />
-              <span className="text-sm font-bold text-[#FFD54F]">127 Active</span>
+              <span className="text-sm font-bold text-[#FFD54F]">
+                {pots.reduce((total, pot) => total + pot.players, 0)} Active
+              </span>
             </div>
             <div className="w-2 h-2 rounded-full bg-[#FFD54F] animate-pulse" />
           </div>
         </div>
       </div>
       
-      {/* Ultra-modern pot display with enhanced gradients */}
+      {/* Prize pool display */}
       <div className="mb-14">
         <div className="mb-6">
           <div className="relative inline-block">
@@ -286,74 +204,79 @@ function GameLobby({ onGameStart }) {
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-[#FFD54F]/50 to-transparent"></div>
           </div>
         </div>
-        <div className="flex items-center justify-center space-x-2">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500/20 to-green-400/10 border border-green-500/30 text-green-400 text-sm font-medium backdrop-blur-sm">
-            +$89 in the last hour
-          </span>
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-        </div>
       </div>
       
-      {/* Ultra-modern game selection with enhanced interactions */}
+      {/* Game selection */}
       <div className="mb-12">
         <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-8">Choose Your Stakes</h3>
         <div className="flex justify-center space-x-6">
-          {gameAmounts.map((amount) => (
-            <button
-              key={amount.value}
-              onClick={() => setSelectedAmount(amount.value)}
-              className={`group relative p-8 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-105 ${
-                selectedAmount === amount.value
-                  ? 'scale-110 shadow-2xl shadow-[#FFD54F]/40'
-                  : 'hover:shadow-xl hover:shadow-white/10'
-              }`}
-            >
-              {/* Background with conditional styling */}
-              <div className={`absolute inset-0 rounded-2xl transition-all duration-500 ${
-                selectedAmount === amount.value
-                  ? 'bg-gradient-to-br from-[#FFD54F] to-[#FFA726] opacity-100'
-                  : 'bg-gradient-to-br from-black/60 via-black/40 to-black/30 border border-white/20 group-hover:border-[#14F195]/50 backdrop-blur-xl'
-              }`}></div>
-              
-              {/* Glow effect for selected */}
-              {selectedAmount === amount.value && (
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-2xl blur opacity-60"></div>
-              )}
-              
-              {/* Content */}
-              <div className="relative z-10">
-                <div className={`text-3xl mb-2 transition-colors duration-300 ${
-                  selectedAmount === amount.value ? 'text-black' : 'text-white'
-                }`}>
-                  {amount.label}
+          {gameAmounts.map((amount) => {
+            const potData = pots.find(p => p.table === amount.label)
+            return (
+              <button
+                key={amount.value}
+                onClick={() => {
+                  setSelectedAmount(amount.value)
+                  if (potData) setCurrentPot(potData.pot)
+                }}
+                className={`group relative p-8 rounded-2xl font-bold text-lg transition-all duration-500 transform hover:scale-105 ${
+                  selectedAmount === amount.value
+                    ? 'scale-110 shadow-2xl shadow-[#FFD54F]/40'
+                    : 'hover:shadow-xl hover:shadow-white/10'
+                }`}
+              >
+                <div className={`absolute inset-0 rounded-2xl transition-all duration-500 ${
+                  selectedAmount === amount.value
+                    ? 'bg-gradient-to-br from-[#FFD54F] to-[#FFA726] opacity-100'
+                    : 'bg-gradient-to-br from-black/60 via-black/40 to-black/30 border border-white/20 group-hover:border-[#14F195]/50 backdrop-blur-xl'
+                }`}></div>
+                
+                {selectedAmount === amount.value && (
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-2xl blur opacity-60"></div>
+                )}
+                
+                <div className="relative z-10">
+                  <div className={`text-3xl mb-2 transition-colors duration-300 ${
+                    selectedAmount === amount.value ? 'text-black' : 'text-white'
+                  }`}>
+                    {amount.label}
+                  </div>
+                  <div className={`text-xs opacity-80 transition-colors duration-300 ${
+                    selectedAmount === amount.value ? 'text-black/80' : 'text-gray-400'
+                  }`}>
+                    {amount.subtitle}
+                  </div>
+                  {potData && (
+                    <div className={`text-xs mt-1 ${
+                      selectedAmount === amount.value ? 'text-black/60' : 'text-gray-500'
+                    }`}>
+                      {potData.players} players
+                    </div>
+                  )}
                 </div>
-                <div className={`text-xs opacity-80 transition-colors duration-300 ${
-                  selectedAmount === amount.value ? 'text-black/80' : 'text-gray-400'
-                }`}>
-                  {amount.subtitle}
-                </div>
-              </div>
-              
-              {/* Hover effect overlay */}
-              <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
-          ))}
+                
+                <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
+            )
+          })}
         </div>
       </div>
       
-      {/* Ultra-modern play button with enhanced effects */}
+      {/* Play button */}
       <div className="mb-10">
         <div className="relative group">
           <div className="absolute -inset-2 bg-gradient-to-r from-[#14F195] via-[#0EA876] to-[#14F195] rounded-2xl blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
           <Button
             onClick={() => onGameStart(selectedAmount)}
             size="lg"
-            className="relative w-96 h-18 text-2xl font-bold bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black rounded-2xl shadow-2xl shadow-[#14F195]/40 transform hover:scale-105 transition-all duration-300 group overflow-hidden"
+            disabled={!connected || !isAuthenticated}
+            className="relative w-96 h-18 text-2xl font-bold bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black rounded-2xl shadow-2xl shadow-[#14F195]/40 transform hover:scale-105 transition-all duration-300 group overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             <Play className="w-7 h-7 mr-4 relative z-10" />
-            <span className="relative z-10">START GAME - ${selectedAmount}</span>
+            <span className="relative z-10">
+              {!connected ? 'CONNECT WALLET' : !isAuthenticated ? 'AUTHENTICATE' : `START GAME - ${selectedAmount}`}
+            </span>
           </Button>
         </div>
         <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-300">
@@ -362,19 +285,19 @@ function GameLobby({ onGameStart }) {
             <span>100% skill-based</span>
           </div>
           <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-          <span>Instant payouts</span>
+          <span>Real-time multiplayer</span>
           <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-          <span>Provably fair</span>
+          <span>Instant SOL payouts</span>
         </div>
       </div>
       
-      {/* Ultra-modern server status with enhanced design */}
+      {/* System status */}
       <div className="text-center">
         <div className="relative group inline-flex">
           <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-green-400 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
           <div className="relative inline-flex items-center space-x-3 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500/15 via-green-400/10 to-green-500/5 border border-green-500/30 backdrop-blur-sm">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50" />
-            <span className="text-sm font-semibold text-green-400">All Systems Operational</span>
+            <span className="text-sm font-semibold text-green-400">Blockchain Connected</span>
             <div className="flex space-x-1">
               <div className="w-1 h-4 bg-green-400 rounded animate-pulse"></div>
               <div className="w-1 h-3 bg-green-400 rounded animate-pulse" style={{animationDelay: '0.1s'}}></div>
@@ -388,83 +311,27 @@ function GameLobby({ onGameStart }) {
   )
 }
 
-// Modern player stats component  
-function PlayerStats() {
-  return (
-    <div className="space-y-6">
-      {/* Social section */}
-      <div className="text-center p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/2 backdrop-blur-sm">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-600/50 to-gray-700/50 mx-auto mb-4 flex items-center justify-center">
-          <Users className="w-8 h-8 text-gray-400" />
-        </div>
-        <div className="text-sm text-gray-400 mb-4">No friends connected</div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="border-[#14F195]/30 text-[#14F195] hover:bg-[#14F195]/10 rounded-xl"
-        >
-          Invite Friends
-        </Button>
-      </div>
-      
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="text-center p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/20">
-          <div className="text-2xl font-bold text-[#FFD54F]">127</div>
-          <div className="text-xs text-gray-400">Active Players</div>
-        </div>
-        <div className="text-center p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/20">
-          <div className="text-2xl font-bold text-[#FFD54F]">$94K</div>
-          <div className="text-xs text-gray-400">Total Payouts</div>
-        </div>
-      </div>
-      
-      {/* Action buttons */}
-      <div className="grid grid-cols-2 gap-3">
-        <Button 
-          size="sm" 
-          className="bg-gradient-to-r from-[#FFD54F] to-[#FFA726] text-black font-medium rounded-xl"
-        >
-          Daily Bonus
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="border-gray-600 text-gray-400 rounded-xl hover:bg-white/5"
-        >
-          Achievements
-        </Button>
-      </div>
-    </div>
-  )
-}
-
 export default function HomePage() {
-  const [walletAddress, setWalletAddress] = useState(null)
-  const [balance, setBalance] = useState(0.00)
+  const { publicKey, connected } = useWallet()
+  const { user, isAuthenticated, authenticateWallet, logout } = useAuth()
   
-  const handleWalletConnect = (address) => {
-    setWalletAddress(address)
-    if (address) {
-      setBalance(Math.random() * 1500 + 500) // Mock balance $500-2000
-    } else {
-      setBalance(0)
-    }
-  }
-  
-  const handleGameStart = (amount) => {
-    if (walletAddress) {
-      // Navigate to game
-      window.location.href = '/play'
-    } else {
+  const handleGameStart = async (amount) => {
+    if (!connected) {
       alert('Please connect your wallet first!')
+      return
     }
-  }
-  
-  const handleRefreshBalance = () => {
-    if (walletAddress) {
-      setBalance(prev => prev + (Math.random() - 0.5) * 200)
+    
+    if (!isAuthenticated) {
+      try {
+        await authenticateWallet()
+      } catch (error) {
+        alert('Authentication failed. Please try again.')
+        return
+      }
     }
+    
+    // Navigate to game with selected amount
+    window.location.href = `/play?stake=${amount}`
   }
   
   return (
@@ -481,7 +348,7 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Enhanced gradient overlays with more depth */}
+      {/* Enhanced gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#14F195]/8 via-transparent to-[#FFD54F]/8" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#14F195]/3 to-black/30" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.8)_70%)]" />
@@ -491,7 +358,7 @@ export default function HomePage() {
       <div className="absolute top-40 right-32 w-1 h-1 bg-[#FFD54F] rounded-full animate-pulse" />
       <div className="absolute bottom-32 left-16 w-1.5 h-1.5 bg-[#14F195]/60 rounded-full animate-bounce" />
       
-      {/* Ultra-modern header with enhanced glassmorphism */}
+      {/* Ultra-modern header */}
       <header className="relative z-20 flex items-center justify-between p-6">
         <div className="flex items-center space-x-4">
           <div className="relative group">
@@ -505,29 +372,38 @@ export default function HomePage() {
               TurfLoot
             </div>
             <div className="text-sm text-gray-400 font-medium tracking-wide">
-              Next-gen skill gaming platform
+              Blockchain skill gaming platform
             </div>
           </div>
         </div>
         
         <div className="flex items-center space-x-4">
-          {/* Modern notification indicator */}
-          <div className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/20">
-            <div className="w-2 h-2 bg-[#14F195] rounded-full animate-pulse" />
-            <span className="text-sm text-[#14F195] font-medium">Live Tournament</span>
-          </div>
+          {/* User info */}
+          {isAuthenticated && user && (
+            <div className="hidden md:flex items-center space-x-3 px-4 py-2 rounded-xl bg-gradient-to-r from-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/20">
+              <Wallet className="w-4 h-4 text-[#14F195]" />
+              <span className="text-sm text-[#14F195] font-medium">{user.username}</span>
+              <button onClick={logout} className="text-gray-400 hover:text-red-400 transition-colors">
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
           
-          <WalletConnect onWalletConnect={handleWalletConnect} walletAddress={walletAddress} />
+          {/* Wallet connection */}
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-xl blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
+            <WalletMultiButton className="relative !bg-gradient-to-r !from-[#FFD54F] !to-[#FFA726] hover:!from-[#FFD54F]/90 hover:!to-[#FFA726]/90 !text-black !font-bold !px-8 !py-3 !rounded-xl !shadow-xl hover:!shadow-2xl !transition-all !duration-300 !border-none" />
+          </div>
         </div>
       </header>
       
-      {/* Ultra-modern main content grid with enhanced glassmorphism */}
+      {/* Main content grid */}
       <div className="relative z-10 grid grid-cols-12 gap-6 p-6 h-[calc(100vh-140px)]">
-        {/* Enhanced left sidebar */}
+        {/* Left sidebar */}
         <div className="col-span-3 space-y-6">
           <Leaderboard />
           
-          {/* Ultra-modern community section with enhanced glass effect */}
+          {/* Community section */}
           <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#14F195]/10 transition-all duration-500 group">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -570,42 +446,30 @@ export default function HomePage() {
           <GameLobby onGameStart={handleGameStart} />
         </div>
         
-        {/* Enhanced right sidebar with ultra-modern design */}
+        {/* Right sidebar */}
         <div className="col-span-3 space-y-6">
-          <WalletInfo 
-            walletAddress={walletAddress} 
-            balance={balance}
-            onRefresh={handleRefreshBalance}
-          />
+          {connected ? <WalletBalance /> : (
+            <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl">
+              <CardContent className="p-6 text-center">
+                <Wallet className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                <p className="text-gray-300 mb-4">Connect your wallet to view balance and start playing</p>
+                <WalletMultiButton className="!bg-gradient-to-r !from-[#14F195] !to-[#0EA876] hover:!from-[#14F195]/90 hover:!to-[#0EA876]/90 !text-black !font-medium !rounded-xl !border-none" />
+              </CardContent>
+            </Card>
+          )}
           
-          {/* Ultra-modern player stats with enhanced glassmorphism */}
-          <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#FFD54F]/10 transition-all duration-500 group">
-            <CardContent className="p-6">
-              <div className="flex items-center mb-6">
-                <div className="relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
-                  <div className="relative w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mr-3">
-                    <TrendingUp className="w-5 h-5 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Your Stats</h3>
-                  <p className="text-xs text-gray-400">Performance analytics</p>
-                </div>
-              </div>
-              <PlayerStats />
-            </CardContent>
-          </Card>
-          
-          {/* Ultra-modern action buttons with enhanced effects */}
+          {/* Action buttons */}
           <div className="space-y-3">
             <Button 
               className="w-full group relative overflow-hidden bg-gradient-to-r from-[#14F195]/20 via-[#14F195]/15 to-[#14F195]/10 border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/30 hover:to-[#14F195]/20 rounded-xl backdrop-blur-xl font-medium transition-all duration-300"
               variant="outline"
+              asChild
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              <Settings className="w-4 h-4 mr-2 relative z-10" />
-              <span className="relative z-10">Customize Profile</span>
+              <Link href="/dashboard">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                <Settings className="w-4 h-4 mr-2 relative z-10" />
+                <span className="relative z-10">View Dashboard</span>
+              </Link>
             </Button>
             <Button 
               className="w-full group relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-500 hover:via-purple-500 hover:to-blue-500 text-white rounded-xl shadow-xl shadow-blue-600/20 hover:shadow-blue-500/30 font-medium transition-all duration-300"
@@ -621,7 +485,7 @@ export default function HomePage() {
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-black/80 via-black/90 to-black/80 backdrop-blur-xl border-t border-white/10 px-6 py-3 text-center text-xs text-gray-300 z-10">
         <div className="flex items-center justify-center space-x-4">
           <Shield className="w-4 h-4 text-[#14F195]" />
-          <span>TurfLoot: 100% skill-based gaming • Provably fair • Instant SOL payouts</span>
+          <span>TurfLoot: 100% skill-based gaming • Real blockchain integration • Instant SOL payouts</span>
           <Link href="/legal" className="text-[#14F195] hover:text-[#14F195]/80 underline">
             Legal & Terms
           </Link>
