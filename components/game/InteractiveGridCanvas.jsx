@@ -1,62 +1,78 @@
 'use client'
 
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 const InteractiveGridCanvas = () => {
   const canvasRef = useRef(null)
   const animationFrameRef = useRef(null)
-  const lastMousePosRef = useRef({ x: -1, y: -1 })
-  const isInitializedRef = useRef(false)
+  const gridStateRef = useRef([])
   
-  // Grid state
-  const GRID_SIZE = 40
+  // Grid configuration
+  const GRID_SIZE = 30
   const CELL_LIFETIME = 4000 // 4 seconds
-  const FADE_DURATION = 1000 // 1s fade out
   
-  const [gridState] = useState(() => {
-    // Initialize grid with timestamp and alpha for each cell
-    const grid = Array(GRID_SIZE).fill(null).map(() => 
+  // Initialize grid state
+  useEffect(() => {
+    console.log('🎮 InteractiveGridCanvas: Initializing...')
+    gridStateRef.current = Array(GRID_SIZE).fill(null).map(() => 
       Array(GRID_SIZE).fill(null).map(() => ({
         filled: false,
         timestamp: 0,
         alpha: 0
       }))
     )
-    return grid
-  })
-
-  // Check for reduced motion preference
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
+  }, [])
+  
+  // Canvas setup
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-      setPrefersReducedMotion(mediaQuery.matches)
+    const canvas = canvasRef.current
+    if (!canvas) return
+    
+    console.log('🎨 Canvas: Setting up canvas...')
+    
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect()
+      console.log('📐 Canvas: Resizing to', rect.width, 'x', rect.height)
       
-      const handleChange = (e) => setPrefersReducedMotion(e.matches)
-      mediaQuery.addEventListener('change', handleChange)
-      return () => mediaQuery.removeEventListener('change', handleChange)
+      // Set canvas size to match container
+      canvas.width = rect.width
+      canvas.height = rect.height
+      
+      const ctx = canvas.getContext('2d')
+      
+      // Test draw - should show red square in top-left
+      ctx.fillStyle = 'red'
+      ctx.fillRect(0, 0, 50, 50)
+      console.log('🔴 Canvas: Test red square drawn')
+    }
+    
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+    
+    return () => {
+      window.removeEventListener('resize', resizeCanvas)
     }
   }, [])
-
-  // Convert screen coordinates to grid coordinates
-  const screenToGrid = useCallback((clientX, clientY) => {
+  
+  // Convert screen coordinates to grid coordinates  
+  const screenToGrid = (clientX, clientY) => {
     const canvas = canvasRef.current
-    if (!canvas) return { x: -1, y: -1 }
-
+    if (!canvas) return null
+    
     const rect = canvas.getBoundingClientRect()
     const x = Math.floor(((clientX - rect.left) / rect.width) * GRID_SIZE)
     const y = Math.floor(((clientY - rect.top) / rect.height) * GRID_SIZE)
     
-    return { 
-      x: Math.max(0, Math.min(GRID_SIZE - 1, x)), 
-      y: Math.max(0, Math.min(GRID_SIZE - 1, y)) 
+    return {
+      x: Math.max(0, Math.min(GRID_SIZE - 1, x)),
+      y: Math.max(0, Math.min(GRID_SIZE - 1, y))
     }
-  }, [])
-
-  // Fill grid cell and surrounding area (trail effect)
-  const fillGridCells = useCallback((gridX, gridY, timestamp) => {
-    const radius = 1.5 // Trail thickness
+  }
+  
+  // Fill grid cells
+  const fillGridCells = (gridX, gridY) => {
+    const timestamp = Date.now()
+    const radius = 1.5
     
     for (let dx = -radius; dx <= radius; dx++) {
       for (let dy = -radius; dy <= radius; dy++) {
@@ -66,200 +82,142 @@ const InteractiveGridCanvas = () => {
         if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
           const distance = Math.sqrt(dx * dx + dy * dy)
           if (distance <= radius) {
-            gridState[y][x] = {
+            gridStateRef.current[y][x] = {
               filled: true,
               timestamp,
-              alpha: 1 - (distance / radius) * 0.3 // Softer edges
+              alpha: 1
             }
           }
         }
       }
     }
-  }, [gridState])
-
-  // Update grid state (handle fading)
-  const updateGrid = useCallback((currentTime) => {
-    for (let y = 0; y < GRID_SIZE; y++) {
-      for (let x = 0; x < GRID_SIZE; x++) {
-        const cell = gridState[y][x]
-        if (cell.filled) {
-          const age = currentTime - cell.timestamp
-          
-          if (age > CELL_LIFETIME) {
-            // Start fading
-            const fadeProgress = Math.min(1, (age - CELL_LIFETIME) / FADE_DURATION)
-            cell.alpha = (1 - fadeProgress) * cell.alpha
-            
-            if (fadeProgress >= 1) {
-              // Reset cell
-              cell.filled = false
-              cell.alpha = 0
-              cell.timestamp = 0
-            }
-          }
-        }
-      }
-    }
-  }, [gridState])
-
-  // Draw grid
-  const drawGrid = useCallback(() => {
+  }
+  
+  // Draw the grid
+  const drawGrid = () => {
     const canvas = canvasRef.current
     if (!canvas) return
-
+    
     const ctx = canvas.getContext('2d')
     const rect = canvas.getBoundingClientRect()
-    const cellWidth = rect.width / GRID_SIZE
-    const cellHeight = rect.height / GRID_SIZE
-
+    
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    // Draw subtle grid background
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)'
+    
+    const cellWidth = rect.width / GRID_SIZE
+    const cellHeight = rect.height / GRID_SIZE
+    
+    // Draw subtle grid lines
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
     ctx.lineWidth = 0.5
     
     for (let i = 0; i <= GRID_SIZE; i++) {
       const x = (i / GRID_SIZE) * rect.width
       const y = (i / GRID_SIZE) * rect.height
       
+      // Vertical lines
       ctx.beginPath()
       ctx.moveTo(x, 0)
       ctx.lineTo(x, rect.height)
       ctx.stroke()
       
+      // Horizontal lines  
       ctx.beginPath()
       ctx.moveTo(0, y)
       ctx.lineTo(rect.width, y)
       ctx.stroke()
     }
-
+    
     // Draw filled cells
+    const currentTime = Date.now()
+    let drawnCells = 0
+    
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
-        const cell = gridState[y][x]
-        if (cell.filled && cell.alpha > 0.01) {
-          const cellX = x * cellWidth
-          const cellY = y * cellHeight
+        const cell = gridStateRef.current[y][x]
+        if (cell.filled) {
+          const age = currentTime - cell.timestamp
           
-          // Fill cell with Solana green
-          ctx.fillStyle = `rgba(20, 241, 149, ${cell.alpha * 0.7})`
-          ctx.fillRect(cellX, cellY, cellWidth, cellHeight)
-          
-          // Stroke outline
-          ctx.strokeStyle = `rgba(255, 255, 255, ${cell.alpha * 0.25})`
-          ctx.lineWidth = 1
-          ctx.strokeRect(cellX, cellY, cellWidth, cellHeight)
+          if (age > CELL_LIFETIME) {
+            // Reset expired cells
+            cell.filled = false
+            cell.alpha = 0
+            cell.timestamp = 0
+          } else {
+            // Draw active cells
+            const cellX = x * cellWidth
+            const cellY = y * cellHeight
+            
+            // Fade out over time
+            const fadeStart = CELL_LIFETIME * 0.7 // Start fading at 70% of lifetime
+            let alpha = 1
+            if (age > fadeStart) {
+              alpha = 1 - ((age - fadeStart) / (CELL_LIFETIME - fadeStart))
+            }
+            
+            // Fill with Solana green
+            ctx.fillStyle = `rgba(20, 241, 149, ${alpha * 0.8})`
+            ctx.fillRect(cellX, cellY, cellWidth, cellHeight)
+            
+            // Stroke outline
+            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.3})`
+            ctx.lineWidth = 1
+            ctx.strokeRect(cellX, cellY, cellWidth, cellHeight)
+            
+            drawnCells++
+          }
         }
       }
     }
-  }, [gridState])
-
+    
+    if (drawnCells > 0) {
+      console.log('✅ Drawing', drawnCells, 'active cells')
+    }
+  }
+  
   // Animation loop
-  const animate = useCallback((currentTime) => {
-    updateGrid(currentTime)
+  const animate = () => {
     drawGrid()
     animationFrameRef.current = requestAnimationFrame(animate)
-  }, [updateGrid, drawGrid])
-
-  // Handle pointer events (mouse and touch)
-  const handlePointerMove = useCallback((clientX, clientY) => {
-    const currentTime = Date.now()
-    const { x, y } = screenToGrid(clientX, clientY)
-    const lastPos = lastMousePosRef.current
-    
-    if (x !== -1 && y !== -1 && (x !== lastPos.x || y !== lastPos.y)) {
-      fillGridCells(x, y, currentTime)
-      lastMousePosRef.current = { x, y }
-    }
-  }, [screenToGrid, fillGridCells])
-
-  // Event handlers
-  const handleMouseMove = useCallback((e) => {
-    if (prefersReducedMotion) return
-    handlePointerMove(e.clientX, e.clientY)
-  }, [prefersReducedMotion, handlePointerMove])
-
-  const handleTouchMove = useCallback((e) => {
-    if (prefersReducedMotion) return
-    e.preventDefault()
-    const touch = e.touches[0]
-    if (touch) {
-      handlePointerMove(touch.clientX, touch.clientY)
-    }
-  }, [prefersReducedMotion, handlePointerMove])
-
-  // Initialize canvas
+  }
+  
+  // Start animation
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas || isInitializedRef.current) return
-
-    const resizeCanvas = () => {
-      const rect = canvas.getBoundingClientRect()
-      const dpr = window.devicePixelRatio || 1
-      
-      // Set actual canvas size
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      
-      // Scale context for high DPI
-      const ctx = canvas.getContext('2d')
-      ctx.scale(dpr, dpr)
-      
-      // Set CSS size
-      canvas.style.width = rect.width + 'px'
-      canvas.style.height = rect.height + 'px'
-    }
-
-    resizeCanvas()
-    window.addEventListener('resize', resizeCanvas)
-    
-    isInitializedRef.current = true
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas)
-    }
-  }, [])
-
-  // Start animation loop
-  useEffect(() => {
-    if (prefersReducedMotion || !isInitializedRef.current) return
-
-    console.log('Starting animation loop...')
+    console.log('🎬 Animation: Starting loop...')
     animationFrameRef.current = requestAnimationFrame(animate)
     
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
+        console.log('🛑 Animation: Stopped')
       }
     }
-  }, [prefersReducedMotion, animate])
-
-  // Add touch event listeners
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas || prefersReducedMotion) return
-
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
-    
-    return () => {
-      canvas.removeEventListener('touchmove', handleTouchMove)
+  }, [])
+  
+  // Mouse move handler
+  const handleMouseMove = (e) => {
+    const gridPos = screenToGrid(e.clientX, e.clientY)
+    if (gridPos) {
+      console.log('🖱️  Mouse at grid:', gridPos.x, gridPos.y)
+      fillGridCells(gridPos.x, gridPos.y)
     }
-  }, [prefersReducedMotion, handleTouchMove])
-
+  }
+  
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full cursor-crosshair pointer-events-auto"
-      onMouseMove={handleMouseMove}
-      style={{
-        background: prefersReducedMotion 
-          ? 'radial-gradient(circle at center, rgba(20, 241, 149, 0.1) 0%, transparent 70%)'
-          : 'transparent',
-        zIndex: 1
-      }}
-    />
+    <div className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full cursor-crosshair"
+        onMouseMove={handleMouseMove}
+        style={{
+          display: 'block',
+          background: 'transparent'
+        }}
+      />
+    </div>
   )
 }
+
+export default InteractiveGridCanvas
 
 export default InteractiveGridCanvas
