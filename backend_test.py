@@ -1343,7 +1343,13 @@ class TurfLootAPITester:
             ("Enhanced User Profile", self.test_enhanced_user_profile),
             ("User Profile Update", self.test_user_profile_update),
             ("Auth Me Endpoint", self.test_auth_me_endpoint),
-            ("WebSocket Connection", self.test_websocket_connection)
+            ("WebSocket Connection", self.test_websocket_connection),
+            ("Google OAuth - Missing session_id", self.test_google_oauth_missing_session_id),
+            ("Google OAuth - Invalid session_id", self.test_google_oauth_invalid_session_id),
+            ("Google OAuth - Endpoint Structure", self.test_google_oauth_endpoint_structure),
+            ("Google OAuth - CORS Headers", self.test_google_oauth_cors_headers),
+            ("Google OAuth - Response Structure", self.test_google_oauth_response_structure),
+            ("Google OAuth - External API Integration", self.test_google_oauth_external_api_integration)
         ]
         
         # Run each test
