@@ -46,8 +46,8 @@ const HeroContent = ({
       </header>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex items-center justify-center px-8">
-        <div className="w-full max-w-7xl grid grid-cols-12 gap-8 items-center">
+      <div className="flex-1 flex items-center justify-center px-8 pointer-events-none">
+        <div className="w-full max-w-7xl grid grid-cols-12 gap-8 items-center pointer-events-none">
           
           {/* Left Section - Leaderboard */}
           <div className="col-span-3">
