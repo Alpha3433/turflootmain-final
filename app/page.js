@@ -17,10 +17,11 @@ import {
   RefreshCw,
   Crown,
   Star,
-  UserPlus
+  UserPlus,
+  Loader2
 } from 'lucide-react'
 
-const LeaderboardCard = ({ leaderboardData }) => (
+const LeaderboardCard = ({ leaderboardData, loading }) => (
   <Card className="bg-gray-900/80 border-yellow-500/30">
     <CardContent className="p-4">
       <div className="flex items-center justify-between mb-4">
@@ -34,15 +35,27 @@ const LeaderboardCard = ({ leaderboardData }) => (
         </div>
       </div>
       <div className="space-y-3">
-        {leaderboardData.map((player) => (
-          <div key={player.rank} className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-yellow-500 font-bold w-4">{player.rank}.</span>
-              <span className="text-sm">{player.name}</span>
-            </div>
-            <span className="text-yellow-500 font-bold">${player.winnings.toFixed(2)}</span>
+        {loading ? (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="w-4 h-4 animate-spin text-yellow-500" />
+            <span className="ml-2 text-sm text-gray-400">Loading...</span>
           </div>
-        ))}
+        ) : leaderboardData.length > 0 ? (
+          leaderboardData.map((player, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <span className="text-yellow-500 font-bold w-4">{index + 1}.</span>
+                <span className="text-sm">{player.username || `Player_${player.id?.slice(0, 8)}`}</span>
+              </div>
+              <span className="text-yellow-500 font-bold">${player.total_winnings?.toFixed(2) || '0.00'}</span>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-4 text-gray-500">
+            <Trophy className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">No players yet</p>
+          </div>
+        )}
       </div>
       <Button variant="outline" className="w-full mt-4 border-gray-700 text-gray-300 hover:bg-gray-800" size="sm">
         View Full Leaderboard
@@ -52,32 +65,114 @@ const LeaderboardCard = ({ leaderboardData }) => (
 )
 
 export default function Home() {
-  const [globalWinnings, setGlobalWinnings] = useState(76628)
-  const [playersInGame, setPlayersInGame] = useState(33)
+  const [leaderboardData, setLeaderboardData] = useState([])
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true)
+  const [globalStats, setGlobalStats] = useState({ winnings: 0, players: 0 })
+  const [statsLoading, setStatsLoading] = useState(true)
   const [isConnected, setIsConnected] = useState(false)
   const [balance, setBalance] = useState(0)
   const [selectedStake, setSelectedStake] = useState(5)
-  const [username, setUsername] = useState('')
+  const [userProfile, setUserProfile] = useState(null)
+  const [walletAddress, setWalletAddress] = useState('')
 
-  const leaderboardData = [
-    { rank: 1, name: 'TL', winnings: 1589.14 },
-    { rank: 2, name: 'RageStreet', winnings: 1245.25 },
-    { rank: 3, name: 'Xzibit', winnings: 1101.88 }
-  ]
-
+  // Fetch leaderboard data
   useEffect(() => {
-    // Simulate live data updates
-    const interval = setInterval(() => {
-      setGlobalWinnings(prev => prev + Math.floor(Math.random() * 10))
-      setPlayersInGame(prev => Math.max(20, prev + Math.floor(Math.random() * 3 - 1)))
-    }, 3000)
+    const fetchLeaderboard = async () => {
+      try {
+        setLeaderboardLoading(true)
+        const response = await fetch('/api/leaderboard')
+        if (response.ok) {
+          const data = await response.json()
+          setLeaderboardData(data.slice(0, 3)) // Top 3 players
+        }
+      } catch (error) {
+        console.error('Failed to fetch leaderboard:', error)
+      } finally {
+        setLeaderboardLoading(false)
+      }
+    }
+
+    fetchLeaderboard()
+    // Refresh leaderboard every 30 seconds
+    const interval = setInterval(fetchLeaderboard, 30000)
     return () => clearInterval(interval)
   }, [])
 
-  const handleWalletConnect = () => {
-    setIsConnected(!isConnected)
-    setBalance(isConnected ? 0 : 25.50)
-    setUsername(isConnected ? '' : 'bruh!')
+  // Fetch global stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true)
+        // Get total games and calculate stats
+        const gamesResponse = await fetch('/api/games')
+        const usersResponse = await fetch('/api/users')
+        
+        if (gamesResponse.ok && usersResponse.ok) {
+          const games = await gamesResponse.json()
+          const users = await usersResponse.json()
+          
+          // Calculate real stats from data
+          const totalWinnings = users.reduce((sum, user) => sum + (user.profile?.total_winnings || 0), 0)
+          const activeGames = games.filter(game => game.status === 'active').length
+          
+          setGlobalStats({ 
+            winnings: totalWinnings, 
+            players: activeGames 
+          })
+        }
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+      } finally {
+        setStatsLoading(false)
+      }
+    }
+
+    fetchStats()
+    // Refresh stats every 15 seconds
+    const interval = setInterval(fetchStats, 15000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleWalletConnect = async () => {
+    if (!isConnected) {
+      // Simulate wallet connection - in real implementation, this would use Solana wallet adapter
+      const mockWalletAddress = '7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU'
+      setWalletAddress(mockWalletAddress)
+      
+      try {
+        // Check wallet balance
+        const balanceResponse = await fetch(`/api/wallet/${mockWalletAddress}/balance`)
+        if (balanceResponse.ok) {
+          const balanceData = await balanceResponse.json()
+          setBalance(balanceData.sol_balance || 0)
+        }
+
+        // Authenticate user
+        const authResponse = await fetch('/api/auth/wallet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            wallet_address: mockWalletAddress,
+            signature: 'mock_signature',
+            message: 'mock_message'
+          })
+        })
+
+        if (authResponse.ok) {
+          const authData = await authResponse.json()
+          setUserProfile(authData.user)
+          setIsConnected(true)
+        }
+      } catch (error) {
+        console.error('Wallet connection failed:', error)
+      }
+    } else {
+      // Disconnect
+      setIsConnected(false)
+      setUserProfile(null)
+      setWalletAddress('')
+      setBalance(0)
+    }
   }
 
   const stakeAmounts = [1, 5, 20, 50]
@@ -94,7 +189,7 @@ export default function Home() {
         <div className="flex items-center space-x-4">
           <div className="text-orange-400 text-lg">🔥</div>
           <span className="text-lg font-medium">
-            Welcome, {isConnected ? username : 'player'}!
+            Welcome, {isConnected && userProfile ? userProfile.username : 'player'}!
           </span>
         </div>
         <Button className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6">
@@ -105,7 +200,7 @@ export default function Home() {
       <div className="relative z-10 flex h-[calc(100vh-80px)]">
         {/* Left sidebar */}
         <div className="w-80 bg-black/60 backdrop-blur-sm border-r border-yellow-500/20 p-6 space-y-6">
-          <LeaderboardCard leaderboardData={leaderboardData} />
+          <LeaderboardCard leaderboardData={leaderboardData} loading={leaderboardLoading} />
 
           {/* Friends */}
           <Card className="bg-gray-900/80 border-yellow-500/30">
@@ -122,9 +217,13 @@ export default function Home() {
                 <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
                   <UserPlus className="w-5 h-5 text-gray-500" />
                 </div>
-                <p className="text-sm text-gray-500 mb-3">No friends... add some!</p>
+                <p className="text-sm text-gray-500 mb-3">Connect wallet to find friends</p>
               </div>
-              <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white" size="sm">
+              <Button 
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white" 
+                size="sm"
+                disabled={!isConnected}
+              >
                 Add Friends
               </Button>
             </CardContent>
@@ -171,14 +270,14 @@ export default function Home() {
             disabled={!isConnected}
           >
             <Play className="w-6 h-6 mr-3" />
-            {isConnected ? `JOIN GAME` : 'CONNECT WALLET FIRST'}
+            {isConnected ? `JOIN GAME - $${selectedStake}` : 'CONNECT WALLET FIRST'}
           </Button>
 
           {/* Quick actions */}
           <div className="flex space-x-4">
             <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800" size="lg">
               <Settings className="w-4 h-4 mr-2" />
-              UI
+              Settings
             </Button>
             <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800" size="lg">
               <Users className="w-4 h-4 mr-2" />
@@ -189,12 +288,16 @@ export default function Home() {
           {/* Stats */}
           <div className="flex items-center space-x-12 text-center">
             <div>
-              <div className="text-3xl font-bold text-yellow-500">{playersInGame}</div>
+              <div className="text-3xl font-bold text-yellow-500">
+                {statsLoading ? <Loader2 className="w-8 h-8 animate-spin mx-auto" /> : globalStats.players}
+              </div>
               <div className="text-sm text-gray-400">Players in Game</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-yellow-500">${globalWinnings.toLocaleString()}</div>
-              <div className="text-sm text-gray-400">Global Player Winnings</div>
+              <div className="text-3xl font-bold text-yellow-500">
+                {statsLoading ? <Loader2 className="w-8 h-8 animate-spin mx-auto" /> : `$${globalStats.winnings.toFixed(2)}`}
+              </div>
+              <div className="text-sm text-gray-400">Total Player Winnings</div>
             </div>
           </div>
         </div>
@@ -209,19 +312,25 @@ export default function Home() {
                   <Wallet className="w-4 h-4 text-green-400" />
                   <span className="font-bold">Wallet</span>
                 </div>
-                <div className="flex space-x-2">
-                  <Button variant="ghost" size="sm" className="p-1">
-                    <Copy className="w-3 h-3" />
-                  </Button>
-                  <Button variant="ghost" size="sm" className="p-1">
-                    <RefreshCw className="w-3 h-3" />
-                  </Button>
-                </div>
+                {isConnected && (
+                  <div className="flex space-x-2">
+                    <Button variant="ghost" size="sm" className="p-1">
+                      <Copy className="w-3 h-3" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="p-1">
+                      <RefreshCw className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
               </div>
               
               <div className="text-center mb-6">
-                <div className="text-4xl font-bold text-yellow-500">${balance.toFixed(2)}</div>
-                <div className="text-sm text-gray-400">{(balance / 200).toFixed(4)} SOL</div>
+                <div className="text-4xl font-bold text-yellow-500">
+                  {isConnected ? `$${(balance * 200).toFixed(2)}` : '$0.00'}
+                </div>
+                <div className="text-sm text-gray-400">
+                  {isConnected ? `${balance.toFixed(4)} SOL` : '0.0000 SOL'}
+                </div>
               </div>
 
               {isConnected ? (
@@ -246,28 +355,32 @@ export default function Home() {
           </Card>
 
           {/* User profile */}
-          {isConnected && (
+          {isConnected && userProfile && (
             <Card className="bg-gray-900/80 border-yellow-500/30">
               <CardContent className="p-4">
                 <div className="text-center mb-4">
                   <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <span className="font-bold text-black">B</span>
+                    <span className="font-bold text-black">
+                      {userProfile.username?.charAt(0).toUpperCase() || 'P'}
+                    </span>
                   </div>
-                  <h3 className="font-bold">{username}</h3>
+                  <h3 className="font-bold">{userProfile.username}</h3>
                   <p className="text-sm text-gray-400">Connected</p>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Games Won:</span>
-                    <span className="font-semibold">0</span>
+                    <span className="font-semibold">{userProfile.profile?.stats?.games_won || 0}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Win Rate:</span>
-                    <span className="font-semibold">0%</span>
+                    <span className="font-semibold">{userProfile.profile?.win_rate || 0}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Total Winnings:</span>
-                    <span className="font-semibold text-yellow-500">$0.00</span>
+                    <span className="font-semibold text-yellow-500">
+                      ${userProfile.profile?.total_winnings?.toFixed(2) || '0.00'}
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -282,11 +395,19 @@ export default function Home() {
                 <span className="font-bold">Customize</span>
               </div>
               <div className="space-y-3">
-                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+                  disabled={!isConnected}
+                >
                   <Crown className="w-4 h-4 mr-2" />
                   Daily Crate
                 </Button>
-                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-800">
+                <Button 
+                  variant="outline" 
+                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-800"
+                  disabled={!isConnected}
+                >
                   <Star className="w-4 h-4 mr-2" />
                   Affiliate
                 </Button>
