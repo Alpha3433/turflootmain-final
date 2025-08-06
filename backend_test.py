@@ -63,12 +63,12 @@ class TurfLootAPITester:
             raise
 
     def test_root_endpoint(self) -> bool:
-        """Test GET /api/ - Root endpoint"""
-        print("\n🧪 Testing Root Endpoint (GET /api/)")
+        """Test GET /api - Root endpoint"""
+        print("\n🧪 Testing Root Endpoint (GET /api)")
         print("-" * 40)
         
         try:
-            response = self.make_request('GET', '/')
+            response = self.make_request('GET', '')
             
             print(f"Status Code: {response.status_code}")
             print(f"Response: {response.text}")
