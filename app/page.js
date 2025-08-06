@@ -77,6 +77,8 @@ export default function Home() {
           isConnected={isConnected}
           handleWalletConnect={handleWalletConnect}
           setShowLoginModal={setShowLoginModal}
+          balance={balance}
+          userProfile={userProfile}
         />
       </section>
 
