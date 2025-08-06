@@ -12,7 +12,7 @@ export default function Home() {
   const [selectedStake, setSelectedStake] = useState(5)
   const [userProfile, setUserProfile] = useState(null)
   const [walletAddress, setWalletAddress] = useState('')
-  const [showLoginModal, setShowLoginModal] = useState(true)  // Force modal open for testing
+  const [showLoginModal, setShowLoginModal] = useState(false)
 
   const handleWalletConnect = async () => {
     if (!isConnected) {
