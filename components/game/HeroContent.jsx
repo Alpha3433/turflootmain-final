@@ -93,7 +93,7 @@ const HeroContent = ({
           </div>
 
           {/* Center Section - Main Game */}
-          <div className="col-span-6 text-center space-y-8">
+          <div className="col-span-6 text-center space-y-8 pointer-events-auto">
             {/* Branding */}
             <div className="space-y-4">
               <h1 className="text-6xl font-black tracking-wider leading-tight">
