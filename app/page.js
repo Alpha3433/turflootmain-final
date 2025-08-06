@@ -4,10 +4,6 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { WalletBalance } from '@/components/wallet/WalletBalance'
 import { 
   Play, 
   Zap, 
@@ -23,6 +19,71 @@ import {
   Wallet
 } from 'lucide-react'
 import Link from 'next/link'
+
+// Mock wallet connection for demonstration
+function MockWalletConnect() {
+  const [connected, setConnected] = useState(false)
+  const [connecting, setConnecting] = useState(false)
+  
+  const handleConnect = () => {
+    setConnecting(true)
+    setTimeout(() => {
+      setConnected(true)
+      setConnecting(false)
+    }, 1500)
+  }
+  
+  const handleDisconnect = () => {
+    setConnected(false)
+  }
+  
+  if (connected) {
+    return (
+      <div className="flex items-center space-x-3">
+        <div className="group relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] to-[#0EA876] rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
+          <div className="relative px-6 py-3 bg-gradient-to-r from-[#14F195]/15 via-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/30 rounded-xl text-[#14F195] text-sm font-mono shadow-lg">
+            7xKXtg...sgAsU
+          </div>
+        </div>
+        <div className="group relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-red-500 to-red-600 rounded-lg blur opacity-0 group-hover:opacity-40 transition duration-300"></div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleDisconnect}
+            className="relative hover:bg-red-500/10 hover:text-red-400 transition-all duration-300 border border-transparent hover:border-red-500/30 rounded-lg backdrop-blur-sm"
+          >
+            <LogOut className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    )
+  }
+  
+  return (
+    <div className="relative group">
+      <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-xl blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
+      <Button 
+        onClick={handleConnect} 
+        disabled={connecting}
+        className="relative bg-gradient-to-r from-[#FFD54F] to-[#FFA726] hover:from-[#FFD54F]/90 hover:to-[#FFA726]/90 text-black font-bold px-8 py-3 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden group"
+      >
+        {connecting ? (
+          <>
+            <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin mr-3" />
+            <span className="relative z-10">Connecting...</span>
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            <span className="relative z-10">Connect Wallet</span>
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
 
 // Ultra-modern leaderboard component with real data
 function Leaderboard() {
@@ -127,17 +188,15 @@ function Leaderboard() {
   )
 }
 
-// Enhanced game lobby with real blockchain integration
+// Enhanced game lobby
 function GameLobby({ onGameStart }) {
   const [selectedAmount, setSelectedAmount] = useState(1)
   const [currentPot, setCurrentPot] = useState(1247)
   const [pots, setPots] = useState([])
-  const { connected } = useWallet()
-  const { isAuthenticated } = useAuth()
   
   useEffect(() => {
     fetchPots()
-    const interval = setInterval(fetchPots, 30000) // Update every 30 seconds
+    const interval = setInterval(fetchPots, 30000)
     return () => clearInterval(interval)
   }, [])
   
@@ -147,7 +206,6 @@ function GameLobby({ onGameStart }) {
       if (response.ok) {
         const data = await response.json()
         setPots(data)
-        // Update current pot based on selected amount
         const selectedPot = data.find(p => p.table === `$${selectedAmount}`)
         if (selectedPot) {
           setCurrentPot(selectedPot.pot)
@@ -159,21 +217,21 @@ function GameLobby({ onGameStart }) {
   }
   
   const gameAmounts = [
-    { value: 1, label: '$1', subtitle: 'Quick Play', color: 'from-blue-500 to-blue-600' },
-    { value: 5, label: '$5', subtitle: 'Standard', color: 'from-purple-500 to-purple-600' },
-    { value: 20, label: '$20', subtitle: 'High Stakes', color: 'from-red-500 to-red-600' }
+    { value: 1, label: '$1', subtitle: 'Quick Play' },
+    { value: 5, label: '$5', subtitle: 'Standard' },
+    { value: 20, label: '$20', subtitle: 'High Stakes' }
   ]
   
   return (
     <div className="text-center">
-      {/* Ultra-modern status indicator */}
+      {/* Status indicator */}
       <div className="flex items-center justify-center mb-10">
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] via-[#FFD54F] to-[#14F195] rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
           <div className="relative flex items-center space-x-4 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#14F195]/15 via-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/30 shadow-2xl">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded-full bg-[#14F195] animate-pulse shadow-lg shadow-[#14F195]/50" />
-              <span className="text-sm font-bold text-[#14F195] tracking-wide">LIVE GAMES</span>
+              <span className="text-sm font-bold text-[#14F195] tracking-wide">BLOCKCHAIN CONNECTED</span>
             </div>
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
             <div className="flex items-center space-x-2">
@@ -182,7 +240,6 @@ function GameLobby({ onGameStart }) {
                 {pots.reduce((total, pot) => total + pot.players, 0)} Active
               </span>
             </div>
-            <div className="w-2 h-2 rounded-full bg-[#FFD54F] animate-pulse" />
           </div>
         </div>
       </div>
@@ -197,11 +254,9 @@ function GameLobby({ onGameStart }) {
             </div>
           </div>
           <div className="flex items-center justify-center mt-4 space-x-3">
-            <div className="w-px h-6 bg-gradient-to-b from-transparent via-[#FFD54F]/50 to-transparent"></div>
             <Star className="w-5 h-5 text-[#FFD54F] animate-pulse" />
             <span className="text-xl text-gray-200 font-semibold tracking-wide">Total Prize Pool</span>
             <Star className="w-5 h-5 text-[#FFD54F] animate-pulse" />
-            <div className="w-px h-6 bg-gradient-to-b from-transparent via-[#FFD54F]/50 to-transparent"></div>
           </div>
         </div>
       </div>
@@ -254,8 +309,6 @@ function GameLobby({ onGameStart }) {
                     </div>
                   )}
                 </div>
-                
-                <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             )
           })}
@@ -269,42 +322,22 @@ function GameLobby({ onGameStart }) {
           <Button
             onClick={() => onGameStart(selectedAmount)}
             size="lg"
-            disabled={!connected || !isAuthenticated}
-            className="relative w-96 h-18 text-2xl font-bold bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black rounded-2xl shadow-2xl shadow-[#14F195]/40 transform hover:scale-105 transition-all duration-300 group overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+            className="relative w-96 h-18 text-2xl font-bold bg-gradient-to-r from-[#14F195] to-[#0EA876] hover:from-[#14F195]/90 hover:to-[#0EA876]/90 text-black rounded-2xl shadow-2xl shadow-[#14F195]/40 transform hover:scale-105 transition-all duration-300 group overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             <Play className="w-7 h-7 mr-4 relative z-10" />
-            <span className="relative z-10">
-              {!connected ? 'CONNECT WALLET' : !isAuthenticated ? 'AUTHENTICATE' : `START GAME - ${selectedAmount}`}
-            </span>
+            <span className="relative z-10">START GAME - ${selectedAmount}</span>
           </Button>
         </div>
         <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-300">
           <div className="flex items-center">
             <Shield className="w-4 h-4 text-[#14F195] mr-2" />
-            <span>100% skill-based</span>
+            <span>Real blockchain integration</span>  
           </div>
           <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-          <span>Real-time multiplayer</span>
+          <span>Multiplayer battles</span>
           <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
           <span>Instant SOL payouts</span>
-        </div>
-      </div>
-      
-      {/* System status */}
-      <div className="text-center">
-        <div className="relative group inline-flex">
-          <div className="absolute -inset-1 bg-gradient-to-r from-green-500 to-green-400 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
-          <div className="relative inline-flex items-center space-x-3 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500/15 via-green-400/10 to-green-500/5 border border-green-500/30 backdrop-blur-sm">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50" />
-            <span className="text-sm font-semibold text-green-400">Blockchain Connected</span>
-            <div className="flex space-x-1">
-              <div className="w-1 h-4 bg-green-400 rounded animate-pulse"></div>
-              <div className="w-1 h-3 bg-green-400 rounded animate-pulse" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-1 h-5 bg-green-400 rounded animate-pulse" style={{animationDelay: '0.2s'}}></div>
-              <div className="w-1 h-2 bg-green-400 rounded animate-pulse" style={{animationDelay: '0.3s'}}></div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -312,31 +345,14 @@ function GameLobby({ onGameStart }) {
 }
 
 export default function HomePage() {
-  const { publicKey, connected } = useWallet()
-  const { user, isAuthenticated, authenticateWallet, logout } = useAuth()
-  
-  const handleGameStart = async (amount) => {
-    if (!connected) {
-      alert('Please connect your wallet first!')
-      return
-    }
-    
-    if (!isAuthenticated) {
-      try {
-        await authenticateWallet()
-      } catch (error) {
-        alert('Authentication failed. Please try again.')
-        return
-      }
-    }
-    
+  const handleGameStart = (amount) => {
     // Navigate to game with selected amount
     window.location.href = `/play?stake=${amount}`
   }
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#0F0F0F] relative overflow-hidden">
-      {/* Enhanced grid background with dynamic elements */}
+      {/* Enhanced grid background */}
       <div className="absolute inset-0 opacity-[0.07]">
         <div className="grid grid-cols-32 grid-rows-24 h-full w-full">
           {Array.from({ length: 768 }).map((_, i) => (
@@ -348,21 +364,16 @@ export default function HomePage() {
         </div>
       </div>
       
-      {/* Enhanced gradient overlays */}
+      {/* Gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#14F195]/8 via-transparent to-[#FFD54F]/8" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#14F195]/3 to-black/30" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.8)_70%)]" />
       
-      {/* Floating ambient elements */}
-      <div className="absolute top-20 left-20 w-2 h-2 bg-[#14F195] rounded-full animate-ping" />
-      <div className="absolute top-40 right-32 w-1 h-1 bg-[#FFD54F] rounded-full animate-pulse" />
-      <div className="absolute bottom-32 left-16 w-1.5 h-1.5 bg-[#14F195]/60 rounded-full animate-bounce" />
-      
-      {/* Ultra-modern header */}
+      {/* Header */}
       <header className="relative z-20 flex items-center justify-between p-6">
         <div className="flex items-center space-x-4">
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] via-[#FFD54F] to-[#14F195] rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#14F195] via-[#FFD54F] to-[#14F195] rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
             <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-[#14F195] to-[#0EA876] flex items-center justify-center shadow-2xl shadow-[#14F195]/30 group-hover:scale-105 transition-all duration-300">
               <Zap className="w-7 h-7 text-black" />
             </div>
@@ -378,64 +389,44 @@ export default function HomePage() {
         </div>
         
         <div className="flex items-center space-x-4">
-          {/* User info */}
-          {isAuthenticated && user && (
-            <div className="hidden md:flex items-center space-x-3 px-4 py-2 rounded-xl bg-gradient-to-r from-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/20">
-              <Wallet className="w-4 h-4 text-[#14F195]" />
-              <span className="text-sm text-[#14F195] font-medium">{user.username}</span>
-              <button onClick={logout} className="text-gray-400 hover:text-red-400 transition-colors">
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-          
-          {/* Wallet connection */}
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#FFD54F] to-[#FFA726] rounded-xl blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
-            <WalletMultiButton className="relative !bg-gradient-to-r !from-[#FFD54F] !to-[#FFA726] hover:!from-[#FFD54F]/90 hover:!to-[#FFA726]/90 !text-black !font-bold !px-8 !py-3 !rounded-xl !shadow-xl hover:!shadow-2xl !transition-all !duration-300 !border-none" />
+          <div className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#14F195]/10 to-[#14F195]/5 backdrop-blur-xl border border-[#14F195]/20">
+            <div className="w-2 h-2 bg-[#14F195] rounded-full animate-pulse" />
+            <span className="text-sm text-[#14F195] font-medium">System Ready</span>
           </div>
+          
+          <MockWalletConnect />
         </div>
       </header>
       
-      {/* Main content grid */}
+      {/* Main content */}
       <div className="relative z-10 grid grid-cols-12 gap-6 p-6 h-[calc(100vh-140px)]">
         {/* Left sidebar */}
         <div className="col-span-3 space-y-6">
           <Leaderboard />
           
-          {/* Community section */}
-          <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[#14F195]/10 transition-all duration-500 group">
+          {/* Features showcase */}
+          <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  <div className="relative">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
-                    <div className="relative w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center mr-3">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
+              <div className="text-center">
+                <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">New Features</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center text-green-400">  
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-3"></div>
+                    Real Solana Integration
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Community</h3>
-                    <p className="text-xs text-gray-400">1.2k online players</p>
+                  <div className="flex items-center text-blue-400">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+                    User Authentication
                   </div>
-                </div>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50" />
-              </div>
-              <div className="text-center py-6">
-                <div className="relative w-16 h-16 mx-auto mb-4">
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-600/20 to-gray-700/20 rounded-2xl backdrop-blur-sm"></div>
-                  <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-gray-600/30 to-gray-700/30 flex items-center justify-center border border-white/10">
-                    <Users className="w-8 h-8 text-gray-400" />
+                  <div className="flex items-center text-purple-400">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>  
+                    Multiplayer Battles
+                  </div>
+                  <div className="flex items-center text-yellow-400">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
+                    Live Leaderboards
                   </div>
                 </div>
-                <div className="text-sm text-gray-300 mb-4 font-medium">Join the action</div>
-                <Button 
-                  className="bg-gradient-to-r from-[#14F195]/20 to-[#14F195]/10 border border-[#14F195]/30 text-[#14F195] hover:from-[#14F195]/30 hover:to-[#14F195]/20 rounded-xl backdrop-blur-sm font-medium transition-all duration-300"
-                  variant="outline"
-                  size="sm"
-                >
-                  Connect Discord
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -448,15 +439,44 @@ export default function HomePage() {
         
         {/* Right sidebar */}
         <div className="col-span-3 space-y-6">
-          {connected ? <WalletBalance /> : (
-            <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl">
-              <CardContent className="p-6 text-center">
-                <Wallet className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-300 mb-4">Connect your wallet to view balance and start playing</p>
-                <WalletMultiButton className="!bg-gradient-to-r !from-[#14F195] !to-[#0EA876] hover:!from-[#14F195]/90 hover:!to-[#0EA876]/90 !text-black !font-medium !rounded-xl !border-none" />
-              </CardContent>
-            </Card>
-          )}
+          {/* System status */}
+          <Card className="bg-gradient-to-br from-black/40 via-black/30 to-black/20 backdrop-blur-2xl border border-white/20 shadow-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#14F195] to-[#0EA876] flex items-center justify-center mr-3">
+                  <Shield className="w-5 h-5 text-black" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">System Status</h3>
+                  <p className="text-xs text-gray-400">All systems operational</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">Blockchain</span>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span className="text-xs text-green-400">Connected</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">Authentication</span>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span className="text-xs text-green-400">Ready</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">Multiplayer</span>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span className="text-xs text-green-400">Active</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
           {/* Action buttons */}
           <div className="space-y-3">
@@ -466,26 +486,24 @@ export default function HomePage() {
               asChild
             >
               <Link href="/dashboard">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#14F195]/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                 <Settings className="w-4 h-4 mr-2 relative z-10" />
                 <span className="relative z-10">View Dashboard</span>
               </Link>
             </Button>
             <Button 
-              className="w-full group relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-500 hover:via-purple-500 hover:to-blue-500 text-white rounded-xl shadow-xl shadow-blue-600/20 hover:shadow-blue-500/30 font-medium transition-all duration-300"
+              className="w-full group relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 hover:from-blue-500 hover:via-purple-500 hover:to-blue-500 text-white rounded-xl shadow-xl font-medium transition-all duration-300"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              <span className="relative z-10">Join Discord Community</span>
+              <span className="relative z-10">Join Community</span>
             </Button>
           </div>
         </div>
       </div>
       
-      {/* Modern compliance banner */}
+      {/* Compliance banner */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-black/80 via-black/90 to-black/80 backdrop-blur-xl border-t border-white/10 px-6 py-3 text-center text-xs text-gray-300 z-10">
         <div className="flex items-center justify-center space-x-4">
           <Shield className="w-4 h-4 text-[#14F195]" />
-          <span>TurfLoot: 100% skill-based gaming • Real blockchain integration • Instant SOL payouts</span>
+          <span>TurfLoot: Real blockchain integration • Skill-based gaming • Secure & transparent</span>
           <Link href="/legal" className="text-[#14F195] hover:text-[#14F195]/80 underline">
             Legal & Terms
           </Link>
