@@ -251,6 +251,136 @@ export async function POST(request, { params }) {
       }, { headers: corsHeaders })
     }
 
+    // Google authentication callback
+    if (route === 'auth/google-callback') {
+      const { session_id } = body
+      
+      if (!session_id) {
+        return NextResponse.json(
+          { error: 'Missing session_id' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+      
+      try {
+        // Call Emergent auth API to validate session and get user data
+        const authResponse = await fetch('https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data', {
+          headers: {
+            'X-Session-ID': session_id,
+            'Content-Type': 'application/json'
+          }
+        })
+        
+        if (!authResponse.ok) {
+          throw new Error('Invalid session_id')
+        }
+        
+        const googleUserData = await authResponse.json()
+        const { id, email, name, picture, session_token } = googleUserData
+        
+        // Find or create user in MongoDB
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        let user = await users.findOne({ email })
+        
+        if (!user) {
+          // Create new user with Google data
+          user = {
+            id: crypto.randomUUID(),
+            email,
+            username: name || `user_${Date.now()}`,
+            google_id: id,
+            profile: {
+              avatar_url: picture || null,
+              display_name: name || email.split('@')[0],
+              bio: '',
+              total_games: 0,
+              total_winnings: 0,
+              win_rate: 0,
+              favorite_stake: 1,
+              achievements: [],
+              stats: {
+                games_played: 0,
+                games_won: 0,
+                total_territory_captured: 0,
+                best_territory_percent: 0,
+                longest_game_duration: 0,
+                total_time_played: 0
+              }
+            },
+            preferences: {
+              theme: 'dark',
+              notifications: true,
+              sound_effects: true,
+              auto_cash_out: false,
+              auto_cash_out_threshold: 50
+            },
+            auth_method: 'google',
+            session_token,
+            session_expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+            created_at: new Date(),
+            updated_at: new Date(),
+            last_login: new Date(),
+            status: 'active'
+          }
+          
+          await users.insertOne(user)
+        } else {
+          // Update existing user with new session
+          await users.updateOne(
+            { email },
+            {
+              $set: {
+                session_token,
+                session_expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                last_login: new Date(),
+                updated_at: new Date(),
+                'profile.avatar_url': picture || user.profile?.avatar_url
+              }
+            }
+          )
+        }
+        
+        // Generate JWT token for consistent auth system
+        const jwtToken = jwt.sign(
+          {
+            userId: user.id,
+            email: user.email,
+            username: user.username,
+            auth_method: 'google'
+          },
+          JWT_SECRET,
+          { expiresIn: '7d' }
+        )
+        
+        return NextResponse.json({
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            profile: user.profile,
+            auth_method: 'google'
+          },
+          token: jwtToken,
+          session_token
+        }, { 
+          headers: {
+            ...corsHeaders,
+            'Set-Cookie': `session_token=${session_token}; Path=/; HttpOnly; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax`
+          }
+        })
+        
+      } catch (error) {
+        console.error('Google auth callback error:', error)
+        return NextResponse.json(
+          { error: 'Authentication failed' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+    }
+
     if (route === 'auth/register') {
       const user = await createUser(body)
       const { password_hash, ...publicUser } = user
