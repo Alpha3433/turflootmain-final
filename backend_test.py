@@ -26,6 +26,7 @@ class TurfLootAPITester:
         # Store created resources for cleanup
         self.created_users = []
         self.created_games = []
+        self.auth_token = None
         
         print(f"🚀 TurfLoot API Tester initialized")
         print(f"📍 Base URL: {self.base_url}")
