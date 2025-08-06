@@ -9,25 +9,49 @@ import {
   Trophy, 
   Users, 
   Settings,
-  LogOut,
   TrendingUp,
-  Star,
   Shield,
   Wallet,
-  CheckCircle,
   Plus,
-  Gamepad2,
   Copy,
   RefreshCw,
   Crown,
-  Zap,
-  DollarSign,
+  Star,
   UserPlus
 } from 'lucide-react'
-import Link from 'next/link'
+
+const LeaderboardCard = ({ leaderboardData }) => (
+  <Card className="bg-gray-900/80 border-yellow-500/30">
+    <CardContent className="p-4">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <Trophy className="w-4 h-4 text-yellow-500" />
+          <span className="font-bold">Leaderboard</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-xs text-green-500">LIVE</span>
+        </div>
+      </div>
+      <div className="space-y-3">
+        {leaderboardData.map((player) => (
+          <div key={player.rank} className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="text-yellow-500 font-bold w-4">{player.rank}.</span>
+              <span className="text-sm">{player.name}</span>
+            </div>
+            <span className="text-yellow-500 font-bold">${player.winnings.toFixed(2)}</span>
+          </div>
+        ))}
+      </div>
+      <Button variant="outline" className="w-full mt-4 border-gray-700 text-gray-300 hover:bg-gray-800" size="sm">
+        View Full Leaderboard
+      </Button>
+    </CardContent>
+  </Card>
+)
 
 export default function Home() {
-  const [livePot, setLivePot] = useState(156.78)
   const [globalWinnings, setGlobalWinnings] = useState(76628)
   const [playersInGame, setPlayersInGame] = useState(33)
   const [isConnected, setIsConnected] = useState(false)
@@ -44,10 +68,9 @@ export default function Home() {
   useEffect(() => {
     // Simulate live data updates
     const interval = setInterval(() => {
-      setLivePot(prev => prev + Math.random() * 0.5)
       setGlobalWinnings(prev => prev + Math.floor(Math.random() * 10))
       setPlayersInGame(prev => Math.max(20, prev + Math.floor(Math.random() * 3 - 1)))
-    }, 2000)
+    }, 3000)
     return () => clearInterval(interval)
   }, [])
 
@@ -63,11 +86,7 @@ export default function Home() {
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Animated grid background */}
       <div className="absolute inset-0 opacity-5">
-        <div className="grid grid-cols-12 h-full">
-          {Array.from({ length: 144 }).map((_, i) => (
-            <div key={i} className="border border-yellow-500/20 animate-pulse" style={{ animationDelay: `${i * 0.1}s` }}></div>
-          ))}
-        </div>
+        <div className="bg-grid-pattern h-full animate-pulse"></div>
       </div>
 
       {/* Top header */}
@@ -78,10 +97,7 @@ export default function Home() {
             Welcome, {isConnected ? username : 'player'}!
           </span>
         </div>
-        <Button 
-          className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6"
-          onClick={() => setUsername('Enter username')}
-        >
+        <Button className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6">
           {isConnected ? 'Profile' : 'Login'}
         </Button>
       </header>
@@ -89,39 +105,7 @@ export default function Home() {
       <div className="relative z-10 flex h-[calc(100vh-80px)]">
         {/* Left sidebar */}
         <div className="w-80 bg-black/60 backdrop-blur-sm border-r border-yellow-500/20 p-6 space-y-6">
-          {/* Leaderboard */}
-          <Card className="bg-gray-900/80 border-yellow-500/30">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="w-4 h-4 text-yellow-500" />
-                  <span className="font-bold">Leaderboard</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-green-500">LIVE</span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                {leaderboardData.map((player) => (
-                  <div key={player.rank} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-yellow-500 font-bold w-4">{player.rank}.</span>
-                      <span className="text-sm">{player.name}</span>
-                    </div>
-                    <span className="text-yellow-500 font-bold">${player.winnings.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-              <Button 
-                variant="outline" 
-                className="w-full mt-4 border-gray-700 text-gray-300 hover:bg-gray-800"
-                size="sm"
-              >
-                View Full Leaderboard
-              </Button>
-            </CardContent>
-          </Card>
+          <LeaderboardCard leaderboardData={leaderboardData} />
 
           {/* Friends */}
           <Card className="bg-gray-900/80 border-yellow-500/30">
@@ -130,9 +114,7 @@ export default function Home() {
                 <div className="flex items-center space-x-2">
                   <Users className="w-4 h-4 text-blue-400" />
                   <span className="font-bold">Friends</span>
-                  <Badge variant="secondary" className="bg-blue-900/50 text-blue-400">
-                    Online
-                  </Badge>
+                  <Badge variant="secondary" className="bg-blue-900/50 text-blue-400">Online</Badge>
                 </div>
                 <span className="text-sm text-gray-400">0 playing</span>
               </div>
@@ -142,10 +124,7 @@ export default function Home() {
                 </div>
                 <p className="text-sm text-gray-500 mb-3">No friends... add some!</p>
               </div>
-              <Button 
-                className="w-full bg-gray-800 hover:bg-gray-700 text-white"
-                size="sm"
-              >
+              <Button className="w-full bg-gray-800 hover:bg-gray-700 text-white" size="sm">
                 Add Friends
               </Button>
             </CardContent>
@@ -184,13 +163,6 @@ export default function Home() {
                 ${amount}
               </Button>
             ))}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-yellow-500 hover:bg-yellow-500/20 ml-4"
-            >
-              ?
-            </Button>
           </div>
 
           {/* Main join button */}
@@ -204,19 +176,11 @@ export default function Home() {
 
           {/* Quick actions */}
           <div className="flex space-x-4">
-            <Button 
-              variant="outline"
-              className="border-gray-600 text-gray-300 hover:bg-gray-800"
-              size="lg"
-            >
+            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800" size="lg">
               <Settings className="w-4 h-4 mr-2" />
               UI
             </Button>
-            <Button 
-              variant="outline"
-              className="border-gray-600 text-gray-300 hover:bg-gray-800"
-              size="lg"
-            >
+            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800" size="lg">
               <Users className="w-4 h-4 mr-2" />
               Browse Lobbies
             </Button>
@@ -281,7 +245,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* User profile/login */}
+          {/* User profile */}
           {isConnected && (
             <Card className="bg-gray-900/80 border-yellow-500/30">
               <CardContent className="p-4">
@@ -336,7 +300,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Decorative game elements */}
+      {/* Decorative elements */}
       <div className="absolute bottom-8 right-8 z-10">
         <div className="w-32 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full opacity-80 animate-pulse"></div>
       </div>
@@ -345,10 +309,7 @@ export default function Home() {
       </div>
 
       {/* Discord button */}
-      <Button 
-        className="absolute bottom-6 left-6 bg-indigo-600 hover:bg-indigo-500"
-        size="sm"
-      >
+      <Button className="absolute bottom-6 left-6 bg-indigo-600 hover:bg-indigo-500" size="sm">
         Join Discord
       </Button>
     </div>
