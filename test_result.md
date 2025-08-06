@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Continue with landing page modernization redesign for TurfLoot"
+user_problem_statement: "Implement three high-priority features: Real Blockchain Integration, Real-Time Multiplayer System, and User Authentication & Profiles"
 
 backend:
   - task: "Root endpoint (GET /api/)"
