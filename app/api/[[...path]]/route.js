@@ -1,284 +1,474 @@
-import { MongoClient } from 'mongodb'
-import { v4 as uuidv4 } from 'uuid'
 import { NextResponse } from 'next/server'
+import { MongoClient } from 'mongodb'
+import { createUser, authenticateUser, verifyToken, requireAuth, updateUserProfile, getUserStats } from '@/lib/auth'
+import { getSolBalance, getTokenAccounts } from '@/lib/solana'
 
-// MongoDB connection
-let client
-let db
+const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017'
+const DB_NAME = process.env.DB_NAME || 'turfloot_db'
 
-async function connectToMongo() {
+let client = null
+
+async function getDb() {
   if (!client) {
-    client = new MongoClient(process.env.MONGO_URL)
+    client = new MongoClient(MONGO_URL)
     await client.connect()
-    db = client.db(process.env.DB_NAME)
   }
-  return db
+  return client.db(DB_NAME)
 }
 
-// Helper function to handle CORS
-function handleCORS(response) {
-  response.headers.set('Access-Control-Allow-Origin', '*')
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
-  return response
+// Enable CORS
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 }
 
-// OPTIONS handler for CORS
-export async function OPTIONS() {
-  return handleCORS(new NextResponse(null, { status: 200 }))
-}
-
-// Verify Privy webhook signature
-function verifyPrivySignature(payload, signature, secret) {
-  // TODO: Implement proper HMAC-SHA256 verification
-  const crypto = require('crypto');
+// Route handler
+export async function GET(request, { params }) {
+  const { path } = params
+  const url = new URL(request.url)
   
   try {
-    const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(payload);
-    const calculatedSignature = hmac.digest('hex');
-    
-    return crypto.timingSafeEqual(
-      Buffer.from(calculatedSignature),
-      Buffer.from(signature)
-    );
-  } catch (error) {
-    console.log('[PRIVY] Signature verification error:', error);
-    return true; // Allow for development - TODO: Change in production
-  }
-}
-
-// Route handler function
-async function handleRoute(request, { params }) {
-  const { path = [] } = params
-  const route = `/${path.join('/')}`
-  const method = request.method
-
-  try {
-    const db = await connectToMongo()
-
-    // Root endpoint
-    if (route === '/' && method === 'GET') {
-      return handleCORS(NextResponse.json({ 
-        message: "TurfLoot API v1.0",
-        service: "Skill-based crypto land battles" 
-      }))
+    // Root API endpoint
+    if (!path || path.length === 0) {
+      return NextResponse.json(
+        { 
+          message: 'TurfLoot API v2.0',
+          service: 'turfloot-backend',
+          features: ['auth', 'blockchain', 'multiplayer'],
+          timestamp: new Date().toISOString()
+        },
+        { headers: corsHeaders }
+      )
     }
 
-    // GET /api/pots - Returns current game pot values
-    if (route === '/pots' && method === 'GET') {
+    const route = path.join('/')
+
+    // Authentication routes
+    if (route === 'auth/me') {
+      return requireAuth(async (req) => {
+        const stats = await getUserStats(req.user.id)
+        return NextResponse.json({
+          user: req.user,
+          stats
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Blockchain routes
+    if (route.startsWith('wallet/')) {
+      const walletAddress = route.split('/')[1]
+      
+      if (route.endsWith('/balance')) {
+        const balance = await getSolBalance(walletAddress)
+        return NextResponse.json({
+          wallet_address: walletAddress,
+          sol_balance: balance,
+          usd_value: balance * 210, // Approximate SOL price
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      }
+      
+      if (route.endsWith('/tokens')) {
+        const tokens = await getTokenAccounts(walletAddress)
+        return NextResponse.json({
+          wallet_address: walletAddress,
+          tokens,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      }
+    }
+
+    // Game pots endpoint
+    if (route === 'pots') {
+      const db = await getDb()
+      const games = db.collection('games')
+      
+      // Get active game statistics
+      const stats = await games.aggregate([
+        {
+          $match: {
+            created_at: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Last 24 hours
+          }
+        },
+        {
+          $group: {
+            _id: '$stake',
+            totalPot: { $sum: '$stake' },
+            playerCount: { $sum: 1 }
+          }
+        }
+      ]).toArray()
+      
       const pots = [
-        { table: '$1', pot: 24.50, players: 8 },
-        { table: '$5', pot: 87.25, players: 12 },
-        { table: '$20', pot: 340.00, players: 15 }
+        { 
+          table: '$1', 
+          pot: stats.find(s => s._id === 1)?.totalPot || 127, 
+          players: stats.find(s => s._id === 1)?.playerCount || 45 
+        },
+        { 
+          table: '$5', 
+          pot: stats.find(s => s._id === 5)?.totalPot || 892, 
+          players: stats.find(s => s._id === 5)?.playerCount || 23 
+        },
+        { 
+          table: '$20', 
+          pot: stats.find(s => s._id === 20)?.totalPot || 3456, 
+          players: stats.find(s => s._id === 20)?.playerCount || 12 
+        }
       ]
       
-      return handleCORS(NextResponse.json(pots))
+      return NextResponse.json(pots, { headers: corsHeaders })
     }
 
-    // POST /api/withdraw - Handle SOL cash-out requests
-    if (route === '/withdraw' && method === 'POST') {
-      const body = await request.json()
+    // User routes
+    if (route.startsWith('users/')) {
+      const userId = route.split('/')[1]
       
-      if (!body.wallet_address || !body.amount) {
-        return handleCORS(NextResponse.json(
-          { error: "wallet_address and amount are required" }, 
-          { status: 400 }
-        ))
+      if (request.method === 'GET') {
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        const user = await users.findOne({ 
+          $or: [
+            { id: userId },
+            { wallet_address: userId }
+          ]
+        })
+        
+        if (!user) {
+          return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+        
+        // Remove sensitive data
+        const { password_hash, ...publicUser } = user
+        
+        return NextResponse.json(publicUser, { headers: corsHeaders })
       }
-
-      // TODO: Implement Solana Anchor program call
-      const withdrawalId = uuidv4()
-      const withdrawal = {
-        id: withdrawalId,
-        wallet_address: body.wallet_address,
-        amount: body.amount,
-        status: 'pending',
-        timestamp: new Date(),
-        tx_hash: null // Will be populated after blockchain transaction
-      }
-
-      await db.collection('withdrawals').insertOne(withdrawal)
-      
-      // Simulate withdrawal processing (TODO: Replace with real Solana transaction)
-      console.log(`[SOLANA] Processing withdrawal: ${body.amount} SOL to ${body.wallet_address}`)
-      
-      return handleCORS(NextResponse.json({
-        message: "Withdrawal request submitted",
-        withdrawal_id: withdrawalId,
-        status: "pending"
-      }))
     }
 
-    // POST /api/onramp/webhook - Privy webhook handler
-    if (route === '/onramp/webhook' && method === 'POST') {
-      const body = await request.text()
-      const signature = request.headers.get('x-privy-signature')
-      
-      if (!verifyPrivySignature(body, signature, process.env.PRIVY_APP_SECRET)) {
-        return handleCORS(NextResponse.json(
-          { error: "Invalid signature" }, 
-          { status: 401 }
-        ))
-      }
-
-      const webhookData = JSON.parse(body)
-      console.log('[PRIVY] Webhook processed:', webhookData)
-      
-      // TODO: Credit user balance based on webhook data
-      const webhookRecord = {
-        id: uuidv4(),
-        event_type: webhookData.event_type || webhookData.eventType,
-        user_id: webhookData.user?.id || webhookData.data?.user_id,
-        amount: webhookData.data?.crypto_amount || webhookData.cryptoAmount,
-        currency: webhookData.data?.crypto_currency || webhookData.cryptoCurrency,
-        status: webhookData.data?.status || webhookData.status,
-        timestamp: new Date(),
-        raw_data: webhookData
-      }
-
-      await db.collection('privy_onramp_events').insertOne(webhookRecord)
-      
-      // Handle different event types
-      switch (webhookData.event_type) {
-        case 'fiat_onramp.created':
-          console.log('[PRIVY] On-ramp created:', webhookData.data?.id)
-          break
-        case 'fiat_onramp.completed':
-          console.log('[PRIVY] On-ramp completed:', webhookData.data?.id)
-          // TODO: Credit user SOL balance
-          break
-        case 'fiat_onramp.failed':
-          console.log('[PRIVY] On-ramp failed:', webhookData.data?.id)
-          break
-        default:
-          console.log('[PRIVY] Unhandled event type:', webhookData.event_type)
-      }
-      
-      return handleCORS(NextResponse.json({ message: "Webhook processed" }))
+    // Games routes
+    if (route === 'games') {
+      return requireAuth(async (req) => {
+        const db = await getDb()
+        const games = db.collection('games')
+        
+        const userGames = await games.find({ player_id: req.user.id })
+          .sort({ created_at: -1 })
+          .limit(20)
+          .toArray()
+        
+        return NextResponse.json(userGames, { headers: corsHeaders })
+      })(request)
     }
 
-    // POST /api/users - Create or update user profile
-    if (route === '/users' && method === 'POST') {
-      const body = await request.json()
+    if (route.startsWith('games/') && route.split('/').length === 2) {
+      const gameId = route.split('/')[1]
       
-      if (!body.wallet_address) {
-        return handleCORS(NextResponse.json(
-          { error: "wallet_address is required" }, 
-          { status: 400 }
-        ))
+      const db = await getDb()
+      const games = db.collection('games')
+      
+      const game = await games.findOne({ id: gameId })
+      
+      if (!game) {
+        return NextResponse.json(
+          { error: 'Game not found' },
+          { status: 404, headers: corsHeaders }
+        )
       }
-
-      const existingUser = await db.collection('users').findOne({
-        wallet_address: body.wallet_address
-      })
-
-      if (existingUser) {
-        return handleCORS(NextResponse.json(existingUser))
-      }
-
-      const newUser = {
-        id: uuidv4(),
-        wallet_address: body.wallet_address,
-        balance_sol: 0,
-        total_winnings: 0,
-        games_played: 0,
-        created_at: new Date(),
-        updated_at: new Date()
-      }
-
-      await db.collection('users').insertOne(newUser)
-      return handleCORS(NextResponse.json(newUser))
+      
+      return NextResponse.json(game, { headers: corsHeaders })
     }
 
-    // GET /api/users/:wallet - Get user profile
-    if (route.startsWith('/users/') && method === 'GET') {
-      const walletAddress = route.split('/')[2]
+    // Leaderboard routes
+    if (route === 'leaderboard') {
+      const db = await getDb()
+      const users = db.collection('users')
       
-      const user = await db.collection('users').findOne({
-        wallet_address: walletAddress
-      })
-
-      if (!user) {
-        return handleCORS(NextResponse.json(
-          { error: "User not found" }, 
-          { status: 404 }
-        ))
-      }
-
-      return handleCORS(NextResponse.json(user))
+      const leaderboard = await users.find({})
+        .sort({ 'profile.total_winnings': -1 })
+        .limit(100)
+        .project({
+          id: 1,
+          username: 1,
+          'profile.display_name': 1,
+          'profile.total_winnings': 1,
+          'profile.stats.games_played': 1,
+          'profile.stats.games_won': 1,
+          'profile.stats.win_rate': 1
+        })
+        .toArray()
+      
+      return NextResponse.json(leaderboard, { headers: corsHeaders })
     }
 
-    // POST /api/games - Create new game session
-    if (route === '/games' && method === 'POST') {
-      const body = await request.json()
-      
-      if (!body.wallet_address || !body.stake_amount) {
-        return handleCORS(NextResponse.json(
-          { error: "wallet_address and stake_amount are required" }, 
-          { status: 400 }
-        ))
-      }
-
-      const gameSession = {
-        id: uuidv4(),
-        wallet_address: body.wallet_address,
-        stake_amount: body.stake_amount,
-        territory_percent: 0,
-        status: 'active',
-        started_at: new Date(),
-        ended_at: null,
-        final_winnings: null
-      }
-
-      await db.collection('games').insertOne(gameSession)
-      return handleCORS(NextResponse.json(gameSession))
-    }
-
-    // PUT /api/games/:id - Update game progress
-    if (route.startsWith('/games/') && method === 'PUT') {
-      const gameId = route.split('/')[2]
-      const body = await request.json()
-      
-      const updateData = {
-        ...body,
-        updated_at: new Date()
-      }
-
-      const result = await db.collection('games').updateOne(
-        { id: gameId },
-        { $set: updateData }
-      )
-
-      if (result.matchedCount === 0) {
-        return handleCORS(NextResponse.json(
-          { error: "Game not found" }, 
-          { status: 404 }
-        ))
-      }
-
-      return handleCORS(NextResponse.json({ message: "Game updated successfully" }))
-    }
-
-    // Route not found
-    return handleCORS(NextResponse.json(
-      { error: `Route ${route} not found` }, 
-      { status: 404 }
-    ))
+    return NextResponse.json(
+      { error: 'Endpoint not found' },
+      { status: 404, headers: corsHeaders }
+    )
 
   } catch (error) {
     console.error('API Error:', error)
-    return handleCORS(NextResponse.json(
-      { error: "Internal server error" }, 
-      { status: 500 }
-    ))
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500, headers: corsHeaders }
+    )
   }
 }
 
-// Export all HTTP methods
-export const GET = handleRoute
-export const POST = handleRoute
-export const PUT = handleRoute
-export const DELETE = handleRoute
-export const PATCH = handleRoute
+export async function POST(request, { params }) {
+  const { path } = params
+  
+  try {
+    const route = path.join('/')
+    const body = await request.json()
+
+    // Authentication routes
+    if (route === 'auth/wallet') {
+      const { wallet_address, signature, message } = body
+      
+      if (!wallet_address || !signature || !message) {
+        return NextResponse.json(
+          { error: 'Missing required fields' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+      
+      const { user, token } = await authenticateUser(wallet_address, signature, message)
+      
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: user.id,
+          wallet_address: user.wallet_address,
+          username: user.username,
+          profile: user.profile
+        },
+        token
+      }, { headers: corsHeaders })
+    }
+
+    if (route === 'auth/register') {
+      const user = await createUser(body)
+      const { password_hash, ...publicUser } = user
+      
+      return NextResponse.json({
+        success: true,
+        user: publicUser
+      }, { headers: corsHeaders })
+    }
+
+    // Create user
+    if (route === 'users') {
+      const user = await createUser(body)
+      const { password_hash, ...publicUser } = user
+      
+      return NextResponse.json(publicUser, { headers: corsHeaders })
+    }
+
+    // Create game session
+    if (route === 'games') {
+      return requireAuth(async (req) => {
+        const { stake, game_mode } = body
+        
+        if (!stake || stake <= 0) {
+          return NextResponse.json(
+            { error: 'Invalid stake amount' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        const db = await getDb()
+        const games = db.collection('games')
+        
+        const game = {
+          id: crypto.randomUUID(),
+          player_id: req.user.id,
+          stake: parseFloat(stake),
+          game_mode: game_mode || 'territory',
+          territory_percent: 0,
+          status: 'active',
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+        
+        await games.insertOne(game)
+        
+        return NextResponse.json(game, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Withdrawal request
+    if (route === 'withdraw') {
+      return requireAuth(async (req) => {
+        const { amount } = body
+        
+        if (!amount || amount <= 0) {
+          return NextResponse.json(
+            { error: 'Invalid withdrawal amount' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        const db = await getDb()
+        const withdrawals = db.collection('withdrawals')
+        
+        const withdrawal = {
+          id: crypto.randomUUID(),
+          user_id: req.user.id,
+          wallet_address: req.user.wallet_address,
+          amount: parseFloat(amount),
+          status: 'pending',
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+        
+        await withdrawals.insertOne(withdrawal)
+        
+        return NextResponse.json({
+          success: true,
+          withdrawal_id: withdrawal.id,
+          message: `Withdrawal of ${amount} SOL requested successfully`
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Privy webhook
+    if (route === 'onramp/webhook') {
+      const signature = request.headers.get('x-privy-signature')
+      
+      // In production, verify the signature properly
+      console.log('Privy webhook received:', body)
+      
+      const db = await getDb()
+      const privyEvents = db.collection('privy_onramp_events')
+      
+      const event = {
+        id: crypto.randomUUID(),
+        event_type: body.event_type,
+        data: body.data,
+        signature,
+        processed: false,
+        created_at: new Date()
+      }
+      
+      await privyEvents.insertOne(event)
+      
+      // Process the event based on type
+      if (body.event_type === 'fiat_onramp.completed') {
+        // Credit user balance or handle successful onramp
+        console.log('Onramp completed:', body.data)
+      }
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Webhook processed successfully'
+      }, { headers: corsHeaders })
+    }
+
+    return NextResponse.json(
+      { error: 'Endpoint not found' },
+      { status: 404, headers: corsHeaders }
+    )
+
+  } catch (error) {
+    console.error('API Error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500, headers: corsHeaders }
+    )
+  }
+}
+
+export async function PUT(request, { params }) {
+  const { path } = params
+  
+  try {
+    const route = path.join('/')
+    const body = await request.json()
+
+    // Update user profile
+    if (route.startsWith('users/') && route.endsWith('/profile')) {
+      const userId = route.split('/')[1]
+      
+      return requireAuth(async (req) => {
+        if (req.user.id !== userId) {
+          return NextResponse.json(
+            { error: 'Unauthorized' },
+            { status: 403, headers: corsHeaders }
+          )
+        }
+        
+        const success = await updateUserProfile(userId, body)
+        
+        if (!success) {
+          return NextResponse.json(
+            { error: 'Failed to update profile' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Profile updated successfully'
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Update game progress
+    if (route.startsWith('games/')) {
+      const gameId = route.split('/')[1]
+      
+      return requireAuth(async (req) => {
+        const db = await getDb()
+        const games = db.collection('games')
+        
+        const game = await games.findOne({ id: gameId, player_id: req.user.id })
+        
+        if (!game) {
+          return NextResponse.json(
+            { error: 'Game not found' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+        
+        const updateData = {
+          ...body,
+          updated_at: new Date()
+        }
+        
+        await games.updateOne(
+          { id: gameId },
+          { $set: updateData }
+        )
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Game updated successfully'
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    return NextResponse.json(
+      { error: 'Endpoint not found' },
+      { status: 404, headers: corsHeaders }
+    )
+
+  } catch (error) {
+    console.error('API Error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500, headers: corsHeaders }
+    )
+  }
+}
+
+export async function OPTIONS(request) {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders
+  })
+}
