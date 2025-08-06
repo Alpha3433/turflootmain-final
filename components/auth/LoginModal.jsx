@@ -114,11 +114,6 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     }
   }
 
-  const handleGoogleLogin = () => {
-    // Implement Google OAuth
-    alert('Google login not implemented yet')
-  }
-
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-gray-900/95 border-yellow-500/30 relative">
