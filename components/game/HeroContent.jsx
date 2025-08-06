@@ -158,7 +158,7 @@ const HeroContent = ({
           </div>
 
           {/* Right Section - Wallet */}
-          <div className="col-span-3">
+          <div className="col-span-3 pointer-events-auto">
             <Card className="bg-black/40 backdrop-blur-sm border-green-500/30">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-4">
