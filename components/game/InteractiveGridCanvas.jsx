@@ -150,6 +150,3 @@ const InteractiveGridCanvas = () => {
 }
 
 export default InteractiveGridCanvas
-}
-
-export default InteractiveGridCanvas
