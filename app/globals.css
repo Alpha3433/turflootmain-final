@@ -123,6 +123,14 @@
     @apply bg-black/40 backdrop-blur-md border border-white/10;
   }
   
+  /* Gaming grid background */
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
   .glass-card-dark {
     background: linear-gradient(145deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%);
     backdrop-filter: blur(20px);
