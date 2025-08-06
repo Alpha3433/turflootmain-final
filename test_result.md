@@ -225,6 +225,54 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - All Privy webhook event types working correctly (fiat_onramp.created, fiat_onramp.completed, fiat_onramp.failed). Events stored in privy_onramp_events collection with UUID IDs. Signature validation implemented (currently allows development mode). Database verified with 4 webhook events stored correctly."
 
+  - task: "Solana wallet authentication (POST /api/auth/wallet)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js, /app/lib/auth.js, /app/lib/solana.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW - Implemented Solana wallet-based authentication with JWT tokens and user profile creation. Ready for testing."
+
+  - task: "User profile management (GET/PUT /api/users/{wallet})"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js, /app/lib/auth.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW - Enhanced user profile endpoints with detailed stats, preferences, and authentication. Ready for testing."
+
+  - task: "Solana balance checking (GET /api/solana/balance/{wallet})"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js, /app/lib/solana.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW - Real Solana blockchain integration for balance checking and transaction verification. Ready for testing."
+
+  - task: "WebSocket server for multiplayer (WebSocket connection)"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/websocket.js, /app/server.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW - WebSocket server for real-time multiplayer with game rooms, territory tracking, and anti-cheat measures. Ready for testing."
+
 frontend:
   - task: "Landing page modernization redesign"
     implemented: true
