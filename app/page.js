@@ -18,8 +18,12 @@ import {
   Crown,
   Star,
   UserPlus,
-  Loader2
+  Loader2,
+  Palette
 } from 'lucide-react'
+
+import LoginModal from '@/components/auth/LoginModal'
+import CharacterCustomizer from '@/components/game/CharacterCustomizer'
 
 const LeaderboardCard = ({ leaderboardData, loading }) => (
   <Card className="bg-gray-900/80 border-yellow-500/30">
@@ -74,6 +78,8 @@ export default function Home() {
   const [selectedStake, setSelectedStake] = useState(5)
   const [userProfile, setUserProfile] = useState(null)
   const [walletAddress, setWalletAddress] = useState('')
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showCharacterCustomizer, setShowCharacterCustomizer] = useState(false)
 
   // Fetch leaderboard data
   useEffect(() => {
@@ -175,6 +181,18 @@ export default function Home() {
     }
   }
 
+  const handleLoginSuccess = (userData) => {
+    // Handle successful login from modal
+    setUserProfile(userData.user)
+    setIsConnected(true)
+    console.log('Login successful:', userData)
+  }
+
+  const handleCharacterSave = (characterData) => {
+    // Handle character save
+    console.log('Character saved:', characterData)
+  }
+
   const stakeAmounts = [1, 5, 20, 50]
 
   return (
@@ -192,14 +210,17 @@ export default function Home() {
             Welcome, {isConnected && userProfile ? userProfile.username : 'player'}!
           </span>
         </div>
-        <Button className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6">
+        <Button 
+          className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-6"
+          onClick={() => setShowLoginModal(true)}
+        >
           {isConnected ? 'Profile' : 'Login'}
         </Button>
       </header>
 
       <div className="relative z-10 flex h-[calc(100vh-80px)]">
         {/* Left sidebar */}
-        <div className="w-80 bg-black/60 backdrop-blur-sm border-r border-yellow-500/20 p-6 space-y-6">
+        <div className="w-80 bg-black/60 backdrop-blur-sm border-r border-yellow-500/20 p-6 space-y-6 overflow-y-auto">
           <LeaderboardCard leaderboardData={leaderboardData} loading={leaderboardLoading} />
 
           {/* Friends */}
@@ -225,6 +246,24 @@ export default function Home() {
                 disabled={!isConnected}
               >
                 Add Friends
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Character Customizer Toggle */}
+          <Card className="bg-gray-900/80 border-purple-500/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Palette className="w-4 h-4 text-purple-400" />
+                  <span className="font-bold">Character</span>
+                </div>
+              </div>
+              <Button 
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold"
+                onClick={() => setShowCharacterCustomizer(!showCharacterCustomizer)}
+              >
+                {showCharacterCustomizer ? 'Hide Customizer' : 'Customize Character'}
               </Button>
             </CardContent>
           </Card>
@@ -303,7 +342,7 @@ export default function Home() {
         </div>
 
         {/* Right sidebar */}
-        <div className="w-80 bg-black/60 backdrop-blur-sm border-l border-yellow-500/20 p-6 space-y-6">
+        <div className="w-80 bg-black/60 backdrop-blur-sm border-l border-yellow-500/20 p-6 space-y-6 overflow-y-auto">
           {/* Wallet section */}
           <Card className="bg-gray-900/80 border-yellow-500/30">
             <CardContent className="p-4">
@@ -387,6 +426,14 @@ export default function Home() {
             </Card>
           )}
 
+          {/* Character Customizer - Show when toggled */}
+          {showCharacterCustomizer && (
+            <CharacterCustomizer 
+              isConnected={isConnected}
+              onSave={handleCharacterSave}
+            />
+          )}
+
           {/* Customize */}
           <Card className="bg-gray-900/80 border-purple-500/30">
             <CardContent className="p-4">
@@ -433,6 +480,13 @@ export default function Home() {
       <Button className="absolute bottom-6 left-6 bg-indigo-600 hover:bg-indigo-500" size="sm">
         Join Discord
       </Button>
+
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onSuccess={handleLoginSuccess}
+      />
     </div>
   )
 }
