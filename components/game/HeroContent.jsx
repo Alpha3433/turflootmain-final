@@ -133,7 +133,8 @@ const HeroContent = ({
               {/* Main CTA */}
               <Button 
                 className="w-80 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-black text-xl tracking-wide shadow-xl transform hover:scale-105 transition-all duration-200"
-                disabled={!isConnected}
+                onClick={() => !isConnected && setShowLoginModal(true)}
+                disabled={isConnected}
               >
                 <Play className="w-6 h-6 mr-3" />
                 {isConnected ? 'JOIN GAME' : 'LOGIN TO PLAY'}
