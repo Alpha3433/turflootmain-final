@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,6 +11,55 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const [step, setStep] = useState('email') // 'email' or 'otp'
   const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Handle Google auth callback
+  useEffect(() => {
+    const handleGoogleCallback = async () => {
+      // Check if we have session_id in URL fragment (after redirect)
+      const hash = window.location.hash
+      if (hash && hash.includes('session_id=')) {
+        const sessionId = hash.split('session_id=')[1].split('&')[0]
+        
+        try {
+          setLoading(true)
+          
+          // Call backend to validate Google auth session
+          const response = await fetch('/api/auth/google-callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+          })
+          
+          if (response.ok) {
+            const userData = await response.json()
+            onSuccess(userData)
+            onClose()
+            
+            // Clear hash from URL
+            window.history.replaceState(null, null, window.location.pathname)
+          } else {
+            alert('Google authentication failed. Please try again.')
+          }
+        } catch (error) {
+          console.error('Google auth callback failed:', error)
+          alert('Google authentication failed. Please try again.')
+        } finally {
+          setLoading(false)
+        }
+      }
+    }
+
+    if (isOpen) {
+      handleGoogleCallback()
+    }
+  }, [isOpen, onSuccess, onClose])
+
+  // Handle Google login redirect
+  const handleGoogleLogin = () => {
+    const currentUrl = window.location.origin + window.location.pathname
+    const redirectUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(currentUrl)}`
+    window.location.href = redirectUrl
+  }
 
   if (!isOpen) return null
 
