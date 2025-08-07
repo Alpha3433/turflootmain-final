@@ -261,12 +261,17 @@ export async function POST(request, { params }) {
 
     // Google authentication with ID token verification
     if (route === 'auth/google') {
-      const { credential } = body
-      
       console.log('🔑 Google auth request received')
+      console.log('🔍 Request body type:', typeof body)
+      console.log('🔍 Request body keys:', Object.keys(body || {}))
+      console.log('🔍 Raw body:', JSON.stringify(body))
+      
+      const { credential } = body || {}
+      
+      console.log('🔍 Extracted credential:', credential ? `${credential.substring(0, 50)}...` : 'MISSING')
       
       if (!credential) {
-        console.log('❌ Missing Google credential')
+        console.log('❌ Missing Google credential in request body:', body)
         return NextResponse.json(
           { error: 'Missing Google ID token' },
           { status: 400, headers: corsHeaders }
