@@ -257,38 +257,45 @@ export async function POST(request, { params }) {
       }, { headers: corsHeaders })
     }
 
-    // Google authentication callback
-    if (route === 'auth/google-callback') {
-      const { session_id } = body
+    // Google authentication with ID token verification
+    if (route === 'auth/google') {
+      const { credential } = body
       
-      if (!session_id) {
+      if (!credential) {
         return NextResponse.json(
-          { error: 'Missing session_id' },
+          { error: 'Missing Google ID token' },
           { status: 400, headers: corsHeaders }
         )
       }
       
       try {
-        // Call Emergent auth API to validate session and get user data
-        const authResponse = await fetch('https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data', {
-          headers: {
-            'X-Session-ID': session_id,
-            'Content-Type': 'application/json'
-          }
+        // Verify the Google ID token
+        const ticket = await googleClient.verifyIdToken({
+          idToken: credential,
+          audience: GOOGLE_CLIENT_ID
         })
         
-        if (!authResponse.ok) {
-          throw new Error('Invalid session_id')
+        const payload = ticket.getPayload()
+        if (!payload) {
+          throw new Error('Invalid token payload')
         }
         
-        const googleUserData = await authResponse.json()
-        const { id, email, name, picture, session_token } = googleUserData
+        const { sub: googleId, email, name, picture } = payload
+        
+        if (!email) {
+          throw new Error('Email not provided by Google')
+        }
         
         // Find or create user in MongoDB
         const db = await getDb()
         const users = db.collection('users')
         
-        let user = await users.findOne({ email })
+        let user = await users.findOne({ 
+          $or: [
+            { email },
+            { google_id: googleId }
+          ]
+        })
         
         if (!user) {
           // Create new user with Google data
@@ -296,7 +303,7 @@ export async function POST(request, { params }) {
             id: crypto.randomUUID(),
             email,
             username: name || `user_${Date.now()}`,
-            google_id: id,
+            google_id: googleId,
             profile: {
               avatar_url: picture || null,
               display_name: name || email.split('@')[0],
@@ -323,8 +330,6 @@ export async function POST(request, { params }) {
               auto_cash_out_threshold: 50
             },
             auth_method: 'google',
-            session_token,
-            session_expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             created_at: new Date(),
             updated_at: new Date(),
             last_login: new Date(),
@@ -333,16 +338,16 @@ export async function POST(request, { params }) {
           
           await users.insertOne(user)
         } else {
-          // Update existing user with new session
+          // Update existing user
           await users.updateOne(
-            { email },
+            { $or: [{ email }, { google_id: googleId }] },
             {
               $set: {
-                session_token,
-                session_expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                google_id: googleId,
                 last_login: new Date(),
                 updated_at: new Date(),
-                'profile.avatar_url': picture || user.profile?.avatar_url
+                'profile.avatar_url': picture || user.profile?.avatar_url,
+                'profile.display_name': name || user.profile?.display_name || email.split('@')[0]
               }
             }
           )
@@ -354,6 +359,7 @@ export async function POST(request, { params }) {
             userId: user.id,
             email: user.email,
             username: user.username,
+            google_id: googleId,
             auth_method: 'google'
           },
           JWT_SECRET,
@@ -369,22 +375,29 @@ export async function POST(request, { params }) {
             profile: user.profile,
             auth_method: 'google'
           },
-          token: jwtToken,
-          session_token
+          token: jwtToken
         }, { 
           headers: {
             ...corsHeaders,
-            'Set-Cookie': `session_token=${session_token}; Path=/; HttpOnly; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax`
+            'Set-Cookie': `auth_token=${jwtToken}; Path=/; HttpOnly; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax`
           }
         })
         
       } catch (error) {
-        console.error('Google auth callback error:', error)
+        console.error('Google authentication error:', error)
         return NextResponse.json(
-          { error: 'Authentication failed' },
+          { error: 'Google authentication failed' },
           { status: 400, headers: corsHeaders }
         )
       }
+    }
+
+    // Legacy Google callback endpoint (to be removed)
+    if (route === 'auth/google-callback') {
+      return NextResponse.json(
+        { error: 'This endpoint is deprecated. Use /api/auth/google instead.' },
+        { status: 410, headers: corsHeaders }
+      )
     }
 
     if (route === 'auth/register') {
