@@ -19,32 +19,50 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
 
     const initializeGoogle = async () => {
       try {
+        console.log('🔍 Initializing Google Sign-In...')
+        
         // Load Google Identity Services script
         if (!window.google) {
+          console.log('📥 Loading Google script...')
           await loadGoogleScript()
+          console.log('✅ Google script loaded')
         }
 
         // Initialize Google Sign-In
         if (window.google?.accounts?.id) {
+          console.log('🔧 Configuring Google Sign-In...')
+          
           window.google.accounts.id.initialize({
             client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
             callback: handleGoogleResponse,
-            use_fedcm_for_prompt: true
+            use_fedcm_for_prompt: false,
+            auto_select: false,
+            cancel_on_tap_outside: false
           })
+          
+          console.log('✅ Google Sign-In initialized')
 
           // Render the Google Sign-In button
           if (googleButtonRef.current) {
+            // Clear any existing button content
+            googleButtonRef.current.innerHTML = ''
+            
             window.google.accounts.id.renderButton(googleButtonRef.current, {
-              theme: 'filled_black',
+              theme: 'filled_blue',
               size: 'large',
               text: 'continue_with',
               shape: 'rectangular',
-              width: 300
+              width: 300,
+              locale: 'en'
             })
+            
+            console.log('✅ Google button rendered')
           }
+        } else {
+          console.error('❌ Google Identity Services not available')
         }
       } catch (error) {
-        console.error('Google Sign-In initialization failed:', error)
+        console.error('❌ Google Sign-In initialization failed:', error)
       }
     }
 
