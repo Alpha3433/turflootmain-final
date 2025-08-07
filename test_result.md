@@ -317,6 +317,21 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ IMPROVED IMPLEMENTATION VERIFIED - All enhanced Google OAuth features working perfectly. Comprehensive testing of 11 improvements completed (100% success rate): 1) Enhanced error messages with detailed debugging info ✅, 2) Environment variable loading from both GOOGLE_CLIENT_ID and NEXT_PUBLIC_GOOGLE_CLIENT_ID ✅, 3) Console logging shows '🔑 Google Client ID loaded: YES' ✅, 4) Enhanced debugging logs for token verification ('🔍 Verifying Google ID token...') ✅, 5) Detailed error messages ('Google authentication failed: [specific error]') ✅, 6) Email verification requirement implemented ✅, 7) Google client initialization with proper error handling ✅, 8) MongoDB integration still functional ✅, 9) Google-auth-library working correctly ✅, 10) Deprecated endpoint returns 410 status ✅, 11) CORS headers properly configured ✅. Console logs confirm enhanced debugging: request received logs, token verification attempts, detailed error messages. All improvements from the latest fixes are working correctly. Production ready."
+      - working: false
+        agent: "main"
+        comment: "DEPRECATED - User requested switch to Privy Google OAuth due to conflicts between direct Google OAuth and existing Privy integration. Direct implementation now deprecated in favor of Privy's unified authentication system."
+
+  - task: "Privy Google OAuth authentication"
+    implemented: true
+    working: "NA"
+    file: "/app/components/auth/LoginModal.jsx, /app/components/providers/PrivyAuthProvider.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW - Migrated from direct Google OAuth to Privy's Google OAuth integration. Privy provider set up with NEXT_PUBLIC_PRIVY_APP_ID and PRIVY_APP_SECRET, LoginModal updated to use usePrivy hook for Google authentication. Eliminates conflicts between authentication systems."
 
 frontend:
   - task: "Landing page modernization redesign"
@@ -384,3 +399,5 @@ agent_communication:
     message: "✅ GOOGLE OAUTH DIRECT API KEYS TESTING COMPLETED - All 8 comprehensive tests PASSED (100% success rate). New Google OAuth implementation with direct API keys (POST /api/auth/google) working perfectly: 1) Missing credential parameter validation ✅, 2) Invalid Google ID token handling ✅, 3) Endpoint structure and error handling ✅, 4) CORS headers configuration ✅, 5) Google-auth-library integration with OAuth2Client.verifyIdToken() ✅, 6) MongoDB user system integration with profile creation/update ✅, 7) Deprecated endpoint handling (410 status for old callback) ✅, 8) JWT token generation structure ✅. Implementation uses google-auth-library for direct Google token verification, integrates seamlessly with existing MongoDB user system, generates JWT tokens for authentication, and properly deprecates old callback endpoint. Ready for production use."
   - agent: "testing"
     message: "✅ IMPROVED GOOGLE OAUTH TESTING COMPLETED - All enhanced features from latest fixes working perfectly (100% success rate). Comprehensive testing of 11 improvements: 1) Enhanced error messages with detailed debugging info ✅, 2) Environment variable loading from both GOOGLE_CLIENT_ID and NEXT_PUBLIC_GOOGLE_CLIENT_ID ✅, 3) Console logging shows '🔑 Google Client ID loaded: YES' ✅, 4) Enhanced debugging logs ('🔑 Google auth request received', '🔍 Verifying Google ID token...', '❌ Google authentication error: [details]') ✅, 5) Detailed error messages with specific Google library errors ✅, 6) Email verification requirement implemented ✅, 7) Google client initialization with proper error handling ✅, 8) MongoDB integration verified ✅, 9) Google-auth-library working correctly ✅, 10) Deprecated endpoint returns 410 status ✅, 11) CORS headers properly configured ✅. All improvements from the enhanced implementation are working correctly. Console logs confirm enhanced debugging is active. Production ready with improved error handling and logging."
+  - agent: "main"
+    message: "MIGRATING TO PRIVY GOOGLE OAUTH - User requested switch from direct Google OAuth to Privy's Google OAuth due to conflicts. Privy integration already set up: @privy-io/react-auth v2.21.1 installed, NEXT_PUBLIC_PRIVY_APP_ID and PRIVY_APP_SECRET configured in .env, PrivyAuthProvider created and integrated in layout.js, LoginModal updated to use Privy hooks. Ready for testing the new Privy Google OAuth implementation."
