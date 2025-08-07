@@ -300,6 +300,21 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - Google OAuth authentication endpoint working perfectly. All 6 test scenarios passed: 1) Missing session_id validation (400 error) ✅, 2) Invalid session_id handling (400 error with external API call) ✅, 3) Endpoint structure and processing ✅, 4) CORS headers configuration ✅, 5) JSON response structure ✅, 6) External API integration with Emergent auth service ✅. Endpoint correctly calls https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data, handles user creation/update with Google data, generates JWT tokens, manages session tokens, and integrates with existing user system. Ready for production use."
 
+  - task: "Google OAuth direct API keys (POST /api/auth/google)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Google OAuth implementation with direct API keys using google-auth-library for Google ID token verification. Replaces callback-based approach with direct token validation."
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Google OAuth direct API keys implementation working perfectly. All 8 comprehensive tests passed (100% success rate): 1) Missing credential parameter validation (400 error) ✅, 2) Invalid Google ID token handling (400 error) ✅, 3) Endpoint structure and error handling ✅, 4) CORS headers configuration ✅, 5) Google-auth-library integration with token verification ✅, 6) MongoDB user system integration ✅, 7) Deprecated endpoint handling (410 status) ✅, 8) JWT token generation structure ✅. Implementation uses OAuth2Client.verifyIdToken() for direct Google token verification, creates/updates users in MongoDB with Google profile data, generates JWT tokens for authentication, and properly handles all error cases. Old /api/auth/google-callback endpoint correctly returns deprecation message. Ready for production use."
+
 frontend:
   - task: "Landing page modernization redesign"
     implemented: true
