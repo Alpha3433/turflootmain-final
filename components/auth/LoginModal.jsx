@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,43 +11,69 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const [step, setStep] = useState('email') // 'email' or 'otp'
   const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
+  const googleButtonRef = useRef(null)
 
-  // Load Google Sign-In script
+  // Load Google Sign-In script and initialize
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (!isOpen) return
 
-    const loadGoogleScript = () => {
-      if (document.getElementById('google-signin-script')) return
+    const initializeGoogle = async () => {
+      try {
+        // Load Google Identity Services script
+        if (!window.google) {
+          await loadGoogleScript()
+        }
 
-      const script = document.createElement('script')
-      script.id = 'google-signin-script'
-      script.src = 'https://accounts.google.com/gsi/client'
-      script.async = true
-      script.defer = true
-      script.onload = initializeGoogleSignIn
-      document.head.appendChild(script)
-    }
+        // Initialize Google Sign-In
+        if (window.google?.accounts?.id) {
+          window.google.accounts.id.initialize({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+            callback: handleGoogleResponse,
+            use_fedcm_for_prompt: true
+          })
 
-    const initializeGoogleSignIn = () => {
-      if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-          callback: handleGoogleSignIn,
-          auto_select: false,
-          cancel_on_tap_outside: false
-        })
+          // Render the Google Sign-In button
+          if (googleButtonRef.current) {
+            window.google.accounts.id.renderButton(googleButtonRef.current, {
+              theme: 'filled_black',
+              size: 'large',
+              text: 'continue_with',
+              shape: 'rectangular',
+              width: 300
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Google Sign-In initialization failed:', error)
       }
     }
 
-    loadGoogleScript()
-  }, [])
+    initializeGoogle()
+  }, [isOpen])
 
-  // Handle Google Sign-In callback
-  const handleGoogleSignIn = async (response) => {
+  // Load Google script
+  const loadGoogleScript = () => {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
+        resolve()
+        return
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://accounts.google.com/gsi/client'
+      script.onload = resolve
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
+  }
+
+  // Handle Google authentication response
+  const handleGoogleResponse = async (response) => {
     try {
       setLoading(true)
-      
-      // Send the Google ID token to our backend for verification
+      console.log('Google response received:', response)
+
+      // Send credential to backend
       const apiResponse = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,13 +82,15 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
         })
       })
 
-      if (apiResponse.ok) {
-        const userData = await apiResponse.json()
-        onSuccess(userData)
+      const result = await apiResponse.json()
+      console.log('Backend response:', result)
+
+      if (apiResponse.ok && result.success) {
+        // Success! User is logged in
+        onSuccess(result.user)
         onClose()
       } else {
-        const errorData = await apiResponse.json()
-        alert(`Google login failed: ${errorData.error}`)
+        alert(`Google login failed: ${result.error || 'Unknown error'}`)
       }
     } catch (error) {
       console.error('Google login error:', error)
@@ -72,12 +100,12 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     }
   }
 
-  // Handle Google login button click
-  const handleGoogleLogin = () => {
-    if (window.google) {
-      window.google.accounts.id.prompt() // Show the Google One Tap prompt
+  // Custom Google button click handler (fallback)
+  const handleCustomGoogleClick = () => {
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.prompt()
     } else {
-      alert('Google Sign-In is not loaded. Please refresh the page.')
+      alert('Google Sign-In not loaded. Please refresh the page and try again.')
     }
   }
 
