@@ -34,21 +34,54 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   if (authenticated && user) {
     console.log('✅ User authenticated via Privy:', user)
     
-    // Create user object compatible with existing system
-    const userData = {
-      id: user.id,
-      email: user.email?.address || user.google?.email || user.twitter?.email,
-      username: user.google?.name || user.twitter?.name || user.email?.address?.split('@')[0] || `user_${Date.now()}`,
-      profile: {
-        avatar_url: user.google?.picture || user.twitter?.profilePictureUrl,
-        display_name: user.google?.name || user.twitter?.name || user.email?.address?.split('@')[0],
-      },
-      auth_method: 'privy'
+    // Send Privy authentication data to backend
+    const sendPrivyAuthToBackend = async () => {
+      try {
+        setLoading(true)
+        console.log('🔄 Sending Privy auth data to backend...')
+        
+        const response = await fetch('/api/auth/privy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            access_token: 'privy_token', // Privy handles tokens internally
+            privy_user: user
+          })
+        })
+        
+        if (response.ok) {
+          const backendData = await response.json()
+          console.log('✅ Backend authentication successful:', backendData)
+          
+          // Create user object compatible with existing system
+          const userData = {
+            id: backendData.user.id,
+            email: backendData.user.email,
+            username: backendData.user.username,
+            profile: backendData.user.profile,
+            auth_method: 'privy',
+            token: backendData.token
+          }
+          
+          // Call success callback and close modal
+          onSuccess(userData)
+          onClose()
+        } else {
+          const errorData = await response.json()
+          console.error('❌ Backend authentication failed:', errorData)
+          alert('Authentication failed. Please try again.')
+        }
+      } catch (error) {
+        console.error('❌ Backend authentication error:', error)
+        alert('Authentication failed. Please try again.')
+      } finally {
+        setLoading(false)
+      }
     }
     
-    // Call success callback and close modal
-    onSuccess(userData)
-    onClose()
+    sendPrivyAuthToBackend()
     return null
   }
 
