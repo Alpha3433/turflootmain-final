@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const [step, setStep] = useState('email') // 'email' or 'otp'
   const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
+  const [authProcessed, setAuthProcessed] = useState(false)
   
   // Privy hooks
   const { login, ready, authenticated, user } = usePrivy()
@@ -30,60 +31,70 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     })
   }
 
-  // Handle authentication state changes
-  if (authenticated && user) {
-    console.log('✅ User authenticated via Privy:', user)
-    
-    // Send Privy authentication data to backend
-    const sendPrivyAuthToBackend = async () => {
-      try {
-        setLoading(true)
-        console.log('🔄 Sending Privy auth data to backend...')
-        
-        const response = await fetch('/api/auth/privy', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            access_token: 'privy_token', // Privy handles tokens internally
-            privy_user: user
+  // Handle authentication state changes with useEffect
+  useEffect(() => {
+    if (authenticated && user && !authProcessed) {
+      console.log('✅ User authenticated via Privy:', user)
+      setAuthProcessed(true)
+      
+      // Send Privy authentication data to backend
+      const sendPrivyAuthToBackend = async () => {
+        try {
+          setLoading(true)
+          console.log('🔄 Sending Privy auth data to backend...')
+          
+          const response = await fetch('/api/auth/privy', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              access_token: 'privy_token', // Privy handles tokens internally
+              privy_user: user
+            })
           })
-        })
-        
-        if (response.ok) {
-          const backendData = await response.json()
-          console.log('✅ Backend authentication successful:', backendData)
           
-          // Create user object compatible with existing system
-          const userData = {
-            id: backendData.user.id,
-            email: backendData.user.email,
-            username: backendData.user.username,
-            profile: backendData.user.profile,
-            auth_method: 'privy',
-            token: backendData.token
+          if (response.ok) {
+            const backendData = await response.json()
+            console.log('✅ Backend authentication successful:', backendData)
+            
+            // Create user object compatible with existing system
+            const userData = {
+              id: backendData.user.id,
+              email: backendData.user.email,
+              username: backendData.user.username,
+              profile: backendData.user.profile,
+              auth_method: 'privy',
+              token: backendData.token
+            }
+            
+            // Call success callback and close modal
+            onSuccess(userData)
+            onClose()
+          } else {
+            const errorData = await response.json()
+            console.error('❌ Backend authentication failed:', errorData)
+            alert('Authentication failed. Please try again.')
           }
-          
-          // Call success callback and close modal
-          onSuccess(userData)
-          onClose()
-        } else {
-          const errorData = await response.json()
-          console.error('❌ Backend authentication failed:', errorData)
+        } catch (error) {
+          console.error('❌ Backend authentication error:', error)
           alert('Authentication failed. Please try again.')
+        } finally {
+          setLoading(false)
         }
-      } catch (error) {
-        console.error('❌ Backend authentication error:', error)
-        alert('Authentication failed. Please try again.')
-      } finally {
-        setLoading(false)
       }
+      
+      sendPrivyAuthToBackend()
     }
-    
-    sendPrivyAuthToBackend()
-    return null
-  }
+  }, [authenticated, user, authProcessed, onSuccess, onClose])
+
+  // Reset auth processed state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setAuthProcessed(false)
+      setLoading(false)
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
