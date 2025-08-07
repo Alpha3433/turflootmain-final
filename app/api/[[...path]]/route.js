@@ -420,6 +420,163 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Privy authentication endpoint
+    if (route === 'auth/privy') {
+      console.log('🔑 Privy auth request received')
+      
+      const { access_token, privy_user } = body || {}
+      
+      if (!access_token) {
+        console.log('❌ Missing Privy access token in request body:', body)
+        return NextResponse.json(
+          { error: 'Missing Privy access token' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+      
+      if (!privy_user) {
+        console.log('❌ Missing Privy user data in request body:', body)
+        return NextResponse.json(
+          { error: 'Missing Privy user data' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+      
+      try {
+        console.log('🔍 Processing Privy authentication for user:', privy_user.id)
+        
+        // Extract user info from Privy user object
+        const privyId = privy_user.id
+        const email = privy_user.email?.address || 
+                     privy_user.google?.email || 
+                     privy_user.twitter?.email
+        const name = privy_user.google?.name || 
+                    privy_user.twitter?.name || 
+                    privy_user.email?.address?.split('@')[0] ||
+                    `user_${Date.now()}`
+        const picture = privy_user.google?.picture || 
+                       privy_user.twitter?.profilePictureUrl
+        
+        if (!email && !privyId) {
+          throw new Error('Unable to extract user identifier from Privy data')
+        }
+        
+        // Find or create user in MongoDB
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        let user = await users.findOne({ 
+          $or: [
+            { email: email },
+            { privy_id: privyId },
+            ...(email ? [{ email }] : [])
+          ].filter(Boolean)
+        })
+        
+        if (!user) {
+          // Create new user with Privy data
+          console.log('👤 Creating new user for Privy user:', privyId)
+          user = {
+            id: crypto.randomUUID(),
+            email,
+            username: name || `privy_user_${Date.now()}`,
+            privy_id: privyId,
+            wallet_address: privy_user.wallet?.address || null,
+            profile: {
+              avatar_url: picture || null,
+              display_name: name || (email ? email.split('@')[0] : 'Anonymous'),
+              bio: '',
+              total_games: 0,
+              total_winnings: 0,
+              win_rate: 0,
+              favorite_stake: 1,
+              achievements: [],
+              stats: {
+                games_played: 0,
+                games_won: 0,
+                total_territory_captured: 0,
+                best_territory_percent: 0,
+                longest_game_duration: 0,
+                total_time_played: 0
+              }
+            },
+            preferences: {
+              theme: 'dark',
+              notifications: true,
+              sound_effects: true,
+              auto_cash_out: false,
+              auto_cash_out_threshold: 50
+            },
+            auth_method: 'privy',
+            created_at: new Date(),
+            updated_at: new Date(),
+            last_login: new Date(),
+            status: 'active'
+          }
+          
+          await users.insertOne(user)
+          console.log('✅ New Privy user created:', user.id)
+        } else {
+          // Update existing user
+          console.log('🔄 Updating existing Privy user:', user.email || user.privy_id)
+          await users.updateOne(
+            { $or: [{ email }, { privy_id: privyId }].filter(Boolean) },
+            {
+              $set: {
+                privy_id: privyId,
+                last_login: new Date(),
+                updated_at: new Date(),
+                wallet_address: privy_user.wallet?.address || user.wallet_address,
+                'profile.avatar_url': picture || user.profile?.avatar_url,
+                'profile.display_name': name || user.profile?.display_name || (email ? email.split('@')[0] : 'Anonymous')
+              }
+            }
+          )
+          console.log('✅ Privy user updated')
+        }
+        
+        // Generate JWT token for consistent auth system
+        const jwtToken = jwt.sign(
+          {
+            userId: user.id,
+            email: user.email,
+            username: user.username,
+            privy_id: privyId,
+            auth_method: 'privy'
+          },
+          JWT_SECRET,
+          { expiresIn: '7d' }
+        )
+        
+        console.log('🎉 Privy authentication successful for:', email || privyId)
+        
+        return NextResponse.json({
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            profile: user.profile,
+            auth_method: 'privy',
+            wallet_address: user.wallet_address
+          },
+          token: jwtToken
+        }, { 
+          headers: {
+            ...corsHeaders,
+            'Set-Cookie': `auth_token=${jwtToken}; Path=/; HttpOnly; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax`
+          }
+        })
+        
+      } catch (error) {
+        console.error('❌ Privy authentication error:', error.message)
+        return NextResponse.json(
+          { error: 'Privy authentication failed: ' + error.message },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+    }
+
     // Legacy Google callback endpoint (to be removed)
     if (route === 'auth/google-callback') {
       return NextResponse.json(
