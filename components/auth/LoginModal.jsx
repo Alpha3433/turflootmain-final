@@ -6,13 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { X, Mail } from 'lucide-react'
 
-// Declare global google object
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const [email, setEmail] = useState('')
   const [step, setStep] = useState('email') // 'email' or 'otp'
