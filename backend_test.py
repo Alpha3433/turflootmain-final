@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing - Privy Google OAuth Focus
-Testing the new Privy Google OAuth authentication system and backend compatibility
+TurfLoot Backend API Testing - Privy Authentication Focus
+Testing the newly implemented Privy Google OAuth authentication backend endpoint
 """
 
 import requests
