@@ -6,59 +6,86 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { X, Mail } from 'lucide-react'
 
+// Declare global google object
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const [email, setEmail] = useState('')
   const [step, setStep] = useState('email') // 'email' or 'otp'
   const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Handle Google auth callback
+  // Load Google Sign-In script
   useEffect(() => {
-    const handleGoogleCallback = async () => {
-      // Check if we have session_id in URL fragment (after redirect)
-      const hash = window.location.hash
-      if (hash && hash.includes('session_id=')) {
-        const sessionId = hash.split('session_id=')[1].split('&')[0]
-        
-        try {
-          setLoading(true)
-          
-          // Call backend to validate Google auth session
-          const response = await fetch('/api/auth/google-callback', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId })
-          })
-          
-          if (response.ok) {
-            const userData = await response.json()
-            onSuccess(userData)
-            onClose()
-            
-            // Clear hash from URL
-            window.history.replaceState(null, null, window.location.pathname)
-          } else {
-            alert('Google authentication failed. Please try again.')
-          }
-        } catch (error) {
-          console.error('Google auth callback failed:', error)
-          alert('Google authentication failed. Please try again.')
-        } finally {
-          setLoading(false)
-        }
+    if (typeof window === 'undefined') return
+
+    const loadGoogleScript = () => {
+      if (document.getElementById('google-signin-script')) return
+
+      const script = document.createElement('script')
+      script.id = 'google-signin-script'
+      script.src = 'https://accounts.google.com/gsi/client'
+      script.async = true
+      script.defer = true
+      script.onload = initializeGoogleSignIn
+      document.head.appendChild(script)
+    }
+
+    const initializeGoogleSignIn = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignIn,
+          auto_select: false,
+          cancel_on_tap_outside: false
+        })
       }
     }
 
-    if (isOpen) {
-      handleGoogleCallback()
-    }
-  }, [isOpen, onSuccess, onClose])
+    loadGoogleScript()
+  }, [])
 
-  // Handle Google login redirect
+  // Handle Google Sign-In callback
+  const handleGoogleSignIn = async (response) => {
+    try {
+      setLoading(true)
+      
+      // Send the Google ID token to our backend for verification
+      const apiResponse = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          credential: response.credential 
+        })
+      })
+
+      if (apiResponse.ok) {
+        const userData = await apiResponse.json()
+        onSuccess(userData)
+        onClose()
+      } else {
+        const errorData = await apiResponse.json()
+        alert(`Google login failed: ${errorData.error}`)
+      }
+    } catch (error) {
+      console.error('Google login error:', error)
+      alert('Google login failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Handle Google login button click
   const handleGoogleLogin = () => {
-    const currentUrl = window.location.origin + window.location.pathname
-    const redirectUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(currentUrl)}`
-    window.location.href = redirectUrl
+    if (window.google) {
+      window.google.accounts.id.prompt() // Show the Google One Tap prompt
+    } else {
+      alert('Google Sign-In is not loaded. Please refresh the page.')
+    }
   }
 
   if (!isOpen) return null
