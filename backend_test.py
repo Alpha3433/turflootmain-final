@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
+"""
+TurfLoot Backend API Testing - Privy Google OAuth Focus
+Testing the new Privy Google OAuth authentication system and backend compatibility
+"""
 
 import requests
 import json
+import time
 import os
-import sys
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://d3a35ba2-1b25-4c95-979b-2667ffe40b71.preview.emergentagent.com')
+BASE_URL = "https://d3a35ba2-1b25-4c95-979b-2667ffe40b71.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(test_name, status, details=""):
     """Log test results with timestamp"""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now().strftime("%H:%M:%S")
     status_emoji = "✅" if status == "PASS" else "❌" if status == "FAIL" else "⚠️"
-    print(f"[{timestamp}] {status_emoji} {test_name}: {status}")
+    print(f"[{timestamp}] {status_emoji} {test_name}")
     if details:
-        print(f"    Details: {details}")
+        print(f"    {details}")
     print()
 
 def test_google_oauth_improvements():
