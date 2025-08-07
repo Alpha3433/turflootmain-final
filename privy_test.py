@@ -105,7 +105,7 @@ def test_privy_authentication_backend_support():
         
         if response.status_code == 404:
             log_test("Privy Auth Endpoint", "WARN", 
-                   "No /api/auth/privy endpoint found - may need implementation")
+                   "No /api/auth/privy endpoint found - NEEDS IMPLEMENTATION for Privy integration")
         elif response.status_code == 200:
             log_test("Privy Auth Endpoint", "PASS", "Privy auth endpoint exists")
         else:
@@ -114,6 +114,27 @@ def test_privy_authentication_backend_support():
             
     except Exception as e:
         log_test("Privy Auth Endpoint", "FAIL", f"Request failed: {str(e)}")
+    
+    # Test 2: Check if there's a Privy user verification endpoint
+    try:
+        response = requests.post(
+            f"{API_BASE}/auth/privy/verify",
+            json={"privy_token": "test_privy_token", "user_id": "privy_user_123"},
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        
+        if response.status_code == 404:
+            log_test("Privy Token Verification Endpoint", "WARN", 
+                   "No /api/auth/privy/verify endpoint found - may need implementation")
+        elif response.status_code == 200:
+            log_test("Privy Token Verification Endpoint", "PASS", "Privy verification endpoint exists")
+        else:
+            log_test("Privy Token Verification Endpoint", "WARN", 
+                   f"Unexpected response: HTTP {response.status_code}")
+            
+    except Exception as e:
+        log_test("Privy Token Verification Endpoint", "FAIL", f"Request failed: {str(e)}")
 
 def test_deprecated_google_oauth():
     """Test that direct Google OAuth endpoints are properly deprecated"""
