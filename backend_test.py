@@ -7,7 +7,7 @@ import sys
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://14b606ac-994f-4799-a20a-dbd6731e5a52.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://d3a35ba2-1b25-4c95-979b-2667ffe40b71.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(test_name, status, details=""):
