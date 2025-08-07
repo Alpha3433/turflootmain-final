@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,91 +13,19 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false)
   const googleButtonRef = useRef(null)
 
-  // Load Google Sign-In script and initialize
-  useEffect(() => {
-    if (!isOpen) return
-
-    const initializeGoogle = async () => {
-      try {
-        console.log('🔍 Initializing Google Sign-In...')
-        
-        // Load Google Identity Services script
-        if (!window.google) {
-          console.log('📥 Loading Google script...')
-          await loadGoogleScript()
-          console.log('✅ Google script loaded')
-        }
-
-        // Initialize Google Sign-In
-        if (window.google?.accounts?.id) {
-          console.log('🔧 Configuring Google Sign-In...')
-          
-          window.google.accounts.id.initialize({
-            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-            callback: handleGoogleResponse,
-            use_fedcm_for_prompt: false,
-            auto_select: false,
-            cancel_on_tap_outside: false
-          })
-          
-          console.log('✅ Google Sign-In initialized')
-
-          // Render the Google Sign-In button
-          if (googleButtonRef.current) {
-            // Clear any existing button content
-            googleButtonRef.current.innerHTML = ''
-            
-            window.google.accounts.id.renderButton(googleButtonRef.current, {
-              theme: 'filled_blue',
-              size: 'large',
-              text: 'continue_with',
-              shape: 'rectangular',
-              width: 300,
-              locale: 'en'
-            })
-            
-            console.log('✅ Google button rendered')
-          }
-        } else {
-          console.error('❌ Google Identity Services not available')
-        }
-      } catch (error) {
-        console.error('❌ Google Sign-In initialization failed:', error)
-      }
-    }
-
-    initializeGoogle()
-  }, [isOpen])
-
-  // Load Google script
-  const loadGoogleScript = () => {
-    return new Promise((resolve, reject) => {
-      if (document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
-        resolve()
-        return
-      }
-
-      const script = document.createElement('script')
-      script.src = 'https://accounts.google.com/gsi/client'
-      script.onload = resolve
-      script.onerror = reject
-      document.head.appendChild(script)
-    })
-  }
-
   // Handle Google authentication response
-  const handleGoogleResponse = async (response) => {
+  const handleGoogleResponse = useCallback(async (response) => {
     try {
       setLoading(true)
       console.log('🔍 Google response received:', response)
       
       if (!response || !response.credential) {
-        console.error('❌ Invalid Google response - missing credential')
+        console.error('❌ Invalid Google response - missing credential:', response)
         alert('Google login failed: Invalid response from Google')
         return
       }
 
-      console.log('📤 Sending credential to backend...')
+      console.log('📤 Sending credential to backend (length:', response.credential.length, ')')
       
       // Send credential to backend
       const apiResponse = await fetch('/api/auth/google', {
@@ -127,7 +55,84 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [onSuccess, onClose])
+
+  // Load Google script
+  const loadGoogleScript = useCallback(() => {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
+        resolve()
+        return
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://accounts.google.com/gsi/client'
+      script.onload = resolve
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
+  }, [])
+
+  // Load Google Sign-In script and initialize
+  useEffect(() => {
+    if (!isOpen) return
+
+    const initializeGoogle = async () => {
+      try {
+        console.log('🔍 Initializing Google Sign-In...')
+        
+        // Load Google Identity Services script
+        if (!window.google) {
+          console.log('📥 Loading Google script...')
+          await loadGoogleScript()
+          console.log('✅ Google script loaded')
+        }
+
+        // Initialize Google Sign-In
+        if (window.google?.accounts?.id) {
+          console.log('🔧 Configuring Google Sign-In...')
+          console.log('🔧 Client ID:', process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.substring(0, 20) + '...')
+          
+          window.google.accounts.id.initialize({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+            callback: handleGoogleResponse,
+            auto_select: false,
+            cancel_on_tap_outside: false,
+            use_fedcm_for_prompt: false
+          })
+          
+          console.log('✅ Google Sign-In initialized with callback')
+
+          // Render the Google Sign-In button
+          if (googleButtonRef.current) {
+            // Clear any existing button content
+            googleButtonRef.current.innerHTML = ''
+            
+            try {
+              window.google.accounts.id.renderButton(googleButtonRef.current, {
+                theme: 'filled_blue',
+                size: 'large',
+                text: 'continue_with',
+                shape: 'rectangular',
+                width: 300,
+                locale: 'en'
+              })
+              
+              console.log('✅ Google button rendered successfully')
+            } catch (renderError) {
+              console.error('❌ Google button render failed:', renderError)
+            }
+          }
+        } else {
+          console.error('❌ Google Identity Services not available')
+        }
+      } catch (error) {
+        console.error('❌ Google Sign-In initialization failed:', error)
+      }
+    }
+
+    initializeGoogle()
+  }, [isOpen, handleGoogleResponse, loadGoogleScript])
 
   // Custom Google button click handler (fallback)
   const handleCustomGoogleClick = () => {
