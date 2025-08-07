@@ -372,10 +372,9 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Privy Google OAuth authentication"
     - "Solana wallet authentication (POST /api/auth/wallet)"
     - "User profile management (GET/PUT /api/users/{wallet})"
-    - "Solana balance checking (GET /api/solana/balance/{wallet})"
-    - "WebSocket server for multiplayer (WebSocket connection)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
