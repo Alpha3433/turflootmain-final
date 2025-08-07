@@ -71,8 +71,16 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   const handleGoogleResponse = async (response) => {
     try {
       setLoading(true)
-      console.log('Google response received:', response)
+      console.log('🔍 Google response received:', response)
+      
+      if (!response || !response.credential) {
+        console.error('❌ Invalid Google response - missing credential')
+        alert('Google login failed: Invalid response from Google')
+        return
+      }
 
+      console.log('📤 Sending credential to backend...')
+      
       // Send credential to backend
       const apiResponse = await fetch('/api/auth/google', {
         method: 'POST',
@@ -82,18 +90,21 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
         })
       })
 
+      console.log('📥 Backend response status:', apiResponse.status)
       const result = await apiResponse.json()
-      console.log('Backend response:', result)
+      console.log('📥 Backend response data:', result)
 
       if (apiResponse.ok && result.success) {
+        console.log('✅ Google login successful!')
         // Success! User is logged in
         onSuccess(result.user)
         onClose()
       } else {
-        alert(`Google login failed: ${result.error || 'Unknown error'}`)
+        console.error('❌ Backend authentication failed:', result)
+        alert(`Google login failed: ${result.error || 'Authentication failed'}`)
       }
     } catch (error) {
-      console.error('Google login error:', error)
+      console.error('❌ Google login error:', error)
       alert('Google login failed. Please try again.')
     } finally {
       setLoading(false)
