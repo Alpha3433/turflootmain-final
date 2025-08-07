@@ -135,13 +135,29 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
   }, [isOpen, handleGoogleResponse, loadGoogleScript])
 
   // Custom Google button click handler (fallback)
-  const handleCustomGoogleClick = () => {
+  const handleCustomGoogleClick = useCallback(() => {
+    console.log('🖱️ Custom Google button clicked')
+    
     if (window.google?.accounts?.id) {
-      window.google.accounts.id.prompt()
+      console.log('🔧 Prompting Google Sign-In...')
+      try {
+        window.google.accounts.id.prompt((notification) => {
+          console.log('🔔 Google prompt notification:', notification)
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('⚠️ Google prompt not displayed, trying disableAutoSelect...')
+            window.google.accounts.id.disableAutoSelect()
+          }
+        })
+      } catch (promptError) {
+        console.error('❌ Google prompt error:', promptError)
+        // Fallback: try to trigger sign-in differently
+        alert('Google Sign-In prompt failed. Please try refreshing the page.')
+      }
     } else {
+      console.error('❌ Google Sign-In not loaded')
       alert('Google Sign-In not loaded. Please refresh the page and try again.')
     }
-  }
+  }, [])
 
   if (!isOpen) return null
 
