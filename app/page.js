@@ -12,7 +12,7 @@ export default function Home() {
   const [selectedStake, setSelectedStake] = useState(5)
   const [userProfile, setUserProfile] = useState(null)
   const [walletAddress, setWalletAddress] = useState('')
-  const [showLoginModal, setShowLoginModal] = useState(true)  // Testing Google OAuth credential passing
+  const [showLoginModal, setShowLoginModal] = useState(false)
 
   const handleWalletConnect = async () => {
     if (!isConnected) {
