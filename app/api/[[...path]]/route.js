@@ -263,14 +263,27 @@ export async function POST(request, { params }) {
     if (route === 'auth/google') {
       const { credential } = body
       
+      console.log('🔑 Google auth request received')
+      
       if (!credential) {
+        console.log('❌ Missing Google credential')
         return NextResponse.json(
           { error: 'Missing Google ID token' },
           { status: 400, headers: corsHeaders }
         )
       }
       
+      if (!googleClient) {
+        console.log('❌ Google client not initialized - missing GOOGLE_CLIENT_ID')
+        return NextResponse.json(
+          { error: 'Google authentication not configured' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+      
       try {
+        console.log('🔍 Verifying Google ID token...')
+        
         // Verify the Google ID token
         const ticket = await googleClient.verifyIdToken({
           idToken: credential,
@@ -282,10 +295,12 @@ export async function POST(request, { params }) {
           throw new Error('Invalid token payload')
         }
         
-        const { sub: googleId, email, name, picture } = payload
+        const { sub: googleId, email, name, picture, email_verified } = payload
         
-        if (!email) {
-          throw new Error('Email not provided by Google')
+        console.log('✅ Google token verified for:', email)
+        
+        if (!email || !email_verified) {
+          throw new Error('Email not verified by Google')
         }
         
         // Find or create user in MongoDB
@@ -301,6 +316,7 @@ export async function POST(request, { params }) {
         
         if (!user) {
           // Create new user with Google data
+          console.log('👤 Creating new user for:', email)
           user = {
             id: crypto.randomUUID(),
             email,
@@ -339,8 +355,10 @@ export async function POST(request, { params }) {
           }
           
           await users.insertOne(user)
+          console.log('✅ New user created:', user.id)
         } else {
           // Update existing user
+          console.log('🔄 Updating existing user:', user.email)
           await users.updateOne(
             { $or: [{ email }, { google_id: googleId }] },
             {
@@ -353,6 +371,7 @@ export async function POST(request, { params }) {
               }
             }
           )
+          console.log('✅ User updated')
         }
         
         // Generate JWT token for consistent auth system
@@ -367,6 +386,8 @@ export async function POST(request, { params }) {
           JWT_SECRET,
           { expiresIn: '7d' }
         )
+        
+        console.log('🎉 Google authentication successful for:', email)
         
         return NextResponse.json({
           success: true,
@@ -386,9 +407,9 @@ export async function POST(request, { params }) {
         })
         
       } catch (error) {
-        console.error('Google authentication error:', error)
+        console.error('❌ Google authentication error:', error.message)
         return NextResponse.json(
-          { error: 'Google authentication failed' },
+          { error: 'Google authentication failed: ' + error.message },
           { status: 400, headers: corsHeaders }
         )
       }
