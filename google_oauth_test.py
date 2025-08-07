@@ -11,8 +11,8 @@ import sys
 import os
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://14b606ac-994f-4799-a20a-dbd6731e5a52.preview.emergentagent.com')
+# Use localhost for testing since external URL has ingress issues
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 def print_test_header(test_name):
