@@ -246,10 +246,10 @@ def test_jwt_token_compatibility():
     """Test JWT token generation and validation for authentication"""
     print("🔍 TESTING: JWT Token Compatibility")
     
-    # Test using existing Solana wallet auth to verify JWT system works
+    # Test using a different wallet address to avoid conflicts
     try:
         auth_data = {
-            "wallet_address": "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",
+            "wallet_address": f"test_wallet_{int(time.time())}",
             "signature": "test_signature",
             "message": "Sign this message to authenticate"
         }
@@ -289,6 +289,10 @@ def test_jwt_token_compatibility():
                            f"Invalid JWT structure: {len(token_parts)} parts")
             else:
                 log_test("JWT Token Generation", "FAIL", "No token in response")
+        elif response.status_code == 500:
+            error_data = response.json()
+            log_test("JWT Token Generation", "WARN", 
+                   f"Server error: {error_data.get('details', 'Unknown error')}")
         else:
             log_test("JWT Token Generation", "WARN", 
                    f"Auth endpoint: HTTP {response.status_code}")
