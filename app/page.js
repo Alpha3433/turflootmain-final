@@ -345,24 +345,14 @@ export default function Home() {
                   <div className="text-lg">🏆</div>
                   <h3 className="text-white font-bold text-sm">Leaderboard</h3>
                 </div>
-                <div className="space-y-2">
-                  {[
-                    { rank: 1, name: 'aji', amount: '$1,610.02', color: 'text-yellow-400' },
-                    { rank: 2, name: 'Erion', amount: '$1,380.53', color: 'text-gray-300' },
-                    { rank: 3, name: 'Hotller', amount: '$1,233.80', color: 'text-orange-400' }
-                  ].map((player) => (
-                    <div key={player.rank} className="flex justify-between items-center py-2 px-3 bg-gray-800/30 rounded-lg text-xs">
-                      <div className="flex items-center space-x-2">
-                        <span className={`font-bold text-xs ${player.color}`}>#{player.rank}</span>
-                        <span className="text-gray-300">{player.name}</span>
-                      </div>
-                      <span className="text-yellow-400 font-bold text-xs">{player.amount}</span>
-                    </div>
-                  ))}
+                <div className="text-center py-8">
+                  <div className="text-gray-400 text-sm">
+                    🎯 No games played yet
+                  </div>
+                  <div className="text-gray-500 text-xs mt-1">
+                    Start playing to see rankings!
+                  </div>
                 </div>
-                <button className="w-full mt-3 py-2 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 rounded-lg text-xs font-bold transition-all">
-                  View Full Leaderboard
-                </button>
               </div>
 
               {/* Compact Friends Panel */}
