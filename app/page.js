@@ -404,6 +404,24 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Live Stats Section */}
+            <div className="col-span-12 mb-4">
+              <div className="flex justify-center space-x-8">
+                <div className="text-center bg-black/40 backdrop-blur-md px-6 py-4 rounded-xl border border-gray-700/50">
+                  <div className="text-3xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                    {livePlayerCount}
+                  </div>
+                  <div className="text-gray-400 text-sm font-medium mt-1">Players in Game</div>
+                </div>
+                <div className="text-center bg-black/40 backdrop-blur-md px-6 py-4 rounded-xl border border-gray-700/50">
+                  <div className="text-3xl font-black bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent">
+                    ${globalWinnings.toLocaleString()}
+                  </div>
+                  <div className="text-gray-400 text-sm font-medium mt-1">Global Player Winnings</div>
+                </div>
+              </div>
+            </div>
+
             {/* Compact Center Panel */}
             <div className="col-span-6 flex flex-col justify-center space-y-2">
               {/* Editable User Name Section */}
