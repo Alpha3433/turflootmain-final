@@ -526,8 +526,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Compact Right Panel */}
-            <div className="col-span-3 space-y-3 h-full">
+            {/* Compact Right Panel - Moved Up 330% */}
+            <div className="col-span-3 space-y-3 h-full -mt-48">
               {/* Compact Wallet */}
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[58%]">
                 <div className="flex items-center justify-between mb-3">
@@ -541,17 +541,21 @@ export default function Home() {
                     <button className="text-gray-400 hover:text-cyan-400">Refresh</button>
                   </div>
                 </div>
-                <div className="text-center mb-3 p-3 bg-gray-800/30 rounded-lg">
-                  <div className="text-xl font-black text-white mb-1">$0.00</div>
-                  <div className="text-gray-400 text-xs">0.0000 SOL</div>
-                </div>
-                <div className="flex space-x-2">
-                  <button className="flex-1 py-2.5 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 rounded-lg font-bold text-xs transition-all hover:scale-105">
-                    Add Funds
-                  </button>
-                  <button className="flex-1 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-lg font-bold text-xs transition-all hover:scale-105">
-                    Cash Out
-                  </button>
+                
+                <div className="text-center py-4">
+                  <div className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+                    $0.00
+                  </div>
+                  <div className="text-gray-400 text-xs mb-4">SOL Balance</div>
+                  
+                  <div className="flex space-x-2">
+                    <button className="flex-1 px-3 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-lg text-green-400 text-xs font-bold">
+                      Add Funds
+                    </button>
+                    <button className="flex-1 px-3 py-2 bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/30 rounded-lg text-orange-400 text-xs font-bold">
+                      Cash Out
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -561,15 +565,18 @@ export default function Home() {
                   <div className="text-lg">🎨</div>
                   <h3 className="text-white font-bold text-sm">Customize</h3>
                 </div>
-                <div className="flex justify-center mb-3">
-                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full relative shadow-xl hover:scale-110 transition-all">
-                    <div className="absolute inset-2 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full"></div>
-                    <div className="absolute right-0 top-1/2 transform translate-x-1.5 -translate-y-1/2 w-3 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-r-full"></div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full mx-auto mb-3 flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 bg-white rounded-full relative">
+                      <div className="absolute top-2 left-2 w-2 h-2 bg-blue-600 rounded-full"></div>
+                      <div className="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full"></div>
+                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-blue-600 rounded-full"></div>
+                    </div>
                   </div>
+                  <button className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg text-purple-400 text-xs font-medium">
+                    Change Look
+                  </button>
                 </div>
-                <button className="w-full py-2 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-lg text-xs font-bold transition-all hover:scale-[1.02]">
-                  Change Skin
-                </button>
               </div>
             </div>
           </div>
