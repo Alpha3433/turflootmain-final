@@ -218,9 +218,15 @@ export default function Home() {
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-3 border border-gray-700/50 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-sm font-bold text-black">
-                    ?
+                    {authenticated && user ? (
+                      user.google?.name?.charAt(0)?.toUpperCase() || 
+                      user.email?.address?.charAt(0)?.toUpperCase() || 
+                      '?'
+                    ) : '?'}
                   </div>
-                  <span className="text-gray-300 text-sm font-medium">Login to set your name</span>
+                  <span className="text-gray-300 text-sm font-medium">
+                    {authenticated && user ? "Enter your Name!" : "Login to set your name"}
+                  </span>
                 </div>
                 <button className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all">
                   <span className="text-sm">✏️</span>
