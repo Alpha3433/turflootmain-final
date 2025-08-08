@@ -1,14 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
   const [selectedBet, setSelectedBet] = useState(5)
+  const [showWelcome, setShowWelcome] = useState(false)
+  const [hasShownWelcome, setHasShownWelcome] = useState(false)
   
   // Get Privy hooks
-  const { login, ready, authenticated, user } = usePrivy()
+  const { login, ready, authenticated, user, logout } = usePrivy()
+
+  // Check for new authentication and show welcome message
+  useEffect(() => {
+    if (authenticated && user && !hasShownWelcome) {
+      console.log('🎉 User authenticated:', user)
+      setShowWelcome(true)
+      setHasShownWelcome(true)
+      setUserProfile(user)
+    }
+  }, [authenticated, user, hasShownWelcome])
 
   // Handle direct Privy login when button is clicked
   const handleLoginClick = () => {
@@ -26,6 +38,16 @@ export default function Home() {
   const handleLoginSuccess = (userData) => {
     console.log('Login successful:', userData)
     setUserProfile(userData)
+  }
+
+  const closeWelcome = () => {
+    setShowWelcome(false)
+  }
+
+  const handleLogout = () => {
+    logout()
+    setUserProfile(null)
+    setHasShownWelcome(false)
   }
 
   return (
