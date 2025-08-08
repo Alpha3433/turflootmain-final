@@ -110,6 +110,71 @@ export default function Home() {
     setShowWelcome(false)
   }
 
+  const handleLetsPlay = () => {
+    setShowWelcome(false)
+    setShowUsernameCreation(true)
+    setUsernameInput(displayName || '')
+  }
+
+  const closeUsernameCreation = () => {
+    setShowUsernameCreation(false)
+  }
+
+  const handleUsernameSubmit = async () => {
+    if (!usernameInput.trim()) {
+      alert('Please enter a username before continuing.')
+      return
+    }
+
+    try {
+      console.log('💾 Creating username:', usernameInput)
+      
+      const requestBody = {
+        userId: user.id,
+        customName: usernameInput.trim(),
+        privyId: user.id
+      }
+      
+      const response = await fetch('/api/users/profile/update-name', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ API Error response:', errorText)
+        alert('Failed to create username. Please try again.')
+        return
+      }
+      
+      const responseData = await response.json()
+      console.log('📡 Username creation response:', responseData)
+
+      if (responseData.success) {
+        setDisplayName(usernameInput.trim())
+        setShowUsernameCreation(false)
+        console.log('✅ Username created successfully')
+      } else {
+        alert('Failed to create username. Please try again.')
+      }
+    } catch (error) {
+      console.error('❌ Error creating username:', error)
+      alert('Network error creating username. Please try again.')
+    }
+  }
+
+  const handleUsernameKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleUsernameSubmit()
+    } else if (e.key === 'Escape') {
+      closeUsernameCreation()
+    }
+  }
+
   const handleLogout = () => {
     logout()
     setUserProfile(null)
