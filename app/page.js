@@ -533,8 +533,8 @@ export default function Home() {
             <div className="col-span-3 space-y-3 h-full -mt-96">
               {/* Exact alignment with very top of Players in Game box */}
               
-              {/* Compact Wallet */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[58%]">
+              {/* Compact Wallet - Increased Height */}
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[65%]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <div className="text-lg">💳</div>
@@ -553,7 +553,7 @@ export default function Home() {
                   </div>
                   <div className="text-gray-400 text-xs mb-4">SOL Balance</div>
                   
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 mb-4">
                     <button className="flex-1 px-3 py-2 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-lg text-green-400 text-xs font-bold">
                       Add Funds
                     </button>
@@ -564,8 +564,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Compact Customize */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[38%]">
+              {/* Compact Customize - Adjusted Height */}
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[31%]">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">🎨</div>
                   <h3 className="text-white font-bold text-sm">Customize</h3>
