@@ -455,7 +455,7 @@ export default function Home() {
             </div>
 
             {/* Compact Left Panel - Perfect Top Alignment with Players in Game Box */}
-            <div className="col-span-3 space-y-3 -mt-80">
+            <div className="col-span-3 space-y-3 -mt-96">
               {/* Maximum upward positioning to exactly align with very top of Players in Game box */}
               
               {/* Compact Leaderboard */}
