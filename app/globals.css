@@ -266,6 +266,16 @@
   }
 }
 
+/* Pulse live animation for live statistics */
+@keyframes pulse-live {
+  0% {
+    background-position: -100% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
