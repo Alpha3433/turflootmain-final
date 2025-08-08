@@ -388,10 +388,13 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Compact Left Panel */}
-            <div className="col-span-3 space-y-3 h-full">
+            {/* Compact Left Panel - Aligned with Live Stats */}
+            <div className="col-span-3 space-y-3">
+              {/* Spacer to align with live stats section */}
+              <div className="h-[100px]"></div>
+              
               {/* Compact Leaderboard */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[48%]">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">🏆</div>
                   <h3 className="text-white font-bold text-sm">Leaderboard</h3>
@@ -407,7 +410,7 @@ export default function Home() {
               </div>
 
               {/* Compact Friends Panel */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[48%]">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">👥</div>
                   <h3 className="text-white font-bold text-sm">Friends</h3>
