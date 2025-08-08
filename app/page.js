@@ -260,10 +260,11 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Center - Live indicator */}
-        <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-green-500/30">
-          <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-green-400 font-bold">Live</span>
+        {/* Center - Logo/Branding Only */}
+        <div className="flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-white font-bold text-sm">TURFLOOT</div>
+          </div>
         </div>
 
         {/* Right side - Login button or User Navigation */}
