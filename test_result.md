@@ -321,6 +321,21 @@ backend:
         agent: "main"
         comment: "DEPRECATED - User requested switch to Privy Google OAuth due to conflicts between direct Google OAuth and existing Privy integration. Direct implementation now deprecated in favor of Privy's unified authentication system."
 
+  - task: "Unified Privy Authentication System"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "COMPLETELY REMADE - All authentication now runs through a single unified Privy endpoint (POST /api/auth/privy). Removed ALL old authentication methods (Google OAuth direct, Solana wallet auth). Created unified endpoint that handles Google OAuth through Privy, Email OTP through Privy, and Wallet connections through Privy. All old endpoints now return 410 deprecation messages."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETED - All 13 unified Privy authentication tests PASSED (100% success rate). UNIFIED PRIVY AUTHENTICATION: 1) ✅ Missing privy_user validation (400 error), 2) ✅ Google OAuth user creation through Privy with JWT token validation, 3) ✅ Email OTP user creation through Privy with profile initialization, 4) ✅ Wallet-only user creation through Privy with JWT wallet data, 5) ✅ Mixed authentication (email + wallet) with Google precedence, 6) ✅ JWT token expiration (7 days) and Set-Cookie headers. DEPRECATED ENDPOINTS: 7) ✅ POST /api/auth/google returns 410 deprecated, 8) ✅ POST /api/auth/wallet returns 410 deprecated, 9) ✅ POST /api/auth/register returns 410 deprecated, 10) ✅ GET /api/wallet/{address}/balance returns 410 deprecated. USER DATA STRUCTURE: 11) ✅ Unified user records with privy_id and auth_method fields, 12) ✅ Profile and preferences initialization with stats and achievements. JWT COMPATIBILITY: 13) ✅ JWT tokens contain all required unified auth fields (userId, privyId, authMethod, email, walletAddress). Single unified endpoint successfully replaces all old authentication methods. Production ready."
+
   - task: "Privy Google OAuth authentication"
     implemented: true
     working: true
@@ -335,6 +350,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - Privy Google OAuth authentication backend endpoint (POST /api/auth/privy) implemented and working perfectly. All 8 comprehensive tests passed (100% success rate): 1) Missing access_token validation (400 error with proper message) ✅, 2) Missing privy_user validation (400 error with proper message) ✅, 3) Valid Privy user creation with Google data and wallet address ✅, 4) User profile creation with complete stats, achievements, and preferences ✅, 5) JWT token generation with valid 3-part structure and Set-Cookie headers ✅, 6) Database integration with MongoDB storage verified ✅, 7) User update scenario for existing users ✅, 8) Response format and error handling ✅. Backend integration is complete and production-ready. Frontend LoginModal updated to send Privy auth data to backend endpoint."
+      - working: true
+        agent: "testing"
+        comment: "✅ INTEGRATED INTO UNIFIED SYSTEM - This task is now part of the unified Privy authentication system. The Google OAuth functionality through Privy is fully integrated and tested as part of the comprehensive unified authentication endpoint."
 
 frontend:
   - task: "Landing page modernization redesign"
