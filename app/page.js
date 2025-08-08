@@ -17,16 +17,38 @@ export default function Home() {
 
   // Check for new authentication and show welcome message
   useEffect(() => {
+    console.log('🔍 Auth effect triggered:', { authenticated, user, ready, hasShownWelcome })
+    
     if (authenticated && user && !hasShownWelcome) {
       console.log('🎉 User authenticated:', user)
+      console.log('🔑 User ID:', user.id)
+      console.log('📧 User email:', user.email?.address)
+      console.log('🌐 User google:', user.google?.name)
+      
       setShowWelcome(true)
       setHasShownWelcome(true)
       setUserProfile(user)
       
       // Load user's custom name if it exists
       loadUserProfile(user.id)
+    } else if (authenticated && user) {
+      // User is authenticated but welcome was already shown, just load profile
+      console.log('👤 User already authenticated, loading profile')
+      setUserProfile(user)
+      loadUserProfile(user.id)
     }
-  }, [authenticated, user, hasShownWelcome])
+  }, [authenticated, user, hasShownWelcome, ready])
+
+  // Debug effect for authentication changes
+  useEffect(() => {
+    console.log('🔄 Authentication state changed:', { 
+      ready, 
+      authenticated, 
+      userId: user?.id, 
+      email: user?.email?.address,
+      displayName 
+    })
+  }, [ready, authenticated, user, displayName])
 
   const loadUserProfile = async (userId) => {
     try {
