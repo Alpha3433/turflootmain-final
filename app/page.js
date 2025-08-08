@@ -148,7 +148,7 @@ export default function Home() {
             </div>
 
             {/* Compact Center Panel */}
-            <div className="col-span-6 flex flex-col justify-center space-y-3">
+            <div className="col-span-6 flex flex-col justify-center space-y-2">
               {/* Compact User Name Section */}
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-3 border border-gray-700/50 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -168,7 +168,7 @@ export default function Home() {
                   <button
                     key={amount}
                     onClick={() => setSelectedBet(amount)}
-                    className={`px-6 py-3 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 ${
+                    className={`px-5 py-2.5 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 ${
                       selectedBet === amount
                         ? 'bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 text-black shadow-xl shadow-orange-500/25'
                         : 'bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 text-white border border-gray-600/50'
@@ -181,8 +181,8 @@ export default function Home() {
 
               {/* Large Join Game Button */}
               <div className="text-center">
-                <button className="relative group bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black px-10 py-4 rounded-2xl font-black text-xl shadow-2xl transition-all duration-300 hover:scale-105 flex items-center space-x-3 mx-auto">
-                  <span className="text-2xl">▶</span>
+                <button className="relative group bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black px-8 py-3 rounded-2xl font-black text-lg shadow-2xl transition-all duration-300 hover:scale-105 flex items-center space-x-3 mx-auto">
+                  <span className="text-xl">▶</span>
                   <span className="relative">JOIN GAME</span>
                 </button>
               </div>
