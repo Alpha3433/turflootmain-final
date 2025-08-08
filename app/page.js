@@ -80,17 +80,17 @@ export default function Home() {
       </header>
 
       {/* Compact Main Content */}
-      <div className="relative z-10 h-[calc(100vh-88px)] flex flex-col">
+      <div className="relative z-10 flex flex-col" style={{height: 'calc(100vh - 100px)'}}>
         
         {/* Compact Title Section */}
-        <div className="text-center mb-3">
+        <div className="text-center mb-2">
           <div className="relative inline-block">
-            <h1 className="text-5xl font-black tracking-tight">
+            <h1 className="text-4xl font-black tracking-tight">
               <span className="text-white drop-shadow-xl">TURF</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600">LOOT</span>
             </h1>
           </div>
-          <p className="text-gray-300 text-base font-bold tracking-wide mt-1">
+          <p className="text-gray-300 text-sm font-bold tracking-wide mt-1">
             SKILL-BASED TERRITORY GAME
           </p>
           <div className="text-yellow-400 text-xs font-medium mt-1">
@@ -99,7 +99,7 @@ export default function Home() {
         </div>
 
         {/* Compact Main Interface */}
-        <div className="flex-1 flex justify-center px-4">
+        <div className="flex-1 flex justify-center px-4 min-h-0">
           <div className="grid grid-cols-12 gap-4 max-w-7xl w-full h-full">
             
             {/* Compact Left Panel */}
