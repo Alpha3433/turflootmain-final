@@ -388,9 +388,9 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Compact Left Panel - Perfect Alignment with Live Stats Top */}
-            <div className="col-span-3 space-y-3 -mt-56">
-              {/* Maximum upward positioning to perfectly align with top of Players in Game box */}
+            {/* Compact Left Panel - Exact Top Alignment with Live Stats */}
+            <div className="col-span-3 space-y-3 -mt-72">
+              {/* Maximum upward positioning to exactly align with top of Players in Game box */}
               
               {/* Compact Leaderboard */}
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
