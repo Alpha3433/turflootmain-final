@@ -137,6 +137,24 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - Returns correct pot data for all tables ($1, $5, $20) with pot amounts and player counts. Proper JSON array structure."
+      - working: true
+        agent: "testing"
+        comment: "✅ POST-REDESIGN VERIFICATION PASSED - Game pots endpoint working perfectly after professional gaming interface redesign. Returns all 3 pot tables with 58 total players and $3588 total pot. Live statistics integration confirmed working."
+
+  - task: "Live Statistics APIs (GET /api/stats/live-players and GET /api/stats/global-winnings)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Live statistics endpoints for professional gaming interface redesign - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Both live statistics endpoints working perfectly. GET /api/stats/live-players returns player count and timestamp. GET /api/stats/global-winnings returns total winnings and timestamp. These endpoints power the redesigned frontend live statistics display."
 
   - task: "Create user (POST /api/users)"
     implemented: true
