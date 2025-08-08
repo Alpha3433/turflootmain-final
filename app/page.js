@@ -117,10 +117,13 @@ export default function Home() {
   }
 
   const handleNameClick = () => {
-    if (authenticated && user) {
-      setIsEditingName(true)
-      setCustomName(displayName)
+    if (!authenticated || !user) {
+      alert('Please log in first to set your custom name.')
+      handleLoginClick() // Automatically trigger login
+      return
     }
+    setIsEditingName(true)
+    setCustomName(displayName || '')
   }
 
   const handleNameSave = async () => {
