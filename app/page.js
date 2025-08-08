@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
+import WalletManager from '../components/wallet/WalletManager'
 
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
