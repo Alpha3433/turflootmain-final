@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing - Privy Authentication Focus
-Testing the newly implemented Privy Google OAuth authentication backend endpoint
+TurfLoot Backend API Testing - Unified Privy Authentication System
+Testing the completely remade unified Privy authentication backend system
+All authentication now runs through a single Privy endpoint.
 """
 
 import requests
 import json
 import time
 import os
+import jwt
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "http://localhost:3000"
+BASE_URL = "https://d3a35ba2-1b25-4c95-979b-2667ffe40b71.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(test_name, status, details=""):
