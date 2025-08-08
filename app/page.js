@@ -569,26 +569,6 @@ export default function Home() {
                   🌍 Browse Lobbies
                 </button>
               </div>
-
-              {/* Live Stats */}
-              <div className="flex justify-center space-x-12">
-                <div className="text-center">
-                  <div className={`text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
-                    playerCountPulse ? 'pulse-live' : ''
-                  }`}>
-                    {livePlayerCount}
-                  </div>
-                  <div className="text-gray-400 text-sm font-medium">Players in Game</div>
-                </div>
-                <div className="text-center">
-                  <div className={`text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
-                    globalWinningsPulse ? 'pulse-live' : ''
-                  }`}>
-                    ${globalWinnings.toLocaleString()}
-                  </div>
-                  <div className="text-gray-400 text-sm font-medium">Global Player Winnings</div>
-                </div>
-              </div>
             </div>
 
             {/* RIGHT COLUMN - Wallet & Customize */}
