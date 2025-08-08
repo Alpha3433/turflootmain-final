@@ -10,8 +10,8 @@ import sys
 import os
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://1129be5f-620c-46b6-bfba-476a3eb10829.preview.emergentagent.com')
+# Use localhost for testing since external URL has ingress issues
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 def test_custom_name_update_debug():
