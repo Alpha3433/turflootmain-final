@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "https://d3a35ba2-1b25-4c95-979b-2667ffe40b71.preview.emergentagent.com"
+BASE_URL = "https://2d1eda33-bd6c-40ac-a392-59cfdb7e363d.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(test_name, status, details=""):
