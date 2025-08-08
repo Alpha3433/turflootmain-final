@@ -62,14 +62,30 @@ export default function Home() {
         const playerResponse = await fetch('/api/stats/live-players')
         if (playerResponse.ok) {
           const playerData = await playerResponse.json()
-          setLivePlayerCount(playerData.count || 0)
+          const newPlayerCount = playerData.count || 0
+          
+          // Trigger pulse animation if count changed
+          if (newPlayerCount !== livePlayerCount) {
+            setPlayerCountPulse(true)
+            setTimeout(() => setPlayerCountPulse(false), 1000)
+          }
+          
+          setLivePlayerCount(newPlayerCount)
         }
 
         // Fetch global winnings
         const winningsResponse = await fetch('/api/stats/global-winnings')
         if (winningsResponse.ok) {
           const winningsData = await winningsResponse.json()
-          setGlobalWinnings(winningsData.total || 0)
+          const newGlobalWinnings = winningsData.total || 0
+          
+          // Trigger pulse animation if winnings changed
+          if (newGlobalWinnings !== globalWinnings) {
+            setGlobalWinningsPulse(true)
+            setTimeout(() => setGlobalWinningsPulse(false), 1000)
+          }
+          
+          setGlobalWinnings(newGlobalWinnings)
         }
       } catch (error) {
         console.log('📊 Stats fetch failed (using defaults):', error.message)
@@ -82,7 +98,7 @@ export default function Home() {
     // Update every 30 seconds
     const interval = setInterval(fetchLiveStats, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [livePlayerCount, globalWinnings])
 
   const loadUserProfile = async (userId) => {
     try {
