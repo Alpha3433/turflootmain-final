@@ -470,7 +470,10 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Enhanced CSS animations and effects"
+    - "Landing page modernization redesign"
+    - "Welcome message popup and user navigation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
