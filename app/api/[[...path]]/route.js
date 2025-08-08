@@ -222,6 +222,7 @@ export async function POST(request, { params }) {
       const { userId, customName, privyId } = body
       
       if (!userId || !customName) {
+        console.log('❌ Missing required fields:', { userId: !!userId, customName: !!customName })
         return NextResponse.json(
           { error: 'Missing userId or customName' },
           { status: 400, headers: corsHeaders }
@@ -229,25 +230,68 @@ export async function POST(request, { params }) {
       }
       
       try {
+        console.log('🔍 Attempting to connect to database...')
         const db = await getDb()
         const usersCollection = db.collection('users')
         
-        // Update the user's custom name
-        const updateResult = await usersCollection.updateOne(
-          { $or: [{ id: userId }, { privy_id: privyId }] },
-          { 
-            $set: { 
-              custom_name: customName,
-              updated_at: new Date().toISOString()
-            } 
-          }
-        )
+        console.log('🔍 Searching for user with:', { userId, privyId })
         
-        if (updateResult.matchedCount === 0) {
-          return NextResponse.json(
-            { error: 'User not found' },
-            { status: 404, headers: corsHeaders }
+        // First, let's see if the user exists
+        const existingUser = await usersCollection.findOne({
+          $or: [
+            { id: userId },
+            { privy_id: privyId },
+            { privy_id: userId },
+            { id: privyId },
+            // Also try email-based matching for Privy users
+            ...(userId.includes('@') ? [{ email: userId }] : []),
+            ...(privyId && privyId.includes('@') ? [{ email: privyId }] : [])
+          ]
+        })
+        
+        console.log('👤 Found existing user:', existingUser ? 'YES' : 'NO')
+        
+        if (!existingUser) {
+          console.log('❌ User not found, creating new user record...')
+          
+          // Create a new user record if it doesn't exist
+          const newUser = {
+            id: userId,
+            privy_id: privyId || userId,
+            email: userId.includes('@') ? userId : null,
+            custom_name: customName,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            stats: {
+              games_played: 0,
+              games_won: 0,
+              total_winnings: 0
+            },
+            achievements: [],
+            preferences: {
+              sound_enabled: true,
+              notifications_enabled: true
+            }
+          }
+          
+          const insertResult = await usersCollection.insertOne(newUser)
+          console.log('✅ New user created:', insertResult.insertedId)
+        } else {
+          // Update the user's custom name
+          const updateResult = await usersCollection.updateOne(
+            { _id: existingUser._id },
+            { 
+              $set: { 
+                custom_name: customName,
+                updated_at: new Date().toISOString()
+              } 
+            }
           )
+          
+          console.log('🔄 User update result:', { 
+            matchedCount: updateResult.matchedCount,
+            modifiedCount: updateResult.modifiedCount 
+          })
         }
         
         console.log('✅ Custom name updated successfully for user:', userId)
@@ -259,8 +303,15 @@ export async function POST(request, { params }) {
         
       } catch (error) {
         console.error('❌ Error updating custom name:', error)
+        console.error('❌ Error stack:', error.stack)
+        console.error('❌ Error details:', {
+          name: error.name,
+          message: error.message,
+          code: error.code
+        })
+        
         return NextResponse.json(
-          { error: 'Failed to update custom name' },
+          { error: `Database error: ${error.message}` },
           { status: 500, headers: corsHeaders }
         )
       }
