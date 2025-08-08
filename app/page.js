@@ -80,17 +80,17 @@ export default function Home() {
       </header>
 
       {/* Compact Main Content */}
-      <div className="relative z-10 h-[calc(100vh-80px)] flex flex-col">
+      <div className="relative z-10 h-[calc(100vh-88px)] flex flex-col">
         
         {/* Compact Title Section */}
-        <div className="text-center mb-4">
+        <div className="text-center mb-3">
           <div className="relative inline-block">
-            <h1 className="text-6xl font-black tracking-tight">
+            <h1 className="text-5xl font-black tracking-tight">
               <span className="text-white drop-shadow-xl">TURF</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600">LOOT</span>
             </h1>
           </div>
-          <p className="text-gray-300 text-lg font-bold tracking-wide mt-1">
+          <p className="text-gray-300 text-base font-bold tracking-wide mt-1">
             SKILL-BASED TERRITORY GAME
           </p>
           <div className="text-yellow-400 text-xs font-medium mt-1">
@@ -105,10 +105,10 @@ export default function Home() {
             {/* Compact Left Panel */}
             <div className="col-span-3 space-y-3 h-full">
               {/* Compact Leaderboard */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[45%]">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[48%]">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">🏆</div>
-                  <h3 className="text-white font-bold">Leaderboard</h3>
+                  <h3 className="text-white font-bold text-sm">Leaderboard</h3>
                 </div>
                 <div className="space-y-2">
                   {[
@@ -116,7 +116,7 @@ export default function Home() {
                     { rank: 2, name: 'Erion', amount: '$1,380.53', color: 'text-gray-300' },
                     { rank: 3, name: 'Hotller', amount: '$1,233.80', color: 'text-orange-400' }
                   ].map((player) => (
-                    <div key={player.rank} className="flex justify-between items-center py-2 px-3 bg-gray-800/30 rounded-lg text-sm">
+                    <div key={player.rank} className="flex justify-between items-center py-2 px-3 bg-gray-800/30 rounded-lg text-xs">
                       <div className="flex items-center space-x-2">
                         <span className={`font-bold text-xs ${player.color}`}>#{player.rank}</span>
                         <span className="text-gray-300">{player.name}</span>
@@ -131,16 +131,16 @@ export default function Home() {
               </div>
 
               {/* Compact Friends Panel */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[50%]">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[48%]">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">👥</div>
-                  <h3 className="text-white font-bold">Friends</h3>
+                  <h3 className="text-white font-bold text-sm">Friends</h3>
                   <span className="text-gray-400 text-xs bg-gray-800/50 px-2 py-0.5 rounded-full">w/ RobtHurt</span>
                 </div>
-                <div className="text-center py-4">
-                  <div className="text-4xl font-bold text-gray-600 mb-2">0</div>
-                  <div className="text-gray-400 text-sm mb-3">No friends... add some!</div>
-                  <button className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-blue-400 text-xs font-medium">
+                <div className="text-center py-3">
+                  <div className="text-3xl font-bold text-gray-600 mb-2">0</div>
+                  <div className="text-gray-400 text-xs mb-2">No friends... add some!</div>
+                  <button className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-blue-400 text-xs font-medium">
                     Invite Friends
                   </button>
                 </div>
@@ -148,17 +148,17 @@ export default function Home() {
             </div>
 
             {/* Compact Center Panel */}
-            <div className="col-span-6 flex flex-col justify-center space-y-4">
+            <div className="col-span-6 flex flex-col justify-center space-y-3">
               {/* Compact User Name Section */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 flex items-center justify-between">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-3 border border-gray-700/50 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-lg font-bold text-black">
+                  <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-sm font-bold text-black">
                     ?
                   </div>
-                  <span className="text-gray-300 font-medium">Login to set your name</span>
+                  <span className="text-gray-300 text-sm font-medium">Login to set your name</span>
                 </div>
                 <button className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all">
-                  <span className="text-lg">✏️</span>
+                  <span className="text-sm">✏️</span>
                 </button>
               </div>
 
@@ -168,7 +168,7 @@ export default function Home() {
                   <button
                     key={amount}
                     onClick={() => setSelectedBet(amount)}
-                    className={`px-8 py-4 rounded-xl font-bold text-xl transition-all duration-300 hover:scale-105 ${
+                    className={`px-6 py-3 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 ${
                       selectedBet === amount
                         ? 'bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 text-black shadow-xl shadow-orange-500/25'
                         : 'bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 text-white border border-gray-600/50'
@@ -181,18 +181,18 @@ export default function Home() {
 
               {/* Large Join Game Button */}
               <div className="text-center">
-                <button className="relative group bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black px-12 py-6 rounded-2xl font-black text-2xl shadow-2xl transition-all duration-300 hover:scale-105 flex items-center space-x-3 mx-auto">
-                  <span className="text-3xl">▶</span>
+                <button className="relative group bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black px-10 py-4 rounded-2xl font-black text-xl shadow-2xl transition-all duration-300 hover:scale-105 flex items-center space-x-3 mx-auto">
+                  <span className="text-2xl">▶</span>
                   <span className="relative">JOIN GAME</span>
                 </button>
               </div>
 
               {/* Compact Game Options */}
               <div className="flex justify-center space-x-4">
-                <button className="px-6 py-3 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-xl font-bold border border-gray-600/50 transition-all hover:scale-105">
+                <button className="px-4 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-xl text-sm font-bold border border-gray-600/50 transition-all hover:scale-105">
                   UB
                 </button>
-                <button className="px-6 py-3 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-xl font-bold border border-gray-600/50 transition-all hover:scale-105">
+                <button className="px-4 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-xl text-sm font-bold border border-gray-600/50 transition-all hover:scale-105">
                   Browse Lobbies
                 </button>
               </div>
@@ -201,11 +201,11 @@ export default function Home() {
             {/* Compact Right Panel */}
             <div className="col-span-3 space-y-3 h-full">
               {/* Compact Wallet */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[60%]">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[58%]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <div className="text-lg">💳</div>
-                    <h3 className="text-white font-bold">Wallet</h3>
+                    <h3 className="text-white font-bold text-sm">Wallet</h3>
                   </div>
                   <div className="flex space-x-2 text-xs">
                     <button className="text-gray-400 hover:text-cyan-400">Copy</button>
@@ -213,30 +213,30 @@ export default function Home() {
                     <button className="text-gray-400 hover:text-cyan-400">Refresh</button>
                   </div>
                 </div>
-                <div className="text-center mb-4 p-4 bg-gray-800/30 rounded-lg">
-                  <div className="text-2xl font-black text-white mb-1">$0.00</div>
-                  <div className="text-gray-400 text-sm">0.0000 SOL</div>
+                <div className="text-center mb-3 p-3 bg-gray-800/30 rounded-lg">
+                  <div className="text-xl font-black text-white mb-1">$0.00</div>
+                  <div className="text-gray-400 text-xs">0.0000 SOL</div>
                 </div>
                 <div className="flex space-x-2">
-                  <button className="flex-1 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 rounded-lg font-bold text-sm transition-all hover:scale-105">
+                  <button className="flex-1 py-2.5 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 rounded-lg font-bold text-xs transition-all hover:scale-105">
                     Add Funds
                   </button>
-                  <button className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-lg font-bold text-sm transition-all hover:scale-105">
+                  <button className="flex-1 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-lg font-bold text-xs transition-all hover:scale-105">
                     Cash Out
                   </button>
                 </div>
               </div>
 
               {/* Compact Customize */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[35%]">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[38%]">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">🎨</div>
-                  <h3 className="text-white font-bold">Customize</h3>
+                  <h3 className="text-white font-bold text-sm">Customize</h3>
                 </div>
                 <div className="flex justify-center mb-3">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full relative shadow-xl hover:scale-110 transition-all">
+                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full relative shadow-xl hover:scale-110 transition-all">
                     <div className="absolute inset-2 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full"></div>
-                    <div className="absolute right-0 top-1/2 transform translate-x-2 -translate-y-1/2 w-4 h-3 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-r-full"></div>
+                    <div className="absolute right-0 top-1/2 transform translate-x-1.5 -translate-y-1/2 w-3 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-r-full"></div>
                   </div>
                 </div>
                 <button className="w-full py-2 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-lg text-xs font-bold transition-all hover:scale-[1.02]">
@@ -247,32 +247,32 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Compact Bottom Section */}
-        <div className="relative z-10 py-3">
+        {/* Fixed Bottom Section */}
+        <div className="relative z-10 py-2 mt-auto">
           {/* Compact Stats */}
-          <div className="flex justify-center space-x-8 mb-3">
-            <div className="text-center bg-black/20 backdrop-blur-sm px-6 py-3 rounded-xl border border-gray-700/30">
-              <div className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">38</div>
+          <div className="flex justify-center space-x-6 mb-2">
+            <div className="text-center bg-black/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-700/30">
+              <div className="text-lg font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">38</div>
               <div className="text-gray-400 text-xs">Players in Game</div>
             </div>
-            <div className="text-center bg-black/20 backdrop-blur-sm px-6 py-3 rounded-xl border border-gray-700/30">
-              <div className="text-2xl font-black bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent">$96,512</div>
+            <div className="text-center bg-black/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-700/30">
+              <div className="text-lg font-black bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent">$96,512</div>
               <div className="text-gray-400 text-xs">Global Winnings</div>
             </div>
           </div>
 
           {/* Compact Action Buttons */}
-          <div className="flex justify-center space-x-4">
-            <button className="px-4 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-sm font-bold border border-gray-600/50 transition-all hover:scale-105">
+          <div className="flex justify-center space-x-3">
+            <button className="px-3 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-xs font-bold border border-gray-600/50 transition-all hover:scale-105">
               Add Friends
             </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black rounded-lg text-sm font-bold transition-all hover:scale-105">
+            <button className="px-3 py-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black rounded-lg text-xs font-bold transition-all hover:scale-105">
               Daily Crate
             </button>
-            <button className="px-4 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-sm font-bold border border-gray-600/50 transition-all hover:scale-105">
+            <button className="px-3 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-xs font-bold border border-gray-600/50 transition-all hover:scale-105">
               Affiliate
             </button>
-            <button className="px-4 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-sm font-bold border border-gray-600/50 transition-all hover:scale-105">
+            <button className="px-3 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-xs font-bold border border-gray-600/50 transition-all hover:scale-105">
               Change Appearance
             </button>
           </div>
@@ -280,23 +280,17 @@ export default function Home() {
       </div>
 
       {/* Discord Button */}
-      <div className="absolute bottom-3 left-3">
-        <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 rounded-lg text-sm font-bold flex items-center space-x-2 transition-all hover:scale-105">
-          <span className="text-lg">🔗</span>
+      <div className="absolute bottom-2 left-2">
+        <button className="px-3 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 rounded-lg text-xs font-bold flex items-center space-x-2 transition-all hover:scale-105">
+          <span className="text-sm">🔗</span>
           <span>Discord</span>
         </button>
       </div>
 
-      {/* User Status Display */}
+      {/* User Status Display - Only show userProfile, not Privy auth status */}
       {userProfile && (
         <div className="absolute top-16 right-6 p-3 bg-black/60 backdrop-blur-md rounded-lg border border-green-500/30">
           <p className="text-green-400 text-sm">✅ {userProfile.username || userProfile.email}</p>
-        </div>
-      )}
-      
-      {authenticated && user && !userProfile && (
-        <div className="absolute top-16 right-6 p-3 bg-black/60 backdrop-blur-md rounded-lg border border-green-500/30">
-          <p className="text-green-400 text-sm">✅ Authenticated via Privy</p>
         </div>
       )}
     </div>
