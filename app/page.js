@@ -100,102 +100,82 @@ export default function Home() {
       const userData = await response.json()
       console.log('👤 User profile loaded:', userData)
       
-      // Set display name from custom name or fallback to default
+      // Set display name from user data
       if (userData.custom_name) {
-        console.log('✅ Found custom name:', userData.custom_name)
         setDisplayName(userData.custom_name)
+      } else if (userData.username) {
+        setDisplayName(userData.username)
       } else {
-        const defaultName = user?.google?.name || user?.email?.address || 'Player'
-        console.log('🔄 No custom name, using default:', defaultName)
-        setDisplayName(defaultName)
+        // Fallback to Google name or email
+        const fallbackName = user?.google?.name || user?.email?.address || 'Player'
+        setDisplayName(fallbackName)
       }
     } catch (error) {
       console.error('❌ Error loading user profile:', error)
-      // Fallback if profile loading fails
-      const defaultName = user?.google?.name || user?.email?.address || 'Player'
-      console.log('🔄 Error fallback, using default:', defaultName)
-      setDisplayName(defaultName)
+      // Fallback to Google name or email on error
+      const fallbackName = user?.google?.name || user?.email?.address || 'Player'
+      setDisplayName(fallbackName)
     }
   }
 
-  // Handle direct Privy login when button is clicked
   const handleLoginClick = () => {
-    console.log('🔍 Starting direct Privy login...')
-    
-    // Call Privy's login directly - this will show the interface
-    login().then(() => {
-      console.log('✅ Privy login interface opened')
-    }).catch((error) => {
-      console.error('❌ Privy login error:', error)
-      alert('Login failed. Please try again.')
-    })
+    console.log('🔑 Login button clicked')
+    if (ready && !authenticated) {
+      console.log('🚀 Triggering Privy login')
+      login()
+    }
   }
 
-  const handleLoginSuccess = (userData) => {
-    console.log('Login successful:', userData)
-    setUserProfile(userData)
+  const handleLogout = () => {
+    console.log('🔐 Logout clicked')
+    logout()
+    setUserProfile(null)
+    setDisplayName('')
+    setShowWelcome(false)
+    setHasShownWelcome(false)
   }
 
   const closeWelcome = () => {
     setShowWelcome(false)
   }
 
-  const handleLetsPlay = () => {
-    setShowWelcome(false)
-  }
-
-  const handleLogout = () => {
-    logout()
-    setUserProfile(null)
-    setHasShownWelcome(false)
-    setDisplayName('')
-    setCustomName('')
-  }
-
   const handleNameClick = () => {
-    if (!authenticated || !user) {
-      alert('Please log in first to set your custom name.')
-      handleLoginClick() // Automatically trigger login
-      return
+    if (authenticated && user) {
+      setIsEditingName(true)
+      setCustomName(displayName && displayName !== user.google?.name && displayName !== user.email?.address ? displayName : '')
     }
-    setIsEditingName(true)
-    setCustomName(displayName || '')
   }
 
   const handleNameSave = async () => {
     if (!customName.trim()) {
-      alert('Please enter a name before saving.')
+      alert('Please enter a name')
       return
     }
 
-    if (!user || !user.id) {
-      alert('Authentication error. Please log in again.')
+    if (!authenticated || !user) {
+      alert('You must be logged in to update your name')
       return
     }
 
     try {
-      console.log('💾 Saving custom name:', customName)
-      console.log('👤 User data:', user)
-      console.log('🔑 User ID:', user.id)
-      
-      const requestBody = {
+      console.log('💾 Saving custom name:', customName.trim())
+      console.log('🔑 User info:', { userId: user.id, privyId: user.id, email: user.email?.address })
+
+      const requestData = {
         userId: user.id,
         customName: customName.trim(),
         privyId: user.id
       }
-      
-      console.log('📡 Making API request with body:', requestBody)
-      
-      // Make API call to update user profile
+      console.log('📤 Request data:', requestData)
+
       const response = await fetch('/api/users/profile/update-name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestData)
       })
-
+      
       console.log('📡 API Response status:', response.status)
       console.log('📡 API Response ok:', response.ok)
       
