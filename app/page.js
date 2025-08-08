@@ -572,20 +572,20 @@ export default function Home() {
         </div>
 
         {/* Bottom Action Bar */}
-        <div className="flex justify-center space-x-6 mt-16">
-          <button className="px-8 py-4 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-lg font-bold border border-gray-600/50 transition-all hover:scale-105">
+        <div className="flex justify-center space-x-4 mt-6">
+          <button className="px-6 py-3 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-base font-bold border border-gray-600/50 transition-all hover:scale-105">
             Daily Crate
           </button>
-          <button className="px-8 py-4 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-lg font-bold border border-gray-600/50 transition-all hover:scale-105">
+          <button className="px-6 py-3 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-base font-bold border border-gray-600/50 transition-all hover:scale-105">
             Affiliate Program
           </button>
         </div>
       </main>
 
       {/* Discord Button */}
-      <div className="absolute bottom-6 left-6">
-        <button className="px-6 py-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 rounded-2xl font-bold flex items-center space-x-3 transition-all hover:scale-105 shadow-lg">
-          <span className="text-xl">🔗</span>
+      <div className="absolute bottom-4 left-6">
+        <button className="px-5 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 rounded-2xl font-bold flex items-center space-x-2 transition-all hover:scale-105 shadow-lg">
+          <span className="text-lg">🔗</span>
           <span>Join Discord</span>
         </button>
       </div>
