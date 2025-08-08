@@ -346,18 +346,18 @@ export default function Home() {
           <div className="grid grid-cols-12 gap-6 h-[480px]">
             
             {/* Left Panel - Leaderboard & Friends */}
-            <div className="col-span-3 space-y-6">
+            <div className="col-span-3 space-y-4">
               {/* Leaderboard */}
-              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 h-[280px] shadow-2xl">
-                <div className="flex items-center space-x-3 mb-6">
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-gray-700/50 h-[220px] shadow-2xl">
+                <div className="flex items-center space-x-3 mb-4">
                   <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
                     <span className="text-black font-bold text-sm">🏆</span>
                   </div>
                   <h3 className="text-white font-bold text-lg">Leaderboard</h3>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {[1, 2, 3].map((rank) => (
-                    <div key={rank} className="flex justify-between items-center py-3 px-4 bg-gray-800/30 rounded-xl border border-gray-600/20">
+                    <div key={rank} className="flex justify-between items-center py-2 px-3 bg-gray-800/30 rounded-xl border border-gray-600/20">
                       <div className="flex items-center space-x-3">
                         <span className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold text-xs">
                           {rank}
@@ -368,23 +368,23 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <button className="w-full mt-4 py-3 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl border border-gray-600/30 text-gray-300 font-medium transition-all hover:scale-105">
+                <button className="w-full mt-3 py-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl border border-gray-600/30 text-gray-300 font-medium transition-all hover:scale-105">
                   View Full Leaderboard
                 </button>
               </div>
 
               {/* Friends */}
-              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 h-[280px] shadow-2xl">
-                <div className="flex items-center space-x-3 mb-6">
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-gray-700/50 h-[240px] shadow-2xl">
+                <div className="flex items-center space-x-3 mb-4">
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-sm">👥</span>
                   </div>
                   <h3 className="text-white font-bold text-lg">Friends</h3>
                 </div>
-                <div className="text-center py-12">
-                  <div className="text-6xl font-black text-gray-600 mb-4">0</div>
-                  <div className="text-gray-400 text-lg mb-6">No friends... add some!</div>
-                  <button className="px-6 py-3 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-blue-400 font-bold transition-all hover:scale-105">
+                <div className="text-center py-8">
+                  <div className="text-5xl font-black text-gray-600 mb-3">0</div>
+                  <div className="text-gray-400 text-base mb-4">No friends... add some!</div>
+                  <button className="px-5 py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-blue-400 font-bold transition-all hover:scale-105">
                     Add Friends
                   </button>
                 </div>
