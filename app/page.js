@@ -360,7 +360,6 @@ export default function Home() {
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">👥</div>
                   <h3 className="text-white font-bold text-sm">Friends</h3>
-                  <span className="text-gray-400 text-xs bg-gray-800/50 px-2 py-0.5 rounded-full">w/ RobtHurt</span>
                 </div>
                 <div className="text-center py-3">
                   <div className="text-3xl font-bold text-gray-600 mb-2">0</div>
