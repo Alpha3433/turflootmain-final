@@ -696,20 +696,13 @@ export default function Home() {
                 </ul>
               </div>
               
-              {/* Action buttons */}
+              {/* Action button */}
               <div className="space-y-3">
                 <button 
-                  onClick={closeWelcome}
+                  onClick={handleLetsPlay}
                   className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 shadow-xl"
                 >
                   Let's Play! 🎮
-                </button>
-                
-                <button 
-                  onClick={closeWelcome}
-                  className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white px-6 py-2 rounded-xl font-medium transition-all duration-300"
-                >
-                  Got it, thanks!
                 </button>
               </div>
             </div>
