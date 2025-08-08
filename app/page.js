@@ -257,7 +257,7 @@ export default function Home() {
       {/* Animated Snake Elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Top Left Snake */}
-        <div className="absolute top-20 left-10 animate-float">
+        <div className="absolute top-20 left-10 animate-snake-float animate-snake-glow">
           <svg width="120" height="200" viewBox="0 0 120 200" className="opacity-80">
             <path
               d="M20 20 Q60 60 80 100 Q100 140 60 180"
@@ -274,7 +274,7 @@ export default function Home() {
         </div>
 
         {/* Bottom Right Snake */}
-        <div className="absolute bottom-32 right-16 animate-float" style={{ animationDelay: '1s' }}>
+        <div className="absolute bottom-32 right-16 animate-snake-float animate-snake-glow" style={{ animationDelay: '1s' }}>
           <svg width="150" height="180" viewBox="0 0 150 180" className="opacity-80">
             <path
               d="M130 160 Q90 120 70 80 Q50 40 90 20"
@@ -291,11 +291,19 @@ export default function Home() {
         </div>
 
         {/* Small Snake Elements */}
-        <div className="absolute top-1/3 right-1/4 animate-pulse">
+        <div className="absolute top-1/3 right-1/4 animate-snake-breathe">
           <div className="w-8 h-8 bg-cyan-400 rounded-full opacity-60"></div>
         </div>
-        <div className="absolute bottom-1/3 left-1/4 animate-pulse" style={{ animationDelay: '0.5s' }}>
+        <div className="absolute bottom-1/3 left-1/4 animate-snake-drift" style={{ animationDelay: '0.5s' }}>
           <div className="w-6 h-6 bg-cyan-300 rounded-full opacity-40"></div>
+        </div>
+        
+        {/* Additional floating elements for enhanced DAMNBRUH aesthetic */}
+        <div className="absolute top-1/4 left-1/3 animate-snake-breathe" style={{ animationDelay: '2s' }}>
+          <div className="w-4 h-4 bg-yellow-400 rounded-full opacity-50"></div>
+        </div>
+        <div className="absolute bottom-1/4 right-1/3 animate-snake-drift" style={{ animationDelay: '3s' }}>
+          <div className="w-5 h-5 bg-green-400 rounded-full opacity-60"></div>
         </div>
       </div>
 
