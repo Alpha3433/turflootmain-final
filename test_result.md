@@ -606,9 +606,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced CSS animations and effects"
-    - "Landing page modernization redesign"
-    - "Welcome message popup and user navigation"
+    - "Wallet Component Display and Authentication Integration"
+    - "Add Funds Modal Functionality"
+    - "Cash Out Modal Functionality"
+    - "Transaction History Display"
+    - "Wallet Balance Display and Real-time Updates"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
