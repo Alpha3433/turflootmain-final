@@ -417,8 +417,8 @@ frontend:
     working: true
     file: "/app/app/globals.css"
     stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -426,6 +426,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "✅ COMPLETED - Enhanced CSS with new animations (shimmer, float, glowPulse), glassmorphism utilities (glass-card, glass-card-dark), and advanced button effects (btn-shimmer). All animations working correctly with improved visual feedback."
+      - working: true
+        agent: "testing"
+        comment: "DAMNBRUH REDESIGN FOCUS - Enhanced snake animations and pulse-live functionality need verification after React state hookup for livePlayerCount/globalWinnings changes. Priority increased to high for frontend testing."
 
   - task: "Privy Google OAuth frontend integration"
     implemented: true
