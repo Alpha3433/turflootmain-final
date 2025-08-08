@@ -194,6 +194,58 @@ export async function GET(request, { params }) {
       return NextResponse.json(leaderboard, { headers: corsHeaders })
     }
 
+    // Live statistics endpoints
+    if (route === 'stats/live-players') {
+      try {
+        const db = await getDb()
+        const gamesCollection = db.collection('games')
+        
+        // Count active games or players
+        const activeGames = await gamesCollection.countDocuments({
+          status: 'active',
+          updated_at: { $gte: new Date(Date.now() - 5 * 60 * 1000) } // Last 5 minutes
+        })
+        
+        // For now, estimate players as active games * average players per game (e.g., 2)
+        const estimatedPlayers = activeGames * 2
+        
+        return NextResponse.json({
+          count: estimatedPlayers,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error fetching live players:', error)
+        return NextResponse.json({ count: 0 }, { headers: corsHeaders })
+      }
+    }
+
+    if (route === 'stats/global-winnings') {
+      try {
+        const db = await getDb()
+        const usersCollection = db.collection('users')
+        
+        // Sum all user winnings
+        const result = await usersCollection.aggregate([
+          {
+            $group: {
+              _id: null,
+              totalWinnings: { $sum: '$stats.total_winnings' }
+            }
+          }
+        ]).toArray()
+        
+        const total = result.length > 0 ? result[0].totalWinnings || 0 : 0
+        
+        return NextResponse.json({
+          total: total,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error fetching global winnings:', error)
+        return NextResponse.json({ total: 0 }, { headers: corsHeaders })
+      }
+    }
+
     return NextResponse.json(
       { error: 'Endpoint not found' },
       { status: 404, headers: corsHeaders }
