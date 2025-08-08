@@ -124,40 +124,81 @@ export default function Home() {
   }
 
   const handleNameSave = async () => {
-    if (!customName.trim()) return
+    if (!customName.trim()) {
+      alert('Please enter a name before saving.')
+      return
+    }
+
+    if (!user || !user.id) {
+      alert('Authentication error. Please log in again.')
+      return
+    }
 
     try {
       console.log('💾 Saving custom name:', customName)
       console.log('👤 User data:', user)
+      console.log('🔑 User ID:', user.id)
+      
+      const requestBody = {
+        userId: user.id,
+        customName: customName.trim(),
+        privyId: user.id
+      }
+      
+      console.log('📡 Making API request with body:', requestBody)
       
       // Make API call to update user profile
       const response = await fetch('/api/users/profile/update-name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          userId: user.id,
-          customName: customName.trim(),
-          privyId: user.id
-        })
+        body: JSON.stringify(requestBody)
       })
 
       console.log('📡 API Response status:', response.status)
+      console.log('📡 API Response ok:', response.ok)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ API Error response:', errorText)
+        
+        try {
+          const errorData = JSON.parse(errorText)
+          alert(`Failed to update name: ${errorData.error || errorText}. Please try again.`)
+        } catch {
+          alert(`Failed to update name (HTTP ${response.status}): ${errorText}. Please try again.`)
+        }
+        return
+      }
+      
       const responseData = await response.json()
       console.log('📡 API Response data:', responseData)
 
-      if (response.ok) {
+      if (responseData.success) {
         setDisplayName(customName.trim())
         setIsEditingName(false)
         console.log('✅ Name updated successfully')
       } else {
-        console.error('❌ Failed to update name:', responseData)
+        console.error('❌ API returned success=false:', responseData)
         alert(`Failed to update name: ${responseData.error || 'Unknown error'}. Please try again.`)
       }
     } catch (error) {
-      console.error('❌ Error updating name:', error)
-      alert('Network error updating name. Please check your connection and try again.')
+      console.error('❌ Network error updating name:', error)
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        alert('Network error: Unable to connect to server. Please check your internet connection and try again.')
+      } else if (error.name === 'SyntaxError') {
+        alert('Server response error. Please try refreshing the page and try again.')  
+      } else {
+        alert(`Network error updating name: ${error.message}. Please check your connection and try again.`)
+      }
     }
   }
 
