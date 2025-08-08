@@ -18,11 +18,15 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-center mb-8">TurfLoot</h1>
         <div className="text-center">
           <button 
-            onClick={() => {
+            onClick={(e) => {
               console.log('🔍 LOGIN TO PLAY button clicked!')
+              console.log('🔍 Event:', e)
+              console.log('🔍 Current showLoginModal state:', showLoginModal)
               setShowLoginModal(true)
+              console.log('🔍 After setting showLoginModal to true')
             }}
-            className="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-lg font-bold"
+            className="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-lg font-bold cursor-pointer"
+            style={{ pointerEvents: 'auto' }}
           >
             LOGIN TO PLAY
           </button>
