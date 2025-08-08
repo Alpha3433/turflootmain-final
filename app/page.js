@@ -326,24 +326,24 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 flex-1 px-8 py-12">
+      <main className="relative z-10 flex-1 px-8 py-4">
         {/* Hero Title */}
-        <div className="text-center mb-16">
-          <h1 className="text-8xl font-black tracking-tight mb-4">
+        <div className="text-center mb-8">
+          <h1 className="text-6xl font-black tracking-tight mb-3">
             <span className="text-white">TURF</span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600">LOOT</span>
           </h1>
-          <p className="text-gray-300 text-2xl font-bold tracking-wide mb-4">
+          <p className="text-gray-300 text-xl font-bold tracking-wide mb-2">
             SKILL-BASED TERRITORY GAME
           </p>
-          <div className="text-yellow-400 text-lg font-medium">
+          <div className="text-yellow-400 text-base font-medium">
             ⚡ Real-time • 🏆 Skill-based • 💎 Blockchain verified
           </div>
         </div>
 
         {/* Main Gaming Interface */}
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-12 gap-8 h-[600px]">
+          <div className="grid grid-cols-12 gap-6 h-[480px]">
             
             {/* Left Panel - Leaderboard & Friends */}
             <div className="col-span-3 space-y-6">
