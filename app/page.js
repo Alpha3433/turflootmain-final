@@ -530,7 +530,7 @@ export default function Home() {
             </div>
 
             {/* Compact Right Panel - Perfect Top Alignment with Players in Game Box */}
-            <div className="col-span-3 space-y-3 h-full -mt-80">
+            <div className="col-span-3 space-y-3 h-full -mt-96">
               {/* Exact alignment with very top of Players in Game box */}
               
               {/* Compact Wallet */}
