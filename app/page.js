@@ -52,6 +52,36 @@ export default function Home() {
     })
   }, [ready, authenticated, user, displayName])
 
+  // Fetch live statistics
+  useEffect(() => {
+    const fetchLiveStats = async () => {
+      try {
+        // Fetch live player count
+        const playerResponse = await fetch('/api/stats/live-players')
+        if (playerResponse.ok) {
+          const playerData = await playerResponse.json()
+          setLivePlayerCount(playerData.count || 0)
+        }
+
+        // Fetch global winnings
+        const winningsResponse = await fetch('/api/stats/global-winnings')
+        if (winningsResponse.ok) {
+          const winningsData = await winningsResponse.json()
+          setGlobalWinnings(winningsData.total || 0)
+        }
+      } catch (error) {
+        console.log('📊 Stats fetch failed (using defaults):', error.message)
+        // Keep default values of 0
+      }
+    }
+
+    fetchLiveStats()
+    
+    // Update every 30 seconds
+    const interval = setInterval(fetchLiveStats, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
   const loadUserProfile = async (userId) => {
     try {
       console.log('🔍 Loading user profile for userId:', userId)
