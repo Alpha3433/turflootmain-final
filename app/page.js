@@ -529,9 +529,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Compact Right Panel - Aligned with Top of Live Stats */}
-            <div className="col-span-3 space-y-3 h-full -mt-72">
-              {/* Exact alignment with top of Players in Game box */}
+            {/* Compact Right Panel - Perfect Top Alignment with Players in Game Box */}
+            <div className="col-span-3 space-y-3 h-full -mt-80">
+              {/* Exact alignment with very top of Players in Game box */}
               
               {/* Compact Wallet */}
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[58%]">
