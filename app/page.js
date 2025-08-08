@@ -449,6 +449,26 @@ export default function Home() {
             {/* CENTER COLUMN - Main Game Area */}
             <div className="col-span-12 lg:col-span-6 flex flex-col justify-center space-y-8">
               
+              {/* Live Stats */}
+              <div className="flex justify-center space-x-12">
+                <div className="text-center">
+                  <div className={`text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
+                    playerCountPulse ? 'pulse-live' : ''
+                  }`}>
+                    {livePlayerCount}
+                  </div>
+                  <div className="text-gray-400 text-sm font-medium">Players in Game</div>
+                </div>
+                <div className="text-center">
+                  <div className={`text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
+                    globalWinningsPulse ? 'pulse-live' : ''
+                  }`}>
+                    ${globalWinnings.toLocaleString()}
+                  </div>
+                  <div className="text-gray-400 text-sm font-medium">Global Player Winnings</div>
+                </div>
+              </div>
+
               {/* User Name Display */}
               <div className="flex justify-center">
                 <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl px-6 py-4 border border-gray-700/50 flex items-center space-x-4 shadow-lg">
