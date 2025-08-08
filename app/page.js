@@ -18,7 +18,10 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-center mb-8">TurfLoot</h1>
         <div className="text-center">
           <button 
-            onClick={() => setShowLoginModal(true)}
+            onClick={() => {
+              console.log('🔍 LOGIN TO PLAY button clicked!')
+              setShowLoginModal(true)
+            }}
             className="bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded-lg font-bold"
           >
             LOGIN TO PLAY
