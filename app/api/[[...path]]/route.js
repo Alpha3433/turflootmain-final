@@ -449,22 +449,15 @@ export async function POST(request, { params }) {
       }
     }
 
-    // Legacy Google callback endpoint (to be removed)
-    if (route === 'auth/google-callback') {
+    // Legacy authentication endpoints - all deprecated in favor of unified Privy auth
+    if (route === 'auth/google-callback' || route === 'auth/register') {
       return NextResponse.json(
-        { error: 'This endpoint is deprecated. Use /api/auth/google instead.' },
+        { 
+          error: 'This endpoint is deprecated. Use Privy authentication instead.',
+          redirect: 'Use the LOGIN TO PLAY button for unified authentication.'
+        },
         { status: 410, headers: corsHeaders }
       )
-    }
-
-    if (route === 'auth/register') {
-      const user = await createUser(body)
-      const { password_hash, ...publicUser } = user
-      
-      return NextResponse.json({
-        success: true,
-        user: publicUser
-      }, { headers: corsHeaders })
     }
 
     // Create user
