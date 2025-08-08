@@ -11,6 +11,8 @@ export default function Home() {
   const [isEditingName, setIsEditingName] = useState(false)
   const [customName, setCustomName] = useState('')
   const [displayName, setDisplayName] = useState('')
+  const [livePlayerCount, setLivePlayerCount] = useState(0)
+  const [globalWinnings, setGlobalWinnings] = useState(0)
   
   // Get Privy hooks
   const { login, ready, authenticated, user, logout } = usePrivy()
