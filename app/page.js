@@ -386,109 +386,76 @@ export default function Home() {
                   <div className="text-gray-400 text-sm font-medium mt-1">Global Player Winnings</div>
                 </div>
               </div>
-            </div>
-            
-            {/* Compact Left Panel - Exact Top Alignment with Live Stats */}
-            <div className="col-span-3 space-y-3 -mt-72">
-              {/* Maximum upward positioning to exactly align with top of Players in Game box */}
               
-              {/* Compact Leaderboard */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
-                <div className="flex items-center space-x-2 mb-3">
-                  <div className="text-lg">🏆</div>
-                  <h3 className="text-white font-bold text-sm">Leaderboard</h3>
-                </div>
-                <div className="text-center py-8">
-                  <div className="text-gray-400 text-sm">
-                    🎯 No games played yet
-                  </div>
-                  <div className="text-gray-500 text-xs mt-1">
-                    Start playing to see rankings!
-                  </div>
-                </div>
-              </div>
-
-              {/* Compact Friends Panel */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
-                <div className="flex items-center space-x-2 mb-3">
-                  <div className="text-lg">👥</div>
-                  <h3 className="text-white font-bold text-sm">Friends</h3>
-                </div>
-                <div className="text-center py-3">
-                  <div className="text-3xl font-bold text-gray-600 mb-2">0</div>
-                  <div className="text-gray-400 text-xs mb-2">No friends... add some!</div>
-                  <button className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-blue-400 text-xs font-medium">
-                    Invite Friends
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Compact Center Panel */}
-            <div className="col-span-6 flex flex-col justify-center space-y-2">
-              {/* Editable User Name Section */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-3 border border-gray-700/50 flex items-center justify-between">
-                <div className="flex items-center space-x-3 flex-1">
-                  <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-sm font-bold text-black">
-                    {authenticated && user ? (
-                      displayName?.charAt(0)?.toUpperCase() || 
-                      user.google?.name?.charAt(0)?.toUpperCase() || 
-                      user.email?.address?.charAt(0)?.toUpperCase() || 
-                      '?'
-                    ) : '?'}
+              {/* Compact Login Box - Positioned under live stats */}
+              <div className="flex justify-center mt-4">
+                <div className="w-80 bg-black/40 backdrop-blur-md rounded-xl p-3 border border-gray-700/50 flex items-center justify-between">
+                  <div className="flex items-center space-x-3 flex-1">
+                    <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-sm font-bold text-black">
+                      {authenticated && user ? (
+                        displayName?.charAt(0)?.toUpperCase() || 
+                        user.google?.name?.charAt(0)?.toUpperCase() || 
+                        user.email?.address?.charAt(0)?.toUpperCase() || 
+                        '?'
+                      ) : '?'}
+                    </div>
+                    
+                    {isEditingName ? (
+                      <div className="flex-1 flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={customName}
+                          onChange={(e) => setCustomName(e.target.value)}
+                          onKeyDown={handleNameKeyPress}
+                          placeholder="Enter your name"
+                          autoFocus
+                          className="bg-gray-800/60 text-white text-sm font-medium px-3 py-1.5 rounded-lg border border-gray-600/50 focus:border-yellow-400/50 focus:outline-none flex-1"
+                          maxLength={20}
+                        />
+                        <button
+                          onClick={handleNameSave}
+                          className="p-1.5 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-lg text-green-400 text-xs font-bold transition-all"
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={handleNameCancel}
+                          className="p-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 rounded-lg text-red-400 text-xs font-bold transition-all"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <span 
+                        className={`text-gray-300 text-sm font-medium flex-1 ${
+                          authenticated && user ? 'cursor-pointer hover:text-white hover:bg-gray-700/30 px-2 py-1 rounded transition-all' : ''
+                        }`}
+                        onClick={handleNameClick}
+                      >
+                        {authenticated && user 
+                          ? (displayName && displayName !== user.google?.name && displayName !== user.email?.address 
+                              ? displayName 
+                              : "Enter your Name!")
+                          : "Login to set your name"
+                        }
+                      </span>
+                    )}
                   </div>
                   
-                  {isEditingName ? (
-                    <div className="flex-1 flex items-center space-x-2">
-                      <input
-                        type="text"
-                        value={customName}
-                        onChange={(e) => setCustomName(e.target.value)}
-                        onKeyDown={handleNameKeyPress}
-                        placeholder="Enter your name"
-                        autoFocus
-                        className="bg-gray-800/60 text-white text-sm font-medium px-3 py-1.5 rounded-lg border border-gray-600/50 focus:border-yellow-400/50 focus:outline-none flex-1"
-                        maxLength={20}
-                      />
-                      <button
-                        onClick={handleNameSave}
-                        className="p-1.5 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-lg text-green-400 text-xs font-bold transition-all"
-                      >
-                        ✓
-                      </button>
-                      <button
-                        onClick={handleNameCancel}
-                        className="p-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 rounded-lg text-red-400 text-xs font-bold transition-all"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ) : (
-                    <span 
-                      className={`text-gray-300 text-sm font-medium flex-1 ${
-                        authenticated && user ? 'cursor-pointer hover:text-white hover:bg-gray-700/30 px-2 py-1 rounded transition-all' : ''
-                      }`}
+                  {!isEditingName && (
+                    <button 
+                      className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
                       onClick={handleNameClick}
                     >
-                      {authenticated && user 
-                        ? (displayName && displayName !== user.google?.name && displayName !== user.email?.address 
-                            ? displayName 
-                            : "Enter your Name!")
-                        : "Login to set your name"
-                      }
-                    </span>
+                      <span className="text-sm">✏️</span>
+                    </button>
                   )}
                 </div>
-                
-                {!isEditingName && (
-                  <button 
-                    className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
-                    onClick={handleNameClick}
-                  >
-                    <span className="text-sm">✏️</span>
-                  </button>
-                )}
               </div>
+            </div>
+
+            {/* Compact Center Panel - Game Controls */}
+            <div className="col-span-6 flex flex-col justify-center space-y-2">
 
               {/* Compact Betting Options */}
               <div className="flex justify-center space-x-4">
