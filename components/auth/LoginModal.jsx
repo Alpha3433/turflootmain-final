@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
