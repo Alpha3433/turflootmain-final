@@ -240,7 +240,7 @@ class WalletTester:
             deposit_data = {
                 "amount": 10.0,
                 "currency": "USDC",
-                "transaction_hash": "test_tx_456"
+                "transaction_hash": f"test_tx_usdc_{int(time.time())}"
             }
             
             response = self.session.post(f"{API_BASE}/wallet/add-funds", json=deposit_data)
