@@ -141,6 +141,23 @@
     animation: glowPulse 2s ease-in-out infinite alternate;
   }
   
+  .pulse-live {
+    background: linear-gradient(90deg, 
+      rgba(0, 0, 0, 0.4) 0%, 
+      rgba(20, 241, 149, 0.1) 50%, 
+      rgba(0, 0, 0, 0.4) 100%);
+    background-size: 200% 100%;
+    animation: pulse-live 1s ease-out;
+  }
+  
+  /* Disable animations for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-live {
+      animation: none;
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+  
   /* Ultra-modern glassmorphism utilities */
   .glass-card {
     @apply bg-black/40 backdrop-blur-md border border-white/10;
