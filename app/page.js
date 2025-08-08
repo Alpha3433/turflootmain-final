@@ -478,7 +478,9 @@ export default function Home() {
                       user.google?.name?.charAt(0)?.toUpperCase() || 
                       user.email?.address?.charAt(0)?.toUpperCase() || 
                       '?'
-                    ) : '?'}
+                    ) : (
+                      displayName?.charAt(0)?.toUpperCase() || '?'
+                    )}
                   </div>
                   
                   {isEditingName ? (
@@ -509,27 +511,23 @@ export default function Home() {
                   ) : (
                     <>
                       <span 
-                        className={`text-white text-lg font-medium ${
-                          authenticated && user ? 'cursor-pointer hover:text-cyan-400 transition-colors' : ''
-                        }`}
-                        onClick={handleNameClick}
+                        className="text-white text-lg font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+                        onClick={authenticated && user ? handleNameClick : () => setIsEditingName(true)}
                       >
                         {authenticated && user 
                           ? (displayName && displayName !== user.google?.name && displayName !== user.email?.address 
                               ? displayName 
                               : user.google?.name || user.email?.address || "Player")
-                          : "wewae"
+                          : (displayName || "Click to set name")
                         }
                       </span>
                       
-                      {authenticated && user && (
-                        <button 
-                          className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
-                          onClick={handleNameClick}
-                        >
-                          <span className="text-sm">✏️</span>
-                        </button>
-                      )}
+                      <button 
+                        className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
+                        onClick={authenticated && user ? handleNameClick : () => setIsEditingName(true)}
+                      >
+                        <span className="text-sm">✏️</span>
+                      </button>
                     </>
                   )}
                 </div>
