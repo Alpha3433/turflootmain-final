@@ -21,11 +21,6 @@ export default function PrivyAuthProvider({ children }) {
           createOnLogin: 'all-users',
           requireUserPasswordOnCreate: false,
         },
-        externalWallets: {
-          solana: {
-            connectors: [], // Empty array to disable Solana wallet warnings
-          },
-        },
         mfa: {
           noPromptOnMfaRequired: false,
         },
