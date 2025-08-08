@@ -276,23 +276,68 @@ export default function Home() {
 
             {/* Compact Center Panel */}
             <div className="col-span-6 flex flex-col justify-center space-y-2">
-              {/* Compact User Name Section */}
+              {/* Editable User Name Section */}
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-3 border border-gray-700/50 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 flex-1">
                   <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-sm font-bold text-black">
                     {authenticated && user ? (
+                      displayName?.charAt(0)?.toUpperCase() || 
                       user.google?.name?.charAt(0)?.toUpperCase() || 
                       user.email?.address?.charAt(0)?.toUpperCase() || 
                       '?'
                     ) : '?'}
                   </div>
-                  <span className="text-gray-300 text-sm font-medium">
-                    {authenticated && user ? "Enter your Name!" : "Login to set your name"}
-                  </span>
+                  
+                  {isEditingName ? (
+                    <div className="flex-1 flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={customName}
+                        onChange={(e) => setCustomName(e.target.value)}
+                        onKeyDown={handleNameKeyPress}
+                        placeholder="Enter your name"
+                        autoFocus
+                        className="bg-gray-800/60 text-white text-sm font-medium px-3 py-1.5 rounded-lg border border-gray-600/50 focus:border-yellow-400/50 focus:outline-none flex-1"
+                        maxLength={20}
+                      />
+                      <button
+                        onClick={handleNameSave}
+                        className="p-1.5 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-lg text-green-400 text-xs font-bold transition-all"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        onClick={handleNameCancel}
+                        className="p-1.5 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 rounded-lg text-red-400 text-xs font-bold transition-all"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <span 
+                      className={`text-gray-300 text-sm font-medium flex-1 ${
+                        authenticated && user ? 'cursor-pointer hover:text-white hover:bg-gray-700/30 px-2 py-1 rounded transition-all' : ''
+                      }`}
+                      onClick={handleNameClick}
+                    >
+                      {authenticated && user 
+                        ? (displayName && displayName !== user.google?.name && displayName !== user.email?.address 
+                            ? displayName 
+                            : "Enter your Name!")
+                        : "Login to set your name"
+                      }
+                    </span>
+                  )}
                 </div>
-                <button className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all">
-                  <span className="text-sm">✏️</span>
-                </button>
+                
+                {!isEditingName && (
+                  <button 
+                    className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
+                    onClick={handleNameClick}
+                  >
+                    <span className="text-sm">✏️</span>
+                  </button>
+                )}
               </div>
 
               {/* Compact Betting Options */}
