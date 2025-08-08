@@ -133,21 +133,21 @@
     animation: shimmer 2s ease-in-out infinite;
   }
   
-  /* Enhanced floating animations for DAMNBRUH aesthetic */
-  .animate-snake-float {
-    animation: snake-float 4s ease-in-out infinite;
+  /* Paper.io inspired animations */
+  .animate-territory-expand {
+    animation: territory-expand 3s ease-out infinite;
   }
   
-  .animate-snake-glow {
-    animation: snake-glow 3s ease-in-out infinite;
+  .animate-grid-pulse {
+    animation: grid-pulse 4s ease-in-out infinite;
   }
   
-  .animate-snake-drift {
-    animation: snake-drift 8s ease-in-out infinite;
+  .animate-paper-drift {
+    animation: paper-drift 6s ease-in-out infinite;
   }
   
-  .animate-snake-breathe {
-    animation: snake-breathe 2.5s ease-in-out infinite;
+  .animate-capture-line {
+    animation: capture-line 2s ease-out infinite;
   }
   
   .animate-float {
