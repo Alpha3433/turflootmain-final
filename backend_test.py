@@ -190,12 +190,16 @@ class WalletTester:
         """Test POST /api/wallet/add-funds"""
         print("\n💳 Testing Add Funds API...")
         
+        # Generate unique transaction hashes for this test run
+        sol_tx_hash = f"test_tx_sol_{int(time.time())}"
+        usdc_tx_hash = f"test_tx_usdc_{int(time.time())}"
+        
         # Test valid SOL deposit
         try:
             deposit_data = {
                 "amount": 0.1,
                 "currency": "SOL",
-                "transaction_hash": f"test_tx_sol_{int(time.time())}"
+                "transaction_hash": sol_tx_hash
             }
             
             response = self.session.post(f"{API_BASE}/wallet/add-funds", json=deposit_data)
@@ -240,7 +244,7 @@ class WalletTester:
             deposit_data = {
                 "amount": 10.0,
                 "currency": "USDC",
-                "transaction_hash": f"test_tx_usdc_{int(time.time())}"
+                "transaction_hash": usdc_tx_hash
             }
             
             response = self.session.post(f"{API_BASE}/wallet/add-funds", json=deposit_data)
@@ -322,7 +326,7 @@ class WalletTester:
             deposit_data = {
                 "amount": 0.1,
                 "currency": "SOL",
-                "transaction_hash": f"test_tx_sol_{int(time.time())}"  # Same as first test
+                "transaction_hash": sol_tx_hash  # Same as first test
             }
             
             response = self.session.post(f"{API_BASE}/wallet/add-funds", json=deposit_data)
