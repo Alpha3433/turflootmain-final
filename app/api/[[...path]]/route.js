@@ -215,6 +215,57 @@ export async function POST(request, { params }) {
     const route = path.join('/')
     const body = await request.json()
 
+    // Update user custom name
+    if (route === 'users/profile/update-name') {
+      console.log('📝 Custom name update request:', body)
+      
+      const { userId, customName, privyId } = body
+      
+      if (!userId || !customName) {
+        return NextResponse.json(
+          { error: 'Missing userId or customName' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+      
+      try {
+        const db = await getDb()
+        const usersCollection = db.collection('users')
+        
+        // Update the user's custom name
+        const updateResult = await usersCollection.updateOne(
+          { $or: [{ id: userId }, { privy_id: privyId }] },
+          { 
+            $set: { 
+              custom_name: customName,
+              updated_at: new Date().toISOString()
+            } 
+          }
+        )
+        
+        if (updateResult.matchedCount === 0) {
+          return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+        
+        console.log('✅ Custom name updated successfully for user:', userId)
+        return NextResponse.json({
+          success: true,
+          message: 'Custom name updated successfully',
+          customName: customName
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Error updating custom name:', error)
+        return NextResponse.json(
+          { error: 'Failed to update custom name' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     // UNIFIED PRIVY AUTHENTICATION - Handles Google OAuth, Email OTP, and Wallet connections
     if (route === 'auth/privy') {
       console.log('🔑 Privy authentication request received')
