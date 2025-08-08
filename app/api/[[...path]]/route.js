@@ -56,23 +56,16 @@ export async function GET(request, { params }) {
       })(request)
     }
 
-    // Blockchain routes
+    // Legacy wallet endpoints - deprecated in favor of Privy wallet functionality
     if (route.startsWith('wallet/')) {
-      const walletAddress = route.split('/')[1]
-      
-      if (route.endsWith('/balance')) {
-        const balance = await getSolBalance(walletAddress)
-        return NextResponse.json({
-          wallet_address: walletAddress,
-          sol_balance: balance,
-          usd_value: balance * 210, // Approximate SOL price
-          timestamp: new Date().toISOString()
-        }, { headers: corsHeaders })
-      }
-      
-      if (route.endsWith('/tokens')) {
-        const tokens = await getTokenAccounts(walletAddress)
-        return NextResponse.json({
+      return NextResponse.json(
+        { 
+          error: 'Direct wallet endpoints are deprecated. Wallet data is now managed through Privy authentication.',
+          redirect: 'Use the unified Privy authentication system.'
+        },
+        { status: 410, headers: corsHeaders }
+      )
+    }
           wallet_address: walletAddress,
           tokens,
           timestamp: new Date().toISOString()
