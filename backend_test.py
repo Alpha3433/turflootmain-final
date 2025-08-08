@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://2d1eda33-bd6c-40ac-a392-59cfdb7e363d.preview.emergentagent.com"
+BASE_URL = "https://247b4ccd-3ca1-4058-9869-0a0a47b3d2a9.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootBackendTester:
