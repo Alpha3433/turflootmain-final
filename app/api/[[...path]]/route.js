@@ -855,6 +855,258 @@ export async function POST(request, { params }) {
       })(request)
     }
 
+    // Get user balance
+    if (route === 'wallet/balance') {
+      return requireAuth(async (req) => {
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        const user = await users.findOne({ 
+          $or: [
+            { id: req.user.id },
+            { privy_id: req.user.privyId }
+          ]
+        })
+        
+        if (!user) {
+          return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+        
+        return NextResponse.json({
+          balance: user.balance || 0,
+          currency: 'USD',
+          sol_balance: user.sol_balance || 0,
+          usdc_balance: user.usdc_balance || 0
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Add funds to game balance
+    if (route === 'wallet/add-funds') {
+      return requireAuth(async (req) => {
+        const { amount, currency, transaction_hash } = body
+        
+        if (!amount || amount <= 0) {
+          return NextResponse.json(
+            { error: 'Invalid deposit amount' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        const minDepositSol = parseFloat(process.env.MIN_DEPOSIT_SOL) || 0.01
+        
+        if (currency === 'SOL' && amount < minDepositSol) {
+          return NextResponse.json(
+            { error: `Minimum deposit is ${minDepositSol} SOL` },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        if (!transaction_hash) {
+          return NextResponse.json(
+            { error: 'Transaction hash required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        const db = await getDb()
+        const users = db.collection('users')
+        const transactions = db.collection('transactions')
+        
+        // Check if transaction already processed
+        const existingTx = await transactions.findOne({ transaction_hash })
+        if (existingTx) {
+          return NextResponse.json(
+            { error: 'Transaction already processed' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        // Convert to USD for game balance
+        const usdAmount = currency === 'SOL' ? amount * 100 : amount // Mock conversion
+        
+        const transaction = {
+          id: crypto.randomUUID(),
+          user_id: req.user.id,
+          type: 'deposit',
+          amount,
+          currency,
+          usd_amount: usdAmount,
+          transaction_hash,
+          status: 'completed',
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+        
+        await transactions.insertOne(transaction)
+        
+        // Update user balance
+        const updateField = currency === 'SOL' ? 'sol_balance' : 'usdc_balance'
+        await users.updateOne(
+          { 
+            $or: [
+              { id: req.user.id },
+              { privy_id: req.user.privyId }
+            ]
+          },
+          { 
+            $inc: { 
+              balance: usdAmount,
+              [updateField]: amount
+            },
+            $set: { updated_at: new Date() }
+          }
+        )
+        
+        return NextResponse.json({
+          success: true,
+          transaction_id: transaction.id,
+          new_balance: usdAmount,
+          message: `Successfully added ${amount} ${currency} to your game balance`
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Cash out from game balance
+    if (route === 'wallet/cash-out') {
+      return requireAuth(async (req) => {
+        const { amount, currency, recipient_address } = body
+        
+        if (!amount || amount <= 0) {
+          return NextResponse.json(
+            { error: 'Invalid withdrawal amount' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        const minCashoutSol = parseFloat(process.env.MIN_CASHOUT_SOL) || 0.05
+        
+        if (currency === 'SOL' && amount < minCashoutSol) {
+          return NextResponse.json(
+            { error: `Minimum cash out is ${minCashoutSol} SOL` },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        if (!recipient_address) {
+          return NextResponse.json(
+            { error: 'Recipient wallet address required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        const platformFee = parseFloat(process.env.PLATFORM_FEE_PERCENTAGE) || 10
+        const feeAmount = (amount * platformFee) / 100
+        const netAmount = amount - feeAmount
+        
+        const db = await getDb()
+        const users = db.collection('users')
+        const transactions = db.collection('transactions')
+        
+        // Get user current balance
+        const user = await users.findOne({ 
+          $or: [
+            { id: req.user.id },
+            { privy_id: req.user.privyId }
+          ]
+        })
+        
+        if (!user) {
+          return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+        
+        const currentBalance = user.balance || 0
+        const usdAmount = currency === 'SOL' ? amount * 100 : amount // Mock conversion
+        
+        if (currentBalance < usdAmount) {
+          return NextResponse.json(
+            { error: 'Insufficient balance' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        const transaction = {
+          id: crypto.randomUUID(),
+          user_id: req.user.id,
+          type: 'withdrawal',
+          amount,
+          currency,
+          usd_amount: usdAmount,
+          fee_amount: feeAmount,
+          net_amount: netAmount,
+          recipient_address,
+          status: 'pending',
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+        
+        await transactions.insertOne(transaction)
+        
+        // Update user balance (deduct immediately)
+        const updateField = currency === 'SOL' ? 'sol_balance' : 'usdc_balance'
+        await users.updateOne(
+          { 
+            $or: [
+              { id: req.user.id },
+              { privy_id: req.user.privyId }
+            ]
+          },
+          { 
+            $inc: { 
+              balance: -usdAmount,
+              [updateField]: -amount
+            },
+            $set: { updated_at: new Date() }
+          }
+        )
+        
+        return NextResponse.json({
+          success: true,
+          transaction_id: transaction.id,
+          amount_requested: amount,
+          platform_fee: feeAmount,
+          net_amount: netAmount,
+          status: 'pending',
+          message: `Cash out request for ${netAmount} ${currency} created successfully. Platform fee: ${feeAmount} ${currency} (${platformFee}%)`
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Get transaction history
+    if (route === 'wallet/transactions') {
+      return requireAuth(async (req) => {
+        const db = await getDb()
+        const transactions = db.collection('transactions')
+        
+        const userTransactions = await transactions
+          .find({ user_id: req.user.id })
+          .sort({ created_at: -1 })
+          .limit(50)
+          .toArray()
+        
+        return NextResponse.json({
+          transactions: userTransactions.map(tx => ({
+            id: tx.id,
+            type: tx.type,
+            amount: tx.amount,
+            currency: tx.currency,
+            status: tx.status,
+            created_at: tx.created_at,
+            transaction_hash: tx.transaction_hash,
+            recipient_address: tx.recipient_address,
+            fee_amount: tx.fee_amount,
+            net_amount: tx.net_amount
+          }))
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
     // Withdrawal request
     if (route === 'withdraw') {
       return requireAuth(async (req) => {
