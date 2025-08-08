@@ -16,8 +16,8 @@ import time
 import uuid
 from datetime import datetime
 
-# Configuration
-BASE_URL = "http://localhost:3000"
+# Configuration - Use external URL from .env
+BASE_URL = "https://1129be5f-620c-46b6-bfba-476a3eb10829.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 HEADERS = {
     'Content-Type': 'application/json',
