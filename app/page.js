@@ -523,17 +523,15 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Fixed Bottom Section */}
+        {/* Stats Section - Real Data Only */}
         <div className="relative z-10 py-1 flex-shrink-0">
-          {/* Compact Stats */}
-          <div className="flex justify-center space-x-6 mb-2">
-            <div className="text-center bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-gray-700/30">
-              <div className="text-lg font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">38</div>
-              <div className="text-gray-400 text-xs">Players in Game</div>
-            </div>
-            <div className="text-center bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-gray-700/30">
-              <div className="text-lg font-black bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent">$96,512</div>
-              <div className="text-gray-400 text-xs">Global Winnings</div>
+          {/* Live Game Status */}
+          <div className="flex justify-center mb-2">
+            <div className="text-center bg-black/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-700/30">
+              <div className="flex items-center space-x-2 justify-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="text-white text-sm font-medium">Game Server Online</div>
+              </div>
             </div>
           </div>
 
