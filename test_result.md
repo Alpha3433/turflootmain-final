@@ -538,6 +538,66 @@ frontend:
         agent: "main"
         comment: "✅ COMPLETED - Successfully implemented welcome message popup and authenticated user navigation: 1) Welcome popup appears automatically after successful Privy authentication with celebration animation and feature overview, 2) Header dynamically shows personalized welcome message with user's name from Google/email, 3) Added navigation icons for authenticated users: Profile (user icon), Settings (gear icon), Sound (speaker icon), and Logout button, 4) Navigation icons use glassmorphism styling consistent with app design, 5) Proper authentication state management with useEffect to trigger welcome on first login, 6) Welcome popup includes feature highlights and call-to-action buttons, 7) Clean logout functionality that resets authentication state. Ready for testing."
 
+  - task: "Wallet Component Display and Authentication Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/components/wallet/WalletManager.jsx, /app/app/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Wallet component integrated in right panel with authentication-based display. Shows 'Login to access wallet features' for non-authenticated users and full wallet functionality for authenticated users. Needs comprehensive testing of display states, balance formatting, and Privy integration."
+
+  - task: "Add Funds Modal Functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/components/wallet/WalletManager.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Add Funds modal with SOL/USDC currency selector, amount input validation (minimum 0.01 SOL), form submission with mock transaction hash generation, error handling, and loading states. Integrates with backend /api/wallet/add-funds endpoint. Needs comprehensive testing of all validation scenarios and user flows."
+
+  - task: "Cash Out Modal Functionality"
+    implemented: true
+    working: "NA"
+    file: "/app/components/wallet/WalletManager.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Cash Out modal with SOL/USDC currency selector, amount input validation (minimum 0.05 SOL), recipient Solana address validation, platform fee display (10%), form submission, error handling for insufficient balance, and loading states. Integrates with backend /api/wallet/cash-out endpoint. Needs comprehensive testing of validation, fee calculation, and user flows."
+
+  - task: "Transaction History Display"
+    implemented: true
+    working: "NA"
+    file: "/app/components/wallet/WalletManager.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Transaction history display showing recent transactions with status indicators (✅ completed, ⏳ pending, ❌ failed), transaction type display (↓ deposit, ↑ withdrawal), proper sorting (newest first), and scrollable list. Integrates with backend /api/wallet/transactions endpoint. Needs testing of display formatting, status indicators, and data integration."
+
+  - task: "Wallet Balance Display and Real-time Updates"
+    implemented: true
+    working: "NA"
+    file: "/app/components/wallet/WalletManager.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Wallet balance display with USD, SOL, and USDC formatting, real-time balance updates after transactions, pulse animations, and proper authentication integration. Integrates with backend /api/wallet/balance endpoint. Needs testing of balance formatting, update mechanisms, and visual feedback."
+
 metadata:
   created_by: "main_agent"
   version: "2.0"
