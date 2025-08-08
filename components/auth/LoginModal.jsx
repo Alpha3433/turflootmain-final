@@ -33,7 +33,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
 
   // Handle authentication state changes with useEffect
   useEffect(() => {
-    if (authenticated && user && !authProcessed) {
+    if (authenticated && user && !authProcessed && isOpen) { // Only process if modal is still open
       console.log('✅ User authenticated via Privy:', user)
       setAuthProcessed(true)
       
@@ -74,11 +74,17 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
           } else {
             const errorData = await response.json()
             console.error('❌ Backend authentication failed:', errorData)
-            alert('Authentication failed. Please try again.')
+            // Only show alert if modal is still open
+            if (isOpen) {
+              alert('Authentication failed. Please try again.')
+            }
           }
         } catch (error) {
           console.error('❌ Backend authentication error:', error)
-          alert('Authentication failed. Please try again.')
+          // Only show alert if modal is still open
+          if (isOpen) {
+            alert('Authentication failed. Please try again.')
+          }
         } finally {
           setLoading(false)
         }
@@ -86,7 +92,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
       
       sendPrivyAuthToBackend()
     }
-  }, [authenticated, user, authProcessed, onSuccess, onClose])
+  }, [authenticated, user, authProcessed, onSuccess, onClose, isOpen]) // Added isOpen dependency
 
   // Reset auth processed state when modal closes
   useEffect(() => {
