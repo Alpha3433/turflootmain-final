@@ -264,8 +264,6 @@ export default function Home() {
         <div className="flex items-center space-x-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full border border-green-500/30">
           <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
           <span className="text-green-400 font-bold">Live</span>
-          <div className="text-gray-400 text-sm">•</div>
-          <span className="text-gray-300 text-sm">38 Online</span>
         </div>
 
         {/* Right side - Login button or User Navigation */}
