@@ -97,6 +97,7 @@ export default function Home() {
 
     try {
       console.log('💾 Saving custom name:', customName)
+      console.log('👤 User data:', user)
       
       // Make API call to update user profile
       const response = await fetch('/api/users/profile/update-name', {
@@ -111,17 +112,21 @@ export default function Home() {
         })
       })
 
+      console.log('📡 API Response status:', response.status)
+      const responseData = await response.json()
+      console.log('📡 API Response data:', responseData)
+
       if (response.ok) {
         setDisplayName(customName.trim())
         setIsEditingName(false)
         console.log('✅ Name updated successfully')
       } else {
-        console.error('❌ Failed to update name')
-        alert('Failed to update name. Please try again.')
+        console.error('❌ Failed to update name:', responseData)
+        alert(`Failed to update name: ${responseData.error || 'Unknown error'}. Please try again.`)
       }
     } catch (error) {
       console.error('❌ Error updating name:', error)
-      alert('Error updating name. Please try again.')
+      alert('Network error updating name. Please check your connection and try again.')
     }
   }
 
