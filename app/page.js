@@ -388,9 +388,9 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Compact Left Panel - Moved Up 150% More */}
-            <div className="col-span-3 space-y-3 -mt-6">
-              {/* No spacer - pulled up with negative margin */}
+            {/* Compact Left Panel - Moved Up 90% More */}
+            <div className="col-span-3 space-y-3 -mt-16">
+              {/* Maximum upward positioning with increased negative margin */}
               
               {/* Compact Leaderboard */}
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
