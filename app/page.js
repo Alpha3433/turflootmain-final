@@ -392,29 +392,29 @@ export default function Home() {
             </div>
 
             {/* Center Panel - Game Controls */}
-            <div className="col-span-6 flex flex-col justify-center space-y-8">
+            <div className="col-span-6 flex flex-col justify-center space-y-4">
               
               {/* Live Stats */}
-              <div className="flex justify-center space-x-12 mb-8">
-                <div className="text-center bg-black/40 backdrop-blur-md px-8 py-6 rounded-2xl border border-gray-700/50 shadow-2xl">
-                  <div className="text-5xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-2">
+              <div className="flex justify-center space-x-8 mb-4">
+                <div className="text-center bg-black/40 backdrop-blur-md px-6 py-4 rounded-2xl border border-gray-700/50 shadow-2xl">
+                  <div className="text-4xl font-black bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent mb-1">
                     {livePlayerCount}
                   </div>
-                  <div className="text-gray-400 text-lg font-medium">Players in Game</div>
+                  <div className="text-gray-400 text-base font-medium">Players in Game</div>
                 </div>
-                <div className="text-center bg-black/40 backdrop-blur-md px-8 py-6 rounded-2xl border border-gray-700/50 shadow-2xl">
-                  <div className="text-5xl font-black bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent mb-2">
+                <div className="text-center bg-black/40 backdrop-blur-md px-6 py-4 rounded-2xl border border-gray-700/50 shadow-2xl">
+                  <div className="text-4xl font-black bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent mb-1">
                     ${globalWinnings.toLocaleString()}
                   </div>
-                  <div className="text-gray-400 text-lg font-medium">Global Player Winnings</div>
+                  <div className="text-gray-400 text-base font-medium">Global Player Winnings</div>
                 </div>
               </div>
 
               {/* Name Input */}
-              <div className="flex justify-center mb-8">
-                <div className="w-96 bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-gray-700/50 flex items-center justify-between shadow-2xl">
-                  <div className="flex items-center space-x-4 flex-1">
-                    <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-lg font-bold text-black">
+              <div className="flex justify-center mb-4">
+                <div className="w-80 bg-black/40 backdrop-blur-md rounded-2xl p-3 border border-gray-700/50 flex items-center justify-between shadow-2xl">
+                  <div className="flex items-center space-x-3 flex-1">
+                    <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center text-base font-bold text-black">
                       {authenticated && user ? (
                         displayName?.charAt(0)?.toUpperCase() || 
                         user.google?.name?.charAt(0)?.toUpperCase() || 
@@ -424,7 +424,7 @@ export default function Home() {
                     </div>
                     
                     {isEditingName ? (
-                      <div className="flex-1 flex items-center space-x-3">
+                      <div className="flex-1 flex items-center space-x-2">
                         <input
                           type="text"
                           value={customName}
@@ -432,7 +432,7 @@ export default function Home() {
                           onKeyDown={handleNameKeyPress}
                           placeholder="Enter your name"
                           autoFocus
-                          className="bg-gray-800/60 text-white text-lg font-medium px-4 py-2 rounded-xl border border-gray-600/50 focus:border-yellow-400/50 focus:outline-none flex-1"
+                          className="bg-gray-800/60 text-white text-base font-medium px-3 py-2 rounded-xl border border-gray-600/50 focus:border-yellow-400/50 focus:outline-none flex-1"
                           maxLength={20}
                         />
                         <button
@@ -450,8 +450,8 @@ export default function Home() {
                       </div>
                     ) : (
                       <span 
-                        className={`text-gray-300 text-lg font-medium flex-1 ${
-                          authenticated && user ? 'cursor-pointer hover:text-white hover:bg-gray-700/30 px-3 py-2 rounded-xl transition-all' : ''
+                        className={`text-gray-300 text-base font-medium flex-1 ${
+                          authenticated && user ? 'cursor-pointer hover:text-white hover:bg-gray-700/30 px-2 py-1 rounded-xl transition-all' : ''
                         }`}
                         onClick={handleNameClick}
                       >
@@ -467,22 +467,22 @@ export default function Home() {
                   
                   {!isEditingName && (
                     <button 
-                      className="p-3 bg-gray-700/50 hover:bg-gray-600/50 rounded-xl transition-all"
+                      className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-xl transition-all"
                       onClick={handleNameClick}
                     >
-                      <span className="text-lg">✏️</span>
+                      <span className="text-base">✏️</span>
                     </button>
                   )}
                 </div>
               </div>
 
               {/* Betting Options */}
-              <div className="flex justify-center space-x-6 mb-8">
+              <div className="flex justify-center space-x-4 mb-4">
                 {[1, 5, 20].map((amount) => (
                   <button
                     key={amount}
                     onClick={() => setSelectedBet(amount)}
-                    className={`px-8 py-4 rounded-2xl font-bold text-2xl transition-all duration-300 hover:scale-105 shadow-2xl ${
+                    className={`px-6 py-3 rounded-2xl font-bold text-xl transition-all duration-300 hover:scale-105 shadow-2xl ${
                       selectedBet === amount
                         ? 'bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 text-black'
                         : 'bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 text-white border border-gray-600/50'
@@ -494,19 +494,19 @@ export default function Home() {
               </div>
 
               {/* Join Game Button */}
-              <div className="text-center mb-8">
-                <button className="bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black px-16 py-6 rounded-2xl font-black text-3xl shadow-2xl transition-all duration-300 hover:scale-105 flex items-center space-x-4 mx-auto">
-                  <span className="text-4xl">▶</span>
+              <div className="text-center mb-4">
+                <button className="bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black px-12 py-4 rounded-2xl font-black text-2xl shadow-2xl transition-all duration-300 hover:scale-105 flex items-center space-x-3 mx-auto">
+                  <span className="text-3xl">▶</span>
                   <span>JOIN GAME</span>
                 </button>
               </div>
 
               {/* Game Options */}
-              <div className="flex justify-center space-x-6">
-                <button className="px-8 py-4 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-lg font-bold border border-gray-600/50 transition-all hover:scale-105">
+              <div className="flex justify-center space-x-4">
+                <button className="px-6 py-3 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-base font-bold border border-gray-600/50 transition-all hover:scale-105">
                   Quick Match
                 </button>
-                <button className="px-8 py-4 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-lg font-bold border border-gray-600/50 transition-all hover:scale-105">
+                <button className="px-6 py-3 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-2xl text-base font-bold border border-gray-600/50 transition-all hover:scale-105">
                   Browse Lobbies
                 </button>
               </div>
