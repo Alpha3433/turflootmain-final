@@ -378,6 +378,21 @@ backend:
         agent: "testing"
         comment: "✅ INTEGRATED INTO UNIFIED SYSTEM - This task is now part of the unified Privy authentication system. The Google OAuth functionality through Privy is fully integrated and tested as part of the comprehensive unified authentication endpoint."
 
+  - task: "Custom Name Update Endpoint (POST /api/users/profile/update-name)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Custom name update endpoint for professional gaming interface redesign - needs verification"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Custom name update endpoint working perfectly. Validates missing fields (userId, customName) with proper 400 errors. Successfully updates user custom names and creates new user records when needed. Supports both userId and privyId matching for flexible user identification. Database integration confirmed working with MongoDB user collection updates."
+
 frontend:
   - task: "Landing page modernization redesign"
     implemented: true
