@@ -315,6 +315,143 @@ class TurfLootBackendTester:
         except Exception as e:
             self.log_test("Privy Webhook", False, f"Request failed: {str(e)}")
     
+    def test_custom_name_update_valid(self):
+        """Test POST /api/users/profile/update-name - Valid request"""
+        if not self.test_user_id:
+            self.log_test("Custom Name Update - Valid Request", False, "No test user ID available from previous tests")
+            return
+            
+        try:
+            custom_name = f"CoolGamer_{uuid.uuid4().hex[:6]}"
+            update_data = {
+                "userId": self.test_user_id,
+                "customName": custom_name
+            }
+            
+            response = requests.post(f"{API_BASE}/users/profile/update-name", json=update_data, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get("success") and 
+                    data.get("message") == "Custom name updated successfully" and 
+                    data.get("customName") == custom_name):
+                    self.log_test(
+                        "Custom Name Update - Valid Request", 
+                        True, 
+                        f"Custom name set to: {custom_name}"
+                    )
+                else:
+                    self.log_test("Custom Name Update - Valid Request", False, f"Unexpected response: {data}")
+            else:
+                self.log_test("Custom Name Update - Valid Request", False, f"Status {response.status_code}: {response.text}")
+                
+        except Exception as e:
+            self.log_test("Custom Name Update - Valid Request", False, f"Request failed: {str(e)}")
+    
+    def test_custom_name_update_missing_userid(self):
+        """Test POST /api/users/profile/update-name - Missing userId parameter"""
+        try:
+            update_data = {
+                "customName": "TestName"
+                # Missing userId
+            }
+            
+            response = requests.post(f"{API_BASE}/users/profile/update-name", json=update_data, timeout=10)
+            
+            if response.status_code == 400:
+                data = response.json()
+                if "error" in data and "Missing userId" in data["error"]:
+                    self.log_test(
+                        "Custom Name Update - Missing userId", 
+                        True, 
+                        f"Proper validation: {data['error']}"
+                    )
+                else:
+                    self.log_test("Custom Name Update - Missing userId", False, f"Wrong error message: {data}")
+            else:
+                self.log_test("Custom Name Update - Missing userId", False, f"Expected 400, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Custom Name Update - Missing userId", False, f"Request failed: {str(e)}")
+    
+    def test_custom_name_update_missing_customname(self):
+        """Test POST /api/users/profile/update-name - Missing customName parameter"""
+        try:
+            update_data = {
+                "userId": "test-user-id"
+                # Missing customName
+            }
+            
+            response = requests.post(f"{API_BASE}/users/profile/update-name", json=update_data, timeout=10)
+            
+            if response.status_code == 400:
+                data = response.json()
+                if "error" in data and "Missing" in data["error"] and "customName" in data["error"]:
+                    self.log_test(
+                        "Custom Name Update - Missing customName", 
+                        True, 
+                        f"Proper validation: {data['error']}"
+                    )
+                else:
+                    self.log_test("Custom Name Update - Missing customName", False, f"Wrong error message: {data}")
+            else:
+                self.log_test("Custom Name Update - Missing customName", False, f"Expected 400, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Custom Name Update - Missing customName", False, f"Request failed: {str(e)}")
+    
+    def test_custom_name_update_user_not_found(self):
+        """Test POST /api/users/profile/update-name - User not found scenario"""
+        try:
+            update_data = {
+                "userId": f"nonexistent_{uuid.uuid4()}",
+                "customName": "TestName"
+            }
+            
+            response = requests.post(f"{API_BASE}/users/profile/update-name", json=update_data, timeout=10)
+            
+            if response.status_code == 404:
+                data = response.json()
+                if "error" in data and "User not found" in data["error"]:
+                    self.log_test(
+                        "Custom Name Update - User Not Found", 
+                        True, 
+                        f"Proper error handling: {data['error']}"
+                    )
+                else:
+                    self.log_test("Custom Name Update - User Not Found", False, f"Wrong error message: {data}")
+            else:
+                self.log_test("Custom Name Update - User Not Found", False, f"Expected 404, got {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Custom Name Update - User Not Found", False, f"Request failed: {str(e)}")
+    
+    def test_verify_custom_name_in_database(self):
+        """Verify that the custom name was actually saved to the database"""
+        if not self.test_user_id:
+            self.log_test("Verify Custom Name in Database", False, "No test user ID available from previous tests")
+            return
+            
+        try:
+            # Get the user profile again to verify the custom name was saved
+            response = requests.get(f"{API_BASE}/users/{self.test_user_id}", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "custom_name" in data and data["custom_name"] is not None:
+                    self.log_test(
+                        "Verify Custom Name in Database", 
+                        True, 
+                        f"Custom name found in database: {data['custom_name']}"
+                    )
+                else:
+                    self.log_test("Verify Custom Name in Database", False, f"Custom name not found in user data: {data}")
+            else:
+                self.log_test("Verify Custom Name in Database", False, f"Failed to retrieve user: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Verify Custom Name in Database", False, f"Request failed: {str(e)}")
+
     def test_deprecated_endpoints(self):
         """Test deprecated endpoints return 410 status"""
         deprecated_endpoints = [
