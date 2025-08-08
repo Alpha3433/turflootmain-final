@@ -726,17 +726,18 @@ export default function Home() {
             
             {/* Username creation content */}
             <div className="text-center">
-              {/* User icon */}
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 via-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              {/* User icon with matching gradient */}
+              <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 via-orange-500 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+                <svg className="w-10 h-10 text-black" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1V3H9V1L3 7V9H21Z" />
+                  <path d="M12 7.5C14.21 7.5 16 9.29 16 11.5V16.5C16 18.71 14.21 20.5 12 20.5C9.79 20.5 8 18.71 8 16.5V11.5C8 9.29 9.79 7.5 12 7.5Z" />
                 </svg>
               </div>
               
               {/* Create username message */}
               <h2 className="text-3xl font-black text-white mb-2">
                 Create Your 
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 ml-2">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600 ml-2">
                   Username
                 </span>
                 !
@@ -755,7 +756,7 @@ export default function Home() {
                   onKeyDown={handleUsernameKeyPress}
                   placeholder="Enter your username"
                   autoFocus
-                  className="w-full bg-gray-800/60 text-white text-lg font-medium px-4 py-3 rounded-xl border border-gray-600/50 focus:border-blue-400/50 focus:outline-none focus:ring-2 focus:ring-blue-400/20 transition-all"
+                  className="w-full bg-gray-800/60 text-white text-lg font-medium px-4 py-3 rounded-xl border border-gray-600/50 focus:border-yellow-400/50 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 transition-all"
                   maxLength={20}
                 />
                 <p className="text-gray-400 text-sm mt-2">
@@ -763,21 +764,14 @@ export default function Home() {
                 </p>
               </div>
               
-              {/* Action buttons */}
+              {/* Action button */}
               <div className="space-y-3">
                 <button 
                   onClick={handleUsernameSubmit}
                   disabled={!usernameInput.trim()}
-                  className="w-full bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 hover:from-blue-300 hover:via-purple-400 hover:to-blue-300 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 shadow-xl"
+                  className="w-full bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed text-black px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 shadow-xl"
                 >
                   Create Username ✨
-                </button>
-                
-                <button 
-                  onClick={closeUsernameCreation}
-                  className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white px-6 py-2 rounded-xl font-medium transition-all duration-300"
-                >
-                  Skip for now
                 </button>
               </div>
             </div>
