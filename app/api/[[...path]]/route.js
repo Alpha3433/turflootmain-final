@@ -66,12 +66,6 @@ export async function GET(request, { params }) {
         { status: 410, headers: corsHeaders }
       )
     }
-          wallet_address: walletAddress,
-          tokens,
-          timestamp: new Date().toISOString()
-        }, { headers: corsHeaders })
-      }
-    }
 
     // Game pots endpoint
     if (route === 'pots') {
