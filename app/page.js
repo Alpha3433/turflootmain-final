@@ -665,34 +665,16 @@ export default function Home() {
 
             {/* RIGHT COLUMN - Wallet & Customize */}
             <div className="col-span-12 lg:col-span-3 space-y-6">
-              {/* Wallet */}
-              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 shadow-2xl">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                      <span className="text-black font-bold text-sm">💳</span>
-                    </div>
-                    <h3 className="text-white font-bold text-lg">Wallet</h3>
+              {/* Wallet Panel */}
+              <div className="glass-card rounded-2xl p-4 border border-cyan-400/20 shadow-lg">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center">
+                    <span className="text-xs font-bold text-black">💰</span>
                   </div>
-                  <div className="flex space-x-2 text-xs">
-                    <button className="text-cyan-400 hover:text-cyan-300 transition-colors">📋 Copy Address</button>
-                    <button className="text-cyan-400 hover:text-cyan-300 transition-colors">⟲ Refresh Balance</button>
-                  </div>
+                  <h3 className="text-white font-bold text-lg">Wallet</h3>
                 </div>
                 
-                <div className="text-center py-4">
-                  <div className="text-3xl font-black text-white mb-2">$0.00</div>
-                  <div className="text-gray-400 text-sm mb-6">0.0000 SOL</div>
-                  
-                  <div className="space-y-3">
-                    <button className="w-full py-3 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-xl text-green-400 font-bold text-sm transition-all hover:scale-105">
-                      Add Funds
-                    </button>
-                    <button className="w-full py-3 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-blue-400 font-bold text-sm transition-all hover:scale-105">
-                      Cash Out
-                    </button>
-                  </div>
-                </div>
+                <WalletManager onBalanceUpdate={(balance) => setWalletBalance(balance.balance)} />
               </div>
 
               {/* Customize */}
