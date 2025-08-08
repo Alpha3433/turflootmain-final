@@ -286,13 +286,6 @@ export default function Home() {
           <span>Discord</span>
         </button>
       </div>
-
-      {/* User Status Display - Only show userProfile, not Privy auth status */}
-      {userProfile && (
-        <div className="absolute top-16 right-6 p-3 bg-black/60 backdrop-blur-md rounded-lg border border-green-500/30">
-          <p className="text-green-400 text-sm">✅ {userProfile.username || userProfile.email}</p>
-        </div>
-      )}
     </div>
   )
 }
