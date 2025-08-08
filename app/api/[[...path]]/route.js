@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server'
 import { MongoClient } from 'mongodb'
-import { OAuth2Client } from 'google-auth-library'
 import jwt from 'jsonwebtoken'
-import { createUser, authenticateUser, verifyToken, requireAuth, updateUserProfile, getUserStats } from '@/lib/auth'
-import { getSolBalance, getTokenAccounts } from '@/lib/solana'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'turfloot-secret-key-change-in-production'
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null
-
-console.log('🔑 Google Client ID loaded:', GOOGLE_CLIENT_ID ? 'YES' : 'NO')
 
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017'
 const DB_NAME = process.env.DB_NAME || 'turfloot_db'
