@@ -30,27 +30,36 @@ export default function Home() {
 
   const loadUserProfile = async (userId) => {
     try {
-      const response = await fetch(`/api/users/${userId}`)
-      if (response.ok) {
-        const userData = response.json ? await response.json() : response
-        console.log('👤 User profile loaded:', userData)
-        
-        // Set display name from custom name or fallback to default
-        if (userData.custom_name) {
-          setDisplayName(userData.custom_name)
-        } else {
-          const defaultName = user.google?.name || user.email?.address || 'Player'
-          setDisplayName(defaultName)
-        }
+      console.log('🔍 Loading user profile for userId:', userId)
+      
+      // First try to get user by userId, then by privy ID
+      let response = await fetch(`/api/users/${userId}`)
+      
+      if (!response.ok) {
+        console.log('🔍 User not found by userId, trying with privy ID')
+        // If not found, the user might not exist yet, use default name
+        const defaultName = user?.google?.name || user?.email?.address || 'Player'
+        setDisplayName(defaultName)
+        return
+      }
+      
+      const userData = await response.json()
+      console.log('👤 User profile loaded:', userData)
+      
+      // Set display name from custom name or fallback to default
+      if (userData.custom_name) {
+        console.log('✅ Found custom name:', userData.custom_name)
+        setDisplayName(userData.custom_name)
       } else {
-        // Fallback if profile loading fails
-        const defaultName = user.google?.name || user.email?.address || 'Player'
+        const defaultName = user?.google?.name || user?.email?.address || 'Player'
+        console.log('🔄 No custom name, using default:', defaultName)
         setDisplayName(defaultName)
       }
     } catch (error) {
       console.error('❌ Error loading user profile:', error)
       // Fallback if profile loading fails
-      const defaultName = user.google?.name || user.email?.address || 'Player'
+      const defaultName = user?.google?.name || user?.email?.address || 'Player'
+      console.log('🔄 Error fallback, using default:', defaultName)
       setDisplayName(defaultName)
     }
   }
