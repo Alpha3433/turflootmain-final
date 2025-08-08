@@ -96,6 +96,8 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     }
   }, [isOpen])
 
+  console.log('🔍 LoginModal render - isOpen:', isOpen)
+  
   if (!isOpen) return null
 
   const handleEmailSubmit = async (e) => {
