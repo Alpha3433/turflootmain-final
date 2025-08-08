@@ -170,8 +170,11 @@ export default function Home() {
       return
     }
 
+    // For non-authenticated users, just set the display name locally
     if (!authenticated || !user) {
-      alert('You must be logged in to update your name')
+      setDisplayName(customName.trim())
+      setIsEditingName(false)
+      console.log('✅ Name set locally for non-authenticated user:', customName.trim())
       return
     }
 
