@@ -33,7 +33,8 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
 
   // Handle authentication state changes with useEffect
   useEffect(() => {
-    if (authenticated && user && !authProcessed && isOpen) { // Only process if modal is still open
+    // Only process authentication if modal is open and user hasn't been processed yet
+    if (authenticated && user && isOpen && !authProcessed) {
       console.log('✅ User authenticated via Privy:', user)
       setAuthProcessed(true)
       
@@ -74,17 +75,11 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
           } else {
             const errorData = await response.json()
             console.error('❌ Backend authentication failed:', errorData)
-            // Only show alert if modal is still open
-            if (isOpen) {
-              alert('Authentication failed. Please try again.')
-            }
+            alert('Authentication failed. Please try again.')
           }
         } catch (error) {
           console.error('❌ Backend authentication error:', error)
-          // Only show alert if modal is still open
-          if (isOpen) {
-            alert('Authentication failed. Please try again.')
-          }
+          alert('Authentication failed. Please try again.')
         } finally {
           setLoading(false)
         }
@@ -92,23 +87,15 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
       
       sendPrivyAuthToBackend()
     }
-  }, [authenticated, user, authProcessed, onSuccess, onClose, isOpen]) // Added isOpen dependency
+  }, [authenticated, user, isOpen, authProcessed, onSuccess, onClose])
 
   // Reset auth processed state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setAuthProcessed(false)
       setLoading(false)
-      // Reset any ongoing authentication processes
       console.log('🔄 Modal closed - resetting authentication state')
     }
-  }, [isOpen])
-
-  // Add a ref to track if component is still mounted and modal is open
-  const isActiveRef = useRef(false)
-  
-  useEffect(() => {
-    isActiveRef.current = isOpen
   }, [isOpen])
 
   console.log('🔍 LoginModal render - isOpen:', isOpen)
