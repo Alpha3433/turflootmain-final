@@ -388,10 +388,10 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Compact Left Panel - Aligned with Live Stats */}
+            {/* Compact Left Panel - Moved Up 90% */}
             <div className="col-span-3 space-y-3">
-              {/* Spacer to align with live stats section */}
-              <div className="h-[100px]"></div>
+              {/* Reduced spacer - moved up 90% */}
+              <div className="h-[10px]"></div>
               
               {/* Compact Leaderboard */}
               <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
