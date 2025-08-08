@@ -8,6 +8,9 @@ export default function Home() {
   const [selectedBet, setSelectedBet] = useState(5)
   const [showWelcome, setShowWelcome] = useState(false)
   const [hasShownWelcome, setHasShownWelcome] = useState(false)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [customName, setCustomName] = useState('')
+  const [displayName, setDisplayName] = useState('')
   
   // Get Privy hooks
   const { login, ready, authenticated, user, logout } = usePrivy()
@@ -19,6 +22,10 @@ export default function Home() {
       setShowWelcome(true)
       setHasShownWelcome(true)
       setUserProfile(user)
+      
+      // Initialize display name from user data or existing custom name
+      const initialName = user.google?.name || user.email?.address || 'Player'
+      setDisplayName(initialName)
     }
   }, [authenticated, user, hasShownWelcome])
 
@@ -48,6 +55,61 @@ export default function Home() {
     logout()
     setUserProfile(null)
     setHasShownWelcome(false)
+    setDisplayName('')
+    setCustomName('')
+  }
+
+  const handleNameClick = () => {
+    if (authenticated && user) {
+      setIsEditingName(true)
+      setCustomName(displayName)
+    }
+  }
+
+  const handleNameSave = async () => {
+    if (!customName.trim()) return
+
+    try {
+      console.log('💾 Saving custom name:', customName)
+      
+      // Make API call to update user profile
+      const response = await fetch('/api/users/profile/update-name', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          customName: customName.trim(),
+          privyId: user.id
+        })
+      })
+
+      if (response.ok) {
+        setDisplayName(customName.trim())
+        setIsEditingName(false)
+        console.log('✅ Name updated successfully')
+      } else {
+        console.error('❌ Failed to update name')
+        alert('Failed to update name. Please try again.')
+      }
+    } catch (error) {
+      console.error('❌ Error updating name:', error)
+      alert('Error updating name. Please try again.')
+    }
+  }
+
+  const handleNameCancel = () => {
+    setIsEditingName(false)
+    setCustomName('')
+  }
+
+  const handleNameKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleNameSave()
+    } else if (e.key === 'Escape') {
+      handleNameCancel()
+    }
   }
 
   return (
