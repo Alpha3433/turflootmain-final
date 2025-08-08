@@ -99,7 +99,16 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     if (!isOpen) {
       setAuthProcessed(false)
       setLoading(false)
+      // Reset any ongoing authentication processes
+      console.log('🔄 Modal closed - resetting authentication state')
     }
+  }, [isOpen])
+
+  // Add a ref to track if component is still mounted and modal is open
+  const isActiveRef = useRef(false)
+  
+  useEffect(() => {
+    isActiveRef.current = isOpen
   }, [isOpen])
 
   console.log('🔍 LoginModal render - isOpen:', isOpen)
