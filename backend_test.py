@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Testing for TurfLoot
-Testing all endpoints including NEW Custom Name Update Endpoint
+TurfLoot Backend API Testing Script - Post Professional Gaming Interface Redesign
+Comprehensive testing focusing on priority endpoints from review request:
+1. Core API Health Check: GET /api/
+2. Live Statistics APIs: GET /api/stats/live-players and GET /api/stats/global-winnings  
+3. Unified Privy Authentication: POST /api/auth/privy
+4. Game Systems: POST /api/games and GET /api/pots
+5. User Management: POST /api/users and GET /api/users/{wallet}
+6. Profile Updates: POST /api/users/profile/update-name
 """
 
 import requests
@@ -13,6 +19,10 @@ from datetime import datetime
 # Configuration
 BASE_URL = "https://247b4ccd-3ca1-4058-9869-0a0a47b3d2a9.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
+HEADERS = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'TurfLoot-Backend-Test/2.0'
+}
 
 class TurfLootBackendTester:
     def __init__(self):
