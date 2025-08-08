@@ -513,33 +513,33 @@ export default function Home() {
             </div>
 
             {/* Right Panel - Wallet & Customize */}
-            <div className="col-span-3 space-y-6">
+            <div className="col-span-3 space-y-4">
               {/* Wallet */}
-              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 h-[320px] shadow-2xl">
-                <div className="flex items-center justify-between mb-6">
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-gray-700/50 h-[260px] shadow-2xl">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-cyan-500 rounded-lg flex items-center justify-center">
                       <span className="text-white font-bold text-sm">💳</span>
                     </div>
                     <h3 className="text-white font-bold text-lg">Wallet</h3>
                   </div>
-                  <div className="flex space-x-4 text-sm">
+                  <div className="flex space-x-3 text-xs">
                     <button className="text-gray-400 hover:text-cyan-400 transition-colors">Copy Address</button>
                     <button className="text-gray-400 hover:text-cyan-400 transition-colors">Refresh Balance</button>
                   </div>
                 </div>
                 
-                <div className="text-center py-8">
-                  <div className="text-6xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-4">
+                <div className="text-center py-6">
+                  <div className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-3">
                     $0.00
                   </div>
-                  <div className="text-gray-400 text-lg mb-8">SOL Balance</div>
+                  <div className="text-gray-400 text-base mb-6">SOL Balance</div>
                   
-                  <div className="space-y-4">
-                    <button className="w-full py-4 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-xl text-green-400 font-bold text-lg transition-all hover:scale-105">
+                  <div className="space-y-3">
+                    <button className="w-full py-3 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-xl text-green-400 font-bold text-base transition-all hover:scale-105">
                       Add Funds
                     </button>
-                    <button className="w-full py-4 bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/30 rounded-xl text-orange-400 font-bold text-lg transition-all hover:scale-105">
+                    <button className="w-full py-3 bg-orange-600/20 hover:bg-orange-600/30 border border-orange-500/30 rounded-xl text-orange-400 font-bold text-base transition-all hover:scale-105">
                       Cash Out
                     </button>
                   </div>
@@ -547,22 +547,22 @@ export default function Home() {
               </div>
 
               {/* Customize */}
-              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 h-[240px] shadow-2xl">
-                <div className="flex items-center space-x-3 mb-6">
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-gray-700/50 h-[200px] shadow-2xl">
+                <div className="flex items-center space-x-3 mb-4">
                   <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-sm">🎨</span>
                   </div>
                   <h3 className="text-white font-bold text-lg">Customize</h3>
                 </div>
                 <div className="text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
-                    <div className="w-16 h-16 bg-white rounded-full relative">
-                      <div className="absolute top-3 left-3 w-3 h-3 bg-blue-600 rounded-full"></div>
-                      <div className="absolute top-3 right-3 w-3 h-3 bg-blue-600 rounded-full"></div>
-                      <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-blue-600 rounded-full"></div>
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 bg-white rounded-full relative">
+                      <div className="absolute top-2 left-2 w-2 h-2 bg-blue-600 rounded-full"></div>
+                      <div className="absolute top-2 right-2 w-2 h-2 bg-blue-600 rounded-full"></div>
+                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-1.5 bg-blue-600 rounded-full"></div>
                     </div>
                   </div>
-                  <button className="px-6 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-xl text-purple-400 font-bold transition-all hover:scale-105">
+                  <button className="px-5 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-xl text-purple-400 font-bold transition-all hover:scale-105">
                     Change Appearance
                   </button>
                 </div>
