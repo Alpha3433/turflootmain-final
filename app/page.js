@@ -534,7 +534,7 @@ export default function Home() {
               {/* Exact alignment with very top of Players in Game box */}
               
               {/* Compact Wallet - Increased Height */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[65%]">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[60%]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <div className="text-lg">💳</div>
@@ -564,8 +564,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Compact Customize - Adjusted Height */}
-              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[31%]">
+              {/* Compact Customize - Increased Height */}
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[36%]">
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="text-lg">🎨</div>
                   <h3 className="text-white font-bold text-sm">Customize</h3>
@@ -578,9 +578,11 @@ export default function Home() {
                       <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-blue-600 rounded-full"></div>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg text-purple-400 text-xs font-medium">
-                    Change Look
-                  </button>
+                  <div className="mb-4">
+                    <button className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg text-purple-400 text-xs font-medium">
+                      Change Look
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
