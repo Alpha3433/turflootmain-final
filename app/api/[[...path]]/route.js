@@ -417,86 +417,16 @@ export async function POST(request, { params }) {
         )
       }
     }
-        }
-        
-        const { sub: googleId, email, name, picture, email_verified } = payload
-        
-        console.log('✅ Google token verified for:', email)
-        
-        if (!email || !email_verified) {
-          throw new Error('Email not verified by Google')
-        }
-        
-        // Find or create user in MongoDB
-        const db = await getDb()
-        const users = db.collection('users')
-        
-        let user = await users.findOne({ 
-          $or: [
-            { email },
-            { google_id: googleId }
-          ]
-        })
-        
-        if (!user) {
-          // Create new user with Google data
-          console.log('👤 Creating new user for:', email)
-          user = {
-            id: crypto.randomUUID(),
-            email,
-            username: name || `user_${Date.now()}`,
-            google_id: googleId,
-            profile: {
-              avatar_url: picture || null,
-              display_name: name || email.split('@')[0],
-              bio: '',
-              total_games: 0,
-              total_winnings: 0,
-              win_rate: 0,
-              favorite_stake: 1,
-              achievements: [],
-              stats: {
-                games_played: 0,
-                games_won: 0,
-                total_territory_captured: 0,
-                best_territory_percent: 0,
-                longest_game_duration: 0,
-                total_time_played: 0
-              }
-            },
-            preferences: {
-              theme: 'dark',
-              notifications: true,
-              sound_effects: true,
-              auto_cash_out: false,
-              auto_cash_out_threshold: 50
-            },
-            auth_method: 'google',
-            created_at: new Date(),
-            updated_at: new Date(),
-            last_login: new Date(),
-            status: 'active'
-          }
-          
-          await users.insertOne(user)
-          console.log('✅ New user created:', user.id)
-        } else {
-          // Update existing user
-          console.log('🔄 Updating existing user:', user.email)
-          await users.updateOne(
-            { $or: [{ email }, { google_id: googleId }] },
-            {
-              $set: {
-                google_id: googleId,
-                last_login: new Date(),
-                updated_at: new Date(),
-                'profile.avatar_url': picture || user.profile?.avatar_url,
-                'profile.display_name': name || user.profile?.display_name || email.split('@')[0]
-              }
-            }
-          )
-          console.log('✅ User updated')
-        }
+    // Deprecated authentication endpoints
+    if (route === 'auth/google' || route === 'auth/wallet' || route === 'auth/google-callback') {
+      return NextResponse.json(
+        { 
+          error: 'This authentication method has been deprecated. Please use Privy authentication instead.',
+          redirect: 'Use the LOGIN TO PLAY button for unified authentication.'
+        },
+        { status: 410, headers: corsHeaders }
+      )
+    }
         
         // Generate JWT token for consistent auth system
         const jwtToken = jwt.sign(
