@@ -126,14 +126,26 @@ export default function Home() {
       return
     }
 
+    if (!user || !user.id) {
+      alert('Authentication error. Please log in again and try creating your username.')
+      return
+    }
+
     try {
       console.log('💾 Creating username:', usernameInput)
+      console.log('👤 User data for username creation:', {
+        userId: user.id,
+        email: user.email?.address,
+        privyId: user.id
+      })
       
       const requestBody = {
         userId: user.id,
         customName: usernameInput.trim(),
         privyId: user.id
       }
+      
+      console.log('📡 Sending username creation request:', requestBody)
       
       const response = await fetch('/api/users/profile/update-name', {
         method: 'POST',
@@ -144,26 +156,57 @@ export default function Home() {
         body: JSON.stringify(requestBody)
       })
 
+      console.log('📡 Username API Response status:', response.status)
+      console.log('📡 Username API Response ok:', response.ok)
+
       if (!response.ok) {
         const errorText = await response.text()
-        console.error('❌ API Error response:', errorText)
-        alert('Failed to create username. Please try again.')
+        console.error('❌ Username API Error response:', errorText)
+        
+        let errorMessage = 'Failed to create username'
+        try {
+          const errorData = JSON.parse(errorText)
+          errorMessage = errorData.error || errorMessage
+        } catch {
+          errorMessage = `HTTP ${response.status}: ${errorText || 'Unknown server error'}`
+        }
+        
+        alert(`Username creation failed: ${errorMessage}\n\nPlease try again or contact support if the issue persists.`)
         return
       }
       
       const responseData = await response.json()
-      console.log('📡 Username creation response:', responseData)
+      console.log('📡 Username API Response data:', responseData)
 
       if (responseData.success) {
         setDisplayName(usernameInput.trim())
         setShowUsernameCreation(false)
-        console.log('✅ Username created successfully')
+        console.log('✅ Username created successfully:', usernameInput.trim())
+        
+        // Show success message
+        alert(`🎉 Username "${usernameInput.trim()}" created successfully! Welcome to TurfLoot!`)
       } else {
-        alert('Failed to create username. Please try again.')
+        console.error('❌ Username API returned success=false:', responseData)
+        alert(`Username creation failed: ${responseData.error || 'Unknown error'}\n\nPlease try again.`)
       }
     } catch (error) {
-      console.error('❌ Error creating username:', error)
-      alert('Network error creating username. Please try again.')
+      console.error('❌ Network error creating username:', error)
+      console.error('❌ Username creation error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      
+      let errorMessage = 'Network error creating username'
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = 'Unable to connect to server. Please check your internet connection'
+      } else if (error.name === 'SyntaxError') {
+        errorMessage = 'Server response error. Please try refreshing the page'
+      } else {
+        errorMessage = `Network error: ${error.message}`
+      }
+      
+      alert(`${errorMessage}\n\nPlease try again or contact support if the issue persists.`)
     }
   }
 
