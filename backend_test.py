@@ -483,6 +483,7 @@ class TurfLootBackendTester:
     def run_all_tests(self):
         """Run comprehensive backend testing suite"""
         print("🚀 Starting Comprehensive Backend API Testing for TurfLoot")
+        print("🆕 INCLUDING NEW CUSTOM NAME UPDATE ENDPOINT TESTING")
         print("=" * 70)
         
         # Core API Health Checks
@@ -498,6 +499,14 @@ class TurfLootBackendTester:
         print("\n👤 USER MANAGEMENT")
         self.test_user_creation()
         self.test_user_profile_retrieval()
+        
+        # NEW: Custom Name Update Endpoint Testing
+        print("\n🆕 CUSTOM NAME UPDATE ENDPOINT TESTING")
+        self.test_custom_name_update_valid()
+        self.test_custom_name_update_missing_userid()
+        self.test_custom_name_update_missing_customname()
+        self.test_custom_name_update_user_not_found()
+        self.test_verify_custom_name_in_database()
         
         # Game Systems
         print("\n🎮 GAME SYSTEMS")
@@ -527,6 +536,12 @@ class TurfLootBackendTester:
         print(f"✅ Passed: {passed_tests}")
         print(f"❌ Failed: {failed_tests}")
         print(f"📈 Success Rate: {success_rate:.1f}%")
+        
+        # Highlight Custom Name Update Results
+        custom_name_tests = [result for result in self.test_results if "Custom Name" in result["test"]]
+        if custom_name_tests:
+            custom_passed = sum(1 for test in custom_name_tests if test["success"])
+            print(f"\n🆕 CUSTOM NAME UPDATE TESTS: {custom_passed}/{len(custom_name_tests)} passed")
         
         if failed_tests > 0:
             print(f"\n❌ FAILED TESTS:")
