@@ -398,49 +398,10 @@ export async function POST(request, { params }) {
       }
     }
     // Deprecated authentication endpoints
-    if (route === 'auth/google' || route === 'auth/wallet' || route === 'auth/google-callback') {
+    if (route === 'auth/google' || route === 'auth/wallet' || route === 'auth/google-callback' || route === 'auth/register') {
       return NextResponse.json(
         { 
           error: 'This authentication method has been deprecated. Please use Privy authentication instead.',
-          redirect: 'Use the LOGIN TO PLAY button for unified authentication.'
-        },
-        { status: 410, headers: corsHeaders }
-      )
-    }
-
-        
-        return NextResponse.json({
-          success: true,
-          user: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            profile: user.profile,
-            auth_method: 'privy',
-            wallet_address: user.wallet_address
-          },
-          token: jwtToken
-        }, { 
-          headers: {
-            ...corsHeaders,
-            'Set-Cookie': `auth_token=${jwtToken}; Path=/; HttpOnly; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax`
-          }
-        })
-        
-      } catch (error) {
-        console.error('❌ Privy authentication error:', error.message)
-        return NextResponse.json(
-          { error: 'Privy authentication failed: ' + error.message },
-          { status: 400, headers: corsHeaders }
-        )
-      }
-    }
-
-    // Legacy authentication endpoints - all deprecated in favor of unified Privy auth
-    if (route === 'auth/google-callback' || route === 'auth/register') {
-      return NextResponse.json(
-        { 
-          error: 'This endpoint is deprecated. Use Privy authentication instead.',
           redirect: 'Use the LOGIN TO PLAY button for unified authentication.'
         },
         { status: 410, headers: corsHeaders }
