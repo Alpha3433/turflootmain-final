@@ -234,70 +234,189 @@ export async function POST(request, { params }) {
     const route = path.join('/')
     const body = await request.json()
 
-    // Authentication routes
-    if (route === 'auth/wallet') {
-      const { wallet_address, signature, message } = body
+    // UNIFIED PRIVY AUTHENTICATION - Handles Google OAuth, Email OTP, and Wallet connections
+    if (route === 'auth/privy') {
+      console.log('🔑 Privy authentication request received')
       
-      if (!wallet_address || !signature || !message) {
+      const { privy_user, access_token } = body || {}
+      
+      if (!privy_user) {
+        console.log('❌ Missing Privy user data in request body:', body)
         return NextResponse.json(
-          { error: 'Missing required fields' },
+          { error: 'Missing Privy user data' },
           { status: 400, headers: corsHeaders }
-        )
-      }
-      
-      const { user, token } = await authenticateUser(wallet_address, signature, message)
-      
-      return NextResponse.json({
-        success: true,
-        user: {
-          id: user.id,
-          wallet_address: user.wallet_address,
-          username: user.username,
-          profile: user.profile
-        },
-        token
-      }, { headers: corsHeaders })
-    }
-
-    // Google authentication with ID token verification
-    if (route === 'auth/google') {
-      console.log('🔑 Google auth request received')
-      console.log('🔍 Request body type:', typeof body)
-      console.log('🔍 Request body keys:', Object.keys(body || {}))
-      console.log('🔍 Raw body:', JSON.stringify(body))
-      
-      const { credential } = body || {}
-      
-      console.log('🔍 Extracted credential:', credential ? `${credential.substring(0, 50)}...` : 'MISSING')
-      
-      if (!credential) {
-        console.log('❌ Missing Google credential in request body:', body)
-        return NextResponse.json(
-          { error: 'Missing Google ID token' },
-          { status: 400, headers: corsHeaders }
-        )
-      }
-      
-      if (!googleClient) {
-        console.log('❌ Google client not initialized - missing GOOGLE_CLIENT_ID')
-        return NextResponse.json(
-          { error: 'Google authentication not configured' },
-          { status: 500, headers: corsHeaders }
         )
       }
       
       try {
-        console.log('🔍 Verifying Google ID token...')
+        console.log('🔍 Processing Privy authentication for user:', privy_user.id)
+        console.log('🔍 Auth method:', privy_user.google ? 'Google OAuth' : privy_user.email ? 'Email OTP' : privy_user.wallet ? 'Wallet' : 'Unknown')
         
-        // Verify the Google ID token
-        const ticket = await googleClient.verifyIdToken({
-          idToken: credential,
-          audience: GOOGLE_CLIENT_ID
+        // Extract unified user info from Privy user object
+        const privyId = privy_user.id
+        let email = null
+        let username = null
+        let avatar_url = null
+        let wallet_address = null
+        let auth_method = 'privy'
+        
+        // Handle Google OAuth authentication
+        if (privy_user.google) {
+          email = privy_user.google.email
+          username = privy_user.google.name || privy_user.google.email?.split('@')[0]
+          avatar_url = privy_user.google.picture
+          auth_method = 'google'
+          console.log('📱 Google OAuth user:', email)
+        }
+        
+        // Handle Email OTP authentication
+        if (privy_user.email && !privy_user.google) {
+          email = privy_user.email.address
+          username = email?.split('@')[0] || `user_${Date.now()}`
+          auth_method = 'email'
+          console.log('✉️ Email OTP user:', email)
+        }
+        
+        // Handle Wallet authentication (via Privy)
+        if (privy_user.wallet) {
+          wallet_address = privy_user.wallet.address
+          console.log('🔗 Wallet connected:', wallet_address)
+          if (!email && !privy_user.google && !privy_user.email) {
+            // Wallet-only authentication
+            username = `wallet_${wallet_address.slice(0, 8)}`
+            auth_method = 'wallet'
+            console.log('💰 Wallet-only user:', wallet_address)
+          }
+        }
+        
+        // Validate we have enough info to create/find user
+        if (!email && !wallet_address && !privyId) {
+          throw new Error('Unable to extract user identifier from Privy data')
+        }
+        
+        // Find or create user in MongoDB
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Search for existing user by multiple identifiers
+        let user = await users.findOne({ 
+          $or: [
+            { privy_id: privyId },
+            ...(email ? [{ email }] : []),
+            ...(wallet_address ? [{ wallet_address }] : [])
+          ].filter(Boolean)
         })
         
-        const payload = ticket.getPayload()
-        if (!payload) {
-          throw new Error('Invalid token payload')
+        if (!user) {
+          // Create new user with unified Privy data
+          console.log('👤 Creating new user for Privy ID:', privyId)
+          user = {
+            id: crypto.randomUUID(),
+            privy_id: privyId,
+            email,
+            username: username || `user_${Date.now()}`,
+            wallet_address,
+            auth_method,
+            profile: {
+              avatar_url: avatar_url || null,
+              display_name: username || (email ? email.split('@')[0] : 'Anonymous'),
+              bio: '',
+              total_games: 0,
+              total_winnings: 0,
+              win_rate: 0,
+              favorite_stake: 1,
+              achievements: [],
+              stats: {
+                games_played: 0,
+                games_won: 0,
+                total_territory_captured: 0,
+                best_territory_percent: 0,
+                longest_game_duration: 0,
+                total_time_played: 0
+              }
+            },
+            preferences: {
+              theme: 'dark',
+              notifications: true,
+              sound_effects: true,
+              auto_cash_out: false,
+              auto_cash_out_threshold: 50
+            },
+            created_at: new Date(),
+            updated_at: new Date(),
+            last_login: new Date(),
+            status: 'active'
+          }
+          
+          await users.insertOne(user)
+          console.log('✅ New user created via Privy:', user.id)
+        } else {
+          // Update existing user with latest Privy data
+          console.log('🔄 Updating existing user:', user.email || user.wallet_address || user.privy_id)
+          await users.updateOne(
+            { $or: [{ privy_id: privyId }, { email }, { wallet_address }].filter(Boolean) },
+            {
+              $set: {
+                privy_id: privyId,
+                email: email || user.email,
+                wallet_address: wallet_address || user.wallet_address,
+                auth_method,
+                last_login: new Date(),
+                updated_at: new Date(),
+                'profile.avatar_url': avatar_url || user.profile?.avatar_url,
+                'profile.display_name': username || user.profile?.display_name || (email ? email.split('@')[0] : 'Anonymous')
+              }
+            }
+          )
+          
+          // Refresh user data
+          user = await users.findOne({ privy_id: privyId })
+          console.log('✅ User updated via Privy')
+        }
+        
+        // Generate unified JWT token
+        const jwtToken = jwt.sign(
+          {
+            userId: user.id,
+            privyId: user.privy_id,
+            email: user.email,
+            username: user.username,
+            walletAddress: user.wallet_address,
+            authMethod: user.auth_method
+          },
+          JWT_SECRET,
+          { expiresIn: '7d' }
+        )
+        
+        console.log(`🎉 Privy authentication successful - Method: ${auth_method}, User: ${email || wallet_address || privyId}`)
+        
+        return NextResponse.json({
+          success: true,
+          user: {
+            id: user.id,
+            privy_id: user.privy_id,
+            email: user.email,
+            username: user.username,
+            wallet_address: user.wallet_address,
+            profile: user.profile,
+            auth_method: user.auth_method
+          },
+          token: jwtToken
+        }, { 
+          headers: {
+            ...corsHeaders,
+            'Set-Cookie': `auth_token=${jwtToken}; Path=/; HttpOnly; Max-Age=${7 * 24 * 60 * 60}; SameSite=Lax`
+          }
+        })
+        
+      } catch (error) {
+        console.error('❌ Privy authentication error:', error.message)
+        return NextResponse.json(
+          { error: 'Privy authentication failed: ' + error.message },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+    }
         }
         
         const { sub: googleId, email, name, picture, email_verified } = payload
