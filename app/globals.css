@@ -133,6 +133,23 @@
     animation: shimmer 2s ease-in-out infinite;
   }
   
+  /* Enhanced floating animations for DAMNBRUH aesthetic */
+  .animate-snake-float {
+    animation: snake-float 4s ease-in-out infinite;
+  }
+  
+  .animate-snake-glow {
+    animation: snake-glow 3s ease-in-out infinite;
+  }
+  
+  .animate-snake-drift {
+    animation: snake-drift 8s ease-in-out infinite;
+  }
+  
+  .animate-snake-breathe {
+    animation: snake-breathe 2.5s ease-in-out infinite;
+  }
+  
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
