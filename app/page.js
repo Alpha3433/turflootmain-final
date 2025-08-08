@@ -573,18 +573,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Section - Real Data Only */}
-        <div className="relative z-10 py-1 flex-shrink-0">
-          {/* Live Game Status */}
-          <div className="flex justify-center mb-2">
-            <div className="text-center bg-black/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-700/30">
-              <div className="flex items-center space-x-2 justify-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <div className="text-white text-sm font-medium">Game Server Online</div>
-              </div>
-            </div>
-          </div>
-
           {/* Compact Action Buttons */}
           <div className="flex justify-center space-x-3">
             <button className="px-3 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-xs font-bold border border-gray-600/50 transition-all hover:scale-105">
