@@ -546,10 +546,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Wallet Balance API (GET /api/wallet/balance)"
-    - "Add Funds API (POST /api/wallet/add-funds)"
-    - "Cash Out API (POST /api/wallet/cash-out)"
-    - "Transaction History API (GET /api/wallet/transactions)"
+    - "Enhanced CSS animations and effects"
+    - "Landing page modernization redesign"
+    - "Welcome message popup and user navigation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
