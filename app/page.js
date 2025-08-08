@@ -572,23 +572,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-          {/* Compact Action Buttons */}
-          <div className="flex justify-center space-x-3">
-            <button className="px-3 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-xs font-bold border border-gray-600/50 transition-all hover:scale-105">
-              Add Friends
-            </button>
-            <button className="px-3 py-2 bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 hover:from-yellow-300 hover:via-orange-400 hover:to-yellow-300 text-black rounded-lg text-xs font-bold transition-all hover:scale-105">
-              Daily Crate
-            </button>
-            <button className="px-3 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-xs font-bold border border-gray-600/50 transition-all hover:scale-105">
-              Affiliate
-            </button>
-            <button className="px-3 py-2 bg-gray-800/60 backdrop-blur-sm hover:bg-gray-700/60 rounded-lg text-xs font-bold border border-gray-600/50 transition-all hover:scale-105">
-              Change Appearance
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Discord Button */}
