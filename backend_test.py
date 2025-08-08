@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Comprehensive Backend API Testing for TurfLoot
-Testing all endpoints after @noble package dependency fixes
+Testing all endpoints including NEW Custom Name Update Endpoint
 """
 
 import requests
@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BASE_URL = "http://localhost:3000"
+BASE_URL = "https://2d1eda33-bd6c-40ac-a392-59cfdb7e363d.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootBackendTester:
