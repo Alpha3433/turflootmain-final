@@ -87,12 +87,10 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     console.log('🔍 Starting Google login via Privy...')
     setLoading(true)
     
-    // Use Privy's login with Google-specific configuration
-    login({ 
-      loginMethod: 'google',
-      disableSignup: false 
-    }).then(() => {
+    // Use Privy's login - it will show their interface with options
+    login().then(() => {
       console.log('✅ Google login initiated')
+      setLoading(false)
     }).catch((error) => {
       console.error('❌ Google login error:', error)
       alert('Google login failed. Please try again.')
@@ -100,17 +98,15 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
     })
   }
 
-  // Handle Email login
+  // Handle Email login  
   const handleEmailLogin = () => {
     console.log('🔍 Starting Email login via Privy...')
     setLoading(true)
     
-    // Use Privy's login with Email-specific configuration
-    login({ 
-      loginMethod: 'email',
-      disableSignup: false 
-    }).then(() => {
-      console.log('✅ Email login initiated')
+    // Use Privy's login - it will show their interface with options
+    login().then(() => {
+      console.log('✅ Email login initiated') 
+      setLoading(false)
     }).catch((error) => {
       console.error('❌ Email login error:', error)
       alert('Email login failed. Please try again.')
