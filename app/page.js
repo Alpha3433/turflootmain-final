@@ -147,18 +147,18 @@ export default function Home() {
       {/* Compact Main Content */}
       <div className="relative z-10 flex flex-col" style={{height: 'calc(100vh - 100px)'}}>
         
-        {/* Compact Title Section */}
-        <div className="text-center mb-2">
+        {/* Enhanced Title Section */}
+        <div className="text-center mb-4">
           <div className="relative inline-block">
-            <h1 className="text-4xl font-black tracking-tight">
+            <h1 className="text-7xl font-black tracking-tight mb-2">
               <span className="text-white drop-shadow-xl">TURF</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600">LOOT</span>
             </h1>
           </div>
-          <p className="text-gray-300 text-sm font-bold tracking-wide mt-1">
+          <p className="text-gray-300 text-2xl font-bold tracking-wide mt-2 mb-3">
             SKILL-BASED TERRITORY GAME
           </p>
-          <div className="text-yellow-400 text-xs font-medium mt-1">
+          <div className="text-yellow-400 text-lg font-medium mt-2">
             ⚡ Real-time • 🏆 Skill-based • 💎 Blockchain verified
           </div>
         </div>
