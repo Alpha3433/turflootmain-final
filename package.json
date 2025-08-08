@@ -55,6 +55,7 @@
         "@solana/wallet-adapter-react-ui": "^0.9.35",
         "@solana/wallet-adapter-wallets": "^0.19.32",
         "@solana/web3.js": "^1.95.2",
+        "@swc/helpers": "^0.5.17",
         "@tanstack/react-table": "^8.21.3",
         "axios": "^1.10.0",
         "bcryptjs": "^2.4.3",
