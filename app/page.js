@@ -23,11 +23,37 @@ export default function Home() {
       setHasShownWelcome(true)
       setUserProfile(user)
       
-      // Initialize display name from user data or existing custom name
-      const initialName = user.google?.name || user.email?.address || 'Player'
-      setDisplayName(initialName)
+      // Load user's custom name if it exists
+      loadUserProfile(user.id)
     }
   }, [authenticated, user, hasShownWelcome])
+
+  const loadUserProfile = async (userId) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`)
+      if (response.ok) {
+        const userData = response.json ? await response.json() : response
+        console.log('👤 User profile loaded:', userData)
+        
+        // Set display name from custom name or fallback to default
+        if (userData.custom_name) {
+          setDisplayName(userData.custom_name)
+        } else {
+          const defaultName = user.google?.name || user.email?.address || 'Player'
+          setDisplayName(defaultName)
+        }
+      } else {
+        // Fallback if profile loading fails
+        const defaultName = user.google?.name || user.email?.address || 'Player'
+        setDisplayName(defaultName)
+      }
+    } catch (error) {
+      console.error('❌ Error loading user profile:', error)
+      // Fallback if profile loading fails
+      const defaultName = user.google?.name || user.email?.address || 'Player'
+      setDisplayName(defaultName)
+    }
+  }
 
   // Handle direct Privy login when button is clicked
   const handleLoginClick = () => {
