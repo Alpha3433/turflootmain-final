@@ -410,51 +410,63 @@ backend:
 
   - task: "Wallet Balance API (GET /api/wallet/balance)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "NEW - Wallet balance retrieval endpoint for TurfLoot gaming economy - needs comprehensive testing with authenticated users"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Wallet balance API working perfectly. Authenticated requests return all required fields (balance, currency, sol_balance, usdc_balance). Unauthenticated requests properly rejected with 401. Balance retrieval shows current user balance: $10 USD, 0 SOL, 20 USDC. Authentication integration with JWT tokens working correctly."
 
   - task: "Add Funds API (POST /api/wallet/add-funds)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "NEW - Add funds endpoint with SOL/USDC support, minimum deposit validation, and transaction hash verification - needs comprehensive testing"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Add funds API working perfectly. All 5 test scenarios passed: 1) Valid SOL deposit (0.1 SOL) with transaction recording and balance updates ✅, 2) Valid USDC deposit (10.0 USDC) with proper processing ✅, 3) Minimum deposit validation correctly rejects amounts below 0.01 SOL ✅, 4) Duplicate transaction hash prevention working correctly ✅, 5) Missing transaction hash validation with proper 400 error ✅. Database integration confirmed with transaction records and user balance updates. Platform configuration (min deposit: 0.01 SOL) working as expected."
 
   - task: "Cash Out API (POST /api/wallet/cash-out)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "NEW - Cash out endpoint with platform fee calculation, minimum withdrawal validation, and balance verification - needs comprehensive testing"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Cash out API working perfectly. All 4 test scenarios passed: 1) Valid SOL withdrawal (0.1 SOL) with correct 10% platform fee calculation (fee: 0.01 SOL, net: 0.09 SOL) ✅, 2) Minimum withdrawal validation correctly rejects amounts below 0.05 SOL ✅, 3) Insufficient balance scenarios properly handled with 400 error ✅, 4) Missing recipient address validation working correctly ✅. Transaction records created with pending status, user balance deducted immediately. Platform fee calculation accurate (10% as configured)."
 
   - task: "Transaction History API (GET /api/wallet/transactions)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "NEW - Transaction history endpoint for wallet operations tracking - needs comprehensive testing"
+      - working: true
+        agent: "testing"
+        comment: "✅ PASSED - Transaction history API working perfectly. Authenticated requests return complete transaction history (7 transactions found) with proper sorting (newest first). Transaction records include all required fields: id, type, amount, currency, status, created_at, transaction_hash, recipient_address, fee_amount, net_amount. Unauthenticated requests properly rejected with 401. Database integration confirmed with deposits and withdrawals properly recorded."
 
 frontend:
   - task: "Landing page modernization redesign"
