@@ -454,6 +454,42 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Compact Left Panel - Exact Top Alignment with Live Stats */}
+            <div className="col-span-3 space-y-3 -mt-72">
+              {/* Maximum upward positioning to exactly align with top of Players in Game box */}
+              
+              {/* Compact Leaderboard */}
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="text-lg">🏆</div>
+                  <h3 className="text-white font-bold text-sm">Leaderboard</h3>
+                </div>
+                <div className="text-center py-8">
+                  <div className="text-gray-400 text-sm">
+                    🎯 No games played yet
+                  </div>
+                  <div className="text-gray-500 text-xs mt-1">
+                    Start playing to see rankings!
+                  </div>
+                </div>
+              </div>
+
+              {/* Compact Friends Panel */}
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-gray-700/50 h-[180px]">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="text-lg">👥</div>
+                  <h3 className="text-white font-bold text-sm">Friends</h3>
+                </div>
+                <div className="text-center py-3">
+                  <div className="text-3xl font-bold text-gray-600 mb-2">0</div>
+                  <div className="text-gray-400 text-xs mb-2">No friends... add some!</div>
+                  <button className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-blue-400 text-xs font-medium">
+                    Invite Friends
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Compact Center Panel - Game Controls */}
             <div className="col-span-6 flex flex-col justify-center space-y-2">
 
