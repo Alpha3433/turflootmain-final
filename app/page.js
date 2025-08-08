@@ -709,6 +709,81 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Username Creation Popup */}
+      {showUsernameCreation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="relative bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 border border-yellow-500/30 shadow-2xl">
+            {/* Close button */}
+            <button 
+              onClick={closeUsernameCreation}
+              className="absolute top-4 right-4 p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-all hover:scale-110"
+            >
+              <svg className="w-5 h-5 text-gray-300 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            {/* Username creation content */}
+            <div className="text-center">
+              {/* User icon */}
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 via-purple-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              
+              {/* Create username message */}
+              <h2 className="text-3xl font-black text-white mb-2">
+                Create Your 
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 ml-2">
+                  Username
+                </span>
+                !
+              </h2>
+              
+              <p className="text-gray-300 text-lg mb-6">
+                Choose a unique name to represent you in battles! 🎯
+              </p>
+              
+              {/* Username input */}
+              <div className="mb-6">
+                <input
+                  type="text"
+                  value={usernameInput}
+                  onChange={(e) => setUsernameInput(e.target.value)}
+                  onKeyDown={handleUsernameKeyPress}
+                  placeholder="Enter your username"
+                  autoFocus
+                  className="w-full bg-gray-800/60 text-white text-lg font-medium px-4 py-3 rounded-xl border border-gray-600/50 focus:border-blue-400/50 focus:outline-none focus:ring-2 focus:ring-blue-400/20 transition-all"
+                  maxLength={20}
+                />
+                <p className="text-gray-400 text-sm mt-2">
+                  Max 20 characters • This will be your display name
+                </p>
+              </div>
+              
+              {/* Action buttons */}
+              <div className="space-y-3">
+                <button 
+                  onClick={handleUsernameSubmit}
+                  disabled={!usernameInput.trim()}
+                  className="w-full bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 hover:from-blue-300 hover:via-purple-400 hover:to-blue-300 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 hover:scale-105 shadow-xl"
+                >
+                  Create Username ✨
+                </button>
+                
+                <button 
+                  onClick={closeUsernameCreation}
+                  className="w-full bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white px-6 py-2 rounded-xl font-medium transition-all duration-300"
+                >
+                  Skip for now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
