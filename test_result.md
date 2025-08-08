@@ -408,6 +408,54 @@ backend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE DEBUG TESTING COMPLETED - Custom name update endpoint is working perfectly on localhost. All 6 test scenarios PASSED (100% success rate): 1) ✅ Exact reproduction with provided test data (userId: did:privy:cm1234567890abcdef, customName: quoc) - Status 200, 2) ✅ Minimal required fields test - Status 200, 3) ✅ Email as userId test - Status 200, 4) ✅ Missing fields validation - Proper 400 error, 5) ✅ Database connectivity confirmed via other endpoints, 6) ✅ Existing vs new user scenarios working correctly. CRITICAL FINDING: The reported HTTP 500 error is NOT from the backend code but from external URL ingress/gateway issues (502 Bad Gateway). Backend logs show all requests returning 200 status with successful database operations. The custom name update functionality is fully operational - the issue is infrastructure-related, not code-related."
 
+  - task: "Wallet Balance API (GET /api/wallet/balance)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Wallet balance retrieval endpoint for TurfLoot gaming economy - needs comprehensive testing with authenticated users"
+
+  - task: "Add Funds API (POST /api/wallet/add-funds)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Add funds endpoint with SOL/USDC support, minimum deposit validation, and transaction hash verification - needs comprehensive testing"
+
+  - task: "Cash Out API (POST /api/wallet/cash-out)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Cash out endpoint with platform fee calculation, minimum withdrawal validation, and balance verification - needs comprehensive testing"
+
+  - task: "Transaction History API (GET /api/wallet/transactions)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Transaction history endpoint for wallet operations tracking - needs comprehensive testing"
+
 frontend:
   - task: "Landing page modernization redesign"
     implemented: true
