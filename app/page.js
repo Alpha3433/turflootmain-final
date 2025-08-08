@@ -180,12 +180,19 @@ export default function Home() {
 
     try {
       console.log('💾 Saving custom name:', customName.trim())
-      console.log('🔑 User info:', { userId: user.id, privyId: user.id, email: user.email?.address })
+      console.log('🔑 User info:', { 
+        userId: user.id, 
+        privyId: user.id, 
+        email: user.email?.address,
+        userType: typeof user,
+        userKeys: Object.keys(user || {})
+      })
 
       const requestData = {
         userId: user.id,
         customName: customName.trim(),
-        privyId: user.id
+        privyId: user.id,
+        email: user.email?.address || null
       }
       console.log('📤 Request data:', requestData)
 
@@ -198,17 +205,32 @@ export default function Home() {
       })
       
       console.log('📡 API Response status:', response.status)
-      console.log('📡 API Response ok:', response.ok)
+      console.log('📡 API Response headers:', response.headers)
       
       if (!response.ok) {
         const errorText = await response.text()
         console.error('❌ API Error response:', errorText)
+        console.error('❌ Response status:', response.status)
+        console.error('❌ Response statusText:', response.statusText)
         
-        try {
-          const errorData = JSON.parse(errorText)
-          alert(`Failed to update name: ${errorData.error || errorText}. Please try again.`)
-        } catch {
-          alert(`Failed to update name (HTTP ${response.status}): ${errorText}. Please try again.`)
+        // More specific error messages
+        if (response.status === 500) {
+          console.error('❌ Server error - checking backend logs...')
+          alert('Server error occurred. The name update failed due to a backend issue. Please try again in a moment.')
+        } else if (response.status === 400) {
+          try {
+            const errorData = JSON.parse(errorText)
+            alert(`Invalid request: ${errorData.error || errorText}`)
+          } catch {
+            alert(`Bad request: ${errorText}`)
+          }
+        } else {
+          try {
+            const errorData = JSON.parse(errorText)
+            alert(`Failed to update name: ${errorData.error || errorText}. Please try again.`)
+          } catch {
+            alert(`Failed to update name (HTTP ${response.status}): ${errorText}. Please try again.`)
+          }
         }
         return
       }
@@ -216,13 +238,13 @@ export default function Home() {
       const responseData = await response.json()
       console.log('📡 API Response data:', responseData)
 
-      if (responseData.success) {
+      if (responseData && responseData.success) {
         setDisplayName(customName.trim())
         setIsEditingName(false)
         console.log('✅ Name updated successfully')
       } else {
         console.error('❌ API returned success=false:', responseData)
-        alert(`Failed to update name: ${responseData.error || 'Unknown error'}. Please try again.`)
+        alert(`Failed to update name: ${responseData?.error || 'Unknown error'}. Please try again.`)
       }
     } catch (error) {
       console.error('❌ Network error updating name:', error)
