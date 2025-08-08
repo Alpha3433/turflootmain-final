@@ -57,8 +57,66 @@ export async function GET(request, { params }) {
       })(request)
     }
 
+    // Wallet balance endpoint (GET)
+    if (route === 'wallet/balance') {
+      return requireAuth(async (req) => {
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        const user = await users.findOne({ 
+          $or: [
+            { id: req.user.id },
+            { privy_id: req.user.privyId }
+          ]
+        })
+        
+        if (!user) {
+          return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+        
+        return NextResponse.json({
+          balance: user.balance || 0,
+          currency: 'USD',
+          sol_balance: user.sol_balance || 0,
+          usdc_balance: user.usdc_balance || 0
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
+    // Transaction history endpoint (GET)
+    if (route === 'wallet/transactions') {
+      return requireAuth(async (req) => {
+        const db = await getDb()
+        const transactions = db.collection('transactions')
+        
+        const userTransactions = await transactions
+          .find({ user_id: req.user.id })
+          .sort({ created_at: -1 })
+          .limit(50)
+          .toArray()
+        
+        return NextResponse.json({
+          transactions: userTransactions.map(tx => ({
+            id: tx.id,
+            type: tx.type,
+            amount: tx.amount,
+            currency: tx.currency,
+            status: tx.status,
+            created_at: tx.created_at,
+            transaction_hash: tx.transaction_hash,
+            recipient_address: tx.recipient_address,
+            fee_amount: tx.fee_amount,
+            net_amount: tx.net_amount
+          }))
+        }, { headers: corsHeaders })
+      })(request)
+    }
+
     // Legacy wallet endpoints - deprecated in favor of Privy wallet functionality
-    if (route.startsWith('wallet/')) {
+    if (route.startsWith('wallet/') && !['wallet/balance', 'wallet/transactions'].includes(route)) {
       return NextResponse.json(
         { 
           error: 'Direct wallet endpoints are deprecated. Wallet data is now managed through Privy authentication.',
