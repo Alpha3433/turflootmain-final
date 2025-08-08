@@ -144,7 +144,7 @@ export default function Home() {
           </div>
           <span className="text-white text-lg font-semibold">
             {authenticated && user 
-              ? `Welcome, ${user.google?.name || user.email?.address || 'Player'}!` 
+              ? `Welcome, ${displayName || user.google?.name || user.email?.address || 'Player'}!` 
               : 'Welcome, bruh!'
             }
           </span>
