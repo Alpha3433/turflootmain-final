@@ -654,11 +654,17 @@ export default function Home() {
 
               {/* Game Options */}
               <div className="flex justify-center space-x-4">
-                <button className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl font-medium border border-gray-600 transition-all hover:scale-105 text-white">
-                  ⚡ EU
+                <button 
+                  onClick={() => window.location.href = '/play?mode=free&room=lobby'}
+                  className="px-6 py-3 bg-cyan-600/20 hover:bg-cyan-600/30 border border-cyan-500/30 rounded-2xl font-medium transition-all hover:scale-105 text-cyan-400"
+                >
+                  🎮 Play Free
                 </button>
-                <button className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl font-medium border border-gray-600 transition-all hover:scale-105 text-white">
-                  🌍 Browse Lobbies
+                <button 
+                  onClick={() => window.location.href = '/play?mode=cash&room=premium&fee=10'}
+                  className="px-6 py-3 bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/30 rounded-2xl font-medium transition-all hover:scale-105 text-yellow-400"
+                >
+                  💰 Play for Cash ($10)
                 </button>
               </div>
             </div>
