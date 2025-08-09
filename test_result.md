@@ -468,6 +468,78 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - Transaction history API working perfectly. Authenticated requests return complete transaction history (7 transactions found) with proper sorting (newest first). Transaction records include all required fields: id, type, amount, currency, status, created_at, transaction_hash, recipient_address, fee_amount, net_amount. Unauthenticated requests properly rejected with 401. Database integration confirmed with deposits and withdrawals properly recorded."
 
+  - task: "Agario Game Server Initialization"
+    implemented: true
+    working: "NA"
+    file: "/app/server.js, /app/lib/gameServer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Custom server.js properly loads and initializes TurfLoot Game Server with Socket.IO alongside Next.js. Needs verification of server initialization and Socket.IO connectivity."
+
+  - task: "Game Room Management System"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/gameServer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - TurfLootGameRoom class handles both free and cash game modes with configurable fees. Supports room isolation, player management, and maximum 6 players per room. Needs testing of room creation and management."
+
+  - task: "Cash Game Wallet Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/gameServer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Entry fee deduction system for cash games ($10 fee support), balance checking before game entry, transaction recording for game entry fees, and 10% platform fee calculation. Needs testing of wallet integration and fee processing."
+
+  - task: "Game State Management and Broadcasting"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/gameServer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Real-time game state updates via Socket.IO, player joining/leaving rooms, match start/end conditions, and 30 FPS game tick rate. Needs testing of game state management and broadcasting functionality."
+
+  - task: "Game Authentication Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/gameServer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - JWT token verification for game access, user info extraction from Privy tokens, and authentication-based game features. Needs testing of authentication integration with game server."
+
+  - task: "Agario Game Frontend Integration"
+    implemented: true
+    working: "NA"
+    file: "/app/app/play/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Complete Agario-style game frontend with Phaser.js integration, Socket.IO client connection, URL parameter support for room/mode/fee, and real-time game rendering. Needs testing of frontend game integration."
+
 frontend:
   - task: "Landing page modernization redesign"
     implemented: true
