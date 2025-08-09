@@ -688,25 +688,11 @@ export default function Home() {
 
               {/* JOIN GAME Button */}
               <div className="flex justify-center">
-                <button className="w-full max-w-md bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-300 text-black px-8 py-6 rounded-2xl font-black text-2xl shadow-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-3">
-                  <span className="text-3xl">▶</span>
-                  <span>JOIN GAME</span>
-                </button>
-              </div>
-
-              {/* Game Options */}
-              <div className="flex justify-center space-x-4">
                 <button 
-                  onClick={() => window.location.href = '/play?mode=free&room=lobby'}
-                  className="px-6 py-3 bg-cyan-600/20 hover:bg-cyan-600/30 border border-cyan-500/30 rounded-2xl font-medium transition-all hover:scale-105 text-cyan-400"
+                  onClick={handleJoinGame}
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-black font-black py-6 px-16 rounded-2xl text-2xl transition-all duration-300 hover:scale-105 shadow-2xl border-2 border-cyan-300"
                 >
-                  🎮 Play Free
-                </button>
-                <button 
-                  onClick={() => window.location.href = '/play?mode=cash&room=premium&fee=10'}
-                  className="px-6 py-3 bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/30 rounded-2xl font-medium transition-all hover:scale-105 text-yellow-400"
-                >
-                  💰 Play for Cash ($10)
+                  {selectedStake > 0 ? `JOIN GAME - $${selectedStake}` : 'JOIN FREE GAME'}
                 </button>
               </div>
             </div>
