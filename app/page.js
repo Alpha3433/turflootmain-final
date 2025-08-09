@@ -644,21 +644,48 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Stake Selector */}
-              <div className="flex justify-center space-x-4">
-                {[1, 5, 20].map((amount) => (
-                  <button
-                    key={amount}
-                    onClick={() => setSelectedBet(amount)}
-                    className={`px-8 py-4 rounded-2xl font-bold text-xl transition-all duration-300 hover:scale-105 shadow-xl min-w-[80px] ${
-                      selectedBet === amount
-                        ? 'bg-yellow-500 text-black border-2 border-yellow-400'
-                        : 'bg-gray-800 hover:bg-gray-700 text-white border-2 border-gray-600'
-                    }`}
-                  >
-                    ${amount}
-                  </button>
-                ))}
+              {/* Stakes */}
+              <div className="flex justify-center space-x-3">
+                <button 
+                  onClick={() => setSelectedStake(0)}
+                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
+                    selectedStake === 0 
+                      ? 'bg-cyan-400 text-black border-2 border-cyan-300' 
+                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
+                  }`}
+                >
+                  FREE
+                </button>
+                <button 
+                  onClick={() => setSelectedStake(1)}
+                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
+                    selectedStake === 1 
+                      ? 'bg-yellow-400 text-black border-2 border-yellow-300' 
+                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
+                  }`}
+                >
+                  $1
+                </button>
+                <button 
+                  onClick={() => setSelectedStake(5)}
+                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
+                    selectedStake === 5 
+                      ? 'bg-yellow-400 text-black border-2 border-yellow-300' 
+                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
+                  }`}
+                >
+                  $5
+                </button>
+                <button 
+                  onClick={() => setSelectedStake(20)}
+                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
+                    selectedStake === 20 
+                      ? 'bg-yellow-400 text-black border-2 border-yellow-300' 
+                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
+                  }`}
+                >
+                  $20
+                </button>
               </div>
 
               {/* JOIN GAME Button */}
