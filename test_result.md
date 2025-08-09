@@ -708,11 +708,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Agario Game Server Initialization"
-    - "Game Room Management System"
-    - "Cash Game Wallet Integration"
-    - "Game State Management and Broadcasting"
-    - "Game Authentication Integration"
+    - "Agario Game Frontend Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
