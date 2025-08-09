@@ -1,17 +1,16 @@
-// Custom server to handle WebSocket connections
+// Custom server to handle WebSocket connections and TurfLoot game server
 const { createServer } = require('http')
 const next = require('next')
 const { parse } = require('url')
-const { initializeWebSocket } = require('./lib/websocket.js')
 
 const dev = process.env.NODE_ENV !== 'production'
-const hostname = 'localhost'
+const hostname = '0.0.0.0'
 const port = process.env.PORT || 3000
 
 const app = next({ dev, hostname, port })
 const handle = app.getRequestHandler()
 
-app.prepare().then(() => {
+app.prepare().then(async () => {
   const server = createServer(async (req, res) => {
     try {
       const parsedUrl = parse(req.url, true)
@@ -23,9 +22,23 @@ app.prepare().then(() => {
     }
   })
 
-  // Initialize WebSocket server
-  const io = initializeWebSocket(server)
-  console.log('WebSocket server initialized')
+  // Initialize TurfLoot Game Server with Socket.IO
+  try {
+    const { gameServer } = await import('./lib/gameServer.js')
+    gameServer.initialize(server)
+    console.log('🎮 TurfLoot Game Server initialized with Socket.IO')
+  } catch (error) {
+    console.log('⚠️ Game server not available:', error.message)
+  }
+
+  // Keep legacy WebSocket support for backwards compatibility
+  try {
+    const { initializeWebSocket } = require('./lib/websocket.js')
+    const io = initializeWebSocket(server)
+    console.log('📡 Legacy WebSocket server initialized')
+  } catch (error) {
+    console.log('⚠️ Legacy WebSocket not available:', error.message)
+  }
 
   server
     .once('error', (err) => {
@@ -33,6 +46,6 @@ app.prepare().then(() => {
       process.exit(1)
     })
     .listen(port, () => {
-      console.log(`> Ready on http://${hostname}:${port}`)
+      console.log(`🚀 TurfLoot server ready on http://${hostname}:${port}`)
     })
 })
