@@ -693,11 +693,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Wallet Component Display and Authentication Integration"
-    - "Add Funds Modal Functionality"
-    - "Cash Out Modal Functionality"
-    - "Transaction History Display"
-    - "Wallet Balance Display and Real-time Updates"
+    - "Agario Game Server Initialization"
+    - "Game Room Management System"
+    - "Cash Game Wallet Integration"
+    - "Game State Management and Broadcasting"
+    - "Game Authentication Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
