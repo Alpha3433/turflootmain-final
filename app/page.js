@@ -813,18 +813,3 @@ export default function Home() {
     </div>
   )
 }
-
-  const handleJoinGame = () => {
-    if (!authenticated) {
-      login()
-      return
-    }
-
-    // Determine game mode and room based on selected stake
-    const mode = selectedStake > 0 ? 'cash' : 'free'
-    const roomId = selectedStake > 0 ? `stake_${selectedStake}` : 'lobby'
-    const fee = selectedStake
-
-    // Navigate to game page with appropriate parameters
-    window.location.href = `/play?mode=${mode}&room=${roomId}&fee=${fee}`
-  }
