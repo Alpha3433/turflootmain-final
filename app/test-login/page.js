@@ -80,13 +80,24 @@ export default function TestLogin() {
             {message}
             
             {message.includes('✅') && (
-              <div className="mt-3">
+              <div className="mt-3 space-y-2">
                 <button
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => {
+                    console.log('🔄 Manual redirect triggered')
+                    try {
+                      window.location.replace('/')
+                    } catch (error) {
+                      console.error('Redirect error:', error)
+                      window.location.href = '/'
+                    }
+                  }}
                   className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg transition-all"
                 >
                   Go to Main Page Now
                 </button>
+                <div className="text-xs text-gray-400 text-center">
+                  If redirect doesn't work, manually go to the main page
+                </div>
               </div>
             )}
           </div>
