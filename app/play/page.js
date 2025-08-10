@@ -5,9 +5,9 @@ import { usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 
 const TurfLootGame = () => {
-  const { authenticated, user, login } = usePrivy()
+  const { authenticated, user, login, ready } = usePrivy()
   const router = useRouter()
-  const [gameStatus, setGameStatus] = useState('lobby') // lobby, playing, ended
+  const [gameStatus, setGameStatus] = useState('loading') // loading, lobby, playing, ended
   const [roomInfo, setRoomInfo] = useState(null)
   const [balance, setBalance] = useState(0)
   const [playerStats, setPlayerStats] = useState({ mass: 10, rank: 1 })
