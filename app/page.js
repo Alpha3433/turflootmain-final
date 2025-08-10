@@ -306,12 +306,12 @@ export default function Home() {
       return
     }
 
-    // Determine game mode and room based on selected stake
-    const mode = selectedStake > 0 ? 'cash' : 'free'
-    const roomId = selectedStake > 0 ? `stake_${selectedStake}` : 'lobby'
+    // All games are now cash games with entry fees
+    const mode = 'cash'
+    const roomId = `stake_${selectedStake}`
     const fee = selectedStake
 
-    // Navigate to game page with appropriate parameters
+    // Navigate to game page with cash game parameters
     window.location.href = `/play?mode=${mode}&room=${roomId}&fee=${fee}`
   }
 
