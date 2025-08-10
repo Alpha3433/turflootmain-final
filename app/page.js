@@ -544,7 +544,7 @@ export default function Home() {
                   </div>
                   <button className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors">⟲ Refresh</button>
                 </div>
-                <div className="text-center py-4">
+                <div className="text-center pt-4 pb-6">
                   <div className="text-3xl font-black text-gray-600 mb-1">0</div>
                   <div className="text-gray-400 text-xs mb-1">playing</div>
                   <div className="text-gray-500 text-xs mb-3">No friends - add some!</div>
