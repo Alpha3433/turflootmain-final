@@ -479,8 +479,8 @@ const AgarIOGame = () => {
         game.camera.x = game.player.x
         game.camera.y = game.player.y
         
-        // Zoom based on net worth
-        const targetZoom = Math.max(0.3, Math.min(1.0, 1.0 / Math.sqrt(game.player.netWorth / 100)))
+        // Zoom based on mass
+        const targetZoom = Math.max(0.3, Math.min(1.0, 1.0 / Math.sqrt(game.player.mass / 10)))
         game.camera.zoom += (targetZoom - game.camera.zoom) * deltaTime * 2
       }
 
