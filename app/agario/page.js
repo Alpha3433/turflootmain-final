@@ -189,7 +189,7 @@ const AgarIOGame = () => {
       },
       bots: [],
       orbs: [],
-      camera: { x: 0, y: 0, zoom: 0.25 },
+      camera: { x: 0, y: 0, zoom: 0.6 }, // More zoomed in like original
       running: true,
       bounties: new Set()
     }
