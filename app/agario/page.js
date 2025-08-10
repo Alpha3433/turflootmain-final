@@ -547,7 +547,7 @@ const AgarIOGame = () => {
       allEntities.sort((a, b) => a.netWorth - b.netWorth)
       
       allEntities.forEach(entity => {
-        const radius = getRadius(entity.netWorth)
+        const radius = getRadius(entity.mass)
         const isPlayer = entity === game.player
         
         // Bounty gold ring
