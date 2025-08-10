@@ -171,6 +171,7 @@ const AgarIOGame = () => {
       player: {
         x: 0,
         y: 0,
+        mass: config.startingMass,
         netWorth: config.startingNetWorth,
         dir: { x: 0, y: 0 },
         alive: true,
