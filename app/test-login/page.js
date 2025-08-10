@@ -72,12 +72,23 @@ export default function TestLogin() {
         </div>
 
         {message && (
-          <div className={`p-4 rounded-lg ${
+          <div className={`p-4 rounded-lg mb-4 ${
             message.includes('✅') 
               ? 'bg-green-600/20 border border-green-500/30 text-green-400' 
               : 'bg-red-600/20 border border-red-500/30 text-red-400'
           }`}>
             {message}
+            
+            {message.includes('✅') && (
+              <div className="mt-3">
+                <button
+                  onClick={() => window.location.href = '/'}
+                  className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg transition-all"
+                >
+                  Go to Main Page Now
+                </button>
+              </div>
+            )}
           </div>
         )}
 
