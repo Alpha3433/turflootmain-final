@@ -158,10 +158,12 @@ const AgarIOGame = () => {
       botCount: 15,
       baseSpeed: 180,
       startingNetWorth: 100,
-      orbValue: 5,
-      radiusPerDollar: 0.8,
+      startingMass: 10,
+      orbMassValue: 1.5, // Orbs now only give mass, not money
+      massPerDollar: 0.8,
       bountyThreshold: 500,
-      killReward: 50
+      killReward: 50,
+      platformFee: 0.10 // 10% platform fee on cash out
     }
 
     // Game state
