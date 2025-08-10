@@ -767,48 +767,29 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Stakes */}
-              <div className="flex justify-center space-x-3">
-                <button 
-                  onClick={() => setSelectedStake(0)}
-                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
-                    selectedStake === 0 
-                      ? 'bg-cyan-400 text-black border-2 border-cyan-300' 
-                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
-                  }`}
-                >
-                  FREE
-                </button>
-                <button 
-                  onClick={() => setSelectedStake(1)}
-                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
-                    selectedStake === 1 
-                      ? 'bg-yellow-400 text-black border-2 border-yellow-300' 
-                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
-                  }`}
-                >
-                  $1
-                </button>
-                <button 
-                  onClick={() => setSelectedStake(5)}
-                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
-                    selectedStake === 5 
-                      ? 'bg-yellow-400 text-black border-2 border-yellow-300' 
-                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
-                  }`}
-                >
-                  $5
-                </button>
-                <button 
-                  onClick={() => setSelectedStake(20)}
-                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
-                    selectedStake === 20 
-                      ? 'bg-yellow-400 text-black border-2 border-yellow-300' 
-                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
-                  }`}
-                >
-                  $20
-                </button>
+              <div className="bg-gradient-to-br from-gray-800/40 via-gray-900/40 to-gray-800/40 backdrop-blur-sm rounded-xl border border-gray-700/30 shadow-xl">
+                <div className="p-6 text-center">
+                  <h3 className="text-xl font-bold text-green-400 mb-2">🎮 Play FREE Agario!</h3>
+                  <p className="text-gray-300 text-sm mb-4">
+                    No login required • Single-player vs Bots • Full Agario experience
+                  </p>
+                  
+                  {/* Free Game Button */}
+                  <button
+                    onClick={() => setSelectedStake('FREE')}
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 mb-3 ${
+                      selectedStake === 'FREE'
+                        ? 'bg-gradient-to-r from-green-500 to-green-400 text-black shadow-lg'
+                        : 'bg-gray-700/50 text-green-400 border border-green-400/30 hover:bg-green-400/10'
+                    }`}
+                  >
+                    ✨ FREE ✨
+                  </button>
+                  
+                  <p className="text-gray-400 text-xs">
+                    Perfect for testing and casual play
+                  </p>
+                </div>
               </div>
 
               {/* JOIN GAME Button */}
