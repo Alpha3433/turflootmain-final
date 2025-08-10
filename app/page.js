@@ -217,6 +217,10 @@ export default function Home() {
 
   const handleLogout = () => {
     console.log('🔐 Logout clicked')
+    
+    // Clear auth token for game
+    localStorage.removeItem('auth_token')
+    
     logout()
     setUserProfile(null)
     setDisplayName('')
