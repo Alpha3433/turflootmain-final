@@ -38,11 +38,23 @@ const TurfLootGame = () => {
   }, [])
 
   useEffect(() => {
+    console.log('🔍 Auth state check:', { authenticated, ready, hasUser: !!user })
+    
+    if (!ready) {
+      // Privy is still loading, wait
+      console.log('⏳ Privy still loading...')
+      setGameStatus('loading')
+      return
+    }
+    
     if (authenticated && user) {
+      console.log('✅ User is authenticated, initializing game')
+      setGameStatus('lobby')
       fetchUserBalance()
       initializeGame()
-    } else if (!authenticated) {
-      // If not authenticated, prompt user to login
+    } else if (ready && !authenticated) {
+      // Privy has loaded but user is not authenticated
+      console.log('❌ User not authenticated, showing login screen')
       setError('Please login first to play the game')
       setGameStatus('needs_auth')
     }
@@ -55,7 +67,7 @@ const TurfLootGame = () => {
         gameInstanceRef.current.destroy()
       }
     }
-  }, [authenticated, user, roomParams])
+  }, [authenticated, user, ready, roomParams])
 
   const fetchUserBalance = async () => {
     try {
