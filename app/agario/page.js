@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Phaser from 'phaser'
 
 const AgarIOGame = () => {
   const canvasRef = useRef(null)
