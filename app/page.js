@@ -605,11 +605,11 @@ export default function Home() {
               <div className="flex justify-center">
                 <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl px-6 py-4 border border-gray-700/50 flex items-center space-x-4 shadow-lg">
                   <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center text-xl font-bold text-black">
-                    {authenticated && user ? (
+                    {(authenticated && user) || isTestUser ? (
                       displayName?.charAt(0)?.toUpperCase() || 
-                      user.google?.name?.charAt(0)?.toUpperCase() || 
-                      user.email?.address?.charAt(0)?.toUpperCase() || 
-                      '?'
+                      user?.google?.name?.charAt(0)?.toUpperCase() || 
+                      user?.email?.address?.charAt(0)?.toUpperCase() || 
+                      'T'
                     ) : (
                       displayName?.charAt(0)?.toUpperCase() || '?'
                     )}
