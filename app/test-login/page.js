@@ -26,13 +26,20 @@ export default function TestLogin() {
       // Store test user data in localStorage
       localStorage.setItem('test_user_session', JSON.stringify(testUserData))
       localStorage.setItem('auth_token', 'test-session-token')
+      localStorage.setItem('test_user_authenticated', 'true')
       
       setMessage('✅ Successfully logged in as test user!')
       
-      // Redirect to main page after 2 seconds
+      // Force redirect immediately and also with timeout as backup
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 1000)
+      
+      // Also try router push as backup
       setTimeout(() => {
         router.push('/')
-      }, 2000)
+      }, 1500)
+      
     } catch (error) {
       setMessage('❌ Error: ' + error.message)
     } finally {
