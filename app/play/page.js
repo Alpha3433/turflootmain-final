@@ -41,6 +41,10 @@ const TurfLootGame = () => {
     if (authenticated && user) {
       fetchUserBalance()
       initializeGame()
+    } else if (!authenticated) {
+      // If not authenticated, prompt user to login
+      setError('Please login first to play the game')
+      setGameStatus('needs_auth')
     }
     
     return () => {
