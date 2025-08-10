@@ -32,6 +32,9 @@ export default function Home() {
       console.log('📧 User email:', user.email?.address)
       console.log('🌐 User google:', user.google?.name)
       
+      // Create JWT token for game authentication
+      createAuthToken(user)
+      
       setShowWelcome(true)
       setHasShownWelcome(true)
       setUserProfile(user)
@@ -41,6 +44,10 @@ export default function Home() {
     } else if (authenticated && user) {
       // User is authenticated but welcome was already shown, just load profile
       console.log('👤 User already authenticated, loading profile')
+      
+      // Ensure auth token exists for game
+      createAuthToken(user)
+      
       setUserProfile(user)
       loadUserProfile(user.id)
     }
