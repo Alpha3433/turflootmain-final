@@ -302,7 +302,7 @@ const AgarIOGame = () => {
       
       // Update player (only if not cashing out)
       if (game.player.alive && !isCashingOut) {
-        const speed = config.baseSpeed / Math.sqrt(Math.max(game.player.netWorth / 100, 1))
+        const speed = config.baseSpeed / Math.sqrt(Math.max(game.player.mass, 1))
         game.player.x += game.player.dir.x * speed * deltaTime
         game.player.y += game.player.dir.y * speed * deltaTime
         
