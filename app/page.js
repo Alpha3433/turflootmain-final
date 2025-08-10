@@ -57,6 +57,28 @@ export default function Home() {
     })
   }, [ready, authenticated, user, displayName])
 
+  // Check for test user authentication
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const testAuth = localStorage.getItem('test_user_authenticated')
+      const testSession = localStorage.getItem('test_user_session')
+      
+      if (testAuth === 'true' && testSession) {
+        setIsTestUser(true)
+        console.log('🧪 Test user detected')
+        
+        // Parse test user data
+        try {
+          const userData = JSON.parse(testSession)
+          setDisplayName(userData.username || 'TestPlayer')
+          console.log('🧪 Test user data loaded:', userData)
+        } catch (error) {
+          console.error('Error parsing test user data:', error)
+        }
+      }
+    }
+  }, [])
+
   // Fetch live statistics
   useEffect(() => {
     const fetchLiveStats = async () => {
