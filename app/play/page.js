@@ -153,12 +153,65 @@ const TurfLootGame = () => {
     if (!socketRef.current || !authenticated) return
 
     const token = localStorage.getItem('auth_token')
+    console.log('🔑 Attempting to join room with token:', {
+      hasToken: !!token,
+      tokenLength: token?.length,
+      tokenPreview: token ? token.substring(0, 50) + '...' : 'null',
+      roomId: roomParams.roomId,
+      mode: roomParams.mode,
+      fee: roomParams.fee
+    })
+    
+    if (!token && user) {
+      console.log('🔑 No token found, creating one from Privy user...')
+      createAuthToken(user)
+      return // Will retry after token is created
+    }
+    
     socketRef.current.emit('join_room', {
       roomId: roomParams.roomId,
       mode: roomParams.mode,
       fee: roomParams.fee,
       token
     })
+  }
+
+  const createAuthToken = async (privyUser) => {
+    try {
+      console.log('🔑 Creating auth token for user:', privyUser.id)
+
+      // Call Privy authentication endpoint to get JWT token
+      const response = await fetch('/api/auth/privy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          privy_user: privyUser
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.token) {
+          // Store JWT token for game authentication
+          localStorage.setItem('auth_token', data.token)
+          console.log('✅ Auth token created and stored successfully')
+          
+          // Retry joining room now that we have a token
+          setTimeout(() => joinRoom(), 500)
+        } else {
+          console.error('❌ No token received from auth endpoint')
+          setError('Failed to authenticate. Please try again.')
+        }
+      } else {
+        console.error('❌ Failed to create auth token:', response.status)
+        setError('Authentication failed. Please try again.')
+      }
+    } catch (error) {
+      console.error('❌ Error creating auth token:', error)
+      setError('Authentication error. Please try again.')
+    }
   }
 
   const handleReady = () => {
