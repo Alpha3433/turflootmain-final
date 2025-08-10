@@ -412,17 +412,31 @@ export default function Home() {
   }
 
   const handleJoinGame = () => {
-    if (!authenticated && selectedStake > 0) {
+    console.log('🎮 Join game clicked:', { 
+      authenticated, 
+      selectedStake, 
+      user: !!user 
+    })
+    
+    if (selectedStake === 0) {
+      // Route to simple Agario clone (no auth needed)
+      console.log('🆓 Routing to free Agario game')
+      window.location.href = '/agario'
+      return
+    }
+    
+    if (!authenticated || !user) {
+      console.log('❌ User not authenticated for cash game')
       login()
       return
     }
-
-    // Determine game mode and room based on selected stake
+    
+    // For cash games, use the original complex game with authentication
     const mode = selectedStake > 0 ? 'cash' : 'free'
     const roomId = selectedStake > 0 ? `stake_${selectedStake}` : 'lobby'
     const fee = selectedStake
-
-    // Navigate to game page with appropriate parameters
+    
+    console.log('💰 Routing to cash game with auth:', { mode, fee, roomId })
     window.location.href = `/play?mode=${mode}&room=${roomId}&fee=${fee}`
   }
 
