@@ -434,15 +434,21 @@ const TurfLootGame = () => {
   if (!authenticated) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-4">Login Required</h2>
-          <p className="text-gray-400 mb-8">You need to login to play TurfLoot</p>
+        <div className="text-center max-w-md">
+          <h2 className="text-3xl font-bold mb-4 text-cyan-400">Login Required</h2>
+          <p className="text-gray-400 mb-6">You need to login to play TurfLoot</p>
           <button 
             onClick={login}
-            className="bg-cyan-400 hover:bg-cyan-300 text-black font-bold py-3 px-6 rounded-xl transition-all"
+            className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-black font-bold py-3 px-8 rounded-xl transition-all hover:scale-105 mb-4"
           >
-            Login to Play
+            Login with Privy
           </button>
+          <p className="text-gray-500 text-sm">
+            Or go back to the <button 
+              onClick={() => router.push('/')} 
+              className="text-cyan-400 hover:text-cyan-300 underline"
+            >main lobby</button> to login first
+          </p>
         </div>
       </div>
     )
