@@ -868,22 +868,19 @@ export async function POST(request, { params }) {
       }
 
       try {
-        // Create a JWT token for the test user
-        const token = jwt.sign(
-          {
-            userId: userId,
-            privyId: userId,
-            email: { address: email },
-            username: username,
-            iat: Math.floor(Date.now() / 1000),
-            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
-          },
-          process.env.JWT_SECRET || 'turfloot-secret-key'
-        )
+        // Create a simple test token (not JWT for now)
+        const testToken = Buffer.from(JSON.stringify({
+          userId: userId,
+          privyId: userId,
+          email: { address: email },
+          username: username,
+          timestamp: Date.now(),
+          isTestUser: true
+        })).toString('base64')
 
         return NextResponse.json({
           success: true,
-          token: token,
+          token: testToken,
           user: {
             id: userId,
             email,
@@ -891,6 +888,7 @@ export async function POST(request, { params }) {
           }
         }, { headers: corsHeaders })
       } catch (error) {
+        console.error('Test session error:', error)
         return NextResponse.json(
           { error: 'Failed to create test session: ' + error.message },
           { status: 500, headers: corsHeaders }
