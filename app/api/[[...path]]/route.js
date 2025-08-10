@@ -230,7 +230,39 @@ export async function GET(request, { params }) {
       return NextResponse.json(game, { headers: corsHeaders })
     }
 
-    // Leaderboard routes
+    // Debug endpoint for authentication testing
+    if (route === 'debug/auth-test') {
+      const jwtSecret = process.env.JWT_SECRET
+      
+      return NextResponse.json({
+        jwt_secret_exists: !!jwtSecret,
+        jwt_secret_length: jwtSecret?.length,
+        jwt_secret_preview: jwtSecret ? jwtSecret.substring(0, 20) + '...' : null,
+        node_env: process.env.NODE_ENV,
+        test_token_creation: (() => {
+          try {
+            if (!jwtSecret) return 'No JWT_SECRET'
+            
+            const testToken = jwt.sign({
+              userId: 'debug-test',
+              privyId: 'debug-privy',
+              email: 'debug@test.com'
+            }, jwtSecret, { expiresIn: '1h' })
+            
+            const decoded = jwt.verify(testToken, jwtSecret)
+            
+            return {
+              token_created: true,
+              token_length: testToken.length,
+              token_preview: testToken.substring(0, 50) + '...',
+              decoded_payload: decoded
+            }
+          } catch (error) {
+            return { error: error.message }
+          }
+        })()
+      }, { headers: corsHeaders })
+    }
     if (route === 'leaderboard') {
       const db = await getDb()
       const users = db.collection('users')
