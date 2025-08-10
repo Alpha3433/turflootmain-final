@@ -175,11 +175,24 @@ export default function Home() {
       // Check if token already exists and is still valid
       const existingToken = localStorage.getItem('auth_token')
       if (existingToken) {
-        console.log('🔑 Auth token already exists')
-        return
+        console.log('🔑 Auth token already exists, checking validity...')
+        
+        // Try to decode the existing token to check if it's still valid
+        try {
+          const payload = JSON.parse(atob(existingToken.split('.')[1]))
+          if (payload.exp && payload.exp > Date.now() / 1000) {
+            console.log('🔑 Existing auth token is still valid')
+            return
+          } else {
+            console.log('🔑 Existing auth token expired, creating new one...')
+          }
+        } catch (e) {
+          console.log('🔑 Existing auth token invalid, creating new one...')
+        }
       }
 
       // Call Privy authentication endpoint to get JWT token
+      console.log('🔑 Calling Privy auth endpoint...')
       const response = await fetch('/api/auth/privy', {
         method: 'POST',
         headers: {
@@ -190,17 +203,42 @@ export default function Home() {
         })
       })
 
+      console.log('🔑 Privy auth response status:', response.status)
+
       if (response.ok) {
         const data = await response.json()
+        console.log('🔑 Privy auth response data:', {
+          success: data.success,
+          hasToken: !!data.token,
+          hasUser: !!data.user,
+          tokenLength: data.token?.length
+        })
+        
         if (data.token) {
           // Store JWT token for game authentication
           localStorage.setItem('auth_token', data.token)
           console.log('✅ Auth token created and stored successfully')
+          
+          // Debug: Decode token to verify content
+          try {
+            const payload = JSON.parse(atob(data.token.split('.')[1]))
+            console.log('🔍 Token payload:', {
+              userId: payload.userId,
+              privyId: payload.privyId,
+              email: payload.email,
+              username: payload.username,
+              exp: payload.exp,
+              expiresAt: new Date(payload.exp * 1000)
+            })
+          } catch (e) {
+            console.log('🔍 Could not decode token for debugging:', e.message)
+          }
         } else {
-          console.error('❌ No token received from auth endpoint')
+          console.error('❌ No token received from auth endpoint:', data)
         }
       } else {
-        console.error('❌ Failed to create auth token:', response.status)
+        const errorText = await response.text()
+        console.error('❌ Failed to create auth token:', response.status, errorText)
       }
     } catch (error) {
       console.error('❌ Error creating auth token:', error)
