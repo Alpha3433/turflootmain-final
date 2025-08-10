@@ -7,20 +7,139 @@ const AgarIOGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
   const router = useRouter()
-  const [gameStats, setGameStats] = useState({ mass: 10, rank: 1, players: 1 })
+  const [gameStats, setGameStats] = useState({ netWorth: 100, rank: 1, players: 1, kills: 0, deaths: 0, streak: 0 })
   const [isGameOver, setIsGameOver] = useState(false)
   const [gameResult, setGameResult] = useState('')
+  const [isCashingOut, setIsCashingOut] = useState(false)
+  const [cashOutProgress, setCashOutProgress] = useState(0)
+  const [killFeed, setKillFeed] = useState([])
+  const [floatingTexts, setFloatingTexts] = useState([])
 
   useEffect(() => {
-    // Initialize the Agario game
+    // Handle page visibility (exit game when tab is not visible)
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log('👁️ Tab hidden - removing player from game')
+        if (gameRef.current && !isGameOver) {
+          gameRef.current.cleanup()
+          setIsGameOver(true)
+          setGameResult('🚪 Left Game - Tab Closed')
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // Initialize the game
     initializeGame()
     
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (gameRef.current) {
         gameRef.current.cleanup()
       }
     }
   }, [])
+
+  // Handle keyboard input for cash-out
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key.toLowerCase() === 'e' && !isCashingOut && gameRef.current?.game?.player?.alive) {
+        startCashOut()
+      }
+    }
+
+    const handleKeyUp = (e) => {
+      if (e.key.toLowerCase() === 'e' && isCashingOut) {
+        cancelCashOut()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [isCashingOut])
+
+  const startCashOut = () => {
+    setIsCashingOut(true)
+    setCashOutProgress(0)
+    
+    const cashOutTimer = setInterval(() => {
+      setCashOutProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(cashOutTimer)
+          completeCashOut()
+          return 100
+        }
+        return prev + 2 // 5 seconds = 100 / 2
+      })
+    }, 100)
+
+    gameRef.current.cashOutTimer = cashOutTimer
+  }
+
+  const cancelCashOut = () => {
+    setIsCashingOut(false)
+    setCashOutProgress(0)
+    if (gameRef.current?.cashOutTimer) {
+      clearInterval(gameRef.current.cashOutTimer)
+    }
+  }
+
+  const completeCashOut = () => {
+    const netWorth = gameRef.current?.game?.player?.netWorth || 0
+    addFloatingText(`Banked: $${netWorth}`, gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#00ff00')
+    
+    // Add to kill feed
+    addToKillFeed(`You cashed out $${netWorth}`)
+    
+    setIsCashingOut(false)
+    setCashOutProgress(0)
+    
+    // Fade out and end game
+    setTimeout(() => {
+      setIsGameOver(true)
+      setGameResult(`💰 Cashed Out: $${netWorth}`)
+    }, 1000)
+  }
+
+  const addToKillFeed = (message) => {
+    const newFeedItem = {
+      id: Date.now(),
+      message,
+      timestamp: Date.now()
+    }
+    
+    setKillFeed(prev => [newFeedItem, ...prev.slice(0, 4)]) // Keep last 5 items
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      setKillFeed(prev => prev.filter(item => item.id !== newFeedItem.id))
+    }, 5000)
+  }
+
+  const addFloatingText = (text, x, y, color = '#ffff00') => {
+    const newText = {
+      id: Date.now(),
+      text,
+      x,
+      y,
+      color,
+      life: 1.0,
+      startY: y
+    }
+    
+    setFloatingTexts(prev => [...prev, newText])
+    
+    // Remove after animation
+    setTimeout(() => {
+      setFloatingTexts(prev => prev.filter(item => item.id !== newText.id))
+    }, 2000)
+  }
 
   const initializeGame = () => {
     const canvas = canvasRef.current
@@ -35,12 +154,14 @@ const AgarIOGame = () => {
     // Game configuration
     const config = {
       worldSize: 4000,
-      foodCount: 400,
-      botCount: 20,
+      orbCount: 200,
+      botCount: 15,
       baseSpeed: 180,
-      startingMass: 10,
-      foodMass: 1,
-      radiusPerMass: 1.2
+      startingNetWorth: 100,
+      orbValue: 5,
+      radiusPerDollar: 0.8,
+      bountyThreshold: 500,
+      killReward: 50
     }
 
     // Game state
@@ -48,48 +169,63 @@ const AgarIOGame = () => {
       player: {
         x: 0,
         y: 0,
-        mass: config.startingMass,
+        netWorth: config.startingNetWorth,
         dir: { x: 0, y: 0 },
         alive: true,
-        name: 'Player'
+        name: 'You',
+        kills: 0,
+        deaths: 0,
+        streak: 0,
+        isBounty: false,
+        cashBadgeScale: 1.0,
+        lastNetWorth: config.startingNetWorth
       },
       bots: [],
-      food: [],
+      orbs: [],
       camera: { x: 0, y: 0, zoom: 0.6 },
-      running: true
+      running: true,
+      bounties: new Set()
     }
 
-    // Initialize food
-    for (let i = 0; i < config.foodCount; i++) {
-      game.food.push({
+    // Initialize orbs (money pickup)
+    for (let i = 0; i < config.orbCount; i++) {
+      game.orbs.push({
         id: i,
         x: (Math.random() - 0.5) * config.worldSize,
         y: (Math.random() - 0.5) * config.worldSize,
-        color: `hsl(${Math.random() * 360}, 70%, 60%)`
+        value: config.orbValue,
+        color: `hsl(${60 + Math.random() * 30}, 70%, 60%)` // Gold-ish colors
       })
     }
 
-    // Initialize bots
+    // Initialize bots with varying net worth
     for (let i = 0; i < config.botCount; i++) {
+      const netWorth = config.startingNetWorth + Math.random() * 200
       game.bots.push({
         id: i,
         x: (Math.random() - 0.5) * config.worldSize,
         y: (Math.random() - 0.5) * config.worldSize,
-        mass: config.startingMass + Math.random() * 20,
+        netWorth: netWorth,
         dir: { 
           x: (Math.random() - 0.5) * 2, 
           y: (Math.random() - 0.5) * 2 
         },
         alive: true,
-        name: `Bot ${i + 1}`,
+        name: `Player ${i + 1}`,
         color: `hsl(${Math.random() * 360}, 60%, 50%)`,
         targetDir: { x: 0, y: 0 },
-        lastDirChange: Date.now()
+        lastDirChange: Date.now(),
+        kills: Math.floor(Math.random() * 5),
+        deaths: Math.floor(Math.random() * 2),
+        streak: Math.floor(Math.random() * 3),
+        isBounty: false,
+        cashBadgeScale: 1.0,
+        lastNetWorth: netWorth
       })
     }
 
     // Helper functions
-    const getRadius = (mass) => Math.sqrt(mass) * config.radiusPerMass
+    const getRadius = (netWorth) => Math.sqrt(netWorth) * config.radiusPerDollar
     
     const getDistance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y)
     
@@ -98,9 +234,34 @@ const AgarIOGame = () => {
       return { x: vec.x / length, y: vec.y / length }
     }
 
+    const getCashBadgeColor = (netWorth) => {
+      if (netWorth < 200) return '#90EE90' // Light green
+      if (netWorth < 500) return '#FFD700' // Gold
+      if (netWorth < 1000) return '#FF6347' // Tomato
+      return '#8A2BE2' // Blue violet for high stakes
+    }
+
+    const updateBounties = () => {
+      const allPlayers = [game.player, ...game.bots].filter(p => p.alive)
+      allPlayers.sort((a, b) => b.netWorth - a.netWorth)
+      
+      // Clear old bounties
+      game.bounties.clear()
+      allPlayers.forEach(p => p.isBounty = false)
+      
+      // Mark top 25% as bounties if they have enough net worth
+      const bountyCount = Math.max(1, Math.floor(allPlayers.length * 0.25))
+      for (let i = 0; i < bountyCount; i++) {
+        if (allPlayers[i].netWorth >= config.bountyThreshold) {
+          game.bounties.add(allPlayers[i])
+          allPlayers[i].isBounty = true
+        }
+      }
+    }
+
     // Mouse movement handler
     const handleMouseMove = (e) => {
-      if (!game.player.alive) return
+      if (!game.player.alive || isCashingOut) return
       
       const rect = canvas.getBoundingClientRect()
       const mouseX = e.clientX - rect.left
@@ -125,9 +286,14 @@ const AgarIOGame = () => {
       const deltaTime = (currentTime - lastTime) / 1000
       lastTime = currentTime
       
-      // Update player
-      if (game.player.alive) {
-        const speed = config.baseSpeed / Math.sqrt(Math.max(game.player.mass, 1))
+      // Cancel cash out if moving
+      if (isCashingOut && (game.player.dir.x !== 0 || game.player.dir.y !== 0)) {
+        cancelCashOut()
+      }
+      
+      // Update player (only if not cashing out)
+      if (game.player.alive && !isCashingOut) {
+        const speed = config.baseSpeed / Math.sqrt(Math.max(game.player.netWorth / 100, 1))
         game.player.x += game.player.dir.x * speed * deltaTime
         game.player.y += game.player.dir.y * speed * deltaTime
         
@@ -141,21 +307,41 @@ const AgarIOGame = () => {
       game.bots.forEach(bot => {
         if (!bot.alive) return
         
-        // Simple AI: change direction occasionally
-        if (Date.now() - bot.lastDirChange > 2000 + Math.random() * 3000) {
-          bot.targetDir = {
-            x: (Math.random() - 0.5) * 2,
-            y: (Math.random() - 0.5) * 2
+        // Simple AI: change direction occasionally, chase orbs
+        if (Date.now() - bot.lastDirChange > 1000 + Math.random() * 2000) {
+          // Find nearest orb
+          let nearestOrb = null
+          let nearestDistance = Infinity
+          
+          game.orbs.forEach(orb => {
+            const distance = getDistance(bot, orb)
+            if (distance < nearestDistance) {
+              nearestDistance = distance
+              nearestOrb = orb
+            }
+          })
+          
+          if (nearestOrb && nearestDistance < 400) {
+            // Chase orb
+            const dx = nearestOrb.x - bot.x
+            const dy = nearestOrb.y - bot.y
+            bot.targetDir = normalizeVector({ x: dx, y: dy })
+          } else {
+            // Random movement
+            bot.targetDir = {
+              x: (Math.random() - 0.5) * 2,
+              y: (Math.random() - 0.5) * 2
+            }
           }
           bot.lastDirChange = Date.now()
         }
         
         // Move towards target direction
-        bot.dir.x += (bot.targetDir.x - bot.dir.x) * deltaTime
-        bot.dir.y += (bot.targetDir.y - bot.dir.y) * deltaTime
+        bot.dir.x += (bot.targetDir.x - bot.dir.x) * deltaTime * 3
+        bot.dir.y += (bot.targetDir.y - bot.dir.y) * deltaTime * 3
         bot.dir = normalizeVector(bot.dir)
         
-        const speed = config.baseSpeed / Math.sqrt(Math.max(bot.mass, 1))
+        const speed = config.baseSpeed / Math.sqrt(Math.max(bot.netWorth / 100, 1))
         bot.x += bot.dir.x * speed * deltaTime
         bot.y += bot.dir.y * speed * deltaTime
         
@@ -165,53 +351,84 @@ const AgarIOGame = () => {
         bot.y = Math.max(-halfWorld, Math.min(halfWorld, bot.y))
       })
 
-      // Food consumption
+      // Orb pickup
       const allEntities = [game.player, ...game.bots].filter(e => e.alive)
       
-      for (let i = game.food.length - 1; i >= 0; i--) {
-        const food = game.food[i]
+      for (let i = game.orbs.length - 1; i >= 0; i--) {
+        const orb = game.orbs[i]
         
         for (const entity of allEntities) {
-          const distance = getDistance(entity, food)
-          const radius = getRadius(entity.mass)
+          const distance = getDistance(entity, orb)
+          const radius = getRadius(entity.netWorth)
           
           if (distance <= radius) {
-            entity.mass += config.foodMass
-            game.food.splice(i, 1)
+            const oldNetWorth = entity.netWorth
+            entity.netWorth += orb.value
+            
+            // Animate cash badge scale up
+            entity.cashBadgeScale = 1.3
+            setTimeout(() => {
+              if (entity.cashBadgeScale > 1.0) entity.cashBadgeScale = 1.0
+            }, 200)
+            
+            // Add floating text for player
+            if (entity === game.player) {
+              addFloatingText(`+$${orb.value}`, entity.x, entity.y - 30, '#00ff00')
+            }
+            
+            game.orbs.splice(i, 1)
             break
           }
         }
       }
 
-      // Replenish food
-      while (game.food.length < config.foodCount) {
-        game.food.push({
+      // Replenish orbs
+      while (game.orbs.length < config.orbCount) {
+        game.orbs.push({
           id: Math.random(),
           x: (Math.random() - 0.5) * config.worldSize,
           y: (Math.random() - 0.5) * config.worldSize,
-          color: `hsl(${Math.random() * 360}, 70%, 60%)`
+          value: config.orbValue,
+          color: `hsl(${60 + Math.random() * 30}, 70%, 60%)`
         })
       }
 
-      // Player vs Bot combat
+      // Combat
       if (game.player.alive) {
         for (const bot of game.bots) {
           if (!bot.alive) continue
           
           const distance = getDistance(game.player, bot)
-          const playerRadius = getRadius(game.player.mass)
-          const botRadius = getRadius(bot.mass)
+          const playerRadius = getRadius(game.player.netWorth)
+          const botRadius = getRadius(bot.netWorth)
           
           if (distance < Math.max(playerRadius, botRadius)) {
-            if (game.player.mass > bot.mass * 1.1) {
-              // Player eats bot
-              game.player.mass += bot.mass * 0.8
+            if (game.player.netWorth > bot.netWorth * 1.15) {
+              // Player kills bot
+              const bountyMultiplier = bot.isBounty ? 1.5 : 1.0
+              const killReward = Math.floor(config.killReward * bountyMultiplier)
+              
+              game.player.netWorth += killReward
+              game.player.kills += 1
+              game.player.streak += 1
+              game.player.cashBadgeScale = 1.3
+              
               bot.alive = false
-            } else if (bot.mass > game.player.mass * 1.1) {
-              // Bot eats player
+              
+              // Add floating text
+              const bountyText = bot.isBounty ? ` Bounty!` : ''
+              addFloatingText(`+$${killReward}${bountyText}`, game.player.x, game.player.y - 50, '#ff4444')
+              
+              // Add to kill feed
+              addToKillFeed(`You eliminated ${bot.name} (+$${killReward}${bountyText})`)
+              
+            } else if (bot.netWorth > game.player.netWorth * 1.15) {
+              // Bot kills player
               game.player.alive = false
+              game.player.deaths += 1
+              game.player.streak = 0
               setIsGameOver(true)
-              setGameResult('💀 Game Over! You were eaten by ' + bot.name)
+              setGameResult(`💀 Eliminated by ${bot.name}`)
             }
           }
         }
@@ -225,43 +442,64 @@ const AgarIOGame = () => {
           if (!game.bots[j].alive) continue
           
           const distance = getDistance(game.bots[i], game.bots[j])
-          const radiusA = getRadius(game.bots[i].mass)
-          const radiusB = getRadius(game.bots[j].mass)
+          const radiusA = getRadius(game.bots[i].netWorth)
+          const radiusB = getRadius(game.bots[j].netWorth)
           
           if (distance < Math.max(radiusA, radiusB)) {
-            if (game.bots[i].mass > game.bots[j].mass * 1.1) {
-              game.bots[i].mass += game.bots[j].mass * 0.8
+            if (game.bots[i].netWorth > game.bots[j].netWorth * 1.15) {
+              game.bots[i].netWorth += config.killReward
+              game.bots[i].kills += 1
+              game.bots[i].streak += 1
               game.bots[j].alive = false
-            } else if (game.bots[j].mass > game.bots[i].mass * 1.1) {
-              game.bots[j].mass += game.bots[i].mass * 0.8
+              game.bots[j].deaths += 1
+              game.bots[j].streak = 0
+            } else if (game.bots[j].netWorth > game.bots[i].netWorth * 1.15) {
+              game.bots[j].netWorth += config.killReward
+              game.bots[j].kills += 1
+              game.bots[j].streak += 1
               game.bots[i].alive = false
+              game.bots[i].deaths += 1
+              game.bots[i].streak = 0
             }
           }
         }
       }
+
+      // Update bounty system
+      updateBounties()
 
       // Update camera
       if (game.player.alive) {
         game.camera.x = game.player.x
         game.camera.y = game.player.y
         
-        // Zoom based on mass
-        const targetZoom = Math.max(0.4, Math.min(1.0, 1.0 / Math.sqrt(game.player.mass / 10)))
+        // Zoom based on net worth
+        const targetZoom = Math.max(0.3, Math.min(1.0, 1.0 / Math.sqrt(game.player.netWorth / 100)))
         game.camera.zoom += (targetZoom - game.camera.zoom) * deltaTime * 2
       }
 
       // Update stats
       const aliveBots = game.bots.filter(b => b.alive)
       const allAlive = game.player.alive ? [game.player, ...aliveBots] : aliveBots
-      allAlive.sort((a, b) => b.mass - a.mass)
+      allAlive.sort((a, b) => b.netWorth - a.netWorth)
       
       const playerRank = game.player.alive ? allAlive.findIndex(e => e === game.player) + 1 : allAlive.length + 1
       
       setGameStats({
-        mass: Math.floor(game.player.mass),
+        netWorth: Math.floor(game.player.netWorth),
         rank: playerRank,
-        players: allAlive.length
+        players: allAlive.length,
+        kills: game.player.kills,
+        deaths: game.player.deaths,
+        streak: game.player.streak
       })
+
+      // Update floating texts
+      setFloatingTexts(prev => prev.map(text => ({
+        ...text,
+        life: text.life - deltaTime * 0.8,
+        y: text.startY - (1 - text.life) * 50
+      })).filter(text => text.life > 0))
 
       // Render
       render()
@@ -284,32 +522,41 @@ const AgarIOGame = () => {
       // Draw grid
       drawGrid()
       
-      // Draw food
-      game.food.forEach(food => {
-        ctx.fillStyle = food.color
+      // Draw orbs
+      game.orbs.forEach(orb => {
+        ctx.fillStyle = orb.color
         ctx.beginPath()
-        ctx.arc(food.x, food.y, 5, 0, Math.PI * 2)
+        ctx.arc(orb.x, orb.y, 8, 0, Math.PI * 2)
         ctx.fill()
         
-        // Glow effect
-        ctx.fillStyle = food.color + '40'
-        ctx.beginPath()
-        ctx.arc(food.x, food.y, 8, 0, Math.PI * 2)
-        ctx.fill()
+        // Dollar sign
+        ctx.fillStyle = '#000000'
+        ctx.font = '10px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText('$', orb.x, orb.y + 3)
       })
       
-      // Draw entities (sorted by mass)
+      // Draw entities (sorted by net worth)
       const allEntities = [game.player, ...game.bots].filter(e => e.alive)
-      allEntities.sort((a, b) => a.mass - b.mass)
+      allEntities.sort((a, b) => a.netWorth - b.netWorth)
       
       allEntities.forEach(entity => {
-        const radius = getRadius(entity.mass)
+        const radius = getRadius(entity.netWorth)
         const isPlayer = entity === game.player
         
+        // Bounty gold ring
+        if (entity.isBounty) {
+          ctx.strokeStyle = '#FFD700'
+          ctx.lineWidth = 6
+          ctx.beginPath()
+          ctx.arc(entity.x, entity.y, radius + 10, 0, Math.PI * 2)
+          ctx.stroke()
+        }
+        
         // Shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
         ctx.beginPath()
-        ctx.arc(entity.x + 3, entity.y + 3, radius, 0, Math.PI * 2)
+        ctx.arc(entity.x + 4, entity.y + 4, radius, 0, Math.PI * 2)
         ctx.fill()
         
         // Entity circle
@@ -319,7 +566,7 @@ const AgarIOGame = () => {
         ctx.fill()
         
         // Border
-        ctx.strokeStyle = '#ffffff'
+        ctx.strokeStyle = entity.isBounty ? '#FFD700' : '#ffffff'
         ctx.lineWidth = 3
         ctx.beginPath()
         ctx.arc(entity.x, entity.y, radius, 0, Math.PI * 2)
@@ -340,17 +587,86 @@ const AgarIOGame = () => {
           ctx.fill()
         }
         
-        // Name and mass
-        ctx.fillStyle = '#ffffff'
-        ctx.strokeStyle = '#000000'
-        ctx.lineWidth = 3
-        ctx.font = `${Math.max(12, Math.min(18, radius * 0.3))}px Arial`
-        ctx.textAlign = 'center'
+        // Bounty crown
+        if (entity.isBounty) {
+          ctx.fillStyle = '#FFD700'
+          ctx.font = `${Math.max(16, radius * 0.4)}px Arial`
+          ctx.textAlign = 'center'
+          ctx.fillText('👑', entity.x, entity.y - radius - 25)
+        }
         
-        const text = `${entity.name} (${Math.floor(entity.mass)})`
-        ctx.strokeText(text, entity.x, entity.y - radius - 10)
-        ctx.fillText(text, entity.x, entity.y - radius - 10)
+        // Cash Badge above player
+        const badgeY = entity.y - radius - (entity.isBounty ? 50 : 35)
+        const badgeScale = entity.cashBadgeScale || 1.0
+        
+        ctx.save()
+        ctx.translate(entity.x, badgeY)
+        ctx.scale(badgeScale, badgeScale)
+        
+        // Badge background with drop shadow
+        const badgeColor = getCashBadgeColor(entity.netWorth)
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+        ctx.shadowBlur = 5
+        ctx.shadowOffsetX = 2
+        ctx.shadowOffsetY = 2
+        
+        ctx.fillStyle = badgeColor
+        ctx.beginPath()
+        ctx.roundRect(-25, -8, 50, 16, 8)
+        ctx.fill()
+        
+        ctx.shadowColor = 'transparent'
+        
+        // Badge text
+        ctx.fillStyle = '#000000'
+        ctx.font = '12px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(`$${Math.floor(entity.netWorth)}`, 0, 4)
+        
+        ctx.restore()
       })
+      
+      // Draw floating texts
+      floatingTexts.forEach(text => {
+        if (text.life > 0) {
+          ctx.fillStyle = text.color + Math.floor(text.life * 255).toString(16).padStart(2, '0')
+          ctx.font = '16px Arial'
+          ctx.textAlign = 'center'
+          ctx.strokeStyle = '#000000'
+          ctx.lineWidth = 2
+          ctx.strokeText(text.text, text.x, text.y)
+          ctx.fillText(text.text, text.x, text.y)
+        }
+      })
+      
+      // Cash out progress ring
+      if (isCashingOut && game.player.alive) {
+        const radius = getRadius(game.player.netWorth) + 20
+        const progress = cashOutProgress / 100
+        
+        // Background ring
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'
+        ctx.lineWidth = 8
+        ctx.beginPath()
+        ctx.arc(game.player.x, game.player.y, radius, 0, Math.PI * 2)
+        ctx.stroke()
+        
+        // Progress ring
+        ctx.strokeStyle = '#00ff00'
+        ctx.lineWidth = 8
+        ctx.beginPath()
+        ctx.arc(game.player.x, game.player.y, radius, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2)
+        ctx.stroke()
+        
+        // Cash out text
+        ctx.fillStyle = '#ffffff'
+        ctx.font = '14px Arial'
+        ctx.textAlign = 'center'
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 2
+        ctx.strokeText('CASHING OUT...', game.player.x, game.player.y - radius - 20)
+        ctx.fillText('CASHING OUT...', game.player.x, game.player.y - radius - 20)
+      }
       
       ctx.restore()
     }
@@ -400,6 +716,9 @@ const AgarIOGame = () => {
       cleanup: () => {
         game.running = false
         canvas.removeEventListener('mousemove', handleMouseMove)
+        if (gameRef.current?.cashOutTimer) {
+          clearInterval(gameRef.current.cashOutTimer)
+        }
       }
     }
   }
@@ -407,6 +726,10 @@ const AgarIOGame = () => {
   const restartGame = () => {
     setIsGameOver(false)
     setGameResult('')
+    setKillFeed([])
+    setFloatingTexts([])
+    setIsCashingOut(false)
+    setCashOutProgress(0)
     if (gameRef.current) {
       gameRef.current.cleanup()
     }
@@ -422,25 +745,116 @@ const AgarIOGame = () => {
         style={{ display: isGameOver ? 'none' : 'block' }}
       />
       
-      {/* HUD */}
-      <div className="absolute top-4 left-4 space-y-4 pointer-events-none z-10">
-        {/* Game Stats */}
-        <div className="bg-black/70 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30">
-          <div className="text-cyan-400 font-bold text-lg">Agario Clone</div>
-          <div className="text-sm text-gray-300">Mass: {gameStats.mass}</div>
-          <div className="text-sm text-gray-300">Rank: #{gameStats.rank}</div>
-          <div className="text-sm text-gray-300">Players: {gameStats.players}</div>
+      {/* Top-right Player Stats Panel */}
+      {!isGameOver && (
+        <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 min-w-[200px]">
+          <div className="text-cyan-400 font-bold text-lg mb-2">You</div>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-300">Net Worth:</span>
+              <span className="text-green-400 font-bold">${gameStats.netWorth}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-300">K/D:</span>
+              <span className="text-white">{gameStats.kills}/{gameStats.deaths}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Streak:</span>
+              <div className="flex items-center">
+                <span className="text-yellow-400 mr-1">{gameStats.streak}</span>
+                {gameStats.streak > 0 && <span>🔥</span>}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Leaderboard (Net Worth) */}
+      {!isGameOver && (
+        <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 max-w-[250px]">
+          <div className="text-cyan-400 font-bold text-lg mb-2">💰 Net Worth Leaders</div>
+          <div className="text-sm text-gray-300">
+            <div className="mb-1">Rank #{gameStats.rank} of {gameStats.players}</div>
+            <div className="text-green-400">Your Worth: ${gameStats.netWorth}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Kill Feed */}
+      {killFeed.length > 0 && !isGameOver && (
+        <div className="absolute bottom-4 left-4 space-y-2 max-w-[400px]">
+          {killFeed.map((item, index) => (
+            <div 
+              key={item.id}
+              className="bg-black/80 backdrop-blur-sm rounded px-3 py-2 border border-gray-600/30 text-sm text-white"
+              style={{ opacity: 1 - (index * 0.2) }}
+            >
+              {item.message}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Minimap */}
+      {!isGameOver && gameRef.current?.game && (
+        <div className="absolute bottom-4 right-4 w-32 h-32 bg-black/80 backdrop-blur-sm rounded border border-gray-600/30">
+          <canvas 
+            width="128" 
+            height="128" 
+            className="w-full h-full"
+            ref={(minimapCanvas) => {
+              if (minimapCanvas && gameRef.current?.game) {
+                const ctx = minimapCanvas.getContext('2d')
+                const game = gameRef.current.game
+                
+                // Clear minimap
+                ctx.fillStyle = '#111'
+                ctx.fillRect(0, 0, 128, 128)
+                
+                // Draw border
+                ctx.strokeStyle = '#333'
+                ctx.lineWidth = 1
+                ctx.strokeRect(0, 0, 128, 128)
+                
+                // Scale factor
+                const scale = 128 / 4000 // world size is 4000
+                
+                // Draw players
+                const allPlayers = [game.player, ...game.bots].filter(p => p.alive)
+                allPlayers.forEach(player => {
+                  const x = (player.x + 2000) * scale // offset by half world
+                  const y = (player.y + 2000) * scale
+                  
+                  if (player === game.player) {
+                    ctx.fillStyle = '#00f5ff'
+                    ctx.fillRect(x - 2, y - 2, 4, 4)
+                  } else if (player.isBounty) {
+                    ctx.fillStyle = '#FFD700'
+                    ctx.fillRect(x - 3, y - 3, 6, 6)
+                    // Add crown indicator
+                    ctx.fillStyle = '#FFD700'
+                    ctx.fillRect(x - 1, y - 5, 2, 2)
+                  } else {
+                    ctx.fillStyle = '#666'
+                    ctx.fillRect(x - 1, y - 1, 2, 2)
+                  }
+                })
+              }
+            }}
+          />
+        </div>
+      )}
 
       {/* Controls */}
-      <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm rounded-lg p-3 border border-gray-600/30 pointer-events-none z-10">
-        <div className="text-xs text-gray-300">
-          <div>🖱️ Move mouse to control</div>
-          <div>🍎 Eat food to grow</div>
-          <div>⚔️ Eat smaller players</div>
+      {!isGameOver && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-600/30">
+          <div className="text-xs text-gray-300 text-center space-y-1">
+            <div>🖱️ Move mouse to control • 💰 Collect orbs for money</div>
+            <div>⚔️ Eliminate smaller players • 🏦 Hold E to cash out</div>
+            <div>👑 Bounty players give bonus rewards</div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Game Over Screen */}
       {isGameOver && (
@@ -450,9 +864,11 @@ const AgarIOGame = () => {
               {gameResult}
             </div>
             
-            <div className="text-gray-300 mb-6">
-              <p className="mb-2">Final Mass: {gameStats.mass}</p>
-              <p>Final Rank: #{gameStats.rank}</p>
+            <div className="text-gray-300 mb-6 space-y-2">
+              <p>Final Net Worth: <span className="text-green-400 font-bold">${gameStats.netWorth}</span></p>
+              <p>Final Rank: <span className="text-cyan-400">#{gameStats.rank}</span></p>
+              <p>K/D Ratio: <span className="text-yellow-400">{gameStats.kills}/{gameStats.deaths}</span></p>
+              <p>Best Streak: <span className="text-orange-400">{gameStats.streak} 🔥</span></p>
             </div>
 
             <div className="space-y-3">
@@ -473,16 +889,6 @@ const AgarIOGame = () => {
           </div>
         </div>
       )}
-
-      {/* Back Button */}
-      <div className="absolute top-4 right-4 z-10">
-        <button
-          onClick={() => router.push('/')}
-          className="bg-gray-800/70 backdrop-blur-sm hover:bg-gray-700/70 text-white font-bold py-2 px-4 rounded-lg transition-all border border-gray-600/30"
-        >
-          ← Back to Lobby
-        </button>
-      </div>
     </div>
   )
 }
