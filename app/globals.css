@@ -294,6 +294,26 @@
   }
 }
 
+@keyframes animate-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes animate-hover-bounce {
+  0%, 100% {
+    transform: scale(1.1) translateY(0px);
+  }
+  50% {
+    transform: scale(1.15) translateY(-5px);
+  }
+}
+
 /* Paper.io inspired grid animations */
 @keyframes grid-pulse {
   0%, 100% {
