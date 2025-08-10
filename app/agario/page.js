@@ -528,18 +528,18 @@ const AgarIOGame = () => {
       // Draw grid
       drawGrid()
       
-      // Draw orbs
+      // Draw orbs - bigger like original Agario
       game.orbs.forEach(orb => {
         ctx.fillStyle = orb.color
         ctx.beginPath()
-        ctx.arc(orb.x, orb.y, 8, 0, Math.PI * 2)
+        ctx.arc(orb.x, orb.y, 12, 0, Math.PI * 2) // Bigger orbs
         ctx.fill()
         
         // Dollar sign
         ctx.fillStyle = '#000000'
-        ctx.font = '10px Arial'
+        ctx.font = '14px Arial'
         ctx.textAlign = 'center'
-        ctx.fillText('$', orb.x, orb.y + 3)
+        ctx.fillText('$', orb.x, orb.y + 4)
       })
       
       // Draw entities (sorted by net worth)
