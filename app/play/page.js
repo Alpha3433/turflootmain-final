@@ -227,6 +227,10 @@ const TurfLootGame = () => {
             const myPlayer = state.players.find(p => p.id === this.myPlayerId)
             if (myPlayer && myPlayer.alive) {
               this.cameras.main.startFollow({ x: myPlayer.x, y: myPlayer.y }, true, 0.08, 0.08)
+              
+              // Adjust zoom based on player mass (bigger = more zoomed out)
+              const zoomLevel = Math.max(0.4, Math.min(1.0, 1.0 / Math.sqrt(myPlayer.mass / 10)))
+              this.cameras.main.setZoom(zoomLevel)
             }
 
             this.render()
@@ -237,41 +241,73 @@ const TurfLootGame = () => {
 
             this.graphics.clear()
 
-            // Draw grid
+            // Draw grid background
             this.drawGrid()
 
-            // Draw food
+            // Draw food particles
             this.gameState.food.forEach(food => {
               this.graphics.fillStyle(0x10b981, 1)
-              this.graphics.fillCircle(food.x, food.y, 4)
+              this.graphics.fillCircle(food.x, food.y, 5)
+              
+              // Add slight glow effect
+              this.graphics.fillStyle(0x10b981, 0.3)
+              this.graphics.fillCircle(food.x, food.y, 8)
             })
 
+            // Sort players by mass (smallest first, so largest renders on top)
+            const sortedPlayers = [...this.gameState.players].sort((a, b) => a.mass - b.mass)
+
             // Draw players
-            this.gameState.players.forEach(player => {
+            sortedPlayers.forEach(player => {
               if (!player.alive) return
 
               const radius = Math.sqrt(player.mass) * 1.2
               const isMe = player.id === this.myPlayerId
-              const color = isMe ? 0x00f5ff : 0x9ca3af
+              
+              // Player colors - different for each player
+              let color = 0x9ca3af // Default gray
+              if (isMe) {
+                color = 0x00f5ff // Cyan for current player
+              } else {
+                // Generate consistent color based on player ID
+                const hash = this.stringToHash(player.id)
+                const colors = [0xff6b6b, 0x4ecdc4, 0x45b7d1, 0x96ceb4, 0xfeca57, 0xff9ff3, 0x54a0ff]
+                color = colors[Math.abs(hash) % colors.length]
+              }
+              
+              // Player shadow
+              this.graphics.fillStyle(0x000000, 0.2)
+              this.graphics.fillCircle(player.x + 3, player.y + 3, radius)
               
               // Player circle
               this.graphics.fillStyle(color, 1)
               this.graphics.fillCircle(player.x, player.y, radius)
               
               // Player border
-              this.graphics.lineStyle(2, 0xffffff, 0.8)
+              this.graphics.lineStyle(3, 0xffffff, 0.8)
               this.graphics.strokeCircle(player.x, player.y, radius)
               
-              // Player name
+              // Player eyes (for character)
+              if (radius > 15) {
+                const eyeOffset = radius * 0.3
+                const eyeSize = Math.max(2, radius * 0.1)
+                
+                this.graphics.fillStyle(0x000000, 1)
+                this.graphics.fillCircle(player.x - eyeOffset, player.y - eyeOffset, eyeSize)
+                this.graphics.fillCircle(player.x + eyeOffset, player.y - eyeOffset, eyeSize)
+              }
+              
+              // Player name and mass
               const nameText = this.add.text(
                 player.x, 
-                player.y - radius - 15, 
-                player.nickname, 
+                player.y - radius - 20, 
+                `${player.nickname} (${Math.floor(player.mass)})`, 
                 { 
-                  fontSize: '14px', 
+                  fontSize: `${Math.max(12, Math.min(18, radius * 0.3))}px`, 
                   color: '#ffffff',
                   stroke: '#000000',
-                  strokeThickness: 2
+                  strokeThickness: 3,
+                  align: 'center'
                 }
               )
               nameText.setOrigin(0.5, 0.5)
@@ -284,21 +320,42 @@ const TurfLootGame = () => {
 
           drawGrid() {
             const gridSize = 100
-            this.graphics.lineStyle(1, 0x1f2937, 0.5)
+            this.graphics.lineStyle(1, 0x1f2937, 0.3)
             
-            for (let x = -2000; x <= 2000; x += gridSize) {
+            // Get camera bounds for efficient grid rendering
+            const camera = this.cameras.main
+            const worldView = camera.worldView
+            
+            const startX = Math.floor(worldView.x / gridSize) * gridSize
+            const endX = Math.ceil((worldView.x + worldView.width) / gridSize) * gridSize
+            const startY = Math.floor(worldView.y / gridSize) * gridSize
+            const endY = Math.ceil((worldView.y + worldView.height) / gridSize) * gridSize
+            
+            // Vertical lines
+            for (let x = startX; x <= endX; x += gridSize) {
               this.graphics.beginPath()
-              this.graphics.moveTo(x, -2000)
-              this.graphics.lineTo(x, 2000)
+              this.graphics.moveTo(x, startY)
+              this.graphics.lineTo(x, endY)
               this.graphics.strokePath()
             }
             
-            for (let y = -2000; y <= 2000; y += gridSize) {
+            // Horizontal lines
+            for (let y = startY; y <= endY; y += gridSize) {
               this.graphics.beginPath()
-              this.graphics.moveTo(-2000, y)
-              this.graphics.lineTo(2000, y)
+              this.graphics.moveTo(startX, y)
+              this.graphics.lineTo(endX, y)
               this.graphics.strokePath()
             }
+          }
+
+          stringToHash(str) {
+            let hash = 0
+            for (let i = 0; i < str.length; i++) {
+              const char = str.charCodeAt(i)
+              hash = ((hash << 5) - hash) + char
+              hash = hash & hash // Convert to 32bit integer
+            }
+            return hash
           }
         }
 
