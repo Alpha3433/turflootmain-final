@@ -443,7 +443,21 @@ const TurfLootGame = () => {
     }
   }
 
-  if (!authenticated) {
+  // Loading state while Privy initializes
+  if (!ready || gameStatus === 'loading') {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <h2 className="text-xl font-bold text-cyan-400">Loading TurfLoot...</h2>
+          <p className="text-gray-400">Checking authentication status</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Authentication required state  
+  if (!authenticated || gameStatus === 'needs_auth') {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center max-w-md">
