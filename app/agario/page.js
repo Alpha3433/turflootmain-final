@@ -402,16 +402,17 @@ const AgarIOGame = () => {
           if (!bot.alive) continue
           
           const distance = getDistance(game.player, bot)
-          const playerRadius = getRadius(game.player.netWorth)
-          const botRadius = getRadius(bot.netWorth)
+          const playerRadius = getRadius(game.player.mass)
+          const botRadius = getRadius(bot.mass)
           
           if (distance < Math.max(playerRadius, botRadius)) {
-            if (game.player.netWorth > bot.netWorth * 1.15) {
-              // Player kills bot
+            if (game.player.mass > bot.mass * 1.15) {
+              // Player kills bot - gain money and some mass
               const bountyMultiplier = bot.isBounty ? 1.5 : 1.0
               const killReward = Math.floor(config.killReward * bountyMultiplier)
               
               game.player.netWorth += killReward
+              game.player.mass += bot.mass * 0.3 // Gain some mass from kill
               game.player.kills += 1
               game.player.streak += 1
               game.player.cashBadgeScale = 1.3
@@ -425,7 +426,7 @@ const AgarIOGame = () => {
               // Add to kill feed
               addToKillFeed(`You eliminated ${bot.name} (+$${killReward}${bountyText})`)
               
-            } else if (bot.netWorth > game.player.netWorth * 1.15) {
+            } else if (bot.mass > game.player.mass * 1.15) {
               // Bot kills player
               game.player.alive = false
               game.player.deaths += 1
@@ -445,19 +446,21 @@ const AgarIOGame = () => {
           if (!game.bots[j].alive) continue
           
           const distance = getDistance(game.bots[i], game.bots[j])
-          const radiusA = getRadius(game.bots[i].netWorth)
-          const radiusB = getRadius(game.bots[j].netWorth)
+          const radiusA = getRadius(game.bots[i].mass)
+          const radiusB = getRadius(game.bots[j].mass)
           
           if (distance < Math.max(radiusA, radiusB)) {
-            if (game.bots[i].netWorth > game.bots[j].netWorth * 1.15) {
+            if (game.bots[i].mass > game.bots[j].mass * 1.15) {
               game.bots[i].netWorth += config.killReward
+              game.bots[i].mass += game.bots[j].mass * 0.3
               game.bots[i].kills += 1
               game.bots[i].streak += 1
               game.bots[j].alive = false
               game.bots[j].deaths += 1
               game.bots[j].streak = 0
-            } else if (game.bots[j].netWorth > game.bots[i].netWorth * 1.15) {
+            } else if (game.bots[j].mass > game.bots[i].mass * 1.15) {
               game.bots[j].netWorth += config.killReward
+              game.bots[j].mass += game.bots[i].mass * 0.3
               game.bots[j].kills += 1
               game.bots[j].streak += 1
               game.bots[i].alive = false
