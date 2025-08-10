@@ -13,34 +13,26 @@ export default function TestLogin() {
     setMessage('')
 
     try {
-      // Create a test JWT token for the test user
-      const response = await fetch('/api/test/create-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: 'test-user-max-money',
-          email: 'testuser@turfloot.com',
-          username: 'TestPlayer'
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        
-        // Store the auth token
-        localStorage.setItem('auth_token', data.token)
-        
-        setMessage('✅ Successfully logged in as test user!')
-        
-        // Redirect to main page after 2 seconds
-        setTimeout(() => {
-          router.push('/')
-        }, 2000)
-      } else {
-        setMessage('❌ Failed to create test session')
+      // Create a simple test session without backend
+      const testUserData = {
+        userId: 'test-user-max-money',
+        privyId: 'test-user-max-money',
+        email: 'testuser@turfloot.com',
+        username: 'TestPlayer',
+        isTestUser: true,
+        timestamp: Date.now()
       }
+      
+      // Store test user data in localStorage
+      localStorage.setItem('test_user_session', JSON.stringify(testUserData))
+      localStorage.setItem('auth_token', 'test-session-token')
+      
+      setMessage('✅ Successfully logged in as test user!')
+      
+      // Redirect to main page after 2 seconds
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
     } catch (error) {
       setMessage('❌ Error: ' + error.message)
     } finally {
