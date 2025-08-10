@@ -855,6 +855,49 @@ export async function POST(request, { params }) {
       })(request)
     }
 
+    // TEST ENDPOINT - Create test session for development
+    if (route === 'test/create-session') {
+      const { userId, email, username } = body
+      
+      // Only allow in development
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          { error: 'Test endpoints not available in production' },
+          { status: 403, headers: corsHeaders }
+        )
+      }
+
+      try {
+        // Create a JWT token for the test user
+        const token = jwt.sign(
+          {
+            userId: userId,
+            privyId: userId,
+            email: { address: email },
+            username: username,
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
+          },
+          process.env.JWT_SECRET || 'turfloot-secret-key'
+        )
+
+        return NextResponse.json({
+          success: true,
+          token: token,
+          user: {
+            id: userId,
+            email,
+            username
+          }
+        }, { headers: corsHeaders })
+      } catch (error) {
+        return NextResponse.json(
+          { error: 'Failed to create test session: ' + error.message },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     // Withdrawal request
     if (route === 'withdraw') {
       return requireAuth(async (req) => {
