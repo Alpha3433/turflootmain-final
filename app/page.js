@@ -22,6 +22,7 @@ export default function Home() {
   
   // Get Privy hooks
   const { login, ready, authenticated, user, logout } = usePrivy()
+  const router = useRouter()
 
   // Check for new authentication and show welcome message
   useEffect(() => {
