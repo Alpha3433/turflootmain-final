@@ -92,10 +92,14 @@ const AgarIOGame = () => {
 
   const completeCashOut = () => {
     const netWorth = gameRef.current?.game?.player?.netWorth || 0
-    addFloatingText(`Banked: $${netWorth}`, gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#00ff00')
+    const platformFee = netWorth * 0.10 // 10% platform fee
+    const finalAmount = netWorth - platformFee
+    
+    addFloatingText(`Banked: $${Math.floor(finalAmount)}`, gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#00ff00')
+    addFloatingText(`-$${Math.floor(platformFee)} fee`, gameRef.current?.game?.player?.x || 0, (gameRef.current?.game?.player?.y || 0) - 25, '#ff4444')
     
     // Add to kill feed
-    addToKillFeed(`You cashed out $${netWorth}`)
+    addToKillFeed(`You cashed out $${Math.floor(finalAmount)} (after 10% fee)`)
     
     setIsCashingOut(false)
     setCashOutProgress(0)
@@ -103,7 +107,7 @@ const AgarIOGame = () => {
     // Fade out and end game
     setTimeout(() => {
       setIsGameOver(true)
-      setGameResult(`💰 Cashed Out: $${netWorth}`)
+      setGameResult(`💰 Cashed Out: $${Math.floor(finalAmount)} (${Math.floor(platformFee)} fee)`)
     }, 1000)
   }
 
