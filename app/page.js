@@ -8,6 +8,7 @@ import WalletManager from '../components/wallet/WalletManager'
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
   const [showWelcome, setShowWelcome] = useState(false)
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const [hasShownWelcome, setHasShownWelcome] = useState(false)
   const [isEditingName, setIsEditingName] = useState(false)
   const [customName, setCustomName] = useState('')
