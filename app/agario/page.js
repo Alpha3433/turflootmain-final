@@ -356,7 +356,7 @@ const AgarIOGame = () => {
         bot.y = Math.max(-halfWorld, Math.min(halfWorld, bot.y))
       })
 
-      // Orb pickup
+      // Orb pickup (mass only, no money)
       const allEntities = [game.player, ...game.bots].filter(e => e.alive)
       
       for (let i = game.orbs.length - 1; i >= 0; i--) {
@@ -364,21 +364,15 @@ const AgarIOGame = () => {
         
         for (const entity of allEntities) {
           const distance = getDistance(entity, orb)
-          const radius = getRadius(entity.netWorth)
+          const radius = getRadius(entity.mass)
           
           if (distance <= radius) {
-            const oldNetWorth = entity.netWorth
-            entity.netWorth += orb.value
+            const oldMass = entity.mass
+            entity.mass += config.orbMassValue
             
-            // Animate cash badge scale up
-            entity.cashBadgeScale = 1.3
-            setTimeout(() => {
-              if (entity.cashBadgeScale > 1.0) entity.cashBadgeScale = 1.0
-            }, 200)
-            
-            // Add floating text for player
+            // Add floating text for player (mass gained, not money)
             if (entity === game.player) {
-              addFloatingText(`+$${orb.value}`, entity.x, entity.y - 30, '#00ff00')
+              addFloatingText(`+${config.orbMassValue} mass`, entity.x, entity.y - 30, '#00ff88')
             }
             
             game.orbs.splice(i, 1)
