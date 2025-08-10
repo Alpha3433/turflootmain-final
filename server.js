@@ -1,3 +1,6 @@
+// Load environment variables first
+require('dotenv').config()
+
 // Custom server to handle WebSocket connections and TurfLoot game server
 const { createServer } = require('http')
 const next = require('next')
