@@ -421,26 +421,28 @@ export default function Home() {
       user: !!user 
     })
     
+    // For FREE games - route to Agario clone (regardless of auth status)
     if (selectedStake === 'FREE' || selectedStake === 0) {
-      // Route to simple Agario clone (no auth needed)
-      console.log('🆓 Routing to free Agario game')
-      window.location.href = '/agario'
+      console.log('🆓 Routing to Agario game')
+      router.push('/agario')
       return
     }
     
+    // For cash games - require authentication
     if (!authenticated || !user) {
       console.log('❌ User not authenticated for cash game')
-      login()
+      setShowWelcome(false)
+      setShowLoginModal(true)
       return
     }
     
     // For cash games, use the original complex game with authentication
-    const mode = selectedStake > 0 ? 'cash' : 'free'
-    const roomId = selectedStake > 0 ? `stake_${selectedStake}` : 'lobby'
-    const fee = selectedStake
+    const mode = 'cash'
+    const fee = parseInt(selectedStake.toString().replace('$', ''))
+    const roomId = 'lobby'
     
     console.log('💰 Routing to cash game with auth:', { mode, fee, roomId })
-    window.location.href = `/play?mode=${mode}&room=${roomId}&fee=${fee}`
+    router.push(`/play?mode=${mode}&room=${roomId}&fee=${fee}`)
   }
 
   return (
