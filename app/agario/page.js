@@ -201,13 +201,15 @@ const AgarIOGame = () => {
       })
     }
 
-    // Initialize bots with varying net worth
+    // Initialize bots with varying mass and net worth
     for (let i = 0; i < config.botCount; i++) {
+      const mass = config.startingMass + Math.random() * 15
       const netWorth = config.startingNetWorth + Math.random() * 200
       game.bots.push({
         id: i,
         x: (Math.random() - 0.5) * config.worldSize,
         y: (Math.random() - 0.5) * config.worldSize,
+        mass: mass,
         netWorth: netWorth,
         dir: { 
           x: (Math.random() - 0.5) * 2, 
@@ -228,7 +230,7 @@ const AgarIOGame = () => {
     }
 
     // Helper functions
-    const getRadius = (netWorth) => Math.sqrt(netWorth) * config.radiusPerDollar
+    const getRadius = (mass) => Math.sqrt(mass) * config.massPerDollar
     
     const getDistance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y)
     
