@@ -168,6 +168,45 @@ export default function Home() {
     }
   }
 
+  const createAuthToken = async (privyUser) => {
+    try {
+      console.log('🔑 Creating auth token for user:', privyUser.id)
+      
+      // Check if token already exists and is still valid
+      const existingToken = localStorage.getItem('auth_token')
+      if (existingToken) {
+        console.log('🔑 Auth token already exists')
+        return
+      }
+
+      // Call Privy authentication endpoint to get JWT token
+      const response = await fetch('/api/auth/privy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          privy_user: privyUser
+        })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.token) {
+          // Store JWT token for game authentication
+          localStorage.setItem('auth_token', data.token)
+          console.log('✅ Auth token created and stored successfully')
+        } else {
+          console.error('❌ No token received from auth endpoint')
+        }
+      } else {
+        console.error('❌ Failed to create auth token:', response.status)
+      }
+    } catch (error) {
+      console.error('❌ Error creating auth token:', error)
+    }
+  }
+
   const handleLoginClick = () => {
     console.log('🔑 Login button clicked')
     if (ready && !authenticated) {
