@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import WalletManager from '../components/wallet/WalletManager'
 
