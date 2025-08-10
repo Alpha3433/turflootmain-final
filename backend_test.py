@@ -14,7 +14,7 @@ from datetime import datetime
 
 # Configuration
 BASE_URL = "http://localhost:3000"
-EXTERNAL_URL = "https://1129be5f-620c-46b6-bfba-476a3eb10829.preview.emergentagent.com"
+EXTERNAL_URL = "https://e8d9b53c-8bb8-4974-be4b-ba80d39bb968.preview.emergentagent.com"
 
 class TurfLootGameServerTester:
     def __init__(self):
