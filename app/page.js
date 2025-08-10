@@ -418,7 +418,7 @@ export default function Home() {
       user: !!user 
     })
     
-    if (selectedStake === 0) {
+    if (selectedStake === 'FREE' || selectedStake === 0) {
       // Route to simple Agario clone (no auth needed)
       console.log('🆓 Routing to free Agario game')
       window.location.href = '/agario'
