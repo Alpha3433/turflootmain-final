@@ -150,6 +150,15 @@
     animation: capture-line 2s ease-out infinite;
   }
   
+  /* Character animations */
+  .animate-breathe {
+    animation: animate-breathe 2s ease-in-out infinite;
+  }
+  
+  .animate-hover-bounce {
+    animation: animate-hover-bounce 0.6s ease-in-out;
+  }
+  
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
