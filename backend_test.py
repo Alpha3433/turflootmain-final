@@ -13,7 +13,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://e8d9b53c-8bb8-4974-be4b-ba80d39bb968.preview.emergentagent.com"
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootAPITester:
