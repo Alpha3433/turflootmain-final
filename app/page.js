@@ -645,16 +645,6 @@ export default function Home() {
               {/* Stakes */}
               <div className="flex justify-center space-x-3">
                 <button 
-                  onClick={() => setSelectedStake(0)}
-                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
-                    selectedStake === 0 
-                      ? 'bg-cyan-400 text-black border-2 border-cyan-300' 
-                      : 'bg-gray-800 hover:bg-gray-700 text-white border border-gray-600'
-                  }`}
-                >
-                  FREE
-                </button>
-                <button 
                   onClick={() => setSelectedStake(1)}
                   className={`px-4 py-2 rounded-xl font-bold text-sm transition-all hover:scale-105 ${
                     selectedStake === 1 
