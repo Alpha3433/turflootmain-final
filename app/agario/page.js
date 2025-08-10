@@ -851,12 +851,34 @@ const AgarIOGame = () => {
         </div>
       )}
 
+      {/* Cash Out Button */}
+      {!isGameOver && (
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
+          <button
+            onMouseDown={startCashOut}
+            onMouseUp={cancelCashOut}
+            onMouseLeave={cancelCashOut}
+            className={`px-6 py-3 rounded-lg font-bold transition-all ${
+              isCashingOut 
+                ? 'bg-green-600 text-white' 
+                : 'bg-yellow-500 hover:bg-yellow-400 text-black'
+            }`}
+            disabled={!gameRef.current?.game?.player?.alive}
+          >
+            {isCashingOut 
+              ? `Cashing Out... ${Math.floor(cashOutProgress)}%` 
+              : `💰 Cash Out $${gameStats.netWorth} (Hold)`
+            }
+          </button>
+        </div>
+      )}
+
       {/* Controls */}
       {!isGameOver && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-600/30">
           <div className="text-xs text-gray-300 text-center space-y-1">
-            <div>🖱️ Move mouse to control • 💰 Collect orbs for money</div>
-            <div>⚔️ Eliminate smaller players • 🏦 Hold E to cash out</div>
+            <div>🖱️ Move mouse to control • 💰 Collect orbs for growth</div>
+            <div>⚔️ Eliminate smaller players • 💵 Only kills give money</div>
             <div>👑 Bounty players give bonus rewards</div>
           </div>
         </div>
