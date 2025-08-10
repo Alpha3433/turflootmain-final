@@ -16,7 +16,7 @@ export default function Home() {
   const [playerCountPulse, setPlayerCountPulse] = useState(false)
   const [globalWinningsPulse, setGlobalWinningsPulse] = useState(false)
   const [walletBalance, setWalletBalance] = useState(0)
-  const [selectedStake, setSelectedStake] = useState(0)
+  const [selectedStake, setSelectedStake] = useState(1)
   
   // Get Privy hooks
   const { login, ready, authenticated, user, logout } = usePrivy()
