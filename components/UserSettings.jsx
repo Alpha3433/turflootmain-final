@@ -190,7 +190,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
                 <div className="text-xl">🔒</div>
                 <div>
                   <div className="text-white font-medium">Privacy Policy</div>
-                  <div className="text-sm text-gray-400">Last updated: August 8, 2025</div>
+                  <div className="text-sm text-gray-400">View privacy and data policies</div>
                 </div>
               </div>
               <div className="text-gray-400">→</div>
