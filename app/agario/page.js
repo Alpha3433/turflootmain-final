@@ -852,17 +852,19 @@ const AgarIOGame = () => {
       })
       
       // Draw floating texts
-      floatingTexts.forEach(text => {
-        if (text.life > 0) {
-          ctx.fillStyle = text.color + Math.floor(text.life * 255).toString(16).padStart(2, '0')
-          ctx.font = '16px Arial'
-          ctx.textAlign = 'center'
-          ctx.strokeStyle = '#000000'
-          ctx.lineWidth = 2
-          ctx.strokeText(text.text, text.x, text.y)
-          ctx.fillText(text.text, text.x, text.y)
-        }
-      })
+      if (settings.showFloatingText) {
+        floatingTexts.forEach(text => {
+          if (text.life > 0) {
+            ctx.fillStyle = text.color + Math.floor(text.life * 255).toString(16).padStart(2, '0')
+            ctx.font = '16px Arial'
+            ctx.textAlign = 'center'
+            ctx.strokeStyle = '#000000'
+            ctx.lineWidth = 2
+            ctx.strokeText(text.text, text.x, text.y)
+            ctx.fillText(text.text, text.x, text.y)
+          }
+        })
+      }
       
       // Cash out progress ring
       if (isCashingOut && game.player.alive) {
