@@ -361,10 +361,16 @@ const AgarIOGame = () => {
         bot.x += bot.dir.x * speed * deltaTime
         bot.y += bot.dir.y * speed * deltaTime
         
-        // World boundaries
-        const halfWorld = config.worldSize / 2
-        bot.x = Math.max(-halfWorld, Math.min(halfWorld, bot.x))
-        bot.y = Math.max(-halfWorld, Math.min(halfWorld, bot.y))
+        // Circular world boundaries for bots
+        const worldRadius = config.worldSize / 2
+        const distanceFromCenter = Math.sqrt(bot.x * bot.x + bot.y * bot.y)
+        
+        if (distanceFromCenter > worldRadius) {
+          // Push bot back inside the circle
+          const angle = Math.atan2(bot.y, bot.x)
+          bot.x = Math.cos(angle) * worldRadius
+          bot.y = Math.sin(angle) * worldRadius
+        }
       })
 
       // Orb pickup (mass only, no money)
