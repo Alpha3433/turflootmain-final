@@ -161,10 +161,10 @@ const AgarIOGame = () => {
       worldSize: 4000,
       orbCount: 600, // Increased even more - 50% more orbs from 400
       botCount: 15,
-      baseSpeed: 405, // Another 50% increase (270 * 1.5 = 405)
+      baseSpeed: 648, // Additional 60% increase (405 * 1.6 = 648)
       startingNetWorth: 100,
       startingMass: 10,
-      orbMassValue: 1.5,
+      orbMassValue: 4.5, // Tripled from 1.5 to 4.5 - much bigger growth per orb
       massPerDollar: 0.8,
       bountyThreshold: 500,
       killReward: 50,
