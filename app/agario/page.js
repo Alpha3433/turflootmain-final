@@ -225,6 +225,26 @@ const AgarIOGame = () => {
         color: `hsl(${60 + Math.random() * 30}, 70%, 60%)` // Gold-ish colors
       })
     }
+    
+    // Initialize viruses (green spiky obstacles) - only spawn within circular boundary
+    for (let i = 0; i < config.virusCount; i++) {
+      let x, y, distance
+      // Keep generating random positions until we find one inside the circle
+      do {
+        x = (Math.random() - 0.5) * config.worldSize
+        y = (Math.random() - 0.5) * config.worldSize
+        distance = Math.sqrt(x * x + y * y)
+      } while (distance > config.worldSize / 2) // Only accept positions within circular boundary
+      
+      game.viruses.push({
+        id: i,
+        x: x,
+        y: y,
+        radius: config.virusRadius,
+        color: '#00ff41', // Bright green
+        spikes: 8 + Math.floor(Math.random() * 4) // 8-12 spikes for variety
+      })
+    }
 
     // Initialize bots with varying mass and net worth - only spawn within circular boundary
     for (let i = 0; i < config.botCount; i++) {
