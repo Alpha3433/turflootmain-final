@@ -40,35 +40,12 @@ const UserProfile = ({ isOpen, onClose, user }) => {
         </select>
       </div>
       
-      <div className="space-y-2">
-        {[
-          { rank: 1, name: 'aj', earnings: '$1,659.28', highlight: true },
-          { rank: 2, name: 'Redditor', earnings: '$1,436.59' },
-          { rank: 3, name: '1dollar', earnings: '$1,269.18', highlight: true },
-          { rank: 4, name: 'KanyeNHH', earnings: '$1,111.57' },
-          { rank: 5, name: 'CircleMeCircleMe', earnings: '$1,055.58' },
-          { rank: 6, name: 'Denis237', earnings: '$1,003.02' },
-          { rank: 7, name: 'darkle', earnings: '$735.91' }
-        ].map((player) => (
-          <div 
-            key={player.rank}
-            className={`flex items-center justify-between p-4 rounded-lg border ${
-              player.highlight 
-                ? 'bg-yellow-400/10 border-yellow-400/50' 
-                : 'bg-gray-800/50 border-gray-600/30'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                player.rank === 1 ? 'bg-yellow-400 text-black' : 'bg-gray-600 text-white'
-              }`}>
-                {player.rank}
-              </div>
-              <span className="text-white font-medium">{player.name}</span>
-            </div>
-            <span className="text-yellow-400 font-bold">{player.earnings}</span>
-          </div>
-        ))}
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="text-4xl">🏆</div>
+        <div className="text-center">
+          <h3 className="text-lg font-bold text-white mb-2">Leaderboard Loading...</h3>
+          <p className="text-gray-400">Top players will appear here once you start playing</p>
+        </div>
       </div>
     </div>
   )
