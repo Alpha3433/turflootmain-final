@@ -809,59 +809,6 @@ const AgarIOGame = () => {
         }
       })
       
-      // Draw split pieces if player is split
-      if (game.player.isSplit && game.player.splitPieces) {
-        game.player.splitPieces.forEach(piece => {
-          if (piece.alive) {
-            const radius = getRadius(piece.mass) * 2.0 // Same size calculation as normal entities
-            
-            // Shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
-            ctx.beginPath()
-            ctx.arc(piece.x + 3, piece.y + 3, radius, 0, Math.PI * 2)
-            ctx.fill()
-            
-            // Piece circle (slightly transparent to show they're split)
-            ctx.fillStyle = 'rgba(0, 245, 255, 0.8)' // Semi-transparent cyan
-            ctx.beginPath()
-            ctx.arc(piece.x, piece.y, radius, 0, Math.PI * 2)
-            ctx.fill()
-            
-            // Pulsing border to show split state
-            const pulseAlpha = 0.5 + 0.5 * Math.sin(Date.now() * 0.01)
-            ctx.strokeStyle = `rgba(255, 255, 255, ${pulseAlpha})`
-            ctx.lineWidth = 2
-            ctx.beginPath()
-            ctx.arc(piece.x, piece.y, radius, 0, Math.PI * 2)
-            ctx.stroke()
-            
-            // Eyes for pieces
-            if (radius > 8) {
-              const eyeOffset = radius * 0.3
-              const eyeSize = Math.max(1, radius * 0.1)
-              
-              ctx.fillStyle = '#000000'
-              ctx.beginPath()
-              ctx.arc(piece.x - eyeOffset, piece.y - eyeOffset, eyeSize, 0, Math.PI * 2)
-              ctx.fill()
-              
-              ctx.beginPath()
-              ctx.arc(piece.x + eyeOffset, piece.y - eyeOffset, eyeSize, 0, Math.PI * 2)
-              ctx.fill()
-            }
-            
-            // Mass/Net Worth display for pieces
-            if (radius > 12) {
-              ctx.fillStyle = '#ffffff'
-              ctx.font = `${Math.max(8, radius * 0.3)}px Arial`
-              ctx.textAlign = 'center'
-              ctx.fillText(`${Math.floor(piece.mass)}`, piece.x, piece.y + 2)
-              ctx.fillText(`$${Math.floor(piece.netWorth)}`, piece.x, piece.y + radius * 0.6)
-            }
-          }
-        })
-      }
-      
       // Draw entities (sorted by net worth)
       let allEntities = [...game.bots].filter(e => e.alive)
       
