@@ -14,6 +14,7 @@ const AgarIOGame = () => {
   const [cashOutProgress, setCashOutProgress] = useState(0)
   const [killFeed, setKillFeed] = useState([])
   const [floatingTexts, setFloatingTexts] = useState([])
+  const [leaderboard, setLeaderboard] = useState([])
 
   useEffect(() => {
     // Handle page visibility (exit game when tab is not visible)
