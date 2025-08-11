@@ -472,24 +472,57 @@ const AgarIOGame = () => {
           if (distance <= visualRadius + virus.radius) {
             // Check if entity is big enough to split when hitting virus
             if (entity.mass >= config.virusSplitThreshold) {
-              // Split the player/bot into smaller pieces
+              // Split the player/bot into multiple smaller pieces based on mass
+              const pieceSize = 100 + Math.random() * 20 // 100-120 mass per piece
+              const numPieces = Math.floor(entity.mass / pieceSize)
+              const actualPieceSize = entity.mass / numPieces
+              
               if (entity === game.player) {
-                addFloatingText('💥 VIRUS SPLIT!', entity.x, entity.y - 40, '#ff0000')
-                // Split player into 4 pieces
-                const newMass = entity.mass / 4
-                entity.mass = newMass
-                entity.netWorth = Math.floor(entity.netWorth / 2) // Lose half net worth as penalty
+                addFloatingText(`💥 SPLIT INTO ${numPieces} PIECES!`, entity.x, entity.y - 40, '#ff0000')
                 
-                // Add visual effect with screen shake or something similar
-                console.log('Player hit virus and split!')
+                // Create split player pieces
+                if (!game.player.splitPieces) {
+                  game.player.splitPieces = []
+                }
+                
+                // Clear any existing pieces
+                game.player.splitPieces = []
+                
+                // Create new pieces that shoot outward from virus
+                for (let i = 0; i < numPieces; i++) {
+                  const angle = (i / numPieces) * Math.PI * 2
+                  const spreadDistance = virus.radius + 50 + Math.random() * 30
+                  const pieceX = virus.x + Math.cos(angle) * spreadDistance
+                  const pieceY = virus.y + Math.sin(angle) * spreadDistance
+                  
+                  const piece = {
+                    id: `piece_${i}`,
+                    x: pieceX,
+                    y: pieceY,
+                    mass: actualPieceSize,
+                    dir: { x: Math.cos(angle) * 0.8, y: Math.sin(angle) * 0.8 }, // Initial spread velocity
+                    color: '#00bcd4',
+                    alive: true,
+                    netWorth: Math.floor(entity.netWorth / numPieces),
+                    isPiece: true,
+                    parentId: 'player'
+                  }
+                  
+                  game.player.splitPieces.push(piece)
+                }
+                
+                // Hide main player while split
+                game.player.alive = false
+                game.player.isSplit = true
+                
+                console.log(`Player split into ${numPieces} pieces of ~${Math.floor(actualPieceSize)} mass each`)
               } else {
-                // Split bot
+                // Split bot (simplified version)
                 entity.mass = entity.mass / 3
                 entity.netWorth = Math.floor(entity.netWorth / 2)
               }
             } else if (entity.mass <= config.virusHideThreshold) {
               // Small entities can hide inside virus (immunity mechanic)
-              // For now, just add floating text to indicate they're safe
               if (entity === game.player) {
                 addFloatingText('🛡️ PROTECTED', entity.x, entity.y - 30, '#00ff88')
               }
