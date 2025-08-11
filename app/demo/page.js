@@ -9,10 +9,10 @@ export default function ProfileSettingsDemo() {
   const [showSettings, setShowSettings] = useState(false)
   
   const demoUser = {
-    username: 'wewae',
-    email: { address: 'demo@turfloot.com' },
-    id: 'demo-user-123',
-    google: { name: 'Demo User' }
+    username: user?.username || 'Player',
+    email: user?.email || null,
+    id: user?.id || 'demo-user',
+    google: user?.google || null
   }
 
   return (
