@@ -459,7 +459,43 @@ const AgarIOGame = () => {
         })
       }
 
-      // Combat
+      // Virus collision detection
+      for (const virus of game.viruses) {
+        for (const entity of allEntities) {
+          const distance = getDistance(entity, virus)
+          const baseRadius = getRadius(entity.mass) * 2.0
+          const visualRadius = entity === game.player ? baseRadius * 3.0 : baseRadius
+          
+          if (distance <= visualRadius + virus.radius) {
+            // Check if entity is big enough to split when hitting virus
+            if (entity.mass >= config.virusSplitThreshold) {
+              // Split the player/bot into smaller pieces
+              if (entity === game.player) {
+                addFloatingText('💥 VIRUS SPLIT!', entity.x, entity.y - 40, '#ff0000')
+                // Split player into 4 pieces
+                const newMass = entity.mass / 4
+                entity.mass = newMass
+                entity.netWorth = Math.floor(entity.netWorth / 2) // Lose half net worth as penalty
+                
+                // Add visual effect with screen shake or something similar
+                console.log('Player hit virus and split!')
+              } else {
+                // Split bot
+                entity.mass = entity.mass / 3
+                entity.netWorth = Math.floor(entity.netWorth / 2)
+              }
+            } else if (entity.mass <= config.virusHideThreshold) {
+              // Small entities can hide inside virus (immunity mechanic)
+              // For now, just add floating text to indicate they're safe
+              if (entity === game.player) {
+                addFloatingText('🛡️ PROTECTED', entity.x, entity.y - 30, '#00ff88')
+              }
+            }
+          }
+        }
+      }
+
+      // PvP Combat (only if not in virus protection)
       if (game.player.alive) {
         for (const bot of game.bots) {
           if (!bot.alive) continue
