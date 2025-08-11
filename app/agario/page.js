@@ -1169,7 +1169,7 @@ const AgarIOGame = () => {
       )}
 
       {/* Controls */}
-      {!isGameOver && showControls && (
+      {!isGameOver && showControls && settings.showControls && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-600/30">
           <div className="text-xs text-gray-300 text-center space-y-1">
             <div>🖱️ Move mouse to control • 💰 Collect orbs for growth</div>
