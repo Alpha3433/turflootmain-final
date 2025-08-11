@@ -8,6 +8,7 @@ const AgarIOGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
   const router = useRouter()
+  const { settings } = useGameSettings()  // Add settings hook
   
   // Ping monitoring function
   const measurePing = async () => {
