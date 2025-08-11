@@ -543,6 +543,16 @@ const AgarIOGame = () => {
       // Draw grid
       drawGrid()
       
+      // Draw world border (red circle)
+      const worldRadius = config.worldSize / 2
+      ctx.strokeStyle = '#ff0000'
+      ctx.lineWidth = 8
+      ctx.setLineDash([20, 10]) // Dashed line pattern
+      ctx.beginPath()
+      ctx.arc(0, 0, worldRadius, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.setLineDash([]) // Reset line dash
+      
       // Draw orbs - bigger like original Agario
       game.orbs.forEach(orb => {
         ctx.fillStyle = orb.color
