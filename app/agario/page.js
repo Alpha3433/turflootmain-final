@@ -548,7 +548,8 @@ const AgarIOGame = () => {
       allEntities.sort((a, b) => a.netWorth - b.netWorth)
       
       allEntities.forEach(entity => {
-        const radius = getRadius(entity.mass) * 2.0 // Much bigger like original Agario
+        const baseRadius = getRadius(entity.mass) * 2.0 // Base size like original Agario
+        const radius = entity === game.player ? baseRadius * 3.0 : baseRadius // Player 3x bigger
         const isPlayer = entity === game.player
         
         // Bounty gold ring
