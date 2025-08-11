@@ -792,14 +792,49 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Leaderboard (Net Worth) */}
+      {/* Live Leaderboard (All Players) */}
       {!isGameOver && (
-        <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 max-w-[250px]">
-          <div className="text-cyan-400 font-bold text-lg mb-2">💰 Net Worth Leaders</div>
-          <div className="text-sm text-gray-300">
-            <div className="mb-1">Rank #{gameStats.rank} of {gameStats.players}</div>
-            <div className="text-green-400">Your Worth: ${gameStats.netWorth}</div>
+        <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 max-w-[280px]">
+          <div className="text-cyan-400 font-bold text-lg mb-3">💰 Live Leaderboard</div>
+          <div className="space-y-1 max-h-96 overflow-y-auto">
+            {leaderboard.slice(0, 12).map((player) => (
+              <div 
+                key={`${player.rank}-${player.name}`}
+                className={`flex justify-between items-center py-1 px-2 rounded text-sm ${
+                  player.isPlayer 
+                    ? 'bg-cyan-600/30 border border-cyan-400/50' 
+                    : 'hover:bg-gray-800/30'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <span className={`font-bold w-6 text-center ${
+                    player.rank === 1 ? 'text-yellow-400' : 
+                    player.rank === 2 ? 'text-gray-300' : 
+                    player.rank === 3 ? 'text-orange-400' : 'text-gray-400'
+                  }`}>
+                    #{player.rank}
+                  </span>
+                  <span className={`${player.isPlayer ? 'text-cyan-400 font-bold' : 'text-white'}`}>
+                    {player.name}
+                  </span>
+                  {player.isBounty && <span className="text-yellow-400">👑</span>}
+                </div>
+                <span className="text-green-400 font-bold">
+                  ${player.netWorth}
+                </span>
+              </div>
+            ))}
+            {leaderboard.length > 12 && (
+              <div className="text-center text-gray-400 text-xs py-1">
+                ... and {leaderboard.length - 12} more players
+              </div>
+            )}
           </div>
+          {leaderboard.length === 0 && (
+            <div className="text-gray-400 text-sm text-center py-2">
+              No players in game
+            </div>
+          )}
         </div>
       )}
 
