@@ -621,17 +621,7 @@ const AgarIOGame = () => {
       updateBounties()
 
       // Update camera
-      if (game.player.isSplit && game.player.splitPieces && game.player.splitPieces.length > 0) {
-        // Follow center of split pieces
-        const alivePieces = game.player.splitPieces.filter(p => p.alive)
-        if (alivePieces.length > 0) {
-          const centerX = alivePieces.reduce((sum, p) => sum + p.x, 0) / alivePieces.length
-          const centerY = alivePieces.reduce((sum, p) => sum + p.y, 0) / alivePieces.length
-          
-          game.camera.x += (centerX - game.camera.x) * deltaTime * 3 // Smooth follow
-          game.camera.y += (centerY - game.camera.y) * deltaTime * 3
-        }
-      } else if (game.player.alive) {
+      if (game.player.alive) {
         game.camera.x = game.player.x
         game.camera.y = game.player.y
         
