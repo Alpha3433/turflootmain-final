@@ -446,8 +446,8 @@ const AgarIOGame = () => {
           if (!game.bots[j].alive) continue
           
           const distance = getDistance(game.bots[i], game.bots[j])
-          const radiusA = getRadius(game.bots[i].mass)
-          const radiusB = getRadius(game.bots[j].mass)
+          const radiusA = getRadius(game.bots[i].mass) * 2.0 // Use visual scaling
+          const radiusB = getRadius(game.bots[j].mass) * 2.0 // Use visual scaling
           
           if (distance < Math.max(radiusA, radiusB)) {
             if (game.bots[i].mass > game.bots[j].mass * 1.15) {
