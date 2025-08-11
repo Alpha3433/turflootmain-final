@@ -7,6 +7,23 @@ const AgarIOGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
   const router = useRouter()
+  
+  // Ping monitoring function
+  const measurePing = async () => {
+    try {
+      const startTime = Date.now()
+      await fetch('/api/ping', { 
+        method: 'HEAD',
+        cache: 'no-cache' 
+      })
+      const endTime = Date.now()
+      const latency = endTime - startTime
+      setPing(latency)
+    } catch (error) {
+      // If ping fails, set high ping value to indicate connection issues
+      setPing(999)
+    }
+  }
   const [gameStats, setGameStats] = useState({ netWorth: 100, rank: 1, players: 1, kills: 0, deaths: 0, streak: 0 })
   const [isGameOver, setIsGameOver] = useState(false)
   const [gameResult, setGameResult] = useState('')
