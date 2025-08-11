@@ -58,9 +58,14 @@ const AgarIOGame = () => {
       setShowControls(false)
     }, 5000)
     
+    // Start ping monitoring
+    measurePing() // Initial measurement
+    const pingInterval = setInterval(measurePing, 2000) // Measure every 2 seconds
+    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       clearTimeout(controlsTimer)
+      clearInterval(pingInterval)
       if (gameRef.current) {
         gameRef.current.cleanup()
       }
