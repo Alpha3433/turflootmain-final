@@ -1180,7 +1180,7 @@ const AgarIOGame = () => {
       )}
       
       {/* Live Ping Monitor */}
-      {!isGameOver && (
+      {!isGameOver && settings.showPingMonitor && (
         <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
           <div className="flex items-center space-x-2 text-sm">
             <div className="w-2 h-2 rounded-full animate-pulse bg-green-400"></div>
