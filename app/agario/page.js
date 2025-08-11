@@ -915,8 +915,8 @@ const AgarIOGame = () => {
                 ctx.lineWidth = 1
                 ctx.strokeRect(0, 0, 128, 128)
                 
-                // Scale factor (updated for smaller world size - 2000)
-                const worldSize = 2000 // Use hardcoded value since config is not accessible here
+                // Scale factor (updated for expanded world size - 3000)
+                const worldSize = 3000 // Updated to match expanded worldSize
                 const scale = 128 / worldSize
                 
                 // Draw world border on minimap (red circle)
