@@ -479,8 +479,9 @@ const AgarIOGame = () => {
         game.camera.x = game.player.x
         game.camera.y = game.player.y
         
-        // Zoom based on mass - keep zoomed in like original Agario
-        const targetZoom = Math.max(0.4, Math.min(1.0, 1.0 / Math.sqrt(game.player.mass / 10)))
+        // Keep camera zoom constant - no zoom changes based on mass
+        // This way players can see their character actually growing bigger
+        const targetZoom = 0.6 // Fixed zoom level
         game.camera.zoom += (targetZoom - game.camera.zoom) * deltaTime * 2
       }
 
