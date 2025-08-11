@@ -167,6 +167,7 @@ const AgarIOGame = () => {
     const config = {
       worldSize: 3000, // Expanded by 50% (was 2000, now 3000)
       orbCount: 600, // Increased even more - 50% more orbs from 400
+      virusCount: 25, // Virus cells scattered around the map
       botCount: 15,
       baseSpeed: 648, // Additional 60% increase (405 * 1.6 = 648)
       startingNetWorth: 100,
@@ -175,7 +176,10 @@ const AgarIOGame = () => {
       massPerDollar: 0.8,
       bountyThreshold: 500,
       killReward: 50,
-      platformFee: 0.10
+      platformFee: 0.10,
+      virusRadius: 25,
+      virusSplitThreshold: 35, // Mass threshold to split when hitting virus
+      virusHideThreshold: 25 // Mass threshold to hide inside virus
     }
 
     // Game state
