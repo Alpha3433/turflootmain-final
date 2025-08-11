@@ -307,10 +307,16 @@ const AgarIOGame = () => {
         game.player.x += game.player.dir.x * speed * deltaTime
         game.player.y += game.player.dir.y * speed * deltaTime
         
-        // World boundaries
-        const halfWorld = config.worldSize / 2
-        game.player.x = Math.max(-halfWorld, Math.min(halfWorld, game.player.x))
-        game.player.y = Math.max(-halfWorld, Math.min(halfWorld, game.player.y))
+        // Circular world boundaries
+        const worldRadius = config.worldSize / 2
+        const distanceFromCenter = Math.sqrt(game.player.x * game.player.x + game.player.y * game.player.y)
+        
+        if (distanceFromCenter > worldRadius) {
+          // Push player back inside the circle
+          const angle = Math.atan2(game.player.y, game.player.x)
+          game.player.x = Math.cos(angle) * worldRadius
+          game.player.y = Math.sin(angle) * worldRadius
+        }
       }
 
       // Update bots
