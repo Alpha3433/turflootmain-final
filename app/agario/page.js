@@ -242,7 +242,7 @@ const AgarIOGame = () => {
         y: y,
         radius: config.virusRadius,
         color: '#00ff41', // Bright green
-        spikes: 8 + Math.floor(Math.random() * 4) // 8-12 spikes for variety
+        spikes: 4 + Math.floor(Math.random() * 2) // 4-5 spikes (50% fewer than 8-12)
       })
     }
 
