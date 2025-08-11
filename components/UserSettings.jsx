@@ -57,12 +57,13 @@ const UserSettings = ({ isOpen, onClose, user }) => {
               <div className="w-8 h-8 bg-gray-600 rounded flex items-center justify-center">
                 💳
               </div>
-              <span className="text-white font-mono">89aJtp...JP8nGv</span>
+              <span className="text-white font-mono">Connect wallet to view address</span>
             </div>
             <button
               onClick={copyWalletAddress}
               className="p-2 text-gray-400 hover:text-white transition-colors"
               title="Copy wallet address"
+              disabled
             >
               <Copy size={18} />
             </button>
@@ -79,7 +80,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
               <div className="text-gray-400">📅</div>
               <span className="text-gray-400">Member Since</span>
             </div>
-            <span className="text-white font-medium">August 8, 2025</span>
+            <span className="text-white font-medium">Login to view date</span>
           </div>
           
           <div className="flex items-center justify-between py-3 border-b border-gray-700">
@@ -87,7 +88,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
               <div className="text-gray-400">🔥</div>
               <span className="text-gray-400">Login Streak</span>
             </div>
-            <span className="text-white font-medium">0 days</span>
+            <span className="text-white font-medium">Play games to build streak</span>
           </div>
         </div>
       </div>
