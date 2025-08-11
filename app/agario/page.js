@@ -651,7 +651,8 @@ const AgarIOGame = () => {
       
       // Cash out progress ring
       if (isCashingOut && game.player.alive) {
-        const radius = getRadius(game.player.mass) * 2.0 + 20 // Match bigger character size
+        const baseRadius = getRadius(game.player.mass) * 2.0
+        const radius = baseRadius * 3.0 + 20 // Match player's 3x bigger size
         const progress = cashOutProgress / 100
         
         // Background ring
