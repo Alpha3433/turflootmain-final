@@ -210,12 +210,13 @@ const AgarIOGame = () => {
     // Initialize orbs (mass pickup, not money) - only spawn within circular boundary
     for (let i = 0; i < config.orbCount; i++) {
       let x, y, distance
-      // Keep generating random positions until we find one inside the circle
+      const maxRadius = (config.worldSize / 2) - 20 // Add 20 unit margin from edge
+      // Keep generating random positions until we find one inside the circle with margin
       do {
         x = (Math.random() - 0.5) * config.worldSize
         y = (Math.random() - 0.5) * config.worldSize
         distance = Math.sqrt(x * x + y * y)
-      } while (distance > config.worldSize / 2) // Only accept positions within circular boundary
+      } while (distance > maxRadius) // Only accept positions well within circular boundary
       
       game.orbs.push({
         id: i,
