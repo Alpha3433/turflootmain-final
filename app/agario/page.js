@@ -1090,6 +1090,20 @@ const AgarIOGame = () => {
                     ctx.fillRect(x - 1, y - 1, 2, 2)
                   }
                 })
+                
+                // Draw viruses on minimap
+                game.viruses.forEach(virus => {
+                  const x = (virus.x + worldSize / 2) * scale
+                  const y = (virus.y + worldSize / 2) * scale
+                  
+                  ctx.fillStyle = '#00ff41' // Bright green
+                  ctx.fillRect(x - 2, y - 2, 4, 4)
+                  
+                  // Add small border to make them more visible
+                  ctx.strokeStyle = '#00aa22'
+                  ctx.lineWidth = 1
+                  ctx.strokeRect(x - 2, y - 2, 4, 4)
+                })
               }
             }}
           />
