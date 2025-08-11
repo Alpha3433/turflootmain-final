@@ -519,12 +519,7 @@ const AgarIOGame = () => {
               if (entity === game.player) {
                 addFloatingText(`💥 SPLIT INTO ${numPieces} PIECES!`, entity.x, entity.y - 40, '#ff0000')
                 
-                // Create split player pieces
-                if (!game.player.splitPieces) {
-                  game.player.splitPieces = []
-                }
-                
-                // Clear any existing pieces
+                // Create split player pieces that replace the main player
                 game.player.splitPieces = []
                 
                 // Create new pieces that shoot outward from virus
@@ -544,15 +539,20 @@ const AgarIOGame = () => {
                     alive: true,
                     netWorth: Math.floor(entity.netWorth / numPieces),
                     isPiece: true,
-                    parentId: 'player'
+                    parentId: 'player',
+                    kills: 0,
+                    deaths: 0,
+                    streak: 0,
+                    isBounty: false,
+                    name: `You-${i+1}`
                   }
                   
                   game.player.splitPieces.push(piece)
                 }
                 
-                // Hide main player while split
-                game.player.alive = false
+                // Set player as split but keep alive flag true
                 game.player.isSplit = true
+                game.player.mass = actualPieceSize // Set to piece size
                 
                 console.log(`Player split into ${numPieces} pieces of ~${Math.floor(actualPieceSize)} mass each`)
               } else {
