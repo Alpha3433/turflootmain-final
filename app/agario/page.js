@@ -158,9 +158,9 @@ const AgarIOGame = () => {
     // Game configuration
     const config = {
       worldSize: 4000,
-      orbCount: 400, // Doubled from 200 - much more orbs to collect
+      orbCount: 600, // Increased even more - 50% more orbs from 400
       botCount: 15,
-      baseSpeed: 270, // Increased by 50% (was 180)
+      baseSpeed: 405, // Another 50% increase (270 * 1.5 = 405)
       startingNetWorth: 100,
       startingMass: 10,
       orbMassValue: 1.5,
