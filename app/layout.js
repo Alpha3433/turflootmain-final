@@ -21,7 +21,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-[#1E1E1E] text-white antialiased">
         <PrivyAuthProvider>
-          {children}
+          <GameSettingsProvider>
+            {children}
+          </GameSettingsProvider>
         </PrivyAuthProvider>
       </body>
     </html>
