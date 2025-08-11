@@ -556,7 +556,7 @@ const AgarIOGame = () => {
       drawGrid()
       
       // Draw red out-of-bounds area (everything outside the circle)
-      const worldRadius = config.worldSize / 2
+      const playableRadius = config.worldSize / 2
       
       // Get visible world bounds for efficient rendering
       const viewWidth = canvas.width / game.camera.zoom
@@ -574,17 +574,17 @@ const AgarIOGame = () => {
       ctx.globalCompositeOperation = 'destination-out'
       ctx.fillStyle = '#000000'
       ctx.beginPath()
-      ctx.arc(0, 0, worldRadius, 0, Math.PI * 2)
+      ctx.arc(0, 0, playableRadius, 0, Math.PI * 2)
       ctx.fill()
       ctx.globalCompositeOperation = 'source-over' // Reset blend mode
       
       // Draw world border (red circle)
-      const worldRadius = config.worldSize / 2
+      const borderRadius = config.worldSize / 2
       ctx.strokeStyle = '#ff0000'
       ctx.lineWidth = 8
       ctx.setLineDash([20, 10]) // Dashed line pattern
       ctx.beginPath()
-      ctx.arc(0, 0, worldRadius, 0, Math.PI * 2)
+      ctx.arc(0, 0, borderRadius, 0, Math.PI * 2)
       ctx.stroke()
       ctx.setLineDash([]) // Reset line dash
       
