@@ -9,10 +9,10 @@ export default function ProfileSettingsDemo() {
   const [showSettings, setShowSettings] = useState(false)
   
   const demoUser = {
-    username: user?.username || 'Player',
-    email: user?.email || null,
-    id: user?.id || 'demo-user',
-    google: user?.google || null
+    username: 'Player',
+    email: null,
+    id: 'demo-user',
+    google: null
   }
 
   return (
