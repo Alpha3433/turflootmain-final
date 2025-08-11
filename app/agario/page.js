@@ -651,6 +651,43 @@ const AgarIOGame = () => {
         ctx.fillText('$', orb.x, orb.y + 4)
       })
       
+      // Draw viruses (green spiky obstacles)
+      game.viruses.forEach(virus => {
+        const spikeLength = virus.radius * 0.6
+        const spikeCount = virus.spikes
+        
+        // Draw virus body (green circle)
+        ctx.fillStyle = virus.color
+        ctx.beginPath()
+        ctx.arc(virus.x, virus.y, virus.radius, 0, Math.PI * 2)
+        ctx.fill()
+        
+        // Draw darker green border
+        ctx.strokeStyle = '#00cc33'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.arc(virus.x, virus.y, virus.radius, 0, Math.PI * 2)
+        ctx.stroke()
+        
+        // Draw spikes
+        ctx.strokeStyle = '#00aa22'
+        ctx.lineWidth = 3
+        ctx.lineCap = 'round'
+        
+        for (let i = 0; i < spikeCount; i++) {
+          const angle = (i / spikeCount) * Math.PI * 2
+          const startX = virus.x + Math.cos(angle) * virus.radius
+          const startY = virus.y + Math.sin(angle) * virus.radius
+          const endX = virus.x + Math.cos(angle) * (virus.radius + spikeLength)
+          const endY = virus.y + Math.sin(angle) * (virus.radius + spikeLength)
+          
+          ctx.beginPath()
+          ctx.moveTo(startX, startY)
+          ctx.lineTo(endX, endY)
+          ctx.stroke()
+        }
+      })
+      
       // Draw entities (sorted by net worth)
       const allEntities = [game.player, ...game.bots].filter(e => e.alive)
       allEntities.sort((a, b) => a.netWorth - b.netWorth)
