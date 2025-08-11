@@ -368,7 +368,8 @@ const AgarIOGame = () => {
         
         for (const entity of allEntities) {
           const distance = getDistance(entity, orb)
-          const visualRadius = getRadius(entity.mass) * 2.0 // Use same scaling as visual rendering
+          const baseRadius = getRadius(entity.mass) * 2.0 // Base visual scaling
+          const visualRadius = entity === game.player ? baseRadius * 3.0 : baseRadius // Player 3x bigger
           
           if (distance <= visualRadius) {
             const oldMass = entity.mass
