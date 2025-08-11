@@ -751,6 +751,7 @@ const AgarIOGame = () => {
     setGameResult('')
     setKillFeed([])
     setFloatingTexts([])
+    setLeaderboard([])
     setIsCashingOut(false)
     setCashOutProgress(0)
     if (gameRef.current) {
