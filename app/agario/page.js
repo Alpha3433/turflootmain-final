@@ -880,14 +880,26 @@ const AgarIOGame = () => {
                 ctx.lineWidth = 1
                 ctx.strokeRect(0, 0, 128, 128)
                 
-                // Scale factor
-                const scale = 128 / 4000 // world size is 4000
+                // Scale factor (updated for smaller world size)
+                const scale = 128 / config.worldSize // world size is now 2000
+                
+                // Draw world border on minimap (red circle)
+                const centerX = 64 // center of 128x128 minimap
+                const centerY = 64
+                const worldRadius = (config.worldSize / 2) * scale
+                ctx.strokeStyle = '#ff0000'
+                ctx.lineWidth = 2
+                ctx.setLineDash([4, 2]) // Smaller dashed pattern for minimap
+                ctx.beginPath()
+                ctx.arc(centerX, centerY, worldRadius, 0, Math.PI * 2)
+                ctx.stroke()
+                ctx.setLineDash([]) // Reset line dash
                 
                 // Draw players
                 const allPlayers = [game.player, ...game.bots].filter(p => p.alive)
                 allPlayers.forEach(player => {
-                  const x = (player.x + 2000) * scale // offset by half world
-                  const y = (player.y + 2000) * scale
+                  const x = (player.x + config.worldSize / 2) * scale // offset by half world
+                  const y = (player.y + config.worldSize / 2) * scale
                   
                   if (player === game.player) {
                     ctx.fillStyle = '#00f5ff'
