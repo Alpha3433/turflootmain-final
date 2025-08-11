@@ -370,45 +370,6 @@ const AgarIOGame = () => {
           game.player.y = Math.sin(angle) * worldRadius
         }
       }
-      
-      // Update split pieces if player is split
-      if (game.player.isSplit && game.player.splitPieces) {
-        game.player.splitPieces.forEach(piece => {
-          if (piece.alive) {
-            // Split pieces move faster (smaller mass = higher speed)
-            const pieceSpeed = config.baseSpeed / Math.pow(Math.max(piece.mass, 1), 0.2) // Even less speed decay for pieces
-            
-            // Gradually reduce spread velocity
-            piece.dir.x *= 0.98
-            piece.dir.y *= 0.98
-            
-            // Add player input direction
-            piece.dir.x += game.player.dir.x * 0.1
-            piece.dir.y += game.player.dir.y * 0.1
-            
-            // Normalize direction
-            const dirLength = Math.sqrt(piece.dir.x * piece.dir.x + piece.dir.y * piece.dir.y)
-            if (dirLength > 1) {
-              piece.dir.x /= dirLength
-              piece.dir.y /= dirLength
-            }
-            
-            // Move piece
-            piece.x += piece.dir.x * pieceSpeed * deltaTime
-            piece.y += piece.dir.y * pieceSpeed * deltaTime
-            
-            // Keep pieces within boundaries
-            const worldRadius = config.worldSize / 2
-            const distanceFromCenter = Math.sqrt(piece.x * piece.x + piece.y * piece.y)
-            
-            if (distanceFromCenter > worldRadius) {
-              const angle = Math.atan2(piece.y, piece.x)
-              piece.x = Math.cos(angle) * worldRadius
-              piece.y = Math.sin(angle) * worldRadius
-            }
-          }
-        })
-      }
 
       // Update bots
       game.bots.forEach(bot => {
