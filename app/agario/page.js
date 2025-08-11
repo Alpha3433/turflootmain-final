@@ -821,12 +821,19 @@ const AgarIOGame = () => {
     setKillFeed([])
     setFloatingTexts([])
     setLeaderboard([])
+    setShowControls(true) // Show controls again on restart
     setIsCashingOut(false)
     setCashOutProgress(0)
     if (gameRef.current) {
       gameRef.current.cleanup()
     }
-    setTimeout(() => initializeGame(), 100)
+    setTimeout(() => {
+      initializeGame()
+      // Hide controls after 5 seconds on restart
+      setTimeout(() => {
+        setShowControls(false)
+      }, 5000)
+    }, 100)
   }
 
   return (
