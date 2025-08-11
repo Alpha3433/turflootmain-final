@@ -820,6 +820,19 @@ const AgarIOGame = () => {
           ctx.fillText('👑', entity.x, entity.y - radius - 25)
         }
         
+        // Player name display (only if showPlayerNames is enabled)
+        if (settings.showPlayerNames && entity.name) {
+          ctx.fillStyle = '#ffffff'
+          ctx.font = '14px Arial'
+          ctx.textAlign = 'center'
+          ctx.strokeStyle = '#000000'
+          ctx.lineWidth = 2
+          
+          const nameY = entity.y + radius + 15
+          ctx.strokeText(entity.name, entity.x, nameY)
+          ctx.fillText(entity.name, entity.x, nameY)
+        }
+        
         // Cash Badge above player (only if showNetWorth is enabled)
         if (settings.showNetWorth) {
           const badgeY = entity.y - radius - (entity.isBounty ? 50 : 35)
