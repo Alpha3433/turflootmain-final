@@ -902,6 +902,16 @@ const AgarIOGame = () => {
               </div>
             ))}
           </div>
+          
+          {/* Live Player Count */}
+          {leaderboard.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-600/30">
+              <div className="text-center text-gray-300 text-sm">
+                <span className="text-cyan-400 font-bold">{leaderboard.length}</span> players in game
+              </div>
+            </div>
+          )}
+          
           {leaderboard.length === 0 && (
             <div className="text-gray-400 text-sm text-center py-2">
               No players in game
