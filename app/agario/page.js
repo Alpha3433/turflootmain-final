@@ -863,7 +863,18 @@ const AgarIOGame = () => {
       }
       
       // Draw entities (sorted by net worth)
-      const allEntities = [game.player, ...game.bots].filter(e => e.alive)
+      let allEntities = [...game.bots].filter(e => e.alive)
+      
+      // Add player or split pieces to entities list
+      if (game.player.isSplit && game.player.splitPieces && game.player.splitPieces.length > 0) {
+        // When split, render split pieces instead of main player
+        const alivePieces = game.player.splitPieces.filter(p => p.alive)
+        allEntities.push(...alivePieces)
+      } else if (game.player.alive) {
+        // When not split, render main player
+        allEntities.push(game.player)
+      }
+      
       allEntities.sort((a, b) => a.netWorth - b.netWorth)
       
       allEntities.forEach(entity => {
