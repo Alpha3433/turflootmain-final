@@ -214,14 +214,23 @@ const AgarIOGame = () => {
       })
     }
 
-    // Initialize bots with varying mass and net worth
+    // Initialize bots with varying mass and net worth - only spawn within circular boundary
     for (let i = 0; i < config.botCount; i++) {
       const mass = config.startingMass + Math.random() * 15
       const netWorth = config.startingNetWorth + Math.random() * 200
+      
+      let x, y, distance
+      // Keep generating random positions until we find one inside the circle
+      do {
+        x = (Math.random() - 0.5) * config.worldSize
+        y = (Math.random() - 0.5) * config.worldSize
+        distance = Math.sqrt(x * x + y * y)
+      } while (distance > config.worldSize / 2) // Only accept positions within circular boundary
+      
       game.bots.push({
         id: i,
-        x: (Math.random() - 0.5) * config.worldSize,
-        y: (Math.random() - 0.5) * config.worldSize,
+        x: x,
+        y: y,
         mass: mass,
         netWorth: netWorth,
         dir: { 
