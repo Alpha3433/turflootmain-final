@@ -479,18 +479,18 @@ const AgarIOGame = () => {
               if (entity === game.player) {
                 addFloatingText(`💥 SPLIT INTO ${numPieces} PIECES!`, entity.x, entity.y - 40, '#ff0000')
                 
-                // Simple approach: just reduce mass and net worth significantly
+                // Reduce mass significantly but keep net worth unchanged
                 const newMass = entity.mass / numPieces
-                const newNetWorth = Math.floor(entity.netWorth / 2) // Penalty for hitting virus
+                // Keep net worth unchanged - no financial penalty
                 
                 entity.mass = newMass
-                entity.netWorth = newNetWorth
+                // entity.netWorth remains the same - no change to balance
                 
-                console.log(`Player split into ${numPieces} pieces, reduced to ${Math.floor(newMass)} mass and $${newNetWorth} net worth`)
+                console.log(`Player split into ${numPieces} pieces, reduced to ${Math.floor(newMass)} mass but kept $${entity.netWorth} net worth`)
               } else {
                 // Split bot (simplified version)
                 entity.mass = entity.mass / 3
-                entity.netWorth = Math.floor(entity.netWorth / 2)
+                entity.netWorth = Math.floor(entity.netWorth / 2) // Bots still get financial penalty
               }
             } else if (entity.mass <= config.virusHideThreshold) {
               // Small entities can hide inside virus (immunity mechanic)
