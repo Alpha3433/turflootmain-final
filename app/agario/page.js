@@ -351,7 +351,7 @@ const AgarIOGame = () => {
         bot.dir.y += (bot.targetDir.y - bot.dir.y) * deltaTime * 3
         bot.dir = normalizeVector(bot.dir)
         
-        const speed = config.baseSpeed / Math.sqrt(Math.max(bot.mass, 1))
+        const speed = config.baseSpeed / Math.pow(Math.max(bot.mass, 1), 0.3) // Less aggressive decay (was sqrt = 0.5, now 0.3)
         bot.x += bot.dir.x * speed * deltaTime
         bot.y += bot.dir.y * speed * deltaTime
         
