@@ -825,11 +825,6 @@ const AgarIOGame = () => {
                 </span>
               </div>
             ))}
-            {leaderboard.length > 5 && (
-              <div className="text-center text-gray-400 text-xs py-1">
-                ... and {leaderboard.length - 5} more players
-              </div>
-            )}
           </div>
           {leaderboard.length === 0 && (
             <div className="text-gray-400 text-sm text-center py-2">
