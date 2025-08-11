@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import WalletManager from '../components/wallet/WalletManager'
+import UserProfile from '../components/UserProfile'
+import UserSettings from '../components/UserSettings'
 
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
