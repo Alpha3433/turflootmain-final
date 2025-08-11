@@ -555,6 +555,29 @@ const AgarIOGame = () => {
       // Draw grid
       drawGrid()
       
+      // Draw red out-of-bounds area (everything outside the circle)
+      const worldRadius = config.worldSize / 2
+      
+      // Get visible world bounds for efficient rendering
+      const viewWidth = canvas.width / game.camera.zoom
+      const viewHeight = canvas.height / game.camera.zoom
+      const left = game.camera.x - viewWidth / 2
+      const right = game.camera.x + viewWidth / 2
+      const top = game.camera.y - viewHeight / 2
+      const bottom = game.camera.y + viewHeight / 2
+      
+      // Draw red background everywhere first
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.3)' // Semi-transparent red
+      ctx.fillRect(left, top, viewWidth, viewHeight)
+      
+      // Cut out the playable area (create a "hole" in the red)
+      ctx.globalCompositeOperation = 'destination-out'
+      ctx.fillStyle = '#000000'
+      ctx.beginPath()
+      ctx.arc(0, 0, worldRadius, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.globalCompositeOperation = 'source-over' // Reset blend mode
+      
       // Draw world border (red circle)
       const worldRadius = config.worldSize / 2
       ctx.strokeStyle = '#ff0000'
