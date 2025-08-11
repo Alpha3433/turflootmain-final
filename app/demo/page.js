@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import UserProfile from '../components/UserProfile'
-import UserSettings from '../components/UserSettings'
+import UserProfile from '../../components/UserProfile'
+import UserSettings from '../../components/UserSettings'
 
 export default function ProfileSettingsDemo() {
   const [showProfile, setShowProfile] = useState(false)
