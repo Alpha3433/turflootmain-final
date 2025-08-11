@@ -402,8 +402,8 @@ const AgarIOGame = () => {
           if (!bot.alive) continue
           
           const distance = getDistance(game.player, bot)
-          const playerRadius = getRadius(game.player.mass)
-          const botRadius = getRadius(bot.mass)
+          const playerRadius = getRadius(game.player.mass) * 2.0 // Use visual scaling
+          const botRadius = getRadius(bot.mass) * 2.0 // Use visual scaling
           
           if (distance < Math.max(playerRadius, botRadius)) {
             if (game.player.mass > bot.mass * 1.15) {
