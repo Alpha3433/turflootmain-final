@@ -997,7 +997,7 @@ const AgarIOGame = () => {
           >
             {isCashingOut 
               ? `Cashing Out... ${Math.floor(cashOutProgress)}%` 
-              : `💰 Cash Out $${gameStats.netWorth} (Hold)`
+              : `💰 Hold E to Cash Out ($${gameStats.netWorth})`
             }
           </button>
         </div>
