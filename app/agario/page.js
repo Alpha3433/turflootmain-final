@@ -101,6 +101,10 @@ const AgarIOGame = () => {
     setIsCashingOut(true)
     setCashOutProgress(0)
     
+    // Use quickCashOut setting: 3s if enabled, 5s if disabled
+    const cashOutDuration = settings.quickCashOut ? 3000 : 5000 // 3s or 5s in milliseconds
+    const increment = 100 / (cashOutDuration / 100) // Calculate increment per 100ms
+    
     const cashOutTimer = setInterval(() => {
       setCashOutProgress(prev => {
         if (prev >= 100) {
@@ -108,7 +112,7 @@ const AgarIOGame = () => {
           completeCashOut()
           return 100
         }
-        return prev + 2 // 5 seconds = 100 / 2
+        return prev + increment
       })
     }, 100)
 
