@@ -658,6 +658,16 @@ const AgarIOGame = () => {
         // This way players can see their character actually growing bigger
         const targetZoom = 1.2 // Much more zoomed in fixed level
         game.camera.zoom += (targetZoom - game.camera.zoom) * deltaTime * 2
+      } else if (game.player.isSplit && game.player.splitPieces && game.player.splitPieces.length > 0) {
+        // Follow center of split pieces
+        const alivePieces = game.player.splitPieces.filter(p => p.alive)
+        if (alivePieces.length > 0) {
+          const centerX = alivePieces.reduce((sum, p) => sum + p.x, 0) / alivePieces.length
+          const centerY = alivePieces.reduce((sum, p) => sum + p.y, 0) / alivePieces.length
+          
+          game.camera.x += (centerX - game.camera.x) * deltaTime * 2 // Smooth follow
+          game.camera.y += (centerY - game.camera.y) * deltaTime * 2
+        }
       }
 
       // Update stats
