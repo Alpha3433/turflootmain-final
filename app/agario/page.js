@@ -513,48 +513,19 @@ const AgarIOGame = () => {
             if (entity.mass >= config.virusSplitThreshold) {
               // Split the player/bot into multiple smaller pieces based on mass
               const pieceSize = 100 + Math.random() * 20 // 100-120 mass per piece
-              const numPieces = Math.floor(entity.mass / pieceSize)
-              const actualPieceSize = entity.mass / numPieces
+              const numPieces = Math.max(2, Math.floor(entity.mass / pieceSize)) // At least 2 pieces
               
               if (entity === game.player) {
                 addFloatingText(`💥 SPLIT INTO ${numPieces} PIECES!`, entity.x, entity.y - 40, '#ff0000')
                 
-                // Create split player pieces that replace the main player
-                game.player.splitPieces = []
+                // Simple approach: just reduce mass and net worth significantly
+                const newMass = entity.mass / numPieces
+                const newNetWorth = Math.floor(entity.netWorth / 2) // Penalty for hitting virus
                 
-                // Create new pieces that shoot outward from virus
-                for (let i = 0; i < numPieces; i++) {
-                  const angle = (i / numPieces) * Math.PI * 2
-                  const spreadDistance = virus.radius + 50 + Math.random() * 30
-                  const pieceX = virus.x + Math.cos(angle) * spreadDistance
-                  const pieceY = virus.y + Math.sin(angle) * spreadDistance
-                  
-                  const piece = {
-                    id: `piece_${i}`,
-                    x: pieceX,
-                    y: pieceY,
-                    mass: actualPieceSize,
-                    dir: { x: Math.cos(angle) * 0.8, y: Math.sin(angle) * 0.8 }, // Initial spread velocity
-                    color: '#00bcd4',
-                    alive: true,
-                    netWorth: Math.floor(entity.netWorth / numPieces),
-                    isPiece: true,
-                    parentId: 'player',
-                    kills: 0,
-                    deaths: 0,
-                    streak: 0,
-                    isBounty: false,
-                    name: `You-${i+1}`
-                  }
-                  
-                  game.player.splitPieces.push(piece)
-                }
+                entity.mass = newMass
+                entity.netWorth = newNetWorth
                 
-                // Set player as split but keep alive flag true
-                game.player.isSplit = true
-                game.player.mass = actualPieceSize // Set to piece size
-                
-                console.log(`Player split into ${numPieces} pieces of ~${Math.floor(actualPieceSize)} mass each`)
+                console.log(`Player split into ${numPieces} pieces, reduced to ${Math.floor(newMass)} mass and $${newNetWorth} net worth`)
               } else {
                 // Split bot (simplified version)
                 entity.mass = entity.mass / 3
