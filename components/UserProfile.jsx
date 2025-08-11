@@ -73,17 +73,19 @@ const UserProfile = ({ isOpen, onClose, user }) => {
     <div className="space-y-6">
       {/* User Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-2xl">
-            👤
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-white">{user?.username || 'Player'}</h2>
+        <div>
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-2xl">
+              👤
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">{user?.username || 'Player'}</h2>
+            </div>
           </div>
         </div>
         <div className="text-right space-y-1">
-          <div className="text-sm text-gray-400">📅 Joined Aug 8, 2025</div>
-          <div className="text-sm text-gray-400">🔥 0 day streak</div>
+          <div className="text-sm text-gray-400">📅 Member since login</div>
+          <div className="text-sm text-gray-400">🔥 Play games to build streak</div>
         </div>
       </div>
 
