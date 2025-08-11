@@ -798,7 +798,7 @@ const AgarIOGame = () => {
         <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 max-w-[280px]">
           <div className="text-cyan-400 font-bold text-lg mb-3">💰 Live Leaderboard</div>
           <div className="space-y-1 max-h-96 overflow-y-auto">
-            {leaderboard.slice(0, 12).map((player) => (
+            {leaderboard.slice(0, 5).map((player) => (
               <div 
                 key={`${player.rank}-${player.name}`}
                 className={`flex justify-between items-center py-1 px-2 rounded text-sm ${
@@ -825,9 +825,9 @@ const AgarIOGame = () => {
                 </span>
               </div>
             ))}
-            {leaderboard.length > 12 && (
+            {leaderboard.length > 5 && (
               <div className="text-center text-gray-400 text-xs py-1">
-                ... and {leaderboard.length - 12} more players
+                ... and {leaderboard.length - 5} more players
               </div>
             )}
           </div>
