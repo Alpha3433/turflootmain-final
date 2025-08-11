@@ -158,16 +158,16 @@ const AgarIOGame = () => {
     // Game configuration
     const config = {
       worldSize: 4000,
-      orbCount: 200,
+      orbCount: 400, // Doubled from 200 - much more orbs to collect
       botCount: 15,
-      baseSpeed: 180,
+      baseSpeed: 270, // Increased by 50% (was 180)
       startingNetWorth: 100,
       startingMass: 10,
-      orbMassValue: 1.5, // Orbs now only give mass, not money
+      orbMassValue: 1.5,
       massPerDollar: 0.8,
       bountyThreshold: 500,
       killReward: 50,
-      platformFee: 0.10 // 10% platform fee on cash out
+      platformFee: 0.10
     }
 
     // Game state
