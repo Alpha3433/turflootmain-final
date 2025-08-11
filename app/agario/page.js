@@ -35,8 +35,14 @@ const AgarIOGame = () => {
     // Initialize the game
     initializeGame()
     
+    // Hide controls after 5 seconds
+    const controlsTimer = setTimeout(() => {
+      setShowControls(false)
+    }, 5000)
+    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearTimeout(controlsTimer)
       if (gameRef.current) {
         gameRef.current.cleanup()
       }
