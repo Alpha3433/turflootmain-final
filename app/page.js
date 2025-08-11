@@ -955,6 +955,20 @@ export default function Home() {
           </div>
         </div>
       )}
+      
+      {/* Profile Modal */}
+      <UserProfile 
+        isOpen={showProfile} 
+        onClose={() => setShowProfile(false)} 
+        user={userProfile}
+      />
+      
+      {/* Settings Modal */}
+      <UserSettings 
+        isOpen={showSettings} 
+        onClose={() => setShowSettings(false)} 
+        user={userProfile}
+      />
     </div>
   )
 }
