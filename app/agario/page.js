@@ -1172,6 +1172,23 @@ const AgarIOGame = () => {
           </div>
         </div>
       )}
+      
+      {/* Live Ping Monitor */}
+      {!isGameOver && (
+        <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
+          <div className="flex items-center space-x-2 text-sm">
+            <div className="w-2 h-2 rounded-full animate-pulse bg-green-400"></div>
+            <span className="text-gray-300">Ping:</span>
+            <span className={`font-bold ${
+              ping < 50 ? 'text-green-400' : 
+              ping < 100 ? 'text-yellow-400' : 
+              ping < 200 ? 'text-orange-400' : 'text-red-400'
+            }`}>
+              {ping}ms
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Game Over Screen */}
       {isGameOver && (
