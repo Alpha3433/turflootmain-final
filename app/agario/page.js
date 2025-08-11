@@ -504,6 +504,17 @@ const AgarIOGame = () => {
         streak: game.player.streak
       })
 
+      // Update live leaderboard
+      const leaderboardData = allAlive.map((player, index) => ({
+        rank: index + 1,
+        name: player.name,
+        netWorth: Math.floor(player.netWorth),
+        isPlayer: player === game.player,
+        isBounty: player.isBounty || false
+      }))
+      
+      setLeaderboard(leaderboardData)
+
       // Update floating texts
       setFloatingTexts(prev => prev.map(text => ({
         ...text,
