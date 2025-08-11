@@ -786,9 +786,8 @@ const AgarIOGame = () => {
       
       allEntities.forEach(entity => {
         const baseRadius = getRadius(entity.mass) * 2.0 // Base size like original Agario
-        const radius = (entity === game.player || entity.isPiece) ? baseRadius * 3.0 : baseRadius // Player and pieces 3x bigger
+        const radius = entity === game.player ? baseRadius * 3.0 : baseRadius // Player 3x bigger
         const isPlayer = entity === game.player
-        const isPiece = entity.isPiece
         
         // Bounty gold ring
         if (entity.isBounty) {
@@ -806,27 +805,14 @@ const AgarIOGame = () => {
         ctx.fill()
         
         // Entity circle
-        if (isPiece) {
-          // Split pieces are semi-transparent with pulsing effect
-          const pulseAlpha = 0.6 + 0.3 * Math.sin(Date.now() * 0.005)
-          ctx.fillStyle = `rgba(0, 245, 255, ${pulseAlpha})` // Pulsing cyan
-        } else {
-          ctx.fillStyle = isPlayer ? '#00f5ff' : entity.color
-        }
+        ctx.fillStyle = isPlayer ? '#00f5ff' : entity.color
         ctx.beginPath()
         ctx.arc(entity.x, entity.y, radius, 0, Math.PI * 2)
         ctx.fill()
         
         // Border
-        if (isPiece) {
-          // Pulsing white border for split pieces
-          const pulseAlpha = 0.5 + 0.5 * Math.sin(Date.now() * 0.008)
-          ctx.strokeStyle = `rgba(255, 255, 255, ${pulseAlpha})`
-          ctx.lineWidth = 3
-        } else {
-          ctx.strokeStyle = entity.isBounty ? '#FFD700' : '#ffffff'
-          ctx.lineWidth = 3
-        }
+        ctx.strokeStyle = entity.isBounty ? '#FFD700' : '#ffffff'
+        ctx.lineWidth = 3
         ctx.beginPath()
         ctx.arc(entity.x, entity.y, radius, 0, Math.PI * 2)
         ctx.stroke()
