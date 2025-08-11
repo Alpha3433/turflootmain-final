@@ -6,6 +6,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import WalletManager from '../components/wallet/WalletManager'
 import UserProfile from '../components/UserProfile'
 import UserSettings from '../components/UserSettings'
+import { GameSettingsProvider } from '../components/providers/GameSettingsProvider'
 
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
