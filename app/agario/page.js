@@ -1050,7 +1050,7 @@ const AgarIOGame = () => {
 
       {/* Kill Feed */}
       {killFeed.length > 0 && !isGameOver && (
-        <div className="absolute bottom-4 left-4 space-y-2 max-w-[400px]">
+        <div className="absolute bottom-16 left-4 space-y-2 max-w-[400px]">
           {killFeed.map((item, index) => (
             <div 
               key={item.id}
