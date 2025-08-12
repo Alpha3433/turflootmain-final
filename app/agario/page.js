@@ -253,6 +253,125 @@ const AgarIOGame = () => {
     }, 2000)
   }
 
+  // Enhanced functions for new features
+  const addCoinAnimation = (x, y) => {
+    const animation = {
+      id: Date.now() + Math.random(),
+      x,
+      y,
+      scale: 1,
+      rotation: 0,
+      particles: [],
+      life: 1.0
+    }
+    
+    // Generate particle burst
+    for (let i = 0; i < 8; i++) {
+      animation.particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 200,
+        vy: (Math.random() - 0.5) * 200,
+        life: 1.0,
+        color: Math.random() > 0.5 ? '#FFD700' : '#00FFFF'
+      })
+    }
+    
+    setCoinAnimations(prev => [...prev, animation])
+    
+    // Remove after animation
+    setTimeout(() => {
+      setCoinAnimations(prev => prev.filter(item => item.id !== animation.id))
+    }, 1000)
+  }
+
+  const addKillStreakAnnouncement = (streak) => {
+    let message = ''
+    let color = '#FF6B6B'
+    
+    if (streak === 2) {
+      message = 'Double Loot!'
+      color = '#FFD93D'
+    } else if (streak === 3) {
+      message = 'Triple Threat!'
+      color = '#6BCF7F'
+    } else if (streak === 5) {
+      message = 'Loot King!'
+      color = '#4ECDC4'
+    } else if (streak >= 10) {
+      message = 'LEGENDARY!'
+      color = '#FF3366'
+    }
+    
+    if (message) {
+      const announcement = {
+        id: Date.now(),
+        message,
+        color,
+        scale: 1,
+        life: 1.0
+      }
+      
+      setKillStreakAnnouncements(prev => [...prev, announcement])
+      
+      setTimeout(() => {
+        setKillStreakAnnouncements(prev => prev.filter(item => item.id !== announcement.id))
+      }, 3000)
+    }
+  }
+
+  const generateMission = () => {
+    const missions = [
+      { type: 'collect', target: 20, duration: 30000, reward: 50, description: 'Collect 20 coins in 30 seconds' },
+      { type: 'survive', target: 60000, duration: 60000, reward: 100, description: 'Survive for 60 seconds' },
+      { type: 'eliminate', target: 3, duration: 45000, reward: 150, description: 'Eliminate 3 players in 45 seconds' },
+      { type: 'mass', target: 500, duration: 40000, reward: 75, description: 'Reach 500 mass in 40 seconds' }
+    ]
+    
+    const mission = missions[Math.floor(Math.random() * missions.length)]
+    mission.id = Date.now()
+    mission.startTime = Date.now()
+    mission.progress = 0
+    
+    setCurrentMission(mission)
+    setMissionProgress(0)
+    
+    // Auto-complete mission after duration
+    setTimeout(() => {
+      if (mission.progress >= mission.target) {
+        completeMission(mission)
+      } else {
+        setCurrentMission(null)
+        addFloatingText('Mission Failed!', gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#FF4444')
+      }
+    }, mission.duration)
+  }
+
+  const completeMission = (mission) => {
+    if (gameRef.current?.game?.player) {
+      gameRef.current.game.player.netWorth += mission.reward
+      addFloatingText(`Mission Complete! +$${mission.reward}`, gameRef.current.game.player.x, gameRef.current.game.player.y - 60, '#00FF00')
+      addToKillFeed(`Mission completed: ${mission.description} (+$${mission.reward})`)
+    }
+    setCurrentMission(null)
+  }
+
+  const addLiveEvent = (message, type = 'info') => {
+    const event = {
+      id: Date.now(),
+      message,
+      type,
+      timestamp: Date.now()
+    }
+    
+    setLiveEventFeed(prev => [event, ...prev.slice(0, 4)]) // Keep only 5 most recent events
+    
+    // Remove after 10 seconds
+    setTimeout(() => {
+      setLiveEventFeed(prev => prev.filter(item => item.id !== event.id))
+    }, 10000)
+  }
+
   const initializeGame = () => {
     const canvas = canvasRef.current
     if (!canvas) return
