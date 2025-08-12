@@ -1340,19 +1340,51 @@ const AgarIOGame = () => {
         ctx.arc(entity.x, entity.y, radius, 0, Math.PI * 2)
         ctx.stroke()
         
-        // Eyes
+        // Eyes with customization support
         if (radius > 15) {
           const eyeOffset = radius * 0.3
           const eyeSize = Math.max(2, radius * 0.1)
+          const faceStyle = isPlayer ? getPlayerFaceStyle() : 'normal_eyes'
           
-          ctx.fillStyle = '#000000'
-          ctx.beginPath()
-          ctx.arc(entity.x - eyeOffset, entity.y - eyeOffset, eyeSize, 0, Math.PI * 2)
-          ctx.fill()
-          
-          ctx.beginPath()
-          ctx.arc(entity.x + eyeOffset, entity.y - eyeOffset, eyeSize, 0, Math.PI * 2)
-          ctx.fill()
+          if (faceStyle === 'angry_eyes' && isPlayer) {
+            // Angry eyes - angled eyebrows
+            ctx.fillStyle = '#000000'
+            ctx.fillRect(entity.x - eyeOffset - eyeSize, entity.y - eyeOffset - eyeSize, eyeSize * 2, eyeSize)
+            ctx.fillRect(entity.x + eyeOffset - eyeSize, entity.y - eyeOffset - eyeSize, eyeSize * 2, eyeSize)
+            
+            // Angry mouth
+            ctx.strokeStyle = '#FF0000'
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.arc(entity.x, entity.y + eyeOffset, eyeSize * 2, 0, Math.PI)
+            ctx.stroke()
+          } else if (faceStyle === 'wink_eyes' && isPlayer) {
+            // Wink eyes - one closed, one open
+            ctx.fillStyle = '#000000'
+            // Closed eye (line)
+            ctx.fillRect(entity.x - eyeOffset - eyeSize, entity.y - eyeOffset, eyeSize * 2, 1)
+            // Open eye (circle)
+            ctx.beginPath()
+            ctx.arc(entity.x + eyeOffset, entity.y - eyeOffset, eyeSize, 0, Math.PI * 2)
+            ctx.fill()
+            
+            // Happy mouth
+            ctx.strokeStyle = '#FF69B4'
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.arc(entity.x, entity.y + eyeOffset, eyeSize * 1.5, 0, Math.PI)
+            ctx.stroke()
+          } else {
+            // Normal eyes
+            ctx.fillStyle = '#000000'
+            ctx.beginPath()
+            ctx.arc(entity.x - eyeOffset, entity.y - eyeOffset, eyeSize, 0, Math.PI * 2)
+            ctx.fill()
+            
+            ctx.beginPath()
+            ctx.arc(entity.x + eyeOffset, entity.y - eyeOffset, eyeSize, 0, Math.PI * 2)
+            ctx.fill()
+          }
         }
         
         // Bounty crown
