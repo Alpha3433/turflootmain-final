@@ -1293,6 +1293,21 @@ const AgarIOGame = () => {
         }
       }
     }
+    
+    // Start first mission after 10 seconds
+    setTimeout(() => {
+      if (gameRef.current?.game?.running && !currentMission) {
+        generateMission()
+      }
+    }, 10000)
+    
+    // Generate new missions every 2 minutes
+    const missionInterval = setInterval(() => {
+      if (gameRef.current?.game?.running && !currentMission) {
+        generateMission()
+      }
+    }, 120000)
+    gameRef.current.missionInterval = missionInterval
   }
 
   const restartGame = () => {
