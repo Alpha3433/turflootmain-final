@@ -68,12 +68,14 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
 
     try {
-      console.log('🎯 Opening Privy wallet funding modal')
+      console.log('🎯 Attempting to open Privy wallet funding modal')
+      console.log('🔍 Available Privy functions:', { fundWallet: typeof fundWallet, authenticated, user: !!user })
       
-      // Use Privy's built-in funding modal
-      if (fundWallet) {
+      // Check if fundWallet is available
+      if (typeof fundWallet === 'function') {
+        console.log('✅ fundWallet function found, calling it...')
         await fundWallet()
-        console.log('✅ Privy funding modal opened')
+        console.log('✅ Privy funding modal should be open')
         
         // Refresh balance after funding (with delay for processing)
         setTimeout(() => {
@@ -81,12 +83,18 @@ const WalletManager = ({ onBalanceUpdate }) => {
           fetchTransactions()
         }, 2000)
       } else {
-        console.error('❌ Privy fundWallet not available')
-        // Fallback to custom modal if Privy funding not available
+        console.warn('⚠️ fundWallet function not available, using fallback modal')
+        console.log('🔍 This might mean:')
+        console.log('  1. Privy version doesn\'t support fundWallet')
+        console.log('  2. Privy configuration doesn\'t have funding enabled')
+        console.log('  3. Need to use a different Privy hook')
+        
+        // Fallback to custom modal
         setShowAddFunds(true)
       }
     } catch (error) {
-      console.error('Error opening Privy funding:', error)
+      console.error('❌ Error opening Privy funding:', error)
+      console.log('🔄 Falling back to custom modal')
       // Fallback to custom modal on error
       setShowAddFunds(true)
     }
