@@ -141,6 +141,7 @@ const AgarIOGame = () => {
     
     setIsCashingOut(false)
     setCashOutProgress(0)
+    setAutoCashOutTriggered(false) // Reset auto cash out flag for next game
     
     // Fade out and end game
     setTimeout(() => {
