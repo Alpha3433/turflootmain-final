@@ -60,58 +60,35 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
   }
 
-  const handleAddFunds = async (e) => {
-    e.preventDefault()
-    
-    if (!authenticated || !wallets.length) {
-      alert('Please connect your wallet first')
+  // Handle Add Funds with Privy
+  const handleAddFunds = async () => {
+    if (!authenticated) {
+      alert('Please login first')
       return
     }
 
-    setLoading(true)
-    
     try {
-      const wallet = wallets[0] // Use first connected wallet
-      const amount = parseFloat(addFundsForm.amount)
+      console.log('🎯 Opening Privy wallet funding modal')
       
-      if (amount < 0.01) {
-        alert('Minimum deposit is 0.01 SOL')
-        setLoading(false)
-        return
-      }
-
-      // Mock transaction hash for demo - in production, execute actual transaction
-      const mockTxHash = `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      
-      const response = await fetch('/api/wallet/add-funds', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        },
-        body: JSON.stringify({
-          amount,
-          currency: addFundsForm.currency,
-          transaction_hash: mockTxHash
-        })
-      })
-
-      const data = await response.json()
-      
-      if (response.ok) {
-        alert(`✅ ${data.message}`)
-        setAddFundsForm({ amount: '', currency: 'SOL' })
-        setShowAddFunds(false)
-        fetchBalance()
-        fetchTransactions()
+      // Use Privy's built-in funding modal
+      if (fundWallet) {
+        await fundWallet()
+        console.log('✅ Privy funding modal opened')
+        
+        // Refresh balance after funding (with delay for processing)
+        setTimeout(() => {
+          fetchBalance()
+          fetchTransactions()
+        }, 2000)
       } else {
-        alert(`❌ ${data.error}`)
+        console.error('❌ Privy fundWallet not available')
+        // Fallback to custom modal if Privy funding not available
+        setShowAddFunds(true)
       }
     } catch (error) {
-      console.error('Error adding funds:', error)
-      alert('Error adding funds. Please try again.')
-    } finally {
-      setLoading(false)
+      console.error('Error opening Privy funding:', error)
+      // Fallback to custom modal on error
+      setShowAddFunds(true)
     }
   }
 
