@@ -45,6 +45,7 @@ export async function GET(request, { params }) {
     }
 
     const route = path.join('/')
+    console.log(`🔍 GET Route requested: ${route}`)
 
     // Authentication routes
     if (route === 'auth/me') {
