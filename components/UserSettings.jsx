@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Copy, Check } from 'lucide-react'
 import { useGameSettings } from './providers/GameSettingsProvider'
 
