@@ -103,11 +103,12 @@ export default function Home() {
   useEffect(() => {
     const fetchLiveStats = async () => {
       try {
-        // Fetch live player count and global winnings
-        const [playersResponse, winningsResponse, leaderboardResponse] = await Promise.all([
+        // Fetch live player count, global winnings, leaderboard, and friends
+        const [playersResponse, winningsResponse, leaderboardResponse, friendsResponse] = await Promise.all([
           fetch('/api/stats/live-players'),
           fetch('/api/stats/global-winnings'),
-          fetch('/api/users/leaderboard')
+          fetch('/api/users/leaderboard'),
+          fetch(`/api/friends/list?userId=${userProfile?.id || userProfile?.privyId || 'demo-user'}`)
         ])
 
         if (playersResponse.ok) {
@@ -150,9 +151,28 @@ export default function Home() {
           console.log('⚠️ No leaderboard data available')
           setLeaderboardData([])
         }
+
+        if (friendsResponse.ok) {
+          const friendsData = await friendsResponse.json()
+          console.log('👥 Friends data received:', friendsData)
+          
+          // Process friends data for display
+          const processedFriends = friendsData.friends.slice(0, 3).map((friend) => ({
+            id: friend.id,
+            name: friend.custom_name || friend.email?.split('@')[0] || `Player${friend.id?.slice(-4)}`,
+            status: friend.online_status || 'offline',
+            wins: friend.stats?.games_won || 0
+          }))
+          
+          setFriendsList(processedFriends)
+        } else {
+          console.log('⚠️ No friends data available')
+          setFriendsList([])
+        }
       } catch (error) {
         console.error('Error loading statistics:', error)
         setLeaderboardData([])
+        setFriendsList([])
       }
     }
 
