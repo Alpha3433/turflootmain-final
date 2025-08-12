@@ -432,8 +432,8 @@ const AgarIOGame = () => {
   const completeMission = (mission) => {
     if (gameRef.current?.game?.player) {
       gameRef.current.game.player.netWorth += mission.reward
-      addFloatingText(`Mission Complete! +$${mission.reward}`, gameRef.current.game.player.x, gameRef.current.game.player.y - 60, '#00FF00')
-      addToKillFeed(`Mission completed: ${mission.description} (+$${mission.reward})`)
+      addFloatingText(`Mission Complete! +${mission.reward} SP`, gameRef.current.game.player.x, gameRef.current.game.player.y - 60, '#00FF00')
+      addToKillFeed(`Mission completed: ${mission.description} (+${mission.reward} SP)`)
     }
     setCurrentMission(null)
   }
