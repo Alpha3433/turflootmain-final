@@ -112,9 +112,14 @@ const UserSettings = ({ isOpen, onClose, user }) => {
           />
           <button
             onClick={handleUpdateUsername}
-            className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors"
+            disabled={isUpdatingUsername}
+            className={`px-6 py-3 text-white font-medium rounded-lg transition-colors ${
+              isUpdatingUsername 
+                ? 'bg-gray-500 cursor-not-allowed' 
+                : 'bg-green-500 hover:bg-green-600'
+            }`}
           >
-            📝 Update
+            {isUpdatingUsername ? '⏳ Updating...' : '📝 Update'}
           </button>
         </div>
       </div>
