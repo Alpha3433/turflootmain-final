@@ -1245,6 +1245,15 @@ export default function Home() {
         onClose={() => setShowSettings(false)} 
         user={userProfile}
       />
+
+      {/* Customization Modal */}
+      {showCustomization && (
+        <CustomizationModal
+          isOpen={showCustomization}
+          onClose={() => setShowCustomization(false)}
+          userBalance={walletBalance}
+        />
+      )}
       
       {/* Real-time Cash-out Notifications Feed */}
       <div className="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
