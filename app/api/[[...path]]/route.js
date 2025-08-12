@@ -1363,6 +1363,167 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Friend request endpoints
+    if (route === 'friends/send-request') {
+      try {
+        const { fromUserId, toUserId } = body
+        
+        if (!fromUserId || !toUserId) {
+          return NextResponse.json({
+            error: 'fromUserId and toUserId are required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        if (fromUserId === toUserId) {
+          return NextResponse.json({
+            error: 'Cannot send friend request to yourself'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        console.log('👥 Sending friend request from:', fromUserId, 'to:', toUserId)
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        
+        // Check if request already exists
+        const existingRequest = await friends.findOne({
+          $or: [
+            { fromUserId, toUserId },
+            { fromUserId: toUserId, toUserId: fromUserId }
+          ]
+        })
+
+        if (existingRequest) {
+          return NextResponse.json({
+            error: 'Friend request already exists or you are already friends'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Create friend request
+        const friendRequest = {
+          fromUserId,
+          toUserId,
+          status: 'pending',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+
+        await friends.insertOne(friendRequest)
+
+        console.log('✅ Friend request sent successfully')
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Friend request sent successfully'
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error sending friend request:', error)
+        return NextResponse.json({
+          error: 'Failed to send friend request',
+          details: error.message
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
+    if (route === 'friends/accept-request') {
+      try {
+        const { requestId, userId } = body
+        
+        if (!requestId || !userId) {
+          return NextResponse.json({
+            error: 'requestId and userId are required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        
+        // Update request status to accepted
+        const result = await friends.updateOne(
+          { 
+            _id: new ObjectId(requestId),
+            toUserId: userId,
+            status: 'pending'
+          },
+          {
+            $set: {
+              status: 'accepted',
+              updatedAt: new Date()
+            }
+          }
+        )
+
+        if (result.matchedCount === 0) {
+          return NextResponse.json({
+            error: 'Friend request not found or already processed'
+          }, { status: 404, headers: corsHeaders })
+        }
+
+        console.log('✅ Friend request accepted')
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Friend request accepted'
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error accepting friend request:', error)
+        return NextResponse.json({
+          error: 'Failed to accept friend request'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
+    if (route === 'friends/list') {
+      try {
+        const userId = url.searchParams.get('userId')
+        
+        if (!userId) {
+          return NextResponse.json({
+            error: 'userId is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        const users = db.collection('users')
+        
+        // Get accepted friends
+        const friendships = await friends.find({
+          $or: [
+            { fromUserId: userId, status: 'accepted' },
+            { toUserId: userId, status: 'accepted' }
+          ]
+        }).toArray()
+
+        // Get friend user details
+        const friendIds = friendships.map(f => 
+          f.fromUserId === userId ? f.toUserId : f.fromUserId
+        )
+
+        const friendsData = await users.find({
+          id: { $in: friendIds }
+        }).project({
+          id: 1,
+          custom_name: 1,
+          email: 1,
+          stats: 1,
+          last_seen: 1,
+          online_status: 1
+        }).toArray()
+
+        console.log(`👥 Found ${friendsData.length} friends for user ${userId}`)
+        
+        return NextResponse.json({
+          friends: friendsData
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error getting friends list:', error)
+        return NextResponse.json({
+          error: 'Failed to get friends list'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     return NextResponse.json(
       { error: 'Endpoint not found' },
       { status: 404, headers: corsHeaders }
