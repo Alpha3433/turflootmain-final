@@ -12,8 +12,8 @@ import uuid
 import sys
 from datetime import datetime
 
-# Configuration - Use external URL for testing
-BASE_URL = "https://6ab07e9e-a0f5-48da-9a37-3af5eed166ad.preview.emergentagent.com"
+# Configuration - Use localhost for testing
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootAPITester:
