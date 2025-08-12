@@ -792,7 +792,7 @@ export default function Home() {
             </div>
 
             {/* CENTER COLUMN - Main Game Area */}
-            <div className="col-span-12 lg:col-span-6 flex flex-col justify-center space-y-6">
+            <div className="col-span-12 lg:col-span-6 flex flex-col justify-center space-y-4">
               
               {/* Live Stats */}
               <div className="flex justify-center space-x-12">
