@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Search, Plus, Users, Trophy, Target, Clock } from 'lucide-react'
 
 const UserProfile = ({ isOpen, onClose, user }) => {
   const [activeTab, setActiveTab] = useState('leaderboard')
@@ -16,6 +16,185 @@ const UserProfile = ({ isOpen, onClose, user }) => {
     avgGameTime: '0:00',
     earnings: 0.00
   })
+  const [leaderboard, setLeaderboard] = useState([])
+  const [searchResults, setSearchResults] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [friends, setFriends] = useState([])
+  const [friendsFilter, setFriendsFilter] = useState('friends')
+  const [loading, setLoading] = useState(false)
+  const [leaderboardType, setLeaderboardType] = useState('winnings')
+  
+  // Load user stats when component opens
+  useEffect(() => {
+    if (isOpen && user) {
+      loadUserStats()
+      if (activeTab === 'leaderboard') {
+        loadLeaderboard()
+      }
+    }
+  }, [isOpen, user])
+
+  // Load data when tab changes
+  useEffect(() => {
+    if (isOpen && user) {
+      switch (activeTab) {
+        case 'leaderboard':
+          loadLeaderboard()
+          break
+        case 'friends':
+          loadFriends()
+          break
+      }
+    }
+  }, [activeTab, isOpen, user])
+
+  const loadUserStats = async () => {
+    if (!user?.id && !user?.privyId) return
+    
+    try {
+      setLoading(true)
+      console.log('📊 Loading user stats for:', user?.id || user?.privyId)
+      
+      // If user has profile data with stats, use it
+      if (user.stats) {
+        const userStats = user.stats
+        setStats({
+          winRate: userStats.games_played > 0 ? ((userStats.games_won / userStats.games_played) * 100).toFixed(1) : 0.0,
+          gamesWon: userStats.games_won || 0,
+          gamesPlayed: userStats.games_played || 0,
+          avgSurvival: formatTime(userStats.avg_survival_time || 0),
+          totalEliminations: userStats.total_eliminations || 0,
+          killsPerGame: userStats.games_played > 0 ? (userStats.total_eliminations / userStats.games_played).toFixed(1) : 0.0,
+          totalPlayTime: formatPlayTime(userStats.total_play_time || 0),
+          avgGameTime: formatTime(userStats.avg_game_time || 0),
+          earnings: userStats.total_earnings || 0.00
+        })
+      } else {
+        // Generate some dynamic stats based on user activity for demo
+        const randomStats = generateDemoStats()
+        setStats(randomStats)
+      }
+    } catch (error) {
+      console.error('Error loading user stats:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const generateDemoStats = () => {
+    // Generate realistic-looking stats for demonstration
+    const gamesPlayed = Math.floor(Math.random() * 50) + 5
+    const gamesWon = Math.floor(gamesPlayed * (0.15 + Math.random() * 0.3))
+    const totalEliminations = Math.floor(gamesPlayed * (1.2 + Math.random() * 2.8))
+    
+    return {
+      winRate: gamesPlayed > 0 ? ((gamesWon / gamesPlayed) * 100).toFixed(1) : 0.0,
+      gamesWon,
+      gamesPlayed,
+      avgSurvival: formatTime(60 + Math.floor(Math.random() * 180)), // 1-4 minutes
+      totalEliminations,
+      killsPerGame: gamesPlayed > 0 ? (totalEliminations / gamesPlayed).toFixed(1) : 0.0,
+      totalPlayTime: formatPlayTime(gamesPlayed * (120 + Math.random() * 240)), // 2-6 min per game
+      avgGameTime: formatTime(120 + Math.floor(Math.random() * 240)),
+      earnings: (gamesWon * (5 + Math.random() * 45)).toFixed(2) // $5-50 per win
+    }
+  }
+
+  const loadLeaderboard = async () => {
+    try {
+      setLoading(true)
+      console.log('🏆 Loading leaderboard data, type:', leaderboardType)
+      
+      // Generate dynamic leaderboard data
+      const mockLeaderboard = []
+      const playerNames = [
+        'ProGamer2024', 'ElitePlayer', 'TurfMaster', 'CashKing', 'VictorySeeker',
+        'GameChanger', 'TopShooter', 'StrategyPro', 'QuickWin', 'DominantForce'
+      ]
+      
+      for (let i = 0; i < 10; i++) {
+        const isCurrentUser = i === 2 && user // Put current user at #3
+        mockLeaderboard.push({
+          rank: i + 1,
+          name: isCurrentUser ? (user.custom_name || user.google?.name || 'You') : playerNames[i],
+          winnings: Math.floor((1000 - (i * 80)) + Math.random() * 500),
+          wins: Math.floor((50 - (i * 4)) + Math.random() * 20),
+          killDeathRatio: (2.5 - (i * 0.2) + Math.random() * 0.8).toFixed(2),
+          isCurrentUser,
+          avatar: isCurrentUser ? '👤' : ['🎮', '🏆', '⚡', '🔥', '💎', '🚀', '⭐', '💪', '🎯', '👑'][i]
+        })
+      }
+      
+      setLeaderboard(mockLeaderboard)
+    } catch (error) {
+      console.error('Error loading leaderboard:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadFriends = async () => {
+    try {
+      setLoading(true)
+      console.log('👥 Loading friends list')
+      
+      // Generate demo friends data
+      const mockFriends = [
+        { id: 1, name: 'GameBuddy', status: 'online', lastSeen: 'Online', wins: 23, avatar: '🎮' },
+        { id: 2, name: 'StrategyMaster', status: 'playing', lastSeen: 'In game', wins: 34, avatar: '🏆' },
+        { id: 3, name: 'CasualPlayer', status: 'offline', lastSeen: '2h ago', wins: 12, avatar: '⚡' }
+      ]
+      
+      setFriends(mockFriends)
+    } catch (error) {
+      console.error('Error loading friends:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+    
+    try {
+      setLoading(true)
+      console.log('🔍 Searching for:', query)
+      
+      // Generate mock search results
+      const mockResults = [
+        { id: 1, name: `${query}Player`, wins: 15, status: 'online', avatar: '🔍' },
+        { id: 2, name: `Elite${query}`, wins: 28, status: 'offline', avatar: '🎯' },
+        { id: 3, name: `${query}Master`, wins: 42, status: 'playing', avatar: '👑' }
+      ].filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
+      
+      setSearchResults(mockResults)
+    } catch (error) {
+      console.error('Error searching players:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  const formatPlayTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    return `${hours}h ${mins}m`
+  }
+
+  const addFriend = (playerId) => {
+    console.log('➕ Adding friend:', playerId)
+    // In real implementation, this would make an API call
+    alert('Friend request sent!')
+  }
 
   if (!isOpen) return null
 
