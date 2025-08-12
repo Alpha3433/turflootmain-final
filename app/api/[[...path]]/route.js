@@ -463,6 +463,149 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Achievement System API endpoints
+    if (route === 'achievements/progress') {
+      try {
+        const userId = url.searchParams.get('userId') || 'demo-user'
+        console.log('🏆 Getting achievement progress for:', userId)
+
+        const db = await getDb()
+        const users = db.collection('users')
+        const achievements = db.collection('achievements')
+        
+        // Get user's current season progress
+        const user = await users.findOne({ id: userId })
+        const currentSeason = getCurrentSeason()
+        
+        // Initialize user achievement data if not exists
+        if (!user?.achievements || user.achievements.season !== currentSeason.id) {
+          await users.updateOne(
+            { id: userId },
+            {
+              $set: {
+                'achievements.season': currentSeason.id,
+                'achievements.totalAP': 0,
+                'achievements.unlockedCosmetics': [],
+                'achievements.completedAchievements': [],
+                'achievements.dailyStreak': 0,
+                'achievements.lastPlayDate': null
+              }
+            },
+            { upsert: true }
+          )
+        }
+
+        // Get all available achievements
+        const allAchievements = getAchievementDefinitions()
+        
+        // Calculate progress for each achievement
+        const progressData = await calculateAchievementProgress(userId, user)
+        
+        return NextResponse.json({
+          season: currentSeason,
+          totalAP: user?.achievements?.totalAP || 0,
+          achievements: allAchievements,
+          progress: progressData,
+          cosmetics: {
+            unlocked: user?.achievements?.unlockedCosmetics || [],
+            available: getCosmeticDefinitions()
+          }
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error getting achievement progress:', error)
+        return NextResponse.json({ 
+          error: 'Failed to get achievement progress',
+          details: error.message 
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
+    if (route === 'achievements/unlock-cosmetic') {
+      try {
+        const { userId, cosmeticId } = body
+        
+        if (!userId || !cosmeticId) {
+          return NextResponse.json({
+            error: 'userId and cosmeticId are required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        console.log('🎨 Unlocking cosmetic:', cosmeticId, 'for user:', userId)
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        const user = await users.findOne({ id: userId })
+        const cosmetics = getCosmeticDefinitions()
+        const cosmetic = cosmetics.find(c => c.id === cosmeticId)
+        
+        if (!cosmetic) {
+          return NextResponse.json({
+            error: 'Cosmetic not found'
+          }, { status: 404, headers: corsHeaders })
+        }
+
+        const userAP = user?.achievements?.totalAP || 0
+        
+        if (userAP < cosmetic.cost) {
+          return NextResponse.json({
+            error: 'Insufficient Achievement Points',
+            required: cosmetic.cost,
+            current: userAP
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Check if already unlocked
+        const unlockedCosmetics = user?.achievements?.unlockedCosmetics || []
+        if (unlockedCosmetics.includes(cosmeticId)) {
+          return NextResponse.json({
+            error: 'Cosmetic already unlocked'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Unlock cosmetic and deduct AP
+        await users.updateOne(
+          { id: userId },
+          {
+            $inc: { 'achievements.totalAP': -cosmetic.cost },
+            $push: { 'achievements.unlockedCosmetics': cosmeticId }
+          }
+        )
+
+        console.log('✅ Cosmetic unlocked successfully')
+        
+        return NextResponse.json({
+          success: true,
+          cosmetic: cosmetic,
+          remainingAP: userAP - cosmetic.cost
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error unlocking cosmetic:', error)
+        return NextResponse.json({
+          error: 'Failed to unlock cosmetic',
+          details: error.message
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
+    if (route === 'achievements/daily-challenge') {
+      try {
+        const userId = url.searchParams.get('userId') || 'demo-user'
+        console.log('📅 Getting daily challenge for:', userId)
+
+        const challenge = generateDailyChallenge()
+        
+        return NextResponse.json({
+          challenge: challenge
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error getting daily challenge:', error)
+        return NextResponse.json({ 
+          error: 'Failed to get daily challenge' 
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     return NextResponse.json(
       { error: 'Endpoint not found' },
       { status: 404, headers: corsHeaders }
