@@ -685,7 +685,7 @@ export default function Home() {
           <div className="grid grid-cols-12 gap-3 max-w-6xl mx-auto">
             
             {/* LEFT COLUMN - Leaderboard & Friends */}
-            <div className="col-span-12 lg:col-span-3 space-y-4">
+            <div className="col-span-12 lg:col-span-3 space-y-3">
               {/* Leaderboard */}
               <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 shadow-2xl">
                 <div className="flex items-center space-x-3 mb-6">
