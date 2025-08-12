@@ -1225,6 +1225,51 @@ export default function Home() {
         onClose={() => setShowSettings(false)} 
         user={userProfile}
       />
+      
+      {/* Real-time Cash-out Notifications Feed */}
+      <div className="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
+        {cashOutNotifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`bg-black/90 backdrop-blur-sm border border-green-400/30 rounded-lg p-3 max-w-sm shadow-2xl transition-all duration-500 ${
+              notification.fadeOut ? 'opacity-0 transform translate-x-full' : 'opacity-100 transform translate-x-0'
+            }`}
+            style={{
+              animation: notification.fadeOut ? '' : 'slideInFromRight 0.5s ease-out'
+            }}
+          >
+            <div className="flex items-center space-x-3">
+              {/* Player Avatar */}
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                style={{ backgroundColor: notification.color }}
+              >
+                {notification.name.charAt(0).toUpperCase()}
+              </div>
+              
+              {/* Notification Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center space-x-2">
+                  <span className="text-white font-semibold text-sm truncate">
+                    {notification.name}
+                  </span>
+                  <span className="text-green-400 font-bold text-sm">
+                    ${notification.amount.toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-gray-300 text-xs">
+                  cashed out instantly
+                </div>
+                <div className="flex items-center space-x-2 text-xs text-gray-400">
+                  <span>📍 {notification.city}</span>
+                  <span>•</span>
+                  <span>{formatTimeAgo(notification.timestamp)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
