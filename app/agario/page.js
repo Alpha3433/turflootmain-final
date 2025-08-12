@@ -1291,7 +1291,7 @@ const AgarIOGame = () => {
 
       {/* Minimap */}
       {!isGameOver && gameRef.current?.game && settings.showMinimap && (
-        <div className="absolute top-4 right-4 w-32 h-32 bg-black/80 backdrop-blur-sm rounded border border-gray-600/30">
+        <div className="absolute bottom-4 right-4 w-32 h-32 bg-black/80 backdrop-blur-sm rounded border border-gray-600/30">
           <canvas 
             width="128" 
             height="128" 
