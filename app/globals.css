@@ -325,7 +325,7 @@
 
 /* Custom animation classes for blue circle */
 .animate-breathe {
-  animation: animate-breathe 4s ease-in-out infinite;
+  animation: animate-breathe 7s ease-in-out infinite;
 }
 
 .animate-hover-bounce-loop {
