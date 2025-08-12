@@ -25,6 +25,8 @@ export default function Home() {
   const [isTestUser, setIsTestUser] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [leaderboardData, setLeaderboardData] = useState([])
+  const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
   
   // Get Privy hooks
   const { login, ready, authenticated, user, logout } = usePrivy()
