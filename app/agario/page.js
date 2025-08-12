@@ -646,6 +646,12 @@ const AgarIOGame = () => {
           addFloatingText(`AUTO CASH OUT!`, game.player.x, game.player.y - 70, '#ffff00')
           addToKillFeed(`Auto cash out triggered at $${currentNetWorth}`)
         }
+      } else if (settings.autoCashOut && game.player.alive) {
+        // Debug logging to help understand why auto cash out isn't triggering
+        const currentNetWorth = Math.floor(game.player.netWorth)
+        if (currentNetWorth % 50 === 0) { // Log every $50 to avoid spam
+          console.log(`💰 Auto cash out monitoring: $${currentNetWorth} / $${settings.autoCashOutThreshold} (${isCashingOut ? 'already cashing out' : 'threshold not reached'})`)
+        }
       }
 
       // Update live leaderboard
