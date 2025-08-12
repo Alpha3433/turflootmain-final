@@ -439,23 +439,101 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-white mb-4">Live Preview</h3>
               <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-600/50 mb-4">
-                {/* Character Preview */}
+                {/* Enhanced Character Preview */}
                 <div className="flex justify-center mb-4">
-                  <div className={`w-20 h-20 rounded-full border-4 border-cyan-300 flex items-center justify-center transition-all duration-500 ${
-                    previewAnimation === 'spin' ? 'animate-spin' :
-                    previewAnimation === 'bounce' ? 'animate-bounce' :
-                    previewAnimation === 'pulse' ? 'animate-pulse' :
-                    'animate-breathe'
-                  } ${
-                    selectedItem && activeCategory === 'skins' ? 
-                      selectedItem.rarity === 'legendary' ? 'bg-gradient-to-br from-yellow-400 to-orange-500' :
-                      selectedItem.rarity === 'epic' ? 'bg-gradient-to-br from-purple-400 to-pink-500' :
-                      selectedItem.rarity === 'rare' ? 'bg-gradient-to-br from-blue-400 to-cyan-500' :
+                  <div className="relative">
+                    {/* Main character body */}
+                    <div className={`w-20 h-20 rounded-full border-4 border-cyan-300 flex items-center justify-center transition-all duration-500 ${
+                      previewAnimation === 'spin' ? 'animate-spin' :
+                      previewAnimation === 'bounce' ? 'animate-bounce' :
+                      previewAnimation === 'pulse' ? 'animate-pulse' :
+                      'animate-breathe'
+                    } ${
+                      // Dynamic skin based on equipped or selected item
+                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/30 shadow-lg' :
+                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/30 shadow-lg' :
+                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/30 shadow-lg' :
+                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/30 shadow-lg' :
+                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/30 shadow-lg' :
                       'bg-cyan-400'
-                    : 'bg-cyan-400'
-                  }`}>
-                    <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6"></div>
-                    <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6"></div>
+                    }`}>
+                      
+                      {/* Dynamic eyes based on equipped face */}
+                      {(selectedItem && activeCategory === 'faces' && selectedItem.id === 'angry_eyes') || playerData.equippedFace === 'angry_eyes' ? (
+                        <>
+                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 left-6 transform rotate-12"></div>
+                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 right-6 transform -rotate-12"></div>
+                          <div className="w-4 h-1 bg-red-600 rounded absolute bottom-6"></div>
+                        </>
+                      ) : (selectedItem && activeCategory === 'faces' && selectedItem.id === 'wink_eyes') || playerData.equippedFace === 'wink_eyes' ? (
+                        <>
+                          <div className="w-2 h-0.5 bg-black rounded absolute top-6 left-6"></div>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6"></div>
+                          <div className="w-3 h-1 bg-pink-500 rounded-full absolute bottom-6"></div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6"></div>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6"></div>
+                        </>
+                      )}
+                      
+                      {/* Legendary skin effects */}
+                      {((selectedItem && activeCategory === 'skins' && selectedItem.rarity === 'legendary') || 
+                        playerData.equippedSkin === 'golden_snake' || playerData.equippedSkin === 'shadow_black') && (
+                        <>
+                          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Dynamic hat rendering */}
+                    {((selectedItem && activeCategory === 'hats') || playerData.equippedHat) && (
+                      <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${
+                        (selectedItem && activeCategory === 'hats' && selectedItem.id === 'crown_gold') || playerData.equippedHat === 'crown_gold' ? 
+                          'w-8 h-6 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border border-yellow-600' :
+                        (selectedItem && activeCategory === 'hats' && selectedItem.id === 'cap_baseball') || playerData.equippedHat === 'cap_baseball' ? 
+                          'w-10 h-4 bg-gradient-to-r from-red-600 to-red-500 rounded-full' :
+                        (selectedItem && activeCategory === 'hats' && selectedItem.id === 'helmet_space') || playerData.equippedHat === 'helmet_space' ? 
+                          'w-14 h-8 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full border-2 border-blue-400' :
+                          'w-6 h-4 bg-gray-600 rounded'
+                      }`}>
+                        {((selectedItem && activeCategory === 'hats' && selectedItem.id === 'crown_gold') || playerData.equippedHat === 'crown_gold') && (
+                          <div className="flex justify-center">
+                            <div className="w-1 h-2 bg-yellow-300 rounded-t-full mt-1"></div>
+                          </div>
+                        )}
+                        {((selectedItem && activeCategory === 'hats' && selectedItem.id === 'helmet_space') || playerData.equippedHat === 'helmet_space') && (
+                          <div className="absolute inset-2 bg-gradient-to-b from-blue-200/30 to-cyan-200/30 rounded-full"></div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Dynamic trail rendering */}
+                    {((selectedItem && activeCategory === 'trails') || playerData.equippedTrail) && (
+                      <div className="absolute -right-10 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                        {(selectedItem && activeCategory === 'trails' && selectedItem.id === 'rainbow_trail') || playerData.equippedTrail === 'rainbow_trail' ? (
+                          <>
+                            <div className="w-2 h-2 bg-red-400 rounded-full opacity-70 animate-pulse"></div>
+                            <div className="w-2 h-2 bg-yellow-400 rounded-full opacity-50 animate-pulse"></div>
+                            <div className="w-1 h-1 bg-green-400 rounded-full opacity-30 animate-pulse"></div>
+                          </>
+                        ) : (selectedItem && activeCategory === 'trails' && selectedItem.id === 'fire_trail') || playerData.equippedTrail === 'fire_trail' ? (
+                          <>
+                            <div className="w-2 h-2 bg-orange-500 rounded-full opacity-70 animate-pulse"></div>
+                            <div className="w-2 h-2 bg-red-500 rounded-full opacity-50 animate-pulse"></div>
+                            <div className="w-1 h-1 bg-yellow-500 rounded-full opacity-30 animate-pulse"></div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-2 h-2 bg-blue-400 rounded-full opacity-70 animate-pulse"></div>
+                            <div className="w-1 h-1 bg-cyan-400 rounded-full opacity-50 animate-pulse"></div>
+                            <div className="w-1 h-1 bg-white rounded-full opacity-30 animate-pulse"></div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
