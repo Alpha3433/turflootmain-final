@@ -1607,18 +1607,53 @@ const AgarIOGame = () => {
                   }
                 })
                 
-                // Draw viruses on minimap
+                // Draw viruses on minimap (spikes icon)
                 game.viruses.forEach(virus => {
                   const x = (virus.x + worldSize / 2) * scale
                   const y = (virus.y + worldSize / 2) * scale
                   
                   ctx.fillStyle = '#00ff41' // Bright green
-                  ctx.fillRect(x - 2, y - 2, 4, 4)
+                  // Draw spike/star shape
+                  ctx.beginPath()
+                  for (let i = 0; i < 8; i++) {
+                    const angle = (i * Math.PI) / 4
+                    const radius = i % 2 === 0 ? 3 : 1.5
+                    const px = x + Math.cos(angle) * radius
+                    const py = y + Math.sin(angle) * radius
+                    if (i === 0) ctx.moveTo(px, py)
+                    else ctx.lineTo(px, py)
+                  }
+                  ctx.closePath()
+                  ctx.fill()
+                })
+
+                // Draw orbs on minimap with different icons
+                game.orbs.forEach((orb, index) => {
+                  const x = (orb.x + worldSize / 2) * scale
+                  const y = (orb.y + worldSize / 2) * scale
                   
-                  // Add small border to make them more visible
-                  ctx.strokeStyle = '#00aa22'
-                  ctx.lineWidth = 1
-                  ctx.strokeRect(x - 2, y - 2, 4, 4)
+                  const isBonusOrb = index % 7 === 0 // Every 7th orb is a bonus orb
+                  const isHighValue = orb.massValue > config.orbMassValue * 1.5
+                  
+                  if (isBonusOrb) {
+                    // Bonus orb - golden diamond
+                    ctx.fillStyle = '#FFD700'
+                    ctx.beginPath()
+                    ctx.moveTo(x, y - 2)
+                    ctx.lineTo(x + 2, y)
+                    ctx.lineTo(x, y + 2)
+                    ctx.lineTo(x - 2, y)
+                    ctx.closePath()
+                    ctx.fill()
+                  } else if (isHighValue) {
+                    // High value orb - cyan square
+                    ctx.fillStyle = '#00FFFF'
+                    ctx.fillRect(x - 1.5, y - 1.5, 3, 3)
+                  } else {
+                    // Regular orb - small yellow dot
+                    ctx.fillStyle = '#FFFF00'
+                    ctx.fillRect(x - 0.5, y - 0.5, 1, 1)
+                  }
                 })
               }
             }}
