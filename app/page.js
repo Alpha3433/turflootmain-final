@@ -31,6 +31,29 @@ export default function Home() {
   const [friendsList, setFriendsList] = useState([])
   const [loadingFriends, setLoadingFriends] = useState(false)
   
+  // Real-time cash-out notifications state
+  const [cashOutNotifications, setCashOutNotifications] = useState([])
+  
+  // Mock data for notifications
+  const mockPlayerNames = [
+    'Alex', 'Jordan', 'Casey', 'Morgan', 'Riley', 'Taylor', 'Avery', 'Quinn',
+    'Cameron', 'Blake', 'Sage', 'Phoenix', 'River', 'Skyler', 'Dakota', 'Emery',
+    'Finley', 'Harper', 'Indigo', 'Justice', 'Kai', 'Lane', 'Marley', 'Nova'
+  ]
+  
+  const mockCities = [
+    'New York', 'Los Angeles', 'Chicago', 'Miami', 'Seattle', 'Austin', 'Denver',
+    'Boston', 'San Francisco', 'Las Vegas', 'Atlanta', 'Portland', 'Nashville',
+    'Phoenix', 'San Diego', 'Dallas', 'Houston', 'Philadelphia', 'Detroit',
+    'Minneapolis', 'Tampa', 'Orlando', 'Charlotte', 'Raleigh', 'Louisville'
+  ]
+  
+  const avatarColors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57', '#FF9FF3',
+    '#54A0FF', '#5F27CD', '#00D2D3', '#FF9F43', '#EE5A24', '#0ABDE3',
+    '#10AC84', '#F79F1F', '#A3CB38', '#FDA7DF', '#D63031', '#74B9FF'
+  ]
+  
   // Get Privy hooks
   const { login, ready, authenticated, user, logout } = usePrivy()
   const router = useRouter()
