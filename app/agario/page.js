@@ -202,6 +202,19 @@ const AgarIOGame = () => {
     const canvas = canvasRef.current
     if (!canvas) return
 
+    // Initialize game session tracking
+    setGameSession({
+      startTime: Date.now(),
+      endTime: null,
+      kills: 0,
+      survived: false,
+      cashedOut: false,
+      earnings: 0,
+      playTimeSeconds: 0
+    })
+    
+    console.log('🎮 Game session started - tracking statistics')
+
     const ctx = canvas.getContext('2d')
     
     // Set canvas size
