@@ -666,13 +666,13 @@ export default function Home() {
         <span className="text-cyan-400 text-xs">⚠️ TurfLoot prizes are determined solely by player skill. Play responsibly.</span>
       </div>
 
-      {/* Main Content - More Compact Layout */}
-      <main className="flex-1 flex items-center justify-center py-4 relative z-10">
+      {/* Main Content - Further Optimized Layout */}
+      <main className="flex-1 flex items-center justify-center py-2 relative z-10">
         <div className="w-full max-w-7xl mx-auto px-6">
           
           {/* Hero Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-5xl md:text-6xl xl:text-7xl font-black tracking-tight mb-3">
+          <div className="text-center mb-6">
+            <h1 className="text-5xl md:text-6xl xl:text-7xl font-black tracking-tight mb-2">
               <span className="text-white">TURF</span>
               <span className="text-yellow-400">LOOT</span>
             </h1>
@@ -682,7 +682,7 @@ export default function Home() {
           </div>
 
           {/* Main Game Grid */}
-          <div className="grid grid-cols-12 gap-4 max-w-6xl mx-auto">
+          <div className="grid grid-cols-12 gap-3 max-w-6xl mx-auto">
             
             {/* LEFT COLUMN - Leaderboard & Friends */}
             <div className="col-span-12 lg:col-span-3 space-y-4">
