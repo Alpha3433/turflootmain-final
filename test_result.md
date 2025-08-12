@@ -422,6 +422,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ PASSED - Wallet balance API working perfectly. Authenticated requests return all required fields (balance, currency, sol_balance, usdc_balance). Unauthenticated requests properly rejected with 401. Balance retrieval shows current user balance: $10 USD, 0 SOL, 20 USDC. Authentication integration with JWT tokens working correctly."
+      - working: true
+        agent: "testing"
+        comment: "✅ POST-PRIVY WALLET INTEGRATION VERIFICATION PASSED - Wallet balance API working perfectly after WalletManager.jsx useFundWallet hook changes. Authenticated requests return correct balance: $5010 USD, 49.9 SOL, 20 USDC. Unauthenticated requests properly rejected with 401. No regression issues detected from frontend Privy integration changes. Backend API functionality unaffected by frontend hook modifications."
 
   - task: "Add Funds API (POST /api/wallet/add-funds)"
     implemented: true
