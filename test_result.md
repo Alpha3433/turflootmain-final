@@ -146,6 +146,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ POST-REDESIGN VERIFICATION PASSED - Game pots endpoint working perfectly after professional gaming interface redesign. Returns all 3 pot tables with 58 total players and $3588 total pot. Live statistics integration confirmed working."
+      - working: true
+        agent: "testing"
+        comment: "✅ POST-UI POSITION SWAP VERIFICATION PASSED - Game pots endpoint working perfectly after UI position swap and dynamic settings system integration. Returns all 3 pot tables with 80 total players and $4475 total pot. No regression issues detected from frontend changes."
 
   - task: "Live Statistics APIs (GET /api/stats/live-players and GET /api/stats/global-winnings)"
     implemented: true
