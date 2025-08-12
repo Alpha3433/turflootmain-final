@@ -89,7 +89,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
 
   // Filter and sort items
   const getFilteredItems = () => {
-    let items = mockItems[activeCategory] || []
+    let items = itemsData[activeCategory] || []
     
     // Filter by tab (inventory/shop)
     if (activeTab === 'inventory') {
