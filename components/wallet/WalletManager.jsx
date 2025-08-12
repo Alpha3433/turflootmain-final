@@ -280,8 +280,31 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
   if (!authenticated) {
     return (
-      <div className="text-center py-6">
-        <div className="text-gray-400 text-sm mb-4">Login to access wallet features</div>
+      <div className="space-y-4">
+        {/* Balance Display - Mock data for unauthenticated users */}
+        <div className="text-center py-4">
+          <div className="text-3xl font-black text-white mb-2">$0.00</div>
+          <div className="text-gray-400 text-sm mb-2">Game Balance</div>
+          <div className="text-xs text-gray-500">
+            0.0000 SOL • 0.00 USDC
+          </div>
+        </div>
+        
+        {/* Action Buttons - Trigger login on click */}
+        <div className="space-y-3">
+          <button 
+            onClick={() => login()}
+            className="w-full py-3 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-xl text-green-400 font-bold text-sm transition-all hover:scale-105"
+          >
+            Add Funds
+          </button>
+          <button 
+            onClick={() => login()}
+            className="w-full py-3 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-blue-400 font-bold text-sm transition-all hover:scale-105"
+          >
+            Cash Out
+          </button>
+        </div>
       </div>
     )
   }
