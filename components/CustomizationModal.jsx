@@ -130,10 +130,31 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   const handleEquipItem = (item) => {
     if (!item.owned) return
     
+    // Update local player data
+    const categoryKey = `equipped${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1, -1)}`
     setPlayerData(prev => ({
       ...prev,
-      [`equipped${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1, -1)}`]: item.id
+      [categoryKey]: item.id
     }))
+    
+    // Update global player appearance (this would be sent to server in real game)
+    const customizationData = {
+      skin: activeCategory === 'skins' ? item.id : playerData.equippedSkin,
+      hat: activeCategory === 'hats' ? item.id : playerData.equippedHat,
+      trail: activeCategory === 'trails' ? item.id : playerData.equippedTrail,
+      face: activeCategory === 'faces' ? item.id : playerData.equippedFace
+    }
+    
+    // Store in localStorage for persistence across game sessions
+    try {
+      localStorage.setItem('turfloot_player_customization', JSON.stringify(customizationData))
+      console.log('Player customization saved:', customizationData)
+    } catch (error) {
+      console.error('Failed to save customization:', error)
+    }
+    
+    // In a real game, this would also send to server:
+    // fetch('/api/player/customization', { method: 'POST', body: JSON.stringify(customizationData) })
   }
 
   const handlePurchaseItem = (item) => {
