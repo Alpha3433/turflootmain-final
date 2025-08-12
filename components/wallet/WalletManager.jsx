@@ -13,7 +13,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
   const [showAddFunds, setShowAddFunds] = useState(false)
   const [showCashOut, setShowCashOut] = useState(false)
   const [addFundsForm, setAddFundsForm] = useState({ amount: '', currency: 'SOL' })
-  const [cashOutForm, setCashOutForm] = useState({ amount: '', currency: 'SOL', address: '' })
+  const [cashOutForm, setCashOutForm] = useState({ amount: '', currency: 'USD', address: '' })
   
   // Define fetch functions first
   const fetchBalance = async () => {
