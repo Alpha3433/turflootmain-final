@@ -371,45 +371,45 @@ const WalletManager = ({ onBalanceUpdate }) => {
         </div>
       )}
 
-      {/* Cash Out Modal - Using React Portal for True Centering */}
+      {/* Cash Out Modal - Redesigned to Match Screenshot */}
       {showCashOut && typeof document !== 'undefined' && createPortal(
         <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
           style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          <div className="bg-gray-900 rounded-2xl w-full max-w-2xl mx-4 border border-gray-700 shadow-2xl">
+          <div className="bg-gray-900/95 rounded-2xl w-full max-w-md mx-4 border border-gray-700/50 shadow-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between p-6">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">💸</span>
-                <h2 className="text-2xl font-bold text-white">Cash Out</h2>
+            <div className="flex items-center justify-between p-6 pb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-500 text-xl">💸</span>
+                <h2 className="text-xl font-bold text-yellow-500">Cash Out</h2>
               </div>
               <button 
                 onClick={() => setShowCashOut(false)}
-                className="text-gray-400 hover:text-white transition-colors text-2xl"
+                className="text-gray-400 hover:text-white transition-colors text-xl"
               >
                 ✕
               </button>
             </div>
 
-            <div className="px-6 pb-6 space-y-6">
+            <div className="px-6 pb-6 space-y-4">
               {/* Available Balance */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">💰</span>
-                  <span className="text-gray-300 text-lg font-medium">Available Balance</span>
+                  <span className="text-green-400 text-lg">💰</span>
+                  <span className="text-gray-300 font-medium">Available Balance</span>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-red-500">${balance.balance.toFixed(2)}</div>
-                  <div className="text-gray-400 text-base">{balance.sol_balance.toFixed(6)} SOL</div>
+                  <div className="text-xl font-bold text-red-500">${balance.balance.toFixed(2)}</div>
+                  <div className="text-gray-400 text-sm">{balance.sol_balance.toFixed(6)} SOL</div>
                 </div>
               </div>
 
               {/* Insufficient Balance Warning */}
-              <div className="bg-red-900/30 border border-red-600/50 rounded-xl p-4">
-                <div className="flex items-center gap-3 text-red-400">
-                  <span className="text-xl">⚠️</span>
-                  <span className="text-base font-medium">
+              <div className="bg-red-900/40 border border-red-600/60 rounded-xl p-3">
+                <div className="flex items-center gap-2 text-red-400">
+                  <span className="text-base">⚠️</span>
+                  <span className="text-sm font-medium">
                     Insufficient balance for cashout. Minimum $0.20 + $0.01 required.
                   </span>
                 </div>
@@ -425,20 +425,20 @@ const WalletManager = ({ onBalanceUpdate }) => {
                     value={cashOutForm.amount}
                     onChange={(e) => setCashOutForm({...cashOutForm, amount: e.target.value})}
                     placeholder="0.00"
-                    className="w-full text-3xl font-normal bg-gray-800 text-white rounded-xl border border-gray-600 focus:border-blue-400 focus:outline-none p-4 pr-32"
+                    className="w-full text-2xl font-normal bg-gray-800/80 text-white rounded-xl border border-gray-600/50 focus:border-blue-400/70 focus:outline-none p-4 pr-28"
                   />
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center gap-3">
-                    <span className="text-gray-400 text-xl font-medium">USD</span>
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-2">
+                    <span className="text-gray-400 text-lg font-medium">USD</span>
                     <button
                       type="button"
-                      className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded transition-colors"
+                      className="px-2 py-1 bg-blue-600/90 hover:bg-blue-500 text-white text-xs font-bold rounded border border-blue-400/50"
                     >
                       ⇅
                     </button>
                     <button
                       type="button"
                       onClick={handleMaxCashOut}
-                      className="px-3 py-2 bg-yellow-600 hover:bg-yellow-500 text-black text-sm font-bold rounded transition-colors"
+                      className="px-2 py-1 bg-yellow-600/90 hover:bg-yellow-500 text-black text-xs font-bold rounded border border-yellow-400/60"
                     >
                       MAX
                     </button>
@@ -447,35 +447,35 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
                 {/* Percentage Slider */}
                 <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 bg-gray-600 rounded-full border-2 border-gray-500"></div>
-                    <div className="flex-1 h-2 bg-gray-700 rounded-full">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gray-600 rounded-full border border-gray-500"></div>
+                    <div className="flex-1 h-1.5 bg-gray-700/80 rounded-full">
                       <div className="h-full w-0 bg-cyan-400 rounded-full"></div>
                     </div>
                   </div>
-                  <div className="text-center text-gray-400 text-base">0% of available balance</div>
+                  <div className="text-center text-gray-400 text-sm">0% of available balance</div>
                 </div>
               </div>
 
               {/* Destination Wallet Address */}
-              <div className="space-y-3">
-                <label className="block text-gray-300 text-lg font-medium">Destination Wallet Address</label>
+              <div className="space-y-2">
+                <label className="block text-gray-300 font-medium">Destination Wallet Address</label>
                 <input
                   type="text"
                   value={cashOutForm.address}
                   onChange={(e) => setCashOutForm({...cashOutForm, address: e.target.value})}
                   placeholder="Enter Solana wallet address..."
-                  className="w-full p-4 bg-gray-800 text-white rounded-xl border border-gray-600 focus:border-blue-400 focus:outline-none font-mono text-base"
+                  className="w-full p-3 bg-gray-800/80 text-white rounded-xl border border-gray-600/50 focus:border-blue-400/70 focus:outline-none font-mono text-sm"
                   required
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowCashOut(false)}
-                  className="flex-1 py-4 px-6 bg-transparent border-2 border-gray-500 text-white font-semibold rounded-xl hover:bg-gray-700/30 transition-colors text-lg"
+                  className="flex-1 py-3 px-4 bg-transparent border border-gray-500/70 text-gray-300 font-semibold rounded-xl hover:bg-gray-700/30 transition-colors"
                 >
                   Cancel
                 </button>
@@ -483,7 +483,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
                   type="button"
                   onClick={handleCashOut}
                   disabled={loading || !cashOutForm.amount || !cashOutForm.address}
-                  className="flex-1 py-4 px-6 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                  className="flex-1 py-3 px-4 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Processing...' : '💸 Cash Out'}
                 </button>
