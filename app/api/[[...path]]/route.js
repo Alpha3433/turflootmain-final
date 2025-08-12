@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 import { MongoClient } from 'mongodb'
 import jwt from 'jsonwebtoken'
 import { createUser, requireAuth, updateUserProfile, getUserStats } from '../../../lib/auth.js'
+import { 
+  getCurrentSeason, 
+  getAchievementDefinitions, 
+  getCosmeticDefinitions, 
+  calculateAchievementProgress, 
+  generateDailyChallenge 
+} from '../../../lib/achievements.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'turfloot-secret-key-change-in-production'
 
