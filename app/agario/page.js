@@ -1762,7 +1762,7 @@ const AgarIOGame = () => {
                   const y = (orb.y + worldSize / 2) * scale
                   
                   const isBonusOrb = index % 7 === 0 // Every 7th orb is a bonus orb
-                  const isHighValue = orb.massValue > config.orbMassValue * 1.5
+                  const isHighValue = false // Simplified: remove config dependency for now
                   
                   if (isBonusOrb) {
                     // Bonus orb - golden diamond
