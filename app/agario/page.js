@@ -1201,7 +1201,7 @@ const AgarIOGame = () => {
       
       {/* Top-right Player Stats Panel */}
       {!isGameOver && (
-        <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 min-w-[200px]">
+        <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 min-w-[200px]">
           <div className="text-cyan-400 font-bold text-lg mb-2">You</div>
           <div className="space-y-1 text-sm">
             <div className="flex justify-between">
