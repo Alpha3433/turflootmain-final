@@ -105,6 +105,52 @@ const AgarIOGame = () => {
     }
   }, [])
 
+  // Helper function to get player's customized appearance
+  const getPlayerSkinColor = () => {
+    switch (playerCustomization.skin) {
+      case 'golden_snake':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #FCD34D 0%, #F59E0B 50%, #EA580C 100%)',
+          solidColor: '#F59E0B',
+          hasSpecialEffect: true
+        }
+      case 'neon_green':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #86EFAC 0%, #22C55E 50%, #16A34A 100%)',
+          solidColor: '#22C55E',
+          hasSpecialEffect: false
+        }
+      case 'fire_red':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #FCA5A5 0%, #EF4444 50%, #DC2626 100%)',
+          solidColor: '#EF4444',
+          hasSpecialEffect: false
+        }
+      case 'ice_blue':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #BFDBFE 0%, #60A5FA 50%, #3B82F6 100%)',
+          solidColor: '#60A5FA',
+          hasSpecialEffect: false
+        }
+      case 'shadow_black':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #4B5563 0%, #6B21C8 50%, #000000 100%)',
+          solidColor: '#6B21C8',
+          hasSpecialEffect: true
+        }
+      default: // default_blue
+        return { 
+          fillStyle: '#00f5ff',
+          solidColor: '#00f5ff',
+          hasSpecialEffect: false
+        }
+    }
+  }
+
+  const getPlayerFaceStyle = () => {
+    return playerCustomization.face || 'normal_eyes'
+  }
+
   // Load player customization data
   useEffect(() => {
     try {
