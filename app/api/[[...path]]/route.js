@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { MongoClient, ObjectId } from 'mongodb'
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 import { createUser, requireAuth, updateUserProfile, getUserStats } from '../../../lib/auth.js'
 import { 
   getCurrentSeason, 
