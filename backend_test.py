@@ -320,8 +320,17 @@ class TurfLootAPITester:
         
         # Test 4: Insufficient balance scenario
         try:
+            # First get current balance to ensure we test with truly insufficient amount
+            balance_response = self.session.get(f"{API_BASE}/wallet/balance")
+            if balance_response.status_code == 200:
+                balance_data = balance_response.json()
+                current_sol_balance = balance_data.get('sol_balance', 0)
+                insufficient_amount = current_sol_balance + 10.0  # Request more than available
+            else:
+                insufficient_amount = 1000.0  # Fallback to large amount
+            
             insufficient_request = {
-                "amount": 10.0,  # More than available balance
+                "amount": insufficient_amount,
                 "currency": "SOL",
                 "recipient_address": "11111111111111111111111111111112"
             }
@@ -338,7 +347,7 @@ class TurfLootAPITester:
                     self.log_test(
                         "Insufficient Balance Validation", 
                         True, 
-                        f"Correctly rejected large amount: {data.get('error')}"
+                        f"Correctly rejected {insufficient_amount} SOL (more than available): {data.get('error')}"
                     )
                 else:
                     self.log_test(
