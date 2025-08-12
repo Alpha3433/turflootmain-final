@@ -68,34 +68,35 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
 
     try {
-      console.log('🎯 Attempting to open Privy wallet funding modal')
-      console.log('🔍 Available Privy functions:', { fundWallet: typeof fundWallet, authenticated, user: !!user })
+      console.log('🎯 Attempting to open Privy wallet functionality')
+      console.log('🔍 Available functions:', { connectWallet: typeof connectWallet, wallets: wallets?.length })
       
-      // Check if fundWallet is available
-      if (typeof fundWallet === 'function') {
-        console.log('✅ fundWallet function found, calling it...')
-        await fundWallet()
-        console.log('✅ Privy funding modal should be open')
+      // Try to connect wallet if no wallets are connected
+      if (!wallets || wallets.length === 0) {
+        console.log('📱 No wallets connected, trying to connect wallet...')
+        if (typeof connectWallet === 'function') {
+          await connectWallet()
+          console.log('✅ Wallet connection initiated')
+          return
+        }
+      }
+      
+      // If we have wallets connected, try to open funding interface
+      if (wallets && wallets.length > 0) {
+        console.log('💳 Wallet connected, looking for funding options...')
+        const wallet = wallets[0]
+        console.log('🔍 Wallet details:', { type: wallet.walletClientType, address: wallet.address })
         
-        // Refresh balance after funding (with delay for processing)
-        setTimeout(() => {
-          fetchBalance()
-          fetchTransactions()
-        }, 2000)
+        // For now, show the custom modal since Privy's funding modal isn't available
+        console.log('⚠️ Using custom funding modal (Privy fundWallet not available in current version)')
+        setShowAddFunds(true)
       } else {
-        console.warn('⚠️ fundWallet function not available, using fallback modal')
-        console.log('🔍 This might mean:')
-        console.log('  1. Privy version doesn\'t support fundWallet')
-        console.log('  2. Privy configuration doesn\'t have funding enabled')
-        console.log('  3. Need to use a different Privy hook')
-        
-        // Fallback to custom modal
+        console.log('⚠️ No wallets available, showing custom modal')
         setShowAddFunds(true)
       }
     } catch (error) {
-      console.error('❌ Error opening Privy funding:', error)
+      console.error('❌ Error with Privy wallet operations:', error)
       console.log('🔄 Falling back to custom modal')
-      // Fallback to custom modal on error
       setShowAddFunds(true)
     }
   }
