@@ -675,21 +675,34 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="space-y-3">
-                  {[
-                    { rank: 1, name: 'aj', earnings: '$1,821.23' },
-                    { rank: 2, name: 'Enten', earnings: '$1,403.84' },
-                    { rank: 3, name: 'hotbar', earnings: '$1,240.07' }
-                  ].map((player) => (
-                    <div key={player.rank} className="flex justify-between items-center py-2 px-3 bg-gray-800/30 rounded-xl border border-gray-700/20">
-                      <div className="flex items-center space-x-3">
-                        <span className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-xs">
-                          {player.rank}
-                        </span>
-                        <span className="text-gray-300 font-medium">{player.name}</span>
-                      </div>
-                      <span className="text-green-400 font-bold text-sm">{player.earnings}</span>
+                  {loadingLeaderboard ? (
+                    <div className="text-center py-8">
+                      <div className="text-2xl animate-spin mb-2">⏳</div>
+                      <div className="text-gray-400 text-sm">Loading leaderboard...</div>
                     </div>
-                  ))}
+                  ) : leaderboardData.length > 0 ? (
+                    leaderboardData.map((player) => (
+                      <div key={player.rank} className="flex justify-between items-center py-2 px-3 bg-gray-800/30 rounded-xl border border-gray-700/20">
+                        <div className="flex items-center space-x-3">
+                          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-black font-bold text-xs ${
+                            player.rank === 1 ? 'bg-yellow-500' :
+                            player.rank === 2 ? 'bg-gray-400' :
+                            'bg-amber-600'
+                          }`}>
+                            {player.rank}
+                          </span>
+                          <span className="text-gray-300 font-medium">{player.name}</span>
+                        </div>
+                        <span className="text-green-400 font-bold text-sm">{player.earnings}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="text-4xl mb-2">🏆</div>
+                      <div className="text-gray-400 text-sm">No players yet</div>
+                      <div className="text-gray-500 text-xs">Be the first to cash out and appear on the leaderboard!</div>
+                    </div>
+                  )}
                 </div>
                 <button className="w-full mt-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl border border-gray-600 text-gray-300 font-medium transition-all hover:scale-105 text-sm">
                   View Full Leaderboard
