@@ -53,6 +53,9 @@ const AgarIOGame = () => {
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     
+    // Reset auto cash out flag for fresh game
+    setAutoCashOutTriggered(false)
+    
     // Initialize the game
     initializeGame()
     
