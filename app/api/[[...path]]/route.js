@@ -407,7 +407,8 @@ export async function GET(request, { params }) {
     // User search endpoint
     if (route === 'users/search') {
       try {
-        const { query, limit = 10 } = body
+        const query = url.searchParams.get('q')
+        const limit = parseInt(url.searchParams.get('limit')) || 10
         
         if (!query || query.trim().length < 2) {
           return NextResponse.json({
@@ -425,8 +426,7 @@ export async function GET(request, { params }) {
             { custom_name: { $regex: query, $options: 'i' } },
             { 'email': { $regex: query, $options: 'i' } },
             { id: { $regex: query, $options: 'i' } }
-          ],
-          'stats.games_played': { $gt: 0 } // Only show users who have played
+          ]
         })
         .limit(parseInt(limit))
         .project({
