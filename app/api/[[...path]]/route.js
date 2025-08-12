@@ -1451,11 +1451,11 @@ export async function POST(request, { params }) {
           }, { status: 400, headers: corsHeaders })
         }
 
-        // Create friend request
+        // Create friend request (for demo, set as accepted)
         const friendRequest = {
           fromUserId,
           toUserId,
-          status: 'pending',
+          status: 'accepted', // Auto-accept for demo purposes
           createdAt: new Date(),
           updatedAt: new Date()
         }
