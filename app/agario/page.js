@@ -778,8 +778,22 @@ const AgarIOGame = () => {
               const bountyText = bot.isBounty ? ` Bounty!` : ''
               addFloatingText(`+$${killReward}${bountyText}`, game.player.x, game.player.y - 50, '#ff4444')
               
-              // Add to kill feed
-              addToKillFeed(`You eliminated ${bot.name} (+$${killReward}${bountyText})`)
+              // Add kill streak announcement
+              addKillStreakAnnouncement(game.player.streak)
+              
+              // Add to kill feed and live events
+              const killMessage = `You eliminated ${bot.name} (+$${killReward}${bountyText})`
+              addToKillFeed(killMessage)
+              addLiveEvent(`Player eliminated ${bot.name} for $${killReward}`, 'kill')
+              
+              // Update mission progress
+              if (currentMission && currentMission.type === 'eliminate') {
+                const newProgress = currentMission.progress + 1
+                setMissionProgress(newProgress)
+                if (newProgress >= currentMission.target) {
+                  completeMission(currentMission)
+                }
+              }
               
             } else if (bot.mass > game.player.mass * 1.15) {
               // Bot kills player
