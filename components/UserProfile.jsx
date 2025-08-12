@@ -209,42 +209,151 @@ const UserProfile = ({ isOpen, onClose, user }) => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-yellow-400 flex items-center">
-          💰 Top 10 Players
-          <span className="text-sm text-gray-400 ml-2">• 25+ games required</span>
+          🏆 Global Leaderboard
+          <span className="text-sm text-gray-400 ml-2">• Live Rankings</span>
         </h2>
-        <select className="bg-gray-800 border border-yellow-400/30 rounded px-3 py-1 text-yellow-400">
-          <option>💰 Winnings</option>
-          <option>🏆 Wins</option>
-          <option>⚡ K/D</option>
+        <select 
+          className="bg-gray-800 border border-yellow-400/30 rounded px-3 py-1 text-yellow-400"
+          value={leaderboardType}
+          onChange={(e) => {
+            setLeaderboardType(e.target.value)
+            loadLeaderboard()
+          }}
+        >
+          <option value="winnings">💰 Winnings</option>
+          <option value="wins">🏆 Wins</option>
+          <option value="kd">⚡ K/D Ratio</option>
         </select>
       </div>
       
-      <div className="flex flex-col items-center justify-center h-64 space-y-4">
-        <div className="text-4xl">🏆</div>
-        <div className="text-center">
-          <h3 className="text-lg font-bold text-white mb-2">Leaderboard Loading...</h3>
-          <p className="text-gray-400">Top players will appear here once you start playing</p>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+          <div className="text-4xl animate-spin">⏳</div>
+          <div className="text-center">
+            <h3 className="text-lg font-bold text-white mb-2">Loading Leaderboard...</h3>
+            <p className="text-gray-400">Fetching latest rankings</p>
+          </div>
         </div>
-      </div>
+      ) : leaderboard.length > 0 ? (
+        <div className="space-y-2">
+          {leaderboard.map((player) => (
+            <div
+              key={player.rank}
+              className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
+                player.isCurrentUser
+                  ? 'bg-yellow-400/10 border-yellow-400/50 ring-1 ring-yellow-400/30'
+                  : 'bg-gray-800/50 border-gray-600/30 hover:bg-gray-700/50'
+              }`}
+            >
+              <div className="flex items-center space-x-4">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                  player.rank === 1 ? 'bg-yellow-500 text-black' :
+                  player.rank === 2 ? 'bg-gray-400 text-black' :
+                  player.rank === 3 ? 'bg-amber-600 text-white' : 
+                  'bg-gray-600 text-white'
+                }`}>
+                  {player.rank}
+                </div>
+                <div className="text-2xl">{player.avatar}</div>
+                <div>
+                  <div className={`font-bold ${player.isCurrentUser ? 'text-yellow-400' : 'text-white'}`}>
+                    {player.name} {player.isCurrentUser && '(You)'}
+                  </div>
+                  <div className="text-sm text-gray-400">{player.wins} wins</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-green-400">${player.winnings.toLocaleString()}</div>
+                <div className="text-sm text-gray-400">K/D: {player.killDeathRatio}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+          <div className="text-4xl">🏆</div>
+          <div className="text-center">
+            <h3 className="text-lg font-bold text-white mb-2">Leaderboard Empty</h3>
+            <p className="text-gray-400">Be the first to climb the rankings!</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 
   const renderSearch = () => (
-    <div className="flex flex-col items-center justify-center h-96 space-y-6">
-      <div className="text-6xl">🔍</div>
+    <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-white mb-2">Search Players</h2>
-        <p className="text-gray-400 mb-4">Start typing to find players by username or Game ID</p>
-        <div className="text-sm text-gray-500 space-y-1">
-          <div>• Username: "john", "player123"</div>
-          <div>• Game ID: "abc123def456..."</div>
-        </div>
+        <h2 className="text-xl font-bold text-white mb-2">🔍 Find Players</h2>
+        <p className="text-gray-400">Search by username or Game ID</p>
       </div>
-      <input 
-        type="text"
-        placeholder="Search by username or Game ID..."
-        className="w-full max-w-md px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
-      />
+      
+      <div className="relative">
+        <input 
+          type="text"
+          placeholder="Search by username or Game ID..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value)
+            handleSearch(e.target.value)
+          }}
+          className="w-full px-4 py-3 pl-12 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
+        />
+        <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+      </div>
+
+      {loading && searchQuery ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="text-2xl animate-spin">🔍</div>
+          <span className="ml-3 text-gray-400">Searching...</span>
+        </div>
+      ) : searchResults.length > 0 ? (
+        <div className="space-y-3">
+          <h3 className="text-lg font-bold text-yellow-400">Search Results</h3>
+          {searchResults.map((player) => (
+            <div key={player.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-600/30">
+              <div className="flex items-center space-x-4">
+                <div className="text-2xl">{player.avatar}</div>
+                <div>
+                  <div className="font-bold text-white">{player.name}</div>
+                  <div className="text-sm text-gray-400">
+                    {player.wins} wins • {player.status}
+                    {player.status === 'online' && <span className="text-green-400 ml-1">●</span>}
+                    {player.status === 'playing' && <span className="text-yellow-400 ml-1">●</span>}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => addFriend(player.id)}
+                className="px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-black font-medium rounded-lg transition-colors flex items-center"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Friend
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : searchQuery ? (
+        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          <div className="text-4xl">😔</div>
+          <div className="text-center">
+            <h3 className="text-lg font-bold text-white mb-2">No Results Found</h3>
+            <p className="text-gray-400">Try a different search term</p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          <div className="text-6xl">🔍</div>
+          <div className="text-center">
+            <h3 className="text-lg font-bold text-white mb-2">Start Searching</h3>
+            <p className="text-gray-400 mb-4">Find players by typing their username or Game ID</p>
+            <div className="text-sm text-gray-500 space-y-1">
+              <div>• Username: "ProGamer", "player123"</div>
+              <div>• Game ID: "abc123def456..."</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 
