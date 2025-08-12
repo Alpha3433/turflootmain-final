@@ -1291,6 +1291,9 @@ const AgarIOGame = () => {
         if (gameRef.current?.cashOutTimer) {
           clearInterval(gameRef.current.cashOutTimer)
         }
+        if (gameRef.current?.missionInterval) {
+          clearInterval(gameRef.current.missionInterval)
+        }
       }
     }
     
