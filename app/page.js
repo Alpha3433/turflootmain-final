@@ -167,9 +167,9 @@ export default function Home() {
       }, 5000) // Show for 5 seconds
     }
 
-    // Start generating notifications every 4-8 seconds
+    // Start generating notifications every 15-25 seconds (less frequent)
     const generateNotifications = () => {
-      const randomDelay = Math.random() * 4000 + 4000 // 4-8 seconds
+      const randomDelay = Math.random() * 10000 + 15000 // 15-25 seconds
       setTimeout(() => {
         addNotification()
         generateNotifications() // Schedule next notification
