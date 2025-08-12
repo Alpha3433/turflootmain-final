@@ -932,18 +932,23 @@ export async function POST(request, { params }) {
         })
         
         if (!user) {
+          // Generate a unique random username for new user
+          const randomUsername = await generateUniqueUsername()
+          console.log('🎲 Generated unique username:', randomUsername)
+          
           // Create new user with unified Privy data
           console.log('👤 Creating new user for Privy ID:', privyId)
           user = {
             id: crypto.randomUUID(),
             privy_id: privyId,
             email,
-            username: username || `user_${Date.now()}`,
+            username: randomUsername,
+            custom_name: null, // Users can set this later
             wallet_address,
             auth_method,
             profile: {
               avatar_url: avatar_url || null,
-              display_name: username || (email ? email.split('@')[0] : 'Anonymous'),
+              display_name: randomUsername, // Use random name instead of email
               bio: '',
               total_games: 0,
               total_winnings: 0,
