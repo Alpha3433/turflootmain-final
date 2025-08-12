@@ -95,7 +95,7 @@ const AgarIOGame = () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [isCashingOut])
+  }, [isCashingOut, settings])
 
   const startCashOut = () => {
     setIsCashingOut(true)
