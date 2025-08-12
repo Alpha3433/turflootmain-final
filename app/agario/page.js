@@ -1010,14 +1010,22 @@ const AgarIOGame = () => {
       ctx.fill()
       ctx.globalCompositeOperation = 'source-over' // Reset blend mode
       
-      // Draw world border (red circle)
+      // Draw world border with enhanced glow
       const borderRadius = config.worldSize / 2
-      ctx.strokeStyle = '#ff0000'
+      
+      // Draw glow effect
+      ctx.shadowColor = '#ff0000'
+      ctx.shadowBlur = 20 * territoryGlowIntensity
+      ctx.strokeStyle = `rgba(255, 0, 0, ${0.8 + territoryGlowIntensity * 0.4})`
       ctx.lineWidth = 8
       ctx.setLineDash([20, 10]) // Dashed line pattern
       ctx.beginPath()
       ctx.arc(0, 0, borderRadius, 0, Math.PI * 2)
       ctx.stroke()
+      
+      // Reset shadow for other drawings
+      ctx.shadowColor = 'transparent'
+      ctx.shadowBlur = 0
       ctx.setLineDash([]) // Reset line dash
       
       // Draw orbs - bigger like original Agario
