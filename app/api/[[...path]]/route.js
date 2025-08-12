@@ -614,6 +614,58 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Friends list endpoint (GET)
+    if (route === 'friends/list') {
+      try {
+        const userId = url.searchParams.get('userId')
+        
+        if (!userId) {
+          return NextResponse.json({
+            error: 'userId is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        const users = db.collection('users')
+        
+        // Get accepted friends
+        const friendships = await friends.find({
+          $or: [
+            { fromUserId: userId, status: 'accepted' },
+            { toUserId: userId, status: 'accepted' }
+          ]
+        }).toArray()
+
+        // Get friend user details
+        const friendIds = friendships.map(f => 
+          f.fromUserId === userId ? f.toUserId : f.fromUserId
+        )
+
+        const friendsData = await users.find({
+          id: { $in: friendIds }
+        }).project({
+          id: 1,
+          custom_name: 1,
+          email: 1,
+          stats: 1,
+          last_seen: 1,
+          online_status: 1
+        }).toArray()
+
+        console.log(`👥 Found ${friendsData.length} friends for user ${userId}`)
+        
+        return NextResponse.json({
+          friends: friendsData
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error getting friends list:', error)
+        return NextResponse.json({
+          error: 'Failed to get friends list'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     return NextResponse.json(
       { error: 'Endpoint not found' },
       { status: 404, headers: corsHeaders }
