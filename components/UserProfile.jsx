@@ -281,10 +281,44 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
     return `${hours}h ${mins}m`
   }
 
-  const addFriend = (playerId) => {
-    console.log('➕ Adding friend:', playerId)
-    // In real implementation, this would make an API call
-    alert('Friend request sent!')
+  const addFriend = async (playerId) => {
+    try {
+      const currentUserId = user?.id || user?.privyId || 'demo-user'
+      console.log('➕ Adding friend:', playerId, 'from user:', currentUserId)
+      
+      const response = await fetch('/api/friends/send-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fromUserId: currentUserId,
+          toUserId: playerId
+        }),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('✅ Friend request sent:', result)
+        alert('✅ Friend request sent successfully!')
+        
+        // Update search results to show request sent
+        setSearchResults(prev => 
+          prev.map(p => 
+            p.id === playerId 
+              ? { ...p, friendRequestSent: true }
+              : p
+          )
+        )
+      } else {
+        const error = await response.json()
+        console.error('❌ Failed to send friend request:', error)
+        alert(`❌ ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error)
+      alert('❌ Network error. Please try again.')
+    }
   }
 
   if (!isOpen) return null
