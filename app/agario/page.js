@@ -838,41 +838,128 @@ const AgarIOGame = () => {
         ctx.fillText('$', orb.x, orb.y + 4)
       })
       
-      // Draw viruses (green spiky obstacles)
+      // Draw viruses (modern geometric spiky obstacles)
       game.viruses.forEach(virus => {
-        const spikeLength = virus.radius * 0.6
+        const time = Date.now() * 0.003 // For animations
+        const pulseScale = 1 + Math.sin(time * 2) * 0.1 // Subtle pulse animation
+        const spikeLength = virus.radius * 0.8 * pulseScale
         const spikeCount = virus.spikes
         
-        // Draw virus body (green circle)
-        ctx.fillStyle = virus.color
+        // Create gradient for virus body
+        const gradient = ctx.createRadialGradient(virus.x, virus.y, 0, virus.x, virus.y, virus.radius)
+        gradient.addColorStop(0, '#00ff88') // Bright green center (matching your logo)
+        gradient.addColorStop(0.7, '#00cc66')
+        gradient.addColorStop(1, '#009944') // Darker green edge
+        
+        // Draw outer glow/shadow
+        ctx.shadowColor = '#00ff88'
+        ctx.shadowBlur = 15 * pulseScale
+        ctx.shadowOffsetX = 2
+        ctx.shadowOffsetY = 2
+        
+        // Draw virus body with gradient
+        ctx.fillStyle = gradient
         ctx.beginPath()
-        ctx.arc(virus.x, virus.y, virus.radius, 0, Math.PI * 2)
+        ctx.arc(virus.x, virus.y, virus.radius * pulseScale, 0, Math.PI * 2)
         ctx.fill()
         
-        // Draw darker green border
-        ctx.strokeStyle = '#00cc33'
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.arc(virus.x, virus.y, virus.radius, 0, Math.PI * 2)
-        ctx.stroke()
+        // Reset shadow for spikes
+        ctx.shadowBlur = 0
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
         
-        // Draw spikes
-        ctx.strokeStyle = '#00aa22'
-        ctx.lineWidth = 3
-        ctx.lineCap = 'round'
-        
+        // Draw outer layer spikes (larger, triangular)
         for (let i = 0; i < spikeCount; i++) {
-          const angle = (i / spikeCount) * Math.PI * 2
-          const startX = virus.x + Math.cos(angle) * virus.radius
-          const startY = virus.y + Math.sin(angle) * virus.radius
-          const endX = virus.x + Math.cos(angle) * (virus.radius + spikeLength)
-          const endY = virus.y + Math.sin(angle) * (virus.radius + spikeLength)
+          const angle = (i / spikeCount) * Math.PI * 2 + time * 0.5 // Slow rotation
+          const baseX = virus.x + Math.cos(angle) * virus.radius * pulseScale
+          const baseY = virus.y + Math.sin(angle) * virus.radius * pulseScale
+          const tipX = virus.x + Math.cos(angle) * (virus.radius + spikeLength) * pulseScale
+          const tipY = virus.y + Math.sin(angle) * (virus.radius + spikeLength) * pulseScale
           
+          // Calculate perpendicular points for triangle base
+          const perpAngle = angle + Math.PI / 2
+          const baseWidth = virus.radius * 0.15
+          const base1X = baseX + Math.cos(perpAngle) * baseWidth
+          const base1Y = baseY + Math.sin(perpAngle) * baseWidth
+          const base2X = baseX - Math.cos(perpAngle) * baseWidth
+          const base2Y = baseY - Math.sin(perpAngle) * baseWidth
+          
+          // Create gradient for spike
+          const spikeGradient = ctx.createLinearGradient(baseX, baseY, tipX, tipY)
+          spikeGradient.addColorStop(0, '#00cc66') // Base darker
+          spikeGradient.addColorStop(0.5, '#00ff88') // Middle bright
+          spikeGradient.addColorStop(1, '#88ffcc') // Tip lighter (3D effect)
+          
+          // Draw triangular spike with glow
+          ctx.shadowColor = '#00ffaa'
+          ctx.shadowBlur = 8 * pulseScale
+          ctx.fillStyle = spikeGradient
           ctx.beginPath()
-          ctx.moveTo(startX, startY)
-          ctx.lineTo(endX, endY)
+          ctx.moveTo(tipX, tipY)
+          ctx.lineTo(base1X, base1Y)
+          ctx.lineTo(base2X, base2Y)
+          ctx.closePath()
+          ctx.fill()
+          
+          // Draw spike border with cyan accent (matching your logo)
+          ctx.shadowBlur = 0
+          ctx.strokeStyle = '#00ddff' // Cyan accent
+          ctx.lineWidth = 1.5
           ctx.stroke()
         }
+        
+        // Draw inner layer spikes (smaller, for depth)
+        const innerSpikeCount = Math.floor(spikeCount * 0.6)
+        const innerSpikeLength = spikeLength * 0.6
+        
+        for (let i = 0; i < innerSpikeCount; i++) {
+          const angle = ((i + 0.5) / innerSpikeCount) * Math.PI * 2 + time * 0.3 // Offset and slower rotation
+          const baseX = virus.x + Math.cos(angle) * virus.radius * 0.7 * pulseScale
+          const baseY = virus.y + Math.sin(angle) * virus.radius * 0.7 * pulseScale
+          const tipX = virus.x + Math.cos(angle) * (virus.radius * 0.7 + innerSpikeLength) * pulseScale
+          const tipY = virus.y + Math.sin(angle) * (virus.radius * 0.7 + innerSpikeLength) * pulseScale
+          
+          // Smaller triangular spikes
+          const perpAngle = angle + Math.PI / 2
+          const baseWidth = virus.radius * 0.08
+          const base1X = baseX + Math.cos(perpAngle) * baseWidth
+          const base1Y = baseY + Math.sin(perpAngle) * baseWidth
+          const base2X = baseX - Math.cos(perpAngle) * baseWidth
+          const base2Y = baseY - Math.sin(perpAngle) * baseWidth
+          
+          // Inner spike gradient (more subtle)
+          const innerGradient = ctx.createLinearGradient(baseX, baseY, tipX, tipY)
+          innerGradient.addColorStop(0, '#009955')
+          innerGradient.addColorStop(1, '#66ffaa')
+          
+          ctx.fillStyle = innerGradient
+          ctx.beginPath()
+          ctx.moveTo(tipX, tipY)
+          ctx.lineTo(base1X, base1Y)
+          ctx.lineTo(base2X, base2Y)
+          ctx.closePath()
+          ctx.fill()
+          
+          // Inner spike accent
+          ctx.strokeStyle = '#44ffcc'
+          ctx.lineWidth = 1
+          ctx.stroke()
+        }
+        
+        // Draw core highlight (matching your logo's bright center)
+        const coreGradient = ctx.createRadialGradient(virus.x, virus.y, 0, virus.x, virus.y, virus.radius * 0.3)
+        coreGradient.addColorStop(0, '#88ffcc') // Bright center
+        coreGradient.addColorStop(1, 'transparent')
+        
+        ctx.fillStyle = coreGradient
+        ctx.beginPath()
+        ctx.arc(virus.x, virus.y, virus.radius * 0.3 * pulseScale, 0, Math.PI * 2)
+        ctx.fill()
+        
+        // Reset any remaining effects
+        ctx.shadowBlur = 0
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
       })
       
       // Draw entities (sorted by net worth)
