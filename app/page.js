@@ -66,7 +66,45 @@ export default function Home() {
     }
   }, [authenticated, user, hasShownWelcome, ready])
 
-  // Debug effect for authentication changes
+  // Eye tracking effect for the blue circle
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const character = document.getElementById('player-character')
+      const leftEye = document.getElementById('left-eye')
+      const rightEye = document.getElementById('right-eye')
+      
+      if (!character || !leftEye || !rightEye) return
+      
+      const characterRect = character.getBoundingClientRect()
+      const characterCenterX = characterRect.left + characterRect.width / 2
+      const characterCenterY = characterRect.top + characterRect.height / 2
+      
+      const mouseX = e.clientX
+      const mouseY = e.clientY
+      
+      // Calculate angle for eye movement
+      const angle = Math.atan2(mouseY - characterCenterY, mouseX - characterCenterX)
+      
+      // Maximum eye movement distance (in pixels)
+      const maxDistance = 3
+      
+      // Calculate eye positions
+      const eyeX = Math.cos(angle) * maxDistance
+      const eyeY = Math.sin(angle) * maxDistance
+      
+      // Apply transforms to eyes
+      leftEye.style.transform = `translate(${eyeX}px, ${eyeY}px)`
+      rightEye.style.transform = `translate(${eyeX}px, ${eyeY}px)`
+    }
+    
+    // Add event listener
+    window.addEventListener('mousemove', handleMouseMove)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [])
   useEffect(() => {
     console.log('🔄 Authentication state changed:', { 
       ready, 
