@@ -677,7 +677,7 @@ export default function Home() {
               <span className="text-yellow-400">LOOT</span>
             </h1>
             <p className="text-gray-400 text-lg font-bold tracking-wide">
-              SKILL-BASED TERRITORY GAME
+              SKILL-BASED GRID DOMINATION
             </p>
           </div>
 
