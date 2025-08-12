@@ -1868,7 +1868,9 @@ const AgarIOGame = () => {
                   const y = (player.y + worldSize / 2) * scale
                   
                   if (player === game.player) {
-                    ctx.fillStyle = '#00f5ff'
+                    // Use customized player color on minimap
+                    const playerSkin = getPlayerSkinColor()
+                    ctx.fillStyle = playerSkin.solidColor
                     ctx.fillRect(x - 2, y - 2, 4, 4)
                   } else if (player.isBounty) {
                     ctx.fillStyle = '#FFD700'
