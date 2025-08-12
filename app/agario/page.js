@@ -637,6 +637,17 @@ const AgarIOGame = () => {
         streak: game.player.streak
       })
 
+      // Auto Cash Out Logic - check if threshold is reached
+      if (settings.autoCashOut && game.player.alive && !isCashingOut) {
+        const currentNetWorth = Math.floor(game.player.netWorth)
+        if (currentNetWorth >= settings.autoCashOutThreshold) {
+          console.log(`🎯 Auto cash out triggered! Net worth: $${currentNetWorth} >= threshold: $${settings.autoCashOutThreshold}`)
+          startCashOut()
+          addFloatingText(`AUTO CASH OUT!`, game.player.x, game.player.y - 70, '#ffff00')
+          addToKillFeed(`Auto cash out triggered at $${currentNetWorth}`)
+        }
+      }
+
       // Update live leaderboard
       const leaderboardData = allAlive.map((player, index) => ({
         rank: index + 1,
