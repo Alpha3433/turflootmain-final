@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { MongoClient } from 'mongodb'
+import { MongoClient, ObjectId } from 'mongodb'
 import jwt from 'jsonwebtoken'
 import { createUser, requireAuth, updateUserProfile, getUserStats } from '../../../lib/auth.js'
 import { 
