@@ -49,33 +49,95 @@ const UserProfile = ({ isOpen, onClose, user }) => {
   }, [activeTab, isOpen, user])
 
   const loadUserStats = async () => {
-    if (!user?.id && !user?.privyId) return
+    if (!user?.id && !user?.privyId) {
+      console.log('⚠️ No user ID available for loading stats')
+      setStats({
+        winRate: 0.0,
+        gamesWon: 0,
+        gamesPlayed: 0,
+        avgSurvival: '0:00',
+        totalEliminations: 0,
+        killsPerGame: 0.0,
+        totalPlayTime: '0h 0m',
+        avgGameTime: '0:00',
+        earnings: 0.00
+      })
+      return
+    }
     
     try {
       setLoading(true)
-      console.log('📊 Loading user stats for:', user?.id || user?.privyId)
+      console.log('📊 Loading real user stats for:', user?.id || user?.privyId)
       
-      // If user has profile data with stats, use it
-      if (user.stats) {
-        const userStats = user.stats
-        setStats({
-          winRate: userStats.games_played > 0 ? ((userStats.games_won / userStats.games_played) * 100).toFixed(1) : 0.0,
-          gamesWon: userStats.games_won || 0,
-          gamesPlayed: userStats.games_played || 0,
-          avgSurvival: formatTime(userStats.avg_survival_time || 0),
-          totalEliminations: userStats.total_eliminations || 0,
-          killsPerGame: userStats.games_played > 0 ? (userStats.total_eliminations / userStats.games_played).toFixed(1) : 0.0,
-          totalPlayTime: formatPlayTime(userStats.total_play_time || 0),
-          avgGameTime: formatTime(userStats.avg_game_time || 0),
-          earnings: userStats.total_earnings || 0.00
-        })
+      const response = await fetch(`/api/users/${user?.id || user?.privyId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const userData = await response.json()
+        console.log('📊 User data received:', userData)
+        
+        // Use real user stats if available
+        if (userData.user?.stats) {
+          const userStats = userData.user.stats
+          setStats({
+            winRate: userStats.games_played > 0 ? ((userStats.games_won / userStats.games_played) * 100).toFixed(1) : '0.0',
+            gamesWon: userStats.games_won || 0,
+            gamesPlayed: userStats.games_played || 0,
+            avgSurvival: formatTime(userStats.avg_survival_time || 0),
+            totalEliminations: userStats.total_eliminations || 0,
+            killsPerGame: userStats.games_played > 0 ? (userStats.total_eliminations / userStats.games_played).toFixed(1) : '0.0',
+            totalPlayTime: formatPlayTime(userStats.total_play_time || 0),
+            avgGameTime: formatTime(userStats.avg_game_time || 0),
+            earnings: (userStats.total_earnings || 0).toFixed(2)
+          })
+        } else {
+          // User exists but no stats yet - show zeros
+          console.log('📊 No stats available for user - showing empty state')
+          setStats({
+            winRate: '0.0',
+            gamesWon: 0,
+            gamesPlayed: 0,
+            avgSurvival: '0:00',
+            totalEliminations: 0,
+            killsPerGame: '0.0',
+            totalPlayTime: '0h 0m',
+            avgGameTime: '0:00',
+            earnings: '0.00'
+          })
+        }
       } else {
-        // Generate some dynamic stats based on user activity for demo
-        const randomStats = generateDemoStats()
-        setStats(randomStats)
+        console.error('Failed to load user stats:', response.status)
+        // Show empty stats on error
+        setStats({
+          winRate: '0.0',
+          gamesWon: 0,
+          gamesPlayed: 0,
+          avgSurvival: '0:00',
+          totalEliminations: 0,
+          killsPerGame: '0.0',
+          totalPlayTime: '0h 0m',
+          avgGameTime: '0:00',
+          earnings: '0.00'
+        })
       }
     } catch (error) {
       console.error('Error loading user stats:', error)
+      // Show empty stats on error
+      setStats({
+        winRate: '0.0',
+        gamesWon: 0,
+        gamesPlayed: 0,
+        avgSurvival: '0:00',
+        totalEliminations: 0,
+        killsPerGame: '0.0',
+        totalPlayTime: '0h 0m',
+        avgGameTime: '0:00',
+        earnings: '0.00'
+      })
     } finally {
       setLoading(false)
     }
