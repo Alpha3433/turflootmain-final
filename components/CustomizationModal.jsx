@@ -36,8 +36,8 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
     equippedFace: 'normal_eyes'
   })
 
-  // Mock data for customization items
-  const mockItems = {
+  // Mock data for customization items - with proper equipped state management
+  const [itemsData, setItemsData] = useState({
     skins: [
       { id: 'default_blue', name: 'Classic Blue', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/skin_blue.png' },
       { id: 'golden_snake', name: 'Golden Snake', rarity: 'legendary', price: 500, owned: true, equipped: false, preview: '/previews/skin_gold.png' },
@@ -64,7 +64,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
       { id: 'angry_eyes', name: 'Angry Eyes', rarity: 'rare', price: 80, owned: true, equipped: false, preview: '/previews/face_angry.png' },
       { id: 'wink_eyes', name: 'Wink Eyes', rarity: 'rare', price: 75, owned: false, equipped: false, preview: '/previews/face_wink.png' }
     ]
-  }
+  })
 
   const categories = [
     { id: 'skins', name: 'Skins', icon: Palette, color: 'text-blue-400' },
