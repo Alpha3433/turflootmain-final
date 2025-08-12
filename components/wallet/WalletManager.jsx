@@ -5,7 +5,7 @@ import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 const WalletManager = ({ onBalanceUpdate }) => {
-  const { authenticated, user, fundWallet } = usePrivy()
+  const { authenticated, user, login, connectWallet } = usePrivy()
   const { wallets } = useWallets()
   const [balance, setBalance] = useState({ balance: 0, sol_balance: 0, usdc_balance: 0 })
   const [transactions, setTransactions] = useState([])
