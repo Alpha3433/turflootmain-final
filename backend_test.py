@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing Suite - Privy Wallet Funding Integration Testing
-Tests all backend APIs after Privy wallet funding integration changes in WalletManager.jsx
-Focus: Verify no regression issues from useFundWallet hook implementation
+Enhanced Cash Out Workflow Backend API Testing
+Testing the enhanced cash out functionality with improved validation, fee calculation, and user experience.
+Focus: Verify enhanced cash out workflow with SOL/USD minimums, platform fees, and improved UX
 """
 
 import requests
@@ -12,8 +12,8 @@ import uuid
 import sys
 from datetime import datetime
 
-# Configuration
-BASE_URL = "http://localhost:3000"
+# Configuration - Use external URL for testing
+BASE_URL = "https://6ab07e9e-a0f5-48da-9a37-3af5eed166ad.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootAPITester:
