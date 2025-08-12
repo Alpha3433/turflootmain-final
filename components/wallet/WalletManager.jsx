@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 const WalletManager = ({ onBalanceUpdate }) => {
