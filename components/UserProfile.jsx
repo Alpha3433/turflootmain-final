@@ -363,26 +363,30 @@ const UserProfile = ({ isOpen, onClose, user }) => {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-2xl">
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-3xl shadow-lg">
               👤
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">{user?.username || 'Player'}</h2>
+              <h2 className="text-2xl font-bold text-white">{user?.custom_name || user?.google?.name || user?.email?.address || 'Player'}</h2>
+              <div className="text-sm text-gray-400">
+                {user?.email?.address && `📧 ${user.email.address}`}
+              </div>
             </div>
           </div>
         </div>
         <div className="text-right space-y-1">
-          <div className="text-sm text-gray-400">📅 Member since login</div>
-          <div className="text-sm text-gray-400">🔥 Play games to build streak</div>
+          <div className="text-sm text-gray-400">📅 Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'today'}</div>
+          <div className="text-sm text-gray-400">🔥 {stats.gamesPlayed > 0 ? `${Math.max(1, Math.floor(stats.gamesPlayed / 5))} day streak` : 'Start playing to build streak'}</div>
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Game Performance */}
-        <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30">
+        <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30 hover:border-yellow-400/30 transition-colors">
           <h3 className="text-lg font-bold text-yellow-400 mb-4 flex items-center">
-            🏆 Game Performance
+            <Trophy className="w-5 h-5 mr-2" />
+            Game Performance
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -405,9 +409,10 @@ const UserProfile = ({ isOpen, onClose, user }) => {
         </div>
 
         {/* Combat & Time */}
-        <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30">
+        <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30 hover:border-yellow-400/30 transition-colors">
           <h3 className="text-lg font-bold text-yellow-400 mb-4 flex items-center">
-            🎯 Combat & Time
+            <Target className="w-5 h-5 mr-2" />
+            Combat & Time
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -430,17 +435,65 @@ const UserProfile = ({ isOpen, onClose, user }) => {
         </div>
       </div>
 
-      {/* Earnings */}
-      <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-yellow-400 flex items-center">
-            📈 Earnings <span className="text-2xl font-bold text-yellow-400 ml-4">${stats.earnings}</span>
+      {/* Earnings & Achievements */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Earnings */}
+        <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30 hover:border-green-400/30 transition-colors">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-yellow-400 flex items-center">
+              💰 Total Earnings
+            </h3>
+            <select className="bg-gray-700 border border-gray-600 rounded px-3 py-1 text-white text-sm">
+              <option>All Time</option>
+              <option>This Month</option>
+              <option>This Week</option>
+            </select>
+          </div>
+          <div className="text-3xl font-bold text-green-400 mb-2">${stats.earnings}</div>
+          <div className="text-sm text-gray-400">
+            {stats.gamesWon > 0 ? `$${(parseFloat(stats.earnings) / stats.gamesWon).toFixed(2)} avg per win` : 'Win games to start earning'}
+          </div>
+        </div>
+
+        {/* Recent Achievements */}
+        <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30">
+          <h3 className="text-lg font-bold text-yellow-400 mb-4 flex items-center">
+            🏅 Recent Achievements
           </h3>
-          <select className="bg-gray-700 border border-gray-600 rounded px-3 py-1 text-white">
-            <option>YTD</option>
-            <option>All Time</option>
-            <option>This Month</option>
-          </select>
+          <div className="space-y-3">
+            {stats.gamesPlayed >= 10 && (
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl">🎮</div>
+                <div>
+                  <div className="text-white font-medium">Veteran Player</div>
+                  <div className="text-sm text-gray-400">Played 10+ games</div>
+                </div>
+              </div>
+            )}
+            {parseFloat(stats.winRate) >= 25 && (
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl">🏆</div>
+                <div>
+                  <div className="text-white font-medium">Skilled Competitor</div>
+                  <div className="text-sm text-gray-400">25%+ win rate</div>
+                </div>
+              </div>
+            )}
+            {stats.totalEliminations >= 50 && (
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl">⚔️</div>
+                <div>
+                  <div className="text-white font-medium">Eliminator</div>
+                  <div className="text-sm text-gray-400">50+ total eliminations</div>
+                </div>
+              </div>
+            )}
+            {stats.gamesPlayed === 0 && (
+              <div className="text-center py-4">
+                <div className="text-gray-400 text-sm">Play games to unlock achievements!</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -449,30 +502,97 @@ const UserProfile = ({ isOpen, onClose, user }) => {
   const renderFriends = () => (
     <div className="space-y-4">
       {/* Friends Tabs */}
-      <div className="flex space-x-2">
-        {['👥 Friends', '❌ Blocked', '⏳ Pending'].map((tab) => (
+      <div className="flex space-x-2 mb-4">
+        {[
+          { id: 'friends', label: '👥 Friends', count: friends.length },
+          { id: 'blocked', label: '❌ Blocked', count: 0 },
+          { id: 'pending', label: '⏳ Pending', count: 0 }
+        ].map((tab) => (
           <button
-            key={tab}
-            className="px-4 py-2 rounded-lg bg-yellow-400 text-black font-medium"
+            key={tab.id}
+            onClick={() => setFriendsFilter(tab.id)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center ${
+              friendsFilter === tab.id
+                ? 'bg-yellow-400 text-black'
+                : 'bg-gray-800 text-white border border-gray-600 hover:bg-gray-700'
+            }`}
           >
-            {tab}
+            {tab.label}
+            {tab.count > 0 && (
+              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                friendsFilter === tab.id ? 'bg-black/20 text-black' : 'bg-gray-600 text-white'
+              }`}>
+                {tab.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      <input 
-        type="text"
-        placeholder="Search friends..."
-        className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
-      />
-
-      <div className="flex flex-col items-center justify-center h-64 space-y-4">
-        <div className="text-4xl">👥</div>
-        <div className="text-center">
-          <h3 className="text-lg font-bold text-white mb-2">No friends yet</h3>
-          <p className="text-gray-400">Add friends to see them here</p>
-        </div>
+      <div className="relative mb-4">
+        <input 
+          type="text"
+          placeholder="Search friends..."
+          className="w-full px-4 py-2 pl-10 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
+        />
+        <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
       </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center h-32 space-y-4">
+          <div className="text-2xl animate-spin">⏳</div>
+          <div className="text-gray-400">Loading friends...</div>
+        </div>
+      ) : friendsFilter === 'friends' && friends.length > 0 ? (
+        <div className="space-y-3">
+          {friends.map((friend) => (
+            <div key={friend.id} className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-600/30 hover:border-gray-500/50 transition-colors">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="text-3xl">{friend.avatar}</div>
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${
+                    friend.status === 'online' ? 'bg-green-400' :
+                    friend.status === 'playing' ? 'bg-yellow-400' : 'bg-gray-500'
+                  }`}></div>
+                </div>
+                <div>
+                  <div className="font-bold text-white">{friend.name}</div>
+                  <div className="text-sm text-gray-400">
+                    {friend.wins} wins • {friend.lastSeen}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                {friend.status === 'playing' && (
+                  <button className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition-colors">
+                    Join Game
+                  </button>
+                )}
+                <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors">
+                  Message
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-48 space-y-4">
+          <div className="text-4xl">
+            {friendsFilter === 'friends' ? '👥' : 
+             friendsFilter === 'blocked' ? '❌' : '⏳'}
+          </div>
+          <div className="text-center">
+            <h3 className="text-lg font-bold text-white mb-2">
+              {friendsFilter === 'friends' ? 'No friends yet' :
+               friendsFilter === 'blocked' ? 'No blocked players' : 'No pending requests'}
+            </h3>
+            <p className="text-gray-400">
+              {friendsFilter === 'friends' ? 'Add friends through search to see them here' :
+               friendsFilter === 'blocked' ? 'Blocked players will appear here' : 'Pending friend requests will appear here'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 
