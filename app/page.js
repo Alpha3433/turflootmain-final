@@ -27,6 +27,7 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false)
   const [leaderboardData, setLeaderboardData] = useState([])
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
+  const [socialInitialTab, setSocialInitialTab] = useState('leaderboard')
   
   // Get Privy hooks
   const { login, ready, authenticated, user, logout } = usePrivy()
