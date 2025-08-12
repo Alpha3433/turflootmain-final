@@ -772,6 +772,30 @@ export async function POST(request, { params }) {
           { status: 400, headers: corsHeaders }
         )
       }
+
+      // Validate custom name format (3-20 characters, alphanumeric + spaces)
+      if (customName.length < 3 || customName.length > 20) {
+        return NextResponse.json(
+          { error: 'Name must be between 3 and 20 characters' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+
+      if (!/^[a-zA-Z0-9\s]+$/.test(customName)) {
+        return NextResponse.json(
+          { error: 'Name can only contain letters, numbers, and spaces' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
+      
+      // Check if the name is already taken
+      const isAvailable = await isUsernameAvailable(customName, userId)
+      if (!isAvailable) {
+        return NextResponse.json(
+          { error: 'This name is already taken. Please choose a different one.' },
+          { status: 400, headers: corsHeaders }
+        )
+      }
       
       try {
         console.log('🔍 Attempting to connect to database...')
