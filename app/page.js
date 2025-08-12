@@ -933,7 +933,7 @@ export default function Home() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-center space-x-4 mt-6">
+              <div className="flex justify-center space-x-4 mt-4">
                 <button className="px-6 py-3 bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/30 rounded-2xl font-bold text-yellow-400 transition-all hover:scale-105 text-sm">
                   🎁 Daily Crate
                 </button>
