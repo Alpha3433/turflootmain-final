@@ -22,9 +22,52 @@ const UserSettings = ({ isOpen, onClose, user }) => {
     { id: 'legal', label: 'Legal', icon: '📄' }
   ]
 
-  const handleUpdateUsername = () => {
-    // TODO: Implement username update logic with backend
-    console.log('Updating username to:', username)
+  const handleUpdateUsername = async () => {
+    if (!username.trim()) {
+      alert('Please enter a valid username')
+      return
+    }
+
+    if (!user?.id && !user?.privyId) {
+      alert('Please login to update your username')
+      return
+    }
+
+    setIsUpdatingUsername(true)
+
+    try {
+      console.log('💾 Updating username to:', username.trim())
+      console.log('🔑 User ID:', user?.id || user?.privyId)
+
+      const response = await fetch('/api/users/profile/update-name', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user?.id || user?.privyId,
+          customName: username.trim(),
+          privyId: user?.privyId
+        }),
+      })
+
+      console.log('📡 Response status:', response.status)
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('✅ Username update response:', data)
+        alert(`✅ Username successfully updated to "${username.trim()}"!`)
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ Username update failed:', response.status, errorData)
+        alert(`❌ Failed to update username: ${errorData.error || 'Server error'}`)
+      }
+    } catch (error) {
+      console.error('❌ Network error updating username:', error)
+      alert(`❌ Network error: ${error.message}. Please check your connection and try again.`)
+    } finally {
+      setIsUpdatingUsername(false)
+    }
   }
 
   const copyWalletAddress = async () => {
