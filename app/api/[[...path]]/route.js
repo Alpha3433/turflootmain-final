@@ -7,7 +7,8 @@ import {
   getAchievementDefinitions, 
   getCosmeticDefinitions, 
   calculateAchievementProgress, 
-  generateDailyChallenge 
+  generateDailyChallenge,
+  checkAndAwardAchievements
 } from '../../../lib/achievements.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'turfloot-secret-key-change-in-production'
