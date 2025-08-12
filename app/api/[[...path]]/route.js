@@ -404,6 +404,51 @@ export async function GET(request, { params }) {
       })(request)
     }
 
+    // User search endpoint
+    if (route === 'users/search') {
+      try {
+        const { query, limit = 10 } = body
+        
+        if (!query || query.trim().length < 2) {
+          return NextResponse.json({
+            users: [],
+            message: 'Query must be at least 2 characters'
+          }, { headers: corsHeaders })
+        }
+        
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Search users by custom name or email
+        const searchResults = await users.find({
+          $or: [
+            { custom_name: { $regex: query, $options: 'i' } },
+            { 'email': { $regex: query, $options: 'i' } },
+            { id: { $regex: query, $options: 'i' } }
+          ],
+          'stats.games_played': { $gt: 0 } // Only show users who have played
+        })
+        .limit(parseInt(limit))
+        .project({
+          id: 1,
+          custom_name: 1,
+          email: 1,
+          stats: 1,
+          online_status: 1,
+          last_seen: 1,
+          created_at: 1
+        })
+        .toArray()
+        
+        return NextResponse.json({
+          users: searchResults
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error searching users:', error)
+        return NextResponse.json({ users: [] }, { headers: corsHeaders })
+      }
+    }
+
     return NextResponse.json(
       { error: 'Endpoint not found' },
       { status: 404, headers: corsHeaders }
