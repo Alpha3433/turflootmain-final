@@ -961,9 +961,9 @@ export default function Home() {
                 <div className="text-center">
                   <div className="relative w-20 h-20 mx-auto mb-4">
                     {/* Playable Character Circle */}
-                    <div className="w-20 h-20 bg-cyan-400 rounded-full player-character animate-breathe hover:animate-hover-bounce-loop transition-all duration-300 cursor-pointer shadow-lg border-2 border-cyan-300 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6"></div>
-                      <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6"></div>
+                    <div className="w-20 h-20 bg-cyan-400 rounded-full player-character animate-breathe hover:animate-hover-bounce-loop transition-all duration-300 cursor-pointer shadow-lg border-2 border-cyan-300 flex items-center justify-center" id="player-character">
+                      <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
+                      <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
                     </div>
                   </div>
                   <div className="text-gray-400 text-xs mb-3">Your Character</div>
