@@ -6,8 +6,9 @@ import { useGameSettings } from './providers/GameSettingsProvider'
 
 const UserSettings = ({ isOpen, onClose, user }) => {
   const [activeTab, setActiveTab] = useState('account')
-  const [username, setUsername] = useState(user?.username || 'Player')
+  const [username, setUsername] = useState(user?.username || user?.custom_name || user?.google?.name || user?.email?.address || 'Player')
   const [showCopySuccess, setShowCopySuccess] = useState(false)
+  const [isUpdatingUsername, setIsUpdatingUsername] = useState(false)
   
   const { settings, updateSetting, resetSettings } = useGameSettings()
 
