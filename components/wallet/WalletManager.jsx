@@ -172,9 +172,23 @@ const WalletManager = ({ onBalanceUpdate }) => {
     
     try {
       const amount = parseFloat(cashOutForm.amount)
+      const minCashOut = cashOutForm.currency === 'SOL' ? 0.05 : 20 // 0.05 SOL or $20 USD
+      const platformFeePercent = 10
+      const platformFee = amount * (platformFeePercent / 100)
+      const netAmount = amount - platformFee
       
-      if (amount < 0.05) {
-        alert('Minimum cash out is 0.05 SOL')
+      // Enhanced validation
+      if (amount < minCashOut) {
+        const minDisplay = cashOutForm.currency === 'SOL' ? '0.05 SOL' : '$20 USD'
+        alert(`Minimum cash out is ${minDisplay}`)
+        setLoading(false)
+        return
+      }
+
+      // Check if user has sufficient balance
+      const availableBalance = cashOutForm.currency === 'SOL' ? balance.sol_balance : balance.balance
+      if (amount > availableBalance) {
+        alert(`Insufficient balance. Available: ${availableBalance.toFixed(4)} ${cashOutForm.currency}`)
         setLoading(false)
         return
       }
@@ -189,7 +203,17 @@ const WalletManager = ({ onBalanceUpdate }) => {
       try {
         new PublicKey(cashOutForm.address)
       } catch (err) {
-        alert('Invalid Solana wallet address')
+        alert('Invalid Solana wallet address. Please enter a valid Solana address.')
+        setLoading(false)
+        return
+      }
+      
+      // Confirmation dialog with fee breakdown
+      const feeDisplay = `${platformFee.toFixed(4)} ${cashOutForm.currency}`
+      const netDisplay = `${netAmount.toFixed(4)} ${cashOutForm.currency}`
+      const confirmMessage = `Confirm Cash Out:\n\nAmount: ${amount} ${cashOutForm.currency}\nPlatform Fee (10%): ${feeDisplay}\nYou'll receive: ${netDisplay}\n\nProceed?`
+      
+      if (!confirm(confirmMessage)) {
         setLoading(false)
         return
       }
@@ -210,19 +234,46 @@ const WalletManager = ({ onBalanceUpdate }) => {
       const data = await response.json()
       
       if (response.ok) {
-        alert(`✅ ${data.message}`)
+        alert(`✅ Cash out successful! ${data.message}\n\nTransaction will be processed within 24 hours.`)
         setCashOutForm({ amount: '', currency: 'SOL', address: '' })
         setShowCashOut(false)
         fetchBalance()
         fetchTransactions()
       } else {
-        alert(`❌ ${data.error}`)
+        alert(`❌ Cash out failed: ${data.error}`)
       }
     } catch (error) {
       console.error('Error cashing out:', error)
-      alert('Error processing cash out. Please try again.')
+      alert('Error processing cash out. Please check your connection and try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Handle MAX button for cash out
+  const handleMaxCashOut = () => {
+    const availableBalance = cashOutForm.currency === 'SOL' ? balance.sol_balance : balance.balance
+    const minCashOut = cashOutForm.currency === 'SOL' ? 0.05 : 20
+    
+    if (availableBalance >= minCashOut) {
+      setCashOutForm({ ...cashOutForm, amount: availableBalance.toString() })
+    } else {
+      alert(`Insufficient balance for minimum cash out of ${minCashOut} ${cashOutForm.currency}`)
+    }
+  }
+
+  // Calculate fee display for cash out
+  const getCashOutFeeInfo = () => {
+    const amount = parseFloat(cashOutForm.amount) || 0
+    const platformFee = amount * 0.1 // 10% fee
+    const netAmount = amount - platformFee
+    
+    return {
+      amount: amount,
+      fee: platformFee,
+      net: netAmount,
+      feeDisplay: `${platformFee.toFixed(4)} ${cashOutForm.currency}`,
+      netDisplay: `${netAmount.toFixed(4)} ${cashOutForm.currency}`
     }
   }
 
