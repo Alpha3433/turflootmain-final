@@ -12,6 +12,14 @@ const UserSettings = ({ isOpen, onClose, user }) => {
   
   const { settings, updateSetting, resetSettings } = useGameSettings()
 
+  // Update username when user prop changes
+  useEffect(() => {
+    if (user) {
+      const currentName = user.custom_name || user.google?.name || user.email?.address || 'Player'
+      setUsername(currentName)
+    }
+  }, [user])
+
   if (!isOpen) return null
 
   const tabs = [
