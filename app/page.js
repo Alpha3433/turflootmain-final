@@ -1148,7 +1148,16 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-gray-400 text-xs mb-3">Your Character</div>
-                  <button className="w-full py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-xl text-purple-400 font-medium transition-all hover:scale-105 text-sm">
+                  <button 
+                    onClick={() => {
+                      if (!authenticated) {
+                        login()
+                      } else {
+                        setShowCustomization(true)
+                      }
+                    }}
+                    className="w-full py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-xl text-purple-400 font-medium transition-all hover:scale-105 text-sm"
+                  >
                     Change Appearance
                   </button>
                 </div>
