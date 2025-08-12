@@ -100,38 +100,56 @@ export default function Home() {
   useEffect(() => {
     const fetchLiveStats = async () => {
       try {
-        // Fetch live player count
-        const playerResponse = await fetch('/api/stats/live-players')
-        if (playerResponse.ok) {
-          const playerData = await playerResponse.json()
-          const newPlayerCount = playerData.count || 0
+        // Fetch live player count and global winnings
+        const [playersResponse, winningsResponse, leaderboardResponse] = await Promise.all([
+          fetch('/api/stats/live-players'),
+          fetch('/api/stats/global-winnings'),
+          fetch('/api/users/leaderboard')
+        ])
+
+        if (playersResponse.ok) {
+          const playersData = await playersResponse.json()
+          const newCount = playersData.count
           
-          // Trigger pulse animation if count changed
-          if (newPlayerCount !== livePlayerCount) {
+          if (newCount !== livePlayerCount) {
             setPlayerCountPulse(true)
             setTimeout(() => setPlayerCountPulse(false), 1000)
           }
           
-          setLivePlayerCount(newPlayerCount)
+          setLivePlayerCount(newCount)
         }
 
-        // Fetch global winnings
-        const winningsResponse = await fetch('/api/stats/global-winnings')
         if (winningsResponse.ok) {
           const winningsData = await winningsResponse.json()
-          const newGlobalWinnings = winningsData.total || 0
+          const newWinnings = winningsData.total
           
-          // Trigger pulse animation if winnings changed
-          if (newGlobalWinnings !== globalWinnings) {
+          if (newWinnings !== globalWinnings) {
             setGlobalWinningsPulse(true)
             setTimeout(() => setGlobalWinningsPulse(false), 1000)
           }
           
-          setGlobalWinnings(newGlobalWinnings)
+          setGlobalWinnings(newWinnings)
+        }
+
+        if (leaderboardResponse.ok) {
+          const leaderboardData = await leaderboardResponse.json()
+          console.log('📊 Leaderboard data received:', leaderboardData)
+          
+          // Process leaderboard data for display
+          const processedLeaderboard = leaderboardData.users.slice(0, 3).map((user, index) => ({
+            rank: index + 1,
+            name: user.custom_name || user.email?.split('@')[0] || `Player${user.id?.slice(-4)}`,
+            earnings: `$${(user.stats?.total_earnings || 0).toFixed(2)}`
+          }))
+          
+          setLeaderboardData(processedLeaderboard)
+        } else {
+          console.log('⚠️ No leaderboard data available')
+          setLeaderboardData([])
         }
       } catch (error) {
-        console.log('📊 Stats fetch failed (using defaults):', error.message)
-        // Keep default values of 0
+        console.error('Error loading statistics:', error)
+        setLeaderboardData([])
       }
     }
 
