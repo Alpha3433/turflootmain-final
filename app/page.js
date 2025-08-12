@@ -599,9 +599,7 @@ export default function Home() {
         <div className="flex justify-between items-center px-8 h-full">
           {/* Left side - Welcome with icon */}
           <div className="flex items-center space-x-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-              <img src="/turfloot-logo.png" alt="TurfLoot Logo" className="w-6 h-6 object-contain" />
-            </div>
+            <img src="/turfloot-sun-logo.png" alt="TurfLoot Logo" className="w-10 h-10 object-contain" />
             <span className="text-white text-lg font-semibold">
               {authenticated && user 
                 ? `Welcome, ${displayName || user.google?.name || user.email?.address || 'Player'}!` 
