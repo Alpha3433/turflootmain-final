@@ -672,9 +672,19 @@ const AgarIOGame = () => {
             const oldMass = entity.mass
             entity.mass += config.orbMassValue
             
-            // Add floating text for player (mass gained, not money)
+            // Add enhanced coin collection effects for player
             if (entity === game.player) {
               addFloatingText(`+${config.orbMassValue} mass`, entity.x, entity.y - 30, '#00ff88')
+              addCoinAnimation(orb.x, orb.y) // New animated coin pickup
+              
+              // Update mission progress
+              if (currentMission && currentMission.type === 'collect') {
+                const newProgress = currentMission.progress + 1
+                setMissionProgress(newProgress)
+                if (newProgress >= currentMission.target) {
+                  completeMission(currentMission)
+                }
+              }
             }
             
             game.orbs.splice(i, 1)
