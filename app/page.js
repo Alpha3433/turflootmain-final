@@ -609,32 +609,32 @@ export default function Home() {
           </div>
 
           {/* Right side - Navigation Icons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {authenticated && user ? (
               <>
                 <button 
                   onClick={() => setShowProfile(true)}
-                  className="p-3 bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 rounded-xl border border-blue-500/30 transition-all hover:scale-105 group shadow-lg"
+                  className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
                   title="Profile"
                 >
-                  <svg className="w-5 h-5 text-white group-hover:text-cyan-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
                   </svg>
                 </button>
                 
                 <button 
                   onClick={() => setShowSettings(true)}
-                  className="p-3 bg-gradient-to-br from-green-600 to-teal-600 hover:from-green-500 hover:to-teal-500 rounded-xl border border-green-500/30 transition-all hover:scale-105 group shadow-lg"
+                  className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
                   title="Settings"
                 >
-                  <svg className="w-5 h-5 text-white group-hover:text-green-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100-4m0 4v2m0-6V4" />
+                  <svg className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
                 
                 <button 
                   onClick={handleLogout}
-                  className="px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black rounded-lg font-bold transition-all hover:scale-105 shadow-lg text-sm"
+                  className="ml-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all duration-200 hover:text-yellow-300 text-sm border border-white/20 hover:border-white/30"
                 >
                   Logout
                 </button>
