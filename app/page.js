@@ -209,6 +209,19 @@ export default function Home() {
     // Cleanup is not needed as this runs for the lifetime of the component
   }, [])
 
+  // Load player customization data
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('turfloot_player_customization')
+      if (saved) {
+        const customizationData = JSON.parse(saved)
+        setPlayerCustomization(customizationData)
+      }
+    } catch (error) {
+      console.error('Failed to load customization:', error)
+    }
+  }, [showCustomization]) // Reload when customization modal closes
+
   // Update notification timestamps every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
