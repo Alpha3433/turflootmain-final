@@ -1387,6 +1387,55 @@ const AgarIOGame = () => {
           }
         }
         
+        // Hat rendering for player
+        if (isPlayer && playerCustomization.hat && radius > 15) {
+          const hatY = entity.y - radius - 5 // Position hat above the character
+          const hatSize = radius * 0.8
+          
+          ctx.save()
+          
+          switch (playerCustomization.hat) {
+            case 'crown_gold':
+              // Golden crown
+              ctx.fillStyle = '#FFD700'
+              ctx.fillRect(entity.x - hatSize/2, hatY - hatSize/2, hatSize, hatSize/2)
+              // Crown jewel
+              ctx.fillStyle = '#FF0000'
+              ctx.beginPath()
+              ctx.arc(entity.x, hatY - hatSize/4, 3, 0, Math.PI * 2)
+              ctx.fill()
+              break
+              
+            case 'cap_baseball':
+              // Baseball cap
+              ctx.fillStyle = '#FF0000'
+              ctx.beginPath()
+              ctx.ellipse(entity.x, hatY, hatSize/2, hatSize/3, 0, 0, Math.PI * 2)
+              ctx.fill()
+              // Cap visor
+              ctx.fillStyle = '#CC0000'
+              ctx.beginPath()
+              ctx.ellipse(entity.x + hatSize/3, hatY + hatSize/4, hatSize/3, hatSize/6, 0, 0, Math.PI * 2)
+              ctx.fill()
+              break
+              
+            case 'helmet_space':
+              // Space helmet
+              ctx.fillStyle = '#C0C0C0'
+              ctx.beginPath()
+              ctx.arc(entity.x, hatY, hatSize/2, 0, Math.PI * 2)
+              ctx.fill()
+              // Helmet visor
+              ctx.fillStyle = 'rgba(135, 206, 250, 0.3)'
+              ctx.beginPath()
+              ctx.arc(entity.x, hatY, hatSize/2 - 2, 0, Math.PI * 2)
+              ctx.fill()
+              break
+          }
+          
+          ctx.restore()
+        }
+        
         // Bounty crown
         if (entity.isBounty) {
           ctx.fillStyle = '#FFD700'
