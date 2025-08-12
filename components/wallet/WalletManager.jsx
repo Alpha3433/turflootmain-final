@@ -370,58 +370,58 @@ const WalletManager = ({ onBalanceUpdate }) => {
         </div>
       )}
 
-      {/* Cash Out Modal - Redesigned to match user's design */}
+      {/* Cash Out Modal - Fixed Layout and Positioning */}
       {showCashOut && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="relative bg-gradient-to-br from-gray-900/95 via-black/90 to-gray-900/95 rounded-2xl p-8 w-full max-w-lg mx-4 border border-gray-700/50 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative bg-gradient-to-br from-gray-900/95 via-black/90 to-gray-900/95 rounded-2xl w-full max-w-md mx-auto border border-gray-700/50 shadow-2xl overflow-hidden">
             <button 
               onClick={() => setShowCashOut(false)}
-              className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors text-xl"
+              className="absolute top-4 right-4 z-10 text-gray-400 hover:text-white transition-colors text-xl"
             >
               ✕
             </button>
             
-            <div className="space-y-6">
+            <div className="p-6 space-y-4">
               {/* Header */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">💸</span>
-                <h2 className="text-2xl font-bold text-white">Cash Out</h2>
+                <h2 className="text-xl font-bold text-white">Cash Out</h2>
               </div>
               
               {/* Available Balance */}
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/30">
+              <div className="bg-gray-800/50 rounded-xl p-3 border border-gray-700/30">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <span className="text-green-400">💰</span>
-                    <span className="text-gray-300 font-medium">Available Balance</span>
+                    <span className="text-gray-300 text-sm font-medium">Available Balance</span>
                   </div>
                   <div className="text-right">
-                    <div className="text-xl font-bold text-red-400">${balance.balance.toFixed(2)}</div>
-                    <div className="text-gray-400 text-sm">{balance.sol_balance.toFixed(6)} SOL</div>
+                    <div className="text-lg font-bold text-red-400">${balance.balance.toFixed(2)}</div>
+                    <div className="text-gray-400 text-xs">{balance.sol_balance.toFixed(6)} SOL</div>
                   </div>
                 </div>
               </div>
 
               {/* Insufficient balance warning */}
               {balance.balance < (cashOutForm.currency === 'SOL' ? 0.05 : 20) && (
-                <div className="bg-red-900/30 border border-red-500/30 rounded-xl p-4">
+                <div className="bg-red-900/30 border border-red-500/30 rounded-xl p-3">
                   <div className="flex items-center gap-2 text-red-400">
                     <span>⚠️</span>
-                    <span className="text-sm">
+                    <span className="text-xs">
                       Insufficient balance for cashout. Minimum ${cashOutForm.currency === 'SOL' ? '0.05' : '20.00'} + $0.01 required.
                     </span>
                   </div>
                 </div>
               )}
 
-              <form onSubmit={handleCashOut} className="space-y-6">
+              <form onSubmit={handleCashOut} className="space-y-4">
                 {/* Currency Selection */}
                 <div>
-                  <label className="block text-gray-300 text-sm font-medium mb-2">Currency</label>
+                  <label className="block text-gray-300 text-xs font-medium mb-2">Currency</label>
                   <select
                     value={cashOutForm.currency}
                     onChange={(e) => setCashOutForm({...cashOutForm, currency: e.target.value, amount: ''})}
-                    className="w-full p-4 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 text-lg"
+                    className="w-full p-3 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:border-cyan-400/50 focus:outline-none text-sm"
                   >
                     <option value="SOL">SOL</option>
                     <option value="USD">USD</option>
@@ -430,7 +430,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
                 
                 {/* Amount Input with MAX button */}
                 <div>
-                  <label className="block text-gray-300 text-sm font-medium mb-2">Amount</label>
+                  <label className="block text-gray-300 text-xs font-medium mb-2">Amount</label>
                   <div className="relative">
                     <input
                       type="number"
@@ -439,20 +439,20 @@ const WalletManager = ({ onBalanceUpdate }) => {
                       value={cashOutForm.amount}
                       onChange={(e) => setCashOutForm({...cashOutForm, amount: e.target.value})}
                       placeholder={cashOutForm.currency === 'SOL' ? '0.05' : '20.00'}
-                      className="w-full p-4 pr-24 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 text-lg font-mono"
+                      className="w-full p-3 pr-20 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:border-cyan-400/50 focus:outline-none text-sm font-mono"
                       required
                     />
-                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1">
                       <button
                         type="button"
-                        className="px-3 py-2 bg-blue-600/80 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-all border border-blue-400/30"
+                        className="px-2 py-1 bg-blue-600/80 hover:bg-blue-500 text-white text-xs font-bold rounded transition-all"
                       >
                         ⇅
                       </button>
                       <button
                         type="button"
                         onClick={handleMaxCashOut}
-                        className="px-3 py-2 bg-yellow-600/80 hover:bg-yellow-500 text-black text-xs font-bold rounded-lg transition-all border border-yellow-400/50"
+                        className="px-2 py-1 bg-yellow-600/80 hover:bg-yellow-500 text-black text-xs font-bold rounded transition-all"
                       >
                         MAX
                       </button>
@@ -460,37 +460,37 @@ const WalletManager = ({ onBalanceUpdate }) => {
                   </div>
                   
                   {/* Percentage slider */}
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="w-6 h-6 bg-gray-600 rounded-full border border-gray-500"></div>
-                      <div className="flex-1 h-2 bg-gray-700 rounded-full mx-4">
+                  <div className="mt-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="w-4 h-4 bg-gray-600 rounded-full border border-gray-500"></div>
+                      <div className="flex-1 h-1 bg-gray-700 rounded-full mx-3">
                         <div className="h-full w-0 bg-cyan-400 rounded-full"></div>
                       </div>
                     </div>
-                    <div className="text-center text-gray-400 text-sm">0% of available balance</div>
+                    <div className="text-center text-gray-400 text-xs">0% of available balance</div>
                   </div>
                 </div>
                 
                 {/* Destination Address */}
                 <div>
-                  <label className="block text-gray-300 text-sm font-medium mb-2">Destination Wallet Address</label>
+                  <label className="block text-gray-300 text-xs font-medium mb-2">Destination Wallet Address</label>
                   <input
                     type="text"
                     value={cashOutForm.address}
                     onChange={(e) => setCashOutForm({...cashOutForm, address: e.target.value})}
                     placeholder="Enter Solana wallet address..."
-                    className="w-full p-4 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 font-mono text-sm"
+                    className="w-full p-3 bg-gray-800/70 text-white rounded-xl border border-gray-600/50 focus:border-cyan-400/50 focus:outline-none font-mono text-xs"
                     required
                   />
                 </div>
                 
                 {/* Important Notice */}
-                <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-xl p-4">
+                <div className="bg-yellow-900/20 border border-yellow-600/30 rounded-xl p-3">
                   <div className="flex items-start gap-2">
-                    <span className="text-yellow-400 mt-0.5">⚠️</span>
-                    <div className="text-yellow-200 text-sm">
+                    <span className="text-yellow-400 mt-0.5 text-sm">⚠️</span>
+                    <div className="text-yellow-200 text-xs">
                       <div className="font-semibold mb-1">Important:</div>
-                      <div className="space-y-1 text-xs">
+                      <div className="space-y-0.5 text-xs">
                         <div>• Minimum cash out: {cashOutForm.currency === 'SOL' ? '0.05 SOL' : '$20 USD'}</div>
                         <div>• Platform fee: 10% of cash out amount</div>
                         <div>• Processing time: Up to 24 hours</div>
@@ -501,18 +501,18 @@ const WalletManager = ({ onBalanceUpdate }) => {
                 </div>
                 
                 {/* Action Buttons */}
-                <div className="flex gap-4 pt-2">
+                <div className="flex gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setShowCashOut(false)}
-                    className="flex-1 py-4 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 font-semibold rounded-xl transition-all border border-gray-600/30"
+                    className="flex-1 py-3 bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 font-medium rounded-xl transition-all border border-gray-600/30 text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={loading || !cashOutForm.amount || !cashOutForm.address}
-                    className="flex-1 py-4 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                    className="flex-1 py-3 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-black font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm"
                   >
                     {loading ? 'Processing...' : '💸 Cash Out'}
                   </button>
