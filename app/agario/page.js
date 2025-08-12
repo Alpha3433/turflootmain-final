@@ -1308,11 +1308,30 @@ const AgarIOGame = () => {
         ctx.arc(entity.x + 4, entity.y + 4, radius, 0, Math.PI * 2)
         ctx.fill()
         
-        // Entity circle
-        ctx.fillStyle = isPlayer ? '#00f5ff' : entity.color
-        ctx.beginPath()
-        ctx.arc(entity.x, entity.y, radius, 0, Math.PI * 2)
-        ctx.fill()
+        // Entity circle with customization support
+        if (isPlayer) {
+          const playerSkin = getPlayerSkinColor()
+          ctx.fillStyle = playerSkin.solidColor
+          ctx.beginPath()
+          ctx.arc(entity.x, entity.y, radius, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Add special effects for legendary skins
+          if (playerSkin.hasSpecialEffect) {
+            ctx.save()
+            ctx.globalCompositeOperation = 'overlay'
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'
+            ctx.beginPath()
+            ctx.arc(entity.x, entity.y, radius * 0.8, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.restore()
+          }
+        } else {
+          ctx.fillStyle = entity.color
+          ctx.beginPath()
+          ctx.arc(entity.x, entity.y, radius, 0, Math.PI * 2)
+          ctx.fill()
+        }
         
         // Border
         ctx.strokeStyle = entity.isBounty ? '#FFD700' : '#ffffff'
