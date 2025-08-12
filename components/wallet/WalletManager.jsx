@@ -71,41 +71,6 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
   }, [authenticated, user])
 
-  const fetchBalance = async () => {
-    try {
-      const response = await fetch('/api/wallet/balance', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setBalance(data)
-        if (onBalanceUpdate) onBalanceUpdate(data)
-      }
-    } catch (error) {
-      console.error('Error fetching balance:', error)
-    }
-  }
-
-  const fetchTransactions = async () => {
-    try {
-      const response = await fetch('/api/wallet/transactions', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setTransactions(data.transactions)
-      }
-    } catch (error) {
-      console.error('Error fetching transactions:', error)
-    }
-  }
-
   // Handle Add Funds with Privy
   const handleAddFunds = async () => {
     if (!authenticated) {
