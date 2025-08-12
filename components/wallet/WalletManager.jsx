@@ -76,34 +76,50 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
 
     try {
-      console.log('🎯 Attempting to open Privy wallet functionality')
-      console.log('🔍 Available functions:', { connectWallet: typeof connectWallet, wallets: wallets?.length })
+      console.log('🎯 Attempting to open Privy wallet funding modal')
+      console.log('🔍 Available functions:', { fundWallet: typeof fundWallet, wallets: wallets?.length })
       
-      // Try to connect wallet if no wallets are connected
-      if (!wallets || wallets.length === 0) {
-        console.log('📱 No wallets connected, trying to connect wallet...')
+      // Get user's wallet address
+      let walletAddress = null
+      
+      if (wallets && wallets.length > 0) {
+        walletAddress = wallets[0].address
+        console.log('💳 Using connected wallet address:', walletAddress)
+      } else if (user?.wallet?.address) {
+        walletAddress = user.wallet.address
+        console.log('💳 Using user wallet address:', walletAddress)
+      }
+      
+      if (!walletAddress) {
+        console.log('📱 No wallet address found, trying to connect wallet first...')
         if (typeof connectWallet === 'function') {
           await connectWallet()
           console.log('✅ Wallet connection initiated')
           return
+        } else {
+          console.log('⚠️ No wallet connection available, showing custom modal')
+          setShowAddFunds(true)
+          return
         }
       }
       
-      // If we have wallets connected, try to open funding interface
-      if (wallets && wallets.length > 0) {
-        console.log('💳 Wallet connected, looking for funding options...')
-        const wallet = wallets[0]
-        console.log('🔍 Wallet details:', { type: wallet.walletClientType, address: wallet.address })
-        
-        // For now, show the custom modal since Privy's funding modal isn't available
-        console.log('⚠️ Using custom funding modal (Privy fundWallet not available in current version)')
-        setShowAddFunds(true)
+      // Try to use Privy's native funding modal
+      if (typeof fundWallet === 'function') {
+        console.log('🚀 Opening Privy native funding modal for:', walletAddress)
+        await fundWallet(walletAddress, {
+          uiConfig: {
+            receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
+            receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
+          },
+        })
+        console.log('✅ Privy funding modal opened successfully')
       } else {
-        console.log('⚠️ No wallets available, showing custom modal')
+        console.log('⚠️ fundWallet function not available, showing custom modal')
         setShowAddFunds(true)
       }
+      
     } catch (error) {
-      console.error('❌ Error with Privy wallet operations:', error)
+      console.error('❌ Error opening Privy funding modal:', error)
       console.log('🔄 Falling back to custom modal')
       setShowAddFunds(true)
     }
