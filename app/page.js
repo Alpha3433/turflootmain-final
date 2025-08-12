@@ -1008,6 +1008,7 @@ export default function Home() {
         isOpen={showProfile} 
         onClose={() => setShowProfile(false)} 
         user={userProfile}
+        initialTab={socialInitialTab}
       />
       
       {/* Settings Modal */}
