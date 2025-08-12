@@ -215,10 +215,23 @@ export default function Home() {
       const saved = localStorage.getItem('turfloot_player_customization')
       if (saved) {
         const customizationData = JSON.parse(saved)
-        setPlayerCustomization(customizationData)
+        setPlayerCustomization({
+          skin: customizationData.skin || 'default_blue',
+          hat: customizationData.hat || null,
+          trail: customizationData.trail || 'default_sparkle',
+          face: customizationData.face || 'normal_eyes'
+        })
+        console.log('Loaded player customization:', customizationData)
       }
     } catch (error) {
       console.error('Failed to load customization:', error)
+      // Reset to defaults if there's an error
+      setPlayerCustomization({
+        skin: 'default_blue',
+        hat: null,
+        trail: 'default_sparkle',
+        face: 'normal_eyes'
+      })
     }
   }, [showCustomization]) // Reload when customization modal closes
 
