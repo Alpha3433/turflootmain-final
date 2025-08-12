@@ -739,8 +739,8 @@ export default function Home() {
               </div>
 
               {/* Friends */}
-              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 shadow-2xl h-[200px]">
-                <div className="flex items-center justify-between mb-6">
+              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 shadow-2xl h-[200px]">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-cyan-400 rounded-lg flex items-center justify-center">
                       <span className="text-black font-bold text-sm">👥</span>
