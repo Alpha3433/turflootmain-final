@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing Suite
-Tests all backend APIs after server configuration changes from yarn dev to custom server.js
-Focus: Verify no regression issues from switching to Socket.IO game server integration
+TurfLoot Backend API Testing Suite - Privy Wallet Funding Integration Testing
+Tests all backend APIs after Privy wallet funding integration changes in WalletManager.jsx
+Focus: Verify no regression issues from useFundWallet hook implementation
 """
 
 import requests
@@ -13,7 +13,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "http://localhost:3000"
+BASE_URL = "https://6ab07e9e-a0f5-48da-9a37-3af5eed166ad.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootAPITester:
