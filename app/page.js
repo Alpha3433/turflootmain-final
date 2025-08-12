@@ -706,7 +706,10 @@ export default function Home() {
                   )}
                 </div>
                 <button 
-                  onClick={() => setShowProfile(true)}
+                  onClick={() => {
+                    setSocialInitialTab('leaderboard')
+                    setShowProfile(true)
+                  }}
                   className="w-full mt-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl border border-gray-600 text-gray-300 font-medium transition-all hover:scale-105 text-sm"
                 >
                   View Full Leaderboard
