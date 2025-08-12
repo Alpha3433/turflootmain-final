@@ -1338,6 +1338,9 @@ export async function POST(request, { params }) {
               }
             }
           )
+
+          // Check and award new achievements
+          await checkAndAwardAchievements(defaultUserId, updatedUser)
         }
 
         console.log('✅ User statistics updated successfully')
