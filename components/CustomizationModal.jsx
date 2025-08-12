@@ -57,8 +57,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
       { id: 'fire_trail', name: 'Fire Trail', rarity: 'rare', price: 120, owned: false, equipped: false, preview: '/previews/trail_fire.png' }
     ],
     boosts: [
-      { id: 'speed_boost', name: 'Speed Boost', rarity: 'rare', price: 100, owned: true, equipped: false, preview: '/previews/boost_speed.png' },
-      { id: 'shield_boost', name: 'Shield Boost', rarity: 'epic', price: 200, owned: false, equipped: false, preview: '/previews/boost_shield.png' }
+      // Removed boosts category as requested
     ],
     faces: [
       { id: 'normal_eyes', name: 'Normal Eyes', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/face_normal.png' },
