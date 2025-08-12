@@ -200,6 +200,15 @@ export default function Home() {
     
     // Cleanup is not needed as this runs for the lifetime of the component
   }, [])
+
+  // Update notification timestamps every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCashOutNotifications(prev => [...prev]) // Force re-render to update timestamps
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [])
   useEffect(() => {
     const handleMouseMove = (e) => {
       const character = document.getElementById('player-character')
