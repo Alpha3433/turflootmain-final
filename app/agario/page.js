@@ -923,6 +923,49 @@ const AgarIOGame = () => {
         y: text.startY - (1 - text.life) * 50
       })).filter(text => text.life > 0))
 
+      // Update coin animations
+      setCoinAnimations(prev => prev.map(anim => ({
+        ...anim,
+        life: anim.life - deltaTime * 2.0,
+        scale: 1 + (1 - anim.life) * 2,
+        rotation: anim.rotation + deltaTime * 720, // 720 degrees per second
+        particles: anim.particles.map(particle => ({
+          ...particle,
+          x: particle.x + particle.vx * deltaTime,
+          y: particle.y + particle.vy * deltaTime,
+          life: particle.life - deltaTime * 1.5
+        })).filter(p => p.life > 0)
+      })).filter(anim => anim.life > 0))
+
+      // Update kill streak announcements
+      setKillStreakAnnouncements(prev => prev.map(announcement => ({
+        ...announcement,
+        life: announcement.life - deltaTime * 0.5,
+        scale: 1 + Math.sin((1 - announcement.life) * Math.PI * 4) * 0.2
+      })).filter(announcement => announcement.life > 0))
+
+      // Update territory glow intensity (pulsing)
+      setTerritoryGlowIntensity(prev => 0.3 + Math.sin(currentTime * 0.003) * 0.2)
+
+      // Update mission progress for survive type
+      if (currentMission && currentMission.type === 'survive') {
+        const elapsed = Date.now() - currentMission.startTime
+        const newProgress = Math.min(elapsed, currentMission.target)
+        setMissionProgress(newProgress)
+        if (newProgress >= currentMission.target) {
+          completeMission(currentMission)
+        }
+      }
+
+      // Update mission progress for mass type
+      if (currentMission && currentMission.type === 'mass' && game.player.alive) {
+        const newProgress = Math.min(game.player.mass, currentMission.target)
+        setMissionProgress(newProgress)
+        if (newProgress >= currentMission.target) {
+          completeMission(currentMission)
+        }
+      }
+
       // Render
       render()
       
