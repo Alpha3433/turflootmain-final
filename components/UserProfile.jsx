@@ -49,27 +49,15 @@ const UserProfile = ({ isOpen, onClose, user }) => {
   }, [activeTab, isOpen, user])
 
   const loadUserStats = async () => {
-    if (!user?.id && !user?.privyId) {
-      console.log('⚠️ No user ID available for loading stats')
-      setStats({
-        winRate: 0.0,
-        gamesWon: 0,
-        gamesPlayed: 0,
-        avgSurvival: '0:00',
-        totalEliminations: 0,
-        killsPerGame: 0.0,
-        totalPlayTime: '0h 0m',
-        avgGameTime: '0:00',
-        earnings: 0.00
-      })
-      return
-    }
-    
     try {
       setLoading(true)
-      console.log('📊 Loading real user stats for:', user?.id || user?.privyId)
+      console.log('📊 Loading real user stats')
       
-      const response = await fetch(`/api/users/${user?.id || user?.privyId}`, {
+      // For demo purposes, load stats for the demo user
+      // TODO: Replace with actual authenticated user ID
+      const userId = user?.id || user?.privyId || 'demo-user'
+      
+      const response = await fetch(`/api/users/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +72,7 @@ const UserProfile = ({ isOpen, onClose, user }) => {
         if (userData.user?.stats) {
           const userStats = userData.user.stats
           setStats({
-            winRate: userStats.games_played > 0 ? ((userStats.games_won / userStats.games_played) * 100).toFixed(1) : '0.0',
+            winRate: userStats.win_rate?.toFixed(1) || '0.0',
             gamesWon: userStats.games_won || 0,
             gamesPlayed: userStats.games_played || 0,
             avgSurvival: formatTime(userStats.avg_survival_time || 0),
@@ -94,6 +82,7 @@ const UserProfile = ({ isOpen, onClose, user }) => {
             avgGameTime: formatTime(userStats.avg_game_time || 0),
             earnings: (userStats.total_earnings || 0).toFixed(2)
           })
+          console.log('📊 Stats loaded from database:', userStats)
         } else {
           // User exists but no stats yet - show zeros
           console.log('📊 No stats available for user - showing empty state')
