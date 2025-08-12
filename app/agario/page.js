@@ -1600,6 +1600,27 @@ const AgarIOGame = () => {
             </div>
           )}
           
+          {/* Live Event Feed */}
+          {liveEventFeed.length > 0 && (
+            <div className="mt-4 pt-3 border-t border-gray-600/30">
+              <div className="text-cyan-400 font-bold text-sm mb-2">📺 Live Events</div>
+              <div className="space-y-1 max-h-24 overflow-y-auto">
+                {liveEventFeed.map((event) => (
+                  <div 
+                    key={event.id} 
+                    className={`text-xs px-2 py-1 rounded ${
+                      event.type === 'kill' ? 'bg-red-500/20 text-red-300' :
+                      event.type === 'cashout' ? 'bg-green-500/20 text-green-300' :
+                      'bg-blue-500/20 text-blue-300'
+                    }`}
+                  >
+                    {event.message}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {leaderboard.length === 0 && (
             <div className="text-gray-400 text-sm text-center py-2">
               No players in game
