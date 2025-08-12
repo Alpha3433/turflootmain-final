@@ -153,12 +153,23 @@ const AgarIOGame = () => {
     // Add to kill feed
     addToKillFeed(`You cashed out $${Math.floor(finalAmount)} (after 10% fee)`)
     
+    // Update session tracking - successful cash out (win)
+    setGameSession(prev => ({
+      ...prev,
+      cashedOut: true,
+      survived: true,
+      earnings: finalAmount,
+      endTime: Date.now(),
+      playTimeSeconds: prev.startTime ? Math.floor((Date.now() - prev.startTime) / 1000) : 0
+    }))
+    
     setIsCashingOut(false)
     setCashOutProgress(0)
     setAutoCashOutTriggered(false) // Reset auto cash out flag for next game
     
-    // Fade out and end game
+    // Update user statistics after successful cash out
     setTimeout(() => {
+      updateUserStatistics(true) // true = won/survived
       setIsGameOver(true)
       setGameResult(`💰 Cashed Out: $${Math.floor(finalAmount)} (${Math.floor(platformFee)} fee)`)
     }, 1000)
