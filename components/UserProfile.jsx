@@ -81,53 +81,45 @@ const UserProfile = ({ isOpen, onClose, user }) => {
     }
   }
 
-  const generateDemoStats = () => {
-    // Generate realistic-looking stats for demonstration
-    const gamesPlayed = Math.floor(Math.random() * 50) + 5
-    const gamesWon = Math.floor(gamesPlayed * (0.15 + Math.random() * 0.3))
-    const totalEliminations = Math.floor(gamesPlayed * (1.2 + Math.random() * 2.8))
-    
-    return {
-      winRate: gamesPlayed > 0 ? ((gamesWon / gamesPlayed) * 100).toFixed(1) : 0.0,
-      gamesWon,
-      gamesPlayed,
-      avgSurvival: formatTime(60 + Math.floor(Math.random() * 180)), // 1-4 minutes
-      totalEliminations,
-      killsPerGame: gamesPlayed > 0 ? (totalEliminations / gamesPlayed).toFixed(1) : 0.0,
-      totalPlayTime: formatPlayTime(gamesPlayed * (120 + Math.random() * 240)), // 2-6 min per game
-      avgGameTime: formatTime(120 + Math.floor(Math.random() * 240)),
-      earnings: (gamesWon * (5 + Math.random() * 45)).toFixed(2) // $5-50 per win
-    }
-  }
-
   const loadLeaderboard = async () => {
     try {
       setLoading(true)
-      console.log('🏆 Loading leaderboard data, type:', leaderboardType)
+      console.log('🏆 Loading real leaderboard data, type:', leaderboardType)
       
-      // Generate dynamic leaderboard data
-      const mockLeaderboard = []
-      const playerNames = [
-        'ProGamer2024', 'ElitePlayer', 'TurfMaster', 'CashKing', 'VictorySeeker',
-        'GameChanger', 'TopShooter', 'StrategyPro', 'QuickWin', 'DominantForce'
-      ]
-      
-      for (let i = 0; i < 10; i++) {
-        const isCurrentUser = i === 2 && user // Put current user at #3
-        mockLeaderboard.push({
-          rank: i + 1,
-          name: isCurrentUser ? (user.custom_name || user.google?.name || 'You') : playerNames[i],
-          winnings: Math.floor((1000 - (i * 80)) + Math.random() * 500),
-          wins: Math.floor((50 - (i * 4)) + Math.random() * 20),
-          killDeathRatio: (2.5 - (i * 0.2) + Math.random() * 0.8).toFixed(2),
-          isCurrentUser,
-          avatar: isCurrentUser ? '👤' : ['🎮', '🏆', '⚡', '🔥', '💎', '🚀', '⭐', '💪', '🎯', '👑'][i]
-        })
+      // TODO: Create API endpoint for leaderboard data
+      // For now, fetch from users collection and calculate rankings
+      const response = await fetch('/api/users/leaderboard', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('📊 Leaderboard data received:', data)
+        
+        // Process and rank users
+        const processedLeaderboard = data.users?.map((userData, index) => ({
+          rank: index + 1,
+          name: userData.custom_name || userData.email?.split('@')[0] || `Player${userData.id?.slice(-4)}`,
+          winnings: userData.stats?.total_earnings || 0,
+          wins: userData.stats?.games_won || 0,
+          killDeathRatio: userData.stats?.games_played > 0 
+            ? (userData.stats.total_eliminations / Math.max(userData.stats.games_played - userData.stats.games_won, 1)).toFixed(2)
+            : '0.00',
+          isCurrentUser: userData.id === user?.id || userData.privyId === user?.privyId,
+          avatar: userData.id === user?.id || userData.privyId === user?.privyId ? '👤' : '🎮'
+        })) || []
+        
+        setLeaderboard(processedLeaderboard)
+      } else {
+        console.error('Failed to load leaderboard:', response.status)
+        setLeaderboard([])
       }
-      
-      setLeaderboard(mockLeaderboard)
     } catch (error) {
       console.error('Error loading leaderboard:', error)
+      setLeaderboard([])
     } finally {
       setLoading(false)
     }
@@ -136,18 +128,42 @@ const UserProfile = ({ isOpen, onClose, user }) => {
   const loadFriends = async () => {
     try {
       setLoading(true)
-      console.log('👥 Loading friends list')
+      console.log('👥 Loading real friends list')
       
-      // Generate demo friends data
-      const mockFriends = [
-        { id: 1, name: 'GameBuddy', status: 'online', lastSeen: 'Online', wins: 23, avatar: '🎮' },
-        { id: 2, name: 'StrategyMaster', status: 'playing', lastSeen: 'In game', wins: 34, avatar: '🏆' },
-        { id: 3, name: 'CasualPlayer', status: 'offline', lastSeen: '2h ago', wins: 12, avatar: '⚡' }
-      ]
-      
-      setFriends(mockFriends)
+      if (!user?.id && !user?.privyId) {
+        setFriends([])
+        return
+      }
+
+      const response = await fetch('/api/users/friends', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('👥 Friends data received:', data)
+        
+        const processedFriends = data.friends?.map(friend => ({
+          id: friend.id,
+          name: friend.custom_name || friend.email?.split('@')[0] || `Player${friend.id?.slice(-4)}`,
+          status: friend.online_status || 'offline',
+          lastSeen: friend.last_seen ? new Date(friend.last_seen).toLocaleString() : 'Unknown',
+          wins: friend.stats?.games_won || 0,
+          avatar: '👤'
+        })) || []
+        
+        setFriends(processedFriends)
+      } else {
+        console.error('Failed to load friends:', response.status)
+        setFriends([])
+      }
     } catch (error) {
       console.error('Error loading friends:', error)
+      setFriends([])
     } finally {
       setLoading(false)
     }
@@ -161,18 +177,39 @@ const UserProfile = ({ isOpen, onClose, user }) => {
     
     try {
       setLoading(true)
-      console.log('🔍 Searching for:', query)
+      console.log('🔍 Searching for real users:', query)
       
-      // Generate mock search results
-      const mockResults = [
-        { id: 1, name: `${query}Player`, wins: 15, status: 'online', avatar: '🔍' },
-        { id: 2, name: `Elite${query}`, wins: 28, status: 'offline', avatar: '🎯' },
-        { id: 3, name: `${query}Master`, wins: 42, status: 'playing', avatar: '👑' }
-      ].filter(p => p.name.toLowerCase().includes(query.toLowerCase()))
-      
-      setSearchResults(mockResults)
+      const response = await fetch('/api/users/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: query.trim(),
+          limit: 10
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('🔍 Search results received:', data)
+        
+        const processedResults = data.users?.map(userData => ({
+          id: userData.id,
+          name: userData.custom_name || userData.email?.split('@')[0] || `Player${userData.id?.slice(-4)}`,
+          wins: userData.stats?.games_won || 0,
+          status: userData.online_status || 'offline',
+          avatar: '👤'
+        })) || []
+        
+        setSearchResults(processedResults)
+      } else {
+        console.error('Failed to search users:', response.status)
+        setSearchResults([])
+      }
     } catch (error) {
-      console.error('Error searching players:', error)
+      console.error('Error searching users:', error)
+      setSearchResults([])
     } finally {
       setLoading(false)
     }
