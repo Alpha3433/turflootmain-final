@@ -5,6 +5,13 @@ import { X, Search, Plus, Users, Trophy, Target, Clock } from 'lucide-react'
 
 const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
   const [activeTab, setActiveTab] = useState(initialTab)
+
+  // Reset tab when modal opens with new initialTab
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab)
+    }
+  }, [isOpen, initialTab])
   const [stats, setStats] = useState({
     winRate: 0.0,
     gamesWon: 0,
