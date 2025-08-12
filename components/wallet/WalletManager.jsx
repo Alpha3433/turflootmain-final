@@ -7,6 +7,51 @@ import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 const WalletManager = ({ onBalanceUpdate }) => {
   const { authenticated, user, login, connectWallet } = usePrivy()
   const { wallets } = useWallets()
+  const [balance, setBalance] = useState({ balance: 0, sol_balance: 0, usdc_balance: 0 })
+  const [transactions, setTransactions] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [showAddFunds, setShowAddFunds] = useState(false)
+  const [showCashOut, setShowCashOut] = useState(false)
+  const [addFundsForm, setAddFundsForm] = useState({ amount: '', currency: 'SOL' })
+  const [cashOutForm, setCashOutForm] = useState({ amount: '', currency: 'SOL', address: '' })
+  
+  // Define fetch functions first
+  const fetchBalance = async () => {
+    try {
+      const response = await fetch('/api/wallet/balance', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setBalance(data)
+        if (onBalanceUpdate) onBalanceUpdate(data)
+      }
+    } catch (error) {
+      console.error('Error fetching balance:', error)
+    }
+  }
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch('/api/wallet/transactions', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setTransactions(data.transactions)
+      }
+    } catch (error) {
+      console.error('Error fetching transactions:', error)
+    }
+  }
+  
+  // Now initialize useFundWallet hook
   const { fundWallet } = useFundWallet({
     onUserExited: ({ balance }) => {
       console.log('💰 Funding flow exited, balance:', balance)
@@ -15,13 +60,6 @@ const WalletManager = ({ onBalanceUpdate }) => {
       fetchTransactions()
     }
   })
-  const [balance, setBalance] = useState({ balance: 0, sol_balance: 0, usdc_balance: 0 })
-  const [transactions, setTransactions] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [showAddFunds, setShowAddFunds] = useState(false)
-  const [showCashOut, setShowCashOut] = useState(false)
-  const [addFundsForm, setAddFundsForm] = useState({ amount: '', currency: 'SOL' })
-  const [cashOutForm, setCashOutForm] = useState({ amount: '', currency: 'SOL', address: '' })
 
   // Solana connection
   const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com', 'confirmed')
