@@ -25,6 +25,7 @@ export default function Home() {
   const [isTestUser, setIsTestUser] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showCustomization, setShowCustomization] = useState(false)
   const [leaderboardData, setLeaderboardData] = useState([])
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
   const [socialInitialTab, setSocialInitialTab] = useState('leaderboard')
