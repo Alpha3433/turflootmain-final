@@ -291,13 +291,110 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                 >
                   {/* Item Preview */}
                   <div className="aspect-square bg-gray-700/30 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
-                    {/* Mock preview - in real app this would be actual item preview */}
-                    <div className={`w-16 h-16 rounded-full ${
-                      item.rarity === 'legendary' ? 'bg-gradient-to-br from-yellow-400 to-orange-500' :
-                      item.rarity === 'epic' ? 'bg-gradient-to-br from-purple-400 to-pink-500' :
-                      item.rarity === 'rare' ? 'bg-gradient-to-br from-blue-400 to-cyan-500' :
-                      'bg-gradient-to-br from-gray-400 to-gray-600'
-                    } ${!item.owned ? 'grayscale' : ''}`} />
+                    {/* Custom item textures based on category and item */}
+                    {activeCategory === 'skins' && (
+                      <div className={`w-16 h-16 rounded-full border-4 border-white/20 flex items-center justify-center relative ${
+                        item.id === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/50 shadow-lg' :
+                        item.id === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/50 shadow-lg animate-pulse' :
+                        item.id === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/50 shadow-lg' :
+                        item.id === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/50 shadow-lg' :
+                        item.id === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/50 shadow-lg' :
+                        'bg-gradient-to-br from-cyan-300 via-cyan-400 to-cyan-600 shadow-cyan-500/50 shadow-lg'
+                      } ${!item.owned ? 'grayscale' : ''}`}>
+                        {/* Eyes */}
+                        <div className="w-2 h-2 bg-black rounded-full absolute top-4 left-4"></div>
+                        <div className="w-2 h-2 bg-black rounded-full absolute top-4 right-4"></div>
+                        {/* Special effects for legendary items */}
+                        {item.rarity === 'legendary' && (
+                          <>
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    
+                    {activeCategory === 'hats' && (
+                      <div className="relative flex items-center justify-center">
+                        {/* Base character */}
+                        <div className="w-12 h-12 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 left-3"></div>
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 right-3"></div>
+                        </div>
+                        {/* Hat overlay */}
+                        <div className={`absolute -top-2 ${
+                          item.id === 'crown_gold' ? 'w-8 h-6 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border border-yellow-600' :
+                          item.id === 'cap_baseball' ? 'w-10 h-4 bg-gradient-to-r from-red-600 to-red-500 rounded-full' :
+                          item.id === 'helmet_space' ? 'w-14 h-8 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full border-2 border-blue-400' :
+                          'w-6 h-4 bg-gray-600 rounded'
+                        } ${!item.owned ? 'grayscale' : ''}`}>
+                          {item.id === 'crown_gold' && (
+                            <div className="flex justify-center">
+                              <div className="w-1 h-2 bg-yellow-300 rounded-t-full mt-1"></div>
+                            </div>
+                          )}
+                          {item.id === 'helmet_space' && (
+                            <div className="absolute inset-2 bg-gradient-to-b from-blue-200/30 to-cyan-200/30 rounded-full"></div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {activeCategory === 'trails' && (
+                      <div className="relative flex items-center justify-center">
+                        {/* Character with trail */}
+                        <div className="w-12 h-12 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 left-3"></div>
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 right-3"></div>
+                        </div>
+                        {/* Trail effect */}
+                        <div className={`absolute -right-8 flex space-x-1 ${!item.owned ? 'grayscale' : ''}`}>
+                          {item.id === 'rainbow_trail' ? (
+                            <>
+                              <div className="w-2 h-2 bg-red-400 rounded-full opacity-70"></div>
+                              <div className="w-2 h-2 bg-yellow-400 rounded-full opacity-50"></div>
+                              <div className="w-1 h-1 bg-green-400 rounded-full opacity-30"></div>
+                            </>
+                          ) : item.id === 'fire_trail' ? (
+                            <>
+                              <div className="w-2 h-2 bg-orange-500 rounded-full opacity-70 animate-pulse"></div>
+                              <div className="w-2 h-2 bg-red-500 rounded-full opacity-50 animate-pulse"></div>
+                              <div className="w-1 h-1 bg-yellow-500 rounded-full opacity-30 animate-pulse"></div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-2 h-2 bg-blue-400 rounded-full opacity-70 animate-pulse"></div>
+                              <div className="w-1 h-1 bg-cyan-400 rounded-full opacity-50 animate-pulse"></div>
+                              <div className="w-1 h-1 bg-white rounded-full opacity-30 animate-pulse"></div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {activeCategory === 'faces' && (
+                      <div className={`w-16 h-16 bg-cyan-400 rounded-full border-4 border-white/20 flex items-center justify-center relative ${!item.owned ? 'grayscale' : ''}`}>
+                        {/* Different eye expressions */}
+                        {item.id === 'angry_eyes' ? (
+                          <>
+                            <div className="w-2 h-1.5 bg-black rounded-sm absolute top-4 left-4 transform rotate-12"></div>
+                            <div className="w-2 h-1.5 bg-black rounded-sm absolute top-4 right-4 transform -rotate-12"></div>
+                            <div className="w-4 h-1 bg-red-600 rounded absolute bottom-5"></div>
+                          </>
+                        ) : item.id === 'wink_eyes' ? (
+                          <>
+                            <div className="w-2 h-0.5 bg-black rounded absolute top-5 left-4"></div>
+                            <div className="w-2 h-2 bg-black rounded-full absolute top-4 right-4"></div>
+                            <div className="w-3 h-1 bg-pink-500 rounded-full absolute bottom-5"></div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-2 h-2 bg-black rounded-full absolute top-4 left-4"></div>
+                            <div className="w-2 h-2 bg-black rounded-full absolute top-4 right-4"></div>
+                          </>
+                        )}
+                      </div>
+                    )}
                     
                     {/* Equipped indicator */}
                     {item.equipped && (
