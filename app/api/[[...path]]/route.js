@@ -1123,6 +1123,92 @@ export async function POST(request, { params }) {
       }, { headers: corsHeaders })
     }
 
+    // User statistics update endpoint
+    if (route === 'users/stats/update') {
+      try {
+        const { sessionData, userId } = body
+        
+        if (!sessionData) {
+          return NextResponse.json({
+            error: 'Session data is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        console.log('📊 Updating user statistics:', sessionData)
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Calculate new statistics
+        const gameWon = sessionData.won || sessionData.cashedOut
+        const playTimeSeconds = sessionData.playTimeSeconds || 0
+        const kills = sessionData.kills || 0
+        const earnings = sessionData.earnings || 0
+
+        // For now, update a default user record or create one
+        // TODO: Replace with actual user ID from authentication
+        const defaultUserId = userId || 'demo-user'
+        
+        // Use upsert to create or update user stats
+        const updateResult = await users.updateOne(
+          { id: defaultUserId },
+          {
+            $inc: {
+              'stats.games_played': 1,
+              'stats.games_won': gameWon ? 1 : 0,
+              'stats.total_eliminations': kills,
+              'stats.total_play_time': playTimeSeconds,
+              'stats.total_earnings': earnings
+            },
+            $set: {
+              'stats.last_played': new Date(),
+              id: defaultUserId,
+              custom_name: `DemoPlayer${defaultUserId.slice(-4)}`
+            }
+          },
+          { upsert: true }
+        )
+
+        // Calculate derived statistics
+        const updatedUser = await users.findOne({ id: defaultUserId })
+        if (updatedUser?.stats) {
+          const stats = updatedUser.stats
+          const avgSurvivalTime = stats.games_played > 0 ? Math.floor(stats.total_play_time / stats.games_played) : 0
+          const avgGameTime = avgSurvivalTime // Same for now
+          const winRate = stats.games_played > 0 ? (stats.games_won / stats.games_played) * 100 : 0
+
+          // Update derived stats
+          await users.updateOne(
+            { id: defaultUserId },
+            {
+              $set: {
+                'stats.avg_survival_time': avgSurvivalTime,
+                'stats.avg_game_time': avgGameTime,
+                'stats.win_rate': winRate
+              }
+            }
+          )
+        }
+
+        console.log('✅ User statistics updated successfully')
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Statistics updated successfully',
+          gameWon,
+          earnings,
+          kills,
+          playTimeSeconds
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error updating user statistics:', error)
+        return NextResponse.json({
+          error: 'Failed to update statistics',
+          details: error.message
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     return NextResponse.json(
       { error: 'Endpoint not found' },
       { status: 404, headers: corsHeaders }
