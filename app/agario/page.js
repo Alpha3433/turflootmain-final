@@ -1028,18 +1028,56 @@ const AgarIOGame = () => {
       ctx.shadowBlur = 0
       ctx.setLineDash([]) // Reset line dash
       
-      // Draw orbs - bigger like original Agario
-      game.orbs.forEach(orb => {
-        ctx.fillStyle = orb.color
-        ctx.beginPath()
-        ctx.arc(orb.x, orb.y, 12, 0, Math.PI * 2) // Bigger orbs
-        ctx.fill()
+      // Draw orbs - enhanced with different types
+      game.orbs.forEach((orb, index) => {
+        // Determine orb type based on properties
+        const isHighValue = orb.massValue > config.orbMassValue * 1.5
+        const isBonusOrb = index % 7 === 0 // Every 7th orb is a bonus orb
         
-        // Dollar sign
-        ctx.fillStyle = '#000000'
-        ctx.font = '14px Arial'
-        ctx.textAlign = 'center'
-        ctx.fillText('$', orb.x, orb.y + 4)
+        // Set orb appearance
+        if (isBonusOrb) {
+          // Bonus orbs - larger and golden
+          ctx.fillStyle = '#FFD700'
+          ctx.beginPath()
+          ctx.arc(orb.x, orb.y, 16, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Add sparkle effect
+          ctx.fillStyle = '#FFFFFF'
+          ctx.beginPath()
+          ctx.arc(orb.x - 4, orb.y - 4, 2, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Dollar sign
+          ctx.fillStyle = '#8B4513' // Dark brown
+          ctx.font = 'bold 16px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText('$', orb.x, orb.y + 5)
+        } else if (isHighValue) {
+          // High value orbs - silver/cyan
+          ctx.fillStyle = '#00FFFF'
+          ctx.beginPath()
+          ctx.arc(orb.x, orb.y, 14, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Dollar sign
+          ctx.fillStyle = '#000080' // Dark blue
+          ctx.font = 'bold 15px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText('$', orb.x, orb.y + 4)
+        } else {
+          // Regular orbs
+          ctx.fillStyle = orb.color
+          ctx.beginPath()
+          ctx.arc(orb.x, orb.y, 12, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Dollar sign
+          ctx.fillStyle = '#000000'
+          ctx.font = '14px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText('$', orb.x, orb.y + 4)
+        }
       })
       
       // Draw viruses (modern geometric spiky obstacles)
