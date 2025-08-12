@@ -649,6 +649,21 @@ const AgarIOGame = () => {
               game.player.alive = false
               game.player.deaths += 1
               game.player.streak = 0
+              
+              // Update session tracking - game loss
+              setGameSession(prev => ({
+                ...prev,
+                survived: false,
+                cashedOut: false,
+                endTime: Date.now(),
+                playTimeSeconds: prev.startTime ? Math.floor((Date.now() - prev.startTime) / 1000) : 0
+              }))
+              
+              // Update user statistics for game loss
+              setTimeout(() => {
+                updateUserStatistics(false) // false = lost/died
+              }, 100)
+              
               setIsGameOver(true)
               setGameResult(`💀 Eliminated by ${bot.name}`)
             }
