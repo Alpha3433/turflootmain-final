@@ -27,6 +27,77 @@ async function getDb() {
   return client.db(DB_NAME)
 }
 
+// Random name generator for new users
+const generateRandomUsername = () => {
+  const adjectives = [
+    'Swift', 'Clever', 'Bold', 'Mighty', 'Fierce', 'Cosmic', 'Alpha', 'Neon', 'Cyber', 'Quantum',
+    'Shadow', 'Lightning', 'Thunder', 'Frost', 'Fire', 'Steel', 'Golden', 'Silver', 'Crystal', 'Diamond',
+    'Ninja', 'Dragon', 'Phoenix', 'Storm', 'Blaze', 'Viper', 'Wolf', 'Eagle', 'Tiger', 'Shark',
+    'Sonic', 'Turbo', 'Ultra', 'Mega', 'Super', 'Hyper', 'Prime', 'Elite', 'Pro', 'Master',
+    'Mystic', 'Phantom', 'Ghost', 'Spirit', 'Soul', 'Void', 'Dark', 'Bright', 'Pure', 'Wild'
+  ]
+  
+  const nouns = [
+    'Warrior', 'Hunter', 'Ranger', 'Guardian', 'Champion', 'Hero', 'Legend', 'Knight', 'Samurai', 'Gladiator',
+    'Player', 'Gamer', 'Raider', 'Striker', 'Fighter', 'Slayer', 'Destroyer', 'Crusher', 'Conqueror', 'Victor',
+    'Wolf', 'Lion', 'Tiger', 'Bear', 'Eagle', 'Hawk', 'Falcon', 'Dragon', 'Phoenix', 'Griffin',
+    'Storm', 'Thunder', 'Lightning', 'Flame', 'Blaze', 'Frost', 'Ice', 'Shadow', 'Phantom', 'Ghost',
+    'Blade', 'Sword', 'Arrow', 'Spear', 'Shield', 'Armor', 'Crown', 'Gem', 'Star', 'Moon'
+  ]
+  
+  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)]
+  const noun = nouns[Math.floor(Math.random() * nouns.length)]
+  const number = Math.floor(Math.random() * 999) + 1
+  
+  return `${adjective}${noun}${number}`
+}
+
+// Check if username is already taken
+const isUsernameAvailable = async (username, currentUserId = null) => {
+  try {
+    const db = await getDb()
+    const users = db.collection('users')
+    
+    const query = {
+      $or: [
+        { username: { $regex: new RegExp(`^${username}$`, 'i') } }, // Case-insensitive match
+        { 'profile.display_name': { $regex: new RegExp(`^${username}$`, 'i') } },
+        { custom_name: { $regex: new RegExp(`^${username}$`, 'i') } }
+      ]
+    }
+    
+    // If updating existing user, exclude their current record
+    if (currentUserId) {
+      query.id = { $ne: currentUserId }
+    }
+    
+    const existingUser = await users.findOne(query)
+    return !existingUser
+  } catch (error) {
+    console.error('Error checking username availability:', error)
+    return false
+  }
+}
+
+// Generate a unique username
+const generateUniqueUsername = async () => {
+  let attempts = 0
+  let username
+  
+  do {
+    username = generateRandomUsername()
+    attempts++
+    
+    // Prevent infinite loop
+    if (attempts > 50) {
+      username = `Player${Date.now()}${Math.floor(Math.random() * 1000)}`
+      break
+    }
+  } while (!(await isUsernameAvailable(username)))
+  
+  return username
+}
+
 // Enable CORS
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
