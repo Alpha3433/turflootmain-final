@@ -890,7 +890,6 @@ export async function POST(request, { params }) {
         // Handle Google OAuth authentication
         if (privy_user.google) {
           email = privy_user.google.email
-          username = privy_user.google.name || privy_user.google.email?.split('@')[0]
           avatar_url = privy_user.google.picture
           auth_method = 'google'
           console.log('📱 Google OAuth user:', email)
@@ -899,7 +898,6 @@ export async function POST(request, { params }) {
         // Handle Email OTP authentication
         if (privy_user.email && !privy_user.google) {
           email = privy_user.email.address
-          username = email?.split('@')[0] || `user_${Date.now()}`
           auth_method = 'email'
           console.log('✉️ Email OTP user:', email)
         }
@@ -910,7 +908,6 @@ export async function POST(request, { params }) {
           console.log('🔗 Wallet connected:', wallet_address)
           if (!email && !privy_user.google && !privy_user.email) {
             // Wallet-only authentication
-            username = `wallet_${wallet_address.slice(0, 8)}`
             auth_method = 'wallet'
             console.log('💰 Wallet-only user:', wallet_address)
           }
