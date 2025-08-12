@@ -89,6 +89,21 @@ export default function Home() {
     }
   }, [authenticated, user, hasShownWelcome, ready])
 
+  // Helper function to format time elapsed
+  const formatTimeAgo = (timestamp) => {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000)
+    
+    if (seconds < 60) {
+      return `${seconds}s ago`
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60)
+      return `${minutes}m ago`
+    } else {
+      const hours = Math.floor(seconds / 3600)
+      return `${hours}h ago`
+    }
+  }
+
   // Real-time cash-out notifications effect
   useEffect(() => {
     // Helper function to generate a random notification
