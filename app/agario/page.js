@@ -1324,6 +1324,37 @@ const AgarIOGame = () => {
           }
         })
       }
+
+      // Draw coin animations
+      coinAnimations.forEach(anim => {
+        if (anim.life > 0) {
+          ctx.save()
+          ctx.translate(anim.x, anim.y)
+          ctx.scale(anim.scale, anim.scale)
+          ctx.rotate(anim.rotation * Math.PI / 180)
+          
+          // Draw spinning coin
+          ctx.fillStyle = '#FFD700'
+          ctx.beginPath()
+          ctx.arc(0, 0, 10, 0, Math.PI * 2)
+          ctx.fill()
+          
+          ctx.fillStyle = '#000000'
+          ctx.font = 'bold 14px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText('$', 0, 4)
+          
+          ctx.restore()
+          
+          // Draw particles
+          anim.particles.forEach(particle => {
+            if (particle.life > 0) {
+              ctx.fillStyle = particle.color + Math.floor(particle.life * 255).toString(16).padStart(2, '0')
+              ctx.fillRect(particle.x - 1, particle.y - 1, 2, 2)
+            }
+          })
+        }
+      })
       
       // Cash out progress ring
       if (isCashingOut && game.player.alive) {
