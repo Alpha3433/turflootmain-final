@@ -142,6 +142,42 @@ const AgarIOGame = () => {
     }
   }
 
+  // Function to update user statistics after a game session
+  const updateUserStatistics = async (wonGame = false) => {
+    // Calculate session statistics
+    const sessionData = {
+      ...gameSession,
+      endTime: gameSession.endTime || Date.now(),
+      playTimeSeconds: gameSession.startTime ? Math.floor((Date.now() - gameSession.startTime) / 1000) : 0,
+      survived: wonGame || gameSession.cashedOut,
+      won: wonGame
+    }
+
+    console.log('📊 Updating user statistics:', sessionData)
+
+    try {
+      const response = await fetch('/api/users/stats/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionData,
+          userId: 'current-user', // TODO: Get actual user ID from auth
+        }),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('✅ User statistics updated successfully:', result)
+      } else {
+        console.error('❌ Failed to update user statistics:', response.status)
+      }
+    } catch (error) {
+      console.error('❌ Error updating user statistics:', error)
+    }
+  }
+
   const completeCashOut = () => {
     const netWorth = gameRef.current?.game?.player?.netWorth || 0
     const platformFee = netWorth * 0.10 // 10% platform fee
