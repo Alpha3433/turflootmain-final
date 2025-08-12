@@ -105,6 +105,32 @@ const AgarIOGame = () => {
     }
   }, [])
 
+  // Load player customization data
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('turfloot_player_customization')
+      if (saved) {
+        const customizationData = JSON.parse(saved)
+        setPlayerCustomization({
+          skin: customizationData.skin || 'default_blue',
+          hat: customizationData.hat || null,
+          trail: customizationData.trail || 'default_sparkle',
+          face: customizationData.face || 'normal_eyes'
+        })
+        console.log('Agario: Loaded player customization:', customizationData)
+      }
+    } catch (error) {
+      console.error('Agario: Failed to load customization:', error)
+      // Reset to defaults if there's an error
+      setPlayerCustomization({
+        skin: 'default_blue',
+        hat: null,
+        trail: 'default_sparkle',
+        face: 'normal_eyes'
+      })
+    }
+  }, [])
+
   // Handle keyboard input for cash-out
   useEffect(() => {
     const handleKeyDown = (e) => {
