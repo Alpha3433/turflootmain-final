@@ -12,8 +12,8 @@ import uuid
 import sys
 from datetime import datetime
 
-# Configuration - Use environment URL from .env
-BASE_URL = "https://gridgame-dev.preview.emergentagent.com"
+# Configuration - Use localhost for testing (external URL has ingress issues)
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootComprehensiveTester:
