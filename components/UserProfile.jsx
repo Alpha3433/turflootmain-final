@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { X, Search, Plus, Users, Trophy, Target, Clock } from 'lucide-react'
 
-const UserProfile = ({ isOpen, onClose, user }) => {
-  const [activeTab, setActiveTab] = useState('leaderboard')
+const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
+  const [activeTab, setActiveTab] = useState(initialTab)
   const [stats, setStats] = useState({
     winRate: 0.0,
     gamesWon: 0,
