@@ -51,13 +51,19 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
   }
   
-  // Now initialize useFundWallet hook
+  // Now initialize useFundWallet hook with better error handling
   const { fundWallet } = useFundWallet({
     onUserExited: ({ balance }) => {
-      console.log('💰 Funding flow exited, balance:', balance)
+      console.log('💰 Privy funding flow exited, balance:', balance)
       // Refresh balance after funding
       fetchBalance()
       fetchTransactions()
+    },
+    onError: (error) => {
+      console.error('💥 Privy funding error:', error)
+    },
+    onFundingMethodSelected: (method) => {
+      console.log('💳 Funding method selected:', method)
     }
   })
 
