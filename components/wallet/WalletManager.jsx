@@ -370,10 +370,13 @@ const WalletManager = ({ onBalanceUpdate }) => {
         </div>
       )}
 
-      {/* Cash Out Modal - Completely Recreated from Scratch */}
+      {/* Cash Out Modal - Fixed True Center Positioning */}
       {showCashOut && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm">
-          <div className="bg-gray-900 rounded-2xl w-full max-w-2xl mx-4 border border-gray-700 shadow-2xl">
+        <div 
+          className="fixed top-0 left-0 right-0 bottom-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-sm"
+          style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div className="bg-gray-900 rounded-2xl w-full max-w-2xl mx-4 border border-gray-700 shadow-2xl relative">
             {/* Header */}
             <div className="flex items-center justify-between p-6">
               <div className="flex items-center gap-3">
