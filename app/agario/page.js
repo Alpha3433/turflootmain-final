@@ -582,6 +582,12 @@ const AgarIOGame = () => {
               game.player.streak += 1
               game.player.cashBadgeScale = 1.3
               
+              // Update session tracking
+              setGameSession(prev => ({
+                ...prev,
+                kills: prev.kills + 1
+              }))
+              
               bot.alive = false
               
               // Add floating text
