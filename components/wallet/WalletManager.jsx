@@ -180,7 +180,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
       {/* Action Buttons */}
       <div className="space-y-3">
         <button 
-          onClick={() => setShowAddFunds(true)}
+          onClick={handleAddFunds}
           className="w-full py-3 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-xl text-green-400 font-bold text-sm transition-all hover:scale-105"
         >
           Add Funds
