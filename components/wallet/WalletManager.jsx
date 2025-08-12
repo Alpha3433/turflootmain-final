@@ -7,6 +7,14 @@ import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 const WalletManager = ({ onBalanceUpdate }) => {
   const { authenticated, user, login, connectWallet } = usePrivy()
   const { wallets } = useWallets()
+  const { fundWallet } = useFundWallet({
+    onUserExited: ({ balance }) => {
+      console.log('💰 Funding flow exited, balance:', balance)
+      // Refresh balance after funding
+      fetchBalance()
+      fetchTransactions()
+    }
+  })
   const [balance, setBalance] = useState({ balance: 0, sol_balance: 0, usdc_balance: 0 })
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(false)
