@@ -150,6 +150,25 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   const handleEquipItem = (item) => {
     if (!item.owned) return
     
+    // Update items data to mark the new item as equipped and unequip others in the same category
+    setItemsData(prev => {
+      const newItemsData = { ...prev }
+      
+      // Unequip all items in the current category
+      newItemsData[activeCategory] = newItemsData[activeCategory].map(categoryItem => ({
+        ...categoryItem,
+        equipped: false
+      }))
+      
+      // Equip the selected item
+      newItemsData[activeCategory] = newItemsData[activeCategory].map(categoryItem => ({
+        ...categoryItem,
+        equipped: categoryItem.id === item.id ? true : categoryItem.equipped
+      }))
+      
+      return newItemsData
+    })
+    
     // Update local player data
     const categoryKey = `equipped${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1, -1)}`
     setPlayerData(prev => ({
