@@ -38,6 +38,14 @@ const AgarIOGame = () => {
   const [ping, setPing] = useState(0)
   const [autoCashOutTriggered, setAutoCashOutTriggered] = useState(false) // Flag to prevent multiple auto cash outs
   
+  // Enhanced game features
+  const [coinAnimations, setCoinAnimations] = useState([]) // For animated coin pickups
+  const [killStreakAnnouncements, setKillStreakAnnouncements] = useState([])
+  const [currentMission, setCurrentMission] = useState(null)
+  const [missionProgress, setMissionProgress] = useState(0)
+  const [liveEventFeed, setLiveEventFeed] = useState([])
+  const [territoryGlowIntensity, setTerritoryGlowIntensity] = useState(0.3)
+  
   // Game session tracking for statistics
   const [gameSession, setGameSession] = useState({
     startTime: null,
