@@ -86,7 +86,14 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
     try {
       console.log('🎯 Attempting to open Privy wallet funding modal')
-      console.log('🔍 Available functions:', { fundWallet: typeof fundWallet, wallets: wallets?.length })
+      console.log('🔍 Debug info:', { 
+        fundWallet: typeof fundWallet, 
+        fundWalletAvailable: !!fundWallet,
+        walletsCount: wallets?.length || 0,
+        userWallet: user?.wallet?.address,
+        authenticated,
+        userId: user?.id
+      })
       
       // Get user's wallet address
       let walletAddress = null
@@ -102,6 +109,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
       if (!walletAddress) {
         console.log('📱 No wallet address found, trying to connect wallet first...')
         if (typeof connectWallet === 'function') {
+          console.log('🔗 Attempting wallet connection...')
           await connectWallet()
           console.log('✅ Wallet connection initiated')
           return
@@ -114,21 +122,39 @@ const WalletManager = ({ onBalanceUpdate }) => {
       
       // Try to use Privy's native funding modal
       if (typeof fundWallet === 'function') {
-        console.log('🚀 Opening Privy native funding modal for:', walletAddress)
-        await fundWallet(walletAddress, {
-          uiConfig: {
-            receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
-            receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
-          },
-        })
-        console.log('✅ Privy funding modal opened successfully')
+        console.log('🚀 Attempting to open Privy native funding modal for:', walletAddress)
+        
+        try {
+          await fundWallet(walletAddress, {
+            uiConfig: {
+              receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
+              receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
+            },
+          })
+          console.log('✅ Privy funding modal should have opened')
+          return
+        } catch (privyError) {
+          console.error('❌ Privy fundWallet failed:', privyError)
+          console.log('📋 Error details:', {
+            message: privyError.message,
+            name: privyError.name,
+            stack: privyError.stack?.substring(0, 200)
+          })
+          throw privyError
+        }
       } else {
-        console.log('⚠️ fundWallet function not available, showing custom modal')
+        console.log('⚠️ fundWallet function not available, type:', typeof fundWallet)
+        console.log('🔄 Falling back to custom modal')
         setShowAddFunds(true)
       }
       
     } catch (error) {
       console.error('❌ Error opening Privy funding modal:', error)
+      console.log('📋 Full error details:', {
+        message: error.message,
+        name: error.name,
+        cause: error.cause
+      })
       console.log('🔄 Falling back to custom modal')
       setShowAddFunds(true)
     }
