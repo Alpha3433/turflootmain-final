@@ -600,7 +600,7 @@ export default function Home() {
           {/* Left side - Welcome with icon */}
           <div className="flex items-center space-x-4">
             <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-black font-bold text-sm">🎮</span>
+              <img src="/turfloot-logo.png" alt="TurfLoot Logo" className="w-6 h-6 object-contain" />
             </div>
             <span className="text-white text-lg font-semibold">
               {authenticated && user 
