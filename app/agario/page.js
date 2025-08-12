@@ -46,6 +46,14 @@ const AgarIOGame = () => {
   const [liveEventFeed, setLiveEventFeed] = useState([])
   const [territoryGlowIntensity, setTerritoryGlowIntensity] = useState(0.3)
   
+  // Player customization state
+  const [playerCustomization, setPlayerCustomization] = useState({
+    skin: 'default_blue',
+    hat: null,
+    trail: 'default_sparkle',
+    face: 'normal_eyes'
+  })
+  
   // Game session tracking for statistics
   const [gameSession, setGameSession] = useState({
     startTime: null,
