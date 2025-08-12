@@ -1122,10 +1122,18 @@ export async function POST(request, { params }) {
         }
         
         const minCashoutSol = parseFloat(process.env.MIN_CASHOUT_SOL) || 0.05
+        const minCashoutUsd = parseFloat(process.env.MIN_CASHOUT_USD) || 20
         
         if (currency === 'SOL' && amount < minCashoutSol) {
           return NextResponse.json(
             { error: `Minimum cash out is ${minCashoutSol} SOL` },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+        
+        if (currency === 'USD' && amount < minCashoutUsd) {
+          return NextResponse.json(
+            { error: `Minimum cash out is $${minCashoutUsd} USD` },
             { status: 400, headers: corsHeaders }
           )
         }
