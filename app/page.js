@@ -406,30 +406,27 @@ export default function Home() {
       
       if (!response.ok) {
         console.log('🔍 User not found by userId, trying with privy ID')
-        // If not found, the user might not exist yet, use default name
-        const defaultName = user?.google?.name || user?.email?.address || 'Player'
-        setDisplayName(defaultName)
+        // If not found, use a temporary random-style name until user is created
+        setDisplayName('Loading...')
         return
       }
       
       const userData = await response.json()
       console.log('👤 User profile loaded:', userData)
       
-      // Set display name from user data
+      // Set display name priority: custom_name > username (random) > fallback to "Player"
       if (userData.custom_name) {
         setDisplayName(userData.custom_name)
-      } else if (userData.username) {
+      } else if (userData.username && !userData.username.includes('@')) {
         setDisplayName(userData.username)
       } else {
-        // Fallback to Google name or email
-        const fallbackName = user?.google?.name || user?.email?.address || 'Player'
-        setDisplayName(fallbackName)
+        // Final fallback - should rarely be used since API assigns random usernames
+        setDisplayName('Player')
       }
     } catch (error) {
       console.error('❌ Error loading user profile:', error)
-      // Fallback to Google name or email on error
-      const fallbackName = user?.google?.name || user?.email?.address || 'Player'
-      setDisplayName(fallbackName)
+      // Fallback to generic name on error - no more email addresses
+      setDisplayName('Player')
     }
   }
 
