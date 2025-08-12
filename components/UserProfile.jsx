@@ -241,15 +241,11 @@ const UserProfile = ({ isOpen, onClose, user }) => {
       setLoading(true)
       console.log('🔍 Searching for real users:', query)
       
-      const response = await fetch('/api/users/search', {
-        method: 'POST',
+      const response = await fetch(`/api/users/search?q=${encodeURIComponent(query.trim())}&limit=10`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          query: query.trim(),
-          limit: 10
-        }),
       })
 
       if (response.ok) {
