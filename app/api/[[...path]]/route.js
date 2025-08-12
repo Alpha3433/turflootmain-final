@@ -336,6 +336,74 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Social features API endpoints
+    if (route === 'users/leaderboard') {
+      try {
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Get top users with real stats, excluding sensitive data
+        const leaderboard = await users.find({
+          'stats.games_played': { $gt: 0 } // Only users who have played games
+        })
+        .sort({ 'stats.total_earnings': -1 }) // Sort by earnings by default
+        .limit(50)
+        .project({
+          id: 1,
+          custom_name: 1,
+          email: 1,
+          stats: 1,
+          created_at: 1
+        })
+        .toArray()
+        
+        return NextResponse.json({
+          users: leaderboard
+        }, { headers: corsHeaders })
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error)
+        return NextResponse.json({ users: [] }, { headers: corsHeaders })
+      }
+    }
+
+    if (route === 'users/friends') {
+      return requireAuth(async (req) => {
+        try {
+          const db = await getDb()
+          const friends = db.collection('friends')
+          const users = db.collection('users')
+          
+          // Get user's friends list
+          const friendsList = await friends.find({
+            user_id: req.user.id,
+            status: 'accepted'
+          }).toArray()
+          
+          // Get detailed friend information
+          const friendIds = friendsList.map(f => f.friend_id)
+          const friendsData = await users.find({
+            id: { $in: friendIds }
+          })
+          .project({
+            id: 1,
+            custom_name: 1,
+            email: 1,
+            stats: 1,
+            online_status: 1,
+            last_seen: 1
+          })
+          .toArray()
+          
+          return NextResponse.json({
+            friends: friendsData
+          }, { headers: corsHeaders })
+        } catch (error) {
+          console.error('Error fetching friends:', error)
+          return NextResponse.json({ friends: [] }, { headers: corsHeaders })
+        }
+      })(request)
+    }
+
     return NextResponse.json(
       { error: 'Endpoint not found' },
       { status: 404, headers: corsHeaders }
