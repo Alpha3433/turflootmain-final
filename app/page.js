@@ -749,19 +749,35 @@ export default function Home() {
                   </div>
                   <button className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors">⟲ Refresh</button>
                 </div>
-                <div className="text-center pt-4 pb-10">
-                  <div className="text-3xl font-black text-gray-600 mb-1">0</div>
-                  <div className="text-gray-400 text-xs mb-1">playing</div>
-                  <div className="text-gray-500 text-xs mb-3">No friends - add some!</div>
-                  <button 
-                    onClick={() => {
-                      setSocialInitialTab('friends')
-                      setShowProfile(true)
-                    }}
-                    className="w-full py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-blue-400 font-bold text-xs transition-all hover:scale-105"
-                  >
-                    Add Friends
-                  </button>
+                <div className="space-y-3">
+                  {loadingFriends ? (
+                    <div className="text-center py-4">
+                      <div className="text-xl animate-spin mb-2">⏳</div>
+                      <div className="text-gray-400 text-xs">Loading friends...</div>
+                    </div>
+                  ) : friendsList.length > 0 ? (
+                    friendsList.map((friend) => (
+                      <div key={friend.id} className="flex justify-between items-center py-2 px-3 bg-gray-800/30 rounded-xl border border-gray-700/20">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            friend.status === 'online' ? 'bg-green-400' :
+                            friend.status === 'playing' ? 'bg-yellow-400' :
+                            'bg-gray-500'
+                          }`}></div>
+                          <span className="text-gray-300 font-medium text-sm">{friend.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-gray-400 text-xs">{friend.wins} wins</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6">
+                      <div className="text-3xl mb-2">👥</div>
+                      <div className="text-gray-400 text-sm mb-1">No friends yet</div>
+                      <div className="text-gray-500 text-xs">Add friends to see them here</div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
