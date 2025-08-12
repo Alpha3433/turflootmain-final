@@ -448,13 +448,19 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => addFriend(player.id)}
-                className="px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-black font-medium rounded-lg transition-colors flex items-center"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Friend
-              </button>
+              {player.friendRequestSent ? (
+                <div className="px-3 py-1 bg-gray-600/20 text-gray-400 rounded text-sm">
+                  ✓ Request Sent
+                </div>
+              ) : (
+                <button
+                  onClick={() => addFriend(player.id)}
+                  className="px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-black font-medium rounded-lg transition-colors flex items-center"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Friend
+                </button>
+              )}
             </div>
           ))}
         </div>
