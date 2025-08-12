@@ -194,8 +194,10 @@ const AgarIOGame = () => {
     addFloatingText(`Banked: $${Math.floor(finalAmount)}`, gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#00ff00')
     addFloatingText(`-$${Math.floor(platformFee)} fee`, gameRef.current?.game?.player?.x || 0, (gameRef.current?.game?.player?.y || 0) - 25, '#ff4444')
     
-    // Add to kill feed
-    addToKillFeed(`You cashed out $${Math.floor(finalAmount)} (after 10% fee)`)
+    // Add to kill feed and live events
+    const cashOutMessage = `You cashed out $${Math.floor(finalAmount)} (after 10% fee)`
+    addToKillFeed(cashOutMessage)
+    addLiveEvent(`Player cashed out $${Math.floor(finalAmount)}`, 'cashout')
     
     // Update session tracking - successful cash out (win)
     setGameSession(prev => ({
