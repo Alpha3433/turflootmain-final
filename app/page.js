@@ -597,9 +597,8 @@ export default function Home() {
       {/* Top Navigation - 64px height, sticky */}
       <header className="sticky top-0 z-50 h-16 w-full backdrop-blur-sm bg-black/80 border-b border-gray-800">
         <div className="flex justify-between items-center px-8 h-full">
-          {/* Left side - Welcome with new brand logo */}
+          {/* Left side - Welcome message */}
           <div className="flex items-center space-x-4">
-            <img src="/turfloot-new-brand-logo.png" alt="TurfLoot Logo" className="w-10 h-10 object-contain" />
             <span className="text-white text-lg font-semibold">
               {authenticated && user 
                 ? `Welcome, ${displayName || user.google?.name || user.email?.address || 'Player'}!` 
