@@ -37,6 +37,17 @@ const AgarIOGame = () => {
   const [showControls, setShowControls] = useState(true)
   const [ping, setPing] = useState(0)
   const [autoCashOutTriggered, setAutoCashOutTriggered] = useState(false) // Flag to prevent multiple auto cash outs
+  
+  // Game session tracking for statistics
+  const [gameSession, setGameSession] = useState({
+    startTime: null,
+    endTime: null,
+    kills: 0,
+    survived: false,
+    cashedOut: false,
+    earnings: 0,
+    playTimeSeconds: 0
+  })
 
   useEffect(() => {
     // Handle page visibility (exit game when tab is not visible)
