@@ -729,7 +729,10 @@ export default function Home() {
                   <div className="text-gray-400 text-xs mb-1">playing</div>
                   <div className="text-gray-500 text-xs mb-3">No friends - add some!</div>
                   <button 
-                    onClick={() => setShowProfile(true)}
+                    onClick={() => {
+                      setSocialInitialTab('friends')
+                      setShowProfile(true)
+                    }}
                     className="w-full py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-xl text-blue-400 font-bold text-xs transition-all hover:scale-105"
                   >
                     Add Friends
