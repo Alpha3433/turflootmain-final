@@ -1161,11 +1161,82 @@ export default function Home() {
                 </div>
                 <div className="text-center">
                   <div className="relative w-20 h-20 mx-auto mb-4">
-                    {/* Playable Character Circle */}
-                    <div className="w-20 h-20 bg-cyan-400 rounded-full player-character animate-breathe hover:animate-hover-bounce-loop transition-all duration-300 cursor-pointer shadow-lg border-2 border-cyan-300 flex items-center justify-center" id="player-character">
-                      <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
-                      <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
+                    {/* Playable Character Circle with Dynamic Customization */}
+                    <div className={`w-20 h-20 rounded-full player-character animate-breathe hover:animate-hover-bounce-loop transition-all duration-300 cursor-pointer shadow-lg border-2 border-cyan-300 flex items-center justify-center ${
+                      playerCustomization.skin === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/30' :
+                      playerCustomization.skin === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/30' :
+                      playerCustomization.skin === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/30' :
+                      playerCustomization.skin === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/30' :
+                      playerCustomization.skin === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/30' :
+                      'bg-cyan-400'
+                    }`} id="player-character">
+                      
+                      {/* Dynamic Eyes based on equipped face */}
+                      {playerCustomization.face === 'angry_eyes' ? (
+                        <>
+                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 left-6 transform rotate-12 transition-transform duration-150 ease-out" id="left-eye"></div>
+                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 right-6 transform -rotate-12 transition-transform duration-150 ease-out" id="right-eye"></div>
+                          <div className="w-4 h-1 bg-red-600 rounded absolute top-7 left-1/2 transform -translate-x-1/2"></div>
+                        </>
+                      ) : playerCustomization.face === 'wink_eyes' ? (
+                        <>
+                          <div className="w-2 h-0.5 bg-black rounded absolute top-6 left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
+                          <div className="w-3 h-1 bg-pink-500 rounded-full absolute top-7 left-1/2 transform -translate-x-1/2"></div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
+                        </>
+                      )}
+                      
+                      {/* Legendary skin effects */}
+                      {(playerCustomization.skin === 'golden_snake' || playerCustomization.skin === 'shadow_black') && (
+                        <>
+                          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                        </>
+                      )}
                     </div>
+
+                    {/* Dynamic Hat Rendering */}
+                    {playerCustomization.hat && (
+                      <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${
+                        playerCustomization.hat === 'crown_gold' ? 'w-8 h-6 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border border-yellow-600' :
+                        playerCustomization.hat === 'cap_baseball' ? 'w-10 h-4 bg-gradient-to-r from-red-600 to-red-500 rounded-full' :
+                        playerCustomization.hat === 'helmet_space' ? 'w-14 h-8 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full border-2 border-blue-400' :
+                        'w-6 h-4 bg-gray-600 rounded'
+                      }`}>
+                        {playerCustomization.hat === 'crown_gold' && (
+                          <div className="flex justify-center">
+                            <div className="w-1 h-2 bg-yellow-300 rounded-t-full mt-1"></div>
+                          </div>
+                        )}
+                        {playerCustomization.hat === 'helmet_space' && (
+                          <div className="absolute inset-2 bg-gradient-to-b from-blue-200/30 to-cyan-200/30 rounded-full"></div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Dynamic Trail Preview */}
+                    {playerCustomization.trail && playerCustomization.trail !== 'default_sparkle' && (
+                      <div className="absolute -right-8 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                        {playerCustomization.trail === 'rainbow_trail' ? (
+                          <>
+                            <div className="w-1.5 h-1.5 bg-red-400 rounded-full opacity-70 animate-pulse"></div>
+                            <div className="w-1 h-1 bg-yellow-400 rounded-full opacity-50 animate-pulse"></div>
+                            <div className="w-0.5 h-0.5 bg-green-400 rounded-full opacity-30 animate-pulse"></div>
+                          </>
+                        ) : playerCustomization.trail === 'fire_trail' ? (
+                          <>
+                            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full opacity-70 animate-pulse"></div>
+                            <div className="w-1 h-1 bg-red-500 rounded-full opacity-50 animate-pulse"></div>
+                            <div className="w-0.5 h-0.5 bg-yellow-500 rounded-full opacity-30 animate-pulse"></div>
+                          </>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                   <div className="text-gray-400 text-xs mb-3">Your Character</div>
                   <button 
