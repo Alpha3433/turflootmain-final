@@ -323,6 +323,15 @@
   }
 }
 
+/* Custom animation classes for blue circle */
+.animate-breathe {
+  animation: animate-breathe 4s ease-in-out infinite;
+}
+
+.animate-hover-bounce-loop {
+  animation: animate-hover-bounce 1.5s ease-in-out infinite;
+}
+
 /* Paper.io inspired grid animations */
 @keyframes grid-pulse {
   0%, 100% {
