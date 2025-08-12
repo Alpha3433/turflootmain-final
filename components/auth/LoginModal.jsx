@@ -134,38 +134,9 @@ export default function LoginModal({ isOpen, onClose, onSuccess }) {
               Log in or sign up
             </h2>
             
-            {/* Cute character mascot */}
+            {/* Brand logo */}
             <div className="flex justify-center mb-6">
-              <div className="relative">
-                {/* Snake/Dragon character */}
-                <div className="w-24 h-24 bg-gradient-to-br from-orange-400 via-yellow-500 to-orange-600 rounded-full relative shadow-lg">
-                  {/* Eyes */}
-                  <div className="absolute top-4 left-4 w-4 h-4 bg-white rounded-full">
-                    <div className="absolute top-1 left-1 w-2 h-2 bg-black rounded-full"></div>
-                  </div>
-                  <div className="absolute top-4 right-4 w-4 h-4 bg-white rounded-full">
-                    <div className="absolute top-1 left-1 w-2 h-2 bg-black rounded-full"></div>
-                  </div>
-                  
-                  {/* Mouth */}
-                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-                    <div className="w-8 h-2 bg-black/20 rounded-full"></div>
-                  </div>
-                  
-                  {/* Nostrils */}
-                  <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
-                    <div className="flex space-x-1">
-                      <div className="w-1 h-1 bg-black/30 rounded-full"></div>
-                      <div className="w-1 h-1 bg-black/30 rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Red tongue */}
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                  <div className="w-1 h-4 bg-red-500 rounded-full"></div>
-                </div>
-              </div>
+              <img src="/turfloot-new-brand-logo.png" alt="TurfLoot Logo" className="w-24 h-24 object-contain" />
             </div>
           </div>
 
