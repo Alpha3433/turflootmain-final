@@ -127,6 +127,26 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
     return items
   }
 
+  // Load saved customization data on component mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('turfloot_player_customization')
+      if (saved) {
+        const customizationData = JSON.parse(saved)
+        setPlayerData(prev => ({
+          ...prev,
+          equippedSkin: customizationData.skin || prev.equippedSkin,
+          equippedHat: customizationData.hat || prev.equippedHat,
+          equippedTrail: customizationData.trail || prev.equippedTrail,
+          equippedFace: customizationData.face || prev.equippedFace
+        }))
+        console.log('Loaded player customization:', customizationData)
+      }
+    } catch (error) {
+      console.error('Failed to load customization:', error)
+    }
+  }, [isOpen])
+
   const handleEquipItem = (item) => {
     if (!item.owned) return
     
