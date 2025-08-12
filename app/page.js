@@ -89,7 +89,102 @@ export default function Home() {
     }
   }, [authenticated, user, hasShownWelcome, ready])
 
-  // Eye tracking effect for the blue circle
+  // Real-time cash-out notifications effect
+  useEffect(() => {
+    // Helper function to generate a random notification
+    const generateNotification = () => {
+      const name = mockPlayerNames[Math.floor(Math.random() * mockPlayerNames.length)]
+      const city = mockCities[Math.floor(Math.random() * mockCities.length)]
+      const amount = Math.floor(Math.random() * 2500) + 100 // $100 - $2600
+      const color = avatarColors[Math.floor(Math.random() * avatarColors.length)]
+      
+      return {
+        id: Date.now() + Math.random(),
+        name,
+        city,
+        amount,
+        color,
+        timestamp: Date.now(),
+        fadeOut: false
+      }
+    }
+
+    // Seed initial notifications (3-4 notifications with different timestamps)
+    const seedNotifications = []
+    for (let i = 0; i < 4; i++) {
+      const notification = generateNotification()
+      notification.timestamp = Date.now() - (i * 15000) - Math.random() * 30000 // Random times in the past
+      seedNotifications.push(notification)
+    }
+    setCashOutNotifications(seedNotifications)
+
+    // Function to add new notification
+    const addNotification = () => {
+      const newNotification = generateNotification()
+      
+      setCashOutNotifications(prev => {
+        let updated = [...prev, newNotification]
+        
+        // If we have more than 6, mark the oldest for fade-out
+        if (updated.length > 6) {
+          updated = updated.slice(-6) // Keep only the 6 most recent
+        }
+        
+        return updated
+      })
+      
+      // Set fade-out timer for this notification
+      setTimeout(() => {
+        setCashOutNotifications(prev => 
+          prev.map(notif => 
+            notif.id === newNotification.id 
+              ? { ...notif, fadeOut: true }
+              : notif
+          )
+        )
+        
+        // Remove after fade-out animation
+        setTimeout(() => {
+          setCashOutNotifications(prev => 
+            prev.filter(notif => notif.id !== newNotification.id)
+          )
+        }, 500) // 500ms fade-out duration
+      }, 5000) // Show for 5 seconds
+    }
+
+    // Start generating notifications every 4-8 seconds
+    const generateNotifications = () => {
+      const randomDelay = Math.random() * 4000 + 4000 // 4-8 seconds
+      setTimeout(() => {
+        addNotification()
+        generateNotifications() // Schedule next notification
+      }, randomDelay)
+    }
+    
+    generateNotifications()
+    
+    // Set fade-out timers for seed notifications
+    seedNotifications.forEach((notification, index) => {
+      const remainingTime = Math.max(1000, 5000 - (Date.now() - notification.timestamp))
+      setTimeout(() => {
+        setCashOutNotifications(prev => 
+          prev.map(notif => 
+            notif.id === notification.id 
+              ? { ...notif, fadeOut: true }
+              : notif
+          )
+        )
+        
+        setTimeout(() => {
+          setCashOutNotifications(prev => 
+            prev.filter(notif => notif.id !== notification.id)
+          )
+        }, 500)
+      }, remainingTime)
+    })
+    
+    // Cleanup is not needed as this runs for the lifetime of the component
+  }, [])
   useEffect(() => {
     const handleMouseMove = (e) => {
       const character = document.getElementById('player-character')
