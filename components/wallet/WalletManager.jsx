@@ -250,15 +250,15 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
   }
 
-  // Handle MAX button for cash out
+  // Handle MAX button for cash out (USD only)
   const handleMaxCashOut = () => {
-    const availableBalance = cashOutForm.currency === 'SOL' ? balance.sol_balance : balance.balance
-    const minCashOut = cashOutForm.currency === 'SOL' ? 0.05 : 20
+    const availableBalance = balance.balance // Always use USD balance
+    const minCashOut = 0.21 // $0.20 + $0.01 minimum
     
     if (availableBalance >= minCashOut) {
-      setCashOutForm({ ...cashOutForm, amount: availableBalance.toString() })
+      setCashOutForm({ ...cashOutForm, amount: availableBalance.toFixed(2) })
     } else {
-      alert(`Insufficient balance for minimum cash out of ${minCashOut} ${cashOutForm.currency}`)
+      alert(`Insufficient balance for minimum cash out of $${minCashOut.toFixed(2)} USD`)
     }
   }
 
