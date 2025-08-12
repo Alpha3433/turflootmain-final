@@ -1694,9 +1694,9 @@ const AgarIOGame = () => {
         </div>
       ))}
 
-      {/* Current Mission Display */}
+      {/* Current Mission Display - Moved to Top Center */}
       {currentMission && !isGameOver && (
-        <div className="absolute top-4 left-4 bg-black/90 backdrop-blur-sm rounded-lg p-4 border border-purple-400/50 max-w-xs">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-sm rounded-lg p-4 border border-purple-400/50 max-w-xs">
           <div className="text-purple-400 font-bold text-sm mb-2">🎯 MISSION</div>
           <div className="text-white text-sm mb-2">{currentMission.description}</div>
           <div className="bg-gray-700 rounded-full h-2 mb-2">
@@ -1707,7 +1707,7 @@ const AgarIOGame = () => {
           </div>
           <div className="flex justify-between text-xs text-gray-300">
             <span>{missionProgress}/{currentMission.target}</span>
-            <span className="text-green-400">+${currentMission.reward}</span>
+            <span className="text-green-400">{currentMission.reward} SP</span>
           </div>
           <div className="text-xs text-gray-400 mt-1">
             {Math.max(0, Math.ceil((currentMission.startTime + currentMission.duration - Date.now()) / 1000))}s left
