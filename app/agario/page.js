@@ -995,6 +995,7 @@ const AgarIOGame = () => {
     setShowControls(true) // Show controls again on restart
     setIsCashingOut(false)
     setCashOutProgress(0)
+    setAutoCashOutTriggered(false) // Reset auto cash out flag for new game
     if (gameRef.current) {
       gameRef.current.cleanup()
     }
