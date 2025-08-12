@@ -344,14 +344,17 @@ export async function GET(request, { params }) {
         
         // Get top users with real stats, excluding sensitive data
         const leaderboard = await users.find({
-          'stats.games_played': { $gt: 0 } // Only users who have played games
+          $or: [
+            { 'stats.games_played': { $gt: 0 } }, // Users who have played games
+            { 'stats.total_earnings': { $gt: 0 } } // Users with earnings
+          ]
         })
         .sort({ 'stats.total_earnings': -1 }) // Sort by earnings by default
         .limit(50)
         .project({
           id: 1,
           custom_name: 1,
-          email: 1,
+          email: { $substr: ['$email', 0, 1] }, // Only first letter for privacy
           stats: 1,
           created_at: 1
         })
@@ -362,7 +365,10 @@ export async function GET(request, { params }) {
         }, { headers: corsHeaders })
       } catch (error) {
         console.error('Error fetching leaderboard:', error)
-        return NextResponse.json({ users: [] }, { headers: corsHeaders })
+        return NextResponse.json({ 
+          users: [],
+          message: 'No leaderboard data available yet. Play games to appear on the leaderboard!'
+        }, { headers: corsHeaders })
       }
     }
 
