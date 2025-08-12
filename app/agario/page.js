@@ -1803,6 +1803,27 @@ const AgarIOGame = () => {
         </div>
       )}
 
+      {/* Separate Live Event Feed */}
+      {!isGameOver && liveEventFeed.length > 0 && (
+        <div className="absolute top-4 left-80 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-orange-400/30 max-w-[250px]">
+          <div className="text-orange-400 font-bold text-sm mb-2">📺 Live Events</div>
+          <div className="space-y-1 max-h-24 overflow-y-auto">
+            {liveEventFeed.map((event) => (
+              <div 
+                key={event.id} 
+                className={`text-xs px-2 py-1 rounded ${
+                  event.type === 'kill' ? 'bg-red-500/20 text-red-300' :
+                  event.type === 'cashout' ? 'bg-green-500/20 text-green-300' :
+                  'bg-blue-500/20 text-blue-300'
+                }`}
+              >
+                {event.message}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Minimap */}
       {!isGameOver && gameRef.current?.game && settings.showMinimap && (
         <div className="absolute bottom-4 right-4 w-32 h-32 bg-black/80 backdrop-blur-sm rounded border border-gray-600/30">
