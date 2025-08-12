@@ -383,7 +383,7 @@ export async function GET(request, { params }) {
         const db = await getDb()
         const users = db.collection('users')
         
-        const user = await users.findOne({ 
+        let user = await users.findOne({ 
           $or: [
             { id: userId },
             { wallet_address: userId }
@@ -395,6 +395,36 @@ export async function GET(request, { params }) {
             { error: 'User not found' },
             { status: 404, headers: corsHeaders }
           )
+        }
+
+        // If user doesn't have a proper username (is using email-based or legacy name), assign random username
+        const needsRandomUsername = !user.username || 
+                                   user.username.includes('@') || 
+                                   user.username.startsWith('user_') ||
+                                   user.username.startsWith('wallet_')
+
+        if (needsRandomUsername) {
+          console.log('🎲 Assigning random username to existing user:', userId)
+          const randomUsername = await generateUniqueUsername()
+          
+          // Update user with random username
+          await users.updateOne(
+            { _id: user._id },
+            { 
+              $set: { 
+                username: randomUsername,
+                'profile.display_name': randomUsername,
+                updated_at: new Date().toISOString()
+              } 
+            }
+          )
+          
+          // Update the user object to return
+          user.username = randomUsername
+          user.profile = user.profile || {}
+          user.profile.display_name = randomUsername
+          
+          console.log('✅ Assigned random username:', randomUsername)
         }
         
         // Remove sensitive data
