@@ -1002,6 +1002,7 @@ const AgarIOGame = () => {
           bot.y = Math.sin(angle) * worldRadius
         }
       })
+      } // Close the multiplayer/offline mode conditional
 
       // Orb pickup (mass only, no money)
       const allEntities = [game.player, ...game.bots].filter(e => e.alive)
