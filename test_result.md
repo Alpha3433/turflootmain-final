@@ -606,6 +606,21 @@ backend:
         agent: "testing"
         comment: "✅ PASSED - Game authentication integration working perfectly. All 3 authentication tests passed: 1) User authentication successful with JWT token generated for game access ✅, 2) JWT token verified and user balance accessible ($10) ✅, 3) Unauthenticated requests properly rejected for game features ✅. JWT token verification system integrated with game server for secure access to cash games and user features."
 
+  - task: "Enhanced Server Browser API (GET /api/servers/lobbies)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Enhanced server browser endpoint that returns actual servers instead of lobby types. Generates 30+ servers across 3 regions (US-East-1, US-West-1, EU-Central-1) with all stake levels ($1, $5, $20, Free). Includes server data structure with all required fields, realistic ping calculations, server filtering, and proper statistics."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETED - All 15 enhanced server browser tests PASSED (100% success rate). ENDPOINT FUNCTIONALITY: 1) ✅ Returns 36 servers across 3 regions with proper data structure, 2) ✅ All required server fields present (id, name, region, stake, mode, currentPlayers, maxPlayers, minPlayers, waitingPlayers, isRunning, ping, avgWaitTime, difficulty, entryFee, potentialWinning, status), 3) ✅ All stake levels represented ($1, $5, $20, Free), 4) ✅ Realistic ping calculations (US-East: 15-40ms, US-West: 25-55ms, EU: 35-80ms). SERVER GENERATION: 5) ✅ Server count requirement met (36 servers), 6) ✅ Proper distribution (2-4 servers per game type per region), 7) ✅ Unique server IDs across all regions and game types, 8) ✅ Server status logic working correctly (Active: 10, Waiting: 26, Full: 0). STATISTICS & CALCULATIONS: 9) ✅ Potential winnings calculated correctly (stake * maxPlayers * 0.9), 10) ✅ Statistics accuracy verified (totalPlayers: 23, totalActiveServers: 10), 11) ✅ All expected game types present with proper structure. PERFORMANCE: 12) ✅ Response time excellent (0.020 seconds), 13) ✅ Consistent server count across requests, 14) ✅ Fallback functionality working, 15) ✅ Valid ISO timestamp format. Enhanced server browser functionality is working perfectly and ready for production use."
+
 
 
 frontend:
