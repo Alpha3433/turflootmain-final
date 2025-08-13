@@ -552,7 +552,7 @@ const AgarIOGame = () => {
         x: x,
         y: y,
         massValue: config.orbMassValue,
-        color: `hsl(${60 + Math.random() * 30}, 70%, 60%)` // Gold-ish colors
+        color: '#FFD700' // Fixed gold color - no more random flickering
       })
     }
     
