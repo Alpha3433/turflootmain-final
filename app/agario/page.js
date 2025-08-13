@@ -510,7 +510,162 @@ const AgarIOGame = () => {
     }, 10000)
   }
 
-  const initializeGame = () => {
+  // Real-time multiplayer initialization
+  const initializeMultiplayer = async () => {
+    try {
+      console.log('🔗 Initializing multiplayer connection...')
+      
+      // Get JWT token from Privy for authentication
+      const accessToken = await getAccessToken()
+      if (!accessToken) {
+        console.error('❌ No access token available - user not authenticated')
+        setGameResult('Authentication required to play')
+        setIsGameOver(true)
+        return
+      }
+      
+      // Parse URL parameters for room settings
+      const urlParams = new URLSearchParams(window.location.search)
+      const paramRoomId = urlParams.get('roomId') || `room_${Date.now()}`
+      const paramMode = urlParams.get('mode') || 'free'
+      const paramFee = parseFloat(urlParams.get('fee')) || 0
+      
+      setRoomId(paramRoomId)
+      setGameMode(paramMode)
+      setEntryFee(paramFee)
+      
+      console.log('🎮 Game settings:', { roomId: paramRoomId, mode: paramMode, fee: paramFee })
+      
+      // Connect to Socket.IO server
+      const socket = io({
+        auth: {
+          token: accessToken
+        },
+        transports: ['websocket', 'polling']
+      })
+      
+      socketRef.current = socket
+      
+      // Socket event handlers
+      socket.on('connect', () => {
+        console.log('✅ Connected to game server:', socket.id)
+        setIsConnected(true)
+        
+        // Join game room
+        socket.emit('join_room', {
+          roomId: paramRoomId,
+          mode: paramMode,
+          fee: paramFee,
+          token: accessToken
+        })
+      })
+      
+      socket.on('disconnect', () => {
+        console.log('❌ Disconnected from game server')
+        setIsConnected(false)
+        if (!isGameOver) {
+          setGameResult('Disconnected from server')
+          setIsGameOver(true)
+        }
+      })
+      
+      socket.on('joined', (data) => {
+        console.log('🎯 Joined room:', data)
+        setIsWaitingForPlayers(true)
+        
+        // Set player as ready to start
+        setTimeout(() => {
+          socket.emit('player_ready', { token: accessToken })
+          setIsPlayerReady(true)
+        }, 1000)
+      })
+      
+      socket.on('room_info', (roomInfo) => {
+        console.log('📊 Room info update:', roomInfo)
+        setConnectedPlayers(roomInfo.playerCount)
+        
+        if (roomInfo.running && isWaitingForPlayers) {
+          setIsWaitingForPlayers(false)
+        }
+      })
+      
+      socket.on('match_start', (data) => {
+        console.log('🏁 Match started!', data)
+        setIsWaitingForPlayers(false)
+        
+        // Initialize local game with multiplayer mode
+        initializeGame(true) // true = multiplayer mode
+      })
+      
+      socket.on('game_state', (gameState) => {
+        // Update real players from server
+        const playersMap = new Map()
+        gameState.players.forEach(player => {
+          if (player.id !== socket.id) { // Don't include our own player
+            playersMap.set(player.id, {
+              id: player.id,
+              x: player.x,
+              y: player.y,
+              mass: player.mass,
+              nickname: player.nickname,
+              alive: player.alive,
+              color: `hsl(${(player.id.charCodeAt(0) * 137) % 360}, 60%, 50%)` // Consistent color
+            })
+          }
+        })
+        setRealPlayers(playersMap)
+        
+        // Update food from server
+        setGameServerFood(gameState.food || [])
+      })
+      
+      socket.on('match_end', (data) => {
+        console.log('🏆 Match ended:', data)
+        setIsGameOver(true)
+        
+        if (data.winnerId === socket.id) {
+          setGameResult(`🎉 Victory! You won the match!`)
+          if (data.mode === 'cash' && data.fee > 0) {
+            // Handle cash prize
+            console.log('💰 Prize won:', data)
+          }
+        } else {
+          setGameResult(`💔 Game Over - Winner: ${data.winnerName}`)
+        }
+      })
+      
+      socket.on('player_eaten', (data) => {
+        console.log('💀 You were eaten by:', data.eatenBy)
+        setIsGameOver(true)
+        setGameResult(`💀 Eaten by ${data.eatenBy}`)
+      })
+      
+      socket.on('auth_error', (error) => {
+        console.error('🔐 Authentication error:', error)
+        setGameResult('Authentication failed')
+        setIsGameOver(true)
+      })
+      
+      socket.on('join_error', (error) => {
+        console.error('🚫 Join error:', error)
+        setGameResult(`Failed to join game: ${error.message}`)
+        setIsGameOver(true)
+      })
+      
+      socket.on('insufficient_balance', (data) => {
+        console.error('💸 Insufficient balance:', data)
+        setGameResult(`Insufficient balance. Required: $${data.required}`)
+        setIsGameOver(true)
+      })
+      
+    } catch (error) {
+      console.error('❌ Multiplayer initialization failed:', error)
+      setGameResult('Failed to connect to multiplayer server')
+      setIsGameOver(true)
+    }
+  }
+
+  const initializeGame = (isMultiplayer = false) => {
     const canvas = canvasRef.current
     if (!canvas) return
 
