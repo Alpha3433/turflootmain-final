@@ -1147,8 +1147,11 @@ export default function Home() {
                 <button className="px-6 py-3 bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/30 rounded-2xl font-bold text-yellow-400 transition-all hover:scale-105 text-sm">
                   🎁 Daily Crate
                 </button>
-                <button className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl font-medium border border-gray-600 transition-all hover:scale-105 text-white text-sm">
-                  👥 Affiliate
+                <button 
+                  onClick={() => setShowServerBrowser(true)}
+                  className="px-6 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-2xl font-bold text-purple-400 transition-all hover:scale-105 text-sm"
+                >
+                  🌐 Server Browser
                 </button>
                 <button className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-lg text-sm">
                   🔗 Join Discord
