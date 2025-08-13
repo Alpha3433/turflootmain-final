@@ -273,6 +273,19 @@ const AgarIOGame = () => {
     const platformFee = netWorth * 0.10 // 10% platform fee
     const finalAmount = netWorth - platformFee
     
+    // Store cash out details for success popup
+    setCashOutDetails({
+      originalAmount: netWorth,
+      platformFee: platformFee,
+      finalAmount: finalAmount,
+      kills: gameRef.current?.game?.player?.kills || 0,
+      streak: gameRef.current?.game?.player?.streak || 0,
+      playTime: gameSession.startTime ? Math.floor((Date.now() - gameSession.startTime) / 1000) : 0
+    })
+    
+    // Show success popup first
+    setShowCashOutSuccess(true)
+    
     addFloatingText(`Banked: $${Math.floor(finalAmount)}`, gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#00ff00')
     addFloatingText(`-$${Math.floor(platformFee)} fee`, gameRef.current?.game?.player?.x || 0, (gameRef.current?.game?.player?.y || 0) - 25, '#ff4444')
     
@@ -290,17 +303,16 @@ const AgarIOGame = () => {
       endTime: Date.now(),
       playTimeSeconds: prev.startTime ? Math.floor((Date.now() - prev.startTime) / 1000) : 0
     }))
-    
+
+    // Update user statistics for successful cash out
+    setTimeout(() => {
+      updateUserStatistics(true) // true = won/cashed out successfully
+    }, 100)
+
     setIsCashingOut(false)
     setCashOutProgress(0)
-    setAutoCashOutTriggered(false) // Reset auto cash out flag for next game
     
-    // Update user statistics after successful cash out
-    setTimeout(() => {
-      updateUserStatistics(true) // true = won/survived
-      setIsGameOver(true)
-      setGameResult(`💰 Cashed Out: $${Math.floor(finalAmount)} (${Math.floor(platformFee)} fee)`)
-    }, 1000)
+    // Don't end game immediately - let success popup handle it
   }
 
   const addToKillFeed = (message) => {
