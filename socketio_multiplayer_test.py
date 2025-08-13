@@ -80,7 +80,24 @@ class SocketIOMultiplayerTester:
             # Test if Socket.IO server is responding
             response = self.session.get(f"{BASE_URL}/socket.io/")
             
-            if response.status_code == 200:
+            # Socket.IO returns 400 with "Transport unknown" when accessed without proper parameters
+            # This is expected behavior and indicates the server is running
+            if response.status_code == 400:
+                try:
+                    data = response.json()
+                    if data.get('message') == 'Transport unknown':
+                        self.log_test("Socket.IO Server Connection", "PASS", 
+                                     f"Socket.IO server responding correctly with transport error (expected)")
+                        return True
+                    else:
+                        self.log_test("Socket.IO Server Connection", "FAIL", 
+                                     f"Unexpected 400 response: {data}")
+                        return False
+                except:
+                    self.log_test("Socket.IO Server Connection", "FAIL", 
+                                 f"400 status but invalid JSON response")
+                    return False
+            elif response.status_code == 200:
                 # Check if response contains Socket.IO handshake data
                 response_text = response.text
                 if "socket.io" in response_text.lower() or "websocket" in response_text.lower():
