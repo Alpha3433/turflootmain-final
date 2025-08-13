@@ -1519,7 +1519,6 @@ const AgarIOGame = () => {
         
         // Display balance above other players' heads (not for the main player)
         if (!isPlayer && entity.netWorth > 0) {
-          console.log('💰 Drawing balance for', entity.name, 'NetWorth:', entity.netWorth, 'Radius:', radius)
           ctx.save()
           ctx.font = 'bold 12px Arial'
           ctx.textAlign = 'center'
