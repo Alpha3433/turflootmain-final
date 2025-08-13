@@ -596,7 +596,8 @@ const AgarIOGame = () => {
         deaths: Math.floor(Math.random() * 2),
         streak: Math.floor(Math.random() * 3),
         isBounty: false,
-        // Removed cashBadgeScale - no more cash badge flickering
+        spawnProtected: true, // New bots get spawn protection
+        spawnTime: Date.now(), // Track when spawned
         lastNetWorth: netWorth
       })
     }
