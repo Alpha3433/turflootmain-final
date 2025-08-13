@@ -45,6 +45,8 @@ const AgarIOGame = () => {
   const [missionProgress, setMissionProgress] = useState(0)
   const [liveEventFeed, setLiveEventFeed] = useState([])
   const [territoryGlowIntensity, setTerritoryGlowIntensity] = useState(0.3)
+  const [showCashOutSuccess, setShowCashOutSuccess] = useState(false)
+  const [cashOutDetails, setCashOutDetails] = useState(null)
   
   // Player customization state
   const [playerCustomization, setPlayerCustomization] = useState({
