@@ -1046,15 +1046,26 @@ const AgarIOGame = () => {
         }
       }
 
-      // Replenish orbs
-      while (game.orbs.length < config.orbCount) {
-        game.orbs.push({
-          id: Math.random(),
-          x: (Math.random() - 0.5) * config.worldSize,
-          y: (Math.random() - 0.5) * config.worldSize,
-          value: config.orbValue,
-          color: '#FFD700' // Fixed gold color - no more random flickering
-        })
+      // Replenish orbs (only in offline mode - server handles food in multiplayer)
+      if (!isMultiplayer) {
+        while (game.orbs.length < config.orbCount) {
+          game.orbs.push({
+            id: Math.random(),
+            x: (Math.random() - 0.5) * config.worldSize,
+            y: (Math.random() - 0.5) * config.worldSize,
+            massValue: config.orbMassValue,
+            color: '#FFD700' // Fixed gold color - no more random flickering
+          })
+        }
+      } else {
+        // In multiplayer mode, use food from server
+        game.orbs = gameServerFood.map(food => ({
+          id: food.id,
+          x: food.x,
+          y: food.y,
+          massValue: config.orbMassValue,
+          color: '#FFD700'
+        }))
       }
 
       // Virus collision detection
