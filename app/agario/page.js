@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useGameSettings } from '@/components/providers/GameSettingsProvider'
+import { usePrivy } from '@privy-io/react-auth'
+import { io } from 'socket.io-client'
 
 const AgarIOGame = () => {
   const canvasRef = useRef(null)
