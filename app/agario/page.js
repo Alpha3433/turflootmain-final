@@ -774,43 +774,49 @@ const AgarIOGame = () => {
       })
     }
 
-    // Initialize bots with varying mass and net worth - only spawn within circular boundary
-    for (let i = 0; i < config.botCount; i++) {
-      const mass = config.startingMass + Math.random() * 15
-      const netWorth = config.startingNetWorth + Math.random() * 200
-      
-      let x, y, distance
-      const maxRadius = (config.worldSize / 2) - 25 // Add 25 unit margin from edge for bots
-      // Keep generating random positions until we find one inside the circle with margin
-      do {
-        x = (Math.random() - 0.5) * config.worldSize
-        y = (Math.random() - 0.5) * config.worldSize
-        distance = Math.sqrt(x * x + y * y)
-      } while (distance > maxRadius) // Only accept positions well within circular boundary
-      
-      game.bots.push({
-        id: i,
-        x: x,
-        y: y,
-        mass: mass,
-        netWorth: netWorth,
-        dir: { 
-          x: (Math.random() - 0.5) * 2, 
-          y: (Math.random() - 0.5) * 2 
-        },
-        alive: true,
-        name: `Player ${i + 1}`,
-        color: `hsl(${Math.random() * 360}, 60%, 50%)`,
-        targetDir: { x: 0, y: 0 },
-        lastDirChange: Date.now(),
-        kills: Math.floor(Math.random() * 5),
-        deaths: Math.floor(Math.random() * 2),
-        streak: Math.floor(Math.random() * 3),
-        isBounty: false,
-        spawnProtected: true, // New bots get spawn protection
-        spawnTime: Date.now(), // Track when spawned
-        lastNetWorth: netWorth
-      })
+    // Initialize bots or use real players
+    if (!isMultiplayer) {
+      // Only create bots in offline/demo mode - Initialize bots with varying mass and net worth
+      for (let i = 0; i < config.botCount; i++) {
+        const mass = config.startingMass + Math.random() * 15
+        const netWorth = config.startingNetWorth + Math.random() * 200
+        
+        let x, y, distance
+        const maxRadius = (config.worldSize / 2) - 25 // Add 25 unit margin from edge for bots
+        // Keep generating random positions until we find one inside the circle with margin
+        do {
+          x = (Math.random() - 0.5) * config.worldSize
+          y = (Math.random() - 0.5) * config.worldSize
+          distance = Math.sqrt(x * x + y * y)
+        } while (distance > maxRadius) // Only accept positions well within circular boundary
+        
+        game.bots.push({
+          id: i,
+          x: x,
+          y: y,
+          mass: mass,
+          netWorth: netWorth,
+          dir: { 
+            x: (Math.random() - 0.5) * 2, 
+            y: (Math.random() - 0.5) * 2 
+          },
+          alive: true,
+          name: `Player ${i + 1}`,
+          color: `hsl(${Math.random() * 360}, 60%, 50%)`,
+          targetDir: { x: 0, y: 0 },
+          lastDirChange: Date.now(),
+          kills: Math.floor(Math.random() * 5),
+          deaths: Math.floor(Math.random() * 2),
+          streak: Math.floor(Math.random() * 3),
+          isBounty: false,
+          spawnProtected: true, // New bots get spawn protection
+          spawnTime: Date.now(), // Track when spawned
+          lastNetWorth: netWorth
+        })
+      }
+    } else {
+      // In multiplayer mode, bots array will be populated by real players from Socket.IO
+      console.log('🔗 Multiplayer mode - waiting for real players from server')
     }
 
     // Helper functions
