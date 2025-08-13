@@ -2165,15 +2165,14 @@ const AgarIOGame = () => {
             {/* Action Buttons */}
             <div className="flex space-x-3">
               <button
-                onClick={() => {
-                  setShowCashOutSuccess(false)
-                  setCashOutDetails(null)
-                  setIsGameOver(true)
-                  setGameResult(`💰 Cashed Out: $${Math.floor(cashOutDetails.finalAmount)}`)
-                }}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all hover:scale-105"
+                onClick={handlePlayAgain}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-all hover:scale-105 flex items-center justify-center space-x-2"
               >
-                Continue
+                <span>🎮</span>
+                <div className="text-center">
+                  <div>Play Again</div>
+                  <div className="text-xs opacity-75">${initialLobbyFee} entry fee</div>
+                </div>
               </button>
               <button
                 onClick={() => {
@@ -2181,9 +2180,10 @@ const AgarIOGame = () => {
                   setCashOutDetails(null)
                   window.location.href = '/'
                 }}
-                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-all hover:scale-105"
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-all hover:scale-105 flex items-center justify-center space-x-2"
               >
-                Main Menu
+                <span>🏠</span>
+                <span>Main Menu</span>
               </button>
             </div>
           </div>
