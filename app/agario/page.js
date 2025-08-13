@@ -1403,6 +1403,33 @@ const AgarIOGame = () => {
           }
         }
         
+        // Spawn protection shield effect
+        if ((isPlayer && game.player.spawnProtected) || (!isPlayer && entity.spawnProtected)) {
+          ctx.save()
+          const shieldRadius = radius + 8
+          const pulseIntensity = Math.sin(Date.now() * 0.01) * 0.3 + 0.7
+          
+          // Shield outer glow
+          ctx.shadowColor = '#00BFFF'
+          ctx.shadowBlur = 15
+          ctx.strokeStyle = `rgba(0, 191, 255, ${pulseIntensity})`
+          ctx.lineWidth = 4
+          ctx.setLineDash([8, 4])
+          ctx.beginPath()
+          ctx.arc(entity.x, entity.y, shieldRadius, 0, Math.PI * 2)
+          ctx.stroke()
+          
+          // Shield text
+          ctx.shadowColor = 'transparent'
+          ctx.shadowBlur = 0
+          ctx.fillStyle = '#00BFFF'
+          ctx.font = 'bold 10px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText('🛡️', entity.x, entity.y - radius - 20)
+          
+          ctx.restore()
+        }
+        
         // Hat rendering for player
         if (isPlayer && playerCustomization.hat && radius > 15) {
           const hatY = entity.y - radius - 5 // Position hat above the character
