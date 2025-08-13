@@ -783,6 +783,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "✅ IMPLEMENTED - Successfully added two player information features: 1) BALANCE DISPLAY: Other players now show their current net worth above their heads with dark background, green border, and shadow effects for readability, 2) TOTAL MASS STATS: Added 'Total Mass' field to player stats box showing current mass value in blue color, positioned between Net Worth and K/D stats, 3) Both features update dynamically in real-time as players move and grow. Screenshot verification shows Player 2 and Player 1 with balance displays above heads, and Total Mass: 10 visible in stats panel alongside Net Worth: $100."
+      - working: true
+        agent: "main"
+        comment: "✅ FIXED BALANCE DISPLAY VISIBILITY - Resolved user-reported issue where other players' balances weren't appearing in game: 1) CONDITION FIX: Changed restrictive condition from 'radius > 15' to 'entity.netWorth > 0' to show balances for all players with money, 2) IMPROVED STYLING: Adjusted font size to 12px, made background more opaque (0.8 vs 0.7), adjusted positioning from -35 to -30 pixels above head, 3) VISUAL VERIFICATION: Screenshot confirms Player 13 now shows '$190' balance in green box above their head with proper dark background and green border styling. Balance displays now work for all other players in the game as intended."
 
   - task: "Mission System Tracking Fix"
     implemented: true
