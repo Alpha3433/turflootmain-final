@@ -680,18 +680,19 @@ export default function Home() {
       user: !!user 
     })
     
-    // For FREE games - route to Agario clone (regardless of auth status)
-    if (selectedStake === 'FREE' || selectedStake === 0) {
-      console.log('🆓 Routing to Agario game')
-      router.push('/agario')
+    // Require authentication for ALL games (both FREE and cash games)
+    if (!authenticated || !user) {
+      console.log('❌ User not authenticated - showing Privy login')
+      setShowWelcome(false)
+      // Trigger Privy login directly instead of showing our modal
+      login()
       return
     }
     
-    // For cash games - require authentication
-    if (!authenticated || !user) {
-      console.log('❌ User not authenticated for cash game')
-      setShowWelcome(false)
-      setShowLoginModal(true)
+    // For FREE games - route to Agario clone (with authentication)
+    if (selectedStake === 'FREE' || selectedStake === 0) {
+      console.log('🆓 Routing to Agario game (authenticated)')
+      router.push('/agario')
       return
     }
     
