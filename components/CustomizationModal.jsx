@@ -354,7 +354,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                   onClick={() => setSelectedItem(item)}
                   className={`relative bg-gray-800/50 rounded-lg p-4 border-2 cursor-pointer transition-all hover:scale-105 ${
                     item.equipped ? 'border-green-400 bg-green-400/10' : rarityColors[item.rarity]
-                  } ${rarityGlow[item.rarity]} ${selectedItem?.id === item.id ? 'ring-2 ring-purple-400' : ''}`}
+                  } ${rarityGlow[item.rarity]} ${rarityCardGlow[item.rarity]} ${selectedItem?.id === item.id ? 'ring-2 ring-purple-400' : ''}`}
                 >
                   {/* Item Preview */}
                   <div className="aspect-square bg-gray-700/30 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
