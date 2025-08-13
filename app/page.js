@@ -831,7 +831,7 @@ export default function Home() {
               <span className="text-green-400 font-medium text-sm">{currentServer}</span>
               <span className="text-gray-400 text-xs">|</span>
               <span className="text-gray-400 text-xs">
-                {Math.floor(Math.random() * 20) + 15}ms
+                {currentPing}ms
               </span>
             </div>
             
