@@ -74,17 +74,24 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   ]
 
   const rarityColors = {
-    common: 'border-gray-400 text-gray-400',
-    rare: 'border-blue-400 text-blue-400',
-    epic: 'border-purple-400 text-purple-400',
-    legendary: 'border-yellow-400 text-yellow-400'
+    common: 'border-gray-400 text-gray-300',
+    rare: 'border-blue-400 text-blue-300',
+    epic: 'border-purple-400 text-purple-300',
+    legendary: 'border-yellow-400 text-yellow-300'
   }
 
   const rarityGlow = {
     common: 'shadow-lg',
-    rare: 'shadow-blue-500/20 shadow-lg',
-    epic: 'shadow-purple-500/20 shadow-lg',
-    legendary: 'shadow-yellow-500/20 shadow-lg'
+    rare: 'shadow-blue-500/30 shadow-lg',
+    epic: 'shadow-purple-500/30 shadow-lg',
+    legendary: 'shadow-yellow-500/40 shadow-xl'
+  }
+
+  const rarityCardGlow = {
+    common: '',
+    rare: 'ring-1 ring-blue-400/30',
+    epic: 'ring-2 ring-purple-400/40 bg-gradient-to-br from-purple-500/5 to-transparent',
+    legendary: 'ring-2 ring-yellow-400/50 bg-gradient-to-br from-yellow-500/10 to-transparent'
   }
 
   // Filter and sort items
