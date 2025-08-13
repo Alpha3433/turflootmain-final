@@ -983,6 +983,14 @@ export default function Home() {
                 </div>
                 <button 
                   onClick={() => {
+                    // Require authentication to add friends
+                    if (!authenticated || !user) {
+                      console.log('❌ User not authenticated for Add Friends - showing Privy login')
+                      login()
+                      return
+                    }
+                    
+                    // Authenticated users can access friends functionality
                     setSocialInitialTab('friends')
                     setShowProfile(true)
                   }}
