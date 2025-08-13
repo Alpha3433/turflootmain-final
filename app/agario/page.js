@@ -1074,18 +1074,36 @@ const AgarIOGame = () => {
         const elapsed = Date.now() - currentMission.startTime
         const newProgress = Math.min(elapsed, currentMission.target)
         setMissionProgress(newProgress)
-        if (newProgress >= currentMission.target) {
-          completeMission(currentMission)
-        }
+        
+        // Update the mission state as well
+        setCurrentMission(prev => {
+          if (prev && prev.type === 'survive') {
+            const updatedMission = { ...prev, progress: newProgress }
+            if (newProgress >= prev.target) {
+              completeMission(updatedMission)
+            }
+            return updatedMission
+          }
+          return prev
+        })
       }
 
       // Update mission progress for mass type
       if (currentMission && currentMission.type === 'mass' && game.player.alive) {
         const newProgress = Math.min(game.player.mass, currentMission.target)
         setMissionProgress(newProgress)
-        if (newProgress >= currentMission.target) {
-          completeMission(currentMission)
-        }
+        
+        // Update the mission state as well
+        setCurrentMission(prev => {
+          if (prev && prev.type === 'mass') {
+            const updatedMission = { ...prev, progress: newProgress }
+            if (newProgress >= prev.target) {
+              completeMission(updatedMission)
+            }
+            return updatedMission
+          }
+          return prev
+        })
       }
 
       // Render
