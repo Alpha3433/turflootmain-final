@@ -907,12 +907,16 @@ const AgarIOGame = () => {
               
               // Update mission progress
               if (currentMission && currentMission.type === 'eliminate') {
+                console.log('🎯 Eliminate mission progress update - Current progress:', currentMission.progress, 'Target:', currentMission.target)
                 setCurrentMission(prev => {
                   if (prev) {
                     const newProgress = prev.progress + 1
+                    console.log('🎯 New eliminate progress:', newProgress, '/', prev.target)
                     setMissionProgress(newProgress)
                     if (newProgress >= prev.target) {
+                      console.log('🎯 Eliminate mission completed!')
                       completeMission({ ...prev, progress: newProgress })
+                      return null // Clear mission when completed
                     }
                     return { ...prev, progress: newProgress }
                   }
