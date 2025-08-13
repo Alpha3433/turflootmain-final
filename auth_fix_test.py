@@ -17,8 +17,8 @@ import time
 import sys
 from datetime import datetime
 
-# Configuration
-BASE_URL = "https://bf7b3564-8863-4eaa-9ec0-5d002ec5a3fe.preview.emergentagent.com"
+# Configuration - Use localhost since external URL has 502 errors
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootAuthFixTester:
