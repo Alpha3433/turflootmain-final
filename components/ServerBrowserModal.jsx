@@ -4,14 +4,18 @@ import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 
 const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
-  const [lobbies, setLobbies] = useState([])
+  const [servers, setServers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveGames: 0 })
+  const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
+  const [selectedRegion, setSelectedRegion] = useState('All')
+  const [selectedGameType, setSelectedGameType] = useState('All')
+  const [regions, setRegions] = useState([])
+  const [gameTypes, setGameTypes] = useState([])
   const { user } = usePrivy()
 
-  // Fetch lobby data
-  const fetchLobbies = async (showRefresh = false) => {
+  // Fetch server data
+  const fetchServers = async (showRefresh = false) => {
     try {
       if (showRefresh) setRefreshing(true)
       
@@ -19,16 +23,18 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       const data = await response.json()
       
       if (response.ok) {
-        setLobbies(data.lobbies || [])
+        setServers(data.servers || [])
+        setRegions(['All', ...(data.regions || [])])
+        setGameTypes(['All', ...(data.gameTypes || []).map(gt => gt.name)])
         setTotalStats({
           totalPlayers: data.totalPlayers || 0,
-          totalActiveGames: data.totalActiveGames || 0
+          totalActiveServers: data.totalActiveServers || 0
         })
       } else {
-        console.error('Failed to fetch lobbies:', data)
+        console.error('Failed to fetch servers:', data)
       }
     } catch (error) {
-      console.error('Error fetching lobbies:', error)
+      console.error('Error fetching servers:', error)
     } finally {
       setIsLoading(false)
       if (showRefresh) setRefreshing(false)
