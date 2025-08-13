@@ -376,25 +376,68 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                     
                     {activeCategory === 'hats' && (
                       <div className="relative flex items-center justify-center">
-                        {/* Base character */}
-                        <div className="w-12 h-12 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 left-3"></div>
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 right-3"></div>
+                        {/* Enhanced hat preview with 3D effects and shadows */}
+                        {/* Base character with shadow for hat attachment */}
+                        <div className="w-14 h-14 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center shadow-lg">
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 left-4"></div>
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 right-4"></div>
                         </div>
-                        {/* Hat overlay */}
-                        <div className={`absolute -top-2 ${
-                          item.id === 'crown_gold' ? 'w-8 h-6 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border border-yellow-600' :
-                          item.id === 'cap_baseball' ? 'w-10 h-4 bg-gradient-to-r from-red-600 to-red-500 rounded-full' :
-                          item.id === 'helmet_space' ? 'w-14 h-8 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full border-2 border-blue-400' :
-                          'w-6 h-4 bg-gray-600 rounded'
-                        } ${!item.owned ? 'grayscale' : ''}`}>
-                          {item.id === 'crown_gold' && (
-                            <div className="flex justify-center">
-                              <div className="w-1 h-2 bg-yellow-300 rounded-t-full mt-1"></div>
+                        
+                        {/* Enhanced Hat Rendering with 3D effects */}
+                        <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${!item.owned ? 'grayscale' : ''}`}>
+                          {item.id === 'crown_gold' ? (
+                            <div className="relative">
+                              {/* Crown base with gradient and shadow */}
+                              <div className="w-10 h-7 bg-gradient-to-b from-yellow-300 via-yellow-500 to-yellow-700 rounded-t-lg border border-yellow-600 shadow-lg">
+                                {/* 3D shading effect */}
+                                <div className="absolute inset-1 bg-gradient-to-br from-yellow-200/60 to-transparent rounded-t-md"></div>
+                                {/* Crown spikes */}
+                                <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 flex space-x-1">
+                                  <div className="w-1 h-3 bg-gradient-to-t from-yellow-600 to-yellow-300 rounded-t-full"></div>
+                                  <div className="w-1 h-4 bg-gradient-to-t from-yellow-600 to-yellow-300 rounded-t-full"></div>
+                                  <div className="w-1 h-3 bg-gradient-to-t from-yellow-600 to-yellow-300 rounded-t-full"></div>
+                                </div>
+                                {/* Legendary metallic shine animation */}
+                                {item.rarity === 'legendary' && (
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse rounded-t-lg"></div>
+                                )}
+                              </div>
+                              {/* Hat shadow on character */}
+                              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-8 h-2 bg-black/20 rounded-full blur-sm"></div>
                             </div>
-                          )}
-                          {item.id === 'helmet_space' && (
-                            <div className="absolute inset-2 bg-gradient-to-b from-blue-200/30 to-cyan-200/30 rounded-full"></div>
+                          ) : item.id === 'cap_baseball' ? (
+                            <div className="relative">
+                              {/* Baseball cap with 3D effect */}
+                              <div className="w-12 h-5 bg-gradient-to-b from-red-500 to-red-700 rounded-full shadow-md">
+                                <div className="absolute inset-1 bg-gradient-to-br from-red-300/50 to-transparent rounded-full"></div>
+                              </div>
+                              {/* Cap visor with depth */}
+                              <div className="absolute top-2 right-0 w-5 h-3 bg-gradient-to-r from-red-600 to-red-800 rounded-full transform rotate-12 shadow-sm">
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-red-400/40 to-transparent rounded-full"></div>
+                              </div>
+                              {/* Hat shadow */}
+                              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-10 h-2 bg-black/20 rounded-full blur-sm"></div>
+                            </div>
+                          ) : item.id === 'helmet_space' ? (
+                            <div className="relative">
+                              {/* Space helmet with metallic finish */}
+                              <div className="w-16 h-10 bg-gradient-to-b from-gray-200 via-gray-400 to-gray-600 rounded-full border-2 border-blue-400 shadow-lg">
+                                {/* Metallic shine */}
+                                <div className="absolute inset-2 bg-gradient-to-br from-white/60 via-transparent to-gray-600/30 rounded-full"></div>
+                                {/* Helmet visor */}
+                                <div className="absolute inset-3 bg-gradient-to-b from-blue-200/40 to-cyan-300/60 rounded-full border border-blue-300/50"></div>
+                                {/* Epic rarity glow */}
+                                {item.rarity === 'epic' && (
+                                  <div className="absolute -inset-1 bg-purple-500/30 rounded-full animate-pulse blur-sm"></div>
+                                )}
+                              </div>
+                              {/* Hat shadow */}
+                              <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-12 h-2 bg-black/25 rounded-full blur-sm"></div>
+                            </div>
+                          ) : (
+                            <div className="w-8 h-5 bg-gradient-to-b from-gray-500 to-gray-700 rounded shadow-md">
+                              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-black/20 rounded-full blur-sm"></div>
+                            </div>
                           )}
                         </div>
                       </div>
