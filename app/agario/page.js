@@ -93,6 +93,10 @@ const AgarIOGame = () => {
           setIsGameOver(true)
           setGameResult('🚪 Left Game - Tab Closed')
         }
+        // Disconnect from multiplayer if connected
+        if (socketRef.current) {
+          socketRef.current.disconnect()
+        }
       }
     }
 
@@ -101,8 +105,15 @@ const AgarIOGame = () => {
     // Reset auto cash out flag for fresh game
     setAutoCashOutTriggered(false)
     
-    // Initialize the game
-    initializeGame()
+    // Check if user is authenticated for multiplayer
+    if (user && getAccessToken) {
+      // Initialize multiplayer game
+      initializeMultiplayer()
+    } else {
+      // Initialize offline demo game with bots
+      console.log('🤖 Starting offline demo mode')
+      initializeGame(false) // false = offline mode with bots
+    }
     
     // Hide controls after 5 seconds
     const controlsTimer = setTimeout(() => {
@@ -120,8 +131,12 @@ const AgarIOGame = () => {
       if (gameRef.current) {
         gameRef.current.cleanup()
       }
+      // Clean up Socket.IO connection
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+      }
     }
-  }, [])
+  }, [user, getAccessToken]) // Add dependencies
 
   const handlePlayAgain = () => {
     // Charge the same entry fee as when they joined the lobby
