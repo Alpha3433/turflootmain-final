@@ -992,6 +992,19 @@ const AgarIOGame = () => {
       
       setLeaderboard(leaderboardData)
 
+      // Update spawn protection (2 second duration)
+      if (game.player.spawnProtected && Date.now() - game.player.spawnTime > 2000) {
+        game.player.spawnProtected = false
+        console.log('🛡️ Spawn protection expired for player')
+      }
+      
+      // Update bot spawn protection
+      game.bots.forEach(bot => {
+        if (bot.spawnProtected && Date.now() - bot.spawnTime > 2000) {
+          bot.spawnProtected = false
+        }
+      })
+
       // Update floating texts
       setFloatingTexts(prev => prev.map(text => ({
         ...text,
