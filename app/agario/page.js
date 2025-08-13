@@ -1489,6 +1489,49 @@ const AgarIOGame = () => {
           ctx.restore()
         }
         
+        // Display balance above other players' heads (not for the main player)
+        if (!isPlayer && radius > 15) {
+          ctx.save()
+          ctx.font = 'bold 14px Arial'
+          ctx.textAlign = 'center'
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
+          ctx.shadowBlur = 4
+          ctx.shadowOffsetX = 1
+          ctx.shadowOffsetY = 1
+          
+          // Background for better readability
+          const balanceText = `$${Math.floor(entity.netWorth)}`
+          const textMetrics = ctx.measureText(balanceText)
+          const textWidth = textMetrics.width
+          const textHeight = 16
+          const bgPadding = 4
+          
+          // Draw background rectangle
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+          ctx.fillRect(
+            entity.x - textWidth/2 - bgPadding, 
+            entity.y - radius - 35 - textHeight/2 - bgPadding, 
+            textWidth + bgPadding*2, 
+            textHeight + bgPadding*2
+          )
+          
+          // Draw border
+          ctx.strokeStyle = '#00ff00'
+          ctx.lineWidth = 1
+          ctx.strokeRect(
+            entity.x - textWidth/2 - bgPadding, 
+            entity.y - radius - 35 - textHeight/2 - bgPadding, 
+            textWidth + bgPadding*2, 
+            textHeight + bgPadding*2
+          )
+          
+          // Draw balance text
+          ctx.fillStyle = '#00ff88'
+          ctx.fillText(balanceText, entity.x, entity.y - radius - 30)
+          
+          ctx.restore()
+        }
+        
         // Hat rendering for player
         if (isPlayer && playerCustomization.hat && radius > 15) {
           const hatY = entity.y - radius - 5 // Position hat above the character
