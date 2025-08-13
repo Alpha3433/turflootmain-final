@@ -798,6 +798,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "✅ IMPLEMENTED - Successfully updated cash-out flow: 1) completeCashOut() function now immediately redirects to main page using window.location.href = '/' after 1-second delay, 2) Removed cash-out success popup (showCashOutSuccess state), 3) Players are instantly taken out of game after successful cash-out, 4) Floating text still shows earnings briefly before redirect, 5) Screenshot verification shows cash-out prompt working in game with 'Hold E to Cash Out ($100)' message."
+      - working: true
+        agent: "main"
+        comment: "✅ FIXED CASH-OUT POPUP ISSUE - Completely removed all cash-out success popup code that was preventing instant exit: 1) Removed showCashOutSuccess and cashOutDetails state variables, 2) Removed entire cash-out success popup JSX section (85+ lines), 3) Removed all references to these states in reset functions, 4) Cash-out now truly instant - no popup interference, 5) Screenshot verification shows clean game interface with 'Hold E to Cash Out ($100)' prompt visible. Players will now be immediately redirected to main menu after 5-second E key hold completion with 1-second delay for floating earnings text."
 
   - task: "Authentication Required for Join Game and Add Friends"
     implemented: true
