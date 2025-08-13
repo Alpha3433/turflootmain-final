@@ -1368,6 +1368,20 @@ export default function Home() {
         />
       )}
       
+      {/* Server Browser Modal */}
+      {showServerBrowser && (
+        <ServerBrowserModal
+          isOpen={showServerBrowser}
+          onClose={() => setShowServerBrowser(false)}
+          onJoinLobby={(lobby) => {
+            console.log('Joining lobby:', lobby)
+            setShowServerBrowser(false)
+            // Navigate to game with lobby parameters
+            router.push(`/agario?roomId=${lobby.id}&mode=${lobby.mode}&fee=${lobby.entryFee}`)
+          }}
+        />
+      )}
+      
       {/* Real-time Cash-out Notifications Feed */}
       <div className="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
         {cashOutNotifications.map((notification) => (
