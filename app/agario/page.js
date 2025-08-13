@@ -111,8 +111,6 @@ const AgarIOGame = () => {
     console.log(`🎮 Player wants to play again - charging entry fee: $${initialLobbyFee}`)
     
     // Reset all game states
-    setShowCashOutSuccess(false)
-    setCashOutDetails(null)
     setIsGameOver(false)
     setGameResult('')
     setIsCashingOut(false)
