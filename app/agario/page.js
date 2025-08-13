@@ -1105,6 +1105,7 @@ const AgarIOGame = () => {
       if (currentMission && currentMission.type === 'survive') {
         const elapsed = Date.now() - currentMission.startTime
         const newProgress = Math.min(elapsed, currentMission.target)
+        console.log('🎯 Survive mission progress:', Math.floor(newProgress/1000) + 's /', Math.floor(currentMission.target/1000) + 's')
         setMissionProgress(newProgress)
         
         // Update the mission state as well
@@ -1112,7 +1113,9 @@ const AgarIOGame = () => {
           if (prev && prev.type === 'survive') {
             const updatedMission = { ...prev, progress: newProgress }
             if (newProgress >= prev.target) {
+              console.log('🎯 Survive mission completed!')
               completeMission(updatedMission)
+              return null // Clear mission when completed
             }
             return updatedMission
           }
