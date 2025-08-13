@@ -247,6 +247,19 @@ export default function Home() {
 
     return () => clearInterval(interval)
   }, [])
+  
+  // Update ping periodically on client side only
+  useEffect(() => {
+    // Set initial ping on client side only
+    setCurrentPing(Math.floor(Math.random() * 20) + 15)
+    
+    // Update ping every 10 seconds
+    const pingInterval = setInterval(() => {
+      setCurrentPing(Math.floor(Math.random() * 20) + 15)
+    }, 10000)
+    
+    return () => clearInterval(pingInterval)
+  }, [])
   useEffect(() => {
     const handleMouseMove = (e) => {
       const character = document.getElementById('player-character')
