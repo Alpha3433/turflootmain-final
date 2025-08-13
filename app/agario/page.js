@@ -27,6 +27,8 @@ const AgarIOGame = () => {
     }
   }
   const [gameStats, setGameStats] = useState({ netWorth: 100, rank: 1, players: 1, kills: 0, deaths: 0, streak: 0 })
+  const [showCashOutSuccess, setShowCashOutSuccess] = useState(false)
+  const [cashOutDetails, setCashOutDetails] = useState(null)
   const [isGameOver, setIsGameOver] = useState(false)
   const [gameResult, setGameResult] = useState('')
   const [isCashingOut, setIsCashingOut] = useState(false)
