@@ -116,12 +116,12 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
             {/* Stats */}
             <div className="text-right text-sm">
               <div className="text-green-400 font-bold">{totalStats.totalPlayers} Players</div>
-              <div className="text-blue-400">{totalStats.totalActiveGames} Active Games</div>
+              <div className="text-blue-400">{totalStats.totalActiveServers} Active Servers</div>
             </div>
             
             {/* Refresh Button */}
             <button
-              onClick={() => fetchLobbies(true)}
+              onClick={() => fetchServers(true)}
               disabled={refreshing}
               className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
             >
@@ -144,6 +144,41 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="px-6 py-4 bg-gray-800/30 border-b border-gray-700/50">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <label className="text-gray-400 text-sm font-medium">Region:</label>
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-1 text-white text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                {regions.map(region => (
+                  <option key={region} value={region}>{region}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <label className="text-gray-400 text-sm font-medium">Game Type:</label>
+              <select
+                value={selectedGameType}
+                onChange={(e) => setSelectedGameType(e.target.value)}
+                className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-1 text-white text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                {gameTypes.map(gameType => (
+                  <option key={gameType} value={gameType}>{gameType}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="text-gray-400 text-sm ml-auto">
+              Showing {filteredServers.length} of {servers.length} servers
+            </div>
           </div>
         </div>
 
