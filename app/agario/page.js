@@ -530,6 +530,74 @@ const AgarIOGame = () => {
   }
 
   // Real-time multiplayer initialization
+  // Token refresh mechanism to prevent random auth errors
+  const refreshAuthToken = async () => {
+    if (!user) return false
+    
+    try {
+      console.log('🔄 Refreshing auth token...')
+      
+      // Try to get fresh Privy token
+      const privyToken = await getAccessToken()
+      if (privyToken) {
+        // Try to exchange for our API token
+        const response = await fetch('/api/auth/privy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            privy_user: user
+          })
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.token) {
+            localStorage.setItem('auth_token', data.token)
+            console.log('✅ Auth token refreshed successfully')
+            return true
+          }
+        }
+        
+        // Fallback: use Privy token directly
+        localStorage.setItem('auth_token', privyToken)
+        console.log('✅ Using Privy token as fallback')
+        return true
+      }
+    } catch (error) {
+      console.warn('⚠️ Token refresh failed:', error.message)
+    }
+    
+    return false
+  }
+
+  // Periodic token check to prevent expiration during gameplay
+  useEffect(() => {
+    if (!user) return
+    
+    const tokenCheckInterval = setInterval(async () => {
+      const storedToken = localStorage.getItem('auth_token')
+      if (!storedToken) return
+      
+      try {
+        const payload = JSON.parse(atob(storedToken.split('.')[1]))
+        const currentTime = Date.now() / 1000
+        
+        // Refresh token if expiring in next 10 minutes
+        if (payload.exp && payload.exp < currentTime + 600) {
+          console.log('⏰ Token expiring soon, refreshing...')
+          await refreshAuthToken()
+        }
+      } catch (e) {
+        console.warn('⚠️ Token check failed, refreshing:', e.message)
+        await refreshAuthToken()
+      }
+    }, 60000) // Check every minute
+    
+    return () => clearInterval(tokenCheckInterval)
+  }, [user])
+
   const initializeMultiplayer = async () => {
     try {
       console.log('🔗 Initializing multiplayer connection...')
