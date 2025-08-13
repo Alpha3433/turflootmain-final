@@ -912,6 +912,17 @@ const AgarIOGame = () => {
           game.player.x = Math.cos(angle) * worldRadius
           game.player.y = Math.sin(angle) * worldRadius
         }
+        
+        // Send position update to server in multiplayer mode
+        if (socketRef.current && isConnected) {
+          // Send updates every few frames to avoid overwhelming the server
+          if (currentTime % 3 === 0) { // Send every 3rd frame (10 FPS updates)
+            socketRef.current.emit('set_direction', {
+              x: game.player.dir.x,
+              y: game.player.dir.y
+            })
+          }
+        }
       }
 
       // Update bots
