@@ -107,11 +107,15 @@ const AgarIOGame = () => {
     
     // Check if user is authenticated for multiplayer
     if (user && getAccessToken) {
-      // Initialize multiplayer game
-      initializeMultiplayer()
+      // Try multiplayer first, but fallback to offline if authentication fails
+      initializeMultiplayer().catch((error) => {
+        console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
+        // Initialize offline demo game with bots as fallback
+        initializeGame(false) // false = offline mode with bots
+      })
     } else {
       // Initialize offline demo game with bots
-      console.log('🤖 Starting offline demo mode')
+      console.log('🤖 Starting offline demo mode - user not authenticated')
       initializeGame(false) // false = offline mode with bots
     }
     
