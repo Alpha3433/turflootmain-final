@@ -187,31 +187,45 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-              <span className="ml-3 text-gray-400">Loading lobbies...</span>
+              <span className="ml-3 text-gray-400">Loading servers...</span>
             </div>
           ) : (
             <div className="space-y-4">
-              {lobbies.map((lobby) => (
+              {filteredServers.map((server) => (
                 <div
-                  key={lobby.id}
+                  key={server.id}
                   className="bg-black/30 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 hover:border-purple-500/30 transition-all group"
                 >
                   <div className="flex items-center justify-between">
-                    {/* Lobby Info */}
+                    {/* Server Info */}
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">
-                          {lobby.name}
+                          {server.name}
                         </h3>
                         
+                        {/* Region Badge */}
+                        <span className="px-2 py-1 rounded-full text-xs font-bold bg-blue-400/10 text-blue-400">
+                          {server.region}
+                        </span>
+                        
                         {/* Difficulty Badge */}
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${getDifficultyColor(lobby.difficulty)}`}>
-                          {lobby.difficulty}
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${getDifficultyColor(server.difficulty)}`}>
+                          {server.difficulty}
                         </span>
                         
                         {/* Entry Fee */}
-                        <span className={`font-bold ${getStakeColor(lobby.stake)}`}>
-                          {lobby.stake === 0 ? 'FREE' : `$${lobby.stake}`}
+                        <span className={`font-bold ${getStakeColor(server.stake)}`}>
+                          {server.stake === 0 ? 'FREE' : `$${server.stake}`}
+                        </span>
+                        
+                        {/* Status Badge */}
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                          server.status === 'active' ? 'bg-green-400/10 text-green-400' :
+                          server.status === 'full' ? 'bg-red-400/10 text-red-400' :
+                          'bg-yellow-400/10 text-yellow-400'
+                        }`}>
+                          {server.status.toUpperCase()}
                         </span>
                       </div>
                       
@@ -221,7 +235,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9 12a4 4 0 110-8 4 4 0 010 8zM9 2a6 6 0 100 12A6 6 0 009 2zM19 19a1 1 0 01-1 1h-8a1 1 0 01-1-1v-1a3 3 0 016 0v1zM14 9a2 2 0 11-4 0 2 2 0 014 0z" />
                           </svg>
-                          <span className="text-white font-medium">{lobby.currentPlayers}/{lobby.maxPlayers}</span>
+                          <span className="text-white font-medium">{server.currentPlayers}/{server.maxPlayers}</span>
                           <span>players</span>
                         </div>
                         
@@ -229,33 +243,31 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                           </svg>
-                          <span>{lobby.avgWaitTime}</span>
+                          <span>{server.avgWaitTime}</span>
                         </div>
                         
-                        {lobby.waitingPlayers > 0 && (
+                        <div className="flex items-center space-x-1">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-green-400">{server.ping}ms</span>
+                        </div>
+                        
+                        {server.waitingPlayers > 0 && (
                           <div className="flex items-center space-x-1 text-yellow-400">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12zM6.5 9.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm8 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" clipRule="evenodd" />
                             </svg>
-                            <span>{lobby.waitingPlayers} waiting</span>
-                          </div>
-                        )}
-                        
-                        {lobby.activeGames > 0 && (
-                          <div className="flex items-center space-x-1 text-green-400">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-                            </svg>
-                            <span>{lobby.activeGames} active</span>
+                            <span>{server.waitingPlayers} waiting</span>
                           </div>
                         )}
                       </div>
                       
                       {/* Potential Winnings */}
-                      {lobby.potentialWinning > 0 && (
+                      {server.potentialWinning > 0 && (
                         <div className="mt-2 text-sm">
                           <span className="text-gray-400">Potential Prize:</span>
-                          <span className="ml-2 text-green-400 font-bold">${lobby.potentialWinning.toFixed(2)}</span>
+                          <span className="ml-2 text-green-400 font-bold">${server.potentialWinning.toFixed(2)}</span>
                         </div>
                       )}
                     </div>
@@ -263,32 +275,32 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                     {/* Join Button */}
                     <div className="ml-4">
                       <button
-                        onClick={() => handleJoinLobby(lobby)}
-                        disabled={lobby.currentPlayers >= lobby.maxPlayers}
+                        onClick={() => handleJoinServer(server)}
+                        disabled={server.status === 'full'}
                         className={`px-6 py-3 rounded-xl font-bold transition-all ${
-                          lobby.currentPlayers >= lobby.maxPlayers
+                          server.status === 'full'
                             ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                            : lobby.stake === 0
+                            : server.stake === 0
                               ? 'bg-blue-600 hover:bg-blue-500 text-white hover:scale-105'
-                              : lobby.stake >= 20
+                              : server.stake >= 20
                                 ? 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white hover:scale-105'
-                                : lobby.stake >= 5
+                                : server.stake >= 5
                                   ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white hover:scale-105'
                                   : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white hover:scale-105'
                         }`}
                       >
-                        {lobby.currentPlayers >= lobby.maxPlayers ? 'FULL' : 'JOIN'}
+                        {server.status === 'full' ? 'FULL' : 'JOIN'}
                       </button>
                     </div>
                   </div>
                 </div>
               ))}
               
-              {lobbies.length === 0 && !isLoading && (
+              {filteredServers.length === 0 && !isLoading && (
                 <div className="text-center py-12 text-gray-400">
                   <div className="text-4xl mb-4">🎮</div>
-                  <p>No lobbies available at the moment.</p>
-                  <p className="text-sm mt-2">Check back in a few seconds!</p>
+                  <p>No servers match your filters.</p>
+                  <p className="text-sm mt-2">Try adjusting your region or game type selection!</p>
                 </div>
               )}
             </div>
