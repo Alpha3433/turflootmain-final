@@ -1788,7 +1788,12 @@ const AgarIOGame = () => {
             />
           </div>
           <div className="flex justify-between text-xs text-gray-300">
-            <span>{missionProgress}/{currentMission.target}</span>
+            <span>
+              {currentMission.type === 'survive' 
+                ? `${Math.floor(missionProgress / 1000)}/${Math.floor(currentMission.target / 1000)}s`
+                : `${missionProgress}/${currentMission.target}`
+              }
+            </span>
             <span className="text-green-400">{currentMission.reward} SP</span>
           </div>
           <div className="text-xs text-gray-400 mt-1">
