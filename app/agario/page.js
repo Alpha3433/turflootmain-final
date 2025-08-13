@@ -1518,9 +1518,10 @@ const AgarIOGame = () => {
         }
         
         // Display balance above other players' heads (not for the main player)
-        if (!isPlayer && radius > 15) {
+        if (!isPlayer && entity.netWorth > 0) {
+          console.log('💰 Drawing balance for', entity.name, 'NetWorth:', entity.netWorth, 'Radius:', radius)
           ctx.save()
-          ctx.font = 'bold 14px Arial'
+          ctx.font = 'bold 12px Arial'
           ctx.textAlign = 'center'
           ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
           ctx.shadowBlur = 4
@@ -1531,31 +1532,31 @@ const AgarIOGame = () => {
           const balanceText = `$${Math.floor(entity.netWorth)}`
           const textMetrics = ctx.measureText(balanceText)
           const textWidth = textMetrics.width
-          const textHeight = 16
-          const bgPadding = 4
+          const textHeight = 14
+          const bgPadding = 3
           
           // Draw background rectangle
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'
           ctx.fillRect(
             entity.x - textWidth/2 - bgPadding, 
-            entity.y - radius - 35 - textHeight/2 - bgPadding, 
+            entity.y - radius - 30 - textHeight/2 - bgPadding, 
             textWidth + bgPadding*2, 
             textHeight + bgPadding*2
           )
           
           // Draw border
-          ctx.strokeStyle = '#00ff00'
+          ctx.strokeStyle = '#00ff88'
           ctx.lineWidth = 1
           ctx.strokeRect(
             entity.x - textWidth/2 - bgPadding, 
-            entity.y - radius - 35 - textHeight/2 - bgPadding, 
+            entity.y - radius - 30 - textHeight/2 - bgPadding, 
             textWidth + bgPadding*2, 
             textHeight + bgPadding*2
           )
           
           // Draw balance text
           ctx.fillStyle = '#00ff88'
-          ctx.fillText(balanceText, entity.x, entity.y - radius - 30)
+          ctx.fillText(balanceText, entity.x, entity.y - radius - 25)
           
           ctx.restore()
         }
