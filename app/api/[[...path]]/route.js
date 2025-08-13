@@ -771,90 +771,15 @@ export async function GET(request, { params }) {
     // Server Browser endpoint - Get available game lobbies
     if (route === 'servers/lobbies') {
       try {
-        // Import the game server to get room stats
+        // Import the game server to get real persistent server data
         const { gameServer } = await import('../../../lib/gameServer.js')
-        const roomStats = gameServer.getRoomStats()
         
-        // Create actual servers with unique IDs and proper room management
-        const serverRegions = ['US-East-1', 'US-West-1', 'EU-Central-1']
-        const gameTypes = [
-          { stake: 1, mode: 'cash', name: '$1 Cash Game', maxPlayers: 6, minPlayers: 2 },
-          { stake: 5, mode: 'cash', name: '$5 Cash Game', maxPlayers: 6, minPlayers: 2 },
-          { stake: 20, mode: 'cash', name: '$20 High Stakes', maxPlayers: 6, minPlayers: 2 },
-          { stake: 0, mode: 'free', name: 'Free Play', maxPlayers: 6, minPlayers: 1 }
-        ]
+        // Get real server statistics from the game server
+        const serverData = gameServer.getServerStatistics()
         
-        // Generate actual servers for each region and game type
-        const servers = []
+        console.log(`📊 Serving ${serverData.servers.length} real multiplayer servers`)
         
-        for (const region of serverRegions) {
-          for (const gameType of gameTypes) {
-            // Create 2-3 servers per game type per region
-            const serverCount = gameType.stake >= 20 ? 2 : gameType.stake >= 5 ? 3 : gameType.stake === 1 ? 3 : 4
-            
-            for (let i = 1; i <= serverCount; i++) {
-              const serverId = `${region.toLowerCase()}-${gameType.mode}-${gameType.stake}-${i}`
-              
-              // Check if this server has active rooms
-              const activeRooms = roomStats.filter(room => 
-                room.roomId.includes(serverId) && room.fee === gameType.stake && room.mode === gameType.mode
-              )
-              
-              const totalPlayers = activeRooms.reduce((sum, room) => sum + room.players.total, 0)
-              const waitingPlayers = activeRooms.reduce((sum, room) => sum + (room.players.total - room.players.ready), 0)
-              const isRunning = activeRooms.some(room => room.running)
-              
-              // Generate realistic player counts based on game type and time
-              const basePopularity = gameType.stake === 0 ? 0.8 : gameType.stake === 1 ? 0.6 : gameType.stake === 5 ? 0.4 : 0.2
-              const currentHour = new Date().getHours()
-              const peakMultiplier = (currentHour >= 18 && currentHour <= 23) ? 1.5 : (currentHour >= 12 && currentHour <= 17) ? 1.2 : 0.8
-              
-              const simulatedPlayers = totalPlayers > 0 ? totalPlayers : 
-                Math.floor(Math.random() * (gameType.maxPlayers - 1) * basePopularity * peakMultiplier)
-              
-              servers.push({
-                id: serverId,
-                name: `${gameType.name} #${i}`,
-                region: region,
-                stake: gameType.stake,
-                mode: gameType.mode,
-                currentPlayers: Math.min(simulatedPlayers, gameType.maxPlayers - 1), // Leave room for joining
-                maxPlayers: gameType.maxPlayers,
-                minPlayers: gameType.minPlayers,
-                waitingPlayers: Math.floor(simulatedPlayers * 0.3), // 30% typically waiting
-                isRunning: simulatedPlayers >= gameType.minPlayers,
-                ping: region.includes('US-East') ? Math.floor(Math.random() * 20) + 15 : 
-                      region.includes('US-West') ? Math.floor(Math.random() * 30) + 25 :
-                      Math.floor(Math.random() * 40) + 35, // EU servers have higher ping
-                avgWaitTime: simulatedPlayers >= gameType.minPlayers ? '< 30s' : gameType.stake === 0 ? '< 10s' : '1-2 min',
-                difficulty: gameType.stake >= 20 ? 'High' : gameType.stake >= 5 ? 'Medium' : 'Easy',
-                entryFee: gameType.stake,
-                potentialWinning: gameType.stake > 0 ? gameType.stake * gameType.maxPlayers * 0.9 : 0, // 90% after 10% rake
-                status: simulatedPlayers >= gameType.maxPlayers ? 'full' : 
-                       simulatedPlayers >= gameType.minPlayers ? 'active' : 'waiting'
-              })
-            }
-          }
-        }
-        
-        // Sort servers by region, then by stake, then by server number
-        servers.sort((a, b) => {
-          if (a.region !== b.region) return a.region.localeCompare(b.region)
-          if (a.stake !== b.stake) return a.stake - b.stake
-          return a.id.localeCompare(b.id)
-        })
-        
-        const totalPlayers = servers.reduce((sum, server) => sum + server.currentPlayers, 0)
-        const activeServers = servers.filter(server => server.status === 'active').length
-        
-        return NextResponse.json({
-          servers: servers,
-          totalPlayers: totalPlayers,
-          totalActiveServers: activeServers,
-          regions: serverRegions,
-          gameTypes: gameTypes.map(gt => ({ stake: gt.stake, mode: gt.mode, name: gt.name })),
-          timestamp: new Date().toISOString()
-        }, { headers: corsHeaders })
+        return NextResponse.json(serverData, { headers: corsHeaders })
         
       } catch (error) {
         console.error('Error fetching server lobbies:', error)
@@ -896,42 +821,6 @@ export async function GET(request, { params }) {
             entryFee: 1,
             potentialWinning: 5.4,
             status: 'waiting'
-          },
-          {
-            id: 'us-east-1-cash-5-1',
-            name: '$5 Cash Game #1',
-            region: 'US-East-1',
-            stake: 5,
-            mode: 'cash',
-            currentPlayers: Math.floor(Math.random() * 4) + 2,
-            maxPlayers: 6,
-            minPlayers: 2,
-            waitingPlayers: Math.floor(Math.random() * 2),
-            isRunning: true,
-            ping: Math.floor(Math.random() * 20) + 15,
-            avgWaitTime: '< 20s',
-            difficulty: 'Medium',
-            entryFee: 5,
-            potentialWinning: 27,
-            status: 'active'
-          },
-          {
-            id: 'us-east-1-cash-20-1',
-            name: '$20 High Stakes #1',
-            region: 'US-East-1',
-            stake: 20,
-            mode: 'cash',
-            currentPlayers: Math.floor(Math.random() * 3) + 1,
-            maxPlayers: 6,
-            minPlayers: 2,
-            waitingPlayers: Math.floor(Math.random() * 2),
-            isRunning: false,
-            ping: Math.floor(Math.random() * 20) + 15,
-            avgWaitTime: '1-2 min',
-            difficulty: 'High',
-            entryFee: 20,
-            potentialWinning: 108,
-            status: 'waiting'
           }
         ]
         
@@ -942,9 +831,7 @@ export async function GET(request, { params }) {
           regions: ['US-East-1'],
           gameTypes: [
             { stake: 0, mode: 'free', name: 'Free Play' },
-            { stake: 1, mode: 'cash', name: '$1 Cash Game' },
-            { stake: 5, mode: 'cash', name: '$5 Cash Game' },
-            { stake: 20, mode: 'cash', name: '$20 High Stakes' }
+            { stake: 1, mode: 'cash', name: '$1 Cash Game' }
           ],
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
