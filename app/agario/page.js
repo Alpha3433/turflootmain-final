@@ -927,7 +927,7 @@ const AgarIOGame = () => {
       }
 
       // Update bots (only in offline mode) or sync real players (in multiplayer mode)
-      if (isMultiplayer && realPlayers.size > 0) {
+      if (game.isMultiplayer && realPlayers.size > 0) {
         // Replace bots with real players from Socket.IO
         game.bots = Array.from(realPlayers.values()).map(realPlayer => ({
           id: realPlayer.id,
@@ -949,7 +949,7 @@ const AgarIOGame = () => {
           spawnTime: Date.now(),
           lastNetWorth: realPlayer.mass * 10
         }))
-      } else if (!isMultiplayer) {
+      } else if (!game.isMultiplayer) {
         // Original bot AI logic (only in offline mode)
       game.bots.forEach(bot => {
         if (!bot.alive) return
