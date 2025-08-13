@@ -44,25 +44,39 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   // Auto-refresh every 5 seconds when modal is open
   useEffect(() => {
     if (isOpen) {
-      fetchLobbies()
-      const interval = setInterval(() => fetchLobbies(true), 5000)
+      fetchServers()
+      const interval = setInterval(() => fetchServers(true), 5000)
       return () => clearInterval(interval)
     }
   }, [isOpen])
 
-  const handleJoinLobby = (lobby) => {
-    if (!user && lobby.mode === 'cash') {
+  const handleJoinServer = (server) => {
+    if (!user && server.mode === 'cash') {
       alert('Please login to join cash games')
       return
     }
     
-    if (lobby.currentPlayers >= lobby.maxPlayers) {
-      alert('This lobby is full. Please try another one.')
+    if (server.status === 'full') {
+      alert('This server is full. Please try another one.')
       return
     }
     
-    onJoinLobby(lobby)
+    // Pass server data to join function
+    onJoinLobby({
+      id: server.id,
+      mode: server.mode,
+      entryFee: server.entryFee,
+      region: server.region,
+      name: server.name
+    })
   }
+
+  // Filter servers based on selected region and game type
+  const filteredServers = servers.filter(server => {
+    const regionMatch = selectedRegion === 'All' || server.region === selectedRegion
+    const gameTypeMatch = selectedGameType === 'All' || server.name.includes(selectedGameType.split(' ')[0])
+    return regionMatch && gameTypeMatch
+  })
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
