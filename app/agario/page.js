@@ -296,6 +296,19 @@ const AgarIOGame = () => {
     const platformFee = netWorth * 0.10 // 10% platform fee
     const finalAmount = netWorth - platformFee
     
+    // Store cash out details for success popup
+    setCashOutDetails({
+      originalAmount: netWorth,
+      platformFee: platformFee,
+      finalAmount: finalAmount,
+      kills: gameRef.current?.game?.player?.kills || 0,
+      streak: gameRef.current?.game?.player?.streak || 0,
+      playTime: gameSession.startTime ? Math.floor((Date.now() - gameSession.startTime) / 1000) : 0
+    })
+    
+    // Show success popup
+    setShowCashOutSuccess(true)
+    
     addFloatingText(`Banked: $${Math.floor(finalAmount)}`, gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#00ff00')
     addFloatingText(`-$${Math.floor(platformFee)} fee`, gameRef.current?.game?.player?.x || 0, (gameRef.current?.game?.player?.y || 0) - 25, '#ff4444')
     
@@ -319,13 +332,6 @@ const AgarIOGame = () => {
 
     setIsCashingOut(false)
     setCashOutProgress(0)
-    
-    console.log('💰 Cash out completed - returning to main menu')
-    
-    // Immediately redirect to main page after cash out
-    setTimeout(() => {
-      window.location.href = '/'
-    }, 1000) // 1 second delay to show the floating text, then redirect
   }
 
   const addToKillFeed = (message) => {
