@@ -1231,8 +1231,8 @@ const AgarIOGame = () => {
           ctx.textAlign = 'center'
           ctx.fillText('$', orb.x, orb.y + 4)
         } else {
-          // Regular orbs
-          ctx.fillStyle = orb.color
+          // Regular orbs - fixed gold color to prevent flickering
+          ctx.fillStyle = '#FFD700'
           ctx.beginPath()
           ctx.arc(orb.x, orb.y, 12, 0, Math.PI * 2)
           ctx.fill()
