@@ -619,7 +619,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                   <div className="text-center">
                     <h4 className="text-white text-sm font-semibold mb-1 truncate">{item.name}</h4>
                     <div className="flex items-center justify-center space-x-2 mb-2">
-                      <span className={`text-xs ${rarityColors[item.rarity]} capitalize`}>
+                      <span className={`text-xs font-semibold ${rarityColors[item.rarity]} capitalize`}>
                         {item.rarity}
                       </span>
                       {Array.from({ length: item.rarity === 'legendary' ? 5 : item.rarity === 'epic' ? 4 : item.rarity === 'rare' ? 3 : 2 }).map((_, i) => (
