@@ -47,6 +47,7 @@ const AgarIOGame = () => {
   const [territoryGlowIntensity, setTerritoryGlowIntensity] = useState(0.3)
   const [showCashOutSuccess, setShowCashOutSuccess] = useState(false)
   const [cashOutDetails, setCashOutDetails] = useState(null)
+  const [initialLobbyFee, setInitialLobbyFee] = useState(100) // Track the entry fee for this lobby
   
   // Player customization state
   const [playerCustomization, setPlayerCustomization] = useState({
