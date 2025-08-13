@@ -152,6 +152,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ POST-UI POSITION SWAP VERIFICATION PASSED - Game pots endpoint working perfectly after UI position swap and dynamic settings system integration. Returns all 3 pot tables with 80 total players and $4475 total pot. No regression issues detected from frontend changes."
+      - working: true
+        agent: "testing"
+        comment: "✅ POST-CUSTOMIZATION MODAL REGRESSION TEST PASSED - Game pots endpoint working perfectly after frontend customization modal enhancements. Returns all 3 pot tables ($1, $5, $20) with 36 total players and $4349 total pot. No regression issues detected from frontend visual enhancement work."
 
   - task: "Live Statistics APIs (GET /api/stats/live-players and GET /api/stats/global-winnings)"
     implemented: true
