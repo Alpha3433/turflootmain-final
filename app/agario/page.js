@@ -108,6 +108,30 @@ const AgarIOGame = () => {
     }
   }, [])
 
+  const handlePlayAgain = () => {
+    // Charge the same entry fee as when they joined the lobby
+    console.log(`🎮 Player wants to play again - charging entry fee: $${initialLobbyFee}`)
+    
+    // Reset all game states
+    setShowCashOutSuccess(false)
+    setCashOutDetails(null)
+    setIsGameOver(false)
+    setGameResult('')
+    setIsCashingOut(false)
+    setCashOutProgress(0)
+    setCurrentMission(null)
+    setMissionProgress(0)
+    
+    // Note: In a real implementation, you would:
+    // 1. Check if user has sufficient balance
+    // 2. Deduct the entry fee from their wallet
+    // 3. Update the backend with the transaction
+    // For now, we'll restart the game immediately
+    
+    // Restart the game with the same parameters
+    window.location.reload() // Simple restart - in production you'd restart more elegantly
+  }
+
   // Helper function to get player's customized appearance
   const getPlayerSkinColor = () => {
     switch (playerCustomization.skin) {
