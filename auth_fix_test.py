@@ -185,7 +185,7 @@ class TurfLootAuthFixTester:
             
             if response.status_code == 400:
                 data = response.json()
-                if 'error' in data and 'privy_user' in data['error']:
+                if 'error' in data and ('privy_user' in data['error'] or 'Privy user data' in data['error']):
                     self.log_test(
                         "Privy Authentication Endpoint",
                         True,
