@@ -530,11 +530,40 @@ const AgarIOGame = () => {
     try {
       console.log('🔗 Initializing multiplayer connection...')
       
-      // Get JWT token from Privy for authentication
-      const accessToken = await getAccessToken()
-      if (!accessToken) {
-        console.error('❌ No access token available - user not authenticated')
+      // Get the correct JWT token from our API (not Privy's token)
+      const storedToken = localStorage.getItem('auth_token')
+      
+      if (!storedToken) {
+        console.error('❌ No auth token available - user not authenticated with our API')
         setGameResult('Authentication required to play')
+        setIsGameOver(true)
+        return
+      }
+      
+      // Verify token is still valid by checking if it's not expired
+      try {
+        const payload = JSON.parse(atob(storedToken.split('.')[1]))
+        const currentTime = Date.now() / 1000
+        
+        if (payload.exp && payload.exp < currentTime) {
+          console.error('❌ Auth token expired - user needs to re-authenticate')
+          localStorage.removeItem('auth_token') // Remove expired token
+          setGameResult('Session expired - please refresh and login again')
+          setIsGameOver(true)
+          return
+        }
+        
+        console.log('✅ Auth token is valid:', {
+          userId: payload.userId,
+          privyId: payload.privyId,
+          email: payload.email,
+          username: payload.username,
+          expiresAt: new Date(payload.exp * 1000)
+        })
+      } catch (e) {
+        console.error('❌ Invalid auth token format:', e.message)
+        localStorage.removeItem('auth_token') // Remove invalid token
+        setGameResult('Invalid session - please refresh and login again')
         setIsGameOver(true)
         return
       }
@@ -554,7 +583,7 @@ const AgarIOGame = () => {
       // Connect to Socket.IO server
       const socket = io({
         auth: {
-          token: accessToken
+          token: storedToken // Use our API token, not Privy's token
         },
         transports: ['websocket', 'polling']
       })
@@ -571,7 +600,7 @@ const AgarIOGame = () => {
           roomId: paramRoomId,
           mode: paramMode,
           fee: paramFee,
-          token: accessToken
+          token: storedToken // Use our API token
         })
       })
       
