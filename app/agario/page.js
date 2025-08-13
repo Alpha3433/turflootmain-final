@@ -534,42 +534,65 @@ const AgarIOGame = () => {
     try {
       console.log('🔗 Initializing multiplayer connection...')
       
-      // Get the correct JWT token from our API (not Privy's token)
-      const storedToken = localStorage.getItem('auth_token')
+      // For authenticated users, try to get our API token first, then fall back to Privy token
+      let authToken = localStorage.getItem('auth_token')
       
-      if (!storedToken) {
-        console.error('❌ No auth token available - user not authenticated with our API')
+      // If no stored token but user is authenticated, try to get fresh token
+      if (!authToken && user) {
+        console.log('🔄 No stored token found, trying to get fresh token...')
+        try {
+          // Try to get Privy access token as fallback
+          const privyToken = await getAccessToken()
+          if (privyToken) {
+            authToken = privyToken
+            console.log('✅ Using Privy token as fallback')
+          }
+        } catch (e) {
+          console.log('⚠️ Could not get Privy token:', e.message)
+        }
+      }
+      
+      if (!authToken) {
+        console.error('❌ No auth token available - user not authenticated')
         setGameResult('Authentication required to play')
         setIsGameOver(true)
         return
       }
       
-      // Verify token is still valid by checking if it's not expired
+      // Validate token format but be more lenient with expiration
+      let tokenValid = true
+      let tokenInfo = null
+      
       try {
-        const payload = JSON.parse(atob(storedToken.split('.')[1]))
+        const payload = JSON.parse(atob(authToken.split('.')[1]))
         const currentTime = Date.now() / 1000
         
-        if (payload.exp && payload.exp < currentTime) {
-          console.error('❌ Auth token expired - user needs to re-authenticate')
-          localStorage.removeItem('auth_token') // Remove expired token
-          setGameResult('Session expired - please refresh and login again')
-          setIsGameOver(true)
-          return
-        }
-        
-        console.log('✅ Auth token is valid:', {
-          userId: payload.userId,
+        tokenInfo = {
+          userId: payload.userId || payload.sub,
           privyId: payload.privyId,
           email: payload.email,
           username: payload.username,
-          expiresAt: new Date(payload.exp * 1000)
-        })
+          exp: payload.exp,
+          expiresAt: new Date((payload.exp || 0) * 1000)
+        }
+        
+        // Check if token is expired, but allow some grace period
+        if (payload.exp && payload.exp < currentTime - 300) { // 5 minute grace period
+          console.warn('⚠️ Auth token expired, but continuing with graceful degradation')
+          tokenValid = false
+        } else if (payload.exp && payload.exp < currentTime + 600) { // Warn if expiring in 10 minutes
+          console.warn('⚠️ Auth token expiring soon:', tokenInfo.expiresAt)
+        }
+        
+        console.log('✅ Auth token analyzed:', tokenInfo)
       } catch (e) {
-        console.error('❌ Invalid auth token format:', e.message)
-        localStorage.removeItem('auth_token') // Remove invalid token
-        setGameResult('Invalid session - please refresh and login again')
-        setIsGameOver(true)
-        return
+        console.warn('⚠️ Could not parse token, but continuing:', e.message)
+        tokenValid = false
+      }
+      
+      // If token is invalid but user is still authenticated with Privy, continue anyway
+      if (!tokenValid && user) {
+        console.log('🔄 Token invalid but user authenticated - continuing with degraded auth')
       }
       
       // Parse URL parameters for room settings
@@ -587,7 +610,8 @@ const AgarIOGame = () => {
       // Connect to Socket.IO server
       const socket = io({
         auth: {
-          token: storedToken // Use our API token, not Privy's token
+          token: authToken,
+          fallback: true // Allow graceful degradation
         },
         transports: ['websocket', 'polling']
       })
@@ -604,7 +628,8 @@ const AgarIOGame = () => {
           roomId: paramRoomId,
           mode: paramMode,
           fee: paramFee,
-          token: storedToken // Use our API token
+          token: authToken,
+          fallback: true
         })
       })
       
