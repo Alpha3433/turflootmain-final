@@ -440,6 +440,8 @@ const AgarIOGame = () => {
     mission.startTime = Date.now()
     mission.progress = 0
     
+    console.log('🎯 Generated new mission:', mission.description, 'Duration:', mission.duration/1000, 'seconds')
+    
     setCurrentMission(mission)
     setMissionProgress(0)
     
@@ -448,6 +450,7 @@ const AgarIOGame = () => {
       setCurrentMission(prev => {
         // Only fail if mission is still active and not completed
         if (prev && prev.id === mission.id && prev.progress < prev.target) {
+          console.log('🎯 Mission failed:', prev.description)
           addFloatingText('Mission Failed!', gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#FF4444')
           addToKillFeed(`Mission failed: ${prev.description}`)
           return null
