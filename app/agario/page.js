@@ -943,6 +943,14 @@ const AgarIOGame = () => {
               game.player.deaths += 1
               game.player.streak = 0
               
+              // Fail any active mission when player dies
+              if (currentMission) {
+                console.log('🎯 Mission failed due to player death:', currentMission.description)
+                addFloatingText('Mission Failed!', game.player.x, game.player.y - 80, '#FF4444')
+                addToKillFeed(`Mission failed: ${currentMission.description} (eliminated)`)
+                setCurrentMission(null)
+              }
+              
               // Update session tracking - game loss
               setGameSession(prev => ({
                 ...prev,
