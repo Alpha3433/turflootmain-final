@@ -822,8 +822,18 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Right side - Navigation Icons */}
+          {/* Right side - Server Indicator and Navigation Icons */}
           <div className="flex items-center space-x-3">
+            {/* Server Indicator */}
+            <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-800/60 border border-gray-700/50 rounded-lg">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-green-400 font-medium text-sm">{currentServer}</span>
+              <span className="text-gray-400 text-xs">|</span>
+              <span className="text-gray-400 text-xs">
+                {Math.floor(Math.random() * 20) + 15}ms
+              </span>
+            </div>
+            
             {authenticated && user ? (
               <>
                 <button 
