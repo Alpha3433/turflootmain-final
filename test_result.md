@@ -769,6 +769,21 @@ frontend:
         agent: "testing"
         comment: "✅ CODE ANALYSIS AND FORMATTING TESTING COMPLETED - Wallet balance display functionality fully implemented and working correctly. BALANCE DISPLAY: 1) ✅ Main balance display with large text (text-3xl font-black) showing USD amount, 2) ✅ 'Game Balance' label properly positioned, 3) ✅ Currency breakdown showing SOL and USDC balances with proper formatting. FORMATTING LOGIC: 4) ✅ USD balance formatted to 2 decimal places (toFixed(2)), 5) ✅ SOL balance formatted to 4 decimal places (toFixed(4)), 6) ✅ USDC balance formatted to 2 decimal places (toFixed(2)). REAL-TIME UPDATES: 7) ✅ fetchBalance() called after successful Add Funds and Cash Out operations, 8) ✅ Balance state updates trigger re-render of display components, 9) ✅ onBalanceUpdate callback integration for parent component updates. BACKEND INTEGRATION: 10) ✅ Integrates with /api/wallet/balance endpoint (backend API tested and working), 11) ✅ Authentication required for balance access (401 responses for non-authenticated). All balance display and update functionality implemented correctly and ready for production use."
 
+  - task: "Player Balance Display and Total Mass Stats"
+    implemented: true
+    working: true
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "NEW - Added dynamic balance display above other players' heads and Total Mass field in player stats box. Balance shows real-time net worth of other players with dark background and green border for visibility."
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Successfully added two player information features: 1) BALANCE DISPLAY: Other players now show their current net worth above their heads with dark background, green border, and shadow effects for readability, 2) TOTAL MASS STATS: Added 'Total Mass' field to player stats box showing current mass value in blue color, positioned between Net Worth and K/D stats, 3) Both features update dynamically in real-time as players move and grow. Screenshot verification shows Player 2 and Player 1 with balance displays above heads, and Total Mass: 10 visible in stats panel alongside Net Worth: $100."
+
   - task: "Instant Cash-Out Game Exit"
     implemented: true
     working: true
