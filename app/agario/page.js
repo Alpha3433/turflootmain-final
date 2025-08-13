@@ -510,7 +510,8 @@ const AgarIOGame = () => {
         deaths: 0,
         streak: 0,
         isBounty: false,
-        // Removed cashBadgeScale - no more cash badge flickering
+        spawnProtected: true, // New spawn protection
+        spawnTime: Date.now(), // Track when spawned
         lastNetWorth: config.startingNetWorth
       },
       bots: [],
