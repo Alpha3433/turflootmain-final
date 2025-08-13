@@ -1004,6 +1004,7 @@ const AgarIOGame = () => {
       
       setGameStats({
         netWorth: Math.floor(game.player.netWorth),
+        mass: Math.floor(game.player.mass),
         rank: playerRank,
         players: allAlive.length,
         kills: game.player.kills,
