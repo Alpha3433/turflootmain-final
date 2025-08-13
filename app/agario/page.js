@@ -9,8 +9,10 @@ import { io } from 'socket.io-client'
 const AgarIOGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
+  const socketRef = useRef(null)
   const router = useRouter()
   const { settings } = useGameSettings()  // Add settings hook
+  const { user, getAccessToken } = usePrivy() // Add Privy auth
   
   // Ping monitoring function
   const measurePing = async () => {
