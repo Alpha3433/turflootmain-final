@@ -1843,6 +1843,10 @@ const AgarIOGame = () => {
               <span className="text-green-400 font-bold">${gameStats.netWorth}</span>
             </div>
             <div className="flex justify-between">
+              <span className="text-gray-300">Total Mass:</span>
+              <span className="text-blue-400 font-bold">{Math.floor(gameStats.mass || 0)}</span>
+            </div>
+            <div className="flex justify-between">
               <span className="text-gray-300">K/D:</span>
               <span className="text-white">{gameStats.kills}/{gameStats.deaths}</span>
             </div>
