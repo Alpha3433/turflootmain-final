@@ -580,15 +580,15 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
 
           {/* Right Sidebar - Preview & Details */}
           <div className="w-80 bg-gray-800/30 border-l border-gray-700/50 p-6 overflow-y-auto">
-            {/* Live Preview */}
+            {/* Live Preview - Enhanced Size (30% bigger) */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-white mb-4">Live Preview</h3>
-              <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-600/50 mb-4">
+              <div className="bg-gray-900/50 rounded-lg p-8 border border-gray-600/50 mb-4">
                 {/* Enhanced Character Preview */}
-                <div className="flex justify-center mb-4">
+                <div className="flex justify-center mb-6">
                   <div className="relative">
-                    {/* Main character body */}
-                    <div className={`w-20 h-20 rounded-full border-4 border-cyan-300 flex items-center justify-center transition-all duration-500 ${
+                    {/* Main character body - 30% bigger */}
+                    <div className={`w-26 h-26 rounded-full border-4 border-cyan-300 flex items-center justify-center transition-all duration-500 ${
                       previewAnimation === 'spin' ? 'animate-spin' :
                       previewAnimation === 'bounce' ? 'animate-bounce' :
                       previewAnimation === 'pulse' ? 'animate-pulse' :
