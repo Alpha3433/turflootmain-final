@@ -445,31 +445,66 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                     
                     {activeCategory === 'trails' && (
                       <div className="relative flex items-center justify-center">
-                        {/* Character with trail */}
-                        <div className="w-12 h-12 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 left-3"></div>
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 right-3"></div>
+                        {/* Character with enhanced trail preview */}
+                        <div className="w-14 h-14 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center shadow-lg">
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 left-4"></div>
+                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 right-4"></div>
                         </div>
-                        {/* Trail effect */}
-                        <div className={`absolute -right-8 flex space-x-1 ${!item.owned ? 'grayscale' : ''}`}>
+                        
+                        {/* Enhanced Animated Trail Effects */}
+                        <div className={`absolute -right-12 top-1/2 transform -translate-y-1/2 flex items-center ${!item.owned ? 'grayscale' : ''}`}>
                           {item.id === 'rainbow_trail' ? (
-                            <>
-                              <div className="w-2 h-2 bg-red-400 rounded-full opacity-70"></div>
-                              <div className="w-2 h-2 bg-yellow-400 rounded-full opacity-50"></div>
-                              <div className="w-1 h-1 bg-green-400 rounded-full opacity-30"></div>
-                            </>
+                            <div className="flex items-center space-x-1">
+                              {/* Rainbow trail with flowing animation */}
+                              <div className="w-3 h-3 bg-red-400 rounded-full opacity-80 animate-pulse shadow-lg shadow-red-400/50">
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-2.5 h-2.5 bg-orange-400 rounded-full opacity-70 animate-pulse shadow-md shadow-orange-400/50" style={{animationDelay: '0.2s'}}>
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-orange-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-2 h-2 bg-yellow-400 rounded-full opacity-60 animate-pulse shadow-sm shadow-yellow-400/50" style={{animationDelay: '0.4s'}}>
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-1.5 h-1.5 bg-green-400 rounded-full opacity-50 animate-pulse" style={{animationDelay: '0.6s'}}>
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-green-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-1 h-1 bg-blue-400 rounded-full opacity-40 animate-pulse" style={{animationDelay: '0.8s'}}></div>
+                              {/* Epic rarity glow */}
+                              {item.rarity === 'epic' && (
+                                <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 rounded-full animate-pulse blur-sm"></div>
+                              )}
+                            </div>
                           ) : item.id === 'fire_trail' ? (
-                            <>
-                              <div className="w-2 h-2 bg-orange-500 rounded-full opacity-70 animate-pulse"></div>
-                              <div className="w-2 h-2 bg-red-500 rounded-full opacity-50 animate-pulse"></div>
-                              <div className="w-1 h-1 bg-yellow-500 rounded-full opacity-30 animate-pulse"></div>
-                            </>
+                            <div className="flex items-center space-x-1">
+                              {/* Fire trail with flickering effect */}
+                              <div className="relative">
+                                <div className="w-3 h-3 bg-orange-500 rounded-full opacity-80 animate-pulse shadow-lg shadow-orange-500/50">
+                                  <div className="absolute inset-0.5 bg-gradient-to-br from-orange-200 to-transparent rounded-full"></div>
+                                </div>
+                                {/* Fire sparkles */}
+                                <div className="absolute -top-1 -right-1 w-1 h-1 bg-yellow-300 rounded-full animate-ping"></div>
+                              </div>
+                              <div className="w-2.5 h-2.5 bg-red-500 rounded-full opacity-70 animate-pulse shadow-md shadow-red-500/50" style={{animationDelay: '0.3s'}}>
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-2 h-2 bg-yellow-500 rounded-full opacity-60 animate-pulse shadow-sm shadow-yellow-500/50" style={{animationDelay: '0.6s'}}>
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-1.5 h-1.5 bg-orange-400 rounded-full opacity-50 animate-pulse" style={{animationDelay: '0.9s'}}></div>
+                              <div className="w-1 h-1 bg-red-400 rounded-full opacity-40 animate-pulse" style={{animationDelay: '1.2s'}}></div>
+                            </div>
                           ) : (
-                            <>
-                              <div className="w-2 h-2 bg-blue-400 rounded-full opacity-70 animate-pulse"></div>
-                              <div className="w-1 h-1 bg-cyan-400 rounded-full opacity-50 animate-pulse"></div>
-                              <div className="w-1 h-1 bg-white rounded-full opacity-30 animate-pulse"></div>
-                            </>
+                            <div className="flex items-center space-x-1">
+                              {/* Default sparkle trail with subtle glow */}
+                              <div className="w-2.5 h-2.5 bg-blue-400 rounded-full opacity-80 animate-pulse shadow-md shadow-blue-400/50">
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-blue-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-2 h-2 bg-cyan-400 rounded-full opacity-70 animate-pulse shadow-sm shadow-cyan-400/50" style={{animationDelay: '0.4s'}}>
+                                <div className="absolute inset-0.5 bg-gradient-to-br from-cyan-200 to-transparent rounded-full"></div>
+                              </div>
+                              <div className="w-1.5 h-1.5 bg-white rounded-full opacity-60 animate-pulse" style={{animationDelay: '0.8s'}}></div>
+                              <div className="w-1 h-1 bg-blue-300 rounded-full opacity-50 animate-pulse" style={{animationDelay: '1.2s'}}></div>
+                            </div>
                           )}
                         </div>
                       </div>
