@@ -714,27 +714,54 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                       </div>
                     )}
 
-                    {/* Dynamic trail rendering */}
+                    {/* Dynamic trail rendering with advanced effects */}
                     {((selectedItem && activeCategory === 'trails') || playerData.equippedTrail) && (
-                      <div className="absolute -right-10 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                      <div className="absolute -right-14 top-1/2 transform -translate-y-1/2 flex space-x-1">
                         {(selectedItem && activeCategory === 'trails' && selectedItem.id === 'rainbow_trail') || playerData.equippedTrail === 'rainbow_trail' ? (
-                          <>
-                            <div className="w-2 h-2 bg-red-400 rounded-full opacity-70 animate-pulse"></div>
-                            <div className="w-2 h-2 bg-yellow-400 rounded-full opacity-50 animate-pulse"></div>
-                            <div className="w-1 h-1 bg-green-400 rounded-full opacity-30 animate-pulse"></div>
-                          </>
+                          <div className="relative flex items-center space-x-1">
+                            {/* Enhanced rainbow trail with star particles */}
+                            <div className="w-3 h-3 bg-red-400 opacity-80 animate-pulse shadow-lg shadow-red-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDuration: '1s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
+                            </div>
+                            <div className="w-2.5 h-2.5 bg-yellow-400 opacity-70 animate-pulse shadow-md shadow-yellow-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.3s', animationDuration: '1.2s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
+                            </div>
+                            <div className="w-2 h-2 bg-green-400 opacity-60 animate-pulse shadow-sm shadow-green-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.6s', animationDuration: '1.4s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-green-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
+                            </div>
+                            <div className="w-1.5 h-1.5 bg-blue-400 opacity-50 animate-pulse" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.9s', animationDuration: '1.6s'}}></div>
+                            {/* Epic glow effect */}
+                            <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/20 via-pink-500/25 to-purple-500/20 rounded-full animate-pulse blur-md" style={{animationDuration: '2s'}}></div>
+                          </div>
                         ) : (selectedItem && activeCategory === 'trails' && selectedItem.id === 'fire_trail') || playerData.equippedTrail === 'fire_trail' ? (
-                          <>
-                            <div className="w-2 h-2 bg-orange-500 rounded-full opacity-70 animate-pulse"></div>
-                            <div className="w-2 h-2 bg-red-500 rounded-full opacity-50 animate-pulse"></div>
-                            <div className="w-1 h-1 bg-yellow-500 rounded-full opacity-30 animate-pulse"></div>
-                          </>
+                          <div className="relative flex items-center space-x-1">
+                            {/* Enhanced fire trail with neon streaks */}
+                            <div className="w-3 h-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 opacity-90 animate-pulse shadow-xl shadow-orange-500/60 rounded-full" style={{animationDuration: '0.8s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-orange-200 to-transparent rounded-full"></div>
+                              <div className="absolute -top-1 -right-1 w-1 h-1 bg-yellow-300 rounded-full animate-ping opacity-75"></div>
+                            </div>
+                            <div className="w-2.5 h-1 bg-gradient-to-r from-red-500 to-orange-500 opacity-80 animate-pulse shadow-lg shadow-red-500/50 rounded-full" style={{animationDelay: '0.2s', animationDuration: '1s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent rounded-full"></div>
+                            </div>
+                            <div className="w-2 h-1 bg-yellow-500 opacity-70 animate-pulse shadow-md shadow-yellow-500/50 rounded-full" style={{animationDelay: '0.4s', animationDuration: '1.2s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent rounded-full"></div>
+                            </div>
+                            <div className="w-1.5 h-0.5 bg-orange-400 opacity-60 animate-pulse rounded-full" style={{animationDelay: '0.6s', animationDuration: '1.4s'}}></div>
+                            {/* Rare glow effect */}
+                            <div className="absolute -inset-1 bg-blue-500/15 rounded-full animate-pulse blur-sm" style={{animationDuration: '3s'}}></div>
+                          </div>
                         ) : (
-                          <>
-                            <div className="w-2 h-2 bg-blue-400 rounded-full opacity-70 animate-pulse"></div>
-                            <div className="w-1 h-1 bg-cyan-400 rounded-full opacity-50 animate-pulse"></div>
-                            <div className="w-1 h-1 bg-white rounded-full opacity-30 animate-pulse"></div>
-                          </>
+                          <div className="relative flex items-center space-x-1">
+                            {/* Enhanced default sparkle trail with pixel particles */}
+                            <div className="w-2.5 h-2.5 bg-blue-400 opacity-90 animate-pulse shadow-lg shadow-blue-400/60" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDuration: '1.3s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-blue-200 to-transparent" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}}></div>
+                            </div>
+                            <div className="w-2 h-2 bg-cyan-400 opacity-80 animate-pulse shadow-md shadow-cyan-400/50" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDelay: '0.3s', animationDuration: '1.5s'}}>
+                              <div className="absolute inset-0.5 bg-gradient-to-br from-cyan-200 to-transparent" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}}></div>
+                            </div>
+                            <div className="w-1.5 h-1.5 bg-white opacity-70 animate-pulse shadow-sm" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDelay: '0.6s', animationDuration: '1.7s'}}></div>
+                            <div className="w-1 h-1 bg-blue-300 opacity-60 animate-pulse" style={{animationDelay: '0.9s', animationDuration: '1.9s'}}></div>
+                          </div>
                         )}
                       </div>
                     )}
