@@ -443,14 +443,17 @@ const AgarIOGame = () => {
     setCurrentMission(mission)
     setMissionProgress(0)
     
-    // Auto-complete mission after duration
+    // Auto-fail mission after duration if not completed
     setTimeout(() => {
-      if (mission.progress >= mission.target) {
-        completeMission(mission)
-      } else {
-        setCurrentMission(null)
-        addFloatingText('Mission Failed!', gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#FF4444')
-      }
+      setCurrentMission(prev => {
+        // Only fail if mission is still active and not completed
+        if (prev && prev.id === mission.id && prev.progress < prev.target) {
+          addFloatingText('Mission Failed!', gameRef.current?.game?.player?.x || 0, gameRef.current?.game?.player?.y || 0, '#FF4444')
+          addToKillFeed(`Mission failed: ${prev.description}`)
+          return null
+        }
+        return prev
+      })
     }, mission.duration)
   }
 
