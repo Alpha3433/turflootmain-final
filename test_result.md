@@ -890,7 +890,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Agario Game Frontend Integration"
+    - "Enhanced Server Browser API (GET /api/servers/lobbies)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
