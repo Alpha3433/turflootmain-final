@@ -1457,37 +1457,7 @@ const AgarIOGame = () => {
           ctx.fillText(entity.name, entity.x, nameY)
         }
         
-        // Cash Badge above player (only if showNetWorth is enabled)
-        if (settings.showNetWorth) {
-          const badgeY = entity.y - radius - (entity.isBounty ? 50 : 35)
-          const badgeScale = entity.cashBadgeScale || 1.0
-          
-          ctx.save()
-          ctx.translate(entity.x, badgeY)
-          ctx.scale(badgeScale, badgeScale)
-          
-          // Badge background with drop shadow
-          const badgeColor = getCashBadgeColor(entity.netWorth)
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-          ctx.shadowBlur = 5
-          ctx.shadowOffsetX = 2
-          ctx.shadowOffsetY = 2
-          
-          ctx.fillStyle = badgeColor
-          ctx.beginPath()
-          ctx.roundRect(-25, -8, 50, 16, 8)
-          ctx.fill()
-          
-          ctx.shadowColor = 'transparent'
-          
-          // Badge text
-          ctx.fillStyle = '#000000'
-          ctx.font = '12px Arial'
-          ctx.textAlign = 'center'
-          ctx.fillText(`$${Math.floor(entity.netWorth)}`, 0, 4)
-          
-          ctx.restore()
-        }
+
       })
       
       // Draw floating texts
