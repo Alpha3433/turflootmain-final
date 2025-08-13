@@ -29,6 +29,7 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false)
   const [showCustomization, setShowCustomization] = useState(false)
   const [showServerBrowser, setShowServerBrowser] = useState(false)
+  const [currentServer, setCurrentServer] = useState('US-East-1') // Default server
   const [leaderboardData, setLeaderboardData] = useState([])
   const [playerCustomization, setPlayerCustomization] = useState({
     skin: 'default_blue',
