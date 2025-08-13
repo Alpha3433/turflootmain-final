@@ -798,6 +798,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "✅ FIXED MISSION TRACKING ISSUES - Resolved multiple issues with eliminate mission system: 1) TIMEOUT LOGIC: Fixed setTimeout closure issue where mission.progress was checking outdated values instead of current React state, now uses setCurrentMission with prev callback to check current state, 2) COMPLETION HANDLING: Added proper mission clearing (return null) when mission is completed instead of leaving stale state, 3) DEBUG LOGGING: Added console.log statements to track mission generation, progress updates, and completion for better debugging, 4) FAIL CONDITION: Improved mission failure logic to only fail active missions that haven't been completed. Eliminate missions should now properly track kills (0/3 → 1/3 → 2/3 → 3/3) and complete correctly when target is reached."
+      - working: true
+        agent: "main"
+        comment: "✅ FIXED SURVIVE MISSION TRACKING - Resolved user-reported issue with 'Survive for 60 seconds' mission not tracking properly: 1) COMPLETION HANDLING: Added proper mission clearing (return null) when survive mission reaches 60 seconds instead of leaving mission in completed state, 2) DEBUG LOGGING: Added console tracking for survive progress showing elapsed time (0s/60s → 30s/60s → 60s/60s), 3) DEATH HANDLING: Added mission failure logic when player dies during survive mission - clears mission and shows failure message, 4) STATE SYNCHRONIZATION: Fixed survive mission to properly track elapsed time and detect completion at exactly 60 seconds. Survive missions now accurately track time survived and complete correctly when 60-second target is reached without dying."
 
   - task: "Instant Cash-Out Game Exit"
     implemented: true
