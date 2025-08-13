@@ -72,6 +72,17 @@ const AgarIOGame = () => {
     playTimeSeconds: 0
   })
 
+  // Real-time multiplayer state
+  const [isConnected, setIsConnected] = useState(false)
+  const [roomId, setRoomId] = useState(null)
+  const [realPlayers, setRealPlayers] = useState(new Map())
+  const [gameMode, setGameMode] = useState('free') // 'free' or 'cash'
+  const [entryFee, setEntryFee] = useState(0)
+  const [isWaitingForPlayers, setIsWaitingForPlayers] = useState(false)
+  const [connectedPlayers, setConnectedPlayers] = useState(0)
+  const [gameServerFood, setGameServerFood] = useState([])
+  const [isPlayerReady, setIsPlayerReady] = useState(false)
+
   useEffect(() => {
     // Handle page visibility (exit game when tab is not visible)
     const handleVisibilityChange = () => {
