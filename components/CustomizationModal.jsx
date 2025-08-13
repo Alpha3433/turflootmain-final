@@ -587,8 +587,8 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                 {/* Enhanced Character Preview */}
                 <div className="flex justify-center mb-6">
                   <div className="relative">
-                    {/* Main character body - 30% bigger */}
-                    <div className={`w-26 h-26 rounded-full border-4 border-cyan-300 flex items-center justify-center transition-all duration-500 ${
+                    {/* Main character body - 20% bigger */}
+                    <div className={`w-24 h-24 rounded-full border-4 border-cyan-300 flex items-center justify-center transition-all duration-500 shadow-lg ${
                       previewAnimation === 'spin' ? 'animate-spin' :
                       previewAnimation === 'bounce' ? 'animate-bounce' :
                       previewAnimation === 'pulse' ? 'animate-pulse' :
