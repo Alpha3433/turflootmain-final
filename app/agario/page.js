@@ -772,11 +772,17 @@ const AgarIOGame = () => {
               
               // Update mission progress
               if (currentMission && currentMission.type === 'collect') {
-                const newProgress = currentMission.progress + 1
-                setMissionProgress(newProgress)
-                if (newProgress >= currentMission.target) {
-                  completeMission(currentMission)
-                }
+                setCurrentMission(prev => {
+                  if (prev) {
+                    const newProgress = prev.progress + 1
+                    setMissionProgress(newProgress)
+                    if (newProgress >= prev.target) {
+                      completeMission({ ...prev, progress: newProgress })
+                    }
+                    return { ...prev, progress: newProgress }
+                  }
+                  return prev
+                })
               }
             }
             
