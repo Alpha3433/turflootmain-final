@@ -74,10 +74,10 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   ]
 
   const rarityColors = {
-    common: 'border-gray-400 text-gray-300',
-    rare: 'border-blue-400 text-blue-300',
-    epic: 'border-purple-400 text-purple-300',
-    legendary: 'border-yellow-400 text-yellow-300'
+    common: 'border-gray-400 text-gray-100 drop-shadow-sm',
+    rare: 'border-blue-400 text-blue-200 drop-shadow-md shadow-blue-400/20',
+    epic: 'border-purple-400 text-purple-200 drop-shadow-lg shadow-purple-400/30',
+    legendary: 'border-yellow-400 text-yellow-100 drop-shadow-xl shadow-yellow-400/40'
   }
 
   const rarityGlow = {
