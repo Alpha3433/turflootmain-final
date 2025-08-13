@@ -745,7 +745,8 @@ const AgarIOGame = () => {
       viruses: [], // Add virus array
       camera: { x: 0, y: 0, zoom: 1.2 }, // Much more zoomed in
       running: true,
-      bounties: new Set()
+      bounties: new Set(),
+      isMultiplayer: isMultiplayer // Add multiplayer flag to game state
     }
 
     // Initialize orbs (mass pickup, not money) - only spawn within circular boundary
