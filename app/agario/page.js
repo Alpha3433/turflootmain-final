@@ -846,7 +846,7 @@ const AgarIOGame = () => {
               game.player.mass += bot.mass * 0.3 // Gain some mass from kill
               game.player.kills += 1
               game.player.streak += 1
-              game.player.cashBadgeScale = 1.3
+              // Removed cashBadgeScale animation to fix flickering
               
               // Update session tracking
               setGameSession(prev => ({
