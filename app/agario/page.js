@@ -1048,7 +1048,7 @@ const AgarIOGame = () => {
       }
 
       // Replenish orbs (only in offline mode - server handles food in multiplayer)
-      if (!isMultiplayer) {
+      if (!game.isMultiplayer) {
         while (game.orbs.length < config.orbCount) {
           game.orbs.push({
             id: Math.random(),
