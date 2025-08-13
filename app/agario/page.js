@@ -716,7 +716,7 @@ const AgarIOGame = () => {
         
         // Set player as ready to start
         setTimeout(() => {
-          socket.emit('player_ready', { token: accessToken })
+          socket.emit('player_ready', { token: authToken })
           setIsPlayerReady(true)
         }, 1000)
       })
