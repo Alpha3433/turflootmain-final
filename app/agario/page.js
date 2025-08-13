@@ -595,7 +595,7 @@ const AgarIOGame = () => {
         deaths: Math.floor(Math.random() * 2),
         streak: Math.floor(Math.random() * 3),
         isBounty: false,
-        cashBadgeScale: 1.0,
+        // Removed cashBadgeScale - no more cash badge flickering
         lastNetWorth: netWorth
       })
     }
