@@ -791,7 +791,7 @@ const AgarIOGame = () => {
     }
 
     // Initialize bots or use real players
-    if (!isMultiplayer) {
+    if (!game.isMultiplayer) {
       // Only create bots in offline/demo mode - Initialize bots with varying mass and net worth
       for (let i = 0; i < config.botCount; i++) {
         const mass = config.startingMass + Math.random() * 15
