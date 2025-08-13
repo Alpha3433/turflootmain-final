@@ -27,6 +27,7 @@ export default function Home() {
   const [showProfile, setShowProfile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showCustomization, setShowCustomization] = useState(false)
+  const [showServerBrowser, setShowServerBrowser] = useState(false)
   const [leaderboardData, setLeaderboardData] = useState([])
   const [playerCustomization, setPlayerCustomization] = useState({
     skin: 'default_blue',
