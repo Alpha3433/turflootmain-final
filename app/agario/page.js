@@ -833,6 +833,12 @@ const AgarIOGame = () => {
           const botRadius = getRadius(bot.mass) * 2.0 // Bot normal size
           
           if (distance < Math.max(playerRadius, botRadius)) {
+            // Check spawn protection - no combat allowed during protection
+            if (game.player.spawnProtected || bot.spawnProtected) {
+              // During spawn protection, no one can eat anyone
+              continue
+            }
+            
             if (game.player.mass > bot.mass * 1.15) {
               // Player kills bot - gain money and some mass
               const bountyMultiplier = bot.isBounty ? 1.5 : 1.0
