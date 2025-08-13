@@ -2051,6 +2051,54 @@ const AgarIOGame = () => {
         style={{ display: isGameOver ? 'none' : 'block' }}
       />
       
+      {/* Multiplayer Status */}
+      {isConnected && (
+        <div className="absolute top-4 right-4 bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-green-400/50">
+          <div className="flex items-center gap-2 text-green-400 font-bold text-sm">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            MULTIPLAYER
+          </div>
+          <div className="text-white text-xs mt-1">
+            Room: {roomId}
+          </div>
+          <div className="text-white text-xs">
+            Mode: {gameMode} {entryFee > 0 && `($${entryFee})`}
+          </div>
+          <div className="text-white text-xs">
+            Players: {connectedPlayers}
+          </div>
+        </div>
+      )}
+      
+      {/* Waiting for Players */}
+      {isWaitingForPlayers && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/95 backdrop-blur-sm rounded-lg p-6 border border-blue-400/50 text-center">
+          <div className="text-blue-400 font-bold text-lg mb-2">⏳ Waiting for Players</div>
+          <div className="text-white text-sm mb-3">
+            {connectedPlayers} player{connectedPlayers !== 1 ? 's' : ''} connected
+          </div>
+          <div className="text-gray-400 text-xs">
+            {gameMode === 'cash' ? 'Minimum 2 players required' : 'Game starts automatically'}
+          </div>
+          {isPlayerReady && (
+            <div className="text-green-400 text-xs mt-2">✓ You are ready</div>
+          )}
+        </div>
+      )}
+      
+      {/* Connection Status */}
+      {!isConnected && user && (
+        <div className="absolute top-4 right-4 bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-red-400/50">
+          <div className="flex items-center gap-2 text-red-400 font-bold text-sm">
+            <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+            OFFLINE
+          </div>
+          <div className="text-white text-xs mt-1">
+            Demo Mode
+          </div>
+        </div>
+      )}
+      
       {/* Kill Streak Announcements */}
       {killStreakAnnouncements.map((announcement) => (
         <div
