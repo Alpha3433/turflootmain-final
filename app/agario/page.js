@@ -510,7 +510,7 @@ const AgarIOGame = () => {
         deaths: 0,
         streak: 0,
         isBounty: false,
-        cashBadgeScale: 1.0,
+        // Removed cashBadgeScale - no more cash badge flickering
         lastNetWorth: config.startingNetWorth
       },
       bots: [],
