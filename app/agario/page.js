@@ -610,12 +610,7 @@ const AgarIOGame = () => {
       return { x: vec.x / length, y: vec.y / length }
     }
 
-    const getCashBadgeColor = (netWorth) => {
-      if (netWorth < 200) return '#90EE90' // Light green
-      if (netWorth < 500) return '#FFD700' // Gold
-      if (netWorth < 1000) return '#FF6347' // Tomato
-      return '#8A2BE2' // Blue violet for high stakes
-    }
+    // Helper functions for game mechanics
 
     const updateBounties = () => {
       const allPlayers = [game.player, ...game.bots].filter(p => p.alive)
