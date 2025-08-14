@@ -1290,7 +1290,10 @@ export default function Home() {
                 >
                   🌐 Server Browser
                 </button>
-                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-lg text-sm">
+                <button 
+                  onClick={() => window.open('https://discord.gg/WbGTJPPTPs', '_blank')}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-lg text-sm"
+                >
                   🔗 Join Discord
                 </button>
               </div>
