@@ -835,21 +835,34 @@ export default function Home() {
         {/* Game Viruses (Spiky Obstacles) */}
         <div className="absolute top-16 right-1/3 animate-virus-pulse" style={{ animationDelay: '1s' }}>
           <div className="relative w-8 h-8">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full shadow-lg"></div>
-            <div className="absolute -top-1 left-1/2 w-2 h-3 bg-green-500 transform -translate-x-1/2 rotate-0"></div>
-            <div className="absolute -right-1 top-1/2 w-3 h-2 bg-green-500 transform -translate-y-1/2 rotate-90"></div>
-            <div className="absolute -bottom-1 left-1/2 w-2 h-3 bg-green-500 transform -translate-x-1/2 rotate-180"></div>
-            <div className="absolute -left-1 top-1/2 w-3 h-2 bg-green-500 transform -translate-y-1/2 rotate-270"></div>
+            <div className="w-8 h-8 bg-gradient-to-br from-green-300 via-green-500 to-green-700 rounded-full shadow-2xl border-2 border-green-400 opacity-90"></div>
+            <div className="absolute -top-1 left-1/2 w-2 h-3 bg-green-400 transform -translate-x-1/2 rotate-0 opacity-90"></div>
+            <div className="absolute -right-1 top-1/2 w-3 h-2 bg-green-400 transform -translate-y-1/2 rotate-90 opacity-90"></div>
+            <div className="absolute -bottom-1 left-1/2 w-2 h-3 bg-green-400 transform -translate-x-1/2 rotate-180 opacity-90"></div>
+            <div className="absolute -left-1 top-1/2 w-3 h-2 bg-green-400 transform -translate-y-1/2 rotate-270 opacity-90"></div>
+            <div className="absolute inset-0 bg-green-400 rounded-full opacity-20 animate-ping"></div>
           </div>
         </div>
         
         <div className="absolute bottom-20 right-20 animate-virus-pulse" style={{ animationDelay: '3.5s' }}>
           <div className="relative w-6 h-6">
-            <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full shadow-lg"></div>
-            <div className="absolute -top-0.5 left-1/2 w-1.5 h-2 bg-green-500 transform -translate-x-1/2"></div>
-            <div className="absolute -right-0.5 top-1/2 w-2 h-1.5 bg-green-500 transform -translate-y-1/2"></div>
-            <div className="absolute -bottom-0.5 left-1/2 w-1.5 h-2 bg-green-500 transform -translate-x-1/2"></div>
-            <div className="absolute -left-0.5 top-1/2 w-2 h-1.5 bg-green-500 transform -translate-y-1/2"></div>
+            <div className="w-6 h-6 bg-gradient-to-br from-green-300 via-green-500 to-green-700 rounded-full shadow-2xl border-2 border-green-400 opacity-90"></div>
+            <div className="absolute -top-0.5 left-1/2 w-1.5 h-2 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
+            <div className="absolute -right-0.5 top-1/2 w-2 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
+            <div className="absolute -bottom-0.5 left-1/2 w-1.5 h-2 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
+            <div className="absolute -left-0.5 top-1/2 w-2 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
+            <div className="absolute inset-0 bg-green-400 rounded-full opacity-20 animate-ping"></div>
+          </div>
+        </div>
+
+        {/* Additional Virus Obstacles */}
+        <div className="absolute top-1/2 left-16 animate-virus-pulse" style={{ animationDelay: '2.8s' }}>
+          <div className="relative w-7 h-7">
+            <div className="w-7 h-7 bg-gradient-to-br from-green-300 via-green-500 to-green-700 rounded-full shadow-2xl border-2 border-green-400 opacity-85"></div>
+            <div className="absolute -top-0.5 left-1/2 w-1.5 h-2.5 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
+            <div className="absolute -right-0.5 top-1/2 w-2.5 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
+            <div className="absolute -bottom-0.5 left-1/2 w-1.5 h-2.5 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
+            <div className="absolute -left-0.5 top-1/2 w-2.5 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
           </div>
         </div>
 
