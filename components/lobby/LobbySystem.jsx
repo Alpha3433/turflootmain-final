@@ -218,7 +218,7 @@ const LobbySystem = () => {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-40">
       {/* Error Display */}
       {error && (
         <div className="mb-4 p-3 bg-red-900 border border-red-600 rounded-lg text-red-200 text-sm">
@@ -227,8 +227,8 @@ const LobbySystem = () => {
       )}
 
       {/* Connection Status */}
-      <div className="flex items-center space-x-2 mb-4">
-        <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
+      <div className="flex items-center justify-center space-x-2 mb-3">
+        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
         <span className="text-xs text-gray-400">
           {isConnected ? 'Connected' : 'Connecting...'}
         </span>
