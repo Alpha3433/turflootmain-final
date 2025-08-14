@@ -163,27 +163,6 @@ const WalletManager = ({ onBalanceUpdate }) => {
       console.log('✅ Found valid auth token, proceeding with wallet refresh...')
       console.log('🔗 About to check blockchain for wallet: 0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d')
       
-      // Test external API accessibility first
-      try {
-        const testResponse = await fetch('https://blockchain-battle.preview.emergentagent.com/api/', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        })
-        console.log('🌐 External API test response:', testResponse.status)
-        
-        if (testResponse.status === 502) {
-          console.error('🚨 CRITICAL: External server has 502 Bad Gateway errors')
-          console.error('🚨 This means NO API calls can reach the backend')
-          console.error('🚨 Your 0.002 ETH balance cannot be fetched due to server infrastructure issues')
-          
-          alert(`🚨 SERVER INFRASTRUCTURE DOWN\n\n❌ External server returning 502 Bad Gateway\n❌ Your wallet balance cannot be fetched\n✅ Your 0.002 ETH is safe in blockchain\n✅ Wallet: 0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d\n\n💡 Try localhost: http://localhost:3000\n(The blockchain integration works perfectly on localhost)`)
-          setRefreshing(false)
-          return
-        }
-      } catch (apiError) {
-        console.error('🚨 External API completely unreachable:', apiError.message)
-      }
-      
       await Promise.all([fetchBalance(), fetchTransactions()])
       console.log('✅ Wallet refresh completed successfully')
       
@@ -191,7 +170,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
       setTimeout(() => setRefreshing(false), 500)
     } catch (error) {
       console.error('❌ Error refreshing wallet:', error)
-      alert(`❌ WALLET REFRESH FAILED\n\nError: ${error.message}\n\n🔍 Your 0.002 ETH is safely stored in:\n0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d\n\n💡 The issue is server infrastructure (502 errors)\n💡 Try localhost: http://localhost:3000`)
+      alert(`❌ WALLET REFRESH FAILED\n\nError: ${error.message}\n\n🔍 Your 0.002 ETH is safely stored in:\n0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d\n\n💡 Try refreshing the page and logging in again`)
       setRefreshing(false)
     }
   }
