@@ -19,40 +19,45 @@
     "packageExtensions": {
         "@reown/appkit-siwx@*": {
             "peerDependencies": {
-                "lit": "3.3.0"
+                "lit": "3.1.0"
             }
         },
         "@solana/wallet-adapter-particle@*": {
             "peerDependencies": {
-                "bs58": "^4.0.1"
-            }
-        },
-        "@keystonehq/sol-keyring@*": {
-            "peerDependencies": {
-                "react": "18.3.1",
-                "react-dom": "18.3.1"
-            }
-        },
-        "@keystonehq/sdk@*": {
-            "peerDependencies": {
-                "react": "18.3.1",
-                "react-dom": "18.3.1"
-            }
-        },
-        "react-qr-reader@*": {
-            "peerDependencies": {
-                "react": "18.3.1",
-                "react-dom": "18.3.1"
-            }
-        },
-        "qrcode.react@*": {
-            "peerDependencies": {
-                "react": "18.3.1"
+                "bs58": "^6.0.0"
             }
         },
         "@solana/wallet-standard-wallet-adapter-base@*": {
             "peerDependencies": {
-                "bs58": "^4.0.1"
+                "bs58": "^6.0.0"
+            }
+        },
+        "@keystonehq/sol-keyring@*": {
+            "peerDependencies": {
+                "react": "18.2.0",
+                "react-dom": "18.2.0"
+            }
+        },
+        "@keystonehq/sdk@*": {
+            "peerDependencies": {
+                "react": "18.2.0",
+                "react-dom": "18.2.0"
+            }
+        },
+        "react-qr-reader@*": {
+            "peerDependencies": {
+                "react": "18.2.0",
+                "react-dom": "18.2.0"
+            }
+        },
+        "qrcode.react@*": {
+            "peerDependencies": {
+                "react": "18.2.0"
+            }
+        },
+        "react-native@*": {
+            "peerDependencies": {
+                "react": "18.2.0"
             }
         },
         "@react-native/metro-babel-transformer@*": {
