@@ -1,3 +1,17 @@
+const path = require('path')
+const fs = require('fs')
+
+// Load environment variables from .env file explicitly
+const envPath = path.join(__dirname, '.env')
+if (fs.existsSync(envPath)) {
+  const envConfig = require('dotenv').config({ path: envPath })
+  if (envConfig.error) {
+    console.warn('Warning: Could not load .env file:', envConfig.error)
+  } else {
+    console.log('✅ Loaded environment variables from .env file')
+  }
+}
+
 const nextConfig = {
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
   swcMinify: true,
@@ -14,6 +28,14 @@ const nextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
+  },
+  env: {
+    // Explicitly expose environment variables to the frontend
+    NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+    NEXT_PUBLIC_SOLANA_RPC_URL: process.env.NEXT_PUBLIC_SOLANA_RPC_URL,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_TESTING_MODE: process.env.NEXT_PUBLIC_TESTING_MODE,
+    NEXT_PUBLIC_MOCK_WALLET_BALANCE: process.env.NEXT_PUBLIC_MOCK_WALLET_BALANCE,
   },
   webpack(config, { dev, isServer }) {
     // Production optimizations
