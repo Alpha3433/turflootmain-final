@@ -147,7 +147,7 @@ export async function GET(request, { params }) {
         const user = await users.findOne({ 
           $or: [
             { id: req.user.id },
-            { privy_id: req.user.privyId }
+            { privy_id: req.user.privy_id }
           ]
         })
         
@@ -164,14 +164,17 @@ export async function GET(request, { params }) {
         let realUsdcBalance = 0
         let totalUsdBalance = user.balance || 0
 
+        // Determine wallet address to use (prefer JWT token data)
+        const walletAddress = req.user.jwt_wallet_address || user.wallet_address || user.embedded_wallet_address
+        console.log(`🔍 Wallet balance request for user ${user.id}: wallet_address=${walletAddress}`)
+
         try {
           // If user has wallet addresses, fetch real balances
-          if (user.wallet_address || user.embedded_wallet_address) {
-            const walletAddress = user.wallet_address || user.embedded_wallet_address
+          if (walletAddress) {
+            console.log(`🔗 Fetching blockchain balance for wallet: ${walletAddress}`)
             
-            // Fetch ETH balance using Privy's API or direct blockchain query
+            // Fetch ETH balance using Ethereum RPC
             try {
-              // Simple fetch to get ETH balance (using Alchemy or similar RPC)
               const ethRpcUrl = process.env.ETH_RPC_URL || 'https://eth-mainnet.g.alchemy.com/v2/demo'
               
               const ethResponse = await fetch(ethRpcUrl, {
@@ -190,14 +193,20 @@ export async function GET(request, { params }) {
                 if (ethData.result) {
                   // Convert from Wei to ETH
                   realEthBalance = parseInt(ethData.result, 16) / Math.pow(10, 18)
+                  console.log(`💰 ETH Balance: ${realEthBalance} ETH`)
                   
                   // Convert ETH to USD (approximate rate)
                   const ethToUsd = 2400 // Approximate ETH price - in production, fetch from API
                   totalUsdBalance = realEthBalance * ethToUsd
+                  console.log(`💵 USD Balance: $${totalUsdBalance}`)
+                } else {
+                  console.log(`⚠️ ETH RPC returned no result: ${JSON.stringify(ethData)}`)
                 }
+              } else {
+                console.log(`❌ ETH RPC request failed: ${ethResponse.status} - ${await ethResponse.text()}`)
               }
             } catch (ethError) {
-              console.log('ETH balance fetch failed:', ethError.message)
+              console.log('❌ ETH balance fetch failed:', ethError.message)
             }
 
             // Fetch SOL balance if on Solana
@@ -218,26 +227,33 @@ export async function GET(request, { params }) {
                   const solData = await solResponse.json()
                   if (solData.result?.value) {
                     realSolBalance = solData.result.value / Math.pow(10, 9) // Convert lamports to SOL
+                    console.log(`🌞 SOL Balance: ${realSolBalance} SOL`)
                   }
                 }
               }
             } catch (solError) {
-              console.log('SOL balance fetch failed:', solError.message)
+              console.log('❌ SOL balance fetch failed:', solError.message)
             }
+          } else {
+            console.log('⚠️ No wallet address found for user')
           }
         } catch (error) {
-          console.log('Balance fetch error:', error.message)
+          console.log('❌ Balance fetch error:', error.message)
           // Fall back to database balance if blockchain query fails
         }
         
-        return NextResponse.json({
+        const response = {
           balance: totalUsdBalance,
           currency: 'USD',
           sol_balance: realSolBalance,
           usdc_balance: realUsdcBalance,
           eth_balance: realEthBalance,
-          wallet_address: user.wallet_address || user.embedded_wallet_address || null
-        }, { headers: corsHeaders })
+          wallet_address: walletAddress
+        }
+        
+        console.log(`✅ Returning wallet balance: ${JSON.stringify(response)}`)
+        
+        return NextResponse.json(response, { headers: corsHeaders })
       })(request)
     }
 
