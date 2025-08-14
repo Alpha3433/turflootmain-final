@@ -122,6 +122,9 @@ class BlockchainWalletTester:
             
             response = requests.get(f"{API_BASE}/wallet/balance", headers=headers)
             
+            print(f"🔍 Wallet balance response status: {response.status_code}")
+            print(f"🔍 Wallet balance response: {response.text}")
+            
             if response.status_code == 200:
                 data = response.json()
                 
@@ -149,6 +152,9 @@ class BlockchainWalletTester:
                 
                 # Check if ETH balance is being fetched (should be > 0 or at least attempted)
                 eth_balance = data.get('eth_balance', 0)
+                
+                print(f"🔍 Returned wallet address: {wallet_address}")
+                print(f"🔍 Expected wallet address: 0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d")
                 
                 self.log_result(
                     "Wallet Balance Blockchain Integration",
