@@ -57,8 +57,9 @@ class BlockchainWalletTester:
             test_email = f"blockchain.test.{timestamp}@turfloot.com"
             test_user_id = f"test-user-{uuid.uuid4()}"
             
-            # Use the wallet address mentioned in the review request
-            test_wallet_address = "0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d"
+            # Use a unique wallet address for this test to avoid conflicts
+            # Generate a realistic-looking Ethereum address
+            test_wallet_address = f"0x{uuid.uuid4().hex[:8]}{uuid.uuid4().hex[:8]}{uuid.uuid4().hex[:8]}{uuid.uuid4().hex[:8]}{uuid.uuid4().hex[:2]}"
             
             privy_user_data = {
                 "privy_user": {
