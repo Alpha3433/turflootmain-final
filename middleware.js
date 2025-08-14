@@ -11,7 +11,7 @@ const GEO_MODE = process.env.NEXT_PUBLIC_GEO_MODE || 'audit'
 // Temporarily disabled middleware for debugging
 export function middleware(request) {
   // Just pass through without any processing
-  return
+  return NextResponse.next()
 }
 
 export const config = {
