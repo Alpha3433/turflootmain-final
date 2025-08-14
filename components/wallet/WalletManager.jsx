@@ -127,11 +127,11 @@ const WalletManager = ({ onBalanceUpdate }) => {
       console.log('🔄 Starting wallet refresh...')
       console.log('🔍 Current URL:', window.location.href)
       
-      // Check for auth token in multiple locations
+      // Check for auth token in multiple locations - FIXED: include privy:token
       const possibleTokens = [
         localStorage.getItem('auth_token'),
         localStorage.getItem('token'),
-        localStorage.getItem('privy:token'),
+        localStorage.getItem('privy:token'),  // This was missing!
         sessionStorage.getItem('auth_token'),
         sessionStorage.getItem('token')
       ]
@@ -143,7 +143,13 @@ const WalletManager = ({ onBalanceUpdate }) => {
         localStorage_privy_token: localStorage.getItem('privy:token') ? 'Present' : 'Missing',
         sessionStorage_auth_token: sessionStorage.getItem('auth_token') ? 'Present' : 'Missing',
         sessionStorage_token: sessionStorage.getItem('token') ? 'Present' : 'Missing',
-        finalToken: authToken ? 'Present' : 'Missing'
+        finalToken: authToken ? 'Present' : 'Missing',
+        tokenSource: authToken ? (
+          localStorage.getItem('auth_token') === authToken ? 'localStorage.auth_token' :
+          localStorage.getItem('token') === authToken ? 'localStorage.token' :
+          localStorage.getItem('privy:token') === authToken ? 'localStorage.privy:token' :
+          'other'
+        ) : 'none'
       })
       
       if (!authToken) {
@@ -152,6 +158,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
         setRefreshing(false)
         return
       }
+      
+      console.log('✅ Found valid auth token, proceeding with wallet refresh...')
       
       await Promise.all([fetchBalance(), fetchTransactions()])
       console.log('✅ Wallet refresh completed successfully')
