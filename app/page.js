@@ -1169,7 +1169,7 @@ export default function Home() {
                   onClick={handleJoinGame}
                   className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-black font-black py-6 px-16 rounded-2xl text-2xl transition-all duration-300 hover:scale-105 shadow-2xl border-2 border-cyan-300"
                 >
-                  {(selectedStake > 0 && selectedStake !== 'FREE') ? `JOIN GAME - $${selectedStake}` : 'JOIN FREE GAME'}
+                  {(selectedStake > 0 && selectedStake !== 'FREE') ? `JOIN GAME - $${selectedStake}` : '🤖 PRACTICE WITH BOTS'}
                 </button>
               </div>
 
