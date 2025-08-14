@@ -798,43 +798,50 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Animated Player Circles */}
-        <div className="absolute top-24 left-1/3 animate-player-drift" style={{ animationDelay: '0.5s' }}>
-          <div className="w-12 h-12 bg-gradient-to-br from-cyan-200 via-cyan-400 to-cyan-600 rounded-full shadow-2xl border-3 border-cyan-300 flex items-center justify-center opacity-95">
-            <div className="w-2 h-2 bg-black rounded-full mr-1 opacity-80"></div>
-            <div className="w-2 h-2 bg-black rounded-full opacity-80"></div>
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-200 rounded-full opacity-60 animate-ping"></div>
+        {/* Animated Player Circles - Much Brighter */}
+        <div className="absolute top-24 left-1/3 animate-player-drift z-20" style={{ animationDelay: '0.5s' }}>
+          <div className="w-16 h-16 bg-gradient-to-br from-cyan-100 via-cyan-300 to-cyan-500 rounded-full shadow-2xl border-4 border-cyan-200 flex items-center justify-center" style={{ boxShadow: '0 0 25px rgba(0, 255, 255, 0.8)' }}>
+            <div className="w-3 h-3 bg-black rounded-full mr-1 opacity-90"></div>
+            <div className="w-3 h-3 bg-black rounded-full opacity-90"></div>
+            <div className="absolute -top-2 -right-2 w-4 h-4 bg-cyan-100 rounded-full opacity-70 animate-ping"></div>
           </div>
         </div>
         
-        <div className="absolute bottom-1/3 right-1/3 animate-player-drift" style={{ animationDelay: '2.5s' }}>
-          <div className="w-10 h-10 bg-gradient-to-br from-red-300 via-red-500 to-red-700 rounded-full shadow-2xl border-3 border-red-400 flex items-center justify-center opacity-95">
-            <div className="w-1.5 h-1.5 bg-black rounded-full mr-1 opacity-80"></div>
-            <div className="w-1.5 h-1.5 bg-black rounded-full opacity-80"></div>
-            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-300 rounded-full opacity-60 animate-ping"></div>
+        <div className="absolute bottom-1/3 right-1/3 animate-player-drift z-20" style={{ animationDelay: '2.5s' }}>
+          <div className="w-14 h-14 bg-gradient-to-br from-red-200 via-red-400 to-red-600 rounded-full shadow-2xl border-4 border-red-300 flex items-center justify-center" style={{ boxShadow: '0 0 25px rgba(255, 0, 0, 0.8)' }}>
+            <div className="w-2.5 h-2.5 bg-black rounded-full mr-1 opacity-90"></div>
+            <div className="w-2.5 h-2.5 bg-black rounded-full opacity-90"></div>
+            <div className="absolute -top-2 -right-2 w-3.5 h-3.5 bg-red-200 rounded-full opacity-70 animate-ping"></div>
           </div>
         </div>
         
-        <div className="absolute top-1/3 right-20 animate-player-drift" style={{ animationDelay: '4s' }}>
-          <div className="w-14 h-14 bg-gradient-to-br from-green-200 via-green-400 to-green-600 rounded-full shadow-2xl border-3 border-green-300 flex items-center justify-center opacity-95">
-            <div className="w-2.5 h-2.5 bg-black rounded-full mr-1 opacity-80"></div>
-            <div className="w-2.5 h-2.5 bg-black rounded-full opacity-80"></div>
-            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-200 rounded-full opacity-60 animate-ping"></div>
+        <div className="absolute top-1/3 right-20 animate-player-drift z-20" style={{ animationDelay: '4s' }}>
+          <div className="w-18 h-18 bg-gradient-to-br from-green-100 via-green-300 to-green-500 rounded-full shadow-2xl border-4 border-green-200 flex items-center justify-center" style={{ boxShadow: '0 0 30px rgba(0, 255, 0, 0.8)' }}>
+            <div className="w-3.5 h-3.5 bg-black rounded-full mr-1 opacity-90"></div>
+            <div className="w-3.5 h-3.5 bg-black rounded-full opacity-90"></div>
+            <div className="absolute -top-2 -right-2 w-4.5 h-4.5 bg-green-100 rounded-full opacity-70 animate-ping"></div>
           </div>
         </div>
 
         {/* Additional Player Circles for More Life */}
-        <div className="absolute bottom-20 left-1/4 animate-player-drift" style={{ animationDelay: '1.2s' }}>
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-300 via-purple-500 to-purple-700 rounded-full shadow-2xl border-2 border-purple-400 flex items-center justify-center opacity-90">
-            <div className="w-1.5 h-1.5 bg-black rounded-full mr-1 opacity-80"></div>
-            <div className="w-1.5 h-1.5 bg-black rounded-full opacity-80"></div>
+        <div className="absolute bottom-20 left-1/4 animate-player-drift z-20" style={{ animationDelay: '1.2s' }}>
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-200 via-purple-400 to-purple-600 rounded-full shadow-2xl border-3 border-purple-300 flex items-center justify-center" style={{ boxShadow: '0 0 20px rgba(128, 0, 128, 0.8)' }}>
+            <div className="w-2 h-2 bg-black rounded-full mr-1 opacity-90"></div>
+            <div className="w-2 h-2 bg-black rounded-full opacity-90"></div>
           </div>
         </div>
         
-        <div className="absolute top-16 left-1/2 animate-player-drift" style={{ animationDelay: '3.7s' }}>
-          <div className="w-9 h-9 bg-gradient-to-br from-orange-300 via-orange-500 to-orange-700 rounded-full shadow-2xl border-2 border-orange-400 flex items-center justify-center opacity-90">
-            <div className="w-2 h-2 bg-black rounded-full mr-1 opacity-80"></div>
-            <div className="w-2 h-2 bg-black rounded-full opacity-80"></div>
+        <div className="absolute top-16 left-1/2 animate-player-drift z-20" style={{ animationDelay: '3.7s' }}>
+          <div className="w-13 h-13 bg-gradient-to-br from-orange-200 via-orange-400 to-orange-600 rounded-full shadow-2xl border-3 border-orange-300 flex items-center justify-center" style={{ boxShadow: '0 0 22px rgba(255, 165, 0, 0.8)' }}>
+            <div className="w-2.5 h-2.5 bg-black rounded-full mr-1 opacity-90"></div>
+            <div className="w-2.5 h-2.5 bg-black rounded-full opacity-90"></div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-1/2 left-20 animate-player-drift z-20" style={{ animationDelay: '5.2s' }}>
+          <div className="w-11 h-11 bg-gradient-to-br from-pink-200 via-pink-400 to-pink-600 rounded-full shadow-2xl border-3 border-pink-300 flex items-center justify-center" style={{ boxShadow: '0 0 20px rgba(255, 192, 203, 0.8)' }}>
+            <div className="w-2 h-2 bg-black rounded-full mr-1 opacity-90"></div>
+            <div className="w-2 h-2 bg-black rounded-full opacity-90"></div>
           </div>
         </div>
 
