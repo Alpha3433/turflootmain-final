@@ -1,6 +1,7 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
+import { useEffect } from 'react'
 
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
@@ -8,8 +9,20 @@ export default function PrivyAuthProvider({ children }) {
   console.log('🔍 Privy configuration:', {
     appId: appId,
     hasAppId: !!appId,
-    appIdLength: appId?.length
+    appIdLength: appId?.length,
+    environment: process.env.NODE_ENV
   })
+  
+  useEffect(() => {
+    console.log('🔍 Privy Provider mounted with App ID:', appId)
+    
+    // Test network connectivity to Privy
+    if (typeof window !== 'undefined') {
+      fetch('https://auth.privy.io/health', { method: 'HEAD' })
+        .then(() => console.log('✅ Privy servers are reachable'))
+        .catch(err => console.error('❌ Cannot reach Privy servers:', err))
+    }
+  }, [appId])
   
   const config = {
     appearance: {
@@ -37,6 +50,9 @@ export default function PrivyAuthProvider({ children }) {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Configuration Error</h1>
           <p className="text-gray-400">Privy App ID is not configured. Please check your environment variables.</p>
+          <div className="mt-4">
+            <a href="/test-env" className="bg-blue-600 px-4 py-2 rounded">Test Environment</a>
+          </div>
         </div>
       </div>
     )
@@ -46,6 +62,12 @@ export default function PrivyAuthProvider({ children }) {
     <PrivyProvider
       appId={appId}
       config={config}
+      onSuccess={(user) => {
+        console.log('✅ Privy login successful:', user)
+      }}
+      onError={(error) => {
+        console.error('❌ Privy error:', error)
+      }}
     >
       {children}
     </PrivyProvider>
