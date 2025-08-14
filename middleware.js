@@ -1,19 +1,25 @@
 import { NextResponse } from 'next/server'
 
-// Geo-blocking configuration
-const BLOCKED_COUNTRIES = [
-  'AU', 'GB', 'BE', 'NL', 'AZ', // Countries
-  'LA', 'MT', 'SD', 'TN', 'UT', 'WA' // US States
-]
-
-const GEO_MODE = process.env.NEXT_PUBLIC_GEO_MODE || 'audit'
-
-// Temporarily disabled middleware for debugging
+// Minimal middleware configuration
 export function middleware(request) {
-  // Just pass through without any processing
-  return NextResponse.next()
+  // Add security headers
+  const response = NextResponse.next()
+  
+  response.headers.set('X-Frame-Options', 'ALLOWALL')
+  response.headers.set('Content-Security-Policy', 'frame-ancestors *;')
+  
+  return response
 }
 
 export const config = {
-  matcher: [],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }
