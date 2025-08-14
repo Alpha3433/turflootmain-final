@@ -589,7 +589,38 @@ const AgarIOGame = () => {
     return false
   }
 
-  // Periodic token check to prevent expiration during gameplay
+  // Time alive tracking timer
+  useEffect(() => {
+    let timeAliveInterval = null
+    
+    // Start the timer when game is running
+    if (!isGameOver && gameRef.current?.game?.running) {
+      timeAliveInterval = setInterval(() => {
+        setTimeAlive(prev => prev + 1)
+      }, 1000) // Update every second
+    }
+    
+    // Clear interval on game over or cleanup
+    return () => {
+      if (timeAliveInterval) {
+        clearInterval(timeAliveInterval)
+      }
+    }
+  }, [isGameOver])
+
+  // Reset time alive when game restarts
+  useEffect(() => {
+    if (!isGameOver) {
+      setTimeAlive(0) // Reset timer on new game
+    }
+  }, [isGameOver])
+
+  // Format time alive for display (MM:SS)
+  const formatTimeAlive = (seconds) => {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
   useEffect(() => {
     if (!user) return
     
