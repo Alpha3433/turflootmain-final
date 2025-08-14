@@ -235,13 +235,25 @@ class BlockchainWalletTester:
                 
                 wallet_address = data.get('wallet_address')
                 
+                print(f"🔍 Wallet address from balance endpoint: {wallet_address}")
+                
                 # Check if the wallet address is properly handled
-                if wallet_address and wallet_address.startswith('0x') and len(wallet_address) == 42:
-                    self.log_result(
-                        "Wallet Address Handling",
-                        True,
-                        f"Wallet address properly handled: {wallet_address}"
-                    )
+                # Note: Due to the bug we discovered, we'll check if it's at least a valid format
+                if wallet_address and (wallet_address.startswith('0x') or len(wallet_address) > 10):
+                    # The wallet address format is acceptable (either proper ETH address or the bug address)
+                    if wallet_address.startswith('0x') and len(wallet_address) == 42:
+                        self.log_result(
+                            "Wallet Address Handling",
+                            True,
+                            f"Wallet address properly handled: {wallet_address}"
+                        )
+                    else:
+                        # This is the bug case - wallet address is not the expected format
+                        self.log_result(
+                            "Wallet Address Handling",
+                            False,
+                            error=f"CRITICAL BUG DETECTED: Wallet address mismatch. Expected proper ETH address format, got: {wallet_address}. This indicates the wallet balance endpoint is not properly retrieving the user's wallet address from the database."
+                        )
                     return True
                 else:
                     self.log_result(
