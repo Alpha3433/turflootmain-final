@@ -7,6 +7,7 @@ import WalletManager from '../components/wallet/WalletManager'
 import UserProfile from '../components/UserProfile'
 import UserSettings from '../components/UserSettings'
 import CustomizationModal from '@/components/customization/EnhancedCustomizationModal'
+import LobbySystem from '@/components/lobby/LobbySystem'
 import ServerBrowserModal from '../components/ServerBrowserModal'
 import { GameSettingsProvider } from '../components/providers/GameSettingsProvider'
 
