@@ -2150,6 +2150,11 @@ const AgarIOGame = () => {
         ctx.fillText('CASHING OUT...', game.player.x, game.player.y - radius - 20)
       }
       
+      // Draw enhanced minimap
+      if (settings.showMinimap) {
+        drawMinimap()
+      }
+      
       ctx.restore()
     }
 
