@@ -9,9 +9,6 @@ import json
 import time
 import uuid
 import sys
-import asyncio
-import websocket
-import threading
 from datetime import datetime
 
 # Configuration - Use localhost since external URL has 502 errors
