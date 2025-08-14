@@ -1219,24 +1219,15 @@ export default function Home() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-center space-x-6 mt-6">
+              <div className="flex justify-center space-x-4 mt-4">
                 <button 
                   onClick={() => setShowServerBrowser(true)}
-                  className="group relative px-8 py-4 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-2xl font-bold text-purple-400 transition-all hover:scale-105 text-sm overflow-hidden"
+                  className="px-6 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-2xl font-bold text-purple-400 transition-all hover:scale-105 text-sm"
                 >
-                  <span className="relative z-10 flex items-center space-x-2">
-                    <span className="text-lg animate-pulse">🌐</span>
-                    <span>Server Browser</span>
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                  🌐 Server Browser
                 </button>
-                
-                <button className="group relative px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-lg text-sm overflow-hidden">
-                  <span className="relative z-10 flex items-center space-x-2">
-                    <span className="text-lg animate-bounce-slow">🔗</span>
-                    <span>Join Discord</span>
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-white transition-all hover:scale-105 shadow-lg text-sm">
+                  🔗 Join Discord
                 </button>
               </div>
             </div>
