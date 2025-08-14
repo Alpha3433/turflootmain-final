@@ -949,51 +949,14 @@ export default function Home() {
         <div className="w-full max-w-7xl mx-auto px-6">
           
           {/* Hero Title */}
-          <div className="text-center mb-6 relative">
-            <div className="relative inline-block">
-              <h1 className="text-5xl md:text-6xl xl:text-7xl font-black tracking-tight mb-2 relative z-10">
-                <span className="text-white animate-pulse-glow">TURF</span>
-                <span className="text-yellow-400 animate-shimmer bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-300 bg-clip-text text-transparent bg-[length:200%_100%] ml-2">LOOT</span>
-              </h1>
-              
-              {/* Dynamic glow effect behind title */}
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-yellow-400/30 to-cyan-400/20 blur-3xl animate-pulse-glow -z-10"></div>
-              
-              {/* Floating game elements around title */}
-              <div className="absolute -top-4 -left-8 animate-float-coin" style={{ animationDelay: '0.5s' }}>
-                <div className="w-6 h-6 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border border-yellow-400">
-                  <span className="text-black font-bold text-xs">$</span>
-                </div>
-              </div>
-              
-              <div className="absolute -top-2 -right-6 animate-player-drift" style={{ animationDelay: '1.5s' }}>
-                <div className="w-5 h-5 bg-gradient-to-br from-cyan-300 to-cyan-600 rounded-full shadow-lg border border-cyan-400"></div>
-              </div>
-            </div>
-            
-            <p className="text-gray-300 text-xl font-bold tracking-wide mt-4 relative">
-              <span className="bg-gradient-to-r from-cyan-400 via-white to-yellow-400 bg-clip-text text-transparent">
-                SKILL-BASED GRID DOMINATION
-              </span>
+          <div className="text-center mb-4">
+            <h1 className="text-4xl md:text-5xl xl:text-6xl font-black tracking-tight mb-1">
+              <span className="text-white">TURF</span>
+              <span className="text-yellow-400">LOOT</span>
+            </h1>
+            <p className="text-gray-400 text-lg font-bold tracking-wide">
+              SKILL-BASED GRID DOMINATION
             </p>
-            
-            {/* Animated subtitle effects */}
-            <div className="flex justify-center items-center space-x-4 mt-4 text-sm text-gray-400">
-              <div className="flex items-center space-x-2 animate-bounce-slow" style={{ animationDelay: '0s' }}>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-                <span>Real-time Multiplayer</span>
-              </div>
-              <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
-              <div className="flex items-center space-x-2 animate-bounce-slow" style={{ animationDelay: '1s' }}>
-                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
-                <span>Skill-based Rewards</span>
-              </div>
-              <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
-              <div className="flex items-center space-x-2 animate-bounce-slow" style={{ animationDelay: '2s' }}>
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
-                <span>Instant Cash-out</span>
-              </div>
-            </div>
           </div>
 
           {/* Main Game Grid */}
