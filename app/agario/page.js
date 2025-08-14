@@ -69,7 +69,8 @@ const AgarIOGame = () => {
     survived: false,
     cashedOut: false,
     earnings: 0,
-    playTimeSeconds: 0
+    playTimeSeconds: 0,
+    coinsCollected: 0 // Track coins/orbs collected
   })
 
   // Real-time multiplayer state
