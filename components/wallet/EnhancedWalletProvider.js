@@ -25,7 +25,9 @@ export function EnhancedWalletProvider({ children }) {
     if (process.env.NEXT_PUBLIC_SOLANA_RPC_URL) {
       return process.env.NEXT_PUBLIC_SOLANA_RPC_URL
     }
-    return clusterApiUrl(network)
+    return network === WalletAdapterNetwork.Mainnet 
+      ? 'https://api.mainnet-beta.solana.com' 
+      : 'https://api.devnet.solana.com'
   }, [network])
 
   // Initialize wallets
