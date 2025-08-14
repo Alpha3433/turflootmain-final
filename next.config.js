@@ -1,9 +1,9 @@
 const nextConfig = {
+  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
   images: {
     unoptimized: true,
   },
   experimental: {
-    // Remove if not using Server Components
     serverComponentsExternalPackages: ['mongodb'],
   },
   webpack(config, { dev, isServer }) {
