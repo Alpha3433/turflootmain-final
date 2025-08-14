@@ -197,15 +197,15 @@ const LobbySystem = () => {
 
   if (!authenticated) {
     return (
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 border border-gray-600/50 min-w-[280px]">
-          <div className="flex items-center space-x-2 mb-4">
-            <Users className="w-5 h-5 text-purple-400" />
-            <h3 className="text-white font-bold">Lobby System</h3>
+      <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-40">
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 min-w-[280px]">
+          <div className="flex items-center space-x-2 mb-3">
+            <Users className="w-4 h-4 text-purple-400" />
+            <h3 className="text-white font-bold text-sm">Lobby System</h3>
           </div>
           
-          <div className="text-center py-4">
-            <div className="text-gray-400 text-sm mb-3">
+          <div className="text-center py-2">
+            <div className="text-gray-400 text-xs mb-2">
               Login to access lobby features
             </div>
             <div className="text-xs text-gray-500">
