@@ -61,6 +61,16 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       return
     }
     
+    // Show info for free games that they use bots
+    if (server.stake === 0) {
+      const confirmed = window.confirm(
+        '🤖 Free games use AI bots for instant testing and practice.\n\n' +
+        'Cash games use real players for competitive multiplayer.\n\n' +
+        'Continue with bot practice game?'
+      )
+      if (!confirmed) return
+    }
+    
     // Pass server data to join function
     onJoinLobby({
       id: server.id,
