@@ -750,7 +750,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-800 text-white relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white relative overflow-hidden flex flex-col">
       {/* Game-Inspired Animated Background */}
       <div className="absolute inset-0 pointer-events-none">
         
