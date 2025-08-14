@@ -691,11 +691,7 @@ export default function Home() {
   }
 
   const handleJoinGame = () => {
-    console.log('🎮 Join game clicked:', { 
-      authenticated, 
-      selectedStake, 
-      user: !!user 
-    })
+    console.log('🎮 handleJoinGame called, selectedStake:', selectedStake, 'authenticated:', authenticated, 'user:', !!user)
     
     // Require authentication for ALL games (both FREE and cash games)
     if (!authenticated || !user) {
@@ -710,18 +706,27 @@ export default function Home() {
     if (selectedStake === 'FREE' || selectedStake === 0) {
       console.log('🆓 Free game selected - using bots for testing')
       
-      // Show confirmation dialog for bot practice
-      const confirmed = window.confirm(
-        '🤖 Free games use AI bots for instant practice and testing.\n\n' +
-        'Perfect for learning game mechanics and trying strategies without waiting for other players.\n\n' +
-        'Ready to practice against smart AI bots?'
-      )
-      
-      if (confirmed) {
-        console.log('✅ User confirmed bot practice game')
+      try {
+        // Show confirmation dialog for bot practice
+        const confirmed = window.confirm(
+          '🤖 Free games use AI bots for instant practice and testing.\n\n' +
+          'Perfect for learning game mechanics and trying strategies without waiting for other players.\n\n' +
+          'Ready to practice against smart AI bots?'
+        )
+        
+        console.log('🔍 Confirmation result:', confirmed)
+        
+        if (confirmed) {
+          console.log('✅ User confirmed bot practice game - navigating to /agario')
+          router.push('/agario?mode=free&fee=0')
+        } else {
+          console.log('❌ User cancelled bot practice')
+        }
+      } catch (error) {
+        console.error('❌ Error in confirmation dialog:', error)
+        // Fallback: go directly to game if dialog fails
+        console.log('🔄 Dialog failed, going directly to bot game')
         router.push('/agario?mode=free&fee=0')
-      } else {
-        console.log('❌ User cancelled bot practice')
       }
       return
     }
