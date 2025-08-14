@@ -751,103 +751,121 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden flex flex-col">
-      {/* Paper.io Inspired Background */}
-      <div className="absolute inset-0 pointer-events-none paper-bg-grid">
+      {/* Game-Inspired Animated Background */}
+      <div className="absolute inset-0 pointer-events-none">
         
-        {/* Animated Territory Patches */}
-        <div className="absolute top-20 left-16 w-32 h-24 animate-territory-expand">
-          <svg width="128" height="96" viewBox="0 0 128 96" className="opacity-30">
-            <polygon 
-              points="10,10 118,10 118,86 10,86" 
-              fill="rgba(0, 245, 255, 0.2)"
-              stroke="rgba(0, 245, 255, 0.6)"
-              strokeWidth="2"
-            />
+        {/* Floating Game Coins */}
+        <div className="absolute top-20 left-16 animate-float-coin" style={{ animationDelay: '0s' }}>
+          <div className="w-8 h-8 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
+            <span className="text-black font-bold text-sm">$</span>
+          </div>
+        </div>
+        
+        <div className="absolute top-32 right-24 animate-float-coin" style={{ animationDelay: '1.5s' }}>
+          <div className="w-6 h-6 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
+            <span className="text-black font-bold text-xs">$</span>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-40 left-32 animate-float-coin" style={{ animationDelay: '3s' }}>
+          <div className="w-10 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
+            <span className="text-black font-bold text-lg">$</span>
+          </div>
+        </div>
+        
+        <div className="absolute top-1/2 right-1/4 animate-float-coin" style={{ animationDelay: '2s' }}>
+          <div className="w-7 h-7 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
+            <span className="text-black font-bold text-sm">$</span>
+          </div>
+        </div>
+
+        {/* Animated Player Circles */}
+        <div className="absolute top-24 left-1/3 animate-player-drift" style={{ animationDelay: '0.5s' }}>
+          <div className="w-12 h-12 bg-gradient-to-br from-cyan-300 to-cyan-600 rounded-full shadow-lg border-2 border-cyan-400 flex items-center justify-center">
+            <div className="w-2 h-2 bg-black rounded-full mr-1"></div>
+            <div className="w-2 h-2 bg-black rounded-full"></div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-1/3 right-1/3 animate-player-drift" style={{ animationDelay: '2.5s' }}>
+          <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-full shadow-lg border-2 border-red-400 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 bg-black rounded-full mr-1"></div>
+            <div className="w-1.5 h-1.5 bg-black rounded-full"></div>
+          </div>
+        </div>
+        
+        <div className="absolute top-1/3 right-20 animate-player-drift" style={{ animationDelay: '4s' }}>
+          <div className="w-14 h-14 bg-gradient-to-br from-green-300 to-green-600 rounded-full shadow-lg border-2 border-green-400 flex items-center justify-center">
+            <div className="w-2.5 h-2.5 bg-black rounded-full mr-1"></div>
+            <div className="w-2.5 h-2.5 bg-black rounded-full"></div>
+          </div>
+        </div>
+
+        {/* Game Viruses (Spiky Obstacles) */}
+        <div className="absolute top-16 right-1/3 animate-virus-pulse" style={{ animationDelay: '1s' }}>
+          <div className="relative w-8 h-8">
+            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full shadow-lg"></div>
+            <div className="absolute -top-1 left-1/2 w-2 h-3 bg-green-500 transform -translate-x-1/2 rotate-0"></div>
+            <div className="absolute -right-1 top-1/2 w-3 h-2 bg-green-500 transform -translate-y-1/2 rotate-90"></div>
+            <div className="absolute -bottom-1 left-1/2 w-2 h-3 bg-green-500 transform -translate-x-1/2 rotate-180"></div>
+            <div className="absolute -left-1 top-1/2 w-3 h-2 bg-green-500 transform -translate-y-1/2 rotate-270"></div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-20 right-20 animate-virus-pulse" style={{ animationDelay: '3.5s' }}>
+          <div className="relative w-6 h-6">
+            <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full shadow-lg"></div>
+            <div className="absolute -top-0.5 left-1/2 w-1.5 h-2 bg-green-500 transform -translate-x-1/2"></div>
+            <div className="absolute -right-0.5 top-1/2 w-2 h-1.5 bg-green-500 transform -translate-y-1/2"></div>
+            <div className="absolute -bottom-0.5 left-1/2 w-1.5 h-2 bg-green-500 transform -translate-x-1/2"></div>
+            <div className="absolute -left-0.5 top-1/2 w-2 h-1.5 bg-green-500 transform -translate-y-1/2"></div>
+          </div>
+        </div>
+
+        {/* Territory Grid Lines */}
+        <div className="absolute inset-0 opacity-10">
+          <svg width="100%" height="100%" className="absolute inset-0">
+            <defs>
+              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0, 245, 255, 0.3)" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
           </svg>
         </div>
 
-        <div className="absolute bottom-32 right-20 w-40 h-28 animate-territory-expand" style={{ animationDelay: '1s' }}>
-          <svg width="160" height="112" viewBox="0 0 160 112" className="opacity-30">
-            <polygon 
-              points="20,20 140,20 140,92 20,92" 
-              fill="rgba(255, 215, 0, 0.2)"
-              stroke="rgba(255, 215, 0, 0.6)"
-              strokeWidth="2"
-            />
-          </svg>
+        {/* Capture Trail Effects */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-2">
+          <div className="w-full h-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-40 animate-pulse-trail"></div>
+        </div>
+        
+        <div className="absolute bottom-1/3 right-1/4 w-48 h-2" style={{ animationDelay: '2s' }}>
+          <div className="w-full h-full bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-40 animate-pulse-trail"></div>
         </div>
 
-        {/* Capture Lines Animation */}
-        <div className="absolute top-1/3 left-1/4 w-48 h-32">
-          <svg width="192" height="128" viewBox="0 0 192 128" className="opacity-40">
-            <path
-              d="M10 64 Q50 30, 90 64 T170 64"
-              fill="none"
-              stroke="rgba(0, 245, 255, 0.8)"
-              strokeWidth="3"
-              strokeDasharray="5,5"
-              className="animate-capture-line"
-            />
-          </svg>
+        {/* Minimap Corner Preview */}
+        <div className="absolute top-16 right-16 w-24 h-24 bg-black/60 rounded-lg border border-cyan-400/30 p-2">
+          <div className="relative w-full h-full bg-gray-900 rounded border border-gray-700">
+            <div className="absolute top-1 left-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
+            <div className="absolute bottom-2 right-2 w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+            <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-yellow-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute inset-0 border border-red-400 rounded opacity-30"></div>
+          </div>
         </div>
 
-        <div className="absolute bottom-1/3 right-1/4 w-56 h-36" style={{ animationDelay: '1.5s' }}>
-          <svg width="224" height="144" viewBox="0 0 224 144" className="opacity-40">
-            <path
-              d="M20 72 Q80 40, 120 72 T200 72"
-              fill="none"
-              stroke="rgba(255, 215, 0, 0.8)"
-              strokeWidth="3"
-              strokeDasharray="5,5"
-              className="animate-capture-line"
-            />
-          </svg>
+        {/* Floating UI Elements */}
+        <div className="absolute top-1/3 left-8 animate-bounce-slow" style={{ animationDelay: '1s' }}>
+          <div className="bg-black/70 backdrop-blur-sm rounded-lg p-2 border border-green-400/30">
+            <div className="text-green-400 text-xs font-bold">+$250</div>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-1/4 right-8 animate-bounce-slow" style={{ animationDelay: '3s' }}>
+          <div className="bg-black/70 backdrop-blur-sm rounded-lg p-2 border border-yellow-400/30">
+            <div className="text-yellow-400 text-xs font-bold">Streak: 5</div>
+          </div>
         </div>
 
-        {/* Paper.io Style Territory Dots */}
-        <div className="absolute top-1/4 right-1/3 animate-grid-pulse">
-          <div className="w-4 h-4 bg-cyan-400 rounded-sm opacity-60 border border-cyan-300"></div>
-        </div>
-        <div className="absolute bottom-1/4 left-1/3 animate-grid-pulse" style={{ animationDelay: '2s' }}>
-          <div className="w-4 h-4 bg-yellow-400 rounded-sm opacity-60 border border-yellow-300"></div>
-        </div>
-        <div className="absolute top-1/2 left-1/5 animate-paper-drift">
-          <div className="w-3 h-3 bg-green-400 rounded-sm opacity-50 border border-green-300"></div>
-        </div>
-        <div className="absolute top-2/3 right-1/5 animate-paper-drift" style={{ animationDelay: '3s' }}>
-          <div className="w-3 h-3 bg-purple-400 rounded-sm opacity-50 border border-purple-300"></div>
-        </div>
-
-        {/* Large Background Territory Shapes */}
-        <div className="absolute top-10 right-10 w-64 h-48 animate-grid-pulse" style={{ animationDelay: '0.5s' }}>
-          <svg width="256" height="192" viewBox="0 0 256 192" className="opacity-10">
-            <polygon 
-              points="30,30 226,30 226,162 30,162" 
-              fill="rgba(0, 245, 255, 0.1)"
-              stroke="rgba(0, 245, 255, 0.2)"
-              strokeWidth="1"
-            />
-          </svg>
-        </div>
-
-        <div className="absolute bottom-10 left-10 w-72 h-40 animate-grid-pulse" style={{ animationDelay: '2.5s' }}>
-          <svg width="288" height="160" viewBox="0 0 288 160" className="opacity-10">
-            <polygon 
-              points="40,40 248,40 248,120 40,120" 
-              fill="rgba(255, 215, 0, 0.1)"
-              stroke="rgba(255, 215, 0, 0.2)"
-              strokeWidth="1"
-            />
-          </svg>
-        </div>
-
-        {/* Moving Grid Elements */}
-        <div className="absolute top-0 left-0 w-full h-full">
-          <div className="w-8 h-8 absolute top-16 left-32 bg-cyan-500/20 border border-cyan-400/40 animate-paper-drift"></div>
-          <div className="w-6 h-6 absolute top-24 right-40 bg-yellow-500/20 border border-yellow-400/40 animate-paper-drift" style={{ animationDelay: '1s' }}></div>
-          <div className="w-7 h-7 absolute bottom-20 left-24 bg-green-500/20 border border-green-400/40 animate-paper-drift" style={{ animationDelay: '2s' }}></div>
-          <div className="w-5 h-5 absolute bottom-32 right-32 bg-purple-500/20 border border-purple-400/40 animate-paper-drift" style={{ animationDelay: '1.5s' }}></div>
-        </div>
       </div>
 
       {/* Top Navigation - 64px height, sticky */}
