@@ -25,13 +25,22 @@ const WalletManager = ({ onBalanceUpdate }) => {
         ? '/api/wallet/balance' 
         : '/api/wallet/balance'  // Always use relative URL
       
-      // Get auth token from multiple possible sources
+      // Get auth token from multiple possible sources - FIXED: properly get privy token
       const authToken = localStorage.getItem('auth_token') || 
                        localStorage.getItem('token') || 
+                       localStorage.getItem('privy:token') ||  // This was the missing piece!
+                       sessionStorage.getItem('auth_token') ||
+                       sessionStorage.getItem('token') ||
                        document.cookie.split('auth_token=')[1]?.split(';')[0]
       
       console.log('🔍 Fetching balance with token:', authToken ? 'Present' : 'Missing')
       console.log('🔍 API URL:', apiUrl)
+      console.log('🔍 Token source found:', authToken ? (
+        localStorage.getItem('auth_token') ? 'localStorage.auth_token' :
+        localStorage.getItem('token') ? 'localStorage.token' :
+        localStorage.getItem('privy:token') ? 'localStorage.privy:token' :
+        'other'
+      ) : 'none')
       
       if (!authToken) {
         console.error('❌ No authentication token found')
@@ -70,9 +79,12 @@ const WalletManager = ({ onBalanceUpdate }) => {
         ? '/api/wallet/transactions'
         : '/api/wallet/transactions'  // Always use relative URL
         
-      // Get auth token from multiple possible sources
+      // Get auth token from multiple possible sources - FIXED: properly get privy token
       const authToken = localStorage.getItem('auth_token') || 
                        localStorage.getItem('token') || 
+                       localStorage.getItem('privy:token') ||  // This was the missing piece!
+                       sessionStorage.getItem('auth_token') ||
+                       sessionStorage.getItem('token') ||
                        document.cookie.split('auth_token=')[1]?.split(';')[0]
       
       console.log('🔍 Fetching transactions with token:', authToken ? 'Present' : 'Missing')
