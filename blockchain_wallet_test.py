@@ -73,6 +73,8 @@ class BlockchainWalletTester:
                 }
             }
             
+            print(f"🔍 Sending auth request with wallet address: {test_wallet_address}")
+            
             # Authenticate via Privy endpoint
             auth_response = requests.post(
                 f"{API_BASE}/auth/privy",
@@ -80,15 +82,21 @@ class BlockchainWalletTester:
                 headers={"Content-Type": "application/json"}
             )
             
+            print(f"🔍 Auth response status: {auth_response.status_code}")
+            
             if auth_response.status_code == 200:
                 auth_data = auth_response.json()
                 self.auth_token = auth_data.get('token')
                 self.test_user_id = auth_data.get('user', {}).get('id')
                 
+                # Debug: Print the user data returned
+                user_data = auth_data.get('user', {})
+                print(f"🔍 User data returned: wallet_address={user_data.get('wallet_address')}, embedded_wallet_address={user_data.get('embedded_wallet_address')}")
+                
                 self.log_result(
                     "Authentication Setup",
                     True,
-                    f"Created test user with wallet address: {test_wallet_address}, Token: {self.auth_token[:20]}..."
+                    f"Created test user with wallet address: {test_wallet_address}, Token: {self.auth_token[:20]}..., User ID: {self.test_user_id}"
                 )
                 return True
             else:
