@@ -190,9 +190,6 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
   })
 
-  // Solana connection
-  const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com', 'confirmed')
-
   useEffect(() => {
     if (authenticated && user) {
       fetchBalance()
