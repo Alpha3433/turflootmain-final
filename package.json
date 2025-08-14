@@ -143,6 +143,7 @@
         "cmdk": "^1.1.1",
         "critters": "^0.0.24",
         "date-fns": "^4.1.0",
+        "dotenv": "^17.2.1",
         "embla-carousel-react": "^8.6.0",
         "fastestsmallesttextencoderdecoder": "^1.0.22",
         "framer-motion": "^11.18.2",
