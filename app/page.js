@@ -845,37 +845,47 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Game Viruses (Spiky Obstacles) */}
-        <div className="absolute top-16 right-1/3 animate-virus-pulse" style={{ animationDelay: '1s' }}>
-          <div className="relative w-8 h-8">
-            <div className="w-8 h-8 bg-gradient-to-br from-green-300 via-green-500 to-green-700 rounded-full shadow-2xl border-2 border-green-400 opacity-90"></div>
-            <div className="absolute -top-1 left-1/2 w-2 h-3 bg-green-400 transform -translate-x-1/2 rotate-0 opacity-90"></div>
-            <div className="absolute -right-1 top-1/2 w-3 h-2 bg-green-400 transform -translate-y-1/2 rotate-90 opacity-90"></div>
-            <div className="absolute -bottom-1 left-1/2 w-2 h-3 bg-green-400 transform -translate-x-1/2 rotate-180 opacity-90"></div>
-            <div className="absolute -left-1 top-1/2 w-3 h-2 bg-green-400 transform -translate-y-1/2 rotate-270 opacity-90"></div>
-            <div className="absolute inset-0 bg-green-400 rounded-full opacity-20 animate-ping"></div>
+        {/* Game Viruses (Spiky Obstacles) - Much Brighter */}
+        <div className="absolute top-16 right-1/3 animate-virus-pulse z-20" style={{ animationDelay: '1s' }}>
+          <div className="relative w-12 h-12">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-200 via-green-400 to-green-600 rounded-full shadow-2xl border-4 border-green-300" style={{ boxShadow: '0 0 25px rgba(0, 255, 0, 0.8)' }}></div>
+            <div className="absolute -top-2 left-1/2 w-3 h-4 bg-green-300 transform -translate-x-1/2 rotate-0"></div>
+            <div className="absolute -right-2 top-1/2 w-4 h-3 bg-green-300 transform -translate-y-1/2 rotate-90"></div>
+            <div className="absolute -bottom-2 left-1/2 w-3 h-4 bg-green-300 transform -translate-x-1/2 rotate-180"></div>
+            <div className="absolute -left-2 top-1/2 w-4 h-3 bg-green-300 transform -translate-y-1/2 rotate-270"></div>
+            <div className="absolute inset-0 bg-green-300 rounded-full opacity-30 animate-ping"></div>
           </div>
         </div>
         
-        <div className="absolute bottom-20 right-20 animate-virus-pulse" style={{ animationDelay: '3.5s' }}>
-          <div className="relative w-6 h-6">
-            <div className="w-6 h-6 bg-gradient-to-br from-green-300 via-green-500 to-green-700 rounded-full shadow-2xl border-2 border-green-400 opacity-90"></div>
-            <div className="absolute -top-0.5 left-1/2 w-1.5 h-2 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
-            <div className="absolute -right-0.5 top-1/2 w-2 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
-            <div className="absolute -bottom-0.5 left-1/2 w-1.5 h-2 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
-            <div className="absolute -left-0.5 top-1/2 w-2 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
-            <div className="absolute inset-0 bg-green-400 rounded-full opacity-20 animate-ping"></div>
+        <div className="absolute bottom-20 right-20 animate-virus-pulse z-20" style={{ animationDelay: '3.5s' }}>
+          <div className="relative w-10 h-10">
+            <div className="w-10 h-10 bg-gradient-to-br from-green-200 via-green-400 to-green-600 rounded-full shadow-2xl border-3 border-green-300" style={{ boxShadow: '0 0 20px rgba(0, 255, 0, 0.8)' }}></div>
+            <div className="absolute -top-1 left-1/2 w-2 h-3 bg-green-300 transform -translate-x-1/2"></div>
+            <div className="absolute -right-1 top-1/2 w-3 h-2 bg-green-300 transform -translate-y-1/2"></div>
+            <div className="absolute -bottom-1 left-1/2 w-2 h-3 bg-green-300 transform -translate-x-1/2"></div>
+            <div className="absolute -left-1 top-1/2 w-3 h-2 bg-green-300 transform -translate-y-1/2"></div>
+            <div className="absolute inset-0 bg-green-300 rounded-full opacity-25 animate-ping"></div>
           </div>
         </div>
 
         {/* Additional Virus Obstacles */}
-        <div className="absolute top-1/2 left-16 animate-virus-pulse" style={{ animationDelay: '2.8s' }}>
-          <div className="relative w-7 h-7">
-            <div className="w-7 h-7 bg-gradient-to-br from-green-300 via-green-500 to-green-700 rounded-full shadow-2xl border-2 border-green-400 opacity-85"></div>
-            <div className="absolute -top-0.5 left-1/2 w-1.5 h-2.5 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
-            <div className="absolute -right-0.5 top-1/2 w-2.5 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
-            <div className="absolute -bottom-0.5 left-1/2 w-1.5 h-2.5 bg-green-400 transform -translate-x-1/2 opacity-90"></div>
-            <div className="absolute -left-0.5 top-1/2 w-2.5 h-1.5 bg-green-400 transform -translate-y-1/2 opacity-90"></div>
+        <div className="absolute top-1/2 left-16 animate-virus-pulse z-20" style={{ animationDelay: '2.8s' }}>
+          <div className="relative w-11 h-11">
+            <div className="w-11 h-11 bg-gradient-to-br from-green-200 via-green-400 to-green-600 rounded-full shadow-2xl border-3 border-green-300" style={{ boxShadow: '0 0 22px rgba(0, 255, 0, 0.7)' }}></div>
+            <div className="absolute -top-1 left-1/2 w-2.5 h-3.5 bg-green-300 transform -translate-x-1/2"></div>
+            <div className="absolute -right-1 top-1/2 w-3.5 h-2.5 bg-green-300 transform -translate-y-1/2"></div>
+            <div className="absolute -bottom-1 left-1/2 w-2.5 h-3.5 bg-green-300 transform -translate-x-1/2"></div>
+            <div className="absolute -left-1 top-1/2 w-3.5 h-2.5 bg-green-300 transform -translate-y-1/2"></div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-1/3 left-1/2 animate-virus-pulse z-20" style={{ animationDelay: '4.2s' }}>
+          <div className="relative w-9 h-9">
+            <div className="w-9 h-9 bg-gradient-to-br from-green-200 via-green-400 to-green-600 rounded-full shadow-2xl border-3 border-green-300" style={{ boxShadow: '0 0 18px rgba(0, 255, 0, 0.7)' }}></div>
+            <div className="absolute -top-1 left-1/2 w-2 h-3 bg-green-300 transform -translate-x-1/2"></div>
+            <div className="absolute -right-1 top-1/2 w-3 h-2 bg-green-300 transform -translate-y-1/2"></div>
+            <div className="absolute -bottom-1 left-1/2 w-2 h-3 bg-green-300 transform -translate-x-1/2"></div>
+            <div className="absolute -left-1 top-1/2 w-3 h-2 bg-green-300 transform -translate-y-1/2"></div>
           </div>
         </div>
 
