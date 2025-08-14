@@ -20,8 +20,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
   // Define fetch functions first
   const fetchBalance = async () => {
     try {
-      // Use external URL as requested
-      const apiUrl = 'https://blockchain-battle.preview.emergentagent.com/api/wallet/balance'
+      // Use relative URL so it works on both localhost and external URL
+      const apiUrl = '/api/wallet/balance'
       
       // Get auth token from multiple possible sources - FIXED: properly get privy token
       const authToken = localStorage.getItem('auth_token') || 
@@ -64,7 +64,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
         if (response.status === 401) {
           console.error('❌ Authentication failed - token may be expired')
         } else if (response.status >= 502 && response.status <= 504) {
-          console.error('❌ External server has gateway errors (502/503/504)')
+          console.error('❌ Server has gateway errors (502/503/504)')
         }
       }
     } catch (error) {
@@ -74,8 +74,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
   const fetchTransactions = async () => {
     try {
-      // Use external URL as requested
-      const apiUrl = 'https://blockchain-battle.preview.emergentagent.com/api/wallet/transactions'
+      // Use relative URL so it works on both localhost and external URL
+      const apiUrl = '/api/wallet/transactions'
         
       // Get auth token from multiple possible sources - FIXED: properly get privy token
       const authToken = localStorage.getItem('auth_token') || 
@@ -110,7 +110,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
         if (response.status === 401) {
           console.error('❌ Authentication failed - token may be expired')
         } else if (response.status >= 502 && response.status <= 504) {
-          console.error('❌ External server has gateway errors (502/503/504)')
+          console.error('❌ Server has gateway errors (502/503/504)')
         }
       }
     } catch (error) {
