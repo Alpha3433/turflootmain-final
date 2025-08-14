@@ -7,7 +7,33 @@ const nextConfig = {
     // Remove if not using Server Components
     serverComponentsExternalPackages: ['mongodb'],
   },
-  webpack(config, { dev }) {
+  webpack(config, { dev, isServer }) {
+    // Handle WebSocket dependencies for production builds
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        stream: false,
+        url: false,
+        zlib: false,
+        http: false,
+        https: false,
+        assert: false,
+        os: false,
+        path: false,
+      };
+    }
+
+    // Handle WebSocket module resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'rpc-websockets': require.resolve('rpc-websockets'),
+      'ws': require.resolve('ws'),
+    };
+
     if (dev) {
       // Reduce CPU/memory from file watching
       config.watchOptions = {
