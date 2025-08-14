@@ -2150,12 +2150,12 @@ const AgarIOGame = () => {
         ctx.fillText('CASHING OUT...', game.player.x, game.player.y - radius - 20)
       }
       
-      // Draw enhanced minimap
+      ctx.restore()
+      
+      // Draw enhanced minimap (outside camera transform)
       if (settings.showMinimap) {
         drawMinimap()
       }
-      
-      ctx.restore()
     }
 
     const drawGrid = () => {
