@@ -30,11 +30,20 @@ const TurfLootGame = () => {
   useEffect(() => {
     // Parse URL parameters
     const urlParams = new URLSearchParams(window.location.search)
+    const matchId = urlParams.get('matchId')
+    const roomCode = urlParams.get('roomCode')
+    
     setRoomParams({
-      roomId: urlParams.get('room') || 'lobby',
-      mode: urlParams.get('mode') || 'free',
-      fee: parseInt(urlParams.get('fee') || '0', 10)
+      roomId: roomCode || urlParams.get('room') || 'lobby',
+      mode: matchId ? 'lobby_match' : urlParams.get('mode') || 'free',
+      fee: parseInt(urlParams.get('fee') || '0', 10),
+      matchId: matchId,
+      roomCode: roomCode
     })
+    
+    if (matchId && roomCode) {
+      console.log('🎮 Lobby match detected:', { matchId, roomCode })
+    }
   }, [])
 
   useEffect(() => {
