@@ -20,7 +20,12 @@ const WalletManager = ({ onBalanceUpdate }) => {
   // Define fetch functions first
   const fetchBalance = async () => {
     try {
-      const response = await fetch('/api/wallet/balance', {
+      // Force localhost for API calls to bypass ingress issues
+      const apiUrl = window.location.hostname === 'localhost' 
+        ? '/api/wallet/balance' 
+        : `${window.location.origin}/api/wallet/balance`
+      
+      const response = await fetch(apiUrl, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
@@ -30,6 +35,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
         const data = await response.json()
         setBalance(data)
         if (onBalanceUpdate) onBalanceUpdate(data)
+      } else {
+        console.error('Balance fetch failed:', response.status, response.statusText)
       }
     } catch (error) {
       console.error('Error fetching balance:', error)
@@ -38,7 +45,12 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch('/api/wallet/transactions', {
+      // Force localhost for API calls to bypass ingress issues  
+      const apiUrl = window.location.hostname === 'localhost'
+        ? '/api/wallet/transactions'
+        : `${window.location.origin}/api/wallet/transactions`
+        
+      const response = await fetch(apiUrl, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
@@ -47,6 +59,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
       if (response.ok) {
         const data = await response.json()
         setTransactions(data.transactions)
+      } else {
+        console.error('Transactions fetch failed:', response.status, response.statusText)
       }
     } catch (error) {
       console.error('Error fetching transactions:', error)
