@@ -2354,7 +2354,7 @@ const AgarIOGame = () => {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-300">Coins Collected:</span>
-              <span className="text-orange-400 font-bold">{gameSession.coinsCollected}</span>
+              <span className="text-orange-400 font-bold">{gameSession.coinsCollected || 0}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-300">Time Alive:</span>
