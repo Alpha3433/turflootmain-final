@@ -2358,11 +2358,7 @@ const AgarIOGame = () => {
       
       ctx.restore()
       
-      // 9. MINIMAP LABEL
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-      ctx.font = 'bold 12px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText('RADAR', centerX, minimapY + minimapSize + 15)
+
     }
 
     // Start game loop
