@@ -114,7 +114,32 @@ const WalletManager = ({ onBalanceUpdate }) => {
     try {
       console.log('🔄 Starting wallet refresh...')
       console.log('🔍 Current URL:', window.location.href)
-      console.log('🔍 Auth token:', localStorage.getItem('auth_token') ? 'Present' : 'Missing')
+      
+      // Check for auth token in multiple locations
+      const possibleTokens = [
+        localStorage.getItem('auth_token'),
+        localStorage.getItem('token'),
+        localStorage.getItem('privy:token'),
+        sessionStorage.getItem('auth_token'),
+        sessionStorage.getItem('token')
+      ]
+      
+      const authToken = possibleTokens.find(token => token && token !== 'undefined')
+      console.log('🔍 Auth token search results:', {
+        localStorage_auth_token: localStorage.getItem('auth_token') ? 'Present' : 'Missing',
+        localStorage_token: localStorage.getItem('token') ? 'Present' : 'Missing',
+        localStorage_privy_token: localStorage.getItem('privy:token') ? 'Present' : 'Missing',
+        sessionStorage_auth_token: sessionStorage.getItem('auth_token') ? 'Present' : 'Missing',
+        sessionStorage_token: sessionStorage.getItem('token') ? 'Present' : 'Missing',
+        finalToken: authToken ? 'Present' : 'Missing'
+      })
+      
+      if (!authToken) {
+        console.error('❌ No authentication token found anywhere')
+        alert(`Authentication required: No valid token found.\n\nPlease log in again through Privy to access your wallet balance.\n\nIf you're seeing 502 errors, the external server is down but your blockchain integration is working.`)
+        setRefreshing(false)
+        return
+      }
       
       await Promise.all([fetchBalance(), fetchTransactions()])
       console.log('✅ Wallet refresh completed successfully')
@@ -123,7 +148,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
       setTimeout(() => setRefreshing(false), 500)
     } catch (error) {
       console.error('❌ Error refreshing wallet:', error)
-      alert(`Wallet refresh failed: ${error.message}\n\nNote: If you're seeing 502 errors, try accessing the app at http://localhost:3000 instead of the external URL.`)
+      alert(`Wallet refresh failed: ${error.message}\n\nNote: If you're seeing 502 errors, try accessing the app at http://localhost:3000 instead of the external URL.\n\nOr please log in again through Privy.`)
       setRefreshing(false)
     }
   }
