@@ -157,12 +157,86 @@ export async function GET(request, { params }) {
             { status: 404, headers: corsHeaders }
           )
         }
+
+        // Get real blockchain balance if user has a wallet address
+        let realEthBalance = 0
+        let realSolBalance = 0
+        let realUsdcBalance = 0
+        let totalUsdBalance = user.balance || 0
+
+        try {
+          // If user has wallet addresses, fetch real balances
+          if (user.wallet_address || user.embedded_wallet_address) {
+            const walletAddress = user.wallet_address || user.embedded_wallet_address
+            
+            // Fetch ETH balance using Privy's API or direct blockchain query
+            try {
+              // Simple fetch to get ETH balance (using Alchemy or similar RPC)
+              const ethRpcUrl = process.env.ETH_RPC_URL || 'https://eth-mainnet.g.alchemy.com/v2/demo'
+              
+              const ethResponse = await fetch(ethRpcUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  jsonrpc: '2.0',
+                  method: 'eth_getBalance',
+                  params: [walletAddress, 'latest'],
+                  id: 1
+                })
+              })
+              
+              if (ethResponse.ok) {
+                const ethData = await ethResponse.json()
+                if (ethData.result) {
+                  // Convert from Wei to ETH
+                  realEthBalance = parseInt(ethData.result, 16) / Math.pow(10, 18)
+                  
+                  // Convert ETH to USD (approximate rate)
+                  const ethToUsd = 2400 // Approximate ETH price - in production, fetch from API
+                  totalUsdBalance = realEthBalance * ethToUsd
+                }
+              }
+            } catch (ethError) {
+              console.log('ETH balance fetch failed:', ethError.message)
+            }
+
+            // Fetch SOL balance if on Solana
+            try {
+              if (process.env.NEXT_PUBLIC_SOLANA_RPC_URL) {
+                const solResponse = await fetch(process.env.NEXT_PUBLIC_SOLANA_RPC_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'getBalance',
+                    params: [walletAddress],
+                    id: 1
+                  })
+                })
+                
+                if (solResponse.ok) {
+                  const solData = await solResponse.json()
+                  if (solData.result?.value) {
+                    realSolBalance = solData.result.value / Math.pow(10, 9) // Convert lamports to SOL
+                  }
+                }
+              }
+            } catch (solError) {
+              console.log('SOL balance fetch failed:', solError.message)
+            }
+          }
+        } catch (error) {
+          console.log('Balance fetch error:', error.message)
+          // Fall back to database balance if blockchain query fails
+        }
         
         return NextResponse.json({
-          balance: user.balance || 0,
+          balance: totalUsdBalance,
           currency: 'USD',
-          sol_balance: user.sol_balance || 0,
-          usdc_balance: user.usdc_balance || 0
+          sol_balance: realSolBalance,
+          usdc_balance: realUsdcBalance,
+          eth_balance: realEthBalance,
+          wallet_address: user.wallet_address || user.embedded_wallet_address || null
         }, { headers: corsHeaders })
       })(request)
     }
