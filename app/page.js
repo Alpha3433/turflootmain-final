@@ -708,8 +708,21 @@ export default function Home() {
     
     // For FREE games - route to Agario clone (with authentication)
     if (selectedStake === 'FREE' || selectedStake === 0) {
-      console.log('🆓 Routing to Agario game (authenticated)')
-      router.push('/agario')
+      console.log('🆓 Free game selected - using bots for testing')
+      
+      // Show confirmation dialog for bot practice
+      const confirmed = window.confirm(
+        '🤖 Free games use AI bots for instant practice and testing.\n\n' +
+        'Perfect for learning game mechanics and trying strategies without waiting for other players.\n\n' +
+        'Ready to practice against smart AI bots?'
+      )
+      
+      if (confirmed) {
+        console.log('✅ User confirmed bot practice game')
+        router.push('/agario?mode=free&fee=0')
+      } else {
+        console.log('❌ User cancelled bot practice')
+      }
       return
     }
     
