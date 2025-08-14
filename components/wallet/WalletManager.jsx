@@ -298,8 +298,24 @@ const WalletManager = ({ onBalanceUpdate }) => {
     return (
       <div className="space-y-4">
         {/* Balance Display - Mock data for unauthenticated users */}
-        <div className="text-center py-4">
-          <div className="text-3xl font-black text-white mb-2">$0.00</div>
+        <div className="text-center py-4 relative">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="text-3xl font-black text-white">$0.00</div>
+            <button 
+              onClick={() => login()}
+              className="p-1 hover:bg-gray-700/50 rounded-full transition-all group"
+              title="Login to refresh wallet"
+            >
+              <svg 
+                className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
           <div className="text-gray-400 text-sm mb-2">Game Balance</div>
           <div className="text-xs text-gray-500">
             0.0000 SOL • 0.00 USDC
