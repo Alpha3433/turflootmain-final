@@ -5,13 +5,21 @@
     "engines": {
         "node": "20.x"
     },
+    "resolutions": {
+        "rpc-websockets": "^8.0.0",
+        "ws": "^8.18.0",
+        "@solana/web3.js": "^1.95.2",
+        "react-native": "^0.74.0"
+    },
     "overrides": {
         "@solana/web3.js": "^1.95.2",
         "@emotion/react": "11.11.2",
         "@emotion/styled": "11.11.0",
         "@noble/hashes": "^1.8.0",
         "@noble/curves": "^1.6.0",
-        "react-native": "^0.74.0"
+        "react-native": "^0.74.0",
+        "rpc-websockets": "^8.0.0",
+        "ws": "^8.18.0"
     },
     "scripts": {
         "dev": "NODE_OPTIONS='--max-old-space-size=2048' next dev --hostname 0.0.0.0 --port 3000",
