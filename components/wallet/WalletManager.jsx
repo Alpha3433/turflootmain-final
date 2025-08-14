@@ -52,6 +52,21 @@ const WalletManager = ({ onBalanceUpdate }) => {
       console.error('Error fetching transactions:', error)
     }
   }
+
+  // Handle manual wallet refresh
+  const handleRefreshWallet = async () => {
+    if (refreshing) return // Prevent multiple simultaneous refreshes
+    
+    setRefreshing(true)
+    try {
+      await Promise.all([fetchBalance(), fetchTransactions()])
+      // Small delay to show the refresh animation
+      setTimeout(() => setRefreshing(false), 500)
+    } catch (error) {
+      console.error('Error refreshing wallet:', error)
+      setRefreshing(false)
+    }
+  }
   
   // Now initialize useFundWallet hook with better error handling
   const { fundWallet } = useFundWallet({
