@@ -23,23 +23,43 @@ const WalletManager = ({ onBalanceUpdate }) => {
       // Force localhost for API calls to bypass ingress issues
       const apiUrl = window.location.hostname === 'localhost' 
         ? '/api/wallet/balance' 
-        : `${window.location.origin}/api/wallet/balance`
+        : '/api/wallet/balance'  // Always use relative URL
+      
+      // Get auth token from multiple possible sources
+      const authToken = localStorage.getItem('auth_token') || 
+                       localStorage.getItem('token') || 
+                       document.cookie.split('auth_token=')[1]?.split(';')[0]
+      
+      console.log('🔍 Fetching balance with token:', authToken ? 'Present' : 'Missing')
+      console.log('🔍 API URL:', apiUrl)
+      
+      if (!authToken) {
+        console.error('❌ No authentication token found')
+        return
+      }
       
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
         }
       })
       
+      console.log('🔍 Balance response status:', response.status)
+      
       if (response.ok) {
         const data = await response.json()
+        console.log('✅ Balance data received:', data)
         setBalance(data)
         if (onBalanceUpdate) onBalanceUpdate(data)
       } else {
-        console.error('Balance fetch failed:', response.status, response.statusText)
+        console.error('❌ Balance fetch failed:', response.status, response.statusText)
+        if (response.status === 401) {
+          console.error('❌ Authentication failed - token may be expired')
+        }
       }
     } catch (error) {
-      console.error('Error fetching balance:', error)
+      console.error('❌ Error fetching balance:', error)
     }
   }
 
@@ -48,22 +68,41 @@ const WalletManager = ({ onBalanceUpdate }) => {
       // Force localhost for API calls to bypass ingress issues  
       const apiUrl = window.location.hostname === 'localhost'
         ? '/api/wallet/transactions'
-        : `${window.location.origin}/api/wallet/transactions`
+        : '/api/wallet/transactions'  // Always use relative URL
+        
+      // Get auth token from multiple possible sources
+      const authToken = localStorage.getItem('auth_token') || 
+                       localStorage.getItem('token') || 
+                       document.cookie.split('auth_token=')[1]?.split(';')[0]
+      
+      console.log('🔍 Fetching transactions with token:', authToken ? 'Present' : 'Missing')
+      
+      if (!authToken) {
+        console.error('❌ No authentication token found')
+        return
+      }
         
       const response = await fetch(apiUrl, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
         }
       })
       
+      console.log('🔍 Transactions response status:', response.status)
+      
       if (response.ok) {
         const data = await response.json()
+        console.log('✅ Transactions data received:', data)
         setTransactions(data.transactions)
       } else {
-        console.error('Transactions fetch failed:', response.status, response.statusText)
+        console.error('❌ Transactions fetch failed:', response.status, response.statusText)
+        if (response.status === 401) {
+          console.error('❌ Authentication failed - token may be expired')
+        }
       }
     } catch (error) {
-      console.error('Error fetching transactions:', error)
+      console.error('❌ Error fetching transactions:', error)
     }
   }
 
