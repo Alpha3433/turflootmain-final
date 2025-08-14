@@ -70,6 +70,22 @@ export default function Home() {
   const { login, ready, authenticated, user, logout } = usePrivy()
   const router = useRouter()
 
+  // Debug Privy state
+  useEffect(() => {
+    console.log('🔍 Privy Debug Info:', {
+      ready: ready,
+      authenticated: authenticated,
+      user: user ? 'Present' : 'None',
+      appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID ? 'Set' : 'Missing'
+    })
+    
+    if (process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
+      console.log('✅ Privy App ID configured:', process.env.NEXT_PUBLIC_PRIVY_APP_ID.substring(0, 10) + '...')
+    } else {
+      console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is missing!')
+    }
+  }, [ready, authenticated, user])
+
   // Check for new authentication and show welcome message
   useEffect(() => {
     console.log('🔍 Auth effect triggered:', { authenticated, user, ready, hasShownWelcome })
