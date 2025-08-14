@@ -1,5 +1,12 @@
 // Load environment variables first
-require('dotenv').config()
+require('dotenv').config({ path: require('path').join(__dirname, '.env') })
+
+// Log environment loading
+console.log('🔍 Environment variables loaded:')
+console.log('NODE_ENV:', process.env.NODE_ENV || 'NOT SET')
+console.log('NEXT_PUBLIC_PRIVY_APP_ID:', process.env.NEXT_PUBLIC_PRIVY_APP_ID ? 'SET' : 'NOT SET')
+console.log('MONGO_URL:', process.env.MONGO_URL ? 'SET' : 'NOT SET')
+console.log('NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL || 'NOT SET')
 
 // Custom server to handle WebSocket connections and TurfLoot game server
 const { createServer } = require('http')
