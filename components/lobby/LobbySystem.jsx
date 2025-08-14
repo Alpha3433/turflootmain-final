@@ -196,7 +196,25 @@ const LobbySystem = () => {
   }
 
   if (!authenticated) {
-    return null
+    return (
+      <div className="fixed top-4 right-4 z-50">
+        <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-4 border border-gray-600/50 min-w-[280px]">
+          <div className="flex items-center space-x-2 mb-4">
+            <Users className="w-5 h-5 text-purple-400" />
+            <h3 className="text-white font-bold">Lobby System</h3>
+          </div>
+          
+          <div className="text-center py-4">
+            <div className="text-gray-400 text-sm mb-3">
+              Login to access lobby features
+            </div>
+            <div className="text-xs text-gray-500">
+              Create or join 2-player lobbies
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
