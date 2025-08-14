@@ -545,40 +545,8 @@ export default function Home() {
     console.log('🔍 Privy state:', { ready, authenticated, user: !!user })
     
     if (!ready) {
-      console.log('⏳ Privy not ready yet...')
-      
-      // Show user a helpful message and offer fallback
-      const useTestMode = confirm(
-        'Privy authentication is loading. Would you like to use Test Mode instead?\n\n' +
-        'Test Mode allows you to:\n' +
-        '• Play the game immediately\n' +
-        '• Test wallet features with mock data\n' +
-        '• Access all game features\n\n' +
-        'Click OK for Test Mode, or Cancel to wait for Privy.'
-      )
-      
-      if (useTestMode) {
-        console.log('🧪 Activating Test Mode')
-        // Create a test user object
-        const testUser = {
-          id: 'test-user-' + Date.now(),
-          email: { address: 'test@turfloot.com' },
-          wallet: { address: '0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d' },
-          privyId: 'test-privy-id',
-          createdAt: new Date().toISOString()
-        }
-        
-        // Set test user in state
-        setUserProfile(testUser)
-        loadUserProfile(testUser.id)
-        
-        // Show success message
-        alert('✅ Test Mode activated! You can now play TurfLoot with full features.')
-        return
-      } else {
-        console.log('⏳ User chose to wait for Privy')
-        return
-      }
+      console.log('⏳ Privy not ready yet, waiting...')
+      return
     }
     
     if (authenticated) {
@@ -592,28 +560,7 @@ export default function Home() {
       console.log('✅ Login initiated successfully')
     } catch (error) {
       console.error('❌ Login error:', error)
-      
-      // Show user-friendly error message with fallback option
-      const useTestMode = confirm(
-        'Login failed. This might be due to network issues or server problems.\n\n' +
-        'Would you like to use Test Mode instead?\n\n' +
-        'Click OK for Test Mode, or Cancel to try again later.'
-      )
-      
-      if (useTestMode) {
-        console.log('🧪 Fallback to Test Mode')
-        const testUser = {
-          id: 'test-user-' + Date.now(),
-          email: { address: 'test@turfloot.com' },
-          wallet: { address: '0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d' },
-          privyId: 'test-privy-id',
-          createdAt: new Date().toISOString()
-        }
-        
-        setUserProfile(testUser)
-        loadUserProfile(testUser.id)
-        alert('✅ Test Mode activated due to login issues!')
-      }
+      alert('Login failed. Please try again or check your internet connection.')
     }
   }
 
