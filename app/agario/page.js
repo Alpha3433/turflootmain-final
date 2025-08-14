@@ -2189,6 +2189,178 @@ const AgarIOGame = () => {
       }
     }
 
+    // Enhanced Minimap with improved contrast and entity differentiation
+    const drawMinimap = () => {
+      const minimapSize = 200 // Increased from typical 150 for better visibility
+      const minimapX = canvas.width - minimapSize - 20
+      const minimapY = 20
+      const minimapRadius = minimapSize / 2 - 10
+      const centerX = minimapX + minimapSize / 2
+      const centerY = minimapY + minimapSize / 2
+      
+      // World scale factor
+      const worldRadius = config.worldSize / 2
+      const scale = minimapRadius / worldRadius
+      
+      ctx.save()
+      
+      // 1. BACKGROUND - Dark transparent base with better contrast
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)' // Dark background with 70% opacity
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, minimapRadius + 8, 0, Math.PI * 2)
+      ctx.fill()
+      
+      // 2. OUTER BORDER - Thick, bright neon border
+      ctx.strokeStyle = '#00ff41' // Neon green border
+      ctx.lineWidth = 4
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, minimapRadius + 5, 0, Math.PI * 2)
+      ctx.stroke()
+      
+      // 3. DANGER ZONE INDICATORS - Red zones on minimap
+      const playableRadius = worldRadius * 0.35 // Same as orb spawning radius
+      const minimapPlayableRadius = playableRadius * scale
+      
+      // Show danger zone (area outside playable radius)
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.2)' // Red tint for danger zones
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, minimapRadius, 0, Math.PI * 2)
+      ctx.fill()
+      
+      // Show safe zone
+      ctx.fillStyle = 'rgba(0, 100, 0, 0.15)' // Green tint for safe zone
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, minimapPlayableRadius, 0, Math.PI * 2)
+      ctx.fill()
+      
+      // 4. GRID INDICATORS - Subtle sector lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+      ctx.lineWidth = 1
+      for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
+        ctx.beginPath()
+        ctx.moveTo(centerX, centerY)
+        ctx.lineTo(
+          centerX + Math.cos(angle) * minimapRadius,
+          centerY + Math.sin(angle) * minimapRadius
+        )
+        ctx.stroke()
+      }
+      
+      // Clip to circular minimap
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, minimapRadius, 0, Math.PI * 2)
+      ctx.clip()
+      
+      // 5. COINS - Gold $ symbols instead of tiny dots
+      game.orbs.forEach(orb => {
+        const minimapOrbX = centerX + (orb.x * scale)
+        const minimapOrbY = centerY + (orb.y * scale)
+        
+        // Check if orb is within minimap bounds
+        const distFromCenter = Math.sqrt(
+          Math.pow(minimapOrbX - centerX, 2) + Math.pow(minimapOrbY - centerY, 2)
+        )
+        
+        if (distFromCenter <= minimapRadius) {
+          ctx.fillStyle = '#FFD700' // Gold color
+          ctx.font = 'bold 8px Arial'
+          ctx.textAlign = 'center'
+          ctx.fillText('$', minimapOrbX, minimapOrbY + 2)
+        }
+      })
+      
+      // 6. ENEMY BOTS - Red triangles for better visibility
+      game.bots.forEach(bot => {
+        if (bot.alive) {
+          const minimapBotX = centerX + (bot.x * scale)
+          const minimapBotY = centerY + (bot.y * scale)
+          
+          // Check if bot is within minimap bounds
+          const distFromCenter = Math.sqrt(
+            Math.pow(minimapBotX - centerX, 2) + Math.pow(minimapBotY - centerY, 2)
+          )
+          
+          if (distFromCenter <= minimapRadius) {
+            // Draw triangle for enemies
+            ctx.fillStyle = '#FF4444' // Bright red for enemies
+            ctx.beginPath()
+            ctx.moveTo(minimapBotX, minimapBotY - 4)
+            ctx.lineTo(minimapBotX - 3, minimapBotY + 2)
+            ctx.lineTo(minimapBotX + 3, minimapBotY + 2)
+            ctx.closePath()
+            ctx.fill()
+            
+            // Add outline for better visibility
+            ctx.strokeStyle = '#FFFFFF'
+            ctx.lineWidth = 1
+            ctx.stroke()
+          }
+        }
+      })
+      
+      // 7. VIRUSES - Gray hexagons
+      game.viruses?.forEach(virus => {
+        const minimapVirusX = centerX + (virus.x * scale)
+        const minimapVirusY = centerY + (virus.y * scale)
+        
+        const distFromCenter = Math.sqrt(
+          Math.pow(minimapVirusX - centerX, 2) + Math.pow(minimapVirusY - centerY, 2)
+        )
+        
+        if (distFromCenter <= minimapRadius) {
+          ctx.fillStyle = '#888888' // Gray for obstacles
+          ctx.beginPath()
+          for (let i = 0; i < 6; i++) {
+            const angle = (i * Math.PI) / 3
+            const x = minimapVirusX + Math.cos(angle) * 3
+            const y = minimapVirusY + Math.sin(angle) * 3
+            if (i === 0) ctx.moveTo(x, y)
+            else ctx.lineTo(x, y)
+          }
+          ctx.closePath()
+          ctx.fill()
+        }
+      })
+      
+      // 8. PLAYER - Large glowing cyan circle with ring
+      const minimapPlayerX = centerX + (game.player.x * scale)
+      const minimapPlayerY = centerY + (game.player.y * scale)
+      
+      // Player glow effect
+      const gradient = ctx.createRadialGradient(
+        minimapPlayerX, minimapPlayerY, 0,
+        minimapPlayerX, minimapPlayerY, 12
+      )
+      gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)') // Neon cyan center
+      gradient.addColorStop(1, 'rgba(0, 255, 255, 0)') // Fade to transparent
+      
+      ctx.fillStyle = gradient
+      ctx.beginPath()
+      ctx.arc(minimapPlayerX, minimapPlayerY, 12, 0, Math.PI * 2)
+      ctx.fill()
+      
+      // Player main dot
+      ctx.fillStyle = '#00FFFF' // Bright cyan
+      ctx.beginPath()
+      ctx.arc(minimapPlayerX, minimapPlayerY, 5, 0, Math.PI * 2)
+      ctx.fill()
+      
+      // Player ring indicator
+      ctx.strokeStyle = '#FFFFFF'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.arc(minimapPlayerX, minimapPlayerY, 8, 0, Math.PI * 2)
+      ctx.stroke()
+      
+      ctx.restore()
+      
+      // 9. MINIMAP LABEL
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+      ctx.font = 'bold 12px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText('RADAR', centerX, minimapY + minimapSize + 15)
+    }
+
     // Start game loop
     requestAnimationFrame(gameLoop)
 
