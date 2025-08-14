@@ -524,11 +524,29 @@ export default function Home() {
     }
   }
 
-  const handleLoginClick = () => {
+  const handleLoginClick = async () => {
     console.log('🔑 Login button clicked')
-    if (ready && !authenticated) {
+    console.log('🔍 Privy state:', { ready, authenticated, user: !!user })
+    
+    if (!ready) {
+      console.log('⏳ Privy not ready yet, waiting...')
+      return
+    }
+    
+    if (authenticated) {
+      console.log('✅ User already authenticated')
+      return
+    }
+    
+    try {
       console.log('🚀 Triggering Privy login')
-      login()
+      await login()
+      console.log('✅ Login initiated successfully')
+    } catch (error) {
+      console.error('❌ Login error:', error)
+      
+      // Show user-friendly error message
+      alert('Login failed. Please try again or check your internet connection.')
     }
   }
 
