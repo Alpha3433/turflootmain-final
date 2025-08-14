@@ -73,6 +73,9 @@ const AgarIOGame = () => {
     coinsCollected: 0 // Track coins/orbs collected
   })
 
+  // Time alive tracking
+  const [timeAlive, setTimeAlive] = useState(0) // Time in seconds since game started
+
   // Real-time multiplayer state
   const [isConnected, setIsConnected] = useState(false)
   const [roomId, setRoomId] = useState(null)
