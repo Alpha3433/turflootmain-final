@@ -706,37 +706,28 @@ export default function Home() {
     if (selectedStake === 'FREE' || selectedStake === 0) {
       console.log('🆓 Free game selected - using bots for testing')
       
-      // Temporarily skip confirmation for debugging
-      console.log('🔍 Skipping confirmation dialog for testing - going directly to bot game')
-      console.log('🚀 Navigating to: /agario?mode=free&fee=0')
-      router.push('/agario?mode=free&fee=0')
-      return
+      // Try both router.push and window.location as fallback
+      console.log('🔍 Attempting navigation to: /agario?mode=free&fee=0')
       
-      /* 
-      // Original confirmation code (commented for debugging)
       try {
-        // Show confirmation dialog for bot practice
-        const confirmed = window.confirm(
-          '🤖 Free games use AI bots for instant practice and testing.\n\n' +
-          'Perfect for learning game mechanics and trying strategies without waiting for other players.\n\n' +
-          'Ready to practice against smart AI bots?'
-        )
-        
-        console.log('🔍 Confirmation result:', confirmed)
-        
-        if (confirmed) {
-          console.log('✅ User confirmed bot practice game - navigating to /agario')
-          router.push('/agario?mode=free&fee=0')
-        } else {
-          console.log('❌ User cancelled bot practice')
-        }
-      } catch (error) {
-        console.error('❌ Error in confirmation dialog:', error)
-        // Fallback: go directly to game if dialog fails
-        console.log('🔄 Dialog failed, going directly to bot game')
+        console.log('🚀 Trying router.push first...')
         router.push('/agario?mode=free&fee=0')
+        
+        // Fallback using window.location after a delay
+        setTimeout(() => {
+          if (window.location.pathname === '/') {
+            console.log('🔄 router.push failed, using window.location fallback')
+            window.location.href = '/agario?mode=free&fee=0'
+          }
+        }, 1000)
+        
+      } catch (error) {
+        console.error('❌ Router error:', error)
+        console.log('🔄 Using window.location fallback immediately')
+        window.location.href = '/agario?mode=free&fee=0'
       }
-      */
+      
+      return
     }
     
     // For cash games, use the original complex game with authentication
