@@ -73,11 +73,18 @@ const WalletManager = ({ onBalanceUpdate }) => {
     
     setRefreshing(true)
     try {
+      console.log('🔄 Starting wallet refresh...')
+      console.log('🔍 Current URL:', window.location.href)
+      console.log('🔍 Auth token:', localStorage.getItem('auth_token') ? 'Present' : 'Missing')
+      
       await Promise.all([fetchBalance(), fetchTransactions()])
+      console.log('✅ Wallet refresh completed successfully')
+      
       // Small delay to show the refresh animation
       setTimeout(() => setRefreshing(false), 500)
     } catch (error) {
-      console.error('Error refreshing wallet:', error)
+      console.error('❌ Error refreshing wallet:', error)
+      alert(`Wallet refresh failed: ${error.message}\n\nNote: If you're seeing 502 errors, try accessing the app at http://localhost:3000 instead of the external URL.`)
       setRefreshing(false)
     }
   }
