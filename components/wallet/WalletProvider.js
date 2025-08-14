@@ -21,7 +21,10 @@ export default function SolanaWalletProvider({ children }) {
   
   // You can also provide a custom RPC endpoint
   const endpoint = useMemo(() => 
-    process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl(network),
+    process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 
+    (network === WalletAdapterNetwork.Mainnet 
+      ? 'https://api.mainnet-beta.solana.com' 
+      : 'https://api.devnet.solana.com'),
     [network]
   )
   
