@@ -706,6 +706,14 @@ export default function Home() {
     if (selectedStake === 'FREE' || selectedStake === 0) {
       console.log('🆓 Free game selected - using bots for testing')
       
+      // Temporarily skip confirmation for debugging
+      console.log('🔍 Skipping confirmation dialog for testing - going directly to bot game')
+      console.log('🚀 Navigating to: /agario?mode=free&fee=0')
+      router.push('/agario?mode=free&fee=0')
+      return
+      
+      /* 
+      // Original confirmation code (commented for debugging)
       try {
         // Show confirmation dialog for bot practice
         const confirmed = window.confirm(
@@ -728,7 +736,7 @@ export default function Home() {
         console.log('🔄 Dialog failed, going directly to bot game')
         router.push('/agario?mode=free&fee=0')
       }
-      return
+      */
     }
     
     // For cash games, use the original complex game with authentication
