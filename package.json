@@ -2,7 +2,10 @@
     "name": "turfloot",
     "version": "0.1.0",
     "private": true,
-    "workspaces": ["apps/*", "packages/*"],
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
     "engines": {
         "node": "20.x"
     },
@@ -68,8 +71,8 @@
         "@solana/wallet-adapter-wallets": "^0.19.32",
         "@swc/helpers": "^0.5.17",
         "@tanstack/react-table": "^8.21.3",
-        "@types/react": "^18.3.0",
-        "@types/react-dom": "^18.3.0",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
         "axios": "^1.10.0",
         "bcryptjs": "^2.4.3",
         "bs58": "^6.0.0",
@@ -103,13 +106,15 @@
         "tailwind-merge": "^3.3.1",
         "tailwindcss-animate": "^1.0.7",
         "tslib": "^2.6.2",
-        "typescript": "^5.3.3",
+        "typescript": "^5.4",
         "uuid": "^9.0.1",
         "vaul": "^1.1.2",
         "ws": "^8.18.0",
         "zod": "^3.25.67"
     },
     "devDependencies": {
+        "@babel/core": "^7",
+        "@babel/preset-env": "^7",
         "@types/bcryptjs": "^2.4.6",
         "@types/jsonwebtoken": "^9.0.6",
         "@types/node": "^20.0.0",
