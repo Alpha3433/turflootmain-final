@@ -756,26 +756,39 @@ export default function Home() {
         
         {/* Floating Game Coins */}
         <div className="absolute top-20 left-16 animate-float-coin" style={{ animationDelay: '0s' }}>
-          <div className="w-8 h-8 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
-            <span className="text-black font-bold text-sm">$</span>
+          <div className="w-8 h-8 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
+            <span className="text-black font-bold text-sm drop-shadow-lg">$</span>
           </div>
         </div>
         
         <div className="absolute top-32 right-24 animate-float-coin" style={{ animationDelay: '1.5s' }}>
-          <div className="w-6 h-6 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
-            <span className="text-black font-bold text-xs">$</span>
+          <div className="w-6 h-6 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
+            <span className="text-black font-bold text-xs drop-shadow-lg">$</span>
           </div>
         </div>
         
         <div className="absolute bottom-40 left-32 animate-float-coin" style={{ animationDelay: '3s' }}>
-          <div className="w-10 h-10 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
-            <span className="text-black font-bold text-lg">$</span>
+          <div className="w-10 h-10 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
+            <span className="text-black font-bold text-lg drop-shadow-lg">$</span>
           </div>
         </div>
         
         <div className="absolute top-1/2 right-1/4 animate-float-coin" style={{ animationDelay: '2s' }}>
-          <div className="w-7 h-7 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border-2 border-yellow-400">
-            <span className="text-black font-bold text-sm">$</span>
+          <div className="w-7 h-7 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
+            <span className="text-black font-bold text-sm drop-shadow-lg">$</span>
+          </div>
+        </div>
+
+        {/* More Floating Coins for Better Visibility */}
+        <div className="absolute top-1/4 left-1/2 animate-float-coin" style={{ animationDelay: '0.8s' }}>
+          <div className="w-6 h-6 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
+            <span className="text-black font-bold text-xs drop-shadow-lg">$</span>
+          </div>
+        </div>
+        
+        <div className="absolute bottom-1/4 right-1/3 animate-float-coin" style={{ animationDelay: '2.3s' }}>
+          <div className="w-9 h-9 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
+            <span className="text-black font-bold text-sm drop-shadow-lg">$</span>
           </div>
         </div>
 
