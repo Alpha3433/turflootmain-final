@@ -566,6 +566,10 @@
   animation: virus-pulse 3s ease-in-out infinite;
 }
 
+.animate-virus-rotate {
+  animation: virus-rotate 8s linear infinite;
+}
+
 .animate-pulse-trail {
   animation: pulse-trail 2s ease-in-out infinite;
 }
