@@ -409,12 +409,11 @@ class BlockchainWalletTester:
         total = len(tests)
         
         for test_name, test_func in tests:
-            if test_name != "Authentication Setup":  # Skip duplicate auth setup
-                try:
-                    if test_func():
-                        passed += 1
-                except Exception as e:
-                    self.log_result(test_name, False, error=f"Test execution failed: {str(e)}")
+            try:
+                if test_func():
+                    passed += 1
+            except Exception as e:
+                self.log_result(test_name, False, error=f"Test execution failed: {str(e)}")
         
         # Summary
         print("=" * 60)
