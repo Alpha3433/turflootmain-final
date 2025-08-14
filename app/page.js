@@ -752,43 +752,49 @@ export default function Home() {
   return (
     <div className="min-h-screen text-white relative overflow-hidden flex flex-col" style={{ background: 'linear-gradient(to bottom right, rgb(17, 24, 39), rgb(31, 41, 55), rgb(55, 65, 81))' }}>
       {/* Game-Inspired Animated Background */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div className="absolute inset-0 pointer-events-none z-10">
         
-        {/* Floating Game Coins */}
-        <div className="absolute top-20 left-16 animate-float-coin" style={{ animationDelay: '0s' }}>
-          <div className="w-8 h-8 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
-            <span className="text-black font-bold text-sm drop-shadow-lg">$</span>
+        {/* Floating Game Coins - Much Brighter */}
+        <div className="absolute top-20 left-16 animate-float-coin z-20" style={{ animationDelay: '0s' }}>
+          <div className="w-12 h-12 bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl border-4 border-yellow-200" style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.8)' }}>
+            <span className="text-black font-black text-lg drop-shadow-lg">$</span>
           </div>
         </div>
         
-        <div className="absolute top-32 right-24 animate-float-coin" style={{ animationDelay: '1.5s' }}>
-          <div className="w-6 h-6 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
-            <span className="text-black font-bold text-xs drop-shadow-lg">$</span>
+        <div className="absolute top-32 right-24 animate-float-coin z-20" style={{ animationDelay: '1.5s' }}>
+          <div className="w-10 h-10 bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl border-4 border-yellow-200" style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.8)' }}>
+            <span className="text-black font-black text-base drop-shadow-lg">$</span>
           </div>
         </div>
         
-        <div className="absolute bottom-40 left-32 animate-float-coin" style={{ animationDelay: '3s' }}>
-          <div className="w-10 h-10 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
-            <span className="text-black font-bold text-lg drop-shadow-lg">$</span>
+        <div className="absolute bottom-40 left-32 animate-float-coin z-20" style={{ animationDelay: '3s' }}>
+          <div className="w-14 h-14 bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl border-4 border-yellow-200" style={{ boxShadow: '0 0 25px rgba(255, 215, 0, 0.9)' }}>
+            <span className="text-black font-black text-xl drop-shadow-lg">$</span>
           </div>
         </div>
         
-        <div className="absolute top-1/2 right-1/4 animate-float-coin" style={{ animationDelay: '2s' }}>
-          <div className="w-7 h-7 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
-            <span className="text-black font-bold text-sm drop-shadow-lg">$</span>
+        <div className="absolute top-1/2 right-1/4 animate-float-coin z-20" style={{ animationDelay: '2s' }}>
+          <div className="w-11 h-11 bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl border-4 border-yellow-200" style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.8)' }}>
+            <span className="text-black font-black text-lg drop-shadow-lg">$</span>
           </div>
         </div>
 
         {/* More Floating Coins for Better Visibility */}
-        <div className="absolute top-1/4 left-1/2 animate-float-coin" style={{ animationDelay: '0.8s' }}>
-          <div className="w-6 h-6 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
-            <span className="text-black font-bold text-xs drop-shadow-lg">$</span>
+        <div className="absolute top-1/4 left-1/2 animate-float-coin z-20" style={{ animationDelay: '0.8s' }}>
+          <div className="w-9 h-9 bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl border-3 border-yellow-200" style={{ boxShadow: '0 0 18px rgba(255, 215, 0, 0.7)' }}>
+            <span className="text-black font-black text-sm drop-shadow-lg">$</span>
           </div>
         </div>
         
-        <div className="absolute bottom-1/4 right-1/3 animate-float-coin" style={{ animationDelay: '2.3s' }}>
-          <div className="w-9 h-9 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-2xl border-2 border-yellow-300 opacity-90">
-            <span className="text-black font-bold text-sm drop-shadow-lg">$</span>
+        <div className="absolute bottom-1/4 right-1/3 animate-float-coin z-20" style={{ animationDelay: '2.3s' }}>
+          <div className="w-13 h-13 bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl border-4 border-yellow-200" style={{ boxShadow: '0 0 22px rgba(255, 215, 0, 0.8)' }}>
+            <span className="text-black font-black text-lg drop-shadow-lg">$</span>
+          </div>
+        </div>
+
+        <div className="absolute top-16 left-1/4 animate-float-coin z-20" style={{ animationDelay: '4s' }}>
+          <div className="w-10 h-10 bg-gradient-to-br from-yellow-100 via-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-2xl border-3 border-yellow-200" style={{ boxShadow: '0 0 20px rgba(255, 215, 0, 0.8)' }}>
+            <span className="text-black font-black text-base drop-shadow-lg">$</span>
           </div>
         </div>
 
