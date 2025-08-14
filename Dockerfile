@@ -15,7 +15,7 @@ COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn
 
 # Deterministic install
-RUN yarn install --immutable
+RUN yarn install --frozen-lockfile
 
 # Copy the rest
 COPY . .
