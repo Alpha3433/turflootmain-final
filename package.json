@@ -13,7 +13,36 @@
         "rpc-websockets": "^8.0.0",
         "ws": "^8.18.0",
         "@solana/web3.js": "^1.95.2",
-        "react-native": "^0.74.0"
+        "react-native": "^0.74.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "packageExtensions": {
+        "@reown/appkit-siwx@*": {
+            "peerDependencies": {
+                "lit": "3.3.0"
+            }
+        },
+        "@solana/wallet-adapter-particle@*": {
+            "peerDependencies": {
+                "bs58": "^4.0.1"
+            }
+        },
+        "@solana/wallet-standard-wallet-adapter-base@*": {
+            "peerDependencies": {
+                "bs58": "^6.0.0"
+            }
+        },
+        "@react-native/metro-babel-transformer@*": {
+            "peerDependencies": {
+                "@babel/core": "*"
+            }
+        },
+        "@react-native/codegen@*": {
+            "peerDependencies": {
+                "@babel/preset-env": "^7.1.6"
+            }
+        }
     },
     "overrides": {
         "@solana/web3.js": "^1.95.2",
