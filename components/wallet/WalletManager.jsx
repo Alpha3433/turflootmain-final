@@ -20,10 +20,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
   // Define fetch functions first
   const fetchBalance = async () => {
     try {
-      // Force localhost for API calls to bypass ingress issues
-      const apiUrl = window.location.hostname === 'localhost' 
-        ? '/api/wallet/balance' 
-        : '/api/wallet/balance'  // Always use relative URL
+      // Use external URL as requested
+      const apiUrl = 'https://blockchain-battle.preview.emergentagent.com/api/wallet/balance'
       
       // Get auth token from multiple possible sources - FIXED: properly get privy token
       const authToken = localStorage.getItem('auth_token') || 
@@ -65,6 +63,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
         console.error('❌ Balance fetch failed:', response.status, response.statusText)
         if (response.status === 401) {
           console.error('❌ Authentication failed - token may be expired')
+        } else if (response.status >= 502 && response.status <= 504) {
+          console.error('❌ External server has gateway errors (502/503/504)')
         }
       }
     } catch (error) {
@@ -74,10 +74,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
   const fetchTransactions = async () => {
     try {
-      // Force localhost for API calls to bypass ingress issues  
-      const apiUrl = window.location.hostname === 'localhost'
-        ? '/api/wallet/transactions'
-        : '/api/wallet/transactions'  // Always use relative URL
+      // Use external URL as requested
+      const apiUrl = 'https://blockchain-battle.preview.emergentagent.com/api/wallet/transactions'
         
       // Get auth token from multiple possible sources - FIXED: properly get privy token
       const authToken = localStorage.getItem('auth_token') || 
@@ -111,6 +109,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
         console.error('❌ Transactions fetch failed:', response.status, response.statusText)
         if (response.status === 401) {
           console.error('❌ Authentication failed - token may be expired')
+        } else if (response.status >= 502 && response.status <= 504) {
+          console.error('❌ External server has gateway errors (502/503/504)')
         }
       }
     } catch (error) {
