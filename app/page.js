@@ -867,14 +867,26 @@ export default function Home() {
         </div>
 
         {/* Territory Grid Lines */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-25">
           <svg width="100%" height="100%" className="absolute inset-0">
             <defs>
               <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0, 245, 255, 0.3)" strokeWidth="1"/>
+                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(0, 245, 255, 0.6)" strokeWidth="1.5"/>
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
+
+        {/* Enhanced Territory Grid Overlay */}
+        <div className="absolute inset-0 opacity-15">
+          <svg width="100%" height="100%" className="absolute inset-0">
+            <defs>
+              <pattern id="grid-bright" width="100" height="100" patternUnits="userSpaceOnUse">
+                <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255, 215, 0, 0.8)" strokeWidth="2"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid-bright)" />
           </svg>
         </div>
 
