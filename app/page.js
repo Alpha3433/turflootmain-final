@@ -891,12 +891,20 @@ export default function Home() {
         </div>
 
         {/* Capture Trail Effects */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-2">
-          <div className="w-full h-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-40 animate-pulse-trail"></div>
+        <div className="absolute top-1/4 left-1/4 w-64 h-3">
+          <div className="w-full h-full bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-70 animate-pulse-trail shadow-lg"></div>
         </div>
         
-        <div className="absolute bottom-1/3 right-1/4 w-48 h-2" style={{ animationDelay: '2s' }}>
-          <div className="w-full h-full bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-40 animate-pulse-trail"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-48 h-3" style={{ animationDelay: '2s' }}>
+          <div className="w-full h-full bg-gradient-to-r from-transparent via-yellow-300 to-transparent opacity-70 animate-pulse-trail shadow-lg"></div>
+        </div>
+
+        <div className="absolute top-1/2 left-1/3 w-56 h-2" style={{ animationDelay: '1.5s' }}>
+          <div className="w-full h-full bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-60 animate-pulse-trail shadow-lg"></div>
+        </div>
+        
+        <div className="absolute bottom-1/4 right-1/3 w-40 h-2" style={{ animationDelay: '3.2s' }}>
+          <div className="w-full h-full bg-gradient-to-r from-transparent via-purple-400 to-transparent opacity-60 animate-pulse-trail shadow-lg"></div>
         </div>
 
         {/* Minimap Corner Preview */}
