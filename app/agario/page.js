@@ -1241,10 +1241,21 @@ const AgarIOGame = () => {
       // Replenish orbs (only in offline mode - server handles food in multiplayer)
       if (!game.isMultiplayer) {
         while (game.orbs.length < config.orbCount) {
+          // Define safe playable area (circular boundary, avoiding red danger zone)
+          const playableRadius = config.worldSize * 0.35 // Use 35% of world size as safe radius
+          
+          // Generate random position within circular playable area
+          let x, y, distance
+          do {
+            x = (Math.random() - 0.5) * (playableRadius * 2)
+            y = (Math.random() - 0.5) * (playableRadius * 2)
+            distance = Math.sqrt(x * x + y * y)
+          } while (distance > playableRadius) // Only accept positions inside safe circle
+          
           game.orbs.push({
             id: Math.random(),
-            x: (Math.random() - 0.5) * config.worldSize,
-            y: (Math.random() - 0.5) * config.worldSize,
+            x: x,
+            y: y,
             massValue: config.orbMassValue,
             color: '#FFD700' // Fixed gold color - no more random flickering
           })
