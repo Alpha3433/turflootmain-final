@@ -105,14 +105,27 @@ const AgarIOGame = () => {
     // Reset auto cash out flag for fresh game
     setAutoCashOutTriggered(false)
     
-    // Check if user is authenticated for multiplayer
+    // Check if user is authenticated and determine game mode
     if (user && getAccessToken) {
-      // Try multiplayer first, but fallback to offline if authentication fails
-      initializeMultiplayer().catch((error) => {
-        console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
-        // Initialize offline demo game with bots as fallback
+      // Check URL parameters to see if this is a cash game
+      const urlParams = new URLSearchParams(window.location.search)
+      const paramFee = parseFloat(urlParams.get('fee')) || 0
+      const paramMode = urlParams.get('mode') || 'free'
+      
+      // Only use multiplayer for cash games, free games use bots for testing
+      if (paramMode === 'cash' && paramFee > 0) {
+        console.log('💰 Cash game detected - initializing multiplayer')
+        // Try multiplayer first, but fallback to offline if authentication fails
+        initializeMultiplayer().catch((error) => {
+          console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
+          // Initialize offline demo game with bots as fallback
+          initializeGame(false) // false = offline mode with bots
+        })
+      } else {
+        console.log('🆓 Free game detected - using bots for testing')
+        // Free games always use bots for immediate testing
         initializeGame(false) // false = offline mode with bots
-      })
+      }
     } else {
       // Initialize offline demo game with bots
       console.log('🤖 Starting offline demo mode - user not authenticated')
