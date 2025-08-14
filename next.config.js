@@ -24,15 +24,22 @@ const nextConfig = {
         assert: false,
         os: false,
         path: false,
+        ws: false,
       };
     }
 
-    // Handle WebSocket module resolution
+    // Handle specific module resolution issues
     config.resolve.alias = {
       ...config.resolve.alias,
-      'rpc-websockets': require.resolve('rpc-websockets'),
-      'ws': require.resolve('ws'),
+      '@walletconnect/jsonrpc-ws-connection': false,
+      'rpc-websockets': false,
     };
+
+    // Handle missing files
+    config.module.rules.push({
+      test: /\.mjs$/,
+      type: 'javascript/auto',
+    });
 
     if (dev) {
       // Reduce CPU/memory from file watching
