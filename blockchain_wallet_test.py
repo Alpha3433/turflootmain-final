@@ -52,8 +52,9 @@ class BlockchainWalletTester:
         try:
             print("🔐 Setting up test authentication...")
             
-            # Create test user data with wallet address
-            test_email = f"blockchain.test.{int(time.time())}@turfloot.com"
+            # Create test user data with wallet address - use unique timestamp to avoid conflicts
+            timestamp = int(time.time())
+            test_email = f"blockchain.test.{timestamp}@turfloot.com"
             test_user_id = f"test-user-{uuid.uuid4()}"
             
             # Use the wallet address mentioned in the review request
@@ -74,6 +75,7 @@ class BlockchainWalletTester:
             }
             
             print(f"🔍 Sending auth request with wallet address: {test_wallet_address}")
+            print(f"🔍 Using unique email: {test_email}")
             
             # Authenticate via Privy endpoint
             auth_response = requests.post(
