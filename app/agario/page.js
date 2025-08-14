@@ -612,6 +612,17 @@ const AgarIOGame = () => {
   useEffect(() => {
     if (!isGameOver) {
       setTimeAlive(0) // Reset timer on new game
+      // Also reset game session to ensure clean state
+      setGameSession({
+        startTime: Date.now(),
+        endTime: null,
+        kills: 0,
+        survived: false,
+        cashedOut: false,
+        earnings: 0,
+        playTimeSeconds: 0,
+        coinsCollected: 0 // Reset coins collected to 0
+      })
     }
   }, [isGameOver])
 
