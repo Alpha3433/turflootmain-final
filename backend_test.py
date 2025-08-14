@@ -11,8 +11,8 @@ import uuid
 import sys
 from datetime import datetime
 
-# Configuration
-BASE_URL = "https://blockchain-battle.preview.emergentagent.com"
+# Configuration - Use localhost since external URL has 502 errors
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 class WalletRefreshTester:
