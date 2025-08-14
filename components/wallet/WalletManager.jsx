@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 const WalletManager = ({ onBalanceUpdate }) => {
   const { authenticated, user, login, connectWallet } = usePrivy()
