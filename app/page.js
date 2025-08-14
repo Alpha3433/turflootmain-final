@@ -1720,6 +1720,9 @@ export default function Home() {
           userBalance={walletBalance}
         />
       )}
+
+      {/* Lobby System */}
+      <LobbySystem />
       
       {/* Server Browser Modal */}
       {showServerBrowser && (
