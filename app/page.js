@@ -1153,10 +1153,11 @@ export default function Home() {
             ) : (
               <button 
                 onClick={handleLoginClick}
-                className="px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black rounded-lg font-bold transition-all hover:scale-105 shadow-lg text-sm"
-                title={!ready ? 'Click for login options (Privy initializing...)' : authenticated ? 'Already logged in' : 'Click to login'}
+                disabled={!ready}
+                className="px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black rounded-lg font-bold transition-all hover:scale-105 shadow-lg disabled:opacity-50 text-sm disabled:cursor-not-allowed"
+                title={!ready ? 'Initializing authentication...' : authenticated ? 'Already logged in' : 'Click to login'}
               >
-                {!ready ? 'LOGIN OPTIONS' : authenticated ? 'AUTHENTICATED' : 'LOGIN'}
+                {!ready ? 'Loading...' : authenticated ? 'Authenticated' : 'LOGIN'}
               </button>
             )}
           </div>
