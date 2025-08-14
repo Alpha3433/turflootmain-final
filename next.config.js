@@ -8,7 +8,6 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['mongodb'],
-    optimizeCss: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -54,6 +53,8 @@ const nextConfig = {
       ...config.resolve.alias,
       '@walletconnect/jsonrpc-ws-connection': false,
       'rpc-websockets': false,
+      'require-addon': false,
+      'bare-os': false,
     };
 
     // Handle missing files and modules
@@ -68,6 +69,7 @@ const nextConfig = {
       {
         'require-addon': 'commonjs require-addon',
         'bare-os': 'commonjs bare-os',
+        'critters': 'critters',
       },
     ];
 
