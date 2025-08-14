@@ -2153,8 +2153,12 @@ const AgarIOGame = () => {
       ctx.restore()
       
       // Draw enhanced minimap (outside camera transform)
-      if (settings.showMinimap) {
+      console.log('🗺️ Attempting to draw minimap, showMinimap:', settings?.showMinimap)
+      if (settings && settings.showMinimap) {
+        console.log('🗺️ Drawing minimap now')
         drawMinimap()
+      } else {
+        console.log('🗺️ Minimap not drawn - settings:', settings)
       }
     }
 
