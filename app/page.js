@@ -845,26 +845,131 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Game Viruses (Spiky Obstacles) - Much Brighter */}
-        <div className="absolute top-16 right-1/3 animate-virus-pulse z-20" style={{ animationDelay: '1s' }}>
-          <div className="relative w-12 h-12">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-200 via-green-400 to-green-600 rounded-full shadow-2xl border-4 border-green-300" style={{ boxShadow: '0 0 25px rgba(0, 255, 0, 0.8)' }}></div>
-            <div className="absolute -top-2 left-1/2 w-3 h-4 bg-green-300 transform -translate-x-1/2 rotate-0"></div>
-            <div className="absolute -right-2 top-1/2 w-4 h-3 bg-green-300 transform -translate-y-1/2 rotate-90"></div>
-            <div className="absolute -bottom-2 left-1/2 w-3 h-4 bg-green-300 transform -translate-x-1/2 rotate-180"></div>
-            <div className="absolute -left-2 top-1/2 w-4 h-3 bg-green-300 transform -translate-y-1/2 rotate-270"></div>
-            <div className="absolute inset-0 bg-green-300 rounded-full opacity-30 animate-ping"></div>
+        {/* Game Viruses (Spiky Obstacles) - Exact Game Match */}
+        <div className="absolute top-16 right-1/3 z-20" style={{ animationDelay: '1s' }}>
+          <div className="relative w-16 h-16">
+            {/* Virus body with exact game gradient */}
+            <div className="w-12 h-12 absolute top-2 left-2 rounded-full animate-virus-pulse" 
+                 style={{ 
+                   background: 'radial-gradient(circle at center, #00ff88 0%, #00cc66 70%, #009944 100%)', 
+                   filter: 'drop-shadow(0 0 15px #00ff88)',
+                   boxShadow: '2px 2px 8px rgba(0, 255, 136, 0.3)'
+                 }}>
+            </div>
+            
+            {/* Triangular spikes matching game positioning */}
+            <div className="absolute top-0 left-1/2 w-0 h-0 transform -translate-x-1/2 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '4px solid transparent', 
+                   borderRight: '4px solid transparent', 
+                   borderBottom: '8px solid #00ff88',
+                   filter: 'drop-shadow(0 0 3px #00ff88)'
+                 }}>
+            </div>
+            
+            <div className="absolute right-0 top-1/2 w-0 h-0 transform -translate-y-1/2 rotate-90 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '4px solid transparent', 
+                   borderRight: '4px solid transparent', 
+                   borderBottom: '8px solid #00ff88',
+                   filter: 'drop-shadow(0 0 3px #00ff88)',
+                   animationDelay: '0.2s'
+                 }}>
+            </div>
+            
+            <div className="absolute bottom-0 left-1/2 w-0 h-0 transform -translate-x-1/2 rotate-180 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '4px solid transparent', 
+                   borderRight: '4px solid transparent', 
+                   borderBottom: '8px solid #00ff88',
+                   filter: 'drop-shadow(0 0 3px #00ff88)',
+                   animationDelay: '0.4s'
+                 }}>
+            </div>
+            
+            <div className="absolute left-0 top-1/2 w-0 h-0 transform -translate-y-1/2 rotate-270 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '4px solid transparent', 
+                   borderRight: '4px solid transparent', 
+                   borderBottom: '8px solid #00ff88',
+                   filter: 'drop-shadow(0 0 3px #00ff88)',
+                   animationDelay: '0.6s'
+                 }}>
+            </div>
+            
+            {/* Additional inner spikes for game accuracy */}
+            <div className="absolute top-1 right-3 w-0 h-0 transform rotate-45 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '3px solid transparent', 
+                   borderRight: '3px solid transparent', 
+                   borderBottom: '6px solid #00cc66',
+                   filter: 'drop-shadow(0 0 2px #00ff88)',
+                   animationDelay: '0.1s'
+                 }}>
+            </div>
+            
+            <div className="absolute bottom-1 left-3 w-0 h-0 transform rotate-225 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '3px solid transparent', 
+                   borderRight: '3px solid transparent', 
+                   borderBottom: '6px solid #00cc66',
+                   filter: 'drop-shadow(0 0 2px #00ff88)',
+                   animationDelay: '0.3s'
+                 }}>
+            </div>
           </div>
         </div>
         
-        <div className="absolute bottom-20 right-20 animate-virus-pulse z-20" style={{ animationDelay: '3.5s' }}>
-          <div className="relative w-10 h-10">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-200 via-green-400 to-green-600 rounded-full shadow-2xl border-3 border-green-300" style={{ boxShadow: '0 0 20px rgba(0, 255, 0, 0.8)' }}></div>
-            <div className="absolute -top-1 left-1/2 w-2 h-3 bg-green-300 transform -translate-x-1/2"></div>
-            <div className="absolute -right-1 top-1/2 w-3 h-2 bg-green-300 transform -translate-y-1/2"></div>
-            <div className="absolute -bottom-1 left-1/2 w-2 h-3 bg-green-300 transform -translate-x-1/2"></div>
-            <div className="absolute -left-1 top-1/2 w-3 h-2 bg-green-300 transform -translate-y-1/2"></div>
-            <div className="absolute inset-0 bg-green-300 rounded-full opacity-25 animate-ping"></div>
+        <div className="absolute bottom-20 right-20 z-20" style={{ animationDelay: '3.5s' }}>
+          <div className="relative w-14 h-14">
+            {/* Virus body with exact game gradient - smaller version */}
+            <div className="w-10 h-10 absolute top-2 left-2 rounded-full animate-virus-pulse" 
+                 style={{ 
+                   background: 'radial-gradient(circle at center, #00ff88 0%, #00cc66 70%, #009944 100%)', 
+                   filter: 'drop-shadow(0 0 12px #00ff88)',
+                   boxShadow: '2px 2px 6px rgba(0, 255, 136, 0.3)'
+                 }}>
+            </div>
+            
+            {/* Triangular spikes - smaller version */}
+            <div className="absolute top-0 left-1/2 w-0 h-0 transform -translate-x-1/2 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '3px solid transparent', 
+                   borderRight: '3px solid transparent', 
+                   borderBottom: '6px solid #00ff88',
+                   filter: 'drop-shadow(0 0 2px #00ff88)'
+                 }}>
+            </div>
+            
+            <div className="absolute right-0 top-1/2 w-0 h-0 transform -translate-y-1/2 rotate-90 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '3px solid transparent', 
+                   borderRight: '3px solid transparent', 
+                   borderBottom: '6px solid #00ff88',
+                   filter: 'drop-shadow(0 0 2px #00ff88)',
+                   animationDelay: '0.25s'
+                 }}>
+            </div>
+            
+            <div className="absolute bottom-0 left-1/2 w-0 h-0 transform -translate-x-1/2 rotate-180 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '3px solid transparent', 
+                   borderRight: '3px solid transparent', 
+                   borderBottom: '6px solid #00ff88',
+                   filter: 'drop-shadow(0 0 2px #00ff88)',
+                   animationDelay: '0.5s'
+                 }}>
+            </div>
+            
+            <div className="absolute left-0 top-1/2 w-0 h-0 transform -translate-y-1/2 rotate-270 animate-virus-rotate" 
+                 style={{ 
+                   borderLeft: '3px solid transparent', 
+                   borderRight: '3px solid transparent', 
+                   borderBottom: '6px solid #00ff88',
+                   filter: 'drop-shadow(0 0 2px #00ff88)',
+                   animationDelay: '0.75s'
+                 }}>
+            </div>
           </div>
         </div>
 
