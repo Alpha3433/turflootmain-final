@@ -1165,6 +1165,12 @@ const AgarIOGame = () => {
               addFloatingText(`+${config.orbMassValue} mass`, entity.x, entity.y - 30, '#00ff88')
               addCoinAnimation(orb.x, orb.y) // New animated coin pickup
               
+              // Increment coins collected counter
+              setGameSession(prev => ({
+                ...prev,
+                coinsCollected: prev.coinsCollected + 1
+              }))
+              
               // Update mission progress
               if (currentMission && currentMission.type === 'collect') {
                 setCurrentMission(prev => {
