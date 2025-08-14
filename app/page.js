@@ -706,27 +706,37 @@ export default function Home() {
     if (selectedStake === 'FREE' || selectedStake === 0) {
       console.log('🆓 Free game selected - using bots for testing')
       
-      // Try both router.push and window.location as fallback
-      console.log('🔍 Attempting navigation to: /agario?mode=free&fee=0')
+      // Show confirmation dialog for bot practice
+      const confirmed = window.confirm(
+        '🤖 Free games use AI bots for instant practice and testing.\n\n' +
+        'Perfect for learning game mechanics and trying strategies without waiting for other players.\n\n' +
+        'Ready to practice against smart AI bots?'
+      )
       
-      try {
-        console.log('🚀 Trying router.push first...')
-        router.push('/agario?mode=free&fee=0')
+      console.log('🔍 Confirmation result:', confirmed)
+      
+      if (confirmed) {
+        console.log('✅ User confirmed bot practice game - navigating to /agario')
         
-        // Fallback using window.location after a delay
-        setTimeout(() => {
-          if (window.location.pathname === '/') {
-            console.log('🔄 router.push failed, using window.location fallback')
-            window.location.href = '/agario?mode=free&fee=0'
-          }
-        }, 1000)
-        
-      } catch (error) {
-        console.error('❌ Router error:', error)
-        console.log('🔄 Using window.location fallback immediately')
-        window.location.href = '/agario?mode=free&fee=0'
+        // Try router.push with fallback
+        try {
+          router.push('/agario?mode=free&fee=0')
+          
+          // Extra fallback for edge cases
+          setTimeout(() => {
+            if (window.location.pathname === '/') {
+              console.log('🔄 Using window.location fallback')
+              window.location.href = '/agario?mode=free&fee=0'
+            }
+          }, 2000)
+          
+        } catch (error) {
+          console.error('❌ Router error:', error)
+          window.location.href = '/agario?mode=free&fee=0'
+        }
+      } else {
+        console.log('❌ User cancelled bot practice')
       }
-      
       return
     }
     
