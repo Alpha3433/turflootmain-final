@@ -381,40 +381,81 @@ class BlockchainWalletTester:
             self.log_result("Unauthenticated Access Protection", False, error=str(e))
             return False
 
-    def test_environment_variables(self):
-        """Test 7: Verify environment variables are properly configured"""
+    def test_specific_wallet_address_from_review(self):
+        """Test 8: Test with the specific wallet address mentioned in the review request"""
         try:
-            # Test if the root endpoint is accessible to verify server is running
-            response = requests.get(f"{API_BASE}/")
+            print("🔍 Testing with the specific wallet address from the review request...")
             
-            if response.status_code == 200:
-                data = response.json()
-                features = data.get('features', [])
+            # Create a fresh user with the exact wallet address from the review
+            timestamp = int(time.time())
+            test_email = f"review.test.{timestamp}@turfloot.com"
+            review_wallet_address = "0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d"
+            
+            privy_user_data = {
+                "privy_user": {
+                    "id": f"did:privy:cm{uuid.uuid4().hex[:20]}",
+                    "email": {
+                        "address": test_email
+                    },
+                    "wallet": {
+                        "address": review_wallet_address,
+                        "wallet_client_type": "privy",
+                        "connector_type": "embedded"
+                    }
+                }
+            }
+            
+            # Authenticate with the review wallet address
+            auth_response = requests.post(
+                f"{API_BASE}/auth/privy",
+                json=privy_user_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if auth_response.status_code == 200:
+                auth_data = auth_response.json()
+                review_token = auth_data.get('token')
                 
-                if 'blockchain' in features:
-                    self.log_result(
-                        "Environment Configuration",
-                        True,
-                        f"Server running with blockchain features enabled: {features}"
-                    )
+                # Test the wallet balance with this specific address
+                headers = {"Authorization": f"Bearer {review_token}"}
+                balance_response = requests.get(f"{API_BASE}/wallet/balance", headers=headers)
+                
+                if balance_response.status_code == 200:
+                    balance_data = balance_response.json()
+                    returned_wallet = balance_data.get('wallet_address')
+                    eth_balance = balance_data.get('eth_balance', 0)
+                    usd_balance = balance_data.get('balance', 0)
+                    
+                    if returned_wallet == review_wallet_address:
+                        self.log_result(
+                            "Specific Review Wallet Address Test",
+                            True,
+                            f"SUCCESS: Wallet address correctly returned: {returned_wallet}, ETH: {eth_balance}, USD: ${usd_balance}. The user's deposited 0.002 ETH should be visible if the blockchain query is working."
+                        )
+                    else:
+                        self.log_result(
+                            "Specific Review Wallet Address Test",
+                            False,
+                            error=f"CRITICAL BUG CONFIRMED: Expected wallet {review_wallet_address}, but got {returned_wallet}. This explains why the user's 0.002 ETH deposit is not showing up - the system is checking the wrong wallet address!"
+                        )
                     return True
                 else:
                     self.log_result(
-                        "Environment Configuration",
+                        "Specific Review Wallet Address Test",
                         False,
-                        error=f"Blockchain features not enabled. Features: {features}"
+                        error=f"Balance endpoint failed: {balance_response.status_code}"
                     )
                     return False
             else:
                 self.log_result(
-                    "Environment Configuration",
+                    "Specific Review Wallet Address Test",
                     False,
-                    error=f"Server not accessible: HTTP {response.status_code}"
+                    error=f"Authentication failed: {auth_response.status_code}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_result("Environment Configuration", False, error=str(e))
+            self.log_result("Specific Review Wallet Address Test", False, error=str(e))
             return False
 
     def run_all_tests(self):
