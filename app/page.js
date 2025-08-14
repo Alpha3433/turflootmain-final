@@ -1246,13 +1246,42 @@ export default function Home() {
               </div>
 
               {/* JOIN GAME Button */}
-              <div className="flex justify-center">
-                <button 
-                  onClick={handleJoinGame}
-                  className="bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-black font-black py-6 px-16 rounded-2xl text-2xl transition-all duration-300 hover:scale-105 shadow-2xl border-2 border-cyan-300"
-                >
-                  {(selectedStake > 0 && selectedStake !== 'FREE') ? `JOIN GAME - $${selectedStake}` : '🤖 PRACTICE WITH BOTS'}
-                </button>
+              <div className="flex justify-center relative">
+                <div className="relative group">
+                  {/* Animated background glow */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-yellow-400 to-cyan-400 rounded-2xl blur-xl opacity-50 group-hover:opacity-80 transition-all duration-300 animate-pulse-glow"></div>
+                  
+                  {/* Floating game elements around the button */}
+                  <div className="absolute -top-6 -left-6 animate-float-coin group-hover:animate-bounce-slow">
+                    <div className="w-4 h-4 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center shadow-lg border border-yellow-400">
+                      <span className="text-black font-bold text-xs">$</span>
+                    </div>
+                  </div>
+                  
+                  <div className="absolute -top-4 -right-8 animate-player-drift group-hover:animate-bounce-slow" style={{ animationDelay: '0.5s' }}>
+                    <div className="w-3 h-3 bg-gradient-to-br from-cyan-300 to-cyan-600 rounded-full shadow-lg border border-cyan-400"></div>
+                  </div>
+                  
+                  <div className="absolute -bottom-5 -right-4 animate-virus-pulse group-hover:animate-bounce-slow" style={{ animationDelay: '1s' }}>
+                    <div className="relative w-3 h-3">
+                      <div className="w-3 h-3 bg-gradient-to-br from-green-400 to-green-600 rounded-full shadow-lg"></div>
+                      <div className="absolute -top-0.5 left-1/2 w-1 h-1.5 bg-green-500 transform -translate-x-1/2"></div>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    onClick={handleJoinGame}
+                    className="relative bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-black font-black py-6 px-16 rounded-2xl text-2xl transition-all duration-300 hover:scale-105 shadow-2xl border-2 border-cyan-300 btn-shimmer overflow-hidden group-hover:shadow-cyan-400/50"
+                  >
+                    <span className="relative z-10 flex items-center space-x-3">
+                      <span className="text-3xl animate-pulse">{(selectedStake > 0 && selectedStake !== 'FREE') ? '💰' : '🤖'}</span>
+                      <span>{(selectedStake > 0 && selectedStake !== 'FREE') ? `JOIN GAME - $${selectedStake}` : 'PRACTICE WITH BOTS'}</span>
+                    </span>
+                    
+                    {/* Button shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  </button>
+                </div>
               </div>
 
               {/* Action Buttons */}
