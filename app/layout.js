@@ -9,6 +9,7 @@ const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 export const metadata = {
   title: 'TurfLoot – Real-time blockchain skill gaming',
   description: 'Compete in skill-based territory battles. Earn real SOL rewards. 100% skill, 0% luck.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   openGraph: {
     title: 'TurfLoot – Real-time blockchain skill gaming',
     description: 'Compete in skill-based territory battles. Earn real SOL rewards.',
