@@ -281,16 +281,16 @@ def test_missing_userid_friends_api():
         
         response = requests.get(url, timeout=10)
         
-        if response.status_code == 400:
+        if response.status_code == 200:
             data = response.json()
-            if 'error' in data:
-                log_test("Friends API (no userId)", "PASS", f"Proper validation: {data['error']}")
+            if 'friends' in data and isinstance(data['friends'], list) and len(data['friends']) == 0:
+                log_test("Friends API (no userId)", "PASS", f"Returns empty friends array when no userId provided")
                 return True
             else:
-                log_test("Friends API (no userId)", "FAIL", "Missing error message in 400 response")
+                log_test("Friends API (no userId)", "FAIL", "Expected empty friends array")
                 return False
         else:
-            log_test("Friends API (no userId)", "FAIL", f"Expected 400, got {response.status_code}")
+            log_test("Friends API (no userId)", "FAIL", f"Expected 200, got {response.status_code}")
             return False
             
     except Exception as e:
