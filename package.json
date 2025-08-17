@@ -13,7 +13,12 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "critters": "^0.0.24",
-    "bs58": "^6.0.0"
+    "bs58": "^6.0.0",
+    "require-addon": "^1.1.0",
+    "bare-os": "^3.6.1",
+    "@particle-network/solana-wallet": "^1.3.2",
+    "qrcode.react": "^3.1.0",
+    "react-qr-reader": "^3.0.0-beta-1"
   },
   "packageExtensions": {
     "@reown/appkit-siwx@*": {
