@@ -248,7 +248,7 @@ def test_friends_api():
             # If friends has entries, check structure
             if friends:
                 first_friend = friends[0]
-                required_fields = ['id', 'username', 'status', 'last_seen']
+                required_fields = ['id', 'username', 'online', 'lastSeen']
                 missing_fields = [field for field in required_fields if field not in first_friend]
                 
                 if missing_fields:
