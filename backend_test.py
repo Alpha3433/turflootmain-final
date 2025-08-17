@@ -15,8 +15,8 @@ import json
 import time
 from datetime import datetime
 
-# Configuration
-BASE_URL = "https://multiplayer-sol.preview.emergentagent.com"
+# Configuration - Using localhost since external URL has 502 errors
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(test_name, status, details=""):
