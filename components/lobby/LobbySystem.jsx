@@ -21,8 +21,11 @@ const LobbySystem = () => {
   // Initialize Socket.IO connection
   useEffect(() => {
     if (authenticated && user && !socket) {
-      const newSocket = io(undefined, { path: '/socket.io',
-        transports: ['websocket', 'polling']
+      const newSocket = io({
+        path: '/socket.io',
+        transports: ['websocket', 'polling'],
+        withCredentials: true,
+        autoConnect: true,
       })
 
       newSocket.on('connect', () => {
