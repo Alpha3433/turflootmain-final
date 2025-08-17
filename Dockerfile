@@ -17,7 +17,10 @@ COPY package.json yarn.lock .yarnrc.yml .yarnrc ./
 
 # Deterministic, tolerant install with Yarn v1
 ENV YARN_ENABLE_IMMUTABLE_INSTALLS=false
-RUN yarn install --ignore-engines --network-timeout 600000 --frozen-lockfile
+ENV YARN_IGNORE_ENGINES=true
+ENV YARN_IGNORE_PLATFORM=true
+ENV YARN_IGNORE_OPTIONAL=true
+RUN yarn install --ignore-engines --ignore-platform --ignore-optional --network-timeout 600000 --frozen-lockfile --silent
 
 # Copy the rest
 COPY . .
