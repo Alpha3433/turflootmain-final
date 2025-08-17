@@ -25,12 +25,12 @@ ENV YARN_IGNORE_PLATFORM=true
 ENV YARN_IGNORE_OPTIONAL=true
 RUN yarn install --ignore-engines --ignore-platform --ignore-optional --network-timeout 600000 --frozen-lockfile --silent
 
-# Copy the rest
+# Copy the rest including build script
 COPY . .
+RUN chmod +x ./build-kaniko.sh
 
-# Build (adjust if your app uses a different script)
-ENV NODE_OPTIONS="--max-old-space-size=2048"
-RUN yarn build
+# Build using custom script that suppresses warnings
+RUN ./build-kaniko.sh
 
 # Web app default
 EXPOSE 3000
