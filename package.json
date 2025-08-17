@@ -96,8 +96,9 @@
     "dev:no-reload": "next dev --hostname 0.0.0.0 --port 3000",
     "dev:webpack": "next dev --hostname 0.0.0.0 --port 3000",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build:clean": "rm -f yarn.lock && yarn install --ignore-engines --ignore-platform --ignore-optional --network-timeout 600000 && yarn build",
     "start": "next start -p 3000",
-    "postinstall": "yarn config set ignore-engines true || true; echo 'Dependencies installed successfully'"
+    "postinstall": "yarn config set ignore-engines true || true; yarn config set ignore-platform true || true; yarn config set ignore-optional true || true; echo 'Dependencies installed successfully'"
   },
   "dependencies": {
     "@babel/runtime": "^7.24.0",
