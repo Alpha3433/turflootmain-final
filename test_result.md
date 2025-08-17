@@ -728,6 +728,30 @@ backend:
         agent: "testing"
         comment: "✅ ANTI-CHEAT API INTEGRATION TESTING COMPLETED - ALL INTEGRATION TESTS PASSED (100% SUCCESS RATE). API COMPATIBILITY: 1) ✅ All existing API endpoints working correctly with enhanced backend (5/5 core endpoints operational), 2) ✅ /api/servers/lobbies endpoint successfully integrates with enhanced game server and anti-cheat system, 3) ✅ Game server statistics and monitoring working correctly (36 servers, proper status tracking), 4) ✅ No breaking changes detected in existing multiplayer functionality, 5) ✅ Server-side validation methods working properly (authentication validation, error handling), 6) ✅ Proper error handling and logging throughout the system. PERFORMANCE VERIFICATION: Fast response times maintained (0.015s for server queries), consistent data structure across requests, proper authentication integration. The anti-cheat system integration with existing APIs is seamless and maintains full backward compatibility while adding comprehensive cheat protection."
 
+  - task: "Leaderboard API (GET /api/users/leaderboard)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PRIORITY API ENDPOINT TESTING COMPLETED - Leaderboard API working perfectly. Returns proper leaderboard array structure with all required fields (rank, username, gamesWon, gamesPlayed, totalTerritory, bestPercent, winRate). Successfully retrieved 10 leaderboard entries with proper data structure. Endpoint responds with 200 status code and includes timestamp field. Data structure matches frontend expectations for leaderboard display functionality."
+
+  - task: "Friends API (GET /api/friends/list)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PRIORITY API ENDPOINT TESTING COMPLETED - Friends API working perfectly. Returns proper friends array structure with all required fields (id, username, online, lastSeen). Successfully tested with demo-user parameter and returned 1 friend entry with proper structure. Graceful handling when no userId provided (returns empty friends array). Endpoint responds with 200 status code and includes timestamp field. Data structure matches frontend expectations for friends list functionality."
+
 
 
 frontend:
