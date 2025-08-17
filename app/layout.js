@@ -3,6 +3,8 @@ import './globals.css'
 import PrivyAuthProvider from '@/components/providers/PrivyAuthProvider'
 import { GameSettingsProvider } from '@/components/providers/GameSettingsProvider'
 
+export const dynamic = 'force-dynamic'
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 
