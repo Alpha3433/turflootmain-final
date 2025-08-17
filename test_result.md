@@ -108,11 +108,7 @@ user_problem_statement: "Implement three high-priority features: Real Blockchain
 # Test plan for this run
 
 test_plan:
-  current_focus:
-    - "Server Browser API (GET /api/servers/lobbies) - verify 36 servers returned with proper structure"
-    - "Live Statistics APIs (GET /api/stats/live-players and GET /api/stats/global-winnings) - verify working"
-    - "Leaderboard API (GET /api/users/leaderboard) - verify working"
-    - "Friends API (GET /api/friends/list) - verify working with demo userId"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
