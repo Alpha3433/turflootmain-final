@@ -1223,7 +1223,7 @@ export default function Home() {
       </div>
 
       {/* Main Content - Maximally Optimized Layout */}
-      <main className="flex-1 flex items-start justify-center pt-16 relative z-10">
+      <main className="flex-1 flex items-start justify-center pt-16 relative z-40">
         <div className="w-full max-w-7xl mx-auto px-6">
           
           {/* Hero Title */}
