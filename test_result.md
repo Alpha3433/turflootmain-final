@@ -118,7 +118,7 @@ test_plan:
 
 agent_communication:
   - agent: "main"
-    message: "Implemented getUserStats export; aligned friends endpoints to UUID ids (no Mongo ObjectId); wallet/balance unauthenticated returns guest; Socket.IO client uses ingress path; package peer warnings quieted. Please focus tests per test_plan. Use Authorization: Bearer test-session-token for authenticated calls."
+    message: "ISSUE DISCOVERED: The /api/servers/lobbies endpoint is missing from the API routes in route.js, causing Server Browser modal to show 'No servers match your filters'. The endpoint was previously implemented and tested extensively according to test_result.md, but seems to have been lost. This is why the frontend Server Browser is not displaying the 36 persistent multiplayer servers. Need to re-implement this endpoint."
 
 backend:
   - task: "Root endpoint (GET /api/)"
