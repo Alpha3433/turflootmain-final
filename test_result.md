@@ -104,6 +104,22 @@
 
 user_problem_statement: "Implement three high-priority features: Real Blockchain Integration, Real-Time Multiplayer System, and User Authentication & Profiles"
 
+
+# Test plan for this run
+
+test_plan:
+  current_focus:
+    - "Wallet Balance API (GET /api/wallet/balance) - verify guest response without Authorization and authenticated response using Bearer test-session-token"
+    - "Friends API (POST /api/friends/send-request) - should create a request with UUID id and accepted status"
+    - "Friends API (POST /api/friends/accept-request) - if previous request auto-accepted, expect 404 (already processed)"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Implemented getUserStats export; aligned friends endpoints to UUID ids (no Mongo ObjectId); wallet/balance unauthenticated returns guest; Socket.IO client uses ingress path; package peer warnings quieted. Please focus tests per test_plan. Use Authorization: Bearer test-session-token for authenticated calls."
+
 backend:
   - task: "Root endpoint (GET /api/)"
     implemented: true
