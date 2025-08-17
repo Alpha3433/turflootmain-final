@@ -196,6 +196,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ POST-CUSTOMIZATION MODAL REGRESSION TEST PASSED - Live statistics endpoints working perfectly after frontend customization modal enhancements. GET /api/stats/live-players returns count: 0 with timestamp. GET /api/stats/global-winnings returns total: 0 with timestamp. No regression issues detected from frontend visual enhancement work."
+      - working: true
+        agent: "testing"
+        comment: "✅ PRIORITY API ENDPOINTS RE-VERIFICATION COMPLETED - Live Statistics APIs working perfectly. GET /api/stats/live-players returns proper structure with count (integer) and timestamp (ISO string). GET /api/stats/global-winnings returns proper structure with total (numeric), formatted (string), and timestamp (ISO string). Both endpoints respond with 200 status codes and include all required fields. Data types validated and match frontend expectations. Performance excellent with fast response times. Ready for production use."
 
   - task: "Create user (POST /api/users)"
     implemented: true
