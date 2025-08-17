@@ -29,25 +29,25 @@
       "peerDependencies": { "lit": "3.3.0" }
     },
     "@solana/wallet-adapter-particle@*": {
-      "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" }
+      "peerDependencies": { "bs58": "^6.0.0" }
     },
     "@particle-network/solana-wallet@*": {
-      "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" }
+      "peerDependencies": { "bs58": "^6.0.0" }
     },
     "@solana/wallet-standard-wallet-adapter-base@*": {
-      "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" }
+      "peerDependencies": { "bs58": "^6.0.0" }
     },
     "@keystonehq/sol-keyring@*": {
-      "peerDependencies": { "react": "^16 || ^17 || ^18", "react-dom": "^16 || ^17 || ^18" }
+      "peerDependencies": { "react": "^18.2.0", "react-dom": "^18.2.0" }
     },
     "@keystonehq/sdk@*": {
-      "peerDependencies": { "react": "^16 || ^17 || ^18", "react-dom": "^16 || ^17 || ^18" }
+      "peerDependencies": { "react": "^18.2.0", "react-dom": "^18.2.0" }
     },
     "react-qr-reader@*": {
-      "peerDependencies": { "react": "^16 || ^17 || ^18", "react-dom": "^16 || ^17 || ^18" }
+      "peerDependencies": { "react": "^18.2.0", "react-dom": "^18.2.0" }
     },
     "qrcode.react@*": {
-      "peerDependencies": { "react": "^16 || ^17 || ^18" }
+      "peerDependencies": { "react": "^18.2.0", "react-dom": "^18.2.0" }
     },
     "react-native@*": {
       "peerDependencies": { "react": "18.2.0" }
@@ -57,6 +57,12 @@
     },
     "@react-native/codegen@*": {
       "peerDependencies": { "@babel/preset-env": "^7.1.6" }
+    },
+    "require-addon@*": {
+      "engines": { "node": ">=20.0.0" }
+    },
+    "bare-os@*": {
+      "engines": { "node": ">=20.0.0" }
     }
   },
   "overrides": {
