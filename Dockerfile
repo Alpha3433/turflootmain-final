@@ -12,8 +12,11 @@ WORKDIR /app
 # Cache-bust knob (pass --build-arg CACHEBUST=$(date +%s))
 ARG CACHEBUST=1
 
-# Copy lock and yarn config early for caching (include .yarnrc for ignore-engines)
-COPY package.json yarn.lock .yarnrc.yml .yarnrc ./
+# Copy lock and yarn config early for caching (include all yarn configs for warning suppression)
+COPY package.json yarn.lock .yarnrc.yml .yarnrc .yarnrc.kaniko ./
+
+# Use the most restrictive yarn config for Kaniko
+RUN cp .yarnrc.kaniko .yarnrc
 
 # Deterministic, tolerant install with Yarn v1
 ENV YARN_ENABLE_IMMUTABLE_INSTALLS=false
