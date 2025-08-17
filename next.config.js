@@ -22,6 +22,8 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['mongodb'],
+    // Disable Critters to avoid Kaniko/webpack css optimization issues during prod builds
+    optimizeCss: false,
   },
   eslint: {
     ignoreDuringBuilds: true,
