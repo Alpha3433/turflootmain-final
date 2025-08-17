@@ -196,7 +196,7 @@ def test_leaderboard_api():
             # If leaderboard has entries, check structure
             if leaderboard:
                 first_entry = leaderboard[0]
-                required_fields = ['rank', 'username', 'total_territory_captured', 'games_played', 'games_won']
+                required_fields = ['rank', 'username', 'gamesWon', 'gamesPlayed', 'totalTerritory']
                 missing_fields = [field for field in required_fields if field not in first_entry]
                 
                 if missing_fields:
