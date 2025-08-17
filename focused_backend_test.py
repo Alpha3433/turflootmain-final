@@ -11,8 +11,8 @@ import uuid
 import sys
 from datetime import datetime
 
-# Configuration - Use external URL from .env
-BASE_URL = "https://f239035f-3456-4588-a02d-fa156c6d959c.preview.emergentagent.com"
+# Configuration - Use localhost since external URL has 502 ingress errors
+BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
 
 class FocusedBackendTester:
