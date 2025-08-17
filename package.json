@@ -12,7 +12,8 @@
     "react-native": "0.74.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "critters": "^0.0.24"
+    "critters": "^0.0.24",
+    "bs58": "^6.0.0"
   },
   "packageExtensions": {
     "@reown/appkit-siwx@*": {
@@ -28,12 +29,10 @@
       "peerDependencies": { "lit": "3.3.0" }
     },
     "@solana/wallet-adapter-particle@*": {
-      "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" },
-      "dependencies": { "bs58": "^4.0.1" }
+      "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" }
     },
     "@particle-network/solana-wallet@*": {
-      "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" },
-      "dependencies": { "bs58": "^4.0.1" }
+      "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" }
     },
     "@solana/wallet-standard-wallet-adapter-base@*": {
       "peerDependencies": { "bs58": "^4.0.1 || ^6.0.0" }
@@ -71,7 +70,8 @@
     "ws": "^8.18.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "critters": "^0.0.24"
+    "critters": "^0.0.24",
+    "bs58": "^6.0.0"
   },
   "scripts": {
     "dev": "NODE_OPTIONS='--max-old-space-size=2048' next dev --hostname 0.0.0.0 --port 3000",
@@ -169,7 +169,7 @@
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.4.19",
-    "bs58": "^4.0.1",
+    "bs58": "^6.0.0",
     "critters": "^0.0.24",
     "globals": "^16.2.0",
     "postcss": "^8",

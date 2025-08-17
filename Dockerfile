@@ -9,11 +9,15 @@ RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 
 WORKDIR /app
 
-# Copy lock and yarn config early for caching
-COPY package.json yarn.lock .yarnrc.yml ./
+# Cache-bust knob (pass --build-arg CACHEBUST=$(date +%s))
+ARG CACHEBUST=1
 
-# Deterministic install with Yarn v1
-RUN yarn install --frozen-lockfile
+# Copy lock and yarn config early for caching (include .yarnrc for ignore-engines)
+COPY package.json yarn.lock .yarnrc.yml .yarnrc ./
+
+# Deterministic, tolerant install with Yarn v1
+ENV YARN_ENABLE_IMMUTABLE_INSTALLS=false
+RUN yarn install --ignore-engines --network-timeout 600000 --frozen-lockfile
 
 # Copy the rest
 COPY . .
