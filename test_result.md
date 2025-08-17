@@ -109,9 +109,10 @@ user_problem_statement: "Implement three high-priority features: Real Blockchain
 
 test_plan:
   current_focus:
-    - "Wallet Balance API (GET /api/wallet/balance) - verify guest response without Authorization and authenticated response using Bearer test-session-token"
-    - "Friends API (POST /api/friends/send-request) - should create a request with UUID id and accepted status"
-    - "Friends API (POST /api/friends/accept-request) - if previous request auto-accepted, expect 404 (already processed)"
+    - "Server Browser API (GET /api/servers/lobbies) - verify 36 servers returned with proper structure"
+    - "Live Statistics APIs (GET /api/stats/live-players and GET /api/stats/global-winnings) - verify working"
+    - "Leaderboard API (GET /api/users/leaderboard) - verify working"
+    - "Friends API (GET /api/friends/list) - verify working with demo userId"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
