@@ -30,7 +30,10 @@
     "@reown/appkit-ui": "^1.7.19",
     "react-devtools-core": "^5.2.0",
     "engine.io": "^6.5.4",
-    "@privy-io/public-api": "^2.43.1"
+    "@privy-io/public-api": "^2.43.1",
+    "@particle-network/solana-wallet/bs58": "^6.0.0",
+    "react-qr-reader/react": "18.2.0",
+    "react-qr-reader/react-dom": "18.2.0"
   },
   "packageExtensions": {
     "@reown/appkit-siwx@*": {
