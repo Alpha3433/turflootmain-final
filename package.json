@@ -75,6 +75,9 @@
     "bare-os@*": {
       "engines": { "node": ">=20.0.0" },
       "peerDependencies": {}
+    },
+    "@reown/appkit-utils@*": {
+      "peerDependencies": { "valtio": "2.1.5", "lit": "3.3.0" }
     }
   },
   "overrides": {
