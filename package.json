@@ -7,7 +7,7 @@
   },
   "resolutions": {
     "rpc-websockets": "^8.0.0",
-    "ws": "^8.18.0",
+    "ws": "^8.18.3",
     "@solana/web3.js": "^1.95.2",
     "react-native": "0.74.7",
     "react": "18.2.0",
@@ -27,7 +27,10 @@
     "@reown/appkit-controllers": "^1.7.19",
     "@reown/appkit-pay": "^1.7.19",
     "@reown/appkit-scaffold-ui": "^1.7.19",
-    "@reown/appkit-ui": "^1.7.19"
+    "@reown/appkit-ui": "^1.7.19",
+    "react-devtools-core": "^5.2.0",
+    "engine.io": "^6.5.4",
+    "@privy-io/public-api": "^1.0.0"
   },
   "packageExtensions": {
     "@reown/appkit-siwx@*": {
