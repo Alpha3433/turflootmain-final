@@ -108,7 +108,7 @@
     "bs58": "^6.0.0",
     "require-addon": "^1.1.0",
     "bare-os": "^3.6.1",
-    "@solana/wallet-standard": "^1.2.0",
+    "@solana/wallet-adapter-base": "^0.9.23",
     "qrcode.react": "^3.1.0",
     "qr-code-styling": "^1.8.0",
     "lit": "3.3.0",
