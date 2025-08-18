@@ -83,6 +83,18 @@
     },
     "@reown/appkit-utils@*": {
       "peerDependencies": { "valtio": "2.1.5", "lit": "3.3.0" }
+    },
+    "@reown/appkit-controllers@*": {
+      "peerDependencies": { "valtio": "2.1.5", "lit": "3.3.0" }
+    },
+    "@reown/appkit-pay@*": {
+      "peerDependencies": { "lit": "3.3.0" }
+    },
+    "@reown/appkit-scaffold-ui@*": {
+      "peerDependencies": { "lit": "3.3.0" }
+    },
+    "@reown/appkit-ui@*": {
+      "peerDependencies": { "lit": "3.3.0" }
     }
   },
   "overrides": {
