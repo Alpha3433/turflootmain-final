@@ -1,0 +1,28 @@
+yarn run v1.22.22
+$ NODE_OPTIONS='--max-old-space-size=4096' next build
+[dotenv@17.2.1] injecting env (0) from .env -- tip: 📡 auto-backup env with Radar: https://dotenvx.com/radar
+✅ Loaded environment variables from .env file
+  ▲ Next.js 14.2.4
+  - Environments: .env.production, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+
+> Build error occurred
+Error: ENOENT: no such file or directory, open '/app/.next/server/pages-manifest.json'
+    at async open (node:internal/fs/promises:639:25)
+    at async Object.readFile (node:internal/fs/promises:1246:14)
+    at async readManifest (/app/node_modules/next/dist/build/index.js:164:23)
+    at async /app/node_modules/next/dist/build/index.js:1040:35
+    at async Span.traceAsyncFn (/app/node_modules/next/dist/trace/trace.js:154:20)
+    at async build (/app/node_modules/next/dist/build/index.js:366:9) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/app/.next/server/pages-manifest.json'
+}
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

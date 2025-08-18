@@ -1,0 +1,79 @@
+(node:3483) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///app/lib/gameServer.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /app/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+🎮 TurfLoot Game Server initialized
+🎮 TurfLoot Game Server initialized with Socket.IO
+⚠️ Legacy WebSocket not available: Cannot find module '/app/node_modules/next/server' imported from /app/lib/auth.js
+Did you mean to import "next/server.js"?
+🚀 TurfLoot server ready on http://0.0.0.0:3000
+ ○ Compiling /api/[[...path]] ...
+ ✓ Compiled /api/[[...path]] in 1177ms (137 modules)
+ GET /api 200 in 1792ms
+ ○ Compiling / ...
+ ✓ Compiled / in 62.5s (15611 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 64181ms
+ ✓ Compiled in 2.9s (7642 modules)
+ ✓ Compiled in 1354ms (7628 modules)
+ GET /api 200 in 121ms
+ GET /api 200 in 10ms
+🔑 Privy authentication request received
+🔍 Processing Privy authentication for user: did:privy:game_test_1754705893
+🔍 Auth method: Email OTP
+✉️ Email OTP user: gametest.1754705893@turfloot.com
+👤 Creating new user for Privy ID: did:privy:game_test_1754705893
+✅ New user created via Privy: 1efe65fb-e0c8-40b8-9d9f-09222a1a29e9
+🎉 Privy authentication successful - Method: email, User: gametest.1754705893@turfloot.com
+ POST /api/auth/privy 200 in 79ms
+ GET /api/wallet/balance 200 in 33ms
+ GET /api/wallet/balance 401 in 9ms
+ POST /api/wallet/add-funds 200 in 22ms
+ GET /api/wallet/balance 200 in 15ms
+ GET /api/wallet/balance 200 in 29ms
+ GET / 200 in 103ms
+ HEAD / 200 in 39ms
+ ○ Compiling /play ...
+ ✓ Compiled /play in 11.1s (15509 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /play?mode=cash&room=premium&fee=10 200 in 5911ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 3s (7661 modules)
+ GET / 200 in 198ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 2.9s (7661 modules)
+ ✓ Compiled in 1164ms (7661 modules)
+ HEAD /play 200 in 35ms
+ HEAD / 200 in 27ms
+🔌 Player connected: q7XdYF_vNEXM0cJCAAAD
+ GET / 200 in 30ms
+🔌 Player disconnected: q7XdYF_vNEXM0cJCAAAD
+ HEAD / 200 in 38ms
+ GET /play?mode=free&room=lobby 200 in 37ms
+ GET / 200 in 43ms
+ HEAD /play 200 in 28ms
+ HEAD / 200 in 31ms
+
+<--- Last few GCs --->
+
+[3483:0x1242f810]   926495 ms: Scavenge (reduce) 1977.7 (2024.2) -> 1976.7 (2024.2) MB, 71.28 / 0.00 ms  (average mu = 0.311, current mu = 0.232) allocation failure; 
+[3483:0x1242f810]   926724 ms: Scavenge (reduce) 1977.7 (2024.2) -> 1976.8 (2024.2) MB, 55.25 / 0.00 ms  (average mu = 0.311, current mu = 0.232) allocation failure; 
+[3483:0x1242f810]   926936 ms: Scavenge (reduce) 1977.7 (2024.2) -> 1976.7 (2024.2) MB, 28.77 / 0.00 ms  (average mu = 0.311, current mu = 0.232) allocation failure; 
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0xb8859c node::OOMErrorHandler(char const*, v8::OOMDetails const&) [node]
+ 2: 0xecd59c v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]
+ 3: 0xecd76c v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [node]
+ 4: 0x10d53fc  [node]
+ 5: 0x10d5918 v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector) [node]
+ 6: 0x10eb100 v8::internal::Heap::PerformGarbageCollection(v8::internal::GarbageCollector, v8::internal::GarbageCollectionReason, char const*) [node]
+ 7: 0x10eb74c v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [node]
+ 8: 0x10ed640 v8::internal::Heap::HandleGCRequest() [node]
+ 9: 0x105d68c v8::internal::StackGuard::HandleInterrupts() [node]
+10: 0x14b6348 v8::internal::Runtime_StackGuardWithGap(int, unsigned long*, v8::internal::Isolate*) [node]
+11: 0x18b7a84  [node]

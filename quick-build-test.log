@@ -1,0 +1,8 @@
+
+> turfloot@0.1.0 build
+> NODE_OPTIONS='--max-old-space-size=4096' next build
+
+  ▲ Next.js 14.2.4
+  - Environments: .env.production, .env
+
+   Creating an optimized production build ...

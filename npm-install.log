@@ -1,0 +1,76 @@
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: qrcode.react@1.0.1
+npm warn Found: react@18.3.0
+npm warn node_modules/react
+npm warn   react@"18.3.0" from the root project
+npm warn   105 more (zustand, @floating-ui/react, @floating-ui/react-dom, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^15.5.3 || ^16.0.0 || ^17.0.0" from qrcode.react@1.0.1
+npm warn node_modules/@keystonehq/sdk/node_modules/qrcode.react
+npm warn   qrcode.react@"^1.0.1" from @keystonehq/sdk@0.19.2
+npm warn   node_modules/@keystonehq/sdk
+npm warn
+npm warn Conflicting peer dependency: react@17.0.2
+npm warn node_modules/react
+npm warn   peer react@"^15.5.3 || ^16.0.0 || ^17.0.0" from qrcode.react@1.0.1
+npm warn   node_modules/@keystonehq/sdk/node_modules/qrcode.react
+npm warn     qrcode.react@"^1.0.1" from @keystonehq/sdk@0.19.2
+npm warn     node_modules/@keystonehq/sdk
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: react-qr-reader@2.2.1
+npm warn Found: react@18.3.0
+npm warn node_modules/react
+npm warn   react@"18.3.0" from the root project
+npm warn   105 more (zustand, @floating-ui/react, @floating-ui/react-dom, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"~16" from react-qr-reader@2.2.1
+npm warn node_modules/@keystonehq/sdk/node_modules/react-qr-reader
+npm warn   react-qr-reader@"^2.2.1" from @keystonehq/sdk@0.19.2
+npm warn   node_modules/@keystonehq/sdk
+npm warn
+npm warn Conflicting peer dependency: react@16.14.0
+npm warn node_modules/react
+npm warn   peer react@"~16" from react-qr-reader@2.2.1
+npm warn   node_modules/@keystonehq/sdk/node_modules/react-qr-reader
+npm warn     react-qr-reader@"^2.2.1" from @keystonehq/sdk@0.19.2
+npm warn     node_modules/@keystonehq/sdk
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: react-qr-reader@2.2.1
+npm warn Found: react-dom@18.3.0
+npm warn node_modules/react-dom
+npm warn   react-dom@"18.3.0" from the root project
+npm warn   64 more (@floating-ui/react, @floating-ui/react-dom, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react-dom@"~16" from react-qr-reader@2.2.1
+npm warn node_modules/@keystonehq/sdk/node_modules/react-qr-reader
+npm warn   react-qr-reader@"^2.2.1" from @keystonehq/sdk@0.19.2
+npm warn   node_modules/@keystonehq/sdk
+npm warn
+npm warn Conflicting peer dependency: react-dom@16.14.0
+npm warn node_modules/react-dom
+npm warn   peer react-dom@"~16" from react-qr-reader@2.2.1
+npm warn   node_modules/@keystonehq/sdk/node_modules/react-qr-reader
+npm warn     react-qr-reader@"^2.2.1" from @keystonehq/sdk@0.19.2
+npm warn     node_modules/@keystonehq/sdk
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+added 553 packages, removed 267 packages, changed 107 packages, and audited 1656 packages in 1m
+
+168 packages are looking for funding
+  run `npm fund` for details
+
+5 vulnerabilities (4 high, 1 critical)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.

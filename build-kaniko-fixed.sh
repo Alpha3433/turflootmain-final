@@ -18,6 +18,7 @@ fi
 
 # Set environment variables for clean builds
 export NODE_OPTIONS="--max-old-space-size=4096"
+export YARN_ENABLE_WORKSPACES=false
 
 echo "📦 Installing dependencies with Yarn 4.x..."
 

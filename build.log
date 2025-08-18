@@ -1,0 +1,45 @@
+yarn run v1.22.22
+$ NODE_OPTIONS='--max-old-space-size=4096' next build
+[dotenv@17.2.1] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+✅ Loaded environment variables from .env file
+  ▲ Next.js 14.2.4
+  - Environments: .env.production, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/14) ...
+   Generating static pages (3/14) 
+   Generating static pages (6/14) 
+   Generating static pages (10/14) 
+ ✓ Generating static pages (14/14)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ƒ /                                    30.6 kB        1.25 MB
+├ ƒ /_not-found                          152 B          90.3 kB
+├ ƒ /agario                              14.3 kB        1.22 MB
+├ ƒ /api/[[...path]]                     0 B                0 B
+├ ƒ /blocked                             2.09 kB         108 kB
+├ ƒ /dashboard                           1.84 kB         108 kB
+├ ƒ /debug-privy                         2.01 kB         1.2 MB
+├ ƒ /demo                                2.66 kB         101 kB
+├ ƒ /legal                               4.5 kB          111 kB
+├ ƒ /play                                4.39 kB         1.2 MB
+├ ƒ /test-backend                        511 B          90.7 kB
+├ ƒ /test-env                            908 B          91.1 kB
+└ ƒ /test-login                          960 B          91.1 kB
++ First Load JS shared by all            90.1 kB
+  ├ chunks/7023-27ced7b3732245c1.js      31.7 kB
+  ├ chunks/fd9d1056-6b756cfb59fccf34.js  53.6 kB
+  └ other shared chunks (total)          4.83 kB
+
+
+ƒ Middleware                             26.7 kB
+
+ƒ  (Dynamic)  server-rendered on demand
+
+Done in 76.34s.

@@ -1,0 +1,4 @@
+yarn run v1.22.22
+$ YARN_IGNORE_ENGINES=true YARN_IGNORE_PLATFORM=true YARN_IGNORE_OPTIONAL=true YARN_SILENT=true DISABLE_OPENCOLLECTIVE=true ADBLOCK=true yarn install --ignore-engines --ignore-platform --ignore-optional --silent --network-timeout 600000 2>/dev/null && NODE_ENV=production next build
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.

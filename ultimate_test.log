@@ -1,0 +1,34 @@
+🚀 ULTIMATE DEPLOYMENT SCRIPT - ZERO WARNINGS GUARANTEE
+🧹 Cleaning build environment...
+📦 Installing dependencies with ZERO warnings...
+Dependencies installed successfully
+🏗️ Building application...
+[dotenv@17.2.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+✅ Loaded environment variables from .env file
+ ⚠ Invalid next.config.js options detected: 
+ ⚠     Expected string, received boolean at "experimental.outputFileTracingRoot"
+ ⚠     Unrecognized key(s) in object: 'telemetry'
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+  ▲ Next.js 14.2.4
+  - Environments: .env.production, .env
+  - Experiments (use with caution):
+    · outputFileTracingRoot
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./node_modules/@walletconnect/utils/node_modules/viem/node_modules/@noble/curves/esm/abstract/modular.js
+Attempted import error: 'anumber' is not exported from '@noble/hashes/utils' (imported as 'anumber').
+
+Import trace for requested module:
+./node_modules/@walletconnect/utils/node_modules/viem/node_modules/@noble/curves/esm/abstract/modular.js
+./node_modules/@walletconnect/utils/node_modules/viem/node_modules/@noble/curves/esm/secp256k1.js
+./node_modules/@walletconnect/utils/node_modules/viem/_esm/utils/signature/parseSignature.js
+./node_modules/@walletconnect/utils/node_modules/viem/_esm/index.js
+./node_modules/@walletconnect/utils/dist/index.es.js
+./node_modules/@walletconnect/ethereum-provider/dist/index.es.js
+./node_modules/@privy-io/react-auth/dist/esm/index.mjs
+./app/play/page.js
+
+
+> Build failed because of webpack errors

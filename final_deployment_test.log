@@ -1,0 +1,53 @@
+🔧 Pre-deployment setup with comprehensive warning elimination...
+🧹 Cleaning build artifacts...
+📦 Installing dependencies with maximum warning suppression...
+🏗️ Building application with optimized settings...
+[dotenv@17.2.1] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+✅ Loaded environment variables from .env file
+ ⚠ Invalid next.config.js options detected: 
+ ⚠     Expected string, received boolean at "experimental.outputFileTracingRoot"
+ ⚠     Unrecognized key(s) in object: 'telemetry'
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+  ▲ Next.js 14.2.4
+  - Environments: .env.production, .env
+  - Experiments (use with caution):
+    · outputFileTracingRoot
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/14) ...
+   Generating static pages (3/14) 
+   Generating static pages (6/14) 
+   Generating static pages (10/14) 
+ ✓ Generating static pages (14/14)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ƒ /                                    30.6 kB        1.25 MB
+├ ƒ /_not-found                          152 B          89.2 kB
+├ ƒ /agario                              14.3 kB        1.23 MB
+├ ƒ /api/[[...path]]                     0 B                0 B
+├ ƒ /blocked                             2.09 kB         107 kB
+├ ƒ /dashboard                           1.84 kB         107 kB
+├ ƒ /debug-privy                         2.01 kB         1.2 MB
+├ ƒ /demo                                2.66 kB        99.8 kB
+├ ƒ /legal                               4.5 kB          109 kB
+├ ƒ /play                                4.39 kB         1.2 MB
+├ ƒ /test-backend                        511 B          89.6 kB
+├ ƒ /test-env                            925 B            90 kB
+└ ƒ /test-login                          960 B            90 kB
++ First Load JS shared by all            89.1 kB
+  ├ chunks/7023-27ced7b3732245c1.js      31.7 kB
+  ├ chunks/fd9d1056-6b756cfb59fccf34.js  53.6 kB
+  └ other shared chunks (total)          3.76 kB
+
+
+ƒ Middleware                             26.7 kB
+
+ƒ  (Dynamic)  server-rendered on demand
+
+✅ Pre-deployment setup completed successfully!

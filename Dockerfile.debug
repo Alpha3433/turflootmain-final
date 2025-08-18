@@ -1,0 +1,63 @@
+# syntax=docker/dockerfile:1
+FROM node:20-alpine
+
+# Tools for native builds if needed
+RUN apk add --no-cache python3 make g++ git
+
+# Pin Yarn and verify version
+RUN corepack enable && corepack prepare yarn@4.3.1 --activate
+
+WORKDIR /app
+
+# DIAGNOSTIC: Check yarn version and configuration
+RUN echo "=== YARN VERSION CHECK ===" && \
+    yarn --version && \
+    echo "=== YARN CONFIG ===" && \
+    yarn config list || true
+
+# Copy package management files
+COPY package.json .yarnrc.yml ./
+COPY .yarn .yarn
+
+# DIAGNOSTIC: Check if files are copied correctly
+RUN echo "=== FILES IN WORKDIR ===" && \
+    ls -la && \
+    echo "=== YARN DIRECTORY ===" && \
+    ls -la .yarn/ || echo "No .yarn directory" && \
+    echo "=== YARNRC CONTENT ===" && \
+    cat .yarnrc.yml || echo "No .yarnrc.yml"
+
+# Copy yarn.lock if it exists
+COPY yarn.loc[k] ./
+
+# DIAGNOSTIC: Check lockfile
+RUN echo "=== LOCKFILE CHECK ===" && \
+    ls -la yarn.lock || echo "No yarn.lock found" && \
+    echo "=== YARN CACHE INFO ===" && \
+    yarn cache list || true
+
+# Set environment variables to suppress warnings
+ENV YARN_ENABLE_WORKSPACES=false
+ENV YARN_DISABLE_WORKSPACES=true
+ENV YARN_IGNORE_ENGINES=true
+ENV YARN_IGNORE_PLATFORM=true
+ENV YARN_IGNORE_OPTIONAL=true
+ENV YARN_SILENT=false
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+# DIAGNOSTIC: Final yarn config check
+RUN echo "=== FINAL YARN CONFIG ===" && \
+    yarn config list
+
+# Install with verbose logging for diagnosis
+RUN echo "=== STARTING INSTALL ===" && \
+    yarn install --immutable --verbose
+
+# Copy the rest
+COPY . .
+
+# Build your app
+RUN yarn build
+
+EXPOSE 3000
+CMD ["yarn","start"]

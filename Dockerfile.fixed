@@ -13,17 +13,18 @@ WORKDIR /app
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn
 
+# Set environment variables for clean builds
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV YARN_ENABLE_WORKSPACES=false
+
 # Install dependencies with Yarn 4.x syntax
 RUN yarn install --immutable
 
-# Copy the rest
+# Copy the rest of the application
 COPY . .
 
-# Increase build memory for TS/Next
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
-# Build your app (replace with your actual build script)
+# Build the application
 RUN yarn build
 
 EXPOSE 3000
-CMD ["yarn","start"]
+CMD ["yarn", "start"]
