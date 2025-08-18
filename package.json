@@ -30,7 +30,7 @@
     "@reown/appkit-ui": "^1.7.19",
     "react-devtools-core": "^5.2.0",
     "engine.io": "^6.5.4",
-    "@privy-io/public-api": "^1.0.0"
+    "@privy-io/public-api": "^2.43.1"
   },
   "packageExtensions": {
     "@reown/appkit-siwx@*": {
