@@ -17,6 +17,9 @@ const nextConfig = {
   swcMinify: true,
   compress: true,
   poweredByHeader: false,
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
+  },
   images: {
     unoptimized: true,
   },
@@ -24,6 +27,8 @@ const nextConfig = {
     serverComponentsExternalPackages: ['mongodb'],
     // Disable Critters to avoid Kaniko/webpack css optimization issues during prod builds
     optimizeCss: false,
+    // Disable build trace collection to avoid ENOENT errors
+    outputFileTracingRoot: false,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -31,6 +36,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Disable telemetry and build traces
+  telemetry: false,
+  distDir: '.next',
   env: {
     // Explicitly expose environment variables to the frontend
     NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
