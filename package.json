@@ -139,7 +139,9 @@
     "dev:webpack": "next dev --hostname 0.0.0.0 --port 3000",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
     "build:clean": "rm -f yarn.lock && yarn install --ignore-engines --ignore-platform --ignore-optional --network-timeout 600000 && yarn build",
+    "build:deploy": "YARN_IGNORE_ENGINES=true YARN_IGNORE_PLATFORM=true YARN_IGNORE_OPTIONAL=true YARN_SILENT=true DISABLE_OPENCOLLECTIVE=true ADBLOCK=true yarn install --ignore-engines --ignore-platform --ignore-optional --silent --network-timeout 600000 2>/dev/null && NODE_ENV=production next build",
     "start": "next start -p 3000",
+    "preinstall": "npm config set fund false && npm config set audit false || true",
     "postinstall": "export YARN_ENABLE_WORKSPACES=false; export YARN_DISABLE_WORKSPACES=true; yarn config set ignore-engines true || true; yarn config set ignore-platform true || true; yarn config set ignore-optional true || true; echo 'Dependencies installed successfully'"
   },
   "dependencies": {
