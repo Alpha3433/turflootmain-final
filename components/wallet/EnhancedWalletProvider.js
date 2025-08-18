@@ -39,7 +39,6 @@ export function EnhancedWalletProvider({ children }) {
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter({ network }),
       new TorusWalletAdapter(),
-      new LedgerWalletAdapter(),
     ],
     [network]
   )
