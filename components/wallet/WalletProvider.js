@@ -32,11 +32,11 @@ export default function SolanaWalletProvider({ children }) {
     [network]
   )
   
-  // @solana/wallet-adapter-wallets includes all the adapters but supports tree shaking
+  // Using individual wallet adapters to avoid problematic dependencies
   const wallets = useMemo(() => [
     new PhantomWalletAdapter(),
     new SolflareWalletAdapter(),
-    new BackpackWalletAdapter(),
+    new TorusWalletAdapter(),
   ], [network])
 
   return (
