@@ -34,60 +34,101 @@
   },
   "packageExtensions": {
     "@reown/appkit-siwx@*": {
-      "peerDependencies": { "lit": "3.3.0" }
+      "peerDependencies": {
+        "lit": "3.3.0"
+      }
     },
     "@reown/appkit@*": {
-      "peerDependencies": { "lit": "3.3.0" }
+      "peerDependencies": {
+        "lit": "3.3.0"
+      }
     },
     "@reown/appkit-react@*": {
-      "peerDependencies": { "lit": "3.3.0" }
+      "peerDependencies": {
+        "lit": "3.3.0"
+      }
     },
     "@reown/appkit-modal@*": {
-      "peerDependencies": { "lit": "3.3.0" }
+      "peerDependencies": {
+        "lit": "3.3.0"
+      }
     },
     "@solana/wallet-standard-wallet-adapter-base@*": {
-      "peerDependencies": { "bs58": "^6.0.0" }
+      "peerDependencies": {
+        "bs58": "^6.0.0"
+      }
     },
     "@keystonehq/sol-keyring@*": {
-      "peerDependencies": { "react": "18.2.0", "react-dom": "18.2.0" }
+      "peerDependencies": {
+        "react": "18.2.0",
+        "react-dom": "18.2.0"
+      }
     },
     "@keystonehq/sdk@*": {
-      "peerDependencies": { "react": "18.2.0", "react-dom": "18.2.0" }
+      "peerDependencies": {
+        "react": "18.2.0",
+        "react-dom": "18.2.0"
+      }
     },
     "react-qr-reader@*": {
-      "peerDependencies": { "react": "18.2.0", "react-dom": "18.2.0" }
+      "peerDependencies": {
+        "react": "18.2.0",
+        "react-dom": "18.2.0"
+      }
     },
     "react-native@*": {
-      "peerDependencies": { "react": "18.2.0" }
+      "peerDependencies": {
+        "react": "18.2.0"
+      }
     },
     "@react-native/metro-babel-transformer@*": {
-      "peerDependencies": { "@babel/core": "*" }
+      "peerDependencies": {
+        "@babel/core": "*"
+      }
     },
     "@react-native/codegen@*": {
-      "peerDependencies": { "@babel/preset-env": "^7.1.6" }
+      "peerDependencies": {
+        "@babel/preset-env": "^7.1.6"
+      }
     },
     "require-addon@*": {
-      "engines": { "node": ">=20.0.0" },
+      "engines": {
+        "node": ">=20.0.0"
+      },
       "peerDependencies": {}
     },
     "bare-os@*": {
-      "engines": { "node": ">=20.0.0" },
+      "engines": {
+        "node": ">=20.0.0"
+      },
       "peerDependencies": {}
     },
     "@reown/appkit-utils@*": {
-      "peerDependencies": { "valtio": "2.1.5", "lit": "3.3.0" }
+      "peerDependencies": {
+        "valtio": "2.1.5",
+        "lit": "3.3.0"
+      }
     },
     "@reown/appkit-controllers@*": {
-      "peerDependencies": { "valtio": "2.1.5", "lit": "3.3.0" }
+      "peerDependencies": {
+        "valtio": "2.1.5",
+        "lit": "3.3.0"
+      }
     },
     "@reown/appkit-pay@*": {
-      "peerDependencies": { "lit": "3.3.0" }
+      "peerDependencies": {
+        "lit": "3.3.0"
+      }
     },
     "@reown/appkit-scaffold-ui@*": {
-      "peerDependencies": { "lit": "3.3.0" }
+      "peerDependencies": {
+        "lit": "3.3.0"
+      }
     },
     "@reown/appkit-ui@*": {
-      "peerDependencies": { "lit": "3.3.0" }
+      "peerDependencies": {
+        "lit": "3.3.0"
+      }
     }
   },
   "overrides": {
@@ -234,7 +275,6 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "npmConfig": {
     "fund": false,
     "audit": false,
