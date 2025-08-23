@@ -2018,6 +2018,11 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Orientation Gate for Mobile Users */}
+      {showOrientationGate && (
+        <OrientationGate onLandscapeReady={handleOrientationReady} />
+      )}
     </div>
   )
 }
