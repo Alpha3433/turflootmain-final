@@ -1887,6 +1887,191 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      {/* Mobile-Only Lobby & Friends Modal */}
+      {showMobileLobby && isMobile && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onClick={() => setShowMobileLobby(false)}>
+          <div 
+            className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 via-gray-800 to-gray-900 rounded-t-2xl border-t border-gray-600/30 shadow-2xl max-h-[70vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-12 h-1 bg-gray-500 rounded-full"></div>
+            </div>
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700/50">
+              <h2 className="text-xl font-bold text-white">Lobby & Friends</h2>
+              <button 
+                onClick={() => setShowMobileLobby(false)}
+                className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-all"
+              >
+                <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+              
+              {/* Lobby Section */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">🎮</span>
+                  </div>
+                  <h3 className="text-white font-bold text-lg">Quick Play</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-3">
+                  <button
+                    onClick={() => {
+                      setShowMobileLobby(false)
+                      router.push('/agario?mode=free&fee=0')
+                    }}
+                    className="flex items-center justify-between p-4 bg-gray-800/40 hover:bg-gray-700/60 rounded-xl border border-gray-600/30 transition-all"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-green-400 text-xl">🆓</span>
+                      </div>
+                      <div className="text-left">
+                        <div className="text-white font-medium">Practice Mode</div>
+                        <div className="text-gray-400 text-sm">Free • Learn the basics</div>
+                      </div>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowMobileLobby(false)
+                      setShowServerBrowser(true)
+                    }}
+                    className="flex items-center justify-between p-4 bg-gray-800/40 hover:bg-gray-700/60 rounded-xl border border-gray-600/30 transition-all"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                        <span className="text-yellow-400 text-xl">💰</span>
+                      </div>
+                      <div className="text-left">
+                        <div className="text-white font-medium">Ranked Games</div>
+                        <div className="text-gray-400 text-sm">Earn real money</div>
+                      </div>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Friends Section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">👥</span>
+                    </div>
+                    <h3 className="text-white font-bold text-lg">Friends</h3>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setShowMobileLobby(false)
+                      setSocialInitialTab('friends')
+                      setShowProfile(true)
+                    }}
+                    className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors font-medium"
+                  >
+                    Manage
+                  </button>
+                </div>
+                
+                <div className="space-y-2">
+                  {loadingFriends ? (
+                    <div className="text-center py-6">
+                      <div className="text-xl animate-spin mb-2">⏳</div>
+                      <div className="text-gray-400 text-sm">Loading friends...</div>
+                    </div>
+                  ) : friendsList.length > 0 ? (
+                    friendsList.slice(0, 4).map((friend) => (
+                      <div key={friend.id} className="flex items-center justify-between py-3 px-4 bg-gray-800/30 rounded-xl border border-gray-700/20">
+                        <div className="flex items-center space-x-3">
+                          <div 
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                            style={{ backgroundColor: avatarColors[friend.id % avatarColors.length] }}
+                          >
+                            {friend.name.charAt(0)}
+                          </div>
+                          <div>
+                            <div className="text-white font-medium text-sm">{friend.name}</div>
+                            <div className="text-gray-400 text-xs">
+                              {friend.status === 'online' ? '🟢 Online' : '⚫ Offline'}
+                            </div>
+                          </div>
+                        </div>
+                        {friend.status === 'online' && (
+                          <button className="px-3 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 rounded-lg text-xs font-medium transition-all">
+                            Invite
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6">
+                      <div className="text-4xl mb-2">👥</div>
+                      <div className="text-gray-400 text-sm">No friends yet</div>
+                      <div className="text-gray-500 text-xs mb-3">Add friends to play together!</div>
+                      <button 
+                        onClick={() => {
+                          setShowMobileLobby(false)
+                          setSocialInitialTab('friends')
+                          setShowProfile(true)
+                        }}
+                        className="px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 rounded-lg text-sm font-medium transition-all"
+                      >
+                        Add Friends
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">📊</span>
+                  </div>
+                  <h3 className="text-white font-bold text-lg">Your Stats</h3>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center p-3 bg-gray-800/40 rounded-lg border border-gray-600/30">
+                    <div className="text-xl font-bold text-white">0</div>
+                    <div className="text-gray-400 text-xs">Wins</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-800/40 rounded-lg border border-gray-600/30">
+                    <div className="text-xl font-bold text-green-400">$0</div>
+                    <div className="text-gray-400 text-xs">Earned</div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-800/40 rounded-lg border border-gray-600/30">
+                    <div className="text-xl font-bold text-cyan-400">#-</div>
+                    <div className="text-gray-400 text-xs">Rank</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom padding for safe area */}
+              <div className="h-6"></div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
