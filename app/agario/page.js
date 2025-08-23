@@ -2896,8 +2896,8 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Live Leaderboard (All Players) */}
-      {!isGameOver && (
+      {/* Live Leaderboard (All Players) - Desktop Only */}
+      {!isGameOver && !isMobile && (
         <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 max-w-[280px]">
           <div className="text-cyan-400 font-bold text-lg mb-3">💰 Live Leaderboard</div>
           <div className="space-y-1 max-h-96 overflow-y-auto">
