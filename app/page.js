@@ -37,6 +37,9 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false)
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
+
+  // TEMPORARY: Force mobile mode for testing - REMOVE AFTER VERIFICATION
+  const [forceMobileMode, setForceMobileMode] = useState(false)
   const [leaderboardData, setLeaderboardData] = useState([])
   const [playerCustomization, setPlayerCustomization] = useState({
     skin: 'default_blue',
