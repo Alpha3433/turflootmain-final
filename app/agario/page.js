@@ -3174,26 +3174,6 @@ const AgarIOGame = () => {
                   </div>
                 )}
               </div>
-
-              {/* Split/Boost Button */}
-              <div 
-                className="mobile-action-btn"
-                onPointerDown={handleSplitStart}
-                onPointerUp={handleSplitEnd}
-                style={{ touchAction: 'none' }}
-              >
-                ⚡
-              </div>
-
-              {/* Eject Mass Button */}
-              <div 
-                className="mobile-action-btn"
-                onPointerDown={handleEjectStart}
-                onPointerUp={handleEjectEnd}
-                style={{ touchAction: 'none' }}
-              >
-                💨
-              </div>
             </div>
           )}
 
