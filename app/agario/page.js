@@ -799,6 +799,200 @@ const AgarIOGame = () => {
     return () => clearInterval(tokenCheckInterval)
   }, [user])
 
+  // Mobile control handlers - Joystick with Pointer Events and scroll prevention
+  const handleJoystickStart = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!isMobile || !joystickRef.current) return
+    
+    const rect = joystickRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    setJoystickActive(true)
+    setMobileUIFaded(false)
+    touchIdRef.current = e.pointerId
+    
+    const handleJoystickMove = (e) => {
+      e.preventDefault()
+      if (e.pointerId !== touchIdRef.current) return
+      
+      const deltaX = e.clientX - centerX
+      const deltaY = e.clientY - centerY
+      const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), 25)
+      const angle = Math.atan2(deltaY, deltaX)
+      
+      const knobX = Math.cos(angle) * distance
+      const knobY = Math.sin(angle) * distance
+      
+      setJoystickPosition({ x: knobX, y: knobY })
+      
+      if (joystickKnobRef.current) {
+        joystickKnobRef.current.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`
+      }
+      
+      // Send movement to game
+      if (gameRef.current && distance > 2) {
+        const normalizedX = deltaX / 25
+        const normalizedY = deltaY / 25
+        gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
+      }
+    }
+    
+    const handleJoystickEnd = (e) => {
+      e.preventDefault()
+      if (e.pointerId !== touchIdRef.current) return
+      
+      setJoystickActive(false)
+      setJoystickPosition({ x: 0, y: 0 })
+      touchIdRef.current = null
+      
+      if (joystickKnobRef.current) {
+        joystickKnobRef.current.style.transform = 'translate(-50%, -50%)'
+      }
+      
+      if (gameRef.current) {
+        gameRef.current.player.dir = { x: 0, y: 0 }
+      }
+      
+      // Fade UI after inactivity
+      setTimeout(() => setMobileUIFaded(true), 2000)
+      
+      document.removeEventListener('pointermove', handleJoystickMove, { passive: false })
+      document.removeEventListener('pointerup', handleJoystickEnd, { passive: false })
+    }
+    
+    document.addEventListener('pointermove', handleJoystickMove, { passive: false })
+    document.addEventListener('pointerup', handleJoystickEnd, { passive: false })
+  }
+
+  // Mobile cash-out button handlers
+  const handleCashOutStart = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!isMobile || isCashingOut) return
+    
+    setMobileUIFaded(false)
+    // Start cash-out process (similar to desktop 'E' key hold)
+    handleCashOut()
+  }
+
+  const handleCashOutEnd = (e) => {
+    e.preventDefault()
+    if (!isMobile) return
+    
+    // Cancel cash-out if in progress
+    if (isCashingOut) {
+      setIsCashingOut(false)
+      setCashOutProgress(0)
+    }
+  }
+
+  // Mobile action button handlers
+  const handleSplitStart = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!isMobile || !gameRef.current) return
+    
+    setMobileUIFaded(false)
+    // Trigger split action (similar to desktop spacebar)
+    if (gameRef.current.player.mass > 20) {
+      // Split player logic here
+      console.log('🔥 Mobile split triggered')
+    }
+  }
+
+  const handleSplitEnd = (e) => {
+    e.preventDefault()
+  }
+
+  const handleEjectStart = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!isMobile || !gameRef.current) return
+    
+    setMobileUIFaded(false)
+    // Trigger eject mass action (similar to desktop 'W' key)
+    if (gameRef.current.player.mass > 15) {
+      // Eject mass logic here
+      console.log('💨 Mobile eject triggered')
+    }
+  }
+
+  const handleEjectEnd = (e) => {
+    e.preventDefault()
+  }
+
+  // Mobile UI fade management
+  useEffect(() => {
+    if (!isMobile) return
+    
+    let fadeTimeout
+    
+    const handleActivity = () => {
+      setMobileUIFaded(false)
+      clearTimeout(fadeTimeout)
+      fadeTimeout = setTimeout(() => setMobileUIFaded(true), 3000)
+    }
+    
+    // Hide instructions after 5 seconds on mobile
+    setTimeout(() => setInstructionsVisible(false), 5000)
+    
+    // Show mission toast periodically
+    const missionInterval = setInterval(() => {
+      if (currentMission && Math.random() > 0.7) {
+        setMissionToast(`Mission: ${currentMission.description}`)
+        setTimeout(() => setMissionToast(null), 2500)
+      }
+    }, 15000)
+    
+    document.addEventListener('pointerdown', handleActivity, { passive: false })
+    document.addEventListener('pointermove', handleActivity, { passive: false })
+    
+    return () => {
+      clearTimeout(fadeTimeout)
+      clearInterval(missionInterval)
+      document.removeEventListener('pointerdown', handleActivity)
+      document.removeEventListener('pointermove', handleActivity)
+    }
+  }, [isMobile, currentMission])
+
+  // Mobile scroll and touch prevention
+  useEffect(() => {
+    if (!isMobile) return
+    
+    const preventDefault = (e) => {
+      e.preventDefault()
+      return false
+    }
+    
+    // Prevent all forms of scrolling and zooming on mobile
+    document.addEventListener('touchstart', preventDefault, { passive: false })
+    document.addEventListener('touchmove', preventDefault, { passive: false })
+    document.addEventListener('touchend', preventDefault, { passive: false })
+    document.addEventListener('gesturestart', preventDefault, { passive: false })
+    document.addEventListener('gesturechange', preventDefault, { passive: false })
+    document.addEventListener('gestureend', preventDefault, { passive: false })
+    
+    // Prevent context menu
+    document.addEventListener('contextmenu', preventDefault, { passive: false })
+    
+    // Set body classes for mobile
+    document.body.classList.add('mobile-game-active')
+    
+    return () => {
+      document.removeEventListener('touchstart', preventDefault)
+      document.removeEventListener('touchmove', preventDefault)
+      document.removeEventListener('touchend', preventDefault)
+      document.removeEventListener('gesturestart', preventDefault)
+      document.removeEventListener('gesturechange', preventDefault)
+      document.removeEventListener('gestureend', preventDefault)
+      document.removeEventListener('contextmenu', preventDefault)
+      document.body.classList.remove('mobile-game-active')
+    }
+  }, [isMobile])
+
   const initializeMultiplayer = async () => {
     try {
       console.log('🔗 Initializing multiplayer connection...')
