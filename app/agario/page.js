@@ -3363,8 +3363,8 @@ const AgarIOGame = () => {
                 setShowInstructionsIcon(true)
               }}
             >
-              <div className="bg-black/90 backdrop-blur-sm rounded-xl p-4 border border-cyan-400/30 text-center max-w-xs mx-auto">
-                <div className="text-white text-sm font-medium mb-2">
+              <div className="bg-black/90 backdrop-blur-sm rounded-xl p-3 border border-cyan-400/30 text-center max-w-xs mx-auto">
+                <div className="text-white text-xs font-medium mb-2">
                   Use joystick to move • Tap buttons to split/boost • Hold button to cash-out
                 </div>
                 <div className="text-xs text-gray-400">Tap to dismiss</div>
