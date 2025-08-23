@@ -911,7 +911,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden flex flex-col" style={{ background: 'linear-gradient(to bottom right, rgb(17, 24, 39), rgb(31, 41, 55), rgb(55, 65, 81))' }}>
+    <div className="min-h-screen text-white relative flex flex-col" style={{ background: 'linear-gradient(to bottom right, rgb(17, 24, 39), rgb(31, 41, 55), rgb(55, 65, 81))' }}>
       {/* Game-Inspired Animated Background */}
       <div className="absolute inset-0 pointer-events-none z-10">
         
