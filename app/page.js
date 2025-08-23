@@ -36,6 +36,8 @@ export default function Home() {
   
   // Enhanced iOS Mobile Detection State - MISSING FROM LANDING PAGE!
   const [isMobile, setIsMobile] = useState(false)
+  const [showOrientationGate, setShowOrientationGate] = useState(false)
+  const [pendingGameEntry, setPendingGameEntry] = useState(null)
   const [showMobileLobby, setShowMobileLobby] = useState(false)
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
