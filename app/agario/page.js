@@ -43,6 +43,27 @@ const AgarIOGame = () => {
   const [showControls, setShowControls] = useState(true)
   const [ping, setPing] = useState(0)
   const [autoCashOutTriggered, setAutoCashOutTriggered] = useState(false) // Flag to prevent multiple auto cash outs
+
+  // Mobile detection and orientation handling - MISSING LOGIC ADDED
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
+  const [isLandscape, setIsLandscape] = useState(true)
+  const [showOrientationGate, setShowOrientationGate] = useState(false)
+  
+  // Enhanced mobile HUD state
+  const [statsCollapsed, setStatsCollapsed] = useState(true)
+  const [leaderboardCollapsed, setLeaderboardCollapsed] = useState(true)
+  const [showInstructions, setShowInstructions] = useState(true)
+  const [instructionsVisible, setInstructionsVisible] = useState(true)
+  const [missionIconVisible, setMissionIconVisible] = useState(false)
+  const [minimapCollapsed, setMinimapCollapsed] = useState(false)
+  const [mobileUIFaded, setMobileUIFaded] = useState(false)
+  const [missionToast, setMissionToast] = useState(null)
+  
+  // Joystick refs and state
+  const joystickRef = useRef(null)
+  const joystickKnobRef = useRef(null)
+  const touchIdRef = useRef(null)
   
   // Enhanced game features
   const [coinAnimations, setCoinAnimations] = useState([]) // For animated coin pickups
