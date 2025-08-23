@@ -50,11 +50,34 @@ mobile_tests_failed = 0
 
 def log_test(test_name, status, details=""):
     """Log test results with timestamp"""
+    global mobile_tests_passed, mobile_tests_failed
+    
     timestamp = datetime.now().strftime("%H:%M:%S")
     status_icon = "✅" if status == "PASS" else "❌" if status == "FAIL" else "⚠️"
     print(f"[{timestamp}] {status_icon} {test_name}: {status}")
     if details:
         print(f"    {details}")
+    
+    # Track mobile test results
+    mobile_test_results.append({
+        'test': test_name,
+        'status': status,
+        'details': details,
+        'timestamp': timestamp
+    })
+    
+    if status == "PASS":
+        mobile_tests_passed += 1
+    elif status == "FAIL":
+        mobile_tests_failed += 1
+
+def log_mobile_test(test_name, success, message, details=None):
+    """Log mobile-specific test results"""
+    status = "PASS" if success else "FAIL"
+    detail_str = f"{message}"
+    if details:
+        detail_str += f" | {details}"
+    log_test(test_name, status, detail_str)
 
 def test_server_browser_api():
     """Test Server Browser API - Priority Test #1"""
