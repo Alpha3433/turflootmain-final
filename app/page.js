@@ -330,78 +330,79 @@ export default function Home() {
     })
   }, [ready, authenticated, user, displayName])
 
-  // ULTRA-AGGRESSIVE iOS Mobile Detection - FOOLPROOF VERSION
+  // BULLETPROOF iOS Mobile Detection - GUARANTEED TO WORK
   useEffect(() => {
     const detectMobileDevice = () => {
-      // Multiple iOS detection methods
+      // COMPREHENSIVE iOS/Mobile Detection
       const userAgent = navigator.userAgent || navigator.vendor || window.opera
+      
+      // iOS Detection Methods
       const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent)
       const isSafariMobile = /Safari/.test(userAgent) && /Mobile/.test(userAgent)
+      const isIOSWebKit = /WebKit/.test(userAgent) && /Mobile/.test(userAgent)
+      
+      // Mobile Detection Methods  
       const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isAndroidDevice = /Android/.test(userAgent)
       const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
-      const hasSmallScreen = Math.min(window.screen.width, window.screen.height) <= 768
-      const hasSmallViewport = Math.min(window.innerWidth, window.innerHeight) <= 768
-      const isNarrowViewport = window.innerWidth <= 768
       
-      // EXTREMELY AGGRESSIVE - Multiple ways to detect mobile
-      const isMobileDevice = isIOSDevice || isSafariMobile || isAndroidDevice || 
-                            isMobileUserAgent || isTouchCapable || 
-                            hasSmallScreen || hasSmallViewport || isNarrowViewport
+      // Screen Size Detection
+      const screenWidth = window.screen?.width || window.innerWidth
+      const screenHeight = window.screen?.height || window.innerHeight
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      
+      const hasSmallScreen = Math.min(screenWidth, screenHeight) <= 768
+      const hasSmallViewport = Math.min(viewportWidth, viewportHeight) <= 768
+      const isNarrowViewport = viewportWidth <= 768
+      const isPhoneSize = viewportWidth <= 480
+      
+      // ULTIMATE MOBILE DETECTION - ANY indicator = mobile
+      const isMobileDevice = isIOSDevice || isSafariMobile || isIOSWebKit ||
+                            isAndroidDevice || isMobileUserAgent || isTouchCapable ||
+                            hasSmallScreen || hasSmallViewport || isNarrowViewport || isPhoneSize
+      
+      // FORCE MOBILE for iOS devices specifically
+      if (isIOSDevice || isSafariMobile || isIOSWebKit) {
+        console.log('🍎 iOS DEVICE DETECTED - FORCING MOBILE MODE')
+        setIsMobile(true)
+        return
+      }
+      
+      // FORCE MOBILE for narrow screens
+      if (viewportWidth <= 768) {
+        console.log('📱 NARROW SCREEN DETECTED - FORCING MOBILE MODE')
+        setIsMobile(true)
+        return
+      }
       
       setIsMobile(isMobileDevice)
       
-      // ULTRA DEBUG logging with even more detail
-      console.log('🚨 ULTRA-AGGRESSIVE iOS Mobile Detection:', {
-        userAgent: userAgent,
+      // Detailed logging for debugging
+      console.log('🔍 BULLETPROOF Mobile Detection:', {
+        userAgent: userAgent.substring(0, 50) + '...',
         isIOSDevice,
         isSafariMobile,
+        isIOSWebKit,
         isTouchCapable,
-        isAndroidDevice,
-        isMobileUserAgent,
-        hasSmallScreen,
-        hasSmallViewport,
-        isNarrowViewport,
-        screenSize: `${window.screen.width}x${window.screen.height}`,
-        viewportSize: `${window.innerWidth}x${window.innerHeight}`,
-        screenOrientation: screen.orientation?.type || 'unknown',
-        '📱 FINAL_isMobile': isMobileDevice,
-        '⚠️ Any mobile indicator': [isIOSDevice, isSafariMobile, isAndroidDevice, isMobileUserAgent, isTouchCapable, hasSmallScreen, hasSmallViewport, isNarrowViewport].some(Boolean)
+        screenSize: `${screenWidth}x${screenHeight}`,
+        viewportSize: `${viewportWidth}x${viewportHeight}`,
+        '📱 FINAL_isMobile': isMobileDevice || isIOSDevice || viewportWidth <= 768
       })
-      
-      // MULTIPLE FORCED MOBILE CHECKS
-      if (isIOSDevice || isSafariMobile || isNarrowViewport || isTouchCapable) {
-        console.log('🚨 FORCING MOBILE MODE - Multiple triggers detected!')
-        console.log('🔍 Triggers:', { isIOSDevice, isSafariMobile, isNarrowViewport, isTouchCapable })
-        setIsMobile(true)
-        
-        // Force update state immediately
-        setTimeout(() => setIsMobile(true), 100)
-        setTimeout(() => setIsMobile(true), 500)
-        setTimeout(() => setIsMobile(true), 1000)
-      }
-      
-      // NUCLEAR OPTION - Force mobile for ANY screen under 900px
-      if (window.innerWidth < 900) {
-        console.log('🚨 NUCLEAR OPTION: Forcing mobile for width < 900px')
-        setIsMobile(true)
-      }
     }
     
-    // Run detection immediately and repeatedly
+    // Run detection multiple times to ensure it catches
     detectMobileDevice()
+    setTimeout(detectMobileDevice, 50)
     setTimeout(detectMobileDevice, 100)
     setTimeout(detectMobileDevice, 500)
-    setTimeout(detectMobileDevice, 1000)
     
     window.addEventListener('resize', detectMobileDevice)
     window.addEventListener('orientationchange', detectMobileDevice)
-    window.addEventListener('load', detectMobileDevice)
     
     return () => {
       window.removeEventListener('resize', detectMobileDevice)
       window.removeEventListener('orientationchange', detectMobileDevice)
-      window.removeEventListener('load', detectMobileDevice)
     }
   }, [])
 
