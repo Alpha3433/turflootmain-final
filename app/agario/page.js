@@ -3125,13 +3125,7 @@ const AgarIOGame = () => {
         <>
           {/* Orientation Gate - Full-screen landscape requirement */}
           {showOrientationGate && (
-            <div className="orientation-gate">
-              <div className="rotate-icon">📱↻</div>
-              <h2 className="text-2xl font-bold mb-4">Rotate to Landscape</h2>
-              <p className="text-gray-400 text-center max-w-xs">
-                Please rotate your device to landscape mode to play TurfLoot
-              </p>
-            </div>
+            <OrientationGate onLandscapeReady={() => setShowOrientationGate(false)} />
           )}
 
           {/* Mobile Joystick */}
