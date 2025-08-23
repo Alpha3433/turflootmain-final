@@ -41,8 +41,6 @@
   html, body {
     @apply bg-background text-foreground;
     font-family: var(--font-dm-sans), system-ui, sans-serif;
-    overflow: hidden;
-    height: 100vh;
     margin: 0;
     padding: 0;
   }
