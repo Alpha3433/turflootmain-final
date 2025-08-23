@@ -1718,13 +1718,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Mobile Fixed Bottom CTA */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 h-16 bg-gray-900/95 backdrop-blur-md border-t border-gray-700 px-4 flex items-center">
-        <button className="w-full h-12 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-300 text-black rounded-2xl font-black text-lg shadow-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2">
-          <span className="text-xl">▶</span>
-          <span>JOIN GAME</span>
-        </button>
-      </div>
+
 
       {/* Welcome Message Popup */}
       {showWelcome && (
