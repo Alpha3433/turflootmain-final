@@ -64,6 +64,12 @@ const AgarIOGame = () => {
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
   const touchIdRef = useRef(null)
+  const minimapCanvasRef = useRef(null)
+  
+  // Mobile control state
+  const [joystickActive, setJoystickActive] = useState(false)
+  const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
+  const [showCurrentMission, setShowCurrentMission] = useState(false)
   
   // Enhanced game features
   const [coinAnimations, setCoinAnimations] = useState([]) // For animated coin pickups
