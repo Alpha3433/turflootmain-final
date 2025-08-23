@@ -3372,20 +3372,20 @@ const AgarIOGame = () => {
             </div>
           )}
 
-          {/* Instructions Info Icon - Shows after auto-hide */}
+          {/* Instructions Info Icon - Small floating toggle at bottom-center */}
           {!showOrientationGate && !isGameOver && showInstructionsIcon && !instructionsVisible && (
             <div 
-              className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+              className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
               style={{
-                top: `calc(env(safe-area-inset-top, 0px) + 16px)`
+                bottom: `calc(env(safe-area-inset-bottom, 0px) + 32px)`
               }}
               onClick={() => {
                 setInstructionsVisible(true)
                 setShowInstructionsIcon(false)
               }}
             >
-              <div className="bg-black/70 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center border border-cyan-400/30">
-                <span className="text-cyan-400 text-sm">ℹ️</span>
+              <div className="bg-black/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center border border-cyan-400/20 shadow-lg">
+                <span className="text-cyan-400 text-xs">ℹ️</span>
               </div>
             </div>
           )}
