@@ -17,6 +17,16 @@ export const metadata = {
     description: 'Compete in skill-based territory battles. Earn real SOL rewards.',
     images: ['/og-image.png'],
   },
+  manifest: '/manifest.webmanifest',
+  other: {
+    // iOS PWA Meta Tags
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'apple-mobile-web-app-title': 'TurfLoot',
+    'mobile-web-app-capable': 'yes',
+    // Viewport meta for mobile
+    'viewport': 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
+  }
 }
 
 export default function RootLayout({ children }) {
