@@ -3233,76 +3233,188 @@ const AgarIOGame = () => {
             </div>
           )}
 
-          {/* Mobile HUD Icons */}
+          {/* Refined Mobile HUD Elements */}
           {!showOrientationGate && !isGameOver && (
             <>
-              {/* Collapsible Minimap */}
-              <div 
-                className={`mobile-minimap ${minimapCollapsed ? 'collapsed' : ''} ${mobileUIFaded ? 'faded' : ''}`}
-                onClick={() => setMinimapCollapsed(!minimapCollapsed)}
-              >
-                {!minimapCollapsed ? (
-                  <canvas 
-                    width="116" 
-                    height="116"
-                    style={{ borderRadius: '50%' }}
-                    ref={minimapCanvasRef}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white font-bold">
-                    📍
-                  </div>
-                )}
-              </div>
-
-              {/* Collapsible Stats Panel */}
-              <div 
-                className={`mobile-stats-panel ${statsCollapsed ? 'collapsed' : ''} ${mobileUIFaded ? 'faded' : ''}`}
-                onClick={() => setStatsCollapsed(!statsCollapsed)}
-              >
-                {!statsCollapsed ? (
-                  <div className="text-white text-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <span>💰 ${gameStats.netWorth}</span>
-                      <span className="text-xs text-gray-400">#{gameStats.rank}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs">K: {gameStats.kills}</span>
-                      <span className="text-xs">D: {gameStats.deaths}</span>
-                      <span className="text-xs">🔥 {gameStats.streak}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-white font-bold text-lg">$</div>
-                )}
-              </div>
-
-              {/* Mission Icon (when missions are available) */}
-              {missionIconVisible && (
+              {/* Mobile Mission Toast - appears briefly then tucks into icon */}
+              {currentMission && missionToastVisible && (
                 <div 
-                  className={`mobile-hud-icon ${mobileUIFaded ? 'faded' : ''}`}
-                  style={{ 
-                    top: `calc(env(safe-area-inset-top, 0px) + 20px)`,
-                    left: '50%',
-                    transform: 'translateX(-50%)'
+                  className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+                  style={{
+                    top: `calc(env(safe-area-inset-top, 0px) + 16px)`
                   }}
-                  onClick={() => setShowCurrentMission(true)}
                 >
-                  🎯
+                  <div className="mission-toast max-w-xs">
+                    <div className="flex items-center space-x-2">
+                      <span>🎯</span>
+                      <div className="flex-1">
+                        <div className="font-semibold text-sm">{currentMission.description}</div>
+                        <div className="text-xs opacity-75">
+                          {currentMission.type === 'survive' 
+                            ? `${Math.floor(missionProgress / 1000)}/${Math.floor(currentMission.target / 1000)}s`
+                            : `${missionProgress}/${currentMission.target}`
+                          } • {currentMission.reward} SP
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {/* Collapsible Leaderboard Icon */}
+              {/* Mobile Mission Icon (shows when toast is hidden) */}
+              {currentMission && !missionToastVisible && (
+                <div 
+                  className={`mobile-hud-icon ${mobileUIFaded ? 'faded' : ''}`}
+                  style={{ 
+                    top: `calc(env(safe-area-inset-top, 0px) + 16px)`,
+                    right: '130px'
+                  }}
+                  onClick={() => setMissionToastVisible(true)}
+                >
+                  🎯
+                  {/* Mission progress indicator */}
+                  <div 
+                    className="absolute -bottom-1 left-0 h-1 bg-purple-400 rounded-full transition-all duration-300"
+                    style={{ width: `${(missionProgress / currentMission.target) * 100}%` }}
+                  />
+                </div>
+              )}
+
+              {/* Refined Mobile Minimap - 25% smaller, better collapse */}
               <div 
-                className={`mobile-hud-icon ${mobileUIFaded ? 'faded' : ''}`}
-                style={{ 
-                  top: `calc(env(safe-area-inset-top, 0px) + 80px)`,
-                  left: '20px'
+                className={`fixed top-4 right-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'} ${
+                  minimapCollapsed ? 'w-8 h-8' : 'w-24 h-24'
+                }`}
+                style={{
+                  top: `calc(env(safe-area-inset-top, 0px) + 16px)`
+                }}
+                onClick={() => setMinimapCollapsed(!minimapCollapsed)}
+              >
+                <div className={`w-full h-full bg-black/70 rounded-full border-2 border-gray-600/30 flex items-center justify-center transition-all duration-300 ${
+                  minimapCollapsed ? 'border-cyan-400/60' : 'border-gray-600/30'
+                }`}>
+                  {!minimapCollapsed ? (
+                    <canvas 
+                      width="88" 
+                      height="88"
+                      style={{ borderRadius: '50%' }}
+                      ref={minimapCanvasRef}
+                      className="w-full h-full"
+                    />
+                  ) : (
+                    <div className="text-cyan-400 font-bold text-sm">📍</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Mobile Stats Panel - Collapsed by default with 📊 icon */}
+              <div 
+                className={`fixed bottom-4 right-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+                style={{
+                  bottom: `calc(env(safe-area-inset-bottom, 0px) + 120px)`,
+                  right: '16px'
+                }}
+                onClick={() => setStatsCollapsed(!statsCollapsed)}
+              >
+                {!statsCollapsed ? (
+                  <div className="bg-black/80 backdrop-blur-sm rounded-xl p-3 border border-cyan-400/30 min-w-[160px]">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-1">
+                        <span className="text-cyan-400 text-sm">📊</span>
+                        <span className="text-white font-medium text-sm">Stats</span>
+                      </div>
+                      <button className="text-gray-400 hover:text-white text-xs">✕</button>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-gray-300">Worth:</span>
+                        <span className="text-green-400 font-bold">${gameStats.netWorth}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-300">K/D:</span>
+                        <span className="text-white">{gameStats.kills}/{gameStats.deaths}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-300">Streak:</span>
+                        <span className="text-yellow-400">{gameStats.streak} 🔥</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-300">Rank:</span>
+                        <span className="text-cyan-400">#{gameStats.rank}</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mobile-hud-icon bg-black/80 border-cyan-400/60">
+                    <span className="text-cyan-400">📊</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Leaderboard Toggle - Trophy icon, collapsed by default */}
+              <div 
+                className={`fixed top-4 left-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+                style={{
+                  top: `calc(env(safe-area-inset-top, 0px) + 16px)`
                 }}
                 onClick={() => setLeaderboardCollapsed(!leaderboardCollapsed)}
               >
-                🏆
+                {!leaderboardCollapsed ? (
+                  <div className="bg-black/80 backdrop-blur-sm rounded-xl p-3 border border-cyan-400/30 max-w-[200px]">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-1">
+                        <span className="text-yellow-400 text-sm">🏆</span>
+                        <span className="text-cyan-400 font-medium text-sm">Leaders</span>
+                      </div>
+                      <button className="text-gray-400 hover:text-white text-xs">✕</button>
+                    </div>
+                    <div className="space-y-1">
+                      {gameStats.leaderboard.slice(0, 3).map((player, index) => (
+                        <div key={player.id} className="flex items-center justify-between text-xs">
+                          <div className="flex items-center space-x-1">
+                            <span className={`font-bold ${
+                              index === 0 ? 'text-yellow-400' : 
+                              index === 1 ? 'text-gray-300' : 'text-orange-400'
+                            }`}>
+                              #{index + 1}
+                            </span>
+                            <span className="text-white truncate max-w-[60px]">{player.name}</span>
+                          </div>
+                          <span className="text-green-400 font-bold">${player.netWorth}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mobile-hud-icon bg-black/80 border-yellow-400/60">
+                    <span className="text-yellow-400">🏆</span>
+                  </div>
+                )}
               </div>
+
+              {/* Mobile Instructions - Updated text, auto-hide */}
+              {instructionsVisible && (
+                <div 
+                  className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 max-w-xs"
+                  style={{
+                    bottom: `calc(env(safe-area-inset-bottom, 0px) + 150px)`
+                  }}
+                  onClick={() => setInstructionsVisible(false)}
+                >
+                  <div className="bg-black/90 backdrop-blur-sm rounded-xl p-3 border border-cyan-400/30 text-center">
+                    <div className="text-white text-sm space-y-1">
+                      <div>🕹️ Use joystick to move • Tap buttons to split/boost</div>
+                      <div>💰 Hold cash-out button to exit with winnings</div>
+                    </div>
+                    <div className="flex items-center justify-center mt-2 space-x-2">
+                      <span className="text-xs text-gray-400">Tap to dismiss</span>
+                      <div className="mobile-hud-icon w-6 h-6 text-xs" onClick={() => setInstructionsVisible(false)}>
+                        ℹ️
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           )}
 
