@@ -3356,29 +3356,6 @@ const AgarIOGame = () => {
                 )}
               </div>
 
-              {/* Mobile Instructions - Updated text, auto-hide */}
-              {instructionsVisible && (
-                <div 
-                  className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 max-w-xs"
-                  style={{
-                    bottom: `calc(env(safe-area-inset-bottom, 0px) + 150px)`
-                  }}
-                  onClick={() => setInstructionsVisible(false)}
-                >
-                  <div className="bg-black/90 backdrop-blur-sm rounded-xl p-3 border border-cyan-400/30 text-center">
-                    <div className="text-white text-sm space-y-1">
-                      <div>🕹️ Use joystick to move • Tap buttons to split/boost</div>
-                      <div>💰 Hold cash-out button to exit with winnings</div>
-                    </div>
-                    <div className="flex items-center justify-center mt-2 space-x-2">
-                      <span className="text-xs text-gray-400">Tap to dismiss</span>
-                      <div className="mobile-hud-icon w-6 h-6 text-xs" onClick={() => setInstructionsVisible(false)}>
-                        ℹ️
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </>
           )}
 
