@@ -3383,17 +3383,45 @@ const AgarIOGame = () => {
           )}
 
           {/* Mission Toast Notification */}
-          {missionToast && (
+          {missionToastVisible && missionToast && (
             <div className="mission-toast">
               🎯 {missionToast}
             </div>
           )}
 
-          {/* Mobile Instructions (shows briefly on game start) */}
+          {/* Single Mobile Instructions Toast - Shows at match start, auto-hides after 7s */}
           {!showOrientationGate && !isGameOver && instructionsVisible && (
-            <div className="mobile-instructions">
-              <div className="mb-2">🕹️ Use joystick to move • 💰 Hold cash-out button to exit</div>
-              <div className="text-xs text-gray-400">Tap anywhere to dismiss</div>
+            <div 
+              className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+              onClick={() => {
+                setInstructionsVisible(false)
+                setShowInstructionsIcon(true)
+              }}
+            >
+              <div className="bg-black/90 backdrop-blur-sm rounded-xl p-4 border border-cyan-400/30 text-center max-w-xs mx-auto">
+                <div className="text-white text-sm font-medium mb-2">
+                  Use joystick to move • Tap buttons to split/boost • Hold button to cash-out
+                </div>
+                <div className="text-xs text-gray-400">Tap to dismiss</div>
+              </div>
+            </div>
+          )}
+
+          {/* Instructions Info Icon - Shows after auto-hide */}
+          {!showOrientationGate && !isGameOver && showInstructionsIcon && !instructionsVisible && (
+            <div 
+              className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+              style={{
+                top: `calc(env(safe-area-inset-top, 0px) + 16px)`
+              }}
+              onClick={() => {
+                setInstructionsVisible(true)
+                setShowInstructionsIcon(false)
+              }}
+            >
+              <div className="bg-black/70 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center border border-cyan-400/30">
+                <span className="text-cyan-400 text-sm">ℹ️</span>
+              </div>
             </div>
           )}
         </>
