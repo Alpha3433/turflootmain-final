@@ -108,7 +108,7 @@ const AgarIOGame = () => {
   const [gameServerFood, setGameServerFood] = useState([])
   const [isPlayerReady, setIsPlayerReady] = useState(false)
 
-  // Enhanced iOS/Mobile detection effect - This was MISSING!
+  // Enhanced iOS/Mobile detection effect - STRENGTHENED for iOS
   useEffect(() => {
     const detectMobileDevice = () => {
       // Multi-layer iOS/mobile detection for better compatibility
@@ -120,9 +120,10 @@ const AgarIOGame = () => {
       const hasSmallScreen = Math.min(window.screen.width, window.screen.height) <= 768
       const hasSmallViewport = Math.min(window.innerWidth, window.innerHeight) <= 768
       
-      // Comprehensive mobile detection
+      // AGGRESSIVE mobile detection - if ANY mobile indicator is true, consider it mobile
       const isMobileDevice = isIOSDevice || isAndroidDevice || isMobileUserAgent || 
-                            (isTouchCapable && (hasSmallScreen || hasSmallViewport))
+                            isTouchCapable || hasSmallScreen || hasSmallViewport ||
+                            window.innerWidth <= 768 // Simple width check as fallback
       
       const isCurrentlyLandscape = window.innerWidth > window.innerHeight
       
@@ -131,8 +132,8 @@ const AgarIOGame = () => {
       setIsLandscape(isCurrentlyLandscape)
       setShowOrientationGate(isMobileDevice && !isCurrentlyLandscape)
       
-      // Debug logging for troubleshooting
-      console.log('🔍 iOS Mobile Detection:', {
+      // ENHANCED debug logging for troubleshooting
+      console.log('🔍 ENHANCED iOS Mobile Detection:', {
         userAgent,
         isTouchCapable,
         isIOSDevice,
@@ -142,12 +143,19 @@ const AgarIOGame = () => {
         hasSmallViewport,
         screenSize: `${window.screen.width}x${window.screen.height}`,
         viewportSize: `${window.innerWidth}x${window.innerHeight}`,
-        FINAL_isMobile: isMobileDevice,
-        isLandscape: isCurrentlyLandscape
+        '📱 FINAL_isMobile': isMobileDevice,
+        '🔄 isLandscape': isCurrentlyLandscape,
+        '⚠️ showOrientationGate': isMobileDevice && !isCurrentlyLandscape
       })
       
+      // Force mobile detection for testing - TEMPORARY
+      if (window.innerWidth <= 768) {
+        console.log('🚨 FORCING MOBILE MODE for width <= 768px')
+        setIsMobile(true)
+      }
+      
       // Add mobile game body class for scroll prevention
-      if (isMobileDevice) {
+      if (isMobileDevice || window.innerWidth <= 768) {
         document.body.classList.add('mobile-game-active')
       } else {
         document.body.classList.remove('mobile-game-active')
