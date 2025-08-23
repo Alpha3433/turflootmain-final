@@ -625,49 +625,7 @@ export default function Home() {
     }
   }
 
-  // Enhanced Privy state with timeout detection and error handling
-  const [privyTimeout, setPrivyTimeout] = useState(false)
-  const [privyError, setPrivyError] = useState(false)
-  
-  // Monitor Privy initialization with timeout and error detection
-  useEffect(() => {
-    // Set a timeout to detect if Privy fails to initialize
-    const timeout = setTimeout(() => {
-      if (!ready) {
-        console.warn('⚠️ Privy failed to initialize within 10 seconds - activating bypass mode')
-        setPrivyTimeout(true)
-      }
-    }, 10000) // 10 second timeout
-    
-    // Clear timeout if Privy becomes ready
-    if (ready) {
-      console.log('✅ Privy initialized successfully')
-      clearTimeout(timeout)
-      setPrivyTimeout(false)
-      setPrivyError(false)
-    }
-    
-    return () => clearTimeout(timeout)
-  }, [ready])
 
-  // Monitor for Privy errors
-  useEffect(() => {
-    // Check for console errors indicating Privy issues
-    const originalError = console.error
-    console.error = (...args) => {
-      const message = args[0]?.toString() || ''
-      if (message.includes('Invalid Privy app ID') || message.includes('Privy')) {
-        console.log('🚫 Privy error detected - enabling bypass mode')
-        setPrivyError(true)
-        setPrivyTimeout(true)
-      }
-      originalError.apply(console, args)
-    }
-    
-    return () => {
-      console.error = originalError
-    }
-  }, [])
 
   const handleLoginClick = async () => {
     console.log('🔑 Login button clicked')
