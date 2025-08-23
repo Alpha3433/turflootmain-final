@@ -924,11 +924,13 @@ const AgarIOGame = () => {
     e.preventDefault()
   }
 
-  // Mobile UI fade management
+  // Mobile UI fade management with mission toast handling
   useEffect(() => {
     if (!isMobile) return
     
     let fadeTimeout
+    let instructionsTimeout
+    let missionToastTimeout
     
     const handleActivity = () => {
       setMobileUIFaded(false)
@@ -936,27 +938,38 @@ const AgarIOGame = () => {
       fadeTimeout = setTimeout(() => setMobileUIFaded(true), 3000)
     }
     
-    // Hide instructions after 5 seconds on mobile
-    setTimeout(() => setInstructionsVisible(false), 5000)
+    // Hide instructions after 10 seconds on mobile
+    instructionsTimeout = setTimeout(() => {
+      setInstructionsVisible(false)
+    }, 10000)
     
-    // Show mission toast periodically
-    const missionInterval = setInterval(() => {
-      if (currentMission && Math.random() > 0.7) {
-        setMissionToast(`Mission: ${currentMission.description}`)
-        setTimeout(() => setMissionToast(null), 2500)
-      }
-    }, 15000)
+    // Show mission toast when new mission appears
+    if (currentMission && !missionToastVisible) {
+      setMissionToastVisible(true)
+      // Hide toast after 3 seconds and show icon
+      missionToastTimeout = setTimeout(() => {
+        setMissionToastVisible(false)
+        setMissionIconVisible(true)
+      }, 3000)
+    }
+    
+    // Clear mission states when mission ends
+    if (!currentMission) {
+      setMissionToastVisible(false)
+      setMissionIconVisible(false)
+    }
     
     document.addEventListener('pointerdown', handleActivity, { passive: false })
     document.addEventListener('pointermove', handleActivity, { passive: false })
     
     return () => {
       clearTimeout(fadeTimeout)
-      clearInterval(missionInterval)
+      clearTimeout(instructionsTimeout)
+      clearTimeout(missionToastTimeout)
       document.removeEventListener('pointerdown', handleActivity)
       document.removeEventListener('pointermove', handleActivity)
     }
-  }, [isMobile, currentMission])
+  }, [isMobile, currentMission, missionToastVisible])
 
   // Mobile scroll and touch prevention
   useEffect(() => {
