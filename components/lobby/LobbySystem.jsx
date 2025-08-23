@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
-import { Users, Plus, Globe, Lock, Crown, Check, X, MessageCircle, Play, Copy, RefreshCw } from 'lucide-react'
+import { Users, Plus, Globe, Lock, Crown, Check, X, MessageCircle, Play, Copy, RefreshCw, Wifi } from 'lucide-react'
 import { io } from 'socket.io-client'
 
 const LobbySystem = () => {
@@ -17,6 +17,43 @@ const LobbySystem = () => {
   const [chatInput, setChatInput] = useState('')
   const [isReady, setIsReady] = useState(false)
   const [error, setError] = useState(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Mobile detection for auto-condensing
+  useEffect(() => {
+    const detectMobile = () => {
+      const userAgent = navigator.userAgent
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const aspectRatio = viewportWidth / viewportHeight
+      
+      // Comprehensive mobile detection
+      const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream
+      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
+      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      const isNarrowScreen = viewportWidth <= 768
+      const isTabletPortrait = viewportWidth <= 1024 && aspectRatio < 1.2
+      
+      const mobile = isIOSDevice || isMobileUserAgent || isTouchCapable || isNarrowScreen || isTabletPortrait
+      
+      console.log('🎮 Lobby Mobile Detection:', {
+        viewportWidth,
+        aspectRatio: aspectRatio.toFixed(2),
+        mobile,
+        '📱 CONDENSED_MODE': mobile
+      })
+      
+      setIsMobile(mobile)
+    }
+
+    detectMobile()
+    
+    // Re-detect on resize
+    const handleResize = () => detectMobile()
+    window.addEventListener('resize', handleResize)
+    
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Initialize Socket.IO connection
   useEffect(() => {
