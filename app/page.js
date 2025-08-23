@@ -629,29 +629,7 @@ export default function Home() {
 
   const handleLoginClick = async () => {
     console.log('🔑 Login button clicked')
-    console.log('🔍 State:', { ready, authenticated, privyTimeout, privyError, user: !!user })
-    
-    // If Privy has issues or timed out, use bypass authentication immediately
-    if (privyTimeout || privyError || (!ready && Date.now() > 5000)) {
-      console.log('🔄 Using bypass authentication due to Privy connectivity issues')
-      
-      // Create a working user session
-      const bypassUser = {
-        id: 'user_' + Date.now(),
-        email: { address: 'player@turfloot.com' },
-        wallet: { address: '0x742d35Cc6ab4925a1A5b73b6F89c4A3B4A2f2A9d' },
-        privyId: 'bypass_' + Date.now(),
-        createdAt: new Date().toISOString(),
-        bypassMode: true
-      }
-      
-      // Set user profile and load data
-      setUserProfile(bypassUser)
-      loadUserProfile(bypassUser.id)
-      
-      console.log('✅ Bypass authentication successful')
-      return
-    }
+    console.log('🔍 State:', { ready, authenticated, user: !!user })
     
     if (authenticated) {
       console.log('✅ User already authenticated')
