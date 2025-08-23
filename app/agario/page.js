@@ -2954,6 +2954,172 @@ const AgarIOGame = () => {
       )}
 
       {/* Game canvas and other content remains above */}
+
+      {/* Mobile-Only Features (≤768px width or touch device detected) */}
+      {isMobile && (
+        <>
+          {/* Orientation Gate - Full-screen landscape requirement */}
+          {showOrientationGate && (
+            <div className="orientation-gate">
+              <div className="rotate-icon">📱↻</div>
+              <h2 className="text-2xl font-bold mb-4">Rotate to Landscape</h2>
+              <p className="text-gray-400 text-center max-w-xs">
+                Please rotate your device to landscape mode to play TurfLoot
+              </p>
+            </div>
+          )}
+
+          {/* Mobile Joystick */}
+          {!showOrientationGate && !isGameOver && (
+            <div 
+              ref={joystickRef}
+              className={`mobile-joystick ${mobileUIFaded ? 'faded' : ''}`}
+              onPointerDown={handleJoystickStart}
+              style={{ touchAction: 'none' }}
+            >
+              <div ref={joystickKnobRef} className="joystick-knob" />
+            </div>
+          )}
+
+          {/* Mobile Action Buttons */}
+          {!showOrientationGate && !isGameOver && (
+            <div className={`mobile-action-buttons ${mobileUIFaded ? 'faded' : ''}`}>
+              {/* Circular Cash-Out Button with Progress Ring */}
+              <div 
+                className="mobile-action-btn mobile-cashout-btn"
+                onPointerDown={handleCashOutStart}
+                onPointerUp={handleCashOutEnd}
+                onPointerLeave={handleCashOutEnd}
+                style={{ touchAction: 'none' }}
+              >
+                <svg className="cashout-progress-ring" width="86" height="86">
+                  <circle 
+                    cx="43" 
+                    cy="43" 
+                    r="40"
+                    style={{
+                      strokeDasharray: `${2 * Math.PI * 40}`,
+                      strokeDashoffset: `${2 * Math.PI * 40 * (1 - cashOutProgress / 100)}`
+                    }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold">
+                  <div>💰</div>
+                  <div>{isCashingOut ? Math.floor(cashOutProgress) + '%' : '$' + gameStats.netWorth}</div>
+                </div>
+              </div>
+
+              {/* Split/Boost Button */}
+              <div 
+                className="mobile-action-btn"
+                onPointerDown={handleSplitStart}
+                onPointerUp={handleSplitEnd}
+                style={{ touchAction: 'none' }}
+              >
+                ⚡
+              </div>
+
+              {/* Eject Mass Button */}
+              <div 
+                className="mobile-action-btn"
+                onPointerDown={handleEjectStart}
+                onPointerUp={handleEjectEnd}
+                style={{ touchAction: 'none' }}
+              >
+                💨
+              </div>
+            </div>
+          )}
+
+          {/* Mobile HUD Icons */}
+          {!showOrientationGate && !isGameOver && (
+            <>
+              {/* Collapsible Minimap */}
+              <div 
+                className={`mobile-minimap ${minimapCollapsed ? 'collapsed' : ''} ${mobileUIFaded ? 'faded' : ''}`}
+                onClick={() => setMinimapCollapsed(!minimapCollapsed)}
+              >
+                {!minimapCollapsed ? (
+                  <canvas 
+                    width="116" 
+                    height="116"
+                    style={{ borderRadius: '50%' }}
+                    ref={minimapCanvasRef}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white font-bold">
+                    📍
+                  </div>
+                )}
+              </div>
+
+              {/* Collapsible Stats Panel */}
+              <div 
+                className={`mobile-stats-panel ${statsCollapsed ? 'collapsed' : ''} ${mobileUIFaded ? 'faded' : ''}`}
+                onClick={() => setStatsCollapsed(!statsCollapsed)}
+              >
+                {!statsCollapsed ? (
+                  <div className="text-white text-sm">
+                    <div className="flex items-center justify-between mb-2">
+                      <span>💰 ${gameStats.netWorth}</span>
+                      <span className="text-xs text-gray-400">#{gameStats.rank}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs">K: {gameStats.kills}</span>
+                      <span className="text-xs">D: {gameStats.deaths}</span>
+                      <span className="text-xs">🔥 {gameStats.streak}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-white font-bold text-lg">$</div>
+                )}
+              </div>
+
+              {/* Mission Icon (when missions are available) */}
+              {missionIconVisible && (
+                <div 
+                  className={`mobile-hud-icon ${mobileUIFaded ? 'faded' : ''}`}
+                  style={{ 
+                    top: `calc(env(safe-area-inset-top, 0px) + 20px)`,
+                    left: '50%',
+                    transform: 'translateX(-50%)'
+                  }}
+                  onClick={() => setShowCurrentMission(true)}
+                >
+                  🎯
+                </div>
+              )}
+
+              {/* Collapsible Leaderboard Icon */}
+              <div 
+                className={`mobile-hud-icon ${mobileUIFaded ? 'faded' : ''}`}
+                style={{ 
+                  top: `calc(env(safe-area-inset-top, 0px) + 80px)`,
+                  left: '20px'
+                }}
+                onClick={() => setLeaderboardCollapsed(!leaderboardCollapsed)}
+              >
+                🏆
+              </div>
+            </>
+          )}
+
+          {/* Mission Toast Notification */}
+          {missionToast && (
+            <div className="mission-toast">
+              🎯 {missionToast}
+            </div>
+          )}
+
+          {/* Mobile Instructions (shows briefly on game start) */}
+          {!showOrientationGate && !isGameOver && instructionsVisible && (
+            <div className="mobile-instructions">
+              <div className="mb-2">🕹️ Use joystick to move • 💰 Hold cash-out button to exit</div>
+              <div className="text-xs text-gray-400">Tap anywhere to dismiss</div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }
