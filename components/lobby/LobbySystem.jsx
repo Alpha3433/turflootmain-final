@@ -236,7 +236,15 @@ const LobbySystem = () => {
   }
 
   if (!authenticated) {
-    return (
+    return isMobile ? (
+      // Mobile condensed lobby icon for unauthenticated users
+      <div className="fixed top-4 left-4 z-40">
+        <div className="w-12 h-12 bg-gray-800/90 backdrop-blur-sm rounded-full border border-gray-600/50 flex items-center justify-center">
+          <Users className="w-5 h-5 text-gray-400" />
+        </div>
+      </div>
+    ) : (
+      // Desktop full lobby widget for unauthenticated users
       <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-40">
         <div className="bg-gray-800/90 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 min-w-[280px]">
           <div className="flex items-center space-x-2 mb-3">
@@ -257,7 +265,30 @@ const LobbySystem = () => {
     )
   }
 
-  return (
+  return isMobile ? (
+    // Mobile condensed lobby system
+    <MobileCondensedLobby
+      isConnected={isConnected}
+      currentLobby={currentLobby}
+      error={error}
+      onCreateLobby={() => setShowCreateModal(true)}
+      onBrowseLobbies={() => {
+        setShowBrowseModal(true)
+        handleBrowseLobbies()
+      }}
+      onLeaveLobby={handleLeaveLobby}
+      // Pass modals and handlers
+      showCreateModal={showCreateModal}
+      setShowCreateModal={setShowCreateModal}
+      showBrowseModal={showBrowseModal}
+      setShowBrowseModal={setShowBrowseModal}
+      publicLobbies={publicLobbies}
+      handleCreateLobby={handleCreateLobby}
+      handleJoinLobby={handleJoinLobby}
+      handleBrowseLobbies={handleBrowseLobbies}
+    />
+  ) : (
+    // Desktop full lobby system (unchanged)
     <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-40">
       {/* Error Display */}
       {error && (
