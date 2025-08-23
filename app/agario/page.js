@@ -57,6 +57,7 @@ const AgarIOGame = () => {
   const [statsCollapsed, setStatsCollapsed] = useState(true) // Default collapsed on mobile
   const [leaderboardCollapsed, setLeaderboardCollapsed] = useState(true) // Default collapsed on mobile
   const [instructionsVisible, setInstructionsVisible] = useState(true)
+  const [showInstructionsIcon, setShowInstructionsIcon] = useState(false)
   const [missionToastVisible, setMissionToastVisible] = useState(false)
   const [missionIconVisible, setMissionIconVisible] = useState(false)
   const [missionToast, setMissionToast] = useState(null)
