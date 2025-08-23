@@ -2762,14 +2762,13 @@ const AgarIOGame = () => {
         </div>
       )}
       
-      {/* Connection Status */}
+      {/* Demo Mode Badge - Top-left corner, semi-transparent */}
       {!isConnected && user && (
-        <div className="absolute top-4 right-4 bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-red-400/50">
-          <div className="flex items-center gap-2 text-red-400 font-bold text-sm">
-            <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-            OFFLINE
-          </div>
-          <div className="text-white text-xs mt-1">
+        <div className="fixed top-4 left-4 z-40 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 border border-yellow-400/30"
+             style={{
+               top: `calc(env(safe-area-inset-top, 0px) + 16px)`
+             }}>
+          <div className="text-yellow-400 text-xs font-medium">
             Demo Mode
           </div>
         </div>
