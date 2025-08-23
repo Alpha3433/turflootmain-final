@@ -1293,7 +1293,7 @@ export default function Home() {
               )}
             </div>
             
-            {authenticated && user ? (
+            {(authenticated && user) || userProfile ? (
               <>
                 <button 
                   onClick={() => setShowProfile(true)}
