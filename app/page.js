@@ -338,61 +338,57 @@ export default function Home() {
   useEffect(() => {
     const detectMobileDevice = () => {
       // COMPREHENSIVE iOS/Mobile Detection
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera
-      
-      // iOS Detection Methods
-      const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent)
-      const isSafariMobile = /Safari/.test(userAgent) && /Mobile/.test(userAgent)
-      const isIOSWebKit = /WebKit/.test(userAgent) && /Mobile/.test(userAgent)
-      
-      // Mobile Detection Methods  
-      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-      const isAndroidDevice = /Android/.test(userAgent)
-      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
-      
-      // Screen Size Detection
-      const screenWidth = window.screen?.width || window.innerWidth
-      const screenHeight = window.screen?.height || window.innerHeight
+      const userAgent = navigator.userAgent
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
+
+      // Check screen orientation ratio (mobile devices typically have height > width in portrait)
+      const aspectRatio = viewportWidth / viewportHeight
+      const isLikelyMobileScreen = viewportWidth <= 768 || (viewportWidth <= 1024 && aspectRatio < 1.5)
+
+      // Mobile Detection Methods  
+      const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream
+      const isSafariMobile = /Safari/.test(userAgent) && /Mobile/.test(userAgent)
+      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
+      const isIOSWebKit = /AppleWebKit/.test(userAgent) && /Mobile/.test(userAgent)
       
-      const hasSmallScreen = Math.min(screenWidth, screenHeight) <= 768
-      const hasSmallViewport = Math.min(viewportWidth, viewportHeight) <= 768
-      const isNarrowViewport = viewportWidth <= 768
-      const isPhoneSize = viewportWidth <= 480
-      
-      // ULTIMATE MOBILE DETECTION - ANY indicator = mobile
+      // Enhanced mobile detection - including narrow screens
+      const isAndroidDevice = /Android/i.test(userAgent)
+      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+
+      // ULTIMATE MOBILE DETECTION - ANY indicator = mobile OR narrow screen
       const isMobileDevice = isIOSDevice || isSafariMobile || isIOSWebKit ||
                             isAndroidDevice || isMobileUserAgent || isTouchCapable ||
-                            hasSmallScreen || hasSmallViewport || isNarrowViewport || isPhoneSize
-      
-      // FORCE MOBILE for iOS devices specifically
-      if (isIOSDevice || isSafariMobile || isIOSWebKit) {
-        console.log('🍎 iOS DEVICE DETECTED - FORCING MOBILE MODE')
-        setIsMobile(true)
-        return
-      }
-      
-      // FORCE MOBILE for narrow screens
+                            isLikelyMobileScreen // Added viewport-based detection
+
+      console.log('🔍 ENHANCED Mobile Detection:', {
+        userAgent: userAgent.substring(0, 50) + '...',
+        viewportWidth,
+        viewportHeight, 
+        aspectRatio: aspectRatio.toFixed(2),
+        isLikelyMobileScreen,
+        isIOSDevice,
+        isSafariMobile, 
+        isIOSWebKit,
+        isTouchCapable,
+        '📱 FINAL_isMobile': isMobileDevice
+      })
+
+      // Force mobile mode for narrow screens
       if (viewportWidth <= 768) {
         console.log('📱 NARROW SCREEN DETECTED - FORCING MOBILE MODE')
         setIsMobile(true)
         return
       }
-      
+
+      // Also force mobile for tablet portrait mode
+      if (viewportWidth <= 1024 && aspectRatio < 1.2) {
+        console.log('📱 TABLET PORTRAIT DETECTED - FORCING MOBILE MODE')
+        setIsMobile(true)
+        return
+      }
+
       setIsMobile(isMobileDevice)
-      
-      // Detailed logging for debugging
-      console.log('🔍 BULLETPROOF Mobile Detection:', {
-        userAgent: userAgent.substring(0, 50) + '...',
-        isIOSDevice,
-        isSafariMobile,
-        isIOSWebKit,
-        isTouchCapable,
-        screenSize: `${screenWidth}x${screenHeight}`,
-        viewportSize: `${viewportWidth}x${viewportHeight}`,
-        '📱 FINAL_isMobile': isMobileDevice || isIOSDevice || viewportWidth <= 768
-      })
     }
     
     // Run detection multiple times to ensure it catches
