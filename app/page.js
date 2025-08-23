@@ -1327,17 +1327,9 @@ export default function Home() {
                 onClick={handleLoginClick}
                 
                 className="px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black rounded-lg font-bold transition-all hover:scale-105 shadow-lg disabled:opacity-50 text-sm disabled:cursor-not-allowed"
-                title={
-                  privyTimeout ? 'Click to use bypass authentication' :
-                  !ready ? 'Initializing authentication...' : 
-                  authenticated || userProfile ? 'Already logged in' : 
-                  'Click to login'
-                }
+                title="Click to login with TurfLoot"
               >
-                {privyTimeout ? 'LOGIN' : 
-                 !ready ? 'Loading...' : 
-                 authenticated || userProfile ? 'Authenticated' : 
-                 'LOGIN'}
+                LOGIN
               </button>
             )}
           </div>
