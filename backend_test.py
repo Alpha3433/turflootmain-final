@@ -1,13 +1,29 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing Suite
-Testing recently fixed API endpoints as requested in review.
+TurfLoot Backend API Testing Suite - Mobile Orientation Gate Feature Testing
+===========================================================================
 
-Priority Tests:
+This test suite focuses on testing the backend APIs that support the mobile orientation gate feature.
+While the orientation gate itself is a frontend component, we need to ensure that:
+
+1. Backend APIs work correctly when accessed from mobile devices
+2. Authentication flow works for mobile users  
+3. Game entry APIs support both FREE and cash games for mobile users
+4. Server browser APIs work correctly for mobile game selection
+
+Previous Priority Tests (maintained):
 1. Server Browser API (GET /api/servers/lobbies) - Should return 36 persistent multiplayer servers
 2. Live Statistics APIs (GET /api/stats/live-players and GET /api/stats/global-winnings) 
 3. Leaderboard API (GET /api/users/leaderboard) - Should return leaderboard array structure
 4. Friends API (GET /api/friends/list?userId=demo-user) - Should return friends array structure
+
+New Mobile Orientation Gate Tests:
+5. Mobile API Compatibility - Test APIs with mobile user agents
+6. Mobile Authentication Flow - Test Privy auth for mobile users
+7. Mobile Game Entry APIs - Test game creation for mobile users
+8. Mobile Wallet APIs - Test wallet functionality for mobile cash games
+9. Mobile Statistics APIs - Test statistics display for mobile UI
+10. Mobile Integration Assessment - Overall mobile orientation gate support
 """
 
 import requests
