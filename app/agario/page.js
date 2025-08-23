@@ -108,61 +108,88 @@ const AgarIOGame = () => {
   const [gameServerFood, setGameServerFood] = useState([])
   const [isPlayerReady, setIsPlayerReady] = useState(false)
 
-  // Enhanced iOS/Mobile detection effect - STRENGTHENED for iOS
+  // BULLETPROOF iOS Mobile Detection - MATCHING LANDING PAGE
   useEffect(() => {
     const detectMobileDevice = () => {
-      // Multi-layer iOS/mobile detection for better compatibility
+      // COMPREHENSIVE iOS/Mobile Detection
       const userAgent = navigator.userAgent || navigator.vendor || window.opera
-      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      
+      // iOS Detection Methods
       const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent)
+      const isSafariMobile = /Safari/.test(userAgent) && /Mobile/.test(userAgent)
+      const isIOSWebKit = /WebKit/.test(userAgent) && /Mobile/.test(userAgent)
+      
+      // Mobile Detection Methods  
+      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isAndroidDevice = /Android/.test(userAgent)
       const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
-      const hasSmallScreen = Math.min(window.screen.width, window.screen.height) <= 768
-      const hasSmallViewport = Math.min(window.innerWidth, window.innerHeight) <= 768
       
-      // AGGRESSIVE mobile detection - if ANY mobile indicator is true, consider it mobile
-      const isMobileDevice = isIOSDevice || isAndroidDevice || isMobileUserAgent || 
-                            isTouchCapable || hasSmallScreen || hasSmallViewport ||
-                            window.innerWidth <= 768 // Simple width check as fallback
+      // Screen Size Detection
+      const screenWidth = window.screen?.width || window.innerWidth
+      const screenHeight = window.screen?.height || window.innerHeight
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
       
-      const isCurrentlyLandscape = window.innerWidth > window.innerHeight
+      const hasSmallScreen = Math.min(screenWidth, screenHeight) <= 768
+      const hasSmallViewport = Math.min(viewportWidth, viewportHeight) <= 768
+      const isNarrowViewport = viewportWidth <= 768
+      const isPhoneSize = viewportWidth <= 480
+      
+      // ULTIMATE MOBILE DETECTION - ANY indicator = mobile
+      const isMobileDevice = isIOSDevice || isSafariMobile || isIOSWebKit ||
+                            isAndroidDevice || isMobileUserAgent || isTouchCapable ||
+                            hasSmallScreen || hasSmallViewport || isNarrowViewport || isPhoneSize
+      
+      // FORCE MOBILE for iOS devices specifically
+      if (isIOSDevice || isSafariMobile || isIOSWebKit) {
+        console.log('🍎 GAME PAGE: iOS DEVICE DETECTED - FORCING MOBILE MODE')
+        setIsMobile(true)
+        setIsTouchDevice(true)
+        return
+      }
+      
+      // FORCE MOBILE for narrow screens
+      if (viewportWidth <= 768) {
+        console.log('📱 GAME PAGE: NARROW SCREEN DETECTED - FORCING MOBILE MODE')
+        setIsMobile(true)
+        setIsTouchDevice(true)
+        return
+      }
+      
+      const isCurrentlyLandscape = viewportWidth > viewportHeight
       
       setIsTouchDevice(isTouchCapable)
       setIsMobile(isMobileDevice)
       setIsLandscape(isCurrentlyLandscape)
       setShowOrientationGate(isMobileDevice && !isCurrentlyLandscape)
       
-      // ENHANCED debug logging for troubleshooting
-      console.log('🔍 ENHANCED iOS Mobile Detection:', {
-        userAgent,
-        isTouchCapable,
-        isIOSDevice,
-        isAndroidDevice,
-        isMobileUserAgent,
-        hasSmallScreen,
-        hasSmallViewport,
-        screenSize: `${window.screen.width}x${window.screen.height}`,
-        viewportSize: `${window.innerWidth}x${window.innerHeight}`,
-        '📱 FINAL_isMobile': isMobileDevice,
-        '🔄 isLandscape': isCurrentlyLandscape,
-        '⚠️ showOrientationGate': isMobileDevice && !isCurrentlyLandscape
-      })
-      
-      // Force mobile detection for testing - TEMPORARY
-      if (window.innerWidth <= 768) {
-        console.log('🚨 FORCING MOBILE MODE for width <= 768px')
-        setIsMobile(true)
-      }
-      
       // Add mobile game body class for scroll prevention
-      if (isMobileDevice || window.innerWidth <= 768) {
+      if (isMobileDevice || isIOSDevice || viewportWidth <= 768) {
         document.body.classList.add('mobile-game-active')
       } else {
         document.body.classList.remove('mobile-game-active')
       }
+      
+      // Detailed logging for debugging
+      console.log('🎮 GAME PAGE Mobile Detection:', {
+        userAgent: userAgent.substring(0, 50) + '...',
+        isIOSDevice,
+        isSafariMobile,
+        isIOSWebKit,
+        isTouchCapable,
+        screenSize: `${screenWidth}x${screenHeight}`,
+        viewportSize: `${viewportWidth}x${viewportHeight}`,
+        '📱 FINAL_isMobile': isMobileDevice || isIOSDevice || viewportWidth <= 768,
+        '🔄 isLandscape': isCurrentlyLandscape
+      })
     }
     
+    // Run detection multiple times to ensure it catches
     detectMobileDevice()
+    setTimeout(detectMobileDevice, 50)
+    setTimeout(detectMobileDevice, 100)
+    setTimeout(detectMobileDevice, 500)
+    
     window.addEventListener('resize', detectMobileDevice)
     window.addEventListener('orientationchange', detectMobileDevice)
     
