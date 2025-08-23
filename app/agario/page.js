@@ -108,6 +108,86 @@ const AgarIOGame = () => {
   const [gameServerFood, setGameServerFood] = useState([])
   const [isPlayerReady, setIsPlayerReady] = useState(false)
 
+  // Enhanced iOS/Mobile detection effect - This was MISSING!
+  useEffect(() => {
+    const detectMobileDevice = () => {
+      // Multi-layer iOS/mobile detection for better compatibility
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera
+      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent)
+      const isAndroidDevice = /Android/.test(userAgent)
+      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
+      const hasSmallScreen = Math.min(window.screen.width, window.screen.height) <= 768
+      const hasSmallViewport = Math.min(window.innerWidth, window.innerHeight) <= 768
+      
+      // Comprehensive mobile detection
+      const isMobileDevice = isIOSDevice || isAndroidDevice || isMobileUserAgent || 
+                            (isTouchCapable && (hasSmallScreen || hasSmallViewport))
+      
+      const isCurrentlyLandscape = window.innerWidth > window.innerHeight
+      
+      setIsTouchDevice(isTouchCapable)
+      setIsMobile(isMobileDevice)
+      setIsLandscape(isCurrentlyLandscape)
+      setShowOrientationGate(isMobileDevice && !isCurrentlyLandscape)
+      
+      // Debug logging for troubleshooting
+      console.log('🔍 iOS Mobile Detection:', {
+        userAgent,
+        isTouchCapable,
+        isIOSDevice,
+        isAndroidDevice,
+        isMobileUserAgent,
+        hasSmallScreen,
+        hasSmallViewport,
+        screenSize: `${window.screen.width}x${window.screen.height}`,
+        viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+        FINAL_isMobile: isMobileDevice,
+        isLandscape: isCurrentlyLandscape
+      })
+      
+      // Add mobile game body class for scroll prevention
+      if (isMobileDevice) {
+        document.body.classList.add('mobile-game-active')
+      } else {
+        document.body.classList.remove('mobile-game-active')
+      }
+    }
+    
+    detectMobileDevice()
+    window.addEventListener('resize', detectMobileDevice)
+    window.addEventListener('orientationchange', detectMobileDevice)
+    
+    // Additional check after orientation change completes
+    window.addEventListener('orientationchange', () => {
+      setTimeout(detectMobileDevice, 100)
+    })
+    
+    return () => {
+      window.removeEventListener('resize', detectMobileDevice)
+      window.removeEventListener('orientationchange', detectMobileDevice)
+      document.body.classList.remove('mobile-game-active')
+    }
+  }, [])
+
+  // Prevent mobile scrolling
+  useEffect(() => {
+    if (!isMobile) return
+
+    const preventScroll = (e) => {
+      e.preventDefault()
+      return false
+    }
+
+    document.addEventListener('touchmove', preventScroll, { passive: false })
+    document.addEventListener('wheel', preventScroll, { passive: false })
+
+    return () => {
+      document.removeEventListener('touchmove', preventScroll)
+      document.removeEventListener('wheel', preventScroll)
+    }
+  }, [isMobile])
+
   useEffect(() => {
     // Handle page visibility (exit game when tab is not visible)
     const handleVisibilityChange = () => {
