@@ -114,54 +114,20 @@ const AgarIOGame = () => {
   const [gameServerFood, setGameServerFood] = useState([])
   const [isPlayerReady, setIsPlayerReady] = useState(false)
 
-  // BULLETPROOF iOS Mobile Detection - MATCHING LANDING PAGE
+  // Simplified Mobile Detection
   useEffect(() => {
     const detectMobileDevice = () => {
-      // COMPREHENSIVE iOS/Mobile Detection
       const userAgent = navigator.userAgent || navigator.vendor || window.opera
-      
-      // iOS Detection Methods
-      const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent)
-      const isSafariMobile = /Safari/.test(userAgent) && /Mobile/.test(userAgent)
-      const isIOSWebKit = /WebKit/.test(userAgent) && /Mobile/.test(userAgent)
-      
-      // Mobile Detection Methods  
-      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-      const isAndroidDevice = /Android/.test(userAgent)
-      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
-      
-      // Screen Size Detection
-      const screenWidth = window.screen?.width || window.innerWidth
-      const screenHeight = window.screen?.height || window.innerHeight
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
       
-      const hasSmallScreen = Math.min(screenWidth, screenHeight) <= 768
-      const hasSmallViewport = Math.min(viewportWidth, viewportHeight) <= 768
+      // Simple mobile detection based on screen size and basic user agent check
+      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
+      const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isNarrowViewport = viewportWidth <= 768
-      const isPhoneSize = viewportWidth <= 480
       
-      // ULTIMATE MOBILE DETECTION - ANY indicator = mobile
-      const isMobileDevice = isIOSDevice || isSafariMobile || isIOSWebKit ||
-                            isAndroidDevice || isMobileUserAgent || isTouchCapable ||
-                            hasSmallScreen || hasSmallViewport || isNarrowViewport || isPhoneSize
-      
-      // FORCE MOBILE for iOS devices specifically
-      if (isIOSDevice || isSafariMobile || isIOSWebKit) {
-        console.log('🍎 GAME PAGE: iOS DEVICE DETECTED - FORCING MOBILE MODE')
-        setIsMobile(true)
-        setIsTouchDevice(true)
-        return
-      }
-      
-      // FORCE MOBILE for narrow screens
-      if (viewportWidth <= 768) {
-        console.log('📱 GAME PAGE: NARROW SCREEN DETECTED - FORCING MOBILE MODE')
-        setIsMobile(true)
-        setIsTouchDevice(true)
-        return
-      }
-      
+      // Simple mobile detection
+      const isMobileDevice = isMobileUserAgent || isTouchCapable || isNarrowViewport
       const isCurrentlyLandscape = viewportWidth > viewportHeight
       
       setIsTouchDevice(isTouchCapable)
@@ -170,39 +136,22 @@ const AgarIOGame = () => {
       setShowOrientationGate(isMobileDevice && !isCurrentlyLandscape)
       
       // Add mobile game body class for scroll prevention
-      if (isMobileDevice || isIOSDevice || viewportWidth <= 768) {
+      if (isMobileDevice) {
         document.body.classList.add('mobile-game-active')
       } else {
         document.body.classList.remove('mobile-game-active')
       }
       
-      // Detailed logging for debugging
-      console.log('🎮 GAME PAGE Mobile Detection:', {
-        userAgent: userAgent.substring(0, 50) + '...',
-        isIOSDevice,
-        isSafariMobile,
-        isIOSWebKit,
-        isTouchCapable,
-        screenSize: `${screenWidth}x${screenHeight}`,
+      console.log('🎮 Mobile Detection:', {
         viewportSize: `${viewportWidth}x${viewportHeight}`,
-        '📱 FINAL_isMobile': isMobileDevice || isIOSDevice || viewportWidth <= 768,
-        '🔄 isLandscape': isCurrentlyLandscape
+        isMobile: isMobileDevice,
+        isLandscape: isCurrentlyLandscape
       })
     }
     
-    // Run detection multiple times to ensure it catches
     detectMobileDevice()
-    setTimeout(detectMobileDevice, 50)
-    setTimeout(detectMobileDevice, 100)
-    setTimeout(detectMobileDevice, 500)
-    
     window.addEventListener('resize', detectMobileDevice)
     window.addEventListener('orientationchange', detectMobileDevice)
-    
-    // Additional check after orientation change completes
-    window.addEventListener('orientationchange', () => {
-      setTimeout(detectMobileDevice, 100)
-    })
     
     return () => {
       window.removeEventListener('resize', detectMobileDevice)
