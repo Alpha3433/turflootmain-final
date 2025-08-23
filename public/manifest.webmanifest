@@ -1,0 +1,21 @@
+{
+  "name": "TurfLoot - Crypto Agario",
+  "short_name": "TurfLoot",
+  "description": "Real-time multiplayer Agario with crypto rewards",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "theme_color": "#14f195",
+  "background_color": "#0f172a",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "lang": "en",
+  "dir": "ltr"
+}
