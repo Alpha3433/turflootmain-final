@@ -24,23 +24,17 @@ const LobbySystem = () => {
     const detectMobile = () => {
       const userAgent = navigator.userAgent
       const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-      const aspectRatio = viewportWidth / viewportHeight
       
-      // Comprehensive mobile detection
-      const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream
+      // Simplified mobile detection
       const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
       const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isNarrowScreen = viewportWidth <= 768
-      const isTabletPortrait = viewportWidth <= 1024 && aspectRatio < 1.2
       
-      const mobile = isIOSDevice || isMobileUserAgent || isTouchCapable || isNarrowScreen || isTabletPortrait
+      const mobile = isMobileUserAgent || isTouchCapable || isNarrowScreen
       
       console.log('🎮 Lobby Mobile Detection:', {
         viewportWidth,
-        aspectRatio: aspectRatio.toFixed(2),
-        mobile,
-        '📱 CONDENSED_MODE': mobile
+        mobile
       })
       
       setIsMobile(mobile)
