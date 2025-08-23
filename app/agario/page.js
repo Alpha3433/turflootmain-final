@@ -50,14 +50,14 @@ const AgarIOGame = () => {
   const [isLandscape, setIsLandscape] = useState(true)
   const [showOrientationGate, setShowOrientationGate] = useState(false)
   
-  // Enhanced mobile HUD state
-  const [statsCollapsed, setStatsCollapsed] = useState(true)
-  const [leaderboardCollapsed, setLeaderboardCollapsed] = useState(true)
-  const [showInstructions, setShowInstructions] = useState(true)
-  const [instructionsVisible, setInstructionsVisible] = useState(true)
-  const [missionIconVisible, setMissionIconVisible] = useState(false)
-  const [minimapCollapsed, setMinimapCollapsed] = useState(false)
+  // Mobile HUD state
   const [mobileUIFaded, setMobileUIFaded] = useState(false)
+  const [minimapCollapsed, setMinimapCollapsed] = useState(true) // Default collapsed on mobile
+  const [statsCollapsed, setStatsCollapsed] = useState(true) // Default collapsed on mobile
+  const [leaderboardCollapsed, setLeaderboardCollapsed] = useState(true) // Default collapsed on mobile
+  const [instructionsVisible, setInstructionsVisible] = useState(true)
+  const [missionToastVisible, setMissionToastVisible] = useState(false)
+  const [missionIconVisible, setMissionIconVisible] = useState(false)
   const [missionToast, setMissionToast] = useState(null)
   
   // Joystick refs and state
