@@ -32,6 +32,11 @@ export default function Home() {
   const [showServerBrowser, setShowServerBrowser] = useState(false)
   const [currentServer, setCurrentServer] = useState('US-East-1') // Default server
   const [currentPing, setCurrentPing] = useState(null) // Initialize as null to prevent hydration mismatch
+  
+  // Enhanced iOS Mobile Detection State - MISSING FROM LANDING PAGE!
+  const [isMobile, setIsMobile] = useState(false)
+  const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
+  const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
   const [leaderboardData, setLeaderboardData] = useState([])
   const [playerCustomization, setPlayerCustomization] = useState({
     skin: 'default_blue',
