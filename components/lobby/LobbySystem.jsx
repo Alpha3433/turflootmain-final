@@ -689,4 +689,178 @@ const LobbyRoom = ({
   )
 }
 
+// Mobile Condensed Lobby Component
+const MobileCondensedLobby = ({
+  isConnected,
+  currentLobby,
+  error,
+  onCreateLobby,
+  onBrowseLobbies,
+  onLeaveLobby,
+  showCreateModal,
+  setShowCreateModal,
+  showBrowseModal,
+  setShowBrowseModal,
+  publicLobbies,
+  handleCreateLobby,
+  handleJoinLobby,
+  handleBrowseLobbies
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  return (
+    <>
+      {/* Mobile Lobby Icon */}
+      <div className="fixed top-4 left-4 z-40">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`w-12 h-12 bg-gray-800/90 backdrop-blur-sm rounded-full border border-gray-600/50 flex items-center justify-center transition-all duration-200 ${
+            isExpanded ? 'bg-purple-600/90 border-purple-500/50' : 'hover:bg-gray-700/90'
+          }`}
+        >
+          <Users className={`w-5 h-5 ${isExpanded ? 'text-white' : 'text-gray-400'}`} />
+          {/* Connection status indicator */}
+          <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${
+            isConnected ? 'bg-green-400' : 'bg-red-400'
+          }`} />
+          {/* Active lobby indicator */}
+          {currentLobby && (
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-400 rounded-full" />
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Expanded Lobby Panel */}
+      {isExpanded && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-start"
+          onClick={() => setIsExpanded(false)}
+        >
+          <div 
+            className="bg-gray-800/95 backdrop-blur-sm rounded-br-xl border-r border-b border-gray-600/50 max-w-xs w-full p-4 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Users className="w-4 h-4 text-purple-400" />
+                <h3 className="text-white font-bold text-sm">Lobby</h3>
+              </div>
+              <button 
+                onClick={() => setIsExpanded(false)}
+                className="p-1 hover:bg-gray-700/50 rounded"
+              >
+                <X className="w-4 h-4 text-gray-400" />
+              </button>
+            </div>
+
+            {/* Connection Status */}
+            <div className="flex items-center justify-center space-x-2">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
+              <span className="text-xs text-gray-400">
+                {isConnected ? 'Connected' : 'Connecting...'}
+              </span>
+            </div>
+
+            {/* Error Display */}
+            {error && (
+              <div className="p-2 bg-red-900/50 border border-red-600/50 rounded text-red-200 text-xs">
+                {error}
+              </div>
+            )}
+
+            {/* Current Lobby or Actions */}
+            {currentLobby ? (
+              <MobileLobbyRoom lobby={currentLobby} onLeaveLobby={onLeaveLobby} />
+            ) : (
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setIsExpanded(false)
+                    onCreateLobby()
+                  }}
+                  disabled={!isConnected}
+                  className="w-full bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white font-medium py-2 px-3 rounded text-sm transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Create</span>
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setIsExpanded(false)
+                    onBrowseLobbies()
+                  }}
+                  disabled={!isConnected}
+                  className="w-full bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white font-medium py-2 px-3 rounded text-sm transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Globe className="w-3 h-3" />
+                  <span>Browse</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modals (same as desktop) */}
+      {showCreateModal && (
+        <CreateLobbyModal
+          onClose={() => setShowCreateModal(false)}
+          onCreateLobby={handleCreateLobby}
+        />
+      )}
+
+      {showBrowseModal && (
+        <BrowseLobbyModal
+          lobbies={publicLobbies}
+          onClose={() => setShowBrowseModal(false)}
+          onJoinLobby={handleJoinLobby}
+          onRefresh={() => handleBrowseLobbies()}
+        />
+      )}
+    </>
+  )
+}
+
+// Mobile Lobby Room Component (Simplified)
+const MobileLobbyRoom = ({ lobby, onLeaveLobby }) => (
+  <div className="space-y-3">
+    <div className="text-center">
+      <div className="text-white font-medium text-sm">{lobby.name}</div>
+      <div className="text-xs text-gray-400">
+        {lobby.players.length}/{lobby.maxPlayers} players • {lobby.region.toUpperCase()}
+      </div>
+    </div>
+    
+    <div className="space-y-2">
+      {lobby.players.map((player) => (
+        <div
+          key={player.userId}
+          className="flex items-center justify-between bg-gray-700/50 rounded p-2"
+        >
+          <div className="flex items-center space-x-2">
+            {player.role === 'HOST' && (
+              <Crown className="w-3 h-3 text-yellow-400" />
+            )}
+            <span className="text-white text-xs">{player.name}</span>
+          </div>
+          {player.ready ? (
+            <Check className="w-3 h-3 text-green-400" />
+          ) : (
+            <X className="w-3 h-3 text-gray-400" />
+          )}
+        </div>
+      ))}
+    </div>
+    
+    <button
+      onClick={onLeaveLobby}
+      className="w-full bg-red-600/20 hover:bg-red-600/40 text-red-400 font-medium py-2 px-3 rounded text-sm transition-colors"
+    >
+      Leave Lobby
+    </button>
+  </div>
+)
+
 export default LobbySystem
