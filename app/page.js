@@ -337,56 +337,22 @@ export default function Home() {
   // BULLETPROOF iOS Mobile Detection - GUARANTEED TO WORK
   useEffect(() => {
     const detectMobileDevice = () => {
-      // COMPREHENSIVE iOS/Mobile Detection
+      // Simplified Mobile Detection
       const userAgent = navigator.userAgent
       const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-
-      // Check screen orientation ratio (mobile devices typically have height > width in portrait)
-      const aspectRatio = viewportWidth / viewportHeight
-      const isLikelyMobileScreen = viewportWidth <= 768 || (viewportWidth <= 1024 && aspectRatio < 1.5)
-
-      // Mobile Detection Methods  
-      const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream
-      const isSafariMobile = /Safari/.test(userAgent) && /Mobile/.test(userAgent)
-      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
-      const isIOSWebKit = /AppleWebKit/.test(userAgent) && /Mobile/.test(userAgent)
       
-      // Enhanced mobile detection - including narrow screens
-      const isAndroidDevice = /Android/i.test(userAgent)
+      // Basic mobile detection
+      const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
       const isTouchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      const isNarrowViewport = viewportWidth <= 768
+      
+      // Simple mobile detection
+      const isMobileDevice = isMobileUserAgent || isTouchCapable || isNarrowViewport
 
-      // ULTIMATE MOBILE DETECTION - ANY indicator = mobile OR narrow screen
-      const isMobileDevice = isIOSDevice || isSafariMobile || isIOSWebKit ||
-                            isAndroidDevice || isMobileUserAgent || isTouchCapable ||
-                            isLikelyMobileScreen // Added viewport-based detection
-
-      console.log('🔍 ENHANCED Mobile Detection:', {
-        userAgent: userAgent.substring(0, 50) + '...',
+      console.log('📱 Mobile Detection:', {
         viewportWidth,
-        viewportHeight, 
-        aspectRatio: aspectRatio.toFixed(2),
-        isLikelyMobileScreen,
-        isIOSDevice,
-        isSafariMobile, 
-        isIOSWebKit,
-        isTouchCapable,
-        '📱 FINAL_isMobile': isMobileDevice
+        isMobile: isMobileDevice
       })
-
-      // Force mobile mode for narrow screens
-      if (viewportWidth <= 768) {
-        console.log('📱 NARROW SCREEN DETECTED - FORCING MOBILE MODE')
-        setIsMobile(true)
-        return
-      }
-
-      // Also force mobile for tablet portrait mode
-      if (viewportWidth <= 1024 && aspectRatio < 1.2) {
-        console.log('📱 TABLET PORTRAIT DETECTED - FORCING MOBILE MODE')
-        setIsMobile(true)
-        return
-      }
 
       setIsMobile(isMobileDevice)
     }
