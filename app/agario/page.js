@@ -3144,9 +3144,9 @@ const AgarIOGame = () => {
           {/* Mobile Action Buttons */}
           {!showOrientationGate && !isGameOver && (
             <div className={`mobile-action-buttons ${mobileUIFaded ? 'faded' : ''}`}>
-              {/* Circular Cash-Out Button with Progress Ring */}
+              {/* Circular Cash-Out Button with Progress Ring and Guidance */}
               <div 
-                className="mobile-action-btn mobile-cashout-btn"
+                className="mobile-action-btn mobile-cashout-btn relative"
                 onPointerDown={handleCashOutStart}
                 onPointerUp={handleCashOutEnd}
                 onPointerLeave={handleCashOutEnd}
@@ -3167,6 +3167,12 @@ const AgarIOGame = () => {
                   <div>💰</div>
                   <div>{isCashingOut ? Math.floor(cashOutProgress) + '%' : '$' + gameStats.netWorth}</div>
                 </div>
+                {/* Cash-out guidance tooltip */}
+                {!isCashingOut && (
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-80">
+                    Hold to cash out
+                  </div>
+                )}
               </div>
 
               {/* Split/Boost Button */}
