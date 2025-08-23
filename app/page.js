@@ -784,8 +784,41 @@ export default function Home() {
       return
     }
     
+    // Check mobile orientation before game entry
+    if (isMobile) {
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+      const isCurrentlyLandscape = viewportWidth > viewportHeight
+      
+      if (!isCurrentlyLandscape) {
+        console.log('📱 Mobile user in portrait mode - showing orientation gate')
+        
+        // Store the pending game entry details
+        setPendingGameEntry({
+          stake: selectedStake,
+          mode: selectedStake === 'FREE' || selectedStake === 0 ? 'free' : 'cash',
+          fee: selectedStake === 'FREE' || selectedStake === 0 ? 0 : parseInt(selectedStake.toString().replace('$', ''))
+        })
+        
+        // Show orientation gate
+        setShowOrientationGate(true)
+        return
+      }
+    }
+    
+    // Proceed with normal game entry logic
+    proceedToGame()
+  }
+
+  const proceedToGame = () => {
+    const gameStake = pendingGameEntry?.stake || selectedStake
+    const gameMode = pendingGameEntry?.mode || (selectedStake === 'FREE' || selectedStake === 0 ? 'free' : 'cash')
+    const gameFee = pendingGameEntry?.fee || (selectedStake === 'FREE' || selectedStake === 0 ? 0 : parseInt(selectedStake.toString().replace('$', '')))
+    
+    console.log('🎮 Proceeding to game:', { gameStake, gameMode, gameFee })
+    
     // For FREE games - route to Agario clone (with authentication)
-    if (selectedStake === 'FREE' || selectedStake === 0) {
+    if (gameStake === 'FREE' || gameStake === 0) {
       console.log('🆓 Free game selected - using bots for testing')
       
       // Show confirmation dialog for bot practice
@@ -824,11 +857,19 @@ export default function Home() {
     
     // For cash games, use the original complex game with authentication
     const mode = 'cash'
-    const fee = parseInt(selectedStake.toString().replace('$', ''))
+    const fee = gameFee
     const roomId = 'lobby'
     
     console.log('💰 Routing to cash game with auth:', { mode, fee, roomId })
     router.push(`/play?mode=${mode}&room=${roomId}&fee=${fee}`)
+  }
+
+  const handleOrientationReady = () => {
+    console.log('✅ Mobile device ready in landscape - proceeding to game')
+    setShowOrientationGate(false)
+    proceedToGame()
+    // Clear pending game entry
+    setPendingGameEntry(null)
   }
 
   return (
