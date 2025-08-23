@@ -349,51 +349,442 @@ def test_missing_userid_friends_api():
         log_test("Friends API (no userId)", "FAIL", f"Exception: {str(e)}")
         return False
 
-def main():
-    """Run all priority tests"""
-    print("🚀 TurfLoot Backend API Testing Suite")
-    print("Testing recently fixed API endpoints")
+def test_mobile_api_compatibility():
+    """Test Mobile API Compatibility - New Test #5"""
+    print("\n📱 NEW TEST #5: Mobile API Compatibility")
+    print("=" * 60)
+    
+    for device, user_agent in MOBILE_USER_AGENTS.items():
+        try:
+            headers = {
+                'User-Agent': user_agent,
+                'Content-Type': 'application/json'
+            }
+            
+            # Test root API endpoint with mobile user agent
+            response = requests.get(f"{API_BASE}/", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'message' in data and 'TurfLoot' in data['message']:
+                    log_mobile_test(
+                        f"Mobile API ({device})",
+                        True,
+                        f"API accessible from {device}",
+                        f"Response: {data.get('message', 'N/A')}"
+                    )
+                else:
+                    log_mobile_test(
+                        f"Mobile API ({device})",
+                        False,
+                        f"Unexpected response from {device}",
+                        f"Response: {data}"
+                    )
+            else:
+                log_mobile_test(
+                    f"Mobile API ({device})",
+                    False,
+                    f"API not accessible from {device} (HTTP {response.status_code})",
+                    f"Response: {response.text[:200]}"
+                )
+                
+        except Exception as e:
+            log_mobile_test(
+                f"Mobile API ({device})",
+                False,
+                f"Connection error from {device}",
+                str(e)
+            )
+
+def test_mobile_authentication_flow():
+    """Test Mobile Authentication Flow - New Test #6"""
+    print("\n🔐 NEW TEST #6: Mobile Authentication Flow")
+    print("=" * 60)
+    
+    mobile_headers = {
+        'User-Agent': MOBILE_USER_AGENTS['ios_safari'],
+        'Content-Type': 'application/json'
+    }
+    
+    try:
+        # Test missing privy_user validation
+        response = requests.post(
+            f"{API_BASE}/auth/privy",
+            headers=mobile_headers,
+            json={},
+            timeout=10
+        )
+        
+        if response.status_code == 400:
+            error_data = response.json()
+            if 'privy_user' in error_data.get('error', '').lower():
+                log_mobile_test(
+                    "Mobile Auth Validation",
+                    True,
+                    "Mobile auth properly validates missing privy_user",
+                    f"Error: {error_data.get('error')}"
+                )
+            else:
+                log_mobile_test(
+                    "Mobile Auth Validation",
+                    False,
+                    "Unexpected validation error for mobile auth",
+                    f"Response: {error_data}"
+                )
+        else:
+            log_mobile_test(
+                "Mobile Auth Validation",
+                False,
+                f"Unexpected response code for mobile auth (HTTP {response.status_code})",
+                f"Response: {response.text[:200]}"
+            )
+            
+    except Exception as e:
+        log_mobile_test(
+            "Mobile Auth Validation",
+            False,
+            "Mobile auth endpoint connection error",
+            str(e)
+        )
+    
+    # Test with valid mobile user data
+    try:
+        mobile_user_data = {
+            "privy_user": {
+                "id": "did:privy:mobile_test_user_123",
+                "email": {
+                    "address": f"mobile.test.{int(time.time())}@turfloot.com"
+                },
+                "google": None,
+                "wallet": None
+            }
+        }
+        
+        response = requests.post(
+            f"{API_BASE}/auth/privy",
+            headers=mobile_headers,
+            json=mobile_user_data,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('success') and data.get('token'):
+                # Verify JWT token structure
+                token_parts = data['token'].split('.')
+                if len(token_parts) == 3:
+                    log_mobile_test(
+                        "Mobile User Creation",
+                        True,
+                        "Mobile user auth successful with JWT token",
+                        f"User: {mobile_user_data['privy_user']['email']['address']}"
+                    )
+                    # Store for later tests
+                    global mobile_auth_token
+                    mobile_auth_token = data['token']
+                else:
+                    log_mobile_test(
+                        "Mobile User Creation",
+                        False,
+                        "Invalid JWT token structure for mobile user",
+                        f"Token parts: {len(token_parts)}"
+                    )
+            else:
+                log_mobile_test(
+                    "Mobile User Creation",
+                    False,
+                    "Mobile auth failed - missing success/token",
+                    f"Response: {data}"
+                )
+        else:
+            log_mobile_test(
+                "Mobile User Creation",
+                False,
+                f"Mobile auth failed (HTTP {response.status_code})",
+                f"Response: {response.text[:200]}"
+            )
+            
+    except Exception as e:
+        log_mobile_test(
+            "Mobile User Creation",
+            False,
+            "Mobile user creation connection error",
+            str(e)
+        )
+
+def test_mobile_game_entry_apis():
+    """Test Mobile Game Entry APIs - New Test #7"""
+    print("\n🎮 NEW TEST #7: Mobile Game Entry APIs")
+    print("=" * 60)
+    
+    mobile_headers = {
+        'User-Agent': MOBILE_USER_AGENTS['android_chrome'],
+        'Content-Type': 'application/json'
+    }
+    
+    # Test server browser API for mobile game selection
+    try:
+        response = requests.get(f"{API_BASE}/servers/lobbies", headers=mobile_headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            servers = data.get('servers', [])
+            
+            if len(servers) >= 30:  # Should have 36 servers
+                # Check for FREE games (mobile users can play these)
+                free_servers = [s for s in servers if s.get('stake') == 0 or s.get('mode') == 'Free']
+                cash_servers = [s for s in servers if s.get('stake', 0) > 0]
+                
+                log_mobile_test(
+                    "Mobile Server Browser",
+                    True,
+                    f"Server browser accessible from mobile ({len(servers)} servers)",
+                    f"FREE: {len(free_servers)}, Cash: {len(cash_servers)}"
+                )
+            else:
+                log_mobile_test(
+                    "Mobile Server Browser",
+                    False,
+                    f"Insufficient servers for mobile ({len(servers)} found, expected 30+)",
+                    f"Servers: {servers[:3] if servers else 'None'}"
+                )
+        else:
+            log_mobile_test(
+                "Mobile Server Browser",
+                False,
+                f"Server browser not accessible from mobile (HTTP {response.status_code})",
+                f"Response: {response.text[:200]}"
+            )
+            
+    except Exception as e:
+        log_mobile_test(
+            "Mobile Server Browser",
+            False,
+            "Server browser connection error from mobile",
+            str(e)
+        )
+    
+    # Test FREE game creation (primary mobile use case)
+    try:
+        free_game_data = {
+            "wallet_address": "mobile_test_wallet_123",
+            "stake_amount": 0,  # FREE game
+            "game_mode": "free"
+        }
+        
+        response = requests.post(
+            f"{API_BASE}/games",
+            headers=mobile_headers,
+            json=free_game_data,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('success') and data.get('game_id'):
+                log_mobile_test(
+                    "Mobile FREE Game Creation",
+                    True,
+                    "FREE game creation successful for mobile",
+                    f"Game ID: {data['game_id']}, Stake: $0"
+                )
+            else:
+                log_mobile_test(
+                    "Mobile FREE Game Creation",
+                    False,
+                    "FREE game creation failed - missing success/game_id",
+                    f"Response: {data}"
+                )
+        else:
+            log_mobile_test(
+                "Mobile FREE Game Creation",
+                False,
+                f"FREE game creation failed for mobile (HTTP {response.status_code})",
+                f"Response: {response.text[:200]}"
+            )
+            
+    except Exception as e:
+        log_mobile_test(
+            "Mobile FREE Game Creation",
+            False,
+            "FREE game creation connection error from mobile",
+            str(e)
+        )
+
+def test_mobile_orientation_gate_integration():
+    """Test Mobile Orientation Gate Integration - New Test #8"""
+    print("\n📱 NEW TEST #8: Mobile Orientation Gate Integration")
+    print("=" * 60)
+    
+    # Test that all required APIs for mobile game flow are accessible
+    mobile_headers = {
+        'User-Agent': MOBILE_USER_AGENTS['ios_safari'],
+        'Content-Type': 'application/json'
+    }
+    
+    # Critical APIs that mobile orientation gate flow depends on
+    critical_apis = [
+        ('/', 'Root API'),
+        ('/auth/privy', 'Authentication'),
+        ('/servers/lobbies', 'Server Browser'),
+        ('/games', 'Game Creation'),
+        ('/stats/live-players', 'Live Statistics')
+    ]
+    
+    mobile_api_success = 0
+    total_critical_apis = len(critical_apis)
+    
+    for endpoint, name in critical_apis:
+        try:
+            if endpoint == '/auth/privy' or endpoint == '/games':
+                # POST endpoints - test with minimal data
+                response = requests.post(f"{API_BASE}{endpoint}", headers=mobile_headers, json={}, timeout=10)
+                # Expect 400 for missing data, not connection errors
+                success = response.status_code in [200, 400]
+            else:
+                # GET endpoints
+                response = requests.get(f"{API_BASE}{endpoint}", headers=mobile_headers, timeout=10)
+                success = response.status_code == 200
+            
+            if success:
+                mobile_api_success += 1
+                log_mobile_test(
+                    f"Mobile Integration - {name}",
+                    True,
+                    f"{name} API supports mobile orientation gate flow",
+                    f"HTTP {response.status_code}"
+                )
+            else:
+                log_mobile_test(
+                    f"Mobile Integration - {name}",
+                    False,
+                    f"{name} API not accessible for mobile orientation gate flow",
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+                
+        except Exception as e:
+            log_mobile_test(
+                f"Mobile Integration - {name}",
+                False,
+                f"{name} API connection error for mobile orientation gate flow",
+                str(e)
+            )
+    
+    # Overall integration assessment
+    integration_success_rate = (mobile_api_success / total_critical_apis) * 100
+    
+    if integration_success_rate >= 80:
+        log_mobile_test(
+            "Mobile Orientation Gate Backend Support",
+            True,
+            f"Backend fully supports mobile orientation gate ({integration_success_rate:.0f}% APIs working)",
+            f"Critical APIs working: {mobile_api_success}/{total_critical_apis}"
+        )
+    else:
+        log_mobile_test(
+            "Mobile Orientation Gate Backend Support",
+            False,
+            f"Backend has issues supporting mobile orientation gate ({integration_success_rate:.0f}% APIs working)",
+            f"Critical APIs working: {mobile_api_success}/{total_critical_apis}"
+        )
+
+def print_mobile_test_summary():
+    """Print summary of mobile orientation gate tests"""
+    print("\n" + "=" * 80)
+    print("📱 MOBILE ORIENTATION GATE BACKEND TEST SUMMARY")
     print("=" * 80)
+    
+    total_mobile_tests = mobile_tests_passed + mobile_tests_failed
+    if total_mobile_tests > 0:
+        success_rate = (mobile_tests_passed / total_mobile_tests) * 100
+        print(f"Mobile Tests: {total_mobile_tests}")
+        print(f"✅ Passed: {mobile_tests_passed}")
+        print(f"❌ Failed: {mobile_tests_failed}")
+        print(f"Success Rate: {success_rate:.1f}%")
+        
+        if mobile_tests_failed > 0:
+            print(f"\n❌ FAILED MOBILE TESTS ({mobile_tests_failed}):")
+            for result in mobile_test_results:
+                if result['status'] == 'FAIL':
+                    print(f"   • {result['test']}: {result['details']}")
+        
+        print(f"\n🎯 MOBILE ORIENTATION GATE ASSESSMENT:")
+        if mobile_tests_failed == 0:
+            print("✅ ALL MOBILE TESTS PASSED - Backend fully supports mobile orientation gate feature")
+        elif mobile_tests_failed <= 2:
+            print("⚠️ MINOR ISSUES - Backend mostly supports mobile orientation gate with minor issues")
+        else:
+            print("❌ MAJOR ISSUES - Backend has significant problems supporting mobile orientation gate")
+    else:
+        print("⚠️ No mobile tests were executed")
+
+def main():
+    """Run all priority tests + mobile orientation gate tests"""
+    print("🚀 TurfLoot Backend API Testing Suite")
+    print("Testing Priority APIs + Mobile Orientation Gate Support")
+    print(f"📡 API Base: {API_BASE}")
+    print("=" * 80)
+    
+    # Initialize mobile auth token variable
+    global mobile_auth_token
+    mobile_auth_token = None
     
     start_time = time.time()
     
-    # Run priority tests
+    # Run original priority tests
     test_results = []
-    
     test_results.append(test_server_browser_api())
     test_results.append(test_live_statistics_apis())
     test_results.append(test_leaderboard_api())
     test_results.append(test_friends_api())
-    
-    # Additional validation test
     test_results.append(test_missing_userid_friends_api())
+    
+    # Run new mobile orientation gate tests
+    test_mobile_api_compatibility()
+    test_mobile_authentication_flow()
+    test_mobile_game_entry_apis()
+    test_mobile_orientation_gate_integration()
     
     # Summary
     end_time = time.time()
     duration = end_time - start_time
     
+    # Print priority test results
     print("\n" + "=" * 80)
-    print("🏁 TEST SUMMARY")
+    print("📊 PRIORITY API ENDPOINTS TEST SUMMARY")
     print("=" * 80)
     
     passed = sum(test_results)
     total = len(test_results)
     
-    print(f"✅ Tests Passed: {passed}/{total}")
-    print(f"⏱️  Total Duration: {duration:.3f}s")
-    print(f"🎯 Success Rate: {(passed/total)*100:.1f}%")
+    print(f"Priority Tests: {total}")
+    print(f"✅ Passed: {passed}")
+    print(f"❌ Failed: {total - passed}")
+    print(f"Success Rate: {(passed/total)*100:.1f}%")
     
     if passed == total:
-        print("\n🎉 ALL PRIORITY TESTS PASSED!")
-        print("✅ Server Browser API: 36 persistent servers with proper structure")
-        print("✅ Live Statistics APIs: Both endpoints working with correct data structure")
-        print("✅ Leaderboard API: Returns proper leaderboard array structure")
-        print("✅ Friends API: Returns proper friends array structure with validation")
-        print("\n🚀 All recently fixed API endpoints are working correctly!")
+        print("\n✅ ALL PRIORITY TESTS PASSED - Recently fixed endpoints are working correctly!")
     else:
-        print(f"\n⚠️  {total - passed} test(s) failed. Check logs above for details.")
+        print(f"\n❌ {total - passed} PRIORITY TESTS FAILED - Some endpoints need attention")
+        test_names = ["Server Browser API", "Live Statistics APIs", "Leaderboard API", "Friends API", "Friends API Validation"]
+        for i, result in enumerate(test_results):
+            if not result:
+                print(f"   • {test_names[i]} - FAILED")
     
-    return passed == total
+    # Print mobile test summary
+    print_mobile_test_summary()
+    
+    # Overall assessment
+    overall_success = (passed == total) and (mobile_tests_failed == 0)
+    
+    print(f"\n🎯 OVERALL ASSESSMENT:")
+    print(f"⏱️  Total Duration: {duration:.3f}s")
+    if overall_success:
+        print("✅ ALL TESTS PASSED - Backend fully supports both priority APIs and mobile orientation gate")
+    else:
+        print("⚠️ SOME ISSUES FOUND - Check failed tests above for details")
+    
+    return overall_success
 
 if __name__ == "__main__":
     success = main()
