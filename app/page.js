@@ -1230,19 +1230,6 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
-
-                {/* Mobile-Only Lobby & Friends Button */}
-                {isMobile && (
-                  <button 
-                    onClick={() => setShowMobileLobby(true)}
-                    className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
-                    title="Lobby & Friends"
-                  >
-                    <svg className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 12a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6 3 3 0 000 6zm-8 8a6 6 0 016-6h2a6 6 0 016 6v2H9v-2z" />
-                    </svg>
-                  </button>
-                )}
                 
                 <button 
                   onClick={handleLogout}
@@ -1259,6 +1246,19 @@ export default function Home() {
                 title={!ready ? 'Initializing authentication...' : 'Click to login with Privy'}
               >
                 {!ready ? 'Loading...' : 'LOGIN'}
+              </button>
+            )}
+
+            {/* Mobile-Only Lobby & Friends Button - Always visible on mobile */}
+            {isMobile && (
+              <button 
+                onClick={() => setShowMobileLobby(true)}
+                className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
+                title="Lobby & Friends"
+              >
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 12a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6 3 3 0 000 6zm-8 8a6 6 0 016-6h2a6 6 0 016 6v2H9v-2z" />
+                </svg>
               </button>
             )}
           </div>
