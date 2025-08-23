@@ -1281,11 +1281,11 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Main Game Grid */}
-          <div className="grid grid-cols-12 gap-3 max-w-5xl mx-auto">
+          {/* Main Game Grid - Mobile: Flex Column with Order, Desktop: Grid */}
+          <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-3 max-w-5xl mx-auto space-y-3 lg:space-y-0">
             
-            {/* LEFT COLUMN - Leaderboard & Friends */}
-            <div className="col-span-12 lg:col-span-3 space-y-3">
+            {/* LEFT COLUMN - Leaderboard & Friends - Mobile: Order Last (Bottom) */}
+            <div className="order-3 lg:order-1 col-span-12 lg:col-span-3 space-y-3">
               {/* Leaderboard */}
               <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 shadow-2xl">
                 <div className="flex items-center space-x-3 mb-4">
