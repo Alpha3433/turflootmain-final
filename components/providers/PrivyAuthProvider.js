@@ -7,20 +7,14 @@ export default function PrivyAuthProvider({ children }) {
   
   console.log('🔍 Privy Provider - App ID:', appId ? `${appId.substring(0, 10)}...` : 'MISSING')
   
-  // If no app ID or app ID is invalid, show instructions
   if (!appId) {
     console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is not configured!')
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold mb-4">🔑 Authentication Setup Required</h1>
-          <p className="text-gray-400 mb-4">Privy App ID is not configured.</p>
-          <p className="text-sm text-gray-500">
-            Please set NEXT_PUBLIC_PRIVY_APP_ID in your .env file with a valid Privy App ID.
-          </p>
-        </div>
+    return <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold mb-4">🔑 Authentication Setup Required</h1>
+        <p className="text-gray-400">Privy App ID is not configured.</p>
       </div>
-    )
+    </div>
   }
 
   const config = {
@@ -30,7 +24,7 @@ export default function PrivyAuthProvider({ children }) {
       logo: undefined,
       showWalletLoginFirst: false,
     },
-    loginMethods: ['google', 'email'],
+    loginMethods: ['google', 'email', 'wallet'],
     embeddedWallets: {
       createOnLogin: 'all-users',
       requireUserPasswordOnCreate: false,
