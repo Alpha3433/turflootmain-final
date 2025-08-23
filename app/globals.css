@@ -819,7 +819,7 @@
 
 /* Mobile Game Styles - Mobile Only (≤768px) */
 
-/* Mobile game scroll prevention and canvas sizing */
+/* Game body styling for mobile - used when in-game */
 .mobile-game-active {
   overflow: hidden !important;
   position: fixed !important;
@@ -827,10 +827,18 @@
   height: 100% !important;
   touch-action: none !important;
   overscroll-behavior: none !important;
-  -webkit-overflow-scrolling: none !important;
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -webkit-touch-callout: none !important;
+}
+
+/* Orientation Gate Animations */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(1deg); }
+  50% { transform: translateY(-5px) rotate(0deg); }
+  75% { transform: translateY(-15px) rotate(-1deg); }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
 }
 
 /* Game root container for mobile */
