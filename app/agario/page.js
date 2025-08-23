@@ -2834,8 +2834,8 @@ const AgarIOGame = () => {
         </div>
       ))}
 
-      {/* Current Mission Display - Moved to Top Center */}
-      {currentMission && !isGameOver && (
+      {/* Current Mission Display - Desktop Only */}
+      {currentMission && !isGameOver && !isMobile && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-sm rounded-lg p-4 border border-purple-400/50 max-w-xs">
           <div className="text-purple-400 font-bold text-sm mb-2">🎯 MISSION</div>
           <div className="text-white text-sm mb-2">{currentMission.description}</div>
@@ -2859,7 +2859,9 @@ const AgarIOGame = () => {
           </div>
         </div>
       )}
-      {!isGameOver && (
+
+      {/* Stats Panel - Desktop Only */}
+      {!isGameOver && !isMobile && (
         <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 min-w-[200px]">
           <div className="text-cyan-400 font-bold text-lg mb-2">You</div>
           <div className="space-y-1 text-sm">
