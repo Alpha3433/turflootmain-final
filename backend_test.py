@@ -29,11 +29,24 @@ New Mobile Orientation Gate Tests:
 import requests
 import json
 import time
+import sys
 from datetime import datetime
 
 # Configuration - Using localhost since external URL has 502 errors
 BASE_URL = "http://localhost:3000"
 API_BASE = f"{BASE_URL}/api"
+
+# Mobile User Agents for testing
+MOBILE_USER_AGENTS = {
+    'ios_safari': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1',
+    'android_chrome': 'Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Mobile Safari/537.36',
+    'ios_chrome': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/103.0.5060.63 Mobile/15E148 Safari/604.1'
+}
+
+# Global test tracking
+mobile_test_results = []
+mobile_tests_passed = 0
+mobile_tests_failed = 0
 
 def log_test(test_name, status, details=""):
     """Log test results with timestamp"""
