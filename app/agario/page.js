@@ -2985,8 +2985,8 @@ const AgarIOGame = () => {
 
 
 
-      {/* Cash Out Button */}
-      {!isGameOver && (
+      {/* Cash Out Button - Desktop Only */}
+      {!isGameOver && !isMobile && (
         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
           <button
             onMouseDown={startCashOut}
@@ -3007,8 +3007,8 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Controls */}
-      {!isGameOver && showControls && settings.showControls && (
+      {/* Controls - Desktop Only */}
+      {!isGameOver && showControls && settings.showControls && !isMobile && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-600/30">
           <div className="text-xs text-gray-300 text-center space-y-1">
             <div>🖱️ Move mouse to control • 💰 Collect orbs for growth</div>
@@ -3018,8 +3018,8 @@ const AgarIOGame = () => {
         </div>
       )}
       
-      {/* Live Ping Monitor */}
-      {!isGameOver && settings.showPingMonitor && (
+      {/* Live Ping Monitor - Desktop Only */}
+      {!isGameOver && settings.showPingMonitor && !isMobile && (
         <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
           <div className="flex items-center space-x-2 text-sm">
             <div className="w-2 h-2 rounded-full animate-pulse bg-green-400"></div>
