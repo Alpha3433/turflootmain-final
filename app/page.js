@@ -357,11 +357,8 @@ export default function Home() {
       setIsMobile(isMobileDevice)
     }
     
-    // Run detection multiple times to ensure it catches
+    // Run detection once
     detectMobileDevice()
-    setTimeout(detectMobileDevice, 50)
-    setTimeout(detectMobileDevice, 100)
-    setTimeout(detectMobileDevice, 500)
     
     window.addEventListener('resize', detectMobileDevice)
     window.addEventListener('orientationchange', detectMobileDevice)
