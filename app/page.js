@@ -1718,6 +1718,69 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Mobile Scroll Content - Additional sections for mobile scrolling */}
+      <div className="lg:hidden relative z-40 px-6 pb-8 space-y-6">
+        {/* Cash-out notifications on mobile */}
+        <div className="max-w-md mx-auto">
+          <h3 className="text-xl font-bold text-white mb-4 text-center">Recent Wins</h3>
+          <div className="space-y-3">
+            {cashOutNotifications.slice(0, 3).map((notification) => (
+              <div
+                key={notification.id}
+                className="flex items-center justify-between p-3 bg-gray-900/70 backdrop-blur-sm rounded-xl border border-gray-700/50"
+              >
+                <div className="flex items-center space-x-3">
+                  <div 
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                    style={{ backgroundColor: notification.color }}
+                  >
+                    {notification.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="text-white font-medium text-sm">{notification.name}</div>
+                    <div className="text-gray-400 text-xs">{notification.city}</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-green-400 font-bold text-sm">${notification.amount}</div>
+                  <div className="text-gray-500 text-xs">{formatTimeAgo(notification.timestamp)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Game Features on mobile */}
+        <div className="max-w-md mx-auto">
+          <h3 className="text-xl font-bold text-white mb-4 text-center">Game Features</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 bg-gray-900/70 backdrop-blur-sm rounded-xl border border-gray-700/50 text-center">
+              <div className="text-2xl mb-2">🎯</div>
+              <div className="text-white font-medium text-sm">Skill-Based</div>
+              <div className="text-gray-400 text-xs">No luck, pure strategy</div>
+            </div>
+            <div className="p-4 bg-gray-900/70 backdrop-blur-sm rounded-xl border border-gray-700/50 text-center">
+              <div className="text-2xl mb-2">⚡</div>
+              <div className="text-white font-medium text-sm">Real-Time</div>
+              <div className="text-gray-400 text-xs">Live multiplayer action</div>
+            </div>
+            <div className="p-4 bg-gray-900/70 backdrop-blur-sm rounded-xl border border-gray-700/50 text-center">
+              <div className="text-2xl mb-2">💰</div>
+              <div className="text-white font-medium text-sm">Instant Cash</div>
+              <div className="text-gray-400 text-xs">Cash out anytime</div>
+            </div>
+            <div className="p-4 bg-gray-900/70 backdrop-blur-sm rounded-xl border border-gray-700/50 text-center">
+              <div className="text-2xl mb-2">🏆</div>
+              <div className="text-white font-medium text-sm">Tournaments</div>
+              <div className="text-gray-400 text-xs">Compete globally</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Safe area padding for mobile */}
+        <div className="h-16"></div>
+      </div>
+
 
 
       {/* Welcome Message Popup */}
