@@ -1399,8 +1399,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* CENTER COLUMN - Main Game Area */}
-            <div className="col-span-12 lg:col-span-6 flex flex-col justify-center space-y-4">
+            {/* CENTER COLUMN - Main Game Area - Mobile: Order First (Top) */}
+            <div className="order-1 lg:order-2 col-span-12 lg:col-span-6 flex flex-col justify-center space-y-4">
               
               {/* Live Stats */}
               <div className="flex justify-center space-x-12">
