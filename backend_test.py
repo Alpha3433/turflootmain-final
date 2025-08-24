@@ -289,11 +289,11 @@ class MobileGameInitializationTester:
         
         # Test 9: Rapid sequential API calls (simulating mobile game initialization)
         critical_endpoints = [
-            ("/api/", "Root API"),
-            ("/api/servers/lobbies", "Server Browser"),
-            ("/api/stats/live-players", "Live Players"),
-            ("/api/stats/global-winnings", "Global Winnings"),
-            ("/api/users/leaderboard", "Leaderboard")
+            ("/", "Root API"),
+            ("/servers/lobbies", "Server Browser"),
+            ("/stats/live-players", "Live Players"),
+            ("/stats/global-winnings", "Global Winnings"),
+            ("/users/leaderboard", "Leaderboard")
         ]
         
         total_init_time = 0
