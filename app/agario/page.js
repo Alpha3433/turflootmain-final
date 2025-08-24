@@ -3232,23 +3232,23 @@ const AgarIOGame = () => {
                 </div>
               )}
 
-              {/* Ultra-Compact Mobile Minimap - 60% smaller total, simplified */}
+              {/* Micro-Minimap - 70% smaller total, highly simplified */}
               <div 
                 className={`fixed top-4 right-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'} ${
-                  minimapCollapsed ? 'w-5 h-5' : 'w-16 h-16'
+                  minimapCollapsed ? 'w-4 h-4' : 'w-12 h-12'
                 }`}
                 style={{
                   top: `calc(env(safe-area-inset-top, 0px) + 16px)`
                 }}
                 onClick={() => setMinimapCollapsed(!minimapCollapsed)}
               >
-                <div className={`w-full h-full bg-black/80 rounded-full border-2 border-gray-600/30 flex items-center justify-center transition-all duration-300 ${
+                <div className={`w-full h-full bg-black/90 rounded-full border border-gray-600/30 flex items-center justify-center transition-all duration-300 ${
                   minimapCollapsed ? 'border-cyan-400/60' : 'border-gray-600/30'
                 }`}>
                   {!minimapCollapsed ? (
                     <canvas 
-                      width="56" 
-                      height="56"
+                      width="40" 
+                      height="40"
                       style={{ borderRadius: '50%' }}
                       ref={minimapCanvasRef}
                       className="w-full h-full"
