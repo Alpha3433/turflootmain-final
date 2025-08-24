@@ -852,25 +852,46 @@ const AgarIOGame = () => {
     }
   }
 
-  // Mobile cash-out button handlers
+  // Mobile cash-out button handlers - FIXED for mobile
   const handleCashOutStart = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (!isMobile || isCashingOut) return
+    console.log('💰 Cash-out Start - Mobile touch detected')
     
-    setMobileUIFaded(false)
-    // Start cash-out process (similar to desktop 'E' key hold)
-    handleCashOut()
+    try {
+      e.preventDefault()
+      e.stopPropagation()
+      
+      if (!isMobile || isCashingOut) {
+        console.log('❌ Cash-out blocked: isMobile =', isMobile, 'isCashingOut =', isCashingOut)
+        return
+      }
+      
+      setMobileUIFaded(false)
+      
+      // Start cash-out process - FIXED to call the correct function
+      console.log('🎯 Starting cash-out process...')
+      startCashOut()
+      
+    } catch (error) {
+      console.error('❌ Cash-out start error:', error)
+    }
   }
 
   const handleCashOutEnd = (e) => {
-    e.preventDefault()
-    if (!isMobile) return
+    console.log('💰 Cash-out End - Mobile touch released')
     
-    // Cancel cash-out if in progress
-    if (isCashingOut) {
-      setIsCashingOut(false)
-      setCashOutProgress(0)
+    try {
+      e.preventDefault()
+      
+      if (!isMobile) return
+      
+      // Cancel cash-out if in progress - FIXED logic
+      if (isCashingOut) {
+        console.log('🛑 Cancelling cash-out...')
+        cancelCashOut()
+      }
+      
+    } catch (error) {
+      console.error('❌ Cash-out end error:', error)
     }
   }
 
