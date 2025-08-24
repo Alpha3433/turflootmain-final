@@ -3486,19 +3486,19 @@ const AgarIOGame = () => {
             </div>
           )}
 
-          {/* Instructions Info Icon - Small floating toggle at bottom-center */}
+          {/* Instructions Info Icon - Independent bottom-center above iOS home bar */}
           {!showOrientationGate && !isGameOver && showInstructionsIcon && !instructionsVisible && (
             <div 
-              className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+              className={`fixed bottom-12 left-1/2 transform -translate-x-1/2 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
               style={{
-                bottom: `calc(env(safe-area-inset-bottom, 0px) + 32px)`
+                bottom: `calc(env(safe-area-inset-bottom, 0px) + 48px)`
               }}
               onClick={() => {
                 setInstructionsVisible(true)
                 setShowInstructionsIcon(false)
               }}
             >
-              <div className="bg-black/80 backdrop-blur-sm rounded-full w-6 h-6 flex items-center justify-center border border-cyan-400/20 shadow-lg">
+              <div className="bg-black/90 backdrop-blur-sm rounded-full w-7 h-7 flex items-center justify-center border border-cyan-400/20 shadow-lg">
                 <span className="text-cyan-400 text-xs">ℹ️</span>
               </div>
             </div>
