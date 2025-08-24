@@ -3468,7 +3468,7 @@ const AgarIOGame = () => {
             </div>
           )}
 
-          {/* Single Mobile Instructions Toast - Shows at match start, auto-hides after 7s */}
+          {/* Single Mobile Instructions Toast - Smaller mobile typography */}
           {!showOrientationGate && !isGameOver && instructionsVisible && (
             <div 
               className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
@@ -3477,8 +3477,8 @@ const AgarIOGame = () => {
                 setShowInstructionsIcon(true)
               }}
             >
-              <div className="bg-black/90 backdrop-blur-sm rounded-xl p-3 border border-cyan-400/30 text-center max-w-xs mx-auto">
-                <div className="text-white text-xs font-medium mb-2">
+              <div className="bg-black/90 backdrop-blur-sm rounded-xl px-3 py-2 border border-cyan-400/30 text-center max-w-xs mx-auto">
+                <div className="text-white text-xs font-normal leading-tight mb-1">
                   Use joystick to move • Tap buttons to split/boost • Hold button to cash-out
                 </div>
                 <div className="text-xs text-gray-400">Tap to dismiss</div>
