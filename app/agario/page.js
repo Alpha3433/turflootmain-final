@@ -3263,11 +3263,11 @@ const AgarIOGame = () => {
           `}>
             
             {isMobile ? (
-              /* Ultra-Minimal Mobile Layout */
-              <div className="p-4 text-center">
-                {/* Single Line Result */}
-                <div className="text-lg font-bold mb-3 text-red-400 flex items-center justify-center space-x-2">
-                  <span className="text-xl">
+              /* REDESIGNED: Enhanced Mobile Layout with Better Stats Display */
+              <div className="p-5 text-center">
+                {/* Game Result Title with Icon */}
+                <div className="text-xl font-bold mb-4 text-red-400 flex items-center justify-center space-x-3">
+                  <span className="text-2xl">
                     {gameResult.includes('Eliminated') ? '💀' : 
                      gameResult.includes('Tab Closed') ? '🚪' : '💔'}
                   </span>
@@ -3277,15 +3277,45 @@ const AgarIOGame = () => {
                   </span>
                 </div>
                 
-                {/* Ultra-Compact Stats - Single Line */}
-                <div className="text-xs text-gray-400 mb-4 flex justify-center space-x-4">
-                  <span>${gameStats.netWorth}</span>
-                  <span>#{gameStats.rank}</span>
-                  <span>{gameStats.kills}K</span>
+                {/* REDESIGNED: Enhanced Stats Display - Better Layout */}
+                <div className="bg-gray-800/50 rounded-xl p-3 mb-4 border border-gray-600/30">
+                  {/* Primary Stats Row */}
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-400">
+                        ${gameStats.netWorth}
+                      </div>
+                      <div className="text-xs text-gray-500">Net Worth</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-cyan-400">
+                        #{gameStats.rank}
+                      </div>
+                      <div className="text-xs text-gray-500">Position</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-yellow-400">
+                        {gameStats.kills}
+                      </div>
+                      <div className="text-xs text-gray-500">Kills</div>
+                    </div>
+                  </div>
+                  
+                  {/* Secondary Stats Row - if we have a player mass available */}
+                  {gameRef.current?.game?.player?.mass && (
+                    <div className="flex justify-center items-center pt-2 border-t border-gray-600/30">
+                      <div className="text-center">
+                        <div className="text-sm font-bold text-purple-400">
+                          {Math.round(gameRef.current.game.player.mass)}
+                        </div>
+                        <div className="text-xs text-gray-500">Mass</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Minimal Action Buttons */}
-                <div className="space-y-2">
+                {/* Action Buttons */}
+                <div className="space-y-3">
                   <button
                     onClick={(e) => {
                       e.preventDefault()
@@ -3297,7 +3327,7 @@ const AgarIOGame = () => {
                       e.stopPropagation()
                       restartGame()
                     }}
-                    className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-xl transition-all text-sm"
+                    className="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold py-3 px-4 rounded-xl transition-all text-sm shadow-lg"
                     style={{ touchAction: 'manipulation' }}
                   >
                     🔄 Play Again
@@ -3314,7 +3344,7 @@ const AgarIOGame = () => {
                       e.stopPropagation()
                       router.push('/')
                     }}
-                    className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-xl transition-all text-sm"
+                    className="w-full bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white font-bold py-3 px-4 rounded-xl transition-all text-sm shadow-lg"
                     style={{ touchAction: 'manipulation' }}
                   >
                     🏠 Lobby
