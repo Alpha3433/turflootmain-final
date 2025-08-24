@@ -45,11 +45,12 @@ const AgarIOGame = () => {
   const [ping, setPing] = useState(0)
   const [autoCashOutTriggered, setAutoCashOutTriggered] = useState(false) // Flag to prevent multiple auto cash outs
 
-  // Mobile detection and orientation handling - MISSING LOGIC ADDED
+  // FIXED: Mobile detection with proper initialization state tracking
   const [isMobile, setIsMobile] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [isLandscape, setIsLandscape] = useState(true)
   const [showOrientationGate, setShowOrientationGate] = useState(false)
+  const [mobileDetectionComplete, setMobileDetectionComplete] = useState(false) // NEW: Track when detection is done
   
   // Mobile HUD state
   const [mobileUIFaded, setMobileUIFaded] = useState(false)
