@@ -3131,15 +3131,21 @@ const AgarIOGame = () => {
             <OrientationGate onLandscapeReady={() => setShowOrientationGate(false)} />
           )}
 
-          {/* Mobile Joystick */}
+          {/* Mobile Joystick - Enhanced with CSS classes for reliability */}
           {!showOrientationGate && !isGameOver && (
             <div 
               ref={joystickRef}
-              className={`mobile-joystick ${mobileUIFaded ? 'faded' : ''}`}
+              className="mobile-joystick"
               onPointerDown={handleJoystickStart}
-              style={{ touchAction: 'none' }}
+              style={{ 
+                touchAction: 'none',
+                bottom: `calc(env(safe-area-inset-bottom, 0px) + 20px)`,
+                left: '20px'
+              }}
             >
-              <div ref={joystickKnobRef} className="joystick-knob" />
+              <div className="mobile-joystick-base">
+                <div ref={joystickKnobRef} className="mobile-joystick-knob" />
+              </div>
             </div>
           )}
 
