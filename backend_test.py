@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-Mobile Game Initialization Backend Testing Suite
-===============================================
+Backend API Regression Testing Suite for TurfLoot
+================================================
 
-Focus: Testing APIs critical for mobile game initialization and timing issues.
-The main issue reported is that mobile optimizations (minimap size, dynamic zoom) 
-don't apply on first game load but work on subsequent plays after losing.
+Focus: Testing that all existing API endpoints still work correctly after frontend UI changes.
 
-This suggests a timing/initialization issue with either:
-- API response times affecting mobile detection timing
-- Game initialization sequence  
-- Mobile-specific API calls
+Frontend changes made to agario/page.js:
+- Added player's own waged balance display above character head
+- Increased mobile minimap size by 100% (87.5px to 175px)  
+- Moved minimap position slightly to the right
+
+These are purely frontend canvas drawing changes, no backend logic was modified.
+This test verifies that all backend functionality remains intact and there are no regressions.
 
 Testing Priority:
-1. Core API Endpoints (GET /api/ping, GET /api/, game-related endpoints)
-2. Game Server APIs (multiplayer server endpoints for mobile initialization)
-3. Authentication APIs (mobile-compatible authentication endpoints)
-4. Game Statistics (live statistics and leaderboard APIs for mobile game)
-5. Mobile Initialization Timing (API response times critical for mobile detection)
-6. Mobile User Agent Compatibility (ensure APIs work with mobile browsers)
+1. Core API endpoints (GET /api/, GET /api/ping)
+2. Game-related APIs (GET /api/servers/lobbies, Game server functionality)
+3. Authentication APIs (POST /api/auth/privy)
+4. Wallet APIs (GET /api/wallet/balance)
+5. Live Statistics APIs (GET /api/stats/live-players, GET /api/stats/global-winnings)
 """
 
 import requests
