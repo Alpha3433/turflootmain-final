@@ -3383,20 +3383,33 @@ const AgarIOGame = () => {
                   zIndex: 1001 // Higher z-index
                 }}
               >
-                <svg className="cashout-progress-ring" width="86" height="86">
-                  <circle 
-                    cx="43" 
-                    cy="43" 
-                    r="40"
-                    style={{
-                      strokeDasharray: `${2 * Math.PI * 40}`,
-                      strokeDashoffset: `${2 * Math.PI * 40 * (1 - cashOutProgress / 100)}`
-                    }}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold">
-                  <div>💰</div>
-                  <div>{isCashingOut ? Math.floor(cashOutProgress) + '%' : '$' + gameStats.netWorth}</div>
+                {/* Progress ring - ONLY show when cashing out */}
+                {isCashingOut && (
+                  <svg className="cashout-progress-ring absolute inset-0" width="100" height="100">
+                    <circle 
+                      cx="50" 
+                      cy="50" 
+                      r="45"
+                      fill="none"
+                      stroke="rgba(0, 255, 0, 0.3)"
+                      strokeWidth="4"
+                      style={{
+                        strokeDasharray: `${2 * Math.PI * 45}`,
+                        strokeDashoffset: `${2 * Math.PI * 45 * (1 - cashOutProgress / 100)}`,
+                        transform: 'rotate(-90deg)',
+                        transformOrigin: '50px 50px'
+                      }}
+                    />
+                  </svg>
+                )}
+                
+                {/* Button content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold bg-gray-800/80 rounded-full border-2 border-gray-600">
+                  <div className="text-lg">💰</div>
+                  <div className="text-center leading-tight">
+                    <div>{isCashingOut ? `${Math.floor(cashOutProgress)}%` : 'CASH'}</div>
+                    <div className="text-xs">{isCashingOut ? 'OUT' : `$${gameStats.netWorth}`}</div>
+                  </div>
                 </div>
                 {/* Cash-out guidance tooltip */}
                 {!isCashingOut && (
