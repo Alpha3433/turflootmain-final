@@ -899,10 +899,6 @@ const AgarIOGame = () => {
           console.error('❌ Joystick move error:', error)
         }
       }
-        } catch (error) {
-          console.error('❌ Joystick move error:', error)
-        }
-      }
       
       const handleJoystickEnd = (endEvent) => {
         try {
