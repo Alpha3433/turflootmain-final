@@ -892,18 +892,53 @@ const AgarIOGame = () => {
             joystickKnobRef.current.style.transform = 'translate(-50%, -50%)'
           }
           
-          // Stop player movement with fallback methods
+          // Stop player movement with comprehensive fallback methods
           if (gameRef.current) {
+            console.log('🛑 Stopping player movement')
+            
+            // Method 1: Direct player object
             if (gameRef.current.player) {
               gameRef.current.player.dir = { x: 0, y: 0 }
-            } else if (gameRef.current.game?.player) {
-              gameRef.current.game.player.dir = { x: 0, y: 0 }
-            } else if (gameRef.current.setPlayerDirection) {
-              gameRef.current.setPlayerDirection(0, 0)
-            } else if (gameRef.current.stopPlayer) {
-              gameRef.current.stopPlayer()
+              console.log('✅ Movement stopped (method 1) - direct player')
             }
-            console.log('🛑 Player movement stopped')
+            
+            // Method 2: Nested game.player object  
+            if (gameRef.current.game?.player) {
+              gameRef.current.game.player.dir = { x: 0, y: 0 }
+              console.log('✅ Movement stopped (method 2) - game.player')
+            }
+            
+            // Method 3: Function call
+            if (gameRef.current.setPlayerDirection) {
+              gameRef.current.setPlayerDirection(0, 0)
+              console.log('✅ Movement stopped (method 3) - setPlayerDirection')
+            }
+            
+            // Method 4: Alternative function call
+            if (gameRef.current.stopPlayer) {
+              gameRef.current.stopPlayer()
+              console.log('✅ Movement stopped (method 4) - stopPlayer')
+            }
+            
+            // Method 5: Input simulation
+            if (gameRef.current.handleInput) {
+              const inputData = {
+                type: 'move',
+                direction: { x: 0, y: 0 }
+              }
+              gameRef.current.handleInput(inputData)
+              console.log('✅ Movement stopped (method 5) - handleInput')
+            }
+            
+            // Method 6: Direct entity movement stop
+            if (gameRef.current.entities) {
+              const playerEntity = gameRef.current.entities.find(e => e.isPlayer)
+              if (playerEntity) {
+                playerEntity.vx = 0
+                playerEntity.vy = 0
+                console.log('✅ Movement stopped (method 6) - direct entity')
+              }
+            }
           }
           
           // Fade UI after inactivity
