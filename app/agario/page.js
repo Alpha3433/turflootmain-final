@@ -214,7 +214,9 @@ const AgarIOGame = () => {
         console.log('💰 Cash game detected - initializing multiplayer')
         // Try multiplayer first, but fallback to offline if authentication fails
         initializeMultiplayer().catch((error) => {
-          console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
+          }
           // Initialize offline demo game with bots as fallback
           initializeGame(false) // false = offline mode with bots
         })
