@@ -3350,18 +3350,37 @@ const AgarIOGame = () => {
           {/* Mobile Action Buttons */}
           {!showOrientationGate && !isGameOver && (
             <div className={`mobile-action-buttons ${mobileUIFaded ? 'faded' : ''}`}>
-              {/* Circular Cash-Out Button with Progress Ring and Enhanced Touch Support */}
+              {/* Circular Cash-Out Button with LARGER touch area for mobile */}
               <div 
                 className="mobile-action-btn mobile-cashout-btn relative"
-                onPointerDown={handleCashOutStart}
-                onPointerUp={handleCashOutEnd}
-                onPointerLeave={handleCashOutEnd}
-                onTouchStart={handleCashOutStart}
-                onTouchEnd={handleCashOutEnd}
+                onPointerDown={(e) => {
+                  console.log('💰 Cash-out POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
+                  handleCashOutStart(e)
+                }}
+                onPointerUp={(e) => {
+                  console.log('💰 Cash-out POINTER UP - Touch released')
+                  handleCashOutEnd(e)
+                }}
+                onPointerLeave={(e) => {
+                  console.log('💰 Cash-out POINTER LEAVE')
+                  handleCashOutEnd(e)
+                }}
+                onTouchStart={(e) => {
+                  console.log('💰 Cash-out TOUCH START - Mobile touch detected')
+                  handleCashOutStart(e)
+                }}
+                onTouchEnd={(e) => {
+                  console.log('💰 Cash-out TOUCH END - Mobile touch released')
+                  handleCashOutEnd(e)
+                }}
                 style={{ 
                   touchAction: 'none',
                   userSelect: 'none',
-                  WebkitUserSelect: 'none'
+                  WebkitUserSelect: 'none',
+                  width: '100px', // Larger touch area
+                  height: '100px', // Larger touch area
+                  padding: '10px', // Extra padding for easier touch
+                  zIndex: 1001 // Higher z-index
                 }}
               >
                 <svg className="cashout-progress-ring" width="86" height="86">
