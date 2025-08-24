@@ -3237,13 +3237,19 @@ const AgarIOGame = () => {
           {/* Mobile Action Buttons */}
           {!showOrientationGate && !isGameOver && (
             <div className={`mobile-action-buttons ${mobileUIFaded ? 'faded' : ''}`}>
-              {/* Circular Cash-Out Button with Progress Ring and Guidance */}
+              {/* Circular Cash-Out Button with Progress Ring and Enhanced Touch Support */}
               <div 
                 className="mobile-action-btn mobile-cashout-btn relative"
                 onPointerDown={handleCashOutStart}
                 onPointerUp={handleCashOutEnd}
                 onPointerLeave={handleCashOutEnd}
-                style={{ touchAction: 'none' }}
+                onTouchStart={handleCashOutStart}
+                onTouchEnd={handleCashOutEnd}
+                style={{ 
+                  touchAction: 'none',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none'
+                }}
               >
                 <svg className="cashout-progress-ring" width="86" height="86">
                   <circle 
