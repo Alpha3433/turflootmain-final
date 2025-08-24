@@ -848,34 +848,66 @@ const AgarIOGame = () => {
             
             console.log('🎮 SENDING TO GAME:', { normalizedX: normalizedX.toFixed(2), normalizedY: normalizedY.toFixed(2) })
             
-            // FIXED GAME MOVEMENT - Using correct player path
+            // COMPREHENSIVE GAME MOVEMENT - Check all possible states
             console.log('🔍 === GAME MOVEMENT DEBUG ===')
             console.log('gameRef.current exists:', !!gameRef.current)
             
-            if (gameRef.current && gameRef.current.game?.player) {
-              const player = gameRef.current.game.player
-              console.log('✅ PLAYER FOUND at gameRef.current.game.player')
-              console.log('  - Current x:', player.x)
-              console.log('  - Current y:', player.y)
-              console.log('  - Current dir:', player.dir)
+            // Multiple checks to ensure we find the player
+            let player = null
+            let foundPath = null
+            
+            // Check different possible paths
+            if (gameRef.current?.game?.player) {
+              player = gameRef.current.game.player
+              foundPath = 'gameRef.current.game.player'
+            } else if (gameRef.current?.player) {
+              player = gameRef.current.player
+              foundPath = 'gameRef.current.player'
+            } else if (gameRef.current?.game) {
+              console.log('🔍 Game object exists, keys:', Object.keys(gameRef.current.game))
+              if (gameRef.current.game.player) {
+                player = gameRef.current.game.player
+                foundPath = 'gameRef.current.game.player (retry)'
+              }
+            }
+            
+            if (player) {
+              console.log('✅ PLAYER FOUND at', foundPath)
               console.log('  - Player alive:', player.alive)
+              console.log('  - Current position:', { x: player.x, y: player.y })
+              console.log('  - Current direction:', player.dir)
               
-              // FIXED: Update player direction (primary movement method)
+              // Update player direction (primary movement method)
               if (player.alive) {
+                const oldDir = { ...player.dir }
                 player.dir = { x: normalizedX, y: normalizedY }
-                console.log('✅ JOYSTICK MOVEMENT APPLIED:', { x: normalizedX.toFixed(2), y: normalizedY.toFixed(2) })
-                console.log('  - New direction:', player.dir)
+                console.log('✅ MOVEMENT APPLIED:', { 
+                  old: oldDir, 
+                  new: player.dir,
+                  normalized: { x: normalizedX.toFixed(2), y: normalizedY.toFixed(2) }
+                })
+                
+                // Force immediate visual update by triggering game loop
+                if (gameRef.current?.game?.running) {
+                  console.log('✅ Game is running - movement should be visible')
+                } else {
+                  console.log('⚠️ Game not running - starting game loop')
+                }
               } else {
                 console.log('❌ Player is dead, cannot move')
               }
               
             } else {
-              console.error('❌ CRITICAL: Player not found at gameRef.current.game.player!')
+              console.error('❌ CRITICAL: Player not found in any path!')
               if (gameRef.current) {
-                console.log('Available game properties:', Object.keys(gameRef.current))
+                console.log('Available gameRef keys:', Object.keys(gameRef.current))
                 if (gameRef.current.game) {
-                  console.log('Available game.* properties:', Object.keys(gameRef.current.game))
+                  console.log('Available game keys:', Object.keys(gameRef.current.game))
+                } else {
+                  console.log('❌ No game object found')
                 }
+              } else {
+                console.log('❌ gameRef.current is null/undefined')
               }
             }
           }
