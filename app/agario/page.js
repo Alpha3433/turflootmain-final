@@ -3574,20 +3574,41 @@ const AgarIOGame = () => {
                   try {
                     e.preventDefault()
                     e.stopPropagation()
-                    console.log('🏆 Trophy button clicked - toggling leaderboard')
-                    setLeaderboardCollapsed(!leaderboardCollapsed)
+                    console.log('🏆 Trophy button clicked - toggling leaderboard safely')
+                    
+                    // SAFE toggle - prevent any potential API calls or errors
+                    setLeaderboardCollapsed(prev => !prev)
+                    
+                    // Ensure no propagation to prevent potential conflicts
+                    return false
                   } catch (error) {
-                    console.error('❌ Trophy button error:', error)
+                    console.error('❌ Trophy button error (handled):', error)
+                    // Still try to toggle even if there's an error
+                    try {
+                      setLeaderboardCollapsed(prev => !prev)
+                    } catch (innerError) {
+                      console.error('❌ Critical trophy button error:', innerError)
+                    }
                   }
                 }}
                 onTouchEnd={(e) => {
                   try {
                     e.preventDefault()
                     e.stopPropagation()
-                    console.log('🏆 Trophy button touched - toggling leaderboard')
-                    setLeaderboardCollapsed(!leaderboardCollapsed)
+                    console.log('🏆 Trophy button touched - toggling leaderboard safely')
+                    
+                    // SAFE toggle for touch
+                    setLeaderboardCollapsed(prev => !prev)
+                    
+                    return false
                   } catch (error) {
-                    console.error('❌ Trophy touch error:', error)
+                    console.error('❌ Trophy touch error (handled):', error)
+                    // Still try to toggle even if there's an error
+                    try {
+                      setLeaderboardCollapsed(prev => !prev)
+                    } catch (innerError) {
+                      console.error('❌ Critical trophy touch error:', innerError)
+                    }
                   }
                 }}
               >
