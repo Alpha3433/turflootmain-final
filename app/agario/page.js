@@ -794,35 +794,82 @@ const AgarIOGame = () => {
             joystickKnobRef.current.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`
           }
           
-          // Send movement to game with better error handling and fallback methods
+          // Send movement to game with comprehensive fallback methods
           if (gameRef.current && distance > 2) {
             const normalizedX = deltaX / 25
             const normalizedY = deltaY / 25
             
-            // Try multiple game object structures for movement
+            console.log('🎮 Attempting player movement:', { x: normalizedX, y: normalizedY })
+            console.log('🔍 Game object structure:', {
+              hasGameRef: !!gameRef.current,
+              hasPlayer: !!(gameRef.current.player),
+              hasGamePlayer: !!(gameRef.current.game?.player),
+              gameKeys: gameRef.current ? Object.keys(gameRef.current) : []
+            })
+            
+            let movementSuccess = false
+            
+            // Method 1: Direct player object
             if (gameRef.current.player) {
               gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
-              console.log('🎮 Player movement (method 1):', { x: normalizedX, y: normalizedY })
-            } else if (gameRef.current.game?.player) {
+              console.log('✅ Player movement (method 1) - direct player')
+              movementSuccess = true
+            }
+            
+            // Method 2: Nested game.player object
+            if (gameRef.current.game?.player) {
               gameRef.current.game.player.dir = { x: normalizedX, y: normalizedY }
-              console.log('🎮 Player movement (method 2):', { x: normalizedX, y: normalizedY })
-            } else if (gameRef.current.setPlayerDirection) {
+              console.log('✅ Player movement (method 2) - game.player')
+              movementSuccess = true
+            }
+            
+            // Method 3: Function call
+            if (gameRef.current.setPlayerDirection) {
               gameRef.current.setPlayerDirection(normalizedX, normalizedY)
-              console.log('🎮 Player movement (method 3):', { x: normalizedX, y: normalizedY })
-            } else {
-              // Fallback: try to set movement directly on game object
-              if (gameRef.current.movePlayer) {
-                gameRef.current.movePlayer(normalizedX, normalizedY)
-                console.log('🎮 Player movement (fallback):', { x: normalizedX, y: normalizedY })
-              } else {
-                console.warn('⚠️ No valid movement method found. Game structure:', Object.keys(gameRef.current))
+              console.log('✅ Player movement (method 3) - setPlayerDirection')
+              movementSuccess = true
+            }
+            
+            // Method 4: Alternative function call
+            if (gameRef.current.movePlayer) {
+              gameRef.current.movePlayer(normalizedX, normalizedY)
+              console.log('✅ Player movement (method 4) - movePlayer')
+              movementSuccess = true
+            }
+            
+            // Method 5: Input simulation (keyboard emulation)
+            if (!movementSuccess && gameRef.current.handleInput) {
+              const inputData = {
+                type: 'move',
+                direction: { x: normalizedX, y: normalizedY }
+              }
+              gameRef.current.handleInput(inputData)
+              console.log('✅ Player movement (method 5) - handleInput')
+              movementSuccess = true
+            }
+            
+            // Method 6: Direct canvas-based movement
+            if (!movementSuccess && gameRef.current.canvas && gameRef.current.ctx) {
+              // Try to find and move the player entity directly
+              if (gameRef.current.entities) {
+                const playerEntity = gameRef.current.entities.find(e => e.isPlayer)
+                if (playerEntity) {
+                  playerEntity.vx = normalizedX * 5 // Adjust speed as needed
+                  playerEntity.vy = normalizedY * 5
+                  console.log('✅ Player movement (method 6) - direct entity movement')
+                  movementSuccess = true
+                }
               }
             }
+            
+            if (!movementSuccess) {
+              console.warn('⚠️ ALL MOVEMENT METHODS FAILED. Game structure:', gameRef.current)
+            }
+            
           } else if (distance > 2) {
             console.warn('⚠️ Game not ready for movement:', {
               gameExists: !!gameRef.current,
-              playerExists: !!(gameRef.current && gameRef.current.player),
-              gamePlayerExists: !!(gameRef.current && gameRef.current.game?.player)
+              distance: distance
             })
           }
         } catch (error) {
