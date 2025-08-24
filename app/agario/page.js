@@ -3303,14 +3303,14 @@ const AgarIOGame = () => {
             <OrientationGate onLandscapeReady={() => setShowOrientationGate(false)} />
           )}
 
-          {/* Mobile Joystick - FIXED with movable knob and better visual feedback */}
+          {/* Mobile Joystick - REPOSITIONED away from edge to prevent cutoff */}
           {!showOrientationGate && !isGameOver && (
             <div 
               ref={joystickRef}
               className="fixed z-50"
               style={{ 
                 bottom: `calc(env(safe-area-inset-bottom, 0px) + 40px)`,
-                left: '40px',
+                left: '70px', // Moved further from edge to prevent cutoff
                 width: '100px',
                 height: '100px',
                 touchAction: 'none',
