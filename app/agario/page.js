@@ -3505,11 +3505,12 @@ const AgarIOGame = () => {
                 )}
               </div>
 
-              {/* Mobile Leaderboard Toggle - FIXED to prevent server errors */}
+              {/* Mobile Leaderboard Toggle - MOVED RIGHT to avoid iOS notch */}
               <div 
-                className={`fixed top-4 left-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+                className={`fixed top-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
                 style={{
                   top: `calc(env(safe-area-inset-top, 0px) + 16px)`,
+                  right: `calc(env(safe-area-inset-right, 0px) + 16px)`, // MOVED to right side away from notch
                   padding: '10px',
                   minWidth: '60px',
                   minHeight: '60px',
