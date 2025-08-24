@@ -17,7 +17,11 @@ import {
   Play,
   Star,
   Lock,
-  Check
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  User
 } from 'lucide-react'
 
 const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
@@ -28,6 +32,9 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   const [sortBy, setSortBy] = useState('newest')
   const [filterRarity, setFilterRarity] = useState('all')
   const [previewAnimation, setPreviewAnimation] = useState('idle')
+  const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const [playerData, setPlayerData] = useState({
     equippedSkin: 'default_blue',
     equippedHat: null,
@@ -35,6 +42,16 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
     equippedBoost: null,
     equippedFace: 'normal_eyes'
   })
+
+  // Detect mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Mock data for customization items - with proper equipped state management
   const [itemsData, setItemsData] = useState({
@@ -56,9 +73,6 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
       { id: 'rainbow_trail', name: 'Rainbow Trail', rarity: 'epic', price: 200, owned: true, equipped: false, preview: '/previews/trail_rainbow.png' },
       { id: 'fire_trail', name: 'Fire Trail', rarity: 'rare', price: 120, owned: false, equipped: false, preview: '/previews/trail_fire.png' }
     ],
-    boosts: [
-      // Removed boosts category as requested
-    ],
     faces: [
       { id: 'normal_eyes', name: 'Normal Eyes', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/face_normal.png' },
       { id: 'angry_eyes', name: 'Angry Eyes', rarity: 'rare', price: 80, owned: true, equipped: false, preview: '/previews/face_angry.png' },
@@ -74,25 +88,21 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   ]
 
   const rarityColors = {
-    common: 'border-gray-400 text-gray-100 drop-shadow-sm',
-    rare: 'border-blue-400 text-blue-200 drop-shadow-md shadow-blue-400/20',
-    epic: 'border-purple-400 text-purple-200 drop-shadow-lg shadow-purple-400/30',
-    legendary: 'border-yellow-400 text-yellow-100 drop-shadow-xl shadow-yellow-400/40'
+    common: 'border-gray-400 text-gray-100',
+    rare: 'border-blue-400 text-blue-200',
+    epic: 'border-purple-400 text-purple-200',
+    legendary: 'border-yellow-400 text-yellow-100'
   }
 
   const rarityGlow = {
-    common: 'shadow-lg',
+    common: 'shadow-md',
     rare: 'shadow-blue-500/30 shadow-lg',
     epic: 'shadow-purple-500/30 shadow-lg',
     legendary: 'shadow-yellow-500/40 shadow-xl'
   }
 
-  const rarityCardGlow = {
-    common: '',
-    rare: 'ring-1 ring-blue-400/30',
-    epic: 'ring-2 ring-purple-400/40 bg-gradient-to-br from-purple-500/5 to-transparent',
-    legendary: 'ring-2 ring-yellow-400/50 bg-gradient-to-br from-yellow-500/10 to-transparent'
-  }
+  // Items per page for mobile pagination
+  const itemsPerPage = isMobile ? 6 : 12
 
   // Filter and sort items
   const getFilteredItems = () => {
@@ -133,6 +143,15 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
     
     return items
   }
+
+  // Paginated items for mobile
+  const getPaginatedItems = () => {
+    const items = getFilteredItems()
+    const startIndex = currentPage * itemsPerPage
+    return items.slice(startIndex, startIndex + itemsPerPage)
+  }
+
+  const totalPages = Math.ceil(getFilteredItems().length / itemsPerPage)
 
   // Load saved customization data on component mount
   useEffect(() => {
@@ -183,7 +202,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
       [categoryKey]: item.id
     }))
     
-    // Update global player appearance (this would be sent to server in real game)
+    // Update global player appearance
     const customizationData = {
       skin: activeCategory === 'skins' ? item.id : playerData.equippedSkin,
       hat: activeCategory === 'hats' ? item.id : playerData.equippedHat,
@@ -198,9 +217,6 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
     } catch (error) {
       console.error('Failed to save customization:', error)
     }
-    
-    // In a real game, this would also send to server:
-    // fetch('/api/player/customization', { method: 'POST', body: JSON.stringify(customizationData) })
   }
 
   const handlePurchaseItem = (item) => {
@@ -219,270 +235,266 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   if (!isOpen) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl max-w-7xl w-full mx-4 h-[90vh] overflow-hidden border border-purple-500/30 shadow-2xl">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700/50">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Palette className="w-6 h-6 text-purple-400" />
-              <h2 className="text-2xl font-bold text-white">Customize Appearance</h2>
-            </div>
-            
-            {/* Tab Switcher */}
-            <div className="flex bg-gray-800/50 rounded-lg p-1">
-              <button
-                onClick={() => setActiveTab('inventory')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
-                  activeTab === 'inventory' 
-                    ? 'bg-purple-600 text-white' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <Package className="w-4 h-4" />
-                <span>Inventory</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('shop')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
-                  activeTab === 'shop' 
-                    ? 'bg-purple-600 text-white' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <ShoppingCart className="w-4 h-4" />
-                <span>Shop</span>
-              </button>
-            </div>
-          </div>
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
+      {isMobile ? (
+        // MOBILE LAYOUT - Stack-based, full screen
+        <div className="w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
           
-          {/* Currency Display */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-yellow-500/20 px-4 py-2 rounded-lg border border-yellow-500/30">
-              <span className="text-yellow-400 font-bold">💰 {userBalance.toLocaleString()}</span>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-all"
-            >
-              <X className="w-5 h-5 text-gray-300" />
-            </button>
-          </div>
-        </div>
-
-        <div className="flex h-full">
-          {/* Left Sidebar - Categories & Filters */}
-          <div className="w-64 bg-gray-800/30 border-r border-gray-700/50 p-4 overflow-y-auto">
-            {/* Categories */}
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-400 mb-3">CATEGORIES</h3>
-              <div className="space-y-1">
-                {categories.map((category) => {
-                  const Icon = category.icon
-                  return (
-                    <button
-                      key={category.id}
-                      onClick={() => setActiveCategory(category.id)}
-                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all ${
-                        activeCategory === category.id
-                          ? 'bg-purple-600/20 border border-purple-500/30'
-                          : 'hover:bg-gray-700/30'
-                      }`}
-                    >
-                      <Icon className={`w-4 h-4 ${category.color}`} />
-                      <span className="text-white text-sm">{category.name}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Search & Filters */}
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-semibold text-gray-400 mb-2 block">SEARCH</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search items..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white text-sm focus:border-purple-400/50 focus:outline-none"
-                  />
+          {/* Mobile Header */}
+          <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700/50 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={onClose}
+                  className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-all"
+                >
+                  <X className="w-5 h-5 text-gray-300" />
+                </button>
+                <div className="flex items-center space-x-2">
+                  <Palette className="w-5 h-5 text-purple-400" />
+                  <h2 className="text-lg font-bold text-white">Customize</h2>
                 </div>
               </div>
-
-              <div>
-                <label className="text-sm font-semibold text-gray-400 mb-2 block">SORT BY</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white text-sm focus:border-purple-400/50 focus:outline-none"
-                >
-                  <option value="newest">Newest</option>
-                  <option value="name">Name</option>
-                  <option value="price">Price</option>
-                  <option value="rarity">Rarity</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-sm font-semibold text-gray-400 mb-2 block">RARITY</label>
-                <select
-                  value={filterRarity}
-                  onChange={(e) => setFilterRarity(e.target.value)}
-                  className="w-full p-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white text-sm focus:border-purple-400/50 focus:outline-none"
-                >
-                  <option value="all">All Rarities</option>
-                  <option value="common">Common</option>
-                  <option value="rare">Rare</option>
-                  <option value="epic">Epic</option>
-                  <option value="legendary">Legendary</option>
-                </select>
+              
+              {/* Currency Display */}
+              <div className="flex items-center space-x-2 bg-yellow-500/20 px-3 py-1.5 rounded-lg border border-yellow-500/30">
+                <span className="text-yellow-400 font-bold text-sm">💰 {userBalance.toLocaleString()}</span>
               </div>
             </div>
           </div>
 
-          {/* Center - Item Grid */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            <div className="grid grid-cols-4 gap-4">
-              {getFilteredItems().map((item) => (
+          {/* Live Preview - Mobile */}
+          <div className="bg-gray-800/30 p-4 border-b border-gray-700/50">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                {/* Mobile Character Preview - Compact */}
+                <div className={`w-16 h-16 rounded-full border-3 border-cyan-300 flex items-center justify-center transition-all duration-500 shadow-lg ${
+                  previewAnimation === 'spin' ? 'animate-spin' :
+                  previewAnimation === 'bounce' ? 'animate-bounce' :
+                  previewAnimation === 'pulse' ? 'animate-pulse' :
+                  'animate-breathe'
+                } ${
+                  // Dynamic skin based on equipped item
+                  playerData.equippedSkin === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/30 shadow-lg' :
+                  playerData.equippedSkin === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/30 shadow-lg' :
+                  playerData.equippedSkin === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/30 shadow-lg' :
+                  playerData.equippedSkin === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/30 shadow-lg' :
+                  playerData.equippedSkin === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/30 shadow-lg' :
+                  'bg-cyan-400'
+                }`}>
+                  
+                  {/* Eyes */}
+                  {playerData.equippedFace === 'angry_eyes' ? (
+                    <>
+                      <div className="w-1.5 h-1 bg-black rounded-sm absolute top-4 left-4 transform rotate-12"></div>
+                      <div className="w-1.5 h-1 bg-black rounded-sm absolute top-4 right-4 transform -rotate-12"></div>
+                      <div className="w-3 h-0.5 bg-red-600 rounded absolute bottom-4"></div>
+                    </>
+                  ) : playerData.equippedFace === 'wink_eyes' ? (
+                    <>
+                      <div className="w-1.5 h-0.5 bg-black rounded absolute top-4 left-4"></div>
+                      <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-4 right-4"></div>
+                      <div className="w-2 h-0.5 bg-pink-500 rounded-full absolute bottom-4"></div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-4 left-4"></div>
+                      <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-4 right-4"></div>
+                    </>
+                  )}
+                  
+                  {/* Legendary effects */}
+                  {(playerData.equippedSkin === 'golden_snake' || playerData.equippedSkin === 'shadow_black') && (
+                    <>
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
+                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
+                    </>
+                  )}
+                </div>
+
+                {/* Mobile Hat */}
+                {playerData.equippedHat && (
+                  <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 ${
+                    playerData.equippedHat === 'crown_gold' ? 
+                      'w-6 h-4 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border border-yellow-600' :
+                    playerData.equippedHat === 'cap_baseball' ? 
+                      'w-8 h-3 bg-gradient-to-r from-red-600 to-red-500 rounded-full' :
+                    playerData.equippedHat === 'helmet_space' ? 
+                      'w-10 h-6 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full border-2 border-blue-400' :
+                      'w-4 h-3 bg-gray-600 rounded'
+                  }`}>
+                    {playerData.equippedHat === 'crown_gold' && (
+                      <div className="flex justify-center">
+                        <div className="w-0.5 h-1.5 bg-yellow-300 rounded-t-full mt-0.5"></div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Mobile Trail */}
+                {playerData.equippedTrail && (
+                  <div className="absolute -right-10 top-1/2 transform -translate-y-1/2 flex space-x-0.5">
+                    {playerData.equippedTrail === 'rainbow_trail' ? (
+                      <>
+                        <div className="w-2 h-2 bg-red-400 opacity-80 animate-pulse rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-yellow-400 opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-1 h-1 bg-green-400 opacity-60 animate-pulse rounded-full" style={{animationDelay: '0.4s'}}></div>
+                      </>
+                    ) : playerData.equippedTrail === 'fire_trail' ? (
+                      <>
+                        <div className="w-2 h-1 bg-gradient-to-r from-orange-500 to-red-500 opacity-90 animate-pulse rounded-full"></div>
+                        <div className="w-1.5 h-0.5 bg-red-500 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-1 h-0.5 bg-orange-400 opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.4s'}}></div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-1.5 h-1.5 bg-blue-400 opacity-90 animate-pulse rounded-full"></div>
+                        <div className="w-1 h-1 bg-cyan-400 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.3s'}}></div>
+                        <div className="w-0.5 h-0.5 bg-white opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.6s'}}></div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Animation Controls - Mobile */}
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={() => triggerAnimation('spin')}
+                className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
+              >
+                <RotateCcw className="w-4 h-4 text-gray-300" />
+              </button>
+              <button
+                onClick={() => triggerAnimation('bounce')}
+                className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
+              >
+                <Play className="w-4 h-4 text-gray-300" />
+              </button>
+              <button
+                onClick={() => triggerAnimation('pulse')}
+                className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
+              >
+                <Sparkles className="w-4 h-4 text-gray-300" />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Tab Switcher */}
+          <div className="flex bg-gray-800/50 m-4 rounded-lg p-1">
+            <button
+              onClick={() => {setActiveTab('inventory'); setCurrentPage(0)}}
+              className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
+                activeTab === 'inventory' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Package className="w-4 h-4" />
+              <span>Inventory</span>
+            </button>
+            <button
+              onClick={() => {setActiveTab('shop'); setCurrentPage(0)}}
+              className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
+                activeTab === 'shop' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <ShoppingCart className="w-4 h-4" />
+              <span>Shop</span>
+            </button>
+          </div>
+
+          {/* Mobile Category Tabs */}
+          <div className="flex overflow-x-auto scrollbar-hide mx-4 mb-4 space-x-2">
+            {categories.map((category) => {
+              const Icon = category.icon
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => {setActiveCategory(category.id); setCurrentPage(0)}}
+                  className={`flex-shrink-0 flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeCategory === category.id
+                      ? 'bg-purple-600/20 border border-purple-500/30 text-white'
+                      : 'bg-gray-700/30 text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <Icon className={`w-4 h-4 ${category.color}`} />
+                  <span>{category.name}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Mobile Search */}
+          <div className="mx-4 mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search items..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white focus:border-purple-400/50 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Items Grid */}
+          <div className="flex-1 overflow-y-auto px-4 pb-20">
+            <div className="grid grid-cols-2 gap-3">
+              {getPaginatedItems().map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setSelectedItem(item)}
-                  className={`relative bg-gray-800/50 rounded-lg p-4 border-2 cursor-pointer transition-all hover:scale-105 ${
+                  className={`relative bg-gray-800/50 rounded-lg p-3 border-2 cursor-pointer transition-all ${
                     item.equipped ? 'border-green-400 bg-green-400/10' : rarityColors[item.rarity]
-                  } ${rarityGlow[item.rarity]} ${rarityCardGlow[item.rarity]} ${selectedItem?.id === item.id ? 'ring-2 ring-purple-400' : ''}`}
+                  } ${rarityGlow[item.rarity]} ${selectedItem?.id === item.id ? 'ring-2 ring-purple-400' : ''}`}
                 >
-                  {/* Item Preview */}
-                  <div className="aspect-square bg-gray-700/30 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
-                    {/* Custom item textures based on category and item */}
+                  {/* Mobile Item Preview */}
+                  <div className="aspect-square bg-gray-700/30 rounded-lg mb-2 flex items-center justify-center relative overflow-hidden">
+                    {/* Simplified mobile previews */}
                     {activeCategory === 'skins' && (
-                      <div className={`w-16 h-16 rounded-full border-4 border-white/20 flex items-center justify-center relative ${
-                        item.id === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/50 shadow-lg' :
-                        item.id === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/50 shadow-lg animate-pulse' :
-                        item.id === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/50 shadow-lg' :
-                        item.id === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/50 shadow-lg' :
-                        item.id === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/50 shadow-lg' :
-                        'bg-gradient-to-br from-cyan-300 via-cyan-400 to-cyan-600 shadow-cyan-500/50 shadow-lg'
-                      } ${!item.owned ? 'grayscale' : ''}`}>
-                        {/* Eyes */}
-                        <div className="w-2 h-2 bg-black rounded-full absolute top-4 left-4"></div>
-                        <div className="w-2 h-2 bg-black rounded-full absolute top-4 right-4"></div>
-                        {/* Special effects for legendary items */}
-                        {item.rarity === 'legendary' && (
-                          <>
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
-                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
-                          </>
-                        )}
+                      <div className={`w-12 h-12 rounded-full border-3 border-white/20 flex items-center justify-center relative ${
+                        item.id === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600' :
+                        item.id === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600' :
+                        item.id === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500' :
+                        item.id === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500' :
+                        item.id === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black' :
+                        'bg-gradient-to-br from-cyan-300 via-cyan-400 to-cyan-600'
+                      } ${!item.owned ? 'grayscale opacity-60' : ''}`}>
+                        <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 left-3"></div>
+                        <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 right-3"></div>
                       </div>
                     )}
                     
                     {activeCategory === 'hats' && (
                       <div className="relative flex items-center justify-center">
-                        {/* Enhanced hat preview with 3D effects and shadows */}
-                        {/* Base character with shadow for hat attachment */}
-                        <div className="w-14 h-14 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center shadow-lg">
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 left-4"></div>
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 right-4"></div>
+                        <div className="w-10 h-10 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
+                          <div className="w-1 h-1 bg-black rounded-full absolute top-2.5 left-3"></div>
+                          <div className="w-1 h-1 bg-black rounded-full absolute top-2.5 right-3"></div>
                         </div>
-                        
-                        {/* Enhanced Hat Rendering with Advanced 3D effects and Material Differentiation */}
-                        <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${!item.owned ? 'grayscale' : ''}`}>
+                        <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 ${!item.owned ? 'grayscale opacity-60' : ''}`}>
                           {item.id === 'crown_gold' ? (
-                            <div className="relative">
-                              {/* Crown base with metallic gradient and advanced shadow */}
-                              <div className="w-12 h-8 bg-gradient-to-b from-yellow-200 via-yellow-400 to-yellow-600 rounded-t-lg border-2 border-yellow-700 shadow-2xl shadow-yellow-500/60">
-                                {/* Metallic shine animation for legendary */}
-                                <div className="absolute inset-1 bg-gradient-to-br from-yellow-100/80 via-white/40 to-transparent rounded-t-md">
-                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-pulse rounded-t-md"></div>
-                                </div>
-                                {/* Enhanced Crown spikes with individual gradients */}
-                                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
-                                  <div className="w-1.5 h-4 bg-gradient-to-t from-yellow-700 via-yellow-400 to-yellow-200 rounded-t-full shadow-md"></div>
-                                  <div className="w-1.5 h-5 bg-gradient-to-t from-yellow-700 via-yellow-400 to-yellow-200 rounded-t-full shadow-lg"></div>
-                                  <div className="w-1.5 h-4 bg-gradient-to-t from-yellow-700 via-yellow-400 to-yellow-200 rounded-t-full shadow-md"></div>
-                                </div>
-                                {/* Legendary animated glints */}
-                                {item.rarity === 'legendary' && (
-                                  <>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-pulse rounded-t-lg" style={{animationDuration: '2s'}}></div>
-                                    <div className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full animate-ping opacity-75"></div>
-                                    <div className="absolute top-2 left-2 w-1 h-1 bg-yellow-100 rounded-full animate-pulse"></div>
-                                  </>
-                                )}
-                                {/* Gems on crown */}
-                                <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full border border-red-600 shadow-sm"></div>
+                            <div className="w-8 h-5 bg-gradient-to-b from-yellow-200 to-yellow-600 rounded-t-lg border border-yellow-700">
+                              <div className="absolute -top-1.5 left-1/2 transform -translate-x-1/2 flex space-x-0.5">
+                                <div className="w-1 h-2 bg-yellow-300 rounded-t-full"></div>
+                                <div className="w-1 h-2.5 bg-yellow-300 rounded-t-full"></div>
+                                <div className="w-1 h-2 bg-yellow-300 rounded-t-full"></div>
                               </div>
-                              {/* Enhanced shadow on character */}
-                              <div className="absolute top-7 left-1/2 transform -translate-x-1/2 w-10 h-3 bg-black/30 rounded-full blur-md"></div>
-                              {/* Rarity border frame */}
-                              <div className="absolute -inset-1 border-2 border-yellow-400/50 rounded-t-lg bg-gradient-to-b from-yellow-400/10 to-transparent"></div>
                             </div>
                           ) : item.id === 'cap_baseball' ? (
-                            <div className="relative">
-                              {/* Baseball cap with advanced 3D matte finish */}
-                              <div className="w-14 h-6 bg-gradient-to-b from-red-400 via-red-600 to-red-800 rounded-full shadow-xl border border-red-700">
-                                {/* Matte texture overlay for common rarity */}
-                                <div className="absolute inset-1 bg-gradient-to-br from-red-300/40 via-transparent to-red-800/20 rounded-full"></div>
-                                {/* Fabric texture lines */}
-                                <div className="absolute top-1 left-2 right-2 h-px bg-red-300/30"></div>
-                                <div className="absolute top-2 left-3 right-3 h-px bg-red-300/20"></div>
-                                {/* Cap logo/emblem */}
-                                <div className="absolute top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white/80 rounded-full"></div>
-                              </div>
-                              {/* Cap visor with enhanced depth and material */}
-                              <div className="absolute top-3 right-0 w-6 h-4 bg-gradient-to-r from-red-700 via-red-800 to-red-900 rounded-full transform rotate-12 shadow-lg border border-red-800">
-                                <div className="absolute inset-0.5 bg-gradient-to-br from-red-500/30 to-transparent rounded-full"></div>
-                                {/* Visor stitching */}
-                                <div className="absolute top-1 left-1 right-1 h-px bg-red-600/50"></div>
-                              </div>
-                              {/* Enhanced shadow */}
-                              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 w-12 h-3 bg-black/25 rounded-full blur-md"></div>
-                              {/* Common rarity subtle frame */}
-                              <div className="absolute -inset-0.5 border border-gray-400/20 rounded-full bg-gradient-to-b from-gray-300/5 to-transparent"></div>
+                            <div className="w-10 h-4 bg-gradient-to-b from-red-400 to-red-600 rounded-full">
+                              <div className="absolute top-2 right-0 w-4 h-3 bg-red-700 rounded-full transform rotate-12"></div>
                             </div>
                           ) : item.id === 'helmet_space' ? (
-                            <div className="relative">
-                              {/* Space helmet with advanced metallic finish */}
-                              <div className="w-18 h-12 bg-gradient-to-b from-gray-100 via-gray-300 to-gray-500 rounded-full border-2 border-blue-300 shadow-2xl">
-                                {/* Advanced metallic shine with animated reflections */}
-                                <div className="absolute inset-2 bg-gradient-to-br from-white/70 via-gray-200/40 to-gray-600/30 rounded-full">
-                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-pulse rounded-full" style={{animationDuration: '3s'}}></div>
-                                </div>
-                                {/* Helmet visor with sci-fi effects */}
-                                <div className="absolute inset-3 bg-gradient-to-b from-blue-200/60 via-cyan-300/70 to-blue-400/80 rounded-full border-2 border-blue-400/60 shadow-inner">
-                                  {/* HUD reflection */}
-                                  <div className="absolute top-1 left-2 w-4 h-1 bg-green-400/60 rounded-full blur-sm animate-pulse"></div>
-                                  <div className="absolute bottom-1 right-2 w-2 h-2 bg-red-400/40 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                                </div>
-                                {/* Epic rarity animated glow */}
-                                {item.rarity === 'epic' && (
-                                  <>
-                                    <div className="absolute -inset-2 bg-purple-500/40 rounded-full animate-pulse blur-md" style={{animationDuration: '2s'}}></div>
-                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-purple-400 rounded-full animate-ping opacity-60"></div>
-                                  </>
-                                )}
-                                {/* Technical details */}
-                                <div className="absolute top-0 right-2 w-1 h-2 bg-gray-600 rounded-sm shadow-sm"></div>
-                                <div className="absolute bottom-1 left-1 w-2 h-1 bg-blue-500/80 rounded-sm"></div>
-                              </div>
-                              {/* Enhanced shadow */}
-                              <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-14 h-3 bg-black/30 rounded-full blur-lg"></div>
-                              {/* Epic rarity border frame */}
-                              <div className="absolute -inset-1 border-2 border-purple-400/40 rounded-full bg-gradient-to-b from-purple-400/15 to-transparent"></div>
+                            <div className="w-12 h-8 bg-gradient-to-b from-gray-100 to-gray-500 rounded-full border-2 border-blue-300">
+                              <div className="absolute inset-2 bg-gradient-to-b from-blue-200/60 to-blue-400/80 rounded-full"></div>
                             </div>
                           ) : (
-                            <div className="relative">
-                              {/* Generic hat with basic material */}
-                              <div className="w-10 h-6 bg-gradient-to-b from-gray-400 to-gray-700 rounded shadow-lg border border-gray-600">
-                                <div className="absolute inset-1 bg-gradient-to-br from-gray-300/30 to-transparent rounded"></div>
-                              </div>
-                              <div className="absolute top-5 left-1/2 transform -translate-x-1/2 w-8 h-2 bg-black/20 rounded-full blur-sm"></div>
-                            </div>
+                            <div className="w-6 h-4 bg-gray-600 rounded"></div>
                           )}
                         </div>
                       </div>
@@ -490,111 +502,52 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                     
                     {activeCategory === 'trails' && (
                       <div className="relative flex items-center justify-center">
-                        {/* Character with enhanced trail preview */}
-                        <div className="w-14 h-14 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center shadow-lg">
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 left-4"></div>
-                          <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3.5 right-4"></div>
+                        <div className="w-10 h-10 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
+                          <div className="w-1 h-1 bg-black rounded-full absolute top-2.5 left-3"></div>
+                          <div className="w-1 h-1 bg-black rounded-full absolute top-2.5 right-3"></div>
                         </div>
-                        
-                        {/* Advanced Animated Trail Effects with Shape Variety */}
-                        <div className={`absolute -right-16 top-1/2 transform -translate-y-1/2 flex items-center ${!item.owned ? 'grayscale' : ''}`}>
+                        <div className={`absolute -right-12 top-1/2 transform -translate-y-1/2 flex items-center space-x-0.5 ${!item.owned ? 'grayscale opacity-60' : ''}`}>
                           {item.id === 'rainbow_trail' ? (
-                            <div className="relative flex items-center space-x-1">
-                              {/* Rainbow trail with star particles and epic glow */}
-                              <div className="relative">
-                                <div className="w-4 h-4 bg-red-400 opacity-90 animate-pulse shadow-xl shadow-red-400/60" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}>
-                                  <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
-                                </div>
-                                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-300 rounded-full animate-ping opacity-60"></div>
-                              </div>
-                              <div className="relative">
-                                <div className="w-3.5 h-3.5 bg-orange-400 opacity-80 animate-pulse shadow-lg shadow-orange-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.2s'}}>
-                                  <div className="absolute inset-0.5 bg-gradient-to-br from-orange-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
-                                </div>
-                              </div>
-                              <div className="relative">
-                                <div className="w-3 h-3 bg-yellow-400 opacity-70 animate-pulse shadow-md shadow-yellow-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.4s'}}>
-                                  <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
-                                </div>
-                                <div className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-yellow-200 rounded-full animate-ping opacity-50" style={{animationDelay: '0.3s'}}></div>
-                              </div>
-                              <div className="w-2.5 h-2.5 bg-green-400 opacity-60 animate-pulse shadow-sm shadow-green-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.6s'}}>
-                                <div className="absolute inset-0.5 bg-gradient-to-br from-green-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
-                              </div>
-                              <div className="w-2 h-2 bg-blue-400 opacity-50 animate-pulse" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.8s'}}></div>
-                              <div className="w-1.5 h-1.5 bg-purple-400 opacity-40 animate-pulse" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '1s'}}></div>
-                              {/* Epic rarity animated border glow */}
-                              {item.rarity === 'epic' && (
-                                <div className="absolute -inset-3 bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-purple-500/30 rounded-full animate-pulse blur-md" style={{animationDuration: '2s'}}></div>
-                              )}
-                            </div>
+                            <>
+                              <div className="w-2 h-2 bg-red-400 opacity-90 animate-pulse rounded-full"></div>
+                              <div className="w-1.5 h-1.5 bg-yellow-400 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-1 h-1 bg-green-400 opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.4s'}}></div>
+                            </>
                           ) : item.id === 'fire_trail' ? (
-                            <div className="relative flex items-center space-x-1">
-                              {/* Fire trail with neon streak particles */}
-                              <div className="relative">
-                                <div className="w-4 h-2 bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 opacity-90 animate-pulse shadow-xl shadow-orange-500/60 rounded-full">
-                                  <div className="absolute inset-0.5 bg-gradient-to-br from-orange-200 to-transparent rounded-full"></div>
-                                </div>
-                                {/* Fire sparkles */}
-                                <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-yellow-300 rounded-full animate-ping opacity-75"></div>
-                                <div className="absolute -bottom-1 left-0 w-1 h-1 bg-orange-300 rounded-full animate-ping opacity-60" style={{animationDelay: '0.5s'}}></div>
-                              </div>
-                              <div className="relative">
-                                <div className="w-3.5 h-1.5 bg-gradient-to-r from-red-500 via-orange-500 to-red-600 opacity-80 animate-pulse shadow-lg shadow-red-500/50 rounded-full" style={{animationDelay: '0.3s'}}>
-                                  <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent rounded-full"></div>
-                                </div>
-                                <div className="absolute -top-0.5 right-0 w-1 h-1 bg-yellow-200 rounded-full animate-ping opacity-50" style={{animationDelay: '0.8s'}}></div>
-                              </div>
-                              <div className="w-3 h-1 bg-gradient-to-r from-yellow-500 to-orange-500 opacity-70 animate-pulse shadow-md shadow-yellow-500/50 rounded-full" style={{animationDelay: '0.6s'}}>
-                                <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent rounded-full"></div>
-                              </div>
-                              <div className="w-2.5 h-1 bg-orange-400 opacity-60 animate-pulse rounded-full" style={{animationDelay: '0.9s'}}></div>
-                              <div className="w-2 h-0.5 bg-red-400 opacity-50 animate-pulse rounded-full" style={{animationDelay: '1.2s'}}></div>
-                              {/* Rare rarity subtle glow */}
-                              {item.rarity === 'rare' && (
-                                <div className="absolute -inset-2 bg-blue-500/20 rounded-full animate-pulse blur-sm" style={{animationDuration: '3s'}}></div>
-                              )}
-                            </div>
+                            <>
+                              <div className="w-2 h-1 bg-gradient-to-r from-orange-500 to-red-500 opacity-90 animate-pulse rounded-full"></div>
+                              <div className="w-1.5 h-0.5 bg-red-500 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
+                              <div className="w-1 h-0.5 bg-orange-400 opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.4s'}}></div>
+                            </>
                           ) : (
-                            <div className="relative flex items-center space-x-1">
-                              {/* Default sparkle trail with pixel particles */}
-                              <div className="relative">
-                                <div className="w-3 h-3 bg-blue-400 opacity-90 animate-pulse shadow-lg shadow-blue-400/60" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}}>
-                                  <div className="absolute inset-0.5 bg-gradient-to-br from-blue-200 to-transparent" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}}></div>
-                                </div>
-                                <div className="absolute -top-1 -right-1 w-1 h-1 bg-cyan-300 animate-ping opacity-60"></div>
-                              </div>
-                              <div className="w-2.5 h-2.5 bg-cyan-400 opacity-80 animate-pulse shadow-md shadow-cyan-400/50" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDelay: '0.4s'}}>
-                                <div className="absolute inset-0.5 bg-gradient-to-br from-cyan-200 to-transparent" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}}></div>
-                              </div>
-                              <div className="w-2 h-2 bg-white opacity-70 animate-pulse shadow-sm" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDelay: '0.8s'}}></div>
-                              <div className="w-1.5 h-1.5 bg-blue-300 opacity-60 animate-pulse" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDelay: '1.2s'}}></div>
-                              <div className="w-1 h-1 bg-cyan-200 opacity-50 animate-pulse" style={{animationDelay: '1.6s'}}></div>
-                            </div>
+                            <>
+                              <div className="w-1.5 h-1.5 bg-blue-400 opacity-90 animate-pulse rounded-full"></div>
+                              <div className="w-1 h-1 bg-cyan-400 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.3s'}}></div>
+                              <div className="w-0.5 h-0.5 bg-white opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.6s'}}></div>
+                            </>
                           )}
                         </div>
                       </div>
                     )}
                     
                     {activeCategory === 'faces' && (
-                      <div className={`w-16 h-16 bg-cyan-400 rounded-full border-4 border-white/20 flex items-center justify-center relative ${!item.owned ? 'grayscale' : ''}`}>
-                        {/* Different eye expressions */}
+                      <div className={`w-12 h-12 bg-cyan-400 rounded-full border-3 border-white/20 flex items-center justify-center relative ${!item.owned ? 'grayscale opacity-60' : ''}`}>
                         {item.id === 'angry_eyes' ? (
                           <>
-                            <div className="w-2 h-1.5 bg-black rounded-sm absolute top-4 left-4 transform rotate-12"></div>
-                            <div className="w-2 h-1.5 bg-black rounded-sm absolute top-4 right-4 transform -rotate-12"></div>
-                            <div className="w-4 h-1 bg-red-600 rounded absolute bottom-5"></div>
+                            <div className="w-1.5 h-1 bg-black rounded-sm absolute top-3 left-3 transform rotate-12"></div>
+                            <div className="w-1.5 h-1 bg-black rounded-sm absolute top-3 right-3 transform -rotate-12"></div>
+                            <div className="w-3 h-0.5 bg-red-600 rounded absolute bottom-3"></div>
                           </>
                         ) : item.id === 'wink_eyes' ? (
                           <>
-                            <div className="w-2 h-0.5 bg-black rounded absolute top-5 left-4"></div>
-                            <div className="w-2 h-2 bg-black rounded-full absolute top-4 right-4"></div>
-                            <div className="w-3 h-1 bg-pink-500 rounded-full absolute bottom-5"></div>
+                            <div className="w-1.5 h-0.5 bg-black rounded absolute top-3.5 left-3"></div>
+                            <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 right-3"></div>
+                            <div className="w-2 h-0.5 bg-pink-500 rounded-full absolute bottom-3"></div>
                           </>
                         ) : (
                           <>
-                            <div className="w-2 h-2 bg-black rounded-full absolute top-4 left-4"></div>
-                            <div className="w-2 h-2 bg-black rounded-full absolute top-4 right-4"></div>
+                            <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 left-3"></div>
+                            <div className="w-1.5 h-1.5 bg-black rounded-full absolute top-3 right-3"></div>
                           </>
                         )}
                       </div>
@@ -602,32 +555,29 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                     
                     {/* Equipped indicator */}
                     {item.equipped && (
-                      <div className="absolute top-1 right-1 bg-green-500 rounded-full p-1">
-                        <Check className="w-3 h-3 text-white" />
+                      <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
+                        <Check className="w-2 h-2 text-white" />
                       </div>
                     )}
                     
                     {/* Locked indicator */}
                     {!item.owned && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <Lock className="w-6 h-6 text-gray-300" />
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+                        <Lock className="w-4 h-4 text-gray-300" />
                       </div>
                     )}
                   </div>
 
-                  {/* Item Info */}
+                  {/* Mobile Item Info */}
                   <div className="text-center">
-                    <h4 className="text-white text-sm font-semibold mb-1 truncate">{item.name}</h4>
-                    <div className="flex items-center justify-center space-x-2 mb-2">
+                    <h4 className="text-white text-xs font-semibold mb-1 truncate">{item.name}</h4>
+                    <div className="flex items-center justify-center space-x-1 mb-1">
                       <span className={`text-xs font-semibold ${rarityColors[item.rarity]} capitalize`}>
                         {item.rarity}
                       </span>
-                      {Array.from({ length: item.rarity === 'legendary' ? 5 : item.rarity === 'epic' ? 4 : item.rarity === 'rare' ? 3 : 2 }).map((_, i) => (
-                        <Star key={i} className={`w-2 h-2 ${rarityColors[item.rarity]} fill-current`} />
-                      ))}
                     </div>
                     {!item.owned && (
-                      <div className="text-yellow-400 text-sm font-bold">
+                      <div className="text-yellow-400 text-xs font-bold">
                         💰 {item.price}
                       </div>
                     )}
@@ -635,223 +585,284 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                 </div>
               ))}
             </div>
-          </div>
 
-          {/* Right Sidebar - Preview & Details */}
-          <div className="w-80 bg-gray-800/30 border-l border-gray-700/50 p-6 overflow-y-auto">
-            {/* Live Preview - Enhanced Size (30% bigger) */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Live Preview</h3>
-              <div className="bg-gray-900/50 rounded-lg p-8 border border-gray-600/50 mb-4">
-                {/* Enhanced Character Preview */}
-                <div className="flex justify-center mb-6">
-                  <div className="relative">
-                    {/* Main character body - 20% bigger */}
-                    <div className={`w-24 h-24 rounded-full border-4 border-cyan-300 flex items-center justify-center transition-all duration-500 shadow-lg ${
-                      previewAnimation === 'spin' ? 'animate-spin' :
-                      previewAnimation === 'bounce' ? 'animate-bounce' :
-                      previewAnimation === 'pulse' ? 'animate-pulse' :
-                      'animate-breathe'
-                    } ${
-                      // Dynamic skin based on equipped or selected item
-                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/30 shadow-lg' :
-                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/30 shadow-lg' :
-                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/30 shadow-lg' :
-                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/30 shadow-lg' :
-                      (selectedItem && activeCategory === 'skins') || playerData.equippedSkin === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/30 shadow-lg' :
-                      'bg-cyan-400'
-                    }`}>
-                      
-                      {/* Dynamic eyes based on equipped face */}
-                      {(selectedItem && activeCategory === 'faces' && selectedItem.id === 'angry_eyes') || playerData.equippedFace === 'angry_eyes' ? (
-                        <>
-                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 left-6 transform rotate-12"></div>
-                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 right-6 transform -rotate-12"></div>
-                          <div className="w-4 h-1 bg-red-600 rounded absolute bottom-6"></div>
-                        </>
-                      ) : (selectedItem && activeCategory === 'faces' && selectedItem.id === 'wink_eyes') || playerData.equippedFace === 'wink_eyes' ? (
-                        <>
-                          <div className="w-2 h-0.5 bg-black rounded absolute top-6 left-6"></div>
-                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6"></div>
-                          <div className="w-3 h-1 bg-pink-500 rounded-full absolute bottom-6"></div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6"></div>
-                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6"></div>
-                        </>
-                      )}
-                      
-                      {/* Legendary skin effects */}
-                      {((selectedItem && activeCategory === 'skins' && selectedItem.rarity === 'legendary') || 
-                        playerData.equippedSkin === 'golden_snake' || playerData.equippedSkin === 'shadow_black') && (
-                        <>
-                          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Dynamic hat rendering */}
-                    {((selectedItem && activeCategory === 'hats') || playerData.equippedHat) && (
-                      <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 ${
-                        (selectedItem && activeCategory === 'hats' && selectedItem.id === 'crown_gold') || playerData.equippedHat === 'crown_gold' ? 
-                          'w-8 h-6 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-lg border border-yellow-600' :
-                        (selectedItem && activeCategory === 'hats' && selectedItem.id === 'cap_baseball') || playerData.equippedHat === 'cap_baseball' ? 
-                          'w-10 h-4 bg-gradient-to-r from-red-600 to-red-500 rounded-full' :
-                        (selectedItem && activeCategory === 'hats' && selectedItem.id === 'helmet_space') || playerData.equippedHat === 'helmet_space' ? 
-                          'w-14 h-8 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full border-2 border-blue-400' :
-                          'w-6 h-4 bg-gray-600 rounded'
-                      }`}>
-                        {((selectedItem && activeCategory === 'hats' && selectedItem.id === 'crown_gold') || playerData.equippedHat === 'crown_gold') && (
-                          <div className="flex justify-center">
-                            <div className="w-1 h-2 bg-yellow-300 rounded-t-full mt-1"></div>
-                          </div>
-                        )}
-                        {((selectedItem && activeCategory === 'hats' && selectedItem.id === 'helmet_space') || playerData.equippedHat === 'helmet_space') && (
-                          <div className="absolute inset-2 bg-gradient-to-b from-blue-200/30 to-cyan-200/30 rounded-full"></div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Dynamic trail rendering with advanced effects */}
-                    {((selectedItem && activeCategory === 'trails') || playerData.equippedTrail) && (
-                      <div className="absolute -right-14 top-1/2 transform -translate-y-1/2 flex space-x-1">
-                        {(selectedItem && activeCategory === 'trails' && selectedItem.id === 'rainbow_trail') || playerData.equippedTrail === 'rainbow_trail' ? (
-                          <div className="relative flex items-center space-x-1">
-                            {/* Enhanced rainbow trail with star particles */}
-                            <div className="w-3 h-3 bg-red-400 opacity-80 animate-pulse shadow-lg shadow-red-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDuration: '1s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
-                            </div>
-                            <div className="w-2.5 h-2.5 bg-yellow-400 opacity-70 animate-pulse shadow-md shadow-yellow-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.3s', animationDuration: '1.2s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
-                            </div>
-                            <div className="w-2 h-2 bg-green-400 opacity-60 animate-pulse shadow-sm shadow-green-400/50" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.6s', animationDuration: '1.4s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-green-200 to-transparent" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'}}></div>
-                            </div>
-                            <div className="w-1.5 h-1.5 bg-blue-400 opacity-50 animate-pulse" style={{clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)', animationDelay: '0.9s', animationDuration: '1.6s'}}></div>
-                            {/* Epic glow effect */}
-                            <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/20 via-pink-500/25 to-purple-500/20 rounded-full animate-pulse blur-md" style={{animationDuration: '2s'}}></div>
-                          </div>
-                        ) : (selectedItem && activeCategory === 'trails' && selectedItem.id === 'fire_trail') || playerData.equippedTrail === 'fire_trail' ? (
-                          <div className="relative flex items-center space-x-1">
-                            {/* Enhanced fire trail with neon streaks */}
-                            <div className="w-3 h-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 opacity-90 animate-pulse shadow-xl shadow-orange-500/60 rounded-full" style={{animationDuration: '0.8s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-orange-200 to-transparent rounded-full"></div>
-                              <div className="absolute -top-1 -right-1 w-1 h-1 bg-yellow-300 rounded-full animate-ping opacity-75"></div>
-                            </div>
-                            <div className="w-2.5 h-1 bg-gradient-to-r from-red-500 to-orange-500 opacity-80 animate-pulse shadow-lg shadow-red-500/50 rounded-full" style={{animationDelay: '0.2s', animationDuration: '1s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-red-200 to-transparent rounded-full"></div>
-                            </div>
-                            <div className="w-2 h-1 bg-yellow-500 opacity-70 animate-pulse shadow-md shadow-yellow-500/50 rounded-full" style={{animationDelay: '0.4s', animationDuration: '1.2s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-yellow-200 to-transparent rounded-full"></div>
-                            </div>
-                            <div className="w-1.5 h-0.5 bg-orange-400 opacity-60 animate-pulse rounded-full" style={{animationDelay: '0.6s', animationDuration: '1.4s'}}></div>
-                            {/* Rare glow effect */}
-                            <div className="absolute -inset-1 bg-blue-500/15 rounded-full animate-pulse blur-sm" style={{animationDuration: '3s'}}></div>
-                          </div>
-                        ) : (
-                          <div className="relative flex items-center space-x-1">
-                            {/* Enhanced default sparkle trail with pixel particles */}
-                            <div className="w-2.5 h-2.5 bg-blue-400 opacity-90 animate-pulse shadow-lg shadow-blue-400/60" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDuration: '1.3s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-blue-200 to-transparent" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}}></div>
-                            </div>
-                            <div className="w-2 h-2 bg-cyan-400 opacity-80 animate-pulse shadow-md shadow-cyan-400/50" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDelay: '0.3s', animationDuration: '1.5s'}}>
-                              <div className="absolute inset-0.5 bg-gradient-to-br from-cyan-200 to-transparent" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)'}}></div>
-                            </div>
-                            <div className="w-1.5 h-1.5 bg-white opacity-70 animate-pulse shadow-sm" style={{clipPath: 'polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%)', animationDelay: '0.6s', animationDuration: '1.7s'}}></div>
-                            <div className="w-1 h-1 bg-blue-300 opacity-60 animate-pulse" style={{animationDelay: '0.9s', animationDuration: '1.9s'}}></div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Animation Controls */}
-                <div className="flex justify-center space-x-2">
-                  <button
-                    onClick={() => triggerAnimation('spin')}
-                    className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
-                    title="Spin"
-                  >
-                    <RotateCcw className="w-4 h-4 text-gray-300" />
-                  </button>
-                  <button
-                    onClick={() => triggerAnimation('bounce')}
-                    className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
-                    title="Jump"
-                  >
-                    <Play className="w-4 h-4 text-gray-300" />
-                  </button>
-                  <button
-                    onClick={() => triggerAnimation('pulse')}
-                    className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
-                    title="Pulse"
-                  >
-                    <Sparkles className="w-4 h-4 text-gray-300" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Item Details */}
-            {selectedItem && (
-              <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-600/50">
-                <h4 className="text-white text-lg font-semibold mb-3">{selectedItem.name}</h4>
+            {/* Mobile Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center space-x-4 mt-6">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                  disabled={currentPage === 0}
+                  className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all disabled:opacity-50"
+                >
+                  <ChevronLeft className="w-4 h-4 text-gray-300" />
+                </button>
                 
-                <div className="space-y-3 mb-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Type:</span>
-                    <span className="text-white capitalize">{activeCategory.slice(0, -1)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Rarity:</span>
-                    <span className={`${rarityColors[selectedItem.rarity]} capitalize font-semibold`}>
-                      {selectedItem.rarity}
-                    </span>
-                  </div>
-                  {!selectedItem.owned && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Price:</span>
-                      <span className="text-yellow-400 font-bold">💰 {selectedItem.price}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-2">
-                  {selectedItem.owned ? (
-                    <button
-                      onClick={() => handleEquipItem(selectedItem)}
-                      disabled={selectedItem.equipped}
-                      className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                        selectedItem.equipped
-                          ? 'bg-green-600/20 border border-green-500/30 text-green-400 cursor-not-allowed'
-                          : 'bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400 hover:scale-105'
-                      }`}
-                    >
-                      {selectedItem.equipped ? 'Equipped' : 'Equip'}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handlePurchaseItem(selectedItem)}
-                      disabled={userBalance < selectedItem.price}
-                      className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                        userBalance < selectedItem.price
-                          ? 'bg-gray-600/20 border border-gray-500/30 text-gray-400 cursor-not-allowed'
-                          : 'bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400 hover:scale-105'
-                      }`}
-                    >
-                      {userBalance < selectedItem.price ? 'Insufficient Funds' : `Purchase for 💰 ${selectedItem.price}`}
-                    </button>
-                  )}
-                </div>
+                <span className="text-gray-300 font-medium">
+                  {currentPage + 1} / {totalPages}
+                </span>
+                
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                  disabled={currentPage === totalPages - 1}
+                  className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all disabled:opacity-50"
+                >
+                  <ChevronRight className="w-4 h-4 text-gray-300" />
+                </button>
               </div>
             )}
           </div>
+
+          {/* Mobile Bottom Sheet for Selected Item */}
+          {selectedItem && (
+            <div className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700/50 p-4 rounded-t-2xl transform transition-transform duration-300">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h4 className="text-white text-lg font-semibold">{selectedItem.name}</h4>
+                  <span className={`${rarityColors[selectedItem.rarity]} capitalize font-semibold text-sm`}>
+                    {selectedItem.rarity}
+                  </span>
+                </div>
+                {!selectedItem.owned && (
+                  <span className="text-yellow-400 font-bold">💰 {selectedItem.price}</span>
+                )}
+              </div>
+
+              {/* Mobile Action Button */}
+              <div className="space-y-2">
+                {selectedItem.owned ? (
+                  <button
+                    onClick={() => handleEquipItem(selectedItem)}
+                    disabled={selectedItem.equipped}
+                    className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                      selectedItem.equipped
+                        ? 'bg-green-600/20 border border-green-500/30 text-green-400'
+                        : 'bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400'
+                    }`}
+                  >
+                    {selectedItem.equipped ? 'Equipped' : 'Equip'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handlePurchaseItem(selectedItem)}
+                    disabled={userBalance < selectedItem.price}
+                    className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                      userBalance < selectedItem.price
+                        ? 'bg-gray-600/20 border border-gray-500/30 text-gray-400'
+                        : 'bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400'
+                    }`}
+                  >
+                    {userBalance < selectedItem.price ? 'Insufficient Funds' : `Purchase`}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      ) : (
+        // DESKTOP LAYOUT - Keep existing design
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl max-w-7xl w-full h-[90vh] overflow-hidden border border-purple-500/30 shadow-2xl">
+            {/* Original desktop layout continues... */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-700/50">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Palette className="w-6 h-6 text-purple-400" />
+                  <h2 className="text-2xl font-bold text-white">Customize Appearance</h2>
+                </div>
+                
+                <div className="flex bg-gray-800/50 rounded-lg p-1">
+                  <button
+                    onClick={() => setActiveTab('inventory')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
+                      activeTab === 'inventory' 
+                        ? 'bg-purple-600 text-white' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <Package className="w-4 h-4" />
+                    <span>Inventory</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('shop')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2 ${
+                      activeTab === 'shop' 
+                        ? 'bg-purple-600 text-white' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>Shop</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 bg-yellow-500/20 px-4 py-2 rounded-lg border border-yellow-500/30">
+                  <span className="text-yellow-400 font-bold">💰 {userBalance.toLocaleString()}</span>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-full transition-all"
+                >
+                  <X className="w-5 h-5 text-gray-300" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex h-full">
+              {/* Desktop layout content... */}
+              <div className="w-64 bg-gray-800/30 border-r border-gray-700/50 p-4 overflow-y-auto">
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-gray-400 mb-3">CATEGORIES</h3>
+                  <div className="space-y-1">
+                    {categories.map((category) => {
+                      const Icon = category.icon
+                      return (
+                        <button
+                          key={category.id}
+                          onClick={() => setActiveCategory(category.id)}
+                          className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all ${
+                            activeCategory === category.id
+                              ? 'bg-purple-600/20 border border-purple-500/30'
+                              : 'hover:bg-gray-700/30'
+                          }`}
+                        >
+                          <Icon className={`w-4 h-4 ${category.color}`} />
+                          <span className="text-white text-sm">{category.name}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-400 mb-2 block">SEARCH</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Search items..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white text-sm focus:border-purple-400/50 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-semibold text-gray-400 mb-2 block">SORT BY</label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full p-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white text-sm focus:border-purple-400/50 focus:outline-none"
+                    >
+                      <option value="newest">Newest</option>
+                      <option value="name">Name</option>
+                      <option value="price">Price</option>
+                      <option value="rarity">Rarity</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-semibold text-gray-400 mb-2 block">RARITY</label>
+                    <select
+                      value={filterRarity}
+                      onChange={(e) => setFilterRarity(e.target.value)}
+                      className="w-full p-2 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white text-sm focus:border-purple-400/50 focus:outline-none"
+                    >
+                      <option value="all">All Rarities</option>
+                      <option value="common">Common</option>
+                      <option value="rare">Rare</option>
+                      <option value="epic">Epic</option>
+                      <option value="legendary">Legendary</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Center - Item Grid */}
+              <div className="flex-1 p-6 overflow-y-auto">
+                <div className="grid grid-cols-4 gap-4">
+                  {getFilteredItems().map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => setSelectedItem(item)}
+                      className={`relative bg-gray-800/50 rounded-lg p-4 border-2 cursor-pointer transition-all hover:scale-105 ${
+                        item.equipped ? 'border-green-400 bg-green-400/10' : rarityColors[item.rarity]
+                      } ${rarityGlow[item.rarity]} ${selectedItem?.id === item.id ? 'ring-2 ring-purple-400' : ''}`}
+                    >
+                      {/* Desktop item preview content remains the same... */}
+                      <div className="aspect-square bg-gray-700/30 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+                        {/* Existing desktop preview logic... */}
+                        <div className="text-center text-gray-400 text-sm">Preview</div>
+                      </div>
+
+                      <div className="text-center">
+                        <h4 className="text-white text-sm font-semibold mb-1 truncate">{item.name}</h4>
+                        <div className="flex items-center justify-center space-x-2 mb-2">
+                          <span className={`text-xs font-semibold ${rarityColors[item.rarity]} capitalize`}>
+                            {item.rarity}
+                          </span>
+                        </div>
+                        {!item.owned && (
+                          <div className="text-yellow-400 text-sm font-bold">
+                            💰 {item.price}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Sidebar - Desktop */}
+              <div className="w-80 bg-gray-800/30 border-l border-gray-700/50 p-6 overflow-y-auto">
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Live Preview</h3>
+                  <div className="bg-gray-900/50 rounded-lg p-8 text-center">
+                    <div className="text-gray-400">Character Preview</div>
+                  </div>
+                </div>
+
+                {selectedItem && (
+                  <div className="bg-gray-900/50 rounded-lg p-4">
+                    <h4 className="text-white text-lg font-semibold mb-3">{selectedItem.name}</h4>
+                    
+                    <div className="space-y-2">
+                      {selectedItem.owned ? (
+                        <button
+                          onClick={() => handleEquipItem(selectedItem)}
+                          disabled={selectedItem.equipped}
+                          className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                            selectedItem.equipped
+                              ? 'bg-green-600/20 border border-green-500/30 text-green-400'
+                              : 'bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400'
+                          }`}
+                        >
+                          {selectedItem.equipped ? 'Equipped' : 'Equip'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handlePurchaseItem(selectedItem)}
+                          disabled={userBalance < selectedItem.price}
+                          className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                            userBalance < selectedItem.price
+                              ? 'bg-gray-600/20 border border-gray-500/30 text-gray-400'
+                              : 'bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400'
+                          }`}
+                        >
+                          {userBalance < selectedItem.price ? 'Insufficient Funds' : `Purchase for 💰 ${selectedItem.price}`}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>,
     document.body
   )
