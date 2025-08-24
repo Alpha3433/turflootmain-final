@@ -752,288 +752,179 @@ const AgarIOGame = () => {
     return () => clearInterval(tokenCheckInterval)
   }, [user])
 
-  // Mobile control handlers - COMPREHENSIVE DEBUGGING for joystick movement
+  // COMPLETELY NEW SIMPLIFIED JOYSTICK SYSTEM - Step by step debugging
   const handleJoystickStart = (e) => {
-    console.log('🕹️ === JOYSTICK START DEBUG ===')
-    console.log('Touch event type:', e.type)
-    console.log('isMobile:', isMobile)
-    console.log('joystickRef exists:', !!joystickRef.current)
+    console.log('🕹️ === JOYSTICK START - STEP BY STEP DEBUG ===')
+    console.log('Step 1: Event received:', e.type, 'at coordinates:', e.clientX, e.clientY)
     
     try {
       e.preventDefault()
       e.stopPropagation()
+      console.log('Step 2: Event prevented and propagation stopped')
       
-      if (!isMobile || !joystickRef.current) {
-        console.log('❌ JOYSTICK BLOCKED:', { isMobile, joystickRef: !!joystickRef.current })
+      if (!isMobile) {
+        console.log('❌ BLOCKED: Not mobile device')
         return
       }
+      
+      if (!joystickRef.current) {
+        console.log('❌ BLOCKED: No joystick ref')
+        return
+      }
+      
+      console.log('Step 3: Passed mobile and ref checks')
       
       const rect = joystickRef.current.getBoundingClientRect()
       const centerX = rect.left + rect.width / 2
       const centerY = rect.top + rect.height / 2
       
-      console.log('🎯 Joystick info:', { 
-        centerX, 
-        centerY, 
-        rectWidth: rect.width, 
-        rectHeight: rect.height,
-        boundingRect: rect
-      })
+      console.log('Step 4: Joystick center calculated:', { centerX, centerY, rectWidth: rect.width, rectHeight: rect.height })
       
+      // Set active state
+      console.log('Step 5: Setting joystick active...')
       setJoystickActive(true)
       setMobileUIFaded(false)
       touchIdRef.current = e.pointerId
       
-      // DEBUG: Check game state immediately
-      console.log('🎮 GAME STATE CHECK:', {
-        gameRefExists: !!gameRef.current,
-        gameStructure: gameRef.current ? Object.keys(gameRef.current) : 'No game',
-        hasPlayer: gameRef.current?.player ? 'YES' : 'NO',
-        hasGamePlayer: gameRef.current?.game?.player ? 'YES' : 'NO'
-      })
+      console.log('Step 6: Active state set. touchId:', touchIdRef.current)
       
       const handleJoystickMove = (moveEvent) => {
+        console.log('🎮 MOVE EVENT:', moveEvent.type)
+        
         try {
           moveEvent.preventDefault()
-          if (moveEvent.pointerId !== touchIdRef.current) return
+          if (moveEvent.pointerId !== touchIdRef.current) {
+            console.log('⚠️ Wrong pointer ID, ignoring')
+            return
+          }
           
           const deltaX = moveEvent.clientX - centerX
           const deltaY = moveEvent.clientY - centerY
-          const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), 25)
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+          const clampedDistance = Math.min(distance, 40) // Clamp to 40px radius
           const angle = Math.atan2(deltaY, deltaX)
           
-          const knobX = Math.cos(angle) * distance
-          const knobY = Math.sin(angle) * distance
+          const knobX = Math.cos(angle) * clampedDistance
+          const knobY = Math.sin(angle) * clampedDistance
           
-          // CRITICAL: Update joystick position state for visual movement
-          console.log('🎮 UPDATING JOYSTICK POSITION:', { deltaX, deltaY, distance, knobX, knobY })
+          console.log('🎯 MOVEMENT CALCULATION:', {
+            deltaX: Math.round(deltaX),
+            deltaY: Math.round(deltaY), 
+            distance: Math.round(distance),
+            clampedDistance: Math.round(clampedDistance),
+            knobX: Math.round(knobX),
+            knobY: Math.round(knobY)
+          })
+          
+          // CRITICAL: Update state immediately
+          console.log('📊 UPDATING JOYSTICK POSITION STATE...')
           setJoystickPosition({ x: knobX, y: knobY })
+          console.log('✅ State update called with:', { x: knobX, y: knobY })
           
-          // Force immediate visual update
+          // CRITICAL: Force immediate visual update
           if (joystickKnobRef.current) {
-            const newTransform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`
-            joystickKnobRef.current.style.transform = newTransform
-            console.log('✅ VISUAL: Knob transform updated to:', newTransform)
+            const transform = `translate(-50%, -50%) translate(${knobX}px, ${knobY}px)`
+            joystickKnobRef.current.style.transform = transform
+            console.log('✅ VISUAL UPDATE: Applied transform:', transform)
+          } else {
+            console.error('❌ VISUAL FAILED: joystickKnobRef.current is null!')
           }
           
-          // CRITICAL: Send movement to game only if distance > 2
-          if (gameRef.current && distance > 2) {
-            const normalizedX = deltaX / 25
-            const normalizedY = deltaY / 25
+          // Send movement to game if distance is significant
+          if (clampedDistance > 5) {
+            const normalizedX = knobX / 40
+            const normalizedY = knobY / 40
             
-            console.log('🎯 SENDING MOVEMENT TO GAME:', { normalizedX, normalizedY })
-            console.log('🔍 INTENSIVE GAME OBJECT DEBUG:')
-            console.log('  gameRef exists:', !!gameRef.current)
-            console.log('  gameRef type:', typeof gameRef.current)
-            console.log('  gameRef keys (first 20):', gameRef.current ? Object.keys(gameRef.current).slice(0, 20) : [])
+            console.log('🎮 SENDING TO GAME:', { normalizedX: normalizedX.toFixed(2), normalizedY: normalizedY.toFixed(2) })
             
-            if (gameRef.current) {
-              console.log('  🎮 Game Properties:')
-              console.log('    - player:', gameRef.current.player)
-              console.log('    - canvas:', !!gameRef.current.canvas)
-              console.log('    - ctx:', !!gameRef.current.ctx)
-              console.log('    - entities:', gameRef.current.entities ? gameRef.current.entities.length : 'undefined')
-              console.log('    - game:', gameRef.current.game)
-              console.log('    - isRunning:', gameRef.current.isRunning)
-              console.log('    - gameLoop:', !!gameRef.current.gameLoop)
-              
-              if (gameRef.current.player) {
-                console.log('  👤 Player Properties:')
-                console.log('    - player keys:', Object.keys(gameRef.current.player))
-                console.log('    - player.x:', gameRef.current.player.x)
-                console.log('    - player.y:', gameRef.current.player.y)
-                console.log('    - player.vx:', gameRef.current.player.vx)
-                console.log('    - player.vy:', gameRef.current.player.vy)
-                console.log('    - player.dir:', gameRef.current.player.dir)
-              }
-            }
-            
-            let movementSuccess = false
-            let successfulMethods = []
-            
-            // Method 1: Direct player movement
-            if (gameRef.current.player) {
+            // Try the simplest possible movement method first
+            if (gameRef.current?.player) {
               try {
-                const oldDir = gameRef.current.player.dir
-                gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
-                console.log('✅ METHOD 1 SUCCESS: player.dir updated from', oldDir, 'to', gameRef.current.player.dir)
-                movementSuccess = true
-                successfulMethods.push('player.dir')
-              } catch (error) {
-                console.error('❌ METHOD 1 FAILED:', error)
-              }
-            }
-            
-            // Method 2: Set player velocity directly
-            if (gameRef.current.player && gameRef.current.player.vx !== undefined) {
-              try {
-                gameRef.current.player.vx = normalizedX * 3
-                gameRef.current.player.vy = normalizedY * 3
-                console.log('✅ METHOD 2 SUCCESS: player velocity set to', { vx: gameRef.current.player.vx, vy: gameRef.current.player.vy })
-                movementSuccess = true
-                successfulMethods.push('player velocity')
-              } catch (error) {
-                console.error('❌ METHOD 2 FAILED:', error)
-              }
-            }
-            
-            // Method 3: Update player position directly (for immediate movement test)
-            if (gameRef.current.player && gameRef.current.player.x !== undefined) {
-              try {
-                const oldPos = { x: gameRef.current.player.x, y: gameRef.current.player.y }
-                gameRef.current.player.x += normalizedX * 5  // Larger movement for testing
-                gameRef.current.player.y += normalizedY * 5
-                console.log('✅ METHOD 3 SUCCESS: player position moved from', oldPos, 'to', { x: gameRef.current.player.x, y: gameRef.current.player.y })
-                movementSuccess = true
-                successfulMethods.push('direct position')
-              } catch (error) {
-                console.error('❌ METHOD 3 FAILED:', error)
-              }
-            }
-            
-            // Method 4: Try keyboard simulation for game engine
-            if (gameRef.current.keys !== undefined) {
-              try {
-                gameRef.current.keys = {
-                  w: normalizedY < -0.1,
-                  s: normalizedY > 0.1,
-                  a: normalizedX < -0.1,
-                  d: normalizedX > 0.1,
-                  ArrowUp: normalizedY < -0.1,
-                  ArrowDown: normalizedY > 0.1,
-                  ArrowLeft: normalizedX < -0.1,
-                  ArrowRight: normalizedX > 0.1
+                // Method 1: Direct position update (most immediate)
+                const oldX = gameRef.current.player.x || 0
+                const oldY = gameRef.current.player.y || 0
+                
+                if (gameRef.current.player.x !== undefined) {
+                  gameRef.current.player.x += normalizedX * 3
+                  gameRef.current.player.y += normalizedY * 3
+                  console.log('✅ PLAYER MOVED:', `(${oldX}, ${oldY}) → (${gameRef.current.player.x}, ${gameRef.current.player.y})`)
                 }
-                console.log('✅ METHOD 4 SUCCESS: keyboard keys simulated:', gameRef.current.keys)
-                movementSuccess = true
-                successfulMethods.push('keyboard simulation')
+                
+                // Method 2: Set direction
+                gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
+                console.log('✅ DIRECTION SET:', gameRef.current.player.dir)
+                
+                // Method 3: Set velocity if available
+                if (gameRef.current.player.vx !== undefined) {
+                  gameRef.current.player.vx = normalizedX * 4
+                  gameRef.current.player.vy = normalizedY * 4
+                  console.log('✅ VELOCITY SET:', { vx: gameRef.current.player.vx, vy: gameRef.current.player.vy })
+                }
+                
               } catch (error) {
-                console.error('❌ METHOD 4 FAILED:', error)
+                console.error('❌ GAME MOVEMENT FAILED:', error)
               }
-            }
-            
-            // Method 5: Try to trigger game update/render
-            if (gameRef.current.update) {
-              try {
-                gameRef.current.update()
-                console.log('✅ METHOD 5 SUCCESS: game.update() called')
-                successfulMethods.push('game.update()')
-              } catch (error) {
-                console.error('❌ METHOD 5 FAILED:', error)
-              }
-            }
-            
-            console.log('📊 MOVEMENT SUMMARY:')
-            console.log('  Methods attempted: 5')
-            console.log('  Successful methods:', successfulMethods)
-            console.log('  Overall success:', movementSuccess)
-            
-            if (!movementSuccess) {
-              console.error('💥 CRITICAL: ALL MOVEMENT METHODS FAILED!')
-              console.error('This suggests the game object structure is different than expected.')
-              console.error('Full gameRef dump:', gameRef.current)
             } else {
-              console.log('🎯 MOVEMENT COMMANDS SENT SUCCESSFULLY!')
-              console.log('If player still not moving, the issue might be:')
-              console.log('1. Game update loop not running')
-              console.log('2. Canvas rendering not updating') 
-              console.log('3. Movement commands not being processed by game engine')
+              console.warn('⚠️ NO PLAYER OBJECT:', gameRef.current?.player)
             }
-            
-          } else {
-            console.log('⚠️ NOT SENDING MOVEMENT:', { hasGame: !!gameRef.current, distance })
           }
           
         } catch (error) {
-          console.error('❌ Joystick move error:', error)
+          console.error('❌ MOVE EVENT ERROR:', error)
         }
       }
       
       const handleJoystickEnd = (endEvent) => {
+        console.log('🛑 JOYSTICK END')
+        
         try {
           endEvent.preventDefault()
           if (endEvent.pointerId !== touchIdRef.current) return
           
-          console.log('🕹️ Joystick End - Touch released')
-          
+          console.log('📊 RESETTING JOYSTICK...')
           setJoystickActive(false)
           setJoystickPosition({ x: 0, y: 0 })
           touchIdRef.current = null
           
-          // Reset knob to center with immediate visual update
+          // Reset visual position
           if (joystickKnobRef.current) {
             joystickKnobRef.current.style.transform = 'translate(-50%, -50%)'
-            console.log('✅ VISUAL: Knob reset to center')
+            console.log('✅ VISUAL RESET: Knob returned to center')
           }
           
-          // Stop player movement with comprehensive fallback methods
-          if (gameRef.current) {
-            console.log('🛑 Stopping player movement')
-            
-            // Method 1: Direct player object
-            if (gameRef.current.player) {
+          // Stop player movement
+          if (gameRef.current?.player) {
+            if (gameRef.current.player.dir) {
               gameRef.current.player.dir = { x: 0, y: 0 }
-              console.log('✅ Movement stopped (method 1) - direct player')
             }
-            
-            // Method 2: Nested game.player object  
-            if (gameRef.current.game?.player) {
-              gameRef.current.game.player.dir = { x: 0, y: 0 }
-              console.log('✅ Movement stopped (method 2) - game.player')
+            if (gameRef.current.player.vx !== undefined) {
+              gameRef.current.player.vx = 0
+              gameRef.current.player.vy = 0
             }
-            
-            // Method 3: Function call
-            if (gameRef.current.setPlayerDirection) {
-              gameRef.current.setPlayerDirection(0, 0)
-              console.log('✅ Movement stopped (method 3) - setPlayerDirection')
-            }
-            
-            // Method 4: Alternative function call
-            if (gameRef.current.stopPlayer) {
-              gameRef.current.stopPlayer()
-              console.log('✅ Movement stopped (method 4) - stopPlayer')
-            }
-            
-            // Method 5: Input simulation
-            if (gameRef.current.handleInput) {
-              const inputData = {
-                type: 'move',
-                direction: { x: 0, y: 0 }
-              }
-              gameRef.current.handleInput(inputData)
-              console.log('✅ Movement stopped (method 5) - handleInput')
-            }
-            
-            // Method 6: Direct entity movement stop
-            if (gameRef.current.entities) {
-              const playerEntity = gameRef.current.entities.find(e => e.isPlayer)
-              if (playerEntity) {
-                playerEntity.vx = 0
-                playerEntity.vy = 0
-                console.log('✅ Movement stopped (method 6) - direct entity')
-              }
-            }
+            console.log('✅ PLAYER MOVEMENT STOPPED')
           }
-          
-          // Fade UI after inactivity
-          setTimeout(() => setMobileUIFaded(true), 2000)
           
           // Remove event listeners
           document.removeEventListener('pointermove', handleJoystickMove, { passive: false })
           document.removeEventListener('pointerup', handleJoystickEnd, { passive: false })
           document.removeEventListener('pointercancel', handleJoystickEnd, { passive: false })
+          
+          setTimeout(() => setMobileUIFaded(true), 2000)
+          
         } catch (error) {
-          console.error('❌ Joystick end error:', error)
+          console.error('❌ END EVENT ERROR:', error)
         }
       }
       
-      // Add event listeners to document for better tracking
+      // Add event listeners
+      console.log('Step 7: Adding event listeners...')
       document.addEventListener('pointermove', handleJoystickMove, { passive: false })
       document.addEventListener('pointerup', handleJoystickEnd, { passive: false })
       document.addEventListener('pointercancel', handleJoystickEnd, { passive: false })
+      console.log('✅ Event listeners added successfully')
       
     } catch (error) {
-      console.error('❌ Joystick start error:', error)
+      console.error('❌ JOYSTICK START ERROR:', error)
     }
   }
 
