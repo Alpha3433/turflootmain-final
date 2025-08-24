@@ -1955,10 +1955,8 @@ const AgarIOGame = () => {
         game.camera.x = game.player.x
         game.camera.y = game.player.y
         
-        // Dynamic zoom based on player size - Mobile Only
-        let targetZoom
-        
         // FIXED: Dynamic zoom based on player size - Use game's mobile state for consistency
+        let targetZoom
         
         if (game.isMobileGame) {
           // Mobile: LESS INTENSIVE Dynamic zoom that scales with player size for better overview
