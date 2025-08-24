@@ -2546,19 +2546,24 @@ const AgarIOGame = () => {
 
       })
       
-      // Draw floating texts
+      // Draw floating texts - Filter out Mission Failed for cleaner mobile experience
       if (settings.showFloatingText) {
-        floatingTexts.forEach(text => {
-          if (text.life > 0) {
-            ctx.fillStyle = text.color + Math.floor(text.life * 255).toString(16).padStart(2, '0')
-            ctx.font = '16px Arial'
-            ctx.textAlign = 'center'
-            ctx.strokeStyle = '#000000'
-            ctx.lineWidth = 2
-            ctx.strokeText(text.text, text.x, text.y)
-            ctx.fillText(text.text, text.x, text.y)
-          }
-        })
+        floatingTexts
+          .filter(text => 
+            // Remove Mission Failed text for cleaner mobile experience
+            !text.text.includes('Mission Failed')
+          )
+          .forEach(text => {
+            if (text.life > 0) {
+              ctx.fillStyle = text.color + Math.floor(text.life * 255).toString(16).padStart(2, '0')
+              ctx.font = '16px Arial'
+              ctx.textAlign = 'center'
+              ctx.strokeStyle = '#000000'
+              ctx.lineWidth = 2
+              ctx.strokeText(text.text, text.x, text.y)
+              ctx.fillText(text.text, text.x, text.y)
+            }
+          })
       }
 
       // Draw coin animations
