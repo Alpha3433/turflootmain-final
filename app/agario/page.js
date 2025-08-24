@@ -1760,20 +1760,24 @@ const AgarIOGame = () => {
                 coinsCollected: (prev.coinsCollected || 0) + 1
               }))
               
-              // Update mission progress for collect type
-              if (currentMission && currentMission.type === 'collect') {
-                console.log('🎯 Collect mission progress update - Current progress:', currentMission.progress, 'Target:', currentMission.target)
+              // Update mission progress for collect type - FIXED: Use game.currentMission
+              if (game.currentMission && game.currentMission.type === 'collect') {
+                console.log('🎯 Collect mission progress update - Current progress:', game.currentMission.progress, 'Target:', game.currentMission.target)
                 setCurrentMission(prev => {
                   if (prev) {
                     const newProgress = prev.progress + 1
                     console.log('🎯 New collect progress:', newProgress, '/', prev.target)
                     setMissionProgress(newProgress)
+                    // CRITICAL: Update game.currentMission to keep it synchronized
+                    const updatedMission = { ...prev, progress: newProgress }
+                    game.currentMission = updatedMission
                     if (newProgress >= prev.target) {
                       console.log('🎯 Collect mission completed!')
-                      completeMission({ ...prev, progress: newProgress })
+                      completeMission(updatedMission)
+                      game.currentMission = null // Clear from game object too
                       return null // Clear mission when completed
                     }
-                    return { ...prev, progress: newProgress }
+                    return updatedMission
                   }
                   return prev
                 })
