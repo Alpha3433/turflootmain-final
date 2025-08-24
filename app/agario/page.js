@@ -977,8 +977,8 @@ const AgarIOGame = () => {
     if (!isMobile || !gameRef.current) return
     
     setMobileUIFaded(false)
-    // Trigger split action (similar to desktop spacebar)
-    if (gameRef.current.player.mass > 20) {
+    // Trigger split action (similar to desktop spacebar) - FIXED path
+    if (gameRef.current?.game?.player?.mass > 20) {
       // Split player logic here
       console.log('🔥 Mobile split triggered')
     }
