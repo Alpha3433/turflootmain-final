@@ -2724,14 +2724,16 @@ const AgarIOGame = () => {
 
     // Enhanced Minimap with improved contrast and entity differentiation
     const drawMinimap = () => {
-      // MOBILE-SPECIFIC: Make minimap much smaller on mobile devices and avoid overlap
+      // FIXED: Use game's mobile state for consistency instead of component state
       const baseminimapSize = 200 // Desktop size
       const mobileMinimapSize = baseminimapSize * 0.5 // First reduction: 50% smaller (100px)
       const finalMobileSize = mobileMinimapSize * 0.25 // Additional 75% reduction (25px final)
-      const minimapSize = isMobile ? finalMobileSize : baseminimapSize // Ultra-compact on mobile
+      const minimapSize = game.isMobileGame ? finalMobileSize : baseminimapSize // Ultra-compact on mobile
+      
+      console.log(`🗺️ Minimap size: ${minimapSize}px (isMobileGame: ${game.isMobileGame})`)
       
       // FIXED: Adjust minimap position on mobile to avoid cash-out button overlap
-      const minimapX = isMobile 
+      const minimapX = game.isMobileGame 
         ? canvas.width - minimapSize - 120 // Move further left on mobile to avoid cash-out button
         : canvas.width - minimapSize - 20  // Normal position on desktop
       
