@@ -2967,20 +2967,8 @@ const AgarIOGame = () => {
       }
     }
     
-    // Start first mission after 10 seconds
-    setTimeout(() => {
-      if (gameRef.current?.game?.running && !currentMission) {
-        generateMission()
-      }
-    }, 10000)
-    
-    // Generate new missions every 2 minutes
-    const missionInterval = setInterval(() => {
-      if (gameRef.current?.game?.running && !currentMission) {
-        generateMission()
-      }
-    }, 120000)
-    gameRef.current.missionInterval = missionInterval
+    // REMOVED: Mission initialization moved to separate useEffect with proper timing
+    // Missions will now start via the dedicated useEffect that waits for proper initialization
     
     // CRITICAL: Mark game initialization as complete
     console.log('🎮 Game initialization complete - missions will now work properly')
