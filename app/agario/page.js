@@ -3325,17 +3325,7 @@ const AgarIOGame = () => {
                     </div>
                   </div>
                   
-                  {/* Secondary Stats Row - if we have a player mass available */}
-                  {gameRef.current?.game?.player?.mass && (
-                    <div className="flex justify-center items-center pt-2 border-t border-gray-600/30">
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-purple-400">
-                          {Math.round(gameRef.current.game.player.mass)}
-                        </div>
-                        <div className="text-xs text-gray-500">Mass</div>
-                      </div>
-                    </div>
-                  )}
+                  {/* REMOVED: Secondary Stats Row with Mass to prevent button cut-off */}
                 </div>
 
                 {/* Action Buttons */}
