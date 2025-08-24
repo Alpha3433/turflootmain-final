@@ -127,6 +127,21 @@ export async function GET(request, { params }) {
     const route = path.join('/')
     console.log(`🔍 GET Route requested: ${route}`)
 
+    // Ping route for connectivity check
+    if (route === 'ping') {
+      return NextResponse.json(
+        { 
+          status: 'ok',
+          timestamp: Date.now(),
+          server: 'turfloot-api'
+        },
+        { 
+          status: 200,
+          headers: corsHeaders 
+        }
+      )
+    }
+
     // Authentication routes
     if (route === 'auth/me') {
       return requireAuth(async (req) => {
