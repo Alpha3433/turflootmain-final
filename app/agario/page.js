@@ -3438,17 +3438,32 @@ const AgarIOGame = () => {
             </>
           )}
 
-          {/* Compact Mission Toast - Small top notification, auto-fade after 3s */}
+          {/* Small Mission Toast - Top of screen, auto-hide after 3s */}
           {missionToastVisible && missionToast && (
             <div 
-              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-black/90 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-purple-400/30 shadow-lg max-w-xs"
+              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-black/90 backdrop-blur-sm rounded-full px-4 py-2 border border-purple-400/30 shadow-lg max-w-xs"
               style={{
                 top: `calc(env(safe-area-inset-top, 0px) + 16px)`
               }}
             >
               <div className="text-white text-xs font-medium flex items-center space-x-2">
                 <span className="text-purple-400">🎯</span>
-                <span className="truncate">{missionToast}</span>
+                <span className="truncate text-xs">{missionToast}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Mission Icon Toggle - Near minimap for mission access */}
+          {!showOrientationGate && !isGameOver && missionIconVisible && currentMission && (
+            <div 
+              className={`fixed top-16 right-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+              style={{
+                top: `calc(env(safe-area-inset-top, 0px) + 64px)`
+              }}
+              onClick={() => setMissionToastVisible(true)}
+            >
+              <div className="bg-black/80 backdrop-blur-sm rounded-full w-8 h-8 flex items-center justify-center border border-purple-400/30 shadow-lg">
+                <span className="text-purple-400 text-sm">🎯</span>
               </div>
             </div>
           )}
