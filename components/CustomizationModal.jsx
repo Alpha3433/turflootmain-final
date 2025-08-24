@@ -35,6 +35,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   const [showFilters, setShowFilters] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  const [isLandscape, setIsLandscape] = useState(false)
   const [playerData, setPlayerData] = useState({
     equippedSkin: 'default_blue',
     equippedHat: null,
