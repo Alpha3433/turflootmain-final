@@ -3209,36 +3209,142 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Game Over Screen */}
+      {/* Game Over Screen - Mobile-Friendly Redesign */}
       {isGameOver && (
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-20">
-          <div className="bg-gray-900 rounded-2xl p-8 border border-cyan-400/30 text-center max-w-md">
-            <div className="text-3xl font-bold mb-4 text-red-400">
-              {gameResult}
-            </div>
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-20 p-4">
+          {/* Mobile-Optimized Game Over Popup */}
+          <div className={`
+            ${isMobile 
+              ? 'bg-gradient-to-br from-red-900 via-red-800 to-pink-900 rounded-2xl max-w-sm w-full border-2 border-red-400/40 shadow-2xl transform animate-in' 
+              : 'bg-gray-900 rounded-2xl p-8 border border-cyan-400/30 max-w-md'
+            }
+          `}>
             
-            <div className="text-gray-300 mb-6 space-y-2">
-              <p>Final Net Worth: <span className="text-green-400 font-bold">${gameStats.netWorth}</span></p>
-              <p>Final Rank: <span className="text-cyan-400">#{gameStats.rank}</span></p>
-              <p>K/D Ratio: <span className="text-yellow-400">{gameStats.kills}/{gameStats.deaths}</span></p>
-              <p>Best Streak: <span className="text-orange-400">{gameStats.streak} 🔥</span></p>
-            </div>
+            {isMobile ? (
+              /* Mobile Layout - Compact and Touch-Friendly */
+              <div className="p-6 text-center">
+                {/* Large Icon based on game result */}
+                <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center border-2 border-red-400/50">
+                  <span className="text-3xl">
+                    {gameResult.includes('Eliminated') ? '💀' : 
+                     gameResult.includes('Tab Closed') ? '🚪' : '💔'}
+                  </span>
+                </div>
+                
+                {/* Result Message - Shorter for mobile */}
+                <div className="text-xl font-bold mb-3 text-red-400">
+                  {gameResult.includes('Eliminated') ? 
+                    `💀 Eliminated` :
+                    gameResult.includes('Tab Closed') ? 
+                    `🚪 Game Left` :
+                    gameResult
+                  }
+                </div>
+                
+                {gameResult.includes('Eliminated') && (
+                  <div className="text-gray-300 text-sm mb-4">
+                    by {gameResult.split('by ')[1] || 'Unknown Player'}
+                  </div>
+                )}
+                
+                {/* Compact Stats - Mobile Optimized */}
+                <div className="bg-black/40 rounded-xl p-3 mb-4 space-y-1 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Net Worth:</span>
+                    <span className="text-green-400 font-bold">${gameStats.netWorth}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Rank:</span>
+                    <span className="text-cyan-400 font-bold">#{gameStats.rank}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">K/D:</span>
+                    <span className="text-yellow-400 font-bold">{gameStats.kills}/{gameStats.deaths}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Best Streak:</span>
+                    <span className="text-orange-400 font-bold">{gameStats.streak} 🔥</span>
+                  </div>
+                </div>
 
-            <div className="space-y-3">
-              <button
-                onClick={restartGame}
-                className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-xl transition-all"
-              >
-                Play Again
-              </button>
-              
-              <button
-                onClick={() => router.push('/')}
-                className="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-xl transition-all"
-              >
-                Back to Lobby
-              </button>
-            </div>
+                {/* Mobile Action Buttons - Large and Touch-Friendly */}
+                <div className="space-y-3">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      console.log('🔄 Play Again button clicked - mobile')
+                      restartGame()
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      console.log('🔄 Play Again button touched - mobile')
+                      restartGame()
+                    }}
+                    className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-all hover:scale-105 text-lg"
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <span>🔄</span>
+                      <span>Play Again</span>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      console.log('🏠 Back to Lobby button clicked - mobile')
+                      router.push('/')
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      console.log('🏠 Back to Lobby button touched - mobile')
+                      router.push('/')
+                    }}
+                    className="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-4 px-6 rounded-xl transition-all hover:scale-105 text-lg"
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <span>🏠</span>
+                      <span>Back to Lobby</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Desktop Layout - Original Design */
+              <>
+                <div className="text-3xl font-bold mb-4 text-red-400">
+                  {gameResult}
+                </div>
+                
+                <div className="text-gray-300 mb-6 space-y-2">
+                  <p>Final Net Worth: <span className="text-green-400 font-bold">${gameStats.netWorth}</span></p>
+                  <p>Final Rank: <span className="text-cyan-400">#{gameStats.rank}</span></p>
+                  <p>K/D Ratio: <span className="text-yellow-400">{gameStats.kills}/{gameStats.deaths}</span></p>
+                  <p>Best Streak: <span className="text-orange-400">{gameStats.streak} 🔥</span></p>
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={restartGame}
+                    className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                  >
+                    Play Again
+                  </button>
+                  
+                  <button
+                    onClick={() => router.push('/')}
+                    className="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                  >
+                    Back to Lobby
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
