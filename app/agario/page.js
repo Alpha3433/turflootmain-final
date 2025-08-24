@@ -794,16 +794,35 @@ const AgarIOGame = () => {
             joystickKnobRef.current.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`
           }
           
-          // Send movement to game with better error handling
-          if (gameRef.current && gameRef.current.player && distance > 2) {
+          // Send movement to game with better error handling and fallback methods
+          if (gameRef.current && distance > 2) {
             const normalizedX = deltaX / 25
             const normalizedY = deltaY / 25
-            gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
-            console.log('🎮 Player movement:', { x: normalizedX, y: normalizedY })
+            
+            // Try multiple game object structures for movement
+            if (gameRef.current.player) {
+              gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
+              console.log('🎮 Player movement (method 1):', { x: normalizedX, y: normalizedY })
+            } else if (gameRef.current.game?.player) {
+              gameRef.current.game.player.dir = { x: normalizedX, y: normalizedY }
+              console.log('🎮 Player movement (method 2):', { x: normalizedX, y: normalizedY })
+            } else if (gameRef.current.setPlayerDirection) {
+              gameRef.current.setPlayerDirection(normalizedX, normalizedY)
+              console.log('🎮 Player movement (method 3):', { x: normalizedX, y: normalizedY })
+            } else {
+              // Fallback: try to set movement directly on game object
+              if (gameRef.current.movePlayer) {
+                gameRef.current.movePlayer(normalizedX, normalizedY)
+                console.log('🎮 Player movement (fallback):', { x: normalizedX, y: normalizedY })
+              } else {
+                console.warn('⚠️ No valid movement method found. Game structure:', Object.keys(gameRef.current))
+              }
+            }
           } else if (distance > 2) {
-            console.warn('⚠️ Game or player not ready:', {
+            console.warn('⚠️ Game not ready for movement:', {
               gameExists: !!gameRef.current,
-              playerExists: !!(gameRef.current && gameRef.current.player)
+              playerExists: !!(gameRef.current && gameRef.current.player),
+              gamePlayerExists: !!(gameRef.current && gameRef.current.game?.player)
             })
           }
         } catch (error) {
