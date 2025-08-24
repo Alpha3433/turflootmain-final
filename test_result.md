@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "CRITICAL ISSUES: 1) Mission tracking has same initialization bug as before - missions don't track on first game load but work when user is eliminated/switches tabs and clicks play again (race condition issue). 2) Remove mass number from eliminated popup and tab switching popup so main menu button isn't cut off by text overflow."
+user_problem_statement: "NEW REQUEST: Redesign the customize page (accessed via 'Change Appearance' button) to be more mobile-friendly and look modern. Current customize page needs better mobile UX and contemporary styling. Previous mission tracking race condition was successfully resolved."
 
 # Test plan for this run
 
