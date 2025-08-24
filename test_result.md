@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "UPDATED REQUEST: 1) Decrease minimap size by another 25% (from current 175px to ~131px). 2) Remove the player eliminated text that shows up on bottom left-hand side. 3) Fix missions from not tracking properly. Previous changes (player balance display, minimap size increase, position adjustment) were successfully implemented."
+user_problem_statement: "CRITICAL ISSUES: 1) Mission tracking has same initialization bug as before - missions don't track on first game load but work when user is eliminated/switches tabs and clicks play again (race condition issue). 2) Remove mass number from eliminated popup and tab switching popup so main menu button isn't cut off by text overflow."
 
 # Test plan for this run
 
