@@ -288,6 +288,46 @@ const AgarIOGame = () => {
     }
   }, [mobileDetectionComplete, isMobile, isTouchDevice, user, getAccessToken]) // CRITICAL: Include mobileDetectionComplete dependency
 
+  // CRITICAL: Mission initialization that waits for both mobile detection AND game initialization
+  useEffect(() => {
+    // Don't start missions until both mobile detection and game initialization are complete
+    if (!mobileDetectionComplete || !gameInitializationComplete) {
+      console.log('⏳ Mission initialization waiting...', { 
+        mobileDetectionComplete, 
+        gameInitializationComplete 
+      })
+      return
+    }
+    
+    console.log('🎯 Mission system ready to start - both mobile detection and game initialization complete')
+    
+    // Clear any existing missions first to prevent conflicts
+    setCurrentMission(null)
+    setMissionProgress(0)
+    
+    // Start first mission after 5 seconds (shorter delay since we know everything is ready)
+    const firstMissionTimer = setTimeout(() => {
+      if (gameRef.current?.game?.running && !currentMission) {
+        console.log('🎯 Starting first mission (delayed start)')
+        generateMission()
+      }
+    }, 5000)
+    
+    // Generate new missions every 2 minutes 
+    const missionInterval = setInterval(() => {
+      if (gameRef.current?.game?.running && !currentMission) {
+        console.log('🎯 Generating new mission (interval)')
+        generateMission()
+      }
+    }, 120000)
+    
+    // Clean up on unmount or when dependencies change
+    return () => {
+      clearTimeout(firstMissionTimer)
+      clearInterval(missionInterval)
+    }
+  }, [mobileDetectionComplete, gameInitializationComplete, currentMission]) // Wait for both completion flags
+
   const handlePlayAgain = () => {
     // Charge the same entry fee as when they joined the lobby
     console.log(`🎮 Player wants to play again - charging entry fee: $${initialLobbyFee}`)
