@@ -116,12 +116,18 @@ const AgarIOGame = () => {
   const [gameServerFood, setGameServerFood] = useState([])
   const [isPlayerReady, setIsPlayerReady] = useState(false)
 
-  // Simplified Mobile Detection
+  // Simplified Mobile Detection - FIXED orientation detection
   useEffect(() => {
     const detectMobileDevice = () => {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
+      
+      console.log('🎮 Orientation Detection:', {
+        viewportSize: `${viewportWidth}x${viewportHeight}`,
+        ratio: (viewportWidth / viewportHeight).toFixed(2),
+        userAgent: userAgent.includes('Mobile') || userAgent.includes('Android')
+      })
       
       // Simple mobile detection based on screen size and basic user agent check
       const isMobileUserAgent = /Mobi|Android/i.test(userAgent)
@@ -131,6 +137,12 @@ const AgarIOGame = () => {
       // Simple mobile detection
       const isMobileDevice = isMobileUserAgent || isTouchCapable || isNarrowViewport
       const isCurrentlyLandscape = viewportWidth > viewportHeight
+      
+      console.log('📱 Mobile Detection Result:', {
+        isMobileDevice,
+        isCurrentlyLandscape,
+        shouldShowOrientationGate: isMobileDevice && !isCurrentlyLandscape
+      })
       
       setIsTouchDevice(isTouchCapable)
       setIsMobile(isMobileDevice)
@@ -143,17 +155,14 @@ const AgarIOGame = () => {
       } else {
         document.body.classList.remove('mobile-game-active')
       }
-      
-      console.log('🎮 Mobile Detection:', {
-        viewportSize: `${viewportWidth}x${viewportHeight}`,
-        isMobile: isMobileDevice,
-        isLandscape: isCurrentlyLandscape
-      })
     }
     
     detectMobileDevice()
     window.addEventListener('resize', detectMobileDevice)
-    window.addEventListener('orientationchange', detectMobileDevice)
+    window.addEventListener('orientationchange', () => {
+      // Small delay to allow orientation change to complete
+      setTimeout(detectMobileDevice, 200)
+    })
     
     return () => {
       window.removeEventListener('resize', detectMobileDevice)
