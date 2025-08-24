@@ -3117,87 +3117,68 @@ const AgarIOGame = () => {
         </div>
       )}
       
-      {/* Enhanced Cash Out Success Popup */}
+      {/* Mobile-Optimized Cash Out Success Popup - Landscape Friendly */}
       {showCashOutSuccess && cashOutDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 rounded-2xl p-8 max-w-md w-full mx-4 border-2 border-green-400/30 shadow-2xl transform animate-in">
-            {/* Success Header */}
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-400/50">
-                <div className="text-4xl animate-bounce">💰</div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 rounded-2xl max-w-lg w-full border-2 border-green-400/30 shadow-2xl transform animate-in">
+            
+            {/* Landscape-optimized layout */}
+            <div className="flex items-center justify-between p-4">
+              
+              {/* Success Icon & Amount - Left side */}
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-green-400/50">
+                  <span className="text-2xl">💰</span>
+                </div>
+                <div>
+                  <h2 className="text-green-400 font-bold text-lg">Cash Out Success!</h2>
+                  <p className="text-white text-2xl font-bold">${Math.floor(cashOutDetails.finalAmount)}</p>
+                  <p className="text-green-300 text-xs">After ${Math.floor(cashOutDetails.platformFee)} platform fee</p>
+                </div>
               </div>
-              <h2 className="text-3xl font-bold text-green-400 mb-2">Cash Out Successful!</h2>
-              <p className="text-green-200 text-sm">You've successfully survived and cashed out</p>
-            </div>
 
-            {/* Earnings Breakdown */}
-            <div className="bg-black/30 rounded-lg p-4 mb-6">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">Gross Earnings:</span>
-                  <span className="text-white font-bold">${Math.floor(cashOutDetails.originalAmount)}</span>
+              {/* Stats - Center */}
+              <div className="text-center px-4">
+                <div className="text-white text-sm space-y-1">
+                  <div>🎯 {cashOutDetails.kills} Eliminations</div>
+                  <div>🔥 {cashOutDetails.streak} Max Streak</div>
+                  <div>⏱️ {Math.floor(cashOutDetails.playTime / 60)}:{(cashOutDetails.playTime % 60).toString().padStart(2, '0')}</div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">Platform Fee (10%):</span>
-                  <span className="text-red-400 font-bold">-${Math.floor(cashOutDetails.platformFee)}</span>
-                </div>
-                <div className="border-t border-gray-600 pt-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-400 font-bold text-lg">Net Payout:</span>
-                    <span className="text-green-400 font-bold text-xl">${Math.floor(cashOutDetails.finalAmount)}</span>
+                <p className="text-gray-300 text-xs mt-2">
+                  {cashOutDetails.finalAmount > 500 ? "🏆 Incredible!" :
+                   cashOutDetails.finalAmount > 200 ? "🎯 Great job!" :
+                   "🎮 Keep practicing!"}
+                </p>
+              </div>
+
+              {/* Action Buttons - Right side */}
+              <div className="space-y-2">
+                <button
+                  onClick={handlePlayAgain}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all hover:scale-105 text-sm"
+                >
+                  <div className="flex items-center space-x-2">
+                    <span>🎮</span>
+                    <div>
+                      <div>Play Again</div>
+                      <div className="text-xs opacity-75">${initialLobbyFee}</div>
+                    </div>
                   </div>
-                </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCashOutSuccess(false)
+                    setCashOutDetails(null)
+                    window.location.href = '/'
+                  }}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all hover:scale-105 text-sm"
+                >
+                  <div className="flex items-center space-x-2">
+                    <span>🏠</span>
+                    <span>Main Menu</span>
+                  </div>
+                </button>
               </div>
-            </div>
-
-            {/* Game Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{cashOutDetails.kills}</div>
-                <div className="text-xs text-gray-400">Kills</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{cashOutDetails.streak}</div>
-                <div className="text-xs text-gray-400">Max Streak</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">{Math.floor(cashOutDetails.playTime)}s</div>
-                <div className="text-xs text-gray-400">Survived</div>
-              </div>
-            </div>
-
-            {/* Performance Message */}
-            <div className="text-center mb-6">
-              <p className="text-green-300 text-sm">
-                {cashOutDetails.finalAmount > 500 ? "🏆 Incredible performance!" :
-                 cashOutDetails.finalAmount > 200 ? "🎯 Great job surviving!" :
-                 "🎮 Better luck next time!"}
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-3">
-              <button
-                onClick={handlePlayAgain}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-all hover:scale-105 flex items-center justify-center space-x-2"
-              >
-                <span>🎮</span>
-                <div className="text-center">
-                  <div>Play Again</div>
-                  <div className="text-xs opacity-75">${initialLobbyFee} entry fee</div>
-                </div>
-              </button>
-              <button
-                onClick={() => {
-                  setShowCashOutSuccess(false)
-                  setCashOutDetails(null)
-                  window.location.href = '/'
-                }}
-                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-all hover:scale-105 flex items-center justify-center space-x-2"
-              >
-                <span>🏠</span>
-                <span>Main Menu</span>
-              </button>
             </div>
           </div>
         </div>
