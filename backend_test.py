@@ -1,29 +1,24 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing Suite - Mobile Orientation Gate Feature Testing
-===========================================================================
+Mobile Game Initialization Backend Testing Suite
+===============================================
 
-This test suite focuses on testing the backend APIs that support the mobile orientation gate feature.
-While the orientation gate itself is a frontend component, we need to ensure that:
+Focus: Testing APIs critical for mobile game initialization and timing issues.
+The main issue reported is that mobile optimizations (minimap size, dynamic zoom) 
+don't apply on first game load but work on subsequent plays after losing.
 
-1. Backend APIs work correctly when accessed from mobile devices
-2. Authentication flow works for mobile users  
-3. Game entry APIs support both FREE and cash games for mobile users
-4. Server browser APIs work correctly for mobile game selection
+This suggests a timing/initialization issue with either:
+- API response times affecting mobile detection timing
+- Game initialization sequence  
+- Mobile-specific API calls
 
-Previous Priority Tests (maintained):
-1. Server Browser API (GET /api/servers/lobbies) - Should return 36 persistent multiplayer servers
-2. Live Statistics APIs (GET /api/stats/live-players and GET /api/stats/global-winnings) 
-3. Leaderboard API (GET /api/users/leaderboard) - Should return leaderboard array structure
-4. Friends API (GET /api/friends/list?userId=demo-user) - Should return friends array structure
-
-New Mobile Orientation Gate Tests:
-5. Mobile API Compatibility - Test APIs with mobile user agents
-6. Mobile Authentication Flow - Test Privy auth for mobile users
-7. Mobile Game Entry APIs - Test game creation for mobile users
-8. Mobile Wallet APIs - Test wallet functionality for mobile cash games
-9. Mobile Statistics APIs - Test statistics display for mobile UI
-10. Mobile Integration Assessment - Overall mobile orientation gate support
+Testing Priority:
+1. Core API Endpoints (GET /api/ping, GET /api/, game-related endpoints)
+2. Game Server APIs (multiplayer server endpoints for mobile initialization)
+3. Authentication APIs (mobile-compatible authentication endpoints)
+4. Game Statistics (live statistics and leaderboard APIs for mobile game)
+5. Mobile Initialization Timing (API response times critical for mobile detection)
+6. Mobile User Agent Compatibility (ensure APIs work with mobile browsers)
 """
 
 import requests
