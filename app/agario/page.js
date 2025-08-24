@@ -3348,18 +3348,20 @@ const AgarIOGame = () => {
                   transition: 'border-color 0.2s ease'
                 }}
               >
-                {/* Joystick Knob - MOVABLE */}
+                {/* Joystick Knob - FIXED with direct style updates */}
                 <div 
                   ref={joystickKnobRef}
-                  className="absolute rounded-full border-2 border-white transition-all duration-100"
+                  className="absolute rounded-full border-2 border-white"
                   style={{
                     width: '40px',
                     height: '40px',
                     background: joystickActive ? 'rgba(0, 255, 255, 0.9)' : 'rgba(100, 255, 255, 0.7)',
-                    left: `calc(50% - 20px + ${joystickPosition.x}px)`,
-                    top: `calc(50% - 20px + ${joystickPosition.y}px)`,
                     boxShadow: joystickActive ? '0 0 10px rgba(0, 255, 255, 0.5)' : 'none',
-                    transform: 'none' // Remove transform to use left/top positioning
+                    // Use transform for reliable positioning
+                    left: '50%',
+                    top: '50%',
+                    transform: `translate(calc(-50% + ${joystickPosition.x}px), calc(-50% + ${joystickPosition.y}px))`,
+                    transition: joystickActive ? 'none' : 'transform 0.2s ease'
                   }}
                 />
                 
@@ -3372,9 +3374,10 @@ const AgarIOGame = () => {
                   }}
                 />
                 
-                {/* Debug info (remove later) */}
-                <div className="absolute -bottom-8 left-0 text-xs text-white bg-black/50 px-1 rounded">
-                  {`${Math.round(joystickPosition.x)},${Math.round(joystickPosition.y)}`}
+                {/* Enhanced Debug info */}
+                <div className="absolute -bottom-12 left-0 text-xs text-white bg-black/70 px-2 py-1 rounded">
+                  <div>Pos: {Math.round(joystickPosition.x)},{Math.round(joystickPosition.y)}</div>
+                  <div>Active: {joystickActive ? 'YES' : 'NO'}</div>
                 </div>
               </div>
             </div>
