@@ -2122,20 +2122,23 @@ const AgarIOGame = () => {
       // Update territory glow intensity (pulsing)
       setTerritoryGlowIntensity(prev => 0.3 + Math.sin(currentTime * 0.003) * 0.2)
 
-      // Update mission progress for survive type
-      if (currentMission && currentMission.type === 'survive') {
-        const elapsed = Date.now() - currentMission.startTime
-        const newProgress = Math.min(elapsed, currentMission.target)
-        console.log('🎯 Survive mission progress:', Math.floor(newProgress/1000) + 's /', Math.floor(currentMission.target/1000) + 's')
+      // Update mission progress for survive type - FIXED: Use game.currentMission
+      if (game.currentMission && game.currentMission.type === 'survive') {
+        const elapsed = Date.now() - game.currentMission.startTime
+        const newProgress = Math.min(elapsed, game.currentMission.target)
+        console.log('🎯 Survive mission progress:', Math.floor(newProgress/1000) + 's /', Math.floor(game.currentMission.target/1000) + 's')
         setMissionProgress(newProgress)
         
         // Update the mission state as well
         setCurrentMission(prev => {
           if (prev && prev.type === 'survive') {
             const updatedMission = { ...prev, progress: newProgress }
+            // CRITICAL: Update game.currentMission to keep it synchronized
+            game.currentMission = updatedMission
             if (newProgress >= prev.target) {
               console.log('🎯 Survive mission completed!')
               completeMission(updatedMission)
+              game.currentMission = null // Clear from game object too
               return null // Clear mission when completed
             }
             return updatedMission
