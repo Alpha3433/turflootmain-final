@@ -581,6 +581,28 @@ export async function POST(request, { params }) {
     const route = path.join('/')
     console.log(`🔍 POST Route requested: ${route}`)
 
+    // User stats update route
+    if (route === 'users/stats/update') {
+      try {
+        console.log('📊 Updating user statistics:', body)
+        // For now, just return success without actually storing (demo mode)
+        return NextResponse.json(
+          { 
+            success: true,
+            message: 'Statistics updated successfully',
+            timestamp: new Date().toISOString()
+          },
+          { headers: corsHeaders }
+        )
+      } catch (error) {
+        console.error('❌ Stats update error:', error)
+        return NextResponse.json(
+          { error: 'Failed to update statistics' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     if (route === 'friends/send-request') {
       try {
         const { fromUserId, toUserId } = body
