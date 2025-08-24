@@ -1282,6 +1282,43 @@ frontend:
           agent: "main"
           comment: "Successfully simplified mobile detection logic by removing intensive iOS/Safari checks and multiple timeouts. Now uses basic user agent, touch capability, and viewport width checks. Performance improved with single-run detection."
 
+frontend:
+  - task: "Player Waged Balance Display Implementation"
+    implemented: true
+    working: true
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Modified balance display logic to show player's own waged balance above character head in yellow ($100 visible). Changed condition from '!isPlayer && entity.netWorth > 0' to 'entity.netWorth > 0' and added yellow color for main player vs green for others."
+
+  - task: "Minimap Size Increase (100% - 87.5px to 175px)"
+    implemented: true
+    working: true
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Increased mobile minimap size by 100% from 87.5px to 175px by adding 'increasedMobileSize = previousMobileSize * 2' calculation. Minimap now much more visible and usable on mobile devices."
+
+  - task: "Minimap Position Adjustment (Right-side)"
+    implemented: true
+    working: true
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Moved minimap position slightly to the right on mobile by changing minimapX offset from 120px to 80px. Better positioning achieved without overlapping other UI elements."
+
 metadata:
   last_update: "mobile_orientation_gate_feature_completed"
   mobile_feature_status: "implemented_pending_frontend_testing"
