@@ -994,8 +994,8 @@ const AgarIOGame = () => {
     if (!isMobile || !gameRef.current) return
     
     setMobileUIFaded(false)
-    // Trigger eject mass action (similar to desktop 'W' key)
-    if (gameRef.current.player.mass > 15) {
+    // Trigger eject mass action (similar to desktop 'W' key) - FIXED path
+    if (gameRef.current?.game?.player?.mass > 15) {
       // Eject mass logic here
       console.log('💨 Mobile eject triggered')
     }
