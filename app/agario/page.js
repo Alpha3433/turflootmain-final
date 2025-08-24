@@ -3151,11 +3151,23 @@ const AgarIOGame = () => {
                 </p>
               </div>
 
-              {/* Action Buttons - Right side */}
+              {/* Action Buttons - Right side with enhanced mobile touch support */}
               <div className="space-y-2">
                 <button
-                  onClick={handlePlayAgain}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('🎮 Play Again button clicked - mobile')
+                    handlePlayAgain()
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('🎮 Play Again button touched - mobile')
+                    handlePlayAgain()
+                  }}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all hover:scale-105 text-sm"
+                  style={{ touchAction: 'manipulation' }}
                 >
                   <div className="flex items-center space-x-2">
                     <span>🎮</span>
@@ -3166,12 +3178,24 @@ const AgarIOGame = () => {
                   </div>
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('🏠 Main Menu button clicked - mobile')
+                    setShowCashOutSuccess(false)
+                    setCashOutDetails(null)
+                    window.location.href = '/'
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('🏠 Main Menu button touched - mobile')
                     setShowCashOutSuccess(false)
                     setCashOutDetails(null)
                     window.location.href = '/'
                   }}
                   className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all hover:scale-105 text-sm"
+                  style={{ touchAction: 'manipulation' }}
                 >
                   <div className="flex items-center space-x-2">
                     <span>🏠</span>
