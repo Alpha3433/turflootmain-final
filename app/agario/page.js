@@ -3091,8 +3091,8 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Separate Live Event Feed */}
-      {!isGameOver && liveEventFeed.length > 0 && (
+      {/* Live Event Feed - Desktop Version (unchanged) */}
+      {!isGameOver && liveEventFeed.length > 0 && !isMobile && (
         <div className="absolute top-4 left-80 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-orange-400/30 max-w-[250px]">
           <div className="text-orange-400 font-bold text-sm mb-2">📺 Live Events</div>
           <div className="space-y-1 max-h-24 overflow-y-auto">
@@ -3108,6 +3108,46 @@ const AgarIOGame = () => {
                 {event.message}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Live Event Feed - Redesigned for top-left mobile experience */}
+      {!isGameOver && liveEventFeed.length > 0 && isMobile && (
+        <div 
+          className={`fixed top-4 left-4 z-30 transition-all duration-300 ${mobileUIFaded ? 'opacity-60' : 'opacity-95'}`}
+          style={{
+            top: `calc(env(safe-area-inset-top, 0px) + 16px)`,
+            left: `calc(env(safe-area-inset-left, 0px) + 16px)`,
+            maxWidth: '180px'
+          }}
+        >
+          <div className="bg-black/90 backdrop-blur-sm rounded-xl border border-orange-400/40 overflow-hidden">
+            {/* Compact Header */}
+            <div className="bg-orange-500/20 px-3 py-1 border-b border-orange-400/20">
+              <div className="text-orange-300 font-bold text-xs flex items-center">
+                <span className="mr-1">📺</span>
+                <span>Live</span>
+              </div>
+            </div>
+            
+            {/* Compact Event List */}
+            <div className="p-2 space-y-1 max-h-20 overflow-y-auto">
+              {liveEventFeed.slice(0, 3).map((event) => ( // Show max 3 events on mobile
+                <div 
+                  key={event.id} 
+                  className={`text-xs px-2 py-1 rounded-lg border ${
+                    event.type === 'kill' ? 'bg-red-500/15 text-red-200 border-red-400/20' :
+                    event.type === 'cashout' ? 'bg-green-500/15 text-green-200 border-green-400/20' :
+                    'bg-blue-500/15 text-blue-200 border-blue-400/20'
+                  }`}
+                >
+                  <div className="truncate">
+                    {event.message.length > 25 ? `${event.message.substring(0, 25)}...` : event.message}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
