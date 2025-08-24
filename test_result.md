@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix mobile game initialization issues: minimap changes and zoom changes don't apply when user joins game for first time but work when they lose and select play again. Make zoom changes less intensive and redesign eliminated popup menus so $ figure, position and mass look better on mobile."
+user_problem_statement: "NEW REQUEST: Add the player's waged balance display on top of their character head (similar to other players). Increase minimap size by another 100% (from current 87.5px to 175px). Move minimap slightly to the right-hand side. Previous mobile initialization bug was successfully fixed."
 
 # Test plan for this run
 
