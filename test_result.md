@@ -108,9 +108,9 @@ user_problem_statement: "UPDATED REQUEST: 1) Decrease minimap size by another 25
 
 test_plan:
   current_focus: 
-    - "Player Waged Balance Display Implementation"
-    - "Minimap Size Increase (100% - 87.5px to 175px)"
-    - "Minimap Position Adjustment (Right-side)"
+    - "Minimap Size Decrease (25% - 175px to 131px)"
+    - "Remove Player Eliminated Text (Bottom Left)"
+    - "Fix Mission Tracking Issues"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
