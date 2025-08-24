@@ -2479,8 +2479,8 @@ const AgarIOGame = () => {
           ctx.restore()
         }
         
-        // Display balance above other players' heads (not for the main player)
-        if (!isPlayer && entity.netWorth > 0) {
+        // Display balance above all players' heads (including main player)
+        if (entity.netWorth > 0) {
           ctx.save()
           ctx.font = 'bold 12px Arial'
           ctx.textAlign = 'center'
@@ -2505,8 +2505,8 @@ const AgarIOGame = () => {
             textHeight + bgPadding*2
           )
           
-          // Draw border
-          ctx.strokeStyle = '#00ff88'
+          // Draw border - use different color for main player vs other players
+          ctx.strokeStyle = isPlayer ? '#ffff00' : '#00ff88'  // Yellow for main player, green for others
           ctx.lineWidth = 1
           ctx.strokeRect(
             entity.x - textWidth/2 - bgPadding, 
@@ -2515,8 +2515,8 @@ const AgarIOGame = () => {
             textHeight + bgPadding*2
           )
           
-          // Draw balance text
-          ctx.fillStyle = '#00ff88'
+          // Draw balance text - use different color for main player vs other players
+          ctx.fillStyle = isPlayer ? '#ffff00' : '#00ff88'  // Yellow for main player, green for others
           ctx.fillText(balanceText, entity.x, entity.y - radius - 25)
           
           ctx.restore()
