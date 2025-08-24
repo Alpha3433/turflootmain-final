@@ -43,14 +43,23 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
     equippedFace: 'normal_eyes'
   })
 
-  // Detect mobile on mount
+  // Detect mobile and orientation on mount
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      const isMobileDevice = window.innerWidth < 768
+      const isLandscape = window.innerWidth > window.innerHeight
+      setIsMobile(isMobileDevice)
+      setIsLandscape(isLandscape && isMobileDevice)
     }
     checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    window.addEventListener('resize', checkMobile)  
+    window.addEventListener('orientationchange', () => {
+      setTimeout(checkMobile, 100) // Delay to ensure orientation change is complete
+    })
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+      window.removeEventListener('orientationchange', checkMobile)
+    }
   }, [])
 
   // Mock data for customization items - with proper equipped state management
