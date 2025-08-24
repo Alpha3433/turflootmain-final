@@ -2907,8 +2907,8 @@ const AgarIOGame = () => {
         style={{ display: isGameOver ? 'none' : 'block' }}
       />
       
-      {/* Multiplayer Status */}
-      {isConnected && (
+      {/* Multiplayer Status - Desktop Only */}
+      {isConnected && !isMobile && (
         <div className="absolute top-4 right-4 bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-green-400/50">
           <div className="flex items-center gap-2 text-green-400 font-bold text-sm">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
