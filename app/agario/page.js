@@ -117,14 +117,14 @@ const AgarIOGame = () => {
   const [gameServerFood, setGameServerFood] = useState([])
   const [isPlayerReady, setIsPlayerReady] = useState(false)
 
-  // Simplified Mobile Detection - FIXED orientation detection
+  // FIXED: Enhanced Mobile Detection with completion tracking
   useEffect(() => {
     const detectMobileDevice = () => {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
       
-      console.log('🎮 Orientation Detection:', {
+      console.log('🎮 Mobile Detection Starting:', {
         viewportSize: `${viewportWidth}x${viewportHeight}`,
         ratio: (viewportWidth / viewportHeight).toFixed(2),
         userAgent: userAgent.includes('Mobile') || userAgent.includes('Android')
@@ -139,16 +139,20 @@ const AgarIOGame = () => {
       const isMobileDevice = isMobileUserAgent || isTouchCapable || isNarrowViewport
       const isCurrentlyLandscape = viewportWidth > viewportHeight
       
-      console.log('📱 Mobile Detection Result:', {
+      console.log('📱 Mobile Detection Complete:', {
         isMobileDevice,
         isCurrentlyLandscape,
-        shouldShowOrientationGate: isMobileDevice && !isCurrentlyLandscape
+        shouldShowOrientationGate: isMobileDevice && !isCurrentlyLandscape,
+        mobileDetectionComplete: true // NEW: Log completion
       })
       
       setIsTouchDevice(isTouchCapable)
       setIsMobile(isMobileDevice)
       setIsLandscape(isCurrentlyLandscape)
       setShowOrientationGate(isMobileDevice && !isCurrentlyLandscape)
+      
+      // CRITICAL: Mark mobile detection as complete
+      setMobileDetectionComplete(true)
       
       // Add mobile game body class for scroll prevention
       if (isMobileDevice) {
