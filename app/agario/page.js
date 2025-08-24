@@ -899,11 +899,10 @@ const AgarIOGame = () => {
           setJoystickPosition({ x: 0, y: 0 })
           touchIdRef.current = null
           
+          // Reset knob to center with immediate visual update
           if (joystickKnobRef.current) {
-            // Reset knob to center using left/top positioning
-            joystickKnobRef.current.style.left = 'calc(50% - 20px)'
-            joystickKnobRef.current.style.top = 'calc(50% - 20px)'
-            console.log('✅ Knob reset to center')
+            joystickKnobRef.current.style.transform = 'translate(-50%, -50%)'
+            console.log('✅ VISUAL: Knob reset to center')
           }
           
           // Stop player movement with comprehensive fallback methods
