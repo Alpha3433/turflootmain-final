@@ -3098,20 +3098,6 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* DEBUG: Mission Display State - REMOVE AFTER FIXING */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-4 right-4 bg-red-900/80 text-white text-xs p-2 rounded">
-          <div>currentMission: {currentMission ? 'YES' : 'NO'}</div>
-          <div>isGameOver: {isGameOver ? 'YES' : 'NO'}</div>
-          <div>isMobile: {isMobile ? 'YES' : 'NO'}</div>
-          <div>mobileDetectionComplete: {mobileDetectionComplete ? 'YES' : 'NO'}</div>
-          <div>gameInitComplete: {gameInitializationComplete ? 'YES' : 'NO'}</div>
-          {currentMission && (
-            <div>Mission: {currentMission.description}</div>
-          )}
-        </div>
-      )}
-
       {/* Stats Panel - Desktop Only */}
       {!isGameOver && !isMobile && (
         <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 min-w-[200px]">
