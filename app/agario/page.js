@@ -845,8 +845,18 @@ const AgarIOGame = () => {
             joystickKnobRef.current.style.transform = 'translate(-50%, -50%)'
           }
           
-          if (gameRef.current && gameRef.current.player) {
-            gameRef.current.player.dir = { x: 0, y: 0 }
+          // Stop player movement with fallback methods
+          if (gameRef.current) {
+            if (gameRef.current.player) {
+              gameRef.current.player.dir = { x: 0, y: 0 }
+            } else if (gameRef.current.game?.player) {
+              gameRef.current.game.player.dir = { x: 0, y: 0 }
+            } else if (gameRef.current.setPlayerDirection) {
+              gameRef.current.setPlayerDirection(0, 0)
+            } else if (gameRef.current.stopPlayer) {
+              gameRef.current.stopPlayer()
+            }
+            console.log('🛑 Player movement stopped')
           }
           
           // Fade UI after inactivity
