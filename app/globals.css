@@ -915,18 +915,17 @@
   }
 }
 
-/* Mobile joystick styles */
+/* Mobile joystick styles - UNIFIED */
 .mobile-joystick {
-  position: fixed;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-  left: 20px;
-  width: 80px;
-  height: 80px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  touch-action: none;
-  z-index: 1000;
+  position: fixed !important;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px) !important;
+  left: 20px !important;
+  width: 80px !important;
+  height: 80px !important;
+  z-index: 999 !important;
+  pointer-events: auto !important;
+  touch-action: none !important;
+  user-select: none !important;
   transition: opacity 0.3s ease;
 }
 
@@ -934,18 +933,29 @@
   opacity: 0.3;
 }
 
-.joystick-knob {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(135deg, #14f195, #0ea5e9);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: all 0.1s ease;
-  box-shadow: 0 0 10px rgba(20, 241, 149, 0.5);
+.mobile-joystick-base {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: 2px solid rgba(100, 100, 100, 0.5) !important;
+  position: relative !important;
+  touch-action: none !important;
+  user-select: none !important;
+}
+
+.mobile-joystick-knob {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: rgba(0, 200, 255, 0.8) !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  transition: all 0.1s ease !important;
+  pointer-events: none !important;
+  z-index: 1000 !important;
 }
 
 /* Mobile action buttons */
