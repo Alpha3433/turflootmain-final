@@ -841,6 +841,50 @@
   animation: float-slow 6s ease-in-out infinite;
 }
 
+/* Hide Error Displays for Mobile Game */
+.mobile-game-active .error-banner,
+.mobile-game-active [class*="error"],
+.mobile-game-active .bg-red-500,
+.mobile-game-active .text-red-500,
+.mobile-game-active .border-red-500 {
+  display: none !important;
+}
+
+/* Ensure Joystick Area is Always Accessible */
+.mobile-joystick {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 20px !important;
+  z-index: 999 !important;
+  pointer-events: auto !important;
+  touch-action: none !important;
+}
+
+.mobile-joystick-base {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: 2px solid rgba(100, 100, 100, 0.5) !important;
+  position: relative !important;
+  touch-action: none !important;
+  user-select: none !important;
+}
+
+.mobile-joystick-knob {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: rgba(0, 200, 255, 0.8) !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  transition: all 0.1s ease !important;
+  pointer-events: none !important;
+  z-index: 1000 !important;
+}
+
 /* Game root container for mobile */
 #gameRoot {
   position: fixed;
