@@ -3163,16 +3163,19 @@ const AgarIOGame = () => {
             <OrientationGate onLandscapeReady={() => setShowOrientationGate(false)} />
           )}
 
-          {/* Mobile Joystick - Enhanced with CSS classes for reliability */}
+          {/* Mobile Joystick - Enhanced with CSS classes and fallback touch events */}
           {!showOrientationGate && !isGameOver && (
             <div 
               ref={joystickRef}
               className="mobile-joystick"
               onPointerDown={handleJoystickStart}
+              onTouchStart={handleJoystickStart}
               style={{ 
                 touchAction: 'none',
                 bottom: `calc(env(safe-area-inset-bottom, 0px) + 20px)`,
-                left: '20px'
+                left: '20px',
+                userSelect: 'none',
+                WebkitUserSelect: 'none'
               }}
             >
               <div className="mobile-joystick-base">
