@@ -2100,6 +2100,7 @@ const AgarIOGame = () => {
       // Update mission progress for mass type
       if (currentMission && currentMission.type === 'mass' && game.player.alive) {
         const newProgress = Math.min(game.player.mass, currentMission.target)
+        console.log('🎯 Mass mission progress:', newProgress, '/', currentMission.target)
         setMissionProgress(newProgress)
         
         // Update the mission state as well
@@ -2107,7 +2108,9 @@ const AgarIOGame = () => {
           if (prev && prev.type === 'mass') {
             const updatedMission = { ...prev, progress: newProgress }
             if (newProgress >= prev.target) {
+              console.log('🎯 Mass mission completed!')
               completeMission(updatedMission)
+              return null // Clear mission when completed
             }
             return updatedMission
           }
