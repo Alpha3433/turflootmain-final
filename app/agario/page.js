@@ -752,72 +752,104 @@ const AgarIOGame = () => {
     return () => clearInterval(tokenCheckInterval)
   }, [user])
 
-  // Mobile control handlers - Joystick with Pointer Events and scroll prevention
+  // Mobile control handlers - Enhanced Joystick with better error handling
   const handleJoystickStart = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    console.log('🕹️ Joystick Start - Touch detected')
     
-    if (!isMobile || !joystickRef.current) return
-    
-    const rect = joystickRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-    
-    setJoystickActive(true)
-    setMobileUIFaded(false)
-    touchIdRef.current = e.pointerId
-    
-    const handleJoystickMove = (e) => {
+    try {
       e.preventDefault()
-      if (e.pointerId !== touchIdRef.current) return
+      e.stopPropagation()
       
-      const deltaX = e.clientX - centerX
-      const deltaY = e.clientY - centerY
-      const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), 25)
-      const angle = Math.atan2(deltaY, deltaX)
-      
-      const knobX = Math.cos(angle) * distance
-      const knobY = Math.sin(angle) * distance
-      
-      setJoystickPosition({ x: knobX, y: knobY })
-      
-      if (joystickKnobRef.current) {
-        joystickKnobRef.current.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`
+      if (!isMobile || !joystickRef.current) {
+        console.log('❌ Joystick blocked: isMobile =', isMobile, 'joystickRef =', !!joystickRef.current)
+        return
       }
       
-      // Send movement to game
-      if (gameRef.current && distance > 2) {
-        const normalizedX = deltaX / 25
-        const normalizedY = deltaY / 25
-        gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
+      const rect = joystickRef.current.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+      
+      console.log('🎯 Joystick center:', { centerX, centerY })
+      
+      setJoystickActive(true)
+      setMobileUIFaded(false)
+      touchIdRef.current = e.pointerId
+      
+      const handleJoystickMove = (moveEvent) => {
+        try {
+          moveEvent.preventDefault()
+          if (moveEvent.pointerId !== touchIdRef.current) return
+          
+          const deltaX = moveEvent.clientX - centerX
+          const deltaY = moveEvent.clientY - centerY
+          const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), 25)
+          const angle = Math.atan2(deltaY, deltaX)
+          
+          const knobX = Math.cos(angle) * distance
+          const knobY = Math.sin(angle) * distance
+          
+          setJoystickPosition({ x: knobX, y: knobY })
+          
+          if (joystickKnobRef.current) {
+            joystickKnobRef.current.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`
+          }
+          
+          // Send movement to game with better error handling
+          if (gameRef.current && gameRef.current.player && distance > 2) {
+            const normalizedX = deltaX / 25
+            const normalizedY = deltaY / 25
+            gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
+            console.log('🎮 Player movement:', { x: normalizedX, y: normalizedY })
+          } else if (distance > 2) {
+            console.warn('⚠️ Game or player not ready:', {
+              gameExists: !!gameRef.current,
+              playerExists: !!(gameRef.current && gameRef.current.player)
+            })
+          }
+        } catch (error) {
+          console.error('❌ Joystick move error:', error)
+        }
       }
+      
+      const handleJoystickEnd = (endEvent) => {
+        try {
+          endEvent.preventDefault()
+          if (endEvent.pointerId !== touchIdRef.current) return
+          
+          console.log('🕹️ Joystick End - Touch released')
+          
+          setJoystickActive(false)
+          setJoystickPosition({ x: 0, y: 0 })
+          touchIdRef.current = null
+          
+          if (joystickKnobRef.current) {
+            joystickKnobRef.current.style.transform = 'translate(-50%, -50%)'
+          }
+          
+          if (gameRef.current && gameRef.current.player) {
+            gameRef.current.player.dir = { x: 0, y: 0 }
+          }
+          
+          // Fade UI after inactivity
+          setTimeout(() => setMobileUIFaded(true), 2000)
+          
+          // Remove event listeners
+          document.removeEventListener('pointermove', handleJoystickMove, { passive: false })
+          document.removeEventListener('pointerup', handleJoystickEnd, { passive: false })
+          document.removeEventListener('pointercancel', handleJoystickEnd, { passive: false })
+        } catch (error) {
+          console.error('❌ Joystick end error:', error)
+        }
+      }
+      
+      // Add event listeners to document for better tracking
+      document.addEventListener('pointermove', handleJoystickMove, { passive: false })
+      document.addEventListener('pointerup', handleJoystickEnd, { passive: false })
+      document.addEventListener('pointercancel', handleJoystickEnd, { passive: false })
+      
+    } catch (error) {
+      console.error('❌ Joystick start error:', error)
     }
-    
-    const handleJoystickEnd = (e) => {
-      e.preventDefault()
-      if (e.pointerId !== touchIdRef.current) return
-      
-      setJoystickActive(false)
-      setJoystickPosition({ x: 0, y: 0 })
-      touchIdRef.current = null
-      
-      if (joystickKnobRef.current) {
-        joystickKnobRef.current.style.transform = 'translate(-50%, -50%)'
-      }
-      
-      if (gameRef.current) {
-        gameRef.current.player.dir = { x: 0, y: 0 }
-      }
-      
-      // Fade UI after inactivity
-      setTimeout(() => setMobileUIFaded(true), 2000)
-      
-      document.removeEventListener('pointermove', handleJoystickMove, { passive: false })
-      document.removeEventListener('pointerup', handleJoystickEnd, { passive: false })
-    }
-    
-    document.addEventListener('pointermove', handleJoystickMove, { passive: false })
-    document.addEventListener('pointerup', handleJoystickEnd, { passive: false })
   }
 
   // Mobile cash-out button handlers
