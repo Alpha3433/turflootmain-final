@@ -326,7 +326,7 @@ const AgarIOGame = () => {
       clearTimeout(firstMissionTimer)
       clearInterval(missionInterval)
     }
-  }, [mobileDetectionComplete, gameInitializationComplete, currentMission]) // Wait for both completion flags
+  }, [mobileDetectionComplete, gameInitializationComplete]) // Wait for both completion flags, but don't include currentMission to avoid infinite loops
 
   const handlePlayAgain = () => {
     // Charge the same entry fee as when they joined the lobby
