@@ -2941,6 +2941,10 @@ const AgarIOGame = () => {
       }
     }, 120000)
     gameRef.current.missionInterval = missionInterval
+    
+    // CRITICAL: Mark game initialization as complete
+    console.log('🎮 Game initialization complete - missions will now work properly')
+    setGameInitializationComplete(true)
   }
 
   const restartGame = () => {
