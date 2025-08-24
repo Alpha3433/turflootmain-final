@@ -3260,49 +3260,6 @@ const AgarIOGame = () => {
           {/* Refined Mobile HUD Elements */}
           {!showOrientationGate && !isGameOver && (
             <>
-              {/* Mobile Mission Toast - appears briefly then tucks into icon */}
-              {currentMission && missionToastVisible && (
-                <div 
-                  className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
-                  style={{
-                    top: `calc(env(safe-area-inset-top, 0px) + 16px)`
-                  }}
-                >
-                  <div className="mission-toast max-w-xs">
-                    <div className="flex items-center space-x-2">
-                      <span>🎯</span>
-                      <div className="flex-1">
-                        <div className="font-semibold text-sm">{currentMission.description}</div>
-                        <div className="text-xs opacity-75">
-                          {currentMission.type === 'survive' 
-                            ? `${Math.floor(missionProgress / 1000)}/${Math.floor(currentMission.target / 1000)}s`
-                            : `${missionProgress}/${currentMission.target}`
-                          } • {currentMission.reward} SP
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Mobile Mission Icon (shows when toast is hidden) */}
-              {currentMission && !missionToastVisible && (
-                <div 
-                  className={`mobile-hud-icon ${mobileUIFaded ? 'faded' : ''}`}
-                  style={{ 
-                    top: `calc(env(safe-area-inset-top, 0px) + 16px)`,
-                    right: '130px'
-                  }}
-                  onClick={() => setMissionToastVisible(true)}
-                >
-                  🎯
-                  {/* Mission progress indicator */}
-                  <div 
-                    className="absolute -bottom-1 left-0 h-1 bg-purple-400 rounded-full transition-all duration-300"
-                    style={{ width: `${(missionProgress / currentMission.target) * 100}%` }}
-                  />
-                </div>
-              )}
 
               {/* Ultra-Micro Minimap - 87.5% smaller total (50% more reduction) */}
               <div 
