@@ -2725,8 +2725,8 @@ const AgarIOGame = () => {
       const baseminimapSize = 200 // Desktop size
       const mobileMinimapSize = baseminimapSize * 0.5 // First reduction: 50% smaller (100px)
       const finalMobileSize = mobileMinimapSize * 0.25 // Additional 75% reduction (25px final)
-      const increasedMobileSize = finalMobileSize * 1.75 // UPDATED: Increase mobile minimap by 75% (25px -> 44px)
-      const minimapSize = game.isMobileGame ? increasedMobileSize : baseminimapSize // Enhanced mobile minimap
+      const increasedMobileSize = finalMobileSize * 3.5 // UPDATED: Increase mobile minimap by 250% total (25px -> 87.5px)
+      const minimapSize = game.isMobileGame ? increasedMobileSize : baseminimapSize // Much larger mobile minimap
       
       console.log(`🗺️ Minimap size: ${minimapSize}px (isMobileGame: ${game.isMobileGame})`)
       
@@ -2736,7 +2736,7 @@ const AgarIOGame = () => {
         : canvas.width - minimapSize - 20  // Normal position on desktop
       
       const minimapY = 20
-      const minimapRadius = minimapSize / 2 - 5 // Adjust radius for increased size
+      const minimapRadius = minimapSize / 2 - 5 // Adjust radius for larger size
       const centerX = minimapX + minimapSize / 2
       const centerY = minimapY + minimapSize / 2
       
