@@ -2928,17 +2928,7 @@ const AgarIOGame = () => {
         </div>
       )}
       
-      {/* Demo Mode Badge - Top-left corner, semi-transparent */}
-      {!isConnected && user && (
-        <div className="fixed top-4 left-4 z-40 bg-black/60 backdrop-blur-sm rounded-lg px-2 py-1 border border-yellow-400/30"
-             style={{
-               top: `calc(env(safe-area-inset-top, 0px) + 16px)`
-             }}>
-          <div className="text-yellow-400 text-xs font-medium">
-            Demo Mode
-          </div>
-        </div>
-      )}
+      {/* Demo Mode Badge - REMOVED for cleaner mobile experience */}
       
       {/* Kill Streak Announcements */}
       {killStreakAnnouncements.map((announcement) => (
