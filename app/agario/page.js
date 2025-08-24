@@ -894,14 +894,11 @@ const AgarIOGame = () => {
             console.log('✅ VISUAL RESET: Knob returned to center')
           }
           
-          // Stop player movement
-          if (gameRef.current?.player) {
-            if (gameRef.current.player.dir) {
-              gameRef.current.player.dir = { x: 0, y: 0 }
-            }
-            if (gameRef.current.player.vx !== undefined) {
-              gameRef.current.player.vx = 0
-              gameRef.current.player.vy = 0
+          // Stop player movement - FIXED path
+          if (gameRef.current?.game?.player) {
+            const player = gameRef.current.game.player
+            if (player.dir) {
+              player.dir = { x: 0, y: 0 }
             }
             console.log('✅ PLAYER MOVEMENT STOPPED')
           }
