@@ -807,11 +807,17 @@ const AgarIOGame = () => {
           
           setJoystickPosition({ x: knobX, y: knobY })
           
-          if (joystickKnobRef.current) {
-            joystickKnobRef.current.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`
-          }
+          console.log('🎮 JOYSTICK MOVE:', { deltaX, deltaY, distance, knobX, knobY, 'knobRef exists': !!joystickKnobRef.current })
           
-          console.log('🎮 JOYSTICK MOVE:', { deltaX, deltaY, distance, knobX, knobY })
+          // Update knob position visually - FIXED positioning
+          if (joystickKnobRef.current) {
+            // Use left/top positioning instead of transform for better reliability
+            joystickKnobRef.current.style.left = `calc(50% - 20px + ${knobX}px)`
+            joystickKnobRef.current.style.top = `calc(50% - 20px + ${knobY}px)`
+            console.log('✅ Knob position updated:', { left: `calc(50% - 20px + ${knobX}px)`, top: `calc(50% - 20px + ${knobY}px)` })
+          } else {
+            console.warn('⚠️ joystickKnobRef.current is null!')
+          }
           
           // COMPREHENSIVE MOVEMENT DEBUGGING
           if (gameRef.current && distance > 2) {
