@@ -3483,32 +3483,39 @@ const AgarIOGame = () => {
                 )}
               </div>
 
-              {/* Mobile Leaderboard Toggle - ENHANCED touch area for trophy icon */}
+              {/* Mobile Leaderboard Toggle - FIXED to prevent server errors */}
               <div 
                 className={`fixed top-4 left-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
                 style={{
-                  top: `calc(env(safe-area-inset-top, 0px) + 16px)`
-                }}
-                onClick={(e) => {
-                  console.log('🏆 Trophy button CLICKED - Touch detected at:', e.clientX, e.clientY)
-                  setLeaderboardCollapsed(!leaderboardCollapsed)
-                }}
-                onTouchEnd={(e) => {
-                  console.log('🏆 Trophy button TOUCHED - Mobile touch detected')
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setLeaderboardCollapsed(!leaderboardCollapsed)
-                }}
-                style={{
                   top: `calc(env(safe-area-inset-top, 0px) + 16px)`,
-                  padding: '10px', // Extra padding for easier touch
-                  minWidth: '60px', // Minimum touch target
-                  minHeight: '60px', // Minimum touch target
+                  padding: '10px',
+                  minWidth: '60px',
+                  minHeight: '60px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   touchAction: 'manipulation',
                   cursor: 'pointer'
+                }}
+                onClick={(e) => {
+                  try {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('🏆 Trophy button clicked - toggling leaderboard')
+                    setLeaderboardCollapsed(!leaderboardCollapsed)
+                  } catch (error) {
+                    console.error('❌ Trophy button error:', error)
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  try {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('🏆 Trophy button touched - toggling leaderboard')
+                    setLeaderboardCollapsed(!leaderboardCollapsed)
+                  } catch (error) {
+                    console.error('❌ Trophy touch error:', error)
+                  }
                 }}
               >
                 {!leaderboardCollapsed ? (
