@@ -108,9 +108,9 @@ user_problem_statement: "NEW REQUEST: Add the player's waged balance display on 
 
 test_plan:
   current_focus: 
-    - "Mobile Game Initialization Bug Fix"
-    - "Mobile Dynamic Zoom Intensity Reduction"
-    - "Mobile Popup Redesign Enhancement"
+    - "Player Waged Balance Display Implementation"
+    - "Minimap Size Increase (100% - 87.5px to 175px)"
+    - "Minimap Position Adjustment (Right-side)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
