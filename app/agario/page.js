@@ -671,6 +671,12 @@ const AgarIOGame = () => {
     setCurrentMission(mission)
     setMissionProgress(0)
     
+    // CRITICAL: Store mission in game object for game loop access
+    if (gameRef.current?.game) {
+      gameRef.current.game.currentMission = mission
+      console.log('🎯 Mission stored in game object for loop access')
+    }
+    
     // Auto-fail mission after duration if not completed
     setTimeout(() => {
       setCurrentMission(prev => {
