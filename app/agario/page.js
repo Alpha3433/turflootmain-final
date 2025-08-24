@@ -789,13 +789,15 @@ const AgarIOGame = () => {
       console.log('Step 6: Active state set. touchId:', touchIdRef.current)
       
       const handleJoystickMove = (moveEvent) => {
-        console.log('🎮 MOVE EVENT:', moveEvent.type)
+        console.log('🎮 MOVE EVENT:', moveEvent.type, 'PointerID:', moveEvent.pointerId, 'Expected:', touchIdRef.current)
         
         try {
           moveEvent.preventDefault()
-          if (moveEvent.pointerId !== touchIdRef.current) {
-            console.log('⚠️ Wrong pointer ID, ignoring')
-            return
+          
+          // FIXED: More flexible pointer ID checking for mobile compatibility
+          if (touchIdRef.current !== null && moveEvent.pointerId !== touchIdRef.current) {
+            console.log('⚠️ Pointer ID mismatch, but continuing anyway for mobile compatibility')
+            // Don't return - continue processing for mobile devices
           }
           
           const deltaX = moveEvent.clientX - centerX
