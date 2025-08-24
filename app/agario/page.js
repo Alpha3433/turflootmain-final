@@ -3313,36 +3313,60 @@ const AgarIOGame = () => {
             <OrientationGate onLandscapeReady={() => setShowOrientationGate(false)} />
           )}
 
-          {/* Mobile Joystick - REPOSITIONED and ENLARGED for better mobile touch */}
+          {/* Mobile Joystick - FIXED with movable knob and better visual feedback */}
           {!showOrientationGate && !isGameOver && (
             <div 
               ref={joystickRef}
-              className="mobile-joystick"
+              className="fixed z-50"
+              style={{ 
+                bottom: `calc(env(safe-area-inset-bottom, 0px) + 40px)`,
+                left: '40px',
+                width: '100px',
+                height: '100px',
+                touchAction: 'none',
+                userSelect: 'none',
+                WebkitUserSelect: 'none'
+              }}
               onPointerDown={handleJoystickStart}
               onTouchStart={handleJoystickStart}
-              style={{ 
-                touchAction: 'none',
-                bottom: `calc(env(safe-area-inset-bottom, 0px) + 40px)`, // Moved away from corner
-                left: '40px', // Moved away from edge
-                width: '100px', // Larger touch area
-                height: '100px', // Larger touch area
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-                zIndex: 1001 // Higher z-index
-              }}
             >
-              <div className="mobile-joystick-base" style={{ 
-                width: '100px', 
-                height: '100px',
-                background: 'rgba(0, 0, 0, 0.8)',
-                border: '3px solid rgba(100, 255, 100, 0.6)' // More visible border
-              }}>
-                <div ref={joystickKnobRef} className="mobile-joystick-knob" style={{
-                  width: '40px',
-                  height: '40px',
-                  background: 'rgba(0, 255, 255, 0.9)', // More visible knob
-                  border: '2px solid rgba(255, 255, 255, 0.8)'
-                }} />
+              {/* Joystick Base */}
+              <div 
+                className="absolute inset-0 rounded-full border-4 flex items-center justify-center"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.8)',
+                  borderColor: joystickActive ? 'rgba(0, 255, 255, 0.8)' : 'rgba(100, 255, 100, 0.6)',
+                  transition: 'border-color 0.2s ease'
+                }}
+              >
+                {/* Joystick Knob - MOVABLE */}
+                <div 
+                  ref={joystickKnobRef}
+                  className="absolute rounded-full border-2 border-white transition-all duration-100"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    background: joystickActive ? 'rgba(0, 255, 255, 0.9)' : 'rgba(100, 255, 255, 0.7)',
+                    left: `calc(50% - 20px + ${joystickPosition.x}px)`,
+                    top: `calc(50% - 20px + ${joystickPosition.y}px)`,
+                    boxShadow: joystickActive ? '0 0 10px rgba(0, 255, 255, 0.5)' : 'none',
+                    transform: 'none' // Remove transform to use left/top positioning
+                  }}
+                />
+                
+                {/* Center dot for reference */}
+                <div 
+                  className="absolute w-2 h-2 bg-white/30 rounded-full"
+                  style={{
+                    left: 'calc(50% - 4px)',
+                    top: 'calc(50% - 4px)'
+                  }}
+                />
+                
+                {/* Debug info (remove later) */}
+                <div className="absolute -bottom-8 left-0 text-xs text-white bg-black/50 px-1 rounded">
+                  {`${Math.round(joystickPosition.x)},${Math.round(joystickPosition.y)}`}
+                </div>
               </div>
             </div>
           )}
