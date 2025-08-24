@@ -3313,7 +3313,7 @@ const AgarIOGame = () => {
             <OrientationGate onLandscapeReady={() => setShowOrientationGate(false)} />
           )}
 
-          {/* Mobile Joystick - Enhanced with CSS classes and fallback touch events */}
+          {/* Mobile Joystick - REPOSITIONED and ENLARGED for better mobile touch */}
           {!showOrientationGate && !isGameOver && (
             <div 
               ref={joystickRef}
@@ -3322,14 +3322,27 @@ const AgarIOGame = () => {
               onTouchStart={handleJoystickStart}
               style={{ 
                 touchAction: 'none',
-                bottom: `calc(env(safe-area-inset-bottom, 0px) + 20px)`,
-                left: '20px',
+                bottom: `calc(env(safe-area-inset-bottom, 0px) + 40px)`, // Moved away from corner
+                left: '40px', // Moved away from edge
+                width: '100px', // Larger touch area
+                height: '100px', // Larger touch area
                 userSelect: 'none',
-                WebkitUserSelect: 'none'
+                WebkitUserSelect: 'none',
+                zIndex: 1001 // Higher z-index
               }}
             >
-              <div className="mobile-joystick-base">
-                <div ref={joystickKnobRef} className="mobile-joystick-knob" />
+              <div className="mobile-joystick-base" style={{ 
+                width: '100px', 
+                height: '100px',
+                background: 'rgba(0, 0, 0, 0.8)',
+                border: '3px solid rgba(100, 255, 100, 0.6)' // More visible border
+              }}>
+                <div ref={joystickKnobRef} className="mobile-joystick-knob" style={{
+                  width: '40px',
+                  height: '40px',
+                  background: 'rgba(0, 255, 255, 0.9)', // More visible knob
+                  border: '2px solid rgba(255, 255, 255, 0.8)'
+                }} />
               </div>
             </div>
           )}
