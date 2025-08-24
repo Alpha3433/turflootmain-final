@@ -3483,13 +3483,33 @@ const AgarIOGame = () => {
                 )}
               </div>
 
-              {/* Mobile Leaderboard Toggle - Trophy icon, collapsed by default */}
+              {/* Mobile Leaderboard Toggle - ENHANCED touch area for trophy icon */}
               <div 
                 className={`fixed top-4 left-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
                 style={{
                   top: `calc(env(safe-area-inset-top, 0px) + 16px)`
                 }}
-                onClick={() => setLeaderboardCollapsed(!leaderboardCollapsed)}
+                onClick={(e) => {
+                  console.log('🏆 Trophy button CLICKED - Touch detected at:', e.clientX, e.clientY)
+                  setLeaderboardCollapsed(!leaderboardCollapsed)
+                }}
+                onTouchEnd={(e) => {
+                  console.log('🏆 Trophy button TOUCHED - Mobile touch detected')
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setLeaderboardCollapsed(!leaderboardCollapsed)
+                }}
+                style={{
+                  top: `calc(env(safe-area-inset-top, 0px) + 16px)`,
+                  padding: '10px', // Extra padding for easier touch
+                  minWidth: '60px', // Minimum touch target
+                  minHeight: '60px', // Minimum touch target
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  touchAction: 'manipulation',
+                  cursor: 'pointer'
+                }}
               >
                 {!leaderboardCollapsed ? (
                   <div className="bg-black/80 backdrop-blur-sm rounded-xl p-3 border border-cyan-400/30 max-w-[200px]">
