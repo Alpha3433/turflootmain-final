@@ -108,9 +108,9 @@ user_problem_statement: "CRITICAL ISSUES: 1) Mission tracking has same initializ
 
 test_plan:
   current_focus: 
-    - "Minimap Size Decrease (25% - 175px to 131px)"
-    - "Remove Player Eliminated Text (Bottom Left)"
-    - "Fix Mission Tracking Issues"
+    - "Mission Tracking Race Condition Fix (First Game Load)"
+    - "Remove Mass Number from Elimination Popups"
+    - "Prevent Main Menu Button Cut-off Issue"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
