@@ -2836,9 +2836,9 @@ const AgarIOGame = () => {
     // Start game loop
     requestAnimationFrame(gameLoop)
 
-    // Store game reference for cleanup
+    // Store game reference for cleanup - FIXED: Store the actual game object reference
     gameRef.current = {
-      game,
+      game,           // This now points to the SAME object used in the game loop
       cleanup: () => {
         game.running = false
         canvas.removeEventListener('mousemove', handleMouseMove)
