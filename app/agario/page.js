@@ -301,10 +301,6 @@ const AgarIOGame = () => {
     
     console.log('🎯 Mission system ready to start - both mobile detection and game initialization complete')
     
-    // Clear any existing missions first to prevent conflicts
-    setCurrentMission(null)
-    setMissionProgress(0)
-    
     // Start first mission after 5 seconds (shorter delay since we know everything is ready)
     const firstMissionTimer = setTimeout(() => {
       if (gameRef.current?.game?.running && !currentMission) {
