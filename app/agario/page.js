@@ -1403,6 +1403,10 @@ const AgarIOGame = () => {
       virusHideThreshold: 25 // Mass threshold to hide inside virus
     }
 
+    // FIXED: Mobile-aware camera initialization
+    const initialCameraZoom = isMobile ? 1.1 : 1.2 // Start with mobile-appropriate zoom
+    console.log(`📷 Camera initialized with zoom: ${initialCameraZoom} (isMobile: ${isMobile})`)
+    
     // Game state
     const game = {
       player: {
@@ -1424,10 +1428,11 @@ const AgarIOGame = () => {
       bots: [],
       orbs: [],
       viruses: [], // Add virus array
-      camera: { x: 0, y: 0, zoom: 1.2 }, // Much more zoomed in
+      camera: { x: 0, y: 0, zoom: initialCameraZoom }, // FIXED: Mobile-aware initial zoom
       running: true,
       bounties: new Set(),
-      isMultiplayer: isMultiplayer // Add multiplayer flag to game state
+      isMultiplayer: isMultiplayer, // Add multiplayer flag to game state
+      isMobileGame: isMobile // FIXED: Store mobile state in game object for consistency
     }
 
     // Initialize orbs (mass pickup, not money) - only spawn within circular boundary
