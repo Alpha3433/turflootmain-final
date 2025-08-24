@@ -1372,6 +1372,30 @@ frontend:
         agent: "main"
         comment: "✅ IMPLEMENTED - Fixed mission tracking for all mission types (collect, eliminate, survive, mass) by adding comprehensive console logging and ensuring proper mission state clearing when completed. Added 'return null' for all mission completions and enhanced debugging visibility."
 
+  - task: "Mission Tracking Race Condition Fix (First Game Load)" 
+    implemented: true
+    working: true
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Fixed critical race condition where missions didn't track on first game load by implementing gameInitializationComplete state and dedicated useEffect that waits for both mobile detection and game initialization to complete. Added proper timing with console logs 'Mission system ready to start' and removed duplicate mission initialization from initializeGame function."
+
+  - task: "Remove Mass Number from Elimination Popups"
+    implemented: true
+    working: true
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "✅ IMPLEMENTED - Removed mass number display from elimination and tab switching popups to prevent main menu button cut-off. Cleaned up secondary stats row that was causing text overflow and UI layout issues."
+
 metadata:
   last_update: "mobile_orientation_gate_feature_completed"
   mobile_feature_status: "implemented_pending_frontend_testing"
