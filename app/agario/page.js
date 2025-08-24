@@ -1958,7 +1958,10 @@ const AgarIOGame = () => {
         // Dynamic zoom based on player size - Mobile Only
         let targetZoom
         
-        if (isMobile) {
+        // FIXED: Dynamic zoom based on player size - Use game's mobile state for consistency
+        let targetZoom
+        
+        if (game.isMobileGame) {
           // Mobile: LESS INTENSIVE Dynamic zoom that scales with player size for better overview
           const baseMass = 10 // Starting mass
           const currentMass = game.player.mass
@@ -1972,7 +1975,7 @@ const AgarIOGame = () => {
           const zoomReduction = Math.min(massRatio * 0.05, 0.4) // Reduced from 0.1 to 0.05, max reduced from 0.7 to 0.4
           targetZoom = Math.max(baseZoom - zoomReduction, 0.7) // Min increased from 0.4 to 0.7 - much less aggressive
           
-          console.log(`📱 Mobile Dynamic Zoom (Less Intensive): Mass ${currentMass.toFixed(0)} → Zoom ${targetZoom.toFixed(2)}`)
+          console.log(`📱 Mobile Dynamic Zoom (Game State): Mass ${currentMass.toFixed(0)} → Zoom ${targetZoom.toFixed(2)}`)
         } else {
           // Desktop: Keep original fixed zoom
           targetZoom = 1.2 // Much more zoomed in fixed level
