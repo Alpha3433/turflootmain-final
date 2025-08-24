@@ -51,6 +51,7 @@ const AgarIOGame = () => {
   const [isLandscape, setIsLandscape] = useState(true)
   const [showOrientationGate, setShowOrientationGate] = useState(false)
   const [mobileDetectionComplete, setMobileDetectionComplete] = useState(false) // NEW: Track when detection is done
+  const [gameInitializationComplete, setGameInitializationComplete] = useState(false) // NEW: Track when game is fully initialized
   
   // Mobile HUD state
   const [mobileUIFaded, setMobileUIFaded] = useState(false)
