@@ -839,131 +839,35 @@ const AgarIOGame = () => {
             
             console.log('🎮 SENDING TO GAME:', { normalizedX: normalizedX.toFixed(2), normalizedY: normalizedY.toFixed(2) })
             
-            // INTENSIVE GAME MOVEMENT DEBUGGING
+            // FIXED GAME MOVEMENT - Using correct player path
             console.log('🔍 === GAME MOVEMENT DEBUG ===')
             console.log('gameRef.current exists:', !!gameRef.current)
             
-            if (gameRef.current) {
-              console.log('🎮 GAME OBJECT ANALYSIS:')
-              console.log('  - Type:', typeof gameRef.current)
-              console.log('  - Constructor:', gameRef.current.constructor?.name)
-              console.log('  - Keys (first 20):', Object.keys(gameRef.current).slice(0, 20))
+            if (gameRef.current && gameRef.current.game?.player) {
+              const player = gameRef.current.game.player
+              console.log('✅ PLAYER FOUND at gameRef.current.game.player')
+              console.log('  - Current x:', player.x)
+              console.log('  - Current y:', player.y)
+              console.log('  - Current dir:', player.dir)
+              console.log('  - Player alive:', player.alive)
               
-              console.log('👤 PLAYER ANALYSIS:')
-              console.log('  - Player exists:', !!gameRef.current.player)
-              
-              if (gameRef.current.player) {
-                console.log('  - Player type:', typeof gameRef.current.player)
-                console.log('  - Player keys:', Object.keys(gameRef.current.player))
-                console.log('  - Current x:', gameRef.current.player.x)
-                console.log('  - Current y:', gameRef.current.player.y)
-                console.log('  - Current vx:', gameRef.current.player.vx)  
-                console.log('  - Current vy:', gameRef.current.player.vy)
-                console.log('  - Current dir:', gameRef.current.player.dir)
-                
-                // Test all possible movement methods with intensive logging
-                console.log('🚀 TESTING MOVEMENT METHODS:')
-                
-                // Method 1: Direct position update (MOST VISIBLE)
-                try {
-                  const oldX = gameRef.current.player.x
-                  const oldY = gameRef.current.player.y
-                  
-                  if (typeof oldX === 'number' && typeof oldY === 'number') {
-                    gameRef.current.player.x += normalizedX * 10  // LARGE movement for testing
-                    gameRef.current.player.y += normalizedY * 10
-                    console.log('✅ METHOD 1 - DIRECT POSITION:', `(${oldX}, ${oldY}) → (${gameRef.current.player.x}, ${gameRef.current.player.y})`)
-                    console.log('   Position change:', { deltaX: gameRef.current.player.x - oldX, deltaY: gameRef.current.player.y - oldY })
-                  } else {
-                    console.log('❌ METHOD 1 FAILED: x/y not numbers:', { x: oldX, y: oldY, xType: typeof oldX, yType: typeof oldY })
-                  }
-                } catch (error) {
-                  console.error('❌ METHOD 1 ERROR:', error)
-                }
-                
-                // Method 2: Set direction
-                try {
-                  const oldDir = gameRef.current.player.dir
-                  gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
-                  console.log('✅ METHOD 2 - DIRECTION SET:', `${JSON.stringify(oldDir)} → ${JSON.stringify(gameRef.current.player.dir)}`)
-                } catch (error) {
-                  console.error('❌ METHOD 2 ERROR:', error)
-                }
-                
-                // Method 3: Set velocity
-                try {
-                  if (gameRef.current.player.vx !== undefined && gameRef.current.player.vy !== undefined) {
-                    const oldVx = gameRef.current.player.vx
-                    const oldVy = gameRef.current.player.vy
-                    gameRef.current.player.vx = normalizedX * 8  // LARGE velocity for testing
-                    gameRef.current.player.vy = normalizedY * 8
-                    console.log('✅ METHOD 3 - VELOCITY SET:', `(${oldVx}, ${oldVy}) → (${gameRef.current.player.vx}, ${gameRef.current.player.vy})`)
-                  } else {
-                    console.log('❌ METHOD 3 FAILED: No vx/vy properties')
-                  }
-                } catch (error) {
-                  console.error('❌ METHOD 3 ERROR:', error)
-                }
-                
-                // Method 4: Try to trigger game update
-                console.log('🔄 CHECKING GAME UPDATE METHODS:')
-                
-                if (gameRef.current.update) {
-                  try {
-                    gameRef.current.update()
-                    console.log('✅ METHOD 4 - GAME UPDATE CALLED')
-                  } catch (error) {
-                    console.error('❌ METHOD 4 ERROR:', error)
-                  }
-                } else {
-                  console.log('❌ METHOD 4: No update() method')
-                }
-                
-                if (gameRef.current.render) {
-                  try {
-                    gameRef.current.render()
-                    console.log('✅ METHOD 5 - GAME RENDER CALLED')
-                  } catch (error) {
-                    console.error('❌ METHOD 5 ERROR:', error)
-                  }
-                } else {
-                  console.log('❌ METHOD 5: No render() method')
-                }
-                
-                // Method 6: Check if there's a game loop
-                console.log('🔄 GAME LOOP STATUS:')
-                console.log('  - gameLoop exists:', !!gameRef.current.gameLoop)
-                console.log('  - isRunning:', gameRef.current.isRunning)
-                console.log('  - paused:', gameRef.current.paused)
-                
-                // Method 7: Log final player state
-                console.log('📊 FINAL PLAYER STATE:')
-                console.log('  - Final x:', gameRef.current.player.x)
-                console.log('  - Final y:', gameRef.current.player.y)
-                console.log('  - Final vx:', gameRef.current.player.vx)
-                console.log('  - Final vy:', gameRef.current.player.vy)
-                console.log('  - Final dir:', gameRef.current.player.dir)
-                
+              // FIXED: Update player direction (primary movement method)
+              if (player.alive) {
+                player.dir = { x: normalizedX, y: normalizedY }
+                console.log('✅ JOYSTICK MOVEMENT APPLIED:', { x: normalizedX.toFixed(2), y: normalizedY.toFixed(2) })
+                console.log('  - New direction:', player.dir)
               } else {
-                console.error('❌ CRITICAL: No player object found!')
-                console.log('Available game properties:', Object.keys(gameRef.current))
-                
-                // Try to find player in different locations
-                if (gameRef.current.game?.player) {
-                  console.log('🔍 Found player in gameRef.current.game.player')
-                }
-                
-                if (gameRef.current.entities) {
-                  console.log('🔍 Found entities array:', gameRef.current.entities.length)
-                  const playerEntity = gameRef.current.entities.find(e => e.isPlayer || e.type === 'player')
-                  if (playerEntity) {
-                    console.log('🔍 Found player in entities:', playerEntity)
-                  }
-                }
+                console.log('❌ Player is dead, cannot move')
               }
               
             } else {
-              console.error('💥 CRITICAL: gameRef.current is null/undefined!')
+              console.error('❌ CRITICAL: Player not found at gameRef.current.game.player!')
+              if (gameRef.current) {
+                console.log('Available game properties:', Object.keys(gameRef.current))
+                if (gameRef.current.game) {
+                  console.log('Available game.* properties:', Object.keys(gameRef.current.game))
+                }
+              }
             }
           }
           
