@@ -3357,10 +3357,10 @@ const AgarIOGame = () => {
           {!showOrientationGate && !isGameOver && (
             <>
 
-              {/* Ultra-Micro Minimap - 87.5% smaller total (50% more reduction) */}
+              {/* Tiny Minimap - 90% smaller total, minimal footprint */}
               <div 
                 className={`fixed top-4 right-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'} ${
-                  minimapCollapsed ? 'w-2 h-2' : 'w-5 h-5'
+                  minimapCollapsed ? 'w-1.5 h-1.5' : 'w-3 h-3'
                 }`}
                 style={{
                   top: `calc(env(safe-area-inset-top, 0px) + 16px)`
@@ -3372,8 +3372,8 @@ const AgarIOGame = () => {
                 }`}>
                   {!minimapCollapsed ? (
                     <canvas 
-                      width="16" 
-                      height="16"
+                      width="12" 
+                      height="12"
                       style={{ borderRadius: '50%' }}
                       ref={minimapCanvasRef}
                       className="w-full h-full"
