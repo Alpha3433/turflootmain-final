@@ -189,6 +189,7 @@ const AgarIOGame = () => {
     }
   }, [isMobile])
 
+  // FIXED: Game initialization with proper mobile detection timing
   useEffect(() => {
     // Handle page visibility (exit game when tab is not visible)
     const handleVisibilityChange = () => {
@@ -211,48 +212,8 @@ const AgarIOGame = () => {
     // Reset auto cash out flag for fresh game
     setAutoCashOutTriggered(false)
     
-    // Check if user is authenticated and determine game mode
-    if (user && getAccessToken) {
-      // Check URL parameters to see if this is a cash game
-      const urlParams = new URLSearchParams(window.location.search)
-      const paramFee = parseFloat(urlParams.get('fee')) || 0
-      const paramMode = urlParams.get('mode') || 'free'
-      
-      // Only use multiplayer for cash games, free games use bots for testing
-      if (paramMode === 'cash' && paramFee > 0) {
-        console.log('💰 Cash game detected - initializing multiplayer')
-        // Try multiplayer first, but fallback to offline if authentication fails
-        initializeMultiplayer().catch((error) => {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
-          }
-          // Initialize offline demo game with bots as fallback
-          initializeGame(false) // false = offline mode with bots
-        })
-      } else {
-        console.log('🆓 Free game detected - using bots for testing')
-        // Free games always use bots for immediate testing
-        initializeGame(false) // false = offline mode with bots
-      }
-    } else {
-      // Initialize offline demo game with bots
-      console.log('🤖 Starting offline demo mode - user not authenticated')
-      initializeGame(false) // false = offline mode with bots
-    }
-    
-    // Hide controls after 5 seconds
-    const controlsTimer = setTimeout(() => {
-      setShowControls(false)
-    }, 5000)
-    
-    // Start ping monitoring
-    measurePing() // Initial measurement
-    const pingInterval = setInterval(measurePing, 2000) // Measure every 2 seconds
-    
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
-      clearTimeout(controlsTimer)
-      clearInterval(pingInterval)
       if (gameRef.current) {
         gameRef.current.cleanup()
       }
@@ -261,7 +222,63 @@ const AgarIOGame = () => {
         socketRef.current.disconnect()
       }
     }
-  }, [user, getAccessToken]) // Add dependencies
+  }, [])
+
+  // FIXED: Separate effect for game initialization that waits for mobile detection
+  useEffect(() => {
+    console.log('🎮 Game initialization triggered - Mobile detection complete:', { isMobile, isTouchDevice })
+    
+    // Only initialize game after mobile detection is complete
+    // Wait a short delay to ensure all mobile state is properly set
+    const initTimer = setTimeout(() => {
+      // Check if user is authenticated and determine game mode
+      if (user && getAccessToken) {
+        // Check URL parameters to see if this is a cash game
+        const urlParams = new URLSearchParams(window.location.search)
+        const paramFee = parseFloat(urlParams.get('fee')) || 0
+        const paramMode = urlParams.get('mode') || 'free'
+        
+        // Only use multiplayer for cash games, free games use bots for testing
+        if (paramMode === 'cash' && paramFee > 0) {
+          console.log('💰 Cash game detected - initializing multiplayer')
+          // Try multiplayer first, but fallback to offline if authentication fails
+          initializeMultiplayer().catch((error) => {
+            if (process.env.NODE_ENV === 'development') {
+              console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
+            }
+            // Initialize offline demo game with bots as fallback
+            initializeGame(false) // false = offline mode with bots
+          })
+        } else {
+          console.log('🆓 Free game detected - using bots for testing')
+          // Free games always use bots for immediate testing
+          initializeGame(false) // false = offline mode with bots
+        }
+      } else {
+        // Initialize offline demo game with bots
+        console.log('🤖 Starting offline demo mode - user not authenticated')
+        initializeGame(false) // false = offline mode with bots
+      }
+      
+      // Hide controls after 5 seconds
+      const controlsTimer = setTimeout(() => {
+        setShowControls(false)
+      }, 5000)
+      
+      // Start ping monitoring
+      measurePing() // Initial measurement
+      const pingInterval = setInterval(measurePing, 2000) // Measure every 2 seconds
+      
+      return () => {
+        clearTimeout(controlsTimer)
+        clearInterval(pingInterval)
+      }
+    }, 100) // Small delay to ensure mobile detection is complete
+    
+    return () => {
+      clearTimeout(initTimer)
+    }
+  }, [isMobile, isTouchDevice, user, getAccessToken]) // Add mobile detection dependencies
 
   const handlePlayAgain = () => {
     // Charge the same entry fee as when they joined the lobby
