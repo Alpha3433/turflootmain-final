@@ -3719,8 +3719,46 @@ const AgarIOGame = () => {
             </>
           )}
 
-          {/* Small Mission Toast - Top of screen, auto-hide after 3s */}
-          {missionToastVisible && missionToast && (
+          {/* Mobile-Optimized Mission Display - Top Center */}
+          {!showOrientationGate && !isGameOver && currentMission && isMobile && (
+            <div 
+              className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-30 transition-all duration-300 ${mobileUIFaded ? 'opacity-70' : 'opacity-100'}`}
+              style={{
+                top: `calc(env(safe-area-inset-top, 0px) + 16px)`
+              }}
+            >
+              <div className="bg-black/90 backdrop-blur-sm rounded-xl px-4 py-2 border border-purple-400/40 shadow-lg max-w-sm">
+                <div className="text-center">
+                  {/* Mission Title */}
+                  <div className="text-purple-400 text-xs font-bold flex items-center justify-center space-x-2 mb-1">
+                    <span>🎯</span>
+                    <span>MISSION</span>
+                  </div>
+                  
+                  {/* Mission Description - Compact */}
+                  <div className="text-white text-xs mb-2 leading-tight">
+                    {currentMission.description}
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-700 rounded-full h-1.5 mb-1">
+                    <div 
+                      className="bg-purple-400 h-1.5 rounded-full transition-all duration-500"
+                      style={{ width: `${(currentMission.progress / currentMission.target) * 100}%` }}
+                    ></div>
+                  </div>
+                  
+                  {/* Progress Text */}
+                  <div className="text-gray-300 text-xs">
+                    {currentMission.progress}/{currentMission.target}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Mission Toast - Keep original for desktop */}
+          {missionToastVisible && missionToast && !isMobile && (
             <div 
               className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-black/90 backdrop-blur-sm rounded-full px-4 py-2 border border-purple-400/30 shadow-lg max-w-xs"
               style={{
@@ -3730,6 +3768,20 @@ const AgarIOGame = () => {
               <div className="text-white text-xs font-medium flex items-center space-x-2">
                 <span className="text-purple-400">🎯</span>
                 <span className="truncate text-xs">{missionToast}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Mission Toast - Minimal notification style */}
+          {missionToastVisible && missionToast && isMobile && (
+            <div 
+              className="fixed top-16 left-1/2 transform -translate-x-1/2 z-40 bg-purple-900/90 backdrop-blur-sm rounded-full px-3 py-1 border border-purple-400/50 shadow-lg animate-pulse"
+              style={{
+                top: `calc(env(safe-area-inset-top, 0px) + 64px)`
+              }}
+            >
+              <div className="text-purple-200 text-xs font-medium">
+                🎯 {missionToast}
               </div>
             </div>
           )}
