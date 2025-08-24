@@ -3342,14 +3342,14 @@ const AgarIOGame = () => {
           {/* Compact Mission Toast - Small top notification, auto-fade after 3s */}
           {missionToastVisible && missionToast && (
             <div 
-              className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-black/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-purple-400/30 shadow-lg"
+              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-black/90 backdrop-blur-sm rounded-lg px-3 py-1.5 border border-purple-400/30 shadow-lg max-w-xs"
               style={{
-                top: `calc(env(safe-area-inset-top, 0px) + 24px)`
+                top: `calc(env(safe-area-inset-top, 0px) + 16px)`
               }}
             >
               <div className="text-white text-xs font-medium flex items-center space-x-2">
                 <span className="text-purple-400">🎯</span>
-                <span>{missionToast}</span>
+                <span className="truncate">{missionToast}</span>
               </div>
             </div>
           )}
