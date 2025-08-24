@@ -822,61 +822,122 @@ const AgarIOGame = () => {
             const normalizedY = deltaY / 25
             
             console.log('🎯 SENDING MOVEMENT TO GAME:', { normalizedX, normalizedY })
-            console.log('🔍 GAME OBJECT DEBUG:', {
-              gameRef: !!gameRef.current,
-              gameKeys: gameRef.current ? Object.keys(gameRef.current).slice(0, 10) : [],
-              player: gameRef.current?.player,
-              hasCanvas: !!gameRef.current?.canvas,
-              hasCtx: !!gameRef.current?.ctx
-            })
+            console.log('🔍 INTENSIVE GAME OBJECT DEBUG:')
+            console.log('  gameRef exists:', !!gameRef.current)
+            console.log('  gameRef type:', typeof gameRef.current)
+            console.log('  gameRef keys (first 20):', gameRef.current ? Object.keys(gameRef.current).slice(0, 20) : [])
+            
+            if (gameRef.current) {
+              console.log('  🎮 Game Properties:')
+              console.log('    - player:', gameRef.current.player)
+              console.log('    - canvas:', !!gameRef.current.canvas)
+              console.log('    - ctx:', !!gameRef.current.ctx)
+              console.log('    - entities:', gameRef.current.entities ? gameRef.current.entities.length : 'undefined')
+              console.log('    - game:', gameRef.current.game)
+              console.log('    - isRunning:', gameRef.current.isRunning)
+              console.log('    - gameLoop:', !!gameRef.current.gameLoop)
+              
+              if (gameRef.current.player) {
+                console.log('  👤 Player Properties:')
+                console.log('    - player keys:', Object.keys(gameRef.current.player))
+                console.log('    - player.x:', gameRef.current.player.x)
+                console.log('    - player.y:', gameRef.current.player.y)
+                console.log('    - player.vx:', gameRef.current.player.vx)
+                console.log('    - player.vy:', gameRef.current.player.vy)
+                console.log('    - player.dir:', gameRef.current.player.dir)
+              }
+            }
             
             let movementSuccess = false
+            let successfulMethods = []
             
             // Method 1: Direct player movement
             if (gameRef.current.player) {
-              gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
-              console.log('✅ METHOD 1 SUCCESS: player.dir =', gameRef.current.player.dir)
-              movementSuccess = true
+              try {
+                const oldDir = gameRef.current.player.dir
+                gameRef.current.player.dir = { x: normalizedX, y: normalizedY }
+                console.log('✅ METHOD 1 SUCCESS: player.dir updated from', oldDir, 'to', gameRef.current.player.dir)
+                movementSuccess = true
+                successfulMethods.push('player.dir')
+              } catch (error) {
+                console.error('❌ METHOD 1 FAILED:', error)
+              }
             }
             
             // Method 2: Set player velocity directly
             if (gameRef.current.player && gameRef.current.player.vx !== undefined) {
-              gameRef.current.player.vx = normalizedX * 3
-              gameRef.current.player.vy = normalizedY * 3
-              console.log('✅ METHOD 2 SUCCESS: player velocity =', { vx: gameRef.current.player.vx, vy: gameRef.current.player.vy })
-              movementSuccess = true
-            }
-            
-            // Method 3: Update player position directly
-            if (gameRef.current.player && gameRef.current.player.x !== undefined) {
-              gameRef.current.player.x += normalizedX * 2
-              gameRef.current.player.y += normalizedY * 2
-              console.log('✅ METHOD 3 SUCCESS: player position updated')
-              movementSuccess = true
-            }
-            
-            // Method 4: Send input to game engine
-            if (gameRef.current.handleMovement) {
-              gameRef.current.handleMovement(normalizedX, normalizedY)
-              console.log('✅ METHOD 4 SUCCESS: handleMovement called')
-              movementSuccess = true
-            }
-            
-            // Method 5: Keyboard simulation
-            if (gameRef.current.keys !== undefined) {
-              gameRef.current.keys = {
-                w: normalizedY < -0.1,
-                s: normalizedY > 0.1,
-                a: normalizedX < -0.1,
-                d: normalizedX > 0.1
+              try {
+                gameRef.current.player.vx = normalizedX * 3
+                gameRef.current.player.vy = normalizedY * 3
+                console.log('✅ METHOD 2 SUCCESS: player velocity set to', { vx: gameRef.current.player.vx, vy: gameRef.current.player.vy })
+                movementSuccess = true
+                successfulMethods.push('player velocity')
+              } catch (error) {
+                console.error('❌ METHOD 2 FAILED:', error)
               }
-              console.log('✅ METHOD 5 SUCCESS: keys simulated =', gameRef.current.keys)
-              movementSuccess = true
             }
+            
+            // Method 3: Update player position directly (for immediate movement test)
+            if (gameRef.current.player && gameRef.current.player.x !== undefined) {
+              try {
+                const oldPos = { x: gameRef.current.player.x, y: gameRef.current.player.y }
+                gameRef.current.player.x += normalizedX * 5  // Larger movement for testing
+                gameRef.current.player.y += normalizedY * 5
+                console.log('✅ METHOD 3 SUCCESS: player position moved from', oldPos, 'to', { x: gameRef.current.player.x, y: gameRef.current.player.y })
+                movementSuccess = true
+                successfulMethods.push('direct position')
+              } catch (error) {
+                console.error('❌ METHOD 3 FAILED:', error)
+              }
+            }
+            
+            // Method 4: Try keyboard simulation for game engine
+            if (gameRef.current.keys !== undefined) {
+              try {
+                gameRef.current.keys = {
+                  w: normalizedY < -0.1,
+                  s: normalizedY > 0.1,
+                  a: normalizedX < -0.1,
+                  d: normalizedX > 0.1,
+                  ArrowUp: normalizedY < -0.1,
+                  ArrowDown: normalizedY > 0.1,
+                  ArrowLeft: normalizedX < -0.1,
+                  ArrowRight: normalizedX > 0.1
+                }
+                console.log('✅ METHOD 4 SUCCESS: keyboard keys simulated:', gameRef.current.keys)
+                movementSuccess = true
+                successfulMethods.push('keyboard simulation')
+              } catch (error) {
+                console.error('❌ METHOD 4 FAILED:', error)
+              }
+            }
+            
+            // Method 5: Try to trigger game update/render
+            if (gameRef.current.update) {
+              try {
+                gameRef.current.update()
+                console.log('✅ METHOD 5 SUCCESS: game.update() called')
+                successfulMethods.push('game.update()')
+              } catch (error) {
+                console.error('❌ METHOD 5 FAILED:', error)
+              }
+            }
+            
+            console.log('📊 MOVEMENT SUMMARY:')
+            console.log('  Methods attempted: 5')
+            console.log('  Successful methods:', successfulMethods)
+            console.log('  Overall success:', movementSuccess)
             
             if (!movementSuccess) {
-              console.error('❌ ALL MOVEMENT METHODS FAILED!')
-              console.error('Complete game object:', gameRef.current)
+              console.error('💥 CRITICAL: ALL MOVEMENT METHODS FAILED!')
+              console.error('This suggests the game object structure is different than expected.')
+              console.error('Full gameRef dump:', gameRef.current)
+            } else {
+              console.log('🎯 MOVEMENT COMMANDS SENT SUCCESSFULLY!')
+              console.log('If player still not moving, the issue might be:')
+              console.log('1. Game update loop not running')
+              console.log('2. Canvas rendering not updating') 
+              console.log('3. Movement commands not being processed by game engine')
             }
             
           } else {
