@@ -2726,8 +2726,9 @@ const AgarIOGame = () => {
       const mobileMinimapSize = baseminimapSize * 0.5 // First reduction: 50% smaller (100px)
       const finalMobileSize = mobileMinimapSize * 0.25 // Additional 75% reduction (25px final)
       const previousMobileSize = finalMobileSize * 3.5 // Previous: Increase mobile minimap by 250% total (25px -> 87.5px)
-      const increasedMobileSize = previousMobileSize * 2 // NEW: Increase mobile minimap by another 100% (87.5px -> 175px)
-      const minimapSize = game.isMobileGame ? increasedMobileSize : baseminimapSize // Much larger mobile minimap
+      const increasedMobileSize = previousMobileSize * 2 // Increase mobile minimap by another 100% (87.5px -> 175px)
+      const adjustedMobileSize = increasedMobileSize * 0.75 // NEW: Decrease by 25% (175px -> 131.25px)
+      const minimapSize = game.isMobileGame ? adjustedMobileSize : baseminimapSize // Smaller mobile minimap
       
       console.log(`🗺️ Minimap size: ${minimapSize}px (isMobileGame: ${game.isMobileGame})`)
       
