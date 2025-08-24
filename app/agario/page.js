@@ -3140,8 +3140,8 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Kill Feed */}
-      {killFeed.length > 0 && !isGameOver && settings.showKillFeed && (
+      {/* Kill Feed - REMOVED per user request */}
+      {/* {killFeed.length > 0 && !isGameOver && settings.showKillFeed && (
         <div className="absolute bottom-16 left-4 space-y-2 max-w-[400px]">
           {killFeed.map((item, index) => (
             <div 
@@ -3153,7 +3153,7 @@ const AgarIOGame = () => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
 
       {/* Live Event Feed - Desktop Version (unchanged) */}
       {!isGameOver && liveEventFeed.length > 0 && !isMobile && (
