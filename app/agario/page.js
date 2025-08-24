@@ -1926,9 +1926,29 @@ const AgarIOGame = () => {
         game.camera.x = game.player.x
         game.camera.y = game.player.y
         
-        // Keep camera zoom constant - much more zoomed in
-        // This way players can see their character actually growing bigger
-        const targetZoom = 1.2 // Much more zoomed in fixed level
+        // Dynamic zoom based on player size - Mobile Only
+        let targetZoom
+        
+        if (isMobile) {
+          // Mobile: Dynamic zoom that scales with player size for better overview
+          const baseMass = 10 // Starting mass
+          const currentMass = game.player.mass
+          const massRatio = currentMass / baseMass
+          
+          // Dynamic zoom calculation:
+          // - Small players (10-50 mass): 1.2 zoom (close)
+          // - Medium players (50-200 mass): 0.8-1.0 zoom (medium)  
+          // - Large players (200+ mass): 0.5-0.6 zoom (far out)
+          const baseZoom = 1.2
+          const zoomReduction = Math.min(massRatio * 0.1, 0.7) // Max 0.7 reduction
+          targetZoom = Math.max(baseZoom - zoomReduction, 0.4) // Min 0.4 zoom
+          
+          console.log(`📱 Mobile Dynamic Zoom: Mass ${currentMass.toFixed(0)} → Zoom ${targetZoom.toFixed(2)}`)
+        } else {
+          // Desktop: Keep original fixed zoom
+          targetZoom = 1.2 // Much more zoomed in fixed level
+        }
+        
         game.camera.zoom += (targetZoom - game.camera.zoom) * deltaTime * 2
       }
 
