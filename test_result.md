@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "NEW REQUEST: Add the player's waged balance display on top of their character head (similar to other players). Increase minimap size by another 100% (from current 87.5px to 175px). Move minimap slightly to the right-hand side. Previous mobile initialization bug was successfully fixed."
+user_problem_statement: "UPDATED REQUEST: 1) Decrease minimap size by another 25% (from current 175px to ~131px). 2) Remove the player eliminated text that shows up on bottom left-hand side. 3) Fix missions from not tracking properly. Previous changes (player balance display, minimap size increase, position adjustment) were successfully implemented."
 
 # Test plan for this run
 
