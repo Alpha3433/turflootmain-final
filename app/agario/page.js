@@ -2667,12 +2667,14 @@ const AgarIOGame = () => {
 
     // Enhanced Minimap with improved contrast and entity differentiation
     const drawMinimap = () => {
-      // MOBILE-SPECIFIC: Make minimap 50% smaller on mobile devices
+      // MOBILE-SPECIFIC: Make minimap much smaller on mobile devices
       const baseminimapSize = 200 // Desktop size
-      const minimapSize = isMobile ? baseminimapSize * 0.5 : baseminimapSize // 50% smaller on mobile
+      const mobileMinimapSize = baseminimapSize * 0.5 // First reduction: 50% smaller (100px)
+      const finalMobileSize = mobileMinimapSize * 0.25 // Additional 75% reduction (25px final)
+      const minimapSize = isMobile ? finalMobileSize : baseminimapSize // Ultra-compact on mobile
       const minimapX = canvas.width - minimapSize - 20
       const minimapY = 20
-      const minimapRadius = minimapSize / 2 - 10
+      const minimapRadius = minimapSize / 2 - 5 // Adjust radius for tiny size
       const centerX = minimapX + minimapSize / 2
       const centerY = minimapY + minimapSize / 2
       
