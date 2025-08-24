@@ -3500,7 +3500,8 @@ const AgarIOGame = () => {
                       className="w-full h-full"
                     />
                   ) : (
-                    <div className="text-cyan-400 font-bold text-xs">📍</div>
+                    // Pin emoji removed for mobile - just show empty circle
+                    <div className="w-2 h-2 bg-cyan-400/60 rounded-full"></div>
                   )}
                 </div>
               </div>
