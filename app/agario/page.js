@@ -3507,12 +3507,12 @@ const AgarIOGame = () => {
                 )}
               </div>
 
-              {/* Mobile Leaderboard Toggle - MOVED RIGHT to avoid iOS notch */}
+              {/* Mobile Leaderboard Toggle - MOVED to align with joystick on left side */}
               <div 
-                className={`fixed top-4 z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
+                className={`fixed z-40 transition-all duration-300 ${mobileUIFaded ? 'opacity-30' : 'opacity-100'}`}
                 style={{
-                  top: `calc(env(safe-area-inset-top, 0px) + 16px)`,
-                  right: `calc(env(safe-area-inset-right, 0px) + 16px)`, // MOVED to right side away from notch
+                  bottom: `calc(env(safe-area-inset-bottom, 0px) + 40px)`, // Same as joystick
+                  left: '190px', // Positioned to the right of joystick (70px + 100px + 20px margin)
                   padding: '10px',
                   minWidth: '60px',
                   minHeight: '60px',
