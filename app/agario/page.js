@@ -1055,11 +1055,11 @@ const AgarIOGame = () => {
       fadeTimeout = setTimeout(() => setMobileUIFaded(true), 3000)
     }
     
-    // Hide instructions after 7 seconds on mobile and show icon
+    // Hide instructions after 5 seconds on mobile and show icon (reduced from 7s)
     instructionsTimeout = setTimeout(() => {
       setInstructionsVisible(false)
       setShowInstructionsIcon(true)
-    }, 7000)
+    }, 5000)
     
     // Show mission toast when new mission appears
     if (currentMission && !missionToastVisible) {
