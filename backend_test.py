@@ -31,7 +31,7 @@ import sys
 from datetime import datetime
 
 # Test Configuration
-BASE_URL = "https://agario-evolved.preview.emergentagent.com"  # Using external URL as specified in .env
+BASE_URL = "http://localhost:3000"  # Using localhost as external URL has 502 issues
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootBackendRegressionTester:
