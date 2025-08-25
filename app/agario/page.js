@@ -86,8 +86,7 @@ const AgarIOGame = () => {
   
   // Player customization state
   const [playerCustomization, setPlayerCustomization] = useState({
-    skin: 'default_blue',
-    face: 'normal_eyes'
+    skin: 'default_blue'
   })
   
   // Game session tracking for statistics
