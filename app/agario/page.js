@@ -3307,6 +3307,12 @@ const AgarIOGame = () => {
       const minimapPlayerX = centerX + (game.player.x * scale)
       const minimapPlayerY = centerY + (game.player.y * scale)
       
+      // Validate coordinates before creating gradient
+      if (!isFinite(minimapPlayerX) || !isFinite(minimapPlayerY)) {
+        console.warn('Invalid minimap player coordinates:', { minimapPlayerX, minimapPlayerY, playerX: game.player.x, playerY: game.player.y, scale })
+        return // Skip rendering if coordinates are invalid
+      }
+      
       // Player glow effect
       const gradient = ctx.createRadialGradient(
         minimapPlayerX, minimapPlayerY, 0,
