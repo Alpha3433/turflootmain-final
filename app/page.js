@@ -46,8 +46,7 @@ export default function Home() {
   const [forceMobileMode, setForceMobileMode] = useState(false)
   const [leaderboardData, setLeaderboardData] = useState([])
   const [playerCustomization, setPlayerCustomization] = useState({
-    skin: 'default_blue',
-    face: 'normal_eyes'
+    skin: 'default_blue'
   })
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
   const [socialInitialTab, setSocialInitialTab] = useState('leaderboard')
