@@ -48,12 +48,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       { id: 'ice_blue', name: 'Ice Blue', rarity: 'rare', price: 180, owned: false, equipped: false, preview: '/previews/skin_ice.png', description: 'Frozen beauty with crystalline perfection.' },
       { id: 'shadow_black', name: 'Shadow Black', rarity: 'legendary', price: 600, owned: false, equipped: false, preview: '/previews/skin_shadow.png', description: 'Emerges from the void with dark energy.' }
     ],
-    trails: [
-      { id: 'default_sparkle', name: 'Default Sparkle', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/trail_sparkle.png', description: 'Basic particle trail for all players.' },
-      { id: 'rainbow_trail', name: 'Rainbow Trail', rarity: 'epic', price: 200, owned: false, equipped: false, preview: '/previews/trail_rainbow.png', description: 'Leave a rainbow in your wake.' },
-      { id: 'fire_trail', name: 'Fire Trail', rarity: 'rare', price: 120, owned: false, equipped: false, preview: '/previews/trail_fire.png', description: 'Blazing trail of destruction.' },
-      { id: 'lightning_trail', name: 'Lightning Trail', rarity: 'epic', price: 180, owned: false, equipped: false, preview: '/previews/trail_lightning.png', description: 'Strike like lightning.' }
-    ],
     faces: [
       { id: 'normal_eyes', name: 'Normal Eyes', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/face_normal.png', description: 'Standard friendly expression.' },
       { id: 'angry_eyes', name: 'Angry Eyes', rarity: 'rare', price: 80, owned: false, equipped: false, preview: '/previews/face_angry.png', description: 'Show your competitive spirit.' },
