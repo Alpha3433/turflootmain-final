@@ -2029,7 +2029,25 @@ const AgarIOGame = () => {
       
       // Update player (only if not cashing out)
       if (game.player.alive && !isCashingOut) {
-        const speed = config.baseSpeed / Math.pow(Math.max(game.player.mass, 1), 0.3) // Less aggressive decay (was sqrt = 0.5, now 0.3)
+        // Enhanced speed formula: Higher speed for small circles, normal scaling for bigger ones
+        const baseMass = Math.max(game.player.mass, 1)
+        
+        // Add speed boost for small circles (starting players)
+        let speedBoost = 1
+        if (baseMass <= 20) {
+          // 2x speed boost for very small circles (mass 1-20)
+          speedBoost = 2.0
+        } else if (baseMass <= 50) {
+          // Gradual decrease from 2x to 1.5x for small-medium circles (mass 20-50)
+          speedBoost = 2.0 - ((baseMass - 20) / 30) * 0.5
+        } else if (baseMass <= 100) {
+          // Gradual decrease from 1.5x to 1x for medium circles (mass 50-100)
+          speedBoost = 1.5 - ((baseMass - 50) / 50) * 0.5
+        }
+        
+        const baseSpeedCalculation = config.baseSpeed / Math.pow(baseMass, 0.3) // Less aggressive decay
+        const speed = baseSpeedCalculation * speedBoost
+        
         game.player.x += game.player.dir.x * speed * deltaTime
         game.player.y += game.player.dir.y * speed * deltaTime
         
