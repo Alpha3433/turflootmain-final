@@ -3790,9 +3790,10 @@ const AgarIOGame = () => {
 
 
 
-      {/* Cash Out Button - Desktop Only */}
+      {/* Desktop Action Buttons Row */}
       {!isGameOver && !isMobile && (
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2">
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
+          {/* Cash Out Button */}
           <button
             onMouseDown={startCashOut}
             onMouseUp={cancelCashOut}
@@ -3808,6 +3809,46 @@ const AgarIOGame = () => {
               ? `Cashing Out... ${Math.floor(cashOutProgress)}%` 
               : `💰 Hold E to Cash Out ($${gameStats.netWorth})`
             }
+          </button>
+
+          {/* Split Button */}
+          <button
+            className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+              splitCooldownActive
+                ? 'bg-red-600 text-white cursor-not-allowed'
+                : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                  ? 'bg-blue-500 hover:bg-blue-400 text-white'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+            }`}
+            disabled={!gameRef.current?.game?.player?.alive || !canPlayerSplit(gameRef.current?.game?.player || { cells: [] })}
+            onClick={() => {
+              if (gameRef.current?.game?.player?.alive && canPlayerSplit(gameRef.current.game.player)) {
+                // Use last mouse position for split direction
+                const canvas = canvasRef.current
+                if (canvas) {
+                  const rect = canvas.getBoundingClientRect()
+                  const mouseX = lastMousePosition.current?.x || rect.width / 2
+                  const mouseY = lastMousePosition.current?.y || rect.height / 2
+                  
+                  // Convert screen coordinates to world coordinates
+                  const game = gameRef.current.game
+                  const worldX = mouseX - rect.width / 2 + game.camera.x
+                  const worldY = mouseY - rect.height / 2 + game.camera.y
+                  
+                  handleSplit(worldX, worldY)
+                }
+              }
+            }}
+          >
+            <span className="text-lg">⚡</span>
+            <span>
+              {splitCooldownActive
+                ? `Split (${Math.ceil(splitCooldown / 1000)}s)`
+                : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                  ? 'Split (Space)'
+                  : 'Split (Need 20+ mass)'
+              }
+            </span>
           </button>
         </div>
       )}
