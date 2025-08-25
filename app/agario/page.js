@@ -927,7 +927,8 @@ const AgarIOGame = () => {
     const newY = cellToSplit.y + direction.y * spawnDistance
     
     // Check world boundaries
-    const worldRadius = config.worldSize / 2
+    const WORLD_SIZE = 3750 // Hardcoded world size constant
+    const worldRadius = WORLD_SIZE / 2
     const distanceFromCenter = Math.sqrt(newX * newX + newY * newY)
     if (distanceFromCenter + newRadius > worldRadius) {
       // Don't split if it would spawn outside world
