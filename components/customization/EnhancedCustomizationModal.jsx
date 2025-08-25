@@ -123,7 +123,6 @@ const EnhancedCustomizationModal = ({ isOpen, onClose, userBalance = 2500 }) => 
     // Save to localStorage
     const customizationData = {
       skin: activeCategory === 'skins' ? item.id : playerData.equippedSkin,
-      hat: activeCategory === 'hats' ? item.id : playerData.equippedHat,
       trail: activeCategory === 'trails' ? item.id : playerData.equippedTrail,
       face: activeCategory === 'faces' ? item.id : playerData.equippedFace
     }
