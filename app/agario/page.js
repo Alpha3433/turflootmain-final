@@ -2167,6 +2167,58 @@ const AgarIOGame = () => {
             }
           })
           
+          // MERGE LOGIC - Check for cells that can merge back together
+          if (game.player.cells.length > 1) {
+            const currentTime = Date.now()
+            
+            for (let i = 0; i < game.player.cells.length; i++) {
+              for (let j = i + 1; j < game.player.cells.length; j++) {
+                const cell1 = game.player.cells[i]
+                const cell2 = game.player.cells[j]
+                
+                // Check if cells can merge (not merge locked and close enough)
+                const canMerge = !cell1.mergeLocked && !cell2.mergeLocked &&
+                                (currentTime - cell1.splitTime) >= MERGE_MIN_TIME &&
+                                (currentTime - cell2.splitTime) >= MERGE_MIN_TIME
+                
+                if (canMerge) {
+                  const distance = Math.sqrt(
+                    (cell1.x - cell2.x) * (cell1.x - cell2.x) + 
+                    (cell1.y - cell2.y) * (cell1.y - cell2.y)
+                  )
+                  const mergeDistance = cell1.radius + cell2.radius - 10 // Allow slight overlap for merge
+                  
+                  if (distance <= mergeDistance) {
+                    // Merge cells: combine masses and remove smaller cell
+                    const mergedMass = cell1.mass + cell2.mass
+                    const mergedRadius = Math.sqrt(mergedMass / Math.PI) * 8
+                    
+                    // Keep larger cell, merge smaller into it
+                    if (cell1.mass >= cell2.mass) {
+                      cell1.mass = mergedMass
+                      cell1.radius = mergedRadius
+                      // Remove cell2
+                      game.player.cells.splice(j, 1)
+                      console.log(`🔄 Merged cells: ${game.player.cells.length} cells remaining, mass: ${mergedMass}`)
+                    } else {
+                      cell2.mass = mergedMass
+                      cell2.radius = mergedRadius
+                      // Remove cell1
+                      game.player.cells.splice(i, 1)
+                      console.log(`🔄 Merged cells: ${game.player.cells.length} cells remaining, mass: ${mergedMass}`)
+                    }
+                    
+                    // Update total mass
+                    game.player.mass = game.player.cells.reduce((total, cell) => total + cell.mass, 0)
+                    
+                    // Break out of loops since array was modified
+                    break
+                  }
+                }
+              }
+            }
+          }
+          
           // Update main player position to average of all cells (for camera tracking)
           if (game.player.cells.length > 0) {
             const avgX = game.player.cells.reduce((sum, cell) => sum + cell.x, 0) / game.player.cells.length
