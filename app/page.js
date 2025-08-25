@@ -1732,6 +1732,88 @@ export default function Home() {
                   </button>
                 </div>
               </div>
+
+              {/* Integrated Lobby System - Desktop Only */}
+              {!isMobile && (
+                <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl overflow-hidden">
+                  {/* Lobby Header */}
+                  <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-gray-700/50 p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-purple-600/20 rounded-xl border border-purple-500/30">
+                        <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 12a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6 3 3 0 000 6zm-8 8a6 6 0 016-6h2a6 6 0 016 6v2H9v-2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">Multiplayer Lobbies</h3>
+                        <p className="text-gray-400 text-sm">Create or join game rooms</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Lobby Actions */}
+                  <div className="p-4 space-y-3">
+                    {/* Create Lobby Button */}
+                    <button 
+                      onClick={() => {
+                        if (!authenticated) {
+                          login()
+                        } else {
+                          console.log('Create lobby clicked')
+                        }
+                      }}
+                      className="w-full p-4 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-xl hover:from-green-600/30 hover:to-emerald-600/30 transition-all group"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-green-600/20 rounded-lg border border-green-500/30 group-hover:scale-110 transition-transform">
+                          <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                        </div>
+                        <div className="text-left">
+                          <div className="text-white font-medium">Create Lobby</div>
+                          <div className="text-gray-400 text-sm">Start a private game room</div>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Browse Lobbies Button */}
+                    <button 
+                      onClick={() => {
+                        if (!authenticated) {
+                          login()
+                        } else {
+                          setShowServerBrowser(true)
+                        }
+                      }}
+                      className="w-full p-4 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl hover:from-blue-600/30 hover:to-purple-600/30 transition-all group"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-blue-600/20 rounded-lg border border-blue-500/30 group-hover:scale-110 transition-transform">
+                          <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9v-9" />
+                          </svg>
+                        </div>
+                        <div className="text-left">
+                          <div className="text-white font-medium">Browse Lobbies</div>
+                          <div className="text-gray-400 text-sm">Join public game rooms</div>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Quick Solo Play */}
+                    <div className="pt-3 border-t border-gray-700/50">
+                      <div className="text-gray-400 text-xs mb-2 text-center">Or play solo</div>
+                      <button 
+                        onClick={() => window.location.href = '/agario'}
+                        className="w-full py-3 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-500/30 rounded-xl text-yellow-400 font-medium transition-all hover:from-yellow-600/30 hover:to-orange-600/30 hover:scale-105 text-sm"
+                      >
+                        🚀 Quick Match
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
