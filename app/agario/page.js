@@ -2955,8 +2955,28 @@ const AgarIOGame = () => {
         ctx.shadowOffsetY = 0
       })
       
-      // Draw entities (sorted by net worth)
-      const allEntities = [game.player, ...game.bots].filter(e => e.alive)
+      // Draw entities (sorted by net worth) - UPDATED to support split cells
+      const allEntities = [...game.bots].filter(e => e.alive)
+      
+      // Add player cells individually for proper rendering
+      if (game.player.alive && game.player.cells && game.player.cells.length > 0) {
+        // Add each player cell as a separate entity for rendering
+        game.player.cells.forEach(cell => {
+          allEntities.push({
+            ...game.player,
+            x: cell.x,
+            y: cell.y,
+            mass: cell.mass,
+            radius: cell.radius,
+            isPlayerCell: true,
+            cellId: cell.id
+          })
+        })
+      } else if (game.player.alive) {
+        // Fallback to legacy single player entity
+        allEntities.push(game.player)
+      }
+      
       allEntities.sort((a, b) => a.netWorth - b.netWorth)
       
       allEntities.forEach(entity => {
