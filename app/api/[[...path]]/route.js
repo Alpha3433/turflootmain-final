@@ -689,6 +689,40 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Get user balance
+    if (route === 'users/balance') {
+      try {
+        const { userId } = await request.json()
+        
+        if (!userId) {
+          return NextResponse.json({
+            error: 'userId is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Get user data
+        const user = await users.findOne({ userId: userId })
+        const balance = user?.balance || 0
+
+        console.log(`💰 Retrieved balance for user ${userId}: ${balance} coins`)
+        
+        return NextResponse.json({
+          success: true,
+          balance,
+          userId
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error getting user balance:', error)
+        return NextResponse.json({
+          error: 'Failed to get user balance'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // Add mission reward to user account
     if (route === 'users/add-mission-reward') {
       try {
