@@ -48,7 +48,6 @@ const EnhancedCustomizationModal = ({ isOpen, onClose, userBalance = 2500 }) => 
   const [materialsData] = useState({
     skins: Object.values(SkinMaterials),
     trails: Object.values(TrailMaterials),
-    hats: Object.values(HatMaterials),
     faces: [
       { id: 'normal_eyes', name: 'Normal Eyes', rarity: RarityTiers.COMMON, price: 0, type: 'basic' },
       { id: 'angry_eyes', name: 'Angry Eyes', rarity: RarityTiers.RARE, price: 80, type: 'basic' },
