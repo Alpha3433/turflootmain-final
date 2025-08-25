@@ -2669,6 +2669,12 @@ const AgarIOGame = () => {
         const spikeLength = virus.radius * 0.8 * pulseScale
         const spikeCount = virus.spikes
         
+        // Validate virus coordinates before creating gradient
+        if (!isFinite(virus.x) || !isFinite(virus.y) || !isFinite(virus.radius) || virus.radius <= 0) {
+          console.warn('Invalid virus coordinates:', { x: virus.x, y: virus.y, radius: virus.radius })
+          continue // Skip this virus if coordinates are invalid
+        }
+        
         // Create gradient for virus body
         const gradient = ctx.createRadialGradient(virus.x, virus.y, 0, virus.x, virus.y, virus.radius)
         gradient.addColorStop(0, '#00ff88') // Bright green center (matching your logo)
