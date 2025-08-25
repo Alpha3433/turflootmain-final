@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 """
-Backend API Regression Testing Suite for TurfLoot
-================================================
+TurfLoot Backend Regression Testing Suite
+========================================
 
-Focus: Testing that all existing API endpoints still work correctly after frontend UI changes.
+Focus: Testing backend functionality after mobile split button implementation.
 
-Frontend changes made to agario/page.js:
-- Added player's own waged balance display above character head
-- Increased mobile minimap size by 100% (87.5px to 175px)  
-- Moved minimap position slightly to the right
-
-These are purely frontend canvas drawing changes, no backend logic was modified.
-This test verifies that all backend functionality remains intact and there are no regressions.
+Context: Just completed mobile split button implementation in /app/app/agario/page.js
+- Changes were purely frontend (React components, CSS styles, event handlers)
+- Backend should be unaffected but need to verify stability
+- This is a regression test to ensure frontend changes didn't break backend functionality
 
 Testing Priority:
-1. Core API endpoints (GET /api/, GET /api/ping)
-2. Game-related APIs (GET /api/servers/lobbies, Game server functionality)
-3. Authentication APIs (POST /api/auth/privy)
-4. Wallet APIs (GET /api/wallet/balance)
-5. Live Statistics APIs (GET /api/stats/live-players, GET /api/stats/global-winnings)
+1. Core API Endpoints - Verify basic server functionality is not affected by frontend changes
+   - GET /api/ (root endpoint)  
+   - GET /api/ping (connectivity test)
+
+2. Game API Integration - Test game-related endpoints that support the split mechanic
+   - GET /api/servers/lobbies (game server access)
+   - Authentication endpoints if needed
+
+3. Performance Testing - Ensure backend performance remains good
+   - Response times under 2 seconds
+   - No memory leaks or crashes
 """
 
 import requests
