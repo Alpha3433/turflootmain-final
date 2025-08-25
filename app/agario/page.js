@@ -2125,8 +2125,51 @@ const AgarIOGame = () => {
         const baseSpeedCalculation = config.baseSpeed / Math.pow(baseMass, 0.3) // Less aggressive decay
         const speed = baseSpeedCalculation * speedBoost
         
+        // Update legacy player position (for backward compatibility)
         game.player.x += game.player.dir.x * speed * deltaTime
         game.player.y += game.player.dir.y * speed * deltaTime
+        
+        // CRITICAL FIX: Also update all cells in the cells array for split functionality
+        if (game.player.cells && game.player.cells.length > 0) {
+          game.player.cells.forEach(cell => {
+            // Each cell moves independently based on player direction and its own mass
+            const cellMass = Math.max(cell.mass, 1)
+            const cellSpeedBoost = cellMass <= 20 ? 2.0 : cellMass <= 50 ? 1.6 : 1.2
+            const cellSpeed = (config.baseSpeed / Math.pow(cellMass, 0.3)) * cellSpeedBoost
+            
+            // Apply velocity decay for split cells
+            if (cell.velocity) {
+              cell.velocity.x *= 0.95 // Gradual slowdown
+              cell.velocity.y *= 0.95
+              
+              // Add player direction and split velocity
+              cell.x += (game.player.dir.x * cellSpeed + cell.velocity.x) * deltaTime
+              cell.y += (game.player.dir.y * cellSpeed + cell.velocity.y) * deltaTime
+            } else {
+              // Normal movement for non-split cells
+              cell.x += game.player.dir.x * cellSpeed * deltaTime
+              cell.y += game.player.dir.y * cellSpeed * deltaTime
+            }
+            
+            // World boundaries for each cell
+            const worldRadius = config.worldSize / 2
+            const cellDistanceFromCenter = Math.sqrt(cell.x * cell.x + cell.y * cell.y)
+            
+            if (cellDistanceFromCenter > worldRadius) {
+              const angle = Math.atan2(cell.y, cell.x)
+              cell.x = Math.cos(angle) * worldRadius
+              cell.y = Math.sin(angle) * worldRadius
+            }
+          })
+          
+          // Update main player position to average of all cells (for camera tracking)
+          if (game.player.cells.length > 0) {
+            const avgX = game.player.cells.reduce((sum, cell) => sum + cell.x, 0) / game.player.cells.length
+            const avgY = game.player.cells.reduce((sum, cell) => sum + cell.y, 0) / game.player.cells.length
+            game.player.x = avgX
+            game.player.y = avgY
+          }
+        }
         
         // Circular world boundaries
         const worldRadius = config.worldSize / 2
