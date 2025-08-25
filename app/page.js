@@ -1236,8 +1236,17 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Right side - Server Indicator and Navigation Icons */}
+          {/* Right side - Coins Display, Server Indicator and Navigation Icons */}
           <div className="flex items-center space-x-3">
+            {/* Coins Display */}
+            <div className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-yellow-600/80 to-yellow-500/80 border border-yellow-400/60 rounded-lg shadow-lg">
+              <div className="text-yellow-300 text-base">💰</div>
+              <div className="flex flex-col">
+                <span className="text-xs text-yellow-200 opacity-90 leading-none">COINS</span>
+                <span className="text-white font-bold text-sm leading-none">{userBalance.toLocaleString()}</span>
+              </div>
+            </div>
+
             {/* Server Indicator */}
             <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-800/60 border border-gray-700/50 rounded-lg">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
