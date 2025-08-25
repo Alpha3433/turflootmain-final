@@ -166,8 +166,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
     
     // Save to localStorage immediately with all current data
     const newCustomizationData = {
-      skin: activeCategory === 'skins' ? item.id : playerData.equippedSkin,
-      face: activeCategory === 'faces' ? item.id : playerData.equippedFace
+      skin: activeCategory === 'skins' ? item.id : playerData.equippedSkin
     }
     
     try {
