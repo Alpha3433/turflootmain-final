@@ -2777,7 +2777,9 @@ const AgarIOGame = () => {
         }
         
         // Draw core highlight (matching your logo's bright center)
-        const coreGradient = ctx.createRadialGradient(virus.x, virus.y, 0, virus.x, virus.y, virus.radius * 0.3)
+        const coreRadius = virus.radius * 0.3
+        if (isFinite(coreRadius) && coreRadius > 0) {
+          const coreGradient = ctx.createRadialGradient(virus.x, virus.y, 0, virus.x, virus.y, coreRadius)
         coreGradient.addColorStop(0, '#88ffcc') // Bright center
         coreGradient.addColorStop(1, 'transparent')
         
