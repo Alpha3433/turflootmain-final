@@ -46,12 +46,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       { id: 'fire_red', name: 'Fire Red', rarity: 'epic', price: 300, owned: false, equipped: false, preview: '/previews/skin_fire.png', description: 'Burns with the fury of a thousand suns.' },
       { id: 'ice_blue', name: 'Ice Blue', rarity: 'rare', price: 180, owned: false, equipped: false, preview: '/previews/skin_ice.png', description: 'Frozen beauty with crystalline perfection.' },
       { id: 'shadow_black', name: 'Shadow Black', rarity: 'legendary', price: 600, owned: false, equipped: false, preview: '/previews/skin_shadow.png', description: 'Emerges from the void with dark energy.' }
-    ],
-    faces: [
-      { id: 'normal_eyes', name: 'Normal Eyes', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/face_normal.png', description: 'Standard friendly expression.' },
-      { id: 'angry_eyes', name: 'Angry Eyes', rarity: 'rare', price: 80, owned: false, equipped: false, preview: '/previews/face_angry.png', description: 'Show your competitive spirit.' },
-      { id: 'wink_eyes', name: 'Wink Eyes', rarity: 'rare', price: 75, owned: false, equipped: false, preview: '/previews/face_wink.png', description: 'Charming and playful expression.' },
-      { id: 'laser_eyes', name: 'Laser Eyes', rarity: 'legendary', price: 400, owned: false, equipped: false, preview: '/previews/face_laser.png', description: 'Futuristic cybernetic enhancement.' }
     ]
   })
 
