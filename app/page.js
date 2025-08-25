@@ -303,6 +303,11 @@ export default function Home() {
     }
   }, [showCustomization]) // Also reload when customization modal closes
 
+  // Load user balance when component mounts
+  useEffect(() => {
+    loadUserBalance()
+  }, [])
+
   // Update notification timestamps every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
