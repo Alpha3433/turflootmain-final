@@ -2172,6 +2172,11 @@ const AgarIOGame = () => {
             const oldMass = entity.mass
             entity.mass += config.orbMassValue
             
+            // CRITICAL FIX: Also update the main cell's mass for split functionality
+            if (entity === game.player && entity.cells && entity.cells.length > 0) {
+              entity.cells[0].mass = entity.mass // Keep main cell mass in sync
+            }
+            
             // Add enhanced coin collection effects for player
             if (entity === game.player) {
               addFloatingText(`+${config.orbMassValue} mass`, entity.x, entity.y - 30, '#00ff88')
