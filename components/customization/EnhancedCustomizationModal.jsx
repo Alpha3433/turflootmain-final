@@ -33,7 +33,6 @@ const EnhancedCustomizationModal = ({ isOpen, onClose, userBalance = 2500 }) => 
   const [sortBy, setSortBy] = useState('rarity')
   const [filterRarity, setFilterRarity] = useState('all')
   const [previewAnimation, setPreviewAnimation] = useState('idle')
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const previewRef = useRef(null)
   
   // Enhanced player data with material system
