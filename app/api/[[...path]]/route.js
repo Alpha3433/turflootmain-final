@@ -689,6 +689,63 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Add mission reward to user account
+    if (route === 'users/add-mission-reward') {
+      try {
+        const { userId, missionType, rewardAmount, missionDescription, completedAt } = await request.json()
+        
+        if (!userId || !missionType || !rewardAmount) {
+          return NextResponse.json({
+            error: 'userId, missionType, and rewardAmount are required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Update user's balance and add mission record
+        const result = await users.updateOne(
+          { userId: userId },
+          {
+            $inc: { balance: rewardAmount },
+            $push: {
+              missionHistory: {
+                id: crypto.randomUUID(),
+                type: missionType,
+                reward: rewardAmount,
+                description: missionDescription,
+                completedAt: completedAt || new Date().toISOString(),
+                createdAt: new Date()
+              }
+            },
+            $set: { updatedAt: new Date() }
+          },
+          { upsert: true }
+        )
+
+        // Get updated user data to return new balance
+        const updatedUser = await users.findOne({ userId: userId })
+        const newBalance = updatedUser?.balance || rewardAmount
+
+        console.log(`✅ Mission reward added: ${rewardAmount} coins to user ${userId} (new balance: ${newBalance})`)
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Mission reward added successfully',
+          rewardAmount,
+          newBalance,
+          missionType,
+          description: missionDescription
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error adding mission reward:', error)
+        return NextResponse.json({
+          error: 'Failed to add mission reward'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // Fallback
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders })
   } catch (error) {
