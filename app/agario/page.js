@@ -790,9 +790,8 @@ const AgarIOGame = () => {
           const result = await response.json()
           console.log('✅ Mission reward saved to account:', result)
           
-          // Update local balance display
+          // Mission reward saved to account successfully
           if (result.newBalance !== undefined) {
-            setUserBalance(result.newBalance)
             console.log(`💰 Account balance updated: ${result.newBalance} coins`)
           }
         } else {
