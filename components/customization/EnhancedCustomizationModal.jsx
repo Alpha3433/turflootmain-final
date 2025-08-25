@@ -39,7 +39,6 @@ const EnhancedCustomizationModal = ({ isOpen, onClose, userBalance = 2500 }) => 
   // Enhanced player data with material system
   const [playerData, setPlayerData] = useState({
     equippedSkin: 'matte_blue',
-    equippedHat: null,
     equippedTrail: 'basic_sparkle',
     equippedFace: 'normal_eyes',
     ownedItems: new Set(['matte_blue', 'basic_sparkle', 'normal_eyes', 'chrome_steel', 'rainbow_holo'])
