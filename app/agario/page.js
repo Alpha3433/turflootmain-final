@@ -451,27 +451,50 @@ const AgarIOGame = () => {
 
   // Load player customization data
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('turfloot_player_customization')
-      if (saved) {
-        const customizationData = JSON.parse(saved)
+    const loadCustomization = () => {
+      try {
+        const saved = localStorage.getItem('turfloot_player_customization')
+        if (saved) {
+          const customizationData = JSON.parse(saved)
+          setPlayerCustomization({
+            skin: customizationData.skin || 'default_blue',
+            trail: customizationData.trail || 'default_sparkle',
+            face: customizationData.face || 'normal_eyes'
+          })
+          console.log('Agario: Loaded player customization:', customizationData)
+        }
+      } catch (error) {
+        console.error('Agario: Failed to load customization:', error)
+        // Reset to defaults if there's an error
         setPlayerCustomization({
-          skin: customizationData.skin || 'default_blue',
-          hat: customizationData.hat || null,
-          trail: customizationData.trail || 'default_sparkle',
-          face: customizationData.face || 'normal_eyes'
+          skin: 'default_blue',
+          trail: 'default_sparkle',
+          face: 'normal_eyes'
         })
-        console.log('Agario: Loaded player customization:', customizationData)
       }
-    } catch (error) {
-      console.error('Agario: Failed to load customization:', error)
-      // Reset to defaults if there's an error
+    }
+
+    // Initial load
+    loadCustomization()
+
+    // Listen for customization changes from the modal
+    const handleCustomizationChange = (event) => {
+      console.log('Agario: Customization changed:', event.detail)
       setPlayerCustomization({
-        skin: 'default_blue',
-        hat: null,
-        trail: 'default_sparkle',
-        face: 'normal_eyes'
+        skin: event.detail.skin || 'default_blue',
+        trail: event.detail.trail || 'default_sparkle',
+        face: event.detail.face || 'normal_eyes'
       })
+    }
+
+    window.addEventListener('playerCustomizationChanged', handleCustomizationChange)
+    
+    // Also listen for localStorage changes (in case of external updates)
+    window.addEventListener('storage', loadCustomization)
+
+    return () => {
+      window.removeEventListener('playerCustomizationChanged', handleCustomizationChange)
+      window.removeEventListener('storage', loadCustomization)
     }
   }, [])
 
