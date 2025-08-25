@@ -494,11 +494,30 @@ const AgarIOGame = () => {
     }
   }, [])
 
-  // Handle keyboard input for cash-out
+  // Handle keyboard input for cash-out and split
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key.toLowerCase() === 'e' && !isCashingOut && gameRef.current?.game?.player?.alive) {
         startCashOut()
+      }
+      
+      // Split functionality - Space key
+      if (e.code === 'Space' && gameRef.current?.game?.player?.alive) {
+        e.preventDefault() // Prevent page scroll
+        const canvas = canvasRef.current
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect()
+          // Use current mouse position or center of screen
+          const mouseX = lastMousePosition.current?.x || rect.width / 2
+          const mouseY = lastMousePosition.current?.y || rect.height / 2
+          
+          // Convert screen coordinates to world coordinates
+          const game = gameRef.current.game
+          const worldX = mouseX - rect.width / 2 + game.camera.x
+          const worldY = mouseY - rect.height / 2 + game.camera.y
+          
+          handleSplit(worldX, worldY)
+        }
       }
     }
 
@@ -508,12 +527,32 @@ const AgarIOGame = () => {
       }
     }
 
+    // Right-click for split (optional)
+    const handleContextMenu = (e) => {
+      if (gameRef.current?.game?.player?.alive) {
+        e.preventDefault()
+        const canvas = canvasRef.current
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect()
+          const worldX = e.clientX - rect.left - rect.width / 2 + gameRef.current.game.camera.x
+          const worldY = e.clientY - rect.top - rect.height / 2 + gameRef.current.game.camera.y
+          handleSplit(worldX, worldY)
+        }
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
+    if (canvasRef.current) {
+      canvasRef.current.addEventListener('contextmenu', handleContextMenu)
+    }
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
+      if (canvasRef.current) {
+        canvasRef.current.removeEventListener('contextmenu', handleContextMenu)
+      }
     }
   }, [isCashingOut, settings])
 
