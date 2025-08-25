@@ -863,15 +863,18 @@ const AgarIOGame = () => {
   // Split Mechanic Functions
   const canPlayerSplit = (player) => {
     // Safe version that doesn't depend on config - use hardcoded constants
-    const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
+    const MIN_SPLIT_MASS = 20
     const MAX_CELLS = 16
-    const SPLIT_COOLDOWN = 10000 // Changed to 10 seconds (10000ms)
+    const SPLIT_COOLDOWN = 10000 // 10 seconds
+    
+    if (!player || !player.cells || player.cells.length === 0) {
+      return false
+    }
     
     const playerExists = !!player
     const hasCells = !!(player && player.cells)
     const cellsLength = player?.cells?.length || 0
     const cellsUnderLimit = player?.cells?.length < MAX_CELLS
-    const cellMasses = player?.cells?.map(cell => cell.mass) || []
     const hasValidMass = player?.cells?.some(cell => cell.mass >= MIN_SPLIT_MASS)
     const lastSplitTime = player?.lastSplitTime || 0
     const currentTime = Date.now()
@@ -880,24 +883,22 @@ const AgarIOGame = () => {
     
     const canSplit = playerExists && hasCells && cellsUnderLimit && hasValidMass && cooldownPassed
     
-    console.log('🔍 DETAILED Split Check:', {
-      playerExists,
-      hasCells,
-      cellsLength,
-      maxCells: MAX_CELLS,
-      cellsUnderLimit,
-      cellMasses,
-      minMassRequired: MIN_SPLIT_MASS,
-      hasValidMass,
-      lastSplitTime,
-      currentTime,
-      timeSinceLastSplit,
-      splitCooldown: SPLIT_COOLDOWN,
-      cooldownPassed,
-      FINAL_RESULT: canSplit
-    })
+    // Only log when the result changes or every 5 seconds to reduce spam
+    const shouldLog = !window.lastSplitCheckResult || window.lastSplitCheckResult !== canSplit || 
+                     (currentTime - (window.lastSplitCheckTime || 0)) > 5000
     
-    // Check if player has any cells that can split
+    if (shouldLog) {
+      console.log('🔍 Split Check:', {
+        canSplit,
+        cellsLength,
+        hasValidMass,
+        cooldownPassed,
+        timeSinceLastSplit: Math.round(timeSinceLastSplit / 1000) + 's'
+      })
+      window.lastSplitCheckResult = canSplit
+      window.lastSplitCheckTime = currentTime
+    }
+    
     return canSplit
   }
 
