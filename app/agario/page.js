@@ -3162,15 +3162,17 @@ const AgarIOGame = () => {
       />
       
       {/* Coins Display - Desktop & Mobile */}
-      <div className={`absolute top-4 ${isMobile ? 'right-16' : 'right-4'} bg-gradient-to-r from-yellow-600/90 to-yellow-500/90 backdrop-blur-sm rounded-lg p-3 border border-yellow-400/50 shadow-lg`}>
-        <div className="flex items-center gap-2 text-yellow-100 font-bold text-sm">
-          <div className="text-yellow-300 text-lg">💰</div>
-          <div className="flex flex-col">
-            <span className="text-xs text-yellow-300 opacity-80">COINS</span>
-            <span className="text-lg leading-none">{userBalance.toLocaleString()}</span>
+      {!isGameOver && (
+        <div className={`absolute ${isMobile ? 'top-4 right-20' : 'top-4 right-4'} bg-gradient-to-r from-yellow-600/95 to-yellow-500/95 backdrop-blur-sm rounded-lg p-3 border border-yellow-400/60 shadow-lg z-50`}>
+          <div className="flex items-center gap-2 text-yellow-100 font-bold text-sm">
+            <div className="text-yellow-300 text-lg">💰</div>
+            <div className="flex flex-col">
+              <span className="text-xs text-yellow-300 opacity-90">COINS</span>
+              <span className="text-lg leading-none">{userBalance.toLocaleString()}</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       
       {/* Multiplayer Status - Desktop Only */}
       {isConnected && !isMobile && (
