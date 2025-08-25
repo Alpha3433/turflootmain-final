@@ -82,7 +82,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
         setPlayerData(prev => ({
           ...prev,
           equippedSkin: customizationData.skin || 'default_blue',
-          equippedTrail: customizationData.trail || 'default_sparkle',
           equippedFace: customizationData.face || 'normal_eyes'
         }))
         
