@@ -88,14 +88,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
             }))
           }
           
-          // Set equipped states for faces
-          if (customizationData.face && newItemsData.faces) {
-            newItemsData.faces = newItemsData.faces.map(item => ({
-              ...item,
-              equipped: item.id === customizationData.face
-            }))
-          }
-          
           return newItemsData
         })
       }
