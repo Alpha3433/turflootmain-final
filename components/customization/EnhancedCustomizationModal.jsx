@@ -430,20 +430,6 @@ const EnhancedCustomizationModal = ({ isOpen, onClose, userBalance = 2500 }) => 
                             <span>Buy</span>
                           </button>
                         )}
-                        
-                        {/* Upgrade Button */}
-                        {playerData.ownedItems.has(item.id) && RarityUpgrade.canUpgrade(item, userBalance) && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setShowUpgradeModal(true)
-                              setSelectedItem(item)
-                            }}
-                            className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-2 px-3 rounded-xl transition-all"
-                          >
-                            <ArrowUp className="w-4 h-4" />
-                          </button>
-                        )}
                       </div>
                     </div>
                   </div>
