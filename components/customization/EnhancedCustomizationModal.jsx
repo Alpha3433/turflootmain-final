@@ -519,16 +519,6 @@ const EnhancedCustomizationModal = ({ isOpen, onClose, userBalance = 2500 }) => 
                             <Check className="w-5 h-5" />
                             <span>Equip Material</span>
                           </button>
-                          
-                          {RarityUpgrade.canUpgrade(selectedItem, userBalance) && (
-                            <button
-                              onClick={() => setShowUpgradeModal(true)}
-                              className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center space-x-2"
-                            >
-                              <ArrowUp className="w-5 h-5" />
-                              <span>Upgrade Rarity</span>
-                            </button>
-                          )}
                         </>
                       ) : (
                         <button
