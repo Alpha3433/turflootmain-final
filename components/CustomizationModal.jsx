@@ -69,30 +69,33 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   // Mock data for customization items
   const [itemsData, setItemsData] = useState({
     skins: [
+      // Basic collection - Default colors for new users
       { id: 'default_blue', name: 'Classic Blue', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/skin_blue.png', description: 'The original TurfLoot skin that started it all.' },
-      { id: 'golden_snake', name: 'Golden Snake', rarity: 'legendary', price: 500, owned: true, equipped: false, preview: '/previews/skin_gold.png', description: 'Legendary golden skin with mystical powers.' },
-      { id: 'neon_green', name: 'Neon Green', rarity: 'rare', price: 150, owned: true, equipped: false, preview: '/previews/skin_neon.png', description: 'Glows with electric energy in dark environments.' },
+      { id: 'basic_red', name: 'Basic Red', rarity: 'common', price: 0, owned: true, equipped: false, preview: '/previews/skin_red.png', description: 'A classic red skin for bold players.' },
+      { id: 'basic_green', name: 'Basic Green', rarity: 'common', price: 0, owned: true, equipped: false, preview: '/previews/skin_green.png', description: 'Fresh green color for nature lovers.' },
+      { id: 'basic_yellow', name: 'Basic Yellow', rarity: 'common', price: 0, owned: true, equipped: false, preview: '/previews/skin_yellow.png', description: 'Bright yellow for sunshine vibes.' },
+      { id: 'basic_purple', name: 'Basic Purple', rarity: 'common', price: 0, owned: true, equipped: false, preview: '/previews/skin_purple.png', description: 'Royal purple for distinguished players.' },
+      { id: 'basic_orange', name: 'Basic Orange', rarity: 'common', price: 0, owned: true, equipped: false, preview: '/previews/skin_orange.png', description: 'Vibrant orange energy.' },
+      
+      // Premium skins available in store
+      { id: 'rainbow_hologram', name: 'Rainbow Hologram', rarity: 'legendary', price: 750, owned: false, equipped: false, preview: '/previews/skin_rainbow.png', description: 'Shimmering holographic rainbow effect that shifts colors.' },
+      { id: 'chrome_steel', name: 'Chrome Steel', rarity: 'epic', price: 400, owned: false, equipped: false, preview: '/previews/skin_chrome.png', description: 'Polished metallic chrome finish with mirror reflections.' },
+      { id: 'matte_blue', name: 'Matte Blue', rarity: 'rare', price: 200, owned: false, equipped: false, preview: '/previews/skin_matte.png', description: 'Sophisticated matte blue with subtle texture.' },
+      { id: 'golden_snake', name: 'Golden Snake', rarity: 'legendary', price: 500, owned: false, equipped: false, preview: '/previews/skin_gold.png', description: 'Legendary golden skin with mystical powers.' },
+      { id: 'neon_green', name: 'Neon Green', rarity: 'rare', price: 150, owned: false, equipped: false, preview: '/previews/skin_neon.png', description: 'Glows with electric energy in dark environments.' },
       { id: 'fire_red', name: 'Fire Red', rarity: 'epic', price: 300, owned: false, equipped: false, preview: '/previews/skin_fire.png', description: 'Burns with the fury of a thousand suns.' },
       { id: 'ice_blue', name: 'Ice Blue', rarity: 'rare', price: 180, owned: false, equipped: false, preview: '/previews/skin_ice.png', description: 'Frozen beauty with crystalline perfection.' },
-      { id: 'shadow_black', name: 'Shadow Black', rarity: 'legendary', price: 600, owned: false, equipped: false, preview: '/previews/skin_shadow.png', description: 'Emerges from the void with dark energy.' },
-      { id: 'royal_purple', name: 'Royal Purple', rarity: 'epic', price: 350, owned: false, equipped: false, preview: '/previews/skin_purple.png', description: 'Fit for gaming royalty.' },
-      { id: 'cyber_chrome', name: 'Cyber Chrome', rarity: 'legendary', price: 750, owned: false, equipped: false, preview: '/previews/skin_chrome.png', description: 'Futuristic metallic finish.' }
-    ],
-    hats: [
-      { id: 'crown_gold', name: 'Golden Crown', rarity: 'legendary', price: 400, owned: true, equipped: false, preview: '/previews/hat_crown.png', description: 'Crown of the TurfLoot champions.' },
-      { id: 'cap_baseball', name: 'Baseball Cap', rarity: 'common', price: 50, owned: true, equipped: false, preview: '/previews/hat_cap.png', description: 'Classic sports cap for casual gaming.' },
-      { id: 'helmet_space', name: 'Space Helmet', rarity: 'epic', price: 250, owned: false, equipped: false, preview: '/previews/hat_space.png', description: 'Explore the cosmic battlefield.' },
-      { id: 'wizard_hat', name: 'Wizard Hat', rarity: 'rare', price: 200, owned: false, equipped: false, preview: '/previews/hat_wizard.png', description: 'Magical powers not included.' }
+      { id: 'shadow_black', name: 'Shadow Black', rarity: 'legendary', price: 600, owned: false, equipped: false, preview: '/previews/skin_shadow.png', description: 'Emerges from the void with dark energy.' }
     ],
     trails: [
       { id: 'default_sparkle', name: 'Default Sparkle', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/trail_sparkle.png', description: 'Basic particle trail for all players.' },
-      { id: 'rainbow_trail', name: 'Rainbow Trail', rarity: 'epic', price: 200, owned: true, equipped: false, preview: '/previews/trail_rainbow.png', description: 'Leave a rainbow in your wake.' },
+      { id: 'rainbow_trail', name: 'Rainbow Trail', rarity: 'epic', price: 200, owned: false, equipped: false, preview: '/previews/trail_rainbow.png', description: 'Leave a rainbow in your wake.' },
       { id: 'fire_trail', name: 'Fire Trail', rarity: 'rare', price: 120, owned: false, equipped: false, preview: '/previews/trail_fire.png', description: 'Blazing trail of destruction.' },
       { id: 'lightning_trail', name: 'Lightning Trail', rarity: 'epic', price: 180, owned: false, equipped: false, preview: '/previews/trail_lightning.png', description: 'Strike like lightning.' }
     ],
     faces: [
       { id: 'normal_eyes', name: 'Normal Eyes', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/face_normal.png', description: 'Standard friendly expression.' },
-      { id: 'angry_eyes', name: 'Angry Eyes', rarity: 'rare', price: 80, owned: true, equipped: false, preview: '/previews/face_angry.png', description: 'Show your competitive spirit.' },
+      { id: 'angry_eyes', name: 'Angry Eyes', rarity: 'rare', price: 80, owned: false, equipped: false, preview: '/previews/face_angry.png', description: 'Show your competitive spirit.' },
       { id: 'wink_eyes', name: 'Wink Eyes', rarity: 'rare', price: 75, owned: false, equipped: false, preview: '/previews/face_wink.png', description: 'Charming and playful expression.' },
       { id: 'laser_eyes', name: 'Laser Eyes', rarity: 'legendary', price: 400, owned: false, equipped: false, preview: '/previews/face_laser.png', description: 'Futuristic cybernetic enhancement.' }
     ]
