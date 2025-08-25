@@ -412,40 +412,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                         </div>
                       )}
                       
-                      {/* Trail Preview */}
-                      {activeCategory === 'trails' && (
-                        <div className="relative flex items-center justify-center">
-                          <div className="w-8 h-8 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
-                            <div className="w-1 h-1 bg-black rounded-full absolute top-2 left-2"></div>
-                            <div className="w-1 h-1 bg-black rounded-full absolute top-2 right-2"></div>
-                          </div>
-                          <div className={`absolute -right-12 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 ${!item.owned ? 'grayscale opacity-60' : ''}`}>
-                            {item.id === 'rainbow_trail' ? (
-                              <>
-                                <div className="w-2 h-2 bg-red-400 opacity-90 animate-pulse rounded-full"></div>
-                                <div className="w-1.5 h-1.5 bg-yellow-400 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
-                                <div className="w-1 h-1 bg-green-400 opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.4s'}}></div>
-                              </>
-                            ) : item.id === 'fire_trail' ? (
-                              <>
-                                <div className="w-2 h-1 bg-gradient-to-r from-orange-500 to-red-500 opacity-90 animate-pulse rounded-full"></div>
-                                <div className="w-1.5 h-1 bg-red-500 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
-                              </>
-                            ) : item.id === 'lightning_trail' ? (
-                              <>
-                                <div className="w-1.5 h-3 bg-blue-300 opacity-90 animate-pulse" style={{clipPath: 'polygon(0 0, 100% 40%, 60% 50%, 100% 100%, 0 60%, 40% 50%)'}}></div>
-                                <div className="w-1 h-2 bg-cyan-300 opacity-80 animate-pulse" style={{clipPath: 'polygon(0 0, 100% 40%, 60% 50%, 100% 100%, 0 60%, 40% 50%)', animationDelay: '0.3s'}}></div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="w-2 h-2 bg-blue-400 opacity-90 animate-pulse rounded-full"></div>
-                                <div className="w-1.5 h-1.5 bg-cyan-400 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.3s'}}></div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      
                       {/* Face Preview */}
                       {activeCategory === 'faces' && (
                         <div className={`w-8 h-8 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center relative ${!item.owned ? 'grayscale opacity-60' : ''}`}>
