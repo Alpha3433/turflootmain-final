@@ -1070,18 +1070,25 @@ const AgarIOGame = () => {
     console.log('🔄 performSplit result:', splitResult)
     
     if (splitResult) {
-      // Set cooldown
+      // Set cooldown with countdown timer
       setSplitCooldown(SPLIT_COOLDOWN)
       setSplitCooldownActive(true)
       
       // Visual/Audio feedback
       console.log('🔄 Split performed successfully!')
       
-      // Clear cooldown
-      setTimeout(() => {
-        setSplitCooldown(0)
-        setSplitCooldownActive(false)
-      }, SPLIT_COOLDOWN)
+      // Start countdown timer that updates every 100ms for smooth countdown
+      const countdownInterval = setInterval(() => {
+        setSplitCooldown(prev => {
+          const newCooldown = Math.max(0, prev - 100)
+          if (newCooldown <= 0) {
+            clearInterval(countdownInterval)
+            setSplitCooldownActive(false)
+          }
+          return newCooldown
+        })
+      }, 100)
+      
     } else {
       console.log('❌ performSplit failed')
     }
