@@ -892,7 +892,14 @@ const AgarIOGame = () => {
   }
 
   const performSplit = (cellToSplit, direction, game) => {
-    if (!cellToSplit || cellToSplit.mass < config.MIN_SPLIT_MASS) {
+    // Safe version with hardcoded constants
+    const MIN_SPLIT_MASS = 36
+    const SPLIT_BASE_SPEED = 1800
+    const SPLIT_MIN_VELOCITY = 400
+    const SPLIT_MAX_VELOCITY = 1600
+    const MERGE_MIN_TIME = 12000
+    
+    if (!cellToSplit || cellToSplit.mass < MIN_SPLIT_MASS) {
       return false
     }
 
@@ -905,10 +912,10 @@ const AgarIOGame = () => {
     // Calculate initial velocity based on mass
     const initialSpeed = Math.min(
       Math.max(
-        config.SPLIT_BASE_SPEED / Math.sqrt(newMass),
-        config.SPLIT_MIN_VELOCITY
+        SPLIT_BASE_SPEED / Math.sqrt(newMass),
+        SPLIT_MIN_VELOCITY
       ),
-      config.SPLIT_MAX_VELOCITY
+      SPLIT_MAX_VELOCITY
     )
     
     // Calculate safe spawn position
