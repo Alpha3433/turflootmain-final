@@ -469,8 +469,14 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                         item.id === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/60 shadow-lg' :
                         item.id === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/60 shadow-lg' :
                         item.id === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/60 shadow-lg' :
-                        item.id === 'royal_purple' ? 'bg-gradient-to-br from-purple-400 via-purple-600 to-purple-800 shadow-purple-500/60 shadow-lg' :
-                        item.id === 'cyber_chrome' ? 'bg-gradient-to-br from-gray-400 via-gray-300 to-gray-500 shadow-gray-500/60 shadow-lg' :
+                        item.id === 'rainbow_hologram' ? 'bg-gradient-to-br from-red-400 via-purple-500 to-blue-500 shadow-purple-500/60 shadow-lg animate-pulse' :
+                        item.id === 'chrome_steel' ? 'bg-gradient-to-br from-gray-300 via-gray-100 to-gray-400 shadow-gray-500/60 shadow-lg' :
+                        item.id === 'matte_blue' ? 'bg-blue-600 shadow-blue-500/60 shadow-lg' :
+                        item.id === 'basic_red' ? 'bg-red-500 shadow-red-500/30' :
+                        item.id === 'basic_green' ? 'bg-green-500 shadow-green-500/30' :
+                        item.id === 'basic_yellow' ? 'bg-yellow-500 shadow-yellow-500/30' :
+                        item.id === 'basic_purple' ? 'bg-purple-500 shadow-purple-500/30' :
+                        item.id === 'basic_orange' ? 'bg-orange-500 shadow-orange-500/30' :
                         'bg-gradient-to-br from-cyan-300 via-cyan-400 to-cyan-600 shadow-cyan-500/60 shadow-lg'
                       } ${!item.owned ? 'grayscale opacity-60' : ''}`}>
                         <div className="w-2.5 h-2.5 bg-black rounded-full absolute top-5 left-5"></div>
