@@ -904,6 +904,11 @@ const AgarIOGame = () => {
     return canSplit
   }
 
+  // Define constants at component scope so both split and merge logic can access them
+  const MERGE_MIN_TIME = 15000 // 15 seconds for cells to merge back (classic Agar.io timing)
+  const MIN_SPLIT_MASS = 20
+  const MAX_CELLS = 16
+
   const calculateSplitDirection = (targetCell, mouseX, mouseY) => {
     // Calculate direction from cell center to mouse position
     const dx = mouseX - targetCell.x
