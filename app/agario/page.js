@@ -2780,13 +2780,14 @@ const AgarIOGame = () => {
         const coreRadius = virus.radius * 0.3
         if (isFinite(coreRadius) && coreRadius > 0) {
           const coreGradient = ctx.createRadialGradient(virus.x, virus.y, 0, virus.x, virus.y, coreRadius)
-        coreGradient.addColorStop(0, '#88ffcc') // Bright center
-        coreGradient.addColorStop(1, 'transparent')
-        
-        ctx.fillStyle = coreGradient
-        ctx.beginPath()
-        ctx.arc(virus.x, virus.y, virus.radius * 0.3 * pulseScale, 0, Math.PI * 2)
-        ctx.fill()
+          coreGradient.addColorStop(0, '#88ffcc') // Bright center
+          coreGradient.addColorStop(1, 'transparent')
+          
+          ctx.fillStyle = coreGradient
+          ctx.beginPath()
+          ctx.arc(virus.x, virus.y, coreRadius * pulseScale, 0, Math.PI * 2)
+          ctx.fill()
+        }
         
         // Reset any remaining effects
         ctx.shadowBlur = 0
