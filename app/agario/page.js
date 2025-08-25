@@ -3953,8 +3953,8 @@ const AgarIOGame = () => {
                       <button className="text-gray-400 hover:text-white text-xs">✕</button>
                     </div>
                     <div className="space-y-1">
-                      {gameStats.leaderboard.slice(0, 3).map((player, index) => (
-                        <div key={player.id} className="flex items-center justify-between text-xs">
+                      {leaderboard && leaderboard.length > 0 ? leaderboard.slice(0, 3).map((player, index) => (
+                        <div key={player.id || `player-${index}`} className="flex items-center justify-between text-xs">
                           <div className="flex items-center space-x-1">
                             <span className={`font-bold ${
                               index === 0 ? 'text-yellow-400' : 
@@ -3962,11 +3962,15 @@ const AgarIOGame = () => {
                             }`}>
                               #{index + 1}
                             </span>
-                            <span className="text-white truncate max-w-[60px]">{player.name}</span>
+                            <span className="text-white truncate max-w-[60px]">{player.name || 'Player'}</span>
                           </div>
-                          <span className="text-green-400 font-bold">${player.netWorth}</span>
+                          <span className="text-green-400 font-bold">${player.netWorth || 0}</span>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="text-gray-400 text-xs text-center py-2">
+                          No players yet
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (
