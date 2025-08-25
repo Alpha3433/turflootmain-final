@@ -11,6 +11,7 @@ const AgarIOGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
   const socketRef = useRef(null)
+  const lastMousePosition = useRef({ x: 0, y: 0 }) // Track mouse for split direction
   const router = useRouter()
   const { settings } = useGameSettings()  // Add settings hook
   const { user, getAccessToken } = usePrivy() // Add Privy auth
