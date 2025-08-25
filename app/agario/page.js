@@ -1841,6 +1841,10 @@ const AgarIOGame = () => {
           splitTime: 0, // When this cell was created by split
           mergeLocked: false // If this cell can't merge yet
         }],
+        // Legacy properties for backward compatibility
+        x: (Math.random() - 0.5) * (config.worldSize * 0.8), // Same as main cell
+        y: (Math.random() - 0.5) * (config.worldSize * 0.8), // Same as main cell  
+        mass: config.startingMass, // Same as main cell
         totalMass: config.startingMass,
         netWorth: config.startingNetWorth,
         dir: { x: 0, y: 0 },
