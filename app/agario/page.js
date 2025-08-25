@@ -2190,32 +2190,30 @@ const AgarIOGame = () => {
                     (cell1.x - cell2.x) * (cell1.x - cell2.x) + 
                     (cell1.y - cell2.y) * (cell1.y - cell2.y)
                   )
-                  const mergeDistance = cell1.radius + cell2.radius - 10 // Allow slight overlap for merge
+                  // More generous overlap detection - cells merge when they touch
+                  const mergeDistance = (cell1.radius + cell2.radius) * 0.8 // 80% overlap for easier merging
                   
                   if (distance <= mergeDistance) {
                     // Merge cells: combine masses and remove smaller cell
                     const mergedMass = cell1.mass + cell2.mass
                     const mergedRadius = Math.sqrt(mergedMass / Math.PI) * 8
                     
-                    // Keep larger cell, merge smaller into it
-                    if (cell1.mass >= cell2.mass) {
-                      cell1.mass = mergedMass
-                      cell1.radius = mergedRadius
-                      // Remove cell2
-                      game.player.cells.splice(j, 1)
-                      console.log(`🔄 Merged cells: ${game.player.cells.length} cells remaining, mass: ${mergedMass}`)
-                    } else {
-                      cell2.mass = mergedMass
-                      cell2.radius = mergedRadius
-                      // Remove cell1
-                      game.player.cells.splice(i, 1)
-                      console.log(`🔄 Merged cells: ${game.player.cells.length} cells remaining, mass: ${mergedMass}`)
-                    }
+                    // Always keep the cell with lower index for consistent behavior
+                    cell1.mass = mergedMass
+                    cell1.radius = mergedRadius
+                    // Position merged cell at average position
+                    cell1.x = (cell1.x + cell2.x) / 2
+                    cell1.y = (cell1.y + cell2.y) / 2
+                    
+                    // Remove cell2
+                    game.player.cells.splice(j, 1)
+                    console.log(`🔄 Cells merged! ${game.player.cells.length} cells remaining, merged mass: ${mergedMass}`)
                     
                     // Update total mass
                     game.player.mass = game.player.cells.reduce((total, cell) => total + cell.mass, 0)
                     
-                    // Break out of loops since array was modified
+                    // Break out of inner loop and restart outer loop since array was modified
+                    i = -1 // Will be incremented to 0 at start of next iteration
                     break
                   }
                 }
