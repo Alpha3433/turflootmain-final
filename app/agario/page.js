@@ -322,6 +322,11 @@ const AgarIOGame = () => {
     }
   }, [mobileDetectionComplete, gameInitializationComplete]) // Wait for both completion flags, but don't include currentMission to avoid infinite loops
 
+  // Load user balance when component mounts
+  useEffect(() => {
+    loadUserBalance()
+  }, [])
+
   const handlePlayAgain = () => {
     // Charge the same entry fee as when they joined the lobby
     console.log(`🎮 Player wants to play again - charging entry fee: $${initialLobbyFee}`)
