@@ -414,30 +414,31 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                       
                       {/* Face Preview */}
                       {activeCategory === 'faces' && (
-                        <div className={`w-20 h-20 bg-cyan-400 rounded-full border-4 border-white/20 flex items-center justify-center relative ${!item.owned ? 'grayscale opacity-60' : ''}`}>
+                        <div className={`w-20 h-20 bg-cyan-400 rounded-full border-4 border-white/20 flex items-center justify-center relative overflow-hidden ${!item.owned ? 'grayscale opacity-60' : ''}`}>
+                          <div className="w-20 h-20 rounded-full bg-cyan-400 absolute inset-0"></div>
                           {item.id === 'angry_eyes' ? (
                             <>
-                              <div className="w-3 h-2 bg-black rounded-sm absolute top-6 left-6 transform rotate-12"></div>
-                              <div className="w-3 h-2 bg-black rounded-sm absolute top-6 right-6 transform -rotate-12"></div>
-                              <div className="w-6 h-2 bg-red-600 rounded absolute bottom-6"></div>
+                              <div className="w-3 h-2 bg-black rounded-sm absolute top-6 left-6 transform rotate-12 z-10"></div>
+                              <div className="w-3 h-2 bg-black rounded-sm absolute top-6 right-6 transform -rotate-12 z-10"></div>
+                              <div className="w-6 h-2 bg-red-600 rounded absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10"></div>
                             </>
                           ) : item.id === 'wink_eyes' ? (
                             <>
-                              <div className="w-3 h-1.5 bg-black rounded absolute top-7 left-6"></div>
-                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 right-6"></div>
-                              <div className="w-5 h-1.5 bg-pink-500 rounded-full absolute bottom-6"></div>
+                              <div className="w-3 h-1.5 bg-black rounded absolute top-7 left-6 z-10"></div>
+                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 right-6 z-10"></div>
+                              <div className="w-5 h-1.5 bg-pink-500 rounded-full absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10"></div>
                             </>
                           ) : item.id === 'laser_eyes' ? (
                             <>
-                              <div className="w-3 h-3 bg-red-500 rounded-full absolute top-6 left-6 animate-pulse"></div>
-                              <div className="w-3 h-3 bg-red-500 rounded-full absolute top-6 right-6 animate-pulse"></div>
-                              <div className="w-1 h-8 bg-red-400 opacity-80 absolute top-9 left-7.5 animate-pulse"></div>
-                              <div className="w-1 h-8 bg-red-400 opacity-80 absolute top-9 right-7.5 animate-pulse"></div>
+                              <div className="w-3 h-3 bg-red-500 rounded-full absolute top-6 left-6 animate-pulse z-10"></div>
+                              <div className="w-3 h-3 bg-red-500 rounded-full absolute top-6 right-6 animate-pulse z-10"></div>
+                              <div className="w-1 h-8 bg-red-400 opacity-80 absolute top-9 left-7.5 animate-pulse z-10"></div>
+                              <div className="w-1 h-8 bg-red-400 opacity-80 absolute top-9 right-7.5 animate-pulse z-10"></div>
                             </>
                           ) : (
                             <>
-                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 left-7"></div>
-                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 right-7"></div>
+                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 left-7 z-10"></div>
+                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 right-7 z-10"></div>
                             </>
                           )}
                         </div>
