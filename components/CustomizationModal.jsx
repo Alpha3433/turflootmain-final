@@ -1626,27 +1626,6 @@ export default CustomizationModal
                             </div>
                           )}
                           
-                          {/* Similar compact previews for other categories... */}
-                          {activeCategory === 'hats' && (
-                            <div className="relative flex items-center justify-center">
-                              <div className="w-6 h-6 bg-cyan-400 rounded-full border border-white/20 flex items-center justify-center">
-                                <div className="w-0.5 h-0.5 bg-black rounded-full absolute top-1.5 left-1.5"></div>
-                                <div className="w-0.5 h-0.5 bg-black rounded-full absolute top-1.5 right-1.5"></div>
-                              </div>
-                              <div className={`absolute -top-1 left-1/2 transform -translate-x-1/2 ${!item.owned ? 'grayscale opacity-60' : ''}`}>
-                                {item.id === 'crown_gold' ? (
-                                  <div className="w-4 h-2 bg-gradient-to-b from-yellow-200 to-yellow-600 rounded-t border border-yellow-700 text-xs">👑</div>
-                                ) : item.id === 'cap_baseball' ? (
-                                  <div className="w-5 h-2 bg-gradient-to-b from-red-400 to-red-600 rounded-full">🧢</div>
-                                ) : item.id === 'helmet_space' ? (
-                                  <div className="w-6 h-3 bg-gradient-to-b from-gray-100 to-gray-500 rounded-full border border-blue-300">🚀</div>
-                                ) : (
-                                  <div className="w-3 h-2 bg-gray-600 rounded">🎩</div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          
                           {activeCategory === 'trails' && (
                             <div className="relative flex items-center justify-center">
                               <div className="w-6 h-6 bg-cyan-400 rounded-full border border-white/20 flex items-center justify-center">
