@@ -115,6 +115,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
   const handleEquipItem = (item) => {
     if (!item.owned) return
     
+    // Update items data to mark new item as equipped and others as unequipped
     setItemsData(prev => {
       const newItemsData = { ...prev }
       
@@ -133,25 +134,36 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       return newItemsData
     })
     
-    // Update local player data
-    const categoryKey = `equipped${activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1, -1)}`
-    setPlayerData(prev => ({
-      ...prev,
-      [categoryKey]: item.id
-    }))
+    // Update local player data immediately
+    const categoryKey = activeCategory === 'skins' ? 'equippedSkin' : 
+                       activeCategory === 'trails' ? 'equippedTrail' : 
+                       activeCategory === 'faces' ? 'equippedFace' : null
     
-    // Update global player appearance
-    const customizationData = {
+    if (categoryKey) {
+      setPlayerData(prev => ({
+        ...prev,
+        [categoryKey]: item.id
+      }))
+    }
+    
+    // Save to localStorage immediately with all current data
+    const newCustomizationData = {
       skin: activeCategory === 'skins' ? item.id : playerData.equippedSkin,
       trail: activeCategory === 'trails' ? item.id : playerData.equippedTrail,
       face: activeCategory === 'faces' ? item.id : playerData.equippedFace
     }
     
     try {
-      localStorage.setItem('turfloot_player_customization', JSON.stringify(customizationData))
+      localStorage.setItem('turfloot_player_customization', JSON.stringify(newCustomizationData))
+      console.log('Saved customization:', newCustomizationData) // Debug log
     } catch (error) {
       console.error('Failed to save customization:', error)
     }
+    
+    // Also trigger a custom event to notify the game of the change
+    window.dispatchEvent(new CustomEvent('playerCustomizationChanged', { 
+      detail: newCustomizationData 
+    }))
   }
 
   const handlePurchaseItem = (item) => {
