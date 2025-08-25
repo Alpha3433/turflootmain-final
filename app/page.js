@@ -1904,9 +1904,7 @@ export default function Home() {
         />
       )}
 
-      {/* Lobby System */}
-      <LobbySystem />
-      
+
       {/* Server Browser Modal */}
       {showServerBrowser && (
         <ServerBrowserModal
