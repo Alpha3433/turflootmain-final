@@ -1828,13 +1828,17 @@ const AgarIOGame = () => {
     const initialCameraZoom = isMobile ? 1.1 : 1.2 // Start with mobile-appropriate zoom
     console.log(`📷 Camera initialized with zoom: ${initialCameraZoom} (isMobile: ${isMobile})`)
     
+    // Generate random spawn coordinates
+    const spawnX = (Math.random() - 0.5) * (config.worldSize * 0.8)
+    const spawnY = (Math.random() - 0.5) * (config.worldSize * 0.8)
+    
     // Game state
     const game = {
       player: {
         cells: [{
           id: 'main',
-          x: (Math.random() - 0.5) * (config.worldSize * 0.8), // Random spawn within 80% of world
-          y: (Math.random() - 0.5) * (config.worldSize * 0.8), // Random spawn within 80% of world
+          x: spawnX,
+          y: spawnY,
           mass: config.startingMass,
           radius: Math.sqrt(config.startingMass / Math.PI) * 8,
           velocity: { x: 0, y: 0 },
@@ -1842,8 +1846,8 @@ const AgarIOGame = () => {
           mergeLocked: false // If this cell can't merge yet
         }],
         // Legacy properties for backward compatibility
-        x: (Math.random() - 0.5) * (config.worldSize * 0.8), // Same as main cell
-        y: (Math.random() - 0.5) * (config.worldSize * 0.8), // Same as main cell  
+        x: spawnX, // Same as main cell
+        y: spawnY, // Same as main cell  
         mass: config.startingMass, // Same as main cell
         totalMass: config.startingMass,
         netWorth: config.startingNetWorth,
