@@ -1450,6 +1450,14 @@ export default CustomizationModal
                           playerData.equippedSkin === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/30 shadow-lg' :
                           playerData.equippedSkin === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/30 shadow-lg' :
                           playerData.equippedSkin === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/30 shadow-lg' :
+                          playerData.equippedSkin === 'rainbow_hologram' ? 'bg-gradient-to-br from-red-400 via-purple-500 to-blue-500 shadow-purple-500/30 shadow-lg animate-pulse' :
+                          playerData.equippedSkin === 'chrome_steel' ? 'bg-gradient-to-br from-gray-300 via-gray-100 to-gray-400 shadow-gray-500/30 shadow-lg' :
+                          playerData.equippedSkin === 'matte_blue' ? 'bg-blue-600 shadow-blue-500/30 shadow-lg' :
+                          playerData.equippedSkin === 'basic_red' ? 'bg-red-500 shadow-red-500/30' :
+                          playerData.equippedSkin === 'basic_green' ? 'bg-green-500 shadow-green-500/30' :
+                          playerData.equippedSkin === 'basic_yellow' ? 'bg-yellow-500 shadow-yellow-500/30' :
+                          playerData.equippedSkin === 'basic_purple' ? 'bg-purple-500 shadow-purple-500/30' :
+                          playerData.equippedSkin === 'basic_orange' ? 'bg-orange-500 shadow-orange-500/30' :
                           'bg-cyan-400'
                         }`}>
                           {/* Eyes */}
