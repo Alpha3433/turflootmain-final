@@ -247,8 +247,7 @@ export default function Home() {
         if (saved) {
           const customizationData = JSON.parse(saved)
           setPlayerCustomization({
-            skin: customizationData.skin || 'default_blue',
-            face: customizationData.face || 'normal_eyes'
+            skin: customizationData.skin || 'default_blue'
           })
           console.log('Lobby: Loaded player customization:', customizationData)
         }
