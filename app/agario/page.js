@@ -2248,6 +2248,21 @@ const AgarIOGame = () => {
             // CRITICAL FIX: Also update the main cell's mass for split functionality
             if (entity === game.player && entity.cells && entity.cells.length > 0) {
               entity.cells[0].mass = entity.mass // Keep main cell mass in sync
+              // Also update cell radius
+              entity.cells[0].radius = Math.sqrt(entity.mass / Math.PI) * 8
+            } else if (entity === game.player) {
+              // If cells array is missing or empty, recreate it
+              entity.cells = [{
+                id: 'main',
+                x: entity.x,
+                y: entity.y,
+                mass: entity.mass,
+                radius: Math.sqrt(entity.mass / Math.PI) * 8,
+                velocity: { x: 0, y: 0 },
+                splitTime: 0,
+                mergeLocked: false
+              }]
+              console.log('🔧 Recreated missing cells array for player')
             }
             
             // Add enhanced coin collection effects for player
