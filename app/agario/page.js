@@ -462,8 +462,7 @@ const AgarIOGame = () => {
         console.error('Agario: Failed to load customization:', error)
         // Reset to defaults if there's an error
         setPlayerCustomization({
-          skin: 'default_blue',
-          face: 'normal_eyes'
+          skin: 'default_blue'
         })
       }
     }
