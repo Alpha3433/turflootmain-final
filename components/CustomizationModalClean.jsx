@@ -331,7 +331,104 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                     
                     {/* Item Preview */}
                     <div className="aspect-square bg-gradient-to-br from-gray-700/30 to-gray-800/30 rounded-2xl mb-4 flex items-center justify-center relative overflow-hidden">
-                      {/* Preview content here */}
+                      
+                      {/* Skin Color Preview */}
+                      {activeCategory === 'skins' && (
+                        <div className={`w-20 h-20 rounded-full border-4 border-white/20 flex items-center justify-center relative ${
+                          item.id === 'default_blue' || item.id === 'classic_blue' ? 'bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 shadow-blue-500/50 shadow-lg' :
+                          item.id === 'basic_red' ? 'bg-gradient-to-br from-red-400 via-red-500 to-red-600 shadow-red-500/50 shadow-lg' :
+                          item.id === 'basic_green' ? 'bg-gradient-to-br from-green-400 via-green-500 to-green-600 shadow-green-500/50 shadow-lg' :
+                          item.id === 'basic_yellow' ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-yellow-500/50 shadow-lg' :
+                          item.id === 'basic_purple' ? 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 shadow-purple-500/50 shadow-lg' :
+                          item.id === 'basic_orange' ? 'bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 shadow-orange-500/50 shadow-lg' :
+                          item.id === 'rainbow_hologram' ? 'bg-gradient-to-br from-red-400 via-purple-500 to-blue-500 shadow-purple-500/60 shadow-xl animate-pulse' :
+                          item.id === 'chrome_steel' ? 'bg-gradient-to-br from-gray-300 via-gray-100 to-gray-400 shadow-gray-500/60 shadow-lg' :
+                          item.id === 'matte_blue' ? 'bg-blue-600 shadow-blue-500/60 shadow-lg' :
+                          item.id === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/60 shadow-xl' :
+                          item.id === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/60 shadow-xl' :
+                          item.id === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/60 shadow-xl' :
+                          item.id === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/60 shadow-xl' :
+                          item.id === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/60 shadow-xl' :
+                          'bg-gradient-to-br from-cyan-300 via-cyan-400 to-cyan-600 shadow-cyan-500/50 shadow-lg'
+                        } ${!item.owned ? 'grayscale opacity-60' : ''}`}>
+                          {/* Eyes */}
+                          <div className="w-2.5 h-2.5 bg-black rounded-full absolute top-5 left-5"></div>
+                          <div className="w-2.5 h-2.5 bg-black rounded-full absolute top-5 right-5"></div>
+                          
+                          {/* Legendary effects */}
+                          {(item.rarity === 'legendary') && (
+                            <>
+                              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Trail Preview */}
+                      {activeCategory === 'trails' && (
+                        <div className="relative flex items-center justify-center">
+                          <div className="w-8 h-8 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center">
+                            <div className="w-1 h-1 bg-black rounded-full absolute top-2 left-2"></div>
+                            <div className="w-1 h-1 bg-black rounded-full absolute top-2 right-2"></div>
+                          </div>
+                          <div className={`absolute -right-12 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 ${!item.owned ? 'grayscale opacity-60' : ''}`}>
+                            {item.id === 'rainbow_trail' ? (
+                              <>
+                                <div className="w-2 h-2 bg-red-400 opacity-90 animate-pulse rounded-full"></div>
+                                <div className="w-1.5 h-1.5 bg-yellow-400 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
+                                <div className="w-1 h-1 bg-green-400 opacity-70 animate-pulse rounded-full" style={{animationDelay: '0.4s'}}></div>
+                              </>
+                            ) : item.id === 'fire_trail' ? (
+                              <>
+                                <div className="w-2 h-1 bg-gradient-to-r from-orange-500 to-red-500 opacity-90 animate-pulse rounded-full"></div>
+                                <div className="w-1.5 h-1 bg-red-500 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.2s'}}></div>
+                              </>
+                            ) : item.id === 'lightning_trail' ? (
+                              <>
+                                <div className="w-1.5 h-3 bg-blue-300 opacity-90 animate-pulse" style={{clipPath: 'polygon(0 0, 100% 40%, 60% 50%, 100% 100%, 0 60%, 40% 50%)'}}></div>
+                                <div className="w-1 h-2 bg-cyan-300 opacity-80 animate-pulse" style={{clipPath: 'polygon(0 0, 100% 40%, 60% 50%, 100% 100%, 0 60%, 40% 50%)', animationDelay: '0.3s'}}></div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="w-2 h-2 bg-blue-400 opacity-90 animate-pulse rounded-full"></div>
+                                <div className="w-1.5 h-1.5 bg-cyan-400 opacity-80 animate-pulse rounded-full" style={{animationDelay: '0.3s'}}></div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Face Preview */}
+                      {activeCategory === 'faces' && (
+                        <div className={`w-8 h-8 bg-cyan-400 rounded-full border-2 border-white/20 flex items-center justify-center relative ${!item.owned ? 'grayscale opacity-60' : ''}`}>
+                          {item.id === 'angry_eyes' ? (
+                            <>
+                              <div className="w-1 h-0.5 bg-black rounded-sm absolute top-2 left-2 transform rotate-12"></div>
+                              <div className="w-1 h-0.5 bg-black rounded-sm absolute top-2 right-2 transform -rotate-12"></div>
+                              <div className="w-2 h-0.5 bg-red-600 rounded absolute bottom-2"></div>
+                            </>
+                          ) : item.id === 'wink_eyes' ? (
+                            <>
+                              <div className="w-1 h-0.5 bg-black rounded absolute top-2.5 left-2"></div>
+                              <div className="w-1 h-1 bg-black rounded-full absolute top-2 right-2"></div>
+                              <div className="w-1.5 h-0.5 bg-pink-500 rounded-full absolute bottom-2"></div>
+                            </>
+                          ) : item.id === 'laser_eyes' ? (
+                            <>
+                              <div className="w-1 h-1 bg-red-500 rounded-full absolute top-2 left-2 animate-pulse"></div>
+                              <div className="w-1 h-1 bg-red-500 rounded-full absolute top-2 right-2 animate-pulse"></div>
+                              <div className="w-0.5 h-4 bg-red-400 opacity-80 absolute top-3 left-2.5 animate-pulse"></div>
+                              <div className="w-0.5 h-4 bg-red-400 opacity-80 absolute top-3 right-2.5 animate-pulse"></div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-1 h-1 bg-black rounded-full absolute top-2 left-2"></div>
+                              <div className="w-1 h-1 bg-black rounded-full absolute top-2 right-2"></div>
+                            </>
+                          )}
+                        </div>
+                      )}
                       
                       {/* Equipped Badge */}
                       {item.equipped && (
