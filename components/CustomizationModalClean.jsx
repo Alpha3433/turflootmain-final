@@ -436,8 +436,8 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                             </>
                           ) : (
                             <>
-                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 left-6"></div>
-                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 right-6"></div>
+                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 left-7"></div>
+                              <div className="w-3 h-3 bg-black rounded-full absolute top-6 right-7"></div>
                             </>
                           )}
                         </div>
