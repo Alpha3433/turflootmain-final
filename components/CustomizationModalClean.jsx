@@ -324,7 +324,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                   <div
                     key={item.id}
                     onClick={() => setSelectedItem(item)}
-                    className={`group relative bg-gray-800/50 rounded-2xl p-6 border-2 cursor-pointer transition-all hover:scale-105 hover:shadow-2xl ${
+                    className={`group relative bg-gray-800/50 rounded-2xl p-6 border-2 cursor-pointer transition-all hover:scale-105 hover:shadow-2xl h-80 flex flex-col ${
                       item.equipped ? 'border-green-400 bg-green-400/5 shadow-green-400/20' : rarityColors[item.rarity]
                     } ${selectedItem?.id === item.id ? 'ring-2 ring-purple-400 scale-105' : ''}`}
                   >
