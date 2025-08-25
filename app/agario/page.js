@@ -4402,64 +4402,6 @@ const AgarIOGame = () => {
           {/* Instructions Info Icon - REMOVED per user request */}
         </>
       )}
-
-      {/* Mobile Action Buttons Styles */}
-      <style jsx>{`
-        .mobile-action-buttons {
-          position: fixed;
-          bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-          right: 20px;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-          z-index: 1000;
-          transition: opacity 0.3s ease;
-        }
-
-        .mobile-action-buttons.faded {
-          opacity: 0.4;
-        }
-
-        .mobile-action-btn {
-          position: relative;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .mobile-action-btn:active {
-          transform: scale(0.95);
-        }
-
-        .mobile-cashout-btn {
-          position: relative;
-        }
-
-        .mobile-split-btn {
-          position: relative;
-        }
-
-        .shake {
-          animation: shake 0.3s ease-in-out;
-        }
-
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-2px); }
-          75% { transform: translateX(2px); }
-        }
-
-        @media (max-width: 768px) {
-          .mobile-action-buttons {
-            bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-            right: 16px;
-            gap: 12px;
-          }
-        }
-      `}</style>
     </div>
   )
 }
