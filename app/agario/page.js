@@ -3931,32 +3931,64 @@ const AgarIOGame = () => {
                 </div>
               </div>
             ) : (
-              /* Desktop Layout - Original Design */
+              /* Desktop Layout - Modern Redesign */
               <>
-                <div className="text-3xl font-bold mb-4 text-red-400">
-                  {gameResult}
+                {/* Header with gradient and icon */}
+                <div className="text-center mb-8">
+                  <div className="text-6xl mb-3">🚪</div>
+                  <div className="text-2xl font-bold text-white mb-2">
+                    Game Ended
+                  </div>
+                  <div className="text-sm text-gray-400 font-medium tracking-wide">
+                    {gameResult.replace('🚪 ', '')}
+                  </div>
                 </div>
                 
-                <div className="text-gray-300 mb-6 space-y-2">
-                  <p>Final Net Worth: <span className="text-green-400 font-bold">${gameStats.netWorth}</span></p>
-                  <p>Final Rank: <span className="text-cyan-400">#{gameStats.rank}</span></p>
-                  <p>K/D Ratio: <span className="text-yellow-400">{gameStats.kills}/{gameStats.deaths}</span></p>
-                  <p>Best Streak: <span className="text-orange-400">{gameStats.streak} 🔥</span></p>
+                {/* Stats Cards Grid */}
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  {/* Net Worth Card */}
+                  <div className="bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/30 rounded-xl p-4 text-center">
+                    <div className="text-green-400 text-sm font-medium mb-1">NET WORTH</div>
+                    <div className="text-white text-2xl font-bold">${gameStats.netWorth}</div>
+                  </div>
+                  
+                  {/* Rank Card */}
+                  <div className="bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 border border-cyan-500/30 rounded-xl p-4 text-center">
+                    <div className="text-cyan-400 text-sm font-medium mb-1">FINAL RANK</div>
+                    <div className="text-white text-2xl font-bold">#{gameStats.rank}</div>
+                  </div>
+                  
+                  {/* K/D Ratio Card */}
+                  <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30 rounded-xl p-4 text-center">
+                    <div className="text-yellow-400 text-sm font-medium mb-1">K/D RATIO</div>
+                    <div className="text-white text-2xl font-bold">{gameStats.kills}/{gameStats.deaths}</div>
+                  </div>
+                  
+                  {/* Best Streak Card */}
+                  <div className="bg-gradient-to-br from-orange-500/20 to-red-600/10 border border-orange-500/30 rounded-xl p-4 text-center">
+                    <div className="text-orange-400 text-sm font-medium mb-1">BEST STREAK</div>
+                    <div className="text-white text-2xl font-bold flex items-center justify-center gap-1">
+                      {gameStats.streak} <span className="text-lg">🔥</span>
+                    </div>
+                  </div>
                 </div>
 
+                {/* Action Buttons */}
                 <div className="space-y-3">
                   <button
                     onClick={restartGame}
-                    className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 flex items-center justify-center gap-2"
                   >
-                    Play Again
+                    <span className="text-xl">🎮</span>
+                    <span>Play Again</span>
                   </button>
                   
                   <button
                     onClick={() => router.push('/')}
-                    className="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                    className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-xl hover:shadow-gray-500/25 flex items-center justify-center gap-2 border border-gray-500/30"
                   >
-                    Back to Lobby
+                    <span className="text-xl">🏠</span>
+                    <span>Back to Lobby</span>
                   </button>
                 </div>
               </>
