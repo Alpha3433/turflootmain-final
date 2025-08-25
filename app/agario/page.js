@@ -791,8 +791,9 @@ const AgarIOGame = () => {
           const result = await response.json()
           console.log('✅ Mission reward saved to account:', result)
           
-          // Update local balance display if needed
+          // Update local balance display
           if (result.newBalance !== undefined) {
+            setUserBalance(result.newBalance)
             console.log(`💰 Account balance updated: ${result.newBalance} coins`)
           }
         } else {
@@ -804,6 +805,29 @@ const AgarIOGame = () => {
       }
     }
     setCurrentMission(null)
+  }
+
+  // Load user's coin balance from database
+  const loadUserBalance = async () => {
+    try {
+      const response = await fetch('/api/users/balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 'demo-user' // In real implementation, get from auth
+        }),
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setUserBalance(result.balance || 0)
+        console.log(`💰 Loaded user balance: ${result.balance} coins`)
+      }
+    } catch (error) {
+      console.error('❌ Error loading user balance:', error)
+    }
   }
 
   const addLiveEvent = (message, type = 'info') => {
