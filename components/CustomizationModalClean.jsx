@@ -97,14 +97,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
             }))
           }
           
-          // Set equipped states for trails
-          if (customizationData.trail && newItemsData.trails) {
-            newItemsData.trails = newItemsData.trails.map(item => ({
-              ...item,
-              equipped: item.id === customizationData.trail
-            }))
-          }
-          
           // Set equipped states for faces
           if (customizationData.face && newItemsData.faces) {
             newItemsData.faces = newItemsData.faces.map(item => ({
