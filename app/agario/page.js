@@ -945,10 +945,10 @@ const AgarIOGame = () => {
       SPLIT_MAX_VELOCITY
     )
     
-    // Calculate safe spawn position
+    // Calculate safe spawn position with MUCH larger separation for visibility
     const cellRadius = Math.sqrt(remainingMass / Math.PI) * 8
     const newRadius = Math.sqrt(newMass / Math.PI) * 8
-    const spawnDistance = cellRadius + newRadius + 5 // 5px safety margin
+    const spawnDistance = Math.max(cellRadius + newRadius + 50, 100) // Much larger minimum distance for visibility
     
     const newX = cellToSplit.x + direction.x * spawnDistance
     const newY = cellToSplit.y + direction.y * spawnDistance
