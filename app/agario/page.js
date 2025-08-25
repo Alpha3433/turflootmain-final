@@ -2672,7 +2672,7 @@ const AgarIOGame = () => {
         // Validate virus coordinates before creating gradient
         if (!isFinite(virus.x) || !isFinite(virus.y) || !isFinite(virus.radius) || virus.radius <= 0) {
           console.warn('Invalid virus coordinates:', { x: virus.x, y: virus.y, radius: virus.radius })
-          continue // Skip this virus if coordinates are invalid
+          return // Skip this virus if coordinates are invalid
         }
         
         // Create gradient for virus body
