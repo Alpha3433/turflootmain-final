@@ -908,7 +908,7 @@ const AgarIOGame = () => {
 
   const performSplit = (cellToSplit, direction, game) => {
     // Safe version with hardcoded constants
-    const MIN_SPLIT_MASS = 36
+    const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
     const SPLIT_BASE_SPEED = 1800
     const SPLIT_MIN_VELOCITY = 400
     const SPLIT_MAX_VELOCITY = 1600
