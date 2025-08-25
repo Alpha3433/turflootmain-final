@@ -345,7 +345,12 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-white capitalize">{activeCategory}</h3>
-                  <p className="text-gray-400">{getFilteredItems().length} items {activeTab === 'inventory' ? 'in your collection' : 'available'}</p>
+                  <p className="text-gray-400">
+                    {getFilteredItems().length} items {
+                      activeTab === 'inventory' ? 'in your collection' : 
+                      activeTab === 'shop' ? 'available for purchase' : 'available'
+                    }
+                  </p>
                 </div>
               </div>
             </div>
