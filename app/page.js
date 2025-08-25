@@ -271,7 +271,6 @@ export default function Home() {
       console.log('Lobby: Customization changed:', event.detail)
       setPlayerCustomization({
         skin: event.detail.skin || 'default_blue',
-        trail: event.detail.trail || 'default_sparkle',
         face: event.detail.face || 'normal_eyes'
       })
     }
