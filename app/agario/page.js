@@ -970,6 +970,10 @@ const AgarIOGame = () => {
   }
 
   const handleSplit = (mouseX = null, mouseY = null) => {
+    // Safe version with hardcoded constants
+    const MIN_SPLIT_MASS = 36
+    const SPLIT_COOLDOWN = 750
+    
     if (!gameRef.current?.game?.player || !canPlayerSplit(gameRef.current.game.player)) {
       // Show feedback for denied split
       setSplitCooldownActive(true)
@@ -982,7 +986,7 @@ const AgarIOGame = () => {
     
     // Find the largest cell to split
     const cellToSplit = player.cells.reduce((largest, cell) => {
-      if (cell.mass >= config.MIN_SPLIT_MASS && (!largest || cell.mass > largest.mass)) {
+      if (cell.mass >= MIN_SPLIT_MASS && (!largest || cell.mass > largest.mass)) {
         return cell
       }
       return largest
@@ -1007,7 +1011,7 @@ const AgarIOGame = () => {
     // Perform the split
     if (performSplit(cellToSplit, direction, game)) {
       // Set cooldown
-      setSplitCooldown(config.SPLIT_COOLDOWN)
+      setSplitCooldown(SPLIT_COOLDOWN)
       setSplitCooldownActive(true)
       
       // Visual/Audio feedback
@@ -1017,7 +1021,7 @@ const AgarIOGame = () => {
       setTimeout(() => {
         setSplitCooldown(0)
         setSplitCooldownActive(false)
-      }, config.SPLIT_COOLDOWN)
+      }, SPLIT_COOLDOWN)
     }
   }
 
