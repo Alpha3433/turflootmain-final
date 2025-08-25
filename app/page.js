@@ -47,8 +47,6 @@ export default function Home() {
   const [leaderboardData, setLeaderboardData] = useState([])
   const [playerCustomization, setPlayerCustomization] = useState({
     skin: 'default_blue',
-    hat: null,
-    trail: 'default_sparkle',
     face: 'normal_eyes'
   })
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
