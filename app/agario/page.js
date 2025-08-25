@@ -1547,7 +1547,7 @@ const AgarIOGame = () => {
       orbCount: 600, // Increased even more - 50% more orbs from 400
       virusCount: 60, // Increased virus count for more strategic gameplay (was 25)
       botCount: 15,
-      baseSpeed: 648, // Additional 60% increase (405 * 1.6 = 648)
+      baseSpeed: 400, // Reduced speed for more strategic gameplay (was 648)
       startingNetWorth: 100,
       startingMass: 10,
       orbMassValue: 4.5, // Tripled from 1.5 to 4.5 - much bigger growth per orb
