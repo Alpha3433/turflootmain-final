@@ -240,6 +240,30 @@ export default function Home() {
     // Cleanup is not needed as this runs for the lifetime of the component
   }, [])
 
+  // Load user's coin balance from database
+  const loadUserBalance = async () => {
+    try {
+      const response = await fetch('/api/users/balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 'demo-user' // In real implementation, get from auth
+        }),
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        setUserBalance(result.balance || 1250)
+        console.log(`💰 Loaded user balance on landing page: ${result.balance || 1250} coins`)
+      }
+    } catch (error) {
+      console.error('❌ Error loading user balance:', error)
+      // Keep default balance of 1250 if API fails
+    }
+  }
+
   // Load player customization data
   useEffect(() => {
     const loadCustomization = () => {
