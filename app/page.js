@@ -267,8 +267,7 @@ export default function Home() {
     const handleCustomizationChange = (event) => {
       console.log('Lobby: Customization changed:', event.detail)
       setPlayerCustomization({
-        skin: event.detail.skin || 'default_blue',
-        face: event.detail.face || 'normal_eyes'
+        skin: event.detail.skin || 'default_blue'
       })
     }
 
