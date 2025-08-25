@@ -456,7 +456,6 @@ const AgarIOGame = () => {
           const customizationData = JSON.parse(saved)
           setPlayerCustomization({
             skin: customizationData.skin || 'default_blue',
-            trail: customizationData.trail || 'default_sparkle',
             face: customizationData.face || 'normal_eyes'
           })
           console.log('Agario: Loaded player customization:', customizationData)
