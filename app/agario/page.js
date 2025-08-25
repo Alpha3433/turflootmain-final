@@ -1586,9 +1586,17 @@ const AgarIOGame = () => {
     // Game state
     const game = {
       player: {
-        x: 0,
-        y: 0,
-        mass: config.startingMass,
+        cells: [{
+          id: 'main',
+          x: 0,
+          y: 0,
+          mass: config.startingMass,
+          radius: Math.sqrt(config.startingMass / Math.PI) * 8,
+          velocity: { x: 0, y: 0 },
+          splitTime: 0, // When this cell was created by split
+          mergeLocked: false // If this cell can't merge yet
+        }],
+        totalMass: config.startingMass,
         netWorth: config.startingNetWorth,
         dir: { x: 0, y: 0 },
         alive: true,
@@ -1599,7 +1607,8 @@ const AgarIOGame = () => {
         isBounty: false,
         spawnProtected: true, // New spawn protection
         spawnTime: Date.now(), // Track when spawned
-        lastNetWorth: config.startingNetWorth
+        lastNetWorth: config.startingNetWorth,
+        lastSplitTime: 0 // Track last split for cooldown
       },
       bots: [],
       orbs: [],
