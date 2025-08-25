@@ -29,7 +29,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
     equippedFace: 'normal_eyes'
   })
 
-  const [itemsData] = useState({
+  const [itemsData, setItemsData] = useState({
     skins: [
       // Basic collection - Default colors for new users
       { id: 'default_blue', name: 'Classic Blue', rarity: 'common', price: 0, owned: true, equipped: true, preview: '/previews/skin_blue.png', description: 'The original TurfLoot skin that started it all.' },
