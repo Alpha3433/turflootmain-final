@@ -4071,7 +4071,11 @@ const AgarIOGame = () => {
 
               {/* Mobile Split Button */}
               <div 
-                className="mobile-action-btn mobile-split-btn relative"
+                className={`relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                  splitCooldownActive 
+                    ? 'animate-pulse' 
+                    : ''
+                }`}
                 onPointerDown={(e) => {
                   console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
                   handleSplitStart(e)
@@ -4110,7 +4114,7 @@ const AgarIOGame = () => {
                 {/* Button content */}
                 <div className={`absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 ${
                   splitCooldownActive 
-                    ? 'bg-red-800/80 border-red-600 shake' 
+                    ? 'bg-red-800/80 border-red-600' 
                     : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
                       ? 'bg-blue-800/80 border-blue-600 hover:bg-blue-700/90' 
                       : 'bg-gray-800/60 border-gray-700'
