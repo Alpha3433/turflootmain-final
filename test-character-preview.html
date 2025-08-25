@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Character Preview Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 p-8">
+    <div class="max-w-md mx-auto text-center">
+        <h1 class="text-white text-2xl mb-8">Character Preview Test</h1>
+        
+        <!-- Character Preview -->
+        <div class="mb-8">
+            <div id="character-preview" class="w-20 h-20 rounded-full mx-auto border-2 border-cyan-300 flex items-center justify-center bg-gradient-to-br from-cyan-300 via-blue-500 to-blue-600 shadow-blue-500/30 relative">
+                <div class="w-2 h-2 bg-black rounded-full absolute top-5 left-6"></div>
+                <div class="w-2 h-2 bg-black rounded-full absolute top-5 right-6"></div>
+            </div>
+            <p class="text-gray-400 text-sm mt-2">Your Character</p>
+        </div>
+        
+        <!-- Skin Selection Buttons -->
+        <div class="space-y-2">
+            <button onclick="changeSkin('default_blue')" class="w-full bg-blue-600 text-white px-4 py-2 rounded">Default Blue</button>
+            <button onclick="changeSkin('basic_red')" class="w-full bg-red-600 text-white px-4 py-2 rounded">Basic Red</button>
+            <button onclick="changeSkin('basic_green')" class="w-full bg-green-600 text-white px-4 py-2 rounded">Basic Green</button>
+            <button onclick="changeSkin('basic_orange')" class="w-full bg-orange-600 text-white px-4 py-2 rounded">Basic Orange</button>
+            <button onclick="changeSkin('rainbow_hologram')" class="w-full bg-purple-600 text-white px-4 py-2 rounded">Rainbow Hologram</button>
+        </div>
+    </div>
+
+    <script>
+        function changeSkin(skinId) {
+            const preview = document.getElementById('character-preview');
+            
+            // Remove all existing classes
+            preview.className = 'w-20 h-20 rounded-full mx-auto border-2 border-cyan-300 flex items-center justify-center relative';
+            
+            // Add skin-specific classes
+            switch(skinId) {
+                case 'default_blue':
+                    preview.className += ' bg-gradient-to-br from-cyan-300 via-blue-500 to-blue-600 shadow-blue-500/30';
+                    break;
+                case 'basic_red':
+                    preview.className += ' bg-gradient-to-br from-red-400 via-red-500 to-red-600 shadow-red-500/30';
+                    break;
+                case 'basic_green':
+                    preview.className += ' bg-gradient-to-br from-green-400 via-green-500 to-green-600 shadow-green-500/30';
+                    break;
+                case 'basic_orange':
+                    preview.className += ' bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 shadow-orange-500/30';
+                    break;
+                case 'rainbow_hologram':
+                    preview.className += ' bg-gradient-to-br from-red-400 via-purple-500 to-blue-500 shadow-purple-500/40 animate-pulse';
+                    break;
+            }
+            
+            console.log('Changed skin to:', skinId);
+        }
+    </script>
+</body>
+</html>
