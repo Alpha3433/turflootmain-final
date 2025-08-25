@@ -108,9 +108,9 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Customize Page Mobile-Friendly Redesign (COMPLETED)"
-    - "Modern UI/UX Implementation (COMPLETED)" 
-    - "Responsive Mobile Layout (COMPLETED)"
+    - "Mobile Split Button Implementation (IN PROGRESS)"
+    - "Split Mechanic Mobile Integration (IN PROGRESS)" 
+    - "Mobile Action Button UI/UX (IN PROGRESS)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
