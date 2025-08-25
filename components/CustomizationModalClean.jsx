@@ -449,9 +449,9 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                     </div>
 
                     {/* Item Info */}
-                    <div className="text-center mb-4">
-                      <h4 className="text-white text-lg font-bold mb-2 group-hover:text-purple-300 transition-colors line-clamp-1">{item.name}</h4>
-                      <div className="flex items-center justify-center space-x-2 mb-3">
+                    <div className="text-center mb-6">
+                      <h4 className="text-white text-lg font-bold mb-3 group-hover:text-purple-300 transition-colors line-clamp-1">{item.name}</h4>
+                      <div className="flex items-center justify-center space-x-2 mb-4">
                         <span className={`text-sm font-bold px-3 py-1 rounded-full ${rarityColors[item.rarity]} capitalize bg-black/20 border border-current/30`}>
                           {item.rarity}
                         </span>
@@ -462,7 +462,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                         </div>
                       </div>
                       {!item.owned && (
-                        <div className="text-yellow-400 text-lg font-bold bg-yellow-400/10 px-4 py-2 rounded-xl border border-yellow-400/30 mb-3">
+                        <div className="text-yellow-400 text-lg font-bold bg-yellow-400/10 px-4 py-2 rounded-xl border border-yellow-400/30 mb-4">
                           💰 {item.price}
                         </div>
                       )}
