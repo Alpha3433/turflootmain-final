@@ -1557,7 +1557,21 @@ const AgarIOGame = () => {
       platformFee: 0.10,
       virusRadius: 25,
       virusSplitThreshold: 35, // Mass threshold to split when hitting virus
-      virusHideThreshold: 25 // Mass threshold to hide inside virus
+      virusHideThreshold: 25, // Mass threshold to hide inside virus
+
+      // Split Mechanic Configuration
+      MIN_SPLIT_MASS: 36, // Minimum mass required to split
+      SPLIT_BASE_SPEED: 1800, // Base speed for split projection
+      SPLIT_MIN_VELOCITY: 400, // Minimum split velocity
+      SPLIT_MAX_VELOCITY: 1600, // Maximum split velocity
+      SPLIT_FRICTION_TAU: 0.35, // Velocity decay time constant (seconds)
+      SPLIT_DURATION: 0.6, // Maximum split projection duration (seconds)
+      SPLIT_MIN_VELOCITY_STOP: 80, // Stop projecting when velocity drops below this
+      MAX_CELLS: 16, // Maximum cells per player
+      SPLIT_COOLDOWN: 750, // Split cooldown in milliseconds
+      MERGE_MIN_TIME: 12000, // Time before cells can merge (milliseconds)
+      ABSORB_THRESHOLD: 1.25, // Size ratio needed to absorb another cell
+      SPIKE_TRIGGER_MASS: 130 // Mass needed to trigger spike burst
     }
 
     // FIXED: Mobile-aware camera initialization
