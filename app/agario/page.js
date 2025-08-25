@@ -2407,6 +2407,21 @@ const AgarIOGame = () => {
               // CRITICAL FIX: Also update the main cell's mass for split functionality
               if (game.player.cells && game.player.cells.length > 0) {
                 game.player.cells[0].mass = game.player.mass // Keep main cell mass in sync
+                // Also update cell radius
+                game.player.cells[0].radius = Math.sqrt(game.player.mass / Math.PI) * 8
+              } else {
+                // If cells array is missing or empty, recreate it
+                game.player.cells = [{
+                  id: 'main',
+                  x: game.player.x,
+                  y: game.player.y,
+                  mass: game.player.mass,
+                  radius: Math.sqrt(game.player.mass / Math.PI) * 8,
+                  velocity: { x: 0, y: 0 },
+                  splitTime: 0,
+                  mergeLocked: false
+                }]
+                console.log('🔧 Recreated missing cells array for player after bot kill')
               }
               
               game.player.kills += 1
