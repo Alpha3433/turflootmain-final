@@ -270,8 +270,11 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                 <div className="grid grid-cols-2 gap-3">
                   {categories.map((category) => {
                     const Icon = category.icon
-                    const itemCount = itemsData[category.id]?.filter(item => activeTab === 'inventory' ? item.owned : true).length || 0
-                    const ownedCount = itemsData[category.id]?.filter(item => item.owned).length || 0
+                    const allItems = itemsData[category.id] || []
+                    const ownedCount = allItems.filter(item => item.owned).length
+                    const unownedCount = allItems.filter(item => !item.owned).length
+                    const displayCount = activeTab === 'inventory' ? ownedCount : activeTab === 'shop' ? unownedCount : allItems.length
+                    
                     return (
                       <button
                         key={category.id}
@@ -287,7 +290,9 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                           <span className="text-white font-medium">{category.name}</span>
                         </div>
                         <div className="text-xs text-gray-400">
-                          {activeTab === 'inventory' ? `${ownedCount} owned` : `${itemCount} total`}
+                          {activeTab === 'inventory' ? `${ownedCount} owned` : 
+                           activeTab === 'shop' ? `${unownedCount} available` : 
+                           `${allItems.length} total`}
                         </div>
                       </button>
                     )
