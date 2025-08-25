@@ -1545,7 +1545,7 @@ const AgarIOGame = () => {
     const config = {
       worldSize: 3750, // Increased by 25% (was 3000, now 3750)
       orbCount: 600, // Increased even more - 50% more orbs from 400
-      virusCount: 25, // Virus cells scattered around the map
+      virusCount: 60, // Increased virus count for more strategic gameplay (was 25)
       botCount: 15,
       baseSpeed: 648, // Additional 60% increase (405 * 1.6 = 648)
       startingNetWorth: 100,
