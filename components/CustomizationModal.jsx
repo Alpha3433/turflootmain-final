@@ -325,30 +325,6 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                   )}
                 </div>
 
-                {/* Mobile Hat */}
-                {playerData.equippedHat && (
-                  <div className={`absolute -top-4 left-1/2 transform -translate-x-1/2 ${
-                    playerData.equippedHat === 'crown_gold' ? 
-                      'w-10 h-6 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-t-xl border-2 border-yellow-600' :
-                    playerData.equippedHat === 'cap_baseball' ? 
-                      'w-12 h-5 bg-gradient-to-r from-red-600 to-red-500 rounded-full' :
-                    playerData.equippedHat === 'helmet_space' ? 
-                      'w-14 h-8 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full border-2 border-blue-400' :
-                    playerData.equippedHat === 'wizard_hat' ?
-                      'w-8 h-12 bg-gradient-to-b from-purple-600 to-purple-800 rounded-t-full' :
-                      'w-8 h-5 bg-gray-600 rounded'
-                  }`}>
-                    {playerData.equippedHat === 'crown_gold' && (
-                      <div className="flex justify-center">
-                        <div className="w-1 h-3 bg-yellow-300 rounded-t-full mt-1"></div>
-                      </div>
-                    )}
-                    {playerData.equippedHat === 'wizard_hat' && (
-                      <div className="absolute top-1 right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                    )}
-                  </div>
-                )}
-
                 {/* Mobile Trail */}
                 {playerData.equippedTrail && (
                   <div className="absolute -right-16 top-1/2 transform -translate-y-1/2 flex space-x-1">
