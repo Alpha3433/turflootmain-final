@@ -49,7 +49,6 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
   const [showPreviewPanel, setShowPreviewPanel] = useState(true) // desktop only
   const [playerData, setPlayerData] = useState({
     equippedSkin: 'default_blue',
-    equippedHat: null,
     equippedTrail: 'default_sparkle',
     equippedBoost: null,
     equippedFace: 'normal_eyes'
