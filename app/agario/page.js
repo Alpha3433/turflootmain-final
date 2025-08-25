@@ -820,6 +820,155 @@ const AgarIOGame = () => {
     setCurrentMission(null)
   }
 
+  // Split Mechanic Functions
+  const canPlayerSplit = (player) => {
+    // Check if player has any cells that can split
+    return player.cells && 
+           player.cells.length < config.MAX_CELLS && 
+           player.cells.some(cell => cell.mass >= config.MIN_SPLIT_MASS) &&
+           (Date.now() - player.lastSplitTime) >= config.SPLIT_COOLDOWN
+  }
+
+  const calculateSplitDirection = (targetCell, mouseX, mouseY) => {
+    // Calculate direction from cell center to mouse position
+    const dx = mouseX - targetCell.x
+    const dy = mouseY - targetCell.y
+    const distance = Math.sqrt(dx * dx + dy * dy)
+    
+    if (distance === 0) {
+      // Default direction if no mouse movement
+      return { x: 1, y: 0 }
+    }
+    
+    return {
+      x: dx / distance,
+      y: dy / distance
+    }
+  }
+
+  const performSplit = (cellToSplit, direction, game) => {
+    if (!cellToSplit || cellToSplit.mass < config.MIN_SPLIT_MASS) {
+      return false
+    }
+
+    const player = game.player
+    
+    // Calculate new masses (50/50 split)
+    const newMass = Math.floor(cellToSplit.mass / 2)
+    const remainingMass = cellToSplit.mass - newMass
+    
+    // Calculate initial velocity based on mass
+    const initialSpeed = Math.min(
+      Math.max(
+        config.SPLIT_BASE_SPEED / Math.sqrt(newMass),
+        config.SPLIT_MIN_VELOCITY
+      ),
+      config.SPLIT_MAX_VELOCITY
+    )
+    
+    // Calculate safe spawn position
+    const cellRadius = Math.sqrt(remainingMass / Math.PI) * 8
+    const newRadius = Math.sqrt(newMass / Math.PI) * 8
+    const spawnDistance = cellRadius + newRadius + 5 // 5px safety margin
+    
+    const newX = cellToSplit.x + direction.x * spawnDistance
+    const newY = cellToSplit.y + direction.y * spawnDistance
+    
+    // Check world boundaries
+    const worldRadius = config.worldSize / 2
+    const distanceFromCenter = Math.sqrt(newX * newX + newY * newY)
+    if (distanceFromCenter + newRadius > worldRadius) {
+      // Don't split if it would spawn outside world
+      return false
+    }
+    
+    // Update original cell
+    cellToSplit.mass = remainingMass
+    cellToSplit.radius = cellRadius
+    
+    // Create new cell
+    const newCell = {
+      id: `split_${Date.now()}_${Math.random()}`,
+      x: newX,
+      y: newY,
+      mass: newMass,
+      radius: newRadius,
+      velocity: {
+        x: direction.x * initialSpeed,
+        y: direction.y * initialSpeed
+      },
+      splitTime: Date.now(),
+      mergeLocked: true // Can't merge for 12 seconds
+    }
+    
+    // Add new cell to player
+    player.cells.push(newCell)
+    
+    // Update player totals
+    player.totalMass = player.cells.reduce((total, cell) => total + cell.mass, 0)
+    player.lastSplitTime = Date.now()
+    
+    // Set merge lock timer for both cells
+    setTimeout(() => {
+      if (cellToSplit) cellToSplit.mergeLocked = false
+      if (newCell) newCell.mergeLocked = false
+    }, config.MERGE_MIN_TIME)
+    
+    return true
+  }
+
+  const handleSplit = (mouseX = null, mouseY = null) => {
+    if (!gameRef.current?.game?.player || !canPlayerSplit(gameRef.current.game.player)) {
+      // Show feedback for denied split
+      setSplitCooldownActive(true)
+      setTimeout(() => setSplitCooldownActive(false), 300) // Shake effect
+      return
+    }
+
+    const game = gameRef.current.game
+    const player = game.player
+    
+    // Find the largest cell to split
+    const cellToSplit = player.cells.reduce((largest, cell) => {
+      if (cell.mass >= config.MIN_SPLIT_MASS && (!largest || cell.mass > largest.mass)) {
+        return cell
+      }
+      return largest
+    }, null)
+    
+    if (!cellToSplit) return
+    
+    // Calculate direction
+    let direction
+    if (mouseX !== null && mouseY !== null) {
+      // Desktop: use mouse position
+      direction = calculateSplitDirection(cellToSplit, mouseX, mouseY)
+    } else if (player.dir && (player.dir.x !== 0 || player.dir.y !== 0)) {
+      // Mobile: use movement direction
+      const length = Math.sqrt(player.dir.x * player.dir.x + player.dir.y * player.dir.y)
+      direction = { x: player.dir.x / length, y: player.dir.y / length }
+    } else {
+      // Default direction
+      direction = { x: 1, y: 0 }
+    }
+    
+    // Perform the split
+    if (performSplit(cellToSplit, direction, game)) {
+      // Set cooldown
+      setSplitCooldown(config.SPLIT_COOLDOWN)
+      setSplitCooldownActive(true)
+      
+      // Visual/Audio feedback
+      console.log('🔄 Split performed!')
+      
+      // Clear cooldown
+      setTimeout(() => {
+        setSplitCooldown(0)
+        setSplitCooldownActive(false)
+      }, config.SPLIT_COOLDOWN)
+    }
+  }
+
   const addLiveEvent = (message, type = 'info') => {
     const event = {
       id: Date.now(),
