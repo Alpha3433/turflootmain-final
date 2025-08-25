@@ -219,7 +219,6 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
     // Update global player appearance
     const customizationData = {
       skin: activeCategory === 'skins' ? item.id : playerData.equippedSkin,
-      hat: activeCategory === 'hats' ? item.id : playerData.equippedHat,
       trail: activeCategory === 'trails' ? item.id : playerData.equippedTrail,
       face: activeCategory === 'faces' ? item.id : playerData.equippedFace
     }
