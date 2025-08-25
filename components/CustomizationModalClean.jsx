@@ -58,7 +58,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
 
   const categories = [
     { id: 'skins', name: 'Skins', icon: Palette, color: 'text-blue-400' },
-    { id: 'trails', name: 'Trails', icon: Sparkles, color: 'text-purple-400' },
     { id: 'faces', name: 'Faces', icon: Eye, color: 'text-pink-400' }
   ]
 
