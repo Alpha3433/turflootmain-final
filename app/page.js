@@ -258,7 +258,6 @@ export default function Home() {
         // Reset to defaults if there's an error
         setPlayerCustomization({
           skin: 'default_blue',
-          trail: 'default_sparkle',
           face: 'normal_eyes'
         })
       }
