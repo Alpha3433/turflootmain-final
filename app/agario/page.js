@@ -4821,6 +4821,8 @@ const AgarIOGame = () => {
           )}
 
           {/* Instructions Info Icon - REMOVED per user request */}
+            </>
+          )}
         </>
       )}
     </div>
