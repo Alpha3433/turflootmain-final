@@ -1616,6 +1616,7 @@ const AgarIOGame = () => {
     for (let i = 0; i < config.virusCount; i++) {
       let x, y, distance
       const maxRadius = (config.worldSize / 2) - 30 // Add 30 unit margin from edge for viruses
+      
       // Keep generating random positions until we find one inside the circle with margin
       do {
         x = (Math.random() - 0.5) * config.worldSize
@@ -1623,13 +1624,18 @@ const AgarIOGame = () => {
         distance = Math.sqrt(x * x + y * y)
       } while (distance > maxRadius) // Only accept positions well within circular boundary
       
+      // Add variety to virus sizes and spike counts (like agario.com)
+      const sizeVariation = 0.8 + Math.random() * 0.6 // Size varies from 80% to 140% of base
+      const virusRadius = config.virusRadius * sizeVariation
+      const spikeCount = 6 + Math.floor(Math.random() * 6) // 6-11 spikes for more variety
+      
       game.viruses.push({
         id: i,
         x: x,
         y: y,
-        radius: config.virusRadius,
+        radius: virusRadius,
         color: '#00ff41', // Bright green
-        spikes: 4 + Math.floor(Math.random() * 2) // 4-5 spikes (50% fewer than 8-12)
+        spikes: spikeCount
       })
     }
 
