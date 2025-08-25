@@ -2981,8 +2981,8 @@ const AgarIOGame = () => {
       
       allEntities.forEach(entity => {
         const baseRadius = getRadius(entity.mass) * 2.0 // Base size like original Agario
-        const radius = entity === game.player ? baseRadius * 3.0 : baseRadius // Player 3x bigger
-        const isPlayer = entity === game.player
+        const radius = (entity === game.player || entity.isPlayerCell) ? baseRadius * 3.0 : baseRadius // Player cells 3x bigger
+        const isPlayer = entity === game.player || entity.isPlayerCell
         
         // Bounty gold ring
         if (entity.isBounty) {
