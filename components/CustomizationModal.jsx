@@ -179,7 +179,6 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
         setPlayerData(prev => ({
           ...prev,
           equippedSkin: customizationData.skin || prev.equippedSkin,
-          equippedHat: customizationData.hat || prev.equippedHat,
           equippedTrail: customizationData.trail || prev.equippedTrail,
           equippedFace: customizationData.face || prev.equippedFace
         }))
