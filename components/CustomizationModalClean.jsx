@@ -393,44 +393,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                         </div>
                       )}
                       
-                      {/* Face Preview */}
-                      {activeCategory === 'faces' && (
-                        <div className={`w-20 h-20 rounded-full border-4 border-white/20 flex items-center justify-center relative ${
-                          item.id === 'normal_eyes' ? 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 shadow-cyan-500/50 shadow-lg' :
-                          item.id === 'angry_eyes' ? 'bg-gradient-to-br from-red-400 via-red-500 to-red-600 shadow-red-500/50 shadow-lg' :
-                          item.id === 'wink_eyes' ? 'bg-gradient-to-br from-pink-400 via-pink-500 to-pink-600 shadow-pink-500/50 shadow-lg' :
-                          item.id === 'laser_eyes' ? 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 shadow-purple-500/50 shadow-lg' :
-                          'bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 shadow-cyan-500/50 shadow-lg'
-                        } ${!item.owned ? 'grayscale opacity-60' : ''}`}>
-                          
-                          {item.id === 'angry_eyes' ? (
-                            <>
-                              <div className="w-2.5 h-1.5 bg-black rounded-sm absolute top-7 left-7 transform rotate-12"></div>
-                              <div className="w-2.5 h-1.5 bg-black rounded-sm absolute top-7 right-7 transform -rotate-12"></div>
-                              <div className="w-4 h-1 bg-red-900 rounded absolute bottom-7"></div>
-                            </>
-                          ) : item.id === 'wink_eyes' ? (
-                            <>
-                              <div className="w-2.5 h-1 bg-black rounded absolute top-8 left-7"></div>
-                              <div className="w-2.5 h-2.5 bg-black rounded-full absolute top-7 right-7"></div>
-                              <div className="w-3 h-1 bg-pink-700 rounded-full absolute bottom-7"></div>
-                            </>
-                          ) : item.id === 'laser_eyes' ? (
-                            <>
-                              <div className="w-2.5 h-2.5 bg-red-400 rounded-full absolute top-7 left-7 animate-pulse"></div>
-                              <div className="w-2.5 h-2.5 bg-red-400 rounded-full absolute top-7 right-7 animate-pulse"></div>
-                              <div className="w-0.5 h-6 bg-red-300 opacity-80 absolute top-10 left-8 animate-pulse"></div>
-                              <div className="w-0.5 h-6 bg-red-300 opacity-80 absolute top-10 right-8 animate-pulse"></div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="w-2.5 h-2.5 bg-black rounded-full absolute top-7 left-8"></div>
-                              <div className="w-2.5 h-2.5 bg-black rounded-full absolute top-7 right-8"></div>
-                            </>
-                          )}
-                        </div>
-                      )}
-                      
                       {/* Equipped Badge */}
                       {item.equipped && (
                         <div className="absolute top-3 right-3 bg-green-500 rounded-full p-1.5 shadow-lg">
