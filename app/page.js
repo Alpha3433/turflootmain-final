@@ -1590,12 +1590,21 @@ export default function Home() {
                   <div className="relative w-20 h-20 mx-auto mb-4">
                     {/* Playable Character Circle with Dynamic Customization */}
                     <div className={`w-20 h-20 rounded-full player-character animate-breathe hover:animate-hover-bounce-loop transition-all duration-300 cursor-pointer shadow-lg border-2 border-cyan-300 flex items-center justify-center ${
+                      playerCustomization.skin === 'default_blue' || playerCustomization.skin === 'classic_blue' ? 'bg-gradient-to-br from-cyan-300 via-blue-500 to-blue-600 shadow-blue-500/30' :
+                      playerCustomization.skin === 'basic_red' ? 'bg-gradient-to-br from-red-400 via-red-500 to-red-600 shadow-red-500/30' :
+                      playerCustomization.skin === 'basic_green' ? 'bg-gradient-to-br from-green-400 via-green-500 to-green-600 shadow-green-500/30' :
+                      playerCustomization.skin === 'basic_yellow' ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-yellow-500/30' :
+                      playerCustomization.skin === 'basic_purple' ? 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 shadow-purple-500/30' :
+                      playerCustomization.skin === 'basic_orange' ? 'bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 shadow-orange-500/30' :
+                      playerCustomization.skin === 'rainbow_hologram' ? 'bg-gradient-to-br from-red-400 via-purple-500 to-blue-500 shadow-purple-500/40 animate-pulse' :
+                      playerCustomization.skin === 'chrome_steel' ? 'bg-gradient-to-br from-gray-300 via-gray-100 to-gray-400 shadow-gray-500/40' :
+                      playerCustomization.skin === 'matte_blue' ? 'bg-blue-600 shadow-blue-500/40' :
                       playerCustomization.skin === 'golden_snake' ? 'bg-gradient-to-br from-yellow-300 via-yellow-500 to-orange-600 shadow-yellow-500/30' :
                       playerCustomization.skin === 'neon_green' ? 'bg-gradient-to-br from-green-300 via-green-400 to-green-600 shadow-green-500/30' :
                       playerCustomization.skin === 'fire_red' ? 'bg-gradient-to-br from-red-400 via-orange-500 to-yellow-500 shadow-red-500/30' :
                       playerCustomization.skin === 'ice_blue' ? 'bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500 shadow-blue-500/30' :
                       playerCustomization.skin === 'shadow_black' ? 'bg-gradient-to-br from-gray-800 via-purple-900 to-black shadow-purple-500/30' :
-                      'bg-cyan-400'
+                      'bg-gradient-to-br from-cyan-300 via-blue-500 to-blue-600 shadow-blue-500/30'
                     }`} id="player-character">
                       
                       {/* Dynamic Eyes based on equipped face */}
