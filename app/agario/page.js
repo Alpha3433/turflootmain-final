@@ -474,8 +474,7 @@ const AgarIOGame = () => {
     const handleCustomizationChange = (event) => {
       console.log('Agario: Customization changed:', event.detail)
       setPlayerCustomization({
-        skin: event.detail.skin || 'default_blue',
-        face: event.detail.face || 'normal_eyes'
+        skin: event.detail.skin || 'default_blue'
       })
     }
 
