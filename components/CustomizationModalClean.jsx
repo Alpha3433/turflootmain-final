@@ -414,8 +414,10 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                       
                       {/* Face Preview */}
                       {activeCategory === 'faces' && (
-                        <div className={`w-20 h-20 bg-cyan-400 rounded-full border-4 border-white/20 flex items-center justify-center relative overflow-hidden ${!item.owned ? 'grayscale opacity-60' : ''}`}>
-                          <div className="w-20 h-20 rounded-full bg-cyan-400 absolute inset-0"></div>
+                        <div className={`w-20 h-20 rounded-full border-4 border-white/20 flex items-center justify-center relative overflow-hidden ${!item.owned ? 'grayscale opacity-60' : ''}`}>
+                          {/* Face background with gradient like skins */}
+                          <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600 shadow-cyan-500/50 shadow-lg rounded-full"></div>
+                          
                           {item.id === 'angry_eyes' ? (
                             <>
                               <div className="w-3 h-2 bg-black rounded-sm absolute top-6 left-6 transform rotate-12 z-10"></div>
