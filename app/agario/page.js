@@ -967,32 +967,37 @@ const AgarIOGame = () => {
     cellToSplit.mass = remainingMass
     cellToSplit.radius = cellRadius
     
-    // Create new cell
+    // Create new cell with launch velocity for strategic gameplay
     const newCell = {
       id: `split_${Date.now()}_${Math.random()}`,
       x: newX,
       y: newY,
       mass: newMass,
       radius: newRadius,
-      velocity: {
-        x: direction.x * initialSpeed,
-        y: direction.y * initialSpeed
+      velocity: { 
+        x: direction.x * initialSpeed, 
+        y: direction.y * initialSpeed 
       },
       splitTime: Date.now(),
-      mergeLocked: true // Can't merge for 12 seconds
+      mergeLocked: true,
+      mergeUnlockTime: Date.now() + MERGE_MIN_TIME
     }
     
-    // Add new cell to player
+    // Add to player cells array
     player.cells.push(newCell)
     
-    // Update player totals
-    player.totalMass = player.cells.reduce((total, cell) => total + cell.mass, 0)
-    player.lastSplitTime = Date.now()
+    // Update total mass
+    player.mass = player.cells.reduce((total, cell) => total + cell.mass, 0)
     
-    // Set merge lock timer for both cells
+    console.log(`✅ Split successful: ${player.cells.length} cells total, new cell launched with velocity`, newCell.velocity)
+    
+    // Schedule merge unlock after minimum time
     setTimeout(() => {
-      if (cellToSplit) cellToSplit.mergeLocked = false
-      if (newCell) newCell.mergeLocked = false
+      const cellToUnlock = player.cells.find(cell => cell.id === newCell.id)
+      if (cellToUnlock) {
+        cellToUnlock.mergeLocked = false
+        console.log(`🔓 Cell ${newCell.id} merge unlocked after ${MERGE_MIN_TIME/1000}s`)
+      }
     }, MERGE_MIN_TIME)
     
     return true
