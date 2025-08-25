@@ -927,12 +927,10 @@ const AgarIOGame = () => {
   }
 
   const performSplit = (cellToSplit, direction, game) => {
-    // Safe version with hardcoded constants
-    const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
+    // Use component-level constants
     const SPLIT_BASE_SPEED = 1800
     const SPLIT_MIN_VELOCITY = 400
     const SPLIT_MAX_VELOCITY = 1600
-    const MERGE_MIN_TIME = 15000 // 15 seconds for cells to merge back (classic Agar.io timing)
     
     if (!cellToSplit || cellToSplit.mass < MIN_SPLIT_MASS) {
       return false
