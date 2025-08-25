@@ -2029,21 +2029,22 @@ const AgarIOGame = () => {
       
       // Update player (only if not cashing out)
       if (game.player.alive && !isCashingOut) {
-        // Enhanced speed formula: Higher speed for small circles, normal scaling for bigger ones
+        // Enhanced speed formula: Higher speed for small circles, slightly increased speed for bigger ones
         const baseMass = Math.max(game.player.mass, 1)
         
-        // Add speed boost for small circles (starting players)
-        let speedBoost = 1
+        // Add speed boost for small circles and slight boost for bigger circles
+        let speedBoost = 1.2 // Base boost for all circles (was 1.0)
         if (baseMass <= 20) {
           // 2x speed boost for very small circles (mass 1-20)
           speedBoost = 2.0
         } else if (baseMass <= 50) {
-          // Gradual decrease from 2x to 1.5x for small-medium circles (mass 20-50)
-          speedBoost = 2.0 - ((baseMass - 20) / 30) * 0.5
+          // Gradual decrease from 2x to 1.6x for small-medium circles (mass 20-50)
+          speedBoost = 2.0 - ((baseMass - 20) / 30) * 0.4
         } else if (baseMass <= 100) {
-          // Gradual decrease from 1.5x to 1x for medium circles (mass 50-100)
-          speedBoost = 1.5 - ((baseMass - 50) / 50) * 0.5
+          // Gradual decrease from 1.6x to 1.2x for medium circles (mass 50-100)
+          speedBoost = 1.6 - ((baseMass - 50) / 50) * 0.4
         }
+        // Bigger circles (100+) get 1.2x boost instead of 1.0x
         
         const baseSpeedCalculation = config.baseSpeed / Math.pow(baseMass, 0.3) // Less aggressive decay
         const speed = baseSpeedCalculation * speedBoost
