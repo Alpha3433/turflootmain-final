@@ -24,8 +24,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
   const [filterRarity, setFilterRarity] = useState('all')
   
   const [playerData, setPlayerData] = useState({
-    equippedSkin: 'default_blue',
-    equippedFace: 'normal_eyes'
+    equippedSkin: 'default_blue'
   })
 
   const [itemsData, setItemsData] = useState({
