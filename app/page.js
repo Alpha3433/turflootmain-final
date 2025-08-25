@@ -255,12 +255,12 @@ export default function Home() {
       
       if (response.ok) {
         const result = await response.json()
-        setUserBalance(result.balance || 1250)
-        console.log(`💰 Loaded user balance on landing page: ${result.balance || 1250} coins`)
+        setUserBalance(result.balance || 0)
+        console.log(`💰 Loaded user balance on landing page: ${result.balance || 0} coins`)
       }
     } catch (error) {
       console.error('❌ Error loading user balance:', error)
-      // Keep default balance of 1250 if API fails
+      // Keep default balance of 0 if API fails
     }
   }
 
