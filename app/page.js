@@ -244,29 +244,48 @@ export default function Home() {
 
   // Load player customization data
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('turfloot_player_customization')
-      if (saved) {
-        const customizationData = JSON.parse(saved)
+    const loadCustomization = () => {
+      try {
+        const saved = localStorage.getItem('turfloot_player_customization')
+        if (saved) {
+          const customizationData = JSON.parse(saved)
+          setPlayerCustomization({
+            skin: customizationData.skin || 'default_blue',
+            trail: customizationData.trail || 'default_sparkle',
+            face: customizationData.face || 'normal_eyes'
+          })
+          console.log('Lobby: Loaded player customization:', customizationData)
+        }
+      } catch (error) {
+        console.error('Failed to load customization:', error)
+        // Reset to defaults if there's an error
         setPlayerCustomization({
-          skin: customizationData.skin || 'default_blue',
-          hat: customizationData.hat || null,
-          trail: customizationData.trail || 'default_sparkle',
-          face: customizationData.face || 'normal_eyes'
+          skin: 'default_blue',
+          trail: 'default_sparkle',
+          face: 'normal_eyes'
         })
-        console.log('Loaded player customization:', customizationData)
       }
-    } catch (error) {
-      console.error('Failed to load customization:', error)
-      // Reset to defaults if there's an error
+    }
+
+    // Initial load
+    loadCustomization()
+
+    // Listen for customization changes from the modal
+    const handleCustomizationChange = (event) => {
+      console.log('Lobby: Customization changed:', event.detail)
       setPlayerCustomization({
-        skin: 'default_blue',
-        hat: null,
-        trail: 'default_sparkle',
-        face: 'normal_eyes'
+        skin: event.detail.skin || 'default_blue',
+        trail: event.detail.trail || 'default_sparkle',
+        face: event.detail.face || 'normal_eyes'
       })
     }
-  }, [showCustomization]) // Reload when customization modal closes
+
+    window.addEventListener('playerCustomizationChanged', handleCustomizationChange)
+
+    return () => {
+      window.removeEventListener('playerCustomizationChanged', handleCustomizationChange)
+    }
+  }, [showCustomization]) // Also reload when customization modal closes
 
   // Update notification timestamps every 30 seconds
   useEffect(() => {
