@@ -48,7 +48,7 @@ export default function Home() {
   const [playerCustomization, setPlayerCustomization] = useState({
     skin: 'default_blue'
   })
-  const [userBalance, setUserBalance] = useState(1250) // Default starting balance
+  const [userBalance, setUserBalance] = useState(0) // Start at 0 for new accounts
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
   const [socialInitialTab, setSocialInitialTab] = useState('leaderboard')
   const [friendsList, setFriendsList] = useState([])
