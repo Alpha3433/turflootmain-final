@@ -80,7 +80,6 @@ const AgarIOGame = () => {
   const [killStreakAnnouncements, setKillStreakAnnouncements] = useState([])
   const [currentMission, setCurrentMission] = useState(null)
   const [missionProgress, setMissionProgress] = useState(0)
-  const [userBalance, setUserBalance] = useState(1250) // Default starting balance
   const [liveEventFeed, setLiveEventFeed] = useState([])
   const [territoryGlowIntensity, setTerritoryGlowIntensity] = useState(0.3)
   const [initialLobbyFee, setInitialLobbyFee] = useState(100) // Track the entry fee for this lobby
