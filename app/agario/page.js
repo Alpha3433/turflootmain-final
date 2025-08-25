@@ -863,7 +863,7 @@ const AgarIOGame = () => {
   // Split Mechanic Functions
   const canPlayerSplit = (player) => {
     // Safe version that doesn't depend on config - use hardcoded constants
-    const MIN_SPLIT_MASS = 36
+    const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
     const MAX_CELLS = 16
     const SPLIT_COOLDOWN = 750
     
@@ -874,6 +874,7 @@ const AgarIOGame = () => {
       maxCells: MAX_CELLS,
       cellsUnderLimit: player?.cells?.length < MAX_CELLS,
       cellMasses: player?.cells?.map(cell => cell.mass) || [],
+      minMassRequired: MIN_SPLIT_MASS,
       hasValidMass: player?.cells?.some(cell => cell.mass >= MIN_SPLIT_MASS),
       lastSplitTime: player?.lastSplitTime || 0,
       currentTime: Date.now(),
