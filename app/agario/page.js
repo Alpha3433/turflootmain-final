@@ -724,10 +724,10 @@ const AgarIOGame = () => {
 
   const generateMission = () => {
     const missions = [
-      { type: 'collect', target: 20, duration: 30000, reward: 50, description: 'Collect 20 coins in 30 seconds' },
-      { type: 'survive', target: 60000, duration: 60000, reward: 100, description: 'Survive for 60 seconds' },
-      { type: 'eliminate', target: 3, duration: 45000, reward: 150, description: 'Eliminate 3 players in 45 seconds' },
-      { type: 'mass', target: 500, duration: 40000, reward: 75, description: 'Reach 500 mass in 40 seconds' }
+      { type: 'collect', target: 20, duration: 30000, reward: 115, description: 'Collect 20 coins in 30 seconds' },
+      { type: 'survive', target: 60000, duration: 60000, reward: 130, description: 'Survive for 60 seconds' },
+      { type: 'eliminate', target: 3, duration: 45000, reward: 900, description: 'Eliminate 3 players in 45 seconds' },
+      { type: 'mass', target: 500, duration: 40000, reward: 200, description: 'Reach 500 mass in 40 seconds' }
     ]
     
     const mission = missions[Math.floor(Math.random() * missions.length)]
