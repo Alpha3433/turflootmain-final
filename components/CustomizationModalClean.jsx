@@ -173,7 +173,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
     
     // Update local player data immediately
     const categoryKey = activeCategory === 'skins' ? 'equippedSkin' : 
-                       activeCategory === 'trails' ? 'equippedTrail' : 
                        activeCategory === 'faces' ? 'equippedFace' : null
     
     if (categoryKey) {
