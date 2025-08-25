@@ -964,7 +964,7 @@ const AgarIOGame = () => {
     setTimeout(() => {
       if (cellToSplit) cellToSplit.mergeLocked = false
       if (newCell) newCell.mergeLocked = false
-    }, config.MERGE_MIN_TIME)
+    }, MERGE_MIN_TIME)
     
     return true
   }
