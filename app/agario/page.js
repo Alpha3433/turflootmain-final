@@ -946,10 +946,10 @@ const AgarIOGame = () => {
       SPLIT_MAX_VELOCITY
     )
     
-    // Calculate safe spawn position with MUCH larger separation for visibility
+    // Calculate safe spawn position for CLUSTERING (like classic Agar.io)
     const cellRadius = Math.sqrt(remainingMass / Math.PI) * 8
     const newRadius = Math.sqrt(newMass / Math.PI) * 8
-    const spawnDistance = Math.max(cellRadius + newRadius + 150, 200) // Much larger distance for clear visibility
+    const spawnDistance = cellRadius + newRadius + 25 // Close clustering distance for natural grouping
     
     const newX = cellToSplit.x + direction.x * spawnDistance
     const newY = cellToSplit.y + direction.y * spawnDistance
