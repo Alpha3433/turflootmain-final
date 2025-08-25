@@ -76,6 +76,60 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
     legendary: 'border-yellow-400 text-yellow-100'
   }
 
+  // Load saved customization data and update equipped states
+  useEffect(() => {
+    if (!isOpen) return
+    
+    try {
+      const saved = localStorage.getItem('turfloot_player_customization')
+      if (saved) {
+        const customizationData = JSON.parse(saved)
+        console.log('Loading customization:', customizationData) // Debug log
+        
+        // Update player data
+        setPlayerData(prev => ({
+          ...prev,
+          equippedSkin: customizationData.skin || 'default_blue',
+          equippedTrail: customizationData.trail || 'default_sparkle',
+          equippedFace: customizationData.face || 'normal_eyes'
+        }))
+        
+        // Update equipped states in items data
+        setItemsData(prev => {
+          const newItemsData = { ...prev }
+          
+          // Set equipped states for skins
+          if (customizationData.skin && newItemsData.skins) {
+            newItemsData.skins = newItemsData.skins.map(item => ({
+              ...item,
+              equipped: item.id === customizationData.skin
+            }))
+          }
+          
+          // Set equipped states for trails
+          if (customizationData.trail && newItemsData.trails) {
+            newItemsData.trails = newItemsData.trails.map(item => ({
+              ...item,
+              equipped: item.id === customizationData.trail
+            }))
+          }
+          
+          // Set equipped states for faces
+          if (customizationData.face && newItemsData.faces) {
+            newItemsData.faces = newItemsData.faces.map(item => ({
+              ...item,
+              equipped: item.id === customizationData.face
+            }))
+          }
+          
+          return newItemsData
+        })
+      }
+    } catch (error) {
+      console.error('Failed to load customization:', error)
+    }
+  }, [isOpen])
+
   // Filter and sort items
   const getFilteredItems = () => {
     let items = itemsData[activeCategory] || []
