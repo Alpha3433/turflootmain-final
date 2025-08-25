@@ -2315,6 +2315,12 @@ const AgarIOGame = () => {
               
               game.player.netWorth += killReward
               game.player.mass += bot.mass * 0.3 // Gain some mass from kill
+              
+              // CRITICAL FIX: Also update the main cell's mass for split functionality
+              if (game.player.cells && game.player.cells.length > 0) {
+                game.player.cells[0].mass = game.player.mass // Keep main cell mass in sync
+              }
+              
               game.player.kills += 1
               game.player.streak += 1
               // Removed cashBadgeScale animation to fix flickering
