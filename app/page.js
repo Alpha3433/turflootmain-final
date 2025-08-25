@@ -1668,25 +1668,6 @@ export default function Home() {
                         )}
                       </div>
                     )}
-
-                    {/* Dynamic Trail Preview */}
-                    {playerCustomization.trail && playerCustomization.trail !== 'default_sparkle' && (
-                      <div className="absolute -right-8 top-1/2 transform -translate-y-1/2 flex space-x-1">
-                        {playerCustomization.trail === 'rainbow_trail' ? (
-                          <>
-                            <div className="w-1.5 h-1.5 bg-red-400 rounded-full opacity-70 animate-pulse"></div>
-                            <div className="w-1 h-1 bg-yellow-400 rounded-full opacity-50 animate-pulse"></div>
-                            <div className="w-0.5 h-0.5 bg-green-400 rounded-full opacity-30 animate-pulse"></div>
-                          </>
-                        ) : playerCustomization.trail === 'fire_trail' ? (
-                          <>
-                            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full opacity-70 animate-pulse"></div>
-                            <div className="w-1 h-1 bg-red-500 rounded-full opacity-50 animate-pulse"></div>
-                            <div className="w-0.5 h-0.5 bg-yellow-500 rounded-full opacity-30 animate-pulse"></div>
-                          </>
-                        ) : null}
-                      </div>
-                    )}
                   </div>
                   <div className="text-gray-400 text-xs mb-3">Your Character</div>
                   <button 
