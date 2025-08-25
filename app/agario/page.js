@@ -4064,6 +4064,64 @@ const AgarIOGame = () => {
                   </div>
                 )}
               </div>
+
+              {/* Mobile Split Button */}
+              <div 
+                className="mobile-action-btn mobile-split-btn relative"
+                onPointerDown={(e) => {
+                  console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
+                  handleSplitStart(e)
+                }}
+                onPointerUp={(e) => {
+                  console.log('⚡ Split POINTER UP - Touch released')
+                  handleSplitEnd(e)
+                }}
+                onPointerLeave={(e) => {
+                  console.log('⚡ Split POINTER LEAVE')
+                  handleSplitEnd(e)
+                }}
+                onTouchStart={(e) => {
+                  console.log('⚡ Split TOUCH START - Mobile touch detected')
+                  handleSplitStart(e)
+                }}
+                onTouchEnd={(e) => {
+                  console.log('⚡ Split TOUCH END - Mobile touch released')
+                  handleSplitEnd(e)
+                }}
+                style={{ 
+                  touchAction: 'none',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  width: '80px', // Slightly smaller than cash-out
+                  height: '80px', 
+                  padding: '8px',
+                  zIndex: 1001
+                }}
+              >
+                {/* Split cooldown indicator */}
+                {splitCooldownActive && (
+                  <div className="absolute inset-0 bg-red-500/20 rounded-full animate-pulse border-2 border-red-400/60"></div>
+                )}
+                
+                {/* Button content */}
+                <div className={`absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 ${
+                  splitCooldownActive 
+                    ? 'bg-red-800/80 border-red-600 shake' 
+                    : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                      ? 'bg-blue-800/80 border-blue-600 hover:bg-blue-700/90' 
+                      : 'bg-gray-800/60 border-gray-700'
+                }`}>
+                  <div className="text-lg">⚡</div>
+                  <div className="text-center leading-tight">
+                    <div className="text-xs">SPLIT</div>
+                  </div>
+                </div>
+                
+                {/* Split guidance tooltip */}
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-80">
+                  Tap to split
+                </div>
+              </div>
             </div>
           )}
 
