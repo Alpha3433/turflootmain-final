@@ -100,8 +100,13 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
   const getFilteredItems = () => {
     let items = itemsData[activeCategory] || []
     
+    // Separate items based on active tab
     if (activeTab === 'inventory') {
+      // My Collection: Only show owned items
       items = items.filter(item => item.owned)
+    } else if (activeTab === 'shop') {
+      // Item Shop: Only show unowned items
+      items = items.filter(item => !item.owned)
     }
     
     if (searchQuery) {
