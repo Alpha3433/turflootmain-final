@@ -867,26 +867,38 @@ const AgarIOGame = () => {
     const MAX_CELLS = 16
     const SPLIT_COOLDOWN = 750
     
-    console.log('🔍 Checking split conditions:', {
-      playerExists: !!player,
-      hasCells: !!(player && player.cells),
-      cellsLength: player?.cells?.length || 0,
+    const playerExists = !!player
+    const hasCells = !!(player && player.cells)
+    const cellsLength = player?.cells?.length || 0
+    const cellsUnderLimit = player?.cells?.length < MAX_CELLS
+    const cellMasses = player?.cells?.map(cell => cell.mass) || []
+    const hasValidMass = player?.cells?.some(cell => cell.mass >= MIN_SPLIT_MASS)
+    const lastSplitTime = player?.lastSplitTime || 0
+    const currentTime = Date.now()
+    const timeSinceLastSplit = currentTime - lastSplitTime
+    const cooldownPassed = timeSinceLastSplit >= SPLIT_COOLDOWN
+    
+    const canSplit = playerExists && hasCells && cellsUnderLimit && hasValidMass && cooldownPassed
+    
+    console.log('🔍 DETAILED Split Check:', {
+      playerExists,
+      hasCells,
+      cellsLength,
       maxCells: MAX_CELLS,
-      cellsUnderLimit: player?.cells?.length < MAX_CELLS,
-      cellMasses: player?.cells?.map(cell => cell.mass) || [],
+      cellsUnderLimit,
+      cellMasses,
       minMassRequired: MIN_SPLIT_MASS,
-      hasValidMass: player?.cells?.some(cell => cell.mass >= MIN_SPLIT_MASS),
-      lastSplitTime: player?.lastSplitTime || 0,
-      currentTime: Date.now(),
-      timeSinceLastSplit: Date.now() - (player?.lastSplitTime || 0),
-      cooldownPassed: (Date.now() - (player?.lastSplitTime || 0)) >= SPLIT_COOLDOWN
+      hasValidMass,
+      lastSplitTime,
+      currentTime,
+      timeSinceLastSplit,
+      splitCooldown: SPLIT_COOLDOWN,
+      cooldownPassed,
+      FINAL_RESULT: canSplit
     })
     
     // Check if player has any cells that can split
-    return player && player.cells && 
-           player.cells.length < MAX_CELLS && 
-           player.cells.some(cell => cell.mass >= MIN_SPLIT_MASS) &&
-           (Date.now() - (player.lastSplitTime || 0)) >= SPLIT_COOLDOWN
+    return canSplit
   }
 
   const calculateSplitDirection = (targetCell, mouseX, mouseY) => {
