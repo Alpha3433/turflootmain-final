@@ -25,7 +25,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
   
   const [playerData, setPlayerData] = useState({
     equippedSkin: 'default_blue',
-    equippedTrail: 'default_sparkle',
     equippedFace: 'normal_eyes'
   })
 
