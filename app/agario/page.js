@@ -867,6 +867,20 @@ const AgarIOGame = () => {
     const MAX_CELLS = 16
     const SPLIT_COOLDOWN = 750
     
+    console.log('🔍 Checking split conditions:', {
+      playerExists: !!player,
+      hasCells: !!(player && player.cells),
+      cellsLength: player?.cells?.length || 0,
+      maxCells: MAX_CELLS,
+      cellsUnderLimit: player?.cells?.length < MAX_CELLS,
+      cellMasses: player?.cells?.map(cell => cell.mass) || [],
+      hasValidMass: player?.cells?.some(cell => cell.mass >= MIN_SPLIT_MASS),
+      lastSplitTime: player?.lastSplitTime || 0,
+      currentTime: Date.now(),
+      timeSinceLastSplit: Date.now() - (player?.lastSplitTime || 0),
+      cooldownPassed: (Date.now() - (player?.lastSplitTime || 0)) >= SPLIT_COOLDOWN
+    })
+    
     // Check if player has any cells that can split
     return player && player.cells && 
            player.cells.length < MAX_CELLS && 
