@@ -761,11 +761,46 @@ const AgarIOGame = () => {
     }, mission.duration)
   }
 
-  const completeMission = (mission) => {
+  const completeMission = async (mission) => {
     if (gameRef.current?.game?.player) {
+      // Add to local game balance immediately
       gameRef.current.game.player.netWorth += mission.reward
-      addFloatingText(`Mission Complete! +${mission.reward} SP`, gameRef.current.game.player.x, gameRef.current.game.player.y - 60, '#00FF00')
-      addToKillFeed(`Mission completed: ${mission.description} (+${mission.reward} SP)`)
+      
+      // Add visual feedback
+      addFloatingText(`Mission Complete! +${mission.reward} Coins`, gameRef.current.game.player.x, gameRef.current.game.player.y - 60, '#00FF00')
+      addToKillFeed(`Mission completed: ${mission.description} (+${mission.reward} Coins)`)
+      
+      // Save reward to player's persistent account
+      try {
+        const response = await fetch('/api/users/add-mission-reward', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: gameRef.current.game.player.userId || 'demo-user',
+            missionType: mission.type,
+            rewardAmount: mission.reward,
+            missionDescription: mission.description,
+            completedAt: new Date().toISOString()
+          }),
+        })
+        
+        if (response.ok) {
+          const result = await response.json()
+          console.log('✅ Mission reward saved to account:', result)
+          
+          // Update local balance display if needed
+          if (result.newBalance !== undefined) {
+            console.log(`💰 Account balance updated: ${result.newBalance} coins`)
+          }
+        } else {
+          console.error('❌ Failed to save mission reward:', response.statusText)
+        }
+      } catch (error) {
+        console.error('❌ Error saving mission reward:', error)
+        // Mission reward still applies locally even if save fails
+      }
     }
     setCurrentMission(null)
   }
