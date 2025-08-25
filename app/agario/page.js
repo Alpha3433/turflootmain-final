@@ -1002,7 +1002,7 @@ const AgarIOGame = () => {
     
     // Safe version with hardcoded constants  
     const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
-    const SPLIT_COOLDOWN = 750
+    const SPLIT_COOLDOWN = 10000 // Changed to 10 seconds (10000ms)
     
     const gameExists = !!gameRef.current?.game?.player
     const playerRef = gameRef.current?.game?.player
@@ -1070,7 +1070,10 @@ const AgarIOGame = () => {
     console.log('🔄 performSplit result:', splitResult)
     
     if (splitResult) {
-      // Set cooldown with countdown timer
+      // Set player's lastSplitTime for cooldown tracking
+      player.lastSplitTime = Date.now()
+      
+      // Set cooldown with countdown timer (10 seconds)
       setSplitCooldown(SPLIT_COOLDOWN)
       setSplitCooldownActive(true)
       
