@@ -3995,10 +3995,14 @@ const AgarIOGame = () => {
 
           {/* Mobile Action Buttons */}
           {!showOrientationGate && !isGameOver && (
-            <div className={`mobile-action-buttons ${mobileUIFaded ? 'faded' : ''}`}>
+            <div className={`fixed bottom-5 right-5 flex flex-col gap-4 z-50 transition-opacity duration-300 ${mobileUIFaded ? 'opacity-40' : 'opacity-100'}`}
+                 style={{ 
+                   bottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
+                   right: '20px' 
+                 }}>
               {/* Circular Cash-Out Button with LARGER touch area for mobile */}
               <div 
-                className="mobile-action-btn mobile-cashout-btn relative"
+                className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
                 onPointerDown={(e) => {
                   console.log('💰 Cash-out POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
                   handleCashOutStart(e)
