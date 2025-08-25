@@ -1833,8 +1833,8 @@ const AgarIOGame = () => {
       player: {
         cells: [{
           id: 'main',
-          x: 0,
-          y: 0,
+          x: (Math.random() - 0.5) * (config.worldSize * 0.8), // Random spawn within 80% of world
+          y: (Math.random() - 0.5) * (config.worldSize * 0.8), // Random spawn within 80% of world
           mass: config.startingMass,
           radius: Math.sqrt(config.startingMass / Math.PI) * 8,
           velocity: { x: 0, y: 0 },
