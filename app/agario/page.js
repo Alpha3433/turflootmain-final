@@ -2332,8 +2332,28 @@ const AgarIOGame = () => {
       })
       } // Close the multiplayer/offline mode conditional
 
-      // Orb pickup (mass only, no money)
-      const allEntities = [game.player, ...game.bots].filter(e => e.alive)
+      // Orb pickup (mass only, no money) - UPDATED for split cells
+      const allEntities = [...game.bots].filter(e => e.alive)
+      
+      // Add individual player cells for orb collection
+      if (game.player.alive && game.player.cells && game.player.cells.length > 0) {
+        // Each player cell can collect orbs independently
+        game.player.cells.forEach(cell => {
+          allEntities.push({
+            ...game.player,
+            x: cell.x,
+            y: cell.y,
+            mass: cell.mass,
+            radius: cell.radius,
+            isPlayerCell: true,
+            cellReference: cell, // Reference to the actual cell object
+            cellId: cell.id
+          })
+        })
+      } else if (game.player.alive) {
+        // Fallback to legacy single player entity
+        allEntities.push(game.player)
+      }
       
       for (let i = game.orbs.length - 1; i >= 0; i--) {
         const orb = game.orbs[i]
@@ -2341,36 +2361,59 @@ const AgarIOGame = () => {
         for (const entity of allEntities) {
           const distance = getDistance(entity, orb)
           const baseRadius = getRadius(entity.mass) * 2.0 // Base visual scaling
-          const visualRadius = entity === game.player ? baseRadius * 3.0 : baseRadius // Player 3x bigger
+          const visualRadius = (entity === game.player || entity.isPlayerCell) ? baseRadius * 3.0 : baseRadius // Player cells 3x bigger
           
           if (distance <= visualRadius) {
             const oldMass = entity.mass
-            entity.mass += config.orbMassValue
+            const orbMass = config.orbMassValue
             
-            // CRITICAL FIX: Also update the main cell's mass for split functionality
-            if (entity === game.player && entity.cells && entity.cells.length > 0) {
-              entity.cells[0].mass = entity.mass // Keep main cell mass in sync
-              // Also update cell radius
-              entity.cells[0].radius = Math.sqrt(entity.mass / Math.PI) * 8
+            // Handle orb collection for split cells
+            if (entity.isPlayerCell && entity.cellReference) {
+              // Update the specific cell that collected the orb
+              entity.cellReference.mass += orbMass
+              entity.cellReference.radius = Math.sqrt(entity.cellReference.mass / Math.PI) * 8
+              
+              // Update total player mass
+              game.player.mass = game.player.cells.reduce((total, cell) => total + cell.mass, 0)
+              
+              console.log(`🍽️ Cell ${entity.cellId} collected orb! Cell mass: ${entity.cellReference.mass}, Total mass: ${game.player.mass}`)
+              
+              // Add enhanced visual effects for individual cell collection
+              addFloatingText(`+${orbMass} mass`, entity.x, entity.y - 30, '#00ff88')
+              addCoinAnimation(orb.x, orb.y)
+              
             } else if (entity === game.player) {
-              // If cells array is missing or empty, recreate it
-              entity.cells = [{
-                id: 'main',
-                x: entity.x,
-                y: entity.y,
-                mass: entity.mass,
-                radius: Math.sqrt(entity.mass / Math.PI) * 8,
-                velocity: { x: 0, y: 0 },
-                splitTime: 0,
-                mergeLocked: false
-              }]
-              console.log('🔧 Recreated missing cells array for player')
-            }
-            
-            // Add enhanced coin collection effects for player
-            if (entity === game.player) {
-              addFloatingText(`+${config.orbMassValue} mass`, entity.x, entity.y - 30, '#00ff88')
+              // Legacy single cell collection
+              entity.mass += orbMass
+              
+              // CRITICAL FIX: Also update the main cell's mass for split functionality
+              if (entity.cells && entity.cells.length > 0) {
+                entity.cells[0].mass = entity.mass // Keep main cell mass in sync
+                // Also update cell radius
+                entity.cells[0].radius = Math.sqrt(entity.mass / Math.PI) * 8
+              } else {
+                // If cells array is missing or empty, recreate it
+                entity.cells = [{
+                  id: 'main',
+                  x: entity.x,
+                  y: entity.y,
+                  mass: entity.mass,
+                  radius: Math.sqrt(entity.mass / Math.PI) * 8,
+                  velocity: { x: 0, y: 0 },
+                  splitTime: 0,
+                  mergeLocked: false
+                }]
+                console.log('🔧 Recreated missing cells array for player')
+              }
+              
+              // Add enhanced coin collection effects for player
+              addFloatingText(`+${orbMass} mass`, entity.x, entity.y - 30, '#00ff88')
               addCoinAnimation(orb.x, orb.y) // New animated coin pickup
+              
+            } else {
+              // Bot orb collection
+              entity.mass += orbMass
+            }
               
               // Increment coins collected counter (with safety check)
               setGameSession(prev => ({
