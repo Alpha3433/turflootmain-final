@@ -865,7 +865,7 @@ const AgarIOGame = () => {
     // Safe version that doesn't depend on config - use hardcoded constants
     const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
     const MAX_CELLS = 16
-    const SPLIT_COOLDOWN = 750
+    const SPLIT_COOLDOWN = 10000 // Changed to 10 seconds (10000ms)
     
     const playerExists = !!player
     const hasCells = !!(player && player.cells)
