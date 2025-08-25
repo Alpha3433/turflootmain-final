@@ -2003,6 +2003,9 @@ const AgarIOGame = () => {
       const mouseX = e.clientX - rect.left
       const mouseY = e.clientY - rect.top
       
+      // Update lastMousePosition for split functionality
+      lastMousePosition.current = { x: mouseX, y: mouseY }
+      
       const worldMouseX = (mouseX - canvas.width / 2) / game.camera.zoom + game.camera.x
       const worldMouseY = (mouseY - canvas.height / 2) / game.camera.zoom + game.camera.y
       
