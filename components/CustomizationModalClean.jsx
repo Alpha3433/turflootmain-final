@@ -73,8 +73,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
         // Update player data
         setPlayerData(prev => ({
           ...prev,
-          equippedSkin: customizationData.skin || 'default_blue',
-          equippedFace: customizationData.face || 'normal_eyes'
+          equippedSkin: customizationData.skin || 'default_blue'
         }))
         
         // Update equipped states in items data
