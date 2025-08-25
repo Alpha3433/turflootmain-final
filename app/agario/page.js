@@ -864,7 +864,7 @@ const AgarIOGame = () => {
   const canPlayerSplit = (player) => {
     // Safe version that doesn't depend on config - use hardcoded constants
     const MIN_SPLIT_MASS = 20
-    const MAX_CELLS = 16
+    const MAX_CELLS = 16 // Classic Agar.io 16-cell limit
     const SPLIT_COOLDOWN = 10000 // 10 seconds
     
     if (!player || !player.cells || player.cells.length === 0) {
@@ -874,7 +874,7 @@ const AgarIOGame = () => {
     const playerExists = !!player
     const hasCells = !!(player && player.cells)
     const cellsLength = player?.cells?.length || 0
-    const cellsUnderLimit = player?.cells?.length < MAX_CELLS
+    const cellsUnderLimit = player?.cells?.length < MAX_CELLS // Enforce 16-cell limit
     const hasValidMass = player?.cells?.some(cell => cell.mass >= MIN_SPLIT_MASS)
     const lastSplitTime = player?.lastSplitTime || 0
     const currentTime = Date.now()
@@ -891,6 +891,8 @@ const AgarIOGame = () => {
       console.log('🔍 Split Check:', {
         canSplit,
         cellsLength,
+        maxCells: MAX_CELLS,
+        cellsUnderLimit,
         hasValidMass,
         cooldownPassed,
         timeSinceLastSplit: Math.round(timeSinceLastSplit / 1000) + 's'
