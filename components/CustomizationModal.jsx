@@ -317,7 +317,7 @@ const CustomizationModal = ({ isOpen, onClose, userBalance = 1250 }) => {
                   )}
                   
                   {/* Legendary effects */}
-                  {(playerData.equippedSkin === 'golden_snake' || playerData.equippedSkin === 'shadow_black' || playerData.equippedSkin === 'cyber_chrome') && (
+                  {(playerData.equippedSkin === 'golden_snake' || playerData.equippedSkin === 'shadow_black' || playerData.equippedSkin === 'rainbow_hologram') && (
                     <>
                       <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-spin"></div>
                       <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
