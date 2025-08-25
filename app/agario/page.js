@@ -351,6 +351,61 @@ const AgarIOGame = () => {
   // Helper function to get player's customized appearance
   const getPlayerSkinColor = () => {
     switch (playerCustomization.skin) {
+      case 'default_blue':
+      case 'classic_blue':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #67E8F9 0%, #3B82F6 50%, #1E40AF 100%)',
+          solidColor: '#3B82F6',
+          hasSpecialEffect: false
+        }
+      case 'basic_red':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #FCA5A5 0%, #EF4444 50%, #DC2626 100%)',
+          solidColor: '#EF4444',
+          hasSpecialEffect: false
+        }
+      case 'basic_green':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #86EFAC 0%, #22C55E 50%, #16A34A 100%)',
+          solidColor: '#22C55E',
+          hasSpecialEffect: false
+        }
+      case 'basic_yellow':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #FEF08A 0%, #EAB308 50%, #CA8A04 100%)',
+          solidColor: '#EAB308',
+          hasSpecialEffect: false
+        }
+      case 'basic_purple':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #C4B5FD 0%, #8B5CF6 50%, #7C3AED 100%)',
+          solidColor: '#8B5CF6',
+          hasSpecialEffect: false
+        }
+      case 'basic_orange':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #FDBA74 0%, #F97316 50%, #EA580C 100%)',
+          solidColor: '#F97316',
+          hasSpecialEffect: false
+        }
+      case 'rainbow_hologram':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #EF4444 0%, #8B5CF6 50%, #3B82F6 100%)',
+          solidColor: '#8B5CF6',
+          hasSpecialEffect: true
+        }
+      case 'chrome_steel':
+        return { 
+          fillStyle: 'linear-gradient(45deg, #E5E7EB 0%, #F3F4F6 50%, #9CA3AF 100%)',
+          solidColor: '#E5E7EB',
+          hasSpecialEffect: false
+        }
+      case 'matte_blue':
+        return { 
+          fillStyle: '#2563EB',
+          solidColor: '#2563EB',
+          hasSpecialEffect: false
+        }
       case 'golden_snake':
         return { 
           fillStyle: 'linear-gradient(45deg, #FCD34D 0%, #F59E0B 50%, #EA580C 100%)',
@@ -381,10 +436,10 @@ const AgarIOGame = () => {
           solidColor: '#6B21C8',
           hasSpecialEffect: true
         }
-      default: // default_blue
+      default: // fallback to default blue
         return { 
-          fillStyle: '#00f5ff',
-          solidColor: '#00f5ff',
+          fillStyle: 'linear-gradient(45deg, #67E8F9 0%, #3B82F6 50%, #1E40AF 100%)',
+          solidColor: '#3B82F6',
           hasSpecialEffect: false
         }
     }
