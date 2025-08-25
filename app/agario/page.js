@@ -988,8 +988,8 @@ const AgarIOGame = () => {
   const handleSplit = (mouseX = null, mouseY = null) => {
     console.log('⚡ handleSplit called with:', { mouseX, mouseY })
     
-    // Safe version with hardcoded constants
-    const MIN_SPLIT_MASS = 36
+    // Safe version with hardcoded constants  
+    const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
     const SPLIT_COOLDOWN = 750
     
     const gameExists = !!gameRef.current?.game?.player
