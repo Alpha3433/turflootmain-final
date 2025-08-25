@@ -927,7 +927,7 @@ const AgarIOGame = () => {
     const SPLIT_BASE_SPEED = 1800
     const SPLIT_MIN_VELOCITY = 400
     const SPLIT_MAX_VELOCITY = 1600
-    const MERGE_MIN_TIME = 30000 // 30 seconds for cells to merge back (was 12 seconds)
+    const MERGE_MIN_TIME = 15000 // 15 seconds for cells to merge back (classic Agar.io timing)
     
     if (!cellToSplit || cellToSplit.mass < MIN_SPLIT_MASS) {
       return false
