@@ -985,11 +985,28 @@ const AgarIOGame = () => {
   }
 
   const handleSplit = (mouseX = null, mouseY = null) => {
+    console.log('⚡ handleSplit called with:', { mouseX, mouseY })
+    
     // Safe version with hardcoded constants
     const MIN_SPLIT_MASS = 36
     const SPLIT_COOLDOWN = 750
     
+    const gameExists = !!gameRef.current?.game?.player
+    const playerRef = gameRef.current?.game?.player
+    
+    console.log('🎮 Game and player state:', {
+      gameRefExists: !!gameRef.current,
+      gameExists: !!gameRef.current?.game,
+      playerExists: gameExists,
+      playerAlive: playerRef?.alive,
+      playerX: playerRef?.x,
+      playerY: playerRef?.y,
+      playerMass: playerRef?.mass,
+      playerCells: playerRef?.cells?.length || 0
+    })
+    
     if (!gameRef.current?.game?.player || !canPlayerSplit(gameRef.current.game.player)) {
+      console.log('❌ Split denied - conditions not met')
       // Show feedback for denied split
       setSplitCooldownActive(true)
       setTimeout(() => setSplitCooldownActive(false), 300) // Shake effect
@@ -999,6 +1016,8 @@ const AgarIOGame = () => {
     const game = gameRef.current.game
     const player = game.player
     
+    console.log('✅ Split conditions passed, proceeding with split logic')
+    
     // Find the largest cell to split
     const cellToSplit = player.cells.reduce((largest, cell) => {
       if (cell.mass >= MIN_SPLIT_MASS && (!largest || cell.mass > largest.mass)) {
@@ -1007,36 +1026,51 @@ const AgarIOGame = () => {
       return largest
     }, null)
     
-    if (!cellToSplit) return
+    console.log('🔍 Cell to split:', cellToSplit)
+    
+    if (!cellToSplit) {
+      console.log('❌ No valid cell found to split')
+      return
+    }
     
     // Calculate direction
     let direction
     if (mouseX !== null && mouseY !== null) {
       // Desktop: use mouse position
+      console.log('🖱️ Using mouse position for split direction')
       direction = calculateSplitDirection(cellToSplit, mouseX, mouseY)
     } else if (player.dir && (player.dir.x !== 0 || player.dir.y !== 0)) {
       // Mobile: use movement direction
+      console.log('📱 Using player movement direction for split')
       const length = Math.sqrt(player.dir.x * player.dir.x + player.dir.y * player.dir.y)
       direction = { x: player.dir.x / length, y: player.dir.y / length }
     } else {
       // Default direction
+      console.log('🎯 Using default direction for split')
       direction = { x: 1, y: 0 }
     }
     
+    console.log('📐 Split direction:', direction)
+    
     // Perform the split
-    if (performSplit(cellToSplit, direction, game)) {
+    const splitResult = performSplit(cellToSplit, direction, game)
+    console.log('🔄 performSplit result:', splitResult)
+    
+    if (splitResult) {
       // Set cooldown
       setSplitCooldown(SPLIT_COOLDOWN)
       setSplitCooldownActive(true)
       
       // Visual/Audio feedback
-      console.log('🔄 Split performed!')
+      console.log('🔄 Split performed successfully!')
       
       // Clear cooldown
       setTimeout(() => {
         setSplitCooldown(0)
         setSplitCooldownActive(false)
       }, SPLIT_COOLDOWN)
+    } else {
+      console.log('❌ performSplit failed')
     }
   }
 
