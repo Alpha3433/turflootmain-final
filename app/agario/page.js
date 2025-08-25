@@ -1393,10 +1393,50 @@ const AgarIOGame = () => {
     if (!isMobile || !gameRef.current) return
     
     setMobileUIFaded(false)
-    // Trigger split action (similar to desktop spacebar) - FIXED path
-    if (gameRef.current?.game?.player?.mass > 20) {
-      // Split player logic here
-      console.log('🔥 Mobile split triggered')
+    
+    // Get game and player
+    const game = gameRef.current.game
+    const player = game?.player
+    
+    if (!player || !player.alive) return
+    
+    // Check if player can split using the same logic as desktop
+    if (canPlayerSplit(player)) {
+      console.log('🔥 Mobile split triggered - performing split')
+      
+      // For mobile, use joystick direction or default forward direction
+      let targetX, targetY
+      
+      if (joystickActive && (joystickPosition.x !== 0 || joystickPosition.y !== 0)) {
+        // Use joystick direction if active
+        const distance = 100 // Projection distance
+        const largestCell = player.cells.reduce((largest, cell) => 
+          (!largest || cell.mass > largest.mass) ? cell : largest, null)
+        
+        if (largestCell) {
+          targetX = largestCell.x + joystickPosition.x * distance
+          targetY = largestCell.y + joystickPosition.y * distance
+        }
+      } else {
+        // Use forward direction (right) as default for mobile
+        const largestCell = player.cells.reduce((largest, cell) => 
+          (!largest || cell.mass > largest.mass) ? cell : largest, null)
+        
+        if (largestCell) {
+          targetX = largestCell.x + 100
+          targetY = largestCell.y
+        }
+      }
+      
+      // Call the actual split function
+      if (targetX !== undefined && targetY !== undefined) {
+        handleSplit(targetX, targetY)
+      }
+    } else {
+      console.log('🚫 Mobile split denied - conditions not met')
+      // Show visual feedback for denied split
+      setSplitCooldownActive(true)
+      setTimeout(() => setSplitCooldownActive(false), 300)
     }
   }
 
