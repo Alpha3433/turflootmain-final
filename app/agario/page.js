@@ -1011,9 +1011,8 @@ const AgarIOGame = () => {
   const handleSplit = (mouseX = null, mouseY = null) => {
     console.log('⚡ handleSplit called with:', { mouseX, mouseY })
     
-    // Safe version with hardcoded constants  
-    const MIN_SPLIT_MASS = 20 // Reduced from 36 to 20 for easier testing
-    const SPLIT_COOLDOWN = 10000 // Changed to 10 seconds (10000ms)
+    // Use component-level constants
+    const SPLIT_COOLDOWN = 10000 // 10 seconds
     
     const gameExists = !!gameRef.current?.game?.player
     const playerRef = gameRef.current?.game?.player
