@@ -155,8 +155,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
     })
     
     // Update local player data immediately
-    const categoryKey = activeCategory === 'skins' ? 'equippedSkin' : 
-                       activeCategory === 'faces' ? 'equippedFace' : null
+    const categoryKey = activeCategory === 'skins' ? 'equippedSkin' : null
     
     if (categoryKey) {
       setPlayerData(prev => ({
