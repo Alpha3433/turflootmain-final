@@ -790,6 +790,16 @@ const AgarIOGame = () => {
           const result = await response.json()
           console.log('✅ Mission reward saved to account:', result)
           
+          // Dispatch event to update landing page balance in real-time
+          window.dispatchEvent(new CustomEvent('missionRewardEarned', {
+            detail: {
+              rewardAmount: mission.reward,
+              newBalance: result.newBalance,
+              missionType: mission.type,
+              description: mission.description
+            }
+          }))
+          
           // Mission reward saved to account successfully
           if (result.newBalance !== undefined) {
             console.log(`💰 Account balance updated: ${result.newBalance} coins`)
