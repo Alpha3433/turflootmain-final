@@ -537,46 +537,7 @@ const EnhancedCustomizationModal = ({ isOpen, onClose, userBalance = 2500 }) => 
             )}
           </div>
         </div>
-      </div>
-
-      {/* Upgrade Confirmation Modal */}
-      {showUpgradeModal && selectedItem && (
-        <div className="fixed inset-0 z-60 bg-black/80 flex items-center justify-center">
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-8 max-w-md mx-4 border border-purple-500/30">
-            <h3 className="text-2xl font-bold text-white mb-4">Upgrade Material</h3>
-            <p className="text-gray-300 mb-6">
-              Upgrade <span className="text-purple-400">{selectedItem.name}</span> to the next rarity tier?
-            </p>
-            
-            <div className="bg-gray-800/60 rounded-xl p-4 mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-400">Cost:</span>
-                <span className="text-yellow-400 font-bold">💎 {RarityUpgrade.getUpgradeCost(selectedItem)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">New Rarity:</span>
-                <span className="text-purple-400 font-bold">Epic</span>
-              </div>
-            </div>
-            
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowUpgradeModal(false)}
-                className="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-xl transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleUpgradeItem(selectedItem)}
-                className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold py-3 px-4 rounded-xl transition-all"
-              >
-                Upgrade
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>,
+      </div>,
     document.body
   )
 }
