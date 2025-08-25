@@ -862,11 +862,16 @@ const AgarIOGame = () => {
 
   // Split Mechanic Functions
   const canPlayerSplit = (player) => {
+    // Safe version that doesn't depend on config - use hardcoded constants
+    const MIN_SPLIT_MASS = 36
+    const MAX_CELLS = 16
+    const SPLIT_COOLDOWN = 750
+    
     // Check if player has any cells that can split
-    return player.cells && 
-           player.cells.length < config.MAX_CELLS && 
-           player.cells.some(cell => cell.mass >= config.MIN_SPLIT_MASS) &&
-           (Date.now() - player.lastSplitTime) >= config.SPLIT_COOLDOWN
+    return player && player.cells && 
+           player.cells.length < MAX_CELLS && 
+           player.cells.some(cell => cell.mass >= MIN_SPLIT_MASS) &&
+           (Date.now() - (player.lastSplitTime || 0)) >= SPLIT_COOLDOWN
   }
 
   const calculateSplitDirection = (targetCell, mouseX, mouseY) => {
