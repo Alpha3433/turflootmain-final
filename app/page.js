@@ -1688,18 +1688,32 @@ export default function Home() {
                   ) : (
                     <div className="flex flex-col">
                       <span 
-                        className="text-white text-xl font-semibold cursor-pointer hover:text-cyan-400 transition-colors duration-200 group-hover:text-cyan-300"
+                        className="text-white text-xl font-semibold cursor-pointer hover:text-cyan-400 transition-colors duration-200 group-hover:text-cyan-300 flex items-center space-x-2"
                         onClick={authenticated && user ? handleNameClick : () => setIsEditingName(true)}
                       >
                         {authenticated && user 
                           ? (displayName && displayName !== user.google?.name && displayName !== user.email?.address 
                               ? displayName 
                               : user.google?.name || user.email?.address || "Player")
-                          : (displayName || "Click to set name")
+                          : (displayName === "Loading..." 
+                              ? (
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                                  <span className="text-cyan-400">Setting up your profile...</span>
+                                </div>
+                              )
+                              : (displayName || "Click to set name")
+                            )
                         }
                       </span>
                       <span className="text-gray-400 text-sm font-medium">
-                        {authenticated && user ? "Click to edit" : "Choose your display name"}
+                        {authenticated && user 
+                          ? "Click to edit" 
+                          : (displayName === "Loading..." 
+                              ? "Please wait" 
+                              : "Choose your display name"
+                            )
+                        }
                       </span>
                     </div>
                   )}
