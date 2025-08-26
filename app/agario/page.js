@@ -2481,7 +2481,6 @@ const AgarIOGame = () => {
             break
           }
         }
-      }
 
       // Replenish orbs (only in offline mode - server handles food in multiplayer)
       if (!game.isMultiplayer) {
