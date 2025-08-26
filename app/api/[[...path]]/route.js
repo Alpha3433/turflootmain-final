@@ -14,15 +14,36 @@ import {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'turfloot-secret-key-change-in-production'
 
-const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017'
+// MongoDB connection with fallback for Atlas
+const MONGO_URL = process.env.MONGODB_URI || process.env.MONGO_URL || 'mongodb://localhost:27017'
 const DB_NAME = process.env.DB_NAME || 'turfloot_db'
 
 let client = null
 
 async function getDb() {
   if (!client) {
-    client = new MongoClient(MONGO_URL)
-    await client.connect()
+    try {
+      console.log('🔗 Connecting to MongoDB:', MONGO_URL.replace(/\/\/.*@/, '//[CREDENTIALS]@'))
+      client = new MongoClient(MONGO_URL, {
+        serverSelectionTimeoutMS: 5000, // 5 second timeout
+        connectTimeoutMS: 10000, // 10 second connection timeout
+        maxPoolSize: 10, // Maintain up to 10 socket connections
+        serverApi: {
+          version: '1',
+          strict: true,
+          deprecationErrors: true,
+        }
+      })
+      await client.connect()
+      console.log('✅ MongoDB connected successfully')
+      
+      // Verify the connection by pinging the database
+      await client.db(DB_NAME).admin().ping()
+      console.log('✅ MongoDB ping successful')
+    } catch (error) {
+      console.error('❌ MongoDB connection failed:', error)
+      throw error
+    }
   }
   return client.db(DB_NAME)
 }
