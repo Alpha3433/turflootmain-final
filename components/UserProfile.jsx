@@ -714,8 +714,19 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
 
   const renderFriends = () => (
     <div className="space-y-4">
-      {/* Friends Tabs */}
-      <div className="flex space-x-2 mb-4">
+      {/* Friends Header */}
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="p-2 bg-purple-500/20 rounded-lg border border-purple-500/30">
+          <Users className="w-6 h-6 text-purple-400" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-white">Friends</h3>
+          <p className="text-sm text-gray-400">Manage your connections</p>
+        </div>
+      </div>
+
+      {/* Friends Filter Tabs */}
+      <div className="grid grid-cols-3 gap-2 mb-6">
         {[
           { id: 'friends', label: '👥 Friends', count: friends.length },
           { id: 'blocked', label: '❌ Blocked', count: 0 },
@@ -724,16 +735,21 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
           <button
             key={tab.id}
             onClick={() => setFriendsFilter(tab.id)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center ${
+            className={`${isLandscape ? 'py-2' : 'py-3'} px-3 rounded-xl font-medium transition-all flex flex-col items-center justify-center space-y-1 ${
               friendsFilter === tab.id
-                ? 'bg-yellow-400 text-black'
-                : 'bg-gray-800 text-white border border-gray-600 hover:bg-gray-700'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                : 'bg-gray-800/60 text-gray-400 hover:text-white hover:bg-gray-700/60 border border-gray-700/60'
             }`}
           >
-            {tab.label}
+            <span className={`${isLandscape ? 'text-sm' : 'text-base'} font-bold`}>
+              {tab.label.split(' ')[0]}
+            </span>
+            <span className={`${isLandscape ? 'text-xs' : 'text-sm'} leading-tight`}>
+              {tab.label.split(' ').slice(1).join(' ')}
+            </span>
             {tab.count > 0 && (
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                friendsFilter === tab.id ? 'bg-black/20 text-black' : 'bg-gray-600 text-white'
+              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                friendsFilter === tab.id ? 'bg-white/20 text-white' : 'bg-purple-600/80 text-white'
               }`}>
                 {tab.count}
               </span>
@@ -742,48 +758,55 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
         ))}
       </div>
 
-      <div className="relative mb-4">
+      {/* Friends Search */}
+      <div className="relative mb-6">
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <input 
           type="text"
           placeholder="Search friends..."
-          className="w-full px-4 py-2 pl-10 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
+          className={`w-full pl-12 pr-4 ${isLandscape ? 'py-3 text-sm' : 'py-4 text-base'} bg-gray-800/60 border border-gray-700/60 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/60 focus:bg-gray-800/80 shadow-lg`}
         />
-        <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center h-32 space-y-4">
-          <div className="text-2xl animate-spin">⏳</div>
+        <div className="flex flex-col items-center justify-center h-48 space-y-4">
+          <div className="text-4xl animate-pulse">👥</div>
           <div className="text-gray-400">Loading friends...</div>
         </div>
       ) : friendsFilter === 'friends' && friends.length > 0 ? (
         <div className="space-y-3">
           {friends.map((friend) => (
-            <div key={friend.id} className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-gray-600/30 hover:border-gray-500/50 transition-colors">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="text-3xl">{friend.avatar}</div>
-                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${
-                    friend.status === 'online' ? 'bg-green-400' :
-                    friend.status === 'playing' ? 'bg-yellow-400' : 'bg-gray-500'
-                  }`}></div>
-                </div>
-                <div>
-                  <div className="font-bold text-white">{friend.name}</div>
-                  <div className="text-sm text-gray-400">
-                    {friend.wins} wins • {friend.lastSeen}
+            <div key={friend.id} className="p-4 bg-gray-800/50 rounded-2xl border-2 border-gray-700/60 hover:border-gray-600/60 transition-all hover:scale-[1.01]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-xl flex items-center justify-center border-2 border-purple-500/40">
+                      <div className="text-2xl">{friend.avatar}</div>
+                    </div>
+                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${
+                      friend.status === 'online' ? 'bg-green-400' :
+                      friend.status === 'playing' ? 'bg-yellow-400' : 'bg-gray-500'
+                    }`}></div>
+                  </div>
+                  
+                  <div>
+                    <div className="font-bold text-white text-lg">{friend.name}</div>
+                    <div className="text-sm text-gray-400">
+                      {friend.wins} wins • {friend.lastSeen}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                {friend.status === 'playing' && (
-                  <button className="px-3 py-1 bg-green-600 hover:bg-green-500 text-white text-sm rounded transition-colors">
-                    Join Game
+                
+                <div className="flex items-center space-x-2">
+                  {friend.status === 'playing' && (
+                    <button className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white text-sm rounded-xl transition-all font-bold shadow-lg">
+                      Join Game
+                    </button>
+                  )}
+                  <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-sm rounded-xl transition-all font-bold shadow-lg">
+                    Message
                   </button>
-                )}
-                <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors">
-                  Message
-                </button>
+                </div>
               </div>
             </div>
           ))}
