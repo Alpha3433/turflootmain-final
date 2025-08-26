@@ -288,11 +288,11 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </button>
         </div>
 
-        {/* Mobile Content Area - Enhanced */}
-        <div className="flex-1 px-5 pb-5 overflow-hidden">
+        {/* Mobile Content Area - Fixed Scrolling */}
+        <div className="flex-1 flex flex-col px-5 pb-5 overflow-hidden">
           
           {/* Mobile Search & Filter - Enhanced */}
-          <div className="mb-5 space-y-4">
+          <div className="flex-shrink-0 mb-5 space-y-4">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -331,7 +331,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </div>
 
           {/* Mobile Category Pills - Enhanced */}
-          <div className="flex space-x-3 mb-5 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex-shrink-0 flex space-x-3 mb-5 overflow-x-auto pb-2">
             {categories.map((category) => {
               const IconComponent = category.icon
               return (
@@ -351,9 +351,9 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
             })}
           </div>
 
-          {/* Mobile Items Grid - Optimized with Single Column */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-4">
+          {/* Mobile Items Grid - Fixed Scrolling */}
+          <div className="flex-1 overflow-y-auto min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="space-y-4 pb-4">
               {getFilteredItems().map((item) => (
                 <div
                   key={item.id}
