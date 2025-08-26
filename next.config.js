@@ -1,6 +1,10 @@
 const path = require('path')
 const fs = require('fs')
 
+// Disable telemetry and analytics
+process.env.NEXT_TELEMETRY_DISABLED = '1'
+process.env.DISABLE_OPENCOLLECTIVE = 'true'
+
 // Load environment variables from .env file explicitly
 const envPath = path.join(__dirname, '.env')
 if (fs.existsSync(envPath)) {
@@ -22,13 +26,16 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    domains: [],
+    dangerouslyAllowSVG: true,
   },
   experimental: {
     serverComponentsExternalPackages: ['mongodb'],
-    // Disable Critters to avoid Kaniko/webpack css optimization issues during prod builds
+    // Disable problematic optimizations
     optimizeCss: false,
-    // Disable build trace collection to avoid ENOENT errors
     outputFileTracingRoot: false,
+    // Disable source maps in production to save space
+    productionBrowserSourceMaps: false,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -39,6 +46,7 @@ const nextConfig = {
   // Disable telemetry and build traces
   telemetry: false,
   distDir: '.next',
+  trailingSlash: false,
   env: {
     // Explicitly expose environment variables to the frontend
     NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
@@ -46,6 +54,8 @@ const nextConfig = {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_TESTING_MODE: process.env.NEXT_PUBLIC_TESTING_MODE,
     NEXT_PUBLIC_MOCK_WALLET_BALANCE: process.env.NEXT_PUBLIC_MOCK_WALLET_BALANCE,
+    NEXT_PUBLIC_ENV: process.env.NEXT_PUBLIC_ENV,
+    NODE_ENV: process.env.NODE_ENV,
   },
   webpack(config, { dev, isServer }) {
     // Production optimizations
