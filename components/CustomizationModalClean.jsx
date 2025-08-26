@@ -24,6 +24,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
   const [filterRarity, setFilterRarity] = useState('all')
   const [balanceHighlight, setBalanceHighlight] = useState(false)
   const [previousBalance, setPreviousBalance] = useState(userBalance)
+  const [isLandscape, setIsLandscape] = useState(false)
   
   const [playerData, setPlayerData] = useState({
     equippedSkin: 'default_blue'
