@@ -444,16 +444,34 @@ export async function GET(request, { params }) {
     // Live statistics endpoints
     if (route === 'stats/live-players') {
       try {
-        const livePlayerCount = global.turflootGameServer ? 
-          Object.values(global.turflootGameServer.rooms || {}).reduce((total, room) => total + (room.getPlayerCount ? room.getPlayerCount().total : 0), 0) : 0
+        // Count only players in PAID rooms (mode === 'cash' and fee > 0)
+        let paidRoomPlayerCount = 0
+        
+        if (global.turflootGameServer && global.turflootGameServer.rooms) {
+          paidRoomPlayerCount = Object.values(global.turflootGameServer.rooms).reduce((total, room) => {
+            // Only count players in paid rooms (cash mode with fees)
+            if (room.mode === 'cash' && room.fee > 0) {
+              const playerCount = room.getPlayerCount ? room.getPlayerCount().total : 0
+              return total + playerCount
+            }
+            return total
+          }, 0)
+        }
+        
+        console.log(`📊 Live paid room players: ${paidRoomPlayerCount}`)
         
         return NextResponse.json({
-          count: livePlayerCount,
-          timestamp: new Date().toISOString()
+          count: paidRoomPlayerCount,
+          timestamp: new Date().toISOString(),
+          type: 'paid_rooms_only'
         }, { headers: corsHeaders })
       } catch (error) {
         console.error('Error in stats/live-players endpoint:', error)
-        return NextResponse.json({ count: 0, timestamp: new Date().toISOString() }, { headers: corsHeaders })
+        return NextResponse.json({ 
+          count: 0, 
+          timestamp: new Date().toISOString(),
+          type: 'paid_rooms_only'
+        }, { headers: corsHeaders })
       }
     }
 
