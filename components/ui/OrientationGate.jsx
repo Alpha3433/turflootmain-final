@@ -31,15 +31,16 @@ const OrientationGate = ({ onLandscapeReady }) => {
     checkOrientation()
     
     // Listen for orientation changes
-    window.addEventListener('orientationchange', () => {
+    const handleOrientationChange = () => {
       // Small delay to allow orientation change to complete
       setTimeout(checkOrientation, 100)
-    })
+    }
     
+    window.addEventListener('orientationchange', handleOrientationChange)
     window.addEventListener('resize', checkOrientation)
 
     return () => {
-      window.removeEventListener('orientationchange', checkOrientation)
+      window.removeEventListener('orientationchange', handleOrientationChange)
       window.removeEventListener('resize', checkOrientation)
     }
   }, [onLandscapeReady])
