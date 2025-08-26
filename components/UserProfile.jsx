@@ -358,10 +358,10 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
   if (!isOpen) return null
 
   const tabs = [
-    { id: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
-    { id: 'search', label: 'Search', icon: '🔍' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'friends', label: 'Friends', icon: '👥' }
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, color: 'text-yellow-400' },
+    { id: 'search', label: 'Search', icon: UserSearch, color: 'text-blue-400' },
+    { id: 'profile', label: 'Profile', icon: Target, color: 'text-green-400' },
+    { id: 'friends', label: 'Friends', icon: Users, color: 'text-purple-400' }
   ]
 
   const renderLeaderboard = () => (
