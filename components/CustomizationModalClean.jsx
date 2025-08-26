@@ -218,9 +218,9 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       <div className="md:hidden w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
         
         {/* Mobile Header - Responsive for Portrait/Landscape */}
-        <div className="px-5 py-3 landscape:py-2 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90">
-          {/* Portrait Layout - 2 Rows */}
-          <div className="portrait:block landscape:hidden">
+        <div className="px-5 py-3 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90">
+          {/* Portrait Layout - 2 Rows (default mobile) */}
+          <div className="block max-h-screen:hidden">
             {/* Top Row - Title and Close Button */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-4">
@@ -265,7 +265,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </div>
 
           {/* Landscape Layout - Single Compact Row */}
-          <div className="landscape:flex portrait:hidden items-center justify-between">
+          <div className="hidden max-h-screen:flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-purple-600/30 rounded-lg border border-purple-500/40 shadow-lg">
                 <Palette className="w-5 h-5 text-purple-300" />
@@ -308,10 +308,10 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
         </div>
 
         {/* Mobile Tab Switcher - Responsive */}
-        <div className="flex bg-gray-800/60 mx-5 portrait:mt-4 landscape:mt-2 mb-3 landscape:mb-2 rounded-2xl p-1.5 border border-gray-700/60 shadow-lg">
+        <div className="flex bg-gray-800/60 mx-5 mt-4 max-h-screen:mt-2 mb-3 max-h-screen:mb-2 rounded-2xl p-1.5 border border-gray-700/60 shadow-lg">
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`flex-1 portrait:py-4 landscape:py-2 rounded-xl text-base portrait:font-bold landscape:font-semibold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
+            className={`flex-1 py-4 max-h-screen:py-2 rounded-xl text-base max-h-screen:font-semibold font-bold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
               activeTab === 'inventory' 
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
                 : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
@@ -322,7 +322,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </button>
           <button
             onClick={() => setActiveTab('shop')}
-            className={`flex-1 portrait:py-4 landscape:py-2 rounded-xl text-base portrait:font-bold landscape:font-semibold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
+            className={`flex-1 py-4 max-h-screen:py-2 rounded-xl text-base max-h-screen:font-semibold font-bold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
               activeTab === 'shop' 
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
                 : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
