@@ -1,27 +1,13 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend Regression Testing Suite
-========================================
+TurfLoot Backend API Testing - Real-time Latency Region Selection Feature
+Testing the backend API endpoints that support the real-time latency region selection feature.
 
-Focus: Testing backend functionality after mobile split button implementation.
-
-Context: Just completed mobile split button implementation in /app/app/agario/page.js
-- Changes were purely frontend (React components, CSS styles, event handlers)
-- Backend should be unaffected but need to verify stability
-- This is a regression test to ensure frontend changes didn't break backend functionality
-
-Testing Priority:
-1. Core API Endpoints - Verify basic server functionality is not affected by frontend changes
-   - GET /api/ (root endpoint)  
-   - GET /api/ping (connectivity test)
-
-2. Game API Integration - Test game-related endpoints that support the split mechanic
-   - GET /api/servers/lobbies (game server access)
-   - Authentication endpoints if needed
-
-3. Performance Testing - Ensure backend performance remains good
-   - Response times under 2 seconds
-   - No memory leaks or crashes
+Focus Areas:
+1. GET /api/ping - Basic server latency testing
+2. GET /api/ - Root endpoint response time
+3. GET /api/servers/lobbies - Server browser functionality
+4. Verify all endpoints respond properly and quickly for region selection dropdown
 """
 
 import requests
