@@ -301,6 +301,12 @@ export default function Home() {
 
     // Initial load
     loadCustomization()
+    
+    // Reload balance when customization modal opens to ensure fresh data
+    if (showCustomization) {
+      console.log('🎨 Customization modal opened - refreshing balance')
+      loadUserBalance()
+    }
 
     // Listen for customization changes from the modal
     const handleCustomizationChange = (event) => {
@@ -315,7 +321,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('playerCustomizationChanged', handleCustomizationChange)
     }
-  }, [showCustomization]) // Also reload when customization modal closes
+  }, [showCustomization]) // Also reload when customization modal opens/closes
 
   // Load user balance when component mounts
   useEffect(() => {
