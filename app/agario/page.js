@@ -4502,9 +4502,9 @@ const AgarIOGame = () => {
                   touchAction: 'none',
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
-                  width: '80px', // Slightly smaller than cash-out
-                  height: '80px', 
-                  padding: '8px',
+                  width: '75px', // Slightly smaller for horizontal layout
+                  height: '75px', 
+                  padding: '6px',
                   zIndex: 1001
                 }}
               >
