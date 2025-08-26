@@ -640,5 +640,3 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
 }
 
 export default CustomizationModalClean
-
-export default CustomizationModalClean
