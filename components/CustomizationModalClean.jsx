@@ -385,7 +385,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <h3 className="text-lg font-bold text-white mb-1 leading-tight">{item.name}</h3>
-                          <p className="text-sm text-gray-400 leading-snug line-clamp-2">{item.description}</p>
+                          <p className="text-sm text-gray-400 leading-snug overflow-hidden">{item.description}</p>
                         </div>
                         
                         {/* Rarity Badge - More Prominent */}
