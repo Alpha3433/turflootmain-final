@@ -6,6 +6,11 @@ const OrientationGate = ({ onLandscapeReady }) => {
   const [isLandscape, setIsLandscape] = useState(false)
 
   useEffect(() => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     const checkOrientation = () => {
       const orientation = window.screen?.orientation?.angle ?? 0
       const viewportWidth = window.innerWidth
