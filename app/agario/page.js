@@ -1747,12 +1747,27 @@ const AgarIOGame = () => {
       const paramRoomId = urlParams.get('roomId') || `room_${Date.now()}`
       const paramMode = urlParams.get('mode') || 'free'
       const paramFee = parseFloat(urlParams.get('fee')) || 0
+      const paramTier = parseInt(urlParams.get('tier')) || 1
+      const paramMatchId = urlParams.get('matchId') || `match_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       
       setRoomId(paramRoomId)
       setGameMode(paramMode)
       setEntryFee(paramFee)
+      setRoomTier(paramTier)
+      setMatchId(paramMatchId)
       
-      console.log('🎮 Game settings:', { roomId: paramRoomId, mode: paramMode, fee: paramFee })
+      console.log('🎮 Game settings:', { 
+        roomId: paramRoomId, 
+        mode: paramMode, 
+        fee: paramFee, 
+        tier: paramTier,
+        matchId: paramMatchId 
+      })
+      
+      // If this is a paid room, initialize with backend
+      if (paramMode === 'paid' && paramTier && [1, 5, 20].includes(paramTier)) {
+        initializePaidRoom(paramMatchId, paramTier)
+      }
       
       // Connect to Socket.IO server
       const socket = io({
