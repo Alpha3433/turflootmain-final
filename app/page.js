@@ -1695,7 +1695,7 @@ export default function Home() {
                           ? (displayName && displayName !== user.google?.name && displayName !== user.email?.address 
                               ? displayName 
                               : user.google?.name || user.email?.address || "Player")
-                          : (displayName === "Loading..." 
+                          : (displayName === "Loading..." || displayName === "Preparing your turf..."
                               ? (
                                 <div className="flex items-center space-x-2">
                                   <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
