@@ -1325,27 +1325,85 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Server Indicator - Redesigned with Click Functionality */}
-            <button 
-              onClick={() => setShowServerBrowser(true)}
-              className="flex items-center space-x-2 px-3 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group cursor-pointer"
-              title="Click to change server"
-            >
-              <div className="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center border border-green-500/30 group-hover:bg-green-500/30 transition-all duration-200">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-green-400 font-medium text-xs leading-none hidden sm:inline group-hover:text-green-300 transition-colors duration-200">{currentServer}</span>
-                <span className="text-green-400 font-medium text-xs leading-none sm:hidden group-hover:text-green-300 transition-colors duration-200">
-                  {currentServer.split('-')[0]}
-                </span>
-                {currentPing !== null && (
-                  <span className="text-gray-400 text-xs leading-none group-hover:text-gray-300 transition-colors duration-200">
-                    {currentPing}ms
+            {/* Server Indicator - Redesigned with Region Dropdown */}
+            <div className="relative region-dropdown-container">
+              <button 
+                onClick={() => setShowRegionDropdown(!showRegionDropdown)}
+                className="flex items-center space-x-2 px-3 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group cursor-pointer"
+                title="Click to change region"
+              >
+                <div className="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center border border-green-500/30 group-hover:bg-green-500/30 transition-all duration-200">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-green-400 font-medium text-xs leading-none hidden sm:inline group-hover:text-green-300 transition-colors duration-200">{currentServer}</span>
+                  <span className="text-green-400 font-medium text-xs leading-none sm:hidden group-hover:text-green-300 transition-colors duration-200">
+                    {currentServer.split('-')[0]}
                   </span>
-                )}
-              </div>
-            </button>
+                  {currentPing !== null && (
+                    <span className="text-gray-400 text-xs leading-none group-hover:text-gray-300 transition-colors duration-200">
+                      {currentPing}ms
+                    </span>
+                  )}
+                </div>
+                <svg 
+                  className={`w-3 h-3 text-gray-400 group-hover:text-gray-300 transition-all duration-200 ${showRegionDropdown ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Region Dropdown */}
+              {showRegionDropdown && (
+                <div className="absolute top-full mt-2 left-0 w-64 bg-gray-800/95 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-2xl z-50 overflow-hidden">
+                  <div className="p-3 border-b border-gray-700/50">
+                    <h3 className="text-white font-bold text-sm">Select Region</h3>
+                    <p className="text-gray-400 text-xs">Choose your preferred server region</p>
+                  </div>
+                  <div className="py-2">
+                    {availableRegions.map((region) => (
+                      <button
+                        key={region.id}
+                        onClick={() => handleRegionSelect(region.id)}
+                        className={`w-full px-4 py-3 text-left hover:bg-gray-700/60 transition-all duration-200 flex items-center justify-between group ${
+                          currentServer === region.id ? 'bg-green-500/20 border-l-4 border-green-500' : ''
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-2 h-2 rounded-full ${
+                            currentServer === region.id ? 'bg-green-400' : 'bg-gray-500'
+                          }`}></div>
+                          <div>
+                            <div className={`font-medium text-sm ${
+                              currentServer === region.id ? 'text-green-400' : 'text-white group-hover:text-green-300'
+                            }`}>
+                              {region.id}
+                            </div>
+                            <div className="text-gray-400 text-xs">{region.name}</div>
+                          </div>
+                        </div>
+                        <div className={`text-xs font-bold ${
+                          currentServer === region.id ? 'text-green-400' : 'text-gray-400 group-hover:text-green-300'
+                        }`}>
+                          {region.ping}ms
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="p-3 border-t border-gray-700/50 bg-gray-800/60">
+                    <button
+                      onClick={() => setShowServerBrowser(true)}
+                      className="w-full py-2 px-3 bg-gray-700/60 hover:bg-gray-600/80 rounded-lg text-gray-300 hover:text-white text-xs font-medium transition-all duration-200"
+                    >
+                      Advanced Server Browser
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             
             {authenticated && user ? (
               <div className="flex items-center space-x-2">
