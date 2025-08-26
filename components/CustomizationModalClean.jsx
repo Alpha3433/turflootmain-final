@@ -217,40 +217,44 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       {/* Mobile Layout */}
       <div className="md:hidden w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
         
-        {/* Mobile Header - Compact */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/80 to-gray-800/80">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-purple-600/20 rounded-lg border border-purple-500/30">
-              <Palette className="w-5 h-5 text-purple-400" />
+        {/* Mobile Header - Enhanced */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-purple-600/30 rounded-xl border border-purple-500/40 shadow-lg">
+              <Palette className="w-6 h-6 text-purple-300" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Customization</h2>
-              <p className="text-xs text-gray-400">Personalize your experience</p>
+              <h2 className="text-xl font-bold text-white leading-tight">Customization</h2>
+              <p className="text-sm text-gray-400">Personalize your style</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {/* Mobile Coin Balance - Compact */}
-            <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-500 ${
+          <div className="flex items-center space-x-3">
+            {/* Mobile Coin Balance - Enhanced */}
+            <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all duration-500 ${
               balanceHighlight 
-                ? 'bg-green-500/30 border-green-400/50' 
-                : 'bg-yellow-500/20 border-yellow-500/30'
+                ? 'bg-green-500/30 border-green-400/60 shadow-lg shadow-green-400/20' 
+                : 'bg-yellow-500/25 border-yellow-500/40 shadow-lg'
             }`}>
-              <div className="text-yellow-400 text-lg">💰</div>
+              <div className="text-yellow-300 text-xl">💰</div>
               <div>
-                <div className={`font-bold text-sm transition-all duration-500 ${
-                  balanceHighlight ? 'text-green-400' : 'text-yellow-400'
+                <div className={`font-bold text-base transition-all duration-500 ${
+                  balanceHighlight ? 'text-green-300 scale-110' : 'text-yellow-300'
                 }`}>
                   {userBalance.toLocaleString()}
+                  {balanceHighlight && (
+                    <span className="ml-1 text-green-200 text-sm animate-bounce">+</span>
+                  )}
                 </div>
+                <div className="text-yellow-500 text-xs font-medium">COINS</div>
               </div>
             </div>
             
             <button
               onClick={onClose}
-              className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
+              className="p-3 bg-gray-700/60 hover:bg-gray-600/70 rounded-xl transition-all active:scale-95 shadow-lg"
             >
-              <X className="w-5 h-5 text-gray-300" />
+              <X className="w-6 h-6 text-gray-300" />
             </button>
           </div>
         </div>
