@@ -560,7 +560,21 @@ const AgarIOGame = () => {
     }
   }, [isCashingOut, settings])
 
-  const startCashOut = () => {
+  const startCashOut = async () => {
+    if (isCashingOut) return
+    
+    // Handle paid room cashout differently
+    if (gameMode === 'paid' && paidRoomData) {
+      const success = await handlePaidRoomCashout()
+      if (success) {
+        return // Exit early for paid room cashout
+      } else {
+        return // Exit on failure too
+      }
+    }
+    
+    // Original free room cashout logic
+    console.log('💰 Starting cash out process...')
     setIsCashingOut(true)
     setCashOutProgress(0)
     
