@@ -2475,7 +2475,6 @@ const AgarIOGame = () => {
                   return prev
                 })
               }
-            }
             
             game.orbs.splice(i, 1)
             break
