@@ -258,10 +258,21 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           
           {/* Currency Display */}
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-3 bg-yellow-500/20 px-6 py-3 rounded-xl border border-yellow-500/30">
+            <div className={`flex items-center space-x-3 px-6 py-3 rounded-xl border transition-all duration-500 ${
+              balanceHighlight 
+                ? 'bg-green-500/30 border-green-400/50 shadow-lg shadow-green-400/20' 
+                : 'bg-yellow-500/20 border-yellow-500/30'
+            }`}>
               <div className="text-yellow-400 text-2xl">💰</div>
               <div>
-                <div className="text-yellow-400 font-bold text-xl">{userBalance.toLocaleString()}</div>
+                <div className={`font-bold text-xl transition-all duration-500 ${
+                  balanceHighlight ? 'text-green-400 scale-110' : 'text-yellow-400'
+                }`}>
+                  {userBalance.toLocaleString()}
+                  {balanceHighlight && (
+                    <span className="ml-2 text-green-300 text-sm animate-bounce">+</span>
+                  )}
+                </div>
                 <div className="text-yellow-600 text-sm">Coins</div>
               </div>
             </div>
