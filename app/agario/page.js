@@ -4397,11 +4397,6 @@ const AgarIOGame = () => {
                   }}
                 />
                 
-                {/* Enhanced Debug info */}
-                <div className="absolute -bottom-12 left-0 text-xs text-white bg-black/70 px-2 py-1 rounded">
-                  <div>Pos: {Math.round(joystickPosition.x)},{Math.round(joystickPosition.y)}</div>
-                  <div>Active: {joystickActive ? 'YES' : 'NO'}</div>
-                </div>
               </div>
             </div>
           )}
