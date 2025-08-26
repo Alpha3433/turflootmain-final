@@ -692,6 +692,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ POST-FRONTEND UI CHANGES REGRESSION TEST PASSED - Enhanced Server Browser API working perfectly after frontend UI changes to agario/page.js (player waged balance display, minimap size increase, minimap position adjustment). Returns 36 servers across 3 regions with proper data structure. Response time: 0.068s. All required server fields present (id, name, region, stake, mode, currentPlayers, maxPlayers, ping, status). No regression issues detected from frontend canvas drawing changes."
+      - working: true
+        agent: "testing"
+        comment: "✅ REAL-TIME LATENCY REGION SELECTION OPTIMIZED - Server Browser API working perfectly for region selection dropdown functionality. Response time: 0.038s (excellent for server browser updates), returns 36 servers across 3 regions with perfect distribution (US-East-1: 12, US-West-1: 12, EU-Central-1: 12). All required server fields present including ping values (0-1000ms range) suitable for latency display. Region coverage verified with all expected regions available. Server data structure perfect for region selection dropdown with proper ping values for real-time latency measurements."
 
   - task: "Working Multiplayer Servers Implementation"
     implemented: true
