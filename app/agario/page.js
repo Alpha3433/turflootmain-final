@@ -3702,7 +3702,7 @@ const AgarIOGame = () => {
     // CRITICAL: Mark game initialization as complete
     console.log('🎮 Game initialization complete - missions will now work properly')
     setGameInitializationComplete(true)
-  }
+  } // End initializeGame function
 
   const restartGame = () => {
     setIsGameOver(false)
