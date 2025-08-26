@@ -1705,17 +1705,6 @@ export default function Home() {
                   )}
                 </div>
               </div>
-                      
-                      <button 
-                        className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
-                        onClick={authenticated && user ? handleNameClick : () => setIsEditingName(true)}
-                      >
-                        <span className="text-sm">✏️</span>
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
 
               {/* Stakes */}
               <div className="flex justify-center space-x-3">
