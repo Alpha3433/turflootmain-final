@@ -1709,7 +1709,7 @@ export default function Home() {
                       <span className="text-gray-400 text-sm font-medium">
                         {authenticated && user 
                           ? "Click to edit" 
-                          : (displayName === "Loading..." 
+                          : (displayName === "Loading..." || displayName === "Preparing your turf..."
                               ? "Please wait" 
                               : "Choose your display name"
                             )
