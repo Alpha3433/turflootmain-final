@@ -87,3 +87,4 @@ node_modules/next/next-swc-fallback/@next/swc-linux-arm64-gnu/next-swc.linux-arm
 .yarn/cache/phaser-npm-3.90.0-64c22be6a3-43d405832f.zip
 .yarn/cache/@next-swc-linux-arm64-gnu-npm-14.2.4-acf896e2cf-10c0.zip
 .next/cache/webpack/server-production/1.pack
+.next/cache/webpack/server-production/2.pack
