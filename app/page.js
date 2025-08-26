@@ -180,6 +180,11 @@ export default function Home() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     const handleClickOutside = (event) => {
       if (showRegionDropdown && !event.target.closest('.region-dropdown-container')) {
         setShowRegionDropdown(false)
