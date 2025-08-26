@@ -669,6 +669,117 @@ const AgarIOGame = () => {
     setCashOutProgress(0)
   }
 
+  // Paid room damage attribution tracking
+  const reportDamage = async (victimId, attackerId) => {
+    if (gameMode !== 'paid' || !paidRoomData || !matchId) {
+      return // Only for paid rooms
+    }
+    
+    try {
+      await fetch('/api/rooms/damage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matchId,
+          victimUserId: victimId,
+          attackerUserId: attackerId
+        })
+      })
+    } catch (error) {
+      console.error('Failed to report damage:', error)
+    }
+  }
+
+  // Paid room elimination tracking
+  const reportElimination = async (victimId, killerId = null, eliminationType = 'KILL') => {
+    if (gameMode !== 'paid' || !paidRoomData || !matchId) {
+      return // Only for paid rooms
+    }
+    
+    try {
+      const response = await fetch('/api/rooms/eliminate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matchId,
+          victimUserId: victimId,
+          killerUserId: killerId,
+          eliminationType
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('💰 Elimination processed:', result)
+        
+        // Update local paid room data if we got rewards
+        if (killerId === paidRoomData.userId && result.killerEarnings > 0) {
+          const earningsInDollars = result.killerEarnings / 100
+          addFloatingText(`💰 Bounty: +$${earningsInDollars.toFixed(2)}`, 
+            gameRef.current?.game?.player?.x || 400, 
+            gameRef.current?.game?.player?.y || 300, 
+            '#ffd700')
+        }
+      }
+    } catch (error) {
+      console.error('Failed to report elimination:', error)
+    }
+  }
+
+  // Paid room cashout function
+  const handlePaidRoomCashout = async () => {
+    if (gameMode !== 'paid' || !paidRoomData || !matchId) {
+      return false
+    }
+    
+    try {
+      const response = await fetch('/api/rooms/cashout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matchId,
+          userId: paidRoomData.userId
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('✅ Paid room cashout successful:', result)
+        
+        // Show cashout success
+        const netEarnings = result.netEarnings / 100
+        const fee = result.cashoutFee / 100
+        
+        addFloatingText(`💰 Cashed Out: $${netEarnings.toFixed(2)}`, 
+          gameRef.current?.game?.player?.x || 400, 
+          gameRef.current?.game?.player?.y || 300, 
+          '#00ff00')
+        addFloatingText(`💸 Fee: $${fee.toFixed(2)}`, 
+          gameRef.current?.game?.player?.x || 400, 
+          (gameRef.current?.game?.player?.y || 300) + 30, 
+          '#ff4444')
+        
+        addToKillFeed(`Cashed out $${netEarnings.toFixed(2)} from paid room (fee: $${fee.toFixed(2)})`)
+        
+        // End the game since player left the match
+        setGameResult(`💰 Cashed Out Successfully! Net: $${netEarnings.toFixed(2)}`)
+        setIsGameOver(true)
+        
+        return true
+      } else {
+        const error = await response.json()
+        throw new Error(error.error || 'Cashout failed')
+      }
+    } catch (error) {
+      console.error('Failed to cashout from paid room:', error)
+      addFloatingText(`❌ Cashout failed: ${error.message}`, 
+        gameRef.current?.game?.player?.x || 400, 
+        gameRef.current?.game?.player?.y || 300, 
+        '#ff4444')
+      return false
+    }
+  }
+
   const addToKillFeed = (message) => {
     const newFeedItem = {
       id: Date.now(),
