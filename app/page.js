@@ -1294,23 +1294,27 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Server Indicator - Redesigned */}
-            <div className="flex items-center space-x-2 px-3 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group">
-              <div className="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center border border-green-500/30">
+            {/* Server Indicator - Redesigned with Click Functionality */}
+            <button 
+              onClick={() => setShowServerBrowser(true)}
+              className="flex items-center space-x-2 px-3 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group cursor-pointer"
+              title="Click to change server"
+            >
+              <div className="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center border border-green-500/30 group-hover:bg-green-500/30 transition-all duration-200">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               </div>
               <div className="flex flex-col">
-                <span className="text-green-400 font-medium text-xs leading-none hidden sm:inline">{currentServer}</span>
-                <span className="text-green-400 font-medium text-xs leading-none sm:hidden">
+                <span className="text-green-400 font-medium text-xs leading-none hidden sm:inline group-hover:text-green-300 transition-colors duration-200">{currentServer}</span>
+                <span className="text-green-400 font-medium text-xs leading-none sm:hidden group-hover:text-green-300 transition-colors duration-200">
                   {currentServer.split('-')[0]}
                 </span>
                 {currentPing !== null && (
-                  <span className="text-gray-400 text-xs leading-none">
+                  <span className="text-gray-400 text-xs leading-none group-hover:text-gray-300 transition-colors duration-200">
                     {currentPing}ms
                   </span>
                 )}
               </div>
-            </div>
+            </button>
             
             {authenticated && user ? (
               <div className="flex items-center space-x-2">
