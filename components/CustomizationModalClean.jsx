@@ -213,8 +213,205 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
   if (!isOpen) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl max-w-[95vw] w-full max-h-[95vh] overflow-hidden border border-purple-500/30 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+      {/* Mobile Layout */}
+      <div className="md:hidden w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
+        
+        {/* Mobile Header - Compact */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/80 to-gray-800/80">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-purple-600/20 rounded-lg border border-purple-500/30">
+              <Palette className="w-5 h-5 text-purple-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Customization</h2>
+              <p className="text-xs text-gray-400">Personalize your experience</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            {/* Mobile Coin Balance - Compact */}
+            <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all duration-500 ${
+              balanceHighlight 
+                ? 'bg-green-500/30 border-green-400/50' 
+                : 'bg-yellow-500/20 border-yellow-500/30'
+            }`}>
+              <div className="text-yellow-400 text-lg">💰</div>
+              <div>
+                <div className={`font-bold text-sm transition-all duration-500 ${
+                  balanceHighlight ? 'text-green-400' : 'text-yellow-400'
+                }`}>
+                  {userBalance.toLocaleString()}
+                </div>
+              </div>
+            </div>
+            
+            <button
+              onClick={onClose}
+              className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
+            >
+              <X className="w-5 h-5 text-gray-300" />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Tab Switcher */}
+        <div className="flex bg-gray-800/50 mx-4 mt-3 mb-2 rounded-xl p-1 border border-gray-700/50">
+          <button
+            onClick={() => setActiveTab('inventory')}
+            className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
+              activeTab === 'inventory' 
+                ? 'bg-purple-600 text-white shadow-lg' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            <span>Collection</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('shop')}
+            className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
+              activeTab === 'shop' 
+                ? 'bg-purple-600 text-white shadow-lg' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+            }`}
+          >
+            <ShoppingCart className="w-4 h-4" />
+            <span>Shop</span>
+          </button>
+        </div>
+
+        {/* Mobile Content Area */}
+        <div className="flex-1 px-4 pb-4 overflow-hidden">
+          
+          {/* Mobile Search & Filter */}
+          <div className="mb-4 space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search items..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50 text-sm"
+              />
+            </div>
+            
+            <div className="flex space-x-2">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500/50"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="expensive">Most Expensive</option>
+                <option value="cheapest">Least Expensive</option>
+              </select>
+              
+              <select
+                value={filterRarity}
+                onChange={(e) => setFilterRarity(e.target.value)}
+                className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500/50"
+              >
+                <option value="all">All Rarities</option>
+                <option value="common">Common</option>
+                <option value="rare">Rare</option>
+                <option value="epic">Epic</option>
+                <option value="legendary">Legendary</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Mobile Category Pills */}
+          <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
+            {categories.map((category) => {
+              const IconComponent = category.icon
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                    activeCategory === category.id
+                      ? 'bg-purple-600 text-white shadow-lg'
+                      : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50'
+                  }`}
+                >
+                  <IconComponent className="w-4 h-4" />
+                  <span>{category.name}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Mobile Items Grid */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {getCurrentItems().map((item) => (
+                <div
+                  key={item.id}
+                  className={`relative bg-gray-800/40 rounded-xl p-3 border transition-all cursor-pointer ${
+                    playerData.equippedSkin === item.id
+                      ? 'border-purple-500/60 bg-purple-600/20 shadow-lg'
+                      : item.owned
+                      ? 'border-gray-600/50 hover:border-gray-500/70 hover:bg-gray-700/40'
+                      : 'border-gray-700/50 hover:border-purple-500/30'
+                  }`}
+                  onClick={() => item.owned ? handleEquipItem(item) : handlePurchaseItem(item)}
+                >
+                  {/* Mobile Item Preview */}
+                  <div className="aspect-square bg-gray-900 rounded-lg mb-2 flex items-center justify-center border border-gray-700/50">
+                    <div 
+                      className="w-12 h-12 rounded-full border-2"
+                      style={{ 
+                        backgroundColor: item.color,
+                        borderColor: item.color,
+                        opacity: item.owned ? 1 : 0.6
+                      }}
+                    ></div>
+                  </div>
+
+                  {/* Mobile Item Info */}
+                  <div className="text-center">
+                    <h3 className="text-sm font-medium text-white mb-1 truncate">{item.name}</h3>
+                    
+                    {/* Status Badges */}
+                    <div className="flex flex-col space-y-1">
+                      {playerData.equippedSkin === item.id && (
+                        <div className="bg-purple-600/90 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          Equipped
+                        </div>
+                      )}
+                      
+                      {item.owned && playerData.equippedSkin !== item.id && (
+                        <div className="bg-green-600/90 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          Owned
+                        </div>
+                      )}
+                      
+                      {!item.owned && (
+                        <div className="bg-yellow-600/90 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          ${item.price}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Mobile Rarity Indicator */}
+                  <div className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
+                    item.rarity === 'legendary' ? 'bg-yellow-400' :
+                    item.rarity === 'epic' ? 'bg-purple-500' :
+                    item.rarity === 'rare' ? 'bg-blue-500' : 'bg-gray-500'
+                  }`}></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout - Unchanged */}
+      <div className="hidden md:block relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl max-w-[95vw] w-full max-h-[95vh] overflow-hidden border border-purple-500/30 shadow-2xl">
         
         {/* Header */}
         <div className="flex items-center justify-between p-8 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/50 to-gray-800/50">
