@@ -1326,6 +1326,7 @@ export default function Home() {
                   Logout
                 </button>
               </div>
+            ) : (
               <button 
                 onClick={handleLoginClick}
                 disabled={!ready}
