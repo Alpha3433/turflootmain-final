@@ -148,7 +148,22 @@ export default function Home() {
     const generateNotification = () => {
       const name = mockPlayerNames[Math.floor(Math.random() * mockPlayerNames.length)]
       const city = mockCities[Math.floor(Math.random() * mockCities.length)]
-      const amount = Math.floor(Math.random() * 2500) + 100 // $100 - $2600
+      
+      // Realistic cash-out amounts based on lobby tiers ($1, $5, $20, $50, $100)
+      const lobbyTiers = [
+        { base: 1, multiplier: 0.5, max: 3 },     // $1 lobby: $0.50 - $3.00
+        { base: 5, multiplier: 0.8, max: 12 },    // $5 lobby: $4.00 - $12.00  
+        { base: 20, multiplier: 1.2, max: 45 },   // $20 lobby: $24.00 - $45.00
+        { base: 50, multiplier: 1.5, max: 95 },   // $50 lobby: $75.00 - $95.00
+        { base: 100, multiplier: 1.8, max: 185 }  // $100 lobby: $180.00 - $185.00
+      ]
+      
+      const selectedTier = lobbyTiers[Math.floor(Math.random() * lobbyTiers.length)]
+      const amount = Math.floor(
+        (selectedTier.base * selectedTier.multiplier) + 
+        (Math.random() * (selectedTier.max - (selectedTier.base * selectedTier.multiplier)))
+      )
+      
       const color = avatarColors[Math.floor(Math.random() * avatarColors.length)]
       
       return {
