@@ -22,6 +22,8 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('newest')
   const [filterRarity, setFilterRarity] = useState('all')
+  const [balanceHighlight, setBalanceHighlight] = useState(false)
+  const [previousBalance, setPreviousBalance] = useState(userBalance)
   
   const [playerData, setPlayerData] = useState({
     equippedSkin: 'default_blue'
