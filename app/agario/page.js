@@ -3047,6 +3047,11 @@ const AgarIOGame = () => {
                 setCurrentMission(null)
               }
               
+              // Report player death to paid room backend
+              if (gameMode === 'paid' && paidRoomData) {
+                reportElimination(paidRoomData.userId, `bot_${bot.name}`, 'KILL')
+              }
+              
               // Update session tracking - game loss
               setGameSession(prev => ({
                 ...prev,
