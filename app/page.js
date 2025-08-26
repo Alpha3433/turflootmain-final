@@ -7,7 +7,7 @@ import WalletManager from '../components/wallet/WalletManager'
 import UserProfile from '../components/UserProfile'
 import UserSettings from '../components/UserSettings'
 import CustomizationModal from '@/components/CustomizationModalClean'
-import OrientationGate from '@/components/ui/OrientationGate'
+// import OrientationGate from '@/components/ui/OrientationGate'
 import ServerBrowserModal from '../components/ServerBrowserModal'
 import { GameSettingsProvider } from '../components/providers/GameSettingsProvider'
 
