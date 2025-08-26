@@ -32,7 +32,7 @@ const AgarIOGame = () => {
       setPing(999)
     }
   }
-  const [gameStats, setGameStats] = useState({ netWorth: 100, rank: 1, players: 1, kills: 0, deaths: 0, streak: 0 })
+  const [gameStats, setGameStats] = useState({ netWorth: 5, rank: 1, players: 1, kills: 0, deaths: 0, streak: 0 })
   const [showCashOutSuccess, setShowCashOutSuccess] = useState(false)
   const [cashOutDetails, setCashOutDetails] = useState(null)
   const [isGameOver, setIsGameOver] = useState(false)
