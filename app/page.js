@@ -529,15 +529,20 @@ export default function Home() {
           const friendsData = await friendsResponse.json()
           console.log('👥 Friends data received:', friendsData)
           
-          // Process friends data for display
-          const processedFriends = friendsData.friends.slice(0, 3).map((friend) => ({
-            id: friend.id,
-            name: friend.custom_name || friend.email?.split('@')[0] || `Player${friend.id?.slice(-4)}`,
-            status: friend.online_status || 'offline',
-            wins: friend.stats?.games_won || 0
-          }))
-          
-          setFriendsList(processedFriends)
+          // Process friends data for display with null checks
+          if (friendsData && friendsData.friends && Array.isArray(friendsData.friends)) {
+            const processedFriends = friendsData.friends.slice(0, 3).map((friend) => ({
+              id: friend.id,
+              name: friend.custom_name || friend.email?.split('@')[0] || `Player${friend.id?.slice(-4)}`,
+              status: friend.online_status || 'offline',
+              wins: friend.stats?.games_won || 0
+            }))
+            
+            setFriendsList(processedFriends)
+          } else {
+            console.log('⚠️ Invalid friends data structure')
+            setFriendsList([])
+          }
         } else {
           console.log('⚠️ No friends data available')
           setFriendsList([])
