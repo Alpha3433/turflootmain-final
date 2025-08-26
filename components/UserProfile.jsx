@@ -1,10 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Search, Plus, Users, Trophy, Target, Clock } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { 
+  X, 
+  Search, 
+  Plus, 
+  Users, 
+  Trophy, 
+  Target, 
+  Clock,
+  UserSearch,
+  UserPlus
+} from 'lucide-react'
 
 const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
   const [activeTab, setActiveTab] = useState(initialTab)
+  const [isLandscape, setIsLandscape] = useState(false)
 
   // Reset tab when modal opens with new initialTab
   useEffect(() => {
@@ -12,6 +24,28 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
       setActiveTab(initialTab)
     }
   }, [isOpen, initialTab])
+
+  // Orientation detection effect
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const checkOrientation = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight)
+    }
+    
+    // Check orientation on mount
+    checkOrientation()
+    
+    // Listen for orientation changes
+    window.addEventListener('resize', checkOrientation)
+    window.addEventListener('orientationchange', checkOrientation)
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation)
+      window.removeEventListener('orientationchange', checkOrientation)
+    }
+  }, [isOpen])
+
   const [stats, setStats] = useState({
     winRate: 0.0,
     gamesWon: 0,
