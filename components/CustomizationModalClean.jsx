@@ -569,7 +569,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           {/* Desktop Main Content */}
           <div className="flex-1 p-8 overflow-y-auto">
             <div className="grid grid-cols-3 xl:grid-cols-4 gap-6">
-              {getCurrentItems().map((item) => (
+              {getFilteredItems().map((item) => (
                 <div
                   key={item.id}
                   className={`relative bg-gray-800/40 rounded-2xl p-6 border transition-all cursor-pointer hover:scale-105 ${
