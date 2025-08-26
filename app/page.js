@@ -141,13 +141,26 @@ export default function Home() {
 
   // Region selection handler
   const handleRegionSelect = (regionId) => {
-    const selectedRegion = availableRegions.find(r => r.id === regionId)
-    if (selectedRegion) {
-      setCurrentServer(regionId)
-      setCurrentPing(selectedRegion.ping)
-      setShowRegionDropdown(false)
-      console.log(`🌍 Region changed to: ${regionId} (${selectedRegion.ping}ms)`)
-    }
+    setCurrentServer(regionId)
+    
+    // Use real-time ping if available, otherwise use estimated value
+    const realPing = regionPings[regionId]
+    const estimatedPing = getEstimatedLatencyOffset(regionId)
+    const pingToUse = realPing !== undefined ? realPing : estimatedPing
+    
+    setCurrentPing(pingToUse)
+    setShowRegionDropdown(false)
+    
+    console.log(`🌍 Region changed to: ${regionId} (${pingToUse}ms)`)
+    
+    // Re-measure ping for the selected region immediately
+    measurePing(regionId, availableRegions.find(r => r.id === regionId)?.endpoint)
+      .then(newPing => {
+        setCurrentPing(newPing)
+        setRegionPings(prev => ({ ...prev, [regionId]: newPing }))
+        console.log(`📡 Updated ping for ${regionId}: ${newPing}ms`)
+      })
+      .catch(error => console.error(`❌ Failed to update ping for ${regionId}:`, error))
   }
 
   // Close dropdown when clicking outside
