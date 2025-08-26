@@ -4405,8 +4405,8 @@ const AgarIOGame = () => {
           {!showOrientationGate && !isGameOver && (
             <div className={`fixed bottom-5 right-5 flex flex-col gap-4 z-50 transition-opacity duration-300 ${mobileUIFaded ? 'opacity-40' : 'opacity-100'}`}
                  style={{ 
-                   bottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
-                   right: '20px' 
+                   bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)', // Moved down from 20px to 60px
+                   right: '60px' // Moved left from 20px to 60px
                  }}>
               {/* Circular Cash-Out Button with LARGER touch area for mobile */}
               <div 
