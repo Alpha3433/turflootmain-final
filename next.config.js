@@ -131,21 +131,31 @@ const nextConfig = {
       },
     ];
 
-    // Add plugin to ignore missing files
+    // Add plugin to ignore missing files and create aliases
     config.plugins.push({
       apply(compiler) {
-        compiler.hooks.afterResolvers.tap('IgnoreMissingFiles', (compiler) => {
-          compiler.resolverFactory.hooks.resolver.for('normal').tap('IgnoreMissingFiles', (resolver) => {
-            resolver.hooks.resolve.tapAsync('IgnoreMissingFiles', (request, resolveContext, callback) => {
-              if (request.request && request.request.includes('@walletconnect') && request.request.includes('.es.js')) {
-                // Replace with a dummy module
-                return callback(null, {
-                  ...request,
-                  request: require.resolve('./missing-module-stub.js'),
-                });
-              }
-              callback();
-            });
+        compiler.hooks.normalModuleFactory.tap('WalletConnectResolver', (nmf) => {
+          nmf.hooks.beforeResolve.tapAsync('WalletConnectResolver', (result, callback) => {
+            if (!result) return callback();
+            
+            const request = result.request;
+            
+            // Handle specific WalletConnect nested module issues
+            if (request && request.includes('@walletconnect/ethereum-provider/node_modules/@walletconnect/universal-provider')) {
+              result.request = request.replace(
+                '@walletconnect/ethereum-provider/node_modules/@walletconnect/universal-provider/dist/index.es.js',
+                '@walletconnect/universal-provider/dist/index.umd.js'
+              );
+              console.log('🔄 Redirected WalletConnect module:', request, '→', result.request);
+            }
+            
+            // Handle any other nested universal-provider requests
+            if (request && request.includes('universal-provider/dist/index.es.js') && request.includes('node_modules')) {
+              result.request = '@walletconnect/universal-provider/dist/index.umd.js';
+              console.log('🔄 Redirected nested universal-provider:', request, '→', result.request);
+            }
+            
+            callback(null, result);
           });
         });
       }
