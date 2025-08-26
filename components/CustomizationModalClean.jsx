@@ -99,6 +99,27 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
     }
   }, [isOpen])
 
+  // Orientation detection effect
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const checkOrientation = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight)
+    }
+    
+    // Check orientation on mount
+    checkOrientation()
+    
+    // Listen for orientation changes
+    window.addEventListener('resize', checkOrientation)
+    window.addEventListener('orientationchange', checkOrientation)
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation)
+      window.removeEventListener('orientationchange', checkOrientation)
+    }
+  }, [isOpen])
+
   // Balance change detection and highlight effect
   useEffect(() => {
     if (userBalance !== previousBalance && previousBalance !== userBalance) {
