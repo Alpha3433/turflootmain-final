@@ -4403,10 +4403,10 @@ const AgarIOGame = () => {
 
           {/* Mobile Action Buttons */}
           {!showOrientationGate && !isGameOver && (
-            <div className={`fixed bottom-5 right-5 flex flex-col gap-4 z-50 transition-opacity duration-300 ${mobileUIFaded ? 'opacity-40' : 'opacity-100'}`}
+            <div className={`fixed bottom-5 right-5 flex flex-row gap-6 z-50 transition-opacity duration-300 ${mobileUIFaded ? 'opacity-40' : 'opacity-100'}`}
                  style={{ 
-                   bottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)', // Moved down from 20px to 60px
-                   right: '60px' // Moved left from 20px to 60px
+                   bottom: 'calc(env(safe-area-inset-bottom, 0px) + 30px)', // Better vertical spacing from edge
+                   right: '20px' // Back to edge for horizontal layout
                  }}>
               {/* Circular Cash-Out Button with LARGER touch area for mobile */}
               <div 
