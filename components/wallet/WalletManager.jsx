@@ -494,9 +494,6 @@ const WalletManager = ({ onBalanceUpdate }) => {
             </button>
           </div>
           <div className="text-gray-400 text-sm mb-2">Game Balance</div>
-          <div className="text-xs text-gray-500">
-            0.0000 SOL • 0.00 USDC
-          </div>
         </div>
         
         {/* Action Buttons - Trigger login on click */}
