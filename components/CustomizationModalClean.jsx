@@ -285,63 +285,63 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </button>
         </div>
 
-        {/* Mobile Content Area */}
-        <div className="flex-1 px-4 pb-4 overflow-hidden">
+        {/* Mobile Content Area - Enhanced */}
+        <div className="flex-1 px-5 pb-5 overflow-hidden">
           
-          {/* Mobile Search & Filter */}
-          <div className="mb-4 space-y-3">
+          {/* Mobile Search & Filter - Enhanced */}
+          <div className="mb-5 space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search items..."
+                placeholder="Search skins..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50 text-sm"
+                className="w-full pl-12 pr-4 py-4 bg-gray-800/60 border border-gray-700/60 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/60 focus:bg-gray-800/80 text-base shadow-lg"
               />
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-2 gap-3">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500/50"
+                className="px-4 py-4 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white text-base focus:outline-none focus:border-purple-500/60 shadow-lg font-medium"
               >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="expensive">Most Expensive</option>
-                <option value="cheapest">Least Expensive</option>
+                <option value="newest">🆕 Newest First</option>
+                <option value="oldest">📅 Oldest First</option>
+                <option value="expensive">💎 Most Expensive</option>
+                <option value="cheapest">💰 Least Expensive</option>
               </select>
               
               <select
                 value={filterRarity}
                 onChange={(e) => setFilterRarity(e.target.value)}
-                className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white text-sm focus:outline-none focus:border-purple-500/50"
+                className="px-4 py-4 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white text-base focus:outline-none focus:border-purple-500/60 shadow-lg font-medium"
               >
-                <option value="all">All Rarities</option>
-                <option value="common">Common</option>
-                <option value="rare">Rare</option>
-                <option value="epic">Epic</option>
-                <option value="legendary">Legendary</option>
+                <option value="all">✨ All Rarities</option>
+                <option value="common">⚪ Common</option>
+                <option value="rare">🔵 Rare</option>
+                <option value="epic">🟣 Epic</option>
+                <option value="legendary">🟡 Legendary</option>
               </select>
             </div>
           </div>
 
-          {/* Mobile Category Pills */}
-          <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
+          {/* Mobile Category Pills - Enhanced */}
+          <div className="flex space-x-3 mb-5 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map((category) => {
               const IconComponent = category.icon
               return (
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                  className={`flex items-center space-x-3 px-5 py-3 rounded-2xl text-base font-bold transition-all whitespace-nowrap active:scale-95 shadow-lg ${
                     activeCategory === category.id
-                      ? 'bg-purple-600 text-white shadow-lg'
-                      : 'bg-gray-800/50 text-gray-400 hover:text-white hover:bg-gray-700/50 border border-gray-700/50'
+                      ? 'bg-purple-600 text-white shadow-purple-600/30'
+                      : 'bg-gray-800/60 text-gray-400 hover:text-white hover:bg-gray-700/60 border border-gray-700/60'
                   }`}
                 >
-                  <IconComponent className="w-4 h-4" />
+                  <IconComponent className="w-5 h-5" />
                   <span>{category.name}</span>
                 </button>
               )
