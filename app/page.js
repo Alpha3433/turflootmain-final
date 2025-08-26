@@ -1545,7 +1545,7 @@ export default function Home() {
                   }`}>
                     {livePlayerCount}
                   </div>
-                  <div className="text-gray-400 text-sm font-medium">Players in Paid Games</div>
+                  <div className="text-gray-400 text-sm font-medium">Players in Game</div>
                 </div>
                 <div className="text-center">
                   <div className={`text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
