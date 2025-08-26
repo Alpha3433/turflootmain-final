@@ -88,6 +88,11 @@ export default function Home() {
 
   // Measure real-time ping to a region using multiple endpoints
   const measurePing = async (regionId, endpoints) => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') {
+      return getEstimatedLatencyOffset(regionId)
+    }
+    
     console.log(`🏓 Measuring real-time ping to ${regionId}...`)
     
     try {
