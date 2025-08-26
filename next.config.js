@@ -50,7 +50,6 @@ const nextConfig = {
     NEXT_PUBLIC_TESTING_MODE: process.env.NEXT_PUBLIC_TESTING_MODE,
     NEXT_PUBLIC_MOCK_WALLET_BALANCE: process.env.NEXT_PUBLIC_MOCK_WALLET_BALANCE,
     NEXT_PUBLIC_ENV: process.env.NEXT_PUBLIC_ENV,
-    NODE_ENV: process.env.NODE_ENV,
   },
   webpack(config, { dev, isServer }) {
     // Production optimizations
