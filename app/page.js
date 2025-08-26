@@ -41,44 +41,11 @@ export default function Home() {
   const [showMobileLobby, setShowMobileLobby] = useState(false)
 
   // Available regions for the dropdown with real-time ping measurement
-  // Using publicly accessible endpoints in different geographic regions for accurate latency testing
   const availableRegions = [
-    { 
-      id: 'US-East-1', 
-      name: 'US East (Virginia)', 
-      ping: null, 
-      endpoints: [
-        'https://1.1.1.1/', // Cloudflare DNS US
-        'https://api.github.com/zen' // GitHub API
-      ]
-    },
-    { 
-      id: 'US-West-1', 
-      name: 'US West (California)', 
-      ping: null, 
-      endpoints: [
-        'https://www.google.com/generate_204', // Google US servers
-        'https://api.github.com/repos/github/gitignore' // GitHub API
-      ]
-    },
-    { 
-      id: 'EU-Central-1', 
-      name: 'Europe (Frankfurt)', 
-      ping: null, 
-      endpoints: [
-        'https://www.google.de/generate_204', // Google Germany servers
-        'https://api.github.com/users/github' // GitHub EU
-      ]
-    },
-    { 
-      id: 'Oceania-1', 
-      name: 'Oceania (Sydney)', 
-      ping: null, 
-      endpoints: [
-        'https://www.google.com.au/generate_204', // Google Australia servers
-        'https://api.github.com/users/octocat' // GitHub with Oceania routing
-      ]
-    }
+    { id: 'US-East-1', name: 'US East (Virginia)', ping: null, endpoint: 'https://www.google.com/generate_204' },
+    { id: 'US-West-1', name: 'US West (California)', ping: null, endpoint: 'https://www.google.com/generate_204' },
+    { id: 'EU-Central-1', name: 'Europe (Frankfurt)', ping: null, endpoint: 'https://www.google.de/generate_204' },
+    { id: 'Oceania-1', name: 'Oceania (Sydney)', ping: null, endpoint: 'https://www.google.com.au/generate_204' }
   ]
 
   const [regionPings, setRegionPings] = useState({})
