@@ -3735,8 +3735,6 @@ const AgarIOGame = () => {
     }, 100)
   }
 
-  // All functions and hooks should be above this point
-  
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
       {/* Game Canvas */}
