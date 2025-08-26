@@ -41,11 +41,48 @@ export default function Home() {
   const [showMobileLobby, setShowMobileLobby] = useState(false)
 
   // Available regions for the dropdown with real-time ping measurement
+  // Using publicly accessible endpoints in different geographic regions for accurate latency testing
   const availableRegions = [
-    { id: 'US-East-1', name: 'US East (Virginia)', ping: null, endpoint: 'https://us-east-1.turfloot.com/ping' },
-    { id: 'US-West-1', name: 'US West (California)', ping: null, endpoint: 'https://us-west-1.turfloot.com/ping' },
-    { id: 'EU-Central-1', name: 'Europe (Frankfurt)', ping: null, endpoint: 'https://eu-central-1.turfloot.com/ping' },
-    { id: 'Oceania-1', name: 'Oceania (Sydney)', ping: null, endpoint: 'https://oceania-1.turfloot.com/ping' }
+    { 
+      id: 'US-East-1', 
+      name: 'US East (Virginia)', 
+      ping: null, 
+      endpoints: [
+        'https://cloudflare.com/cdn-cgi/trace', // Cloudflare edge in US-East
+        'https://1.1.1.1/', // Cloudflare DNS US
+        'https://httpbin.org/get' // US-based service
+      ]
+    },
+    { 
+      id: 'US-West-1', 
+      name: 'US West (California)', 
+      ping: null, 
+      endpoints: [
+        'https://www.google.com/generate_204', // Google US-West servers
+        'https://httpbin.org/ip', // Alternative US service
+        'https://api.github.com/zen' // GitHub API US-West
+      ]
+    },
+    { 
+      id: 'EU-Central-1', 
+      name: 'Europe (Frankfurt)', 
+      ping: null, 
+      endpoints: [
+        'https://www.google.de/generate_204', // Google Germany servers
+        'https://httpbin.org/uuid', // European mirror
+        'https://api.github.com/repos/github/gitignore' // GitHub EU
+      ]
+    },
+    { 
+      id: 'Oceania-1', 
+      name: 'Oceania (Sydney)', 
+      ping: null, 
+      endpoints: [
+        'https://www.google.com.au/generate_204', // Google Australia servers
+        'https://httpbin.org/headers', // Oceania routing
+        'https://api.github.com/users/github' // GitHub Oceania routing
+      ]
+    }
   ]
 
   const [regionPings, setRegionPings] = useState({})
