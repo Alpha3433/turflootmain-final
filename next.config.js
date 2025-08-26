@@ -87,6 +87,18 @@ const nextConfig = {
         child_process: false,
         'require-addon': false,
         'bare-os': false,
+        // Additional fallbacks for WalletConnect
+        'node:crypto': false,
+        'node:http': false,
+        'node:https': false,
+        'node:net': false,
+        'node:tls': false,
+        'node:url': false,
+        'node:zlib': false,
+        'node:fs': false,
+        'node:path': false,
+        'node:os': false,
+        'node:stream': false,
       };
     }
 
@@ -94,9 +106,15 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@walletconnect/jsonrpc-ws-connection': false,
+      '@walletconnect/universal-provider': '@walletconnect/universal-provider/dist/index.umd.js',
+      '@walletconnect/ethereum-provider': '@walletconnect/ethereum-provider/dist/index.umd.js',
       'rpc-websockets': false,
       'require-addon': false,
       'bare-os': false,
+      // Additional aliases for problematic modules
+      'lokijs': false,
+      'pouchdb-browser': false,
+      'react-native': false,
     };
 
     // Handle missing files and modules
