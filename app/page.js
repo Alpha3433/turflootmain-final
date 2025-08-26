@@ -2377,9 +2377,10 @@ export default function Home() {
       )}
 
       {/* Orientation Gate for Mobile Users */}
-      {showOrientationGate && (
+      {/* Temporarily disable OrientationGate to fix deployment */}
+      {/*showOrientationGate && (
         <OrientationGate onLandscapeReady={handleOrientationReady} />
-      )}
+      )*/}
     </div>
   )
 }
