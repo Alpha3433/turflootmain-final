@@ -4541,7 +4541,8 @@ const AgarIOGame = () => {
                   minimapCollapsed ? 'w-1.5 h-1.5' : 'w-3 h-3'
                 }`}
                 style={{
-                  top: `calc(env(safe-area-inset-top, 0px) + 16px)`
+                  top: `calc(env(safe-area-inset-top, 0px) + 20px)`, // Slightly more top spacing
+                  right: '24px' // More spacing from right edge
                 }}
                 onClick={() => setMinimapCollapsed(!minimapCollapsed)}
               >
