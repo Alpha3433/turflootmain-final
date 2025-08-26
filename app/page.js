@@ -39,6 +39,36 @@ export default function Home() {
   const [showOrientationGate, setShowOrientationGate] = useState(false)
   const [pendingGameEntry, setPendingGameEntry] = useState(null)
   const [showMobileLobby, setShowMobileLobby] = useState(false)
+
+  // Available regions for the dropdown
+  const availableRegions = [
+    { id: 'US-East-1', name: 'US East (Virginia)', ping: 27 },
+    { id: 'US-West-1', name: 'US West (California)', ping: 42 },
+    { id: 'EU-Central-1', name: 'Europe (Frankfurt)', ping: 89 }
+  ]
+
+  // Region selection handler
+  const handleRegionSelect = (regionId) => {
+    const selectedRegion = availableRegions.find(r => r.id === regionId)
+    if (selectedRegion) {
+      setCurrentServer(regionId)
+      setCurrentPing(selectedRegion.ping)
+      setShowRegionDropdown(false)
+      console.log(`🌍 Region changed to: ${regionId} (${selectedRegion.ping}ms)`)
+    }
+  }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showRegionDropdown && !event.target.closest('.region-dropdown-container')) {
+        setShowRegionDropdown(false)
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showRegionDropdown])
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
 
