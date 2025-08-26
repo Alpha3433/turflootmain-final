@@ -4474,12 +4474,6 @@ const AgarIOGame = () => {
                     <div className="text-xs">{isCashingOut ? 'OUT' : `$${gameStats.netWorth}`}</div>
                   </div>
                 </div>
-                {/* Cash-out guidance tooltip */}
-                {!isCashingOut && (
-                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-80">
-                    Hold to cash out
-                  </div>
-                )}
               </div>
 
               {/* Mobile Split Button */}
