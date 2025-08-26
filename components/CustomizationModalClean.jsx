@@ -360,10 +360,10 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
         </div>
 
         {/* Mobile Content Area - Portrait and Landscape Optimized */}
-        <div className="flex-1 flex flex-col px-5 pb-5 landscape:pb-3 overflow-hidden">
+        <div className={`flex-1 flex flex-col px-5 ${isLandscape ? 'pb-3' : 'pb-5'} overflow-hidden`}>
           
           {/* Mobile Search & Filter - Responsive */}
-          <div className="flex-shrink-0 mb-5 landscape:mb-3 space-y-4 landscape:space-y-2">
+          <div className={`flex-shrink-0 ${isLandscape ? 'mb-3 space-y-2' : 'mb-5 space-y-4'}`}>
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -371,15 +371,15 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                 placeholder="Search skins..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 portrait:py-4 landscape:py-3 bg-gray-800/60 border border-gray-700/60 rounded-2xl landscape:rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/60 focus:bg-gray-800/80 text-base landscape:text-sm shadow-lg"
+                className={`w-full pl-12 pr-4 ${isLandscape ? 'py-3 rounded-xl text-sm' : 'py-4 rounded-2xl text-base'} bg-gray-800/60 border border-gray-700/60 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/60 focus:bg-gray-800/80 shadow-lg`}
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-3 landscape:gap-2">
+            <div className={`grid grid-cols-2 ${isLandscape ? 'gap-2' : 'gap-3'}`}>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 portrait:py-4 landscape:py-3 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white portrait:text-base landscape:text-sm focus:outline-none focus:border-purple-500/60 shadow-lg font-medium"
+                className={`px-4 ${isLandscape ? 'py-3 text-sm' : 'py-4 text-base'} bg-gray-800/60 border border-gray-700/60 rounded-xl text-white focus:outline-none focus:border-purple-500/60 shadow-lg font-medium`}
               >
                 <option value="newest">🆕 Newest First</option>
                 <option value="oldest">📅 Oldest First</option>
@@ -390,7 +390,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
               <select
                 value={filterRarity}
                 onChange={(e) => setFilterRarity(e.target.value)}
-                className="px-4 portrait:py-4 landscape:py-3 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white portrait:text-base landscape:text-sm focus:outline-none focus:border-purple-500/60 shadow-lg font-medium"
+                className={`px-4 ${isLandscape ? 'py-3 text-sm' : 'py-4 text-base'} bg-gray-800/60 border border-gray-700/60 rounded-xl text-white focus:outline-none focus:border-purple-500/60 shadow-lg font-medium`}
               >
                 <option value="all">✨ All Rarities</option>
                 <option value="common">⚪ Common</option>
@@ -402,20 +402,20 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </div>
 
           {/* Mobile Category Pills - Responsive */}
-          <div className="flex-shrink-0 flex space-x-3 landscape:space-x-2 mb-5 landscape:mb-3 overflow-x-auto pb-2">
+          <div className={`flex-shrink-0 flex ${isLandscape ? 'space-x-2 mb-3' : 'space-x-3 mb-5'} overflow-x-auto pb-2`}>
             {categories.map((category) => {
               const IconComponent = category.icon
               return (
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`flex items-center space-x-3 landscape:space-x-2 portrait:px-5 landscape:px-4 portrait:py-3 landscape:py-2 rounded-2xl landscape:rounded-xl portrait:text-base landscape:text-sm font-bold landscape:font-semibold transition-all whitespace-nowrap active:scale-95 shadow-lg ${
+                  className={`flex items-center ${isLandscape ? 'space-x-2 px-4 py-2 rounded-xl text-sm font-semibold' : 'space-x-3 px-5 py-3 rounded-2xl text-base font-bold'} transition-all whitespace-nowrap active:scale-95 shadow-lg ${
                     activeCategory === category.id
                       ? 'bg-purple-600 text-white shadow-purple-600/30'
                       : 'bg-gray-800/60 text-gray-400 hover:text-white hover:bg-gray-700/60 border border-gray-700/60'
                   }`}
                 >
-                  <IconComponent className="w-5 h-5 landscape:w-4 landscape:h-4" />
+                  <IconComponent className={`${isLandscape ? 'w-4 h-4' : 'w-5 h-5'}`} />
                   <span>{category.name}</span>
                 </button>
               )
@@ -425,11 +425,11 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           {/* Mobile Items Grid - Responsive Layout */}
           <div className="flex-1 overflow-y-auto min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
             {/* Portrait: Single Column | Landscape: Two Columns */}
-            <div className="portrait:space-y-4 landscape:grid landscape:grid-cols-2 landscape:gap-3 pb-4">
+            <div className={`${isLandscape ? 'grid grid-cols-2 gap-3' : 'space-y-4'} pb-4`}>
               {getFilteredItems().map((item) => (
                 <div
                   key={item.id}
-                  className={`relative bg-gray-800/50 rounded-2xl landscape:rounded-xl portrait:p-5 landscape:p-3 border-2 transition-all cursor-pointer active:scale-[0.98] landscape:mb-3 ${
+                  className={`relative bg-gray-800/50 ${isLandscape ? 'rounded-xl p-3 mb-3' : 'rounded-2xl p-5'} border-2 transition-all cursor-pointer active:scale-[0.98] ${
                     playerData.equippedSkin === item.id
                       ? 'border-purple-500/80 bg-purple-600/25 shadow-lg shadow-purple-500/20'
                       : item.owned
@@ -438,33 +438,90 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                   }`}
                   onClick={() => item.owned ? handleEquipItem(item) : handlePurchaseItem(item)}
                 >
-                  {/* Portrait Layout - Horizontal */}
-                  <div className="portrait:flex portrait:items-center portrait:space-x-5">
-                    {/* Skin Preview */}
-                    <div className="portrait:w-20 portrait:h-20 landscape:w-16 landscape:h-16 landscape:mx-auto landscape:mb-2 bg-gray-900 rounded-2xl landscape:rounded-xl flex items-center justify-center border-2 border-gray-700/60 shadow-inner flex-shrink-0">
-                      <div 
-                        className="portrait:w-14 portrait:h-14 landscape:w-12 landscape:h-12 rounded-full border-4 landscape:border-3 shadow-lg transition-all duration-300"
-                        style={{ 
-                          background: item.color && item.color.includes('linear-gradient') 
-                            ? item.color 
-                            : item.color || '#6B7280',
-                          borderColor: item.owned ? (item.color || '#6B7280') : 'rgba(156, 163, 175, 0.5)',
-                          opacity: item.owned ? 1 : 0.7,
-                          boxShadow: playerData.equippedSkin === item.id ? `0 0 20px ${item.color}40` : '0 4px 12px rgba(0,0,0,0.3)'
-                        }}
-                      ></div>
-                    </div>
+                  {/* Layout varies by orientation */}
+                  {!isLandscape ? (
+                    // Portrait Layout - Horizontal
+                    <div className="flex items-center space-x-5">
+                      {/* Skin Preview */}
+                      <div className="w-20 h-20 bg-gray-900 rounded-2xl flex items-center justify-center border-2 border-gray-700/60 shadow-inner flex-shrink-0">
+                        <div 
+                          className="w-14 h-14 rounded-full border-4 shadow-lg transition-all duration-300"
+                          style={{ 
+                            background: item.color && item.color.includes('linear-gradient') 
+                              ? item.color 
+                              : item.color || '#6B7280',
+                            borderColor: item.owned ? (item.color || '#6B7280') : 'rgba(156, 163, 175, 0.5)',
+                            opacity: item.owned ? 1 : 0.7,
+                            boxShadow: playerData.equippedSkin === item.id ? `0 0 20px ${item.color}40` : '0 4px 12px rgba(0,0,0,0.3)'
+                          }}
+                        ></div>
+                      </div>
 
-                    {/* Item Info */}
-                    <div className="portrait:flex-1 portrait:min-w-0 landscape:text-center">
-                      <div className="portrait:flex portrait:items-start portrait:justify-between portrait:mb-2 landscape:mb-2">
-                        <div className="portrait:flex-1 landscape:w-full">
-                          <h3 className="portrait:text-lg landscape:text-sm font-bold text-white mb-1 leading-tight portrait:text-left landscape:text-center">{item.name}</h3>
-                          <p className="portrait:text-sm landscape:text-xs text-gray-400 leading-snug overflow-hidden portrait:text-left landscape:text-center landscape:hidden">{item.description}</p>
+                      {/* Item Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-white mb-1 leading-tight">{item.name}</h3>
+                            <p className="text-sm text-gray-400 leading-snug overflow-hidden">{item.description}</p>
+                          </div>
+                          
+                          {/* Rarity Badge */}
+                          <div className={`ml-3 px-3 py-1 rounded-full text-xs font-bold border-2 flex-shrink-0 ${
+                            item.rarity === 'legendary' ? 'bg-yellow-500/20 text-yellow-200 border-yellow-500/40' :
+                            item.rarity === 'epic' ? 'bg-purple-600/20 text-purple-200 border-purple-500/40' :
+                            item.rarity === 'rare' ? 'bg-blue-600/20 text-blue-200 border-blue-500/40' : 
+                            'bg-gray-600/20 text-gray-200 border-gray-500/40'
+                          }`}>
+                            {item.rarity.toUpperCase()}
+                          </div>
                         </div>
+
+                        {/* Status Button */}
+                        <div className="mt-3">
+                          {playerData.equippedSkin === item.id && (
+                            <div className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-base px-5 py-3 rounded-xl font-bold text-center shadow-lg border-2 border-purple-500/50">
+                              ✓ EQUIPPED
+                            </div>
+                          )}
+                          
+                          {item.owned && playerData.equippedSkin !== item.id && (
+                            <div className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white text-base px-5 py-3 rounded-xl font-bold text-center shadow-lg border-2 border-green-500/50">
+                              TAP TO EQUIP
+                            </div>
+                          )}
+                          
+                          {!item.owned && (
+                            <div className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-base px-5 py-3 rounded-xl font-bold text-center shadow-lg border-2 border-yellow-400/50">
+                              BUY FOR {item.price} COINS
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Landscape Layout - Vertical Compact
+                    <div className="text-center">
+                      {/* Skin Preview */}
+                      <div className="w-16 h-16 mx-auto mb-2 bg-gray-900 rounded-xl flex items-center justify-center border-2 border-gray-700/60 shadow-inner">
+                        <div 
+                          className="w-12 h-12 rounded-full border-3 shadow-lg transition-all duration-300"
+                          style={{ 
+                            background: item.color && item.color.includes('linear-gradient') 
+                              ? item.color 
+                              : item.color || '#6B7280',
+                            borderColor: item.owned ? (item.color || '#6B7280') : 'rgba(156, 163, 175, 0.5)',
+                            opacity: item.owned ? 1 : 0.7,
+                            boxShadow: playerData.equippedSkin === item.id ? `0 0 20px ${item.color}40` : '0 4px 12px rgba(0,0,0,0.3)'
+                          }}
+                        ></div>
+                      </div>
+
+                      {/* Item Info */}
+                      <div className="mb-2">
+                        <h3 className="text-sm font-bold text-white mb-1 leading-tight">{item.name}</h3>
                         
                         {/* Rarity Badge */}
-                        <div className={`portrait:ml-3 landscape:mx-auto landscape:mb-2 portrait:px-3 landscape:px-2 portrait:py-1 landscape:py-0.5 rounded-full portrait:text-xs landscape:text-xs font-bold border-2 landscape:border flex-shrink-0 ${
+                        <div className={`mx-auto mb-2 px-2 py-0.5 rounded-full text-xs font-bold border inline-block ${
                           item.rarity === 'legendary' ? 'bg-yellow-500/20 text-yellow-200 border-yellow-500/40' :
                           item.rarity === 'epic' ? 'bg-purple-600/20 text-purple-200 border-purple-500/40' :
                           item.rarity === 'rare' ? 'bg-blue-600/20 text-blue-200 border-blue-500/40' : 
@@ -475,27 +532,27 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                       </div>
 
                       {/* Status Button */}
-                      <div className="portrait:mt-3 landscape:mt-2">
+                      <div className="mt-2">
                         {playerData.equippedSkin === item.id && (
-                          <div className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white portrait:text-base landscape:text-xs portrait:px-5 landscape:px-3 portrait:py-3 landscape:py-2 rounded-xl landscape:rounded-lg font-bold text-center shadow-lg border-2 landscape:border border-purple-500/50">
+                          <div className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-xs px-3 py-2 rounded-lg font-bold text-center shadow-lg border border-purple-500/50">
                             ✓ EQUIPPED
                           </div>
                         )}
                         
                         {item.owned && playerData.equippedSkin !== item.id && (
-                          <div className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white portrait:text-base landscape:text-xs portrait:px-5 landscape:px-3 portrait:py-3 landscape:py-2 rounded-xl landscape:rounded-lg font-bold text-center shadow-lg border-2 landscape:border border-green-500/50">
+                          <div className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white text-xs px-3 py-2 rounded-lg font-bold text-center shadow-lg border border-green-500/50">
                             TAP TO EQUIP
                           </div>
                         )}
                         
                         {!item.owned && (
-                          <div className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white portrait:text-base landscape:text-xs portrait:px-5 landscape:px-3 portrait:py-3 landscape:py-2 rounded-xl landscape:rounded-lg font-bold text-center shadow-lg border-2 landscape:border border-yellow-400/50">
+                          <div className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-3 py-2 rounded-lg font-bold text-center shadow-lg border border-yellow-400/50">
                             BUY FOR {item.price} COINS
                           </div>
                         )}
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
