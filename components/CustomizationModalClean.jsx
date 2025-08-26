@@ -347,7 +347,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           {/* Mobile Items Grid */}
           <div className="flex-1 overflow-y-auto">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {getCurrentItems().map((item) => (
+              {getFilteredItems().map((item) => (
                 <div
                   key={item.id}
                   className={`relative bg-gray-800/40 rounded-xl p-3 border transition-all cursor-pointer ${
