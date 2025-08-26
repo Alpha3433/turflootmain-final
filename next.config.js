@@ -100,8 +100,9 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@walletconnect/jsonrpc-ws-connection': false,
-      '@walletconnect/universal-provider': '@walletconnect/universal-provider/dist/index.umd.js',
-      '@walletconnect/ethereum-provider': '@walletconnect/ethereum-provider/dist/index.umd.js',
+      // Fix WalletConnect nested dependency issues
+      '@walletconnect/universal-provider': path.resolve(__dirname, 'node_modules/@walletconnect/universal-provider/dist/index.umd.js'),
+      '@walletconnect/ethereum-provider': path.resolve(__dirname, 'node_modules/@walletconnect/ethereum-provider/dist/index.umd.js'),
       'rpc-websockets': false,
       'require-addon': false,
       'bare-os': false,
