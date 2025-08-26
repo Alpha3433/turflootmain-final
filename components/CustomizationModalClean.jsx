@@ -413,6 +413,231 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       {/* Desktop Layout - Unchanged */}
       <div className="hidden md:block relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl max-w-[95vw] w-full max-h-[95vh] overflow-hidden border border-purple-500/30 shadow-2xl">
         
+        {/* Desktop Header */}
+        <div className="flex items-center justify-between p-8 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/50 to-gray-800/50">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-purple-600/20 rounded-xl border border-purple-500/30">
+                <Palette className="w-8 h-8 text-purple-400" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white">Premium Customization</h2>
+                <p className="text-gray-400">Personalize your TurfLoot experience</p>
+              </div>
+            </div>
+            
+            {/* Desktop Tab Switcher */}
+            <div className="flex bg-gray-800/50 rounded-2xl p-1.5 border border-gray-700/50">
+              <button
+                onClick={() => setActiveTab('inventory')}
+                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all flex items-center space-x-3 ${
+                  activeTab === 'inventory' 
+                    ? 'bg-purple-600 text-white shadow-lg transform scale-105' 
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                }`}
+              >
+                <Package className="w-5 h-5" />
+                <span>My Collection</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('shop')}
+                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all flex items-center space-x-3 ${
+                  activeTab === 'shop' 
+                    ? 'bg-purple-600 text-white shadow-lg transform scale-105' 
+                    : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                }`}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                <span>Item Shop</span>
+              </button>
+            </div>
+          </div>
+          
+          {/* Desktop Currency Display */}
+          <div className="flex items-center space-x-4">
+            <div className={`flex items-center space-x-3 px-6 py-3 rounded-xl border transition-all duration-500 ${
+              balanceHighlight 
+                ? 'bg-green-500/30 border-green-400/50 shadow-lg shadow-green-400/20' 
+                : 'bg-yellow-500/20 border-yellow-500/30'
+            }`}>
+              <div className="text-yellow-400 text-2xl">💰</div>
+              <div>
+                <div className={`font-bold text-xl transition-all duration-500 ${
+                  balanceHighlight ? 'text-green-400 scale-110' : 'text-yellow-400'
+                }`}>
+                  {userBalance.toLocaleString()}
+                  {balanceHighlight && (
+                    <span className="ml-2 text-green-300 text-sm animate-bounce">+</span>
+                  )}
+                </div>
+                <div className="text-yellow-600 text-sm">Coins</div>
+              </div>
+            </div>
+            
+            <button
+              onClick={onClose}
+              className="p-3 bg-gray-700/50 hover:bg-gray-600/50 rounded-xl transition-all"
+            >
+              <X className="w-5 h-5 text-gray-300" />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex h-[calc(95vh-120px)]">
+          {/* Desktop Sidebar */}
+          <div className="w-80 bg-gray-800/30 border-r border-gray-700/50 overflow-y-auto">
+            <div className="p-6 space-y-6">
+              
+              {/* Desktop Categories */}
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+                  <span>Categories</span>
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {categories.map((category) => {
+                    const IconComponent = category.icon
+                    return (
+                      <button
+                        key={category.id}
+                        onClick={() => setActiveCategory(category.id)}
+                        className={`flex items-center space-x-3 p-4 rounded-xl text-left transition-all ${
+                          activeCategory === category.id
+                            ? 'bg-purple-600/80 text-white shadow-lg border border-purple-500/50'
+                            : 'bg-gray-700/30 text-gray-300 hover:bg-gray-600/40 hover:text-white border border-gray-700/50'
+                        }`}
+                      >
+                        <IconComponent className="w-5 h-5" />
+                        <span className="font-medium text-sm">{category.name}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Desktop Filters */}
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4">Filters</h3>
+                <div className="space-y-4">
+                  
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      placeholder="Search items..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/50"
+                    />
+                  </div>
+                  
+                  {/* Sort */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Sort By</label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
+                    >
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                      <option value="expensive">Most Expensive</option>
+                      <option value="cheapest">Least Expensive</option>
+                    </select>
+                  </div>
+                  
+                  {/* Rarity Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Rarity</label>
+                    <select
+                      value={filterRarity}
+                      onChange={(e) => setFilterRarity(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-white focus:outline-none focus:border-purple-500/50"
+                    >
+                      <option value="all">All Rarities</option>
+                      <option value="common">Common</option>
+                      <option value="rare">Rare</option>
+                      <option value="epic">Epic</option>
+                      <option value="legendary">Legendary</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Main Content */}
+          <div className="flex-1 p-8 overflow-y-auto">
+            <div className="grid grid-cols-3 xl:grid-cols-4 gap-6">
+              {getCurrentItems().map((item) => (
+                <div
+                  key={item.id}
+                  className={`relative bg-gray-800/40 rounded-2xl p-6 border transition-all cursor-pointer hover:scale-105 ${
+                    playerData.equippedSkin === item.id
+                      ? 'border-purple-500/60 bg-purple-600/20 shadow-lg shadow-purple-500/20'
+                      : item.owned
+                      ? 'border-gray-600/50 hover:border-gray-500/70 hover:bg-gray-700/40'
+                      : 'border-gray-700/50 hover:border-purple-500/30'
+                  }`}
+                  onClick={() => item.owned ? handleEquipItem(item) : handlePurchaseItem(item)}
+                >
+                  {/* Desktop Item Preview */}
+                  <div className="aspect-square bg-gray-900 rounded-xl mb-4 flex items-center justify-center border border-gray-700/50">
+                    <div 
+                      className="w-16 h-16 rounded-full border-4"
+                      style={{ 
+                        backgroundColor: item.color,
+                        borderColor: item.color,
+                        opacity: item.owned ? 1 : 0.6
+                      }}
+                    ></div>
+                  </div>
+
+                  {/* Desktop Item Info */}
+                  <div className="text-center">
+                    <h3 className="text-lg font-bold text-white mb-2">{item.name}</h3>
+                    <p className="text-gray-400 text-sm mb-4">{item.description}</p>
+                    
+                    {/* Status Badges */}
+                    <div className="space-y-2">
+                      {playerData.equippedSkin === item.id && (
+                        <div className="bg-purple-600/90 text-white text-sm px-4 py-2 rounded-full font-medium">
+                          Currently Equipped
+                        </div>
+                      )}
+                      
+                      {item.owned && playerData.equippedSkin !== item.id && (
+                        <div className="bg-green-600/90 text-white text-sm px-4 py-2 rounded-full font-medium">
+                          Owned - Click to Equip
+                        </div>
+                      )}
+                      
+                      {!item.owned && (
+                        <div className="bg-yellow-600/90 text-white text-sm px-4 py-2 rounded-full font-medium">
+                          Purchase for {item.price} coins
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Desktop Rarity Badge */}
+                  <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-bold ${
+                    item.rarity === 'legendary' ? 'bg-yellow-500 text-black' :
+                    item.rarity === 'epic' ? 'bg-purple-600 text-white' :
+                    item.rarity === 'rare' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-white'
+                  }`}>
+                    {item.rarity.toUpperCase()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  )
+        
         {/* Header */}
         <div className="flex items-center justify-between p-8 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/50 to-gray-800/50">
           <div className="flex items-center space-x-6">
