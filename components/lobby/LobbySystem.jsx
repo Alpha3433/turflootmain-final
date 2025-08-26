@@ -21,6 +21,11 @@ const LobbySystem = () => {
 
   // Mobile detection for auto-condensing
   useEffect(() => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     const detectMobile = () => {
       const userAgent = navigator.userAgent
       const viewportWidth = window.innerWidth
