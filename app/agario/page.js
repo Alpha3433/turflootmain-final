@@ -2586,7 +2586,131 @@ const AgarIOGame = () => {
         }
       }
 
-      // PvP Combat (only if not in virus protection)
+      // Enhanced PvP Combat (Split Cell vs Bots Detection)
+      if (game.player.alive && game.player.cells && game.player.cells.length > 1) {
+        // Check each split cell against bots for individual combat
+        for (const cell of game.player.cells) {
+          if (!cell) continue
+          
+          for (const bot of game.bots) {
+            if (!bot.alive) continue
+            
+            const distance = getDistance(cell, bot)
+            const baseCellRadius = getRadius(cell.mass) * 2.0
+            const cellRadius = baseCellRadius * 3.0 // Split cell 3x bigger visually
+            const botRadius = getRadius(bot.mass) * 2.0
+            
+            if (distance < Math.max(cellRadius, botRadius)) {
+              // Check spawn protection
+              if (game.player.spawnProtected || bot.spawnProtected) {
+                continue
+              }
+              
+              if (cell.mass > bot.mass * 1.15) {
+                // Split cell kills bot
+                const bountyMultiplier = bot.isBounty ? 1.5 : 1.0
+                const killReward = Math.floor(config.killReward * bountyMultiplier)
+                
+                // Update individual cell mass
+                cell.mass += bot.mass * 0.3
+                cell.radius = Math.sqrt(cell.mass / Math.PI) * 8
+                
+                // Update total player mass and net worth
+                game.player.mass = game.player.cells.reduce((total, c) => total + c.mass, 0)
+                game.player.netWorth += killReward
+                game.player.kills += 1
+                game.player.streak += 1
+                
+                // Enhanced mobile feedback for split cell kills
+                if (isMobile) {
+                  addFloatingText(`🎯 CELL KILL: +$${killReward}`, cell.x, cell.y - 50, '#ff4444')
+                  console.log(`📱 Mobile split cell eliminated ${bot.name}! Cell mass: ${cell.mass}, Total mass: ${game.player.mass}`)
+                } else {
+                  addFloatingText(`+$${killReward} (Cell Kill)`, cell.x, cell.y - 50, '#ff4444')
+                }
+                
+                // Update session tracking
+                setGameSession(prev => ({
+                  ...prev,
+                  kills: prev.kills + 1
+                }))
+                
+                bot.alive = false
+                
+                // Kill streak and feed updates
+                addKillStreakAnnouncement(game.player.streak)
+                const killMessage = isMobile 
+                  ? `Split cell eliminated ${bot.name} (+$${killReward})` 
+                  : `You eliminated ${bot.name} with split cell (+$${killReward})`
+                addToKillFeed(killMessage)
+                addLiveEvent(`Split cell eliminated ${bot.name} for $${killReward}`, 'kill')
+                
+                // Update mission progress for split cell kills
+                if (currentMission && currentMission.type === 'eliminate') {
+                  setCurrentMission(prev => {
+                    if (prev) {
+                      const newProgress = prev.progress + 1
+                      setMissionProgress(newProgress)
+                      if (newProgress >= prev.target) {
+                        completeMission({ ...prev, progress: newProgress })
+                        return null
+                      }
+                      return { ...prev, progress: newProgress }
+                    }
+                    return prev
+                  })
+                }
+                
+              } else if (bot.mass > cell.mass * 1.15) {
+                // Bot kills individual split cell
+                const originalCellCount = game.player.cells.length
+                
+                // Remove this specific cell
+                const cellIndex = game.player.cells.findIndex(c => c.id === cell.id)
+                if (cellIndex > -1) {
+                  game.player.cells.splice(cellIndex, 1)
+                  
+                  // Update total player mass
+                  game.player.mass = game.player.cells.reduce((total, c) => total + c.mass, 0)
+                  
+                  // Enhanced mobile feedback for cell loss
+                  if (isMobile) {
+                    addFloatingText(`💀 CELL LOST!`, cell.x, cell.y - 40, '#ff0000')
+                    console.log(`📱 Mobile user lost split cell to ${bot.name}! Remaining cells: ${game.player.cells.length}`)
+                  } else {
+                    addFloatingText(`💀 Cell Eliminated!`, cell.x, cell.y - 40, '#ff0000')
+                  }
+                  
+                  // If no cells left, player dies
+                  if (game.player.cells.length === 0) {
+                    game.player.alive = false
+                    game.player.deaths += 1
+                    
+                    if (isMobile) {
+                      setGameResult(`💀 Game Over! All cells eliminated by ${bot.name}`)
+                    } else {
+                      setGameResult(`💀 Game Over! You were eliminated by ${bot.name}`)
+                    }
+                    setIsGameOver(true)
+                  }
+                  
+                  // Bot grows from eating the cell
+                  bot.mass += cell.mass * 0.5
+                  bot.netWorth += Math.floor(cell.mass * 2)
+                  
+                  const lossMessage = isMobile 
+                    ? `${bot.name} eliminated your cell` 
+                    : `${bot.name} eliminated one of your cells`
+                  addToKillFeed(lossMessage)
+                  addLiveEvent(`${bot.name} eliminated player cell`, 'death')
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Original PvP Combat (Unified Player vs Bots)
       if (game.player.alive) {
         for (const bot of game.bots) {
           if (!bot.alive) continue
