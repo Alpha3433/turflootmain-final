@@ -125,41 +125,15 @@ const nextConfig = {
         'require-addon': 'commonjs require-addon',
         'bare-os': 'commonjs bare-os',
         'critters': 'critters',
-        // Ignore problematic WalletConnect modules
+        // Externalize problematic WalletConnect modules to prevent build issues
         '@walletconnect/ethereum-provider': 'commonjs @walletconnect/ethereum-provider',
         '@walletconnect/universal-provider': 'commonjs @walletconnect/universal-provider',
+        '@walletconnect/jsonrpc-ws-connection': 'commonjs @walletconnect/jsonrpc-ws-connection',
       },
     ];
 
-    // Add plugin to ignore missing files and create aliases
-    config.plugins.push({
-      apply(compiler) {
-        compiler.hooks.normalModuleFactory.tap('WalletConnectResolver', (nmf) => {
-          nmf.hooks.beforeResolve.tapAsync('WalletConnectResolver', (result, callback) => {
-            if (!result) return callback();
-            
-            const request = result.request;
-            
-            // Handle specific WalletConnect nested module issues
-            if (request && request.includes('@walletconnect/ethereum-provider/node_modules/@walletconnect/universal-provider')) {
-              result.request = request.replace(
-                '@walletconnect/ethereum-provider/node_modules/@walletconnect/universal-provider/dist/index.es.js',
-                '@walletconnect/universal-provider/dist/index.umd.js'
-              );
-              console.log('🔄 Redirected WalletConnect module:', request, '→', result.request);
-            }
-            
-            // Handle any other nested universal-provider requests
-            if (request && request.includes('universal-provider/dist/index.es.js') && request.includes('node_modules')) {
-              result.request = '@walletconnect/universal-provider/dist/index.umd.js';
-              console.log('🔄 Redirected nested universal-provider:', request, '→', result.request);
-            }
-            
-            callback(null, result);
-          });
-        });
-      }
-    });
+    // Remove the problematic custom plugin
+    // config.plugins.push(...)
 
     if (dev) {
       // Reduce CPU/memory from file watching
