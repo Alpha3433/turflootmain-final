@@ -538,9 +538,6 @@ const WalletManager = ({ onBalanceUpdate }) => {
           </button>
         </div>
         <div className="text-gray-400 text-sm mb-2">Game Balance</div>
-        <div className="text-xs text-gray-500">
-          {balance.sol_balance.toFixed(4)} SOL • {balance.usdc_balance.toFixed(2)} USDC
-        </div>
       </div>
       
       {/* Action Buttons */}
