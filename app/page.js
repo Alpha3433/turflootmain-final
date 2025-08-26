@@ -1281,82 +1281,111 @@ export default function Home() {
 
           {/* Bottom Row on Mobile - Coins, Server, Actions */}
           <div className="flex items-center justify-between w-full sm:w-auto space-x-2 sm:space-x-3">
-            {/* Coins Display - Compact on Mobile */}
-            <div className="flex items-center space-x-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-yellow-600/80 to-yellow-500/80 border border-yellow-400/60 rounded-lg shadow-lg">
-              <div className="text-yellow-300 text-sm">💰</div>
+            {/* Coins Display - Redesigned */}
+            <div className="flex items-center space-x-2 px-3 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group">
+              <div className="w-6 h-6 bg-yellow-500/20 rounded-lg flex items-center justify-center border border-yellow-500/30">
+                <svg className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H11.5v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.65c.1 1.7 1.36 2.66 2.85 2.97V19h1.71v-1.69c1.48-.3 2.72-1.26 2.72-2.84 0-2.27-1.59-2.96-3.62-3.33z"/>
+                </svg>
+              </div>
               <div className="flex flex-col">
-                <span className="text-xs text-yellow-200 opacity-90 leading-none">COINS</span>
-                <span className="text-white font-bold text-xs sm:text-sm leading-none">{userBalance.toLocaleString()}</span>
+                <span className="text-xs text-yellow-400 font-medium leading-none">COINS</span>
+                <span className="text-white font-bold text-sm leading-none">{userBalance.toLocaleString()}</span>
               </div>
             </div>
 
-            {/* Server Indicator - Compact on Mobile */}
-            <div className="flex items-center space-x-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-800/60 border border-gray-700/50 rounded-lg">
-              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-green-400 font-medium text-xs sm:text-sm hidden sm:inline">{currentServer}</span>
-              <span className="text-green-400 font-medium text-xs sm:hidden">
-                {currentServer.split('-')[0]}
-              </span>
-              {currentPing !== null && (
-                <>
-                  <span className="text-gray-400 text-xs hidden sm:inline">|</span>
-                  <span className="text-gray-400 text-xs">
+            {/* Server Indicator - Redesigned */}
+            <div className="flex items-center space-x-2 px-3 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group">
+              <div className="w-6 h-6 bg-green-500/20 rounded-lg flex items-center justify-center border border-green-500/30">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-green-400 font-medium text-xs leading-none hidden sm:inline">{currentServer}</span>
+                <span className="text-green-400 font-medium text-xs leading-none sm:hidden">
+                  {currentServer.split('-')[0]}
+                </span>
+                {currentPing !== null && (
+                  <span className="text-gray-400 text-xs leading-none">
                     {currentPing}ms
                   </span>
-                </>
-              )}
+                )}
+              </div>
             </div>
             
             {authenticated && user ? (
-              <div className="flex items-center space-x-1 sm:space-x-2">
+              <div className="flex items-center space-x-2">
+                {/* Profile Button - Redesigned */}
                 <button 
                   onClick={() => setShowProfile(true)}
-                  className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
-                  title="Profile"
+                  className="w-10 h-10 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center justify-center"
+                  title="Profile & Social"
                 >
-                  <svg className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" />
-                  </svg>
+                  <div className="w-6 h-6 bg-blue-500/20 rounded-lg flex items-center justify-center border border-blue-500/30">
+                    <svg className="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
                 </button>
                 
+                {/* Settings Button - Redesigned */}
                 <button 
                   onClick={() => setShowSettings(true)}
-                  className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
+                  className="w-10 h-10 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center justify-center"
                   title="Settings"
                 >
-                  <svg className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
+                  <div className="w-6 h-6 bg-purple-500/20 rounded-lg flex items-center justify-center border border-purple-500/30">
+                    <svg className="w-3.5 h-3.5 text-purple-400 group-hover:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
                 </button>
                 
+                {/* Logout Button - Redesigned */}
                 <button 
                   onClick={handleLogout}
-                  className="ml-2 px-4 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-black rounded-lg font-medium transition-all duration-200 text-sm border border-yellow-500/30 hover:border-yellow-400/50"
+                  className="px-4 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center space-x-2"
+                  title="Logout"
                 >
-                  Logout
+                  <div className="w-5 h-5 bg-red-500/20 rounded-lg flex items-center justify-center border border-red-500/30">
+                    <svg className="w-3 h-3 text-red-400 group-hover:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </div>
+                  <span className="text-white text-sm font-medium hidden sm:inline">Logout</span>
                 </button>
               </div>
             ) : (
+              /* Login Button - Redesigned */
               <button 
                 onClick={handleLoginClick}
                 disabled={!ready}
-                className="px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black rounded-lg font-bold transition-all hover:scale-105 shadow-lg disabled:opacity-50 text-sm disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 title={!ready ? 'Initializing authentication...' : 'Click to login with Privy'}
               >
-                {!ready ? 'Loading...' : 'LOGIN'}
+                <div className="w-5 h-5 bg-green-500/20 rounded-lg flex items-center justify-center border border-green-500/30">
+                  <svg className="w-3 h-3 text-green-400 group-hover:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                </div>
+                <span className="text-white font-bold text-sm">
+                  {!ready ? 'Loading...' : 'LOGIN'}
+                </span>
               </button>
             )}
 
-            {/* Mobile-Only Lobby & Friends Button - Always visible on mobile */}
+            {/* Mobile-Only Lobby & Friends Button - Redesigned */}
             {isMobile && (
               <button 
                 onClick={() => setShowMobileLobby(true)}
-                className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
+                className="w-10 h-10 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center justify-center"
                 title="Lobby & Friends"
               >
-                <svg className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 12a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6 3 3 0 000 6zm-8 8a6 6 0 016-6h2a6 6 0 016 6v2H9v-2z" />
-                </svg>
+                <div className="w-6 h-6 bg-cyan-500/20 rounded-lg flex items-center justify-center border border-cyan-500/30">
+                  <svg className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 12a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6 3 3 0 000 6zm-8 8a6 6 0 016-6h2a6 6 0 016 6v2H9v-2z" />
+                  </svg>
+                </div>
               </button>
             )}
           </div>
