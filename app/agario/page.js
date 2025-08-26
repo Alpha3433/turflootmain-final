@@ -1645,6 +1645,88 @@ const AgarIOGame = () => {
     }
   }, [isMobile])
 
+  // Initialize paid room with backend API
+  const initializePaidRoom = async (matchId, tier) => {
+    try {
+      console.log(`💰 Initializing paid room - Tier: $${tier}, Match: ${matchId}`)
+      
+      // Get user ID (in production, this would come from authentication)
+      const userId = localStorage.getItem('agario_user_id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      localStorage.setItem('agario_user_id', userId)
+      
+      // Check available tiers and user balance
+      const tiersResponse = await fetch('/api/rooms/tiers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      })
+      
+      if (!tiersResponse.ok) {
+        throw new Error('Failed to get room tiers')
+      }
+      
+      const tiersData = await tiersResponse.json()
+      console.log('💰 Room tiers:', tiersData)
+      
+      // Find the selected tier
+      const selectedTier = tiersData.tiers.find(t => t.tier === tier)
+      if (!selectedTier) {
+        throw new Error(`Invalid room tier: $${tier}`)
+      }
+      
+      if (!selectedTier.affordable) {
+        throw new Error(`Insufficient balance for $${tier} room. Need ${selectedTier.entryFeeDisplay}, have ${tiersData.userBalanceDisplay}`)
+      }
+      
+      // Join the paid room
+      const joinResponse = await fetch('/api/rooms/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          roomTier: tier,
+          matchId
+        })
+      })
+      
+      if (!joinResponse.ok) {
+        const error = await joinResponse.json()
+        throw new Error(error.error || 'Failed to join paid room')
+      }
+      
+      const joinData = await joinResponse.json()
+      console.log('✅ Successfully joined paid room:', joinData)
+      
+      // Store paid room data for later use
+      setPaidRoomData({
+        userId,
+        matchId,
+        tier,
+        bounty: joinData.playerBounty,
+        platformFee: joinData.platformFee,
+        remainingBalance: joinData.remainingBalance
+      })
+      
+      // Update game stats to reflect paid room
+      setGameStats(prev => ({
+        ...prev,
+        netWorth: joinData.playerBounty / 100 // Convert cents to dollars for display
+      }))
+      
+      addFloatingText(`💰 Joined $${tier} Room!`, 400, 200, '#ffd700')
+      addFloatingText(`Bounty: $${(joinData.playerBounty / 100).toFixed(2)}`, 400, 230, '#00ff88')
+      
+    } catch (error) {
+      console.error('❌ Failed to initialize paid room:', error)
+      addFloatingText(`❌ ${error.message}`, 400, 200, '#ff4444')
+      
+      // Fall back to free mode if paid room fails
+      setGameMode('free')
+      setEntryFee(0)
+      setRoomTier(1)
+    }
+  }
+
   // Game restart function
   const restartGame = () => {
     setIsGameOver(false)
