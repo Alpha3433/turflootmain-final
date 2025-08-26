@@ -1,7 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Copy, Check } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { 
+  X, 
+  Copy, 
+  Check, 
+  User, 
+  Gamepad2, 
+  Monitor, 
+  Volume2, 
+  FileText,
+  Settings as SettingsIcon
+} from 'lucide-react'
 import { useGameSettings } from './providers/GameSettingsProvider'
 
 const UserSettings = ({ isOpen, onClose, user }) => {
@@ -9,6 +20,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
   const [username, setUsername] = useState(user?.username || user?.custom_name || user?.google?.name || user?.email?.address || 'Player')
   const [showCopySuccess, setShowCopySuccess] = useState(false)
   const [isUpdatingUsername, setIsUpdatingUsername] = useState(false)
+  const [isLandscape, setIsLandscape] = useState(false)
   
   const { settings, updateSetting, resetSettings } = useGameSettings()
 
@@ -20,14 +32,35 @@ const UserSettings = ({ isOpen, onClose, user }) => {
     }
   }, [user])
 
+  // Orientation detection effect
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const checkOrientation = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight)
+    }
+    
+    // Check orientation on mount
+    checkOrientation()
+    
+    // Listen for orientation changes
+    window.addEventListener('resize', checkOrientation)
+    window.addEventListener('orientationchange', checkOrientation)
+    
+    return () => {
+      window.removeEventListener('resize', checkOrientation)
+      window.removeEventListener('orientationchange', checkOrientation)
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   const tabs = [
-    { id: 'account', label: 'Account', icon: '👤' },
-    { id: 'game', label: 'Game', icon: '🎮' },
-    { id: 'display', label: 'Display', icon: '🖥️' },
-    { id: 'audio', label: 'Audio', icon: '🔊' },
-    { id: 'legal', label: 'Legal', icon: '📄' }
+    { id: 'account', label: 'Account', icon: User, color: 'text-blue-400' },
+    { id: 'game', label: 'Game', icon: Gamepad2, color: 'text-green-400' },
+    { id: 'display', label: 'Display', icon: Monitor, color: 'text-purple-400' },
+    { id: 'audio', label: 'Audio', icon: Volume2, color: 'text-orange-400' },
+    { id: 'legal', label: 'Legal', icon: FileText, color: 'text-red-400' }
   ]
 
   const handleUpdateUsername = async () => {
