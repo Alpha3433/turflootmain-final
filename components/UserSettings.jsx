@@ -570,43 +570,147 @@ const UserSettings = ({ isOpen, onClose, user }) => {
     }
   }
 
-  return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-lg w-full max-w-5xl h-full max-h-[90vh] overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <h1 className="text-2xl font-bold text-yellow-400">Settings</h1>
-          <button 
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+      {/* Mobile Layout - Portrait and Landscape Optimized */}
+      <div className="md:hidden w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
+        
+        {/* Mobile Header - Responsive for Portrait/Landscape */}
+        <div className={`px-5 ${isLandscape ? 'py-2' : 'py-3'} border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90`}>
+          {/* Portrait Layout - 2 Rows */}
+          {!isLandscape && (
+            <div>
+              {/* Top Row - Title and Close Button */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-orange-600/30 rounded-xl border border-orange-500/40 shadow-lg">
+                    <SettingsIcon className="w-6 h-6 text-orange-300" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white leading-tight">Settings</h2>
+                    <p className="text-sm text-gray-400">Customize your experience</p>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={onClose}
+                  className="p-3 bg-gray-700/60 hover:bg-gray-600/70 rounded-xl transition-all active:scale-95 shadow-lg"
+                >
+                  <X className="w-6 h-6 text-gray-300" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Landscape Layout - Single Compact Row */}
+          {isLandscape && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-orange-600/30 rounded-lg border border-orange-500/40 shadow-lg">
+                  <SettingsIcon className="w-5 h-5 text-orange-300" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white leading-tight">Settings</h2>
+                  <p className="text-xs text-gray-400">Customize your experience</p>
+                </div>
+              </div>
+              
+              <button
+                onClick={onClose}
+                className="p-2 bg-gray-700/60 hover:bg-gray-600/70 rounded-lg transition-all active:scale-95 shadow-lg"
+              >
+                <X className="w-5 h-5 text-gray-300" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Tab Switcher - Responsive */}
+        <div className={`bg-gray-800/60 mx-5 ${isLandscape ? 'mt-2 mb-2' : 'mt-4 mb-3'} rounded-2xl p-1.5 border border-gray-700/60 shadow-lg overflow-x-auto`}>
+          <div className="flex space-x-1 min-w-max">
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 px-4 ${isLandscape ? 'py-2' : 'py-3'} rounded-xl ${isLandscape ? 'text-sm font-semibold' : 'text-base font-bold'} transition-all whitespace-nowrap active:scale-95 min-w-max ${
+                    activeTab === tab.id 
+                      ? 'bg-orange-600 text-white shadow-lg shadow-orange-600/30' 
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
+                  }`}
+                >
+                  <IconComponent className={`${isLandscape ? 'w-4 h-4' : 'w-5 h-5'}`} />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Mobile Content Area - Responsive */}
+        <div className={`flex-1 flex flex-col px-5 ${isLandscape ? 'pb-3' : 'pb-5'} overflow-hidden`}>
+          <div className="flex-1 overflow-y-auto min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="pb-4">
+              {renderContent()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout - Modern Design */}
+      <div className="hidden md:block relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-3xl max-w-[95vw] w-full max-h-[95vh] overflow-hidden border border-orange-500/30 shadow-2xl">
+        
+        {/* Desktop Header */}
+        <div className="flex items-center justify-between p-8 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/50 to-gray-800/50">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-orange-600/20 rounded-xl border border-orange-500/30">
+                <SettingsIcon className="w-8 h-8 text-orange-400" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white">Settings</h2>
+                <p className="text-gray-400">Customize your TurfLoot experience</p>
+              </div>
+            </div>
+            
+            {/* Desktop Tab Switcher */}
+            <div className="flex bg-gray-800/50 rounded-2xl p-1.5 border border-gray-700/50">
+              {tabs.map((tab) => {
+                const IconComponent = tab.icon
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-6 py-3 rounded-xl text-sm font-medium transition-all flex items-center space-x-3 ${
+                      activeTab === tab.id 
+                        ? 'bg-orange-600 text-white shadow-lg transform scale-105' 
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                    }`}
+                  >
+                    <IconComponent className="w-5 h-5" />
+                    <span>{tab.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+          
+          <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white p-2 transition-colors"
+            className="p-3 bg-gray-700/50 hover:bg-gray-600/50 rounded-xl transition-all"
           >
-            <X size={24} />
+            <X className="w-5 h-5 text-gray-300" />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex space-x-2 p-6 pb-4 border-b border-gray-700 overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'bg-yellow-400 text-black'
-                  : 'bg-gray-800 text-white border border-gray-600 hover:bg-gray-700'
-              }`}
-            >
-              {tab.icon} {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="p-6 overflow-y-auto h-full max-h-[calc(90vh-200px)]">
+        {/* Desktop Content */}
+        <div className="p-8 overflow-y-auto h-[calc(95vh-120px)]">
           {renderContent()}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
