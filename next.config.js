@@ -31,11 +31,8 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['mongodb'],
-    // Disable problematic optimizations
     optimizeCss: false,
-    outputFileTracingRoot: false,
-    // Disable source maps in production to save space
-    productionBrowserSourceMaps: false,
+    outputFileTracingRoot: undefined,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -43,8 +40,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Disable telemetry and build traces
-  telemetry: false,
   distDir: '.next',
   trailingSlash: false,
   env: {
