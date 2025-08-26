@@ -130,8 +130,31 @@ const nextConfig = {
         'require-addon': 'commonjs require-addon',
         'bare-os': 'commonjs bare-os',
         'critters': 'critters',
+        // Ignore problematic WalletConnect modules
+        '@walletconnect/ethereum-provider': 'commonjs @walletconnect/ethereum-provider',
+        '@walletconnect/universal-provider': 'commonjs @walletconnect/universal-provider',
       },
     ];
+
+    // Add plugin to ignore missing files
+    config.plugins.push({
+      apply(compiler) {
+        compiler.hooks.afterResolvers.tap('IgnoreMissingFiles', (compiler) => {
+          compiler.resolverFactory.hooks.resolver.for('normal').tap('IgnoreMissingFiles', (resolver) => {
+            resolver.hooks.resolve.tapAsync('IgnoreMissingFiles', (request, resolveContext, callback) => {
+              if (request.request && request.request.includes('@walletconnect') && request.request.includes('.es.js')) {
+                // Replace with a dummy module
+                return callback(null, {
+                  ...request,
+                  request: require.resolve('./missing-module-stub.js'),
+                });
+              }
+              callback();
+            });
+          });
+        });
+      }
+    });
 
     if (dev) {
       // Reduce CPU/memory from file watching
