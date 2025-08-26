@@ -11,253 +11,452 @@ Focus Areas:
 """
 
 import requests
-import json
 import time
+import json
 import sys
-from datetime import datetime
+from typing import Dict, List, Tuple
+import os
 
-# Test Configuration
-BASE_URL = "http://localhost:3000"  # Using localhost as external URL has 502 issues
-API_BASE = f"{BASE_URL}/api"
-
-class TurfLootBackendRegressionTester:
+class TurfLootBackendTester:
     def __init__(self):
+        # Get base URL from environment or use localhost fallback
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+        self.api_base = f"{self.base_url}/api"
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
-        self.failed_tests = 0
         
-    def log_test(self, test_name, status, details="", response_time=None):
+        print(f"🎯 TurfLoot Backend API Testing - Real-time Latency Region Selection")
+        print(f"🔗 Testing API Base URL: {self.api_base}")
+        print("=" * 80)
+
+    def log_test(self, test_name: str, passed: bool, details: str = "", response_time: float = 0):
         """Log test results"""
         self.total_tests += 1
-        if status == "PASS":
+        if passed:
             self.passed_tests += 1
-            print(f"✅ {test_name}: PASSED")
+            status = "✅ PASSED"
         else:
-            self.failed_tests += 1
-            print(f"❌ {test_name}: FAILED - {details}")
+            status = "❌ FAILED"
         
-        if response_time:
-            print(f"   ⏱️ Response time: {response_time:.3f}s")
+        result = {
+            'test': test_name,
+            'passed': passed,
+            'details': details,
+            'response_time': response_time
+        }
+        self.test_results.append(result)
         
-        self.test_results.append({
-            "test": test_name,
-            "status": status,
-            "details": details,
-            "response_time": response_time,
-            "timestamp": datetime.now().isoformat()
-        })
-        print()
+        time_info = f" ({response_time:.3f}s)" if response_time > 0 else ""
+        print(f"{status} - {test_name}{time_info}")
+        if details:
+            print(f"    📝 {details}")
 
-    def test_core_api_endpoints(self):
-        """Test core API endpoints - Priority 1"""
-        print("🔍 TESTING CORE API ENDPOINTS (Priority 1)")
-        print("=" * 60)
+    def test_ping_endpoint(self) -> bool:
+        """Test GET /api/ping endpoint for basic server latency testing"""
+        print("\n🏓 Testing Ping Endpoint (GET /api/ping)")
+        print("-" * 50)
         
-        # Test 1: GET /api/ping - Critical connectivity test
         try:
             start_time = time.time()
-            response = requests.get(f"{API_BASE}/ping", timeout=10)
+            response = requests.get(f"{self.api_base}/ping", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get('status') == 'ok' and 'timestamp' in data:
-                    self.log_test("Ping Endpoint (GET /api/ping)", "PASS", 
-                                f"Connectivity test successful", response_time)
-                else:
-                    self.log_test("Ping Endpoint (GET /api/ping)", "FAIL", 
-                                f"Invalid response structure: {data}", response_time)
-            else:
-                self.log_test("Ping Endpoint (GET /api/ping)", "FAIL", 
-                            f"Status: {response.status_code}", response_time)
-        except Exception as e:
-            self.log_test("Ping Endpoint (GET /api/ping)", "FAIL", f"Exception: {str(e)}")
-
-        # Test 2: GET /api/ - Root API endpoint
-        try:
-            start_time = time.time()
-            response = requests.get(f"{API_BASE}/", timeout=10)
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                data = response.json()
-                required_fields = ['message', 'service', 'features', 'timestamp']
-                if all(field in data for field in required_fields):
-                    self.log_test("Root API Endpoint (GET /api/)", "PASS", 
-                                f"Basic server functionality intact: {data.get('message')}", response_time)
-                else:
-                    self.log_test("Root API Endpoint (GET /api/)", "FAIL", 
-                                f"Missing required fields: {data}", response_time)
-            else:
-                self.log_test("Root API Endpoint (GET /api/)", "FAIL", 
-                            f"Status: {response.status_code}", response_time)
-        except Exception as e:
-            self.log_test("Root API Endpoint (GET /api/)", "FAIL", f"Exception: {str(e)}")
-
-    def test_game_api_integration(self):
-        """Test game-related endpoints that support split mechanic - Priority 2"""
-        print("🎮 TESTING GAME API INTEGRATION (Priority 2)")
-        print("=" * 60)
-        
-        # Test 3: GET /api/servers/lobbies - Game server access
-        try:
-            start_time = time.time()
-            response = requests.get(f"{API_BASE}/servers/lobbies", timeout=15)
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                data = response.json()
-                required_fields = ['servers', 'totalPlayers', 'totalActiveServers', 'regions', 'gameTypes']
                 
-                if all(field in data for field in required_fields):
-                    servers = data.get('servers', [])
-                    if len(servers) >= 30:  # Should have 36 servers
-                        # Check server structure
-                        sample_server = servers[0] if servers else {}
-                        server_fields = ['id', 'name', 'region', 'stake', 'mode', 'currentPlayers', 'maxPlayers', 'ping', 'status']
-                        
-                        if all(field in sample_server for field in server_fields):
-                            self.log_test("Server Browser API (GET /api/servers/lobbies)", "PASS", 
-                                        f"Game server access working - {len(servers)} servers available", response_time)
-                        else:
-                            self.log_test("Server Browser API (GET /api/servers/lobbies)", "FAIL", 
-                                        f"Server missing required fields: {sample_server}", response_time)
-                    else:
-                        self.log_test("Server Browser API (GET /api/servers/lobbies)", "FAIL", 
-                                    f"Insufficient servers: {len(servers)} (expected ≥30)", response_time)
-                else:
-                    self.log_test("Server Browser API (GET /api/servers/lobbies)", "FAIL", 
-                                f"Missing required fields: {data.keys()}", response_time)
+                # Verify required fields for latency testing
+                required_fields = ['status', 'timestamp', 'server']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if missing_fields:
+                    self.log_test("Ping Endpoint - Response Structure", False, 
+                                f"Missing required fields: {missing_fields}", response_time)
+                    return False
+                
+                # Verify status is 'ok'
+                if data.get('status') != 'ok':
+                    self.log_test("Ping Endpoint - Status Check", False, 
+                                f"Expected status 'ok', got '{data.get('status')}'", response_time)
+                    return False
+                
+                # Verify timestamp is recent (within last 10 seconds)
+                current_time = int(time.time() * 1000)  # Convert to milliseconds
+                timestamp = data.get('timestamp', 0)
+                time_diff = abs(current_time - timestamp)
+                
+                if time_diff > 10000:  # 10 seconds in milliseconds
+                    self.log_test("Ping Endpoint - Timestamp Accuracy", False, 
+                                f"Timestamp too old: {time_diff}ms difference", response_time)
+                    return False
+                
+                # Verify response time is suitable for real-time latency measurement (< 2 seconds)
+                if response_time > 2.0:
+                    self.log_test("Ping Endpoint - Response Time", False, 
+                                f"Response too slow for real-time use: {response_time:.3f}s", response_time)
+                    return False
+                
+                self.log_test("Ping Endpoint - Complete Test", True, 
+                            f"Status: {data['status']}, Server: {data['server']}, Response time suitable for latency measurement", response_time)
+                return True
+                
             else:
-                self.log_test("Server Browser API (GET /api/servers/lobbies)", "FAIL", 
-                            f"Status: {response.status_code}", response_time)
-        except Exception as e:
-            self.log_test("Server Browser API (GET /api/servers/lobbies)", "FAIL", f"Exception: {str(e)}")
+                self.log_test("Ping Endpoint - HTTP Status", False, 
+                            f"Expected 200, got {response.status_code}", response_time)
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Ping Endpoint - Timeout", False, "Request timed out after 10 seconds")
+            return False
+        except requests.exceptions.RequestException as e:
+            self.log_test("Ping Endpoint - Connection Error", False, f"Request failed: {str(e)}")
+            return False
+        except json.JSONDecodeError:
+            self.log_test("Ping Endpoint - JSON Parse", False, "Invalid JSON response")
+            return False
 
-        # Test 4: Authentication endpoints (if needed for split mechanic)
+    def test_root_endpoint(self) -> bool:
+        """Test GET /api/ root endpoint response time"""
+        print("\n🏠 Testing Root Endpoint (GET /api/)")
+        print("-" * 50)
+        
         try:
             start_time = time.time()
-            test_data = {"privy_user": {"id": "test-split-user"}}
-            
-            response = requests.post(f"{API_BASE}/auth/privy", 
-                                   json=test_data, 
-                                   timeout=10)
+            response = requests.get(f"{self.api_base}/", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                if 'token' in data and 'user' in data:
-                    self.log_test("Authentication API (POST /api/auth/privy)", "PASS", 
-                                f"Authentication working for split mechanic", response_time)
-                else:
-                    self.log_test("Authentication API (POST /api/auth/privy)", "FAIL", 
-                                f"Missing token or user in response: {data}", response_time)
-            elif response.status_code == 400:
-                # Expected for validation - this is acceptable
-                self.log_test("Authentication API (POST /api/auth/privy)", "PASS", 
-                            f"Proper validation working (400 error expected)", response_time)
-            elif response.status_code == 404:
-                # Auth endpoint not implemented - acceptable
-                self.log_test("Authentication API (POST /api/auth/privy)", "PASS", 
-                            f"Auth endpoint not required for split mechanic", response_time)
+                
+                # Verify required fields for API identification
+                required_fields = ['message', 'service', 'features', 'timestamp']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if missing_fields:
+                    self.log_test("Root Endpoint - Response Structure", False, 
+                                f"Missing required fields: {missing_fields}", response_time)
+                    return False
+                
+                # Verify API version and service
+                if 'TurfLoot API' not in data.get('message', ''):
+                    self.log_test("Root Endpoint - API Identification", False, 
+                                f"Expected TurfLoot API message, got '{data.get('message')}'", response_time)
+                    return False
+                
+                # Verify features include multiplayer (needed for region selection)
+                features = data.get('features', [])
+                if 'multiplayer' not in features:
+                    self.log_test("Root Endpoint - Multiplayer Feature", False, 
+                                f"Multiplayer feature missing from: {features}", response_time)
+                    return False
+                
+                # Verify response time is suitable for quick connectivity checks (< 2 seconds)
+                if response_time > 2.0:
+                    self.log_test("Root Endpoint - Response Time", False, 
+                                f"Response too slow for connectivity check: {response_time:.3f}s", response_time)
+                    return False
+                
+                self.log_test("Root Endpoint - Complete Test", True, 
+                            f"API: {data['message']}, Features: {features}, Response time suitable for connectivity check", response_time)
+                return True
+                
             else:
-                self.log_test("Authentication API (POST /api/auth/privy)", "FAIL", 
-                            f"Unexpected status: {response.status_code}", response_time)
-        except Exception as e:
-            self.log_test("Authentication API (POST /api/auth/privy)", "FAIL", f"Exception: {str(e)}")
+                self.log_test("Root Endpoint - HTTP Status", False, 
+                            f"Expected 200, got {response.status_code}", response_time)
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Root Endpoint - Timeout", False, "Request timed out after 10 seconds")
+            return False
+        except requests.exceptions.RequestException as e:
+            self.log_test("Root Endpoint - Connection Error", False, f"Request failed: {str(e)}")
+            return False
+        except json.JSONDecodeError:
+            self.log_test("Root Endpoint - JSON Parse", False, "Invalid JSON response")
+            return False
 
-    def test_performance_requirements(self):
-        """Test performance requirements - Priority 3"""
-        print("⚡ TESTING PERFORMANCE REQUIREMENTS (Priority 3)")
-        print("=" * 60)
+    def test_servers_lobbies_endpoint(self) -> bool:
+        """Test GET /api/servers/lobbies endpoint for server browser functionality"""
+        print("\n🖥️ Testing Server Browser Endpoint (GET /api/servers/lobbies)")
+        print("-" * 50)
         
-        # Test 5: Response times under 2 seconds
-        slow_endpoints = []
-        fast_endpoints = []
-        
-        for result in self.test_results:
-            if result["response_time"]:
-                if result["response_time"] > 2.0:
-                    slow_endpoints.append(f"{result['test']}: {result['response_time']:.3f}s")
-                else:
-                    fast_endpoints.append(f"{result['test']}: {result['response_time']:.3f}s")
-        
-        if not slow_endpoints:
-            self.log_test("Performance Requirements", "PASS", 
-                        f"All {len(fast_endpoints)} endpoints respond under 2s")
-        else:
-            self.log_test("Performance Requirements", "FAIL", 
-                        f"Slow endpoints detected: {slow_endpoints}")
-
-        # Test 6: Memory leak check (basic server health)
         try:
             start_time = time.time()
-            # Make multiple rapid requests to check for memory issues
-            for i in range(5):
-                response = requests.get(f"{API_BASE}/ping", timeout=5)
-                if response.status_code != 200:
-                    break
+            response = requests.get(f"{self.api_base}/servers/lobbies", timeout=15)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                self.log_test("Memory Leak Check", "PASS", 
-                            f"Server stable under rapid requests", response_time)
+                data = response.json()
+                
+                # Verify required fields for server browser
+                required_fields = ['servers', 'totalPlayers', 'totalActiveServers', 'regions', 'gameTypes', 'timestamp']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if missing_fields:
+                    self.log_test("Server Browser - Response Structure", False, 
+                                f"Missing required fields: {missing_fields}", response_time)
+                    return False
+                
+                # Verify servers array exists and has data
+                servers = data.get('servers', [])
+                if not isinstance(servers, list):
+                    self.log_test("Server Browser - Servers Array", False, 
+                                f"Servers should be an array, got {type(servers)}", response_time)
+                    return False
+                
+                if len(servers) == 0:
+                    self.log_test("Server Browser - Server Count", False, 
+                                "No servers available for region selection", response_time)
+                    return False
+                
+                # Verify regions are available for selection
+                regions = data.get('regions', [])
+                expected_regions = ['US-East-1', 'US-West-1', 'EU-Central-1']
+                missing_regions = [region for region in expected_regions if region not in regions]
+                
+                if missing_regions:
+                    self.log_test("Server Browser - Region Coverage", False, 
+                                f"Missing expected regions: {missing_regions}", response_time)
+                    return False
+                
+                # Verify server data structure for region selection
+                if servers:
+                    sample_server = servers[0]
+                    required_server_fields = ['id', 'name', 'region', 'ping', 'status']
+                    missing_server_fields = [field for field in required_server_fields if field not in sample_server]
+                    
+                    if missing_server_fields:
+                        self.log_test("Server Browser - Server Data Structure", False, 
+                                    f"Server missing required fields: {missing_server_fields}", response_time)
+                        return False
+                    
+                    # Verify ping values are reasonable for latency display
+                    ping = sample_server.get('ping', 0)
+                    if not isinstance(ping, (int, float)) or ping < 0 or ping > 1000:
+                        self.log_test("Server Browser - Ping Values", False, 
+                                    f"Invalid ping value: {ping} (should be 0-1000ms)", response_time)
+                        return False
+                
+                # Verify response time is suitable for server browser updates (< 3 seconds)
+                if response_time > 3.0:
+                    self.log_test("Server Browser - Response Time", False, 
+                                f"Response too slow for server browser: {response_time:.3f}s", response_time)
+                    return False
+                
+                # Count servers by region for region selection dropdown
+                region_counts = {}
+                for server in servers:
+                    region = server.get('region', 'Unknown')
+                    region_counts[region] = region_counts.get(region, 0) + 1
+                
+                self.log_test("Server Browser - Complete Test", True, 
+                            f"Found {len(servers)} servers across {len(regions)} regions. Region distribution: {region_counts}", response_time)
+                return True
+                
             else:
-                self.log_test("Memory Leak Check", "FAIL", 
-                            f"Server unstable: {response.status_code}")
+                self.log_test("Server Browser - HTTP Status", False, 
+                            f"Expected 200, got {response.status_code}", response_time)
+                return False
+                
+        except requests.exceptions.Timeout:
+            self.log_test("Server Browser - Timeout", False, "Request timed out after 15 seconds")
+            return False
+        except requests.exceptions.RequestException as e:
+            self.log_test("Server Browser - Connection Error", False, f"Request failed: {str(e)}")
+            return False
+        except json.JSONDecodeError:
+            self.log_test("Server Browser - JSON Parse", False, "Invalid JSON response")
+            return False
+
+    def test_region_selection_performance(self) -> bool:
+        """Test the combined performance of all endpoints for region selection feature"""
+        print("\n⚡ Testing Region Selection Performance (Combined Endpoints)")
+        print("-" * 50)
+        
+        try:
+            # Simulate the region selection workflow
+            total_start_time = time.time()
+            
+            # Step 1: Check connectivity with root endpoint
+            root_start = time.time()
+            root_response = requests.get(f"{self.api_base}/", timeout=5)
+            root_time = time.time() - root_start
+            
+            if root_response.status_code != 200:
+                self.log_test("Region Selection - Connectivity Check", False, 
+                            f"Root endpoint failed: {root_response.status_code}")
+                return False
+            
+            # Step 2: Measure server latency with ping
+            ping_start = time.time()
+            ping_response = requests.get(f"{self.api_base}/ping", timeout=5)
+            ping_time = time.time() - ping_start
+            
+            if ping_response.status_code != 200:
+                self.log_test("Region Selection - Latency Measurement", False, 
+                            f"Ping endpoint failed: {ping_response.status_code}")
+                return False
+            
+            # Step 3: Load server browser for region selection
+            servers_start = time.time()
+            servers_response = requests.get(f"{self.api_base}/servers/lobbies", timeout=10)
+            servers_time = time.time() - servers_start
+            
+            if servers_response.status_code != 200:
+                self.log_test("Region Selection - Server Browser", False, 
+                            f"Server browser failed: {servers_response.status_code}")
+                return False
+            
+            total_time = time.time() - total_start_time
+            
+            # Verify total workflow time is acceptable for real-time region selection (< 8 seconds)
+            if total_time > 8.0:
+                self.log_test("Region Selection - Total Workflow Time", False, 
+                            f"Total workflow too slow: {total_time:.3f}s (should be < 8s)", total_time)
+                return False
+            
+            # Verify individual endpoint times are reasonable
+            if root_time > 2.0 or ping_time > 2.0 or servers_time > 3.0:
+                self.log_test("Region Selection - Individual Endpoint Performance", False, 
+                            f"One or more endpoints too slow: Root={root_time:.3f}s, Ping={ping_time:.3f}s, Servers={servers_time:.3f}s")
+                return False
+            
+            self.log_test("Region Selection - Complete Workflow", True, 
+                        f"Total: {total_time:.3f}s (Root: {root_time:.3f}s, Ping: {ping_time:.3f}s, Servers: {servers_time:.3f}s)", total_time)
+            return True
+            
+        except requests.exceptions.RequestException as e:
+            self.log_test("Region Selection - Workflow Error", False, f"Workflow failed: {str(e)}")
+            return False
+
+    def test_concurrent_latency_measurements(self) -> bool:
+        """Test multiple concurrent ping requests to simulate real-time latency measurements"""
+        print("\n🔄 Testing Concurrent Latency Measurements")
+        print("-" * 50)
+        
+        try:
+            import threading
+            import queue
+            
+            results_queue = queue.Queue()
+            num_concurrent_requests = 5
+            
+            def ping_worker():
+                try:
+                    start_time = time.time()
+                    response = requests.get(f"{self.api_base}/ping", timeout=5)
+                    response_time = time.time() - start_time
+                    results_queue.put((True, response_time, response.status_code))
+                except Exception as e:
+                    results_queue.put((False, 0, str(e)))
+            
+            # Start concurrent ping requests
+            threads = []
+            start_time = time.time()
+            
+            for i in range(num_concurrent_requests):
+                thread = threading.Thread(target=ping_worker)
+                thread.start()
+                threads.append(thread)
+            
+            # Wait for all threads to complete
+            for thread in threads:
+                thread.join()
+            
+            total_time = time.time() - start_time
+            
+            # Collect results
+            successful_requests = 0
+            response_times = []
+            
+            while not results_queue.empty():
+                success, response_time, status = results_queue.get()
+                if success and status == 200:
+                    successful_requests += 1
+                    response_times.append(response_time)
+            
+            # Verify all requests succeeded
+            if successful_requests != num_concurrent_requests:
+                self.log_test("Concurrent Latency - Success Rate", False, 
+                            f"Only {successful_requests}/{num_concurrent_requests} requests succeeded")
+                return False
+            
+            # Verify average response time is reasonable
+            avg_response_time = sum(response_times) / len(response_times) if response_times else 0
+            max_response_time = max(response_times) if response_times else 0
+            
+            if avg_response_time > 2.0:
+                self.log_test("Concurrent Latency - Average Response Time", False, 
+                            f"Average response time too high: {avg_response_time:.3f}s")
+                return False
+            
+            if max_response_time > 3.0:
+                self.log_test("Concurrent Latency - Maximum Response Time", False, 
+                            f"Maximum response time too high: {max_response_time:.3f}s")
+                return False
+            
+            self.log_test("Concurrent Latency - Complete Test", True, 
+                        f"All {num_concurrent_requests} requests succeeded. Avg: {avg_response_time:.3f}s, Max: {max_response_time:.3f}s, Total: {total_time:.3f}s")
+            return True
+            
+        except ImportError:
+            self.log_test("Concurrent Latency - Threading Support", False, "Threading module not available")
+            return False
         except Exception as e:
-            self.log_test("Memory Leak Check", "FAIL", f"Exception: {str(e)}")
+            self.log_test("Concurrent Latency - Unexpected Error", False, f"Error: {str(e)}")
+            return False
 
     def run_all_tests(self):
-        """Run all backend regression tests"""
-        print("🚀 TURFLOOT BACKEND REGRESSION TESTING")
-        print("Testing after mobile split button implementation")
-        print("=" * 60)
-        print(f"Testing against: {BASE_URL}")
-        print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print()
+        """Run all backend API tests for real-time latency region selection feature"""
+        print("🚀 Starting TurfLoot Backend API Tests for Real-time Latency Region Selection")
+        print("=" * 80)
         
-        # Run all test suites in priority order
-        self.test_core_api_endpoints()
-        self.test_game_api_integration()
-        self.test_performance_requirements()
+        # Test individual endpoints
+        test_methods = [
+            self.test_ping_endpoint,
+            self.test_root_endpoint,
+            self.test_servers_lobbies_endpoint,
+            self.test_region_selection_performance,
+            self.test_concurrent_latency_measurements
+        ]
+        
+        for test_method in test_methods:
+            try:
+                test_method()
+            except Exception as e:
+                print(f"❌ CRITICAL ERROR in {test_method.__name__}: {str(e)}")
+                self.log_test(f"{test_method.__name__} - Critical Error", False, str(e))
         
         # Print summary
-        print("📋 REGRESSION TEST SUMMARY")
-        print("=" * 60)
-        print(f"Total Tests: {self.total_tests}")
-        print(f"✅ Passed: {self.passed_tests}")
-        print(f"❌ Failed: {self.failed_tests}")
-        print(f"📊 Success Rate: {(self.passed_tests/self.total_tests*100):.1f}%")
-        print()
+        print("\n" + "=" * 80)
+        print("📊 TEST SUMMARY - Real-time Latency Region Selection Backend")
+        print("=" * 80)
         
-        if self.failed_tests == 0:
-            print("🎉 ALL REGRESSION TESTS PASSED!")
-            print("✅ Backend is stable after mobile split button implementation")
-            print("✅ Frontend changes did not break backend functionality")
-            print("✅ Server is ready for frontend testing")
+        success_rate = (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
+        
+        print(f"✅ Passed: {self.passed_tests}/{self.total_tests} ({success_rate:.1f}%)")
+        
+        if self.passed_tests == self.total_tests:
+            print("🎉 ALL TESTS PASSED - Backend APIs are ready for real-time latency region selection!")
+            print("🔗 Key findings:")
+            print("   • Ping endpoint responds quickly for latency measurements")
+            print("   • Root endpoint provides fast connectivity checks")
+            print("   • Server browser loads region data efficiently")
+            print("   • Combined workflow completes within acceptable time limits")
+            print("   • Concurrent requests handled properly for real-time updates")
         else:
-            print("⚠️ SOME TESTS FAILED - Backend may have issues")
-            print("❌ Investigation needed before frontend testing")
+            failed_tests = self.total_tests - self.passed_tests
+            print(f"⚠️ {failed_tests} TESTS FAILED - Backend needs attention for optimal region selection")
             
-            print("\n🔍 FAILED TESTS:")
+            print("\n❌ Failed Tests:")
             for result in self.test_results:
-                if result["status"] == "FAIL":
-                    print(f"  - {result['test']}: {result['details']}")
+                if not result['passed']:
+                    print(f"   • {result['test']}: {result['details']}")
         
-        print("\n🎯 REGRESSION TEST CONCLUSION:")
-        if self.failed_tests == 0:
-            print("✅ Backend functionality intact after mobile split button changes")
-            print("✅ No regressions detected in core API endpoints")
-            print("✅ Game server integration working properly")
-            print("✅ Performance requirements met (< 2s response times)")
-        else:
-            print("❌ Backend issues detected that need investigation")
-        
-        return self.failed_tests == 0
+        print("=" * 80)
+        return self.passed_tests == self.total_tests
 
 if __name__ == "__main__":
-    tester = TurfLootBackendRegressionTester()
+    tester = TurfLootBackendTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
