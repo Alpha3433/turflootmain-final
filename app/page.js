@@ -223,6 +223,11 @@ export default function Home() {
 
   // Measure pings on component mount and periodically
   useEffect(() => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     console.log('🚀 Ping measurement effect starting...')
     measureAllPings()
     
