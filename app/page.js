@@ -131,12 +131,19 @@ export default function Home() {
 
   // Measure pings on component mount and periodically
   useEffect(() => {
+    console.log('🚀 Ping measurement effect starting...')
     measureAllPings()
     
     // Refresh pings every 30 seconds
-    const pingInterval = setInterval(measureAllPings, 30000)
+    const pingInterval = setInterval(() => {
+      console.log('🔄 Periodic ping measurement starting...')
+      measureAllPings()
+    }, 30000)
     
-    return () => clearInterval(pingInterval)
+    return () => {
+      console.log('🛑 Ping measurement effect cleanup')
+      clearInterval(pingInterval)
+    }
   }, [])
 
   // Region selection handler
