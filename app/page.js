@@ -184,10 +184,10 @@ export default function Home() {
     if (isLoadingPings) return
     
     setIsLoadingPings(true)
-    console.log('🌍 Measuring ping to all regions...')
+    console.log('🌍 Measuring real-time ping to all regions...')
     
     const pingPromises = availableRegions.map(async (region) => {
-      const ping = await measurePing(region.id, region.endpoint)
+      const ping = await measurePing(region.id, region.endpoints)
       return { regionId: region.id, ping }
     })
 
@@ -197,7 +197,7 @@ export default function Home() {
       
       results.forEach(({ regionId, ping }) => {
         newPings[regionId] = ping
-        console.log(`📡 ${regionId}: ${ping}ms`)
+        console.log(`📡 Final result - ${regionId}: ${ping}ms`)
       })
       
       setRegionPings(newPings)
