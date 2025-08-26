@@ -146,19 +146,12 @@ export default function Home() {
       return
     }
     
-    console.log('🚀 Ping measurement effect starting...')
     measureAllPings()
     
     // Refresh pings every 30 seconds
-    const pingInterval = setInterval(() => {
-      console.log('🔄 Periodic ping measurement starting...')
-      measureAllPings()
-    }, 30000)
+    const pingInterval = setInterval(measureAllPings, 30000)
     
-    return () => {
-      console.log('🛑 Ping measurement effect cleanup')
-      clearInterval(pingInterval)
-    }
+    return () => clearInterval(pingInterval)
   }, [])
 
   // Region selection handler
