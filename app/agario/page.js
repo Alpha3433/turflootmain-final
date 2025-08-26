@@ -2857,7 +2857,7 @@ const AgarIOGame = () => {
       render()
       
       requestAnimationFrame(gameLoop)
-    }
+    } // End gameLoop function
 
     const render = () => {
       // Clear canvas
