@@ -137,7 +137,9 @@ const LobbySystem = () => {
       newSocket.on('lobby:started', (data) => {
         console.log('🎮 Match started:', data)
         // Redirect to game with match data
-        window.location.href = `/play?matchId=${data.matchId}&roomCode=${data.roomCode}`
+        if (typeof window !== 'undefined') {
+          window.location.href = `/play?matchId=${data.matchId}&roomCode=${data.roomCode}`
+        }
       })
 
       newSocket.on('lobby:left', (data) => {
