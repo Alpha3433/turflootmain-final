@@ -184,6 +184,11 @@ export default function Home() {
 
   // Measure ping to all regions
   const measureAllPings = async () => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') {
+      return
+    }
+    
     if (isLoadingPings) return
     
     setIsLoadingPings(true)
