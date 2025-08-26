@@ -240,100 +240,104 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       <div className="md:hidden w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
         
         {/* Mobile Header - Responsive for Portrait/Landscape */}
-        <div className="px-5 py-3 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90">
-          {/* Portrait Layout - 2 Rows (default mobile) */}
-          <div className="block max-h-screen:hidden">
-            {/* Top Row - Title and Close Button */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-purple-600/30 rounded-xl border border-purple-500/40 shadow-lg">
-                  <Palette className="w-6 h-6 text-purple-300" />
+        <div className={`px-5 ${isLandscape ? 'py-2' : 'py-3'} border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90`}>
+          {/* Portrait Layout - 2 Rows */}
+          {!isLandscape && (
+            <div>
+              {/* Top Row - Title and Close Button */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-purple-600/30 rounded-xl border border-purple-500/40 shadow-lg">
+                    <Palette className="w-6 h-6 text-purple-300" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white leading-tight">Customization</h2>
+                    <p className="text-sm text-gray-400">Personalize your style</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white leading-tight">Customization</h2>
-                  <p className="text-sm text-gray-400">Personalize your style</p>
-                </div>
+                
+                <button
+                  onClick={onClose}
+                  className="p-3 bg-gray-700/60 hover:bg-gray-600/70 rounded-xl transition-all active:scale-95 shadow-lg"
+                >
+                  <X className="w-6 h-6 text-gray-300" />
+                </button>
               </div>
               
-              <button
-                onClick={onClose}
-                className="p-3 bg-gray-700/60 hover:bg-gray-600/70 rounded-xl transition-all active:scale-95 shadow-lg"
-              >
-                <X className="w-6 h-6 text-gray-300" />
-              </button>
-            </div>
-            
-            {/* Bottom Row - Coin Balance Centered */}
-            <div className="flex justify-center">
-              <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all duration-500 ${
-                balanceHighlight 
-                  ? 'bg-green-500/30 border-green-400/60 shadow-lg shadow-green-400/20' 
-                  : 'bg-yellow-500/25 border-yellow-500/40 shadow-lg'
-              }`}>
-                <div className="text-yellow-300 text-xl">💰</div>
-                <div>
-                  <div className={`font-bold text-base transition-all duration-500 ${
-                    balanceHighlight ? 'text-green-300 scale-110' : 'text-yellow-300'
-                  }`}>
-                    {userBalance.toLocaleString()}
-                    {balanceHighlight && (
-                      <span className="ml-1 text-green-200 text-sm animate-bounce">+</span>
-                    )}
+              {/* Bottom Row - Coin Balance Centered */}
+              <div className="flex justify-center">
+                <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all duration-500 ${
+                  balanceHighlight 
+                    ? 'bg-green-500/30 border-green-400/60 shadow-lg shadow-green-400/20' 
+                    : 'bg-yellow-500/25 border-yellow-500/40 shadow-lg'
+                }`}>
+                  <div className="text-yellow-300 text-xl">💰</div>
+                  <div>
+                    <div className={`font-bold text-base transition-all duration-500 ${
+                      balanceHighlight ? 'text-green-300 scale-110' : 'text-yellow-300'
+                    }`}>
+                      {userBalance.toLocaleString()}
+                      {balanceHighlight && (
+                        <span className="ml-1 text-green-200 text-sm animate-bounce">+</span>
+                      )}
+                    </div>
+                    <div className="text-yellow-500 text-xs font-medium">COINS</div>
                   </div>
-                  <div className="text-yellow-500 text-xs font-medium">COINS</div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Landscape Layout - Single Compact Row */}
-          <div className="hidden max-h-screen:flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-purple-600/30 rounded-lg border border-purple-500/40 shadow-lg">
-                <Palette className="w-5 h-5 text-purple-300" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-white leading-tight">Customization</h2>
-                <p className="text-xs text-gray-400">Personalize your style</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-              {/* Landscape Coin Balance - Compact */}
-              <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 transition-all duration-500 ${
-                balanceHighlight 
-                  ? 'bg-green-500/30 border-green-400/60 shadow-lg shadow-green-400/20' 
-                  : 'bg-yellow-500/25 border-yellow-500/40 shadow-lg'
-              }`}>
-                <div className="text-yellow-300 text-lg">💰</div>
+          {isLandscape && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-purple-600/30 rounded-lg border border-purple-500/40 shadow-lg">
+                  <Palette className="w-5 h-5 text-purple-300" />
+                </div>
                 <div>
-                  <div className={`font-bold text-sm transition-all duration-500 ${
-                    balanceHighlight ? 'text-green-300 scale-110' : 'text-yellow-300'
-                  }`}>
-                    {userBalance.toLocaleString()}
-                    {balanceHighlight && (
-                      <span className="ml-1 text-green-200 text-xs animate-bounce">+</span>
-                    )}
-                  </div>
-                  <div className="text-yellow-500 text-xs font-medium">COINS</div>
+                  <h2 className="text-lg font-bold text-white leading-tight">Customization</h2>
+                  <p className="text-xs text-gray-400">Personalize your style</p>
                 </div>
               </div>
               
-              <button
-                onClick={onClose}
-                className="p-2 bg-gray-700/60 hover:bg-gray-600/70 rounded-lg transition-all active:scale-95 shadow-lg"
-              >
-                <X className="w-5 h-5 text-gray-300" />
-              </button>
+              <div className="flex items-center space-x-3">
+                {/* Landscape Coin Balance - Compact */}
+                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border-2 transition-all duration-500 ${
+                  balanceHighlight 
+                    ? 'bg-green-500/30 border-green-400/60 shadow-lg shadow-green-400/20' 
+                    : 'bg-yellow-500/25 border-yellow-500/40 shadow-lg'
+                }`}>
+                  <div className="text-yellow-300 text-lg">💰</div>
+                  <div>
+                    <div className={`font-bold text-sm transition-all duration-500 ${
+                      balanceHighlight ? 'text-green-300 scale-110' : 'text-yellow-300'
+                    }`}>
+                      {userBalance.toLocaleString()}
+                      {balanceHighlight && (
+                        <span className="ml-1 text-green-200 text-xs animate-bounce">+</span>
+                      )}
+                    </div>
+                    <div className="text-yellow-500 text-xs font-medium">COINS</div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={onClose}
+                  className="p-2 bg-gray-700/60 hover:bg-gray-600/70 rounded-lg transition-all active:scale-95 shadow-lg"
+                >
+                  <X className="w-5 h-5 text-gray-300" />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Mobile Tab Switcher - Responsive */}
-        <div className="flex bg-gray-800/60 mx-5 mt-4 max-h-screen:mt-2 mb-3 max-h-screen:mb-2 rounded-2xl p-1.5 border border-gray-700/60 shadow-lg">
+        <div className={`flex bg-gray-800/60 mx-5 ${isLandscape ? 'mt-2 mb-2' : 'mt-4 mb-3'} rounded-2xl p-1.5 border border-gray-700/60 shadow-lg`}>
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`flex-1 py-4 max-h-screen:py-2 rounded-xl text-base max-h-screen:font-semibold font-bold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
+            className={`flex-1 ${isLandscape ? 'py-2' : 'py-4'} rounded-xl text-base ${isLandscape ? 'font-semibold' : 'font-bold'} transition-all flex items-center justify-center space-x-3 active:scale-95 ${
               activeTab === 'inventory' 
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
                 : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
@@ -344,7 +348,7 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </button>
           <button
             onClick={() => setActiveTab('shop')}
-            className={`flex-1 py-4 max-h-screen:py-2 rounded-xl text-base max-h-screen:font-semibold font-bold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
+            className={`flex-1 ${isLandscape ? 'py-2' : 'py-4'} rounded-xl text-base ${isLandscape ? 'font-semibold' : 'font-bold'} transition-all flex items-center justify-center space-x-3 active:scale-95 ${
               activeTab === 'shop' 
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
                 : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
