@@ -1933,7 +1933,7 @@ const AgarIOGame = () => {
       SPLIT_MIN_VELOCITY_STOP: 80, // Stop projecting when velocity drops below this
       MAX_CELLS: 16, // Maximum cells per player
       SPLIT_COOLDOWN: 750, // Split cooldown in milliseconds
-      MERGE_MIN_TIME: 12000, // Time before cells can merge (milliseconds)
+      MERGE_MIN_TIME: 8000, // Time before cells can merge (8 seconds - Agar.io timing)
       ABSORB_THRESHOLD: 1.25, // Size ratio needed to absorb another cell
       SPIKE_TRIGGER_MASS: 130 // Mass needed to trigger spike burst
     }
