@@ -80,8 +80,6 @@ export default function Home() {
       ]
     }
   ]
-  
-  console.log('🌍 Available regions:', availableRegions.map(r => `${r.id} (${r.name})`).join(', '))
 
   const [regionPings, setRegionPings] = useState({})
   const [isLoadingPings, setIsLoadingPings] = useState(false)
