@@ -348,13 +348,13 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
             })}
           </div>
 
-          {/* Mobile Items Grid - Optimized */}
+          {/* Mobile Items Grid - Optimized with Single Column */}
           <div className="flex-1 overflow-y-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-4">
               {getFilteredItems().map((item) => (
                 <div
                   key={item.id}
-                  className={`relative bg-gray-800/50 rounded-2xl p-5 border-2 transition-all cursor-pointer active:scale-95 min-h-[120px] ${
+                  className={`relative bg-gray-800/50 rounded-2xl p-5 border-2 transition-all cursor-pointer active:scale-[0.98] ${
                     playerData.equippedSkin === item.id
                       ? 'border-purple-500/80 bg-purple-600/25 shadow-lg shadow-purple-500/20'
                       : item.owned
@@ -363,54 +363,63 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                   }`}
                   onClick={() => item.owned ? handleEquipItem(item) : handlePurchaseItem(item)}
                 >
-                  {/* Mobile Item Preview - Larger */}
-                  <div className="flex items-center space-x-4 mb-3">
-                    <div className="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center border border-gray-700/50 shadow-inner">
+                  {/* Mobile Item Layout - Horizontal */}
+                  <div className="flex items-center space-x-5">
+                    {/* Skin Preview - Larger and Colored */}
+                    <div className="w-20 h-20 bg-gray-900 rounded-2xl flex items-center justify-center border-2 border-gray-700/60 shadow-inner flex-shrink-0">
                       <div 
-                        className="w-12 h-12 rounded-full border-3 shadow-lg"
+                        className="w-14 h-14 rounded-full border-4 shadow-lg transition-all duration-300"
                         style={{ 
-                          background: item.color?.includes('linear-gradient') ? item.color : item.color,
-                          borderColor: item.owned ? item.color : 'rgba(156, 163, 175, 0.5)',
-                          opacity: item.owned ? 1 : 0.7
+                          background: item.color && item.color.includes('linear-gradient') 
+                            ? item.color 
+                            : item.color || '#6B7280',
+                          borderColor: item.owned ? (item.color || '#6B7280') : 'rgba(156, 163, 175, 0.5)',
+                          opacity: item.owned ? 1 : 0.7,
+                          boxShadow: playerData.equippedSkin === item.id ? `0 0 20px ${item.color}40` : '0 4px 12px rgba(0,0,0,0.3)'
                         }}
                       ></div>
                     </div>
 
-                    {/* Mobile Item Info - Better Layout */}
-                    <div className="flex-1">
-                      <h3 className="text-base font-bold text-white mb-1 leading-tight">{item.name}</h3>
-                      
-                      {/* Rarity Badge */}
-                      <div className={`inline-block px-2 py-1 rounded-lg text-xs font-bold mb-2 ${
-                        item.rarity === 'legendary' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
-                        item.rarity === 'epic' ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30' :
-                        item.rarity === 'rare' ? 'bg-blue-600/20 text-blue-300 border border-blue-500/30' : 
-                        'bg-gray-600/20 text-gray-300 border border-gray-500/30'
-                      }`}>
-                        {item.rarity.toUpperCase()}
+                    {/* Item Info - Better Typography */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-white mb-1 leading-tight">{item.name}</h3>
+                          <p className="text-sm text-gray-400 leading-snug line-clamp-2">{item.description}</p>
+                        </div>
+                        
+                        {/* Rarity Badge - More Prominent */}
+                        <div className={`ml-3 px-3 py-1 rounded-full text-xs font-bold border-2 flex-shrink-0 ${
+                          item.rarity === 'legendary' ? 'bg-yellow-500/20 text-yellow-200 border-yellow-500/40' :
+                          item.rarity === 'epic' ? 'bg-purple-600/20 text-purple-200 border-purple-500/40' :
+                          item.rarity === 'rare' ? 'bg-blue-600/20 text-blue-200 border-blue-500/40' : 
+                          'bg-gray-600/20 text-gray-200 border-gray-500/40'
+                        }`}>
+                          {item.rarity.toUpperCase()}
+                        </div>
+                      </div>
+
+                      {/* Status Button - Full Width */}
+                      <div className="mt-3">
+                        {playerData.equippedSkin === item.id && (
+                          <div className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-base px-5 py-3 rounded-xl font-bold text-center shadow-lg border-2 border-purple-500/50">
+                            ✓ EQUIPPED
+                          </div>
+                        )}
+                        
+                        {item.owned && playerData.equippedSkin !== item.id && (
+                          <div className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white text-base px-5 py-3 rounded-xl font-bold text-center shadow-lg border-2 border-green-500/50">
+                            TAP TO EQUIP
+                          </div>
+                        )}
+                        
+                        {!item.owned && (
+                          <div className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-base px-5 py-3 rounded-xl font-bold text-center shadow-lg border-2 border-yellow-400/50">
+                            BUY FOR {item.price} COINS
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Status Badge - More Prominent */}
-                  <div className="flex">
-                    {playerData.equippedSkin === item.id && (
-                      <div className="w-full bg-purple-600 text-white text-sm px-4 py-2 rounded-xl font-bold text-center shadow-lg">
-                        ✓ EQUIPPED
-                      </div>
-                    )}
-                    
-                    {item.owned && playerData.equippedSkin !== item.id && (
-                      <div className="w-full bg-green-600 text-white text-sm px-4 py-2 rounded-xl font-bold text-center shadow-lg">
-                        TAP TO EQUIP
-                      </div>
-                    )}
-                    
-                    {!item.owned && (
-                      <div className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-sm px-4 py-2 rounded-xl font-bold text-center shadow-lg">
-                        BUY FOR {item.price} COINS
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
