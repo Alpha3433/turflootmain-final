@@ -98,6 +98,22 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
     }
   }, [isOpen])
 
+  // Balance change detection and highlight effect
+  useEffect(() => {
+    if (userBalance !== previousBalance && previousBalance !== userBalance) {
+      console.log(`💰 Balance changed in customization modal: ${previousBalance} → ${userBalance}`)
+      setBalanceHighlight(true)
+      setPreviousBalance(userBalance)
+      
+      // Remove highlight after 2 seconds
+      const timer = setTimeout(() => {
+        setBalanceHighlight(false)
+      }, 2000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [userBalance, previousBalance])
+
   // Filter and sort items
   const getFilteredItems = () => {
     let items = itemsData[activeCategory] || []
