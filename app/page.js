@@ -602,7 +602,7 @@ export default function Home() {
       if (!response.ok) {
         console.log('🔍 User not found by userId, trying with privy ID')
         // If not found, use a temporary random-style name until user is created
-        setDisplayName('Loading...')
+        setDisplayName('Preparing your turf...')
         return
       }
       
