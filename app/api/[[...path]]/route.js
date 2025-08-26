@@ -780,6 +780,500 @@ export async function POST(request, { params }) {
       }
     }
 
+    // ==================== PAID ROOM SYSTEM ====================
+    
+    // Configuration
+    const ROOM_TIERS = {
+      1: { entryFee: 100, bounty: 90, platformFee: 10 }, // $1.00 in cents
+      5: { entryFee: 500, bounty: 450, platformFee: 50 }, // $5.00 in cents
+      20: { entryFee: 2000, bounty: 1800, platformFee: 200 } // $20.00 in cents
+    }
+    
+    const PLATFORM_WALLET = '0x6657C1E107e9963EBbFc9Dfe510054238f7E8251'
+    const DAMAGE_ATTRIBUTION_WINDOW = 10000 // 10 seconds in milliseconds
+    const CASHOUT_FEE_PERCENT = 10 // 10% cashout fee
+    
+    // Join Paid Room
+    if (route === 'rooms/join') {
+      try {
+        const { userId, roomTier, matchId } = body
+        
+        if (!userId || !roomTier || !matchId) {
+          return NextResponse.json({ 
+            error: 'userId, roomTier, and matchId are required' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        if (!ROOM_TIERS[roomTier]) {
+          return NextResponse.json({ 
+            error: 'Invalid room tier. Must be 1, 5, or 20' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        const db = await getDb()
+        const users = db.collection('users')
+        const matches = db.collection('paid_matches')
+        const user = await users.findOne({ userId })
+        
+        if (!user) {
+          return NextResponse.json({ 
+            error: 'User not found' 
+          }, { status: 404, headers: corsHeaders })
+        }
+        
+        const tier = ROOM_TIERS[roomTier]
+        
+        // Check if user has sufficient balance
+        if ((user.balance || 0) < tier.entryFee) {
+          return NextResponse.json({ 
+            error: 'Insufficient balance',
+            requiredBalance: tier.entryFee,
+            currentBalance: user.balance || 0,
+            tier: {
+              entry: tier.entryFee,
+              bounty: tier.bounty,
+              platformFee: tier.platformFee
+            }
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        // Deduct entry fee from user balance
+        await users.updateOne(
+          { userId },
+          { 
+            $inc: { balance: -tier.entryFee },
+            $set: { updatedAt: new Date() }
+          }
+        )
+        
+        // Create or update match with player entry
+        const matchData = {
+          matchId,
+          roomTier,
+          status: 'PENDING',
+          players: {},
+          rolloverPot: 0,
+          platformFeesCollected: 0,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+        
+        // Add player to match
+        matchData.players[userId] = {
+          userId,
+          status: 'ACTIVE',
+          bountyEscrow: tier.bounty,
+          joinedAt: new Date(),
+          lastDamageTime: null,
+          lastDamageBy: null,
+          matchEarnings: 0
+        }
+        
+        // Update platform fees collected
+        matchData.platformFeesCollected = tier.platformFee
+        
+        await matches.updateOne(
+          { matchId },
+          { 
+            $set: matchData,
+            $addToSet: { playerIds: userId }
+          },
+          { upsert: true }
+        )
+        
+        console.log(`💰 User ${userId} joined $${roomTier} room. Deducted $${tier.entryFee/100}, bounty: $${tier.bounty/100}`)
+        
+        // TODO: Send platform fee to on-chain wallet (implement web3 integration)
+        console.log(`🏦 Platform fee of $${tier.platformFee/100} to be sent to ${PLATFORM_WALLET}`)
+        
+        return NextResponse.json({
+          success: true,
+          message: `Successfully joined $${roomTier} room`,
+          matchId,
+          playerBounty: tier.bounty,
+          platformFee: tier.platformFee,
+          remainingBalance: (user.balance || 0) - tier.entryFee
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error joining paid room:', error)
+        return NextResponse.json({
+          error: 'Failed to join paid room'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
+    // Record Player Elimination
+    if (route === 'rooms/eliminate') {
+      try {
+        const { matchId, victimUserId, killerUserId, eliminationType } = body
+        
+        if (!matchId || !victimUserId) {
+          return NextResponse.json({ 
+            error: 'matchId and victimUserId are required' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        const db = await getDb()
+        const matches = db.collection('paid_matches')
+        const users = db.collection('users')
+        
+        const match = await matches.findOne({ matchId })
+        
+        if (!match) {
+          return NextResponse.json({ 
+            error: 'Match not found' 
+          }, { status: 404, headers: corsHeaders })
+        }
+        
+        const victim = match.players[victimUserId]
+        
+        if (!victim || victim.status !== 'ACTIVE') {
+          return NextResponse.json({ 
+            error: 'Victim not found or not active in match' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        let bountyTransfer = victim.bountyEscrow
+        let rolloverAddition = 0
+        
+        // Determine if there's a valid killer
+        if (killerUserId && match.players[killerUserId] && match.players[killerUserId].status === 'ACTIVE') {
+          // Valid killer - transfer bounty + any rollover pot
+          const totalPayout = bountyTransfer + match.rolloverPot
+          
+          // Credit killer's platform balance
+          await users.updateOne(
+            { userId: killerUserId },
+            { 
+              $inc: { balance: totalPayout },
+              $set: { updatedAt: new Date() }
+            }
+          )
+          
+          // Update killer's match earnings
+          await matches.updateOne(
+            { matchId },
+            { 
+              $inc: { [`players.${killerUserId}.matchEarnings`]: totalPayout },
+              $set: { 
+                rolloverPot: 0, // Reset rollover pot
+                [`players.${victimUserId}.status`]: 'ELIMINATED',
+                [`players.${victimUserId}.eliminatedAt`]: new Date(),
+                [`players.${victimUserId}.eliminatedBy`]: killerUserId,
+                updatedAt: new Date()
+              }
+            }
+          )
+          
+          console.log(`⚔️ ${killerUserId} eliminated ${victimUserId}, earned $${totalPayout/100} (bounty: $${bountyTransfer/100}, rollover: $${match.rolloverPot/100})`)
+          
+        } else {
+          // No valid killer - add to rollover pot
+          rolloverAddition = bountyTransfer
+          
+          await matches.updateOne(
+            { matchId },
+            { 
+              $inc: { rolloverPot: rolloverAddition },
+              $set: { 
+                [`players.${victimUserId}.status`]: 'ELIMINATED',
+                [`players.${victimUserId}.eliminatedAt`]: new Date(),
+                [`players.${victimUserId}.eliminationType`]: eliminationType || 'SUICIDE',
+                updatedAt: new Date()
+              }
+            }
+          )
+          
+          console.log(`💀 ${victimUserId} eliminated with no killer, $${bountyTransfer/100} added to rollover pot`)
+        }
+        
+        // Check if match should be settled (≤1 active player)
+        const activePlayers = Object.values(match.players).filter(p => p.status === 'ACTIVE')
+        if (activePlayers.length <= 1) {
+          await matches.updateOne(
+            { matchId },
+            { 
+              $set: { 
+                status: 'SETTLED',
+                settledAt: new Date(),
+                updatedAt: new Date()
+              }
+            }
+          )
+          console.log(`🏁 Match ${matchId} settled with ${activePlayers.length} active players`)
+        }
+        
+        return NextResponse.json({
+          success: true,
+          bountyTransferred: bountyTransfer,
+          rolloverPot: match.rolloverPot + rolloverAddition,
+          killerEarnings: killerUserId ? (bountyTransfer + match.rolloverPot) : 0,
+          matchStatus: activePlayers.length <= 1 ? 'SETTLED' : 'ACTIVE'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error processing elimination:', error)
+        return NextResponse.json({
+          error: 'Failed to process elimination'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
+    // Record Damage Attribution
+    if (route === 'rooms/damage') {
+      try {
+        const { matchId, victimUserId, attackerUserId } = body
+        
+        if (!matchId || !victimUserId || !attackerUserId) {
+          return NextResponse.json({ 
+            error: 'matchId, victimUserId, and attackerUserId are required' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        const db = await getDb()
+        const matches = db.collection('paid_matches')
+        
+        const match = await matches.findOne({ matchId })
+        
+        if (!match) {
+          return NextResponse.json({ 
+            error: 'Match not found' 
+          }, { status: 404, headers: corsHeaders })
+        }
+        
+        const victim = match.players[victimUserId]
+        const attacker = match.players[attackerUserId]
+        
+        if (!victim || victim.status !== 'ACTIVE' || !attacker || attacker.status !== 'ACTIVE') {
+          return NextResponse.json({ 
+            error: 'Invalid victim or attacker' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        // Update damage attribution
+        await matches.updateOne(
+          { matchId },
+          { 
+            $set: { 
+              [`players.${victimUserId}.lastDamageTime`]: new Date(),
+              [`players.${victimUserId}.lastDamageBy`]: attackerUserId,
+              updatedAt: new Date()
+            }
+          }
+        )
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Damage attribution recorded'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error recording damage:', error)
+        return NextResponse.json({
+          error: 'Failed to record damage'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
+    // Player Cashout
+    if (route === 'rooms/cashout') {
+      try {
+        const { matchId, userId } = body
+        
+        if (!matchId || !userId) {
+          return NextResponse.json({ 
+            error: 'matchId and userId are required' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        const db = await getDb()
+        const matches = db.collection('paid_matches')
+        const users = db.collection('users')
+        
+        const match = await matches.findOne({ matchId })
+        
+        if (!match) {
+          return NextResponse.json({ 
+            error: 'Match not found' 
+          }, { status: 404, headers: corsHeaders })
+        }
+        
+        const player = match.players[userId]
+        
+        if (!player || player.status !== 'ACTIVE') {
+          return NextResponse.json({ 
+            error: 'Player not found or not active in match' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        if (player.matchEarnings <= 0) {
+          return NextResponse.json({ 
+            error: 'No earnings to cash out' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        // Calculate cashout amounts
+        const grossEarnings = player.matchEarnings
+        const cashoutFee = Math.floor(grossEarnings * CASHOUT_FEE_PERCENT / 100)
+        const netEarnings = grossEarnings - cashoutFee
+        
+        // Credit net earnings to user balance
+        await users.updateOne(
+          { userId },
+          { 
+            $inc: { balance: netEarnings },
+            $set: { updatedAt: new Date() }
+          }
+        )
+        
+        // Update player status to LEFT
+        await matches.updateOne(
+          { matchId },
+          { 
+            $set: { 
+              [`players.${userId}.status`]: 'LEFT',
+              [`players.${userId}.cashedOutAt`]: new Date(),
+              [`players.${userId}.cashoutFee`]: cashoutFee,
+              [`players.${userId}.netCashout`]: netEarnings,
+              updatedAt: new Date()
+            },
+            $inc: { platformFeesCollected: cashoutFee }
+          }
+        )
+        
+        // TODO: Send cashout fee to on-chain wallet
+        console.log(`💰 ${userId} cashed out $${netEarnings/100} (fee: $${cashoutFee/100}) from match ${matchId}`)
+        console.log(`🏦 Cashout fee of $${cashoutFee/100} to be sent to ${PLATFORM_WALLET}`)
+        
+        // Check if match should be settled
+        const activePlayers = Object.values(match.players).filter(p => p.status === 'ACTIVE')
+        if (activePlayers.length <= 1) {
+          await matches.updateOne(
+            { matchId },
+            { 
+              $set: { 
+                status: 'SETTLED',
+                settledAt: new Date(),
+                updatedAt: new Date()
+              }
+            }
+          )
+        }
+        
+        return NextResponse.json({
+          success: true,
+          grossEarnings,
+          cashoutFee,
+          netEarnings,
+          message: `Successfully cashed out $${netEarnings/100}`
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error processing cashout:', error)
+        return NextResponse.json({
+          error: 'Failed to process cashout'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
+    // Get Match Status
+    if (route === 'rooms/match') {
+      try {
+        const { matchId } = body
+        
+        if (!matchId) {
+          return NextResponse.json({ 
+            error: 'matchId is required' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        const db = await getDb()
+        const matches = db.collection('paid_matches')
+        
+        const match = await matches.findOne({ matchId })
+        
+        if (!match) {
+          return NextResponse.json({ 
+            error: 'Match not found' 
+          }, { status: 404, headers: corsHeaders })
+        }
+        
+        // Calculate match statistics
+        const activePlayers = Object.values(match.players).filter(p => p.status === 'ACTIVE').length
+        const totalBounty = Object.values(match.players).reduce((sum, p) => sum + p.bountyEscrow, 0)
+        const totalEarnings = Object.values(match.players).reduce((sum, p) => sum + p.matchEarnings, 0)
+        
+        return NextResponse.json({
+          success: true,
+          match: {
+            matchId: match.matchId,
+            status: match.status,
+            roomTier: match.roomTier,
+            activePlayers,
+            rolloverPot: match.rolloverPot,
+            platformFeesCollected: match.platformFeesCollected,
+            totalBounty,
+            totalEarnings,
+            createdAt: match.createdAt,
+            players: match.players
+          }
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error getting match status:', error)
+        return NextResponse.json({
+          error: 'Failed to get match status'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
+    // Get Available Room Tiers
+    if (route === 'rooms/tiers') {
+      try {
+        const { userId } = body
+        
+        if (!userId) {
+          return NextResponse.json({ 
+            error: 'userId is required' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        const db = await getDb()
+        const users = db.collection('users')
+        const user = await users.findOne({ userId })
+        
+        const userBalance = user?.balance || 0
+        
+        // Format tiers with affordability info
+        const availableTiers = Object.entries(ROOM_TIERS).map(([tier, config]) => ({
+          tier: parseInt(tier),
+          entryFee: config.entryFee,
+          entryFeeDisplay: `$${(config.entryFee / 100).toFixed(2)}`,
+          bounty: config.bounty,
+          bountyDisplay: `$${(config.bounty / 100).toFixed(2)}`,
+          platformFee: config.platformFee,
+          platformFeeDisplay: `$${(config.platformFee / 100).toFixed(2)}`,
+          affordable: userBalance >= config.entryFee,
+          description: `$${tier} → $${(config.bounty / 100).toFixed(2)} bounty, $${(config.platformFee / 100).toFixed(2)} fee`
+        }))
+        
+        return NextResponse.json({
+          success: true,
+          userBalance,
+          userBalanceDisplay: `$${(userBalance / 100).toFixed(2)}`,
+          tiers: availableTiers,
+          platformWallet: PLATFORM_WALLET
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error getting room tiers:', error)
+        return NextResponse.json({
+          error: 'Failed to get room tiers'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // Fallback
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders })
   } catch (error) {
