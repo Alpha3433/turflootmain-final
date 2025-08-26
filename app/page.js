@@ -1832,7 +1832,7 @@ export default function Home() {
         <CustomizationModal
           isOpen={showCustomization}
           onClose={() => setShowCustomization(false)}
-          userBalance={walletBalance}
+          userBalance={userBalance}
         />
       )}
 
