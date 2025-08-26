@@ -2983,6 +2983,11 @@ const AgarIOGame = () => {
               
               bot.alive = false
               
+              // Report elimination to paid room backend
+              if (gameMode === 'paid' && paidRoomData) {
+                reportElimination(`bot_${bot.name}`, paidRoomData.userId, 'KILL')
+              }
+              
               // Add floating text
               const bountyText = bot.isBounty ? ` Bounty!` : ''
               addFloatingText(`+$${killReward}${bountyText}`, game.player.x, game.player.y - 50, '#ff4444')
