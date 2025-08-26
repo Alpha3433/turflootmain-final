@@ -1469,34 +1469,53 @@ export default function Home() {
                     <p className="text-gray-400 text-xs">Choose your preferred server region</p>
                   </div>
                   <div className="py-2">
-                    {availableRegions.map((region) => (
-                      <button
-                        key={region.id}
-                        onClick={() => handleRegionSelect(region.id)}
-                        className={`w-full px-4 py-3 text-left hover:bg-gray-700/60 transition-all duration-200 flex items-center justify-between group ${
-                          currentServer === region.id ? 'bg-green-500/20 border-l-4 border-green-500' : ''
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-2 h-2 rounded-full ${
-                            currentServer === region.id ? 'bg-green-400' : 'bg-gray-500'
-                          }`}></div>
-                          <div>
-                            <div className={`font-medium text-sm ${
-                              currentServer === region.id ? 'text-green-400' : 'text-white group-hover:text-green-300'
-                            }`}>
-                              {region.id}
+                    {availableRegions.map((region) => {
+                      const realPing = regionPings[region.id]
+                      const estimatedPing = getEstimatedLatencyOffset(region.id)
+                      const displayPing = realPing !== undefined ? realPing : estimatedPing
+                      const isLoadingThisPing = isLoadingPings && realPing === undefined
+                      
+                      return (
+                        <button
+                          key={region.id}
+                          onClick={() => handleRegionSelect(region.id)}
+                          className={`w-full px-4 py-3 text-left hover:bg-gray-700/60 transition-all duration-200 flex items-center justify-between group ${
+                            currentServer === region.id ? 'bg-green-500/20 border-l-4 border-green-500' : ''
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-2 h-2 rounded-full ${
+                              currentServer === region.id ? 'bg-green-400' : 'bg-gray-500'
+                            }`}></div>
+                            <div>
+                              <div className={`font-medium text-sm ${
+                                currentServer === region.id ? 'text-green-400' : 'text-white group-hover:text-green-300'
+                              }`}>
+                                {region.id}
+                              </div>
+                              <div className="text-gray-400 text-xs">{region.name}</div>
                             </div>
-                            <div className="text-gray-400 text-xs">{region.name}</div>
                           </div>
-                        </div>
-                        <div className={`text-xs font-bold ${
-                          currentServer === region.id ? 'text-green-400' : 'text-gray-400 group-hover:text-green-300'
-                        }`}>
-                          {region.ping}ms
-                        </div>
-                      </button>
-                    ))}
+                          <div className={`text-xs font-bold flex items-center space-x-1 ${
+                            currentServer === region.id ? 'text-green-400' : 'text-gray-400 group-hover:text-green-300'
+                          }`}>
+                            {isLoadingThisPing ? (
+                              <>
+                                <div className="w-1 h-1 bg-gray-400 rounded-full animate-pulse"></div>
+                                <span>...</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>{displayPing}ms</span>
+                                {realPing !== undefined && (
+                                  <div className="w-1 h-1 bg-green-400 rounded-full" title="Real-time ping"></div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
                   <div className="p-3 border-t border-gray-700/50 bg-gray-800/60">
                     <button
