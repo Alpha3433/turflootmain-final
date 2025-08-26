@@ -1642,6 +1642,38 @@ const AgarIOGame = () => {
     }
   }, [isMobile])
 
+  // Game restart function
+  const restartGame = () => {
+    setIsGameOver(false)
+    setGameResult('')
+    setKillFeed([])
+    setFloatingTexts([])
+    setLeaderboard([])
+    setShowControls(true) // Show controls again on restart
+    setIsCashingOut(false)
+    setCashOutProgress(0)
+    setCurrentMission(null)
+    setMissionProgress(0)
+    setAutoCashOutTriggered(false) // Reset auto cash out flag
+    
+    // CRITICAL: Reset initialization state to allow proper re-initialization
+    setGameInitializationComplete(false)
+    console.log('🔄 Game restart - resetting initialization state')
+    
+    if (gameRef.current) {
+      gameRef.current.cleanup()
+    }
+    
+    // Initialize new game after a brief delay to allow state to settle
+    setTimeout(() => {
+      initializeGame() // This will set gameInitializationComplete back to true
+      // Hide controls after 5 seconds on restart
+      setTimeout(() => {
+        setShowControls(false)
+      }, 5000)
+    }, 100)
+  }
+
   const initializeMultiplayer = async () => {
     try {
       console.log('🔗 Initializing multiplayer connection...')
