@@ -366,74 +366,91 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
 
   const renderLeaderboard = () => (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-yellow-400 flex items-center">
-          🏆 Global Leaderboard
-          <span className="text-sm text-gray-400 ml-2">• Live Rankings</span>
-        </h2>
+      {/* Leaderboard Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-yellow-500/20 rounded-lg border border-yellow-500/30">
+            <Trophy className="w-6 h-6 text-yellow-400" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-white">Global Leaderboard</h3>
+            <p className="text-sm text-gray-400">Live rankings • Updated real-time</p>
+          </div>
+        </div>
+        
         <select 
-          className="bg-gray-800 border border-yellow-400/30 rounded px-3 py-1 text-yellow-400"
+          className={`${isLandscape ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-base'} bg-gray-800/60 border border-gray-700/60 rounded-xl text-white focus:outline-none focus:border-yellow-500/60 shadow-lg font-medium`}
           value={leaderboardType}
           onChange={(e) => {
             setLeaderboardType(e.target.value)
             loadLeaderboard()
           }}
         >
-          <option value="winnings">💰 Winnings</option>
-          <option value="wins">🏆 Wins</option>
+          <option value="winnings">💰 Total Winnings</option>
+          <option value="wins">🏆 Games Won</option>
           <option value="kd">⚡ K/D Ratio</option>
         </select>
       </div>
-      
+
       {loading ? (
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-          <div className="text-4xl animate-spin">⏳</div>
-          <div className="text-center">
-            <h3 className="text-lg font-bold text-white mb-2">Loading Leaderboard...</h3>
-            <p className="text-gray-400">Fetching latest rankings</p>
-          </div>
+        <div className="flex flex-col items-center justify-center h-48 space-y-4">
+          <div className="text-4xl animate-pulse">🏆</div>
+          <div className="text-gray-400">Loading leaderboard...</div>
         </div>
       ) : leaderboard.length > 0 ? (
-        <div className="space-y-2">
-          {leaderboard.map((player) => (
-            <div
-              key={player.rank}
-              className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                player.isCurrentUser
-                  ? 'bg-yellow-400/10 border-yellow-400/50 ring-1 ring-yellow-400/30'
-                  : 'bg-gray-800/50 border-gray-600/30 hover:bg-gray-700/50'
-              }`}
-            >
-              <div className="flex items-center space-x-4">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                  player.rank === 1 ? 'bg-yellow-500 text-black' :
-                  player.rank === 2 ? 'bg-gray-400 text-black' :
-                  player.rank === 3 ? 'bg-amber-600 text-white' : 
-                  'bg-gray-600 text-white'
-                }`}>
-                  {player.rank}
-                </div>
-                <div className="text-2xl">{player.avatar}</div>
-                <div>
-                  <div className={`font-bold ${player.isCurrentUser ? 'text-yellow-400' : 'text-white'}`}>
-                    {player.name} {player.isCurrentUser && '(You)'}
+        <div className="space-y-3">
+          {leaderboard.map((player, index) => (
+            <div key={player.id || index} className={`p-4 rounded-2xl border-2 transition-all hover:scale-[1.02] ${
+              index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/40 shadow-lg shadow-yellow-500/20' :
+              index === 1 ? 'bg-gradient-to-r from-gray-400/20 to-gray-500/20 border-gray-400/40' :
+              index === 2 ? 'bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border-orange-500/40' :
+              'bg-gray-800/50 border-gray-700/60 hover:border-gray-600/60'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg border-2 ${
+                    index === 0 ? 'bg-yellow-500/30 border-yellow-500/60 text-yellow-200' :
+                    index === 1 ? 'bg-gray-400/30 border-gray-400/60 text-gray-200' :
+                    index === 2 ? 'bg-orange-500/30 border-orange-500/60 text-orange-200' :
+                    'bg-gray-700/50 border-gray-600/60 text-gray-300'
+                  }`}>
+                    #{player.rank || index + 1}
                   </div>
-                  <div className="text-sm text-gray-400">{player.wins} wins</div>
+                  
+                  <div>
+                    <div className="font-bold text-white text-lg">{player.username || `Player${(player.id || index).toString().slice(-4)}`}</div>
+                    <div className="text-sm text-gray-400">
+                      {leaderboardType === 'winnings' && `$${(player.totalWinnings || 0).toFixed(2)} earned`}
+                      {leaderboardType === 'wins' && `${player.gamesWon || 0} victories`}
+                      {leaderboardType === 'kd' && `${((player.totalEliminations || 0) / Math.max(player.gamesPlayed || 1, 1)).toFixed(2)} K/D`}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="font-bold text-green-400">${player.winnings.toLocaleString()}</div>
-                <div className="text-sm text-gray-400">K/D: {player.killDeathRatio}</div>
+                
+                <div className="text-right">
+                  <div className={`text-xl font-bold ${
+                    index === 0 ? 'text-yellow-400' :
+                    index === 1 ? 'text-gray-300' :
+                    index === 2 ? 'text-orange-400' : 'text-white'
+                  }`}>
+                    {leaderboardType === 'winnings' && `$${(player.totalWinnings || 0).toFixed(2)}`}
+                    {leaderboardType === 'wins' && (player.gamesWon || 0)}
+                    {leaderboardType === 'kd' && ((player.totalEliminations || 0) / Math.max(player.gamesPlayed || 1, 1)).toFixed(2)}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {player.gamesPlayed || 0} games played
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="flex flex-col items-center justify-center h-48 space-y-4">
           <div className="text-4xl">🏆</div>
           <div className="text-center">
-            <h3 className="text-lg font-bold text-white mb-2">Leaderboard Empty</h3>
-            <p className="text-gray-400">Be the first to climb the rankings!</p>
+            <h3 className="text-lg font-bold text-white mb-2">No rankings yet</h3>
+            <p className="text-gray-400">Play games to see global rankings</p>
           </div>
         </div>
       )}
