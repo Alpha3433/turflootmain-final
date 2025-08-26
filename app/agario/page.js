@@ -905,7 +905,7 @@ const AgarIOGame = () => {
   }
 
   // Define constants at component scope so both split and merge logic can access them
-  const MERGE_MIN_TIME = 15000 // 15 seconds for cells to merge back (classic Agar.io timing)
+  const MERGE_MIN_TIME = 8000 // 8 seconds for cells to merge back (faster Agar.io timing)
   const MIN_SPLIT_MASS = 20
   const MAX_CELLS = 16
 
