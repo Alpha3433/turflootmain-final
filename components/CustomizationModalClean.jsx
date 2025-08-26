@@ -217,20 +217,30 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
       {/* Mobile Layout */}
       <div className="md:hidden w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex flex-col">
         
-        {/* Mobile Header - Enhanced */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-purple-600/30 rounded-xl border border-purple-500/40 shadow-lg">
-              <Palette className="w-6 h-6 text-purple-300" />
+        {/* Mobile Header - Enhanced with Better Spacing */}
+        <div className="px-5 py-5 border-b border-gray-700/50 bg-gradient-to-r from-gray-900/90 to-gray-800/90">
+          {/* Top Row - Title and Close Button */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-purple-600/30 rounded-xl border border-purple-500/40 shadow-lg">
+                <Palette className="w-6 h-6 text-purple-300" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white leading-tight">Customization</h2>
+                <p className="text-sm text-gray-400">Personalize your style</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-white leading-tight">Customization</h2>
-              <p className="text-sm text-gray-400">Personalize your style</p>
-            </div>
+            
+            <button
+              onClick={onClose}
+              className="p-3 bg-gray-700/60 hover:bg-gray-600/70 rounded-xl transition-all active:scale-95 shadow-lg"
+            >
+              <X className="w-6 h-6 text-gray-300" />
+            </button>
           </div>
           
-          <div className="flex items-center space-x-3">
-            {/* Mobile Coin Balance - Enhanced */}
+          {/* Bottom Row - Coin Balance Centered */}
+          <div className="flex justify-center">
             <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl border-2 transition-all duration-500 ${
               balanceHighlight 
                 ? 'bg-green-500/30 border-green-400/60 shadow-lg shadow-green-400/20' 
@@ -249,13 +259,6 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
                 <div className="text-yellow-500 text-xs font-medium">COINS</div>
               </div>
             </div>
-            
-            <button
-              onClick={onClose}
-              className="p-3 bg-gray-700/60 hover:bg-gray-600/70 rounded-xl transition-all active:scale-95 shadow-lg"
-            >
-              <X className="w-6 h-6 text-gray-300" />
-            </button>
           </div>
         </div>
 
