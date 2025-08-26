@@ -2890,6 +2890,7 @@ const AgarIOGame = () => {
       
       requestAnimationFrame(gameLoop)
     } // End gameLoop function
+    } // Close gameLoop function properly
 
     const render = () => {
       // Clear canvas
