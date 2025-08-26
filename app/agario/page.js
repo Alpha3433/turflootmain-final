@@ -4408,7 +4408,66 @@ const AgarIOGame = () => {
                    bottom: 'calc(env(safe-area-inset-bottom, 0px) + 30px)', // Better vertical spacing from edge
                    right: '20px' // Back to edge for horizontal layout
                  }}>
-              {/* Circular Cash-Out Button with LARGER touch area for mobile */}
+              
+              {/* Mobile Split Button - NOW FIRST */}
+              <div 
+                className={`relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                  splitCooldownActive 
+                    ? 'animate-pulse' 
+                    : ''
+                }`}
+                onPointerDown={(e) => {
+                  console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
+                  handleSplitStart(e)
+                }}
+                onPointerUp={(e) => {
+                  console.log('⚡ Split POINTER UP - Touch released')
+                  handleSplitEnd(e)
+                }}
+                onPointerLeave={(e) => {
+                  console.log('⚡ Split POINTER LEAVE')
+                  handleSplitEnd(e)
+                }}
+                onTouchStart={(e) => {
+                  console.log('⚡ Split TOUCH START - Mobile touch detected')
+                  handleSplitStart(e)
+                }}
+                onTouchEnd={(e) => {
+                  console.log('⚡ Split TOUCH END - Mobile touch released')
+                  handleSplitEnd(e)
+                }}
+                style={{ 
+                  touchAction: 'none',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  width: '75px', // Slightly smaller for horizontal layout
+                  height: '75px', 
+                  padding: '6px',
+                  zIndex: 1001
+                }}
+              >
+                {/* Split cooldown indicator */}
+                {splitCooldownActive && (
+                  <div className="absolute inset-0 bg-red-500/20 rounded-full animate-pulse border-2 border-red-400/60"></div>
+                )}
+                
+                {/* Button content */}
+                <div className={`absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 ${
+                  splitCooldownActive 
+                    ? 'bg-red-800/80 border-red-600' 
+                    : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                      ? 'bg-blue-800/80 border-blue-600 hover:bg-blue-700/90' 
+                      : 'bg-gray-800/60 border-gray-700'
+                }`}>
+                  <div className="text-lg">⚡</div>
+                  <div className="text-center leading-tight">
+                    <div className="text-xs">SPLIT</div>
+                  </div>
+                </div>
+                
+              </div>
+
+              {/* Circular Cash-Out Button - NOW SECOND */}
               <div 
                 className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
                 onPointerDown={(e) => {
@@ -4469,64 +4528,6 @@ const AgarIOGame = () => {
                     <div className="text-xs">{isCashingOut ? 'OUT' : `$${gameStats.netWorth}`}</div>
                   </div>
                 </div>
-              </div>
-
-              {/* Mobile Split Button */}
-              <div 
-                className={`relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
-                  splitCooldownActive 
-                    ? 'animate-pulse' 
-                    : ''
-                }`}
-                onPointerDown={(e) => {
-                  console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
-                  handleSplitStart(e)
-                }}
-                onPointerUp={(e) => {
-                  console.log('⚡ Split POINTER UP - Touch released')
-                  handleSplitEnd(e)
-                }}
-                onPointerLeave={(e) => {
-                  console.log('⚡ Split POINTER LEAVE')
-                  handleSplitEnd(e)
-                }}
-                onTouchStart={(e) => {
-                  console.log('⚡ Split TOUCH START - Mobile touch detected')
-                  handleSplitStart(e)
-                }}
-                onTouchEnd={(e) => {
-                  console.log('⚡ Split TOUCH END - Mobile touch released')
-                  handleSplitEnd(e)
-                }}
-                style={{ 
-                  touchAction: 'none',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  width: '75px', // Slightly smaller for horizontal layout
-                  height: '75px', 
-                  padding: '6px',
-                  zIndex: 1001
-                }}
-              >
-                {/* Split cooldown indicator */}
-                {splitCooldownActive && (
-                  <div className="absolute inset-0 bg-red-500/20 rounded-full animate-pulse border-2 border-red-400/60"></div>
-                )}
-                
-                {/* Button content */}
-                <div className={`absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 ${
-                  splitCooldownActive 
-                    ? 'bg-red-800/80 border-red-600' 
-                    : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
-                      ? 'bg-blue-800/80 border-blue-600 hover:bg-blue-700/90' 
-                      : 'bg-gray-800/60 border-gray-700'
-                }`}>
-                  <div className="text-lg">⚡</div>
-                  <div className="text-center leading-tight">
-                    <div className="text-xs">SPLIT</div>
-                  </div>
-                </div>
-                
               </div>
             </div>
           )}
