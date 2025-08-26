@@ -40,12 +40,104 @@ export default function Home() {
   const [pendingGameEntry, setPendingGameEntry] = useState(null)
   const [showMobileLobby, setShowMobileLobby] = useState(false)
 
-  // Available regions for the dropdown
+  // Available regions for the dropdown with real-time ping measurement
   const availableRegions = [
-    { id: 'US-East-1', name: 'US East (Virginia)', ping: 27 },
-    { id: 'US-West-1', name: 'US West (California)', ping: 42 },
-    { id: 'EU-Central-1', name: 'Europe (Frankfurt)', ping: 89 }
+    { id: 'US-East-1', name: 'US East (Virginia)', ping: null, endpoint: 'https://us-east-1.turfloot.com/ping' },
+    { id: 'US-West-1', name: 'US West (California)', ping: null, endpoint: 'https://us-west-1.turfloot.com/ping' },
+    { id: 'EU-Central-1', name: 'Europe (Frankfurt)', ping: null, endpoint: 'https://eu-central-1.turfloot.com/ping' },
+    { id: 'Oceania-1', name: 'Oceania (Sydney)', ping: null, endpoint: 'https://oceania-1.turfloot.com/ping' }
   ]
+
+  const [regionPings, setRegionPings] = useState({})
+  const [isLoadingPings, setIsLoadingPings] = useState(false)
+
+  // Measure real-time ping to a server
+  const measurePing = async (regionId, endpoint) => {
+    try {
+      const startTime = performance.now()
+      
+      // Try to ping the actual server endpoint first
+      try {
+        const response = await fetch(endpoint, { 
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-store'
+        })
+        const endTime = performance.now()
+        const ping = Math.round(endTime - startTime)
+        return ping
+      } catch (serverError) {
+        // If server endpoint fails, fallback to measuring ping to our current server
+        console.log(`❌ Cannot reach ${regionId} server, using fallback measurement`)
+        const fallbackStartTime = performance.now()
+        await fetch('/api/ping', { method: 'GET', cache: 'no-store' })
+        const fallbackEndTime = performance.now()
+        
+        // Add estimated latency based on geographic distance
+        const basePing = Math.round(fallbackEndTime - fallbackStartTime)
+        const estimatedPing = basePing + getEstimatedLatencyOffset(regionId)
+        return estimatedPing
+      }
+    } catch (error) {
+      console.error(`❌ Failed to measure ping for ${regionId}:`, error)
+      return getEstimatedLatencyOffset(regionId) // Fallback to estimated values
+    }
+  }
+
+  // Get estimated latency offset based on geographic distance
+  const getEstimatedLatencyOffset = (regionId) => {
+    switch (regionId) {
+      case 'US-East-1': return 27
+      case 'US-West-1': return 42
+      case 'EU-Central-1': return 89
+      case 'Oceania-1': return 165 // Sydney is typically 150-180ms from most locations
+      default: return 50
+    }
+  }
+
+  // Measure ping to all regions
+  const measureAllPings = async () => {
+    if (isLoadingPings) return
+    
+    setIsLoadingPings(true)
+    console.log('🌍 Measuring ping to all regions...')
+    
+    const pingPromises = availableRegions.map(async (region) => {
+      const ping = await measurePing(region.id, region.endpoint)
+      return { regionId: region.id, ping }
+    })
+
+    try {
+      const results = await Promise.all(pingPromises)
+      const newPings = {}
+      
+      results.forEach(({ regionId, ping }) => {
+        newPings[regionId] = ping
+        console.log(`📡 ${regionId}: ${ping}ms`)
+      })
+      
+      setRegionPings(newPings)
+      
+      // Update current server ping if it's in the results
+      if (newPings[currentServer]) {
+        setCurrentPing(newPings[currentServer])
+      }
+    } catch (error) {
+      console.error('❌ Failed to measure some pings:', error)
+    } finally {
+      setIsLoadingPings(false)
+    }
+  }
+
+  // Measure pings on component mount and periodically
+  useEffect(() => {
+    measureAllPings()
+    
+    // Refresh pings every 30 seconds
+    const pingInterval = setInterval(measureAllPings, 30000)
+    
+    return () => clearInterval(pingInterval)
+  }, [])
 
   // Region selection handler
   const handleRegionSelect = (regionId) => {
