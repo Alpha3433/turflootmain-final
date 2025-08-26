@@ -4532,10 +4532,6 @@ const AgarIOGame = () => {
                   </div>
                 </div>
                 
-                {/* Split guidance tooltip */}
-                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap opacity-80">
-                  Tap to split
-                </div>
               </div>
             </div>
           )}
