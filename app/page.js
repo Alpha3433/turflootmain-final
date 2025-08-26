@@ -51,88 +51,41 @@ export default function Home() {
   const [regionPings, setRegionPings] = useState({})
   const [isLoadingPings, setIsLoadingPings] = useState(false)
 
-  // Measure real-time ping to a region using multiple endpoints
-  const measurePing = async (regionId, endpoints) => {
+  // Measure real-time ping to a server
+  const measurePing = async (regionId, endpoint) => {
     // Only run on client side to avoid SSR issues
     if (typeof window === 'undefined') {
       return getEstimatedLatencyOffset(regionId)
     }
     
-    console.log(`🏓 Measuring real-time ping to ${regionId}...`)
-    
     try {
-      // Test multiple endpoints and get the fastest/most reliable result
-      const pingPromises = endpoints.map(async (endpoint, index) => {
-        try {
-          const startTime = performance.now()
-          
-          // Use a lightweight request that's likely to succeed
-          const controller = new AbortController()
-          const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-          
-          const response = await fetch(endpoint, { 
-            method: 'HEAD', // Use HEAD request for minimal data transfer
-            mode: 'no-cors', // Avoid CORS issues with public endpoints
-            cache: 'no-store',
-            signal: controller.signal
-          })
-          
-          clearTimeout(timeoutId)
-          const endTime = performance.now()
-          const ping = Math.round(endTime - startTime)
-          
-          console.log(`📡 ${regionId} endpoint ${index + 1}: ${ping}ms`)
-          return { ping, endpoint, success: true }
-          
-        } catch (error) {
-          // If endpoint fails, try a different approach with our own server + geographic offset
-          console.log(`⚠️ ${regionId} endpoint ${index + 1} failed, trying fallback...`)
-          
-          try {
-            const startTime = performance.now()
-            await fetch('/api/ping', { method: 'GET', cache: 'no-store' })
-            const endTime = performance.now()
-            const basePing = Math.round(endTime - startTime)
-            const estimatedPing = basePing + getEstimatedLatencyOffset(regionId)
-            
-            return { ping: estimatedPing, endpoint: 'fallback', success: false }
-          } catch (fallbackError) {
-            return { ping: getEstimatedLatencyOffset(regionId), endpoint: 'estimated', success: false }
-          }
-        }
-      })
+      const startTime = performance.now()
       
-      // Wait for all ping attempts with a reasonable timeout
-      const results = await Promise.allSettled(pingPromises)
-      
-      // Find the best result (prioritize successful real measurements)
-      let bestResult = null
-      let fastestPing = Infinity
-      
-      results.forEach((result) => {
-        if (result.status === 'fulfilled' && result.value.ping < fastestPing) {
-          // Prioritize real measurements over fallbacks
-          if (result.value.success || !bestResult || !bestResult.success) {
-            bestResult = result.value
-            fastestPing = result.value.ping
-          }
-        }
-      })
-      
-      if (bestResult) {
-        const resultType = bestResult.success ? '✅ Real-time' : '⚠️ Fallback'
-        console.log(`${resultType} ping for ${regionId}: ${bestResult.ping}ms`)
-        return bestResult.ping
-      } else {
-        // Ultimate fallback
-        const fallbackPing = getEstimatedLatencyOffset(regionId)
-        console.log(`❌ All endpoints failed for ${regionId}, using estimated: ${fallbackPing}ms`)
-        return fallbackPing
+      // Try to ping the actual server endpoint first
+      try {
+        const response = await fetch(endpoint, { 
+          method: 'HEAD',
+          mode: 'no-cors',
+          cache: 'no-store'
+        })
+        const endTime = performance.now()
+        const ping = Math.round(endTime - startTime)
+        return ping
+      } catch (serverError) {
+        // If server endpoint fails, fallback to measuring ping to our current server
+        console.log(`❌ Cannot reach ${regionId} server, using fallback measurement`)
+        const fallbackStartTime = performance.now()
+        await fetch('/api/ping', { method: 'GET', cache: 'no-store' })
+        const fallbackEndTime = performance.now()
+        
+        // Add estimated latency based on geographic distance
+        const basePing = Math.round(fallbackEndTime - fallbackStartTime)
+        const estimatedPing = basePing + getEstimatedLatencyOffset(regionId)
+        return estimatedPing
       }
-      
     } catch (error) {
       console.error(`❌ Failed to measure ping for ${regionId}:`, error)
-      return getEstimatedLatencyOffset(regionId)
+      return getEstimatedLatencyOffset(regionId) // Fallback to estimated values
     }
   }
 
