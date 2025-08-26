@@ -1256,12 +1256,12 @@ export default function Home() {
 
       </div>
 
-      {/* Top Navigation - 64px height, sticky */}
-      <header className="sticky top-0 z-50 h-16 w-full backdrop-blur-sm bg-black/80 border-b border-gray-800">
-        <div className="flex justify-between items-center px-8 h-full">
-          {/* Left side - Welcome message */}
-          <div className="flex items-center space-x-4">
-            <span className="text-white text-lg font-semibold">
+      {/* Top Navigation - Enhanced Mobile Layout */}
+      <header className="sticky top-0 z-50 h-auto min-h-[64px] w-full backdrop-blur-sm bg-black/90 border-b border-gray-800">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-8 py-2 sm:py-0 sm:h-16">
+          {/* Top Row on Mobile - Welcome message */}
+          <div className="flex items-center space-x-4 w-full sm:w-auto mb-2 sm:mb-0">
+            <span className="text-white text-base sm:text-lg font-semibold truncate">
               {authenticated && user 
                 ? `Welcome, ${displayName || user.google?.name || user.email?.address || 'Player'}!` 
                 : 'Welcome, Player!'
@@ -1269,24 +1269,27 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Right side - Coins Display, Server Indicator and Navigation Icons */}
-          <div className="flex items-center space-x-3">
-            {/* Coins Display */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-yellow-600/80 to-yellow-500/80 border border-yellow-400/60 rounded-lg shadow-lg">
-              <div className="text-yellow-300 text-base">💰</div>
+          {/* Bottom Row on Mobile - Coins, Server, Actions */}
+          <div className="flex items-center justify-between w-full sm:w-auto space-x-2 sm:space-x-3">
+            {/* Coins Display - Compact on Mobile */}
+            <div className="flex items-center space-x-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gradient-to-r from-yellow-600/80 to-yellow-500/80 border border-yellow-400/60 rounded-lg shadow-lg">
+              <div className="text-yellow-300 text-sm">💰</div>
               <div className="flex flex-col">
                 <span className="text-xs text-yellow-200 opacity-90 leading-none">COINS</span>
-                <span className="text-white font-bold text-sm leading-none">{userBalance.toLocaleString()}</span>
+                <span className="text-white font-bold text-xs sm:text-sm leading-none">{userBalance.toLocaleString()}</span>
               </div>
             </div>
 
-            {/* Server Indicator */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-800/60 border border-gray-700/50 rounded-lg">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-green-400 font-medium text-sm">{currentServer}</span>
+            {/* Server Indicator - Compact on Mobile */}
+            <div className="flex items-center space-x-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-800/60 border border-gray-700/50 rounded-lg">
+              <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-green-400 font-medium text-xs sm:text-sm hidden sm:inline">{currentServer}</span>
+              <span className="text-green-400 font-medium text-xs sm:hidden">
+                {currentServer.split('-')[0]}
+              </span>
               {currentPing !== null && (
                 <>
-                  <span className="text-gray-400 text-xs">|</span>
+                  <span className="text-gray-400 text-xs hidden sm:inline">|</span>
                   <span className="text-gray-400 text-xs">
                     {currentPing}ms
                   </span>
@@ -1295,7 +1298,7 @@ export default function Home() {
             </div>
             
             {authenticated && user ? (
-              <>
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <button 
                   onClick={() => setShowProfile(true)}
                   className="p-2.5 bg-gray-800/40 hover:bg-gray-700/60 rounded-lg border border-gray-700/50 transition-all duration-200 hover:border-gray-600/70 group"
