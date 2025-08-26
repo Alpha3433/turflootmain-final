@@ -1484,6 +1484,7 @@ export default function Home() {
                     <p className="text-gray-400 text-xs">Choose your preferred server region</p>
                   </div>
                   <div className="py-2">
+                    {console.log('🌍 Rendering regions:', availableRegions.map(r => r.id).join(', '))}
                     {availableRegions.map((region) => {
                       const realPing = regionPings[region.id]
                       const estimatedPing = getEstimatedLatencyOffset(region.id)
