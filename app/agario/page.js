@@ -2515,40 +2515,71 @@ const AgarIOGame = () => {
         }))
       }
 
-      // Virus collision detection
+      // Enhanced Virus/Spike collision detection (Mobile + Split Cell Support)
       for (const virus of game.viruses) {
         for (const entity of allEntities) {
           const distance = getDistance(entity, virus)
           const baseRadius = getRadius(entity.mass) * 2.0
-          const visualRadius = entity === game.player ? baseRadius * 3.0 : baseRadius
+          const visualRadius = (entity === game.player || entity.isPlayerCell) ? baseRadius * 3.0 : baseRadius
           
           if (distance <= visualRadius + virus.radius) {
-            // Check if entity is big enough to split when hitting virus
-            if (entity.mass >= config.virusSplitThreshold) {
-              // Split the player/bot into multiple smaller pieces based on mass
-              const pieceSize = 100 + Math.random() * 20 // 100-120 mass per piece
-              const numPieces = Math.max(2, Math.floor(entity.mass / pieceSize)) // At least 2 pieces
-              
-              if (entity === game.player) {
-                addFloatingText(`💥 SPLIT INTO ${numPieces} PIECES!`, entity.x, entity.y - 40, '#ff0000')
+            // Enhanced collision detection for mobile users and split cells
+            if (entity.isPlayerCell && entity.cellReference) {
+              // Handle virus collision for individual split cells
+              const cell = entity.cellReference
+              if (cell.mass >= config.virusSplitThreshold) {
+                // Split this specific cell
+                const splitMass = cell.mass / 2
+                cell.mass = splitMass
+                cell.radius = Math.sqrt(cell.mass / Math.PI) * 8
                 
-                // Reduce mass significantly but keep net worth unchanged
+                // Update total player mass
+                game.player.mass = game.player.cells.reduce((total, c) => total + c.mass, 0)
+                
+                // Mobile-specific feedback
+                if (isMobile) {
+                  addFloatingText(`💥 CELL SPLIT!`, entity.x, entity.y - 40, '#ff4444')
+                  console.log(`🦠 Mobile user - Cell ${entity.cellId} hit virus! Split from ${cell.mass * 2} to ${cell.mass} mass`)
+                } else {
+                  addFloatingText(`💥 VIRUS HIT!`, entity.x, entity.y - 40, '#ff0000')
+                }
+              } else if (cell.mass <= config.virusHideThreshold) {
+                // Small split cells can hide inside virus
+                if (isMobile) {
+                  addFloatingText('🛡️ CELL SAFE', entity.x, entity.y - 30, '#00ff88')
+                } else {
+                  addFloatingText('🛡️ PROTECTED', entity.x, entity.y - 30, '#00ff88')
+                }
+              }
+            } else if (entity === game.player) {
+              // Original player collision logic (enhanced for mobile)
+              if (entity.mass >= config.virusSplitThreshold) {
+                const pieceSize = 100 + Math.random() * 20
+                const numPieces = Math.max(2, Math.floor(entity.mass / pieceSize))
+                
+                if (isMobile) {
+                  addFloatingText(`💥 MOBILE SPLIT: ${numPieces} PIECES!`, entity.x, entity.y - 40, '#ff0000')
+                  console.log(`🦠 Mobile user hit virus! Split into ${numPieces} pieces`)
+                } else {
+                  addFloatingText(`💥 SPLIT INTO ${numPieces} PIECES!`, entity.x, entity.y - 40, '#ff0000')
+                }
+                
                 const newMass = entity.mass / numPieces
-                // Keep net worth unchanged - no financial penalty
-                
                 entity.mass = newMass
-                // entity.netWorth remains the same - no change to balance
                 
                 console.log(`Player split into ${numPieces} pieces, reduced to ${Math.floor(newMass)} mass but kept $${entity.netWorth} net worth`)
-              } else {
-                // Split bot (simplified version)
-                entity.mass = entity.mass / 3
-                entity.netWorth = Math.floor(entity.netWorth / 2) // Bots still get financial penalty
+              } else if (entity.mass <= config.virusHideThreshold) {
+                if (isMobile) {
+                  addFloatingText('🛡️ MOBILE SAFE', entity.x, entity.y - 30, '#00ff88')
+                } else {
+                  addFloatingText('🛡️ PROTECTED', entity.x, entity.y - 30, '#00ff88')
+                }
               }
-            } else if (entity.mass <= config.virusHideThreshold) {
-              // Small entities can hide inside virus (immunity mechanic)
-              if (entity === game.player) {
-                addFloatingText('🛡️ PROTECTED', entity.x, entity.y - 30, '#00ff88')
+            } else {
+              // Bot collision (unchanged)
+              if (entity.mass >= config.virusSplitThreshold) {
+                entity.mass = entity.mass / 3
+                entity.netWorth = Math.floor(entity.netWorth / 2)
               }
             }
           }
