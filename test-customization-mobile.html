@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Customization Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; background: #000; }
+    </style>
+</head>
+<body>
+    <div class="w-full h-screen bg-black flex items-center justify-center">
+        <button id="openModal" class="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium">Open Mobile Customization Modal</button>
+    </div>
+    
+    <!-- Modal container -->
+    <div id="modalContainer"></div>
+    
+    <script>
+        document.getElementById('openModal').addEventListener('click', () => {
+            // Simulate opening the modal by redirecting to the customization test page
+            window.location.href = '/test-customization';
+        });
+    </script>
+</body>
+</html>
