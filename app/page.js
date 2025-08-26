@@ -30,6 +30,7 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false)
   const [showCustomization, setShowCustomization] = useState(false)
   const [showServerBrowser, setShowServerBrowser] = useState(false)
+  const [showRegionDropdown, setShowRegionDropdown] = useState(false) // New region dropdown state
   const [currentServer, setCurrentServer] = useState('US-East-1') // Default server
   const [currentPing, setCurrentPing] = useState(null) // Initialize as null to prevent hydration mismatch
   
