@@ -118,18 +118,17 @@ const nextConfig = {
       type: 'javascript/auto',
     });
 
-    // Ignore problematic modules during build
+    // Ignore problematic modules during build to prevent them from being bundled
     config.externals = [
       ...(config.externals || []),
-      {
-        'require-addon': 'commonjs require-addon',
-        'bare-os': 'commonjs bare-os',
-        'critters': 'critters',
-        // Externalize problematic WalletConnect modules to prevent build issues
-        '@walletconnect/ethereum-provider': 'commonjs @walletconnect/ethereum-provider',
-        '@walletconnect/universal-provider': 'commonjs @walletconnect/universal-provider',
-        '@walletconnect/jsonrpc-ws-connection': 'commonjs @walletconnect/jsonrpc-ws-connection',
-      },
+      // Only externalize for server-side, not client-side
+      ...(isServer ? [
+        {
+          'require-addon': 'commonjs require-addon',
+          'bare-os': 'commonjs bare-os',
+          'critters': 'critters',
+        }
+      ] : []),
     ];
 
     // Remove the problematic custom plugin
