@@ -458,81 +458,112 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
   )
 
   const renderSearch = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-white mb-2">🔍 Find Players</h2>
-        <p className="text-gray-400">Search by username or Game ID</p>
+    <div className="space-y-4">
+      {/* Search Header */}
+      <div className="flex items-center space-x-3 mb-6">
+        <div className="p-2 bg-blue-500/20 rounded-lg border border-blue-500/30">
+          <UserSearch className="w-6 h-6 text-blue-400" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-white">Find Players</h3>
+          <p className="text-sm text-gray-400">Search and connect with other players</p>
+        </div>
       </div>
-      
-      <div className="relative">
+
+      {/* Search Input */}
+      <div className="relative mb-6">
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <input 
           type="text"
-          placeholder="Search by username or Game ID..."
+          placeholder="Search players by username..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value)
             handleSearch(e.target.value)
           }}
-          className="w-full px-4 py-3 pl-12 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && searchQuery.trim()) {
+              handleSearch(searchQuery.trim())
+            }
+          }}
+          className={`w-full pl-12 pr-4 ${isLandscape ? 'py-3 text-sm' : 'py-4 text-base'} bg-gray-800/60 border border-gray-700/60 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/60 focus:bg-gray-800/80 shadow-lg`}
         />
-        <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+        <button
+          onClick={() => searchQuery.trim() && handleSearch(searchQuery.trim())}
+          disabled={!searchQuery.trim() || loading}
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded-xl transition-all font-medium"
+        >
+          Search
+        </button>
       </div>
 
-      {loading && searchQuery ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="text-2xl animate-spin">🔍</div>
-          <span className="ml-3 text-gray-400">Searching...</span>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center h-48 space-y-4">
+          <div className="text-4xl animate-pulse">🔍</div>
+          <div className="text-gray-400">Searching players...</div>
         </div>
       ) : searchResults.length > 0 ? (
         <div className="space-y-3">
-          <h3 className="text-lg font-bold text-yellow-400">Search Results</h3>
           {searchResults.map((player) => (
-            <div key={player.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-600/30">
-              <div className="flex items-center space-x-4">
-                <div className="text-2xl">{player.avatar}</div>
-                <div>
-                  <div className="font-bold text-white">{player.name}</div>
-                  <div className="text-sm text-gray-400">
-                    {player.wins} wins • {player.status}
-                    {player.status === 'online' && <span className="text-green-400 ml-1">●</span>}
-                    {player.status === 'playing' && <span className="text-yellow-400 ml-1">●</span>}
+            <div key={player.id} className="p-4 bg-gray-800/50 rounded-2xl border-2 border-gray-700/60 hover:border-gray-600/60 transition-all hover:scale-[1.01]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500/30 to-purple-500/30 rounded-xl flex items-center justify-center border-2 border-blue-500/40">
+                      <div className="text-2xl">{player.avatar}</div>
+                    </div>
+                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-900 ${
+                      player.status === 'online' ? 'bg-green-400' :
+                      player.status === 'playing' ? 'bg-yellow-400' : 'bg-gray-500'
+                    }`}></div>
+                  </div>
+                  
+                  <div>
+                    <div className="font-bold text-white text-lg">{player.name}</div>
+                    <div className="text-sm text-gray-400">
+                      {player.wins} wins • {player.status === 'online' ? 'Online' : player.status === 'playing' ? 'In Game' : 'Offline'}
+                    </div>
                   </div>
                 </div>
-              </div>
-              {player.friendRequestSent ? (
-                <div className="px-3 py-1 bg-gray-600/20 text-gray-400 rounded text-sm">
-                  ✓ Request Sent
+                
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => addFriend(player.id)}
+                    disabled={player.friendRequestSent}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                      player.friendRequestSent
+                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg'
+                    }`}
+                  >
+                    {player.friendRequestSent ? (
+                      <>✓ Sent</>
+                    ) : (
+                      <>
+                        <UserPlus className="w-4 h-4 inline mr-2" />
+                        Add Friend
+                      </>
+                    )}
+                  </button>
                 </div>
-              ) : (
-                <button
-                  onClick={() => addFriend(player.id)}
-                  className="px-4 py-2 bg-yellow-400 hover:bg-yellow-300 text-black font-medium rounded-lg transition-colors flex items-center"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Friend
-                </button>
-              )}
+              </div>
             </div>
           ))}
         </div>
       ) : searchQuery ? (
-        <div className="flex flex-col items-center justify-center py-8 space-y-4">
-          <div className="text-4xl">😔</div>
+        <div className="flex flex-col items-center justify-center h-48 space-y-4">
+          <div className="text-4xl">❌</div>
           <div className="text-center">
-            <h3 className="text-lg font-bold text-white mb-2">No Results Found</h3>
-            <p className="text-gray-400">Try a different search term</p>
+            <h3 className="text-lg font-bold text-white mb-2">No players found</h3>
+            <p className="text-gray-400">Try searching with a different username</p>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-8 space-y-4">
-          <div className="text-6xl">🔍</div>
+        <div className="flex flex-col items-center justify-center h-48 space-y-4">
+          <div className="text-4xl">🔍</div>
           <div className="text-center">
-            <h3 className="text-lg font-bold text-white mb-2">Start Searching</h3>
-            <p className="text-gray-400 mb-4">Find players by typing their username or Game ID</p>
-            <div className="text-sm text-gray-500 space-y-1">
-              <div>• Username: "ProGamer", "player123"</div>
-              <div>• Game ID: "abc123def456..."</div>
-            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Search for Players</h3>
+            <p className="text-gray-400">Enter a username to find and connect with players</p>
           </div>
         </div>
       )}
