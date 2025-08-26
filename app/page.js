@@ -48,9 +48,8 @@ export default function Home() {
       name: 'US East (Virginia)', 
       ping: null, 
       endpoints: [
-        'https://cloudflare.com/cdn-cgi/trace', // Cloudflare edge in US-East
         'https://1.1.1.1/', // Cloudflare DNS US
-        'https://httpbin.org/get' // US-based service
+        'https://api.github.com/zen' // GitHub API
       ]
     },
     { 
@@ -58,9 +57,8 @@ export default function Home() {
       name: 'US West (California)', 
       ping: null, 
       endpoints: [
-        'https://www.google.com/generate_204', // Google US-West servers
-        'https://httpbin.org/ip', // Alternative US service
-        'https://api.github.com/zen' // GitHub API US-West
+        'https://www.google.com/generate_204', // Google US servers
+        'https://api.github.com/repos/github/gitignore' // GitHub API
       ]
     },
     { 
@@ -69,8 +67,7 @@ export default function Home() {
       ping: null, 
       endpoints: [
         'https://www.google.de/generate_204', // Google Germany servers
-        'https://httpbin.org/uuid', // European mirror
-        'https://api.github.com/repos/github/gitignore' // GitHub EU
+        'https://api.github.com/users/github' // GitHub EU
       ]
     },
     { 
@@ -79,11 +76,12 @@ export default function Home() {
       ping: null, 
       endpoints: [
         'https://www.google.com.au/generate_204', // Google Australia servers
-        'https://httpbin.org/headers', // Oceania routing
-        'https://api.github.com/users/github' // GitHub Oceania routing
+        'https://api.github.com/users/octocat' // GitHub with Oceania routing
       ]
     }
   ]
+  
+  console.log('🌍 Available regions:', availableRegions.map(r => `${r.id} (${r.name})`).join(', '))
 
   const [regionPings, setRegionPings] = useState({})
   const [isLoadingPings, setIsLoadingPings] = useState(false)
