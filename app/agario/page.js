@@ -4657,26 +4657,30 @@ const AgarIOGame = () => {
               >
                 {/* Progress ring - ONLY show when cashing out */}
                 {isCashingOut && (
-                  <svg className="cashout-progress-ring absolute inset-0" width="100" height="100">
+                  <svg className="cashout-progress-ring absolute inset-0" width="90" height="90">
                     <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="45"
+                      cx="45" 
+                      cy="45" 
+                      r="40"
                       fill="none"
-                      stroke="rgba(0, 255, 0, 0.3)"
+                      stroke="rgba(0, 255, 0, 0.8)"
                       strokeWidth="4"
                       style={{
-                        strokeDasharray: `${2 * Math.PI * 45}`,
-                        strokeDashoffset: `${2 * Math.PI * 45 * (1 - cashOutProgress / 100)}`,
+                        strokeDasharray: `${2 * Math.PI * 40}`,
+                        strokeDashoffset: `${2 * Math.PI * 40 * (1 - cashOutProgress / 100)}`,
                         transform: 'rotate(-90deg)',
-                        transformOrigin: '50px 50px'
+                        transformOrigin: '45px 45px'
                       }}
                     />
                   </svg>
                 )}
                 
-                {/* Button content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold bg-gray-800/80 rounded-full border-2 border-gray-600">
+                {/* Button content - GOLD STYLING */}
+                <div className={`absolute inset-0 flex flex-col items-center justify-center text-black text-xs font-bold rounded-full border-2 transition-all duration-200 ${
+                  isCashingOut 
+                    ? 'bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-400' 
+                    : 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 border-yellow-400 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500'
+                }`}>
                   <div className="text-lg">💰</div>
                   <div className="text-center leading-tight">
                     <div>{isCashingOut ? `${Math.floor(cashOutProgress)}%` : 'CASH'}</div>
