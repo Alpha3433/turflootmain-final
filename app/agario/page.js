@@ -1912,12 +1912,12 @@ const AgarIOGame = () => {
       virusCount: 60, // Increased virus count for more strategic gameplay (was 25)
       botCount: 15,
       baseSpeed: 400, // Reduced speed for more strategic gameplay (was 648)
-      startingNetWorth: 100,
+      startingNetWorth: 5, // Realistic starting amount for paid lobbies
       startingMass: 10,
       orbMassValue: 4.5, // Tripled from 1.5 to 4.5 - much bigger growth per orb
       massPerDollar: 0.8,
-      bountyThreshold: 500,
-      killReward: 50,
+      bountyThreshold: 25, // Realistic bounty threshold ($25 for high earners)
+      killReward: 1, // Realistic kill reward ($1 per kill)
       platformFee: 0.10,
       virusRadius: 25,
       virusSplitThreshold: 35, // Mass threshold to split when hitting virus
