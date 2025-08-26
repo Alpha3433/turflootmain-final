@@ -4435,9 +4435,9 @@ const AgarIOGame = () => {
                   touchAction: 'none',
                   userSelect: 'none',
                   WebkitUserSelect: 'none',
-                  width: '100px', // Larger touch area
-                  height: '100px', // Larger touch area
-                  padding: '10px', // Extra padding for easier touch
+                  width: '90px', // Reduced for horizontal layout
+                  height: '90px', // Reduced for horizontal layout
+                  padding: '8px', // Reduced padding
                   zIndex: 1001 // Higher z-index
                 }}
               >
