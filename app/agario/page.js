@@ -2848,6 +2848,11 @@ const AgarIOGame = () => {
                 
                 bot.alive = false
                 
+                // Report elimination to paid room backend
+                if (gameMode === 'paid' && paidRoomData) {
+                  reportElimination(`bot_${bot.name}`, paidRoomData.userId, 'KILL')
+                }
+                
                 // Kill streak and feed updates
                 addKillStreakAnnouncement(game.player.streak)
                 const killMessage = isMobile 
