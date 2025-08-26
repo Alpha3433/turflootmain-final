@@ -108,9 +108,9 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Mobile Split Button Implementation (COMPLETED)"
-    - "Split Mechanic Mobile Integration (COMPLETED)" 
-    - "Mobile Action Button UI/UX (COMPLETED)"
+    - "Real-time Latency Region Selection Backend (COMPLETED)"
+    - "Ping Endpoint for Latency Measurements (COMPLETED)"
+    - "Server Browser Region Selection Support (COMPLETED)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
