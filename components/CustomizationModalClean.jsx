@@ -259,28 +259,28 @@ const CustomizationModalClean = ({ isOpen, onClose, userBalance = 1250 }) => {
           </div>
         </div>
 
-        {/* Mobile Tab Switcher */}
-        <div className="flex bg-gray-800/50 mx-4 mt-3 mb-2 rounded-xl p-1 border border-gray-700/50">
+        {/* Mobile Tab Switcher - Enhanced */}
+        <div className="flex bg-gray-800/60 mx-5 mt-4 mb-3 rounded-2xl p-1.5 border border-gray-700/60 shadow-lg">
           <button
             onClick={() => setActiveTab('inventory')}
-            className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
+            className={`flex-1 py-4 rounded-xl text-base font-bold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
               activeTab === 'inventory' 
-                ? 'bg-purple-600 text-white shadow-lg' 
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
             }`}
           >
-            <Package className="w-4 h-4" />
+            <Package className="w-5 h-5" />
             <span>Collection</span>
           </button>
           <button
             onClick={() => setActiveTab('shop')}
-            className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center space-x-2 ${
+            className={`flex-1 py-4 rounded-xl text-base font-bold transition-all flex items-center justify-center space-x-3 active:scale-95 ${
               activeTab === 'shop' 
-                ? 'bg-purple-600 text-white shadow-lg' 
-                : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-700/60'
             }`}
           >
-            <ShoppingCart className="w-4 h-4" />
+            <ShoppingCart className="w-5 h-5" />
             <span>Shop</span>
           </button>
         </div>
