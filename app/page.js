@@ -507,14 +507,19 @@ export default function Home() {
           const leaderboardData = await leaderboardResponse.json()
           console.log('📊 Leaderboard data received:', leaderboardData)
           
-          // Process leaderboard data for display
-          const processedLeaderboard = leaderboardData.users.slice(0, 3).map((user, index) => ({
-            rank: index + 1,
-            name: user.custom_name || user.email?.split('@')[0] || `Player${user.id?.slice(-4)}`,
-            earnings: `$${(user.stats?.total_earnings || 0).toFixed(2)}`
-          }))
-          
-          setLeaderboardData(processedLeaderboard)
+          // Process leaderboard data for display with null checks
+          if (leaderboardData && leaderboardData.users && Array.isArray(leaderboardData.users)) {
+            const processedLeaderboard = leaderboardData.users.slice(0, 3).map((user, index) => ({
+              rank: index + 1,
+              name: user.custom_name || user.email?.split('@')[0] || `Player${user.id?.slice(-4)}`,
+              earnings: `$${(user.stats?.total_earnings || 0).toFixed(2)}`
+            }))
+            
+            setLeaderboardData(processedLeaderboard)
+          } else {
+            console.log('⚠️ Invalid leaderboard data structure')
+            setLeaderboardData([])
+          }
         } else {
           console.log('⚠️ No leaderboard data available')
           setLeaderboardData([])
