@@ -1646,10 +1646,10 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* User Name Display */}
+              {/* User Name Display - Redesigned */}
               <div className="flex justify-center">
-                <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl px-6 py-4 border border-gray-700/50 flex items-center space-x-4 shadow-lg">
-                  <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center text-xl font-bold text-black">
+                <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl px-8 py-5 border border-gray-700/50 flex items-center space-x-5 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
                     {(authenticated && user) || isTestUser ? (
                       displayName?.charAt(0)?.toUpperCase() || 
                       user?.google?.name?.charAt(0)?.toUpperCase() || 
@@ -1669,26 +1669,30 @@ export default function Home() {
                         onKeyDown={handleNameKeyPress}
                         placeholder="Enter your name"
                         autoFocus
-                        className="bg-gray-700/60 text-white text-lg font-medium px-4 py-2 rounded-xl border border-gray-600/50 focus:border-cyan-400/50 focus:outline-none"
+                        className="bg-gray-700/80 text-white text-lg font-medium px-5 py-3 rounded-xl border border-gray-600/50 focus:border-cyan-400/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-200 min-w-[200px]"
                         maxLength={20}
                       />
                       <button
                         onClick={handleNameSave}
-                        className="p-2 bg-green-600/30 hover:bg-green-600/40 border border-green-500/50 rounded-lg text-green-400 font-bold transition-all"
+                        className="p-3 bg-green-600/30 hover:bg-green-600/50 border border-green-500/50 rounded-xl text-green-400 font-bold transition-all duration-200 hover:scale-105 shadow-lg"
                       >
-                        ✓
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
                       </button>
                       <button
                         onClick={handleNameCancel}
-                        className="p-2 bg-red-600/30 hover:bg-red-600/40 border border-red-500/50 rounded-lg text-red-400 font-bold transition-all"
+                        className="p-3 bg-red-600/30 hover:bg-red-600/50 border border-red-500/50 rounded-xl text-red-400 font-bold transition-all duration-200 hover:scale-105 shadow-lg"
                       >
-                        ✕
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                       </button>
                     </div>
                   ) : (
-                    <>
+                    <div className="flex flex-col">
                       <span 
-                        className="text-white text-lg font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+                        className="text-white text-xl font-semibold cursor-pointer hover:text-cyan-400 transition-colors duration-200 group-hover:text-cyan-300"
                         onClick={authenticated && user ? handleNameClick : () => setIsEditingName(true)}
                       >
                         {authenticated && user 
@@ -1698,6 +1702,13 @@ export default function Home() {
                           : (displayName || "Click to set name")
                         }
                       </span>
+                      <span className="text-gray-400 text-sm font-medium">
+                        {authenticated && user ? "Click to edit" : "Choose your display name"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
                       
                       <button 
                         className="p-2 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-all"
