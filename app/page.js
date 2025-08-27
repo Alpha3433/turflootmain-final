@@ -1972,44 +1972,25 @@ export default function Home() {
             
             {/* Navigation Buttons */}
             <div className="flex items-center space-x-2">
-              {/* Lobby Button - Always visible but disabled for non-authenticated users */}
+              {/* DEBUG: Always visible lobby button for testing */}
               <button 
                 onClick={() => {
+                  console.log('🏰 Lobby button clicked!')
                   if (authenticated && user) {
                     setShowLobby(!showLobby)
                   } else {
                     alert('Please log in to use Party Lobby feature')
                   }
                 }}
-                disabled={!authenticated || !user}
-                className={`relative w-10 h-10 backdrop-blur-sm border rounded-xl shadow-lg transition-all duration-200 group flex items-center justify-center ${
-                  authenticated && user 
-                    ? 'bg-gradient-to-br from-orange-600/90 to-orange-700/90 border-orange-500/60 hover:from-orange-500/90 hover:to-orange-600/90' 
-                    : 'bg-gray-600/50 border-gray-500/50 opacity-60 cursor-not-allowed'
-                }`}
-                title={authenticated && user ? "Party Lobby" : "Party Lobby (Login Required)"}
+                className="relative w-10 h-10 bg-orange-600/90 border border-orange-500/60 rounded-xl shadow-lg transition-all duration-200 group flex items-center justify-center"
+                title="Party Lobby (Always Visible)"
+                style={{ zIndex: 50 }}
               >
-                <div className={`transition-colors duration-200 ${
-                  authenticated && user 
-                    ? 'text-orange-100 group-hover:text-white' 
-                    : 'text-gray-400'
-                }`}>
+                <div className="text-orange-100 group-hover:text-white transition-colors duration-200">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
-                
-                {/* Active lobby indicator - only for authenticated users */}
-                {authenticated && user && currentLobby && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
-                )}
-                
-                {/* Pending invites indicator - only for authenticated users */}
-                {authenticated && user && lobbyInvites.length > 0 && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                    {lobbyInvites.length}
-                  </div>
-                )}
               </button>
               
               {/* Profile Button - Redesigned */}
