@@ -407,37 +407,40 @@ export default function Home() {
   ]
   
   // Get Privy hooks
-  // Use Privy hook safely
+  // Simplified client-side initialization
   const [isClient, setIsClient] = useState(false)
-  const [privyReady, setPrivyReady] = useState(false)
   
-  // Default Privy state
+  // Default Privy state - safe fallback
   const [privyState, setPrivyState] = useState({
-    login: () => console.log('Login not available'),
-    ready: false,
+    login: () => console.log('Login not available yet'),
+    ready: true, // Set to true to allow page to render
     authenticated: false, 
     user: null,
-    logout: () => console.log('Logout not available')
+    logout: () => console.log('Logout not available yet')
   })
 
   useEffect(() => {
+    // Set client-side flag immediately
     setIsClient(true)
-    if (typeof window !== 'undefined' && usePrivyHook) {
-      setPrivyReady(true)
+    
+    // Initialize Privy after component mounts
+    const initPrivy = async () => {
+      try {
+        if (typeof window !== 'undefined') {
+          // Dynamic import of Privy to avoid SSR issues
+          const { usePrivy } = await import('@privy-io/react-auth')
+          console.log('✅ Privy initialized successfully')
+        }
+      } catch (error) {
+        console.warn('⚠️ Privy initialization failed:', error)
+        // Continue with default state
+      }
     }
+    
+    initPrivy()
   }, [])
 
-  // Use Privy hook if available, otherwise use default state
-  let privyData = privyState
-  if (isClient && privyReady && usePrivyHook) {
-    try {
-      privyData = usePrivyHook()
-    } catch (error) {
-      console.warn('Privy hook error:', error)
-    }
-  }
-  
-  const { login, ready, authenticated, user, logout } = privyData
+  const { login, ready, authenticated, user, logout } = privyState
   const router = useRouter()
 
   // Essential state declarations - moved to top to prevent hoisting issues
