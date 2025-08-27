@@ -405,6 +405,7 @@ export async function GET(request, { params }) {
 
     // Wallet transactions endpoint (GET)
     if (route === 'wallet/transactions') {
+      console.log('🎯 WALLET TRANSACTIONS ENDPOINT REACHED!')
       try {
         // Get Authorization header
         const authHeader = request.headers.get('authorization')
