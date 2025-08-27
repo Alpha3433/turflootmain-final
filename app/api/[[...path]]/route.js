@@ -694,6 +694,8 @@ export async function POST(request, { params }) {
 
     const route = path.join('/')
     console.log(`🔍 POST Route requested: ${route}`)
+    console.log(`🔍 Route length: ${route.length}`)
+    console.log(`🔍 Route comparison: "${route}" === "users/profile/update-name" = ${route === 'users/profile/update-name'}`)
 
     // User stats update route
     if (route === 'users/stats/update') {
