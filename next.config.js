@@ -33,6 +33,7 @@ const nextConfig = {
     serverComponentsExternalPackages: ['mongodb'],
     optimizeCss: false,
     outputFileTracingRoot: undefined,
+    esmExternals: 'loose',
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -42,6 +43,19 @@ const nextConfig = {
   },
   distDir: '.next',
   trailingSlash: false,
+  // Disable static generation for Privy-dependent pages to avoid HTMLElement SSR errors
+  exportPathMap: async function (
+    defaultPathMap,
+    { dev, dir, outDir, distDir, buildId }
+  ) {
+    // Skip static generation for pages that use Privy authentication
+    if (process.env.NODE_ENV === 'production') {
+      return {
+        '/api': { page: '/api' },  // Only include API routes in static export
+      }
+    }
+    return defaultPathMap
+  },
   env: {
     // Explicitly expose environment variables to the frontend
     NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
