@@ -147,6 +147,8 @@ export async function GET(request, { params }) {
 
     const route = path.join('/')
     console.log(`🔍 GET Route requested: ${route}`)
+    console.log(`🔍 Route comparison - wallet/transactions: ${route === 'wallet/transactions'}`)
+    console.log(`🔍 Route comparison - wallet/balance: ${route === 'wallet/balance'}`)
 
     // Ping route for connectivity check
     if (route === 'ping') {
