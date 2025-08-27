@@ -856,31 +856,6 @@ export async function POST(request, { params }) {
 
     const route = path.join('/')
     console.log(`🔍 POST Route requested: ${route}`)
-    console.log(`🔍 POST Route path array:`, path)
-    
-    // SIMPLE DEBUG TEST - ALWAYS LOG THIS
-    console.log('🚨 DEBUGGING ROUTE MATCHING...')
-    console.log(`🚨 Route value: "${route}"`)
-    console.log(`🚨 Route type: ${typeof route}`)
-    console.log(`🚨 Route length: ${route.length}`)
-    console.log(`🚨 Exact comparison result: ${route === 'lobby/create'}`)
-    console.log(`🚨 Characters in route:`, [...route].map(c => c.charCodeAt(0)))
-    console.log(`🚨 Expected characters:`, [...'lobby/create'].map(c => c.charCodeAt(0)))
-    
-    // Return early for debugging
-    if (route === 'lobby/create') {
-      console.log('🎯 LOBBY CREATE ROUTE MATCHED! RETURNING SUCCESS')
-      return NextResponse.json({
-        debug: true,
-        success: true,
-        message: 'Lobby create route matched successfully!',
-        route: route,
-        path: path
-      }, { headers: corsHeaders })
-    }
-    
-    console.log('🚨 Route did not match lobby/create, continuing...')
-    console.log(`🔍 POST Route checking lobby/create: ${route === 'lobby/create'}`)
 
     // User stats update route
     if (route === 'users/stats/update') {
@@ -899,6 +874,112 @@ export async function POST(request, { params }) {
         console.error('❌ Stats update error:', error)
         return NextResponse.json(
           { error: 'Failed to update statistics' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
+    // Lobby creation endpoint
+    if (route === 'lobby/create') {
+      try {
+        console.log('🎯 Creating new lobby:', body)
+        
+        const { userId, userName, roomType, maxPlayers, userBalance } = body
+        
+        if (!userId || !userName || !roomType) {
+          return NextResponse.json(
+            { error: 'userId, userName and roomType are required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        // Validate room type and fee
+        const roomFees = {
+          'FREE': 0,
+          '$1': 1,
+          '$5': 5, 
+          '$20': 20,
+          '$50': 50
+        }
+        
+        const entryFee = roomFees[roomType]
+        if (entryFee === undefined) {
+          return NextResponse.json(
+            { error: 'Invalid roomType. Must be FREE, $1, $5, $20, or $50' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        // Check user balance for paid rooms
+        if (entryFee > 0 && (!userBalance || userBalance < entryFee)) {
+          return NextResponse.json(
+            { error: `Insufficient balance. Need $${entryFee} but have $${userBalance || 0}` },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        // Generate unique room code (6-character alphanumeric)
+        const generateRoomCode = () => {
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+          let code = ''
+          for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length))
+          }
+          return code
+        }
+
+        let roomCode = generateRoomCode()
+        
+        // Ensure room code is unique
+        const db = await getDb()
+        const lobbies = db.collection('lobbies')
+        
+        let existingLobby = await lobbies.findOne({ roomCode, status: { $ne: 'completed' } })
+        while (existingLobby) {
+          roomCode = generateRoomCode()
+          existingLobby = await lobbies.findOne({ roomCode, status: { $ne: 'completed' } })
+        }
+
+        // Create lobby object
+        const lobbyId = crypto.randomUUID()
+        const newLobby = {
+          id: lobbyId,
+          roomCode,
+          roomType,
+          entryFee,
+          maxPlayers: maxPlayers || 6,
+          status: 'waiting',
+          members: [
+            {
+              userId,
+              userName,
+              balance: userBalance || 0,
+              isLeader: true,
+              joinedAt: new Date()
+            }
+          ],
+          created_at: new Date(),
+          updated_at: new Date(),
+          createdBy: userId,
+          gameStarted: false
+        }
+
+        // Insert lobby into database
+        await lobbies.insertOne(newLobby)
+        
+        console.log(`✅ Created lobby ${lobbyId} with room code ${roomCode}`)
+        
+        return NextResponse.json({
+          success: true,
+          lobby: newLobby,
+          roomCode,
+          message: 'Lobby created successfully'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Lobby create error:', error)
+        return NextResponse.json(
+          { error: 'Failed to create lobby' },
           { status: 500, headers: corsHeaders }
         )
       }
