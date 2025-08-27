@@ -777,6 +777,194 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Lobby creation endpoint
+    if (route === 'lobby/create') {
+      try {
+        console.log('🏰 Creating new lobby:', body)
+        
+        const { userId, userName, userBalance, roomType } = body
+        
+        if (!userId || !userName) {
+          return NextResponse.json(
+            { error: 'userId and userName are required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const lobbies = db.collection('lobbies')
+        
+        // Create new lobby
+        const lobbyId = `lobby_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        const newLobby = {
+          id: lobbyId,
+          leaderId: userId,
+          members: [{
+            userId,
+            userName,
+            balance: userBalance || 0,
+            isLeader: true,
+            joinedAt: new Date()
+          }],
+          roomType: roomType || '$5',
+          status: 'waiting',
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+        
+        await lobbies.insertOne(newLobby)
+        console.log(`✅ Created lobby ${lobbyId} with leader ${userId}`)
+        
+        return NextResponse.json({
+          success: true,
+          lobby: newLobby,
+          message: 'Lobby created successfully'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Lobby creation error:', error)
+        return NextResponse.json(
+          { error: 'Failed to create lobby' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
+    // Lobby join endpoint
+    if (route === 'lobby/join') {
+      try {
+        console.log('🚪 Joining lobby:', body)
+        
+        const { lobbyId, userId, userName, userBalance } = body
+        
+        if (!lobbyId || !userId || !userName) {
+          return NextResponse.json(
+            { error: 'lobbyId, userId and userName are required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const lobbies = db.collection('lobbies')
+        
+        // Find and update lobby
+        const lobby = await lobbies.findOne({ id: lobbyId, status: 'waiting' })
+        
+        if (!lobby) {
+          return NextResponse.json(
+            { error: 'Lobby not found or no longer available' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+
+        // Check if user already in lobby
+        const existingMember = lobby.members.find(m => m.userId === userId)
+        if (existingMember) {
+          return NextResponse.json(
+            { error: 'You are already in this lobby' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        // Add user to lobby
+        await lobbies.updateOne(
+          { id: lobbyId },
+          {
+            $push: {
+              members: {
+                userId,
+                userName,
+                balance: userBalance || 0,
+                isLeader: false,
+                joinedAt: new Date()
+              }
+            },
+            $set: { updated_at: new Date() }
+          }
+        )
+        
+        // Get updated lobby
+        const updatedLobby = await lobbies.findOne({ id: lobbyId })
+        console.log(`✅ User ${userId} joined lobby ${lobbyId}`)
+        
+        return NextResponse.json({
+          success: true,
+          lobby: updatedLobby,
+          message: 'Joined lobby successfully'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Lobby join error:', error)
+        return NextResponse.json(
+          { error: 'Failed to join lobby' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
+    // Lobby invite endpoint
+    if (route === 'lobby/invite') {
+      try {
+        console.log('📧 Sending lobby invite:', body)
+        
+        const { lobbyId, fromUserId, fromUserName, toUserId, roomType } = body
+        
+        if (!lobbyId || !fromUserId || !toUserId) {
+          return NextResponse.json(
+            { error: 'lobbyId, fromUserId and toUserId are required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const invites = db.collection('lobby_invites')
+        
+        // Check if invite already exists
+        const existingInvite = await invites.findOne({
+          lobbyId,
+          toUserId,
+          status: 'pending'
+        })
+        
+        if (existingInvite) {
+          return NextResponse.json(
+            { error: 'Invite already sent to this user' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        // Create invite
+        const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        const newInvite = {
+          id: inviteId,
+          lobbyId,
+          fromUserId,
+          fromUserName: fromUserName || 'Unknown Player',
+          toUserId,
+          roomType: roomType || '$5',
+          status: 'pending',
+          created_at: new Date(),
+          expires_at: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes expiry
+        }
+        
+        await invites.insertOne(newInvite)
+        console.log(`✅ Sent lobby invite from ${fromUserId} to ${toUserId}`)
+        
+        return NextResponse.json({
+          success: true,
+          invite: newInvite,
+          message: 'Invite sent successfully'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Lobby invite error:', error)
+        return NextResponse.json(
+          { error: 'Failed to send invite' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     // User profile name update route
     if (route === 'users/profile/update-name') {
       console.log('🎯 ROUTE MATCHED: users/profile/update-name')
