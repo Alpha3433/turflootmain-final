@@ -73,14 +73,33 @@ function PrivyBridge({ children }) {
           }
         },
         logout: async () => {
-          console.log('🔗 Bridge logout called')
-          return await privy.logout()
+          console.log('🔗 Bridge logout called - executing Privy logout')
+          try {
+            if (typeof privy.logout === 'function') {
+              const result = await privy.logout()
+              console.log('✅ Privy logout completed')
+              return result
+            } else {
+              console.error('❌ Privy logout is not a function:', typeof privy.logout)
+              throw new Error('Privy logout function not available')
+            }
+          } catch (error) {
+            console.error('❌ Bridge logout error:', error)
+            throw error
+          }
         },
         ready: privy.ready,
         authenticated: privy.authenticated,
         user: privy.user,
         // Add raw privy object for debugging
-        _rawPrivy: privy
+        _rawPrivy: privy,
+        // Force refresh auth state
+        refreshAuth: () => {
+          console.log('🔄 Forcing authentication state refresh')
+          window.__TURFLOOT_PRIVY__.ready = privy.ready
+          window.__TURFLOOT_PRIVY__.authenticated = privy.authenticated
+          window.__TURFLOOT_PRIVY__.user = privy.user
+        }
       }
       
       console.log('🔗 Privy bridge established - functions exposed globally')
