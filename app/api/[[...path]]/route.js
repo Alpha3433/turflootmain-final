@@ -858,6 +858,9 @@ export async function POST(request, { params }) {
     console.log(`🔍 POST Route requested: ${route}`)
     console.log(`🔍 POST Route path array:`, path)
     console.log(`🔍 POST Route checking lobby/create: ${route === 'lobby/create'}`)
+    console.log(`🔍 POST Route string comparison: "${route}" === "lobby/create"`)
+    console.log(`🔍 POST Route type: ${typeof route}`)
+    console.log(`🔍 POST Route length: ${route.length}`)
 
     // User stats update route
     if (route === 'users/stats/update') {
