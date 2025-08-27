@@ -455,7 +455,8 @@ class PartyLobbyTester:
                 return
                 
             lobby_data = create_response.json()
-            lobby_id = lobby_data['lobbyId']
+            lobby = lobby_data['lobby']
+            lobby_id = lobby['id']
             room_code = lobby_data['roomCode']
             
             # Step 2: Join lobby with second user
