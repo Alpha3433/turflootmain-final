@@ -611,6 +611,66 @@ export async function GET(request, { params }) {
       }
     }
 
+    // User profile get endpoint for server-side username display
+    if (route === 'users/profile') {
+      try {
+        const userId = url.searchParams.get('userId')
+        
+        if (!userId) {
+          return NextResponse.json(
+            { error: 'userId parameter is required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        const user = await users.findOne({
+          $or: [
+            { id: userId },
+            { privy_id: userId }
+          ]
+        }, {
+          projection: {
+            id: 1,
+            privy_id: 1,
+            email: 1,
+            username: 1,
+            customName: 1,
+            custom_name: 1,
+            'profile.display_name': 1,
+            created_at: 1,
+            updated_at: 1
+          }
+        })
+        
+        if (!user) {
+          return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404, headers: corsHeaders }
+          )
+        }
+        
+        const profileResponse = {
+          id: user.id || user.privy_id,
+          username: user.custom_name || user.customName || user.profile?.display_name || user.username || 'Anonymous',
+          email: user.email,
+          created_at: user.created_at,
+          updated_at: user.updated_at
+        }
+        
+        return NextResponse.json(profileResponse, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Profile get error:', error)
+        return NextResponse.json(
+          { error: 'Failed to get user profile' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     // Friends list endpoint
     if (route === 'friends/list') {
       try {
