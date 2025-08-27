@@ -438,9 +438,6 @@ export default function Home() {
   const [userBalance, setUserBalance] = useState(0) // Start at 0 for new accounts
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
   const [socialInitialTab, setSocialInitialTab] = useState('leaderboard')
-  const [showLobby, setShowLobby] = useState(false)
-  const [currentLobby, setCurrentLobby] = useState(null)
-  const [lobbyInvites, setLobbyInvites] = useState([])
   const [friendsList, setFriendsList] = useState([])
   const [lobbyMembers, setLobbyMembers] = useState([])
   const [loadingFriends, setLoadingFriends] = useState(false)
