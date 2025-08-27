@@ -2214,8 +2214,7 @@ export default function Home() {
             
             {/* Navigation Buttons */}
             <div className="flex items-center space-x-2">
-              {/* DEBUG: Always visible lobby button for testing */}
-              <button 
+ 
                 onClick={() => {
                   console.log('🏰 Lobby button clicked!')
                   if (authenticated && user) {
