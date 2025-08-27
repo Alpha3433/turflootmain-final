@@ -1341,14 +1341,14 @@ export default function Home() {
     setPendingGameEntry(null)
   }
 
-  // Show loading state during SSR hydration and Privy initialization
-  if (!isClient || isLoading) {
+  // Show loading state during initial client-side hydration
+  if (!isClient) {
     return (
       <div className="min-h-screen bg-[#1E1E1E] text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
           <h1 className="text-2xl font-bold mb-2">TurfLoot</h1>
-          <p className="text-gray-400">Loading...</p>
+          <p className="text-gray-400">Initializing...</p>
         </div>
       </div>
     )
