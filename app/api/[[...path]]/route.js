@@ -131,6 +131,8 @@ export async function GET(request, { params }) {
   const { path } = params
   const url = new URL(request.url)
   
+  console.log('🚀 GET HANDLER CALLED - PATH:', path)
+  
   try {
     // Root API endpoint
     if (!path || path.length === 0) {
