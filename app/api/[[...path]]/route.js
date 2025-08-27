@@ -885,7 +885,9 @@ export async function POST(request, { params }) {
     }
 
     // Lobby creation endpoint
+    console.log(`🎯 Checking lobby/create: "${route}" === "lobby/create" = ${route === 'lobby/create'}`)
     if (route === 'lobby/create') {
+      console.log('🎯 ROUTE MATCHED: lobby/create')
       try {
         console.log('🏰 Creating new lobby:', body)
         
