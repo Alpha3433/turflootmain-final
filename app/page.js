@@ -470,7 +470,8 @@ export default function Home() {
   ]
   
   // Get Privy hooks
-  const { login, ready, authenticated, user, logout } = usePrivy()
+  // Use safe Privy hook that handles SSR and loading states properly
+  const { login, ready, authenticated, user, logout, isClient, isLoading } = usePrivySafe()
   const router = useRouter()
 
   // Debug Privy state
