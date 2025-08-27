@@ -2,6 +2,31 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+
+// Custom hook to safely use Privy with SSR
+function usePrivySafe() {
+  const [privyHook, setPrivyHook] = useState({
+    login: () => {},
+    ready: false,
+    authenticated: false,
+    user: null,
+    logout: () => {}
+  })
+
+  useEffect(() => {
+    // Dynamically import and use Privy only on client side
+    if (typeof window !== 'undefined') {
+      import('@privy-io/react-auth').then(({ usePrivy }) => {
+        // Note: This is a workaround. In a real app, you'd use usePrivy directly 
+        // within the Privy context. This approach is for SSR compatibility.
+      })
+    }
+  }, [])
+
+  return privyHook
+}
+
+// For now, we'll use a direct import with proper client-side checking
 import { usePrivy } from '@privy-io/react-auth'
 import WalletManager from '../components/wallet/WalletManager'
 import UserProfile from '../components/UserProfile'
