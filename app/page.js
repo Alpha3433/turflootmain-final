@@ -1091,31 +1091,52 @@ export default function Home() {
     try {
       console.log('🚀 Triggering Privy login')
       
-      // Debug: Check what login function we have
-      console.log('🔍 Login function type:', typeof login)
-      console.log('🔍 Login function:', login.toString().substring(0, 100))
-      
-      // Try multiple approaches to ensure Privy login works
+      // Try direct bridge access first
       if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
-        console.log('🎯 Using Privy bridge directly')
         const bridge = window.__TURFLOOT_PRIVY__
-        console.log('🔍 Bridge login type:', typeof bridge.login)
+        console.log('🎯 Using Privy bridge - calling login function')
+        console.log('🔍 Bridge ready state:', bridge.ready)
+        console.log('🔍 Bridge authenticated:', bridge.authenticated)
         
         if (typeof bridge.login === 'function') {
-          console.log('✅ Calling Privy bridge login function')
-          await bridge.login()
+          console.log('✅ Executing bridge login...')
+          const result = await bridge.login()
+          console.log('✅ Bridge login completed:', result)
         } else {
-          console.log('❌ Bridge login is not a function')
+          console.error('❌ Bridge login is not a function:', typeof bridge.login)
+          
+          // Fallback: try raw privy object
+          if (bridge._rawPrivy && typeof bridge._rawPrivy.login === 'function') {
+            console.log('🔄 Trying raw Privy login...')
+            const result = await bridge._rawPrivy.login()
+            console.log('✅ Raw Privy login completed:', result)
+          } else {
+            throw new Error('No valid login function found')
+          }
         }
       } else {
-        console.log('🎯 Using component login function')
-        await login()
+        console.log('🔄 Bridge not available, using component login function')
+        
+        if (typeof login === 'function') {
+          console.log('✅ Executing component login...')
+          const result = await login()
+          console.log('✅ Component login completed:', result)
+        } else {
+          console.error('❌ Component login is not a function:', typeof login)
+          throw new Error('No login function available')
+        }
       }
       
-      console.log('✅ Login call completed')
+      console.log('🎉 Login process completed successfully')
     } catch (error) {
       console.error('❌ Login error:', error)
-      alert('Authentication unavailable. Please try again.')
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack
+      })
+      
+      // Show user-friendly message
+      alert(`Authentication failed: ${error.message}. Please refresh the page and try again.`)
     }
   }
 
