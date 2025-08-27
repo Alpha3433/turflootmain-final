@@ -1,7 +1,31 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
-import { Component } from 'react'
+import { Component, useState, useEffect } from 'react'
+
+// Client-side wrapper to prevent SSR issues with Privy Lit Elements
+function ClientOnlyPrivyProvider({ children, appId, config }) {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Render children without Privy wrapper on server-side
+  if (!isClient) {
+    return <div>{children}</div>
+  }
+
+  // Render with Privy provider on client-side
+  return (
+    <PrivyProvider
+      appId={appId}
+      config={config}
+    >
+      {children}
+    </PrivyProvider>
+  )
+}
 
 // Error boundary to catch and suppress Privy authentication errors
 class PrivyErrorBoundary extends Component {
