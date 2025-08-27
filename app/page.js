@@ -2249,21 +2249,27 @@ export default function Home() {
                   </div>
                 </button>
                 
-              {/* Login Button - Redesigned */}
+              {/* Login Button - Green Theme to match new design */}
               <button 
                 onClick={handleLoginClick}
                 disabled={!ready}
-                className="px-6 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600/90 to-green-700/90 backdrop-blur-sm border border-green-500/60 rounded-xl shadow-lg hover:from-green-500/90 hover:to-green-600/90 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 title={!ready ? 'Initializing authentication...' : 'Click to login with Privy'}
               >
-                <div className="w-5 h-5 bg-green-500/20 rounded-lg flex items-center justify-center border border-green-500/30">
-                  <svg className="w-3 h-3 text-green-400 group-hover:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-green-500/20 border-green-500/30 group-hover:bg-green-500/30 transition-all duration-200">
+                  <svg className="w-4 h-4 text-green-400 group-hover:text-green-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                   </svg>
                 </div>
-                <span className="text-white font-bold text-sm">
-                  {!ready ? 'Loading...' : 'LOGIN'}
-                </span>
+                
+                <div className="flex flex-col">
+                  <span className="font-bold text-xs leading-none text-green-400 group-hover:text-green-300 transition-colors duration-200">
+                    {!ready ? 'Loading...' : 'LOGIN'}
+                  </span>
+                  <span className="text-gray-400 text-xs leading-none">
+                    {!ready ? 'Please wait' : 'Connect'}
+                  </span>
+                </div>
               </button>
               </div>
             )}
