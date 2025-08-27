@@ -857,18 +857,30 @@ export async function POST(request, { params }) {
     const route = path.join('/')
     console.log(`🔍 POST Route requested: ${route}`)
     console.log(`🔍 POST Route path array:`, path)
-    console.log(`🔍 POST Route checking lobby/create: ${route === 'lobby/create'}`)
     
-    // SIMPLE DEBUG TEST
+    // SIMPLE DEBUG TEST - ALWAYS LOG THIS
+    console.log('🚨 DEBUGGING ROUTE MATCHING...')
+    console.log(`🚨 Route value: "${route}"`)
+    console.log(`🚨 Route type: ${typeof route}`)
+    console.log(`🚨 Route length: ${route.length}`)
+    console.log(`🚨 Exact comparison result: ${route === 'lobby/create'}`)
+    console.log(`🚨 Characters in route:`, [...route].map(c => c.charCodeAt(0)))
+    console.log(`🚨 Expected characters:`, [...'lobby/create'].map(c => c.charCodeAt(0)))
+    
+    // Return early for debugging
     if (route === 'lobby/create') {
-      console.log('🎯 LOBBY CREATE ROUTE MATCHED!')
+      console.log('🎯 LOBBY CREATE ROUTE MATCHED! RETURNING SUCCESS')
       return NextResponse.json({
         debug: true,
-        message: 'Route matched successfully',
+        success: true,
+        message: 'Lobby create route matched successfully!',
         route: route,
         path: path
       }, { headers: corsHeaders })
     }
+    
+    console.log('🚨 Route did not match lobby/create, continuing...')
+    console.log(`🔍 POST Route checking lobby/create: ${route === 'lobby/create'}`)
 
     // User stats update route
     if (route === 'users/stats/update') {
