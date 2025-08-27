@@ -74,9 +74,10 @@ class PartyLobbyTester:
             
             if response.status_code == 200:
                 data = response.json()
-                if 'lobbyId' in data and 'roomCode' in data:
+                if data.get('success') and 'lobby' in data and 'roomCode' in data:
+                    lobby = data['lobby']
                     self.created_lobbies.append({
-                        'lobbyId': data['lobbyId'],
+                        'lobbyId': lobby['id'],
                         'roomCode': data['roomCode'],
                         'roomType': 'FREE'
                     })
