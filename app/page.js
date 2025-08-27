@@ -1832,7 +1832,7 @@ export default function Home() {
                 </svg>
               </button>
 
-              {/* LOBBY BUTTON - Added right after region selector */}
+
               <button 
                 onClick={() => {
                   console.log('🏰 Lobby button clicked!')
