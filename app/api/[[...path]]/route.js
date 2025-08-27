@@ -717,6 +717,95 @@ export async function POST(request, { params }) {
       }
     }
 
+    // User profile name update route
+    if (route === 'users/profile/update-name') {
+      try {
+        console.log('✏️ Updating user profile name:', body)
+        
+        const { userId, customName, privyId, email } = body
+        
+        if (!userId || !customName) {
+          return NextResponse.json(
+            { error: 'userId and customName are required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        if (customName.length < 1 || customName.length > 20) {
+          return NextResponse.json(
+            { error: 'Custom name must be between 1 and 20 characters' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Find user by userId or privyId
+        const existingUser = await users.findOne({
+          $or: [
+            { id: userId },
+            { privy_id: userId },
+            { privy_id: privyId }
+          ]
+        })
+        
+        if (existingUser) {
+          // Update existing user's name
+          await users.updateOne(
+            { 
+              $or: [
+                { id: userId },
+                { privy_id: userId },
+                { privy_id: privyId }
+              ]
+            },
+            { 
+              $set: { 
+                customName: customName,
+                username: customName, // Also update username field for compatibility
+                updated_at: new Date()
+              }
+            }
+          )
+          
+          console.log(`✅ Updated existing user ${userId} name to: ${customName}`)
+        } else {
+          // Create new user with the custom name
+          const newUser = {
+            id: userId,
+            privy_id: privyId || userId,
+            email: email,
+            customName: customName,
+            username: customName,
+            balance: 25.00, // Default testing balance
+            created_at: new Date(),
+            updated_at: new Date()
+          }
+          
+          await users.insertOne(newUser)
+          console.log(`✅ Created new user ${userId} with name: ${customName}`)
+        }
+        
+        return NextResponse.json(
+          { 
+            success: true,
+            message: 'Name updated successfully',
+            customName: customName,
+            userId: userId
+          },
+          { headers: corsHeaders }
+        )
+        
+      } catch (error) {
+        console.error('❌ Profile name update error:', error)
+        return NextResponse.json(
+          { error: 'Failed to update profile name' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     if (route === 'friends/send-request') {
       try {
         const { fromUserId, toUserId } = body
