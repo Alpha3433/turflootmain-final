@@ -1115,9 +1115,6 @@ export default function Home() {
       alert('Authentication unavailable. Please try again.')
     }
   }
-      alert('Login failed. Please try again or check your internet connection.')
-    }
-  }
 
   const handleLogout = () => {
     console.log('🔐 Logout clicked')
