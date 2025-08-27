@@ -364,6 +364,37 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Wallet transactions endpoint (GET)
+    if (route === 'wallet/transactions') {
+      try {
+        // Get Authorization header
+        const authHeader = request.headers.get('authorization')
+        let token = null
+        
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          token = authHeader.substring(7)
+        }
+        
+        console.log('🔍 Wallet transactions request - Token present:', !!token)
+        
+        // For now, return empty transactions array since we're in testing phase
+        // In production, this would fetch real blockchain transactions
+        const transactionsResponse = {
+          transactions: [],
+          total_count: 0,
+          wallet_address: '0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d', // Default for testing
+          timestamp: new Date().toISOString()
+        }
+        
+        console.log('📊 Returning transactions data:', transactionsResponse)
+        return NextResponse.json(transactionsResponse, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error in wallet/transactions endpoint:', error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // Server Browser endpoint
     if (route === 'servers/lobbies') {
       try {
