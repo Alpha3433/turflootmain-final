@@ -2130,15 +2130,25 @@ export default function Home() {
               {/* Profile Button - Redesigned */}
               {authenticated && user ? (
                 <div className="flex items-center space-x-2">
+                {/* Profile Button - Blue Theme */}
                 <button 
                   onClick={() => setShowProfile(true)}
-                  className="w-10 h-10 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center justify-center"
+                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-600/90 to-blue-700/90 backdrop-blur-sm border border-blue-500/60 rounded-xl shadow-lg hover:from-blue-500/90 hover:to-blue-600/90 transition-all duration-200 group cursor-pointer"
                   title="Profile & Social"
                 >
-                  <div className="w-6 h-6 bg-blue-500/20 rounded-lg flex items-center justify-center border border-blue-500/30">
-                    <svg className="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-blue-500/20 border-blue-500/30 group-hover:bg-blue-500/30 transition-all duration-200">
+                    <svg className="w-4 h-4 text-blue-400 group-hover:text-blue-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
+                  </div>
+                  
+                  <div className="flex flex-col">
+                    <span className="font-medium text-xs leading-none text-blue-400 group-hover:text-blue-300 transition-colors duration-200">
+                      Profile
+                    </span>
+                    <span className="text-gray-400 text-xs leading-none">
+                      Social
+                    </span>
                   </div>
                 </button>
                 
