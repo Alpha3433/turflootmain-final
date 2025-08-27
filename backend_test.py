@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite for Custom Name Update Endpoint
-Testing the specific 500 error scenario reported by user
+Backend API Testing for TurfLoot - Custom Name Update Endpoint
+Testing the enhanced error logging for /api/users/profile/update-name endpoint
+Focus: Testing exact payload from user console logs with enhanced backend logging
 """
 
 import requests
@@ -9,9 +10,16 @@ import json
 import time
 import sys
 import os
+from datetime import datetime
 
-# Get base URL from environment
+# Configuration
 BASE_URL = "http://localhost:3000"
+PRODUCTION_URL = "https://lobby-party.preview.emergentagent.com"
+
+def log_test(message, status="INFO"):
+    """Log test messages with timestamp"""
+    timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+    print(f"[{timestamp}] {status}: {message}")
 
 def test_custom_name_update_endpoint():
     """Test the /api/users/profile/update-name endpoint with exact user payload"""
