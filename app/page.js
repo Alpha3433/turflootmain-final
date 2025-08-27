@@ -2,59 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 
-// Safe Privy hook that handles SSR and loading states
-function usePrivySafe() {
-  const [privyState, setPrivyState] = useState({
-    login: () => {},
-    ready: false,
-    authenticated: false,
-    user: null,
-    logout: () => {}
-  })
-  
-  const [isClient, setIsClient] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    setIsClient(true)
-    
-    // Only import and use Privy on client side after hydration
-    if (typeof window !== 'undefined') {
-      let mounted = true
-      
-      const initPrivy = async () => {
-        try {
-          const { usePrivy } = await import('@privy-io/react-auth')
-          
-          // Small delay to ensure proper hydration
-          setTimeout(() => {
-            if (mounted) {
-              setIsLoading(false)
-            }
-          }, 100)
-        } catch (error) {
-          console.warn('Privy initialization error:', error)
-          if (mounted) {
-            setIsLoading(false)
-          }
-        }
-      }
-      
-      initPrivy()
-      
-      return () => {
-        mounted = false
-      }
-    }
-  }, [])
-
-  return { ...privyState, isClient, isLoading }
+// Import Privy hook with proper error handling
+let usePrivyHook = null
+if (typeof window !== 'undefined') {
+  try {
+    const { usePrivy } = require('@privy-io/react-auth')
+    usePrivyHook = usePrivy
+  } catch (error) {
+    console.warn('Privy not available:', error)
+  }
 }
 
 // Dynamic imports for components that might have SSR issues
-import dynamic from 'next/dynamic'
-
 const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
   ssr: false,
   loading: () => <div className="animate-pulse bg-gray-800 h-10 w-24 rounded"></div>
