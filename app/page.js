@@ -1090,8 +1090,29 @@ export default function Home() {
     
     try {
       console.log('🚀 Triggering Privy login')
-      await login()
-      console.log('✅ Login initiated successfully')
+      
+      // Debug: Check what login function we have
+      console.log('🔍 Login function type:', typeof login)
+      console.log('🔍 Login function:', login.toString().substring(0, 100))
+      
+      // Try multiple approaches to ensure Privy login works
+      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
+        console.log('🎯 Using Privy bridge directly')
+        const bridge = window.__TURFLOOT_PRIVY__
+        console.log('🔍 Bridge login type:', typeof bridge.login)
+        
+        if (typeof bridge.login === 'function') {
+          console.log('✅ Calling Privy bridge login function')
+          await bridge.login()
+        } else {
+          console.log('❌ Bridge login is not a function')
+        }
+      } else {
+        console.log('🎯 Using component login function')
+        await login()
+      }
+      
+      console.log('✅ Login call completed')
     } catch (error) {
       console.error('❌ Login error:', error)
       alert('Authentication unavailable. Please try again.')
