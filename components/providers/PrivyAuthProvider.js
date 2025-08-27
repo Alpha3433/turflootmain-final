@@ -33,9 +33,34 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
         console.log('✅ Privy authentication successful for user:', user.id)
       }}
     >
-      {children}
+      <PrivyBridge>
+        {children}
+      </PrivyBridge>
     </PrivyProvider>
   )
+}
+
+// Bridge component to expose Privy functions globally
+function PrivyBridge({ children }) {
+  const privy = usePrivy()
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Expose Privy functions globally for the main page to access
+      window.__TURFLOOT_PRIVY__ = {
+        login: privy.login,
+        logout: privy.logout,
+        ready: privy.ready,
+        authenticated: privy.authenticated,
+        user: privy.user
+      }
+      
+      console.log('🔗 Privy bridge established - functions exposed globally')
+    }
+  }, [privy])
+  
+  return children
+}
 }
 
 // Error boundary to catch and suppress Privy authentication errors
