@@ -1,98 +1,71 @@
 <analysis>
-This trajectory details the development of TurfLoot, an Agar.io-style game. The previous AI engineer primarily focused on enhancing the mobile UI/UX and expanding game features. Initial critical build errors were resolved, followed by comprehensive mobile customization modal optimization (including landscape support), social modal redesign, and navigation bar consistency. Key backend logic for paid rooms and dynamic player counts was implemented. Later tasks involved fixing a mobile white screen (JS errors) and refining landing page elements like player count display, region selection dropdown, and wallet text. The work culminated in extensive UI/UX improvements across the app, ensuring responsiveness and a modern aesthetic. The trajectory ends with the engineer in the process of implementing real-time server latency for the region selection dropdown.
+This trajectory chronicles the intensive development of TurfLoot, an Agar.io-style game, by a previous AI engineer. The initial focus was on mobile UI/UX enhancements and feature expansion, including fixing critical build errors, optimizing customization and social modals, and refining the navigation bar. Key backend logic for paid rooms and dynamic player counts was implemented. Significant effort was then directed at resolving persistent server-side rendering (SSR) issues, primarily caused by the Privy authentication provider, necessitating dynamic imports and Webpack externalization. Concurrently, the engineer addressed a non-functional real-time ping for region selection, a zero balance display due to missing API endpoints and incorrect Privy token handling, and username update failures caused by a missing backend endpoint. The work concluded with the successful implementation and visibility of a Party Lobby button across desktop and mobile, alongside its backend infrastructure, and confirmation of server-sided username persistence, despite ongoing production infrastructure concerns.
 </analysis>
 
 <product_requirements>
-TurfLoot is an Agar.io-style real-time multiplayer game needing significant mobile optimization and feature expansion. Initial goals included mobile joysticks, action buttons, dynamic minimap, stat/leaderboard panels, and an orientation gate. Key accomplishments included enabling split cells to collect orbs, cleaning mobile in-game UI, adjusting split cell merge timing to 8 seconds, and making mock data popups realistic for paid lobbies (, , 0, 0, 00). The cash-out button was styled gold with a progress ring, and comprehensive backend logic for paid rooms was implemented and integrated into the UI. Mission reward balance updates sync across the navigation bar and customization modal. Recent explicit requests included redesigning the mobile customization screen for better readability and layout, making it work in landscape mode, modernizing the social popup for both mobile (portrait/landscape) and desktop, redesigning the navigation bar for consistency, dynamically updating the Players in Game count based on paid room players, replacing the server browser modal with a compact region selection dropdown, removing 0.0000 SOL • 0.00 USDC text from the wallet box, redesigning the username section and associated buttons, and finally, adding Oceania to the region dropdown with real-time latency.
+TurfLoot, an Agar.io-style game, requires robust mobile optimization and feature expansion. Initial requirements included mobile joysticks, action buttons, dynamic minimap, stats/leaderboard panels, and an orientation gate. Core functionality involved enabling split cells to collect orbs, cleaning mobile in-game UI, adjusting split cell merge timing to 8 seconds, and realistic mock data popups for paid lobbies (-00). A gold cash-out button with progress ring, comprehensive backend for paid rooms, and mission reward balance sync were also required. Recent explicit requests involved:
+1.  Redesigning the mobile customization screen for readability and landscape support.
+2.  Modernizing the social popup for mobile/desktop.
+3.  Redesigning the navigation bar for consistency.
+4.  Dynamically updating Players in Game (paid rooms only).
+5.  Replacing the server browser with a compact region selection dropdown including Oceania with real-time latency.
+6.  Removing 0.0000 SOL • 0.00 USDC from the wallet box.
+7.  Redesigning the username section.
+8.  Fixing account balance (showing 0) and username update errors (404/500).
+9.  Adding a Lobby button next to Profile/Settings in the nav bar, opening a dropdown for inviting friends and joining paid rooms.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Next.js 14 (App Router)**: Full-stack framework.
--   **React State Management**: ,  for UI logic and responsiveness.
--   **Tailwind CSS & shadcn/ui**: For responsive, modern UI styling.
--   **MongoDB**: Database for player data and economy.
--   **Next.js API Routes**: Centralized backend for game logic and stats ().
--   **CSS Modules/In-line Styling**: For specific UI element design.
--   **JavaScript-based Responsiveness**: ,  for orientation detection.
--   ****: For rendering modals outside the main DOM hierarchy.
--   **Webpack Configuration**: For build process and dependency resolution.
+-   **React State Management**: ,  for UI logic.
+-   **Tailwind CSS & shadcn/ui**: For responsive styling.
+-   **MongoDB**: Database.
+-   **Next.js API Routes**: Centralized backend ().
+-   **Privy Authentication**: User authentication.
+-   **Server-Side Rendering (SSR) Management**: Dynamic imports () and Webpack externalization to prevent client-side code execution on the server.
 </key_technical_concepts>
 
 <code_architecture>
 
 
 -   ****:
-    -   **Summary**: Centralized backend API routes.
-    -   **Changes**: Implemented , comprehensive paid room APIs (, , etc.). Modified MongoDB connection. Updated  to count only players in  rooms with .
+    -   **Summary**: Centralized backend API routes for the entire application.
+    -   **Changes**: Implemented  endpoint. Fixed balance calculation in  to correctly parse Privy tokens and create new users with a default 5.00 balance. Added  endpoint to manage and persist user custom names. Implemented various lobby management endpoints (, , , , ). Debugged and corrected the routing logic for new API endpoints.
 
 -   ****:
-    -   **Summary**: Core game component for real-time logic and UI.
-    -   **Changes**: Fixed critical Next.js syntax errors (extra brace at line 2478). Implemented Split mechanic fixes, mobile UI cleanup (removed debug texts, reconfigured action buttons). Enhanced virus/player detection. Adjusted  to 8s. Integrated paid room logic and API calls.
+    -   **Summary**: The main landing page, containing core UI logic and client-side interactions.
+    -   **Changes**: Added Oceania to the region selection dropdown and implemented real-time ping measurement for all regions. Introduced client-side guards for DOM-related operations ( errors). Added  state and rendered the Lobby button in the navigation bar, along with the Party Lobby dropdown UI. Integrated JavaScript functions for lobby creation, joining, and inviting friends. Fixed positioning and visibility issues of the Lobby button for both authenticated/unauthenticated users and desktop/mobile views.
 
 -   ****:
-    -   **Summary**: The main landing page.
-    -   **Changes**: Adjusted mock data for cash-out popups. Enhanced mission reward balance sync. Fixed vertical mobile layout. Updated Players in Game to display only paid room players (text later reverted to Players in Game but logic remained). Redesigned navigation bar icons for consistency. Restored server selection functionality to the nav bar. Implemented a region selection dropdown to replace the full server browser modal. Redesigned the username section and its loading states. Fixed JS  errors by adding null/undefined checks for  and friends data.
+    -   **Summary**: The root layout component for the application.
+    -   **Changes**: Modified to dynamically import  with  to resolve  errors caused by Privy's Lit Elements during server-side rendering.
 
 -   ****:
-    -   **Summary**: Handles player customization.
-    -   **Changes**: Corrected prop usage (). Added visual feedback for balance updates. Underwent significant mobile optimization (responsive design, single-column, larger touch targets, real color previews). Fixed scrolling issues and header spacing. Optimized for landscape mode with adaptive header and dynamic grid layout (JavaScript-based orientation detection).
+    -   **Summary**: Provides Privy authentication context to the application.
+    -   **Changes**: Wrapped the component in a client-side only provider () to ensure Privy-related code executes exclusively on the client, resolving SSR conflicts.
 
 -   ****:
-    -   **Summary**: Provides Privy authentication context.
-    -   **Changes**: Implemented  to suppress non-critical Failed to fetch errors.
+    -   **Summary**: Handles UI adjustments based on device orientation.
+    -   **Changes**: Added client-side guards () to prevent  and  object access during server-side rendering, resolving  errors.
 
 -   ****:
-    -   **Summary**: Local environment variables.
-    -   **Changes**: Corrected duplicate  (not explicitly fixed but noted).
+    -   **Summary**: Likely responsible for in-game lobby functionality (though not directly modified in this trajectory, it was identified as a potential source of SSR issues).
+    -   **Changes**: Added client-side guards () around , , , etc. to resolve  errors.
 
 -   ****:
-    -   **Summary**: Production environment variables.
-    -   **Changes**: Created and updated with production-specific MongoDB URI, JWT secret, and Privy IDs.
-
--   ****:
-    -   **Summary**: Next.js configuration.
-    -   **Changes**: Fixed invalid options, removed deprecated telemetry, corrected output file tracing. Modified webpack config to externalize WalletConnect modules for server-side.
-
--   ****:
-    -   **Summary**: Stub file created during WalletConnect debugging.
-    -   **Changes**: Newly created.
-
--   ****:
-    -   **Summary**: Project dependencies and scripts.
-    -   **Changes**: Optimized build scripts for production, added  handling, memory optimization.
-
--   ****:
-    -   **Summary**: Manages wallet display and actions.
-    -   **Changes**: Removed 0.0000 SOL • 0.00 USDC text from the wallet box for both unlogged and logged-in users to declutter.
-
--   ****:
-    -   **Summary**: Displays user social information and leaderboards.
-    -   **Changes**: Completely redesigned to match the modern, responsive theme of the customization modal. Uses  for modal rendering. Optimized for mobile portrait and landscape, and redesigned desktop view. Integrated modern Lucide React icons.
-
--   ****:
-    -   **Summary**: Handles user settings.
-    -   **Changes**: Completely redesigned to match the modern, responsive theme of the customization modal. Uses , JavaScript-based orientation detection, and professional Lucide React icons with an orange theme. Optimized for mobile portrait/landscape and desktop.
+    -   **Summary**: Next.js project configuration.
+    -   **Changes**: Added Webpack configuration to externalize  and  from server bundles, which was crucial for resolving persistent  SSR errors related to Privy.
 </code_architecture>
 
 <pending_tasks>
--   **Real Blockchain Integration**: Implement full SOL deposits/withdrawals and smart contract interaction for game entry fees. (Backend paid room logic is ready for this, but the on-chain integration itself is pending.)
--   **Production Infrastructure**: Resolve persistent 502 Bad Gateway errors on external URLs at the infrastructure level. (The build issues have been resolved, but the overall infrastructure stability is separate).
--   **Real-time Latency Implementation**: Finish implementing real-time server latency measurement for the region selection dropdown.
+-   **Real Blockchain Integration**: Implement full SOL deposits/withdrawals and smart contract interaction for game entry fees (backend paid room logic is ready).
+-   **Production Infrastructure Stability**: Resolve persistent 500 Internal Server Error (and previously 502 Bad Gateway) on production for username updates and other API calls, which is an infrastructure/Kubernetes routing issue, not a code issue.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was working on enhancing the region selection dropdown on the landing page. The user explicitly requested to:
-1.  Add Oceania to the list of available regions in the dropdown.
-2.  Implement actual real-life latency (ping) measurement for all regions (US-East-1, US-West-1, EU-Central-1, and the newly added Oceania) instead of displaying hardcoded values.
-
-The AI engineer has begun implementing these changes in . So far, the steps taken include:
--   Adding Oceania to the regions array.
--   Initiating the implementation of real ping measurement for all regions.
--   Updating the region selection handler to integrate these real-time ping values.
-
-The current state is that the engineer is in the process of updating the dropdown display to show these real-time ping values and incorporating loading indicators for when the latency is being measured. This work is ongoing, with the last action being an edit to  to modify the dropdown display logic.
+Immediately before this summary request, the AI engineer successfully ensured the Lobby button is visible and functional on both desktop and mobile versions of the TurfLoot application. This involved extensive debugging and refactoring of the frontend navigation in  to correctly position the button. The button is styled appropriately (gray with a lock icon for non-authenticated users, orange for authenticated users) and acts as a gateway to the Party Lobby system. The backend endpoints for lobby creation, joining, and inviting friends were also fully implemented and tested in , although some routing issues were encountered and resolved during the process. The core UI element and its backend support are now complete and visible in the application's navigation bar.
 </current_work>
 
 <optional_next_step>
-Complete updating the region dropdown display to show real-time ping values and loading indicators.
+Verify the full functionality of the Party Lobby dropdown for authenticated users.
 </optional_next_step>
