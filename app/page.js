@@ -2,7 +2,20 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy } from '@privy-io/react-auth'
+// Conditionally import usePrivy only on client side
+let usePrivy
+if (typeof window !== 'undefined') {
+  usePrivy = require('@privy-io/react-auth').usePrivy
+} else {
+  // Mock usePrivy for server-side rendering
+  usePrivy = () => ({
+    login: () => {},
+    ready: false,
+    authenticated: false,
+    user: null,
+    logout: () => {}
+  })
+}
 import WalletManager from '../components/wallet/WalletManager'
 import UserProfile from '../components/UserProfile'
 import UserSettings from '../components/UserSettings'
