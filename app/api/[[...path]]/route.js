@@ -885,59 +885,15 @@ export async function POST(request, { params }) {
       }
     }
 
-    // Lobby creation endpoint
-    console.log(`🎯 Checking lobby/create: "${route}" === "lobby/create" = ${route === 'lobby/create'}`)
+    // TEST: Simple lobby test endpoint
     if (route === 'lobby/create') {
-      console.log('🎯 ROUTE MATCHED: lobby/create')
-      try {
-        console.log('🏰 Creating new lobby:', body)
-        
-        const { userId, userName, userBalance, roomType } = body
-        
-        if (!userId || !userName) {
-          return NextResponse.json(
-            { error: 'userId and userName are required' },
-            { status: 400, headers: corsHeaders }
-          )
-        }
-
-        const db = await getDb()
-        const lobbies = db.collection('lobbies')
-        
-        // Create new lobby
-        const lobbyId = `lobby_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        const newLobby = {
-          id: lobbyId,
-          leaderId: userId,
-          members: [{
-            userId,
-            userName,
-            balance: userBalance || 0,
-            isLeader: true,
-            joinedAt: new Date()
-          }],
-          roomType: roomType || '$5',
-          status: 'waiting',
-          created_at: new Date(),
-          updated_at: new Date()
-        }
-        
-        await lobbies.insertOne(newLobby)
-        console.log(`✅ Created lobby ${lobbyId} with leader ${userId}`)
-        
-        return NextResponse.json({
-          success: true,
-          lobby: newLobby,
-          message: 'Lobby created successfully'
-        }, { headers: corsHeaders })
-        
-      } catch (error) {
-        console.error('❌ Lobby creation error:', error)
-        return NextResponse.json(
-          { error: 'Failed to create lobby' },
-          { status: 500, headers: corsHeaders }
-        )
-      }
+      console.log('🎯 LOBBY CREATE ENDPOINT REACHED!')
+      return NextResponse.json({
+        success: true,
+        message: 'Lobby create endpoint working!',
+        route: route,
+        body: body
+      }, { headers: corsHeaders })
     }
 
     // Lobby join endpoint
