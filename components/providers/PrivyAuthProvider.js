@@ -123,14 +123,9 @@ class PrivyErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">⚠️ Authentication Error</h1>
-            <p className="text-gray-400">Please refresh the page.</p>
-          </div>
-        </div>
-      )
+      // Don't show error UI, just log and continue
+      console.warn('⚠️ Privy error caught by boundary:', this.state.error?.message)
+      return this.props.children // Continue rendering instead of showing error
     }
 
     return this.props.children
