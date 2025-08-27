@@ -1,6 +1,6 @@
 'use client'
 
-import { PrivyProvider } from '@privy-io/react-auth'
+import { PrivyProvider, usePrivy } from '@privy-io/react-auth'
 import { Component, useState, useEffect } from 'react'
 
 // Client-side wrapper to prevent SSR issues with Privy Lit Elements
