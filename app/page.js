@@ -4,9 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
-// Import usePrivy directly but safely
-import { usePrivy } from '@privy-io/react-auth'
-
 // Dynamic imports for components that might have SSR issues
 const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
   ssr: false,
