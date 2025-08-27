@@ -2311,8 +2311,7 @@ export default function Home() {
 
 
 
-                className="w-10 h-10 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center justify-center"
-                title="Lobby & Friends"
+
               >
                 <div className="w-6 h-6 bg-cyan-500/20 rounded-lg flex items-center justify-center border border-cyan-500/30">
                   <svg className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
