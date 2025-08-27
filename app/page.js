@@ -1108,24 +1108,8 @@ export default function Home() {
     
     try {
       console.log('🚀 Triggering Privy login')
-      
-      // Access Privy context directly through the provider
-      if (typeof window !== 'undefined') {
-        // Use dynamic import to access Privy login function
-        const { usePrivy } = await import('@privy-io/react-auth')
-        
-        // Since we can't use hooks here, we'll trigger login through window events
-        // or use the provider context directly
-        
-        // For now, let's create a custom event that the PrivyAuthProvider can listen to
-        const loginEvent = new CustomEvent('triggerPrivyLogin', {
-          detail: { source: 'turfloot-login-button' }
-        })
-        window.dispatchEvent(loginEvent)
-        
-        console.log('✅ Privy login event dispatched')
-      }
-      
+      await login()
+      console.log('✅ Login initiated successfully')
     } catch (error) {
       console.error('❌ Login error:', error)
       alert('Authentication unavailable. Please try again.')
