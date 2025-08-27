@@ -1,81 +1,11 @@
 'use client'
 
-import { useState, useEffect, useContext, createContext } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
-// Create a custom hook to safely use Privy
-const usePrivySafe = () => {
-  const [isClient, setIsClient] = useState(false)
-  const [privyState, setPrivyState] = useState({
-    login: () => console.log('Login not available yet'),
-    ready: false,
-    authenticated: false, 
-    user: null,
-    logout: () => console.log('Logout not available yet')
-  })
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  useEffect(() => {
-    if (isClient && typeof window !== 'undefined') {
-      // Dynamic import to prevent SSR issues
-      const setupPrivy = async () => {
-        try {
-          const { usePrivy } = await import('@privy-io/react-auth')
-          
-          // We can't use hooks conditionally or in useEffect
-          // So we'll set up a bridge through window events
-          const checkPrivyState = () => {
-            try {
-              // Access Privy through the global context if available
-              if (window.__PRIVY_INSTANCE__) {
-                const privyInstance = window.__PRIVY_INSTANCE__
-                setPrivyState({
-                  login: privyInstance.login || (() => console.log('Login method not found')),
-                  ready: privyInstance.ready || true,
-                  authenticated: privyInstance.authenticated || false,
-                  user: privyInstance.user || null,
-                  logout: privyInstance.logout || (() => console.log('Logout method not found'))
-                })
-              } else {
-                // Fallback - enable the UI but log attempts
-                setPrivyState(prev => ({
-                  ...prev,
-                  ready: true,
-                  login: () => {
-                    console.log('🔑 Attempting to trigger Privy login...')
-                    // Create a custom event for the provider to handle
-                    const event = new CustomEvent('turfloot-login', { 
-                      detail: { timestamp: Date.now() } 
-                    })
-                    window.dispatchEvent(event)
-                  }
-                }))
-              }
-            } catch (error) {
-              console.warn('⚠️ Privy state check failed:', error)
-              setPrivyState(prev => ({ ...prev, ready: true }))
-            }
-          }
-
-          // Check Privy state after a brief delay
-          setTimeout(checkPrivyState, 1000)
-          
-        } catch (error) {
-          console.warn('⚠️ Privy setup failed:', error)
-          setPrivyState(prev => ({ ...prev, ready: true }))
-        }
-      }
-
-      setupPrivy()
-    }
-  }, [isClient])
-
-  return { ...privyState, isClient }
-}
+// Import usePrivy directly but safely
+import { usePrivy } from '@privy-io/react-auth'
 
 // Dynamic imports for components that might have SSR issues
 const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
