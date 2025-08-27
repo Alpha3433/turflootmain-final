@@ -1450,17 +1450,17 @@ export default function Home() {
     setPendingGameEntry(null)
   }
 
-  // Temporarily disable loading check to see runtime errors
-  // if (!isClient) {
-  //   return (
-  //     <div className="min-h-screen bg-[#1E1E1E] text-white flex items-center justify-center">
-  //       <div className="text-center">
-  //         <h1 className="text-xl font-bold">TurfLoot</h1>
-  //         <p className="text-sm text-gray-400">Loading...</p>
-  //       </div>
-  //     </div>
-  //   )
-  // }
+  // Show minimal loading state only briefly during hydration
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-[#1E1E1E] text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-xl font-bold">TurfLoot</h1>
+          <p className="text-sm text-gray-400">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen text-white relative flex flex-col bg-black" style={{ background: 'linear-gradient(to bottom right, rgb(0, 0, 0), rgb(17, 24, 39), rgb(0, 0, 0))' }}>
