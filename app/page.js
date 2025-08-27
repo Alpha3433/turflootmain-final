@@ -2127,7 +2127,7 @@ export default function Home() {
             
             {/* Navigation Buttons */}
             <div className="flex items-center space-x-2">
-              {/* Profile Button - Redesigned */}
+              {/* Navigation Buttons - Redesigned to match Party Lobby style */}
               {authenticated && user ? (
                 <div className="flex items-center space-x-2">
                 {/* Profile Button - Blue Theme */}
