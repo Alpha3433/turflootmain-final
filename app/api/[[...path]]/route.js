@@ -671,6 +671,108 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Lobby status endpoint
+    if (route === 'lobby/status') {
+      try {
+        const userId = url.searchParams.get('userId')
+        
+        if (!userId) {
+          return NextResponse.json(
+            { error: 'userId parameter is required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const lobbies = db.collection('lobbies')
+        const invites = db.collection('lobby_invites')
+        
+        // Find active lobby for user
+        const activeLobby = await lobbies.findOne({
+          'members.userId': userId,
+          status: { $in: ['waiting', 'ready'] }
+        })
+        
+        // Find pending invites for user
+        const pendingInvites = await invites.find({
+          toUserId: userId,
+          status: 'pending',
+          expires_at: { $gt: new Date() }
+        }).toArray()
+        
+        return NextResponse.json({
+          currentLobby: activeLobby,
+          pendingInvites,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Lobby status error:', error)
+        return NextResponse.json(
+          { error: 'Failed to get lobby status' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
+    // Lobby room validation endpoint
+    if (route === 'lobby/validate-room') {
+      try {
+        const roomType = url.searchParams.get('roomType')
+        const memberIds = url.searchParams.get('memberIds')?.split(',') || []
+        
+        if (!roomType || memberIds.length === 0) {
+          return NextResponse.json(
+            { error: 'roomType and memberIds are required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Get room requirements
+        const roomFees = {
+          '$1': 1,
+          '$5': 5, 
+          '$20': 20,
+          '$50': 50
+        }
+        
+        const requiredFee = roomFees[roomType] || 5
+        
+        // Check all members' balances
+        const members = await users.find({
+          $or: memberIds.map(id => ({ $or: [{ id }, { privy_id: id }] }))
+        }).toArray()
+        
+        const memberValidation = members.map(member => ({
+          userId: member.id || member.privy_id,
+          username: member.custom_name || member.username || 'Anonymous',
+          balance: member.balance || 0,
+          canAfford: (member.balance || 0) >= requiredFee,
+          requiredFee
+        }))
+        
+        const allCanAfford = memberValidation.every(m => m.canAfford)
+        
+        return NextResponse.json({
+          roomType,
+          requiredFee,
+          members: memberValidation,
+          canProceed: allCanAfford,
+          insufficientFunds: memberValidation.filter(m => !m.canAfford)
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Room validation error:', error)
+        return NextResponse.json(
+          { error: 'Failed to validate room requirements' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     // Friends list endpoint
     if (route === 'friends/list') {
       try {
