@@ -2203,18 +2203,26 @@ export default function Home() {
                   </div>
                 </button>
                 
-                {/* Logout Button - Redesigned */}
+                {/* Logout Button - Red Theme */}
                 <button 
                   onClick={handleLogout}
-                  className="px-4 py-2 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center space-x-2"
+                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-red-600/90 to-red-700/90 backdrop-blur-sm border border-red-500/60 rounded-xl shadow-lg hover:from-red-500/90 hover:to-red-600/90 transition-all duration-200 group cursor-pointer"
                   title="Logout"
                 >
-                  <div className="w-5 h-5 bg-red-500/20 rounded-lg flex items-center justify-center border border-red-500/30">
-                    <svg className="w-3 h-3 text-red-400 group-hover:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-red-500/20 border-red-500/30 group-hover:bg-red-500/30 transition-all duration-200">
+                    <svg className="w-4 h-4 text-red-400 group-hover:text-red-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                   </div>
-                  <span className="text-white text-sm font-medium hidden sm:inline">Logout</span>
+                  
+                  <div className="flex flex-col">
+                    <span className="font-medium text-xs leading-none text-red-400 group-hover:text-red-300 transition-colors duration-200">
+                      Logout
+                    </span>
+                    <span className="text-gray-400 text-xs leading-none">
+                      Exit
+                    </span>
+                  </div>
                 </button>
                 </div>
               ) : (
