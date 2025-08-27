@@ -474,6 +474,42 @@ export default function Home() {
   const { login, ready, authenticated, user, logout, isClient, isLoading } = usePrivySafe()
   const router = useRouter()
 
+  // State declarations - moved to top to prevent hoisting issues
+  const [showRegionDropdown, setShowRegionDropdown] = useState(false)
+  const [showLobby, setShowLobby] = useState(false)
+  const [currentLobby, setCurrentLobby] = useState(null)
+  const [lobbyInvites, setLobbyInvites] = useState([])
+  
+  // Other state declarations
+  const [selectedRegion, setSelectedRegion] = useState('US East')
+  const [pings, setPings] = useState({})
+  const [gameMode, setGameMode] = useState('Practice with Bots')
+  const [showCustomization, setShowCustomization] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showServerBrowser, setShowServerBrowser] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [orientation, setOrientation] = useState('landscape')
+  const [showStats, setShowStats] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
+  const [showSocial, setSocialModal] = useState(false)
+  const [isInGame, setIsInGame] = useState(false)
+  const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
+  const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
+  const [forceMobileMode, setForceMobileMode] = useState(false)
+  const [leaderboardData, setLeaderboardData] = useState([])
+  const [playerCustomization, setPlayerCustomization] = useState({
+    skin: 'default_blue'
+  })
+  const [userBalance, setUserBalance] = useState(0) // Start at 0 for new accounts
+  const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
+  const [socialInitialTab, setSocialInitialTab] = useState('leaderboard')
+  const [friendsList, setFriendsList] = useState([])
+  const [lobbyMembers, setLobbyMembers] = useState([])
+  const [loadingFriends, setLoadingFriends] = useState(false)
+  const [cashOutNotifications, setCashOutNotifications] = useState([])
+  const [globalWinningsPulse, setGlobalWinningsPulse] = useState(false)
+
   // Debug Privy state
   useEffect(() => {
     console.log('🔍 Privy Debug Info:', {
