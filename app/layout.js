@@ -9,8 +9,6 @@ const PrivyAuthProvider = dynamic(
   { ssr: false }
 )
 
-export const dynamic = 'force-dynamic'
-
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 
