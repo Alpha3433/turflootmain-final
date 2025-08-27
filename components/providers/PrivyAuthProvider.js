@@ -29,9 +29,8 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
     <PrivyProvider
       appId={appId}
       config={config}
-      onSuccess={(user) => {
-        console.log('✅ Privy authentication successful for user:', user.id)
-      }}
+      onSuccess={handleSuccess}
+      onError={handleError}
     >
       <PrivyBridge>
         {children}
