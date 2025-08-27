@@ -856,6 +856,8 @@ export async function POST(request, { params }) {
 
     const route = path.join('/')
     console.log(`🔍 POST Route requested: ${route}`)
+    console.log(`🔍 POST Route path array:`, path)
+    console.log(`🔍 POST Route checking lobby/create: ${route === 'lobby/create'}`)
 
     // User stats update route
     if (route === 'users/stats/update') {
