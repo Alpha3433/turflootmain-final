@@ -2082,8 +2082,8 @@ export default function Home() {
               </button>
               
               {/* Profile Button - Redesigned */}
-              {authenticated && user && (
-                <>
+              {authenticated && user ? (
+                <div className="flex items-center space-x-2">
                 <button 
                   onClick={() => setShowProfile(true)}
                   className="w-10 h-10 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center justify-center"
@@ -2151,9 +2151,8 @@ export default function Home() {
                   </div>
                   <span className="text-white text-sm font-medium hidden sm:inline">Logout</span>
                 </button>
-                </>
-              )}
-            ) : (
+                </div>
+              ) : (
               <div className="flex items-center space-x-2">
                 {/* Lobby Button - Teaser for non-authenticated users */}
                 <button 
