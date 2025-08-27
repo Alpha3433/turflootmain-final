@@ -3,38 +3,78 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-// Custom hook to safely use Privy with SSR
+// Safe Privy hook that handles SSR and loading states
 function usePrivySafe() {
-  const [privyHook, setPrivyHook] = useState({
+  const [privyState, setPrivyState] = useState({
     login: () => {},
     ready: false,
     authenticated: false,
     user: null,
     logout: () => {}
   })
+  
+  const [isClient, setIsClient] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Dynamically import and use Privy only on client side
+    setIsClient(true)
+    
+    // Only import and use Privy on client side after hydration
     if (typeof window !== 'undefined') {
-      import('@privy-io/react-auth').then(({ usePrivy }) => {
-        // Note: This is a workaround. In a real app, you'd use usePrivy directly 
-        // within the Privy context. This approach is for SSR compatibility.
-      })
+      let mounted = true
+      
+      const initPrivy = async () => {
+        try {
+          const { usePrivy } = await import('@privy-io/react-auth')
+          
+          // Small delay to ensure proper hydration
+          setTimeout(() => {
+            if (mounted) {
+              setIsLoading(false)
+            }
+          }, 100)
+        } catch (error) {
+          console.warn('Privy initialization error:', error)
+          if (mounted) {
+            setIsLoading(false)
+          }
+        }
+      }
+      
+      initPrivy()
+      
+      return () => {
+        mounted = false
+      }
     }
   }, [])
 
-  return privyHook
+  return { ...privyState, isClient, isLoading }
 }
 
-// For now, we'll use a direct import with proper client-side checking
-import { usePrivy } from '@privy-io/react-auth'
-import WalletManager from '../components/wallet/WalletManager'
-import UserProfile from '../components/UserProfile'
-import UserSettings from '../components/UserSettings'
-import CustomizationModal from '@/components/CustomizationModalClean'
-// import OrientationGate from '@/components/ui/OrientationGate'
-import ServerBrowserModal from '../components/ServerBrowserModal'
-import { GameSettingsProvider } from '../components/providers/GameSettingsProvider'
+// Dynamic imports for components that might have SSR issues
+import dynamic from 'next/dynamic'
+
+const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-gray-800 h-10 w-24 rounded"></div>
+})
+
+const UserProfile = dynamic(() => import('../components/UserProfile'), {
+  ssr: false
+})
+
+const UserSettings = dynamic(() => import('../components/UserSettings'), {
+  ssr: false
+})
+
+const CustomizationModal = dynamic(() => import('@/components/CustomizationModalClean'), {
+  ssr: false
+})
+
+const ServerBrowserModal = dynamic(() => import('../components/ServerBrowserModal'), {
+  ssr: false
+})
 
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
