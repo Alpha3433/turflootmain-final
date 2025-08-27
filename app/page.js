@@ -2123,74 +2123,7 @@ export default function Home() {
                 )}
               </div>
             )}
-            
-            {/* PARTY LOBBY BUTTON - Added at top level navigation */}
-            <div className="relative">
-              <button 
-                onClick={() => {
-                  console.log('🏰 Desktop Lobby button clicked!')
-                  if (authenticated && user) {
-                    setShowLobby(!showLobby)
-                  } else {
-                    alert('Please log in to use Party Lobby feature and team up with friends!')
-                  }
-                }}
-                className={`flex items-center space-x-2 px-3 py-2 backdrop-blur-sm border rounded-xl shadow-lg transition-all duration-200 group cursor-pointer ${
-                  authenticated && user 
-                    ? 'bg-gradient-to-r from-orange-600/90 to-orange-700/90 border-orange-500/60 hover:from-orange-500/90 hover:to-orange-600/90'
-                    : 'bg-gray-600/50 border-gray-500/50 hover:bg-gray-500/60'
-                }`}
-                title={authenticated && user ? "Party Lobby" : "Party Lobby (Login Required)"}
-              >
-                <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all duration-200 ${
-                  authenticated && user
-                    ? 'bg-orange-500/20 border-orange-500/30 group-hover:bg-orange-500/30'
-                    : 'bg-gray-500/20 border-gray-500/30 group-hover:bg-gray-500/30'
-                }`}>
-                  <svg className={`w-4 h-4 transition-colors duration-200 ${
-                    authenticated && user
-                      ? 'text-orange-400 group-hover:text-orange-300'
-                      : 'text-gray-400 group-hover:text-gray-300'
-                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 515.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 919.288 0M15 7a3 3 0 11-6 0 3 3 0 616 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                
-                <div className="flex flex-col">
-                  <span className={`font-medium text-xs leading-none transition-colors duration-200 ${
-                    authenticated && user
-                      ? 'text-orange-400 group-hover:text-orange-300'
-                      : 'text-gray-400 group-hover:text-gray-300'
-                  }`}>
-                    {authenticated && user ? 'Party' : 'Party'}
-                  </span>
-                  <span className="text-gray-400 text-xs leading-none">
-                    {authenticated && user ? 'Lobby' : 'Login'}
-                  </span>
-                </div>
-                
-                {/* Active lobby indicator - only for authenticated users */}
-                {authenticated && user && currentLobby && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
-                )}
-                
-                {/* Pending invites indicator - only for authenticated users */}
-                {authenticated && user && lobbyInvites.length > 0 && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                    {lobbyInvites.length}
-                  </div>
-                )}
-                
-                {/* Lock icon for non-authenticated users */}
-                {!authenticated && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-800 border border-gray-600 rounded-full flex items-center justify-center">
-                    <svg className="w-2 h-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                )}
-              </button>
-            </div>
+
             
             {/* Navigation Buttons */}
             <div className="flex items-center space-x-2">
