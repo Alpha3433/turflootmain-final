@@ -719,6 +719,7 @@ export async function POST(request, { params }) {
 
     // User profile name update route
     if (route === 'users/profile/update-name') {
+      console.log('🎯 ROUTE MATCHED: users/profile/update-name')
       try {
         console.log('✏️ Updating user profile name:', body)
         
