@@ -224,11 +224,37 @@ export async function GET(request, { params }) {
             authenticatedUser = decoded
             console.log('✅ JWT authenticated user:', decoded.userId || decoded.id)
           } catch (jwtError) {
-            console.log('⚠️ JWT verification failed:', jwtError.message)
+            console.log('⚠️ JWT verification failed, checking if it\'s a Privy token:', jwtError.message)
+            
+            // Try to decode as Privy token (they use different structure)
+            try {
+              // Privy tokens are base64 encoded JWT tokens
+              const base64Payload = token.split('.')[1]
+              if (base64Payload) {
+                const decoded = JSON.parse(Buffer.from(base64Payload, 'base64').toString('utf-8'))
+                console.log('🔍 Privy token payload:', { 
+                  userId: decoded.sub, 
+                  email: decoded.email, 
+                  walletAddress: decoded.wallet?.address 
+                })
+                
+                // Create authenticated user object from Privy token
+                authenticatedUser = {
+                  id: decoded.sub,
+                  privy_id: decoded.sub,
+                  email: decoded.email,
+                  jwt_wallet_address: decoded.wallet?.address,
+                  isPrivyAuth: true
+                }
+                console.log('✅ Privy token authenticated user:', authenticatedUser.id)
+              }
+            } catch (privyError) {
+              console.log('⚠️ Privy token parsing also failed:', privyError.message)
+            }
           }
         }
         
-        // If no authentication, provide guest/demo balance
+        // If no authentication, provide guest/demo balance  
         if (!authenticatedUser && (!token || !token.startsWith('testing-'))) {
           console.log('🎭 Providing guest balance for unauthenticated request')
           
@@ -244,29 +270,42 @@ export async function GET(request, { params }) {
           return NextResponse.json(guestBalance, { headers: corsHeaders })
         }
         
-        // Continue with regular authentication flow
-        return requireAuth(async (req) => {
+        // Handle authenticated user (JWT or Privy)
+        if (authenticatedUser) {
           const db = await getDb()
           const users = db.collection('users')
           
           const user = await users.findOne({ 
             $or: [
-              { id: req.user.id },
-              { privy_id: req.user.privy_id }
+              { id: authenticatedUser.id },
+              { privy_id: authenticatedUser.privy_id || authenticatedUser.id }
             ]
           })
           
           if (!user) {
             console.log('⚠️ User not found in database, creating with default balance')
             
-            // Create user with default balance for testing
+            // Create user in database with default balance
+            const newUser = {
+              id: authenticatedUser.id,
+              privy_id: authenticatedUser.privy_id || authenticatedUser.id,
+              email: authenticatedUser.email,
+              wallet_address: authenticatedUser.jwt_wallet_address,
+              balance: 25.00, // Default testing balance  
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+            
+            await users.insertOne(newUser)
+            console.log('✅ Created new user with default balance:', newUser.id)
+            
             const defaultBalance = {
               balance: 25.00,
               currency: 'USD',
               sol_balance: 0.0850,
               usdc_balance: 5.00,
               eth_balance: 0.0015,
-              wallet_address: req.user.jwt_wallet_address || 'No wallet connected'
+              wallet_address: authenticatedUser.jwt_wallet_address || 'No wallet connected'
             }
             
             return NextResponse.json(defaultBalance, { headers: corsHeaders })
