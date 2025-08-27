@@ -28,9 +28,12 @@ class PartyLobbyTester:
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
+        self.created_lobbies = []
+        self.test_users = []
         
-        print(f"🎯 TurfLoot Party Lobby System Backend Testing")
+        print(f"🚀 COMPREHENSIVE PARTY LOBBY BACKEND ENDPOINTS TESTING - ROUND 2")
         print(f"🔗 Testing API Base URL: {self.api_base}")
+        print(f"⏰ Test started at: {datetime.now().isoformat()}")
         print("=" * 80)
 
     def log_test(self, test_name: str, passed: bool, details: str = "", response_time: float = 0):
