@@ -6,21 +6,32 @@ import { Component, useState, useEffect } from 'react'
 // Client-side wrapper to prevent SSR issues with Privy Lit Elements
 function ClientOnlyPrivyProvider({ children, appId, config }) {
   const [isClient, setIsClient] = useState(false)
+  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
+    // Small delay to ensure proper hydration
+    const timer = setTimeout(() => setIsReady(true), 100)
+    return () => clearTimeout(timer)
   }, [])
 
-  // Render children without Privy wrapper on server-side
-  if (!isClient) {
-    return <div>{children}</div>
+  // Show loading state during hydration to prevent mismatch
+  if (!isClient || !isReady) {
+    return (
+      <div style={{ visibility: 'hidden' }}>
+        {children}
+      </div>
+    )
   }
 
-  // Render with Privy provider on client-side
+  // Render with Privy provider on client-side after hydration
   return (
     <PrivyProvider
       appId={appId}
       config={config}
+      onSuccess={(user) => {
+        console.log('✅ Privy authentication successful for user:', user.id)
+      }}
     >
       {children}
     </PrivyProvider>
