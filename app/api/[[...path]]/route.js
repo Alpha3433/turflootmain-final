@@ -1229,88 +1229,144 @@ export async function POST(request, { params }) {
     // User profile name update route
     if (route === 'users/profile/update-name') {
       console.log('🎯 ROUTE MATCHED: users/profile/update-name')
+      console.log('📥 Request method:', request.method)
+      console.log('📋 Request headers:', JSON.stringify(Object.fromEntries(request.headers.entries())))
+      
       try {
-        console.log('✏️ Updating user profile name:', body)
+        console.log('✏️ Updating user profile name - Body received:', JSON.stringify(body))
         
         const { userId, customName, privyId, email } = body
         
-        if (!userId || customName === undefined || customName === null) {
+        console.log('🔍 Parsed fields:', { 
+          userId: userId ? userId.substring(0, 20) + '...' : 'MISSING',
+          customName, 
+          privyId: privyId ? privyId.substring(0, 20) + '...' : 'N/A',
+          email: email || 'null'
+        })
+        
+        // Enhanced validation
+        if (!userId) {
+          console.error('❌ Missing userId in request')
           return NextResponse.json(
-            { error: 'userId and customName are required' },
+            { error: 'userId is required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        if (customName === undefined || customName === null || customName === '') {
+          console.error('❌ Invalid customName:', customName)
+          return NextResponse.json(
+            { error: 'customName is required and cannot be empty' },
             { status: 400, headers: corsHeaders }
           )
         }
 
         if (typeof customName !== 'string' || customName.length < 1 || customName.length > 20) {
+          console.error('❌ Invalid customName length or type:', typeof customName, customName.length)
           return NextResponse.json(
-            { error: 'Custom name must be between 1 and 20 characters' },
+            { error: 'Custom name must be a string between 1 and 20 characters' },
             { status: 400, headers: corsHeaders }
           )
         }
 
+        console.log('🔗 Attempting to connect to database...')
         const db = await getDb()
+        console.log('✅ Database connection successful')
+        
         const users = db.collection('users')
         
-        // Find user by userId or privyId
-        const existingUser = await users.findOne({
+        // Enhanced user lookup with more flexible matching
+        const userQuery = {
           $or: [
             { id: userId },
             { privy_id: userId },
-            { privy_id: privyId }
-          ]
-        })
+            { privy_id: privyId },
+            { _id: userId }
+          ].filter(Boolean) // Remove null/undefined entries
+        }
+        
+        console.log('🔍 Searching for user with query:', JSON.stringify(userQuery))
+        const existingUser = await users.findOne(userQuery)
+        console.log('👤 User lookup result:', existingUser ? 'FOUND' : 'NOT FOUND')
+        
+        let result;
         
         if (existingUser) {
           // Update existing user's name
-          await users.updateOne(
-            { 
-              $or: [
-                { id: userId },
-                { privy_id: userId },
-                { privy_id: privyId }
-              ]
-            },
+          console.log('🔄 Updating existing user...')
+          result = await users.updateOne(
+            { _id: existingUser._id },
             { 
               $set: { 
                 customName: customName,
                 username: customName, // Also update username field for compatibility
-                updated_at: new Date()
+                displayName: customName, // Additional field for display
+                updated_at: new Date(),
+                last_name_change: new Date()
               }
             }
           )
           
-          console.log(`✅ Updated existing user ${userId} name to: ${customName}`)
+          console.log(`✅ Update operation completed. Modified count: ${result.modifiedCount}`)
+          console.log(`✅ Updated existing user ${userId} name to: "${customName}"`)
         } else {
           // Create new user with the custom name
+          console.log('👤 Creating new user...')
           const newUser = {
             id: userId,
             privy_id: privyId || userId,
-            email: email,
+            email: email || null,
             customName: customName,
             username: customName,
+            displayName: customName,
             balance: 25.00, // Default testing balance
             created_at: new Date(),
-            updated_at: new Date()
+            updated_at: new Date(),
+            last_name_change: new Date()
           }
           
-          await users.insertOne(newUser)
-          console.log(`✅ Created new user ${userId} with name: ${customName}`)
+          result = await users.insertOne(newUser)
+          console.log(`✅ Insert operation completed. Inserted ID: ${result.insertedId}`)
+          console.log(`✅ Created new user ${userId} with name: "${customName}"`)
+        }
+        
+        // Verify the update by fetching the user again
+        const verificationUser = await users.findOne(userQuery)
+        if (verificationUser && verificationUser.customName === customName) {
+          console.log('✅ Name update verified in database')
+        } else {
+          console.error('⚠️ Name update verification failed')
+        }
+        
+        const successResponse = { 
+          success: true,
+          message: 'Name updated successfully',
+          customName: customName,
+          userId: userId,
+          timestamp: new Date().toISOString()
+        }
+        
+        console.log('📤 Sending success response:', JSON.stringify(successResponse))
+        
+        return NextResponse.json(successResponse, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Profile name update error - Full details:')
+        console.error('❌ Error name:', error.name)
+        console.error('❌ Error message:', error.message)
+        console.error('❌ Error stack:', error.stack)
+        
+        // Check for specific error types
+        if (error.name === 'MongoServerError' || error.name === 'MongoNetworkError') {
+          console.error('❌ Database connection error detected')
         }
         
         return NextResponse.json(
           { 
-            success: true,
-            message: 'Name updated successfully',
-            customName: customName,
-            userId: userId
+            error: 'Failed to update profile name',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+            timestamp: new Date().toISOString()
           },
-          { headers: corsHeaders }
-        )
-        
-      } catch (error) {
-        console.error('❌ Profile name update error:', error)
-        return NextResponse.json(
-          { error: 'Failed to update profile name' },
           { status: 500, headers: corsHeaders }
         )
       }
