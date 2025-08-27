@@ -2152,7 +2152,7 @@ export default function Home() {
                   </div>
                 </button>
                 
-                {/* LOBBY BUTTON - Added to main authenticated navigation */}
+                {/* Party Lobby Button - Orange Theme */}
                 <button 
                   onClick={() => {
                     console.log('🏰 Desktop Lobby button clicked!')
