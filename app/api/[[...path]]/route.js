@@ -727,14 +727,14 @@ export async function POST(request, { params }) {
         
         const { userId, customName, privyId, email } = body
         
-        if (!userId || !customName) {
+        if (!userId || customName === undefined || customName === null) {
           return NextResponse.json(
             { error: 'userId and customName are required' },
             { status: 400, headers: corsHeaders }
           )
         }
 
-        if (customName.length < 1 || customName.length > 20) {
+        if (typeof customName !== 'string' || customName.length < 1 || customName.length > 20) {
           return NextResponse.json(
             { error: 'Custom name must be between 1 and 20 characters' },
             { status: 400, headers: corsHeaders }
