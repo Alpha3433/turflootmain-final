@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-TurfLoot Party Lobby System Backend Testing
-Tests all 5 new Party Lobby endpoints with comprehensive scenarios
+Comprehensive Party Lobby Backend Endpoints Testing - ROUND 2
+Tests all 5 Party Lobby endpoints with complete workflow scenarios
 
-Focus Areas:
-1. POST /api/lobby/create - Create a new party lobby
-2. POST /api/lobby/join - Join an existing lobby
-3. POST /api/lobby/invite - Send invite to friend
-4. GET /api/lobby/status - Get user's current lobby status and pending invites
-5. GET /api/lobby/validate-room - Validate if all party members can afford a room
+ALL 5 ENDPOINTS TO TEST:
+1. POST /api/lobby/create - ✅ NEWLY IMPLEMENTED with full functionality
+2. POST /api/lobby/join - ✅ Previously verified as working
+3. POST /api/lobby/invite - ✅ Previously verified as working
+4. GET /api/lobby/status - ✅ Previously verified as working
+5. GET /api/lobby/validate-room - ✅ Previously verified as working
 """
 
 import requests
 import time
 import json
 import sys
+import uuid
 from typing import Dict, List, Tuple
 import os
 from datetime import datetime
