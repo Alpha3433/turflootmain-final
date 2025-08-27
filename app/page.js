@@ -2158,7 +2158,7 @@ export default function Home() {
                     console.log('🏰 Desktop Lobby button clicked!')
                     setShowLobby(!showLobby)
                   }}
-                  className="relative w-10 h-10 bg-gradient-to-br from-orange-600/90 to-orange-700/90 backdrop-blur-sm border border-orange-500/60 rounded-xl shadow-lg hover:from-orange-500/90 hover:to-orange-600/90 transition-all duration-200 group flex items-center justify-center"
+                  className="relative flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-orange-600/90 to-orange-700/90 backdrop-blur-sm border border-orange-500/60 rounded-xl shadow-lg hover:from-orange-500/90 hover:to-orange-600/90 transition-all duration-200 group cursor-pointer"
                   title="Party Lobby"
                 >
                   <div className="text-orange-100 group-hover:text-white transition-colors duration-200">
