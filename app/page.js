@@ -469,49 +469,8 @@ export default function Home() {
   ]
   
   // Get Privy hooks
-  // Safe Privy authentication integration - access through existing provider
-  const [isClient, setIsClient] = useState(false)
-  const [privyAuth, setPrivyAuth] = useState({
-    login: () => console.log('Login not available yet'),
-    ready: false,
-    authenticated: false, 
-    user: null,
-    logout: () => console.log('Logout not available yet')
-  })
-  
-  // Initialize client-side flag
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-  
-  // Access Privy context after hydration
-  useEffect(() => {
-    if (isClient && typeof window !== 'undefined') {
-      // Small delay to ensure Privy provider is ready
-      const timer = setTimeout(async () => {
-        try {
-          // Access Privy through global context or dynamic import
-          const { usePrivy } = await import('@privy-io/react-auth')
-          
-          // This is a workaround - in practice, we'd use the hook directly
-          // For now, we'll set up the hooks to be available for the login function
-          console.log('✅ Privy context accessed successfully')
-          
-          // Update ready state to enable login button
-          setPrivyAuth(prev => ({ ...prev, ready: true }))
-          
-        } catch (error) {
-          console.warn('⚠️ Privy context access failed:', error)
-          // Set ready to true anyway to allow page to function
-          setPrivyAuth(prev => ({ ...prev, ready: true }))
-        }
-      }, 500)
-      
-      return () => clearTimeout(timer)
-    }
-  }, [isClient])
-  
-  const { login, ready, authenticated, user, logout } = privyAuth
+  // Use safe Privy authentication
+  const { login, ready, authenticated, user, logout, isClient } = usePrivySafe()
   const router = useRouter()
 
   // Essential state declarations - moved to top to prevent hoisting issues
