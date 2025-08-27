@@ -396,9 +396,8 @@ export default function Home() {
   ]
   
   // Get Privy hooks
-  // Safe Privy authentication using context access
+  // Use Privy through global bridge for proper authentication
   const [isClient, setIsClient] = useState(false)
-  const [privyReady, setPrivyReady] = useState(false)
   const [privyAuth, setPrivyAuth] = useState({
     login: () => console.log('Login not available yet'),
     ready: false,
@@ -412,102 +411,44 @@ export default function Home() {
     setIsClient(true)
   }, [])
 
-  // Access Privy through React Context after hydration
+  // Access Privy through the global bridge
   useEffect(() => {
     if (isClient && typeof window !== 'undefined') {
-      const initializePrivy = async () => {
-        try {
-          // Wait for Privy provider to be ready
-          await new Promise(resolve => setTimeout(resolve, 1000))
-          
-          // Access Privy through the React context that's already provided
-          // We'll use a more direct approach by accessing the provider
-          
-          // Try to access Privy from the window object or context
-          let privyInstance = null
-          
-          // Check if Privy is available globally
-          if (window.privy) {
-            privyInstance = window.privy
-            console.log('✅ Found Privy on window object')
-          } else if (window.__PRIVY_CLIENT__) {
-            privyInstance = window.__PRIVY_CLIENT__
-            console.log('✅ Found Privy client on window object')
-          } else {
-            // Fallback: Import Privy and setup manual integration
-            const { usePrivy } = await import('@privy-io/react-auth')
-            console.log('✅ Imported Privy module successfully')
-            
-            // Since we can't use hooks in useEffect, we'll create a bridge
-            // Set up a more sophisticated login mechanism
-            setPrivyAuth(prev => ({
-              ...prev,
-              ready: true,
-              login: async () => {
-                console.log('🔑 Triggering manual Privy login integration...')
-                
-                try {
-                  // Try to access the Privy provider directly through DOM
-                  const privyElements = document.querySelectorAll('[data-privy-app-id]')
-                  if (privyElements.length > 0) {
-                    console.log('✅ Found Privy provider elements')
-                    
-                    // Trigger a custom event that the provider can listen to
-                    const loginEvent = new CustomEvent('privy-manual-login', {
-                      detail: { 
-                        source: 'turfloot',
-                        timestamp: Date.now(),
-                        method: 'manual-trigger'
-                      }
-                    })
-                    document.dispatchEvent(loginEvent)
-                    
-                    // Also try window-level event
-                    if (window.dispatchEvent) {
-                      window.dispatchEvent(loginEvent)
-                    }
-                    
-                    console.log('✅ Privy login events dispatched')
-                  } else {
-                    console.log('⚠️ No Privy elements found - using fallback')
-                    alert('Authentication system is initializing. Please try again in a moment.')
-                  }
-                } catch (error) {
-                  console.error('❌ Manual login error:', error)
-                  alert('Login temporarily unavailable. Please refresh and try again.')
-                }
-              }
-            }))
-            
-            return
-          }
-          
-          // If we found a Privy instance, use it
-          if (privyInstance && typeof privyInstance.login === 'function') {
-            setPrivyAuth({
-              login: privyInstance.login.bind(privyInstance),
-              ready: true,
-              authenticated: privyInstance.authenticated || false,
-              user: privyInstance.user || null,
-              logout: privyInstance.logout?.bind(privyInstance) || (() => console.log('Logout not available'))
-            })
-            console.log('✅ Privy instance integrated successfully')
-          }
-          
-        } catch (error) {
-          console.warn('⚠️ Privy initialization error:', error)
-          // Set ready anyway so the page can function
-          setPrivyAuth(prev => ({ 
-            ...prev, 
-            ready: true,
-            login: () => alert('Authentication is currently unavailable. Please refresh the page.')
-          }))
+      const connectToPrivy = () => {
+        // Check for the global Privy bridge
+        if (window.__TURFLOOT_PRIVY__) {
+          const privyBridge = window.__TURFLOOT_PRIVY__
+          setPrivyAuth({
+            login: privyBridge.login,
+            ready: privyBridge.ready || true,
+            authenticated: privyBridge.authenticated || false,
+            user: privyBridge.user || null,
+            logout: privyBridge.logout
+          })
+          console.log('✅ Connected to Privy bridge successfully!')
+          return true
         }
-        
-        setPrivyReady(true)
+        return false
       }
-      
-      initializePrivy()
+
+      // Try to connect immediately
+      if (!connectToPrivy()) {
+        // If not available, poll for it
+        const pollForPrivy = setInterval(() => {
+          if (connectToPrivy()) {
+            clearInterval(pollForPrivy)
+          }
+        }, 500)
+
+        // Stop polling after 10 seconds
+        setTimeout(() => {
+          clearInterval(pollForPrivy)
+          console.warn('⚠️ Privy bridge not found - using fallback')
+          setPrivyAuth(prev => ({ ...prev, ready: true }))
+        }, 10000)
+
+        return () => clearInterval(pollForPrivy)
+      }
     }
   }, [isClient])
 
