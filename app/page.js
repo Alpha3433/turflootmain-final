@@ -445,6 +445,26 @@ export default function Home() {
   const [showRegionDropdown, setShowRegionDropdown] = useState(false)
   const [showLobby, setShowLobby] = useState(false)
 
+  // Close dropdown when clicking outside - moved here after state declarations
+  useEffect(() => {
+    // Only run on client side to avoid SSR issues
+    if (typeof window === 'undefined') {
+      return
+    }
+    
+    const handleClickOutside = (event) => {
+      if (showRegionDropdown && !event.target.closest('.region-dropdown-container')) {
+        setShowRegionDropdown(false)
+      }
+      if (showLobby && !event.target.closest('.lobby-dropdown-container')) {
+        setShowLobby(false)
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showRegionDropdown, showLobby])
+
 
   // Debug Privy state
   useEffect(() => {
