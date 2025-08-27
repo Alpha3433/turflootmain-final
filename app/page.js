@@ -399,8 +399,34 @@ export default function Home() {
   ]
   
   // Get Privy hooks
-  // Use safe Privy authentication
-  const { login, ready, authenticated, user, logout, isClient } = usePrivySafe()
+  // Client-side state for hydration safety
+  const [isClient, setIsClient] = useState(false)
+
+  // Initialize client-side flag
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Use Privy hook safely - only after client hydration
+  let privyData = {
+    login: () => console.log('Login not available yet'),
+    ready: false,
+    authenticated: false, 
+    user: null,
+    logout: () => console.log('Logout not available yet')
+  }
+
+  // Only use Privy hook on client-side after hydration
+  if (isClient) {
+    try {
+      privyData = usePrivy()
+    } catch (error) {
+      console.warn('⚠️ Privy hook error (using fallback):', error)
+      // Continue with default values
+    }
+  }
+
+  const { login, ready, authenticated, user, logout } = privyData
   const router = useRouter()
 
   // Essential state declarations - moved to top to prevent hoisting issues
