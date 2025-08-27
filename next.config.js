@@ -62,15 +62,6 @@ const nextConfig = {
       };
     }
 
-    // Fix Privy SSR issues by excluding @privy-io/react-auth from server bundles
-    if (isServer) {
-      config.externals = [
-        ...(config.externals || []),
-        '@privy-io/react-auth',
-        'lit'
-      ];
-    }
-
     // Handle WebSocket dependencies for production builds
     if (!isServer) {
       config.resolve.fallback = {
