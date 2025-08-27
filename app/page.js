@@ -482,6 +482,9 @@ export default function Home() {
   const [pagesGenerated, setPagesGenerated] = useState(847)
   const [showRegionDropdown, setShowRegionDropdown] = useState(false)
   const [showLobby, setShowLobby] = useState(false)
+  const [currentLobby, setCurrentLobby] = useState(null)
+  const [lobbyInvites, setLobbyInvites] = useState([])
+  const [lobbyMembers, setLobbyMembers] = useState([])
 
   // Close dropdown when clicking outside - moved here after state declarations
   useEffect(() => {
