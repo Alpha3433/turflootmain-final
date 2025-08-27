@@ -1,7 +1,21 @@
 import { Inter, DM_Sans } from 'next/font/google'
 import './globals.css'
-import PrivyAuthProvider from '@/components/providers/PrivyAuthProvider'
+import dynamic from 'next/dynamic'
 import { GameSettingsProvider } from '@/components/providers/GameSettingsProvider'
+
+// Import PrivyAuthProvider dynamically with SSR disabled to fix HTMLElement SSR error
+// while preserving authentication functionality
+const PrivyAuthProvider = dynamic(
+  () => import('@/components/providers/PrivyAuthProvider'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div style={{ visibility: 'hidden' }}>
+        {/* Hidden loading state to prevent layout shift */}
+      </div>
+    )
+  }
+)
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
