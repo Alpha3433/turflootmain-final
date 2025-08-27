@@ -48,14 +48,38 @@ function PrivyBridge({ children }) {
     if (typeof window !== 'undefined') {
       // Expose Privy functions globally for the main page to access
       window.__TURFLOOT_PRIVY__ = {
-        login: privy.login,
-        logout: privy.logout,
+        login: async () => {
+          console.log('🔗 Bridge login called - executing Privy login')
+          try {
+            if (typeof privy.login === 'function') {
+              return await privy.login()
+            } else {
+              console.error('❌ Privy login is not a function:', typeof privy.login)
+              throw new Error('Privy login function not available')
+            }
+          } catch (error) {
+            console.error('❌ Bridge login error:', error)
+            throw error
+          }
+        },
+        logout: async () => {
+          console.log('🔗 Bridge logout called')
+          return await privy.logout()
+        },
         ready: privy.ready,
         authenticated: privy.authenticated,
-        user: privy.user
+        user: privy.user,
+        // Add raw privy object for debugging
+        _rawPrivy: privy
       }
       
       console.log('🔗 Privy bridge established - functions exposed globally')
+      console.log('🔍 Privy state:', {
+        ready: privy.ready,
+        authenticated: privy.authenticated,
+        hasLogin: typeof privy.login === 'function',
+        hasLogout: typeof privy.logout === 'function'
+      })
     }
   }, [privy])
   
