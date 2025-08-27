@@ -61,7 +61,6 @@ function PrivyBridge({ children }) {
   
   return children
 }
-}
 
 // Error boundary to catch and suppress Privy authentication errors
 class PrivyErrorBoundary extends Component {
