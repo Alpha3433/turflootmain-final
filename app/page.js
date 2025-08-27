@@ -203,26 +203,6 @@ export default function Home() {
       .catch(error => console.error(`❌ Failed to update ping for ${regionId}:`, error))
   }
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    // Only run on client side to avoid SSR issues
-    if (typeof window === 'undefined') {
-      return
-    }
-    
-    const handleClickOutside = (event) => {
-      if (showRegionDropdown && !event.target.closest('.region-dropdown-container')) {
-        setShowRegionDropdown(false)
-      }
-      if (showLobby && !event.target.closest('.lobby-dropdown-container')) {
-        setShowLobby(false)
-      }
-    }
-    
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showRegionDropdown, showLobby])
-
   // Lobby management functions
   const createLobby = async (roomType = '$5') => {
     try {
