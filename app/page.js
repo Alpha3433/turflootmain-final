@@ -2012,7 +2012,8 @@ export default function Home() {
                 )}
               </button>
               
-            {authenticated && user ? (
+              {/* Profile Button - Redesigned */}
+              {authenticated && user && (
                 <button 
                   onClick={() => setShowProfile(true)}
                   className="w-10 h-10 bg-gray-800/90 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-lg hover:bg-gray-700/80 transition-all duration-200 group flex items-center justify-center"
