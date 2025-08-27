@@ -2192,6 +2192,7 @@ export default function Home() {
                   {!ready ? 'Loading...' : 'LOGIN'}
                 </span>
               </button>
+              </div>
             )}
 
             {/* Mobile-Only Lobby & Friends Button - Redesigned */}
