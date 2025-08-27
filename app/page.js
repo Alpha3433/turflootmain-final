@@ -2308,7 +2308,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Mobile-Only Lobby & Friends Button - Redesigned */}
+
             {isMobile && (
               <button 
                 onClick={() => setShowMobileLobby(true)}
