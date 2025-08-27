@@ -102,15 +102,9 @@ export default function PrivyAuthProvider({ children }) {
 
   return (
     <PrivyErrorBoundary>
-      <PrivyProvider
-        appId={appId}
-        config={config}
-        onSuccess={(user) => {
-          console.log('✅ Privy authentication successful for user:', user.id)
-        }}
-      >
+      <ClientOnlyPrivyProvider appId={appId} config={config}>
         {children}
-      </PrivyProvider>
+      </ClientOnlyPrivyProvider>
     </PrivyErrorBoundary>
   )
 }
