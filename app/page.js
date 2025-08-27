@@ -1832,10 +1832,6 @@ export default function Home() {
                 </svg>
               </button>
 
-
-
-
-
               {/* Region Dropdown */}
               {showRegionDropdown && (
                 <div className="absolute top-full mt-2 left-0 w-64 bg-gray-800/95 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-2xl z-50 overflow-hidden">
