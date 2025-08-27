@@ -474,6 +474,10 @@ export default function Home() {
   const { login, ready, authenticated, user, logout, isClient, isLoading } = usePrivySafe()
   const router = useRouter()
 
+  // Essential state declarations - moved to top to prevent hoisting issues
+  const [pagesGenerated, setPagesGenerated] = useState(847)
+  const [showRegionDropdown, setShowRegionDropdown] = useState(false)
+  const [showLobby, setShowLobby] = useState(false)
 
 
   // Debug Privy state
