@@ -4,8 +4,13 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
-// Import Privy hook properly
-import { usePrivy } from '@privy-io/react-auth'
+// Use dynamic import for Privy to prevent SSR issues
+const PrivyProvider = dynamic(() => import('@privy-io/react-auth').then(mod => ({ 
+  default: () => {
+    const { usePrivy } = mod
+    return usePrivy
+  }
+})), { ssr: false })
 
 // Dynamic imports for components that might have SSR issues
 const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
