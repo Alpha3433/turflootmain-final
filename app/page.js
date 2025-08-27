@@ -2312,8 +2312,7 @@ export default function Home() {
 
 
 
-              >
-                <div className="w-6 h-6 bg-cyan-500/20 rounded-lg flex items-center justify-center border border-cyan-500/30">
+
                   <svg className="w-3.5 h-3.5 text-cyan-400 group-hover:text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.196-2.121M9 12a4 4 0 100-8 4 4 0 000 8zm8 0a3 3 0 100-6 3 3 0 000 6zm-8 8a6 6 0 016-6h2a6 6 0 016 6v2H9v-2z" />
                   </svg>
