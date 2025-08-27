@@ -427,8 +427,37 @@ export default function Home() {
   ]
   
   // Get Privy hooks
-  // Use safe Privy hook that handles SSR and loading states properly
-  const { login, ready, authenticated, user, logout, isClient, isLoading } = usePrivySafe()
+  // Use Privy hook safely
+  const [isClient, setIsClient] = useState(false)
+  const [privyReady, setPrivyReady] = useState(false)
+  
+  // Default Privy state
+  const [privyState, setPrivyState] = useState({
+    login: () => console.log('Login not available'),
+    ready: false,
+    authenticated: false, 
+    user: null,
+    logout: () => console.log('Logout not available')
+  })
+
+  useEffect(() => {
+    setIsClient(true)
+    if (typeof window !== 'undefined' && usePrivyHook) {
+      setPrivyReady(true)
+    }
+  }, [])
+
+  // Use Privy hook if available, otherwise use default state
+  let privyData = privyState
+  if (isClient && privyReady && usePrivyHook) {
+    try {
+      privyData = usePrivyHook()
+    } catch (error) {
+      console.warn('Privy hook error:', error)
+    }
+  }
+  
+  const { login, ready, authenticated, user, logout } = privyData
   const router = useRouter()
 
   // Essential state declarations - moved to top to prevent hoisting issues
