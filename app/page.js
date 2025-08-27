@@ -369,7 +369,6 @@ export default function Home() {
   const [loadingLeaderboard, setLoadingLeaderboard] = useState(false)
   const [socialInitialTab, setSocialInitialTab] = useState('leaderboard')
   const [friendsList, setFriendsList] = useState([])
-  const [lobbyMembers, setLobbyMembers] = useState([])
   const [loadingFriends, setLoadingFriends] = useState(false)
   
   // Real-time cash-out notifications state
