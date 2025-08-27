@@ -2151,7 +2151,8 @@ export default function Home() {
                   </div>
                   <span className="text-white text-sm font-medium hidden sm:inline">Logout</span>
                 </button>
-              </div>
+                </>
+              )}
             ) : (
               <div className="flex items-center space-x-2">
                 {/* Lobby Button - Teaser for non-authenticated users */}
