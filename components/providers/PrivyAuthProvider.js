@@ -3,6 +3,17 @@
 import { PrivyProvider, usePrivy } from '@privy-io/react-auth'
 import { Component, useState, useEffect } from 'react'
 
+// Simple success handler
+const handleSuccess = (user) => {
+  console.log('✅ Privy authentication successful for user:', user.id)
+}
+
+// Simple error handler
+const handleError = (error) => {
+  console.log('⚠️ Privy authentication error:', error)
+  // Don't throw errors, just log them
+}
+
 // Client-side wrapper to prevent SSR issues with Privy Lit Elements
 function ClientOnlyPrivyProvider({ children, appId, config }) {
   const [isClient, setIsClient] = useState(false)
