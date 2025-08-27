@@ -2211,6 +2211,7 @@ export default function Home() {
             )}
           </div>
         </div>
+      </div>
       </header>
 
       {/* Skill Disclaimer Banner */}
