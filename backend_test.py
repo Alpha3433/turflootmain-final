@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing - Real-time Latency Region Selection Feature
-Testing the backend API endpoints that support the real-time latency region selection feature.
+TurfLoot Party Lobby System Backend Testing
+Tests all 5 new Party Lobby endpoints with comprehensive scenarios
 
 Focus Areas:
-1. GET /api/ping - Basic server latency testing
-2. GET /api/ - Root endpoint response time
-3. GET /api/servers/lobbies - Server browser functionality
-4. Verify all endpoints respond properly and quickly for region selection dropdown
+1. POST /api/lobby/create - Create a new party lobby
+2. POST /api/lobby/join - Join an existing lobby
+3. POST /api/lobby/invite - Send invite to friend
+4. GET /api/lobby/status - Get user's current lobby status and pending invites
+5. GET /api/lobby/validate-room - Validate if all party members can afford a room
 """
 
 import requests
@@ -16,6 +17,7 @@ import json
 import sys
 from typing import Dict, List, Tuple
 import os
+from datetime import datetime
 
 class TurfLootBackendTester:
     def __init__(self):
