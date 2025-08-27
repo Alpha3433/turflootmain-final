@@ -1,13 +1,7 @@
 import { Inter, DM_Sans } from 'next/font/google'
 import './globals.css'
-import dynamic from 'next/dynamic'
+import PrivyAuthProvider from '@/components/providers/PrivyAuthProvider'
 import { GameSettingsProvider } from '@/components/providers/GameSettingsProvider'
-
-// Import PrivyAuthProvider dynamically with SSR disabled to fix HTMLElement SSR error
-const PrivyAuthProvider = dynamic(
-  () => import('@/components/providers/PrivyAuthProvider'),
-  { ssr: false }
-)
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
