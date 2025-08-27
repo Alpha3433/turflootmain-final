@@ -4,16 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
-// Import Privy hook with proper error handling
-let usePrivyHook = null
-if (typeof window !== 'undefined') {
-  try {
-    const { usePrivy } = require('@privy-io/react-auth')
-    usePrivyHook = usePrivy
-  } catch (error) {
-    console.warn('Privy not available:', error)
-  }
-}
+// Import Privy hook properly
+import { usePrivy } from '@privy-io/react-auth'
 
 // Dynamic imports for components that might have SSR issues
 const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
