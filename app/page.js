@@ -2486,32 +2486,32 @@ export default function Home() {
             </div>
 
             {/* CENTER COLUMN - Main Game Area - Mobile: Order First (Top) */}
-            <div className="order-1 lg:order-2 col-span-12 lg:col-span-6 flex flex-col justify-center space-y-4">
+            <div className="order-1 lg:order-2 col-span-12 lg:col-span-6 flex flex-col justify-center space-y-3 lg:space-y-4">
               
-              {/* Live Stats */}
-              <div className="flex justify-center space-x-12">
+              {/* Live Stats - More compact on mobile */}
+              <div className="flex justify-center space-x-8 lg:space-x-12">
                 <div className="text-center">
-                  <div className={`text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
+                  <div className={`text-3xl lg:text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
                     playerCountPulse ? 'pulse-live' : ''
                   }`}>
                     {livePlayerCount}
                   </div>
-                  <div className="text-gray-400 text-sm font-medium">Players in Game</div>
+                  <div className="text-gray-400 text-xs lg:text-sm font-medium">Players in Game</div>
                 </div>
                 <div className="text-center">
-                  <div className={`text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
+                  <div className={`text-3xl lg:text-4xl font-black text-yellow-400 mb-1 transition-all duration-300 ${
                     globalWinningsPulse ? 'pulse-live' : ''
                   }`}>
                     ${globalWinnings.toLocaleString()}
                   </div>
-                  <div className="text-gray-400 text-sm font-medium">Global Player Winnings</div>
+                  <div className="text-gray-400 text-xs lg:text-sm font-medium">Global Player Winnings</div>
                 </div>
               </div>
 
-              {/* User Name Display - Redesigned */}
+              {/* User Name Display - More compact on mobile */}
               <div className="flex justify-center">
-                <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl px-8 py-5 border border-gray-700/50 flex items-center space-x-5 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center text-xl font-bold text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
+                <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl px-6 lg:px-8 py-4 lg:py-5 border border-gray-700/50 flex items-center space-x-4 lg:space-x-5 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center text-lg lg:text-xl font-bold text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
                     {(authenticated && user) || isTestUser ? (
                       displayName?.charAt(0)?.toUpperCase() || 
                       user?.google?.name?.charAt(0)?.toUpperCase() || 
