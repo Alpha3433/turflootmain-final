@@ -276,7 +276,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
 
     try {
       const token = await getAccessToken()
-      const response = await fetch('http://localhost:3000/api/friends/notifications/count', {
+      const response = await fetch(getApiUrl('/api/friends/notifications/count'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
