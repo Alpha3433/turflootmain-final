@@ -14,7 +14,7 @@ const UserProfile = dynamic(() => import('../components/UserProfile'), {
   ssr: false
 })
 
-const UserSettings = dynamic(() => import('../components/UserSettings'), {
+const FriendsPanel = dynamic(() => import('@/components/social/FriendsPanel'), {
   ssr: false
 })
 
