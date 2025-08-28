@@ -36,20 +36,13 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
 
   const fetchFriends = async () => {
     try {
-      const token = await getAccessToken()
-      const response = await fetch(`/api/friends/list?userId=${user.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setAllFriends(data.friends || [])
-      }
+      // Load friends from localStorage
+      const localFriends = JSON.parse(localStorage.getItem('turfloot_friends') || '[]')
+      console.log('👥 Loaded', localFriends.length, 'friends from localStorage')
+      setAllFriends(localFriends)
     } catch (error) {
-      console.error('❌ Error fetching friends:', error)
+      console.error('❌ Error fetching friends from localStorage:', error)
+      setAllFriends([])
     }
   }
 
