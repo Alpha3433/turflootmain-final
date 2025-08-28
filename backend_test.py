@@ -703,6 +703,300 @@ class FriendRequestNotificationTester:
             except Exception as e:
                 self.log_test(f"Missing Parameters ({endpoint})", False, f"Exception: {str(e)}")
 
+    def test_enhanced_validation_friends_auth(self):
+        """Test Friends Authentication Workflow Enhanced Validation - Target: 100%"""
+        print("\n🔐 TESTING FRIENDS AUTHENTICATION WORKFLOW ENHANCED VALIDATION")
+        print("=" * 70)
+        
+        # Test 1: Basic Authentication Edge Cases
+        test_users = [
+            "did:privy:enhanced_auth_user_1",
+            "did:privy:enhanced_auth_user_2", 
+            "did:privy:enhanced_auth_user_3",
+            "did:privy:enhanced_auth_user_4"
+        ]
+        
+        # Create test users via profile update
+        for i, user_id in enumerate(test_users):
+            try:
+                start_time = time.time()
+                response = requests.post(
+                    f"{API_BASE}/users/profile/update-name",
+                    json={
+                        "userId": user_id,
+                        "customName": f"EnhancedAuthUser{i+1}",
+                        "privyId": user_id
+                    },
+                    headers={'Content-Type': 'application/json'},
+                    timeout=10
+                )
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    self.log_test(f"Enhanced Auth User Creation {i+1}", True, f"User {user_id[:20]}... created", response_time)
+                else:
+                    self.log_test(f"Enhanced Auth User Creation {i+1}", False, f"Failed to create user: {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"Enhanced Auth User Creation {i+1}", False, f"Exception: {str(e)}")
+        
+        # Test 2: Authentication Edge Cases - Invalid User IDs
+        invalid_user_ids = [
+            "",  # Empty string
+            "user@#$%^&*()",  # Special characters
+            "a" * 1000,  # Extremely long ID
+            "did:privy:nonexistent_user_12345"  # Non-existent user
+        ]
+        
+        for i, invalid_id in enumerate(invalid_user_ids):
+            try:
+                start_time = time.time()
+                response = requests.get(f"{API_BASE}/users/profile?userId={invalid_id}", timeout=10)
+                response_time = time.time() - start_time
+                
+                if invalid_id == "":
+                    # Empty string should return 400
+                    if response.status_code == 400:
+                        self.log_test(f"Enhanced Auth Edge Case {i+1} (Empty ID)", True, "Correctly rejected empty user ID", response_time)
+                    else:
+                        self.log_test(f"Enhanced Auth Edge Case {i+1} (Empty ID)", False, f"Should reject empty ID with 400, got {response.status_code}", response_time)
+                elif len(invalid_id) > 500:
+                    # Very long ID should be handled gracefully
+                    if response.status_code in [400, 404]:
+                        self.log_test(f"Enhanced Auth Edge Case {i+1} (Long ID)", True, f"Long ID handled gracefully: {response.status_code}", response_time)
+                    else:
+                        self.log_test(f"Enhanced Auth Edge Case {i+1} (Long ID)", False, f"Long ID not handled properly: {response.status_code}", response_time)
+                else:
+                    # Other invalid IDs should return 404 or 400
+                    if response.status_code in [400, 404]:
+                        self.log_test(f"Enhanced Auth Edge Case {i+1} (Invalid ID)", True, f"Invalid ID properly rejected: {response.status_code}", response_time)
+                    else:
+                        self.log_test(f"Enhanced Auth Edge Case {i+1} (Invalid ID)", False, f"Invalid ID not properly handled: {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"Enhanced Auth Edge Case {i+1}", False, f"Exception: {str(e)}")
+
+    def test_enhanced_validation_notifications(self):
+        """Test Friend Request Notifications Enhanced Validation - Target: 100%"""
+        print("\n🔔 TESTING FRIEND REQUEST NOTIFICATIONS ENHANCED VALIDATION")
+        print("=" * 70)
+        
+        # Test the 5 specific failing validation cases identified in diagnostic testing
+        
+        # Test 1: Extra fields in request payloads → should return 400 error
+        print("\n📋 Testing Extra Fields Rejection...")
+        extra_field_payloads = [
+            {
+                "fromUserId": "did:privy:test_user_1",
+                "toUserId": "did:privy:test_user_2", 
+                "extraField": "should_be_rejected"
+            },
+            {
+                "fromUserId": "did:privy:test_user_1",
+                "toUserId": "did:privy:test_user_2",
+                "maliciousField": "hack_attempt",
+                "anotherField": "more_data"
+            },
+            {
+                "fromUserId": "did:privy:test_user_1",
+                "toUserId": "did:privy:test_user_2",
+                "fromUserName": "ValidName",
+                "toUserName": "ValidName",
+                "unexpectedField": "reject_me"
+            }
+        ]
+        
+        for i, payload in enumerate(extra_field_payloads):
+            try:
+                start_time = time.time()
+                response = requests.post(f"{API_BASE}/friends/send-request", json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "Invalid request fields detected" in data.get("error", ""):
+                        self.log_test(f"Extra Fields Rejection {i+1}", True, f"Extra fields properly rejected: {data.get('error')}", response_time)
+                    else:
+                        self.log_test(f"Extra Fields Rejection {i+1}", False, f"Wrong error message: {data.get('error')}", response_time)
+                else:
+                    self.log_test(f"Extra Fields Rejection {i+1}", False, f"Should return 400 for extra fields, got {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"Extra Fields Rejection {i+1}", False, f"Exception: {str(e)}")
+        
+        # Test 2: Integer user IDs → should return 400 error
+        print("\n🔢 Testing Integer User ID Rejection...")
+        integer_payloads = [
+            {"fromUserId": 123, "toUserId": "did:privy:test_user_2"},
+            {"fromUserId": "did:privy:test_user_1", "toUserId": 456},
+            {"fromUserId": 789, "toUserId": 101112}
+        ]
+        
+        for i, payload in enumerate(integer_payloads):
+            try:
+                start_time = time.time()
+                response = requests.post(f"{API_BASE}/friends/send-request", json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "must be strings" in data.get("error", ""):
+                        self.log_test(f"Integer User ID Rejection {i+1}", True, f"Integer IDs properly rejected: {data.get('error')}", response_time)
+                    else:
+                        self.log_test(f"Integer User ID Rejection {i+1}", False, f"Wrong error message: {data.get('error')}", response_time)
+                else:
+                    self.log_test(f"Integer User ID Rejection {i+1}", False, f"Should return 400 for integer IDs, got {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"Integer User ID Rejection {i+1}", False, f"Exception: {str(e)}")
+        
+        # Test 3: Array user IDs → should return 400 error
+        print("\n📋 Testing Array User ID Rejection...")
+        array_payloads = [
+            {"fromUserId": ["did:privy:test_user_1"], "toUserId": "did:privy:test_user_2"},
+            {"fromUserId": "did:privy:test_user_1", "toUserId": ["did:privy:test_user_2"]},
+            {"fromUserId": ["user1", "user2"], "toUserId": ["user3", "user4"]}
+        ]
+        
+        for i, payload in enumerate(array_payloads):
+            try:
+                start_time = time.time()
+                response = requests.post(f"{API_BASE}/friends/send-request", json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "must be strings" in data.get("error", ""):
+                        self.log_test(f"Array User ID Rejection {i+1}", True, f"Array IDs properly rejected: {data.get('error')}", response_time)
+                    else:
+                        self.log_test(f"Array User ID Rejection {i+1}", False, f"Wrong error message: {data.get('error')}", response_time)
+                else:
+                    self.log_test(f"Array User ID Rejection {i+1}", False, f"Should return 400 for array IDs, got {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"Array User ID Rejection {i+1}", False, f"Exception: {str(e)}")
+        
+        # Test 4: Object user IDs → should return 400 error
+        print("\n🏗️ Testing Object User ID Rejection...")
+        object_payloads = [
+            {"fromUserId": {"id": "did:privy:test_user_1"}, "toUserId": "did:privy:test_user_2"},
+            {"fromUserId": "did:privy:test_user_1", "toUserId": {"id": "did:privy:test_user_2"}},
+            {"fromUserId": {"user": "test1"}, "toUserId": {"user": "test2"}}
+        ]
+        
+        for i, payload in enumerate(object_payloads):
+            try:
+                start_time = time.time()
+                response = requests.post(f"{API_BASE}/friends/send-request", json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "must be strings" in data.get("error", ""):
+                        self.log_test(f"Object User ID Rejection {i+1}", True, f"Object IDs properly rejected: {data.get('error')}", response_time)
+                    else:
+                        self.log_test(f"Object User ID Rejection {i+1}", False, f"Wrong error message: {data.get('error')}", response_time)
+                else:
+                    self.log_test(f"Object User ID Rejection {i+1}", False, f"Should return 400 for object IDs, got {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"Object User ID Rejection {i+1}", False, f"Exception: {str(e)}")
+        
+        # Test 5: Empty string user IDs → should return 400 error
+        print("\n🚫 Testing Empty String User ID Rejection...")
+        empty_string_payloads = [
+            {"fromUserId": "", "toUserId": "did:privy:test_user_2"},
+            {"fromUserId": "did:privy:test_user_1", "toUserId": ""},
+            {"fromUserId": "   ", "toUserId": "did:privy:test_user_2"},  # Whitespace only
+            {"fromUserId": "", "toUserId": ""}
+        ]
+        
+        for i, payload in enumerate(empty_string_payloads):
+            try:
+                start_time = time.time()
+                response = requests.post(f"{API_BASE}/friends/send-request", json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "cannot be empty" in data.get("error", "") or "required" in data.get("error", ""):
+                        self.log_test(f"Empty String User ID Rejection {i+1}", True, f"Empty strings properly rejected: {data.get('error')}", response_time)
+                    else:
+                        self.log_test(f"Empty String User ID Rejection {i+1}", False, f"Wrong error message: {data.get('error')}", response_time)
+                else:
+                    self.log_test(f"Empty String User ID Rejection {i+1}", False, f"Should return 400 for empty strings, got {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"Empty String User ID Rejection {i+1}", False, f"Exception: {str(e)}")
+
+    def test_all_notification_endpoints_validation(self):
+        """Test all 6 notification endpoints with enhanced validation"""
+        print("\n🔔 TESTING ALL NOTIFICATION ENDPOINTS ENHANCED VALIDATION")
+        print("=" * 65)
+        
+        # Test all notification endpoints with the same validation patterns
+        endpoints_to_test = [
+            ("friends/accept-request", {"requestId": "test-request-id", "userId": "did:privy:test_user"}),
+            ("friends/decline-request", {"requestId": "test-request-id", "userId": "did:privy:test_user"}),
+            ("friends/requests/pending", {"userId": "did:privy:test_user"}),
+            ("friends/notifications/count", {"userId": "did:privy:test_user"}),
+            ("friends/notifications/mark-read", {"userId": "did:privy:test_user"})
+        ]
+        
+        for endpoint, base_payload in endpoints_to_test:
+            print(f"\n🔍 Testing {endpoint} validation...")
+            
+            # Test extra fields rejection
+            extra_payload = {**base_payload, "extraField": "should_be_rejected"}
+            try:
+                start_time = time.time()
+                response = requests.post(f"{API_BASE}/{endpoint}", json=extra_payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 400:
+                    data = response.json()
+                    if "Invalid request fields detected" in data.get("error", ""):
+                        self.log_test(f"{endpoint} - Extra Fields", True, "Extra fields properly rejected", response_time)
+                    else:
+                        self.log_test(f"{endpoint} - Extra Fields", False, f"Wrong error message: {data.get('error')}", response_time)
+                else:
+                    self.log_test(f"{endpoint} - Extra Fields", False, f"Should return 400 for extra fields, got {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test(f"{endpoint} - Extra Fields", False, f"Exception: {str(e)}")
+            
+            # Test integer values rejection
+            if "userId" in base_payload:
+                integer_payload = {**base_payload}
+                integer_payload["userId"] = 12345
+                try:
+                    start_time = time.time()
+                    response = requests.post(f"{API_BASE}/{endpoint}", json=integer_payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                    response_time = time.time() - start_time
+                    
+                    if response.status_code == 400:
+                        data = response.json()
+                        if "must be a string" in data.get("error", ""):
+                            self.log_test(f"{endpoint} - Integer UserId", True, "Integer userId properly rejected", response_time)
+                        else:
+                            self.log_test(f"{endpoint} - Integer UserId", False, f"Wrong error message: {data.get('error')}", response_time)
+                    else:
+                        self.log_test(f"{endpoint} - Integer UserId", False, f"Should return 400 for integer userId, got {response.status_code}", response_time)
+                except Exception as e:
+                    self.log_test(f"{endpoint} - Integer UserId", False, f"Exception: {str(e)}")
+            
+            # Test empty string rejection
+            if "userId" in base_payload:
+                empty_payload = {**base_payload}
+                empty_payload["userId"] = ""
+                try:
+                    start_time = time.time()
+                    response = requests.post(f"{API_BASE}/{endpoint}", json=empty_payload, headers={'Content-Type': 'application/json'}, timeout=10)
+                    response_time = time.time() - start_time
+                    
+                    if response.status_code == 400:
+                        data = response.json()
+                        if "cannot be empty" in data.get("error", "") or "required" in data.get("error", ""):
+                            self.log_test(f"{endpoint} - Empty UserId", True, "Empty userId properly rejected", response_time)
+                        else:
+                            self.log_test(f"{endpoint} - Empty UserId", False, f"Wrong error message: {data.get('error')}", response_time)
+                    else:
+                        self.log_test(f"{endpoint} - Empty UserId", False, f"Should return 400 for empty userId, got {response.status_code}", response_time)
+                except Exception as e:
+                    self.log_test(f"{endpoint} - Empty UserId", False, f"Exception: {str(e)}")
+
     def run_comprehensive_tests(self):
         """Run all friend request notification tests"""
         print("🚀 STARTING COMPREHENSIVE FRIEND REQUEST NOTIFICATIONS TESTING")
