@@ -171,10 +171,9 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       
       // ONLY server-side friend request - NO localStorage fallback
       const token = await getAccessToken()
-      // Force absolute localhost URL to bypass any fetch interceptors
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-      const apiUrl = `${baseUrl}/api/friends/send-request`
-      console.log('🔗 DEBUG: Using ABSOLUTE send friend request URL =', apiUrl)
+      // Use relative URL for same-origin requests
+      const apiUrl = `/api/friends/send-request`
+      console.log('🔗 DEBUG: Using relative send friend request URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         method: 'POST',
