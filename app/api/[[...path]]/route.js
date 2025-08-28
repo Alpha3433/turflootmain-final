@@ -1692,11 +1692,35 @@ export async function POST(request, { params }) {
 
     if (route === 'friends/accept-request') {
       try {
-        const { requestId, userId } = body
+        const { requestId, userId, ...extraFields } = body
         
+        // Strict input validation
         if (!requestId || !userId) {
           return NextResponse.json({
             error: 'requestId and userId are required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Validate data types
+        if (typeof requestId !== 'string' || typeof userId !== 'string') {
+          return NextResponse.json({
+            error: 'requestId and userId must be strings',
+            details: `Got requestId: ${typeof requestId}, userId: ${typeof userId}`
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Validate string content
+        if (requestId.trim() === '' || userId.trim() === '') {
+          return NextResponse.json({
+            error: 'requestId and userId cannot be empty strings'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Reject extra fields
+        if (Object.keys(extraFields).length > 0) {
+          return NextResponse.json({
+            error: 'Invalid request fields detected',
+            details: `Unexpected fields: ${Object.keys(extraFields).join(', ')}`
           }, { status: 400, headers: corsHeaders })
         }
 
