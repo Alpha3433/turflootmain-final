@@ -10,6 +10,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
+  const [localUsers, setLocalUsers] = useState([]) // Track locally discovered users
   const [searching, setSearching] = useState(false)
   const [activeTab, setActiveTab] = useState('friends') // 'friends' or 'search'
 
