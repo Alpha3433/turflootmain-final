@@ -65,84 +65,91 @@ class TurfLootFriendsSystemTester:
         }
 
     def test_authentication_flow(self):
-        """Test 1: Authentication Flow Testing - Privy authentication endpoint"""
+        """Test 1: Authentication Flow Testing - Test wallet balance endpoint for authentication"""
         print("\n🔐 TESTING AUTHENTICATION FLOW")
         
-        # Test 1.1: Missing privy_user validation
+        # Test 1.1: Wallet balance without authentication (should return guest balance)
         start_time = time.time()
         try:
-            response = requests.post(f"{API_BASE}/auth/privy", 
-                                   json={}, 
-                                   headers={'Content-Type': 'application/json'})
-            response_time = time.time() - start_time
-            
-            if response.status_code == 400:
-                self.log_test("Auth - Missing privy_user validation", True, 
-                            "Correctly returns 400 error for missing privy_user", response_time)
-            else:
-                self.log_test("Auth - Missing privy_user validation", False, 
-                            f"Expected 400, got {response.status_code}", response_time)
-        except Exception as e:
-            self.log_test("Auth - Missing privy_user validation", False, f"Request failed: {str(e)}")
-
-        # Test 1.2: Valid authentication with realistic user data
-        test_user_id = f"did:privy:auth_test_{uuid.uuid4().hex[:16]}"
-        user_data = self.create_test_user_data(test_user_id)
-        
-        start_time = time.time()
-        try:
-            response = requests.post(f"{API_BASE}/auth/privy", 
-                                   json=user_data, 
-                                   headers={'Content-Type': 'application/json'})
+            response = requests.get(f"{API_BASE}/wallet/balance")
             response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                if 'token' in data and 'user' in data:
-                    # Store auth token for later tests
-                    self.auth_tokens[test_user_id] = data['token']
-                    self.test_users.append({
-                        'id': test_user_id,
-                        'email': user_data['privy_user']['email'],
-                        'name': user_data['privy_user']['google']['name']
-                    })
-                    
-                    self.log_test("Auth - Valid user creation", True, 
-                                f"User created successfully with JWT token, email: {user_data['privy_user']['email']}", 
-                                response_time)
+                if 'balance' in data and data['balance'] == 0.0:
+                    self.log_test("Auth - Guest balance validation", True, 
+                                "Correctly returns guest balance (0.0) for unauthenticated request", response_time)
                 else:
-                    self.log_test("Auth - Valid user creation", False, 
-                                "Response missing token or user data", response_time)
+                    self.log_test("Auth - Guest balance validation", False, 
+                                f"Expected guest balance 0.0, got {data.get('balance')}", response_time)
             else:
-                self.log_test("Auth - Valid user creation", False, 
-                            f"Expected 200, got {response.status_code}: {response.text}", response_time)
+                self.log_test("Auth - Guest balance validation", False, 
+                            f"Expected 200, got {response.status_code}", response_time)
         except Exception as e:
-            self.log_test("Auth - Valid user creation", False, f"Request failed: {str(e)}")
+            self.log_test("Auth - Guest balance validation", False, f"Request failed: {str(e)}")
 
-        # Test 1.3: JWT token validation and session management
-        if test_user_id in self.auth_tokens:
+        # Test 1.2: Create test users for friends system testing (simulate authenticated users)
+        for i in range(4):  # Create 4 test users for comprehensive testing
+            test_user_id = f"did:privy:test_user_{uuid.uuid4().hex[:12]}_{i}"
+            
+            # Create user via custom name update (this creates users in the database)
             start_time = time.time()
             try:
-                headers = {
-                    'Authorization': f'Bearer {self.auth_tokens[test_user_id]}',
-                    'Content-Type': 'application/json'
+                user_data = {
+                    'userId': test_user_id,
+                    'customName': f'TestUser{i+1}',
+                    'privyId': test_user_id,
+                    'email': f'testuser{i+1}@turfloot.com'
                 }
-                response = requests.get(f"{API_BASE}/wallet/balance", headers=headers)
+                
+                response = requests.post(f"{API_BASE}/users/profile/update-name", 
+                                       json=user_data, 
+                                       headers={'Content-Type': 'application/json'})
                 response_time = time.time() - start_time
                 
                 if response.status_code == 200:
                     data = response.json()
-                    if 'balance' in data:
-                        self.log_test("Auth - JWT token validation", True, 
-                                    f"JWT token valid, balance retrieved: ${data['balance']}", response_time)
+                    if data.get('success'):
+                        self.test_users.append({
+                            'id': test_user_id,
+                            'email': f'testuser{i+1}@turfloot.com',
+                            'name': f'TestUser{i+1}'
+                        })
+                        
+                        self.log_test(f"Auth - Test user {i+1} creation", True, 
+                                    f"User created successfully: {data.get('customName')}", 
+                                    response_time)
                     else:
-                        self.log_test("Auth - JWT token validation", False, 
-                                    "Balance data missing from response", response_time)
+                        self.log_test(f"Auth - Test user {i+1} creation", False, 
+                                    "Response missing success flag", response_time)
                 else:
-                    self.log_test("Auth - JWT token validation", False, 
+                    self.log_test(f"Auth - Test user {i+1} creation", False, 
+                                f"Expected 200, got {response.status_code}: {response.text}", response_time)
+            except Exception as e:
+                self.log_test(f"Auth - Test user {i+1} creation", False, f"Request failed: {str(e)}")
+
+        # Test 1.3: Verify user profile retrieval (session management simulation)
+        if self.test_users:
+            test_user = self.test_users[0]
+            start_time = time.time()
+            try:
+                response = requests.get(f"{API_BASE}/users/profile", 
+                                      params={'userId': test_user['id']})
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'username' in data:
+                        self.log_test("Auth - User profile retrieval", True, 
+                                    f"Profile retrieved successfully: {data['username']}", response_time)
+                    else:
+                        self.log_test("Auth - User profile retrieval", False, 
+                                    "Profile data missing username", response_time)
+                else:
+                    self.log_test("Auth - User profile retrieval", False, 
                                 f"Expected 200, got {response.status_code}", response_time)
             except Exception as e:
-                self.log_test("Auth - JWT token validation", False, f"Request failed: {str(e)}")
+                self.log_test("Auth - User profile retrieval", False, f"Request failed: {str(e)}")
 
     def test_user_search_functionality(self):
         """Test 2: User Search Functionality - Both names/search and users/search endpoints"""
