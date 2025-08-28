@@ -511,6 +511,18 @@ backend:
         agent: "testing"
         comment: "✅ CUSTOM NAME CHANGE AND SESSION PERSISTENCE FLOW TESTING COMPLETED - ALL 12 TESTS PASSED (100% SUCCESS RATE). COMPREHENSIVE TESTING OF COMPLETE FLOW TO RESOLVE USER'S ISSUE: 1) ✅ NAME UPDATE API ENDPOINT - POST /api/users/profile/update-name working perfectly with realistic user data (TestUsername, PlayerOne, GamerPro2024), saves to all correct fields (customName, username, displayName), database persistence confirmed, 2) ✅ PROFILE RETRIEVAL API - GET /api/users/profile?userId=X working correctly, returns correct name priority (custom_name > customName > profile.display_name > username), tested with users who updated names, 3) ✅ COMPLETE FLOW TESTING - Step 1: Name update successful (FlowTestUser2024), Step 2: Immediate retrieval correct, Step 3: Session persistence verified after 2-second delay, names persist across session refreshes, 4) ✅ DATABASE FIELD VERIFICATION - Name updates save to multiple database fields for compatibility, field priority handling working correctly, 5) ✅ NAME CONSISTENCY - Multiple profile requests (5 consecutive) return consistent names, no reversion to default detected. CRITICAL RESOLUTION: The user's issue with names reverting to default on session refresh has been RESOLVED. Server-side persistence working correctly, profile retrieval returns updated custom names consistently, names available across session refreshes. Both endpoints work together to provide persistent name changes as required. Root cause was proper server-side persistence and retrieval implementation - now fully operational."
 
+  - task: "Profile Retrieval API for Custom Names (GET /api/users/profile)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ PROFILE RETRIEVAL API TESTING COMPLETED - CRITICAL COMPONENT OF CUSTOM NAME PERSISTENCE FLOW. Comprehensive testing verified: 1) ✅ Endpoint returns correct name priority (custom_name > customName > profile.display_name > username), 2) ✅ Successfully retrieves updated custom names for users who changed their names, 3) ✅ Proper error handling for missing users (404), 4) ✅ Consistent responses across multiple requests, 5) ✅ Session persistence - names don't revert to default after session refresh, 6) ✅ Database field compatibility - works with all name field variations. This endpoint is essential for resolving the user's issue with names reverting to default. The name priority logic ensures custom names are always displayed correctly, and server-side persistence is working perfectly. Ready for production use as part of the complete custom name change flow."
+
   - task: "Wallet Balance API (GET /api/wallet/balance)"
     implemented: true
     working: true
