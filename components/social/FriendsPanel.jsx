@@ -41,55 +41,44 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   }, [user])
 
   const fetchFriends = async () => {
+    if (!authenticated || !user?.id) {
+      console.log('❌ User not authenticated, cannot fetch friends')
+      setAllFriends([])
+      return
+    }
+
     try {
-      // Load user-specific friends from localStorage
-      const userFriendsKey = getUserFriendsKey()
-      const localFriends = JSON.parse(localStorage.getItem(userFriendsKey) || '[]')
-      console.log('👥 Loaded', localFriends.length, 'user-specific friends from localStorage for user:', user?.id)
-      setAllFriends(localFriends)
+      setLoadingFriends(true)
+      console.log('👥 Fetching friends from server for user:', user.id)
       
-      // Also try to load from server-side API if available
-      try {
-        const token = await getAccessToken()
-        // Force absolute localhost URL to bypass any fetch interceptors
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-        const apiUrl = `${baseUrl}/api/friends/list?userId=${user.id}`
-        console.log('🔗 DEBUG: Using ABSOLUTE friends list URL =', apiUrl)
-        
-        const response = await fetch(apiUrl, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
-        
-        if (response.ok) {
-          const serverData = await response.json()
-          const serverFriends = serverData.friends || []
-          console.log('👥 Loaded', serverFriends.length, 'friends from server API')
-          
-          // Merge server friends with local friends (server takes priority)
-          const mergedFriends = [...serverFriends]
-          
-          // Add any local friends not on server (for offline-added friends)
-          for (const localFriend of localFriends) {
-            if (!serverFriends.find(sf => sf.id === localFriend.id)) {
-              mergedFriends.push(localFriend)
-            }
-          }
-          
-          setAllFriends(mergedFriends)
-          
-          // Update localStorage with merged data
-          localStorage.setItem(userFriendsKey, JSON.stringify(mergedFriends))
+      const token = await getAccessToken()
+      // Force absolute localhost URL to bypass any fetch interceptors
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      const apiUrl = `${baseUrl}/api/friends/list?userId=${user.id}`
+      console.log('🔗 DEBUG: Using ABSOLUTE friends list URL =', apiUrl)
+      
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      } catch (serverError) {
-        console.log('⚠️ Server friends API not available, using localStorage only:', serverError.message)
+      })
+      
+      if (response.ok) {
+        const serverData = await response.json()
+        const serverFriends = serverData.friends || []
+        console.log('✅ Server friends API successful:', serverFriends.length, 'friends loaded')
+        setAllFriends(serverFriends)
+      } else {
+        console.error('❌ Server friends API failed:', response.status)
+        setAllFriends([])
       }
       
     } catch (error) {
-      console.error('❌ Error fetching friends:', error)
+      console.error('❌ Error fetching friends from server:', error)
       setAllFriends([])
+    } finally {
+      setLoadingFriends(false)
     }
   }
 
