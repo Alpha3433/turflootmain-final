@@ -994,11 +994,11 @@ export default function Home() {
     try {
       console.log('🔍 Loading user profile for userId:', userId)
       
-      // First try to get user by userId, then by privy ID
-      let response = await fetch(`/api/users/${userId}`)
+      // Use the correct profile endpoint with userId parameter
+      const response = await fetch(`/api/users/profile?userId=${encodeURIComponent(userId)}`)
       
       if (!response.ok) {
-        console.log('🔍 User not found by userId, trying with privy ID')
+        console.log('🔍 User not found, using fallback display name')
         // If not found, use a temporary random-style name until user is created
         setDisplayName('Preparing your turf...')
         return
@@ -1007,19 +1007,26 @@ export default function Home() {
       const userData = await response.json()
       console.log('👤 User profile loaded:', userData)
       
-      // Set display name priority: custom_name > username (random) > fallback to "Player"
-      if (userData.custom_name) {
-        setDisplayName(userData.custom_name)
-      } else if (userData.username && !userData.username.includes('@')) {
+      // The API already prioritizes custom_name > customName > profile.display_name > username
+      // Set display name from the API response
+      if (userData.username) {
         setDisplayName(userData.username)
+        // Also update the customName state for editing
+        setCustomName(userData.username)
       } else {
-        // Final fallback - should rarely be used since API assigns random usernames
+        // Final fallback
         setDisplayName('Player')
+        setCustomName('')
       }
+      
+      // Store the full user profile
+      setUserProfile(userData)
+      
     } catch (error) {
       console.error('❌ Error loading user profile:', error)
-      // Fallback to generic name on error - no more email addresses
+      // Fallback to generic name on error
       setDisplayName('Player')
+      setCustomName('')
     }
   }
 
