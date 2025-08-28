@@ -1083,7 +1083,7 @@ export default function Home() {
 
       // Call Privy authentication endpoint to get JWT token
       console.log('🔑 Calling Privy auth endpoint...')
-      const response = await fetch('/api/auth/privy', {
+      const response = await fetch('http://localhost:3000/api/auth/privy', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
