@@ -909,12 +909,12 @@ export default function Home() {
   useEffect(() => {
     const fetchLiveStats = async () => {
       try {
-        // Fetch live player count, global winnings, leaderboard, and friends
+        // Fetch live statistics with dynamic URLs
         const [playersResponse, winningsResponse, leaderboardResponse, friendsResponse] = await Promise.all([
-          fetch('http://localhost:3000/api/stats/live-players'),
-          fetch('http://localhost:3000/api/stats/global-winnings'),
-          fetch('http://localhost:3000/api/users/leaderboard'),
-          fetch(`http://localhost:3000/api/friends/list?userId=${userProfile?.id || userProfile?.privyId || 'demo-user'}`)
+          fetch(getApiUrl('/api/stats/live-players')),
+          fetch(getApiUrl('/api/stats/global-winnings')),
+          fetch(getApiUrl('/api/users/leaderboard')),
+          fetch(getApiUrl(`/api/friends/list?userId=${userProfile?.id || userProfile?.privyId || 'demo-user'}`))
         ])
 
         if (playersResponse.ok) {
