@@ -1465,32 +1465,59 @@ export async function POST(request, { params }) {
 
     if (route === 'friends/send-request') {
       try {
-        const { fromUserId, toUserId } = body
+        const { fromUserId, toUserId, fromUserName, toUserName } = body
         
         if (!fromUserId || !toUserId) {
           return NextResponse.json({ error: 'fromUserId and toUserId are required' }, { status: 400, headers: corsHeaders })
         }
 
+        // Prevent self-addition
+        if (fromUserId === toUserId) {
+          return NextResponse.json({ 
+            error: 'Cannot add yourself as a friend',
+            details: 'Users cannot send friend requests to themselves'
+          }, { status: 400, headers: corsHeaders })
+        }
+
         const db = await getDb()
         const friends = db.collection('friends')
+
+        // Check if friendship already exists
+        const existingFriendship = await friends.findOne({
+          $or: [
+            { fromUserId, toUserId },
+            { fromUserId: toUserId, toUserId: fromUserId }
+          ]
+        })
+
+        if (existingFriendship) {
+          return NextResponse.json({ 
+            error: 'Friendship already exists',
+            status: existingFriendship.status,
+            details: 'You are already friends with this user or a request is pending'
+          }, { status: 400, headers: corsHeaders })
+        }
 
         const friendRequest = {
           id: crypto.randomUUID(),
           fromUserId,
           toUserId,
-          status: 'accepted', // Auto-accept for demo purposes
+          fromUserName: fromUserName || 'Unknown User',
+          toUserName: toUserName || 'Unknown User',
+          status: 'accepted', // Auto-accept for demo purposes - in production would be 'pending'
           createdAt: new Date(),
           updatedAt: new Date()
         }
 
         await friends.insertOne(friendRequest)
 
-        console.log('✅ Friend request sent successfully')
+        console.log(`✅ Friend request sent from ${fromUserId} to ${toUserId} (auto-accepted)`)
         
         return NextResponse.json({
           success: true,
-          message: 'Friend request sent successfully',
+          message: 'Friend request sent and accepted successfully',
           requestId: friendRequest.id,
+          status: friendRequest.status
         }, { headers: corsHeaders })
       } catch (error) {
         console.error('Error sending friend request:', error)
