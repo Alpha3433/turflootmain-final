@@ -387,7 +387,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
 
     try {
       const token = await getAccessToken()
-      await fetch('/api/friends/notifications/mark-read', {
+      await fetch('http://localhost:3000/api/friends/notifications/mark-read', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
