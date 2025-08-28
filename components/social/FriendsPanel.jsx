@@ -128,12 +128,15 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     setSearching(true)
     
     try {
-      // Force localhost URL to avoid 502 gateway issues with preview deployment
-      console.log('🔍 Searching server API for users:', query, 'excluding user:', user.id)
-      console.log('🌐 DEBUG: Using localhost URL to avoid preview 502 errors')
+      // Dynamic API URL - use localhost for local development, relative URL for preview
+      const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      const baseURL = isLocalDevelopment ? 'http://localhost:3000' : ''
       
-      const apiUrl = `http://localhost:3000/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
-      console.log('🔗 DEBUG: Calling localhost API URL =', apiUrl)
+      console.log('🔍 Searching server API for users:', query, 'excluding user:', user.id)
+      console.log('🌐 DEBUG: Environment detected:', isLocalDevelopment ? 'localhost' : 'preview deployment')
+      
+      const apiUrl = `${baseURL}/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
+      console.log('🔗 DEBUG: Calling API URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
