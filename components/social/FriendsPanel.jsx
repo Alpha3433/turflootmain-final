@@ -232,7 +232,12 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       // Try server-side friend request first
       try {
         const token = await getAccessToken()
-        const response = await fetch('/api/friends/send-request', {
+        // Force absolute localhost URL to bypass any fetch interceptors
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+        const apiUrl = `${baseUrl}/api/friends/send-request`
+        console.log('🔗 DEBUG: Using ABSOLUTE send friend request URL =', apiUrl)
+        
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
