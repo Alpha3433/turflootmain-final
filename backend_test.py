@@ -66,13 +66,22 @@ class FriendsSystemTester:
         """Make HTTP request with error handling"""
         try:
             url = f"{API_BASE}/{endpoint}"
+            print(f"🔗 Making {method} request to: {url}")
+            if data:
+                print(f"📤 Request data: {data}")
+            if params:
+                print(f"📤 Request params: {params}")
             
             if method.upper() == 'GET':
                 response = requests.get(url, params=params, timeout=10)
             elif method.upper() == 'POST':
-                response = requests.post(url, json=data, timeout=10)
+                response = requests.post(url, json=data, headers={'Content-Type': 'application/json'}, timeout=10)
             else:
                 raise ValueError(f"Unsupported method: {method}")
+            
+            print(f"📥 Response status: {response.status_code}")
+            if response.text:
+                print(f"📥 Response body: {response.text[:200]}...")
                 
             return response
         except requests.exceptions.RequestException as e:
