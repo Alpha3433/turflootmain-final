@@ -994,38 +994,75 @@ export default function Home() {
     try {
       console.log('🔍 Loading user profile for userId:', userId)
       
-      // Use the correct profile endpoint with userId parameter
-      const response = await fetch(`/api/users/profile?userId=${encodeURIComponent(userId)}`)
+      // Strategy 1: Check localStorage for saved name first
+      let savedName = null
+      let localUserData = null
       
-      if (!response.ok) {
-        console.log('🔍 User not found, using fallback display name')
-        // If not found, use a temporary random-style name until user is created
-        setDisplayName('Preparing your turf...')
-        return
+      try {
+        const savedUserData = localStorage.getItem(`turfloot_user_${userId}`)
+        if (savedUserData) {
+          localUserData = JSON.parse(savedUserData)
+          savedName = localUserData.customName
+          console.log('💾 Found saved name in localStorage:', savedName)
+        }
+      } catch (error) {
+        console.log('ℹ️ No localStorage data found or invalid data')
       }
       
-      const userData = await response.json()
-      console.log('👤 User profile loaded:', userData)
+      // Strategy 2: Try to load from server API
+      try {
+        const response = await fetch(`/api/users/profile?userId=${encodeURIComponent(userId)}`)
+        
+        if (response.ok) {
+          const userData = await response.json()
+          console.log('👤 User profile loaded from server:', userData)
+          
+          // Use server name if available, otherwise use localStorage name
+          const serverName = userData.username
+          const finalName = serverName || savedName
+          
+          if (finalName) {
+            setDisplayName(finalName)
+            setCustomName(finalName)
+            console.log('✅ Using name:', finalName, serverName ? '(from server)' : '(from localStorage)')
+          } else {
+            setDisplayName('Click to set name')
+            setCustomName('')
+          }
+          
+          // Store the full user profile
+          setUserProfile(userData)
+          return
+        } else {
+          console.log('⚠️ Server profile not found, using localStorage fallback')
+        }
+      } catch (error) {
+        console.error('❌ Error loading profile from server:', error)
+      }
       
-      // The API already prioritizes custom_name > customName > profile.display_name > username
-      // Set display name from the API response
-      if (userData.username) {
-        setDisplayName(userData.username)
-        // Also update the customName state for editing
-        setCustomName(userData.username)
+      // Strategy 3: Use localStorage data if server fails
+      if (savedName) {
+        console.log('💾 Using localStorage saved name:', savedName)
+        setDisplayName(savedName)
+        setCustomName(savedName)
+        
+        // Create a minimal user profile from localStorage
+        setUserProfile({
+          id: userId,
+          username: savedName,
+          created_at: localUserData?.timestamp || new Date().toISOString()
+        })
       } else {
         // Final fallback
-        setDisplayName('Player')
+        console.log('🆕 No saved name found, using default')
+        setDisplayName('Click to set name')
         setCustomName('')
       }
       
-      // Store the full user profile
-      setUserProfile(userData)
-      
     } catch (error) {
-      console.error('❌ Error loading user profile:', error)
-      // Fallback to generic name on error
-      setDisplayName('Player')
+      console.error('❌ Error in loadUserProfile:', error)
+      // Ultimate fallback
+      setDisplayName('Click to set name')
       setCustomName('')
     }
   }
