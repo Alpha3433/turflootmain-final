@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Persistent Name Solution
-Testing the new multi-strategy persistent name solution to ensure it resolves the user's issue.
-
-**Test Objective**: Verify that the multi-strategy persistent name solution works correctly 
-and resolves the issue where names don't persist across sessions.
-
-Focus Areas:
-1. Name Update API Testing (POST /api/users/profile/update-name)
-2. Session Persistence Simulation 
-3. Error Handling Verification
-4. Profile Retrieval Enhancement (GET /api/users/profile)
+Friends System Backend Testing
+Testing the updated friends system backend endpoints for:
+1. User-Specific Friend Lists
+2. Self-Addition Prevention  
+3. Friendship Isolation
+4. Duplicate Prevention
+5. Data Integrity
 """
 
 import requests
@@ -20,11 +16,24 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://party-lobby-dev.preview.emergentagent.com"
-LOCAL_URL = "http://localhost:3000"
+BASE_URL = "http://localhost:3000"  # Using localhost as per instructions
+API_BASE = f"{BASE_URL}/api"
 
-# Use localhost for testing as external URL has 502 issues
-API_BASE = LOCAL_URL + "/api"
+# Test users for isolation testing
+TEST_USERS = {
+    "user1": {
+        "userId": "testUser1",
+        "userName": "TestUser1"
+    },
+    "user2": {
+        "userId": "testUser2", 
+        "userName": "TestUser2"
+    },
+    "user3": {
+        "userId": "testUser3",
+        "userName": "TestUser3"
+    }
+}
 
 def log_test(message, status="INFO"):
     """Log test messages with timestamp"""
