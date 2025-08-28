@@ -838,6 +838,18 @@ backend:
         agent: "testing"
         comment: "✅ PRIORITY API ENDPOINT TESTING COMPLETED - Leaderboard API working perfectly. Returns proper leaderboard array structure with all required fields (rank, username, gamesWon, gamesPlayed, totalTerritory, bestPercent, winRate). Successfully retrieved 10 leaderboard entries with proper data structure. Endpoint responds with 200 status code and includes timestamp field. Data structure matches frontend expectations for leaderboard display functionality."
 
+  - task: "Friends System Send Request API (POST /api/friends/send-request)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FRIENDS SYSTEM SEND REQUEST TESTING COMPLETED - ALL TESTS PASSED (100% SUCCESS RATE). COMPREHENSIVE VERIFICATION: 1) ✅ Friendship Creation - Successfully creates friendships between users with auto-accept status, proper UUID generation, database storage confirmed, 2) ✅ Self-Addition Prevention - Correctly blocks users from adding themselves as friends with proper error message ('Cannot add yourself as a friend'), 3) ✅ Duplicate Prevention - Properly rejects duplicate friendship requests with 'Friendship already exists' error, handles both directions (A->B and B->A), 4) ✅ Parameter Validation - Validates required fields (fromUserId, toUserId) and returns proper 400 errors for missing parameters, 5) ✅ Enhanced Logging - Response includes comprehensive fields (success, requestId, status, message) for debugging, 6) ✅ Database Integration - MongoDB friendship records created correctly with proper structure and timestamps. All friendship creation functionality working correctly with proper validation and error handling."
+
   - task: "Friends API (GET /api/friends/list)"
     implemented: true
     working: true
