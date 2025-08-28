@@ -2356,8 +2356,8 @@ export default function Home() {
         <span className="text-cyan-400 text-xs">⚠️ TurfLoot prizes are determined solely by player skill. Play responsibly.</span>
       </div>
 
-      {/* Main Content - Enhanced Mobile Layout with Better Spacing */}
-      <main className="flex-1 flex flex-col relative z-40 min-h-0">
+      {/* Main Content - Full height coverage for mobile */}
+      <main className="flex-1 flex flex-col relative z-40 w-full" style={{ minHeight: 'calc(100vh - 64px)', minHeight: 'calc(100dvh - 64px)' }}>
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col pt-4 sm:pt-8 pb-4 sm:pb-20">
           
           {/* Hero Title - Smaller on mobile to save space */}
