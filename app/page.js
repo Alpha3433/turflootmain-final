@@ -686,7 +686,7 @@ export default function Home() {
   // Load user's coin balance from database
   const loadUserBalance = async () => {
     try {
-      const response = await fetch('/api/users/balance', {
+      const response = await fetch('http://localhost:3000/api/users/balance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
