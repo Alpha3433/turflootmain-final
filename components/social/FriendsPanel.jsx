@@ -25,10 +25,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const [searching, setSearching] = useState(false)
   const [activeTab, setActiveTab] = useState('friends') // 'friends', 'requests', or 'search'
 
-  // Get user-specific localStorage keys
-  const getUserFriendsKey = () => `turfloot_friends_${user?.id}`
-  const getUserRequestsKey = () => `turfloot_friend_requests_${user?.id}`
-  const getUserSentRequestsKey = () => `turfloot_sent_requests_${user?.id}`
+  // Remove localStorage functions - app is now server-only
 
   useEffect(() => {
     if (user) {
