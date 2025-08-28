@@ -1,95 +1,79 @@
 <analysis>
-The AI engineer's work on TurfLoot involved a multi-faceted approach, balancing frontend UI/UX enhancements with critical backend bug fixes. Initially, efforts focused on refining the Friends system, tackling issues like shared lists and self-addition, which led to significant refactoring, including the temporary use and eventual removal of  for a purely server-side design. Concurrently, extensive mobile layout optimizations were made, addressing excess grey space, element overlaps, character eye spacing, and introducing horizontal navigation cycling. A persistent challenge throughout the trajectory was resolving API connectivity problems, specifically  and  errors, which necessitated repeated adjustments to environment variables and API call strategies (toggling between relative and absolute URLs). The work concluded with these API errors still presenting, with the AI identifying the preview deployment itself as the likely source of the  issues, indicating an external infrastructure problem.
+The trajectory details the AI engineer's efforts to stabilize and enhance the TurfLoot application, primarily tackling persistent  and  errors on the preview deployment. Initial work focused on fixing API routing by adjusting  and then explicitly hardcoding API calls to , which resolved issues locally but broke preview functionality. A dynamic  utility was introduced to adapt URLs based on the environment. Despite these code-level fixes, the  errors persisted on the preview URL, leading to the identification of an underlying Kubernetes ingress configuration issue. The AI engineer attempted Next.js rewrites and middleware, which proved ineffective for the  errors. A significant breakthrough occurred when a new  endpoint, not prefixed with , successfully returned a , confirming that external routing was partially functional. This led to the current strategy: creating new API endpoints outside the problematic  path to bypass the ingress restriction. Concurrently, the AI completed the server-side friends system with authentication and real-time notifications, and name saving, all verified to work at 100% on localhost.
 </analysis>
 
 <product_requirements>
-TurfLoot, an Agar.io-style game, is designed as a multiplayer online platform. Initial features included mobile joysticks, action buttons, a dynamic minimap, stats/leaderboards, and an orientation gate. Core gameplay such as cell splitting, orb collection, merge timers, and mock data for paid lobbies (-00) were requested, alongside backend support for paid rooms, gold cash-out, and mission reward balance sync.
+TurfLoot is an Agar.io-style multiplayer online game. Initial requirements included mobile joysticks, minimap, stats, leaderboards, orientation gate, cell mechanics (splitting, orb collection, merge timers), mock data for paid lobbies (-00), and backend for paid rooms, cash-out, and mission rewards.
 
-The previous AI engineer addressed several explicit requests:
-1.  **Mobile customization screen redesign**: Ongoing.
-2.  **Modernizing social popup**: Ongoing.
-3.  **Navigation bar redesign**: Implemented with region selector, settings, and login, plus new mobile horizontal cycling.
-4.  **Dynamic Players in Game update**: Backend ready, frontend partial.
-5.  **Compact region selection with Oceania & latency**: Implemented.
-6.  **Fix 0 balance display**: Addressed.
-7.  **Username section redesign**: Backend and frontend implemented, but server-side saving was problematic and now relies on a dedicated API and no client-side fallbacks.
-8.  **Fix account balance & username errors**: Balance fixed. Username API was a persistent issue, leading to a bulletproof names API.
-9.  **Add Lobby button**: Implemented, then streamlined. Backend operational.
-10. **Real-time social features**: Friends panel, online status, shared practice mode implemented via Socket.IO.
-11. **Users can add and join games**: Partially implemented via Party Lobby and shared practice server, but friends list needs refinement.
-12. **Fix mobile vertical view (remove grey space)**: Implemented, including background fill and layout optimization.
-13. **Fix mobile spacing (customize/leaderboard)**: Implemented, ensuring consistent spacing.
-14. **Fix mobile preview eye spacing**: Implemented.
-15. **Friends functionality to be purely server-side/online-only**: Implemented, with all  usage removed.
+The previous AI engineer made significant progress:
+- **Mobile customization/social popup/navigation bar redesign**: Navigation bar with region selector, settings, login, and horizontal mobile cycling implemented. Customization and social popups are ongoing.
+- **Dynamic Players in Game update**: Backend ready, frontend partially implemented.
+- **Compact region selection (Oceania & latency)**: Implemented.
+- **Fix 0 balance display**: Addressed.
+- **Username section redesign & errors**: Backend and frontend implemented with a dedicated bulletproof names API, removing client-side fallbacks. Persistent 502 errors on preview were blocking this.
+- **Lobby button**: Implemented and streamlined with operational backend.
+- **Real-time social features**: Friends panel, online status, shared practice mode via Socket.IO, friend request notifications, and server-side-only friends functionality.
+- **Mobile vertical view/spacing/eye spacing fixes**: Implemented.
+
+The primary problem at hand has been the persistent  and  errors on the preview deployment, preventing server-side name changes and friend requests from functioning externally, despite the code being complete and working locally. The current focus is to resolve these external API access issues.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Next.js 14 (App Router)**: Full-stack framework.
--   **React State Management**: , .
+-   **React State Management**: ,  for UI.
 -   **Tailwind CSS & shadcn/ui**: Styling.
--   **MongoDB**: Database.
--   **Next.js API Routes**: Backend endpoints (, ).
--   **Privy Authentication**: User authentication (), SSR management.
--   **Socket.IO**: Real-time communication.
+-   **MongoDB**: Database persistence.
+-   **Next.js API Routes**: Backend endpoints (, , , ).
+-   **Privy Authentication**: User authentication ().
+-   **Socket.IO**: Real-time communication (for game servers, social features).
 -   **Kubernetes/Caddy Proxy**: Production infrastructure.
 -   **Environment Variables**:  for API routing.
+-   **Next.js Middleware/Rewrites**: For request routing.
 </key_technical_concepts>
 
 <code_architecture>
 
 
--   ****:
-    -   **Summary**: Centralized backend API routes for user profiles, wallets, Party Lobby, and social features.
-    -   **Changes**: Enhanced , implemented Party Lobby endpoints, and significantly refined  and  endpoints for user isolation, preventing self-addition, and correctly joining  and  collections.
+-   ****: Centralized API.
+    -   **Changes**: Enhanced friends and lobby endpoints, added input validation. Included debugging for external access.
+-   ****: Dedicated name API.
+    -   **Importance**: Critical for persistent username storage.
 -   ** (NEW)**:
-    -   **Summary**: A dedicated API for name storage, retrieval, and user search, created to bypass persistent production infrastructure issues.
-    -   **Changes**: Created to handle  for name saving and  for name retrieval and search (). Uses MongoDB.
--   ****:
-    -   **Summary**: The main landing page, handling core UI logic and client-side interactions.
-    -   **Changes**: Added Oceania to region selection, implemented mobile horizontal navigation cycling (). Extensive mobile layout refactoring to remove grey space, adjust , optimize UI element spacing (e.g., increased  classes), and correct character eye positioning (, , ). All  fallbacks were removed.
--   ****:
-    -   **Summary**: The root layout component for the application.
-    -   **Changes**: Dynamically imported  with  to resolve SSR errors.
--   ****:
-    -   **Summary**: Global CSS styles for the application.
-    -   **Changes**: Added mobile-specific CSS for better viewport handling (e.g., ) and  utility class for hidden scrollbars in mobile navigation.
--   ****:
-    -   **Summary**: Provides Privy authentication context.
-    -   **Changes**: Wrapped in  for client-side execution. Configured for Google auth.
--   ****:
-    -   **Summary**: Next.js project configuration.
-    -   **Changes**: Added Webpack configuration to externalize Privy dependencies and explicitly exposed .
--   ****:
-    -   **Summary**: Manages game servers and real-time interactions using Socket.IO.
-    -   **Changes**: Enhanced to support global practice rooms, persistent multiplayer servers, and new social feature methods.
+    -   **Summary**: A simple health check endpoint.
+    -   **Changes**: Created to test external routing outside the  prefix. Its success indicated specific  path blocking.
 -   ** (NEW)**:
-    -   **Summary**: Frontend component for friends management, including search and request functionality.
-    -   **Changes**: Initially included  for data persistence, which was later **removed** to enforce a server-only architecture. Integrated  to correctly access  status and  ID. Introduced  state. API calls (search, online status, list, send-request) were toggled between absolute  URLs (to bypass a suspected interceptor) and relative  URLs (to fix ).
+    -   **Summary**: An alternative endpoint for name-related API calls.
+    -   **Changes**: Created as a bypass to the problematic  prefix to ensure name saving works externally.
+-   ****: Main landing page.
+    -   **Changes**: Implemented  utility for dynamic API calls (localhost vs. preview), updated name saving, statistics, and lobby-related API calls to use this utility. Fixed a syntax error in a fetch call.
+-   ****: Friends management UI.
+    -   **Changes**: Implemented  utility, updated all friends, requests, and notification API calls to use dynamic URLs.
+-   ****: Next.js configuration.
+    -   **Changes**: Added webpack configuration to externalize Privy dependencies and exposed . Attempted to add rewrite rules for API routing.
+-   ****: Next.js middleware.
+    -   **Changes**: Enhanced to try and handle API routing, though this didn't resolve the external 502 errors.
+-   ****: Environment configuration.
+    -   **Changes**:  was repeatedly changed and dynamically handled in code.
 -   ** (NEW)**:
-    -   **Summary**: A script to initialize MongoDB with necessary collections.
-    -   **Changes**: Created to ensure database schema consistency during production debugging.
--   ****:
-    -   **Summary**: Environment configuration file.
-    -   **Changes**:  was repeatedly changed between  and  to address API routing issues, finally set to the preview URL.
--   **Documentation Files ()**: Various markdown files created to document debugging processes and solutions.
+    -   **Summary**: Document detailing the Kubernetes ingress configuration issues for the DevOps team.
 </code_architecture>
 
 <pending_tasks>
 -   **Real Blockchain Integration**: Implement full SOL deposits/withdrawals and smart contract interaction for game entry fees.
--   **Production Infrastructure Stability**: Resolve persistent 502/404/ERR_ABORTED errors on the preview deployment for API calls.
--   **Friends List Functionality**:
-    -   Implement friend request notifications.
-    -   Ensure dynamic updates of the friends list UI.
--   **Mobile customization screen redesign**: (Specific screen design not fully detailed or verified).
--   **Modernizing social popup**: (Specific screen design not fully detailed or verified).
+-   **Mobile customization screen redesign**: Ongoing (specific design not fully detailed).
+-   **Modernizing social popup**: Ongoing (specific design not fully detailed).
+-   **Friends List Functionality**: Implement friend request notifications (code complete, blocked by infra).
+-   **Production Infrastructure Stability**: Resolve persistent 502/404/ERR_ABORTED errors on the preview deployment for  calls. This is an infrastructure task, not a code task, but it blocks features.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was addressing persistent  errors affecting the friends functionality and other API calls in the development environment. Despite previous attempts to configure  correctly in  (toggling between  and the preview URL) and implementing debug logs to trace URL resolution, the console logs consistently showed frontend requests correctly forming relative API URLs () but still receiving  responses from .
+Immediately prior to this summary, the AI engineer was attempting to resolve the persistent  errors affecting all API calls on the preview deployment (e.g., ). Despite successfully implementing a dynamic  utility in  and  to intelligently switch between  and relative  URLs based on the environment, the preview deployment continued to return  for these  calls.
 
-This indicates that the frontend is correctly constructing its requests and the environment variable is being picked up, but the issue lies in the accessibility or configuration of the **preview deployment's backend itself**. The previous round of fixes involved eliminating  for a pure server-side architecture (per user request), fixing  error by destructuring  from , and adding a  state variable in . However, these fixes are being overshadowed by the persistent backend connectivity issue with the preview environment. The system's current state is that the friends features are implemented to be server-only, but they cannot function due to the  from the target server.
+This led to the confirmation that the issue is external to the application code, residing within the Kubernetes ingress or gateway configuration. Attempts to add rewrite rules in  and enhance the  to handle API routing also failed to resolve the  errors. A crucial diagnostic step was the creation of a new, non- prefixed health endpoint (), which successfully returned a  from the preview deployment. This breakthrough indicated that external routing *is* possible for some paths, but specifically blocked for paths starting with .
+
+The AI engineer has now started creating new API endpoints, such as , to bypass the problematic  prefix and enable the server-side name change and friend request functionalities on the preview deployment. The internal implementation of server-side name changes, friend requests, and notifications is 100% complete and verified working on . The current focus is on adapting the frontend to use these new bypass endpoints, effectively working around the infrastructure limitation.
 </current_work>
 
 <optional_next_step>
-Check the accessibility and status of the preview environment's API endpoints.
+Test the new names API bypass endpoint () to confirm it resolves the  issue for name-related operations on the preview deployment.
 </optional_next_step>
