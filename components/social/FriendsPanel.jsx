@@ -417,7 +417,17 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
 
             {searchQuery.length < 2 && (
               <div className="text-center text-gray-400 py-4">
-                Type at least 2 characters to search
+                <div className="text-sm mb-3">Type at least 2 characters to search</div>
+                
+                <div className="text-xs bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-2">
+                  <div className="font-semibold text-blue-400 mb-2">💡 Finding Friends Tips:</div>
+                  <div className="text-left space-y-1">
+                    <div>• Search by the exact username they set</div>
+                    <div>• Make sure they've updated their name first</div>
+                    <div>• Try refreshing the page if not found</div>
+                    <div>• Both users need to be on https://turfloot.com/</div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
