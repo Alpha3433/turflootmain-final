@@ -161,6 +161,11 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   }
 
   const sendFriendRequest = async (targetUser) => {
+    if (!authenticated || !user?.id) {
+      alert('Please login to add friends!')
+      return
+    }
+
     try {
       console.log('📤 Sending friend request to:', targetUser)
       
@@ -170,102 +175,44 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
         return
       }
       
-      // Check if already friends using user-specific key
-      const userFriendsKey = getUserFriendsKey()
-      const currentFriends = JSON.parse(localStorage.getItem(userFriendsKey) || '[]')
+      // ONLY server-side friend request - NO localStorage fallback
+      const token = await getAccessToken()
+      // Force absolute localhost URL to bypass any fetch interceptors
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      const apiUrl = `${baseUrl}/api/friends/send-request`
+      console.log('🔗 DEBUG: Using ABSOLUTE send friend request URL =', apiUrl)
       
-      const existingFriend = currentFriends.find(friend => friend.id === targetUser.id)
-      if (existingFriend) {
-        alert(`You are already friends with ${targetUser.username}!`)
-        return
-      }
-      
-      // Try server-side friend request first
-      try {
-        const token = await getAccessToken()
-        // Force absolute localhost URL to bypass any fetch interceptors
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-        const apiUrl = `${baseUrl}/api/friends/send-request`
-        console.log('🔗 DEBUG: Using ABSOLUTE send friend request URL =', apiUrl)
-        
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            fromUserId: user.id,
-            fromUserName: user.email?.split('@')[0] || 'Unknown User',
-            toUserId: targetUser.id,
-            toUserName: targetUser.username
-          })
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fromUserId: user.id,
+          fromUserName: user.email?.split('@')[0] || 'Unknown User',
+          toUserId: targetUser.id,
+          toUserName: targetUser.username
         })
-        
-        if (response.ok) {
-          const serverResult = await response.json()
-          console.log('✅ Server-side friend request successful:', serverResult)
-          
-          // If server request is successful, add to local storage as well
-          const newFriend = {
-            id: targetUser.id,
-            username: targetUser.username,
-            addedAt: new Date().toISOString(),
-            source: 'server_request',
-            status: 'accepted' // Assuming auto-accept for now
-          }
-          
-          currentFriends.push(newFriend)
-          localStorage.setItem(userFriendsKey, JSON.stringify(currentFriends))
-          
-          // Refresh friends list immediately
-          setAllFriends(currentFriends)
-          
-          alert(`✅ Added ${targetUser.username} as a friend!\n\n👥 You can now see them in your friends list.`)
-          
-          // Clear search results and query
-          setSearchQuery('')
-          setSearchResults([])
-          setActiveTab('friends') // Switch to friends tab to show the update
-          
-          return
-        } else {
-          console.warn('⚠️ Server-side friend request failed, falling back to localStorage')
-        }
-      } catch (serverError) {
-        console.warn('⚠️ Server-side friend request error:', serverError.message)
-      }
+      })
       
-      // Fallback: localStorage-based friends system
-      try {
-        console.log('📱 Using localStorage fallback for friend request')
-        
-        const newFriend = {
-          id: targetUser.id,
-          username: targetUser.username,
-          addedAt: new Date().toISOString(),
-          source: targetUser.source || 'search',
-          status: 'accepted' // Auto-accept in localStorage mode
-        }
-        
-        currentFriends.push(newFriend)
-        localStorage.setItem(userFriendsKey, JSON.stringify(currentFriends))
-        
-        console.log('✅ Friend added successfully to user-specific localStorage')
-        
-        // Refresh friends list immediately
-        setAllFriends(currentFriends)
+      if (response.ok) {
+        const serverResult = await response.json()
+        console.log('✅ Server-side friend request successful:', serverResult)
         
         alert(`✅ Added ${targetUser.username} as a friend!\n\n👥 You can now see them in your friends list.`)
+        
+        // Refresh friends list from server
+        await fetchFriends()
         
         // Clear search results and query
         setSearchQuery('')
         setSearchResults([])
         setActiveTab('friends') // Switch to friends tab to show the update
-        
-      } catch (error) {
-        console.error('❌ Error adding friend to localStorage:', error)
-        alert(`Failed to add ${targetUser.username} as friend. Please try again.`)
+      } else {
+        const errorData = await response.json()
+        console.error('❌ Server-side friend request failed:', errorData)
+        alert(`Failed to add ${targetUser.username} as friend: ${errorData.error || 'Unknown error'}`)
       }
       
     } catch (error) {
