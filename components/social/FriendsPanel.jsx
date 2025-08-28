@@ -302,7 +302,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.log('✅ Accepting friend request:', requestId)
       
       const token = await getAccessToken()
-      const response = await fetch('/api/friends/accept-request', {
+      const response = await fetch('http://localhost:3000/api/friends/accept-request', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
