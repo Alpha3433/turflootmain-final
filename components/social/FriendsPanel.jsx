@@ -128,12 +128,12 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     setSearching(true)
     
     try {
-      // Use relative URLs for same-origin requests (Next.js handles routing internally)
+      // Force localhost URL to avoid 502 gateway issues with preview deployment
       console.log('🔍 Searching server API for users:', query, 'excluding user:', user.id)
-      console.log('🌐 DEBUG: Using relative URL for same-origin request')
+      console.log('🌐 DEBUG: Using localhost URL to avoid preview 502 errors')
       
-      const apiUrl = `/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
-      console.log('🔗 DEBUG: Calling relative API URL =', apiUrl)
+      const apiUrl = `http://localhost:3000/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
+      console.log('🔗 DEBUG: Calling localhost API URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
