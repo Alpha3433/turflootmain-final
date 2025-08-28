@@ -84,10 +84,9 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     if (!user?.id) return
     
     try {
-      // Force absolute localhost URL to bypass any fetch interceptors
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-      const apiUrl = `${baseUrl}/api/friends/online-status?userId=${user.id}`
-      console.log('🔗 DEBUG: Using ABSOLUTE online friends URL =', apiUrl)
+      // Use relative URL for same-origin requests
+      const apiUrl = `/api/friends/online-status?userId=${user.id}`
+      console.log('🔗 DEBUG: Using relative online friends URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
