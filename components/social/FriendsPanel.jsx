@@ -33,8 +33,15 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     if (user) {
       fetchFriends()
       fetchOnlineFriends()
-      // Set up periodic refresh for online status
-      const interval = setInterval(fetchOnlineFriends, 10000) // Every 10 seconds
+      fetchPendingRequests() // Fetch pending friend requests
+      fetchNotificationCount() // Fetch notification count
+      
+      // Set up periodic refresh for online status and notifications
+      const interval = setInterval(() => {
+        fetchOnlineFriends()
+        fetchNotificationCount() // Check for new notifications
+      }, 10000) // Every 10 seconds
+      
       return () => clearInterval(interval)
     }
   }, [user])
