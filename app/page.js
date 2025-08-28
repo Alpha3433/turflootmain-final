@@ -2424,18 +2424,18 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Friends */}
-              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 shadow-2xl h-[276px]">
-                <div className="flex items-center justify-between mb-4">
+              {/* Friends - More compact on mobile */}
+              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-3 lg:p-4 shadow-2xl h-[200px] lg:h-[276px]">
+                <div className="flex items-center justify-between mb-3 lg:mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-cyan-400 rounded-lg flex items-center justify-center">
-                      <span className="text-black font-bold text-sm">👥</span>
+                    <div className="w-6 h-6 lg:w-8 lg:h-8 bg-cyan-400 rounded-lg flex items-center justify-center">
+                      <span className="text-black font-bold text-xs lg:text-sm">👥</span>
                     </div>
-                    <h3 className="text-white font-bold text-lg">Friends</h3>
+                    <h3 className="text-white font-bold text-base lg:text-lg">Friends</h3>
                   </div>
-                  <button className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors">⟲ Refresh</button>
+                  <button className="text-cyan-400 text-xs lg:text-sm hover:text-cyan-300 transition-colors">⟲ Refresh</button>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2 lg:space-y-3">
                   {loadingFriends ? (
                     <div className="text-center py-4">
                       <div className="text-xl animate-spin mb-2">⏳</div>
