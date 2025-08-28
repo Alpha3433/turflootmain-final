@@ -108,10 +108,10 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Party Lobby Backend Endpoints Testing (/api/lobby/*)"
-    - "Party Lobby Button Visibility and Authentication"  
-    - "Party Lobby Dropdown Functionality for Authenticated Users"
-    - "Party Lobby System Integration Verification"
+    - "API Connectivity Issue Resolution Testing"
+    - "Localhost vs Preview URL Comparison"
+    - "Friends System Workflow Verification"
+    - "Database Connectivity Confirmation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
