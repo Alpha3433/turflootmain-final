@@ -50,7 +50,462 @@ class TurfLootBackendTester:
             'response_time': response_time,
             'timestamp': datetime.now().isoformat()
         })
+
+    def test_custom_name_update_endpoint(self):
+        """Test POST /api/users/profile/update-name with realistic user data"""
+        log_test("🎯 TESTING CUSTOM NAME UPDATE ENDPOINT", "TEST")
         
+        # Test data - realistic user scenario
+        test_users = [
+            {
+                "userId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
+                "customName": "TestUsername",
+                "privyId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
+                "email": "test@example.com"
+            },
+            {
+                "userId": "did:privy:cmetjchq5012yjr0bgxbe748i", 
+                "customName": "PlayerOne",
+                "privyId": "did:privy:cmetjchq5012yjr0bgxbe748i",
+                "email": None
+            },
+            {
+                "userId": "did:privy:cm123456789abcdef",
+                "customName": "GamerPro2024",
+                "privyId": "did:privy:cm123456789abcdef",
+                "email": "gamer@turfloot.com"
+            }
+        ]
+        
+        for i, user_data in enumerate(test_users, 1):
+            log_test(f"Testing user {i}: {user_data['customName']}")
+            
+            try:
+                start_time = time.time()
+                response = requests.post(
+                    f"{API_BASE}/users/profile/update-name",
+                    json=user_data,
+                    headers={"Content-Type": "application/json"},
+                    timeout=10
+                )
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.log_test(
+                        f"Custom Name Update - User {i}",
+                        True,
+                        f"Successfully updated name to '{data.get('customName')}'",
+                        response_time
+                    )
+                else:
+                    self.log_test(
+                        f"Custom Name Update - User {i}",
+                        False,
+                        f"Failed with status {response.status_code}: {response.text}",
+                        response_time
+                    )
+                    
+            except Exception as e:
+                self.log_test(
+                    f"Custom Name Update - User {i}",
+                    False,
+                    f"Exception occurred: {str(e)}"
+                )
+
+    def test_profile_retrieval_endpoint(self):
+        """Test GET /api/users/profile?userId=X endpoint"""
+        log_test("🎯 TESTING PROFILE RETRIEVAL ENDPOINT", "TEST")
+        
+        # Test users from the update test
+        test_user_ids = [
+            "did:privy:cme20s0fl005okz0bmxcr0cp0",
+            "did:privy:cmetjchq5012yjr0bgxbe748i",
+            "did:privy:cm123456789abcdef"
+        ]
+        
+        for i, user_id in enumerate(test_user_ids, 1):
+            log_test(f"Retrieving profile for user {i}: {user_id[:20]}...")
+            
+            try:
+                start_time = time.time()
+                response = requests.get(
+                    f"{API_BASE}/users/profile",
+                    params={"userId": user_id},
+                    timeout=10
+                )
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    username = data.get('username', 'No username')
+                    self.log_test(
+                        f"Profile Retrieval - User {i}",
+                        True,
+                        f"Successfully retrieved username '{username}'",
+                        response_time
+                    )
+                elif response.status_code == 404:
+                    self.log_test(
+                        f"Profile Retrieval - User {i}",
+                        True,  # 404 is expected for non-existent users
+                        f"User not found (expected for new test users)",
+                        response_time
+                    )
+                else:
+                    self.log_test(
+                        f"Profile Retrieval - User {i}",
+                        False,
+                        f"Failed with status {response.status_code}: {response.text}",
+                        response_time
+                    )
+                    
+            except Exception as e:
+                self.log_test(
+                    f"Profile Retrieval - User {i}",
+                    False,
+                    f"Exception occurred: {str(e)}"
+                )
+
+    def test_complete_flow(self):
+        """Test the complete flow: Update name -> Retrieve profile -> Verify persistence"""
+        log_test("🎯 TESTING COMPLETE CUSTOM NAME FLOW", "TEST")
+        
+        # Test scenario: New user with custom name
+        test_user = {
+            "userId": "did:privy:flow_test_" + str(int(time.time())),
+            "customName": "FlowTestUser2024",
+            "privyId": "did:privy:flow_test_" + str(int(time.time())),
+            "email": "flowtest@turfloot.com"
+        }
+        
+        # Step 1: Update user's name
+        log_test("Step 1: Updating user's custom name...")
+        try:
+            start_time = time.time()
+            update_response = requests.post(
+                f"{API_BASE}/users/profile/update-name",
+                json=test_user,
+                headers={"Content-Type": "application/json"},
+                timeout=10
+            )
+            update_time = time.time() - start_time
+            
+            if update_response.status_code == 200:
+                self.log_test(
+                    "Complete Flow - Step 1 (Name Update)",
+                    True,
+                    "Successfully updated user's custom name",
+                    update_time
+                )
+                
+                # Step 2: Retrieve the user profile immediately
+                log_test("Step 2: Retrieving user profile immediately after update...")
+                try:
+                    start_time = time.time()
+                    profile_response = requests.get(
+                        f"{API_BASE}/users/profile",
+                        params={"userId": test_user["userId"]},
+                        timeout=10
+                    )
+                    profile_time = time.time() - start_time
+                    
+                    if profile_response.status_code == 200:
+                        profile_data = profile_response.json()
+                        retrieved_name = profile_data.get('username', 'No username')
+                        
+                        if retrieved_name == test_user["customName"]:
+                            self.log_test(
+                                "Complete Flow - Step 2 (Immediate Retrieval)",
+                                True,
+                                f"Successfully retrieved correct name '{retrieved_name}'",
+                                profile_time
+                            )
+                            
+                            # Step 3: Wait and retrieve again (simulate session refresh)
+                            log_test("Step 3: Waiting 2 seconds and retrieving again (session simulation)...")
+                            time.sleep(2)
+                            
+                            try:
+                                start_time = time.time()
+                                session_response = requests.get(
+                                    f"{API_BASE}/users/profile",
+                                    params={"userId": test_user["userId"]},
+                                    timeout=10
+                                )
+                                session_time = time.time() - start_time
+                                
+                                if session_response.status_code == 200:
+                                    session_data = session_response.json()
+                                    session_name = session_data.get('username', 'No username')
+                                    
+                                    if session_name == test_user["customName"]:
+                                        self.log_test(
+                                            "Complete Flow - Step 3 (Session Persistence)",
+                                            True,
+                                            f"Name persisted across session '{session_name}'",
+                                            session_time
+                                        )
+                                    else:
+                                        self.log_test(
+                                            "Complete Flow - Step 3 (Session Persistence)",
+                                            False,
+                                            f"Name reverted! Expected '{test_user['customName']}', got '{session_name}'",
+                                            session_time
+                                        )
+                                else:
+                                    self.log_test(
+                                        "Complete Flow - Step 3 (Session Persistence)",
+                                        False,
+                                        f"Session retrieval failed: {session_response.status_code}",
+                                        session_time
+                                    )
+                                    
+                            except Exception as e:
+                                self.log_test(
+                                    "Complete Flow - Step 3 (Session Persistence)",
+                                    False,
+                                    f"Session retrieval exception: {str(e)}"
+                                )
+                        else:
+                            self.log_test(
+                                "Complete Flow - Step 2 (Immediate Retrieval)",
+                                False,
+                                f"Name mismatch! Expected '{test_user['customName']}', got '{retrieved_name}'",
+                                profile_time
+                            )
+                    else:
+                        self.log_test(
+                            "Complete Flow - Step 2 (Immediate Retrieval)",
+                            False,
+                            f"Profile retrieval failed: {profile_response.status_code}",
+                            profile_time
+                        )
+                        
+                except Exception as e:
+                    self.log_test(
+                        "Complete Flow - Step 2 (Immediate Retrieval)",
+                        False,
+                        f"Profile retrieval exception: {str(e)}"
+                    )
+            else:
+                self.log_test(
+                    "Complete Flow - Step 1 (Name Update)",
+                    False,
+                    f"Name update failed: {update_response.status_code} - {update_response.text}",
+                    update_time
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "Complete Flow - Step 1 (Name Update)",
+                False,
+                f"Name update exception: {str(e)}"
+            )
+
+    def test_database_field_verification(self):
+        """Test that name updates save to all correct database fields"""
+        log_test("🎯 TESTING DATABASE FIELD VERIFICATION", "TEST")
+        
+        # Create multiple test users to verify field updates
+        test_users = [
+            {
+                "userId": "did:privy:db_test_1_" + str(int(time.time())),
+                "customName": "DatabaseTestUser1",
+                "privyId": "did:privy:db_test_1_" + str(int(time.time())),
+                "email": "dbtest1@turfloot.com"
+            },
+            {
+                "userId": "did:privy:db_test_2_" + str(int(time.time())),
+                "customName": "DatabaseTestUser2",
+                "privyId": "did:privy:db_test_2_" + str(int(time.time())),
+                "email": None
+            }
+        ]
+        
+        for i, test_user in enumerate(test_users, 1):
+            log_test(f"Testing database field verification for user {i}...")
+            
+            try:
+                # Update the user's name
+                start_time = time.time()
+                response = requests.post(
+                    f"{API_BASE}/users/profile/update-name",
+                    json=test_user,
+                    headers={"Content-Type": "application/json"},
+                    timeout=10
+                )
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    # Retrieve the profile to verify the name priority logic
+                    profile_response = requests.get(
+                        f"{API_BASE}/users/profile",
+                        params={"userId": test_user["userId"]},
+                        timeout=10
+                    )
+                    
+                    if profile_response.status_code == 200:
+                        profile_data = profile_response.json()
+                        retrieved_name = profile_data.get('username')
+                        
+                        if retrieved_name == test_user["customName"]:
+                            self.log_test(
+                                f"Database Field Verification - User {i}",
+                                True,
+                                f"Name priority working correctly: '{retrieved_name}'",
+                                response_time
+                            )
+                        else:
+                            self.log_test(
+                                f"Database Field Verification - User {i}",
+                                False,
+                                f"Name priority failed! Expected '{test_user['customName']}', got '{retrieved_name}'",
+                                response_time
+                            )
+                    else:
+                        self.log_test(
+                            f"Database Field Verification - User {i}",
+                            False,
+                            f"Profile retrieval failed: {profile_response.status_code}",
+                            response_time
+                        )
+                else:
+                    self.log_test(
+                        f"Database Field Verification - User {i}",
+                        False,
+                        f"User creation failed: {response.status_code} - {response.text}",
+                        response_time
+                    )
+                    
+            except Exception as e:
+                self.log_test(
+                    f"Database Field Verification - User {i}",
+                    False,
+                    f"Exception occurred: {str(e)}"
+                )
+
+    def test_name_consistency(self):
+        """Test consistency with multiple profile requests"""
+        log_test("🎯 TESTING NAME CONSISTENCY ACROSS MULTIPLE REQUESTS", "TEST")
+        
+        # Create a test user
+        test_user = {
+            "userId": "did:privy:consistency_test_" + str(int(time.time())),
+            "customName": "ConsistencyTestUser",
+            "privyId": "did:privy:consistency_test_" + str(int(time.time())),
+            "email": "consistency@turfloot.com"
+        }
+        
+        # First, create the user
+        try:
+            create_response = requests.post(
+                f"{API_BASE}/users/profile/update-name",
+                json=test_user,
+                headers={"Content-Type": "application/json"},
+                timeout=10
+            )
+            
+            if create_response.status_code == 200:
+                # Now test consistency with multiple requests
+                consistency_results = []
+                
+                for i in range(5):
+                    try:
+                        start_time = time.time()
+                        response = requests.get(
+                            f"{API_BASE}/users/profile",
+                            params={"userId": test_user["userId"]},
+                            timeout=10
+                        )
+                        response_time = time.time() - start_time
+                        
+                        if response.status_code == 200:
+                            data = response.json()
+                            name = data.get('username', 'No username')
+                            consistency_results.append(name)
+                            log_test(f"Request {i+1}: Retrieved '{name}' in {response_time:.3f}s")
+                        else:
+                            consistency_results.append("FAILED")
+                            log_test(f"Request {i+1}: Failed with status {response.status_code}")
+                            
+                    except Exception as e:
+                        consistency_results.append("EXCEPTION")
+                        log_test(f"Request {i+1}: Exception - {str(e)}")
+                
+                # Check consistency
+                unique_names = set(consistency_results)
+                if len(unique_names) == 1 and test_user["customName"] in unique_names:
+                    self.log_test(
+                        "Name Consistency Test",
+                        True,
+                        f"All 5 requests returned consistent name: '{test_user['customName']}'"
+                    )
+                else:
+                    self.log_test(
+                        "Name Consistency Test",
+                        False,
+                        f"Inconsistent results: {consistency_results}"
+                    )
+            else:
+                self.log_test(
+                    "Name Consistency Test",
+                    False,
+                    f"Failed to create test user: {create_response.status_code}"
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "Name Consistency Test",
+                False,
+                f"Exception during consistency test: {str(e)}"
+            )
+
+    def run_custom_name_tests(self):
+        """Run all custom name change and session persistence tests"""
+        log_test("🚀 STARTING CUSTOM NAME CHANGE AND SESSION PERSISTENCE TESTING", "START")
+        print("=" * 80)
+        
+        # Test 1: Custom Name Update Endpoint
+        self.test_custom_name_update_endpoint()
+        print()
+        
+        # Test 2: Profile Retrieval Endpoint  
+        self.test_profile_retrieval_endpoint()
+        print()
+        
+        # Test 3: Complete Flow Testing
+        self.test_complete_flow()
+        print()
+        
+        # Test 4: Database Field Verification
+        self.test_database_field_verification()
+        print()
+        
+        # Test 5: Name Consistency Testing
+        self.test_name_consistency()
+        print()
+        
+        # Summary
+        print("=" * 80)
+        log_test("🎯 CUSTOM NAME TESTING SUMMARY", "SUMMARY")
+        
+        success_rate = (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
+        
+        print(f"📊 TOTAL TESTS: {self.total_tests}")
+        print(f"✅ PASSED: {self.passed_tests}")
+        print(f"❌ FAILED: {self.failed_tests}")
+        print(f"📈 SUCCESS RATE: {success_rate:.1f}%")
+        
+        if success_rate >= 90:
+            log_test("🎉 EXCELLENT: Custom name change and session persistence flow is working correctly!", "SUCCESS")
+        elif success_rate >= 70:
+            log_test("⚠️ GOOD: Most functionality working, minor issues detected", "WARNING")
+        else:
+            log_test("❌ CRITICAL: Major issues detected with custom name change flow", "CRITICAL")
+        
+        return success_rate >= 90
+
     def test_new_social_endpoints(self):
         """Test the newly implemented social features endpoints"""
         print("\n🎯 TESTING NEW SOCIAL FEATURES ENDPOINTS")
