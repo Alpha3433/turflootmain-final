@@ -349,7 +349,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.log('❌ Declining friend request:', requestId)
       
       const token = await getAccessToken()
-      const response = await fetch('/api/friends/decline-request', {
+      const response = await fetch('http://localhost:3000/api/friends/decline-request', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
