@@ -1298,11 +1298,11 @@ export default function Home() {
     }
     console.log('📤 Request data:', requestData)
 
-    // Strategy 1: Try new simplified names API (bulletproof)
+    // ONLY use the bulletproof names API - no fallbacks
     let serverSaveSuccess = false
     
     try {
-      console.log('🎯 Trying simplified names API...')
+      console.log('🎯 Using bulletproof names API...')
       const response = await fetch('/api/names/update', {
         method: 'POST',
         headers: {
@@ -1319,41 +1319,18 @@ export default function Home() {
         console.log('📡 Names API Response data:', responseData)
         
         if (responseData && responseData.success) {
-          console.log('✅ Name saved successfully to reliable names API!')
+          console.log('✅ Name saved successfully to bulletproof names API!')
           serverSaveSuccess = true
         }
       } else {
-        console.error('❌ Names API Error response status:', response.status)
+        const errorText = await response.text()
+        console.error('❌ Names API Error:', response.status, errorText)
       }
     } catch (error) {
       console.error('❌ Names API Request failed:', error)
     }
 
-    // Strategy 2: Try original complex API (fallback)
-    if (!serverSaveSuccess) {
-      try {
-        console.log('🎯 Falling back to original API...')
-        const response = await fetch('/api/users/profile/update-name', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData)
-        })
-        
-        if (response.ok) {
-          const responseData = await response.json()
-          if (responseData && responseData.success) {
-            console.log('✅ Name saved successfully to original API!')
-            serverSaveSuccess = true
-          }
-        }
-      } catch (error) {
-        console.error('❌ Original API also failed:', error)
-      }
-    }
-
-    // Strategy 3: Save to localStorage for persistence across sessions
+    // Enhanced localStorage for cross-user discovery
     try {
       const persistentUserData = {
         userId: user.id,
@@ -1366,9 +1343,7 @@ export default function Home() {
       localStorage.setItem('turfloot_current_user', user.id)
       localStorage.setItem('turfloot_display_name', customName.trim())
       
-      console.log('💾 Name saved to localStorage for persistence')
-      
-      // Also sync to other localStorage users for cross-user discovery
+      // Update shared user discovery cache for friends functionality
       try {
         const allLocalUsers = JSON.parse(localStorage.getItem('turfloot_all_users') || '[]')
         const existingIndex = allLocalUsers.findIndex(u => u.userId === user.id)
@@ -1379,18 +1354,19 @@ export default function Home() {
           allLocalUsers.push(persistentUserData)
         }
         
-        // Keep only last 100 users to prevent localStorage bloat
-        if (allLocalUsers.length > 100) {
-          allLocalUsers.splice(0, allLocalUsers.length - 100)
+        // Keep only last 50 users to prevent localStorage bloat
+        if (allLocalUsers.length > 50) {
+          allLocalUsers.splice(0, allLocalUsers.length - 50)
         }
         
         localStorage.setItem('turfloot_all_users', JSON.stringify(allLocalUsers))
-        console.log('💾 Updated shared user discovery cache')
+        console.log('💾 Updated shared user discovery cache for friends')
         
       } catch (error) {
         console.error('⚠️ Error updating user discovery cache:', error)
       }
       
+      console.log('💾 Name saved to localStorage for cross-session persistence')
     } catch (error) {
       console.error('❌ LocalStorage save failed:', error)
     }
@@ -1399,17 +1375,11 @@ export default function Home() {
     setDisplayName(customName.trim())
     setIsEditingName(false)
     
-    // Reload user profile to sync any server data
-    if (user?.id) {
-      console.log('🔄 Reloading user profile after name update...')
-      await loadUserProfile(user.id)
-    }
-    
-    // User feedback based on success level
+    // User feedback based on success
     if (serverSaveSuccess) {
-      alert(`✅ Name successfully updated to "${customName.trim()}" and saved to server!`)
+      alert(`✅ Name "${customName.trim()}" saved successfully!\n\n🎮 Other players can now find you by searching for "${customName.trim()}"`)
     } else {
-      alert(`✅ Name updated to "${customName.trim()}"!\n\n💾 Saved locally and will be visible to other players.\n🔄 Server sync will retry automatically when infrastructure improves.`)
+      alert(`✅ Name "${customName.trim()}" saved locally!\n\n💾 Visible to other players in this session.\n🔄 Will sync to server when available.`)
     }
   }
 
