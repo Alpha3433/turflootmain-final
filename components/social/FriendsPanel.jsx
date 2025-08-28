@@ -71,7 +71,11 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     }
 
     setSearching(true)
+    let foundUsers = []
+    
     try {
+      // Strategy 1: Try server API search
+      console.log('🔍 Searching server for users:', query)
       const token = await getAccessToken()
       const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
         headers: {
@@ -82,13 +86,74 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       
       if (response.ok) {
         const data = await response.json()
-        setSearchResults(data.users || [])
+        foundUsers = data.users || []
+        console.log('✅ Server search successful:', foundUsers.length, 'users found')
+      } else {
+        console.warn('⚠️ Server search failed, using fallback methods')
       }
     } catch (error) {
-      console.error('❌ Error searching users:', error)
-    } finally {
-      setSearching(false)
+      console.error('❌ Server search error:', error)
     }
+    
+    // Strategy 2: Search localStorage for locally known users
+    try {
+      console.log('🔍 Searching localStorage for users...')
+      const locallyKnownUsers = []
+      
+      // Check all localStorage keys for user data
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith('turfloot_user_')) {
+          try {
+            const userData = JSON.parse(localStorage.getItem(key))
+            if (userData && userData.customName && 
+                userData.customName.toLowerCase().includes(query.toLowerCase()) &&
+                userData.userId !== user.id) {
+              
+              locallyKnownUsers.push({
+                id: userData.userId,
+                username: userData.customName,
+                joinDate: userData.timestamp,
+                source: 'localStorage'
+              })
+            }
+          } catch (e) {
+            // Skip invalid localStorage entries
+          }
+        }
+      }
+      
+      if (locallyKnownUsers.length > 0) {
+        console.log('✅ Found', locallyKnownUsers.length, 'users in localStorage')
+        
+        // Merge with server results, avoiding duplicates
+        const existingIds = foundUsers.map(u => u.id)
+        const newLocalUsers = locallyKnownUsers.filter(u => !existingIds.includes(u.id))
+        foundUsers = [...foundUsers, ...newLocalUsers]
+      }
+      
+    } catch (error) {
+      console.error('❌ localStorage search error:', error)
+    }
+    
+    // Strategy 3: Manual user ID search (if user enters a full user ID)
+    if (query.startsWith('did:privy:') && query.length > 15) {
+      console.log('🔍 Detected potential user ID, adding manual entry option')
+      const existingIds = foundUsers.map(u => u.id)
+      if (!existingIds.includes(query)) {
+        foundUsers.push({
+          id: query,
+          username: `User ${query.substring(10, 20)}...`,
+          joinDate: new Date().toISOString(),
+          source: 'manual'
+        })
+      }
+    }
+    
+    console.log('📊 Final search results:', foundUsers.length, 'users found')
+    setSearchResults(foundUsers)
+    
+    setSearching(false)
   }
 
   const sendFriendRequest = async (targetUsername) => {
