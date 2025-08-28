@@ -1575,27 +1575,29 @@ class TurfLootBackendTester:
 if __name__ == "__main__":
     tester = TurfLootBackendTester()
     
-    # Focus on custom name change and session persistence testing
-    log_test("🎯 CUSTOM NAME CHANGE AND SESSION PERSISTENCE TESTING", "START")
+    # Focus on persistent name solution testing as per review request
+    log_test("🎯 PERSISTENT NAME SOLUTION TESTING", "START")
     log_test(f"Testing against: {API_BASE}")
     log_test(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
-    success = tester.run_custom_name_tests()
+    success = tester.run_persistent_name_solution_tests()
     
     # Save detailed results
     results_data = {
         "test_start_time": datetime.now().isoformat(),
+        "test_objective": "Verify that the multi-strategy persistent name solution works correctly and resolves the issue where names don't persist across sessions",
         "total_tests": tester.total_tests,
         "passed_tests": tester.passed_tests,
         "failed_tests": tester.failed_tests,
         "success_rate": (tester.passed_tests / tester.total_tests * 100) if tester.total_tests > 0 else 0,
-        "test_results": tester.test_results
+        "test_results": tester.test_results,
+        "expected_results_met": success
     }
     
-    with open('/app/custom_name_test_results.json', 'w') as f:
+    with open('/app/persistent_name_test_results.json', 'w') as f:
         json.dump(results_data, f, indent=2)
     
-    log_test("📄 Detailed results saved to: /app/custom_name_test_results.json")
+    log_test("📄 Detailed results saved to: /app/persistent_name_test_results.json")
     log_test(f"Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     sys.exit(0 if success else 1)
