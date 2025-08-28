@@ -1501,7 +1501,11 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen text-white relative flex flex-col bg-black" style={{ background: 'linear-gradient(to bottom right, rgb(0, 0, 0), rgb(17, 24, 39), rgb(0, 0, 0))' }}>
+    <div className="min-h-screen w-full text-white relative flex flex-col bg-black" style={{ 
+      background: 'linear-gradient(to bottom right, rgb(0, 0, 0), rgb(17, 24, 39), rgb(0, 0, 0))',
+      minHeight: '100vh',
+      minHeight: '100dvh' // Use dynamic viewport height for mobile
+    }}>
       {/* Game-Inspired Animated Background */}
       <div className="absolute inset-0 pointer-events-none z-10">
         
