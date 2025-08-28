@@ -84,8 +84,8 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     let foundUsers = []
     
     try {
-      // Strategy 1: Try new bulletproof names API search
-      console.log('🔍 Searching reliable names API for users:', query)
+      // ONLY use bulletproof names API - no fallbacks
+      console.log('🔍 Searching bulletproof names API for users:', query)
       const response = await fetch(`/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
         headers: {
           'Content-Type': 'application/json'
@@ -97,59 +97,16 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
         foundUsers = data.users || []
         console.log('✅ Names API search successful:', foundUsers.length, 'users found')
       } else {
-        console.warn('⚠️ Names API search failed, trying fallback methods')
-        
-        // Strategy 2: Try original server API search
-        try {
-          console.log('🔍 Falling back to original server search...')
-          const token = await getAccessToken()
-          const fallbackResponse = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          })
-          
-          if (fallbackResponse.ok) {
-            const fallbackData = await fallbackResponse.json()
-            foundUsers = fallbackData.users || []
-            console.log('✅ Fallback search successful:', foundUsers.length, 'users found')
-          }
-        } catch (error) {
-          console.error('❌ Fallback server search also failed:', error)
-        }
+        console.warn('⚠️ Names API search failed')
       }
     } catch (error) {
       console.error('❌ Names API search error:', error)
     }
     
-    // Strategy 3: Search localStorage for locally known users  
+    // Enhanced localStorage search for local users
     try {
       console.log('🔍 Searching localStorage for users...')
       const locallyKnownUsers = []
-      
-      // Check individual user entries
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith('turfloot_user_')) {
-          try {
-            const userData = JSON.parse(localStorage.getItem(key))
-            if (userData && userData.customName && 
-                userData.customName.toLowerCase().includes(query.toLowerCase()) &&
-                userData.userId !== user.id) {
-              
-              locallyKnownUsers.push({
-                id: userData.userId,
-                username: userData.customName,
-                joinDate: userData.timestamp,
-                source: 'localStorage'
-              })
-            }
-          } catch (e) {
-            // Skip invalid localStorage entries
-          }
-        }
-      }
       
       // Check shared user discovery cache
       try {
@@ -159,16 +116,12 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
               userData.customName.toLowerCase().includes(query.toLowerCase()) &&
               userData.userId !== user.id) {
             
-            // Avoid duplicates
-            const existingIds = locallyKnownUsers.map(u => u.id)
-            if (!existingIds.includes(userData.userId)) {
-              locallyKnownUsers.push({
-                id: userData.userId,
-                username: userData.customName,
-                joinDate: userData.timestamp,
-                source: 'shared_cache'
-              })
-            }
+            locallyKnownUsers.push({
+              id: userData.userId,
+              username: userData.customName,
+              joinDate: userData.timestamp,
+              source: 'localStorage'
+            })
           }
         }
       } catch (e) {
@@ -178,7 +131,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       if (locallyKnownUsers.length > 0) {
         console.log('✅ Found', locallyKnownUsers.length, 'users in localStorage')
         
-        // Merge with server results, avoiding duplicates
+        // Merge with API results, avoiding duplicates
         const existingIds = foundUsers.map(u => u.id)
         const newLocalUsers = locallyKnownUsers.filter(u => !existingIds.includes(u.id))
         foundUsers = [...foundUsers, ...newLocalUsers]
@@ -186,20 +139,6 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       
     } catch (error) {
       console.error('❌ localStorage search error:', error)
-    }
-    
-    // Strategy 4: Manual user ID search (if user enters a full user ID)
-    if (query.startsWith('did:privy:') && query.length > 15) {
-      console.log('🔍 Detected potential user ID, adding manual entry option')
-      const existingIds = foundUsers.map(u => u.id)
-      if (!existingIds.includes(query)) {
-        foundUsers.push({
-          id: query,
-          username: `User ${query.substring(10, 20)}...`,
-          joinDate: new Date().toISOString(),
-          source: 'manual'
-        })
-      }
     }
     
     console.log('📊 Final search results:', foundUsers.length, 'users found')
