@@ -50,10 +50,9 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.log('👥 Fetching friends from server for user:', user.id)
       
       const token = await getAccessToken()
-      // Force absolute localhost URL to bypass any fetch interceptors
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-      const apiUrl = `${baseUrl}/api/friends/list?userId=${user.id}`
-      console.log('🔗 DEBUG: Using ABSOLUTE friends list URL =', apiUrl)
+      // Use relative URL for same-origin requests
+      const apiUrl = `/api/friends/list?userId=${user.id}`
+      console.log('🔗 DEBUG: Using relative friends list URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
