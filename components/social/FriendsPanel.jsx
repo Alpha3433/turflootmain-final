@@ -121,7 +121,12 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     try {
       // ONLY use bulletproof names API - no fallbacks, and exclude current user
       console.log('🔍 Searching bulletproof names API for users:', query, 'excluding user:', user.id)
-      const response = await fetch(`/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
+      console.log('🌐 DEBUG: NEXT_PUBLIC_BASE_URL =', process.env.NEXT_PUBLIC_BASE_URL)
+      
+      const apiUrl = `/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
+      console.log('🔗 DEBUG: Calling API URL =', apiUrl)
+      
+      const response = await fetch(apiUrl, {
         headers: {
           'Content-Type': 'application/json'
         }
