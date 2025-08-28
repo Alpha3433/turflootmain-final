@@ -2428,8 +2428,8 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Friends - More compact on mobile */}
-              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-3 lg:p-4 shadow-2xl h-[200px] lg:h-[276px]">
+              {/* Friends - Proper height to contain Add Friends button */}
+              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-3 lg:p-4 shadow-2xl min-h-[240px] lg:h-[276px] flex flex-col">
                 <div className="flex items-center justify-between mb-3 lg:mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-6 h-6 lg:w-8 lg:h-8 bg-cyan-400 rounded-lg flex items-center justify-center">
