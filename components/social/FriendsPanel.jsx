@@ -542,6 +542,55 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
               </div>
             )}
           </div>
+        ) : activeTab === 'requests' ? (
+          <div className="space-y-2">
+            {friendRequests.length > 0 ? (
+              <>
+                <h3 className="text-orange-400 font-semibold text-sm mb-3">
+                  📬 Friend Requests ({friendRequests.length})
+                </h3>
+                {friendRequests.map(request => (
+                  <div key={request.id} className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="text-white font-medium">{request.fromUserName}</div>
+                        <div className="text-xs text-gray-400">
+                          Sent {new Date(request.createdAt).toLocaleDateString()} at {new Date(request.createdAt).toLocaleTimeString()}
+                        </div>
+                      </div>
+                      <div className="flex space-x-2 ml-3">
+                        <button
+                          onClick={() => acceptFriendRequest(request.id, request.fromUserName)}
+                          className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-md transition-colors font-medium"
+                        >
+                          ✓ Accept
+                        </button>
+                        <button
+                          onClick={() => declineFriendRequest(request.id, request.fromUserName)}
+                          className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-md transition-colors font-medium"
+                        >
+                          ✕ Decline
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-gray-400 mb-2">📭 No friend requests</div>
+                <div className="text-xs text-gray-500 mb-3">
+                  When someone sends you a friend request, it will appear here.
+                </div>
+                <button
+                  onClick={() => setActiveTab('search')}
+                  className="text-blue-400 hover:text-blue-300 text-sm"
+                >
+                  Search for friends to add
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="space-y-4">
             <div>
