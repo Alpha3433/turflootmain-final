@@ -1701,6 +1701,181 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Get pending friend requests for notifications
+    if (route === 'friends/requests/pending') {
+      try {
+        const { userId } = body
+        
+        if (!userId) {
+          return NextResponse.json({
+            error: 'userId is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        
+        // Get pending friend requests where this user is the recipient
+        const pendingRequests = await friends.find({
+          toUserId: userId,
+          status: 'pending'
+        }).sort({ createdAt: -1 }).toArray()
+
+        console.log(`📬 Retrieved ${pendingRequests.length} pending friend requests for user ${userId}`)
+        
+        return NextResponse.json({
+          success: true,
+          requests: pendingRequests.map(req => ({
+            id: req.id,
+            fromUserId: req.fromUserId,
+            fromUserName: req.fromUserName,
+            createdAt: req.createdAt,
+            status: req.status
+          })),
+          count: pendingRequests.length,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error getting pending friend requests:', error)
+        return NextResponse.json({
+          error: 'Failed to get pending friend requests',
+          details: error.message
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
+    // Decline/Reject friend request
+    if (route === 'friends/decline-request') {
+      try {
+        const { requestId, userId } = body
+        
+        if (!requestId || !userId) {
+          return NextResponse.json({
+            error: 'requestId and userId are required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        
+        // Update request status to declined
+        const result = await friends.updateOne(
+          { 
+            id: requestId,
+            toUserId: userId,
+            status: 'pending'
+          },
+          {
+            $set: {
+              status: 'declined',
+              updatedAt: new Date()
+            }
+          }
+        )
+
+        if (result.matchedCount === 0) {
+          return NextResponse.json({
+            error: 'Friend request not found or already processed'
+          }, { status: 404, headers: corsHeaders })
+        }
+
+        console.log('❌ Friend request declined')
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Friend request declined'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error declining friend request:', error)
+        return NextResponse.json({
+          error: 'Failed to decline friend request'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
+    // Get notification count for badge display
+    if (route === 'friends/notifications/count') {
+      try {
+        const { userId } = body
+        
+        if (!userId) {
+          return NextResponse.json({
+            error: 'userId is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        
+        // Count unnotified pending requests
+        const unnotifiedCount = await friends.countDocuments({
+          toUserId: userId,
+          status: 'pending',
+          notified: { $ne: true }
+        })
+
+        console.log(`🔔 ${unnotifiedCount} unnotified friend requests for user ${userId}`)
+        
+        return NextResponse.json({
+          success: true,
+          count: unnotifiedCount,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error getting notification count:', error)
+        return NextResponse.json({
+          error: 'Failed to get notification count'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
+    // Mark notifications as read
+    if (route === 'friends/notifications/mark-read') {
+      try {
+        const { userId } = body
+        
+        if (!userId) {
+          return NextResponse.json({
+            error: 'userId is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const friends = db.collection('friends')
+        
+        // Mark all pending requests for this user as notified
+        const result = await friends.updateMany(
+          {
+            toUserId: userId,
+            status: 'pending'
+          },
+          {
+            $set: {
+              notified: true,
+              notifiedAt: new Date()
+            }
+          }
+        )
+
+        console.log(`✅ Marked ${result.modifiedCount} notifications as read for user ${userId}`)
+        
+        return NextResponse.json({
+          success: true,
+          markedCount: result.modifiedCount,
+          message: 'Notifications marked as read'
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error marking notifications as read:', error)
+        return NextResponse.json({
+          error: 'Failed to mark notifications as read'
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // Get user balance
     if (route === 'users/balance') {
       try {
