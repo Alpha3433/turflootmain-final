@@ -104,7 +104,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       const onlineUrl = getApiUrl(`/api/friends/online-status?userId=${user.id}`)
       console.log('🔗 DEBUG: Using online friends URL =', onlineUrl)
       
-      const response = await fetch(apiUrl, {
+      const response = await fetch(onlineUrl, {
         headers: {
           'Authorization': `Bearer ${await getAccessToken()}`,
           'Content-Type': 'application/json'
