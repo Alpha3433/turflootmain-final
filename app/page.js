@@ -2356,19 +2356,19 @@ export default function Home() {
       <main className="flex-1 flex flex-col relative z-40 min-h-0">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col pt-4 sm:pt-8 pb-4 sm:pb-20">
           
-          {/* Hero Title */}
-          <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black tracking-tight mb-2 sm:mb-3">
+          {/* Hero Title - Smaller on mobile to save space */}
+          <div className="text-center mb-3 sm:mb-8">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl xl:text-6xl font-black tracking-tight mb-1 sm:mb-3">
               <span className="text-white">TURF</span>
               <span className="text-yellow-400">LOOT</span>
             </h1>
-            <p className="text-gray-400 text-lg font-bold tracking-wide">
+            <p className="text-gray-400 text-sm sm:text-lg font-bold tracking-wide">
               SKILL-BASED GRID DOMINATION
             </p>
           </div>
 
-          {/* Main Game Grid - Mobile: Flex Column with Order, Desktop: Grid */}
-          <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-3 max-w-5xl mx-auto space-y-3 lg:space-y-0">
+          {/* Main Game Grid - Mobile: Flex Column with Better Spacing, Desktop: Grid */}
+          <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-3 max-w-5xl mx-auto space-y-2 sm:space-y-3 lg:space-y-0 flex-1">
             
             {/* LEFT COLUMN - Leaderboard & Friends - Mobile: Order Last (Bottom) */}
             <div className="order-3 lg:order-1 col-span-12 lg:col-span-3 space-y-3">
