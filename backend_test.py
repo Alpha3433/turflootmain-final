@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Custom Name Change and Session Persistence Flow
-Testing the complete flow to resolve user's issue with names reverting to default
+Backend API Testing for Persistent Name Solution
+Testing the new multi-strategy persistent name solution to ensure it resolves the user's issue.
+
+**Test Objective**: Verify that the multi-strategy persistent name solution works correctly 
+and resolves the issue where names don't persist across sessions.
+
+Focus Areas:
+1. Name Update API Testing (POST /api/users/profile/update-name)
+2. Session Persistence Simulation 
+3. Error Handling Verification
+4. Profile Retrieval Enhancement (GET /api/users/profile)
 """
 
 import requests
