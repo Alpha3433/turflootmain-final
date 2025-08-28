@@ -1,0 +1,95 @@
+<analysis>
+The AI engineer's work on TurfLoot started with critical frontend debugging (SSR issues, JSX errors, hoisting) and UI refinements (region selector, navigation redesign). A significant effort involved implementing the Party Lobby system backend and integrating its frontend, which later required removing redundant UI elements. Persistent issues with name changes and friends functionality highlighted deep-seated production deployment problems (Kubernetes/Caddy proxy, dev vs. production builds), leading to the creation of client-side fallbacks and a new bulletproof names API. The focus consistently shifted between resolving local development issues, addressing user-reported production errors, and enhancing core multiplayer features. The trajectory concludes with the AI acknowledging remaining issues in the add friends functionality, specifically shared friend lists, self-addition, lack of notifications, and dynamic updates, setting the stage for the next development cycle.
+</analysis>
+
+<product_requirements>
+TurfLoot, an Agar.io-style game, aims to be a robust multiplayer online platform. Initial requirements included mobile joysticks, action buttons, a dynamic minimap, stats/leaderboards, and an orientation gate. Core gameplay features like split cells, orb collection, merge timers, and mock data for paid lobbies (-00) were requested. Backend support for paid rooms, a gold cash-out, and mission reward balance sync were also needed.
+
+Recent explicit requests and their current implementation status:
+1.  **Mobile customization screen redesign**: Started.
+2.  **Modernizing social popup**: Started.
+3.  **Navigation bar redesign**: Implemented with new designs for region selector, settings, and login, following the style of a removed Party Lobby button.
+4.  **Dynamic Players in Game update**: Backend logic ready, frontend integration partially done.
+5.  **Compact region selection dropdown with Oceania & real-time latency**: Implemented in .
+6.  **Remove 0.0000 SOL • 0.00 USDC from wallet box**: Addressed by fixing 0 balance display.
+7.  **Username section redesign**: Backend update endpoint implemented, frontend redesign implemented, but persistent server-side saving was problematic and required a new dedicated API route and client-side fallbacks.
+8.  **Fix account balance (showing 0) & username update errors (404/500)**: Balance fixed. Username update API was a persistent production issue, leading to client-side persistence with server-sync retries.
+9.  **Add Lobby button next to Profile/Settings**: Implemented, then redundant ones were removed. Backend lobby system is operational.
+10. **Real-time social features**: Friends panel, online status, and shared practice mode implemented using Socket.IO, though friend list persistence and sharing issues remain.
+11. **Users can add each other and join live games**: Partial implementation through Party Lobby and shared practice server, but friends list functionality needs refinement.
+</product_requirements>
+
+<key_technical_concepts>
+-   **Next.js 14 (App Router)**: Full-stack framework.
+-   **React State Management**: ,  for UI logic.
+-   **Tailwind CSS & shadcn/ui**: For responsive styling.
+-   **MongoDB**: Database.
+-   **Next.js API Routes**: Centralized backend (, ).
+-   **Privy Authentication**: User authentication (), with SSR management.
+-   **Server-Side Rendering (SSR) Management**: Dynamic imports () and Webpack externalization.
+-   **Socket.IO**: For real-time multiplayer communication.
+-   **Kubernetes/Caddy Proxy**: Production infrastructure, identified as source of API routing/gateway issues.
+-   **Local Storage**: Client-side persistence for names and friend data when backend is unreliable.
+</key_technical_concepts>
+
+<code_architecture>
+
+
+-   ****:
+    -   **Summary**: Centralized backend API routes.
+    -   **Changes**: Implemented ,  (fixed Privy token parsing),  (enhanced error logging, database operations, validation), all 5 Party Lobby endpoints, and friends API endpoints (, ). Fixed routing logic and added error handling.
+-   ** (NEW)**:
+    -   **Summary**: A new, simplified bulletproof API endpoint for name storage and retrieval, designed to bypass persistent production infrastructure issues by providing a dedicated, isolated route for name-related operations.
+    -   **Changes**: Created to handle  for name saving and  for name retrieval and user search (). Uses MongoDB.
+-   ****:
+    -   **Summary**: The main landing page, containing core UI logic and client-side interactions.
+    -   **Changes**: Added Oceania to region selection. Implemented/removed Party Lobby UI elements. Extensive debugging and refactoring for JSX errors and JavaScript hoisting. Privy authentication re-integrated. Navigation bar redesigned with new button styles (Region, Settings, Login).  fixed to use correct API endpoint ().  enhanced for  persistence and server-side retries, then later simplified to use *only*  with local storage for frontend. Integrated  dynamically.  component issue fixed. Practice mode routing updated to use global shared server. Removed fallbacks for name loading and saving to rely on the new bulletproof API and localStorage.
+-   ****:
+    -   **Summary**: The root layout component for the application.
+    -   **Changes**: Dynamically imported  with  to resolve SSR errors.
+-   ****:
+    -   **Summary**: Provides Privy authentication context.
+    -   **Changes**: Wrapped in  for client-side execution. Privy reinstalled and configured for Google auth.
+-   ****:
+    -   **Summary**: Next.js project configuration.
+    -   **Changes**: Added Webpack configuration to externalize Privy dependencies.  was briefly considered/used during production deployment attempts.
+-   ****:
+    -   **Summary**: Manages game servers and real-time interactions using Socket.IO.
+    -   **Changes**: Enhanced to support a global practice room, persistent multiplayer servers, and new social feature methods (e.g., , , , , , ). Added  import for UUID generation.
+-   ** (NEW)**:
+    -   **Summary**: Frontend component to display and manage friends, including search and request functionality.
+    -   **Changes**: Created to display friends, add a search input, handle friend requests. Initially included local user discovery and fallbacks for unreliable production APIs, then simplified to rely on local storage for friends and the new  endpoint for user search.
+-   ** (NEW)**:
+    -   **Summary**: A script to initialize MongoDB with necessary collections (e.g., , , , , ).
+    -   **Changes**: Created as part of debugging the production 500 errors, to ensure database schema consistency.
+-   **Documentation Files ()**:
+    -   **Summary**: Various markdown files created to document debugging processes, solutions, and deployment guides (, , , , , , , , ).
+</code_architecture>
+
+<pending_tasks>
+-   **Real Blockchain Integration**: Implement full SOL deposits/withdrawals and smart contract interaction for game entry fees.
+-   **Production Infrastructure Stability**: Resolve persistent 500/502/404 errors on production for API calls.
+-   **Friends List Functionality**:
+    -   Ensure user-specific friend lists, not shared across accounts.
+    -   Prevent users from adding themselves.
+    -   Implement friend request notifications and proper request/acceptance flow.
+    -   Ensure dynamic updates of the friends list UI.
+-   **Mobile customization screen redesign**: (Specific screen design not fully detailed or verified).
+-   **Modernizing social popup**: (Specific screen design not fully detailed or verified).
+</pending_tasks>
+
+<current_work>
+Immediately before this summary request, the AI engineer was addressing critical issues with the add friends functionality. The user reported that their own name appeared on the friends list after logging in on another device and attempting to add themselves, indicating that **friends lists were being shared across accounts**. Additionally, the user pointed out the need for **friend request notifications** and **dynamic updates** of the friends list pop-up page once a friend has been added.
+
+The AI acknowledged these four specific issues:
+1.  Friends lists are shared across accounts.
+2.  Users can add themselves.
+3.  No friend request notifications.
+4.  Friends list doesn't update dynamically.
+
+The previous work involved implementing a bulletproof names API () and updating the frontend (, ) to use this API and  for name and friends data persistence, explicitly removing previous production API fallbacks. This was a response to recurring production deployment issues leading to 500 errors on the original  and  endpoints. While the local development environment functions with client-side name persistence and a basic friends panel, the core server-side logic for a true multiplayer friends system (with unique lists, request/accept flow, and real-time updates) is not yet fully implemented or correctly isolated per user.
+</current_work>
+
+<optional_next_step>
+Implement user-specific friend lists and a proper friend request/acceptance flow.
+</optional_next_step>
