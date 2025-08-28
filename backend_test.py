@@ -189,7 +189,7 @@ class FriendsSystemTester:
         
         response = self.make_request('POST', 'friends/send-request', data=request_data)
         
-        if response and (response.status_code == 200 or response.status_code == 400):
+        if response is not None and (response.status_code == 200 or response.status_code == 400):
             if response.status_code == 200:
                 data = response.json()
                 self.log_test(
@@ -348,7 +348,7 @@ class FriendsSystemTester:
         
         response = self.make_request('POST', 'friends/send-request', data=request_data)
         
-        if response and (response.status_code == 200 or response.status_code == 400):
+        if response is not None and (response.status_code == 200 or response.status_code == 400):
             if response.status_code == 200:
                 self.log_test(
                     "Create User2->User3 Friendship", 
