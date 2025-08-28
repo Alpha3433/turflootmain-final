@@ -1,95 +1,95 @@
 <analysis>
-The AI engineer's work on TurfLoot started with critical frontend debugging (SSR issues, JSX errors, hoisting) and UI refinements (region selector, navigation redesign). A significant effort involved implementing the Party Lobby system backend and integrating its frontend, which later required removing redundant UI elements. Persistent issues with name changes and friends functionality highlighted deep-seated production deployment problems (Kubernetes/Caddy proxy, dev vs. production builds), leading to the creation of client-side fallbacks and a new bulletproof names API. The focus consistently shifted between resolving local development issues, addressing user-reported production errors, and enhancing core multiplayer features. The trajectory concludes with the AI acknowledging remaining issues in the add friends functionality, specifically shared friend lists, self-addition, lack of notifications, and dynamic updates, setting the stage for the next development cycle.
+The AI engineer's work on TurfLoot involved a multi-faceted approach, balancing frontend UI/UX enhancements with critical backend bug fixes. Initially, efforts focused on refining the Friends system, tackling issues like shared lists and self-addition, which led to significant refactoring, including the temporary use and eventual removal of  for a purely server-side design. Concurrently, extensive mobile layout optimizations were made, addressing excess grey space, element overlaps, character eye spacing, and introducing horizontal navigation cycling. A persistent challenge throughout the trajectory was resolving API connectivity problems, specifically  and  errors, which necessitated repeated adjustments to environment variables and API call strategies (toggling between relative and absolute URLs). The work concluded with these API errors still presenting, with the AI identifying the preview deployment itself as the likely source of the  issues, indicating an external infrastructure problem.
 </analysis>
 
 <product_requirements>
-TurfLoot, an Agar.io-style game, aims to be a robust multiplayer online platform. Initial requirements included mobile joysticks, action buttons, a dynamic minimap, stats/leaderboards, and an orientation gate. Core gameplay features like split cells, orb collection, merge timers, and mock data for paid lobbies (-00) were requested. Backend support for paid rooms, a gold cash-out, and mission reward balance sync were also needed.
+TurfLoot, an Agar.io-style game, is designed as a multiplayer online platform. Initial features included mobile joysticks, action buttons, a dynamic minimap, stats/leaderboards, and an orientation gate. Core gameplay such as cell splitting, orb collection, merge timers, and mock data for paid lobbies (-00) were requested, alongside backend support for paid rooms, gold cash-out, and mission reward balance sync.
 
-Recent explicit requests and their current implementation status:
-1.  **Mobile customization screen redesign**: Started.
-2.  **Modernizing social popup**: Started.
-3.  **Navigation bar redesign**: Implemented with new designs for region selector, settings, and login, following the style of a removed Party Lobby button.
-4.  **Dynamic Players in Game update**: Backend logic ready, frontend integration partially done.
-5.  **Compact region selection dropdown with Oceania & real-time latency**: Implemented in .
-6.  **Remove 0.0000 SOL • 0.00 USDC from wallet box**: Addressed by fixing 0 balance display.
-7.  **Username section redesign**: Backend update endpoint implemented, frontend redesign implemented, but persistent server-side saving was problematic and required a new dedicated API route and client-side fallbacks.
-8.  **Fix account balance (showing 0) & username update errors (404/500)**: Balance fixed. Username update API was a persistent production issue, leading to client-side persistence with server-sync retries.
-9.  **Add Lobby button next to Profile/Settings**: Implemented, then redundant ones were removed. Backend lobby system is operational.
-10. **Real-time social features**: Friends panel, online status, and shared practice mode implemented using Socket.IO, though friend list persistence and sharing issues remain.
-11. **Users can add each other and join live games**: Partial implementation through Party Lobby and shared practice server, but friends list functionality needs refinement.
+The previous AI engineer addressed several explicit requests:
+1.  **Mobile customization screen redesign**: Ongoing.
+2.  **Modernizing social popup**: Ongoing.
+3.  **Navigation bar redesign**: Implemented with region selector, settings, and login, plus new mobile horizontal cycling.
+4.  **Dynamic Players in Game update**: Backend ready, frontend partial.
+5.  **Compact region selection with Oceania & latency**: Implemented.
+6.  **Fix 0 balance display**: Addressed.
+7.  **Username section redesign**: Backend and frontend implemented, but server-side saving was problematic and now relies on a dedicated API and no client-side fallbacks.
+8.  **Fix account balance & username errors**: Balance fixed. Username API was a persistent issue, leading to a bulletproof names API.
+9.  **Add Lobby button**: Implemented, then streamlined. Backend operational.
+10. **Real-time social features**: Friends panel, online status, shared practice mode implemented via Socket.IO.
+11. **Users can add and join games**: Partially implemented via Party Lobby and shared practice server, but friends list needs refinement.
+12. **Fix mobile vertical view (remove grey space)**: Implemented, including background fill and layout optimization.
+13. **Fix mobile spacing (customize/leaderboard)**: Implemented, ensuring consistent spacing.
+14. **Fix mobile preview eye spacing**: Implemented.
+15. **Friends functionality to be purely server-side/online-only**: Implemented, with all  usage removed.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Next.js 14 (App Router)**: Full-stack framework.
--   **React State Management**: ,  for UI logic.
--   **Tailwind CSS & shadcn/ui**: For responsive styling.
+-   **React State Management**: , .
+-   **Tailwind CSS & shadcn/ui**: Styling.
 -   **MongoDB**: Database.
--   **Next.js API Routes**: Centralized backend (, ).
--   **Privy Authentication**: User authentication (), with SSR management.
--   **Server-Side Rendering (SSR) Management**: Dynamic imports () and Webpack externalization.
--   **Socket.IO**: For real-time multiplayer communication.
--   **Kubernetes/Caddy Proxy**: Production infrastructure, identified as source of API routing/gateway issues.
--   **Local Storage**: Client-side persistence for names and friend data when backend is unreliable.
+-   **Next.js API Routes**: Backend endpoints (, ).
+-   **Privy Authentication**: User authentication (), SSR management.
+-   **Socket.IO**: Real-time communication.
+-   **Kubernetes/Caddy Proxy**: Production infrastructure.
+-   **Environment Variables**:  for API routing.
 </key_technical_concepts>
 
 <code_architecture>
 
 
 -   ****:
-    -   **Summary**: Centralized backend API routes.
-    -   **Changes**: Implemented ,  (fixed Privy token parsing),  (enhanced error logging, database operations, validation), all 5 Party Lobby endpoints, and friends API endpoints (, ). Fixed routing logic and added error handling.
+    -   **Summary**: Centralized backend API routes for user profiles, wallets, Party Lobby, and social features.
+    -   **Changes**: Enhanced , implemented Party Lobby endpoints, and significantly refined  and  endpoints for user isolation, preventing self-addition, and correctly joining  and  collections.
 -   ** (NEW)**:
-    -   **Summary**: A new, simplified bulletproof API endpoint for name storage and retrieval, designed to bypass persistent production infrastructure issues by providing a dedicated, isolated route for name-related operations.
-    -   **Changes**: Created to handle  for name saving and  for name retrieval and user search (). Uses MongoDB.
+    -   **Summary**: A dedicated API for name storage, retrieval, and user search, created to bypass persistent production infrastructure issues.
+    -   **Changes**: Created to handle  for name saving and  for name retrieval and search (). Uses MongoDB.
 -   ****:
-    -   **Summary**: The main landing page, containing core UI logic and client-side interactions.
-    -   **Changes**: Added Oceania to region selection. Implemented/removed Party Lobby UI elements. Extensive debugging and refactoring for JSX errors and JavaScript hoisting. Privy authentication re-integrated. Navigation bar redesigned with new button styles (Region, Settings, Login).  fixed to use correct API endpoint ().  enhanced for  persistence and server-side retries, then later simplified to use *only*  with local storage for frontend. Integrated  dynamically.  component issue fixed. Practice mode routing updated to use global shared server. Removed fallbacks for name loading and saving to rely on the new bulletproof API and localStorage.
+    -   **Summary**: The main landing page, handling core UI logic and client-side interactions.
+    -   **Changes**: Added Oceania to region selection, implemented mobile horizontal navigation cycling (). Extensive mobile layout refactoring to remove grey space, adjust , optimize UI element spacing (e.g., increased  classes), and correct character eye positioning (, , ). All  fallbacks were removed.
 -   ****:
     -   **Summary**: The root layout component for the application.
     -   **Changes**: Dynamically imported  with  to resolve SSR errors.
 -   ****:
+    -   **Summary**: Global CSS styles for the application.
+    -   **Changes**: Added mobile-specific CSS for better viewport handling (e.g., ) and  utility class for hidden scrollbars in mobile navigation.
+-   ****:
     -   **Summary**: Provides Privy authentication context.
-    -   **Changes**: Wrapped in  for client-side execution. Privy reinstalled and configured for Google auth.
+    -   **Changes**: Wrapped in  for client-side execution. Configured for Google auth.
 -   ****:
     -   **Summary**: Next.js project configuration.
-    -   **Changes**: Added Webpack configuration to externalize Privy dependencies.  was briefly considered/used during production deployment attempts.
+    -   **Changes**: Added Webpack configuration to externalize Privy dependencies and explicitly exposed .
 -   ****:
     -   **Summary**: Manages game servers and real-time interactions using Socket.IO.
-    -   **Changes**: Enhanced to support a global practice room, persistent multiplayer servers, and new social feature methods (e.g., , , , , , ). Added  import for UUID generation.
+    -   **Changes**: Enhanced to support global practice rooms, persistent multiplayer servers, and new social feature methods.
 -   ** (NEW)**:
-    -   **Summary**: Frontend component to display and manage friends, including search and request functionality.
-    -   **Changes**: Created to display friends, add a search input, handle friend requests. Initially included local user discovery and fallbacks for unreliable production APIs, then simplified to rely on local storage for friends and the new  endpoint for user search.
+    -   **Summary**: Frontend component for friends management, including search and request functionality.
+    -   **Changes**: Initially included  for data persistence, which was later **removed** to enforce a server-only architecture. Integrated  to correctly access  status and  ID. Introduced  state. API calls (search, online status, list, send-request) were toggled between absolute  URLs (to bypass a suspected interceptor) and relative  URLs (to fix ).
 -   ** (NEW)**:
-    -   **Summary**: A script to initialize MongoDB with necessary collections (e.g., , , , , ).
-    -   **Changes**: Created as part of debugging the production 500 errors, to ensure database schema consistency.
--   **Documentation Files ()**:
-    -   **Summary**: Various markdown files created to document debugging processes, solutions, and deployment guides (, , , , , , , , ).
+    -   **Summary**: A script to initialize MongoDB with necessary collections.
+    -   **Changes**: Created to ensure database schema consistency during production debugging.
+-   ****:
+    -   **Summary**: Environment configuration file.
+    -   **Changes**:  was repeatedly changed between  and  to address API routing issues, finally set to the preview URL.
+-   **Documentation Files ()**: Various markdown files created to document debugging processes and solutions.
 </code_architecture>
 
 <pending_tasks>
 -   **Real Blockchain Integration**: Implement full SOL deposits/withdrawals and smart contract interaction for game entry fees.
--   **Production Infrastructure Stability**: Resolve persistent 500/502/404 errors on production for API calls.
+-   **Production Infrastructure Stability**: Resolve persistent 502/404/ERR_ABORTED errors on the preview deployment for API calls.
 -   **Friends List Functionality**:
-    -   Ensure user-specific friend lists, not shared across accounts.
-    -   Prevent users from adding themselves.
-    -   Implement friend request notifications and proper request/acceptance flow.
+    -   Implement friend request notifications.
     -   Ensure dynamic updates of the friends list UI.
 -   **Mobile customization screen redesign**: (Specific screen design not fully detailed or verified).
 -   **Modernizing social popup**: (Specific screen design not fully detailed or verified).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing critical issues with the add friends functionality. The user reported that their own name appeared on the friends list after logging in on another device and attempting to add themselves, indicating that **friends lists were being shared across accounts**. Additionally, the user pointed out the need for **friend request notifications** and **dynamic updates** of the friends list pop-up page once a friend has been added.
+Immediately prior to this summary, the AI engineer was addressing persistent  errors affecting the friends functionality and other API calls in the development environment. Despite previous attempts to configure  correctly in  (toggling between  and the preview URL) and implementing debug logs to trace URL resolution, the console logs consistently showed frontend requests correctly forming relative API URLs () but still receiving  responses from .
 
-The AI acknowledged these four specific issues:
-1.  Friends lists are shared across accounts.
-2.  Users can add themselves.
-3.  No friend request notifications.
-4.  Friends list doesn't update dynamically.
-
-The previous work involved implementing a bulletproof names API () and updating the frontend (, ) to use this API and  for name and friends data persistence, explicitly removing previous production API fallbacks. This was a response to recurring production deployment issues leading to 500 errors on the original  and  endpoints. While the local development environment functions with client-side name persistence and a basic friends panel, the core server-side logic for a true multiplayer friends system (with unique lists, request/accept flow, and real-time updates) is not yet fully implemented or correctly isolated per user.
+This indicates that the frontend is correctly constructing its requests and the environment variable is being picked up, but the issue lies in the accessibility or configuration of the **preview deployment's backend itself**. The previous round of fixes involved eliminating  for a pure server-side architecture (per user request), fixing  error by destructuring  from , and adding a  state variable in . However, these fixes are being overshadowed by the persistent backend connectivity issue with the preview environment. The system's current state is that the friends features are implemented to be server-only, but they cannot function due to the  from the target server.
 </current_work>
 
 <optional_next_step>
-Implement user-specific friend lists and a proper friend request/acceptance flow.
+Check the accessibility and status of the preview environment's API endpoints.
 </optional_next_step>
