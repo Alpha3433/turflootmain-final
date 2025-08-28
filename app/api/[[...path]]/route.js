@@ -863,6 +863,9 @@ export async function GET(request, { params }) {
         )
       }
     }
+
+    // Friends list endpoint
+    if (route === 'friends/list') {
       try {
         const userId = url.searchParams.get('userId')
         
