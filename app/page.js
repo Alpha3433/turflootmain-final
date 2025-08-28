@@ -1290,12 +1290,38 @@ export default function Home() {
       return
     }
 
-    // For non-authenticated users, just set the display name locally
+    console.log('💾 Saving custom name:', customName.trim())
+    
+    // Generate a consistent guest user ID for non-authenticated users
+    let userId, requestData, isGuest = false
+    
     if (!authenticated || !user) {
-      setDisplayName(customName.trim())
-      setIsEditingName(false)
-      console.log('✅ Name set locally for non-authenticated user:', customName.trim())
-      return
+      // For non-authenticated users, create a guest session
+      let guestId = localStorage.getItem('turfloot_guest_id')
+      if (!guestId) {
+        guestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+        localStorage.setItem('turfloot_guest_id', guestId)
+      }
+      
+      userId = guestId
+      requestData = {
+        userId: guestId,
+        customName: customName.trim(),
+        privyId: null,
+        email: null
+      }
+      isGuest = true
+      console.log('🧑‍💼 Guest user - using guest ID:', guestId)
+    } else {
+      // Authenticated user
+      userId = user.id
+      requestData = {
+        userId: user.id,
+        customName: customName.trim(),
+        privyId: user.id,
+        email: user.email?.address || null
+      }
+      console.log('🔑 Authenticated user:', user.id)
     }
 
     console.log('💾 Saving custom name:', customName.trim())
