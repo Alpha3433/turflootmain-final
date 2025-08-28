@@ -864,6 +864,67 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Names search endpoint (alternative to users/search for frontend compatibility)
+    if (route === 'names/search') {
+      try {
+        const query = url.searchParams.get('q')
+        const currentUserId = url.searchParams.get('userId')
+        
+        if (!query || query.length < 2) {
+          return NextResponse.json({
+            users: [],
+            total: 0,
+            message: 'Search query must be at least 2 characters'
+          }, { headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Search for users by username (case-insensitive) - same logic as users/search
+        const searchResults = await users.find({
+          $and: [
+            {
+              $or: [
+                { username: { $regex: new RegExp(query, 'i') } },
+                { custom_name: { $regex: new RegExp(query, 'i') } },
+                { 'profile.display_name': { $regex: new RegExp(query, 'i') } }
+              ]
+            },
+            { id: { $ne: currentUserId } } // Exclude current user
+          ]
+        })
+        .limit(10)
+        .project({
+          id: 1,
+          username: 1,
+          custom_name: 1,
+          'profile.display_name': 1,
+          created_at: 1
+        })
+        .toArray()
+        
+        const formattedResults = searchResults.map(user => ({
+          id: user.id,
+          username: user.custom_name || user.profile?.display_name || user.username || 'Anonymous',
+          joinDate: user.created_at
+        }))
+        
+        return NextResponse.json({
+          users: formattedResults,
+          total: formattedResults.length,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Names search error:', error)
+        return NextResponse.json(
+          { error: 'Failed to search names' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     // Friends list endpoint
     if (route === 'friends/list') {
       try {
