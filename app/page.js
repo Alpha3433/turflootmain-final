@@ -2168,6 +2168,15 @@ export default function Home() {
                     </svg>
                   </div>
                   
+                  <div className="flex flex-col">
+                    <span className="font-medium text-xs leading-none text-orange-400 group-hover:text-orange-300 transition-colors duration-200">
+                      Party
+                    </span>
+                    <span className="text-gray-400 text-xs leading-none">
+                      Lobby
+                    </span>
+                  </div>
+                  
                   {/* Active lobby indicator */}
                   {currentLobby && (
                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
