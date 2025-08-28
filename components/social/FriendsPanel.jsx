@@ -100,9 +100,9 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     if (!user?.id) return
     
     try {
-      // Force localhost URL to avoid 502 gateway issues
-      const apiUrl = `http://localhost:3000/api/friends/online-status?userId=${user.id}`
-      console.log('🔗 DEBUG: Using localhost online friends URL =', apiUrl)
+      // Use dynamic API URL based on environment
+      const onlineUrl = getApiUrl(`/api/friends/online-status?userId=${user.id}`)
+      console.log('🔗 DEBUG: Using online friends URL =', onlineUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
