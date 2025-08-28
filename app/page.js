@@ -1361,14 +1361,15 @@ export default function Home() {
     // Enhanced localStorage for cross-user discovery
     try {
       const persistentUserData = {
-        userId: user.id,
+        userId: userId,
         customName: customName.trim(),
         timestamp: new Date().toISOString(),
-        serverSaved: serverSaveSuccess
+        serverSaved: serverSaveSuccess,
+        isGuest: isGuest
       }
       
-      localStorage.setItem(`turfloot_user_${user.id}`, JSON.stringify(persistentUserData))
-      localStorage.setItem('turfloot_current_user', user.id)
+      localStorage.setItem(`turfloot_user_${userId}`, JSON.stringify(persistentUserData))
+      localStorage.setItem('turfloot_current_user', userId)
       localStorage.setItem('turfloot_display_name', customName.trim())
       
       // Update shared user discovery cache for friends functionality
