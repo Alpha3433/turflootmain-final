@@ -242,7 +242,7 @@ export default function Home() {
     try {
       console.log('🚪 Joining lobby:', lobbyId)
       
-      const response = await fetch('/api/lobby/join', {
+      const response = await fetch('http://localhost:3000/api/lobby/join', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
