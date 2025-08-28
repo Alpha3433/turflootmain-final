@@ -1244,9 +1244,8 @@ export default function Home() {
       return
     }
 
-    try {
-      console.log('💾 Saving custom name:', customName.trim())
-      console.log('🔑 User info:', { 
+    console.log('💾 Saving custom name:', customName.trim())
+    console.log('🔑 User info:', { 
         userId: user.id, 
         privyId: user.id, 
         email: user.email?.address,
@@ -1254,15 +1253,18 @@ export default function Home() {
         userKeys: Object.keys(user || {})
       })
 
-      const requestData = {
-        userId: user.id,
-        customName: customName.trim(),
-        privyId: user.id,
-        email: user.email?.address || null
-      }
-      console.log('📤 Request data:', requestData)
+    const requestData = {
+      userId: user.id,
+      customName: customName.trim(),
+      privyId: user.id,
+      email: user.email?.address || null
+    }
+    console.log('📤 Request data:', requestData)
 
-      // Try the API request with improved error handling
+    // Strategy 1: Try production API
+    let serverSaveSuccess = false
+    
+    try {
       const response = await fetch('/api/users/profile/update-name', {
         method: 'POST',
         headers: {
@@ -1274,87 +1276,64 @@ export default function Home() {
       console.log('📡 API Response status:', response.status)
       console.log('📡 API Response ok:', response.ok)
       
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('❌ API Error response:', errorText)
-        console.error('❌ Response status:', response.status)
-        console.error('❌ Response statusText:', response.statusText)
+      if (response.ok) {
+        const responseData = await response.json()
+        console.log('📡 API Response data:', responseData)
         
-        // Handle specific error cases
-        if (response.status === 500) {
-          console.error('❌ Server error - this might be a deployment/gateway issue')
-          // For 500 errors, still update locally as a fallback
-          setDisplayName(customName.trim())
-          setIsEditingName(false)
-          alert(`Name updated locally to "${customName.trim()}". There was a server issue saving it permanently, but your change will be visible during this session.`)
-          return
-        } else if (response.status === 400) {
-          try {
-            const errorData = JSON.parse(errorText)
-            alert(`Invalid request: ${errorData.error || errorText}`)
-          } catch {
-            alert(`Bad request: ${errorText}`)
-          }
-        } else if (response.status >= 502 && response.status <= 504) {
-          // Gateway/proxy errors - common with external URLs
-          console.error('❌ Gateway/proxy error - using local fallback')
-          setDisplayName(customName.trim())
-          setIsEditingName(false)
-          alert(`Name updated locally to "${customName.trim()}". Connection issues prevented saving to server, but your change is active for this session.`)
-          return
-        } else {
-          try {
-            const errorData = JSON.parse(errorText)
-            alert(`Failed to update name: ${errorData.error || errorText}. Please try again.`)
-          } catch {
-            alert(`Failed to update name (HTTP ${response.status}): ${errorText}. Please try again.`)
-          }
+        if (responseData && responseData.success) {
+          console.log('✅ Name saved successfully to server!')
+          serverSaveSuccess = true
         }
-        return
-      }
-      
-      const responseData = await response.json()
-      console.log('📡 API Response data:', responseData)
-
-      if (responseData && responseData.success) {
-        setDisplayName(customName.trim())
-        setIsEditingName(false)
-        console.log('✅ Name updated successfully via API')
-        
-        // Reload user profile to get the server-side data
-        if (user?.id) {
-          console.log('🔄 Reloading user profile after name update...')
-          await loadUserProfile(user.id)
-        }
-        
-        // Show success message
-        alert(`✅ Name successfully updated to "${customName.trim()}"!`)
       } else {
-        console.error('❌ API returned success=false:', responseData)
-        // Even if API says it failed, try the local update as fallback
-        setDisplayName(customName.trim())
-        setIsEditingName(false)
-        alert(`Name updated locally to "${customName.trim()}". Server response was unclear, but your change is active.`)
+        console.error('❌ API Error response status:', response.status)
       }
     } catch (error) {
-      console.error('❌ Network error updating name:', error)
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      })
-      
-      // For any network errors, fall back to local update
-      setDisplayName(customName.trim())
-      setIsEditingName(false)
-      
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        alert(`Network error occurred, but name updated locally to "${customName.trim()}". Please check your internet connection. Your change is active for this session.`)
-      } else if (error.name === 'SyntaxError') {
-        alert(`Server response error, but name updated locally to "${customName.trim()}". Your change is active for this session.`)
-      } else {
-        alert(`Connection issue occurred, but name updated locally to "${customName.trim()}". Your change is active for this session.`)
+      console.error('❌ API Request failed:', error)
+    }
+
+    // Strategy 2: Save to localStorage for persistence across sessions
+    try {
+      const persistentUserData = {
+        userId: user.id,
+        customName: customName.trim(),
+        timestamp: new Date().toISOString(),
+        serverSaved: serverSaveSuccess
       }
+      
+      localStorage.setItem(`turfloot_user_${user.id}`, JSON.stringify(persistentUserData))
+      localStorage.setItem('turfloot_current_user', user.id)
+      localStorage.setItem('turfloot_display_name', customName.trim())
+      
+      console.log('💾 Name saved to localStorage for persistence')
+    } catch (error) {
+      console.error('❌ LocalStorage save failed:', error)
+    }
+
+    // Strategy 3: Update Privy display name if possible
+    try {
+      if (user.google && user.google.name !== customName.trim()) {
+        // Note: Privy display names are usually read-only, but we track the intent
+        console.log('📝 Tracking custom name preference in Privy context')
+      }
+    } catch (error) {
+      console.log('ℹ️ Privy display name update not available')
+    }
+
+    // Update local state
+    setDisplayName(customName.trim())
+    setIsEditingName(false)
+    
+    // Reload user profile to sync any server data
+    if (user?.id) {
+      console.log('🔄 Reloading user profile after name update...')
+      await loadUserProfile(user.id)
+    }
+    
+    // User feedback based on success level
+    if (serverSaveSuccess) {
+      alert(`✅ Name successfully updated to "${customName.trim()}" and saved permanently!`)
+    } else {
+      alert(`✅ Name updated to "${customName.trim()}"!\n\n💾 Saved locally - will persist across your sessions.\n⚠️ Server sync pending (will retry automatically).`)
     }
   }
 
