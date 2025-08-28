@@ -51,7 +51,12 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       // Also try to load from server-side API if available
       try {
         const token = await getAccessToken()
-        const response = await fetch(`/api/friends/list?userId=${user.id}`, {
+        // Force absolute localhost URL to bypass any fetch interceptors
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+        const apiUrl = `${baseUrl}/api/friends/list?userId=${user.id}`
+        console.log('🔗 DEBUG: Using ABSOLUTE friends list URL =', apiUrl)
+        
+        const response = await fetch(apiUrl, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
