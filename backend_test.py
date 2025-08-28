@@ -155,35 +155,15 @@ class TurfLootFriendsSystemTester:
         """Test 2: User Search Functionality - Both names/search and users/search endpoints"""
         print("\n🔍 TESTING USER SEARCH FUNCTIONALITY")
         
-        # Create additional test users for search testing
-        search_test_users = []
-        for i in range(3):
-            user_id = f"did:privy:search_test_{uuid.uuid4().hex[:12]}_{i}"
-            user_data = self.create_test_user_data(user_id)
-            user_data['privy_user']['google']['name'] = f"SearchUser{i+1}"
-            user_data['privy_user']['email'] = f"searchuser{i+1}@turfloot.com"
-            
-            # Create user via auth endpoint
-            try:
-                response = requests.post(f"{API_BASE}/auth/privy", json=user_data)
-                if response.status_code == 200:
-                    search_test_users.append({
-                        'id': user_id,
-                        'name': f"SearchUser{i+1}",
-                        'email': f"searchuser{i+1}@turfloot.com"
-                    })
-                    self.test_users.append(search_test_users[-1])
-            except Exception as e:
-                print(f"Failed to create search test user {i+1}: {e}")
-
-        time.sleep(1)  # Allow database to sync
+        # Wait for database sync after user creation
+        time.sleep(1)
 
         # Test 2.1: Names search endpoint
         start_time = time.time()
         try:
             current_user = self.test_users[0]['id'] if self.test_users else "test_user"
             response = requests.get(f"{API_BASE}/names/search", 
-                                  params={'q': 'SearchUser', 'userId': current_user})
+                                  params={'q': 'TestUser', 'userId': current_user})
             response_time = time.time() - start_time
             
             if response.status_code == 200:
@@ -191,7 +171,7 @@ class TurfLootFriendsSystemTester:
                 if 'users' in data and isinstance(data['users'], list):
                     found_users = len(data['users'])
                     self.log_test("Search - Names endpoint", True, 
-                                f"Names search working, found {found_users} users matching 'SearchUser'", 
+                                f"Names search working, found {found_users} users matching 'TestUser'", 
                                 response_time)
                 else:
                     self.log_test("Search - Names endpoint", False, 
@@ -207,7 +187,7 @@ class TurfLootFriendsSystemTester:
         try:
             current_user = self.test_users[0]['id'] if self.test_users else "test_user"
             response = requests.get(f"{API_BASE}/users/search", 
-                                  params={'q': 'SearchUser', 'userId': current_user})
+                                  params={'q': 'TestUser', 'userId': current_user})
             response_time = time.time() - start_time
             
             if response.status_code == 200:
@@ -215,7 +195,7 @@ class TurfLootFriendsSystemTester:
                 if 'users' in data and isinstance(data['users'], list):
                     found_users = len(data['users'])
                     self.log_test("Search - Users endpoint", True, 
-                                f"Users search working, found {found_users} users matching 'SearchUser'", 
+                                f"Users search working, found {found_users} users matching 'TestUser'", 
                                 response_time)
                 else:
                     self.log_test("Search - Users endpoint", False, 
@@ -247,6 +227,34 @@ class TurfLootFriendsSystemTester:
                             f"Expected 200, got {response.status_code}", response_time)
         except Exception as e:
             self.log_test("Search - Query validation", False, f"Request failed: {str(e)}")
+
+        # Test 2.4: Search exclusion (user should not find themselves)
+        if len(self.test_users) >= 2:
+            start_time = time.time()
+            try:
+                user1 = self.test_users[0]
+                response = requests.get(f"{API_BASE}/users/search", 
+                                      params={'q': 'TestUser1', 'userId': user1['id']})
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'users' in data:
+                        # Check if user1 is excluded from their own search results
+                        user_ids = [user.get('id') for user in data['users']]
+                        self_excluded = user1['id'] not in user_ids
+                        
+                        self.log_test("Search - Self exclusion", self_excluded, 
+                                    f"User correctly excluded from own search results: {self_excluded}", 
+                                    response_time)
+                    else:
+                        self.log_test("Search - Self exclusion", False, 
+                                    "Invalid response structure", response_time)
+                else:
+                    self.log_test("Search - Self exclusion", False, 
+                                f"Expected 200, got {response.status_code}", response_time)
+            except Exception as e:
+                self.log_test("Search - Self exclusion", False, f"Request failed: {str(e)}")
 
     def test_friend_request_system(self):
         """Test 3: Friend Request System - Send requests with authentication"""
