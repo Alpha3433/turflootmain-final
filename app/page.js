@@ -208,7 +208,7 @@ export default function Home() {
     try {
       console.log('🏰 Creating lobby for room type:', roomType)
       
-      const response = await fetch('/api/lobby/create', {
+      const response = await fetch('http://localhost:3000/api/lobby/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
