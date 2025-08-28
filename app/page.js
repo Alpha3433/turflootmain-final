@@ -313,7 +313,7 @@ export default function Home() {
 
   const validateRoomAccess = async (roomType, memberIds) => {
     try {
-      const response = await fetch(`/api/lobby/validate-room?roomType=${roomType}&memberIds=${memberIds.join(',')}`)
+      const response = await fetch(`http://localhost:3000/api/lobby/validate-room?roomType=${roomType}&memberIds=${memberIds.join(',')}`)
       const data = await response.json()
       
       if (response.ok) {
