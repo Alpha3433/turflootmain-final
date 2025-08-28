@@ -2375,7 +2375,7 @@ export default function Home() {
           <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-3 max-w-5xl mx-auto space-y-6 sm:space-y-7 lg:space-y-0 flex-1">
             
             {/* LEFT COLUMN - Leaderboard & Friends - Mobile: Order Last (Bottom) */}
-            <div className="order-3 lg:order-1 col-span-12 lg:col-span-3 space-y-4 lg:space-y-3">
+            <div className="order-3 lg:order-1 col-span-12 lg:col-span-3 space-y-4 lg:space-y-3 mt-2 lg:mt-0">
               {/* Leaderboard - More compact on mobile */}
               <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-3 lg:p-4 shadow-2xl">
                 <div className="flex items-center space-x-3 mb-3 lg:mb-4">
