@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Friend Request Notifications System
-Testing the complete notification workflow from friend request → notification → acceptance/decline → friends list update
+Comprehensive Backend Testing for Friends System Enhanced Validation
+Target: 100% Success Rate for Both Systems
+
+Testing Focus:
+1. Friends Authentication Workflow - Target: 100% (was 93.3%)
+2. Friend Request Notifications - Target: 100% (was 96.4%)
+
+Enhanced Validations to Verify:
+- Strict string type validation for user IDs and request IDs
+- Rejection of extra/unexpected fields in request payloads
+- Empty string validation to prevent blank inputs
+- Proper error responses (400 status) for invalid data types
 """
 
 import requests
