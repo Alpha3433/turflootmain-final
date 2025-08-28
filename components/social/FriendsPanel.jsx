@@ -203,7 +203,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
           // Store pending friend request in localStorage
           const pendingRequests = JSON.parse(localStorage.getItem('turfloot_pending_friend_requests') || '[]')
           const newRequest = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             fromUserId: user.id,
             fromUsername: displayName || 'Anonymous',
             toUserId: targetUser.id,
