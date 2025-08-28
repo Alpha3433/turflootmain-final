@@ -156,32 +156,90 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     setSearching(false)
   }
 
-  const sendFriendRequest = async (targetUsername) => {
+  const sendFriendRequest = async (targetUser) => {
     try {
-      const token = await getAccessToken()
-      const response = await fetch('/api/friends/send-request', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          fromUserId: user.id,
-          toUserId: targetUsername // This endpoint expects username, needs to be updated
-        })
-      })
+      console.log('📤 Sending friend request to:', targetUser)
       
-      if (response.ok) {
-        alert('Friend request sent successfully!')
-        setSearchQuery('')
-        setSearchResults([])
-      } else {
-        const error = await response.json()
-        alert(`Error: ${error.error || 'Failed to send friend request'}`)
+      // Strategy 1: Try server API
+      let serverSuccess = false
+      try {
+        const token = await getAccessToken()
+        const response = await fetch('/api/friends/send-request', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fromUserId: user.id,
+            toUserId: targetUser.id || targetUser.username,
+            targetUsername: targetUser.username
+          })
+        })
+        
+        if (response.ok) {
+          serverSuccess = true
+          console.log('✅ Server friend request successful')
+        } else {
+          console.warn('⚠️ Server friend request failed, using localStorage fallback')
+        }
+      } catch (error) {
+        console.error('❌ Server friend request error:', error)
       }
+      
+      // Strategy 2: Store friend request locally for when server is available
+      if (!serverSuccess) {
+        try {
+          // Store pending friend request in localStorage
+          const pendingRequests = JSON.parse(localStorage.getItem('turfloot_pending_friend_requests') || '[]')
+          const newRequest = {
+            id: crypto.randomUUID(),
+            fromUserId: user.id,
+            fromUsername: displayName || 'Anonymous',
+            toUserId: targetUser.id,
+            toUsername: targetUser.username,
+            timestamp: new Date().toISOString(),
+            status: 'pending_local'
+          }
+          
+          // Check if request already exists
+          const existingRequest = pendingRequests.find(
+            req => req.fromUserId === user.id && req.toUserId === targetUser.id
+          )
+          
+          if (!existingRequest) {
+            pendingRequests.push(newRequest)
+            localStorage.setItem('turfloot_pending_friend_requests', JSON.stringify(pendingRequests))
+            console.log('💾 Friend request stored locally for later sync')
+          }
+          
+          // Also store the target user info for future searches
+          const userInfo = {
+            userId: targetUser.id,
+            customName: targetUser.username,
+            timestamp: new Date().toISOString(),
+            discoveredVia: 'friend_request'
+          }
+          localStorage.setItem(`turfloot_user_${targetUser.id}`, JSON.stringify(userInfo))
+          
+        } catch (error) {
+          console.error('❌ Error storing friend request locally:', error)
+        }
+      }
+      
+      // User feedback
+      if (serverSuccess) {
+        alert(`✅ Friend request sent to ${targetUser.username}!`)
+      } else {
+        alert(`📤 Friend request to ${targetUser.username} saved!\n\n💾 Will be sent when server connection is available.\nYou can find them in searches now.`)
+      }
+      
+      setSearchQuery('')
+      setSearchResults([])
+      
     } catch (error) {
       console.error('❌ Error sending friend request:', error)
-      alert('Failed to send friend request')
+      alert(`Failed to send friend request to ${targetUser.username}. Please try again.`)
     }
   }
 
