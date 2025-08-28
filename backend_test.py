@@ -160,7 +160,7 @@ class FriendsSystemTester:
         
         response = self.make_request('POST', 'friends/send-request', data=request_data)
         
-        if response and response.status_code == 400:
+        if response is not None and response.status_code == 400:
             data = response.json()
             error_msg = data.get('error', '')
             self.log_test(
