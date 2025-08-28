@@ -443,7 +443,7 @@ class FriendsSystemTester:
             self.log_test(
                 "Missing fromUserId Validation", 
                 False,
-                f"Should have returned 400 error - Status: {response.status_code if response else 'No response'}"
+                f"Should have returned 400 error - Status: {response.status_code if response else 'No response'}, Response: {response.text if response else 'None'}"
             )
             
         # Test send-request with missing toUserId
@@ -465,7 +465,7 @@ class FriendsSystemTester:
             self.log_test(
                 "Missing toUserId Validation", 
                 False,
-                f"Should have returned 400 error - Status: {response.status_code if response else 'No response'}"
+                f"Should have returned 400 error - Status: {response.status_code if response else 'No response'}, Response: {response.text if response else 'None'}"
             )
             
     def run_all_tests(self):
