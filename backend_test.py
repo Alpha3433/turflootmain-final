@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+Backend API Testing for Custom Name Change and Session Persistence Flow
+Testing the complete flow to resolve user's issue with names reverting to default
+"""
 
 import requests
 import json
@@ -6,9 +10,17 @@ import time
 import sys
 from datetime import datetime
 
-# Test Configuration
-BASE_URL = "http://localhost:3000"
-API_BASE = f"{BASE_URL}/api"
+# Configuration
+BASE_URL = "https://lobby-party.preview.emergentagent.com"
+LOCAL_URL = "http://localhost:3000"
+
+# Use localhost for testing as external URL has 502 issues
+API_BASE = LOCAL_URL + "/api"
+
+def log_test(message, status="INFO"):
+    """Log test messages with timestamp"""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    print(f"[{timestamp}] {status}: {message}")
 
 class TurfLootBackendTester:
     def __init__(self):
