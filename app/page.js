@@ -2372,7 +2372,7 @@ export default function Home() {
           </div>
 
           {/* Main Game Grid - Mobile: Flex Column with Better Spacing, Desktop: Grid */}
-          <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-3 max-w-5xl mx-auto space-y-2 sm:space-y-3 lg:space-y-0 flex-1">
+          <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-3 max-w-5xl mx-auto space-y-4 sm:space-y-5 lg:space-y-0 flex-1">
             
             {/* LEFT COLUMN - Leaderboard & Friends - Mobile: Order Last (Bottom) */}
             <div className="order-3 lg:order-1 col-span-12 lg:col-span-3 space-y-2 lg:space-y-3">
