@@ -1506,8 +1506,8 @@ export default function Home() {
       minHeight: '100vh',
       minHeight: '100dvh' // Use dynamic viewport height for mobile
     }}>
-      {/* Game-Inspired Animated Background */}
-      <div className="absolute inset-0 pointer-events-none z-10">
+      {/* Game-Inspired Animated Background - Full Coverage */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-10" style={{ minHeight: '100vh', minHeight: '100dvh' }}>
         
         {/* Floating Game Coins - Much Brighter */}
         <div className="absolute top-20 left-16 animate-float-coin z-20" style={{ animationDelay: '0s' }}>
