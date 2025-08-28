@@ -42,12 +42,48 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
 
   const fetchFriends = async () => {
     try {
-      // Load friends from localStorage
-      const localFriends = JSON.parse(localStorage.getItem('turfloot_friends') || '[]')
-      console.log('👥 Loaded', localFriends.length, 'friends from localStorage')
+      // Load user-specific friends from localStorage
+      const userFriendsKey = getUserFriendsKey()
+      const localFriends = JSON.parse(localStorage.getItem(userFriendsKey) || '[]')
+      console.log('👥 Loaded', localFriends.length, 'user-specific friends from localStorage for user:', user?.id)
       setAllFriends(localFriends)
+      
+      // Also try to load from server-side API if available
+      try {
+        const token = await getAccessToken()
+        const response = await fetch(`/api/friends/list?userId=${user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+        
+        if (response.ok) {
+          const serverData = await response.json()
+          const serverFriends = serverData.friends || []
+          console.log('👥 Loaded', serverFriends.length, 'friends from server API')
+          
+          // Merge server friends with local friends (server takes priority)
+          const mergedFriends = [...serverFriends]
+          
+          // Add any local friends not on server (for offline-added friends)
+          for (const localFriend of localFriends) {
+            if (!serverFriends.find(sf => sf.id === localFriend.id)) {
+              mergedFriends.push(localFriend)
+            }
+          }
+          
+          setAllFriends(mergedFriends)
+          
+          // Update localStorage with merged data
+          localStorage.setItem(userFriendsKey, JSON.stringify(mergedFriends))
+        }
+      } catch (serverError) {
+        console.log('⚠️ Server friends API not available, using localStorage only:', serverError.message)
+      }
+      
     } catch (error) {
-      console.error('❌ Error fetching friends from localStorage:', error)
+      console.error('❌ Error fetching friends:', error)
       setAllFriends([])
     }
   }
