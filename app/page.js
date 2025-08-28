@@ -2654,31 +2654,31 @@ export default function Home() {
             </div>
 
             {/* RIGHT COLUMN - Wallet & Customize - Mobile: Order Second (Middle) */}
-            <div className="order-2 lg:order-3 col-span-12 lg:col-span-3 space-y-3">
-              {/* Wallet Panel */}
-              <div className="glass-card rounded-2xl p-4 border border-cyan-400/20 shadow-lg">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-6 h-6 bg-cyan-400 rounded-lg flex items-center justify-center">
+            <div className="order-2 lg:order-3 col-span-12 lg:col-span-3 space-y-2 lg:space-y-3">
+              {/* Wallet Panel - More compact on mobile */}
+              <div className="glass-card rounded-2xl p-3 lg:p-4 border border-cyan-400/20 shadow-lg">
+                <div className="flex items-center space-x-3 mb-3 lg:mb-4">
+                  <div className="w-5 h-5 lg:w-6 lg:h-6 bg-cyan-400 rounded-lg flex items-center justify-center">
                     <span className="text-xs font-bold text-black">💰</span>
                   </div>
-                  <h3 className="text-white font-bold text-lg">Wallet</h3>
+                  <h3 className="text-white font-bold text-base lg:text-lg">Wallet</h3>
                 </div>
                 
                 <WalletManager onBalanceUpdate={(balance) => setWalletBalance(balance.balance)} />
               </div>
 
-              {/* Customize */}
-              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-6 shadow-2xl">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">🎨</span>
+              {/* Customize - More compact on mobile */}
+              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 lg:p-6 shadow-2xl">
+                <div className="flex items-center space-x-3 mb-4 lg:mb-6">
+                  <div className="w-6 h-6 lg:w-8 lg:h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-xs lg:text-sm">🎨</span>
                   </div>
-                  <h3 className="text-white font-bold text-lg">Customize</h3>
+                  <h3 className="text-white font-bold text-base lg:text-lg">Customize</h3>
                 </div>
                 <div className="text-center">
-                  <div className="relative w-20 h-20 mx-auto mb-4">
-                    {/* Playable Character Circle with Dynamic Customization */}
-                    <div className={`w-20 h-20 rounded-full player-character animate-breathe hover:animate-hover-bounce-loop transition-all duration-300 cursor-pointer shadow-lg border-2 border-cyan-300 flex items-center justify-center ${
+                  <div className="relative w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-3 lg:mb-4">
+                    {/* Playable Character Circle with Dynamic Customization - Smaller on mobile */}
+                    <div className={`w-16 h-16 lg:w-20 lg:h-20 rounded-full player-character animate-breathe hover:animate-hover-bounce-loop transition-all duration-300 cursor-pointer shadow-lg border-2 border-cyan-300 flex items-center justify-center ${
                       playerCustomization.skin === 'default_blue' || playerCustomization.skin === 'classic_blue' ? 'bg-gradient-to-br from-cyan-300 via-blue-500 to-blue-600 shadow-blue-500/30' :
                       playerCustomization.skin === 'basic_red' ? 'bg-gradient-to-br from-red-400 via-red-500 to-red-600 shadow-red-500/30' :
                       playerCustomization.skin === 'basic_green' ? 'bg-gradient-to-br from-green-400 via-green-500 to-green-600 shadow-green-500/30' :
