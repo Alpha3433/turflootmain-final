@@ -2700,23 +2700,23 @@ export default function Home() {
                       'bg-gradient-to-br from-cyan-300 via-blue-500 to-blue-600 shadow-blue-500/30'
                     }`} id="player-character">
                       
-                      {/* Dynamic Eyes based on equipped face */}
+                      {/* Dynamic Eyes based on equipped face - Mobile responsive spacing */}
                       {playerCustomization.face === 'angry_eyes' ? (
                         <>
-                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 left-6 transform rotate-12 transition-transform duration-150 ease-out" id="left-eye"></div>
-                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-5 right-6 transform -rotate-12 transition-transform duration-150 ease-out" id="right-eye"></div>
-                          <div className="w-4 h-1 bg-red-600 rounded absolute top-7 left-1/2 transform -translate-x-1/2"></div>
+                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-4 lg:top-5 left-4 lg:left-6 transform rotate-12 transition-transform duration-150 ease-out" id="left-eye"></div>
+                          <div className="w-2 h-1.5 bg-black rounded-sm absolute top-4 lg:top-5 right-4 lg:right-6 transform -rotate-12 transition-transform duration-150 ease-out" id="right-eye"></div>
+                          <div className="w-4 h-1 bg-red-600 rounded absolute top-6 lg:top-7 left-1/2 transform -translate-x-1/2"></div>
                         </>
                       ) : playerCustomization.face === 'wink_eyes' ? (
                         <>
-                          <div className="w-2 h-0.5 bg-black rounded absolute top-6 left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
-                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
-                          <div className="w-3 h-1 bg-pink-500 rounded-full absolute top-7 left-1/2 transform -translate-x-1/2"></div>
+                          <div className="w-2 h-0.5 bg-black rounded absolute top-5 lg:top-6 left-4 lg:left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-4 lg:top-5 right-4 lg:right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
+                          <div className="w-3 h-1 bg-pink-500 rounded-full absolute top-6 lg:top-7 left-1/2 transform -translate-x-1/2"></div>
                         </>
                       ) : (
                         <>
-                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
-                          <div className="w-2 h-2 bg-black rounded-full absolute top-5 right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-4 lg:top-5 left-4 lg:left-6 transition-transform duration-150 ease-out" id="left-eye"></div>
+                          <div className="w-2 h-2 bg-black rounded-full absolute top-4 lg:top-5 right-4 lg:right-6 transition-transform duration-150 ease-out" id="right-eye"></div>
                         </>
                       )}
                       
