@@ -17,12 +17,18 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const { user, getAccessToken } = usePrivy()
   const [onlineFriends, setOnlineFriends] = useState([])
   const [allFriends, setAllFriends] = useState([])
+  const [friendRequests, setFriendRequests] = useState([]) // Incoming friend requests
+  const [sentRequests, setSentRequests] = useState([]) // Sent friend requests
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
-  const [localUsers, setLocalUsers] = useState([]) // Track locally discovered users
   const [searching, setSearching] = useState(false)
-  const [activeTab, setActiveTab] = useState('friends') // 'friends' or 'search'
+  const [activeTab, setActiveTab] = useState('friends') // 'friends', 'requests', or 'search'
+
+  // Get user-specific localStorage keys
+  const getUserFriendsKey = () => `turfloot_friends_${user?.id}`
+  const getUserRequestsKey = () => `turfloot_friend_requests_${user?.id}`
+  const getUserSentRequestsKey = () => `turfloot_sent_requests_${user?.id}`
 
   useEffect(() => {
     if (user) {
