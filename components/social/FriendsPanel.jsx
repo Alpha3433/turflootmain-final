@@ -122,14 +122,12 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     setSearching(true)
     
     try {
-      // ONLY use server-side bulletproof names API - NO localStorage fallbacks
+      // Use relative URLs for same-origin requests (Next.js handles routing internally)
       console.log('🔍 Searching server API for users:', query, 'excluding user:', user.id)
-      console.log('🌐 DEBUG: NEXT_PUBLIC_BASE_URL =', process.env.NEXT_PUBLIC_BASE_URL)
+      console.log('🌐 DEBUG: Using relative URL for same-origin request')
       
-      // Force absolute localhost URL to bypass any fetch interceptors
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-      const apiUrl = `${baseUrl}/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
-      console.log('🔗 DEBUG: Using ABSOLUTE API URL =', apiUrl)
+      const apiUrl = `/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
+      console.log('🔗 DEBUG: Calling relative API URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
