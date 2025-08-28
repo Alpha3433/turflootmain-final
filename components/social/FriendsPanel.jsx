@@ -137,14 +137,9 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     setSearching(true)
     
     try {
-      // Dynamic API URL - use localhost for local development, relative URL for preview
-      const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      const baseURL = isLocalDevelopment ? 'http://localhost:3000' : ''
-      
       console.log('🔍 Searching server API for users:', query, 'excluding user:', user.id)
-      console.log('🌐 DEBUG: Environment detected:', isLocalDevelopment ? 'localhost' : 'preview deployment')
       
-      const apiUrl = `${baseURL}/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
+      const apiUrl = getApiUrl(`/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`)
       console.log('🔗 DEBUG: Calling API URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
