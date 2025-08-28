@@ -1,0 +1,349 @@
+{
+  "test_start_time": "2025-08-28T04:59:22.593285",
+  "localhost_results": {
+    "custom_name_flow": true,
+    "multi_user_flow": true,
+    "major_endpoints": true,
+    "production_mode": true
+  },
+  "production_results": {
+    "custom_name_flow": false,
+    "multi_user_flow": false,
+    "major_endpoints": false,
+    "production_mode": false
+  },
+  "total_tests": 41,
+  "passed_tests": 26,
+  "failed_tests": 15,
+  "success_rate": 63.41463414634146,
+  "detailed_results": [
+    {
+      "test": "Custom Name Update - Realistic Data",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.01803421974182129,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:16.601662"
+    },
+    {
+      "test": "Profile Retrieval After Name Update",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.009694576263427734,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:17.611646"
+    },
+    {
+      "test": "Name Persistence Verification",
+      "status": "PASS",
+      "message": "Custom name 'TestUsername' persisted correctly",
+      "response_time": null,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:17.611807"
+    },
+    {
+      "test": "Session Persistence Check #1",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.009460687637329102,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:18.621427"
+    },
+    {
+      "test": "Session Persistence Check #2",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.009193181991577148,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:19.630945"
+    },
+    {
+      "test": "Session Persistence Check #3",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.009546041488647461,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:20.640778"
+    },
+    {
+      "test": "Session Persistence Simulation",
+      "status": "PASS",
+      "message": "Custom name persisted across 3 session refresh simulations",
+      "response_time": null,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:20.640943"
+    },
+    {
+      "test": "Multi-User Test 1 - Name Update (PlayerOne)",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.014075517654418945,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:20.655079"
+    },
+    {
+      "test": "Multi-User Test 1 - Profile Retrieval (PlayerOne)",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.008400917053222656,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:21.163772"
+    },
+    {
+      "test": "Multi-User Test 2 - Name Update (GamerPro2024)",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.013764381408691406,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:21.177716"
+    },
+    {
+      "test": "Multi-User Test 2 - Profile Retrieval (GamerPro2024)",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.00899362564086914,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:21.687016"
+    },
+    {
+      "test": "Multi-User Test 3 - Name Update (FlowTestUser)",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.010524749755859375,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:21.697718"
+    },
+    {
+      "test": "Multi-User Test 3 - Profile Retrieval (FlowTestUser)",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.008208513259887695,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.206182"
+    },
+    {
+      "test": "Root API Endpoint",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.008180618286132812,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.214546"
+    },
+    {
+      "test": "Ping Endpoint",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.005076169967651367,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.219777"
+    },
+    {
+      "test": "Server Browser API",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.03831744194030762,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.258364"
+    },
+    {
+      "test": "Live Players Statistics",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.005036830902099609,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.263587"
+    },
+    {
+      "test": "Global Winnings Statistics",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.004015684127807617,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.267764"
+    },
+    {
+      "test": "Leaderboard API",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.006701946258544922,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.274616"
+    },
+    {
+      "test": "Friends List API",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.004252433776855469,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.279005"
+    },
+    {
+      "test": "Stability Test #1",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.004425764083862305,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.283600"
+    },
+    {
+      "test": "Stability Test #2",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.003844738006591797,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.287582"
+    },
+    {
+      "test": "Stability Test #3",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.004094123840332031,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.291812"
+    },
+    {
+      "test": "Stability Test #4",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.004307746887207031,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.296249"
+    },
+    {
+      "test": "Stability Test #5",
+      "status": "PASS",
+      "message": "Status 200 - Response received successfully",
+      "response_time": 0.004001140594482422,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.300380"
+    },
+    {
+      "test": "Production Stability Test",
+      "status": "PASS",
+      "message": "All 5 rapid requests succeeded in 0.021s",
+      "response_time": 0.02135753631591797,
+      "url_type": "localhost",
+      "timestamp": "2025-08-28T04:59:22.300515"
+    },
+    {
+      "test": "Custom Name Update - Realistic Data",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.05645895004272461,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.357022"
+    },
+    {
+      "test": "Multi-User Test 1 - Name Update (PlayerOne)",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.01966547966003418,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.377031"
+    },
+    {
+      "test": "Root API Endpoint",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.0160825252532959,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.393437"
+    },
+    {
+      "test": "Ping Endpoint",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.014112472534179688,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.407849"
+    },
+    {
+      "test": "Server Browser API",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.020528793334960938,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.428623"
+    },
+    {
+      "test": "Live Players Statistics",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.019087553024291992,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.447994"
+    },
+    {
+      "test": "Global Winnings Statistics",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.017077207565307617,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.465372"
+    },
+    {
+      "test": "Leaderboard API",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.02352428436279297,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.489202"
+    },
+    {
+      "test": "Friends List API",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.018584489822387695,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.508122"
+    },
+    {
+      "test": "Stability Test #1",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.018162012100219727,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.526590"
+    },
+    {
+      "test": "Stability Test #2",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.015019893646240234,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.541890"
+    },
+    {
+      "test": "Stability Test #3",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.018784046173095703,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.560951"
+    },
+    {
+      "test": "Stability Test #4",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.01661968231201172,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.577856"
+    },
+    {
+      "test": "Stability Test #5",
+      "status": "FAIL",
+      "message": "Expected status 200, got 502 - ",
+      "response_time": 0.014809846878051758,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.592916"
+    },
+    {
+      "test": "Production Stability Test",
+      "status": "FAIL",
+      "message": "Only 0/5 rapid requests succeeded",
+      "response_time": 0.0847468376159668,
+      "url_type": "production",
+      "timestamp": "2025-08-28T04:59:22.593169"
+    }
+  ]
+}
