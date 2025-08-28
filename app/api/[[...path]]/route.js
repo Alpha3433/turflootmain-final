@@ -1968,11 +1968,35 @@ export async function POST(request, { params }) {
     // Mark notifications as read
     if (route === 'friends/notifications/mark-read') {
       try {
-        const { userId } = body
+        const { userId, ...extraFields } = body
         
+        // Strict input validation
         if (!userId) {
           return NextResponse.json({
             error: 'userId is required'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Validate data type
+        if (typeof userId !== 'string') {
+          return NextResponse.json({
+            error: 'userId must be a string',
+            details: `Got userId: ${typeof userId}`
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Validate string content
+        if (userId.trim() === '') {
+          return NextResponse.json({
+            error: 'userId cannot be empty string'
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Reject extra fields
+        if (Object.keys(extraFields).length > 0) {
+          return NextResponse.json({
+            error: 'Invalid request fields detected',
+            details: `Unexpected fields: ${Object.keys(extraFields).join(', ')}`
           }, { status: 400, headers: corsHeaders })
         }
 
