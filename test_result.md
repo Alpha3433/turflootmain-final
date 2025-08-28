@@ -1095,7 +1095,7 @@ backend:
 
   - task: "Friend Request Notifications System (POST /api/friends/send-request with pending status)"
     implemented: true
-    working: true
+    working: false
     file: "/app/app/api/[[...path]]/route.js"
     stuck_count: 0
     priority: "high"
