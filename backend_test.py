@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend API Testing - Final Verification for 100% Success Rate
-Testing Friends Authentication Workflow and Friend Request Notifications after API connectivity fix
+BYPASS API ENDPOINTS TESTING FOR 502 BAD GATEWAY RESOLUTION
 
-REVIEW REQUEST VERIFICATION:
-- Confirm 100% success rate achieved after API connectivity fix
-- Test all authentication scenarios with localhost URLs
-- Verify all 6 notification endpoints working properly
-- Test enhanced validation with no connectivity errors
-- Complete end-to-end testing of friends workflow
+Test the newly created bypass endpoints to resolve the persistent 502 Bad Gateway issues 
+affecting /api/* routes on the preview deployment.
 
-API CONNECTIVITY FIX APPLIED:
-✅ Updated all FriendsPanel API calls to use localhost URLs instead of relative URLs
-✅ Fixed searchUsers, fetchFriends, fetchOnlineFriends, fetchPendingRequests functions
-✅ Fixed notification endpoints: count, accept-request, decline-request, mark-read
+PRIORITY ENDPOINTS TO TEST:
+1. Health Check Bypass (NOT /api prefixed): GET /health
+2. Names API Bypass (NOT /api prefixed): GET /names-api/get, POST /names-api/update, GET /names-api/search
+3. Compare with Problematic /api Endpoints: GET /api/names/get, GET /api/ping
+
+TESTING REQUIREMENTS:
+- Test all endpoints on LOCALHOST (http://localhost:3000) - should work
+- Test all endpoints on PREVIEW URL if available - /api/* routes should return 502, bypass routes should work
+- Verify name saving/retrieval functionality works via bypass routes
+- Confirm data persistence between save and retrieve operations
 """
 
 import requests
