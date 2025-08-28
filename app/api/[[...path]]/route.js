@@ -866,11 +866,15 @@ export async function GET(request, { params }) {
 
     // Names search endpoint (alternative to users/search for frontend compatibility)
     if (route === 'names/search') {
+      console.log('🎯 NAMES SEARCH ENDPOINT HIT - Query:', url.searchParams.get('q'), 'UserId:', url.searchParams.get('userId'))
       try {
         const query = url.searchParams.get('q')
         const currentUserId = url.searchParams.get('userId')
         
+        console.log('🔍 Names search parameters:', { query, currentUserId })
+        
         if (!query || query.length < 2) {
+          console.log('⚠️ Query too short or missing')
           return NextResponse.json({
             users: [],
             total: 0,
@@ -878,8 +882,11 @@ export async function GET(request, { params }) {
           }, { headers: corsHeaders })
         }
 
+        console.log('🔗 Connecting to database for names search...')
         const db = await getDb()
         const users = db.collection('users')
+        
+        console.log('🔍 Searching for users with query:', query)
         
         // Search for users by username (case-insensitive) - same logic as users/search
         const searchResults = await users.find({
@@ -904,11 +911,15 @@ export async function GET(request, { params }) {
         })
         .toArray()
         
+        console.log(`📊 Names search found ${searchResults.length} results`)
+        
         const formattedResults = searchResults.map(user => ({
           id: user.id,
           username: user.custom_name || user.profile?.display_name || user.username || 'Anonymous',
           joinDate: user.created_at
         }))
+        
+        console.log('✅ Names search returning results:', formattedResults.length)
         
         return NextResponse.json({
           users: formattedResults,
