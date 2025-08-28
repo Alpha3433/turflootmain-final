@@ -773,8 +773,96 @@ export async function GET(request, { params }) {
       }
     }
 
-    // Friends list endpoint
-    if (route === 'friends/list') {
+    // Real-time friends online status endpoint
+    if (route === 'friends/online-status') {
+      try {
+        const userId = url.searchParams.get('userId')
+        
+        if (!userId) {
+          return NextResponse.json(
+            { error: 'userId parameter is required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        // Get online friends from game server
+        let onlineFriends = []
+        if (global.turflootGameServer) {
+          onlineFriends = await global.turflootGameServer.getOnlineFriends(userId)
+        }
+        
+        return NextResponse.json({
+          onlineFriends,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Online friends status error:', error)
+        return NextResponse.json(
+          { error: 'Failed to get online friends status' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
+    // User search endpoint for adding friends
+    if (route === 'users/search') {
+      try {
+        const query = url.searchParams.get('q')
+        const currentUserId = url.searchParams.get('userId')
+        
+        if (!query || query.length < 2) {
+          return NextResponse.json({
+            users: [],
+            message: 'Search query must be at least 2 characters'
+          }, { headers: corsHeaders })
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Search for users by username (case-insensitive)
+        const searchResults = await users.find({
+          $and: [
+            {
+              $or: [
+                { username: { $regex: new RegExp(query, 'i') } },
+                { custom_name: { $regex: new RegExp(query, 'i') } },
+                { 'profile.display_name': { $regex: new RegExp(query, 'i') } }
+              ]
+            },
+            { id: { $ne: currentUserId } } // Exclude current user
+          ]
+        })
+        .limit(10)
+        .project({
+          id: 1,
+          username: 1,
+          custom_name: 1,
+          'profile.display_name': 1,
+          created_at: 1
+        })
+        .toArray()
+        
+        const formattedResults = searchResults.map(user => ({
+          id: user.id,
+          username: user.custom_name || user.profile?.display_name || user.username || 'Anonymous',
+          joinDate: user.created_at
+        }))
+        
+        return NextResponse.json({
+          users: formattedResults,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ User search error:', error)
+        return NextResponse.json(
+          { error: 'Failed to search users' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
       try {
         const userId = url.searchParams.get('userId')
         
