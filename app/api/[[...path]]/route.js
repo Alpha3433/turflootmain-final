@@ -119,11 +119,15 @@ const generateUniqueUsername = async () => {
   return username
 }
 
-// Enable CORS
+// CORS headers for all API responses - Enhanced for external access
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Accept, Origin',
+  'Access-Control-Max-Age': '86400',
+  'Cache-Control': 'no-store, no-cache, must-revalidate',
+  'X-API-Server': 'TurfLoot-NextJS',
+  'X-External-Access': 'Enabled'
 }
 
 // Route handler
