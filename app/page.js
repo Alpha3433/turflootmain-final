@@ -2371,19 +2371,19 @@ export default function Home() {
           <div className="flex flex-col lg:grid lg:grid-cols-12 lg:gap-3 max-w-5xl mx-auto space-y-2 sm:space-y-3 lg:space-y-0 flex-1">
             
             {/* LEFT COLUMN - Leaderboard & Friends - Mobile: Order Last (Bottom) */}
-            <div className="order-3 lg:order-1 col-span-12 lg:col-span-3 space-y-3">
-              {/* Leaderboard */}
-              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-4 shadow-2xl">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
-                    <span className="text-black font-bold text-sm">🏆</span>
+            <div className="order-3 lg:order-1 col-span-12 lg:col-span-3 space-y-2 lg:space-y-3">
+              {/* Leaderboard - More compact on mobile */}
+              <div className="bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-gray-700/50 p-3 lg:p-4 shadow-2xl">
+                <div className="flex items-center space-x-3 mb-3 lg:mb-4">
+                  <div className="w-6 h-6 lg:w-8 lg:h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                    <span className="text-black font-bold text-xs lg:text-sm">🏆</span>
                   </div>
-                  <h3 className="text-white font-bold text-lg">Leaderboard</h3>
+                  <h3 className="text-white font-bold text-base lg:text-lg">Leaderboard</h3>
                   <div className="ml-auto">
                     <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full font-medium">Live</span>
                   </div>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2 lg:space-y-3">
                   {loadingLeaderboard ? (
                     <div className="text-center py-8">
                       <div className="text-2xl animate-spin mb-2">⏳</div>
