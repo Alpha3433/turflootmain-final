@@ -2181,6 +2181,28 @@ export default function Home() {
                   )}
                 </button>
                 
+                {/* Friends Button - Teal Theme */}
+                <button 
+                  onClick={() => setShowFriendsPanel(true)}
+                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-teal-600/90 to-teal-700/90 backdrop-blur-sm border border-teal-500/60 rounded-xl shadow-lg hover:from-teal-500/90 hover:to-teal-600/90 transition-all duration-200 group cursor-pointer"
+                  title="Friends & Social"
+                >
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-teal-500/20 border-teal-500/30 group-hover:bg-teal-500/30 transition-all duration-200">
+                    <svg className="w-4 h-4 text-teal-400 group-hover:text-teal-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m3 4.197a4 4 0 11-6.918-4.544A6.945 6.945 0 0015 21z" />
+                    </svg>
+                  </div>
+                  
+                  <div className="flex flex-col">
+                    <span className="font-medium text-xs leading-none text-teal-400 group-hover:text-teal-300 transition-colors duration-200">
+                      Friends
+                    </span>
+                    <span className="text-gray-400 text-xs leading-none">
+                      Social
+                    </span>
+                  </div>
+                </button>
+                
                 {/* Settings Button - Purple Theme */}
                 <button 
                   onClick={() => setShowSettings(true)}
