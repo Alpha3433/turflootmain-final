@@ -119,8 +119,8 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     let foundUsers = []
     
     try {
-      // ONLY use bulletproof names API - no fallbacks
-      console.log('🔍 Searching bulletproof names API for users:', query)
+      // ONLY use bulletproof names API - no fallbacks, and exclude current user
+      console.log('🔍 Searching bulletproof names API for users:', query, 'excluding user:', user.id)
       const response = await fetch(`/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
         headers: {
           'Content-Type': 'application/json'
@@ -129,8 +129,13 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       
       if (response.ok) {
         const data = await response.json()
-        foundUsers = data.users || []
-        console.log('✅ Names API search successful:', foundUsers.length, 'users found')
+        let apiUsers = data.users || []
+        
+        // Additional safety check to prevent self-addition
+        apiUsers = apiUsers.filter(u => u.id !== user.id)
+        
+        foundUsers = apiUsers
+        console.log('✅ Names API search successful:', foundUsers.length, 'users found (self excluded)')
       } else {
         console.warn('⚠️ Names API search failed')
       }
@@ -138,18 +143,19 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.error('❌ Names API search error:', error)
     }
     
-    // Enhanced localStorage search for local users
+    // Enhanced localStorage search for local users (excluding self)
     try {
       console.log('🔍 Searching localStorage for users...')
       const locallyKnownUsers = []
       
-      // Check shared user discovery cache
+      // Check user-specific all users cache (not shared anymore)
       try {
-        const allLocalUsers = JSON.parse(localStorage.getItem('turfloot_all_users') || '[]')
+        const userAllUsersKey = `turfloot_all_users_${user.id}`
+        const allLocalUsers = JSON.parse(localStorage.getItem(userAllUsersKey) || '[]')
         for (const userData of allLocalUsers) {
           if (userData && userData.customName && 
               userData.customName.toLowerCase().includes(query.toLowerCase()) &&
-              userData.userId !== user.id) {
+              userData.userId !== user.id) { // Prevent self-addition
             
             locallyKnownUsers.push({
               id: userData.userId,
@@ -160,11 +166,11 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
           }
         }
       } catch (e) {
-        console.error('⚠️ Error searching shared user cache:', e)
+        console.error('⚠️ Error searching user-specific cache:', e)
       }
       
       if (locallyKnownUsers.length > 0) {
-        console.log('✅ Found', locallyKnownUsers.length, 'users in localStorage')
+        console.log('✅ Found', locallyKnownUsers.length, 'users in localStorage (self excluded)')
         
         // Merge with API results, avoiding duplicates
         const existingIds = foundUsers.map(u => u.id)
@@ -176,7 +182,10 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.error('❌ localStorage search error:', error)
     }
     
-    console.log('📊 Final search results:', foundUsers.length, 'users found')
+    // Final safety check to ensure current user is never in results
+    foundUsers = foundUsers.filter(u => u.id !== user.id)
+    
+    console.log('📊 Final search results:', foundUsers.length, 'users found (verified self-excluded)')
     setSearchResults(foundUsers)
     
     setSearching(false)
