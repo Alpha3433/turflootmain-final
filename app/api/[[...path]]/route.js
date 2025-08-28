@@ -876,6 +876,8 @@ export async function GET(request, { params }) {
           }, { headers: corsHeaders })
         }
 
+        console.log(`🔍 Retrieving friends list for user: ${userId}`)
+
         const db = await getDb()
         const friends = db.collection('friends')
         
@@ -887,27 +889,76 @@ export async function GET(request, { params }) {
           ]
         }).toArray()
         
-        // Get friend user data
+        console.log(`📊 Found ${friendships.length} friendships for user ${userId}`)
+        
+        if (friendships.length === 0) {
+          return NextResponse.json({
+            friends: [],
+            timestamp: new Date().toISOString()
+          }, { headers: corsHeaders })
+        }
+
+        // Get friend user data - try multiple collections and fields for user lookup
         const users = db.collection('users')
         const friendIds = friendships.map(friendship => 
           friendship.fromUserId === userId ? friendship.toUserId : friendship.fromUserId
         )
         
-        const friendUsers = await users.find({
-          id: { $in: friendIds }
+        console.log(`🔍 Looking up friend user data for IDs: ${friendIds.join(', ')}`)
+        
+        // Try multiple user lookup strategies
+        let friendUsers = await users.find({
+          $or: [
+            { id: { $in: friendIds } },
+            { userId: { $in: friendIds } },
+            { privy_id: { $in: friendIds } }
+          ]
         }).project({
           id: 1,
+          userId: 1,
+          privy_id: 1,
           username: 1,
+          customName: 1,
           custom_name: 1,
           'profile.display_name': 1
         }).toArray()
         
-        const formattedFriends = friendUsers.map(user => ({
-          id: user.id,
-          username: user.custom_name || user.profile?.display_name || user.username || 'Anonymous',
-          online: false, // Would need Socket.IO integration to determine online status
-          lastSeen: new Date().toISOString() // Placeholder
-        }))
+        console.log(`📊 Found ${friendUsers.length} user records in users collection`)
+        
+        // If users not found in users collection, create friend list from friendship data
+        const formattedFriends = []
+        
+        for (const friendship of friendships) {
+          const friendId = friendship.fromUserId === userId ? friendship.toUserId : friendship.fromUserId
+          const friendName = friendship.fromUserId === userId ? friendship.toUserName : friendship.fromUserName
+          
+          // Try to find user data
+          let userData = friendUsers.find(u => 
+            u.id === friendId || u.userId === friendId || u.privy_id === friendId
+          )
+          
+          if (userData) {
+            // Use database user data
+            formattedFriends.push({
+              id: friendId,
+              username: userData.customName || userData.custom_name || userData.profile?.display_name || userData.username || friendName || 'Anonymous',
+              online: false,
+              lastSeen: new Date().toISOString(),
+              source: 'database'
+            })
+          } else {
+            // Fallback to friendship data
+            formattedFriends.push({
+              id: friendId,
+              username: friendName || 'Unknown User',
+              online: false,
+              lastSeen: new Date().toISOString(),
+              source: 'friendship_record'
+            })
+          }
+        }
+        
+        console.log(`✅ Returning ${formattedFriends.length} friends for user ${userId}`)
         
         return NextResponse.json({
           friends: formattedFriends,
@@ -917,7 +968,8 @@ export async function GET(request, { params }) {
         console.error('Error in friends/list endpoint:', error)
         return NextResponse.json({ 
           friends: [],
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          error: error.message
         }, { headers: corsHeaders })
       }
     }
