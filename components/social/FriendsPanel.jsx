@@ -20,6 +20,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const [friendRequests, setFriendRequests] = useState([]) // Incoming friend requests
   const [sentRequests, setSentRequests] = useState([]) // Sent friend requests
   const [loading, setLoading] = useState(true)
+  const [loadingFriends, setLoadingFriends] = useState(false) // Loading state for friends operations
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
