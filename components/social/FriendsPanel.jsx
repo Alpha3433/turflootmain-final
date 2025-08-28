@@ -240,7 +240,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.log('📬 Fetching pending friend requests for user:', user.id)
       
       const token = await getAccessToken()
-      const response = await fetch('http://localhost:3000/api/friends/requests/pending', {
+      const response = await fetch(getApiUrl('/api/friends/requests/pending'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
