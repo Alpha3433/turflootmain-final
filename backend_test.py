@@ -95,7 +95,7 @@ class FriendsSystemTester:
         # Test getting friend list for user1 (should be empty initially)
         response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user1']['userId']})
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             data = response.json()
             friends_count = len(data.get('friends', []))
             self.log_test(
@@ -113,7 +113,7 @@ class FriendsSystemTester:
         # Test getting friend list for user2 (should be empty initially)  
         response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user2']['userId']})
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             data = response.json()
             friends_count = len(data.get('friends', []))
             self.log_test(
@@ -131,7 +131,7 @@ class FriendsSystemTester:
         # Test without userId parameter (should return empty list)
         response = self.make_request('GET', 'friends/list')
         
-        if response and response.status_code == 200:
+        if response is not None and response.status_code == 200:
             data = response.json()
             friends_count = len(data.get('friends', []))
             self.log_test(
@@ -219,7 +219,7 @@ class FriendsSystemTester:
             # Check user1's friend list (should now include user2)
             response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user1']['userId']})
             
-            if response and response.status_code == 200:
+            if response is not None and response.status_code == 200:
                 data = response.json()
                 friends = data.get('friends', [])
                 user2_in_list = any(friend.get('id') == TEST_USERS['user2']['userId'] for friend in friends)
@@ -238,7 +238,7 @@ class FriendsSystemTester:
             # Check user2's friend list (should now include user1)
             response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user2']['userId']})
             
-            if response and response.status_code == 200:
+            if response is not None and response.status_code == 200:
                 data = response.json()
                 friends = data.get('friends', [])
                 user1_in_list = any(friend.get('id') == TEST_USERS['user1']['userId'] for friend in friends)
@@ -257,7 +257,7 @@ class FriendsSystemTester:
             # Check user3's friend list (should be empty - no connection to user1/user2)
             response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user3']['userId']})
             
-            if response and response.status_code == 200:
+            if response is not None and response.status_code == 200:
                 data = response.json()
                 friends = data.get('friends', [])
                 # User3 might have friends from other tests, so we check they don't have user1
@@ -294,7 +294,7 @@ class FriendsSystemTester:
         
         response = self.make_request('POST', 'friends/send-request', data=request_data)
         
-        if response and response.status_code == 400:
+        if response is not None and response.status_code == 400:
             data = response.json()
             error_msg = data.get('error', '')
             self.log_test(
@@ -319,7 +319,7 @@ class FriendsSystemTester:
         
         response = self.make_request('POST', 'friends/send-request', data=request_data_reverse)
         
-        if response and response.status_code == 400:
+        if response is not None and response.status_code == 400:
             data = response.json()
             error_msg = data.get('error', '')
             self.log_test(
@@ -377,7 +377,7 @@ class FriendsSystemTester:
             
             # User1 should have User2 as friend (from previous test)
             response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user1']['userId']})
-            if response and response.status_code == 200:
+            if response is not None and response.status_code == 200:
                 data = response.json()
                 friends = data.get('friends', [])
                 friend_ids = [friend.get('id') for friend in friends]
@@ -396,7 +396,7 @@ class FriendsSystemTester:
                 
             # User2 should have both User1 and User3 as friends
             response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user2']['userId']})
-            if response and response.status_code == 200:
+            if response is not None and response.status_code == 200:
                 data = response.json()
                 friends = data.get('friends', [])
                 friend_ids = [friend.get('id') for friend in friends]
@@ -414,7 +414,7 @@ class FriendsSystemTester:
                 
             # User3 should have User2 as friend but not User1
             response = self.make_request('GET', 'friends/list', params={'userId': TEST_USERS['user3']['userId']})
-            if response and response.status_code == 200:
+            if response is not None and response.status_code == 200:
                 data = response.json()
                 friends = data.get('friends', [])
                 friend_ids = [friend.get('id') for friend in friends]
@@ -450,7 +450,7 @@ class FriendsSystemTester:
         
         response = self.make_request('POST', 'friends/send-request', data=request_data)
         
-        if response and response.status_code == 400:
+        if response is not None and response.status_code == 400:
             self.log_test(
                 "Missing fromUserId Validation", 
                 True,
@@ -472,7 +472,7 @@ class FriendsSystemTester:
         
         response = self.make_request('POST', 'friends/send-request', data=request_data)
         
-        if response and response.status_code == 400:
+        if response is not None and response.status_code == 400:
             self.log_test(
                 "Missing toUserId Validation", 
                 True,
