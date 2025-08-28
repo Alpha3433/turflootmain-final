@@ -2168,185 +2168,339 @@ export default function Home() {
 
             
             {/* Navigation Buttons */}
-            <div className="flex items-center space-x-2">
-              {/* Navigation Buttons - Redesigned to match Party Lobby style */}
-              {authenticated && user ? (
-                <div className="flex items-center space-x-2">
-                {/* Profile Button - Blue Theme */}
-                <button 
-                  onClick={() => setShowProfile(true)}
-                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-600/90 to-blue-700/90 backdrop-blur-sm border border-blue-500/60 rounded-xl shadow-lg hover:from-blue-500/90 hover:to-blue-600/90 transition-all duration-200 group cursor-pointer"
-                  title="Profile & Social"
-                >
-                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-blue-500/20 border-blue-500/30 group-hover:bg-blue-500/30 transition-all duration-200">
-                    <svg className="w-4 h-4 text-blue-400 group-hover:text-blue-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="font-medium text-xs leading-none text-blue-400 group-hover:text-blue-300 transition-colors duration-200">
-                      Profile
-                    </span>
-                    <span className="text-gray-400 text-xs leading-none">
-                      Social
-                    </span>
-                  </div>
-                </button>
-                
-                {/* Party Lobby Button - Orange Theme */}
-                <button 
-                  onClick={() => {
-                    console.log('🏰 Desktop Lobby button clicked!')
-                    setShowLobby(!showLobby)
-                  }}
-                  className="relative flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-orange-600/90 to-orange-700/90 backdrop-blur-sm border border-orange-500/60 rounded-xl shadow-lg hover:from-orange-500/90 hover:to-orange-600/90 transition-all duration-200 group cursor-pointer"
-                  title="Party Lobby"
-                >
-                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-orange-500/20 border-orange-500/30 group-hover:bg-orange-500/30 transition-all duration-200">
-                    <svg className="w-4 h-4 text-orange-400 group-hover:text-orange-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="font-medium text-xs leading-none text-orange-400 group-hover:text-orange-300 transition-colors duration-200">
-                      Party
-                    </span>
-                    <span className="text-gray-400 text-xs leading-none">
-                      Lobby
-                    </span>
-                  </div>
-                  
-                  {/* Active lobby indicator */}
-                  {currentLobby && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
-                  )}
-                  
-                  {/* Pending invites indicator */}
-                  {lobbyInvites.length > 0 && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                      {lobbyInvites.length}
+            <div className="flex items-center">
+              {/* Desktop Navigation - Original Layout */}
+              <div className="hidden sm:flex items-center space-x-2">
+                {/* Navigation Buttons - Redesigned to match Party Lobby style */}
+                {authenticated && user ? (
+                  <div className="flex items-center space-x-2">
+                  {/* Profile Button - Blue Theme */}
+                  <button 
+                    onClick={() => setShowProfile(true)}
+                    className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-blue-600/90 to-blue-700/90 backdrop-blur-sm border border-blue-500/60 rounded-xl shadow-lg hover:from-blue-500/90 hover:to-blue-600/90 transition-all duration-200 group cursor-pointer"
+                    title="Profile & Social"
+                  >
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-blue-500/20 border-blue-500/30 group-hover:bg-blue-500/30 transition-all duration-200">
+                      <svg className="w-4 h-4 text-blue-400 group-hover:text-blue-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
                     </div>
-                  )}
-                </button>
-                
-                {/* Friends Button - Teal Theme */}
+                    
+                    <div className="flex flex-col">
+                      <span className="font-medium text-xs leading-none text-blue-400 group-hover:text-blue-300 transition-colors duration-200">
+                        Profile
+                      </span>
+                      <span className="text-gray-400 text-xs leading-none">
+                        Social
+                      </span>
+                    </div>
+                  </button>
+                  
+                  {/* Party Lobby Button - Orange Theme */}
+                  <button 
+                    onClick={() => {
+                      console.log('🏰 Desktop Lobby button clicked!')
+                      setShowLobby(!showLobby)
+                    }}
+                    className="relative flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-orange-600/90 to-orange-700/90 backdrop-blur-sm border border-orange-500/60 rounded-xl shadow-lg hover:from-orange-500/90 hover:to-orange-600/90 transition-all duration-200 group cursor-pointer"
+                    title="Party Lobby"
+                  >
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-orange-500/20 border-orange-500/30 group-hover:bg-orange-500/30 transition-all duration-200">
+                      <svg className="w-4 h-4 text-orange-400 group-hover:text-orange-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <span className="font-medium text-xs leading-none text-orange-400 group-hover:text-orange-300 transition-colors duration-200">
+                        Party
+                      </span>
+                      <span className="text-gray-400 text-xs leading-none">
+                        Lobby
+                      </span>
+                    </div>
+                    
+                    {/* Active lobby indicator */}
+                    {currentLobby && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
+                    )}
+                    
+                    {/* Pending invites indicator */}
+                    {lobbyInvites.length > 0 && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                        {lobbyInvites.length}
+                      </div>
+                    )}
+                  </button>
+                  
+                  {/* Friends Button - Teal Theme */}
+                  <button 
+                    onClick={() => setShowFriendsPanel(true)}
+                    className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-teal-600/90 to-teal-700/90 backdrop-blur-sm border border-teal-500/60 rounded-xl shadow-lg hover:from-teal-500/90 hover:to-teal-600/90 transition-all duration-200 group cursor-pointer"
+                    title="Friends & Social"
+                  >
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-teal-500/20 border-teal-500/30 group-hover:bg-teal-500/30 transition-all duration-200">
+                      <svg className="w-4 h-4 text-teal-400 group-hover:text-teal-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m3 4.197a4 4 0 11-6.918-4.544A6.945 6.945 0 0015 21z" />
+                      </svg>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <span className="font-medium text-xs leading-none text-teal-400 group-hover:text-teal-300 transition-colors duration-200">
+                        Friends
+                      </span>
+                      <span className="text-gray-400 text-xs leading-none">
+                        Social
+                      </span>
+                    </div>
+                  </button>
+                  
+                  {/* Settings Button - Purple Theme */}
+                  <button 
+                    onClick={() => setShowSettings(true)}
+                    className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-purple-600/90 to-purple-700/90 backdrop-blur-sm border border-purple-500/60 rounded-xl shadow-lg hover:from-purple-500/90 hover:to-purple-600/90 transition-all duration-200 group cursor-pointer"
+                    title="Settings"
+                  >
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-purple-500/20 border-purple-500/30 group-hover:bg-purple-500/30 transition-all duration-200">
+                      <svg className="w-4 h-4 text-purple-400 group-hover:text-purple-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <span className="font-medium text-xs leading-none text-purple-400 group-hover:text-purple-300 transition-colors duration-200">
+                        Settings
+                      </span>
+                      <span className="text-gray-400 text-xs leading-none">
+                        Config
+                      </span>
+                    </div>
+                  </button>
+                  
+                  {/* Logout Button - Red Theme */}
+                  <button 
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-red-600/90 to-red-700/90 backdrop-blur-sm border border-red-500/60 rounded-xl shadow-lg hover:from-red-500/90 hover:to-red-600/90 transition-all duration-200 group cursor-pointer"
+                    title="Logout"
+                  >
+                    <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-red-500/20 border-red-500/30 group-hover:bg-red-500/30 transition-all duration-200">
+                      <svg className="w-4 h-4 text-red-400 group-hover:text-red-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <span className="font-medium text-xs leading-none text-red-400 group-hover:text-red-300 transition-colors duration-200">
+                        Logout
+                      </span>
+                      <span className="text-gray-400 text-xs leading-none">
+                        Exit
+                      </span>
+                    </div>
+                  </button>
+                  </div>
+                ) : (
+                <div className="flex items-center space-x-2">
+                  {/* Lobby Button - Teaser for non-authenticated users */}
+                  <button 
+                    onClick={() => {
+                      alert('Please log in to use Party Lobby feature and team up with friends!')
+                    }}
+                    className="relative w-10 h-10 bg-gray-600/50 backdrop-blur-sm border border-gray-500/50 rounded-xl shadow-lg transition-all duration-200 group flex items-center justify-center opacity-60 cursor-pointer hover:opacity-80"
+                    title="Party Lobby (Login Required)"
+                  >
+                    <div className="text-gray-400 group-hover:text-gray-300 transition-colors duration-200">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    
+                    {/* Lock icon overlay for non-authenticated users */}
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gray-800 border border-gray-600 rounded-full flex items-center justify-center">
+                      <svg className="w-2 h-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                  </button>
+                  
+                {/* Login Button - Green Theme to match new design */}
                 <button 
-                  onClick={() => setShowFriendsPanel(true)}
-                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-teal-600/90 to-teal-700/90 backdrop-blur-sm border border-teal-500/60 rounded-xl shadow-lg hover:from-teal-500/90 hover:to-teal-600/90 transition-all duration-200 group cursor-pointer"
-                  title="Friends & Social"
+                  onClick={handleLoginClick}
+                  disabled={!ready}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600/90 to-green-700/90 backdrop-blur-sm border border-green-500/60 rounded-xl shadow-lg hover:from-green-500/90 hover:to-green-600/90 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={!ready ? 'Initializing authentication...' : 'Click to login with Privy'}
                 >
-                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-teal-500/20 border-teal-500/30 group-hover:bg-teal-500/30 transition-all duration-200">
-                    <svg className="w-4 h-4 text-teal-400 group-hover:text-teal-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m3 4.197a4 4 0 11-6.918-4.544A6.945 6.945 0 0015 21z" />
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-green-500/20 border-green-500/30 group-hover:bg-green-500/30 transition-all duration-200">
+                    <svg className="w-4 h-4 text-green-400 group-hover:text-green-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
                   </div>
                   
                   <div className="flex flex-col">
-                    <span className="font-medium text-xs leading-none text-teal-400 group-hover:text-teal-300 transition-colors duration-200">
-                      Friends
+                    <span className="font-bold text-xs leading-none text-green-400 group-hover:text-green-300 transition-colors duration-200">
+                      {!ready ? 'Loading...' : 'LOGIN'}
                     </span>
                     <span className="text-gray-400 text-xs leading-none">
-                      Social
-                    </span>
-                  </div>
-                </button>
-                
-                {/* Settings Button - Purple Theme */}
-                <button 
-                  onClick={() => setShowSettings(true)}
-                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-purple-600/90 to-purple-700/90 backdrop-blur-sm border border-purple-500/60 rounded-xl shadow-lg hover:from-purple-500/90 hover:to-purple-600/90 transition-all duration-200 group cursor-pointer"
-                  title="Settings"
-                >
-                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-purple-500/20 border-purple-500/30 group-hover:bg-purple-500/30 transition-all duration-200">
-                    <svg className="w-4 h-4 text-purple-400 group-hover:text-purple-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="font-medium text-xs leading-none text-purple-400 group-hover:text-purple-300 transition-colors duration-200">
-                      Settings
-                    </span>
-                    <span className="text-gray-400 text-xs leading-none">
-                      Config
-                    </span>
-                  </div>
-                </button>
-                
-                {/* Logout Button - Red Theme */}
-                <button 
-                  onClick={handleLogout}
-                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-red-600/90 to-red-700/90 backdrop-blur-sm border border-red-500/60 rounded-xl shadow-lg hover:from-red-500/90 hover:to-red-600/90 transition-all duration-200 group cursor-pointer"
-                  title="Logout"
-                >
-                  <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-red-500/20 border-red-500/30 group-hover:bg-red-500/30 transition-all duration-200">
-                    <svg className="w-4 h-4 text-red-400 group-hover:text-red-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="font-medium text-xs leading-none text-red-400 group-hover:text-red-300 transition-colors duration-200">
-                      Logout
-                    </span>
-                    <span className="text-gray-400 text-xs leading-none">
-                      Exit
+                      {!ready ? 'Please wait' : 'Connect'}
                     </span>
                   </div>
                 </button>
                 </div>
-              ) : (
-              <div className="flex items-center space-x-2">
-                {/* Lobby Button - Teaser for non-authenticated users */}
-                <button 
-                  onClick={() => {
-                    alert('Please log in to use Party Lobby feature and team up with friends!')
-                  }}
-                  className="relative w-10 h-10 bg-gray-600/50 backdrop-blur-sm border border-gray-500/50 rounded-xl shadow-lg transition-all duration-200 group flex items-center justify-center opacity-60 cursor-pointer hover:opacity-80"
-                  title="Party Lobby (Login Required)"
-                >
-                  <div className="text-gray-400 group-hover:text-gray-300 transition-colors duration-200">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                  </div>
-                  
-                  {/* Lock icon overlay for non-authenticated users */}
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gray-800 border border-gray-600 rounded-full flex items-center justify-center">
-                    <svg className="w-2 h-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                </button>
-                
-              {/* Login Button - Green Theme to match new design */}
-              <button 
-                onClick={handleLoginClick}
-                disabled={!ready}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600/90 to-green-700/90 backdrop-blur-sm border border-green-500/60 rounded-xl shadow-lg hover:from-green-500/90 hover:to-green-600/90 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                title={!ready ? 'Initializing authentication...' : 'Click to login with Privy'}
-              >
-                <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-green-500/20 border-green-500/30 group-hover:bg-green-500/30 transition-all duration-200">
-                  <svg className="w-4 h-4 text-green-400 group-hover:text-green-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
-                </div>
-                
-                <div className="flex flex-col">
-                  <span className="font-bold text-xs leading-none text-green-400 group-hover:text-green-300 transition-colors duration-200">
-                    {!ready ? 'Loading...' : 'LOGIN'}
-                  </span>
-                  <span className="text-gray-400 text-xs leading-none">
-                    {!ready ? 'Please wait' : 'Connect'}
-                  </span>
-                </div>
-              </button>
+              )}
               </div>
-            )}
-          </div>
+
+              {/* Mobile Navigation - Horizontal Scrollable */}
+              <div className="sm:hidden w-full">
+                <div className="overflow-x-auto scrollbar-hide">
+                  <div className="flex items-center space-x-2 px-1 py-2 min-w-max">
+                    {authenticated && user ? (
+                      <>
+                        {/* Mobile Profile Button - Compact */}
+                        <button 
+                          onClick={() => setShowProfile(true)}
+                          className="flex-shrink-0 flex flex-col items-center space-y-1 px-3 py-2 bg-gradient-to-r from-blue-600/90 to-blue-700/90 backdrop-blur-sm border border-blue-500/60 rounded-xl shadow-lg hover:from-blue-500/90 hover:to-blue-600/90 transition-all duration-200 group cursor-pointer min-w-[60px]"
+                          title="Profile & Social"
+                        >
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-blue-500/20 border-blue-500/30 group-hover:bg-blue-500/30 transition-all duration-200">
+                            <svg className="w-4 h-4 text-blue-400 group-hover:text-blue-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium text-xs leading-none text-blue-400 group-hover:text-blue-300 transition-colors duration-200">
+                            Profile
+                          </span>
+                        </button>
+                        
+                        {/* Mobile Party Lobby Button - Compact */}
+                        <button 
+                          onClick={() => {
+                            console.log('🏰 Mobile Lobby button clicked!')
+                            setShowLobby(!showLobby)
+                          }}
+                          className="relative flex-shrink-0 flex flex-col items-center space-y-1 px-3 py-2 bg-gradient-to-r from-orange-600/90 to-orange-700/90 backdrop-blur-sm border border-orange-500/60 rounded-xl shadow-lg hover:from-orange-500/90 hover:to-orange-600/90 transition-all duration-200 group cursor-pointer min-w-[60px]"
+                          title="Party Lobby"
+                        >
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-orange-500/20 border-orange-500/30 group-hover:bg-orange-500/30 transition-all duration-200">
+                            <svg className="w-4 h-4 text-orange-400 group-hover:text-orange-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium text-xs leading-none text-orange-400 group-hover:text-orange-300 transition-colors duration-200">
+                            Lobby
+                          </span>
+                          
+                          {/* Active lobby indicator */}
+                          {currentLobby && (
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
+                          )}
+                          
+                          {/* Pending invites indicator */}
+                          {lobbyInvites.length > 0 && (
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                              {lobbyInvites.length}
+                            </div>
+                          )}
+                        </button>
+                        
+                        {/* Mobile Friends Button - Compact */}
+                        <button 
+                          onClick={() => setShowFriendsPanel(true)}
+                          className="flex-shrink-0 flex flex-col items-center space-y-1 px-3 py-2 bg-gradient-to-r from-teal-600/90 to-teal-700/90 backdrop-blur-sm border border-teal-500/60 rounded-xl shadow-lg hover:from-teal-500/90 hover:to-teal-600/90 transition-all duration-200 group cursor-pointer min-w-[60px]"
+                          title="Friends & Social"
+                        >
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-teal-500/20 border-teal-500/30 group-hover:bg-teal-500/30 transition-all duration-200">
+                            <svg className="w-4 h-4 text-teal-400 group-hover:text-teal-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m3 4.197a4 4 0 11-6.918-4.544A6.945 6.945 0 0015 21z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium text-xs leading-none text-teal-400 group-hover:text-teal-300 transition-colors duration-200">
+                            Friends
+                          </span>
+                        </button>
+                        
+                        {/* Mobile Settings Button - Compact */}
+                        <button 
+                          onClick={() => setShowSettings(true)}
+                          className="flex-shrink-0 flex flex-col items-center space-y-1 px-3 py-2 bg-gradient-to-r from-purple-600/90 to-purple-700/90 backdrop-blur-sm border border-purple-500/60 rounded-xl shadow-lg hover:from-purple-500/90 hover:to-purple-600/90 transition-all duration-200 group cursor-pointer min-w-[60px]"
+                          title="Settings"
+                        >
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-purple-500/20 border-purple-500/30 group-hover:bg-purple-500/30 transition-all duration-200">
+                            <svg className="w-4 h-4 text-purple-400 group-hover:text-purple-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium text-xs leading-none text-purple-400 group-hover:text-purple-300 transition-colors duration-200">
+                            Settings
+                          </span>
+                        </button>
+                        
+                        {/* Mobile Logout Button - Compact */}
+                        <button 
+                          onClick={handleLogout}
+                          className="flex-shrink-0 flex flex-col items-center space-y-1 px-3 py-2 bg-gradient-to-r from-red-600/90 to-red-700/90 backdrop-blur-sm border border-red-500/60 rounded-xl shadow-lg hover:from-red-500/90 hover:to-red-600/90 transition-all duration-200 group cursor-pointer min-w-[60px]"
+                          title="Logout"
+                        >
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-red-500/20 border-red-500/30 group-hover:bg-red-500/30 transition-all duration-200">
+                            <svg className="w-4 h-4 text-red-400 group-hover:text-red-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                          </div>
+                          <span className="font-medium text-xs leading-none text-red-400 group-hover:text-red-300 transition-colors duration-200">
+                            Logout
+                          </span>
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {/* Mobile Lobby Button - Teaser for non-authenticated users */}
+                        <button 
+                          onClick={() => {
+                            alert('Please log in to use Party Lobby feature and team up with friends!')
+                          }}
+                          className="relative flex-shrink-0 w-16 h-16 bg-gray-600/50 backdrop-blur-sm border border-gray-500/50 rounded-xl shadow-lg transition-all duration-200 group flex flex-col items-center justify-center opacity-60 cursor-pointer hover:opacity-80"
+                          title="Party Lobby (Login Required)"
+                        >
+                          <div className="text-gray-400 group-hover:text-gray-300 transition-colors duration-200">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          </div>
+                          <span className="font-medium text-xs leading-none text-gray-400 mt-1">
+                            Lobby
+                          </span>
+                          
+                          {/* Lock icon overlay for non-authenticated users */}
+                          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-gray-800 border border-gray-600 rounded-full flex items-center justify-center">
+                            <svg className="w-2 h-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                        </button>
+                        
+                        {/* Mobile Login Button - Compact */}
+                        <button 
+                          onClick={handleLoginClick}
+                          disabled={!ready}
+                          className="flex-shrink-0 flex flex-col items-center space-y-1 px-4 py-2 bg-gradient-to-r from-green-600/90 to-green-700/90 backdrop-blur-sm border border-green-500/60 rounded-xl shadow-lg hover:from-green-500/90 hover:to-green-600/90 transition-all duration-200 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed min-w-[70px]"
+                          title={!ready ? 'Initializing authentication...' : 'Click to login with Privy'}
+                        >
+                          <div className="w-6 h-6 rounded-lg flex items-center justify-center border bg-green-500/20 border-green-500/30 group-hover:bg-green-500/30 transition-all duration-200">
+                            <svg className="w-4 h-4 text-green-400 group-hover:text-green-300 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                          </div>
+                          <span className="font-bold text-xs leading-none text-green-400 group-hover:text-green-300 transition-colors duration-200">
+                            {!ready ? 'Loading...' : 'LOGIN'}
+                          </span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
       </div>
       </header>
