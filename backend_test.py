@@ -998,13 +998,19 @@ class FriendRequestNotificationTester:
                     self.log_test(f"{endpoint} - Empty UserId", False, f"Exception: {str(e)}")
 
     def run_comprehensive_tests(self):
-        """Run all friend request notification tests"""
-        print("🚀 STARTING COMPREHENSIVE FRIEND REQUEST NOTIFICATIONS TESTING")
-        print("=" * 70)
+        """Run all friend request notification tests including enhanced validation"""
+        print("🚀 STARTING COMPREHENSIVE FRIENDS SYSTEM ENHANCED VALIDATION TESTING")
+        print("=" * 80)
+        print(f"Target: 100% Success Rate for Enhanced Validation")
         print(f"Base URL: {BASE_URL}")
         print(f"API Base: {API_BASE}")
         print(f"Test Start Time: {datetime.now().isoformat()}")
         print()
+        
+        # Enhanced Validation Testing (NEW)
+        self.test_enhanced_validation_friends_auth()
+        self.test_enhanced_validation_notifications()
+        self.test_all_notification_endpoints_validation()
         
         # Setup phase
         self.create_test_users()
@@ -1024,7 +1030,7 @@ class FriendRequestNotificationTester:
             self.test_mark_notifications_read(user_id)
         
         # Generate summary
-        self.generate_summary()
+        self.generate_enhanced_summary()
 
     def generate_summary(self):
         """Generate comprehensive test summary"""
