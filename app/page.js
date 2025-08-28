@@ -2439,7 +2439,7 @@ export default function Home() {
                   </div>
                   <button className="text-cyan-400 text-xs lg:text-sm hover:text-cyan-300 transition-colors">⟲ Refresh</button>
                 </div>
-                <div className="space-y-2 lg:space-y-3">
+                <div className="flex-1 space-y-2 lg:space-y-3 mb-3">
                   {loadingFriends ? (
                     <div className="text-center py-4">
                       <div className="text-xl animate-spin mb-2">⏳</div>
@@ -2462,8 +2462,8 @@ export default function Home() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-6">
-                      <div className="text-3xl mb-2">👥</div>
+                    <div className="text-center py-4">
+                      <div className="text-2xl mb-2">👥</div>
                       <div className="text-gray-400 text-sm mb-1">No friends yet</div>
                       <div className="text-gray-500 text-xs">Add friends to see them here</div>
                     </div>
@@ -2482,7 +2482,7 @@ export default function Home() {
                     setSocialInitialTab('friends')
                     setShowProfile(true)
                   }}
-                  className="w-full py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-xl text-purple-400 font-bold text-sm transition-all hover:scale-105"
+                  className="w-full py-2.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-xl text-purple-400 font-bold text-sm transition-all hover:scale-105 mt-auto"
                 >
                   Add Friends
                 </button>
