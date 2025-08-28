@@ -2353,8 +2353,8 @@ export default function Home() {
       </div>
 
       {/* Main Content - Enhanced Mobile Layout with Better Spacing */}
-      <main className="flex-1 flex items-start justify-center pt-8 sm:pt-16 relative z-40 min-h-screen">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pb-20">
+      <main className="flex-1 flex flex-col relative z-40 min-h-0">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex-1 flex flex-col pt-4 sm:pt-8 pb-4 sm:pb-20">
           
           {/* Hero Title */}
           <div className="text-center mb-6 sm:mb-8">
