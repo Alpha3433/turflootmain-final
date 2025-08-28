@@ -193,48 +193,106 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
 
   const sendFriendRequest = async (targetUser) => {
     try {
-      console.log('📤 Adding friend:', targetUser)
+      console.log('📤 Sending friend request to:', targetUser)
       
-      // Simple localStorage-based friends system
+      // Additional safety check to prevent self-addition
+      if (targetUser.id === user.id) {
+        alert('You cannot add yourself as a friend!')
+        return
+      }
+      
+      // Check if already friends using user-specific key
+      const userFriendsKey = getUserFriendsKey()
+      const currentFriends = JSON.parse(localStorage.getItem(userFriendsKey) || '[]')
+      
+      const existingFriend = currentFriends.find(friend => friend.id === targetUser.id)
+      if (existingFriend) {
+        alert(`You are already friends with ${targetUser.username}!`)
+        return
+      }
+      
+      // Try server-side friend request first
       try {
-        // Get current friends list
-        const currentFriends = JSON.parse(localStorage.getItem('turfloot_friends') || '[]')
+        const token = await getAccessToken()
+        const response = await fetch('/api/friends/send-request', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fromUserId: user.id,
+            fromUserName: user.email?.split('@')[0] || 'Unknown User',
+            toUserId: targetUser.id,
+            toUserName: targetUser.username
+          })
+        })
         
-        // Check if already friends
-        const existingFriend = currentFriends.find(
-          friend => friend.id === targetUser.id
-        )
-        
-        if (existingFriend) {
-          alert(`You are already friends with ${targetUser.username}!`)
+        if (response.ok) {
+          const serverResult = await response.json()
+          console.log('✅ Server-side friend request successful:', serverResult)
+          
+          // If server request is successful, add to local storage as well
+          const newFriend = {
+            id: targetUser.id,
+            username: targetUser.username,
+            addedAt: new Date().toISOString(),
+            source: 'server_request',
+            status: 'accepted' // Assuming auto-accept for now
+          }
+          
+          currentFriends.push(newFriend)
+          localStorage.setItem(userFriendsKey, JSON.stringify(currentFriends))
+          
+          // Refresh friends list immediately
+          setAllFriends(currentFriends)
+          
+          alert(`✅ Added ${targetUser.username} as a friend!\n\n👥 You can now see them in your friends list.`)
+          
+          // Clear search results and query
+          setSearchQuery('')
+          setSearchResults([])
+          setActiveTab('friends') // Switch to friends tab to show the update
+          
           return
+        } else {
+          console.warn('⚠️ Server-side friend request failed, falling back to localStorage')
         }
+      } catch (serverError) {
+        console.warn('⚠️ Server-side friend request error:', serverError.message)
+      }
+      
+      // Fallback: localStorage-based friends system
+      try {
+        console.log('📱 Using localStorage fallback for friend request')
         
-        // Add new friend
         const newFriend = {
           id: targetUser.id,
           username: targetUser.username,
           addedAt: new Date().toISOString(),
-          source: targetUser.source || 'search'
+          source: targetUser.source || 'search',
+          status: 'accepted' // Auto-accept in localStorage mode
         }
         
         currentFriends.push(newFriend)
-        localStorage.setItem('turfloot_friends', JSON.stringify(currentFriends))
+        localStorage.setItem(userFriendsKey, JSON.stringify(currentFriends))
         
-        console.log('✅ Friend added successfully to localStorage')
+        console.log('✅ Friend added successfully to user-specific localStorage')
         
-        // Refresh friends list
+        // Refresh friends list immediately
         setAllFriends(currentFriends)
         
         alert(`✅ Added ${targetUser.username} as a friend!\n\n👥 You can now see them in your friends list.`)
+        
+        // Clear search results and query
+        setSearchQuery('')
+        setSearchResults([])
+        setActiveTab('friends') // Switch to friends tab to show the update
         
       } catch (error) {
         console.error('❌ Error adding friend to localStorage:', error)
         alert(`Failed to add ${targetUser.username} as friend. Please try again.`)
       }
-      
-      setSearchQuery('')
-      setSearchResults([])
       
     } catch (error) {
       console.error('❌ Error sending friend request:', error)
