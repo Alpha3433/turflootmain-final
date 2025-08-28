@@ -91,9 +91,9 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     if (!user?.id) return
     
     try {
-      // Use relative URL for same-origin requests
-      const apiUrl = `/api/friends/online-status?userId=${user.id}`
-      console.log('🔗 DEBUG: Using relative online friends URL =', apiUrl)
+      // Force localhost URL to avoid 502 gateway issues
+      const apiUrl = `http://localhost:3000/api/friends/online-status?userId=${user.id}`
+      console.log('🔗 DEBUG: Using localhost online friends URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
