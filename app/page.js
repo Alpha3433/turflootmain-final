@@ -1324,21 +1324,6 @@ export default function Home() {
       console.log('🔑 Authenticated user:', user.id)
     }
 
-    console.log('💾 Saving custom name:', customName.trim())
-    console.log('🔑 User info:', { 
-        userId: user.id, 
-        privyId: user.id, 
-        email: user.email?.address,
-        userType: typeof user,
-        userKeys: Object.keys(user || {})
-      })
-
-    const requestData = {
-      userId: user.id,
-      customName: customName.trim(),
-      privyId: user.id,
-      email: user.email?.address || null
-    }
     console.log('📤 Request data:', requestData)
 
     // ONLY use the bulletproof names API - no fallbacks
