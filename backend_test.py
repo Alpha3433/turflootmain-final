@@ -306,7 +306,7 @@ class FriendsSystemTester:
             self.log_test(
                 "Duplicate Request Prevention", 
                 False,
-                f"Should have returned 400 error for duplicate - Status: {response.status_code if response else 'No response'}"
+                f"Should have returned 400 error for duplicate - Status: {response.status_code if response else 'No response'}, Response: {response.text if response else 'None'}"
             )
             
         # Try reverse direction (user2 -> user1) - should also be rejected
@@ -331,7 +331,7 @@ class FriendsSystemTester:
             self.log_test(
                 "Reverse Duplicate Prevention", 
                 False,
-                f"Should have returned 400 error for reverse duplicate - Status: {response.status_code if response else 'No response'}"
+                f"Should have returned 400 error for reverse duplicate - Status: {response.status_code if response else 'No response'}, Response: {response.text if response else 'None'}"
             )
             
     def test_data_integrity(self):
