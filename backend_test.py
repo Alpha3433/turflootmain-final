@@ -172,7 +172,7 @@ class FriendsSystemTester:
             self.log_test(
                 "Self-Addition Prevention", 
                 False,
-                f"Should have returned 400 error - Status: {response.status_code if response else 'No response'}"
+                f"Should have returned 400 error - Status: {response.status_code if response else 'No response'}, Response: {response.text if response else 'None'}"
             )
             
     def test_friendship_isolation(self):
