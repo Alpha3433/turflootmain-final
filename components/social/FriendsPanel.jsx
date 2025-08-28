@@ -27,13 +27,29 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const [activeTab, setActiveTab] = useState('friends') // 'friends', 'requests', or 'search'
   const [notificationCount, setNotificationCount] = useState(0) // Notification count for badge
   
-  // Dynamic API URL utility function
+  // Dynamic API URL utility function with bypass routing for friends
   const getApiUrl = (endpoint) => {
     if (typeof window === 'undefined') return endpoint // SSR fallback
     
     const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    const baseURL = isLocalDevelopment ? 'http://localhost:3000' : ''
-    return `${baseURL}${endpoint}`
+    
+    if (isLocalDevelopment) {
+      return `http://localhost:3000${endpoint}`
+    }
+    
+    // External deployment: use bypass routes for problematic /api paths
+    if (endpoint.startsWith('/api/friends/')) {
+      // Convert /api/friends/* to /friends-api/*
+      return endpoint.replace('/api/friends/', '/friends-api/')
+    }
+    
+    if (endpoint.startsWith('/api/names/')) {
+      // Convert /api/names/* to /names-api/*
+      return endpoint.replace('/api/names/', '/names-api/')
+    }
+    
+    // Default: use relative URL for external deployment
+    return endpoint
   }
 
   // Remove localStorage functions - app is now server-only
