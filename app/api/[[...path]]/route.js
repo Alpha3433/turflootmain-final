@@ -135,7 +135,12 @@ export async function GET(request, { params }) {
   const { path } = params
   const url = new URL(request.url)
   
+  // Enhanced debugging for external access
   console.log('🚀 GET HANDLER CALLED - PATH:', path)
+  console.log('🔍 Request Origin:', request.headers.get('origin') || 'No origin')
+  console.log('🔍 Request Host:', request.headers.get('host') || 'No host')
+  console.log('🔍 User Agent:', request.headers.get('user-agent')?.substring(0, 50) || 'No user agent')
+  console.log('🔍 Request URL:', url.toString())
   
   try {
     // Root API endpoint
