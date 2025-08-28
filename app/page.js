@@ -385,13 +385,30 @@ export default function Home() {
   // Real-time cash-out notifications state
   const [cashOutNotifications, setCashOutNotifications] = useState([])
   
-  // Dynamic API URL utility function
+  // Dynamic API URL utility function with bypass routing
   const getApiUrl = (endpoint) => {
     if (typeof window === 'undefined') return endpoint // SSR fallback
     
     const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    const baseURL = isLocalDevelopment ? 'http://localhost:3000' : ''
-    return `${baseURL}${endpoint}`
+    
+    if (isLocalDevelopment) {
+      return `http://localhost:3000${endpoint}`
+    }
+    
+    // External deployment: use bypass routes for problematic /api paths
+    if (endpoint.startsWith('/api/names/')) {
+      // Convert /api/names/* to /names-api/*
+      return endpoint.replace('/api/names/', '/names-api/')
+    }
+    
+    if (endpoint.startsWith('/api/friends/')) {
+      // For now, friends endpoints might still need /api prefix testing
+      // TODO: Create friends bypass endpoints if needed
+      return endpoint
+    }
+    
+    // Default: use relative URL for external deployment
+    return endpoint
   }
   
   // Mock data for notifications
