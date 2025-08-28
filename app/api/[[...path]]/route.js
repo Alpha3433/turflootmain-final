@@ -1589,10 +1589,47 @@ export async function POST(request, { params }) {
 
     if (route === 'friends/send-request') {
       try {
-        const { fromUserId, toUserId, fromUserName, toUserName } = body
+        const { fromUserId, toUserId, fromUserName, toUserName, ...extraFields } = body
         
+        // Strict input validation
         if (!fromUserId || !toUserId) {
           return NextResponse.json({ error: 'fromUserId and toUserId are required' }, { status: 400, headers: corsHeaders })
+        }
+
+        // Validate data types - must be strings
+        if (typeof fromUserId !== 'string' || typeof toUserId !== 'string') {
+          return NextResponse.json({ 
+            error: 'fromUserId and toUserId must be strings',
+            details: `Got fromUserId: ${typeof fromUserId}, toUserId: ${typeof toUserId}`
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Validate string content - no empty strings
+        if (fromUserId.trim() === '' || toUserId.trim() === '') {
+          return NextResponse.json({ 
+            error: 'fromUserId and toUserId cannot be empty strings' 
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Reject extra fields for security
+        if (Object.keys(extraFields).length > 0) {
+          return NextResponse.json({ 
+            error: 'Invalid request fields detected',
+            details: `Unexpected fields: ${Object.keys(extraFields).join(', ')}`
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        // Validate user names if provided
+        if (fromUserName && typeof fromUserName !== 'string') {
+          return NextResponse.json({ 
+            error: 'fromUserName must be a string if provided' 
+          }, { status: 400, headers: corsHeaders })
+        }
+
+        if (toUserName && typeof toUserName !== 'string') {
+          return NextResponse.json({ 
+            error: 'toUserName must be a string if provided' 
+          }, { status: 400, headers: corsHeaders })
         }
 
         // Prevent self-addition
