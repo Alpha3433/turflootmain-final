@@ -58,9 +58,9 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.log('👥 Fetching friends from server for user:', user.id)
       
       const token = await getAccessToken()
-      // Use relative URL for same-origin requests
-      const apiUrl = `/api/friends/list?userId=${user.id}`
-      console.log('🔗 DEBUG: Using relative friends list URL =', apiUrl)
+      // Force localhost URL to avoid 502 gateway issues
+      const apiUrl = `http://localhost:3000/api/friends/list?userId=${user.id}`
+      console.log('🔗 DEBUG: Using localhost friends list URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
