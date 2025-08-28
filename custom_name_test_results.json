@@ -1,0 +1,93 @@
+{
+  "test_start_time": "2025-08-28T04:10:02.566668",
+  "total_tests": 12,
+  "passed_tests": 12,
+  "failed_tests": 0,
+  "success_rate": 100.0,
+  "test_results": [
+    {
+      "test": "Custom Name Update - User 1",
+      "success": true,
+      "message": "Successfully updated name to 'TestUsername'",
+      "response_time": 1.7627837657928467,
+      "timestamp": "2025-08-28T04:10:00.173831"
+    },
+    {
+      "test": "Custom Name Update - User 2",
+      "success": true,
+      "message": "Successfully updated name to 'PlayerOne'",
+      "response_time": 0.04294466972351074,
+      "timestamp": "2025-08-28T04:10:00.216872"
+    },
+    {
+      "test": "Custom Name Update - User 3",
+      "success": true,
+      "message": "Successfully updated name to 'GamerPro2024'",
+      "response_time": 0.024984121322631836,
+      "timestamp": "2025-08-28T04:10:00.241952"
+    },
+    {
+      "test": "Profile Retrieval - User 1",
+      "success": true,
+      "message": "Successfully retrieved username 'rebtor'",
+      "response_time": 0.02237391471862793,
+      "timestamp": "2025-08-28T04:10:00.264533"
+    },
+    {
+      "test": "Profile Retrieval - User 2",
+      "success": true,
+      "message": "Successfully retrieved username 'PlayerOne'",
+      "response_time": 0.03951430320739746,
+      "timestamp": "2025-08-28T04:10:00.304160"
+    },
+    {
+      "test": "Profile Retrieval - User 3",
+      "success": true,
+      "message": "Successfully retrieved username 'GamerPro2024'",
+      "response_time": 0.016424179077148438,
+      "timestamp": "2025-08-28T04:10:00.320685"
+    },
+    {
+      "test": "Complete Flow - Step 1 (Name Update)",
+      "success": true,
+      "message": "Successfully updated user's custom name",
+      "response_time": 0.01898026466369629,
+      "timestamp": "2025-08-28T04:10:00.339819"
+    },
+    {
+      "test": "Complete Flow - Step 2 (Immediate Retrieval)",
+      "success": true,
+      "message": "Successfully retrieved correct name 'FlowTestUser2024'",
+      "response_time": 0.01461338996887207,
+      "timestamp": "2025-08-28T04:10:00.354567"
+    },
+    {
+      "test": "Complete Flow - Step 3 (Session Persistence)",
+      "success": true,
+      "message": "Name persisted across session 'FlowTestUser2024'",
+      "response_time": 0.035572052001953125,
+      "timestamp": "2025-08-28T04:10:02.390339"
+    },
+    {
+      "test": "Database Field Verification - User 1",
+      "success": true,
+      "message": "Name priority working correctly: 'DatabaseTestUser1'",
+      "response_time": 0.023921489715576172,
+      "timestamp": "2025-08-28T04:10:02.430386"
+    },
+    {
+      "test": "Database Field Verification - User 2",
+      "success": true,
+      "message": "Name priority working correctly: 'DatabaseTestUser2'",
+      "response_time": 0.018920183181762695,
+      "timestamp": "2025-08-28T04:10:02.464897"
+    },
+    {
+      "test": "Name Consistency Test",
+      "success": true,
+      "message": "All 5 requests returned consistent name: 'ConsistencyTestUser'",
+      "response_time": null,
+      "timestamp": "2025-08-28T04:10:02.566496"
+    }
+  ]
+}
