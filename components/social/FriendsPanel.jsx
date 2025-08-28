@@ -14,7 +14,7 @@ const generateId = () => {
 }
 
 const FriendsPanel = ({ onInviteFriend, onClose }) => {
-  const { user, getAccessToken } = usePrivy()
+  const { user, getAccessToken, authenticated } = usePrivy()
   const [onlineFriends, setOnlineFriends] = useState([])
   const [allFriends, setAllFriends] = useState([])
   const [friendRequests, setFriendRequests] = useState([]) // Incoming friend requests
