@@ -20,7 +20,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://lobby-party.preview.emergentagent.com"
+BASE_URL = "https://party-lobby-dev.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Use localhost for testing as external URL has 502 issues

@@ -20,7 +20,7 @@ def test_infrastructure_endpoints():
     
     endpoints = [
         ("Localhost", "http://localhost:3000"),
-        ("Production", "https://lobby-party.preview.emergentagent.com")
+        ("Production", "https://party-lobby-dev.preview.emergentagent.com")
     ]
     
     test_paths = [
@@ -200,7 +200,7 @@ def test_specific_user_scenario():
     
     try:
         response = requests.post(
-            "https://lobby-party.preview.emergentagent.com/api/users/profile/update-name",
+            "https://party-lobby-dev.preview.emergentagent.com/api/users/profile/update-name",
             json={
                 "userId": "did:privy:cme20s0fl005okz0bmxcr0cp0", 
                 "customName": "jason",
