@@ -905,7 +905,7 @@ export default function Home() {
           fetch('http://localhost:3000/api/stats/live-players'),
           fetch('http://localhost:3000/api/stats/global-winnings'),
           fetch('http://localhost:3000/api/users/leaderboard'),
-          fetch(`/api/friends/list?userId=${userProfile?.id || userProfile?.privyId || 'demo-user'}`)
+          fetch(`http://localhost:3000/api/friends/list?userId=${userProfile?.id || userProfile?.privyId || 'demo-user'}`)
         ])
 
         if (playersResponse.ok) {
