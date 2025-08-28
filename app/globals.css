@@ -43,6 +43,24 @@
     font-family: var(--font-dm-sans), system-ui, sans-serif;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    min-height: 100dvh; /* Use dynamic viewport height for mobile */
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Ensure full viewport coverage on mobile */
+  #__next {
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+  }
+  
+  /* Mobile-specific viewport fixes */
+  @supports (-webkit-touch-callout: none) {
+    html, body, #__next {
+      min-height: -webkit-fill-available;
+    }
   }
   
   /* Hide scrollbar completely */
