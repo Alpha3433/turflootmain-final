@@ -43,6 +43,7 @@ export default function Home() {
   const [isTestUser, setIsTestUser] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showFriendsPanel, setShowFriendsPanel] = useState(false)
   const [showCustomization, setShowCustomization] = useState(false)
   const [showServerBrowser, setShowServerBrowser] = useState(false)
   const [showRegionDropdown, setShowRegionDropdown] = useState(false)
