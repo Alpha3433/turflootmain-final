@@ -945,6 +945,54 @@ backend:
         agent: "testing"
         comment: "✅ ENDPOINT ACCESSIBLE AND CONFIRMED WORKING - Party Lobby room validation endpoint responds to validation requests correctly and ready for room requirement validation testing. Endpoint accessible with proper routing and response structure. Infrastructure testing confirms functionality ready for complete lobby workflow validation."
 
+  - task: "Friends Online Status API (GET /api/friends/online-status)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ NEW SOCIAL FEATURES ENDPOINT VERIFIED - Friends Online Status API working perfectly. Returns proper structure with onlineFriends array and timestamp. Validates missing userId parameter correctly (400 error). Response time: 0.031s (excellent for real-time social features). Integrates with global game server for real-time online friend tracking. Ready for production use."
+
+  - task: "User Search API (GET /api/users/search)"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ NEW SOCIAL FEATURES ENDPOINT VERIFIED - User Search API working perfectly. Returns proper structure with users array and timestamp. Found 10 users in database. Validates short queries (< 2 characters) correctly. Supports case-insensitive search (found 10 users for 'TEST'). Database queries working with MongoDB integration. Response time: 0.019s (excellent for real-time search). Ready for production use."
+
+  - task: "Global Practice Server (global-practice-bots)"
+    implemented: true
+    working: false
+    file: "/app/lib/gameServer.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ GLOBAL PRACTICE SERVER NOT VISIBLE - 'global-practice-bots' server not found in server browser despite being defined in gameServer.js. Server browser returns 36 total servers (US-East-1, US-West-1, EU-Central-1 regions) but no practice mode servers. GameServer initialization may not be adding practice server to persistent servers list correctly. Code shows practice server should be created with id 'global-practice-bots', region 'Global', mode 'practice', maxPlayers 20. Issue needs main agent investigation."
+
+  - task: "Social Features Database Operations"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DATABASE OPERATIONS FOR SOCIAL FEATURES VERIFIED - User search database queries working correctly with MongoDB integration. Friends list database integration functional (retrieved 0 friends for test users). Enhanced friends system working with proper structure. Case-insensitive username matching working. Database connectivity confirmed through multiple endpoints. All social features database operations ready for production use."
+
 
 
 frontend:
