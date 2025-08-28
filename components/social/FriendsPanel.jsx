@@ -84,12 +84,10 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
     let foundUsers = []
     
     try {
-      // Strategy 1: Try server API search
-      console.log('🔍 Searching server for users:', query)
-      const token = await getAccessToken()
-      const response = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
+      // Strategy 1: Try new bulletproof names API search
+      console.log('🔍 Searching reliable names API for users:', query)
+      const response = await fetch(`/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       })
@@ -97,20 +95,40 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       if (response.ok) {
         const data = await response.json()
         foundUsers = data.users || []
-        console.log('✅ Server search successful:', foundUsers.length, 'users found')
+        console.log('✅ Names API search successful:', foundUsers.length, 'users found')
       } else {
-        console.warn('⚠️ Server search failed, using fallback methods')
+        console.warn('⚠️ Names API search failed, trying fallback methods')
+        
+        // Strategy 2: Try original server API search
+        try {
+          console.log('🔍 Falling back to original server search...')
+          const token = await getAccessToken()
+          const fallbackResponse = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&userId=${user.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          })
+          
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json()
+            foundUsers = fallbackData.users || []
+            console.log('✅ Fallback search successful:', foundUsers.length, 'users found')
+          }
+        } catch (error) {
+          console.error('❌ Fallback server search also failed:', error)
+        }
       }
     } catch (error) {
-      console.error('❌ Server search error:', error)
+      console.error('❌ Names API search error:', error)
     }
     
-    // Strategy 2: Search localStorage for locally known users
+    // Strategy 3: Search localStorage for locally known users  
     try {
       console.log('🔍 Searching localStorage for users...')
       const locallyKnownUsers = []
       
-      // Check all localStorage keys for user data
+      // Check individual user entries
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i)
         if (key && key.startsWith('turfloot_user_')) {
@@ -133,6 +151,30 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
         }
       }
       
+      // Check shared user discovery cache
+      try {
+        const allLocalUsers = JSON.parse(localStorage.getItem('turfloot_all_users') || '[]')
+        for (const userData of allLocalUsers) {
+          if (userData && userData.customName && 
+              userData.customName.toLowerCase().includes(query.toLowerCase()) &&
+              userData.userId !== user.id) {
+            
+            // Avoid duplicates
+            const existingIds = locallyKnownUsers.map(u => u.id)
+            if (!existingIds.includes(userData.userId)) {
+              locallyKnownUsers.push({
+                id: userData.userId,
+                username: userData.customName,
+                joinDate: userData.timestamp,
+                source: 'shared_cache'
+              })
+            }
+          }
+        }
+      } catch (e) {
+        console.error('⚠️ Error searching shared user cache:', e)
+      }
+      
       if (locallyKnownUsers.length > 0) {
         console.log('✅ Found', locallyKnownUsers.length, 'users in localStorage')
         
@@ -146,7 +188,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.error('❌ localStorage search error:', error)
     }
     
-    // Strategy 3: Manual user ID search (if user enters a full user ID)
+    // Strategy 4: Manual user ID search (if user enters a full user ID)
     if (query.startsWith('did:privy:') && query.length > 15) {
       console.log('🔍 Detected potential user ID, adding manual entry option')
       const existingIds = foundUsers.map(u => u.id)
