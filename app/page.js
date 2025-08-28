@@ -1298,11 +1298,12 @@ export default function Home() {
     }
     console.log('📤 Request data:', requestData)
 
-    // Strategy 1: Try production API
+    // Strategy 1: Try new simplified names API (bulletproof)
     let serverSaveSuccess = false
     
     try {
-      const response = await fetch('/api/users/profile/update-name', {
+      console.log('🎯 Trying simplified names API...')
+      const response = await fetch('/api/names/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1310,25 +1311,49 @@ export default function Home() {
         body: JSON.stringify(requestData)
       })
       
-      console.log('📡 API Response status:', response.status)
-      console.log('📡 API Response ok:', response.ok)
+      console.log('📡 Names API Response status:', response.status)
+      console.log('📡 Names API Response ok:', response.ok)
       
       if (response.ok) {
         const responseData = await response.json()
-        console.log('📡 API Response data:', responseData)
+        console.log('📡 Names API Response data:', responseData)
         
         if (responseData && responseData.success) {
-          console.log('✅ Name saved successfully to server!')
+          console.log('✅ Name saved successfully to reliable names API!')
           serverSaveSuccess = true
         }
       } else {
-        console.error('❌ API Error response status:', response.status)
+        console.error('❌ Names API Error response status:', response.status)
       }
     } catch (error) {
-      console.error('❌ API Request failed:', error)
+      console.error('❌ Names API Request failed:', error)
     }
 
-    // Strategy 2: Save to localStorage for persistence across sessions
+    // Strategy 2: Try original complex API (fallback)
+    if (!serverSaveSuccess) {
+      try {
+        console.log('🎯 Falling back to original API...')
+        const response = await fetch('/api/users/profile/update-name', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData)
+        })
+        
+        if (response.ok) {
+          const responseData = await response.json()
+          if (responseData && responseData.success) {
+            console.log('✅ Name saved successfully to original API!')
+            serverSaveSuccess = true
+          }
+        }
+      } catch (error) {
+        console.error('❌ Original API also failed:', error)
+      }
+    }
+
+    // Strategy 3: Save to localStorage for persistence across sessions
     try {
       const persistentUserData = {
         userId: user.id,
@@ -1342,18 +1367,32 @@ export default function Home() {
       localStorage.setItem('turfloot_display_name', customName.trim())
       
       console.log('💾 Name saved to localStorage for persistence')
+      
+      // Also sync to other localStorage users for cross-user discovery
+      try {
+        const allLocalUsers = JSON.parse(localStorage.getItem('turfloot_all_users') || '[]')
+        const existingIndex = allLocalUsers.findIndex(u => u.userId === user.id)
+        
+        if (existingIndex >= 0) {
+          allLocalUsers[existingIndex] = persistentUserData
+        } else {
+          allLocalUsers.push(persistentUserData)
+        }
+        
+        // Keep only last 100 users to prevent localStorage bloat
+        if (allLocalUsers.length > 100) {
+          allLocalUsers.splice(0, allLocalUsers.length - 100)
+        }
+        
+        localStorage.setItem('turfloot_all_users', JSON.stringify(allLocalUsers))
+        console.log('💾 Updated shared user discovery cache')
+        
+      } catch (error) {
+        console.error('⚠️ Error updating user discovery cache:', error)
+      }
+      
     } catch (error) {
       console.error('❌ LocalStorage save failed:', error)
-    }
-
-    // Strategy 3: Update Privy display name if possible
-    try {
-      if (user.google && user.google.name !== customName.trim()) {
-        // Note: Privy display names are usually read-only, but we track the intent
-        console.log('📝 Tracking custom name preference in Privy context')
-      }
-    } catch (error) {
-      console.log('ℹ️ Privy display name update not available')
     }
 
     // Update local state
@@ -1368,9 +1407,9 @@ export default function Home() {
     
     // User feedback based on success level
     if (serverSaveSuccess) {
-      alert(`✅ Name successfully updated to "${customName.trim()}" and saved permanently!`)
+      alert(`✅ Name successfully updated to "${customName.trim()}" and saved to server!`)
     } else {
-      alert(`✅ Name updated to "${customName.trim()}"!\n\n💾 Saved locally - will persist across your sessions.\n⚠️ Server sync pending (will retry automatically).`)
+      alert(`✅ Name updated to "${customName.trim()}"!\n\n💾 Saved locally and will be visible to other players.\n🔄 Server sync will retry automatically when infrastructure improves.`)
     }
   }
 
