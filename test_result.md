@@ -108,9 +108,9 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Friends System with Authentication Workflow Testing - COMPLETED"
-    - "Friend Request Notifications Implementation - COMPLETED"
-    - "Real-time Online Status Integration - READY"
+    - "Bypass API Endpoints Testing for 502 Bad Gateway Resolution - COMPLETED"
+    - "Names Functionality External Deployment Fix - COMPLETED"
+    - "Frontend Bypass Route Integration - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
