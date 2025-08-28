@@ -332,7 +332,7 @@ export default function Home() {
     try {
       if (!userProfile?.id && !userProfile?.privyId) return
       
-      const response = await fetch(`/api/lobby/status?userId=${userProfile?.id || userProfile?.privyId}`)
+      const response = await fetch(`http://localhost:3000/api/lobby/status?userId=${userProfile?.id || userProfile?.privyId}`)
       const data = await response.json()
       
       if (response.ok) {
