@@ -2789,6 +2789,19 @@ export default function Home() {
         </div>
       )}
       
+      {/* Friends Panel */}
+      {showFriendsPanel && (
+        <FriendsPanel 
+          onClose={() => setShowFriendsPanel(false)}
+          onInviteFriend={(friendId, friendUsername) => {
+            // Handle friend invitation to current game
+            console.log('🎮 Inviting friend to game:', { friendId, friendUsername })
+            // TODO: Implement friend game invitation
+            alert(`Invited ${friendUsername} to join your game!`)
+          }}
+        />
+      )}
+
       {/* Profile Modal */}
       <UserProfile 
         isOpen={showProfile} 
