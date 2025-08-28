@@ -26,6 +26,15 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const [searching, setSearching] = useState(false)
   const [activeTab, setActiveTab] = useState('friends') // 'friends', 'requests', or 'search'
   const [notificationCount, setNotificationCount] = useState(0) // Notification count for badge
+  
+  // Dynamic API URL utility function
+  const getApiUrl = (endpoint) => {
+    if (typeof window === 'undefined') return endpoint // SSR fallback
+    
+    const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    const baseURL = isLocalDevelopment ? 'http://localhost:3000' : ''
+    return `${baseURL}${endpoint}`
+  }
 
   // Remove localStorage functions - app is now server-only
 
