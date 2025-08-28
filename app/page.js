@@ -1402,34 +1402,35 @@ export default function Home() {
       
       // Show confirmation dialog for bot practice
       const confirmed = window.confirm(
-        '🤖 Free games use AI bots for instant practice and testing.\n\n' +
-        'Perfect for learning game mechanics and trying strategies without waiting for other players.\n\n' +
-        'Ready to practice against smart AI bots?'
+        '🌐 Join Global Practice Server!\n\n' +
+        'Practice with real players AND smart AI bots in a shared global server.\n\n' +
+        'Perfect for learning mechanics, testing strategies, and meeting other players.\n\n' +
+        'Ready to join the global practice arena?'
       )
       
       console.log('🔍 Confirmation result:', confirmed)
       
       if (confirmed) {
-        console.log('✅ User confirmed bot practice game - navigating to /agario')
+        console.log('✅ User confirmed global practice server - navigating to /agario')
         
-        // Try router.push with fallback
+        // Try router.push with fallback - use global practice server
         try {
-          router.push('/agario?mode=free&fee=0')
+          router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
           
           // Extra fallback for edge cases
           setTimeout(() => {
             if (window.location.pathname === '/') {
               console.log('🔄 Using window.location fallback')
-              window.location.href = '/agario?mode=free&fee=0'
+              window.location.href = '/agario?mode=practice&fee=0&roomId=global-practice-bots'
             }
           }, 2000)
           
         } catch (error) {
           console.error('❌ Router error:', error)
-          window.location.href = '/agario?mode=free&fee=0'
+          window.location.href = '/agario?mode=practice&fee=0&roomId=global-practice-bots'
         }
       } else {
-        console.log('❌ User cancelled bot practice')
+        console.log('❌ User cancelled global practice')
       }
       return
     }
