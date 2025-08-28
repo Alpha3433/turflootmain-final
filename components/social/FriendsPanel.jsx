@@ -123,8 +123,10 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
       console.log('🔍 Searching bulletproof names API for users:', query, 'excluding user:', user.id)
       console.log('🌐 DEBUG: NEXT_PUBLIC_BASE_URL =', process.env.NEXT_PUBLIC_BASE_URL)
       
-      const apiUrl = `/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
-      console.log('🔗 DEBUG: Calling API URL =', apiUrl)
+      // Force absolute localhost URL to bypass any fetch interceptors
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+      const apiUrl = `${baseUrl}/api/names/search?q=${encodeURIComponent(query)}&userId=${user.id}`
+      console.log('🔗 DEBUG: Using ABSOLUTE API URL =', apiUrl)
       
       const response = await fetch(apiUrl, {
         headers: {
