@@ -451,6 +451,24 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
             Friends ({allFriends.length})
           </button>
           <button
+            onClick={() => {
+              setActiveTab('requests')
+              markNotificationsAsRead() // Mark as read when user opens requests tab
+            }}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors relative ${
+              activeTab === 'requests'
+                ? 'bg-orange-600 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Requests ({friendRequests.length})
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                {notificationCount > 9 ? '9+' : notificationCount}
+              </span>
+            )}
+          </button>
+          <button
             onClick={() => setActiveTab('search')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'search'
