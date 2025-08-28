@@ -1628,9 +1628,10 @@ export async function POST(request, { params }) {
           toUserId,
           fromUserName: fromUserName || 'Unknown User',
           toUserName: toUserName || 'Unknown User',
-          status: 'accepted', // Auto-accept for demo purposes - in production would be 'pending'
+          status: 'pending', // Changed to pending to enable proper friend request flow
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          notified: false // Track if user has been notified
         }
 
         await friends.insertOne(friendRequest)
