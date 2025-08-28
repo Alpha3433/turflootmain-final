@@ -1011,7 +1011,7 @@ export default function Home() {
       
       // Strategy 2: Try bulletproof names API  
       try {
-        const response = await fetch(`/api/names/get?userId=${encodeURIComponent(userId)}`)
+        const response = await fetch(`http://localhost:3000/api/names/get?userId=${encodeURIComponent(userId)}`)
         
         if (response.ok) {
           const userData = await response.json()
