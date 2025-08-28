@@ -2658,7 +2658,7 @@ export default function Home() {
             </div>
 
             {/* RIGHT COLUMN - Wallet & Customize - Mobile: Order Second (Middle) */}
-            <div className="order-2 lg:order-3 col-span-12 lg:col-span-3 space-y-2 lg:space-y-3">
+            <div className="order-2 lg:order-3 col-span-12 lg:col-span-3 space-y-4 lg:space-y-3">
               {/* Wallet Panel - More compact on mobile */}
               <div className="glass-card rounded-2xl p-3 lg:p-4 border border-cyan-400/20 shadow-lg">
                 <div className="flex items-center space-x-3 mb-3 lg:mb-4">
