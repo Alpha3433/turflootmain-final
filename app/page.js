@@ -2914,7 +2914,7 @@ export default function Home() {
                   <button
                     onClick={() => {
                       setShowMobileLobby(false)
-                      router.push('/agario?mode=free&fee=0')
+                      router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
                     }}
                     className="flex items-center justify-between p-4 bg-gray-800/40 hover:bg-gray-700/60 rounded-xl border border-gray-600/30 transition-all"
                   >
