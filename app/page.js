@@ -1303,7 +1303,7 @@ export default function Home() {
     
     try {
       console.log('🎯 Using bulletproof names API...')
-      const response = await fetch('http://localhost:3000/api/names/update', {
+      const response = await fetch(getApiUrl('/api/names/update'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
