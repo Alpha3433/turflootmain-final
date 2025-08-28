@@ -3,6 +3,16 @@
 import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 
+// Crypto polyfill for older browsers
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  return 'xxxx-xxxx-xxxx'.replace(/[x]/g, () => 
+    (Math.random() * 16 | 0).toString(16)
+  )
+}
+
 const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const { user, getAccessToken } = usePrivy()
   const [onlineFriends, setOnlineFriends] = useState([])
