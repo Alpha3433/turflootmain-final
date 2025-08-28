@@ -389,7 +389,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
                       </div>
                     </div>
                     <button
-                      onClick={() => sendFriendRequest(user.username)}
+                      onClick={() => sendFriendRequest(user)}
                       className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded-md transition-colors"
                     >
                       Add Friend
