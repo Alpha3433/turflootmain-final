@@ -19,6 +19,11 @@ const FriendsPanel = dynamic(() => import('@/components/social/FriendsPanel'), {
   loading: () => <div className="text-white">Loading Friends...</div>
 })
 
+const UserSettings = dynamic(() => import('../components/UserSettings'), {
+  ssr: false,
+  loading: () => <div className="text-white">Loading Settings...</div>
+})
+
 const CustomizationModal = dynamic(() => import('@/components/CustomizationModalClean'), {
   ssr: false
 })
