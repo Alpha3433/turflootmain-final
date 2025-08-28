@@ -1320,6 +1320,13 @@ export default function Home() {
         setDisplayName(customName.trim())
         setIsEditingName(false)
         console.log('✅ Name updated successfully via API')
+        
+        // Reload user profile to get the server-side data
+        if (user?.id) {
+          console.log('🔄 Reloading user profile after name update...')
+          await loadUserProfile(user.id)
+        }
+        
         // Show success message
         alert(`✅ Name successfully updated to "${customName.trim()}"!`)
       } else {
