@@ -902,9 +902,9 @@ export default function Home() {
       try {
         // Fetch live player count, global winnings, leaderboard, and friends
         const [playersResponse, winningsResponse, leaderboardResponse, friendsResponse] = await Promise.all([
-          fetch('/api/stats/live-players'),
-          fetch('/api/stats/global-winnings'),
-          fetch('/api/users/leaderboard'),
+          fetch('http://localhost:3000/api/stats/live-players'),
+          fetch('http://localhost:3000/api/stats/global-winnings'),
+          fetch('http://localhost:3000/api/users/leaderboard'),
           fetch(`/api/friends/list?userId=${userProfile?.id || userProfile?.privyId || 'demo-user'}`)
         ])
 
