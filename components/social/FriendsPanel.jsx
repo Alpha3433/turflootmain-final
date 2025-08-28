@@ -25,6 +25,7 @@ const FriendsPanel = ({ onInviteFriend, onClose }) => {
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
   const [activeTab, setActiveTab] = useState('friends') // 'friends', 'requests', or 'search'
+  const [notificationCount, setNotificationCount] = useState(0) // Notification count for badge
 
   // Remove localStorage functions - app is now server-only
 
