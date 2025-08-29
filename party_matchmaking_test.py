@@ -341,15 +341,21 @@ class PartyMatchmakingTester:
         robiee_party_response, rt2 = self.make_request('GET', '/party-api/current', params={'userId': ROBIEE_USER_ID})
         
         if anth_party_response and robiee_party_response and anth_party_response.status_code == 200 and robiee_party_response.status_code == 200:
-            anth_data = anth_party_response.json().get('party', {})
-            robiee_data = robiee_party_response.json().get('party', {})
+            anth_response_data = anth_party_response.json()
+            robiee_response_data = robiee_party_response.json()
             
-            anth_game_room = anth_data.get('gameRoomId', '')
-            robiee_game_room = robiee_data.get('gameRoomId', '')
+            anth_data = anth_response_data.get('party', {})
+            robiee_data = robiee_response_data.get('party', {})
             
-            same_game_room = anth_game_room == robiee_game_room == self.game_room_id
-            details = f"ANTH gameRoomId: {anth_game_room}, ROBIEE gameRoomId: {robiee_game_room}, Match: {same_game_room}"
-            self.log_test("Same GameRoomId for Both Members", same_game_room, details, max(rt1, rt2))
+            if anth_data and robiee_data:
+                anth_game_room = anth_data.get('gameRoomId', '')
+                robiee_game_room = robiee_data.get('gameRoomId', '')
+                
+                same_game_room = anth_game_room == robiee_game_room == self.game_room_id
+                details = f"ANTH gameRoomId: {anth_game_room}, ROBIEE gameRoomId: {robiee_game_room}, Match: {same_game_room}"
+                self.log_test("Same GameRoomId for Both Members", same_game_room, details, max(rt1, rt2))
+            else:
+                self.log_test("Same GameRoomId for Both Members", False, "One or both users have no party data", max(rt1, rt2))
         else:
             self.log_test("Same GameRoomId for Both Members", False, "Failed to get party data for both users", max(rt1, rt2))
         
