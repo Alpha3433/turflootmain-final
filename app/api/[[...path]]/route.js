@@ -1450,6 +1450,55 @@ export async function POST(request, { params }) {
       }
     }
 
+    // User balance endpoint (POST) - missing endpoint causing 500 errors
+    if (route === 'users/balance') {
+      try {
+        console.log('💰 User balance POST request:', body)
+        
+        const { userId } = body
+        
+        if (!userId) {
+          return NextResponse.json(
+            { error: 'userId is required' },
+            { status: 400, headers: corsHeaders }
+          )
+        }
+
+        const db = await getDb()
+        const users = db.collection('users')
+        
+        // Find user in database
+        const user = await users.findOne({ 
+          $or: [
+            { id: userId },
+            { privy_id: userId }
+          ]
+        })
+        
+        if (user) {
+          // Return user's actual balance
+          return NextResponse.json({
+            balance: user.balance || 25.00, // Default balance for new users
+            currency: 'USD',
+            timestamp: new Date().toISOString()
+          }, { headers: corsHeaders })
+        } else {
+          // Return default balance for non-existing users
+          return NextResponse.json({
+            balance: 25.00,
+            currency: 'USD',
+            timestamp: new Date().toISOString()
+          }, { headers: corsHeaders })
+        }
+      } catch (error) {
+        console.error('❌ Users balance POST error:', error)
+        return NextResponse.json(
+          { error: 'Failed to get user balance' },
+          { status: 500, headers: corsHeaders }
+        )
+      }
+    }
+
     // User profile name update route
     if (route === 'users/profile/update-name') {
       console.log('🎯 ROUTE MATCHED: users/profile/update-name')
