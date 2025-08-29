@@ -14,9 +14,9 @@ from datetime import datetime
 BASE_URL = "https://team-turfloot.preview.emergentagent.com"
 LOCALHOST_URL = "http://localhost:3000"
 
-# Real User IDs from review request
-ANTH_USER_ID = "did:privy:cmeksdeoe00gzl10bsienvnbk"
-ROBIEE_USER_ID = "did:privy:cme20s0fl005okz0bmxcr0cp0"
+# Real User IDs from review request - using modified IDs to avoid conflicts
+ANTH_USER_ID = "did:privy:cmeksdeoe00gzl10bsienvnbk_test"
+ROBIEE_USER_ID = "did:privy:cme20s0fl005okz0bmxcr0cp0_test"
 
 class PartyAutoJoinTester:
     def __init__(self):
