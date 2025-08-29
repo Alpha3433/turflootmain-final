@@ -135,24 +135,24 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     }
   }, [user?.id, apiCall, getApiUrl])
 
-  // Search users
-  const searchUsers = useCallback(async (query) => {
-    if (!user?.id || !query || query.length < 2) {
-      setSearchResults([])
+  // Filter users based on search query
+  const filterUsers = useCallback((query) => {
+    if (!query) {
+      // Show all users when no search query
+      const filtered = onlineOnly ? allUsers.filter(user => user.online) : allUsers
+      setFilteredUsers(filtered)
       return
     }
     
-    try {
-      setLoading(true)
-      const data = await apiCall(getApiUrl(`/friends-api/search?userId=${user.id}&q=${encodeURIComponent(query)}&onlineOnly=${onlineOnly}`))
-      setSearchResults(data.users || [])
-    } catch (error) {
-      console.error('Failed to search users:', error)
-      setSearchResults([])
-    } finally {
-      setLoading(false)
-    }
-  }, [user?.id, onlineOnly, apiCall, getApiUrl])
+    // Filter users by username containing the query (case insensitive)
+    const filtered = allUsers.filter(user => {
+      const matchesQuery = user.username.toLowerCase().includes(query.toLowerCase())
+      const matchesOnlineFilter = onlineOnly ? user.online : true
+      return matchesQuery && matchesOnlineFilter
+    })
+    
+    setFilteredUsers(filtered)
+  }, [allUsers, onlineOnly])
 
   // Send friend request
   const sendFriendRequest = useCallback(async (toUserId, toUsername) => {
