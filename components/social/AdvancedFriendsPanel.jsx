@@ -284,16 +284,12 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     }
   }, [authenticated, user?.id, loadFriends, loadPendingRequests, loadSuggestions, loadAllUsers, setPresence])
 
-  // Search debouncing
+  // Filter users when search query or online filter changes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (activeTab === 'search') {
-        searchUsers(searchQuery)
-      }
-    }, 500)
-    
-    return () => clearTimeout(timer)
-  }, [searchQuery, onlineOnly, activeTab, searchUsers])
+    if (activeTab === 'search') {
+      filterUsers(searchQuery)
+    }
+  }, [searchQuery, onlineOnly, activeTab, filterUsers])
 
   if (!authenticated || !user) {
     return (
