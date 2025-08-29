@@ -174,7 +174,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
       
       // Refresh search results to remove the user
       if (searchQuery) {
-        searchUsers(searchQuery)
+        filterUsers(searchQuery)
       }
       
     } catch (error) {
