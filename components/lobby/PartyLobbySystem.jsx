@@ -59,19 +59,39 @@ export default function PartyLobbySystem({
 
   // Fetch invitable friends for party
   const fetchInvitableFriends = useCallback(async () => {
-    if (!userId || !currentParty) return
+    if (!userId) return
     
     try {
-      const response = await fetch(`${getApiUrl('/api/party/invitable-friends')}?userId=${userId}&partyId=${currentParty.id}`)
+      // Fetch user's friends from the friends API
+      const response = await fetch(`${getApiUrl('/api/friends/list')}?userId=${userId}`)
       const data = await response.json()
       
       if (response.ok) {
-        setInvitableFriends(data.friends || [])
+        // Get the friends array from the response
+        const friends = data.friends || []
+        console.log('🤝 Fetched friends for party invites:', friends)
+        
+        // Filter friends who are online and not already in the party
+        const invitableFriends = friends.filter(friend => {
+          // Don't invite friends who are already in the current party
+          if (currentParty && currentParty.members) {
+            const isAlreadyInParty = currentParty.members.some(member => member.id === friend.id)
+            if (isAlreadyInParty) return false
+          }
+          
+          // Only show online friends (or all friends if we want to allow offline invites)
+          return true // For now, show all friends
+        })
+        
+        setInvitableFriends(invitableFriends)
+        console.log('✅ Invitable friends set:', invitableFriends)
       } else {
-        console.error('Failed to fetch invitable friends:', data.error)
+        console.error('Failed to fetch friends for party invites:', data.error)
+        setInvitableFriends([])
       }
     } catch (error) {
-      console.error('Error fetching invitable friends:', error)
+      console.error('Error fetching friends for party invites:', error)
+      setInvitableFriends([])
     }
   }, [userId, currentParty])
 
