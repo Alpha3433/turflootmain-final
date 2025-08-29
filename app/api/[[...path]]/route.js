@@ -615,7 +615,8 @@ export async function GET(request, { params }) {
       } catch (error) {
         console.error('Error in users/leaderboard endpoint:', error)
         return NextResponse.json({ 
-          leaderboard: [],
+          users: [],     // Frontend expects 'users' array
+          leaderboard: [], // Keep both for compatibility
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
       }
