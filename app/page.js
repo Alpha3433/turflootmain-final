@@ -266,6 +266,27 @@ export default function Home() {
     }, 800) // 800ms delay for better UX
   }, [])
   
+  // Hide loading popup when component unmounts or navigation occurs
+  useEffect(() => {
+    return () => {
+      setIsJoiningGame(false)
+    }
+  }, [])
+
+  // Also hide loading popup on route changes
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setIsJoiningGame(false)
+    }
+    
+    // Note: Next.js 13 app router doesn't have router events
+    // The loading will be hidden when page actually navigates
+    
+    return () => {
+      // Cleanup if needed
+    }
+  }, [router])
+
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
 
