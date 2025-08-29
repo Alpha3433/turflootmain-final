@@ -608,7 +608,8 @@ export async function GET(request, { params }) {
         }))
         
         return NextResponse.json({
-          leaderboard: formattedLeaderboard,
+          users: formattedLeaderboard,  // Frontend expects 'users' not 'leaderboard'
+          leaderboard: formattedLeaderboard, // Keep both for compatibility
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
       } catch (error) {
