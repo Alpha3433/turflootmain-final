@@ -436,7 +436,11 @@ export default function PartyLobbySystem({
                 {/* Party Actions */}
                 <div className="flex space-x-2 mt-3 pt-3 border-t border-gray-700/50">
                   <button 
-                    onClick={() => setShowInviteFriends(true)}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setShowInviteFriends(true)
+                    }}
                     disabled={isLoading}
                     className="flex-1 px-3 py-2 border border-orange-500/40 hover:bg-orange-500/10 disabled:opacity-50 text-orange-400 hover:text-orange-300 rounded-lg transition-all duration-200 text-sm font-medium"
                   >
