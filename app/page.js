@@ -390,9 +390,6 @@ export default function Home() {
       if (showRegionDropdown && !event.target.closest('.region-dropdown-container')) {
         setShowRegionDropdown(false)
       }
-      if (showLobby && !event.target.closest('.lobby-dropdown-container')) {
-        setShowLobby(false)
-      }
     }
     
     document.addEventListener('mousedown', handleClickOutside)
