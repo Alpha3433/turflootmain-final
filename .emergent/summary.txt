@@ -1,79 +1,75 @@
 <analysis>
-The trajectory details the AI engineer's efforts to stabilize and enhance the TurfLoot application, primarily tackling persistent  and  errors on the preview deployment. Initial work focused on fixing API routing by adjusting  and then explicitly hardcoding API calls to , which resolved issues locally but broke preview functionality. A dynamic  utility was introduced to adapt URLs based on the environment. Despite these code-level fixes, the  errors persisted on the preview URL, leading to the identification of an underlying Kubernetes ingress configuration issue. The AI engineer attempted Next.js rewrites and middleware, which proved ineffective for the  errors. A significant breakthrough occurred when a new  endpoint, not prefixed with , successfully returned a , confirming that external routing was partially functional. This led to the current strategy: creating new API endpoints outside the problematic  path to bypass the ingress restriction. Concurrently, the AI completed the server-side friends system with authentication and real-time notifications, and name saving, all verified to work at 100% on localhost.
+The trajectory chronicles the AI engineer's journey in stabilizing and enhancing the TurfLoot application. Initially, the focus was on resolving persistent  errors on the preview deployment, primarily for  routes due to Kubernetes ingress issues. The AI engineer implemented and refined a dynamic  utility and created specific bypass API endpoints (e.g., , ) to circumvent the  route blocking.
+
+Following this, the engineer rebuilt the friends system from the ground up, incorporating advanced features like rate limiting, presence tracking, and robust friend management. This also involved fixing a  error, redesigning the friends search to display all users, and integrating Privy authentication with custom display names. Demo user data was meticulously cleaned.
+
+The current phase involves developing a comprehensive Party Lobby system. The initial implementation focused on core party management, invitations, and member status, but a user clarification shifted the requirement: the lobby should be general, not room-specific, with all party members following the owner into any chosen game room. The AI engineer is actively working on integrating this party system with a new general lobby backend, including a  and updating the smart routing configuration.
 </analysis>
 
 <product_requirements>
-TurfLoot is an Agar.io-style multiplayer online game. Initial requirements included mobile joysticks, minimap, stats, leaderboards, orientation gate, cell mechanics (splitting, orb collection, merge timers), mock data for paid lobbies (-00), and backend for paid rooms, cash-out, and mission rewards.
-
-The previous AI engineer made significant progress:
-- **Mobile customization/social popup/navigation bar redesign**: Navigation bar with region selector, settings, login, and horizontal mobile cycling implemented. Customization and social popups are ongoing.
-- **Dynamic Players in Game update**: Backend ready, frontend partially implemented.
-- **Compact region selection (Oceania & latency)**: Implemented.
-- **Fix 0 balance display**: Addressed.
-- **Username section redesign & errors**: Backend and frontend implemented with a dedicated bulletproof names API, removing client-side fallbacks. Persistent 502 errors on preview were blocking this.
-- **Lobby button**: Implemented and streamlined with operational backend.
-- **Real-time social features**: Friends panel, online status, shared practice mode via Socket.IO, friend request notifications, and server-side-only friends functionality.
-- **Mobile vertical view/spacing/eye spacing fixes**: Implemented.
-
-The primary problem at hand has been the persistent  and  errors on the preview deployment, preventing server-side name changes and friend requests from functioning externally, despite the code being complete and working locally. The current focus is to resolve these external API access issues.
+TurfLoot is an Agar.io-style multiplayer online game. Initial features included mobile joysticks, minimap, stats, leaderboards, orientation gate, and core cell mechanics. Product evolution includes a redesigned navigation bar, dynamic Players in Game updates, compact region selection, 0 balance display fix, and a bulletproof username system.
+A key problem was  and  errors on preview for  routes. This led to creating bypass API endpoints (e.g., , ) to ensure name saving and friends functionality worked externally.
+The social system was re-architected to include robust friend management (cannot friend self/duplicates, accept creates friendship once, block removes/prevents requests, smart search exclusions, rate limiting, and real-time Socket.IO events for all actions).
+The most recent request is to build a Party Lobby system. Users should create a party, invite friends, and upon acceptance, the party owner can join any game room, with all party members automatically following into that room.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Next.js 14 (App Router)**: Full-stack framework.
--   **React State Management**: ,  for UI.
+-   **React Hooks**: , , .
 -   **Tailwind CSS & shadcn/ui**: Styling.
 -   **MongoDB**: Database persistence.
--   **Next.js API Routes**: Backend endpoints (, , , ).
+-   **Next.js API Routes**: Backend endpoints for names, friends, users, parties, lobbies.
 -   **Privy Authentication**: User authentication ().
--   **Socket.IO**: Real-time communication (for game servers, social features).
--   **Kubernetes/Caddy Proxy**: Production infrastructure.
--   **Environment Variables**:  for API routing.
--   **Next.js Middleware/Rewrites**: For request routing.
+-   **Socket.IO**: Real-time communication.
+-   **Kubernetes/Caddy Proxy**: Production infrastructure for routing issues.
+-   **Environment Variables**: .
+-   **Redis**: Used for online presence and suggestions caching.
 </key_technical_concepts>
 
 <code_architecture>
 
 
--   ****: Centralized API.
-    -   **Changes**: Enhanced friends and lobby endpoints, added input validation. Included debugging for external access.
--   ****: Dedicated name API.
-    -   **Importance**: Critical for persistent username storage.
--   ** (NEW)**:
-    -   **Summary**: A simple health check endpoint.
-    -   **Changes**: Created to test external routing outside the  prefix. Its success indicated specific  path blocking.
--   ** (NEW)**:
-    -   **Summary**: An alternative endpoint for name-related API calls.
-    -   **Changes**: Created as a bypass to the problematic  prefix to ensure name saving works externally.
+-   ****: Centralized API. Primarily updated for debugging and routing.
+-   ****: Dedicated name API. Used for persistent username storage.
+-   ****: A simple health check endpoint. Created to test external routing outside the  prefix, confirming specific  path blocking.
+-   ****: (NEW) Alternative endpoint for name-related API calls. Created as a bypass to the problematic  prefix.
+-   ****: (NEW) Bypass endpoint for friends functionality. Re-created and updated to house the new Advanced Friends System API.
+-   ****: (NEW) API endpoint to register and update user profiles, especially for Privy users.
+-   ****: (NEW) API endpoints for creating, inviting, joining, declining, and managing parties.
+-   ****: (NEW) API endpoints for managing general lobbies and coordinating party members joining rooms.
 -   ****: Main landing page.
-    -   **Changes**: Implemented  utility for dynamic API calls (localhost vs. preview), updated name saving, statistics, and lobby-related API calls to use this utility. Fixed a syntax error in a fetch call.
--   ****: Friends management UI.
-    -   **Changes**: Implemented  utility, updated all friends, requests, and notification API calls to use dynamic URLs.
--   ****: Next.js configuration.
-    -   **Changes**: Added webpack configuration to externalize Privy dependencies and exposed . Attempted to add rewrite rules for API routing.
--   ****: Next.js middleware.
-    -   **Changes**: Enhanced to try and handle API routing, though this didn't resolve the external 502 errors.
--   ****: Environment configuration.
-    -   **Changes**:  was repeatedly changed and dynamically handled in code.
--   ** (NEW)**:
-    -   **Summary**: Document detailing the Kubernetes ingress configuration issues for the DevOps team.
+    -   **Changes**: Implemented  utility, updated name saving/retrieval to use it, fixed  import, integrated user authentication and presence management. Switched to .
+-   ****: Original friends management UI. Replaced by .
+-   ****: (NEW) Comprehensive friends management UI.
+    -   **Changes**: Implemented full friends system (add, accept, block, search), integrated Privy user registration, online status indicators, removed suggestions tab, and uses the smart routing and  logic.
+-   ****: (NEW) Core logic for the advanced friends system.
+    -   **Changes**: Contains all business logic for friend requests, friendships, blocking, searching, rate limiting, and online presence (Redis integration). Fixed MongoDB index creation.
+-   ****: (NEW) Handles user registration and profile updates, especially for Privy users, pulling custom names from the names API.
+-   ****: (NEW) Core logic for party creation, invitations, membership, and management.
+-   ****: (NEW) Centralized configuration for smart API routing, allowing easy switching between standard  and bypass routes.
+-   ****: Environment configuration.  is used for dynamic routing.
+-   ****: Added webpack config and rewrite rules (though rewrites didn't solve the  problem).
+-   ****: Attempted to handle API routing.
+-   **Various  files**: Detailed summaries and solutions for specific problems (, , etc.).
 </code_architecture>
 
 <pending_tasks>
 -   **Real Blockchain Integration**: Implement full SOL deposits/withdrawals and smart contract interaction for game entry fees.
--   **Mobile customization screen redesign**: Ongoing (specific design not fully detailed).
--   **Modernizing social popup**: Ongoing (specific design not fully detailed).
--   **Friends List Functionality**: Implement friend request notifications (code complete, blocked by infra).
--   **Production Infrastructure Stability**: Resolve persistent 502/404/ERR_ABORTED errors on the preview deployment for  calls. This is an infrastructure task, not a code task, but it blocks features.
+-   **Mobile Customization Screen Redesign**: Ongoing (specific design not fully detailed).
+-   **Modernizing Social Popup**: Ongoing (specific design not fully detailed, but the backend is mostly done).
+-   **Production Infrastructure Stability**: Resolve persistent 502/404/ERR_ABORTED errors on the preview deployment for  calls (currently worked around by bypass routes, not fixed at infrastructure level).
+-   **Party Lobby Frontend Integration**: Connect the newly built backend party and general lobby system to the frontend UI.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer was attempting to resolve the persistent  errors affecting all API calls on the preview deployment (e.g., ). Despite successfully implementing a dynamic  utility in  and  to intelligently switch between  and relative  URLs based on the environment, the preview deployment continued to return  for these  calls.
+Immediately prior to this summary, the AI engineer was working on the Party Lobby system. The user clarified that the lobby should not be tied to a specific room type but should be a general party. The party owner would then choose a game room, and all party members would automatically be taken to that room/game.
 
-This led to the confirmation that the issue is external to the application code, residing within the Kubernetes ingress or gateway configuration. Attempts to add rewrite rules in  and enhance the  to handle API routing also failed to resolve the  errors. A crucial diagnostic step was the creation of a new, non- prefixed health endpoint (), which successfully returned a  from the preview deployment. This breakthrough indicated that external routing *is* possible for some paths, but specifically blocked for paths starting with .
+The AI engineer has created  to handle this general lobby functionality. This involves creating a lobby that isn't room-specific, allowing the party owner to initiate joining a room, and then facilitating all party members to follow. The  utility in  and the  configuration have been updated to support and correctly route calls to this new .
 
-The AI engineer has now started creating new API endpoints, such as , to bypass the problematic  prefix and enable the server-side name change and friend request functionalities on the preview deployment. The internal implementation of server-side name changes, friend requests, and notifications is 100% complete and verified working on . The current focus is on adapting the frontend to use these new bypass endpoints, effectively working around the infrastructure limitation.
+The previous backend testing for the Party Lobby () confirmed core party creation, invitation, acceptance, and membership tracking. However, the user's latest feedback highlights the need to integrate this party system with a *general* game lobby, and ensure party members join rooms together. The AI engineer is currently in the process of thoroughly testing this party-integrated lobby system, specifically verifying that multiple party members can join the same room automatically after the owner initiates it.
 </current_work>
 
 <optional_next_step>
-Test the new names API bypass endpoint () to confirm it resolves the  issue for name-related operations on the preview deployment.
+Complete the testing of the party-integrated lobby system with multiple party members to ensure full functionality.
 </optional_next_step>
+
