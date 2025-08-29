@@ -104,6 +104,25 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     }
   }, [user?.id, apiCall, getApiUrl])
 
+  // Load all users (for the friends search)
+  const loadAllUsers = useCallback(async () => {
+    if (!user?.id) return
+    
+    try {
+      setLoading(true)
+      // Use a broad search to get all available users
+      const data = await apiCall(getApiUrl(`/friends-api/search?userId=${user.id}&q=&onlineOnly=false&showAll=true`))
+      setAllUsers(data.users || [])
+      setFilteredUsers(data.users || [])
+    } catch (error) {
+      console.error('Failed to load all users:', error)
+      setAllUsers([])
+      setFilteredUsers([])
+    } finally {
+      setLoading(false)
+    }
+  }, [user?.id, apiCall, getApiUrl])
+
   // Load suggestions
   const loadSuggestions = useCallback(async () => {
     if (!user?.id) return
