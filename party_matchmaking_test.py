@@ -195,13 +195,17 @@ class PartyMatchmakingTester:
                     # Test party status update
                     response, rt = self.make_request('GET', '/party-api/current', params={'userId': ANTH_USER_ID})
                     if response and response.status_code == 200:
-                        party_data = response.json().get('party', {})
-                        party_status = party_data.get('status', '')
-                        stored_game_room_id = party_data.get('gameRoomId', '')
-                        
-                        status_updated = party_status == 'in_game' and stored_game_room_id == self.game_room_id
-                        details = f"Party status: {party_status}, GameRoomId: {stored_game_room_id}"
-                        self.log_test(f"Party Status Update ({room_type})", status_updated, details, rt)
+                        party_response = response.json()
+                        party_data = party_response.get('party', {})
+                        if party_data:
+                            party_status = party_data.get('status', '')
+                            stored_game_room_id = party_data.get('gameRoomId', '')
+                            
+                            status_updated = party_status == 'in_game' and stored_game_room_id == self.game_room_id
+                            details = f"Party status: {party_status}, GameRoomId: {stored_game_room_id}"
+                            self.log_test(f"Party Status Update ({room_type})", status_updated, details, rt)
+                        else:
+                            self.log_test(f"Party Status Update ({room_type})", False, "No party data in response", rt)
                     
                     break  # Use first successful room for remaining tests
                 else:
