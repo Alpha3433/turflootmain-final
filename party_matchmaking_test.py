@@ -466,6 +466,9 @@ class PartyMatchmakingTester:
         print(f"👥 Test users: ANTH ({ANTH_USER_ID}), ROBIEE ({ROBIEE_USER_ID})")
         print("=" * 80)
         
+        # Clean up existing parties first
+        self.cleanup_existing_parties()
+        
         start_time = time.time()
         
         # Run all test suites
