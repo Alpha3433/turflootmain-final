@@ -28,7 +28,91 @@ export default function PartyLobbySystem({
   console.log('🔍 PARTY LOBBY DEBUG: user.privyId:', user?.privyId)
   console.log('🔍 PARTY LOBBY DEBUG: displayName:', displayName)
 
-  // Fetch current party status
+  // Fetch user balance
+  const fetchUserBalance = useCallback(async () => {
+    if (!userId) return
+    
+    try {
+      // Use the smart routing system to get balance
+      const response = await fetch(`${getApiUrl('/api/users/balance')}?userId=${userId}`)
+      const data = await response.json()
+      
+      if (response.ok && typeof data.balance === 'number') {
+        setUserBalance(data.balance)
+        console.log('💰 User balance loaded:', data.balance)
+      } else {
+        console.error('❌ Failed to fetch user balance:', data.error)
+        setUserBalance(0) // Default to 0 if balance fetch fails
+      }
+    } catch (error) {
+      console.error('❌ Error fetching user balance:', error)
+      setUserBalance(0)
+    }
+  }, [userId])
+
+  // Fetch party member balances
+  const fetchPartyMemberBalances = useCallback(async () => {
+    if (!currentParty || !currentParty.members) return
+    
+    console.log('💰 Fetching balances for party members:', currentParty.members)
+    
+    const balances = {}
+    
+    try {
+      // Fetch balance for each party member
+      const balancePromises = currentParty.members.map(async (member) => {
+        try {
+          const response = await fetch(`${getApiUrl('/api/users/balance')}?userId=${member.id}`)
+          const data = await response.json()
+          
+          if (response.ok && typeof data.balance === 'number') {
+            balances[member.id] = data.balance
+            console.log(`💰 Balance for ${member.username}: $${data.balance}`)
+          } else {
+            console.error(`❌ Failed to fetch balance for ${member.username}:`, data.error)
+            balances[member.id] = 0
+          }
+        } catch (error) {
+          console.error(`❌ Error fetching balance for ${member.username}:`, error)
+          balances[member.id] = 0
+        }
+      })
+      
+      await Promise.all(balancePromises)
+      setPartyMemberBalances(balances)
+      console.log('💰 All party member balances loaded:', balances)
+      
+    } catch (error) {
+      console.error('❌ Error fetching party member balances:', error)
+      setPartyMemberBalances({})
+    }
+  }, [currentParty])
+
+  // Check if party can afford room fee
+  const canPartyAffordRoom = useCallback((roomFee) => {
+    if (!currentParty || !currentParty.members || Object.keys(partyMemberBalances).length === 0) {
+      return { canAfford: false, insufficientMembers: [] }
+    }
+    
+    const insufficientMembers = []
+    
+    currentParty.members.forEach(member => {
+      const memberBalance = partyMemberBalances[member.id] || 0
+      if (memberBalance < roomFee) {
+        insufficientMembers.push({
+          id: member.id,
+          username: member.username,
+          balance: memberBalance,
+          needed: roomFee - memberBalance
+        })
+      }
+    })
+    
+    return {
+      canAfford: insufficientMembers.length === 0,
+      insufficientMembers
+    }
+  }, [currentParty, partyMemberBalances])
   const fetchPartyStatus = useCallback(async () => {
     if (!userId) return
     
