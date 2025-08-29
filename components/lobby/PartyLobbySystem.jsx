@@ -491,7 +491,10 @@ export default function PartyLobbySystem({
 
         {/* Invite Friends Overlay - Takes over the entire modal */}
         {showInviteFriends && (
-          <div className="absolute inset-0 bg-gray-900 rounded-xl z-10 flex flex-col">
+          <div 
+            className="absolute inset-0 bg-gray-900 rounded-xl z-[70] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
             <div className="p-4 border-b border-orange-500/30 bg-gradient-to-r from-orange-600/20 to-orange-700/20 rounded-t-xl">
               <div className="flex items-center justify-between">
