@@ -224,7 +224,7 @@ export default function Home() {
       // PARTY MODE: Navigate to coordinated game room
       console.log(`🎮 Party Mode: Navigating to game room ${gameRoomId} with ${partySize} members`)
       
-      const gameUrl = `/agario?mode=${roomType === 'practice' ? 'practice' : 'party'}&fee=${entryFee}&roomId=${gameRoomId}&partyId=${partyId}&partySize=${partySize}&members=${encodeURIComponent(JSON.stringify(partyMembers))}`
+      const gameUrl = `/agario?mode=party&fee=${entryFee}&roomId=${gameRoomId}&partyId=${partyId}&partySize=${partySize}&members=${encodeURIComponent(JSON.stringify(partyMembers))}`
       
       console.log('🔗 Game URL:', gameUrl)
       router.push(gameUrl)
