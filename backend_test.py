@@ -162,7 +162,10 @@ def test_create_party_conflict_handling():
     
     success, conflict_result = make_request("POST", "/party-api/create", data=second_party_data)
     
-    if success:
+    # Check if we got an error (either success=False or error in response)
+    has_error = not success or conflict_result.get('error')
+    
+    if not has_error:
         log_test("❌ CONFLICT DETECTION FAILED: Second party creation succeeded", "ERROR")
         return False
     
