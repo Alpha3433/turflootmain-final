@@ -1439,16 +1439,340 @@ export default function PartyLobbySystem({
           </div>
         )}
 
-        {/* Loading Overlay */}
-        {isLoading && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="bg-gray-800 rounded-lg p-4 flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-400"></div>
-              <span className="text-white">Loading...</span>
+          {/* Mobile Header - Compact */}
+          <div className="p-3 border-b border-orange-500/30 bg-gradient-to-r from-orange-600/20 to-orange-700/20">
+            {/* Drag Handle */}
+            <div className="w-12 h-1 bg-gray-600 rounded-full mx-auto mb-3"></div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-6 h-6 bg-orange-500/20 rounded-lg flex items-center justify-center border border-orange-500/30">
+                  <svg className="w-3 h-3 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-white font-bold text-base">Party Lobby</h2>
+                  <p className="text-orange-200 text-xs">Team up & play</p>
+                </div>
+              </div>
+              <button 
+                onClick={onClose}
+                className="w-8 h-8 text-gray-400 hover:text-white transition-colors flex items-center justify-center"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
-        )}
+
+          {/* Mobile Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-3 space-y-3">
+              {/* Error Display - Mobile */}
+              {error && (
+                <div className="p-2 bg-red-500/20 border border-red-500/40 rounded-lg">
+                  <p className="text-red-400 text-xs">{error}</p>
+                </div>
+              )}
+
+              {/* Party Invitations - Mobile Compact */}
+              {partyInvitations.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-white font-semibold text-xs flex items-center space-x-1">
+                    <svg className="w-3 h-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span>Invites ({partyInvitations.length})</span>
+                  </h3>
+                  {partyInvitations.map((invite) => (
+                    <div key={invite.id} className="flex items-center justify-between p-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-400 font-bold text-xs">
+                          {invite.fromUsername.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="text-white font-medium text-xs">{invite.fromUsername}</div>
+                          <div className="text-gray-400 text-xs">{invite.partyName}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <button 
+                          onClick={() => acceptInvitation(invite.id)}
+                          disabled={isLoading}
+                          className="px-2 py-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-medium rounded transition-colors"
+                        >
+                          ✓
+                        </button>
+                        <button 
+                          onClick={() => declineInvitation(invite.id)}
+                          disabled={isLoading}
+                          className="px-2 py-1 bg-gray-600 hover:bg-gray-700 disabled:opacity-50 text-white text-xs font-medium rounded transition-colors"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Current Party or Create Party - Mobile */}
+              {!currentParty ? (
+                <button 
+                  onClick={createParty}
+                  disabled={isLoading}
+                  className="w-full p-3 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-500 hover:to-orange-600 disabled:opacity-50 rounded-lg transition-all duration-200"
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span className="text-white font-semibold text-sm">Create Party</span>
+                  </div>
+                </button>
+              ) : (
+                <div className="space-y-3">
+                  {/* Active Party Info - Mobile Compact */}
+                  <div className="bg-gray-800/40 rounded-lg p-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-white font-semibold text-xs">Active Party</h3>
+                      <div className="px-2 py-1 bg-green-500/20 border border-green-500/30 rounded text-green-400 text-xs font-medium">
+                        {currentParty.memberCount}/2
+                      </div>
+                    </div>
+
+                    {/* Party Members - Mobile */}
+                    <div className="space-y-1">
+                      {currentParty.members?.map((member) => (
+                        <div key={member.id} className="flex items-center space-x-2 p-1">
+                          <div className="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center text-orange-400 font-bold text-xs">
+                            {member.username.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-white font-medium text-xs">{member.username}</div>
+                          </div>
+                          {member.role === 'owner' && (
+                            <div className="text-yellow-400 text-xs">👑</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Party Actions - Mobile */}
+                    <div className="flex space-x-2 mt-2 pt-2 border-t border-gray-700/50">
+                      <button 
+                        onClick={() => setShowInviteFriends(true)}
+                        disabled={isLoading}
+                        className="flex-1 px-2 py-1 border border-orange-500/40 hover:bg-orange-500/10 disabled:opacity-50 text-orange-400 hover:text-orange-300 rounded transition-all duration-200 text-xs font-medium"
+                      >
+                        Invite
+                      </button>
+                      <button 
+                        onClick={leaveParty}
+                        disabled={isLoading}
+                        className="px-2 py-1 bg-red-600/20 border border-red-500/40 hover:bg-red-600/30 disabled:opacity-50 text-red-400 hover:text-red-300 rounded transition-all duration-200 text-xs font-medium"
+                      >
+                        Leave
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Room Selection - Mobile Optimized */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-white font-semibold text-xs">
+                    {currentParty ? 'Select Room' : 'Quick Play'}
+                  </h3>
+                </div>
+
+                {/* Owner-Only Access Control - Mobile */}
+                {currentParty && (
+                  (() => {
+                    const isOwner = currentParty.members?.some(member => 
+                      member.id === userId && member.role === 'owner'
+                    )
+                    
+                    if (!isOwner) {
+                      return (
+                        <div className="p-2 bg-blue-500/10 border border-blue-500/30 rounded-lg text-center">
+                          <div className="flex items-center justify-center space-x-1 mb-1">
+                            <svg className="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <span className="text-blue-400 font-semibold text-xs">Owner Only</span>
+                          </div>
+                          <p className="text-blue-300 text-xs">Wait for {currentParty.ownerUsername} to start</p>
+                        </div>
+                      )
+                    }
+                    return null
+                  })()
+                )}
+                
+                {/* Mobile Room Grid - 2x2 for portrait, 4x1 for landscape */}
+                <div className="grid grid-cols-2 portrait:grid-cols-2 landscape:grid-cols-4 gap-2">
+                  {[
+                    { name: 'Practice', roomType: 'practice', fee: 0, color: 'green' },
+                    { name: '$1', roomType: '$1', fee: 1, color: 'blue' },
+                    { name: '$5', roomType: '$5', fee: 5, color: 'purple' },
+                    { name: '$25', roomType: '$25', fee: 25, color: 'red' }
+                  ].map((room) => {
+                    // Same logic as desktop for affordability
+                    let canAfford = true
+                    let disableReason = null
+                    let isOwner = true
+                    
+                    if (currentParty) {
+                      isOwner = currentParty.members?.some(member => 
+                        member.id === userId && member.role === 'owner'
+                      )
+                      
+                      if (!isOwner) {
+                        canAfford = false
+                        disableReason = 'Owner only'
+                      } else {
+                        const affordabilityCheck = canPartyAffordRoom(room.fee)
+                        canAfford = affordabilityCheck.canAfford
+                        
+                        if (!canAfford && affordabilityCheck.insufficientMembers.length > 0) {
+                          disableReason = 'Need funds'
+                        }
+                        
+                        if (currentParty.memberCount > 2) {
+                          canAfford = false
+                          disableReason = 'Party full'
+                        }
+                      }
+                    } else {
+                      canAfford = userBalance >= room.fee
+                      if (!canAfford && room.fee > 0) {
+                        disableReason = 'Need funds'
+                      }
+                    }
+                    
+                    return (
+                      <button 
+                        key={room.roomType}
+                        onClick={() => canAfford ? joinRoom(room.roomType, room.fee) : null}
+                        disabled={isLoading || !canAfford}
+                        className={`relative p-2 rounded-lg transition-all duration-200 ${
+                          canAfford 
+                            ? `bg-${room.color}-600/20 border border-${room.color}-500/40 hover:bg-${room.color}-600/30 cursor-pointer` 
+                            : 'bg-gray-600/20 border border-gray-500/40 opacity-50 cursor-not-allowed'
+                        }`}
+                        title={disableReason || `Join ${room.name} room`}
+                      >
+                        <div className={`${
+                          canAfford ? `text-${room.color}-400` : 'text-gray-500'
+                        } font-bold text-xs`}>
+                          {room.name}
+                        </div>
+                        <div className="text-gray-400 text-xs">
+                          {canAfford ? (currentParty ? 'Party' : 'Solo') : disableReason}
+                        </div>
+                        
+                        {/* Mobile Warning Indicators */}
+                        {!canAfford && (currentParty ? !isOwner : room.fee > 0) && (
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+                            <span className="text-white text-xs font-bold">!</span>
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Invite Friends Overlay */}
+          {showInviteFriends && (
+            <div className="absolute inset-0 bg-gray-900 rounded-t-2xl z-[70] flex flex-col">
+              {/* Mobile Invite Header */}
+              <div className="p-3 border-b border-teal-500/30 bg-gradient-to-r from-teal-600/20 to-teal-700/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-teal-500/20 rounded-lg flex items-center justify-center border border-teal-500/30">
+                      <svg className="w-3 h-3 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-sm">Invite Friends</h3>
+                      <p className="text-teal-200 text-xs">Invite to party</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowInviteFriends(false)}
+                    className="w-6 h-6 text-gray-400 hover:text-white transition-colors flex items-center justify-center"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Mobile Invite Content */}
+              <div className="flex-1 p-3 space-y-2 overflow-y-auto">
+                {invitableFriends.length === 0 ? (
+                  <div className="text-center py-6">
+                    <div className="w-12 h-12 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-400 text-sm">No friends available</p>
+                    <p className="text-gray-500 text-xs mt-1">Add friends first</p>
+                  </div>
+                ) : (
+                  invitableFriends.map((friend) => (
+                    <div key={friend.id} className="flex items-center justify-between p-2 bg-gray-800/40 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-teal-500/20 rounded-full flex items-center justify-center text-teal-400 font-bold text-xs">
+                          {friend.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="text-white font-medium text-xs">{friend.username}</div>
+                      </div>
+                      <button 
+                        onClick={() => inviteFriend(friend.id, friend.username)}
+                        disabled={isLoading}
+                        className="px-3 py-1 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white text-xs font-medium rounded transition-colors"
+                      >
+                        {isLoading ? '...' : 'Invite'}
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+              
+              {/* Mobile Invite Footer */}
+              <div className="p-3 border-t border-gray-700/50 bg-gray-800/20">
+                <button 
+                  onClick={() => setShowInviteFriends(false)}
+                  className="w-full px-3 py-2 border border-gray-600/40 hover:bg-gray-700/40 text-gray-300 hover:text-white rounded-lg transition-all duration-200 text-xs font-medium"
+                >
+                  Back to Party Lobby
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Loading Overlay */}
+          {isLoading && (
+            <div className="absolute inset-0 bg-black/50 rounded-t-2xl flex items-center justify-center">
+              <div className="bg-gray-800 rounded-lg p-3 flex items-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-400"></div>
+                <span className="text-white text-sm">Loading...</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
