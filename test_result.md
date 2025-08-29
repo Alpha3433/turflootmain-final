@@ -108,9 +108,10 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Party Member Auto-Join Issue Debug"
-  stuck_tasks: 
-    - "Party Lobby State Synchronization Fix"
+    - "API Balance Endpoint Fix"
+    - "Leaderboard Data Structure Fix"
+    - "Overall API Stability Check"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
