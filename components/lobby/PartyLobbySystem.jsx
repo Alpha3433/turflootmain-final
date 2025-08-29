@@ -216,15 +216,24 @@ export default function PartyLobbySystem({
     console.log('🎮 Party Lobby System: Initializing data for user:', userId)
     fetchPartyStatus()
     fetchPartyInvitations()
-    fetchInvitableFriends() // Also fetch friends on initial load
-  }, [fetchPartyStatus, fetchPartyInvitations, fetchInvitableFriends])
+    fetchInvitableFriends()
+    fetchUserBalance() // Fetch user's balance
+  }, [fetchPartyStatus, fetchPartyInvitations, fetchInvitableFriends, fetchUserBalance])
 
   // Refresh data when the modal becomes visible (component mounts)
   useEffect(() => {
     console.log('🔄 Party Lobby System: Refreshing invitations and party data')
-    fetchPartyInvitations() // Always refresh invitations when modal opens
-    fetchPartyStatus() // Also refresh party status
-  }, []) // Run once when component mounts
+    fetchPartyInvitations()
+    fetchPartyStatus()
+  }, [])
+
+  // Fetch party member balances when party changes
+  useEffect(() => {
+    if (currentParty && currentParty.members) {
+      console.log('💰 Party detected, fetching member balances')
+      fetchPartyMemberBalances()
+    }
+  }, [currentParty, fetchPartyMemberBalances])
 
   // Fetch invitable friends when party changes or user changes
   useEffect(() => {
