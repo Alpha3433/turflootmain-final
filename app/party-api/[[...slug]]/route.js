@@ -42,13 +42,34 @@ export async function GET(request, { params }) {
     
     if (action === 'current') {
       // Get user's current party
-      const party = await PartySystem.getUserParty(userId)
-      
-      return NextResponse.json({
-        party,
-        hasParty: !!party,
-        timestamp: new Date().toISOString()
-      }, { headers: corsHeaders })
+      try {
+        console.log(`🎯 Fetching current party for user: ${userId}`)
+        
+        const party = await PartySystem.getUserParty(userId)
+        
+        console.log(`🎯 Party fetch result:`, {
+          hasParty: !!party,
+          partyId: party?.id,
+          partyName: party?.name,
+          memberCount: party?.memberCount
+        })
+        
+        return NextResponse.json({
+          party,
+          hasParty: !!party,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error(`❌ Error fetching party status for user ${userId}:`, error)
+        
+        return NextResponse.json({
+          party: null,
+          hasParty: false,
+          error: `Party status fetch failed: ${error.message}`,
+          timestamp: new Date().toISOString()
+        }, { status: 500, headers: corsHeaders })
+      }
     }
     
     if (action === 'invitations') {
