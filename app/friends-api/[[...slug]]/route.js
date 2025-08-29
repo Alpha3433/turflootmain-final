@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Accept, Origin',
   'Cache-Control': 'no-store, no-cache, must-revalidate',
-  'X-API-Server': 'TurfLoot-FriendsAPI-Bypass'
+  'X-API-Server': 'TurfLoot-FriendsAPI-Advanced'
 }
 
 // Handle OPTIONS requests for CORS
@@ -15,8 +15,18 @@ export async function OPTIONS() {
   return new NextResponse(null, { status: 200, headers: corsHeaders })
 }
 
+// Initialize collections on first load
+let initialized = false
+async function ensureInitialized() {
+  if (!initialized) {
+    await FriendsSystem.initializeCollections()
+    initialized = true
+  }
+}
+
 // GET handler for friends operations
 export async function GET(request, { params }) {
+  await ensureInitialized()
   const { slug } = params
   const url = new URL(request.url)
   
@@ -24,48 +34,68 @@ export async function GET(request, { params }) {
   
   try {
     const action = slug[0] || 'list'
+    const userId = url.searchParams.get('userId')
+    
+    if (!userId) {
+      return NextResponse.json({ error: 'userId required' }, { status: 400, headers: corsHeaders })
+    }
     
     if (action === 'list') {
-      const userId = url.searchParams.get('userId')
-      
-      if (!userId) {
-        return NextResponse.json({ error: 'userId required' }, { status: 400, headers: corsHeaders })
-      }
-      
-      const db = await getDb()
-      const friendships = db.collection('friendships')
-      
-      // Get all friendships for this user
-      const userFriendships = await friendships.find({
-        $or: [
-          { fromUserId: userId, status: 'accepted' },
-          { toUserId: userId, status: 'accepted' }
-        ]
-      }).toArray()
-      
-      const friends = userFriendships.map(friendship => ({
-        id: friendship.fromUserId === userId ? friendship.toUserId : friendship.fromUserId,
-        username: friendship.fromUserId === userId ? friendship.toUsername : friendship.fromUsername,
-        online: false, // Default to offline for bypass
-        lastSeen: friendship.updatedAt || new Date().toISOString()
-      }))
-      
+      const friends = await FriendsSystem.getFriendsList(userId)
       return NextResponse.json({
         friends,
         timestamp: new Date().toISOString()
       }, { headers: corsHeaders })
     }
     
-    if (action === 'online-status') {
-      const userId = url.searchParams.get('userId')
+    if (action === 'pending-requests') {
+      const requests = await FriendsSystem.getPendingRequests(userId)
+      return NextResponse.json({
+        requests,
+        count: requests.length,
+        timestamp: new Date().toISOString()
+      }, { headers: corsHeaders })
+    }
+    
+    if (action === 'suggestions') {
+      const limit = parseInt(url.searchParams.get('limit')) || 10
+      const suggestions = await FriendsSystem.getFriendSuggestions(userId, limit)
+      return NextResponse.json({
+        suggestions,
+        count: suggestions.length,
+        timestamp: new Date().toISOString()
+      }, { headers: corsHeaders })
+    }
+    
+    if (action === 'search') {
+      const query = url.searchParams.get('q') || ''
+      const onlineOnly = url.searchParams.get('onlineOnly') === 'true'
       
-      if (!userId) {
-        return NextResponse.json({ error: 'userId required' }, { status: 400, headers: corsHeaders })
+      if (query.length < 2) {
+        return NextResponse.json({
+          users: [],
+          message: 'Query must be at least 2 characters'
+        }, { headers: corsHeaders })
       }
       
-      // Return empty online friends for bypass (real-time status would need WebSocket)
+      const users = await FriendsSystem.searchUsers(query, userId, onlineOnly)
       return NextResponse.json({
-        onlineFriends: [],
+        users,
+        total: users.length,
+        query,
+        onlineOnly,
+        timestamp: new Date().toISOString()
+      }, { headers: corsHeaders })
+    }
+    
+    if (action === 'online-status') {
+      const friends = await FriendsSystem.getFriendsList(userId)
+      const onlineFriends = friends.filter(friend => friend.online)
+      
+      return NextResponse.json({
+        onlineFriends,
+        totalFriends: friends.length,
+        onlineCount: onlineFriends.length,
         timestamp: new Date().toISOString()
       }, { headers: corsHeaders })
     }
@@ -74,12 +104,16 @@ export async function GET(request, { params }) {
     
   } catch (error) {
     console.error('❌ Friends API GET error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500, headers: corsHeaders })
+    return NextResponse.json({ 
+      error: error.message || 'Internal error',
+      code: error.code || 500
+    }, { status: error.code || 500, headers: corsHeaders })
   }
 }
 
 // POST handler for friends operations
 export async function POST(request, { params }) {
+  await ensureInitialized()
   const { slug } = params
   
   console.log('🤝 FRIENDS-API POST:', slug)
@@ -89,71 +123,144 @@ export async function POST(request, { params }) {
     const action = slug[0] || 'send-request'
     
     if (action === 'send-request') {
-      const { fromUserId, toUserId } = body
+      const { fromUserId, toUserId, fromUsername, toUsername } = body
       
       if (!fromUserId || !toUserId) {
-        return NextResponse.json({ error: 'fromUserId and toUserId required' }, { status: 400, headers: corsHeaders })
+        return NextResponse.json({ 
+          error: 'fromUserId and toUserId required' 
+        }, { status: 400, headers: corsHeaders })
       }
       
-      if (fromUserId === toUserId) {
-        return NextResponse.json({ error: 'Cannot add yourself as friend' }, { status: 400, headers: corsHeaders })
-      }
-      
-      const db = await getDb()
-      const friendships = db.collection('friendships')
-      
-      // Check for existing friendship
-      const existing = await friendships.findOne({
-        $or: [
-          { fromUserId, toUserId },
-          { fromUserId: toUserId, toUserId: fromUserId }
-        ]
-      })
-      
-      if (existing) {
-        return NextResponse.json({ error: 'Friendship already exists' }, { status: 400, headers: corsHeaders })
-      }
-      
-      // Create new friendship (auto-accept for bypass simplicity)
-      const friendshipId = 'friendship_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-      
-      await friendships.insertOne({
-        id: friendshipId,
-        fromUserId,
-        toUserId,
-        fromUsername: body.fromUsername || 'User',
-        toUsername: body.toUsername || 'User',
-        status: 'accepted', // Auto-accept for bypass
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      })
-      
-      console.log('✅ Friends API bypass - friend request sent (auto-accepted)')
+      const result = await FriendsSystem.sendFriendRequest(
+        fromUserId, 
+        toUserId, 
+        fromUsername, 
+        toUsername
+      )
       
       return NextResponse.json({
         success: true,
-        message: 'Friend request sent successfully via bypass route',
-        requestId: friendshipId,
+        message: 'Friend request sent successfully',
+        requestId: result.requestId,
+        remaining: result.remaining,
         timestamp: new Date().toISOString()
       }, { headers: corsHeaders })
     }
     
+    if (action === 'accept-request') {
+      const { requestId, userId } = body
+      
+      if (!requestId || !userId) {
+        return NextResponse.json({ 
+          error: 'requestId and userId required' 
+        }, { status: 400, headers: corsHeaders })
+      }
+      
+      const result = await FriendsSystem.acceptFriendRequest(requestId, userId)
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Friend request accepted',
+        friendshipId: result.friendshipId,
+        timestamp: new Date().toISOString()
+      }, { headers: corsHeaders })
+    }
+    
+    if (action === 'decline-request') {
+      const { requestId, userId } = body
+      
+      if (!requestId || !userId) {
+        return NextResponse.json({ 
+          error: 'requestId and userId required' 
+        }, { status: 400, headers: corsHeaders })
+      }
+      
+      await FriendsSystem.declineFriendRequest(requestId, userId)
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Friend request declined',
+        timestamp: new Date().toISOString()
+      }, { headers: corsHeaders })
+    }
+    
+    if (action === 'block-user') {
+      const { blockerId, blockedId, blockerUsername, blockedUsername } = body
+      
+      if (!blockerId || !blockedId) {
+        return NextResponse.json({ 
+          error: 'blockerId and blockedId required' 
+        }, { status: 400, headers: corsHeaders })
+      }
+      
+      const result = await FriendsSystem.blockUser(
+        blockerId, 
+        blockedId, 
+        blockerUsername, 
+        blockedUsername
+      )
+      
+      return NextResponse.json({
+        success: true,
+        message: 'User blocked successfully',
+        blockId: result.blockId,
+        timestamp: new Date().toISOString()
+      }, { headers: corsHeaders })
+    }
+    
+    if (action === 'presence') {
+      const subAction = slug[1] || 'online'
+      const { userId } = body
+      
+      if (!userId) {
+        return NextResponse.json({ 
+          error: 'userId required' 
+        }, { status: 400, headers: corsHeaders })
+      }
+      
+      if (subAction === 'online') {
+        FriendsSystem.setUserOnline(userId)
+        return NextResponse.json({
+          success: true,
+          message: 'User set as online',
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      }
+      
+      if (subAction === 'offline') {
+        FriendsSystem.setUserOffline(userId)
+        return NextResponse.json({
+          success: true,
+          message: 'User set as offline',
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      }
+    }
+    
+    // Legacy endpoints for backward compatibility
     if (action === 'notifications') {
       const subAction = slug[1] || 'count'
       
       if (subAction === 'count') {
-        // Return 0 notifications for bypass
+        const { userId } = body
+        if (!userId) {
+          return NextResponse.json({ 
+            error: 'userId required' 
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        const requests = await FriendsSystem.getPendingRequests(userId)
         return NextResponse.json({
-          count: 0,
+          count: requests.length,
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
       }
       
       if (subAction === 'mark-read') {
-        // Mark as read (no-op for bypass)
+        // No-op for now - notifications are handled by the requests system
         return NextResponse.json({
           success: true,
-          message: 'Notifications marked as read via bypass route',
+          message: 'Notifications marked as read',
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
       }
@@ -163,6 +270,19 @@ export async function POST(request, { params }) {
     
   } catch (error) {
     console.error('❌ Friends API POST error:', error)
-    return NextResponse.json({ error: 'Failed to process friend request' }, { status: 500, headers: corsHeaders })
+    
+    if (error.code === 429) {
+      return NextResponse.json({
+        error: error.message,
+        code: 429,
+        resetIn: error.resetIn,
+        timestamp: new Date().toISOString()
+      }, { status: 429, headers: corsHeaders })
+    }
+    
+    return NextResponse.json({ 
+      error: error.message || 'Failed to process request',
+      timestamp: new Date().toISOString()
+    }, { status: 500, headers: corsHeaders })
   }
 }
