@@ -2067,10 +2067,8 @@ export default function Home() {
                             Lobby
                           </span>
                           
-                          {/* Active lobby indicator */}
-                          {currentLobby && (
-                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
-                          )}
+                          {/* Party lobby indicator - TODO: Add party state tracking */}
+                          {/* Future: Add party status indicator here */}
                           
                           {/* Party invites indicator - TODO: Add party invitations state tracking */}
                           {/* Future: Add party invitation count indicator here */}
