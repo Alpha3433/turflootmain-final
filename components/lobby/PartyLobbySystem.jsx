@@ -739,7 +739,7 @@ export default function PartyLobbySystem({
             </div>
           )}
 
-          {/* Room Selection with Balance Validation */}
+          {/* Room Selection with Owner-Only Access */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-white font-semibold text-sm">
@@ -751,6 +751,31 @@ export default function PartyLobbySystem({
                 </div>
               )}
             </div>
+
+            {/* Owner-Only Access Control */}
+            {currentParty && (
+              (() => {
+                const isOwner = currentParty.members?.some(member => 
+                  member.id === userId && member.role === 'owner'
+                )
+                
+                if (!isOwner) {
+                  return (
+                    <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg text-center">
+                      <div className="flex items-center justify-center space-x-2 mb-2">
+                        <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span className="text-blue-400 font-semibold text-sm">Owner Only</span>
+                      </div>
+                      <p className="text-blue-300 text-sm">Only the party owner can start games</p>
+                      <p className="text-blue-400 text-xs mt-1">Wait for {currentParty.ownerUsername} to select a room</p>
+                    </div>
+                  )
+                }
+                return null
+              })()
+            )}
             
             <div className="grid grid-cols-2 gap-2">
               {[
@@ -763,21 +788,32 @@ export default function PartyLobbySystem({
                 let canAfford = true
                 let disableReason = null
                 let affordabilityCheck = null
+                let isOwner = true
                 
                 if (currentParty) {
-                  // Check party member balances
-                  affordabilityCheck = canPartyAffordRoom(room.fee)
-                  canAfford = affordabilityCheck.canAfford
+                  // Check if user is party owner
+                  isOwner = currentParty.members?.some(member => 
+                    member.id === userId && member.role === 'owner'
+                  )
                   
-                  if (!canAfford && affordabilityCheck.insufficientMembers.length > 0) {
-                    const insufficientNames = affordabilityCheck.insufficientMembers.map(m => m.username).join(', ')
-                    disableReason = `${insufficientNames} need more funds`
-                  }
-                  
-                  // Check party size limit (max 2 players)
-                  if (currentParty.memberCount > 2) {
+                  if (!isOwner) {
                     canAfford = false
-                    disableReason = `Party too large (${currentParty.memberCount}/2)`
+                    disableReason = 'Only owner can start games'
+                  } else {
+                    // Check party member balances
+                    affordabilityCheck = canPartyAffordRoom(room.fee)
+                    canAfford = affordabilityCheck.canAfford
+                    
+                    if (!canAfford && affordabilityCheck.insufficientMembers.length > 0) {
+                      const insufficientNames = affordabilityCheck.insufficientMembers.map(m => m.username).join(', ')
+                      disableReason = `${insufficientNames} need more funds`
+                    }
+                    
+                    // Check party size limit (max 2 players)
+                    if (currentParty.memberCount > 2) {
+                      canAfford = false
+                      disableReason = `Party too large (${currentParty.memberCount}/2)`
+                    }
                   }
                 } else {
                   // Solo play - check user balance
@@ -815,14 +851,23 @@ export default function PartyLobbySystem({
                     </div>
                     
                     {/* Balance warning indicator */}
-                    {!canAfford && room.fee > 0 && (
+                    {!canAfford && room.fee > 0 && isOwner && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs font-bold">!</span>
                       </div>
                     )}
                     
+                    {/* Owner-only lock indicator */}
+                    {currentParty && !isOwner && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                    
                     {/* Party size warning */}
-                    {currentParty && currentParty.memberCount > 2 && (
+                    {currentParty && currentParty.memberCount > 2 && isOwner && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs font-bold">!</span>
                       </div>
@@ -831,27 +876,6 @@ export default function PartyLobbySystem({
                 )
               })}
             </div>
-            
-            {/* Balance Status Display */}
-            {currentParty && Object.keys(partyMemberBalances).length > 0 && (
-              <div className="mt-3 p-3 bg-gray-800/40 rounded-lg">
-                <h4 className="text-white font-semibold text-xs mb-2">Party Member Balances:</h4>
-                <div className="space-y-1">
-                  {currentParty.members.map(member => (
-                    <div key={member.id} className="flex justify-between items-center">
-                      <span className="text-gray-300 text-xs">{member.username}</span>
-                      <span className={`text-xs font-medium ${
-                        (partyMemberBalances[member.id] || 0) > 0 
-                          ? 'text-green-400' 
-                          : 'text-gray-500'
-                      }`}>
-                        ${partyMemberBalances[member.id] || 0}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
