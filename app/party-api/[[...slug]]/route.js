@@ -202,6 +202,36 @@ export async function POST(request, { params }) {
       }, { headers: corsHeaders })
     }
     
+    if (action === 'start-game') {
+      // Start coordinated game for party members
+      const { partyId, roomType, entryFee, ownerId } = body
+      
+      if (!partyId || !roomType || !ownerId) {
+        return NextResponse.json({ 
+          error: 'partyId, roomType, and ownerId required' 
+        }, { status: 400, headers: corsHeaders })
+      }
+      
+      const result = await PartySystem.startPartyGame(partyId, roomType, entryFee, ownerId)
+      
+      if (result.success) {
+        return NextResponse.json({
+          success: true,
+          message: 'Party game started successfully',
+          gameRoomId: result.gameRoomId,
+          partyMembers: result.partyMembers,
+          roomType: result.roomType,
+          entryFee: result.entryFee,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      } else {
+        return NextResponse.json({ 
+          error: result.error || 'Failed to start party game',
+          timestamp: new Date().toISOString()
+        }, { status: 400, headers: corsHeaders })
+      }
+    }
+    
     if (action === 'disband') {
       // Disband party (owner only)
       const { partyId, ownerId } = body
