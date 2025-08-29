@@ -262,7 +262,6 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     if (authenticated && user?.id) {
       loadFriends()
       loadPendingRequests()
-      loadSuggestions()
       loadAllUsers() // Load all users for search functionality
       setPresence(true)
       
@@ -271,7 +270,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
         setPresence(false)
       }
     }
-  }, [authenticated, user?.id, loadFriends, loadPendingRequests, loadSuggestions, loadAllUsers, setPresence])
+  }, [authenticated, user?.id, loadFriends, loadPendingRequests, loadAllUsers, setPresence])
 
   // Filter users when search query or online filter changes
   useEffect(() => {
