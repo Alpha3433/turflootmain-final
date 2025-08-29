@@ -289,6 +289,14 @@ export default function PartyLobbySystem({
     return () => clearInterval(notificationInterval)
   }, [checkPartyNotifications])
 
+  // Fetch party member balances when party changes
+  useEffect(() => {
+    if (currentParty && currentParty.members) {
+      console.log('💰 Party detected, fetching member balances')
+      fetchPartyMemberBalances()
+    }
+  }, [currentParty, fetchPartyMemberBalances])
+
   // Fetch invitable friends when party changes or user changes
   useEffect(() => {
     fetchInvitableFriends()
