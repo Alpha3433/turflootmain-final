@@ -71,6 +71,50 @@ class PartyAutoJoinTester:
         """Test 1: Party Setup with Real Users"""
         print("\n🎯 TEST 1: PARTY SETUP WITH REAL USERS")
         
+        # Step 1.0: Clean up any existing parties first
+        success, response, rt = self.make_request('GET', '/party-api/current', 
+                                                params={'userId': ANTH_USER_ID})
+        
+        if success and response.get('hasParty'):
+            existing_party = response.get('party')
+            if existing_party:
+                party_id = existing_party.get('id')
+                self.log_test("Found Existing Party", True, 
+                             f"Cleaning up existing party: {party_id}", rt)
+                
+                # Leave existing party
+                leave_success, leave_response, leave_rt = self.make_request('POST', '/party-api/leave', {
+                    'partyId': party_id,
+                    'userId': ANTH_USER_ID
+                })
+                
+                if leave_success:
+                    self.log_test("Clean Up Existing Party", True, 
+                                 f"Left existing party successfully", leave_rt)
+                else:
+                    self.log_test("Clean Up Existing Party", False, 
+                                 f"Failed to leave: {leave_response.get('error', 'Unknown')}", leave_rt)
+        
+        # Also clean up ROBIEE's parties
+        success, response, rt = self.make_request('GET', '/party-api/current', 
+                                                params={'userId': ROBIEE_USER_ID})
+        
+        if success and response.get('hasParty'):
+            existing_party = response.get('party')
+            if existing_party:
+                party_id = existing_party.get('id')
+                leave_success, leave_response, leave_rt = self.make_request('POST', '/party-api/leave', {
+                    'partyId': party_id,
+                    'userId': ROBIEE_USER_ID
+                })
+                
+                if leave_success:
+                    self.log_test("Clean Up ROBIEE's Party", True, 
+                                 f"Left ROBIEE's existing party", leave_rt)
+        
+        # Brief pause for database consistency
+        time.sleep(1)
+        
         # Step 1.1: Create party with ANTH as owner
         success, response, rt = self.make_request('POST', '/party-api/create', {
             'ownerId': ANTH_USER_ID,
