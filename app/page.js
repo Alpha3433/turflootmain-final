@@ -385,8 +385,8 @@ export default function Home() {
   // Real-time cash-out notifications state
   const [cashOutNotifications, setCashOutNotifications] = useState([])
   
-  // Smart API URL utility function - tries standard routes first, bypass only if needed
-  const getApiUrl = useCallback(async (endpoint) => {
+  // API URL utility - prefers standard routes, uses bypass only for known blocked routes
+  const getApiUrl = useCallback((endpoint) => {
     if (typeof window === 'undefined') return endpoint // SSR fallback
     
     const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -396,47 +396,23 @@ export default function Home() {
       return `http://localhost:3000${endpoint}`
     }
     
-    // For external deployment, try standard route first
-    try {
-      const testResponse = await fetch(endpoint + (endpoint.includes('?') ? '&test=1' : '?test=1'), {
-        method: 'GET',
-        signal: AbortSignal.timeout(3000)
-      })
-      
-      // If we get any response (even 404), the route works
-      if (testResponse.ok || testResponse.status === 404) {
-        console.log(`✅ Using standard route: ${endpoint}`)
-        return endpoint
+    // INFRASTRUCTURE WORKAROUND: Only use bypass for known blocked routes
+    // Remove this section when Kubernetes ingress is fixed to allow /api/* routes
+    const useBypassRouting = true // Set to false when infrastructure is fixed
+    
+    if (useBypassRouting) {
+      if (endpoint.startsWith('/api/names/')) {
+        console.log(`🔄 Using bypass route for blocked endpoint: ${endpoint}`)
+        return endpoint.replace('/api/names/', '/names-api/')
       }
-    } catch (error) {
-      console.log(`❌ Standard route failed: ${endpoint}, using bypass`)
+      
+      if (endpoint.startsWith('/api/friends/')) {
+        console.log(`🔄 Using bypass route for blocked endpoint: ${endpoint}`)
+        return endpoint.replace('/api/friends/', '/friends-api/')
+      }
     }
     
-    // Fall back to bypass routes only if standard fails
-    if (endpoint.startsWith('/api/names/')) {
-      return endpoint.replace('/api/names/', '/names-api/')
-    }
-    
-    if (endpoint.startsWith('/api/friends/')) {
-      return endpoint.replace('/api/friends/', '/friends-api/')
-    }
-    
-    // Default: return original endpoint
-    return endpoint
-  }, [])
-  
-  // Sync version for immediate use  
-  const getApiUrlSync = useCallback((endpoint) => {
-    if (typeof window === 'undefined') return endpoint
-    
-    const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    
-    if (isLocalDevelopment) {
-      return `http://localhost:3000${endpoint}`
-    }
-    
-    // For external, assume standard routes work until proven otherwise
-    // This will be tested dynamically on first use
+    // Default: use standard routes (preferred)
     return endpoint
   }, [])
   
