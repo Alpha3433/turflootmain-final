@@ -274,6 +274,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
       loadFriends()
       loadPendingRequests()
       loadSuggestions()
+      loadAllUsers() // Load all users for search functionality
       setPresence(true)
       
       // Set offline on unmount
@@ -281,7 +282,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
         setPresence(false)
       }
     }
-  }, [authenticated, user?.id, loadFriends, loadPendingRequests, loadSuggestions, setPresence])
+  }, [authenticated, user?.id, loadFriends, loadPendingRequests, loadSuggestions, loadAllUsers, setPresence])
 
   // Search debouncing
   useEffect(() => {
