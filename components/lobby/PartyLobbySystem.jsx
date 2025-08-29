@@ -263,12 +263,19 @@ export default function PartyLobbySystem({
     fetchPartyStatus()
   }, [])
 
-  // Check for party game notifications
+  // Check for party game notifications with improved error handling
   const checkPartyNotifications = useCallback(async () => {
     if (!userId) return
     
     try {
       const response = await fetch(`${getApiUrl('/api/party/notifications')}?userId=${userId}`)
+      
+      // Don't throw error for 400/500 status - just log and continue
+      if (!response.ok) {
+        console.log(`ℹ️ Notifications check returned ${response.status} - continuing silently`)
+        return // Silent failure for notifications
+      }
+      
       const data = await response.json()
       
       if (response.ok && data.notifications) {
@@ -309,7 +316,8 @@ export default function PartyLobbySystem({
         }
       }
     } catch (error) {
-      console.error('❌ Error checking party notifications:', error)
+      // Silent failure for notifications - don't show errors to user
+      console.log('ℹ️ Notification check failed (silent):', error.message)
     }
   }, [userId, onGameStart, onClose])
 
