@@ -113,42 +113,54 @@ export default function PartyLobbySystem({
       insufficientMembers
     }
   }, [currentParty, partyMemberBalances])
-  const fetchPartyStatus = useCallback(async () => {
+  const fetchPartyStatus = useCallback(async (retryCount = 0) => {
     if (!userId) {
       console.log('❌ Cannot fetch party status: No userId provided')
       return
     }
     
-    console.log('🎯 Fetching party status for user:', userId)
+    console.log(`🎯 Fetching party status for user: ${userId} (attempt ${retryCount + 1})`)
     
     try {
       const url = `${getApiUrl('/api/party/current')}?userId=${userId}`
       console.log('📡 Party status API URL:', url)
       
       const response = await fetch(url)
+      
+      // Check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const data = await response.json()
       
       console.log('🎯 Party status response:', { status: response.status, data })
       
-      if (response.ok) {
-        if (data.hasParty && data.party) {
-          setCurrentParty(data.party)
-          console.log('✅ User is in party:', data.party.name, 'with', data.party.memberCount, 'members')
-          console.log('👥 Party members:', data.party.members?.map(m => m.username).join(', '))
-        } else {
-          setCurrentParty(null)
-          console.log('ℹ️ User is not in any party')
-        }
-        setError(null) // Clear any previous errors
+      if (data.hasParty && data.party) {
+        setCurrentParty(data.party)
+        console.log('✅ User is in party:', data.party.name, 'with', data.party.memberCount, 'members')
+        console.log('👥 Party members:', data.party.members?.map(m => m.username).join(', '))
       } else {
-        console.error('❌ Failed to fetch party status:', data.error)
         setCurrentParty(null)
-        if (data.error && !data.error.includes('not found')) {
-          setError(data.error)
-        }
+        console.log('ℹ️ User is not in any party')
       }
+      
+      setError(null) // Clear any previous errors on success
+      
     } catch (error) {
       console.error('❌ Error fetching party status:', error)
+      
+      // Retry logic for transient failures
+      if (retryCount < 2) {
+        console.log(`🔄 Retrying party status fetch in 1 second... (attempt ${retryCount + 2}/3)`)
+        setTimeout(() => {
+          fetchPartyStatus(retryCount + 1)
+        }, 1000)
+        return
+      }
+      
+      // Only set error after all retries failed
+      console.error('❌ All retry attempts failed for party status')
       setCurrentParty(null)
       setError('Failed to load party status. Please try again.')
     }
