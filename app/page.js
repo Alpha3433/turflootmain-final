@@ -59,9 +59,6 @@ export default function Home() {
   const [showCustomization, setShowCustomization] = useState(false)
   const [showServerBrowser, setShowServerBrowser] = useState(false)
   const [showRegionDropdown, setShowRegionDropdown] = useState(false)
-  const [showLobby, setShowLobby] = useState(false)
-  const [currentLobby, setCurrentLobby] = useState(null)
-  const [lobbyInvites, setLobbyInvites] = useState([])
   const [currentServer, setCurrentServer] = useState('US-East-1') // Default server
   const [currentPing, setCurrentPing] = useState(null) // Initialize as null to prevent hydration mismatch
   
