@@ -2989,6 +2989,15 @@ export default function Home() {
       {/*showOrientationGate && (
         <OrientationGate onLandscapeReady={handleOrientationReady} />
       )*/}
+
+      {/* Game Loading Popup */}
+      <GameLoadingPopup 
+        isVisible={isJoiningGame}
+        roomType={gameLoadingInfo.roomType}
+        entryFee={gameLoadingInfo.entryFee}
+        partyMode={gameLoadingInfo.partyMode}
+        partySize={gameLoadingInfo.partySize}
+      />
     </div>
   )
 }
