@@ -70,20 +70,23 @@ export async function GET(request, { params }) {
     if (action === 'search') {
       const query = url.searchParams.get('q') || ''
       const onlineOnly = url.searchParams.get('onlineOnly') === 'true'
+      const showAll = url.searchParams.get('showAll') === 'true'
       
-      if (query.length < 2) {
+      // If showAll is true, return all available users regardless of query length
+      if (!showAll && query.length < 2) {
         return NextResponse.json({
           users: [],
           message: 'Query must be at least 2 characters'
         }, { headers: corsHeaders })
       }
       
-      const users = await FriendsSystem.searchUsers(query, userId, onlineOnly)
+      const users = await FriendsSystem.searchUsers(showAll ? '' : query, userId, onlineOnly, showAll)
       return NextResponse.json({
         users,
         total: users.length,
         query,
         onlineOnly,
+        showAll,
         timestamp: new Date().toISOString()
       }, { headers: corsHeaders })
     }
