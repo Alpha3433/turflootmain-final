@@ -24,6 +24,11 @@ const UserSettings = dynamic(() => import('../components/UserSettings'), {
   loading: () => <div className="text-white">Loading Settings...</div>
 })
 
+const PartyLobbySystem = dynamic(() => import('../components/lobby/PartyLobbySystem'), {
+  ssr: false,
+  loading: () => <div className="text-white">Loading Party Lobby...</div>
+})
+
 const CustomizationModal = dynamic(() => import('@/components/CustomizationModalClean'), {
   ssr: false
 })
