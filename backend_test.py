@@ -1,35 +1,46 @@
 #!/usr/bin/env python3
 """
-Party Invitation Workflow Backend Testing
-Testing the complete Party Invitation system to verify invitations are being properly sent and received.
+Backend Testing Script for TurfLoot Party Invitation Debug
+Testing with real user ID formats to debug invitation issues
 """
 
 import requests
 import json
 import time
-import os
+import sys
+from urllib.parse import quote, unquote
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+# Configuration
+BASE_URL = "https://team-turfloot.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
-print(f"🎯 PARTY INVITATION WORKFLOW TESTING")
-print(f"📍 Testing against: {API_BASE}")
-print(f"⏰ Test started at: {datetime.now().isoformat()}")
-print("=" * 80)
+# Real user IDs from server logs (as mentioned in review request)
+ANTH_USER_ID = "did:privy:cmeksdeoe00gzl10bsienvnbk"
+ROBIEE_USER_ID = "did:privy:cme20s0fl005okz0bmxcr0cp0"
 
-# Test data - using realistic user data as mentioned in review request
+# Test data - using real user ID formats
 test_users = {
     "anth": {
-        "userId": "user_anth_12345",
+        "userId": ANTH_USER_ID,
         "username": "anth"
     },
     "robiee": {
-        "userId": "user_robiee_67890", 
+        "userId": ROBIEE_USER_ID, 
         "username": "robiee"
     }
 }
+
+def log_test(message, status="INFO"):
+    """Log test messages with timestamp"""
+    timestamp = time.strftime("%H:%M:%S")
+    print(f"[{timestamp}] {status}: {message}")
+
+print(f"🎯 PARTY INVITATION DEBUG TESTING WITH REAL USER IDS")
+print(f"Testing with ANTH: {ANTH_USER_ID}")
+print(f"Testing with ROBIEE: {ROBIEE_USER_ID}")
+print(f"API Base URL: {API_BASE}")
+print("=" * 80)
 
 def make_request(method, endpoint, data=None, params=None):
     """Make HTTP request with proper error handling"""
