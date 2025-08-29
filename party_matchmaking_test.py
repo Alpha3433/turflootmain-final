@@ -124,6 +124,14 @@ class PartyMatchmakingTester:
                 self.log_test("Party Creation with 2-Player Limit", success, details, rt)
             else:
                 self.log_test("Party Creation with 2-Player Limit", False, f"Invalid response: {data}", rt)
+        elif response and response.status_code == 500:
+            # Handle the case where user already has a party
+            error_data = response.json()
+            error_msg = error_data.get('error', '')
+            if 'already have an active party' in error_msg:
+                self.log_test("Party Creation with 2-Player Limit", False, f"User already has active party: {error_msg}", rt)
+            else:
+                self.log_test("Party Creation with 2-Player Limit", False, f"Server error: {error_msg}", rt)
         else:
             status = response.status_code if response else "No Response"
             self.log_test("Party Creation with 2-Player Limit", False, f"HTTP {status}", rt)
