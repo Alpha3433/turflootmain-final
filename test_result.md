@@ -1639,6 +1639,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE TESTING COMPLETED - Party invitation endpoint working perfectly. Successfully sends invitations with unique IDs (invite_1756467427353_ln8nihswi), proper user validation, and MongoDB storage. Response time: 0.081s. Returns success status and invitationId for tracking."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED FOR REVIEW REQUEST - Party invitation sending working perfectly. Tested specific scenario 'anth → robiee' invitation flow. Successfully creates invitations with all required fields: partyId, fromUserId, toUserId, toUsername, invitationId, status (pending), partyName, fromUsername, createdAt, expiresAt. Database persistence verified. Invitation system fully operational."
 
   - task: "Party API Invitations Endpoint (GET /party-api/invitations)"
     implemented: true
