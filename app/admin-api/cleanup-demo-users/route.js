@@ -27,6 +27,8 @@ export async function POST() {
       /^player_/,           // player_7xKXtg2C
       /^TestUser$/i,        // TestUser
       /^Test User$/i,       // Test User
+      /^TestUsername$/i,    // TestUsername
+      /^Test Gaming User$/i, // Test Gaming User  
       /^Profile Test User$/i,
       /^JWT Test User$/i,
       /^DB Test User/i,
@@ -41,6 +43,7 @@ export async function POST() {
       /^Structure Test User$/i,
       /^profile\.test$/i,   // profile.test
       /^testuser_/i,        // testuser_992a7b4f
+      /^gamer[._]/i,        // gamer.1754633264, gamer_1754633264
       /^ConcurrentUser/i,   // ConcurrentUser0, ConcurrentUser1, etc.
       /^ConsistencyTestUser$/i,
       /^DatabaseTestUser/i, // DatabaseTestUser, DatabaseTestUser1, etc.
