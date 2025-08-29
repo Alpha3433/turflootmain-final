@@ -226,6 +226,42 @@ backend:
         agent: "testing"
         comment: "✅ PARTY MEMBER AUTO-JOIN BACKEND TESTING COMPLETED - ALL REVIEW REQUEST REQUIREMENTS VERIFIED (100% SUCCESS RATE). COMPREHENSIVE TESTING RESULTS: 1) ✅ PARTY SETUP WITH REAL USERS (5/5 PASSED): Party creation with ANTH as owner working perfectly, party structure verification confirmed (1/2 members initially), invitation system working (ANTH → ROBIEE), invitation acceptance working correctly, final verification shows 2-member party complete. 2) ✅ GAME START NOTIFICATION CREATION (3/3 PASSED): Practice game room creation successful with gameRoomId generation, party_notifications created correctly for party members (excluding owner), notification data structure includes all required auto-join fields. 3) ✅ NOTIFICATION RETRIEVAL FOR PARTY MEMBER (3/3 PASSED): GET /party-api/notifications working perfectly for ROBIEE, notification structure complete with all required fields (id, type, title, message, data, status, createdAt, expiresAt), expiration times properly set (2-minute expiry). 4) ✅ AUTO-JOIN DATA VERIFICATION (6/6 PASSED): All required auto-join fields present (gameRoomId, partyId, roomType, entryFee), field values correct (gameRoomId matches, partyId matches, roomType='practice', entryFee=0), party member data complete with both ANTH and ROBIEE. 5) ✅ NOTIFICATION MARKING AS SEEN (3/3 PASSED): Notification status update working correctly (pending → seen), mark-notification-seen endpoint functional. 6) ✅ COMPLETE FLOW DEBUG (4/4 PASSED): Owner party state correct (status: in_game, gameRoomId present), member party state synchronized, notifications still valid within expiry time. CRITICAL FINDINGS: Backend notification system is 100% OPERATIONAL. The issue is NOT in the backend - all party notifications are created correctly, contain proper auto-join data, and are retrievable by party members. The problem is in FRONTEND AUTO-JOIN LOGIC where the frontend should poll for notifications and automatically redirect party members to the game room using the gameRoomId from notification data."
 
+  - task: "API Balance Endpoint Fix"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ API BALANCE ENDPOINT FIX TESTING COMPLETED - ALL REVIEW REQUEST REQUIREMENTS VERIFIED (100% SUCCESS RATE). COMPREHENSIVE TESTING RESULTS: 1) ✅ POST /api/users/balance with demo user (demo-user) working perfectly - Status: 200, Balance: 25, Currency: USD, Response time: 0.091s. 2) ✅ POST /api/users/balance with realistic Privy DID (did:privy:cme20s0fl005okz0bmxcr0cp0) working perfectly - Status: 200, Balance: 25, Currency: USD, Response time: 0.034s. 3) ✅ Error handling validation working correctly - Missing userId parameter returns 400 error as expected, Response time: 0.026s. CRITICAL SUCCESS: The missing POST /api/users/balance endpoint that was causing 500 Internal Server Errors has been successfully implemented and is fully operational. Frontend can now successfully retrieve user balance data without encountering 500 errors. The endpoint properly handles both demo users and realistic Privy DID formats, includes proper error validation, and returns all required fields (balance, currency, timestamp)."
+
+  - task: "Leaderboard Data Structure Fix"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ LEADERBOARD DATA STRUCTURE FIX TESTING COMPLETED - ALL REVIEW REQUEST REQUIREMENTS VERIFIED (100% SUCCESS RATE). COMPREHENSIVE TESTING RESULTS: 1) ✅ GET /api/users/leaderboard data structure verification - Both 'users' and 'leaderboard' fields present with 10 entries each, proper timestamp field included, Response time: 0.036s. 2) ✅ Leaderboard entry structure validation - All 7 expected fields present (rank, username, gamesWon, gamesPlayed, totalTerritory, bestPercent, winRate), complete data structure for frontend compatibility, Response time: 0.026s. CRITICAL SUCCESS: The leaderboard data structure issue that was causing invalid data format and console errors has been completely resolved. The endpoint now returns data in the correct format with both 'users' and 'leaderboard' fields as required by the frontend. This eliminates the console errors and ensures proper frontend compatibility for leaderboard display functionality."
+
+  - task: "Overall API Stability Check"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ OVERALL API STABILITY TESTING COMPLETED - ALL REVIEW REQUEST REQUIREMENTS VERIFIED (100% SUCCESS RATE). COMPREHENSIVE TESTING RESULTS: 1) ✅ Core API endpoints stability - All 7 main endpoints (ping, root API, server browser, live statistics, global winnings, friends list, user search) returning 200 status codes with no 500 errors detected. 2) ✅ Review request specific endpoints verification - POST /api/users/balance returning 200 (no 500 error), GET /api/users/leaderboard returning 200 with correct structure (both 'users' and 'leaderboard' fields present). 3) ✅ No 500 Internal Server Errors detected across all tested endpoints - Server stability confirmed, proper error handling implemented, all endpoints responding correctly. CRITICAL SUCCESS: The overall API stability issues that were causing 500 Internal Server Errors have been completely resolved. All main API endpoints are now stable and returning appropriate status codes. The server has been successfully restarted and is operating with clean compilation, eliminating the console errors and frontend instability that were previously occurring."
+
   - task: "2-Player Max Cap Testing"
     implemented: true
     working: true
