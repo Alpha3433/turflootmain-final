@@ -333,10 +333,22 @@ export default function PartyLobbySystem({
       return
     }
 
+    // First check if user is already in a party
+    console.log('🔍 Checking existing party status before creating new party...')
+    await fetchPartyStatus() // Refresh party status first
+    
+    if (currentParty) {
+      console.log('⚠️ User is already in party:', currentParty.name)
+      setError(`You are already in "${currentParty.name}". Leave your current party first.`)
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 
     try {
+      console.log('🎉 Creating new party for user:', displayName)
+      
       const response = await fetch(`${getApiUrl('/api/party/create')}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -351,9 +363,16 @@ export default function PartyLobbySystem({
 
       if (response.ok && data.success) {
         console.log('✅ Party created successfully:', data.partyId)
-        await fetchPartyStatus() // Refresh party data
+        setError(null) // Clear any errors
+        await fetchPartyStatus() // Refresh party data to show the new party
       } else {
-        setError(data.error || 'Failed to create party')
+        console.error('❌ Failed to create party:', data.error)
+        if (data.error && data.error.includes('already in a party')) {
+          setError('You are already in a party. Please leave your current party first.')
+          await fetchPartyStatus() // Refresh to show current party
+        } else {
+          setError(data.error || 'Failed to create party')
+        }
       }
     } catch (error) {
       console.error('❌ Error creating party:', error)
