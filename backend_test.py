@@ -96,8 +96,21 @@ class GameLoadingPopupBackendTester:
             
             if response.status_code == 200:
                 data = response.json()
-                if isinstance(data, list) and len(data) > 0:
-                    # Check if servers have required fields for game loading popup
+                # Check if response has servers array (wrapped response)
+                if 'servers' in data and isinstance(data['servers'], list) and len(data['servers']) > 0:
+                    servers = data['servers']
+                    server = servers[0]
+                    required_fields = ['id', 'name', 'stake', 'mode', 'currentPlayers', 'maxPlayers']
+                    missing_fields = [field for field in required_fields if field not in server]
+                    
+                    if not missing_fields:
+                        self.log_test("Server Browser API", True, 
+                                    f"Found {len(servers)} servers with proper structure", response_time)
+                    else:
+                        self.log_test("Server Browser API", False, 
+                                    f"Server missing fields: {missing_fields}", response_time)
+                # Check if response is direct array (legacy format)
+                elif isinstance(data, list) and len(data) > 0:
                     server = data[0]
                     required_fields = ['id', 'name', 'stake', 'mode', 'currentPlayers', 'maxPlayers']
                     missing_fields = [field for field in required_fields if field not in server]
