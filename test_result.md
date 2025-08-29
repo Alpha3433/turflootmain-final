@@ -1654,6 +1654,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE TESTING COMPLETED - Party invitations retrieval endpoint working perfectly. Successfully retrieves pending invitations for users with proper filtering and expiration handling. Response time: 0.575s. Returns invitations array and count for notification system."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-TESTED FOR REVIEW REQUEST - Party invitation receiving working perfectly. Verified specific scenario where 'robiee' CAN see pending invitations from 'anth'. Returns proper invitation details including partyName, fromUsername, createdAt, expiresAt. Database query and indexing working correctly. ISSUE RESOLVED: The reported problem where 'robiee is not seeing any pending invitations' is NOT occurring - the system is working correctly."
 
   - task: "Party API Accept Invitation Endpoint (POST /party-api/accept-invitation)"
     implemented: true
