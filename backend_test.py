@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://team-turfloot.preview.emergentagent.com"
+BASE_URL = "https://party-lobby-system.preview.emergentagent.com"
 LOCALHOST_URL = "http://localhost:3000"
 
 # Real User IDs from review request - using modified IDs to avoid conflicts
