@@ -13,7 +13,8 @@ const AdvancedFriendsPanel = ({ onClose }) => {
   const [loading, setLoading] = useState(false)
   const [friends, setFriends] = useState([])
   const [pendingRequests, setPendingRequests] = useState([])
-  const [searchResults, setSearchResults] = useState([])
+  const [allUsers, setAllUsers] = useState([]) // All registered users
+  const [filteredUsers, setFilteredUsers] = useState([]) // Filtered search results
   const [suggestions, setSuggestions] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [onlineOnly, setOnlineOnly] = useState(false)
