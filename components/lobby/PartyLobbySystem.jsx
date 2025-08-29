@@ -95,12 +95,20 @@ export default function PartyLobbySystem({
     }
   }, [userId, currentParty])
 
-  // Initialize data
+  // Initialize data and refresh when modal opens
   useEffect(() => {
+    console.log('🎮 Party Lobby System: Initializing data for user:', userId)
     fetchPartyStatus()
     fetchPartyInvitations()
     fetchInvitableFriends() // Also fetch friends on initial load
   }, [fetchPartyStatus, fetchPartyInvitations, fetchInvitableFriends])
+
+  // Refresh data when the modal becomes visible (component mounts)
+  useEffect(() => {
+    console.log('🔄 Party Lobby System: Refreshing invitations and party data')
+    fetchPartyInvitations() // Always refresh invitations when modal opens
+    fetchPartyStatus() // Also refresh party status
+  }, []) // Run once when component mounts
 
   // Fetch invitable friends when party changes or user changes
   useEffect(() => {
