@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
-import { X, Search, Users, UserPlus, Clock, Ban, CheckCircle, XCircle } from 'lucide-react'
+import { X, Search, Users, Clock, Ban, CheckCircle, XCircle } from 'lucide-react'
 import { smartRouter } from '../../lib/smartApiRouter.js'
 
 const AdvancedFriendsPanel = ({ onClose }) => {
