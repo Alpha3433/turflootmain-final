@@ -1903,17 +1903,11 @@ export default function Home() {
                       </span>
                     </div>
                     
-                    {/* Active party indicator - TODO: Add party state tracking */}
-                    {/* {currentParty && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
-                    )} */}
+                    {/* Party Lobby indicator - TODO: Add party state tracking */}
+                    {/* Future: Add party status indicator here */}
                     
-                    {/* Pending invites indicator - TODO: Add party invitations state tracking */}
-                    {/* {partyInvitations.length > 0 && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                        {partyInvitations.length}
-                      </div>
-                    )} */}
+                    {/* Pending party invites indicator - TODO: Add party invitations state tracking */}
+                    {/* Future: Add party invitation count indicator here */}
                   </button>
                   
                   {/* Friends Button - Teal Theme */}
