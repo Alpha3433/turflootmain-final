@@ -1367,22 +1367,30 @@ export default function Home() {
     
     console.log('🎮 Proceeding to game:', { gameStake, gameMode, gameFee })
     
-    // For FREE games - route to Agario clone (with authentication)
+    // Determine room type for loading popup
+    let roomType
     if (gameStake === 'FREE' || gameStake === 0) {
-      console.log('🆓 Free game selected - using bots for testing')
-      
-      // Show confirmation dialog for bot practice
-      const confirmed = window.confirm(
-        '🌐 Join Global Practice Server!\n\n' +
-        'Practice with real players AND smart AI bots in a shared global server.\n\n' +
-        'Perfect for learning mechanics, testing strategies, and meeting other players.\n\n' +
-        'Ready to join the global practice arena?'
-      )
-      
-      console.log('🔍 Confirmation result:', confirmed)
-      
-      if (confirmed) {
-        console.log('✅ User confirmed global practice server - navigating to /agario')
+      roomType = 'practice'
+    } else {
+      roomType = `$${gameFee}`
+    }
+    
+    // Show loading popup
+    setGameLoadingInfo({
+      roomType: roomType,
+      entryFee: gameFee,
+      partyMode: false,
+      partySize: 1
+    })
+    setIsJoiningGame(true)
+    
+    // Add delay for better UX
+    setTimeout(() => {
+      // For FREE games - route to Agario clone (with authentication)
+      if (gameStake === 'FREE' || gameStake === 0) {
+        console.log('🆓 Free game selected - using bots for testing')
+        
+        console.log('✅ Navigating to global practice server')
         
         // Try router.push with fallback - use global practice server
         try {
@@ -1400,19 +1408,17 @@ export default function Home() {
           console.error('❌ Router error:', error)
           window.location.href = '/agario?mode=practice&fee=0&roomId=global-practice-bots'
         }
-      } else {
-        console.log('❌ User cancelled global practice')
+        return
       }
-      return
-    }
-    
-    // For cash games, use the original complex game with authentication
-    const mode = 'cash'
-    const fee = gameFee
-    const roomId = 'lobby'
-    
-    console.log('💰 Routing to cash game with auth:', { mode, fee, roomId })
-    router.push(`/play?mode=${mode}&room=${roomId}&fee=${fee}`)
+      
+      // For cash games, use the original complex game with authentication
+      const mode = 'cash'
+      const fee = gameFee
+      const roomId = 'lobby'
+      
+      console.log('💰 Routing to cash game with auth:', { mode, fee, roomId })
+      router.push(`/play?mode=${mode}&room=${roomId}&fee=${fee}`)
+    }, 800) // 800ms delay for loading popup UX
   }
 
   const handleOrientationReady = () => {
