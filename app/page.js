@@ -1906,17 +1906,17 @@ export default function Home() {
                       </span>
                     </div>
                     
-                    {/* Active lobby indicator */}
-                    {currentLobby && (
+                    {/* Active party indicator - TODO: Add party state tracking */}
+                    {/* {currentParty && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full animate-pulse"></div>
-                    )}
+                    )} */}
                     
-                    {/* Pending invites indicator */}
-                    {lobbyInvites.length > 0 && (
+                    {/* Pending invites indicator - TODO: Add party invitations state tracking */}
+                    {/* {partyInvitations.length > 0 && (
                       <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-gray-900 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                        {lobbyInvites.length}
+                        {partyInvitations.length}
                       </div>
-                    )}
+                    )} */}
                   </button>
                   
                   {/* Friends Button - Teal Theme */}
