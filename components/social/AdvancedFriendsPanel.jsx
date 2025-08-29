@@ -440,47 +440,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
           </div>
         )
 
-      case 'suggestions':
-        return (
-          <div className="space-y-2">
-            {suggestions.length === 0 ? (
-              <div className="text-center py-8">
-                <UserPlus className="mx-auto mb-2 text-gray-400" size={48} />
-                <p className="text-gray-400">No suggestions available</p>
-                <button
-                  onClick={loadSuggestions}
-                  className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
-                >
-                  Refresh Suggestions
-                </button>
-              </div>
-            ) : (
-              <>
-                {suggestions.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-3 h-3 rounded-full ${user.online ? 'bg-green-500' : 'bg-gray-400'}`} />
-                      <p className="font-medium text-white">{user.username}</p>
-                    </div>
-                    <button
-                      onClick={() => sendFriendRequest(user.id, user.username)}
-                      disabled={rateLimitInfo.remaining <= 0}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 py-1 rounded text-sm"
-                    >
-                      Add Friend
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={loadSuggestions}
-                  className="w-full mt-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm"
-                >
-                  Load More Suggestions
-                </button>
-              </>
-            )}
-          </div>
-        )
+
 
       default:
         return null
