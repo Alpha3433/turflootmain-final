@@ -445,9 +445,13 @@ export default function PartyLobbySystem({
                 {/* Party Actions */}
                 <div className="flex space-x-2 mt-3 pt-3 border-t border-gray-700/50">
                   <button 
+                    type="button"
+                    data-party-lobby-invite="true"
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
+                      e.nativeEvent.stopImmediatePropagation()
+                      console.log('🎯 Party Lobby Invite Button Clicked - Internal Only')
                       setShowInviteFriends(true)
                     }}
                     disabled={isLoading}
