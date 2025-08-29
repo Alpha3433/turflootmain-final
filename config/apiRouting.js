@@ -14,7 +14,9 @@ export const API_ROUTING_CONFIG = {
   // Bypass route mappings
   BYPASS_MAPPINGS: {
     '/api/friends/': '/friends-api/',
-    '/api/names/': '/names-api/'
+    '/api/names/': '/names-api/',
+    '/api/lobby/': '/lobby-api/',
+    '/api/party/': '/party-api/'
   },
   
   // Enable debug logging for route selection
