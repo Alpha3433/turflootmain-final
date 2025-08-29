@@ -482,12 +482,23 @@ export default function PartyLobbySystem({
           </div>
         </div>
 
-        {/* Invite Friends Modal */}
+        {/* Invite Friends Overlay - Takes over the entire modal */}
         {showInviteFriends && (
-          <div className="absolute inset-0 bg-gray-900 rounded-xl">
-            <div className="p-4 border-b border-orange-500/30">
+          <div className="absolute inset-0 bg-gray-900 rounded-xl z-10 flex flex-col">
+            {/* Header */}
+            <div className="p-4 border-b border-orange-500/30 bg-gradient-to-r from-orange-600/20 to-orange-700/20 rounded-t-xl">
               <div className="flex items-center justify-between">
-                <h3 className="text-white font-bold text-lg">Invite Friends</h3>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-teal-500/20 rounded-lg flex items-center justify-center border border-teal-500/30">
+                    <svg className="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg">Invite Friends</h3>
+                    <p className="text-teal-200 text-sm">Invite friends to your party</p>
+                  </div>
+                </div>
                 <button 
                   onClick={() => setShowInviteFriends(false)}
                   className="w-6 h-6 text-gray-400 hover:text-white transition-colors"
@@ -499,31 +510,50 @@ export default function PartyLobbySystem({
               </div>
             </div>
             
-            <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+            {/* Content */}
+            <div className="flex-1 p-4 space-y-3 overflow-y-auto">
               {invitableFriends.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-400">No friends available to invite</p>
+                  <div className="w-16 h-16 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-400 font-medium">No friends available to invite</p>
                   <p className="text-gray-500 text-sm mt-1">Add friends first or they might already be in parties</p>
                 </div>
               ) : (
                 invitableFriends.map((friend) => (
-                  <div key={friend.id} className="flex items-center justify-between p-3 bg-gray-800/40 rounded-lg">
+                  <div key={friend.id} className="flex items-center justify-between p-3 bg-gray-800/40 hover:bg-gray-700/40 rounded-lg transition-colors">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-teal-500/20 rounded-full flex items-center justify-center text-teal-400 font-bold text-sm">
+                      <div className="w-10 h-10 bg-teal-500/20 rounded-full flex items-center justify-center text-teal-400 font-bold">
                         {friend.username.charAt(0).toUpperCase()}
                       </div>
-                      <div className="text-white font-medium text-sm">{friend.username}</div>
+                      <div>
+                        <div className="text-white font-medium">{friend.username}</div>
+                        <div className="text-gray-400 text-sm">Available to invite</div>
+                      </div>
                     </div>
                     <button 
                       onClick={() => inviteFriend(friend.id, friend.username)}
                       disabled={isLoading}
-                      className="px-3 py-1 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white text-xs font-medium rounded transition-colors"
+                      className="px-4 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
                     >
-                      Invite
+                      {isLoading ? 'Sending...' : 'Invite'}
                     </button>
                   </div>
                 ))
               )}
+            </div>
+            
+            {/* Footer */}
+            <div className="p-4 border-t border-gray-700/50 bg-gray-800/20 rounded-b-xl">
+              <button 
+                onClick={() => setShowInviteFriends(false)}
+                className="w-full px-4 py-2 border border-gray-600/40 hover:bg-gray-700/40 text-gray-300 hover:text-white rounded-lg transition-all duration-200 text-sm font-medium"
+              >
+                Back to Party Lobby
+              </button>
             </div>
           </div>
         )}
