@@ -257,9 +257,38 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     }
   }, [user?.id, apiCall, getApiUrl])
 
+  // Register user in database when authenticated
+  const registerUser = useCallback(async () => {
+    if (!user?.id) return
+    
+    try {
+      const username = user.email?.address?.split('@')[0] || 
+                      user.wallet?.address?.slice(0, 8) || 
+                      `User_${Date.now()}`
+      
+      const response = await fetch(getApiUrl('/users-api/register'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          username,
+          email: user.email?.address || null
+        })
+      })
+      
+      const data = await response.json()
+      if (data.success) {
+        console.log('✅ User registered in database:', data.user.username)
+      }
+    } catch (error) {
+      console.error('❌ Failed to register user:', error)
+    }
+  }, [user, getApiUrl])
+
   // Initial load and presence management
   useEffect(() => {
     if (authenticated && user?.id) {
+      registerUser() // Ensure user is in database
       loadFriends()
       loadPendingRequests()
       loadAllUsers() // Load all users for search functionality
@@ -270,7 +299,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
         setPresence(false)
       }
     }
-  }, [authenticated, user?.id, loadFriends, loadPendingRequests, loadAllUsers, setPresence])
+  }, [authenticated, user?.id, registerUser, loadFriends, loadPendingRequests, loadAllUsers, setPresence])
 
   // Filter users when search query or online filter changes
   useEffect(() => {
