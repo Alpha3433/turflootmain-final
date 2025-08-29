@@ -75,7 +75,7 @@ export async function POST() {
         pattern.test(user.username || '')
       ) || demoIdPatterns.some(pattern => 
         pattern.test(user.id || '')
-      )
+      ) || !user.username || user.username === null // Also remove users with null usernames
       
       if (isDemo) {
         demoUsers.push(user)
