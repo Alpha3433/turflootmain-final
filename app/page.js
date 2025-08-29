@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
+import { getApiUrl } from '../config/apiRouting'
 
 // Dynamic imports for components that might have SSR issues
 const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
