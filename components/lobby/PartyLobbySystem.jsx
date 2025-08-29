@@ -268,40 +268,49 @@ export default function PartyLobbySystem({
     if (!userId) return
     
     try {
+      console.log('🔔 Checking for party game notifications...')
       const response = await fetch(`${getApiUrl('/api/party/notifications')}?userId=${userId}`)
       
-      // Don't throw error for 400/500 status - just log and continue
       if (!response.ok) {
         console.log(`ℹ️ Notifications check returned ${response.status} - continuing silently`)
         return // Silent failure for notifications
       }
       
       const data = await response.json()
+      console.log('🔔 Notifications response:', data)
       
-      if (response.ok && data.notifications) {
+      if (data.success && data.notifications && data.notifications.length > 0) {
         const gameStartNotifications = data.notifications.filter(
           notif => notif.type === 'party_game_start' && notif.status === 'pending'
         )
         
+        console.log(`🎮 Found ${gameStartNotifications.length} pending game start notifications`)
+        
         if (gameStartNotifications.length > 0) {
           const latestNotification = gameStartNotifications[0]
-          console.log('🔔 Received party game notification:', latestNotification)
+          console.log('🔔 Processing party game notification:', latestNotification)
           
-          // Mark notification as seen
-          await fetch(`${getApiUrl('/api/party/mark-notification-seen')}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              notificationId: latestNotification.id,
-              userId: userId
+          // Mark notification as seen first
+          try {
+            await fetch(`${getApiUrl('/api/party/mark-notification-seen')}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                notificationId: latestNotification.id,
+                userId: userId
+              })
             })
-          })
+            console.log('✅ Notification marked as seen')
+          } catch (markError) {
+            console.log('⚠️ Failed to mark notification as seen:', markError.message)
+          }
           
           // Auto-join the party game
           if (onGameStart && latestNotification.data) {
-            console.log('🎮 Auto-joining party game from notification')
+            console.log('🎮 AUTO-JOINING PARTY GAME from notification!')
+            console.log('🎯 Game data:', latestNotification.data)
             
-            onGameStart({
+            const gameData = {
               roomType: latestNotification.data.roomType,
               entryFee: latestNotification.data.entryFee,
               gameRoomId: latestNotification.data.gameRoomId,
@@ -309,11 +318,21 @@ export default function PartyLobbySystem({
               partyId: latestNotification.data.partyId,
               partySize: latestNotification.data.partyMembers?.length || 2,
               partyMembers: latestNotification.data.partyMembers || []
-            })
+            }
             
+            console.log('🚀 Calling onGameStart with:', gameData)
+            onGameStart(gameData)
+            
+            console.log('🔄 Closing Party Lobby modal')
             onClose() // Close party lobby modal
+            
+            return // Exit after successful auto-join
+          } else {
+            console.error('❌ Missing onGameStart callback or notification data')
           }
         }
+      } else {
+        console.log('ℹ️ No pending game notifications found')
       }
     } catch (error) {
       // Silent failure for notifications - don't show errors to user
