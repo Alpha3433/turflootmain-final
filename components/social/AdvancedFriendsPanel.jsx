@@ -261,12 +261,29 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     }
   }, [user?.id, apiCall, getApiUrl])
 
-  // Register user in database when authenticated
+  // Register user in database with custom display name when authenticated
   const registerUser = useCallback(async () => {
     if (!user?.id) return
     
     try {
-      const username = user.email?.address?.split('@')[0] || 
+      // First, try to get the custom display name from names API
+      let customDisplayName = null
+      try {
+        const namesResponse = await fetch(getApiUrl(`/names-api/get?userId=${encodeURIComponent(user.id)}`))
+        if (namesResponse.ok) {
+          const namesData = await namesResponse.json()
+          if (namesData.success && namesData.customName) {
+            customDisplayName = namesData.customName
+            console.log('✅ Found custom display name:', customDisplayName)
+          }
+        }
+      } catch (error) {
+        console.log('ℹ️ No custom display name found in names API')
+      }
+      
+      // Use custom display name if available, otherwise generate username
+      const username = customDisplayName || 
+                      user.email?.address?.split('@')[0] || 
                       user.wallet?.address?.slice(0, 8) || 
                       `User_${Date.now()}`
       
@@ -276,13 +293,14 @@ const AdvancedFriendsPanel = ({ onClose }) => {
         body: JSON.stringify({
           userId: user.id,
           username,
-          email: user.email?.address || null
+          email: user.email?.address || null,
+          hasCustomName: !!customDisplayName
         })
       })
       
       const data = await response.json()
       if (data.success) {
-        console.log('✅ User registered in database:', data.user.username)
+        console.log('✅ User registered with display name:', data.user.username)
       }
     } catch (error) {
       console.error('❌ Failed to register user:', error)
