@@ -212,134 +212,23 @@ export default function Home() {
   // Party Lobby management
   const [showPartyLobby, setShowPartyLobby] = useState(false)
 
-  const joinLobby = async (lobbyId) => {
-    try {
-      console.log('🚪 Joining lobby:', lobbyId)
-      
-      const response = await fetch('http://localhost:3000/api/lobby/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lobbyId,
-          userId: userProfile?.id || userProfile?.privyId,
-          userName: displayName || 'Player',
-          userBalance: userBalance
-        })
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok && data.success) {
-        setCurrentLobby(data.lobby)
-        setLobbyMembers(data.lobby.members)
-        console.log('✅ Joined lobby successfully:', lobbyId)
-        
-        // Remove accepted invite from pending invites
-        setLobbyInvites(prev => prev.filter(invite => invite.lobbyId !== lobbyId))
-        
-        // Refresh lobby status
-        fetchLobbyStatus()
-      } else {
-        console.error('❌ Failed to join lobby:', data.error)
-        alert(`Failed to join lobby: ${data.error}`)
-      }
-    } catch (error) {
-      console.error('❌ Join lobby error:', error)
-      alert('Failed to join lobby. Please try again.')
-    }
-  }
+  // Party Lobby management
+  const [showPartyLobby, setShowPartyLobby] = useState(false)
 
-  const inviteFriend = async (friendId, friendName) => {
-    try {
-      if (!currentLobby) {
-        alert('Please create a lobby first')
-        return
-      }
-      
-      console.log('📧 Inviting friend to lobby:', friendId)
-      
-      const response = await fetch('http://localhost:3000/api/lobby/invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lobbyId: currentLobby.id,
-          fromUserId: userProfile?.id || userProfile?.privyId,
-          fromUserName: displayName || 'Player',
-          toUserId: friendId,
-          roomType: currentLobby.roomType
-        })
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok && data.success) {
-        console.log('✅ Invite sent successfully:', data.invite.id)
-        alert(`Invite sent to ${friendName}`)
-      } else {
-        console.error('❌ Failed to send invite:', data.error)
-        alert(`Failed to send invite: ${data.error}`)
-      }
-    } catch (error) {
-      console.error('❌ Send invite error:', error)
-      alert('Failed to send invite. Please try again.')
+  // Handle game start from Party Lobby
+  const handleGameStart = useCallback((gameData) => {
+    const { roomType, entryFee, lobbyId, partySize, partyMembers } = gameData
+    
+    console.log('🎮 Starting game with party:', gameData)
+    
+    if (roomType === 'practice') {
+      // Navigate to practice mode
+      router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
+    } else {
+      // Navigate to cash game with party info
+      router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId}&partySize=${partySize}`)
     }
-  }
-
-  const validateRoomAccess = async (roomType, memberIds) => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/lobby/validate-room?roomType=${roomType}&memberIds=${memberIds.join(',')}`)
-      const data = await response.json()
-      
-      if (response.ok) {
-        return data
-      } else {
-        console.error('❌ Room validation failed:', data.error)
-        return { canProceed: false, error: data.error }
-      }
-    } catch (error) {
-      console.error('❌ Room validation error:', error)
-      return { canProceed: false, error: 'Validation failed' }
-    }
-  }
-
-  const fetchLobbyStatus = async () => {
-    try {
-      if (!userProfile?.id && !userProfile?.privyId) return
-      
-      const response = await fetch(`http://localhost:3000/api/lobby/status?userId=${userProfile?.id || userProfile?.privyId}`)
-      const data = await response.json()
-      
-      if (response.ok) {
-        setCurrentLobby(data.currentLobby)
-        if (data.currentLobby) {
-          setLobbyMembers(data.currentLobby.members)
-        }
-        setLobbyInvites(data.pendingInvites || [])
-      }
-    } catch (error) {
-      console.error('❌ Fetch lobby status error:', error)
-    }
-  }
-
-  const leaveLobby = async () => {
-    try {
-      if (!currentLobby) return
-      
-      // TODO: Add leave lobby API endpoint
-      setCurrentLobby(null)
-      setLobbyMembers([])
-      console.log('👋 Left lobby')
-    } catch (error) {
-      console.error('❌ Leave lobby error:', error)
-    }
-  }
-
-  // Fetch lobby status on component mount and when user changes
-  useEffect(() => {
-    if (userProfile && (userProfile.id || userProfile.privyId)) {
-      fetchLobbyStatus()
-    }
-  }, [userProfile])
+  }, [router])
   
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
