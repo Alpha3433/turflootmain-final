@@ -26,7 +26,7 @@ export async function POST() {
     const demoUserPatterns = [
       /^player_/,           // player_7xKXtg2C
       /^TestUser$/i,        // TestUser
-      /^Test User$/i,       // Test User
+      /^Test User/i,        // Test User, Test User 1754821903
       /^TestUsername$/i,    // TestUsername
       /^Test Gaming User$/i, // Test Gaming User  
       /^Profile Test User$/i,
@@ -34,16 +34,18 @@ export async function POST() {
       /^DB Test User/i,
       /^Update Test User$/i,
       /^Creation Test User/i,
+      /^Wallet Test User$/i, // Wallet Test User
       /^test$/i,            // test
       /^emailonly$/i,       // emailonly
       /^John Doe$/i,        // John Doe
       /^jane\.smith$/i,     // jane.smith
-      /^wallet_/,           // wallet_9WzDXwBb
+      /^wallet[._]/i,       // wallet_9WzDXwBb, wallet.test
       /^jwt\.test$/i,       // jwt.test
       /^Structure Test User$/i,
       /^profile\.test$/i,   // profile.test
       /^testuser_/i,        // testuser_992a7b4f
       /^gamer[._]/i,        // gamer.1754633264, gamer_1754633264
+      /^gametest\./i,       // gametest.1754705893
       /^ConcurrentUser/i,   // ConcurrentUser0, ConcurrentUser1, etc.
       /^ConsistencyTestUser$/i,
       /^DatabaseTestUser/i, // DatabaseTestUser, DatabaseTestUser1, etc.
