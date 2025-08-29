@@ -1,30 +1,5 @@
 import { NextResponse } from 'next/server'
-import { MongoClient } from 'mongodb'
-
-// MongoDB connection with optimized settings for API calls
-let client = null
-let db = null
-
-async function getDb() {
-  if (db) return db
-  
-  try {
-    if (!client) {
-      client = new MongoClient(process.env.MONGO_URL, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 10000,
-        maxPoolSize: 10
-      })
-      await client.connect()
-    }
-    
-    db = client.db(process.env.DB_NAME || 'turfloot_db')
-    return db
-  } catch (error) {
-    console.error('❌ Database connection error:', error)
-    throw error
-  }
-}
+import { FriendsSystem } from '../../../lib/friendsSystem.js'
 
 // CORS headers
 const corsHeaders = {
