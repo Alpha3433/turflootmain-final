@@ -52,9 +52,9 @@ class GameLoadingPopupBackendTester:
             
             if response.status_code == 200:
                 data = response.json()
-                if 'name' in data and 'TurfLoot' in data['name']:
+                if 'message' in data and 'TurfLoot' in data['message']:
                     self.log_test("Root API Endpoint", True, 
-                                f"API responding correctly: {data.get('name', 'Unknown')}", response_time)
+                                f"API responding correctly: {data.get('message', 'Unknown')}", response_time)
                 else:
                     self.log_test("Root API Endpoint", False, 
                                 f"Unexpected API response: {data}", response_time)
