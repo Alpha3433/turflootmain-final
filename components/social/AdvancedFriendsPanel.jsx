@@ -122,17 +122,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     }
   }, [user?.id, apiCall, getApiUrl])
 
-  // Load suggestions
-  const loadSuggestions = useCallback(async () => {
-    if (!user?.id) return
-    
-    try {
-      const data = await apiCall(getApiUrl(`/friends-api/suggestions?userId=${user.id}&limit=10`))
-      setSuggestions(data.suggestions || [])
-    } catch (error) {
-      console.error('Failed to load suggestions:', error)
-    }
-  }, [user?.id, apiCall, getApiUrl])
+
 
   // Filter users based on search query
   const filterUsers = useCallback((query) => {
