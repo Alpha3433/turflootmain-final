@@ -2106,7 +2106,7 @@ export default function Home() {
                   <button 
                     onClick={() => {
                       console.log('🏰 Desktop Lobby button clicked!')
-                      setShowLobby(!showLobby)
+                      setShowPartyLobby(true)
                     }}
                     className="relative flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-orange-600/90 to-orange-700/90 backdrop-blur-sm border border-orange-500/60 rounded-xl shadow-lg hover:from-orange-500/90 hover:to-orange-600/90 transition-all duration-200 group cursor-pointer"
                     title="Party Lobby"
