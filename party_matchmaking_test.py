@@ -64,6 +64,36 @@ class PartyMatchmakingTester:
             print(f"❌ Request failed for {method} {url}: {e}")
             return None, response_time
 
+    def cleanup_existing_parties(self):
+        """Clean up any existing parties for test users"""
+        print("🧹 Cleaning up existing parties...")
+        
+        for user_id, username in [(ANTH_USER_ID, 'anth'), (ROBIEE_USER_ID, 'robiee')]:
+            try:
+                # Get current party
+                response, _ = self.make_request('GET', '/party-api/current', params={'userId': user_id})
+                
+                if response and response.status_code == 200:
+                    data = response.json()
+                    if data.get('hasParty') and data.get('party'):
+                        party_id = data['party']['id']
+                        
+                        # Leave party
+                        leave_response, _ = self.make_request('POST', '/party-api/leave', {
+                            'partyId': party_id,
+                            'userId': user_id
+                        })
+                        
+                        if leave_response and leave_response.status_code == 200:
+                            print(f"  ✅ Cleaned up party for {username}")
+                        else:
+                            print(f"  ⚠️  Could not leave party for {username}")
+                            
+            except Exception as e:
+                print(f"  ⚠️  Cleanup warning for {username}: {e}")
+        
+        print("✅ Cleanup completed")
+
     def test_party_creation_setup(self):
         """Test 1: Party Creation and Setup"""
         print("\n🎯 TESTING PARTY CREATION AND SETUP")
