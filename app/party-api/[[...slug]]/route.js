@@ -100,6 +100,33 @@ export async function GET(request, { params }) {
       }, { headers: corsHeaders })
     }
     
+    if (action === 'notifications') {
+      // Get party notifications for user
+      try {
+        console.log(`📢 Fetching notifications for user: ${userId}`)
+        
+        const result = await PartySystem.getPartyNotifications(userId)
+        
+        return NextResponse.json({
+          success: true,
+          notifications: result.notifications || [],
+          count: result.count || 0,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error(`❌ Error fetching notifications:`, error)
+        
+        return NextResponse.json({
+          success: false,
+          notifications: [],
+          count: 0,
+          error: `Notification fetch failed: ${error.message}`,
+          timestamp: new Date().toISOString()
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
     return NextResponse.json({ error: 'Invalid action' }, { status: 400, headers: corsHeaders })
     
   } catch (error) {
