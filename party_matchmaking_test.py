@@ -363,15 +363,22 @@ class PartyMatchmakingTester:
         # Note: In a real implementation, we would query a game rooms endpoint
         # For now, we verify through party data that contains the game room reference
         if anth_party_response and anth_party_response.status_code == 200:
-            party_data = anth_party_response.json().get('party', {})
-            members = party_data.get('members', [])
+            anth_response_data = anth_party_response.json()
+            party_data = anth_response_data.get('party', {})
             
-            # Verify both party members are present
-            member_ids = [member.get('id') for member in members]
-            has_both_members = ANTH_USER_ID in member_ids and ROBIEE_USER_ID in member_ids
-            
-            details = f"Party members: {len(members)}, Has both users: {has_both_members}"
-            self.log_test("Game Room Party Member Info", has_both_members, details, rt1)
+            if party_data:
+                members = party_data.get('members', [])
+                
+                # Verify both party members are present
+                member_ids = [member.get('id') for member in members]
+                has_both_members = ANTH_USER_ID in member_ids and ROBIEE_USER_ID in member_ids
+                
+                details = f"Party members: {len(members)}, Has both users: {has_both_members}"
+                self.log_test("Game Room Party Member Info", has_both_members, details, rt1)
+            else:
+                self.log_test("Game Room Party Member Info", False, "No party data available", rt1)
+        else:
+            self.log_test("Game Room Party Member Info", False, "Failed to get party data", rt1)
 
     def test_end_to_end_workflow(self):
         """Test 5: End-to-End Matchmaking Workflow"""
