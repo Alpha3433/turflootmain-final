@@ -9,13 +9,12 @@ const AdvancedFriendsPanel = ({ onClose }) => {
   const { user, authenticated } = usePrivy()
   
   // State management
-  const [activeTab, setActiveTab] = useState('friends') // friends, requests, search, suggestions
+  const [activeTab, setActiveTab] = useState('friends') // friends, requests, search
   const [loading, setLoading] = useState(false)
   const [friends, setFriends] = useState([])
   const [pendingRequests, setPendingRequests] = useState([])
   const [allUsers, setAllUsers] = useState([]) // All registered users
   const [filteredUsers, setFilteredUsers] = useState([]) // Filtered search results
-  const [suggestions, setSuggestions] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [onlineOnly, setOnlineOnly] = useState(false)
   const [rateLimitInfo, setRateLimitInfo] = useState({ remaining: 10 })
