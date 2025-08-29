@@ -106,9 +106,14 @@ def test_party_status_detection_after_fix():
     # Try to create party (might fail if already exists - that's fine)
     create_success, create_result = make_request("POST", "/party-api/create", data=party_data)
     
-    if not create_success and 'already have an active party' not in create_result.get('error', '').lower():
-        log_test(f"❌ Unexpected create party error: {create_result}", "ERROR")
-        return False
+    # If creation failed, check if it's because user already has a party
+    if not create_success or create_result.get('error'):
+        error_msg = create_result.get('error', '')
+        if 'already have an active party' not in error_msg.lower():
+            log_test(f"❌ Unexpected create party error: {create_result}", "ERROR")
+            return False
+        else:
+            log_test("✅ User already has a party (expected)", "SUCCESS")
     
     # Now test party status detection
     success, party_status = make_request("GET", "/party-api/current", params={"userId": TEST_USER_ID})
