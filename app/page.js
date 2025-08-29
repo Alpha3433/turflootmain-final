@@ -2065,7 +2065,7 @@ export default function Home() {
                         <button 
                           onClick={() => {
                             console.log('🏰 Mobile Lobby button clicked!')
-                            setShowLobby(!showLobby)
+                            setShowPartyLobby(true)
                           }}
                           className="relative flex-shrink-0 flex flex-col items-center space-y-1 px-3 py-2 bg-gradient-to-r from-orange-600/90 to-orange-700/90 backdrop-blur-sm border border-orange-500/60 rounded-xl shadow-lg hover:from-orange-500/90 hover:to-orange-600/90 transition-all duration-200 group cursor-pointer min-w-[60px]"
                           title="Party Lobby"
