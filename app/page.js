@@ -385,9 +385,49 @@ export default function Home() {
   // Real-time cash-out notifications state
   const [cashOutNotifications, setCashOutNotifications] = useState([])
   
-  // Dynamic API URL utility function with bypass routing
-  const getApiUrl = (endpoint) => {
+  // Smart API URL utility function - tries standard routes first, bypass only if needed
+  const getApiUrl = useCallback(async (endpoint) => {
     if (typeof window === 'undefined') return endpoint // SSR fallback
+    
+    const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    
+    // Always use standard routes for localhost
+    if (isLocalDevelopment) {
+      return `http://localhost:3000${endpoint}`
+    }
+    
+    // For external deployment, try standard route first
+    try {
+      const testResponse = await fetch(endpoint + (endpoint.includes('?') ? '&test=1' : '?test=1'), {
+        method: 'GET',
+        signal: AbortSignal.timeout(3000)
+      })
+      
+      // If we get any response (even 404), the route works
+      if (testResponse.ok || testResponse.status === 404) {
+        console.log(`✅ Using standard route: ${endpoint}`)
+        return endpoint
+      }
+    } catch (error) {
+      console.log(`❌ Standard route failed: ${endpoint}, using bypass`)
+    }
+    
+    // Fall back to bypass routes only if standard fails
+    if (endpoint.startsWith('/api/names/')) {
+      return endpoint.replace('/api/names/', '/names-api/')
+    }
+    
+    if (endpoint.startsWith('/api/friends/')) {
+      return endpoint.replace('/api/friends/', '/friends-api/')
+    }
+    
+    // Default: return original endpoint
+    return endpoint
+  }, [])
+  
+  // Sync version for immediate use  
+  const getApiUrlSync = useCallback((endpoint) => {
+    if (typeof window === 'undefined') return endpoint
     
     const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     
@@ -395,21 +435,10 @@ export default function Home() {
       return `http://localhost:3000${endpoint}`
     }
     
-    // External deployment: use bypass routes for problematic /api paths
-    if (endpoint.startsWith('/api/names/')) {
-      // Convert /api/names/* to /names-api/*
-      return endpoint.replace('/api/names/', '/names-api/')
-    }
-    
-    if (endpoint.startsWith('/api/friends/')) {
-      // For now, friends endpoints might still need /api prefix testing
-      // TODO: Create friends bypass endpoints if needed
-      return endpoint
-    }
-    
-    // Default: use relative URL for external deployment
+    // For external, assume standard routes work until proven otherwise
+    // This will be tested dynamically on first use
     return endpoint
-  }
+  }, [])
   
   // Mock data for notifications
   const mockPlayerNames = [
