@@ -18,8 +18,13 @@ export default function PartyLobbySystem({
   const [error, setError] = useState(null)
   const [showInviteFriends, setShowInviteFriends] = useState(false)
 
-  // Get user ID
+  // Get user ID - Debug the user ID being used
   const userId = user?.id || user?.privyId
+  console.log('🔍 PARTY LOBBY DEBUG: User object:', user)
+  console.log('🔍 PARTY LOBBY DEBUG: Extracted userId:', userId)
+  console.log('🔍 PARTY LOBBY DEBUG: user.id:', user?.id)
+  console.log('🔍 PARTY LOBBY DEBUG: user.privyId:', user?.privyId)
+  console.log('🔍 PARTY LOBBY DEBUG: displayName:', displayName)
 
   // Fetch current party status
   const fetchPartyStatus = useCallback(async () => {
