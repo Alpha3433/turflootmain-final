@@ -479,11 +479,20 @@ class PartyMatchmakingTester:
         robiee_response, rt2 = self.make_request('GET', '/party-api/current', params={'userId': ROBIEE_USER_ID})
         
         if anth_response and robiee_response and anth_response.status_code == 200 and robiee_response.status_code == 200:
-            anth_game_room = anth_response.json().get('party', {}).get('gameRoomId', '')
-            robiee_game_room = robiee_response.json().get('party', {}).get('gameRoomId', '')
+            anth_response_data = anth_response.json()
+            robiee_response_data = robiee_response.json()
             
-            same_room = anth_game_room == robiee_game_room and anth_game_room != ''
-            self.log_test("E2E: Same Room Access", same_room, f"Both users in room: {anth_game_room}", max(rt1, rt2))
+            anth_party_data = anth_response_data.get('party', {})
+            robiee_party_data = robiee_response_data.get('party', {})
+            
+            if anth_party_data and robiee_party_data:
+                anth_game_room = anth_party_data.get('gameRoomId', '')
+                robiee_game_room = robiee_party_data.get('gameRoomId', '')
+                
+                same_room = anth_game_room == robiee_game_room and anth_game_room != ''
+                self.log_test("E2E: Same Room Access", same_room, f"Both users in room: {anth_game_room}", max(rt1, rt2))
+            else:
+                self.log_test("E2E: Same Room Access", False, "One or both users have no party data", max(rt1, rt2))
         else:
             self.log_test("E2E: Same Room Access", False, "Failed to verify room access", max(rt1, rt2))
 
