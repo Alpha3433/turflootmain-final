@@ -30,6 +30,10 @@ const PartyLobbySystem = dynamic(() => import('../components/lobby/PartyLobbySys
   loading: () => <div className="text-white">Loading Party Lobby...</div>
 })
 
+const GameLoadingPopup = dynamic(() => import('../components/GameLoadingPopup'), {
+  ssr: false
+})
+
 const CustomizationModal = dynamic(() => import('@/components/CustomizationModalClean'), {
   ssr: false
 })
