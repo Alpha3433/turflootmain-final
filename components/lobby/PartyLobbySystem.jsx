@@ -321,25 +321,71 @@ export default function PartyLobbySystem({
     }
   }, [userId, onGameStart, onClose])
 
-  // Poll for notifications every 3 seconds when component is active
+  // Poll for notifications with exponential backoff
   useEffect(() => {
-    const notificationInterval = setInterval(() => {
+    let notificationInterval
+    let failureCount = 0
+    
+    const pollNotifications = () => {
       checkPartyNotifications()
-    }, 3000) // Check every 3 seconds
+        .then(() => {
+          // Reset failure count on success
+          failureCount = 0
+        })
+        .catch(() => {
+          // Increase failure count and implement exponential backoff
+          failureCount++
+          if (failureCount > 5) {
+            console.log('🔕 Too many notification failures, stopping polling')
+            clearInterval(notificationInterval)
+            return
+          }
+        })
+    }
     
-    // Initial check
-    checkPartyNotifications()
+    // Start polling every 5 seconds (reduced from 3 seconds to reduce load)
+    notificationInterval = setInterval(pollNotifications, 5000)
     
-    return () => clearInterval(notificationInterval)
+    // Initial check after a short delay
+    setTimeout(pollNotifications, 1000)
+    
+    return () => {
+      if (notificationInterval) {
+        clearInterval(notificationInterval)
+      }
+    }
   }, [checkPartyNotifications])
 
-  // Fetch party member balances when party changes
+  // Fetch party member balances when party changes  
   useEffect(() => {
     if (currentParty && currentParty.members) {
       console.log('💰 Party detected, fetching member balances')
       fetchPartyMemberBalances()
     }
   }, [currentParty, fetchPartyMemberBalances])
+
+  // Refresh party status periodically but less frequently
+  useEffect(() => {
+    let statusRefreshInterval
+    
+    const refreshStatus = () => {
+      // Only refresh if there's no active error
+      if (!error) {
+        fetchPartyStatus().catch((err) => {
+          console.log('ℹ️ Background party status refresh failed (silent):', err.message)
+        })
+      }
+    }
+    
+    // Refresh party status every 30 seconds (much less frequent)
+    statusRefreshInterval = setInterval(refreshStatus, 30000)
+    
+    return () => {
+      if (statusRefreshInterval) {
+        clearInterval(statusRefreshInterval)
+      }
+    }
+  }, [fetchPartyStatus, error])
 
   // Fetch invitable friends when party changes or user changes
   useEffect(() => {
