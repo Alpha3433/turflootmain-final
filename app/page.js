@@ -211,16 +211,33 @@ export default function Home() {
 
   // Handle game start from Party Lobby
   const handleGameStart = useCallback((gameData) => {
-    const { roomType, entryFee, lobbyId, partySize, partyMembers } = gameData
+    const { roomType, entryFee, gameRoomId, lobbyId, partyMode, partyId, partySize, partyMembers } = gameData
     
-    console.log('🎮 Starting game with party:', gameData)
+    console.log('🎮 Starting game with data:', gameData)
     
-    if (roomType === 'practice') {
-      // Navigate to practice mode
+    if (!router) {
+      console.error('Router not available')
+      return
+    }
+    
+    if (partyMode && gameRoomId) {
+      // PARTY MODE: Navigate to coordinated game room
+      console.log(`🎮 Party Mode: Navigating to game room ${gameRoomId} with ${partySize} members`)
+      
+      const gameUrl = `/agario?mode=${roomType === 'practice' ? 'practice' : 'party'}&fee=${entryFee}&roomId=${gameRoomId}&partyId=${partyId}&partySize=${partySize}&members=${encodeURIComponent(JSON.stringify(partyMembers))}`
+      
+      console.log('🔗 Game URL:', gameUrl)
+      router.push(gameUrl)
+      
+    } else if (roomType === 'practice') {
+      // SOLO PRACTICE MODE: Navigate to practice mode
+      console.log('🎮 Solo Practice Mode: Navigating to practice game')
       router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
+      
     } else {
-      // Navigate to cash game with party info
-      router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId}&partySize=${partySize}`)
+      // SOLO CASH MODE: Navigate to cash game
+      console.log(`🎮 Solo Cash Mode: Navigating to ${roomType} game`)
+      router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId || 'solo-' + Date.now()}`)
     }
   }, [])
   
