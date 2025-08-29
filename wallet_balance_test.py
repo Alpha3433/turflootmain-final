@@ -14,7 +14,7 @@ from datetime import datetime
 
 # Configuration - Test both localhost and external URL
 LOCALHOST_URL = "http://localhost:3000"
-EXTERNAL_URL = "https://turf-api-bypass.preview.emergentagent.com"
+EXTERNAL_URL = "https://team-turfloot.preview.emergentagent.com"
 
 # Test wallet address (user's actual wallet with 0.002 ETH)
 TEST_WALLET_ADDRESS = "0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d"
