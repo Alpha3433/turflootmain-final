@@ -419,25 +419,34 @@ const AdvancedFriendsPanel = ({ onClose }) => {
             
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {loading ? (
-                <div className="text-center py-4 text-gray-400">Searching...</div>
-              ) : searchResults.length === 0 && searchQuery.length >= 2 ? (
-                <div className="text-center py-4 text-gray-400">No users found</div>
+                <div className="text-center py-4 text-gray-400">Loading all users...</div>
+              ) : filteredUsers.length === 0 ? (
+                <div className="text-center py-4 text-gray-400">
+                  {searchQuery ? `No users found matching "${searchQuery}"` : 'No users available'}
+                </div>
               ) : (
-                searchResults.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-3 h-3 rounded-full ${user.online ? 'bg-green-500' : 'bg-gray-400'}`} />
-                      <p className="font-medium text-white">{user.username}</p>
-                    </div>
-                    <button
-                      onClick={() => sendFriendRequest(user.id, user.username)}
-                      disabled={!user.canSendRequest || rateLimitInfo.remaining <= 0}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 py-1 rounded text-sm"
-                    >
-                      Add Friend
-                    </button>
+                <>
+                  <div className="text-xs text-gray-400 px-2 mb-2">
+                    Showing {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''} 
+                    {searchQuery && ` matching "${searchQuery}"`}
+                    {onlineOnly && ' (online only)'}
                   </div>
-                ))
+                  {filteredUsers.map((user) => (
+                    <div key={user.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-3 h-3 rounded-full ${user.online ? 'bg-green-500' : 'bg-gray-400'}`} />
+                        <p className="font-medium text-white">{user.username}</p>
+                      </div>
+                      <button
+                        onClick={() => sendFriendRequest(user.id, user.username)}
+                        disabled={!user.canSendRequest || rateLimitInfo.remaining <= 0}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 py-1 rounded text-sm"
+                      >
+                        Add Friend
+                      </button>
+                    </div>
+                  ))}
+                </>
               )}
             </div>
           </div>
