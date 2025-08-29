@@ -208,6 +208,15 @@ export default function Home() {
 
   // Party Lobby management
   const [showPartyLobby, setShowPartyLobby] = useState(false)
+  
+  // Game Loading State
+  const [isJoiningGame, setIsJoiningGame] = useState(false)
+  const [gameLoadingInfo, setGameLoadingInfo] = useState({
+    roomType: null,
+    entryFee: 0,
+    partyMode: false,
+    partySize: 1
+  })
 
   // Handle game start from Party Lobby
   const handleGameStart = useCallback((gameData) => {
