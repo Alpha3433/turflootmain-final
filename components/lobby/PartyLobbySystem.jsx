@@ -417,41 +417,95 @@ export default function PartyLobbySystem({
     }
   }
 
-  // Join room with party (or solo)
+  // Join room with party coordination
   const joinRoom = async (roomType, entryFee = 0) => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const response = await fetch(`${getApiUrl('/api/lobby/create')}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          roomType,
-          entryFee
-        })
-      })
-
-      const data = await response.json()
-
-      if (response.ok && data.success) {
-        console.log('✅ Successfully joined room:', data.lobbyId)
+      if (currentParty && currentParty.members && currentParty.members.length > 1) {
+        // PARTY MODE: Coordinate all party members to join the same room
+        console.log(`🎮 Party Mode: Creating coordinated game room for ${currentParty.members.length} members`)
         
-        // Navigate to game with party members
-        if (onGameStart) {
-          onGameStart({
-            roomType,
-            entryFee,
-            lobbyId: data.lobbyId,
-            partySize: data.partySize,
-            partyMembers: data.partyMembers || []
-          })
+        // Check if user is party owner
+        const isOwner = currentParty.members.some(member => 
+          member.id === userId && member.role === 'owner'
+        )
+        
+        if (!isOwner) {
+          setError('Only the party owner can start games')
+          return
         }
         
-        onClose() // Close the party lobby modal
+        // Create coordinated party room
+        const response = await fetch(`${getApiUrl('/api/party/start-game')}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            partyId: currentParty.id,
+            roomType,
+            entryFee,
+            ownerId: userId
+          })
+        })
+
+        const data = await response.json()
+
+        if (response.ok && data.success) {
+          console.log('✅ Coordinated party room created:', data.gameRoomId)
+          
+          // Navigate party owner to game with party coordination
+          if (onGameStart) {
+            onGameStart({
+              roomType,
+              entryFee,
+              gameRoomId: data.gameRoomId,
+              partyMode: true,
+              partyId: currentParty.id,
+              partySize: currentParty.members.length,
+              partyMembers: currentParty.members
+            })
+          }
+          
+          onClose() // Close the party lobby modal
+        } else {
+          setError(data.error || 'Failed to create party game room')
+        }
       } else {
-        setError(data.error || 'Failed to join room')
+        // SOLO MODE: Regular single-player room joining
+        console.log(`🎮 Solo Mode: Joining ${roomType} room`)
+        
+        const response = await fetch(`${getApiUrl('/api/lobby/create')}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            roomType,
+            entryFee
+          })
+        })
+
+        const data = await response.json()
+
+        if (response.ok && data.success) {
+          console.log('✅ Solo room joined:', data.lobbyId)
+          
+          // Navigate to solo game
+          if (onGameStart) {
+            onGameStart({
+              roomType,
+              entryFee,
+              lobbyId: data.lobbyId,
+              partyMode: false,
+              partySize: 1,
+              partyMembers: []
+            })
+          }
+          
+          onClose() // Close the party lobby modal
+        } else {
+          setError(data.error || 'Failed to join room')
+        }
       }
     } catch (error) {
       console.error('❌ Error joining room:', error)
