@@ -227,13 +227,67 @@ export default function PartyLobbySystem({
     fetchPartyStatus()
   }, [])
 
-  // Fetch party member balances when party changes
-  useEffect(() => {
-    if (currentParty && currentParty.members) {
-      console.log('💰 Party detected, fetching member balances')
-      fetchPartyMemberBalances()
+  // Check for party game notifications
+  const checkPartyNotifications = useCallback(async () => {
+    if (!userId) return
+    
+    try {
+      const response = await fetch(`${getApiUrl('/api/party/notifications')}?userId=${userId}`)
+      const data = await response.json()
+      
+      if (response.ok && data.notifications) {
+        const gameStartNotifications = data.notifications.filter(
+          notif => notif.type === 'party_game_start' && notif.status === 'pending'
+        )
+        
+        if (gameStartNotifications.length > 0) {
+          const latestNotification = gameStartNotifications[0]
+          console.log('🔔 Received party game notification:', latestNotification)
+          
+          // Mark notification as seen
+          await fetch(`${getApiUrl('/api/party/mark-notification-seen')}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              notificationId: latestNotification.id,
+              userId: userId
+            })
+          })
+          
+          // Auto-join the party game
+          if (onGameStart && latestNotification.data) {
+            console.log('🎮 Auto-joining party game from notification')
+            
+            onGameStart({
+              roomType: latestNotification.data.roomType,
+              entryFee: latestNotification.data.entryFee,
+              gameRoomId: latestNotification.data.gameRoomId,
+              partyMode: true,
+              partyId: latestNotification.data.partyId,
+              partySize: latestNotification.data.partyMembers?.length || 2,
+              partyMembers: latestNotification.data.partyMembers || []
+            })
+            
+            onClose() // Close party lobby modal
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error checking party notifications:', error)
     }
-  }, [currentParty, fetchPartyMemberBalances])
+  }, [userId, onGameStart, onClose])
+
+  // Poll for notifications every 3 seconds when component is active
+  useEffect(() => {
+    const notificationInterval = setInterval(() => {
+      checkPartyNotifications()
+    }, 3000) // Check every 3 seconds
+    
+    // Initial check
+    checkPartyNotifications()
+    
+    return () => clearInterval(notificationInterval)
+  }, [checkPartyNotifications])
 
   // Fetch invitable friends when party changes or user changes
   useEffect(() => {
