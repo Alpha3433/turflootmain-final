@@ -310,8 +310,11 @@ export default function PartyLobbySystem({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-start justify-end pt-20 pr-6 p-4">
-      <div className="bg-gray-900 border border-orange-500/40 rounded-xl shadow-2xl w-full max-w-md max-h-[75vh] overflow-hidden animate-in fade-in duration-200 mt-4">
+    <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-start justify-end pt-20 pr-6 p-4" onClick={onClose}>
+      <div 
+        className="bg-gray-900 border border-orange-500/40 rounded-xl shadow-2xl w-full max-w-md max-h-[75vh] overflow-hidden animate-in fade-in duration-200 mt-4" 
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="p-4 border-b border-orange-500/30 bg-gradient-to-r from-orange-600/20 to-orange-700/20">
           <div className="flex items-center justify-between">
