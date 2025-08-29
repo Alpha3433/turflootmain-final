@@ -463,8 +463,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
           {[
             { id: 'friends', label: 'Friends', badge: friends.length },
             { id: 'requests', label: 'Requests', badge: pendingRequests.length },
-            { id: 'search', label: 'Search' },
-            { id: 'suggestions', label: 'Suggestions' }
+            { id: 'search', label: 'Search' }
           ].map((tab) => (
             <button
               key={tab.id}
