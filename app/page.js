@@ -229,25 +229,37 @@ export default function Home() {
       return
     }
     
-    if (partyMode && gameRoomId) {
-      // PARTY MODE: Navigate to coordinated game room
-      console.log(`🎮 Party Mode: Navigating to game room ${gameRoomId} with ${partySize} members`)
-      
-      const gameUrl = `/agario?mode=party&fee=${entryFee}&roomId=${gameRoomId}&partyId=${partyId}&partySize=${partySize}&members=${encodeURIComponent(JSON.stringify(partyMembers))}`
-      
-      console.log('🔗 Game URL:', gameUrl)
-      router.push(gameUrl)
-      
-    } else if (roomType === 'practice') {
-      // SOLO PRACTICE MODE: Navigate to practice mode
-      console.log('🎮 Solo Practice Mode: Navigating to practice game')
-      router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
-      
-    } else {
-      // SOLO CASH MODE: Navigate to cash game
-      console.log(`🎮 Solo Cash Mode: Navigating to ${roomType} game`)
-      router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId || 'solo-' + Date.now()}`)
-    }
+    // Show loading popup with game info
+    setGameLoadingInfo({
+      roomType: roomType || 'practice',
+      entryFee: entryFee || 0,
+      partyMode: partyMode || false,
+      partySize: partySize || 1
+    })
+    setIsJoiningGame(true)
+    
+    // Add a small delay for UX (let user see the loading popup)
+    setTimeout(() => {
+      if (partyMode && gameRoomId) {
+        // PARTY MODE: Navigate to coordinated game room
+        console.log(`🎮 Party Mode: Navigating to game room ${gameRoomId} with ${partySize} members`)
+        
+        const gameUrl = `/agario?mode=party&fee=${entryFee}&roomId=${gameRoomId}&partyId=${partyId}&partySize=${partySize}&members=${encodeURIComponent(JSON.stringify(partyMembers))}`
+        
+        console.log('🔗 Game URL:', gameUrl)
+        router.push(gameUrl)
+        
+      } else if (roomType === 'practice') {
+        // SOLO PRACTICE MODE: Navigate to practice mode
+        console.log('🎮 Solo Practice Mode: Navigating to practice game')
+        router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
+        
+      } else {
+        // SOLO CASH MODE: Navigate to cash game
+        console.log(`🎮 Solo Cash Mode: Navigating to ${roomType} game`)
+        router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId || 'solo-' + Date.now()}`)
+      }
+    }, 800) // 800ms delay for better UX
   }, [])
   
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
