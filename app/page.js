@@ -209,40 +209,8 @@ export default function Home() {
       .catch(error => console.error(`❌ Failed to update ping for ${regionId}:`, error))
   }
 
-  // Lobby management functions
-  const createLobby = async (roomType = '$5') => {
-    try {
-      console.log('🏰 Creating lobby for room type:', roomType)
-      
-      const response = await fetch('http://localhost:3000/api/lobby/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: userProfile?.id || userProfile?.privyId,
-          userName: displayName || 'Player',
-          userBalance: userBalance,
-          roomType
-        })
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok && data.success) {
-        setCurrentLobby(data.lobby)
-        setLobbyMembers(data.lobby.members)
-        console.log('✅ Lobby created successfully:', data.lobby.id)
-        
-        // Refresh lobby status
-        fetchLobbyStatus()
-      } else {
-        console.error('❌ Failed to create lobby:', data.error)
-        alert(`Failed to create lobby: ${data.error}`)
-      }
-    } catch (error) {
-      console.error('❌ Create lobby error:', error)
-      alert('Failed to create lobby. Please try again.')
-    }
-  }
+  // Party Lobby management
+  const [showPartyLobby, setShowPartyLobby] = useState(false)
 
   const joinLobby = async (lobbyId) => {
     try {
