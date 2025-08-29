@@ -181,7 +181,7 @@ const AdvancedFriendsPanel = ({ onClose }) => {
       console.error('Failed to send friend request:', error)
       alert(`Failed to send friend request: ${error.message}`)
     }
-  }, [user, searchQuery, searchUsers, apiCall, getApiUrl])
+  }, [user, searchQuery, filterUsers, apiCall, getApiUrl])
 
   // Accept friend request
   const acceptFriendRequest = useCallback(async (requestId) => {
