@@ -108,7 +108,7 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Party Lobby State Synchronization Fix"
+    - "Party Member Auto-Join Issue Debug"
   stuck_tasks: 
     - "Party Lobby State Synchronization Fix"
   test_all: false
