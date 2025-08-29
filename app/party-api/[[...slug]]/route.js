@@ -255,22 +255,39 @@ export async function POST(request, { params }) {
     
     if (action === 'notifications') {
       // Get party notifications for user
-      const { userId } = Object.fromEntries(url.searchParams)
-      
-      if (!userId) {
-        return NextResponse.json({ 
-          error: 'userId required' 
-        }, { status: 400, headers: corsHeaders })
+      try {
+        const { userId } = Object.fromEntries(url.searchParams)
+        
+        if (!userId) {
+          return NextResponse.json({ 
+            error: 'userId required',
+            notifications: [],
+            count: 0
+          }, { status: 400, headers: corsHeaders })
+        }
+        
+        console.log(`📢 Fetching notifications for user: ${userId}`)
+        
+        const result = await PartySystem.getPartyNotifications(userId)
+        
+        return NextResponse.json({
+          success: true,
+          notifications: result.notifications || [],
+          count: result.count || 0,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error(`❌ Error fetching notifications:`, error)
+        
+        return NextResponse.json({
+          success: false,
+          notifications: [],
+          count: 0,
+          error: `Notification fetch failed: ${error.message}`,
+          timestamp: new Date().toISOString()
+        }, { status: 500, headers: corsHeaders })
       }
-      
-      const result = await PartySystem.getPartyNotifications(userId)
-      
-      return NextResponse.json({
-        success: true,
-        notifications: result.notifications,
-        count: result.count,
-        timestamp: new Date().toISOString()
-      }, { headers: corsHeaders })
     }
     
     if (action === 'mark-notification-seen') {
