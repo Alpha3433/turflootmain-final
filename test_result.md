@@ -108,7 +108,7 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Party System Multiplayer Room Coordination Fix"
+    - "Socket.IO Multiplayer Game Server Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
