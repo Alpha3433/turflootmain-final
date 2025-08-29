@@ -46,12 +46,6 @@ class PartyMatchmakingTester:
         url = f"{self.base_url}{endpoint}"
         start_time = time.time()
         
-        print(f"🔍 Making {method} request to: {url}")
-        if data:
-            print(f"🔍 Request data: {data}")
-        if params:
-            print(f"🔍 Request params: {params}")
-        
         try:
             headers = {'Content-Type': 'application/json'}
             
@@ -63,7 +57,6 @@ class PartyMatchmakingTester:
                 raise ValueError(f"Unsupported method: {method}")
                 
             response_time = time.time() - start_time
-            print(f"🔍 Response: {response.status_code} - {response.text[:200]}...")
             return response, response_time
             
         except requests.exceptions.RequestException as e:
