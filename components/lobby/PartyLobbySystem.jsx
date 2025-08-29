@@ -623,31 +623,119 @@ export default function PartyLobbySystem({
             </div>
           )}
 
-          {/* Room Selection */}
+          {/* Room Selection with Balance Validation */}
           <div className="space-y-3">
-            <h3 className="text-white font-semibold text-sm">
-              {currentParty ? 'Select Room for Party' : 'Quick Play'}
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-white font-semibold text-sm">
+                {currentParty ? `Select Room for Party (${currentParty.memberCount} members)` : 'Quick Play'}
+              </h3>
+              {currentParty && currentParty.memberCount > 2 && (
+                <div className="px-2 py-1 bg-red-500/20 border border-red-500/30 rounded text-red-400 text-xs font-medium">
+                  Max 2 players
+                </div>
+              )}
+            </div>
+            
             <div className="grid grid-cols-2 gap-2">
               {[
                 { name: 'Practice', roomType: 'practice', fee: 0, color: 'green' },
                 { name: '$1', roomType: '$1', fee: 1, color: 'blue' },
                 { name: '$5', roomType: '$5', fee: 5, color: 'purple' },
                 { name: '$25', roomType: '$25', fee: 25, color: 'red' }
-              ].map((room) => (
-                <button 
-                  key={room.roomType}
-                  onClick={() => joinRoom(room.roomType, room.fee)}
-                  disabled={isLoading}
-                  className={`p-3 bg-${room.color}-600/20 border border-${room.color}-500/40 hover:bg-${room.color}-600/30 disabled:opacity-50 rounded-lg transition-all duration-200`}
-                >
-                  <div className={`text-${room.color}-400 font-bold text-sm`}>{room.name}</div>
-                  <div className="text-gray-400 text-xs">
-                    {currentParty ? `Party of ${currentParty.memberCount}` : 'Solo Play'}
-                  </div>
-                </button>
-              ))}
+              ].map((room) => {
+                // Check if user/party can afford this room
+                let canAfford = true
+                let disableReason = null
+                let affordabilityCheck = null
+                
+                if (currentParty) {
+                  // Check party member balances
+                  affordabilityCheck = canPartyAffordRoom(room.fee)
+                  canAfford = affordabilityCheck.canAfford
+                  
+                  if (!canAfford && affordabilityCheck.insufficientMembers.length > 0) {
+                    const insufficientNames = affordabilityCheck.insufficientMembers.map(m => m.username).join(', ')
+                    disableReason = `${insufficientNames} need more funds`
+                  }
+                  
+                  // Check party size limit (max 2 players)
+                  if (currentParty.memberCount > 2) {
+                    canAfford = false
+                    disableReason = `Party too large (${currentParty.memberCount}/2)`
+                  }
+                } else {
+                  // Solo play - check user balance
+                  canAfford = userBalance >= room.fee
+                  if (!canAfford && room.fee > 0) {
+                    disableReason = `Need $${room.fee - userBalance} more`
+                  }
+                }
+                
+                return (
+                  <button 
+                    key={room.roomType}
+                    onClick={() => canAfford ? joinRoom(room.roomType, room.fee) : null}
+                    disabled={isLoading || !canAfford}
+                    className={`relative p-3 rounded-lg transition-all duration-200 ${
+                      canAfford 
+                        ? `bg-${room.color}-600/20 border border-${room.color}-500/40 hover:bg-${room.color}-600/30 cursor-pointer` 
+                        : 'bg-gray-600/20 border border-gray-500/40 opacity-50 cursor-not-allowed'
+                    }`}
+                    title={disableReason || `Join ${room.name} room`}
+                  >
+                    <div className={`${
+                      canAfford ? `text-${room.color}-400` : 'text-gray-500'
+                    } font-bold text-sm`}>
+                      {room.name}
+                    </div>
+                    <div className="text-gray-400 text-xs">
+                      {currentParty ? (
+                        canAfford 
+                          ? `Party of ${Math.min(currentParty.memberCount, 2)}`
+                          : disableReason
+                      ) : (
+                        canAfford ? 'Solo Play' : disableReason
+                      )}
+                    </div>
+                    
+                    {/* Balance warning indicator */}
+                    {!canAfford && room.fee > 0 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">!</span>
+                      </div>
+                    )}
+                    
+                    {/* Party size warning */}
+                    {currentParty && currentParty.memberCount > 2 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">!</span>
+                      </div>
+                    )}
+                  </button>
+                )
+              })}
             </div>
+            
+            {/* Balance Status Display */}
+            {currentParty && Object.keys(partyMemberBalances).length > 0 && (
+              <div className="mt-3 p-3 bg-gray-800/40 rounded-lg">
+                <h4 className="text-white font-semibold text-xs mb-2">Party Member Balances:</h4>
+                <div className="space-y-1">
+                  {currentParty.members.map(member => (
+                    <div key={member.id} className="flex justify-between items-center">
+                      <span className="text-gray-300 text-xs">{member.username}</span>
+                      <span className={`text-xs font-medium ${
+                        (partyMemberBalances[member.id] || 0) > 0 
+                          ? 'text-green-400' 
+                          : 'text-gray-500'
+                      }`}>
+                        ${partyMemberBalances[member.id] || 0}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
