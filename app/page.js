@@ -391,7 +391,7 @@ export default function Home() {
     
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showRegionDropdown, showLobby])
+  }, [showRegionDropdown])
 
 
   // Debug Privy state
