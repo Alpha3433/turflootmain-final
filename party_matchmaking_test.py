@@ -97,13 +97,16 @@ class PartyMatchmakingTester:
                 data = response.json()
                 party = data.get('party', {})
                 
-                required_fields = ['id', 'ownerId', 'ownerUsername', 'name', 'status', 'maxMembers', 'members']
-                has_all_fields = all(field in party for field in required_fields)
-                member_count = len(party.get('members', []))
-                
-                success = has_all_fields and member_count == 1 and party.get('maxMembers') == 2
-                details = f"Party structure verified: {len(required_fields)} fields, {member_count} member(s)"
-                self.log_test("Party Data Structure Verification", success, details, rt)
+                if party:
+                    required_fields = ['id', 'ownerId', 'ownerUsername', 'name', 'status', 'maxMembers', 'members']
+                    has_all_fields = all(field in party for field in required_fields)
+                    member_count = len(party.get('members', []))
+                    
+                    success = has_all_fields and member_count == 1 and party.get('maxMembers') == 2
+                    details = f"Party structure verified: {len(required_fields)} fields, {member_count} member(s)"
+                    self.log_test("Party Data Structure Verification", success, details, rt)
+                else:
+                    self.log_test("Party Data Structure Verification", False, "No party data in response", rt)
             else:
                 status = response.status_code if response else "No Response"
                 self.log_test("Party Data Structure Verification", False, f"HTTP {status}", rt)
