@@ -47,10 +47,12 @@ class PartyMatchmakingTester:
         start_time = time.time()
         
         try:
+            headers = {'Content-Type': 'application/json'}
+            
             if method.upper() == 'GET':
-                response = requests.get(url, params=params, timeout=10)
+                response = requests.get(url, params=params, headers=headers, timeout=10)
             elif method.upper() == 'POST':
-                response = requests.post(url, json=data, timeout=10)
+                response = requests.post(url, json=data, headers=headers, timeout=10)
             else:
                 raise ValueError(f"Unsupported method: {method}")
                 
@@ -59,7 +61,7 @@ class PartyMatchmakingTester:
             
         except requests.exceptions.RequestException as e:
             response_time = time.time() - start_time
-            print(f"❌ Request failed: {e}")
+            print(f"❌ Request failed for {method} {url}: {e}")
             return None, response_time
 
     def test_party_creation_setup(self):
