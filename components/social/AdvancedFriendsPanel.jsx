@@ -19,21 +19,33 @@ const AdvancedFriendsPanel = ({ onClose }) => {
   const [onlineOnly, setOnlineOnly] = useState(false)
   const [rateLimitInfo, setRateLimitInfo] = useState({ remaining: 10 })
 
-  // Dynamic API URL utility function with bypass routing
+  // API URL utility - prefers standard routes, uses bypass only for infrastructure issues
   const getApiUrl = useCallback((endpoint) => {
-    if (typeof window === 'undefined') return endpoint
+    if (typeof window === 'undefined') return endpoint // SSR fallback
     
     const isLocalDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     
+    // Always use standard routes for localhost
     if (isLocalDevelopment) {
       return `http://localhost:3000${endpoint}`
     }
     
-    // External deployment: use bypass routes
-    if (endpoint.startsWith('/api/friends/')) {
-      return endpoint.replace('/api/friends/', '/friends-api/')
+    // INFRASTRUCTURE WORKAROUND: Only use bypass for known blocked routes
+    // TODO: Remove this when Kubernetes ingress allows /api/* routes  
+    const useBypassRouting = true // Set to false when infrastructure is fixed
+    
+    if (useBypassRouting) {
+      if (endpoint.startsWith('/api/friends/')) {
+        console.log(`🔄 Using bypass route: ${endpoint} → friends-api`)
+        return endpoint.replace('/api/friends/', '/friends-api/')
+      }
+      
+      if (endpoint.startsWith('/api/names/')) {
+        return endpoint.replace('/api/names/', '/names-api/')
+      }
     }
     
+    // Default: use standard routes (preferred)
     return endpoint
   }, [])
 
