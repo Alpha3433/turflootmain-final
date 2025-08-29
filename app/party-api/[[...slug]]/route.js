@@ -232,6 +232,52 @@ export async function POST(request, { params }) {
       }
     }
     
+    if (action === 'notifications') {
+      // Get party notifications for user
+      const { userId } = Object.fromEntries(url.searchParams)
+      
+      if (!userId) {
+        return NextResponse.json({ 
+          error: 'userId required' 
+        }, { status: 400, headers: corsHeaders })
+      }
+      
+      const result = await PartySystem.getPartyNotifications(userId)
+      
+      return NextResponse.json({
+        success: true,
+        notifications: result.notifications,
+        count: result.count,
+        timestamp: new Date().toISOString()
+      }, { headers: corsHeaders })
+    }
+    
+    if (action === 'mark-notification-seen') {
+      // Mark notification as seen
+      const { notificationId, userId } = body
+      
+      if (!notificationId || !userId) {
+        return NextResponse.json({ 
+          error: 'notificationId and userId required' 
+        }, { status: 400, headers: corsHeaders })
+      }
+      
+      const result = await PartySystem.markNotificationSeen(notificationId, userId)
+      
+      if (result.success) {
+        return NextResponse.json({
+          success: true,
+          message: 'Notification marked as seen',
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+      } else {
+        return NextResponse.json({ 
+          error: result.error || 'Failed to mark notification as seen',
+          timestamp: new Date().toISOString()
+        }, { status: 400, headers: corsHeaders })
+      }
+    }
+    
     if (action === 'disband') {
       // Disband party (owner only)
       const { partyId, ownerId } = body
