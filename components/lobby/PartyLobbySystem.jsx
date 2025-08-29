@@ -340,7 +340,7 @@ export default function PartyLobbySystem({
     }
   }, [userId, onGameStart, onClose])
 
-  // Poll for notifications with exponential backoff
+  // Poll for notifications with more aggressive checking for game starts
   useEffect(() => {
     let notificationInterval
     let failureCount = 0
@@ -354,7 +354,7 @@ export default function PartyLobbySystem({
         .catch(() => {
           // Increase failure count and implement exponential backoff
           failureCount++
-          if (failureCount > 5) {
+          if (failureCount > 10) {
             console.log('🔕 Too many notification failures, stopping polling')
             clearInterval(notificationInterval)
             return
@@ -362,11 +362,11 @@ export default function PartyLobbySystem({
         })
     }
     
-    // Start polling every 5 seconds (reduced from 3 seconds to reduce load)
-    notificationInterval = setInterval(pollNotifications, 5000)
+    // More aggressive polling every 2 seconds for better responsiveness
+    notificationInterval = setInterval(pollNotifications, 2000)
     
-    // Initial check after a short delay
-    setTimeout(pollNotifications, 1000)
+    // Initial check immediately
+    pollNotifications()
     
     return () => {
       if (notificationInterval) {
