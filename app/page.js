@@ -222,7 +222,7 @@ export default function Home() {
       // Navigate to cash game with party info
       router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId}&partySize=${partySize}`)
     }
-  }, [router])
+  }, [])
   
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
