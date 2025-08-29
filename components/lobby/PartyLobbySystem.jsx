@@ -17,6 +17,8 @@ export default function PartyLobbySystem({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showInviteFriends, setShowInviteFriends] = useState(false)
+  const [partyMemberBalances, setPartyMemberBalances] = useState({})
+  const [userBalance, setUserBalance] = useState(0)
 
   // Get user ID - Debug the user ID being used
   const userId = user?.id || user?.privyId
