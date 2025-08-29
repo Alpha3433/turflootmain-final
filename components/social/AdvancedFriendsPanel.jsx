@@ -307,6 +307,17 @@ const AdvancedFriendsPanel = ({ onClose }) => {
     }
   }, [user, getApiUrl])
 
+  // Refresh friends list periodically to update online status
+  useEffect(() => {
+    if (authenticated && user?.id && activeTab === 'friends') {
+      const interval = setInterval(() => {
+        loadFriends() // Refresh friends list every 10 seconds to update online status
+      }, 10000)
+      
+      return () => clearInterval(interval)
+    }
+  }, [authenticated, user?.id, activeTab, loadFriends])
+
   // Initial load and presence management
   useEffect(() => {
     if (authenticated && user?.id) {
@@ -316,9 +327,15 @@ const AdvancedFriendsPanel = ({ onClose }) => {
       loadAllUsers() // Load all users for search functionality
       setPresence(true)
       
+      // Keep user online with periodic updates
+      const presenceInterval = setInterval(() => {
+        setPresence(true) // Refresh online status every 30 seconds
+      }, 30000)
+      
       // Set offline on unmount
       return () => {
         setPresence(false)
+        clearInterval(presenceInterval)
       }
     }
   }, [authenticated, user?.id, registerUser, loadFriends, loadPendingRequests, loadAllUsers, setPresence])
