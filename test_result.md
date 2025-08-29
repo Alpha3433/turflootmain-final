@@ -108,9 +108,10 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: 
-    - "Bypass API Endpoints Testing for 502 Bad Gateway Resolution - COMPLETED"
-    - "Names Functionality External Deployment Fix - COMPLETED"
-    - "Frontend Bypass Route Integration - COMPLETED"
+    - "2-Player Max Cap Testing - COMPLETED"
+    - "Balance Validation Integration Testing - COMPLETED"
+    - "Enhanced Party Data Structure Testing - COMPLETED"
+    - "End-to-End Party Workflow with 2-Player Limits - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
