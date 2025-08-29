@@ -311,7 +311,7 @@ export default function PartyLobbySystem({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-gray-900 border border-orange-500/40 rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
+      <div className="bg-gray-900 border border-orange-500/40 rounded-xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-hidden animate-in fade-in duration-200">
         {/* Header */}
         <div className="p-4 border-b border-orange-500/30 bg-gradient-to-r from-orange-600/20 to-orange-700/20">
           <div className="flex items-center justify-between">
