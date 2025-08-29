@@ -43,6 +43,10 @@ const AdvancedFriendsPanel = ({ onClose }) => {
       if (endpoint.startsWith('/api/names/')) {
         return endpoint.replace('/api/names/', '/names-api/')
       }
+      
+      if (endpoint.startsWith('/api/users/')) {
+        return endpoint.replace('/api/users/', '/users-api/')
+      }
     }
     
     // Default: use standard routes (preferred)
