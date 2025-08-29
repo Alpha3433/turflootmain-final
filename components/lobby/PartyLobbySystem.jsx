@@ -99,13 +99,12 @@ export default function PartyLobbySystem({
   useEffect(() => {
     fetchPartyStatus()
     fetchPartyInvitations()
-  }, [fetchPartyStatus, fetchPartyInvitations])
+    fetchInvitableFriends() // Also fetch friends on initial load
+  }, [fetchPartyStatus, fetchPartyInvitations, fetchInvitableFriends])
 
-  // Fetch invitable friends when party changes
+  // Fetch invitable friends when party changes or user changes
   useEffect(() => {
-    if (currentParty) {
-      fetchInvitableFriends()
-    }
+    fetchInvitableFriends()
   }, [currentParty, fetchInvitableFriends])
 
   // Create new party
