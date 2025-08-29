@@ -215,11 +215,6 @@ export default function Home() {
     
     console.log('🎮 Starting game with party:', gameData)
     
-    if (!router) {
-      console.error('Router not available')
-      return
-    }
-    
     if (roomType === 'practice') {
       // Navigate to practice mode
       router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
@@ -227,7 +222,7 @@ export default function Home() {
       // Navigate to cash game with party info
       router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId}&partySize=${partySize}`)
     }
-  }, [router])
+  }, [])
   
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
