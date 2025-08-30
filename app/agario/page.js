@@ -54,6 +54,13 @@ const AgarIOGame = () => {
   const [mobileDetectionComplete, setMobileDetectionComplete] = useState(false) // NEW: Track when detection is done
   const [gameInitializationComplete, setGameInitializationComplete] = useState(false) // NEW: Track when game is fully initialized
   
+  // Party coordination state
+  const [partyData, setPartyData] = useState({
+    partyId: null,
+    partySize: 1,
+    partyMembers: []
+  })
+  
   // Mobile HUD state
   const [mobileUIFaded, setMobileUIFaded] = useState(false)
   const [minimapCollapsed, setMinimapCollapsed] = useState(true) // Default collapsed on mobile
