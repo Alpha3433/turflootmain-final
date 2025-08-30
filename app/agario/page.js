@@ -2093,8 +2093,8 @@ const AgarIOGame = () => {
             playersMap.set(player.id, playerData)
             
             // Check if this player is a party member
-            if (game.partyMembers && game.partyMembers.length > 0) {
-              const isPartyMember = game.partyMembers.some(member => 
+            if (gameRef.current?.game?.partyMembers && gameRef.current.game.partyMembers.length > 0) {
+              const isPartyMember = gameRef.current.game.partyMembers.some(member => 
                 member.id === player.id || member.userId === player.id
               )
               
