@@ -1354,7 +1354,30 @@ export default function Home() {
   const handleJoinGame = () => {
     console.log('🎮 handleJoinGame called, selectedStake:', selectedStake, 'authenticated:', authenticated, 'user:', !!user)
     
-    // Require authentication for ALL games (both FREE and cash games)
+    // For FREE/Practice games, allow without authentication but still show loading
+    if ((selectedStake === 'FREE' || selectedStake === 0) && (!authenticated || !user)) {
+      console.log('🤖 Free practice game - showing loading popup before login')
+      
+      // Show loading popup for practice game
+      setGameLoadingInfo({
+        roomType: 'practice',
+        entryFee: 0,
+        partyMode: false,
+        partySize: 1
+      })
+      setIsJoiningGame(true)
+      
+      // Add delay before showing login
+      setTimeout(() => {
+        console.log('❌ User not authenticated - showing Privy login after loading')
+        setIsJoiningGame(false) // Hide loading popup
+        setShowWelcome(false)
+        login() // Trigger Privy login
+      }, 1500) // Show loading for 1.5 seconds before login
+      return
+    }
+    
+    // Require authentication for cash games
     if (!authenticated || !user) {
       console.log('❌ User not authenticated - showing Privy login')
       setShowWelcome(false)
