@@ -264,7 +264,7 @@ export default function Home() {
         router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId || 'solo-' + Date.now()}`)
       }
     }, 800) // 800ms delay for better UX
-  }, [])
+  }, [router]) // Add router as dependency
   
   // Hide loading popup when component unmounts or navigation occurs
   useEffect(() => {
