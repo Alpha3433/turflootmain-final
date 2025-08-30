@@ -247,21 +247,16 @@ export default function PartyLobbySystem({
     }
   }, [userId, currentParty])
 
-  // Initialize data and refresh when modal opens
+  // Initialize data ONCE when modal opens (remove duplicate calls)
   useEffect(() => {
     console.log('🎮 Party Lobby System: Initializing data for user:', userId)
     fetchPartyStatus()
-    fetchPartyInvitations()
+    fetchPartyInvitations() 
     fetchInvitableFriends()
-    fetchUserBalance() // Fetch user's balance
-  }, [fetchPartyStatus, fetchPartyInvitations, fetchInvitableFriends, fetchUserBalance])
+    fetchUserBalance()
+  }, [userId]) // Only depend on userId, not the functions
 
-  // Refresh data when the modal becomes visible (component mounts)
-  useEffect(() => {
-    console.log('🔄 Party Lobby System: Refreshing invitations and party data')
-    fetchPartyInvitations()
-    fetchPartyStatus()
-  }, [])
+  // Remove the duplicate useEffect that was causing extra API calls
 
   // Check for party game notifications with improved error handling
   const checkPartyNotifications = useCallback(async () => {
