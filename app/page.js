@@ -2804,8 +2804,8 @@ export default function Home() {
         />
       )}
       
-      {/* Real-time Cash-out Notifications Feed - Mobile Left, Desktop Right */}
-      <div className="fixed bottom-4 right-4 md:right-4 md:left-auto left-4 z-50 space-y-2 pointer-events-none">
+      {/* Real-time Cash-out Notifications Feed - Desktop Only */}
+      <div className="hidden md:block fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
         {cashOutNotifications.map((notification) => (
           <div
             key={notification.id}
