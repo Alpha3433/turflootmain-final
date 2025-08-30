@@ -108,12 +108,7 @@ user_problem_statement: "Complete the mobile split button implementation for the
 
 test_plan:
   current_focus: []
-  stuck_tasks: 
-    - "Party Mode Detection and Multiplayer Activation"
-    - "URL Parameter Processing for Party Data"
-    - "Socket.IO Party Data Transmission"
-    - "Party Member Position Tracking via Socket.IO"
-    - "Minimap Party Visualization"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
