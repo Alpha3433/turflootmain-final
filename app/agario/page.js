@@ -2078,20 +2078,50 @@ const AgarIOGame = () => {
       socket.on('game_state', (gameState) => {
         // Update real players from server
         const playersMap = new Map()
+        const partyMembersMap = new Map()
+        
         gameState.players.forEach(player => {
           if (player.id !== socket.id) { // Don't include our own player
-            playersMap.set(player.id, {
+            const playerData = {
               id: player.id,
               x: player.x,
               y: player.y,
               mass: player.mass,
               nickname: player.nickname,
+              username: player.username || player.nickname,
               alive: player.alive,
               color: `hsl(${(player.id.charCodeAt(0) * 137) % 360}, 60%, 50%)` // Consistent color
-            })
+            }
+            
+            playersMap.set(player.id, playerData)
+            
+            // Check if this player is a party member
+            if (game.partyMembers && game.partyMembers.length > 0) {
+              const isPartyMember = game.partyMembers.some(member => 
+                member.id === player.id || member.userId === player.id
+              )
+              
+              if (isPartyMember) {
+                partyMembersMap.set(player.id, {
+                  ...playerData,
+                  position: { x: player.x, y: player.y }
+                })
+                console.log('🎉 Party member position update:', {
+                  id: player.id,
+                  username: playerData.username,
+                  position: { x: player.x, y: player.y }
+                })
+              }
+            }
           }
         })
+        
         setRealPlayers(playersMap)
+        
+        // Update party member positions in game object
+        if (gameRef.current?.game) {
+          gameRef.current.game.realPartyMembers = partyMembersMap
+        }
         
         // Update food from server
         setGameServerFood(gameState.food || [])
