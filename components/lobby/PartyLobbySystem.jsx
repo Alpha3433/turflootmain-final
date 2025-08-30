@@ -271,13 +271,21 @@ export default function PartyLobbySystem({
 
   // Remove the duplicate useEffect that was causing extra API calls
 
-  // Check for party game notifications with improved error handling
+  // Check for party notifications (with rate limiting)
   const checkPartyNotifications = useCallback(async () => {
     if (!userId) return
     
     try {
+      // Rate limiting: add delay between requests 
+      await new Promise(resolve => setTimeout(resolve, 150)) // 150ms delay for notifications
+      
       console.log('🔔 Checking for party game notifications...')
       const response = await fetch(`${getApiUrl('/api/party/notifications')}?userId=${userId}`)
+      
+      if (response.status === 429) {
+        console.warn('⚠️ Notification polling rate limited, backing off...')
+        return // Silently skip this polling cycle
+      }
       
       if (!response.ok) {
         console.log(`ℹ️ Notifications check returned ${response.status} - continuing silently`)
