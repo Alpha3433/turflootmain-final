@@ -82,6 +82,9 @@ export default function Home() {
 
   const [regionPings, setRegionPings] = useState({})
   const [isLoadingPings, setIsLoadingPings] = useState(false)
+  
+  // Router hook - MUST be declared early to avoid hoisting issues
+  const router = useRouter()
 
   // Measure real-time ping to a server
   const measurePing = async (regionId, endpoint) => {
