@@ -2245,7 +2245,16 @@ const AgarIOGame = () => {
       running: true,
       bounties: new Set(),
       isMultiplayer: isMultiplayer, // Add multiplayer flag to game state
-      isMobileGame: isMobile // FIXED: Store mobile state in game object for consistency
+      isMobileGame: isMobile, // FIXED: Store mobile state in game object for consistency
+      
+      // Party coordination support
+      partyId: paramPartyId || null,
+      partySize: paramPartySize || 1,
+      partyMembers: paramPartyMembers || [], // Party member data from URL
+      playerId: user?.id || user?.privyId || 'anonymous', // Current player's ID
+      
+      // Initialize empty party member positions (will be populated via Socket.IO)
+      realPartyMembers: new Map() // Map of partyMemberId -> {id, x, y, mass, username, alive}
     }
 
     // Initialize orbs (mass pickup, not money) - only spawn within circular boundary
