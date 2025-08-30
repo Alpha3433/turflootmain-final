@@ -273,8 +273,10 @@ export default function Home() {
     }
   }, [])
 
-  // Also hide loading popup on route changes
+  // Also hide loading popup on route changes (only if router is available)
   useEffect(() => {
+    if (!router) return
+    
     const handleRouteChange = () => {
       setIsJoiningGame(false)
     }
@@ -285,7 +287,7 @@ export default function Home() {
     return () => {
       // Cleanup if needed
     }
-  }, [router])
+  }, [router?.isReady]) // Use router.isReady to avoid initialization errors
 
   const [showMobileRegionDropdown, setShowMobileRegionDropdown] = useState(false)
   const [showMobileFriendsLobby, setShowMobileFriendsLobby] = useState(false)
