@@ -2128,7 +2128,7 @@ export default function Home() {
               {/* Mobile Navigation - Horizontal Scrollable */}
               <div className="sm:hidden w-full">
                 <div className="overflow-x-auto scrollbar-hide mobile-nav-scroll">
-                  <div className="flex items-center space-x-2 px-4 py-2 min-w-max">
+                  <div className="flex items-center space-x-2 px-4 py-2 pr-6 min-w-max">{/* Extra right padding to prevent cutoff */}
                     {authenticated && user ? (
                       <>
                         {/* Mobile Profile Button - Compact */}
