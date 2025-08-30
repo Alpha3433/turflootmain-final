@@ -2804,13 +2804,13 @@ export default function Home() {
         />
       )}
       
-      {/* Real-time Cash-out Notifications Feed */}
-      <div className="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
+      {/* Real-time Cash-out Notifications Feed - Mobile Left, Desktop Right */}
+      <div className="fixed bottom-4 right-4 md:right-4 md:left-auto left-4 z-50 space-y-2 pointer-events-none">
         {cashOutNotifications.map((notification) => (
           <div
             key={notification.id}
-            className={`bg-black/90 backdrop-blur-sm border border-green-400/30 rounded-lg p-3 max-w-sm shadow-2xl transition-all duration-500 ${
-              notification.fadeOut ? 'opacity-0 transform translate-x-full' : 'opacity-100 transform translate-x-0'
+            className={`bg-black/90 backdrop-blur-sm border border-green-400/30 rounded-lg p-2 md:p-3 max-w-xs md:max-w-sm shadow-2xl transition-all duration-500 ${
+              notification.fadeOut ? 'opacity-0 transform translate-x-full md:translate-x-full -translate-x-full' : 'opacity-100 transform translate-x-0'
             }`}
             style={{
               animation: notification.fadeOut ? '' : 'slideInFromRight 0.5s ease-out'
