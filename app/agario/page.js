@@ -4174,11 +4174,11 @@ const AgarIOGame = () => {
       ctx.arc(minimapPlayerX, minimapPlayerY, 8, 0, Math.PI * 2)
       ctx.stroke()
       
-      // 9. PARTY MEMBERS - Green dots for coordinated party members
-      if (game.partyMembers && game.partyMembers.length > 0) {
-        console.log('🎉 Drawing party members on minimap:', game.partyMembers.length)
+      // 9. PARTY MEMBERS - Green dots for coordinated party members  
+      if (game.realPartyMembers && game.realPartyMembers.size > 0) {
+        console.log('🎉 Drawing party members on minimap:', game.realPartyMembers.size)
         
-        game.partyMembers.forEach((member, index) => {
+        game.realPartyMembers.forEach((member, memberId) => {
           if (member.id !== game.playerId && member.position && member.alive !== false) {
             const minimapMemberX = centerX + (member.position.x * scale)
             const minimapMemberY = centerY + (member.position.y * scale)
@@ -4221,7 +4221,7 @@ const AgarIOGame = () => {
               ctx.arc(minimapMemberX, minimapMemberY, 6, 0, Math.PI * 2)
               ctx.stroke()
               
-              // Optional: Add member username above the dot
+              // Add member username above the dot
               if (member.username) {
                 ctx.fillStyle = '#FFFFFF'
                 ctx.font = 'bold 8px Arial'
