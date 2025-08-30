@@ -532,6 +532,7 @@ class ComprehensiveBackendTester:
         try:
             start_time = time.time()
             test_data = {
+                "partyId": getattr(self, 'party_id', 'test-party-id'),
                 "userId": "did:privy:cme20s0fl005okz0bmxcr0cp0"
             }
             response = requests.post(f"{BASE_URL}/party-api/leave", 
