@@ -1447,7 +1447,7 @@ export default function Home() {
       
       console.log('💰 Routing to cash game with auth:', { mode, fee, roomId })
       router.push(`/play?mode=${mode}&room=${roomId}&fee=${fee}`)
-    }, 800) // 800ms delay for loading popup UX
+    }, 2000) // Extended delay for loading popup UX
   }
 
   const handleOrientationReady = () => {
