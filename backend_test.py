@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 
 """
-CRITICAL PARTY COORDINATION DEBUGGING - MEMBERS NOT IN SAME GAME SERVER
+PARTY ROOM COORDINATION SERVER VERIFICATION
+Testing Socket.IO room coordination for party members as requested in review.
 
-This test focuses on debugging the specific issue where party members are still not 
-ending up in the same game server when they join together, despite previous fixes.
+CRITICAL TESTS:
+1. Socket.IO Room Assignment Verification
+2. Party Parameter Processing on Server  
+3. Multiplayer Server Room Status
 
-Test Focus Areas:
-1. Party Room Creation & Coordination
-2. Game Server Room Assignment  
-3. Socket.IO Multiplayer Coordination
-
-Expected vs Actual:
-- Expected: Party members join same multiplayer room and see each other
-- Actual: Party members join separate game instances
+Focus: Verify game server creates ONE room for party members with same gameRoomId
+Issue: User reports party members still can't see each other in games despite JavaScript fixes.
 """
 
 import requests
