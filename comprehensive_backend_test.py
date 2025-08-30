@@ -194,10 +194,10 @@ class ComprehensiveBackendTester:
         try:
             start_time = time.time()
             test_data = {
+                "partyId": getattr(self, 'party_id', 'test-party-id'),
                 "fromUserId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
                 "toUserId": "did:privy:cmetjchq5012yjr0bgxbe748i",
-                "fromUserName": "TestUser",
-                "toUserName": "InvitedUser"
+                "toUsername": "InvitedUser"
             }
             response = requests.post(f"{BASE_URL}/party-api/invite", 
                                    json=test_data, timeout=TIMEOUT)
