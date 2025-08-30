@@ -2849,6 +2849,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+      )}
 
       {/* Mobile-Only Lobby & Friends Modal */}
       {showMobileLobby && isMobile && (
