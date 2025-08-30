@@ -2068,8 +2068,13 @@ const AgarIOGame = () => {
         console.log('🏁 Match started!', data)
         setIsWaitingForPlayers(false)
         
-        // Initialize local game with multiplayer mode
-        initializeGame(true) // true = multiplayer mode
+        // Initialize local game with multiplayer mode and party parameters
+        const partyParams = {
+          partyId: paramPartyId,
+          partySize: paramPartySize,
+          partyMembers: paramPartyMembers
+        }
+        initializeGame(true, partyParams) // true = multiplayer mode
       })
       
       socket.on('game_state', (gameState) => {
