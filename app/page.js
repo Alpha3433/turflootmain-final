@@ -266,7 +266,7 @@ export default function Home() {
         console.log(`🎮 Solo Cash Mode: Navigating to ${roomType} game`)
         router.push(`/agario?mode=cash&fee=${entryFee}&roomId=${lobbyId || 'solo-' + Date.now()}`)
       }
-    }, 800) // 800ms delay for better UX
+    }, 2000) // Extended delay to see loading popup better
   }, [router]) // Add router as dependency
   
   // Hide loading popup when component unmounts or navigation occurs
