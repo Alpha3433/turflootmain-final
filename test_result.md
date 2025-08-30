@@ -2230,7 +2230,7 @@ frontend:
 
   - task: "Socket.IO Party Data Transmission"
     implemented: true
-    working: false
+    working: "NA"
     file: "/app/app/agario/page.js"
     stuck_count: 0
     priority: "high"
