@@ -1891,9 +1891,10 @@ const AgarIOGame = () => {
     }, 100)
   }
 
-  const initializeMultiplayer = async () => {
+  const initializeMultiplayer = async (paramPartyId = null, paramPartySize = 1, paramMembers = null) => {
     try {
       console.log('🔗 Initializing multiplayer connection...')
+      console.log('🎉 Party parameters received:', { paramPartyId, paramPartySize, paramMembers })
       
       // For authenticated users, try to get our API token first, then fall back to Privy token
       let authToken = localStorage.getItem('auth_token')
