@@ -1964,6 +1964,22 @@ const AgarIOGame = () => {
       const paramTier = parseInt(urlParams.get('tier')) || 1
       const paramMatchId = urlParams.get('matchId') || `match_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       
+      // Parse party parameters
+      const paramPartyId = urlParams.get('partyId')
+      const paramPartySize = parseInt(urlParams.get('partySize')) || 1
+      const paramMembersString = urlParams.get('members')
+      let paramPartyMembers = []
+      
+      if (paramMembersString) {
+        try {
+          paramPartyMembers = JSON.parse(decodeURIComponent(paramMembersString))
+          console.log('🎉 Party members parsed:', paramPartyMembers)
+        } catch (e) {
+          console.warn('⚠️ Failed to parse party members:', e.message)
+          paramPartyMembers = []
+        }
+      }
+      
       setRoomId(paramRoomId)
       setGameMode(paramMode)
       setEntryFee(paramFee)
@@ -1975,7 +1991,10 @@ const AgarIOGame = () => {
         mode: paramMode, 
         fee: paramFee, 
         tier: paramTier,
-        matchId: paramMatchId 
+        matchId: paramMatchId,
+        partyId: paramPartyId,
+        partySize: paramPartySize,
+        partyMembers: paramPartyMembers.length
       })
       
       // If this is a paid room, initialize with backend
