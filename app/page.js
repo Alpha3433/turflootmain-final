@@ -2127,8 +2127,8 @@ export default function Home() {
 
               {/* Mobile Navigation - Horizontal Scrollable */}
               <div className="sm:hidden w-full">
-                <div className="overflow-x-auto scrollbar-hide">
-                  <div className="flex items-center space-x-2 px-1 py-2 min-w-max">
+                <div className="overflow-x-auto scrollbar-hide mobile-nav-scroll">
+                  <div className="flex items-center space-x-2 px-4 py-2 min-w-max">
                     {authenticated && user ? (
                       <>
                         {/* Mobile Profile Button - Compact */}
