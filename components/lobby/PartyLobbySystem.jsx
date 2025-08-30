@@ -122,10 +122,23 @@ export default function PartyLobbySystem({
     console.log(`🎯 Fetching party status for user: ${userId} (attempt ${retryCount + 1})`)
     
     try {
+      // Rate limiting: add delay between requests
+      await new Promise(resolve => setTimeout(resolve, 100)) // 100ms delay
+      
       const url = `${getApiUrl('/api/party/current')}?userId=${userId}`
       console.log('📡 Party status API URL:', url)
       
       const response = await fetch(url)
+      
+      if (response.status === 429) {
+        console.warn('⚠️ Rate limited, waiting before retry...')
+        setTimeout(() => {
+          if (retryCount < 2) {
+            fetchPartyStatus(retryCount + 1)
+          }
+        }, 3000) // Wait 3 seconds on rate limit
+        return
+      }
       
       // Check if response is ok before trying to parse JSON
       if (!response.ok) {
