@@ -252,14 +252,21 @@ const AgarIOGame = () => {
     
     // Check if user is authenticated and determine game mode
     if (user && getAccessToken) {
-      // Check URL parameters to see if this is a cash game
+      // Check URL parameters to see if this is a cash game or party game
       const urlParams = new URLSearchParams(window.location.search)
       const paramFee = parseFloat(urlParams.get('fee')) || 0
       const paramMode = urlParams.get('mode') || 'free'
+      const paramPartyId = urlParams.get('partyId')
+      const paramPartySize = parseInt(urlParams.get('partySize')) || 1
+      const paramMembers = urlParams.get('members')
       
-      // Only use multiplayer for cash games, free games use bots for testing
-      if (paramMode === 'cash' && paramFee > 0) {
-        console.log('💰 Cash game detected - initializing multiplayer')
+      console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers })
+      
+      // Enable multiplayer for cash games OR party games
+      if ((paramMode === 'cash' && paramFee > 0) || paramMode === 'party') {
+        console.log('💰 Multiplayer game detected:', paramMode === 'party' ? 'Party Mode' : 'Cash Mode')
+        console.log('🎉 Party details:', { partyId: paramPartyId, partySize: paramPartySize })
+        
         // Try multiplayer first, but fallback to offline if authentication fails
         initializeMultiplayer().catch((error) => {
           if (process.env.NODE_ENV === 'development') {
