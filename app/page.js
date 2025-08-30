@@ -2805,7 +2805,8 @@ export default function Home() {
       )}
       
       {/* Real-time Cash-out Notifications Feed - Desktop Only */}
-      <div className="hidden md:block fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
+      {!isMobile && (
+        <div className="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none">
         {cashOutNotifications.map((notification) => (
           <div
             key={notification.id}
