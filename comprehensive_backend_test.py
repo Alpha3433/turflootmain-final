@@ -386,9 +386,10 @@ class ComprehensiveBackendTester:
         # Test 13: POST /api/friends/send-request
         try:
             start_time = time.time()
+            # Use different user IDs to avoid "friendship already exists" error
             test_data = {
-                "fromUserId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
-                "toUserId": "did:privy:cmetjchq5012yjr0bgxbe748i",
+                "fromUserId": f"did:privy:test_user_{int(time.time())}",
+                "toUserId": f"did:privy:test_friend_{int(time.time())}",
                 "fromUserName": "TestUser",
                 "toUserName": "FriendUser"
             }
