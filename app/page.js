@@ -1405,6 +1405,7 @@ export default function Home() {
     }
     
     // Show loading popup
+    console.log('🎮 Setting loading popup state:', { roomType, gameFee })
     setGameLoadingInfo({
       roomType: roomType,
       entryFee: gameFee,
@@ -1412,6 +1413,7 @@ export default function Home() {
       partySize: 1
     })
     setIsJoiningGame(true)
+    console.log('🎮 isJoiningGame set to true - popup should be visible')
     
     // Add delay for better UX
     setTimeout(() => {
