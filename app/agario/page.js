@@ -268,7 +268,7 @@ const AgarIOGame = () => {
         console.log('🎉 Party details:', { partyId: paramPartyId, partySize: paramPartySize })
         
         // Try multiplayer first, but fallback to offline if authentication fails
-        initializeMultiplayer().catch((error) => {
+        initializeMultiplayer(paramPartyId, paramPartySize, paramMembers).catch((error) => {
           if (process.env.NODE_ENV === 'development') {
             console.error('🔄 Multiplayer failed, falling back to offline mode:', error)
           }
