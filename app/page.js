@@ -442,7 +442,6 @@ export default function Home() {
   }, [isClient])
 
   const { login, ready, authenticated, user, logout } = privyAuth
-  const router = useRouter()
 
   // Close dropdown when clicking outside - moved here after state declarations
   useEffect(() => {
