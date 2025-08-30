@@ -1984,6 +1984,13 @@ const AgarIOGame = () => {
         }
       }
       
+      // Store party data in state for Socket.IO handlers to access
+      setPartyData({
+        partyId: paramPartyId,
+        partySize: paramPartySize,
+        partyMembers: paramPartyMembers
+      })
+      
       setRoomId(paramRoomId)
       setGameMode(paramMode)
       setEntryFee(paramFee)
