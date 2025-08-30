@@ -164,8 +164,8 @@ class ComprehensiveBackendTester:
         try:
             start_time = time.time()
             test_data = {
-                "userId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
-                "userName": "TestUser",
+                "ownerId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
+                "ownerUsername": "TestUser",
                 "partyName": "Test Party"
             }
             response = requests.post(f"{BASE_URL}/party-api/create", 
