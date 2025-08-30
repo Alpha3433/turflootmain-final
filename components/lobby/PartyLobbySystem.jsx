@@ -222,13 +222,22 @@ export default function PartyLobbySystem({
     }
   }, [userId])
 
-  // Fetch invitable friends for party
+  // Fetch invitable friends for party (with rate limiting)
   const fetchInvitableFriends = useCallback(async () => {
     if (!userId) return
     
     try {
+      // Rate limiting: add delay between requests
+      await new Promise(resolve => setTimeout(resolve, 200)) // 200ms delay for friends
+      
       // Fetch user's friends from the friends API
       const response = await fetch(`${getApiUrl('/api/friends/list')}?userId=${userId}`)
+      
+      if (response.status === 429) {
+        console.warn('⚠️ Friends API rate limited, skipping update...')
+        return // Skip this update cycle
+      }
+      
       const data = await response.json()
       
       if (response.ok) {
