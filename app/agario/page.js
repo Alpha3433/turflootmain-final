@@ -4099,6 +4099,68 @@ const AgarIOGame = () => {
       ctx.arc(minimapPlayerX, minimapPlayerY, 8, 0, Math.PI * 2)
       ctx.stroke()
       
+      // 9. PARTY MEMBERS - Green dots for coordinated party members
+      if (game.partyMembers && game.partyMembers.length > 0) {
+        console.log('🎉 Drawing party members on minimap:', game.partyMembers.length)
+        
+        game.partyMembers.forEach((member, index) => {
+          if (member.id !== game.playerId && member.position && member.alive !== false) {
+            const minimapMemberX = centerX + (member.position.x * scale)
+            const minimapMemberY = centerY + (member.position.y * scale)
+            
+            // Validate member coordinates
+            if (!isFinite(minimapMemberX) || !isFinite(minimapMemberY)) {
+              console.warn('Invalid party member coordinates:', member)
+              return
+            }
+            
+            // Check if party member is within minimap bounds
+            const distFromCenter = Math.sqrt(
+              Math.pow(minimapMemberX - centerX, 2) + Math.pow(minimapMemberY - centerY, 2)
+            )
+            
+            if (distFromCenter <= minimapRadius) {
+              // Party member glow effect
+              const memberGradient = ctx.createRadialGradient(
+                minimapMemberX, minimapMemberY, 0,
+                minimapMemberX, minimapMemberY, 10
+              )
+              memberGradient.addColorStop(0, 'rgba(0, 255, 100, 0.7)') // Green glow
+              memberGradient.addColorStop(1, 'rgba(0, 255, 100, 0)') // Fade to transparent
+              
+              ctx.fillStyle = memberGradient
+              ctx.beginPath()
+              ctx.arc(minimapMemberX, minimapMemberY, 10, 0, Math.PI * 2)
+              ctx.fill()
+              
+              // Party member main dot (green)
+              ctx.fillStyle = '#00FF64' // Bright green
+              ctx.beginPath()
+              ctx.arc(minimapMemberX, minimapMemberY, 4, 0, Math.PI * 2)
+              ctx.fill()
+              
+              // Party member ring indicator
+              ctx.strokeStyle = '#FFFFFF'
+              ctx.lineWidth = 1.5
+              ctx.beginPath()
+              ctx.arc(minimapMemberX, minimapMemberY, 6, 0, Math.PI * 2)
+              ctx.stroke()
+              
+              // Optional: Add member username above the dot
+              if (member.username) {
+                ctx.fillStyle = '#FFFFFF'
+                ctx.font = 'bold 8px Arial'
+                ctx.textAlign = 'center'
+                ctx.strokeStyle = '#000000'
+                ctx.lineWidth = 2
+                ctx.strokeText(member.username, minimapMemberX, minimapMemberY - 10)
+                ctx.fillText(member.username, minimapMemberX, minimapMemberY - 10)
+              }
+            }
+          }
+        })
+      }
+      
       ctx.restore()
       
 
