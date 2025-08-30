@@ -2119,6 +2119,66 @@ frontend:
         agent: "main"
         comment: "COMPLETED UI/UX - Added mobile action button CSS with proper positioning (bottom-right), responsive design, shake animations, and visual states (enabled/disabled/cooldown). Split button positioned alongside cash-out button in mobile controls."
 
+  - task: "Party Mode Detection and Multiplayer Activation"
+    implemented: true
+    working: "NA"
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Testing party mode detection from URL parameters (mode=party) and verification that multiplayer mode activates correctly for party games, not just cash games."
+
+  - task: "URL Parameter Processing for Party Data"
+    implemented: true
+    working: "NA"
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Testing extraction and processing of party URL parameters: partyId, partySize, and members from game URL for party coordination."
+
+  - task: "Socket.IO Party Data Transmission"
+    implemented: true
+    working: "NA"
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Testing that join_room Socket.IO event includes party information (partyId, partySize, partyMembers) and server acknowledges party room joining."
+
+  - task: "Party Member Position Tracking via Socket.IO"
+    implemented: true
+    working: "NA"
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Testing real-time party member position updates via Socket.IO game_state events and verification that realPartyMembers map is populated correctly."
+
+  - task: "Minimap Party Visualization"
+    implemented: true
+    working: "NA"
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "NEW - Testing that green dots appear on minimap for party members with usernames displayed, using realPartyMembers data from Socket.IO synchronization."
+
 metadata:
   last_update: "mobile_orientation_gate_feature_completed"
   mobile_feature_status: "implemented_pending_frontend_testing"
