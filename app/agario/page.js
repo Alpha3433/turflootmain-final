@@ -2084,9 +2084,9 @@ const AgarIOGame = () => {
         
         // Initialize local game with multiplayer mode and party parameters
         const partyParams = {
-          partyId: paramPartyId,
-          partySize: paramPartySize,
-          partyMembers: paramPartyMembers
+          partyId: partyData.partyId,
+          partySize: partyData.partySize,
+          partyMembers: partyData.partyMembers
         }
         initializeGame(true, partyParams) // true = multiplayer mode
       })
