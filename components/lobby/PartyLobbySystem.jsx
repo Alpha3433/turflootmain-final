@@ -362,8 +362,8 @@ export default function PartyLobbySystem({
         })
     }
     
-    // More aggressive polling every 2 seconds for better responsiveness
-    notificationInterval = setInterval(pollNotifications, 2000)
+    // More conservative polling every 5 seconds to avoid rate limiting
+    notificationInterval = setInterval(pollNotifications, 5000)
     
     // Initial check immediately
     pollNotifications()
