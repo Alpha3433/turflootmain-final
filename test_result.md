@@ -1357,11 +1357,14 @@ backend:
     file: "/app/lib/gameServer.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "❌ GLOBAL PRACTICE SERVER NOT VISIBLE - 'global-practice-bots' server not found in server browser despite being defined in gameServer.js. Server browser returns 36 total servers (US-East-1, US-West-1, EU-Central-1 regions) but no practice mode servers. GameServer initialization may not be adding practice server to persistent servers list correctly. Code shows practice server should be created with id 'global-practice-bots', region 'Global', mode 'practice', maxPlayers 20. Issue needs main agent investigation."
+      - working: false
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE BACKEND API TESTING COMPLETED - ACHIEVED 90.5% SUCCESS RATE (19/21 tests passed). DETAILED RESULTS: 1) ✅ Core Game APIs (4/4 PASSED): GET /api/users/leaderboard (10 entries), POST /api/users/balance (25 USD), GET /api/users/profile (user data), POST /api/users/profile/update-name (name updates working), 2) ✅ Party System APIs (6/7 PASSED): All major party functionality working - create, invite, accept, start-game, status, notifications. Only minor failure: mark-notification-seen with test data (expected), 3) ✅ Friends System APIs (4/4 PASSED): friends list, send-request, accept-request, search all working correctly, 4) ✅ Lobby System APIs (3/3 PASSED): lobby join, status, leave all working perfectly, 5) ✅ Authentication & User Management (2/2 PASSED): user registration and health check working, 6) ❌ Global Practice Server (0/1 FAILED): Still not found in server browser with 36 total servers. CRITICAL FINDING: Backend APIs performing excellently at 90.5% success rate, exceeding 85.7% baseline. Only legitimate issue is missing global-practice-bots server in gameServer.js initialization."
 
   - task: "Social Features Database Operations"
     implemented: true
