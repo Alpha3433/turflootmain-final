@@ -401,10 +401,12 @@ export default function PartyLobbySystem({
     }
   }, [fetchPartyStatus, error])
 
-  // Fetch invitable friends when party changes or user changes
+  // Only fetch invitable friends when party membership changes (not on every render)
   useEffect(() => {
-    fetchInvitableFriends()
-  }, [currentParty, fetchInvitableFriends])
+    if (userId) {
+      fetchInvitableFriends()
+    }
+  }, [currentParty?.members?.length, userId]) // Only when party member count changes
 
   // Create new party
   const createParty = async () => {
