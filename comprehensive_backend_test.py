@@ -479,7 +479,8 @@ class ComprehensiveBackendTester:
         try:
             start_time = time.time()
             test_data = {
-                "userId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
+                "partyId": getattr(self, 'party_id', 'test-party-id'),
+                "ownerId": "did:privy:cme20s0fl005okz0bmxcr0cp0",
                 "roomType": "practice"
             }
             response = requests.post(f"{BASE_URL}/lobby-api/join-room", 
