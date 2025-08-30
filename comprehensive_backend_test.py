@@ -507,7 +507,7 @@ class ComprehensiveBackendTester:
         # Test 17: GET /api/lobby/status
         try:
             start_time = time.time()
-            response = requests.get(f"{BASE_URL}/lobby-api/status?userId=did:privy:cme20s0fl005okz0bmxcr0cp0", 
+            response = requests.get(f"{BASE_URL}/api/lobby/status?userId=did:privy:cme20s0fl005okz0bmxcr0cp0", 
                                   timeout=TIMEOUT)
             response_time = time.time() - start_time
             
