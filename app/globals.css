@@ -82,6 +82,12 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Ensure smooth scrolling for mobile nav */
+  .mobile-nav-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
   
   body::-webkit-scrollbar {
     display: none;
