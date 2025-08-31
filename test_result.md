@@ -112,6 +112,49 @@ test_plan:
     - "Frontend Spectator UI and Controls"
     - "User Flow Integration"
   stuck_tasks: []
+backend:
+  - task: "Backend Socket.IO Spectator Support"
+    implemented: true
+    working: "NA"  # Needs testing
+    file: "/app/lib/gameServer.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Added comprehensive spectator functionality to TurfLootGameRoom class including addSpectator/removeSpectator methods, spectator-specific Socket.IO handlers (join_as_spectator, spectator_camera_control, spectator_join_game), enhanced game state broadcasting for spectators, and spectator management in TurfLootGameServer class"
+
+frontend:
+  - task: "Frontend Spectator UI and Controls"
+    implemented: true
+    working: "NA"  # Needs testing
+    file: "/app/components/SpectatorMode.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Created comprehensive SpectatorMode component with canvas-based game rendering, multiple camera controls (bird's-eye, player-follow, free-camera), real-time UI overlay with leaderboard and player info, Join Match functionality, mobile-optimized responsive design, and Socket.IO integration for real-time spectator features"
+
+  - task: "User Flow Integration"
+    implemented: true
+    working: "NA"  # Needs testing
+    file: "/app/app/page.js, /app/app/spectate/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Updated landing page to show Play vs Spectate choice modal when clicking JOIN GAME, created dedicated spectator page at /spectate route, modified handleJoinGame to show game mode choice, added handleSpectate function for spectator navigation, integrated with existing loading popup system"
+
+metadata:
+  created_by: "main_agent"
+  version: "2.0"
+  test_sequence: 1
+  run_ui: false
   test_all: false
   test_priority: "high_first"
 
