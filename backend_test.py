@@ -757,12 +757,6 @@ if __name__ == "__main__":
     import sys
     exit_code = asyncio.run(main())
     sys.exit(exit_code)
-            self.log_test("2.3 Member Tracking Capability", False,
-                         "Friends API not accessible")
-            
-        # Test 2.4: Position broadcasting infrastructure
-        # Test real-time sync capability infrastructure
-        result = self.make_request("GET", "/api/stats/live-players")
         if result["success"]:
             stats = result["data"]
             has_realtime_tracking = "timestamp" in stats and "count" in stats
