@@ -970,12 +970,3 @@ if __name__ == "__main__":
             "test_results": self.test_results
         }
 
-if __name__ == "__main__":
-    tester = PartyRoomCoordinationTester()
-    results = tester.run_all_tests()
-    
-    # Exit with appropriate code
-    if results["success_rate"] >= 80:
-        sys.exit(0)  # Success
-    else:
-        sys.exit(1)  # Failure
