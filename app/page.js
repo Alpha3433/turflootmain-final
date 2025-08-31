@@ -1355,6 +1355,14 @@ export default function Home() {
   const handleJoinGame = () => {
     console.log('🎮 handleJoinGame called, selectedStake:', selectedStake, 'authenticated:', authenticated, 'user:', !!user)
     
+    // NEW: Show game mode choice modal (Play vs Spectate)
+    setShowGameModeChoice(true)
+  }
+
+  // NEW: Handle player choice to play as active player
+  const handlePlayAsPlayer = () => {
+    setShowGameModeChoice(false)
+    
     // For FREE/Practice games, allow without authentication but still show loading
     if ((selectedStake === 'FREE' || selectedStake === 0) && (!authenticated || !user)) {
       console.log('🤖 Free practice game - showing loading popup before login')
@@ -1411,6 +1419,30 @@ export default function Home() {
     
     // Proceed with normal game entry logic
     proceedToGame()
+  }
+
+  // NEW: Handle player choice to spectate
+  const handleSpectate = () => {
+    setShowGameModeChoice(false)
+    console.log('👁️ User chose to spectate')
+    
+    // For spectating, we don't need authentication for free games
+    const gameMode = selectedStake === 'FREE' || selectedStake === 0 ? 'free' : 'cash'
+    const gameFee = selectedStake === 'FREE' || selectedStake === 0 ? 0 : parseInt(selectedStake.toString().replace('$', ''))
+    
+    // Determine room ID based on game type
+    let roomId
+    if (gameMode === 'free') {
+      roomId = 'global-practice-bots' // Spectate the global practice room
+    } else {
+      // For cash games, spectate a random server of the same stake
+      roomId = `us-east-1-cash-${gameFee}-1` // Could be made more sophisticated
+    }
+    
+    console.log('👁️ Navigating to spectator mode:', { roomId, gameMode, gameFee })
+    
+    // Navigate to spectator mode
+    router.push(`/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}`)
   }
 
   const proceedToGame = () => {
