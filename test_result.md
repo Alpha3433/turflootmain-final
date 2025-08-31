@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Complete the mobile split button implementation for the Split mechanic in TurfLoot Agario game. The previous work had implemented most split functionality including configuration, state management, desktop controls, and core split logic, but the mobile split button was incomplete."
+user_problem_statement: "Implement comprehensive Spectator Mode for TurfLoot Agario game. This feature allows users to observe live matches without participating, offering various camera controls (bird's-eye, player-locked, free-view), a UI overlay (leaderboard, player info, 'Join Match' button), and optimized for performance and cross-platform UX."
 
 # Test plan for this run
 
