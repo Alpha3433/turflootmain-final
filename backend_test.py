@@ -1,47 +1,38 @@
 #!/usr/bin/env python3
-
 """
-PARTY ROOM COORDINATION SERVER VERIFICATION
-Testing Socket.IO room coordination for party members as requested in review.
-
-CRITICAL TESTS:
-1. Socket.IO Room Assignment Verification
-2. Party Parameter Processing on Server  
-3. Multiplayer Server Room Status
-
-Focus: Verify game server creates ONE room for party members with same gameRoomId
-Issue: User reports party members still can't see each other in games despite JavaScript fixes.
+TurfLoot Spectator Mode Backend Testing Suite
+Tests the newly implemented Spectator Mode backend functionality including:
+- Spectator Socket.IO Handlers
+- Spectator Room Management  
+- Enhanced Game State Broadcasting
+- Spectator Camera Controls
+- Spectator to Player Transition
+- Room Info Integration
 """
 
-import requests
+import asyncio
 import json
 import time
-import sys
-from datetime import datetime
+import requests
+import socketio
+import jwt
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Configuration
-BASE_URL = "https://turfloot-party.preview.emergentagent.com"
-LOCAL_URL = "http://localhost:3000"
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+API_BASE = f"{BASE_URL}/api"
+SOCKET_URL = BASE_URL
 
-# Test data for party coordination
-PARTY_TEST_DATA = {
-    "gameRoomId": "game_test123_party456",
-    "mode": "party", 
-    "partyId": "party_456",
-    "partySize": 2,
-    "partyMembers": [
-        {"id": "user1", "username": "TestUser1"},
-        {"id": "user2", "username": "TestUser2"}
-    ]
-}
+# Test configuration
+TEST_TIMEOUT = 30
+MAX_RETRIES = 3
 
-# Real user IDs from server logs for testing
-REAL_USER_IDS = {
-    "ANTH": "did:privy:cmeksdeoe00gzl10bsienvnbk",
-    "ROBIEE": "did:privy:cme20s0fl005okz0bmxcr0cp0"
-}
-
-class PartyRoomCoordinationTester:
+class SpectatorModeBackendTester:
     def __init__(self):
         self.base_url = LOCAL_URL  # Use localhost for testing
         self.test_results = []
