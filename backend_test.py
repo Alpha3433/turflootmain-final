@@ -67,37 +67,134 @@ class SpectatorModeBackendTester:
         self.socket_clients = {}
         self.test_room_id = f"spectator_test_room_{int(time.time())}"
         
-    def log_test(self, test_name, passed, details=""):
+    def log_test(self, test_name, passed, details="", error_msg=""):
         """Log test result"""
         self.total_tests += 1
         if passed:
             self.passed_tests += 1
             status = "✅ PASSED"
         else:
+            self.failed_tests += 1
             status = "❌ FAILED"
             
-        result = f"{status}: {test_name}"
+        result = {
+            'test_name': test_name,
+            'status': status,
+            'passed': passed,
+            'details': details,
+            'error': error_msg,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        self.test_results.append(result)
+        print(f"{status}: {test_name}")
         if details:
-            result += f" - {details}"
-            
-        print(result)
-        self.test_results.append({
-            "test": test_name,
-            "passed": passed,
-            "details": details,
-            "timestamp": datetime.now().isoformat()
-        })
-        
-    def make_request(self, method, endpoint, data=None, headers=None):
-        """Make HTTP request with error handling"""
-        url = f"{self.base_url}{endpoint}"
-        
+            print(f"   Details: {details}")
+        if error_msg:
+            print(f"   Error: {error_msg}")
+        print()
+
+    def generate_test_token(self, user_data):
+        """Generate a test JWT token for authentication"""
         try:
-            if method.upper() == "GET":
-                response = requests.get(url, headers=headers, timeout=10)
-            elif method.upper() == "POST":
-                response = requests.post(url, json=data, headers=headers, timeout=10)
-            else:
+            payload = {
+                'userId': user_data['userId'],
+                'privyId': user_data['userId'],
+                'email': user_data['email'],
+                'username': user_data['nickname'],
+                'exp': datetime.utcnow() + timedelta(hours=1),
+                'iat': datetime.utcnow()
+            }
+            
+            jwt_secret = os.getenv('JWT_SECRET', 'turfloot-secret-key-change-in-production')
+            token = jwt.encode(payload, jwt_secret, algorithm='HS256')
+            return token
+        except Exception as e:
+            print(f"❌ Error generating test token: {e}")
+            return None
+
+    async def create_socket_client(self, user_data, client_name):
+        """Create and connect a Socket.IO client"""
+        try:
+            sio = socketio.AsyncClient()
+            token = self.generate_test_token(user_data)
+            
+            if not token:
+                raise Exception("Failed to generate authentication token")
+            
+            # Store client info
+            self.socket_clients[client_name] = {
+                'client': sio,
+                'user': user_data,
+                'token': token,
+                'connected': False,
+                'events': []
+            }
+            
+            # Event handlers to capture responses
+            @sio.event
+            async def connect():
+                self.socket_clients[client_name]['connected'] = True
+                print(f"🔌 {client_name} connected")
+            
+            @sio.event
+            async def disconnect():
+                self.socket_clients[client_name]['connected'] = False
+                print(f"🔌 {client_name} disconnected")
+            
+            # Capture all spectator-related events
+            spectator_events = [
+                'spectator_joined', 'spectator_join_failed', 'spectator_join_error',
+                'spectator_game_state', 'spectator_count_update', 'spectator_limit_reached',
+                'spectator_became_player', 'spectator_join_game_error', 'room_info',
+                'auth_error', 'joined', 'match_start', 'game_state'
+            ]
+            
+            for event_name in spectator_events:
+                @sio.event
+                async def event_handler(data, event=event_name):
+                    self.socket_clients[client_name]['events'].append({
+                        'event': event,
+                        'data': data,
+                        'timestamp': time.time()
+                    })
+                    print(f"📨 {client_name} received {event}: {data}")
+                
+                sio.on(event_name, event_handler)
+            
+            # Connect to server
+            await sio.connect(SOCKET_URL)
+            
+            # Wait for connection
+            await asyncio.sleep(1)
+            
+            return sio
+            
+        except Exception as e:
+            print(f"❌ Error creating socket client {client_name}: {e}")
+            return None
+
+    async def cleanup_socket_clients(self):
+        """Disconnect all socket clients"""
+        for client_name, client_info in self.socket_clients.items():
+            try:
+                if client_info['connected']:
+                    await client_info['client'].disconnect()
+                    print(f"🔌 {client_name} disconnected")
+            except Exception as e:
+                print(f"⚠️ Error disconnecting {client_name}: {e}")
+        
+        self.socket_clients.clear()
+
+    def get_client_events(self, client_name, event_type=None):
+        """Get events received by a client"""
+        if client_name not in self.socket_clients:
+            return []
+        
+        events = self.socket_clients[client_name]['events']
+        if event_type:
+            return [e for e in events if e['event'] == event_type]
+        return events
                 raise ValueError(f"Unsupported method: {method}")
                 
             return {
