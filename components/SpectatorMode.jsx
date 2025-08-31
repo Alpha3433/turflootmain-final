@@ -147,16 +147,32 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0 }) => {
     }
   }, [user, getAccessToken, roomId, gameMode, entryFee, router])
 
-  // Canvas rendering
-  useEffect(() => {
-    if (!gameState || !canvasRef.current) return
+  // Canvas rendering with requestAnimationFrame optimization
+  const animationFrameRef = useRef()
+  const lastRenderTimeRef = useRef(0)
+  const renderIntervalMs = 1000 / 30 // 30 FPS to reduce CPU usage
+
+  const renderCanvas = useCallback((timestamp) => {
+    // Throttle rendering to 30 FPS
+    if (timestamp - lastRenderTimeRef.current < renderIntervalMs) {
+      animationFrameRef.current = requestAnimationFrame(renderCanvas)
+      return
+    }
+    lastRenderTimeRef.current = timestamp
 
     const canvas = canvasRef.current
+    if (!canvas || !gameState) {
+      animationFrameRef.current = requestAnimationFrame(renderCanvas)
+      return
+    }
+
     const ctx = canvas.getContext('2d')
     
-    // Set canvas size
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
+    // Set canvas size only when needed
+    if (canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
+      canvas.width = canvas.offsetWidth
+      canvas.height = canvas.offsetHeight
+    }
 
     // Calculate camera position based on mode
     let viewX = 0, viewY = 0, zoom = cameraZoom
@@ -165,7 +181,7 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0 }) => {
       // Show entire game world
       viewX = 0
       viewY = 0
-      zoom = Math.min(canvas.width / gameState.worldBounds.width, canvas.height / gameState.worldBounds.height) * 0.8
+      zoom = Math.min(canvas.width / (gameState.worldBounds?.width || 2000), canvas.height / (gameState.worldBounds?.height || 2000)) * 0.8
     } else if (cameraMode === 'player_follow' && followingPlayer) {
       // Follow specific player
       const player = gameState.players.find(p => p.id === followingPlayer)
@@ -193,58 +209,81 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0 }) => {
     ctx.translate(-viewX, -viewY)
 
     // Draw world bounds
-    ctx.strokeStyle = '#333'
-    ctx.lineWidth = 5 / zoom
-    ctx.strokeRect(
-      -gameState.worldBounds.width / 2,
-      -gameState.worldBounds.height / 2,
-      gameState.worldBounds.width,
-      gameState.worldBounds.height
-    )
+    if (gameState.worldBounds) {
+      ctx.strokeStyle = '#333'
+      ctx.lineWidth = 5 / zoom
+      ctx.strokeRect(
+        -gameState.worldBounds.width / 2,
+        -gameState.worldBounds.height / 2,
+        gameState.worldBounds.width,
+        gameState.worldBounds.height
+      )
+    }
 
     // Draw food
-    if (gameState.food) {
+    if (gameState.food && Array.isArray(gameState.food)) {
       gameState.food.forEach(food => {
-        ctx.fillStyle = '#FFD700' // Gold color for food
-        ctx.beginPath()
-        ctx.arc(food.x, food.y, 3, 0, 2 * Math.PI)
-        ctx.fill()
+        if (food && typeof food.x === 'number' && typeof food.y === 'number') {
+          ctx.fillStyle = '#FFD700' // Gold color for food
+          ctx.beginPath()
+          ctx.arc(food.x, food.y, 3, 0, 2 * Math.PI)
+          ctx.fill()
+        }
       })
     }
 
     // Draw players
-    gameState.players.forEach(player => {
-      if (!player.alive) return
+    if (gameState.players && Array.isArray(gameState.players)) {
+      gameState.players.forEach(player => {
+        if (!player || !player.alive || typeof player.x !== 'number' || typeof player.y !== 'number') return
 
-      const radius = Math.sqrt(player.mass) * 2
-      
-      // Player body
-      ctx.fillStyle = player.id === followingPlayer ? '#00FF00' : (player.alive ? '#3B82F6' : '#999')
-      ctx.beginPath()
-      ctx.arc(player.x, player.y, radius, 0, 2 * Math.PI)
-      ctx.fill()
-      
-      // Player outline
-      ctx.strokeStyle = '#FFF'
-      ctx.lineWidth = 2 / zoom
-      ctx.stroke()
+        const radius = Math.sqrt(player.mass || 10) * 2
+        
+        // Player body
+        ctx.fillStyle = player.id === followingPlayer ? '#00FF00' : (player.alive ? '#3B82F6' : '#999')
+        ctx.beginPath()
+        ctx.arc(player.x, player.y, radius, 0, 2 * Math.PI)
+        ctx.fill()
+        
+        // Player outline
+        ctx.strokeStyle = '#FFF'
+        ctx.lineWidth = 2 / zoom
+        ctx.stroke()
 
-      // Player name
-      ctx.fillStyle = '#FFF'
-      ctx.font = `${Math.max(12 / zoom, 8)}px Arial`
-      ctx.textAlign = 'center'
-      ctx.fillText(player.nickname, player.x, player.y - radius - 10 / zoom)
-      
-      // Player stats
-      ctx.fillStyle = '#FFD700'
-      ctx.font = `${Math.max(10 / zoom, 6)}px Arial`
-      ctx.fillText(`${Math.floor(player.mass)} mass`, player.x, player.y + radius + 15 / zoom)
-    })
+        // Player name
+        if (player.nickname) {
+          ctx.fillStyle = '#FFF'
+          ctx.font = `${Math.max(12 / zoom, 8)}px Arial`
+          ctx.textAlign = 'center'
+          ctx.fillText(player.nickname, player.x, player.y - radius - 10 / zoom)
+        }
+        
+        // Player stats
+        ctx.fillStyle = '#FFD700'
+        ctx.font = `${Math.max(10 / zoom, 6)}px Arial`
+        ctx.fillText(`${Math.floor(player.mass || 0)} mass`, player.x, player.y + radius + 15 / zoom)
+      })
+    }
 
     // Restore context
     ctx.restore()
 
+    // Continue animation loop
+    animationFrameRef.current = requestAnimationFrame(renderCanvas)
   }, [gameState, cameraMode, followingPlayer, cameraPosition, cameraZoom])
+
+  // Start/stop canvas rendering
+  useEffect(() => {
+    if (gameState && canvasRef.current) {
+      animationFrameRef.current = requestAnimationFrame(renderCanvas)
+    }
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [renderCanvas, gameState])
 
   // Camera control handlers
   const handleCameraModeChange = (mode) => {
