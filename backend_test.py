@@ -34,10 +34,38 @@ MAX_RETRIES = 3
 
 class SpectatorModeBackendTester:
     def __init__(self):
-        self.base_url = LOCAL_URL  # Use localhost for testing
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
+        self.failed_tests = 0
+        
+        # Test users for authentication
+        self.test_users = [
+            {
+                'userId': 'did:privy:spectator_test_user_1',
+                'nickname': 'SpectatorTester1',
+                'email': 'spectator1@test.com'
+            },
+            {
+                'userId': 'did:privy:spectator_test_user_2', 
+                'nickname': 'SpectatorTester2',
+                'email': 'spectator2@test.com'
+            },
+            {
+                'userId': 'did:privy:spectator_test_player_1',
+                'nickname': 'PlayerTester1', 
+                'email': 'player1@test.com'
+            },
+            {
+                'userId': 'did:privy:spectator_test_player_2',
+                'nickname': 'PlayerTester2',
+                'email': 'player2@test.com'
+            }
+        ]
+        
+        # Socket clients for testing
+        self.socket_clients = {}
+        self.test_room_id = f"spectator_test_room_{int(time.time())}"
         
     def log_test(self, test_name, passed, details=""):
         """Log test result"""
