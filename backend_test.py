@@ -680,24 +680,83 @@ class SpectatorModeBackendTester:
             
         except Exception as e:
             self.log_test("Authentication and Error Handling", False, error_msg=str(e))
-            api_info = result["data"]
-            supports_multiplayer = "multiplayer" in api_info.get("features", [])
+
+    async def run_all_tests(self):
+        """Run all spectator mode backend tests"""
+        print("🚀 Starting TurfLoot Spectator Mode Backend Testing Suite")
+        print("=" * 60)
+        
+        start_time = time.time()
+        
+        try:
+            # Run all test suites
+            await self.test_spectator_socket_handlers()
+            await self.test_spectator_room_management()
+            await self.test_enhanced_game_state_broadcasting()
+            await self.test_spectator_camera_controls()
+            await self.test_spectator_to_player_transition()
+            await self.test_room_info_integration()
+            await self.test_authentication_and_error_handling()
             
-            self.log_test("2.2 Room ID Preservation", supports_multiplayer,
-                         f"Server {'can' if supports_multiplayer else 'cannot'} handle party room ID: {party_room_id}")
-        else:
-            self.log_test("2.2 Room ID Preservation", False, "API check failed")
-            
-        # Test 2.3: Member tracking capability
-        # Test server's ability to track party member associations
-        result = self.make_request("GET", "/api/friends/list?userId=testUser1")
-        if result["success"]:
-            friends_data = result["data"]
-            has_friends_structure = "friends" in friends_data and "timestamp" in friends_data
-            
-            self.log_test("2.3 Member Tracking Capability", has_friends_structure,
-                         f"Server {'can' if has_friends_structure else 'cannot'} track user associations")
-        else:
+        except Exception as e:
+            print(f"❌ Critical error during testing: {e}")
+        
+        finally:
+            # Cleanup
+            await self.cleanup_socket_clients()
+        
+        # Calculate results
+        end_time = time.time()
+        duration = end_time - start_time
+        success_rate = (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
+        
+        # Print summary
+        print("=" * 60)
+        print("🎯 SPECTATOR MODE BACKEND TESTING SUMMARY")
+        print("=" * 60)
+        print(f"Total Tests: {self.total_tests}")
+        print(f"Passed: {self.passed_tests}")
+        print(f"Failed: {self.failed_tests}")
+        print(f"Success Rate: {success_rate:.1f}%")
+        print(f"Duration: {duration:.2f} seconds")
+        print()
+        
+        # Print detailed results
+        print("📋 DETAILED TEST RESULTS:")
+        print("-" * 40)
+        for result in self.test_results:
+            print(f"{result['status']}: {result['test_name']}")
+            if result['details']:
+                print(f"   Details: {result['details']}")
+            if result['error']:
+                print(f"   Error: {result['error']}")
+        
+        return {
+            'total_tests': self.total_tests,
+            'passed_tests': self.passed_tests,
+            'failed_tests': self.failed_tests,
+            'success_rate': success_rate,
+            'duration': duration,
+            'results': self.test_results
+        }
+
+async def main():
+    """Main test execution"""
+    tester = SpectatorModeBackendTester()
+    results = await tester.run_all_tests()
+    
+    # Return exit code based on results
+    if results['failed_tests'] == 0:
+        print("✅ All tests passed!")
+        return 0
+    else:
+        print(f"❌ {results['failed_tests']} tests failed")
+        return 1
+
+if __name__ == "__main__":
+    import sys
+    exit_code = asyncio.run(main())
+    sys.exit(exit_code)
             self.log_test("2.3 Member Tracking Capability", False,
                          "Friends API not accessible")
             
