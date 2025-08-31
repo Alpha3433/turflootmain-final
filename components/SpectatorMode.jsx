@@ -67,21 +67,32 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0 }) => {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Initialize spectator connection
+  // Initialize spectator connection (optimized to prevent reconnection loops)
   useEffect(() => {
-    if (!user || !getAccessToken || !roomId) return
+    if (!user || !getAccessToken || !roomId || socketRef.current) return
+
+    let isMounted = true
+    let reconnectTimeout = null
 
     const initializeSpectator = async () => {
       try {
         const token = await getAccessToken()
+        
+        if (!isMounted) return
+
         const socket = io('/', {
           transports: ['websocket', 'polling'],
-          autoConnect: true
+          autoConnect: true,
+          reconnection: true,
+          reconnectionDelay: 2000,
+          reconnectionAttempts: 5,
+          timeout: 10000
         })
 
         socketRef.current = socket
 
         socket.on('connect', () => {
+          if (!isMounted) return
           console.log('👁️ Spectator connected to server')
           setIsConnected(true)
           
@@ -93,12 +104,14 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0 }) => {
         })
 
         socket.on('spectator_joined', (data) => {
+          if (!isMounted) return
           console.log('👁️ Successfully joined as spectator:', data)
           setRoomInfo(data)
           setSpectatorCount(data.spectatorCount)
         })
 
         socket.on('spectator_game_state', (state) => {
+          if (!isMounted) return
           setGameState(state)
           setLeaderboard(state.leaderboard || [])
           if (state.spectatorCount !== undefined) {
@@ -107,45 +120,66 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0 }) => {
         })
 
         socket.on('spectator_count_update', (data) => {
+          if (!isMounted) return
           setSpectatorCount(data.spectatorCount || 0)
         })
 
         socket.on('room_info', (info) => {
+          if (!isMounted) return
           setRoomInfo(info)
         })
 
         socket.on('spectator_became_player', (data) => {
+          if (!isMounted) return
           console.log('🎮 Successfully joined game as player')
           // Redirect to game page
           router.push(`/agario?roomId=${data.roomId}&mode=${gameMode}&fee=${entryFee}`)
         })
 
         socket.on('spectator_limit_reached', (data) => {
+          if (!isMounted) return
           console.warn('👁️ Spectator limit reached:', data)
         })
 
         socket.on('auth_error', (error) => {
+          if (!isMounted) return
           console.error('❌ Authentication error:', error)
         })
 
         socket.on('disconnect', () => {
+          if (!isMounted) return
           console.log('👁️ Spectator disconnected')
+          setIsConnected(false)
+          setGameState(null)
+        })
+
+        socket.on('connect_error', (error) => {
+          if (!isMounted) return
+          console.error('❌ Connection error:', error)
           setIsConnected(false)
         })
 
       } catch (error) {
-        console.error('❌ Failed to initialize spectator mode:', error)
+        if (isMounted) {
+          console.error('❌ Failed to initialize spectator mode:', error)
+        }
       }
     }
 
     initializeSpectator()
 
     return () => {
+      isMounted = false
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout)
+      }
       if (socketRef.current) {
+        socketRef.current.removeAllListeners()
         socketRef.current.disconnect()
+        socketRef.current = null
       }
     }
-  }, [user, getAccessToken, roomId, gameMode, entryFee, router])
+  }, [user, getAccessToken, roomId])
 
   // Canvas rendering with requestAnimationFrame optimization
   const animationFrameRef = useRef()
