@@ -662,7 +662,7 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
                 <div className="flex items-center space-x-3">
                   <Play className="h-6 w-6" />
                   <span>
-                    Join Match {entryFee > 0 ? `- $${entryFee}` : '- FREE'}
+                    Join Match {stake === 'FREE' ? '- FREE' : `- $${stake}`}
                   </span>
                 </div>
               </button>
