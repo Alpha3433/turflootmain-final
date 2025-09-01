@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import SpectatorMode from '@/components/SpectatorMode'
+import SimpleSpectatorMode from '@/components/SimpleSpectatorMode'
 import { Card, CardContent } from '@/components/ui/card'
 import { Eye } from 'lucide-react'
 
