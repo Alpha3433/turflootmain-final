@@ -3340,23 +3340,11 @@ const AgarIOGame = () => {
       // Update bounty system
       updateBounties()
 
-      // Update camera
-      if (game.player.alive || isSpectatorMode) {
-        // Camera logic: follow player or bot depending on mode
-        if (isSpectatorMode && game.bots.length > 0) {
-          // Spectator mode: follow first available bot
-          const aliveBots = game.bots.filter(bot => bot.alive)
-          if (aliveBots.length > 0) {
-            // Follow the first alive bot
-            const targetBot = aliveBots[0]
-            game.camera.x = targetBot.x
-            game.camera.y = targetBot.y
-          }
-        } else if (game.player.alive) {
-          // Regular mode: follow player (only if player is alive)
-          game.camera.x = game.player.x
-          game.camera.y = game.player.y
-        }
+      // Update camera - follow player only
+      if (game.player.alive) {
+        // Regular mode: follow player
+        game.camera.x = game.player.x
+        game.camera.y = game.player.y
         
         // FIXED: Dynamic zoom based on player size - Use game's mobile state for consistency
         let targetZoom
