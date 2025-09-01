@@ -2332,7 +2332,27 @@ const AgarIOGame = () => {
     
     // Game state
     const game = {
-      player: {
+      player: spectatorMode ? {
+        // Spectator mode - no active player
+        cells: [],
+        x: 0,
+        y: 0,
+        mass: 0,
+        totalMass: 0,
+        netWorth: 0,
+        dir: { x: 0, y: 0 },
+        alive: false,
+        name: 'Spectator',
+        kills: 0,
+        deaths: 0,
+        streak: 0,
+        isBounty: false,
+        spawnProtected: false,
+        spawnTime: 0,
+        lastNetWorth: 0,
+        lastSplitTime: 0
+      } : {
+        // Regular player mode  
         cells: [{
           id: 'main',
           x: spawnX,
