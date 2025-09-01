@@ -2837,8 +2837,9 @@ const AgarIOGame = () => {
         allEntities.push(game.player)
       }
       
-      // FIXED: Skip orb collection in spectator mode - spectators should just observe
-      if (!isSpectatorMode) {
+      // FIXED: Skip orb collection logic completely (server handles everything in multiplayer)
+      // Only run collision detection in offline mode
+      if (!game.isMultiplayer) {
         for (let i = game.orbs.length - 1; i >= 0; i--) {
           const orb = game.orbs[i]
           
