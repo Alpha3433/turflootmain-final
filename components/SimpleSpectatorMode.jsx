@@ -67,21 +67,40 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
 
         socket.on('connect', () => {
           if (!isMounted) return
-          console.log('👁️ Simple spectator connected')
-          setIsConnected(true)
+          console.log('👁️ Socket connected, joining as spectator...')
           
           // Join as spectator
           socket.emit('join_as_spectator', {
             roomId,
             token: token || 'guest'
           })
+          console.log('👁️ Sent join_as_spectator event for room:', roomId)
         })
 
         socket.on('spectator_joined', (data) => {
           if (!isMounted) return
-          console.log('👁️ Joined as spectator:', data)
+          console.log('👁️ Successfully joined as spectator:', data)
+          setIsConnected(true)  // Set connected only after successful join
           setSpectatorCount(data.spectatorCount || 0)
           setPlayerCount(data.playerCount || 0)
+        })
+
+        socket.on('spectator_join_failed', (data) => {
+          if (!isMounted) return
+          console.error('❌ Failed to join as spectator:', data)
+          setIsConnected(false)
+        })
+
+        socket.on('spectator_join_error', (data) => {
+          if (!isMounted) return
+          console.error('❌ Spectator join error:', data)
+          setIsConnected(false)
+        })
+
+        socket.on('auth_error', (data) => {
+          if (!isMounted) return
+          console.error('❌ Authentication error:', data)
+          setIsConnected(false)
         })
 
         socket.on('spectator_game_state', (state) => {
