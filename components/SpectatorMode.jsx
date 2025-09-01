@@ -534,6 +534,11 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
                       <Users className="h-4 w-4" />
                       <span>{gameState?.players?.length || 0} playing</span>
                     </div>
+                    <div className="flex items-center space-x-1">
+                      <span className="font-bold text-yellow-400">
+                        {stake === 'FREE' ? 'PRACTICE' : `$${stake} CASH`}
+                      </span>
+                    </div>
                     {roomInfo?.running && (
                       <Badge variant="secondary" className="bg-green-600">
                         Live
