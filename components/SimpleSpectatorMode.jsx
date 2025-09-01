@@ -355,28 +355,28 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
       {/* Desktop Action Buttons - Styled exactly like in-game */}
       {!isMobile && (
         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
-          {/* Next Player Button - Styled like Split Button */}
+          {/* Next Player Button - Purple with eye emoji */}
           <button
             onClick={cyclePlayer}
             disabled={players.length <= 1}
             className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
               players.length <= 1
                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-400 text-white'
+                : 'bg-purple-500 hover:bg-purple-400 text-white'
             }`}
           >
-            <span className="text-lg">⚡</span>
+            <span className="text-lg">👁️</span>
             <span>
               Next Player ({players.length})
             </span>
           </button>
 
-          {/* Join Match Button - Styled like Cash Out Button */}
+          {/* Join Match Button - Green with game controller emoji */}
           <button
             onClick={handleJoinMatch}
-            className="px-6 py-3 rounded-lg font-bold transition-all bg-yellow-500 hover:bg-yellow-400 text-black"
+            className="px-6 py-3 rounded-lg font-bold transition-all bg-green-500 hover:bg-green-400 text-white"
           >
-            💰 Join Match {stake === 'FREE' ? '- FREE' : `- $${stake}`}
+            🎮 Join Match {stake === 'FREE' ? '- FREE' : `- $${stake}`}
           </button>
         </div>
       )}
