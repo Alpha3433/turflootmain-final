@@ -2835,68 +2835,7 @@ export default function Home() {
           }}
         />
       )}
-      
-      {/* NEW: Game Mode Choice Modal (Play vs Spectate) */}
-      {showGameModeChoice && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 max-w-md w-full shadow-2xl">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Choose Your Experience</h2>
-              <p className="text-gray-400">
-                {selectedStake === 'FREE' || selectedStake === 0 
-                  ? 'How would you like to experience the practice game?'
-                  : `How would you like to experience the $${selectedStake} game?`
-                }
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              {/* Play as Player Option */}
-              <button
-                onClick={handlePlayAsPlayer}
-                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-black font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
-              >
-                <div className="w-8 h-8 bg-black/20 rounded-lg flex items-center justify-center">
-                  🎮
-                </div>
-                <div className="text-left">
-                  <div className="text-lg font-bold">Play as Player</div>
-                  <div className="text-sm opacity-80">
-                    {selectedStake === 'FREE' || selectedStake === 0 
-                      ? 'Join the game and compete'
-                      : `Risk $${selectedStake} to win big`
-                    }
-                  </div>
-                </div>
-              </button>
-              
-              {/* Spectate Option */}
-              <button
-                onClick={handleSpectate}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center space-x-3"
-              >
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  👁️
-                </div>
-                <div className="text-left">
-                  <div className="text-lg font-bold">Spectate</div>
-                  <div className="text-sm opacity-80">
-                    Watch live matches and learn
-                  </div>
-                </div>
-              </button>
-            </div>
-            
-            {/* Cancel Button */}
-            <button
-              onClick={() => setShowGameModeChoice(false)}
-              className="w-full mt-4 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+
       
       {/* Real-time Cash-out Notifications Feed - Desktop Only */}
       {!isMobile && (
