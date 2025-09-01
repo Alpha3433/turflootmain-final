@@ -71,7 +71,6 @@ export default function Home() {
   const [showOrientationGate, setShowOrientationGate] = useState(false)
   const [pendingGameEntry, setPendingGameEntry] = useState(null)
   const [showMobileLobby, setShowMobileLobby] = useState(false)
-  const [showGameModeChoice, setShowGameModeChoice] = useState(false) // NEW: Show Play vs Spectate choice
 
   // Available regions for the dropdown with real-time ping measurement
   const availableRegions = [
