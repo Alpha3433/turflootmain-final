@@ -71,6 +71,68 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
     }
     
     checkMobile()
+  // WASD Camera Movement for Desktop
+  useEffect(() => {
+    if (isMobile) return
+
+    const handleKeyDown = (e) => {
+      const key = e.key.toLowerCase()
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        e.preventDefault()
+        setKeys(prev => {
+          const newKeys = { ...prev }
+          if (key === 'w' || key === 'arrowup') newKeys.w = true
+          if (key === 'a' || key === 'arrowleft') newKeys.a = true  
+          if (key === 's' || key === 'arrowdown') newKeys.s = true
+          if (key === 'd' || key === 'arrowright') newKeys.d = true
+          keysRef.current = newKeys
+          return newKeys
+        })
+      }
+    }
+
+    const handleKeyUp = (e) => {
+      const key = e.key.toLowerCase()
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+        setKeys(prev => {
+          const newKeys = { ...prev }
+          if (key === 'w' || key === 'arrowup') newKeys.w = false
+          if (key === 'a' || key === 'arrowleft') newKeys.a = false
+          if (key === 's' || key === 'arrowdown') newKeys.s = false
+          if (key === 'd' || key === 'arrowright') newKeys.d = false
+          keysRef.current = newKeys
+          return newKeys
+        })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [isMobile])
+
+  // Update camera position based on WASD keys
+  useEffect(() => {
+    if (cameraMode !== 'free_camera' || isMobile) return
+
+    const moveSpeed = 10 // pixels per frame
+    const updateCamera = () => {
+      const currentKeys = keysRef.current
+      if (currentKeys.w || currentKeys.s || currentKeys.a || currentKeys.d) {
+        setCameraPosition(prev => ({
+          x: prev.x + (currentKeys.d ? moveSpeed : 0) - (currentKeys.a ? moveSpeed : 0),
+          y: prev.y + (currentKeys.s ? moveSpeed : 0) - (currentKeys.w ? moveSpeed : 0)
+        }))
+      }
+    }
+
+    const interval = setInterval(updateCamera, 16) // ~60fps
+    return () => clearInterval(interval)
+  }, [cameraMode, isMobile])
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
