@@ -5103,31 +5103,30 @@ const AgarIOGame = () => {
                    right: '20px' // Back to edge for horizontal layout
                  }}>
               
-              {/* Mobile Split Button - HIDDEN in spectator mode */}
-              {!isSpectatorMode && (
-                <div 
-                  className={`relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
-                    splitCooldownActive 
-                      ? 'animate-pulse' 
-                      : ''
-                  }`}
-                  onPointerDown={(e) => {
-                    console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
-                    handleSplitStart(e)
-                  }}
-                  onPointerUp={(e) => {
-                    console.log('⚡ Split POINTER UP - Touch released')
-                    handleSplitEnd(e)
-                  }}
-                  onPointerLeave={(e) => {
-                    console.log('⚡ Split POINTER LEAVE')
-                    handleSplitEnd(e)
-                  }}
-                  onTouchStart={(e) => {
-                    console.log('⚡ Split TOUCH START - Mobile touch detected')
-                    handleSplitStart(e)
-                  }}
-                  onTouchEnd={(e) => {
+              {/* Mobile Split Button */}
+              <div 
+                className={`relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                  splitCooldownActive 
+                    ? 'animate-pulse' 
+                    : ''
+                }`}
+                onPointerDown={(e) => {
+                  console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
+                  handleSplitStart(e)
+                }}
+                onPointerUp={(e) => {
+                  console.log('⚡ Split POINTER UP - Touch released')
+                  handleSplitEnd(e)
+                }}
+                onPointerLeave={(e) => {
+                  console.log('⚡ Split POINTER LEAVE')
+                  handleSplitEnd(e)
+                }}
+                onTouchStart={(e) => {
+                  console.log('⚡ Split TOUCH START - Mobile touch detected')
+                  handleSplitStart(e)
+                }}
+                onTouchEnd={(e) => {
                   console.log('⚡ Split TOUCH END - Mobile touch released')
                   handleSplitEnd(e)
                 }}
@@ -5161,53 +5160,21 @@ const AgarIOGame = () => {
                 </div>
                 
               </div>
-              )}
 
-              {/* Mobile Cash-Out/Join Match Button */}
-              {isSpectatorMode ? (
-                // Mobile Join Match Button for Spectators
-                <div 
-                  className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
-                  onClick={() => {
-                    console.log('🎮 Mobile: Joining match from spectator mode')
-                    setIsSpectatorMode(false)
-                    // Initialize as active player
-                    initializeGame(true) // Start multiplayer mode
-                  }}
-                  style={{ 
-                    touchAction: 'none',
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    width: '90px',
-                    height: '90px',
-                    padding: '8px',
-                    zIndex: 1001
-                  }}
-                >
-                  {/* Button content - GREEN STYLING for Join */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-400 hover:from-green-300 hover:via-green-400 hover:to-green-500">
-                    <div className="text-lg">🎮</div>
-                    <div className="text-center leading-tight">
-                      <div>JOIN</div>
-                      <div className="text-xs">FREE</div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                // Regular Mobile Cash-Out Button
-                <div 
-                  className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
-                  onPointerDown={(e) => {
-                    console.log('💰 Cash-out POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
-                    handleCashOutStart(e)
-                  }}
-                  onPointerUp={(e) => {
-                    console.log('💰 Cash-out POINTER UP - Touch released')
-                    handleCashOutEnd(e)
-                  }}
-                  onPointerLeave={(e) => {
-                    console.log('💰 Cash-out POINTER LEAVE')
-                    handleCashOutEnd(e)
+              {/* Mobile Cash-Out Button */}
+              <div 
+                className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
+                onPointerDown={(e) => {
+                  console.log('💰 Cash-out POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
+                  handleCashOutStart(e)
+                }}
+                onPointerUp={(e) => {
+                  console.log('💰 Cash-out POINTER UP - Touch released')
+                  handleCashOutEnd(e)
+                }}
+                onPointerLeave={(e) => {
+                  console.log('💰 Cash-out POINTER LEAVE')
+                  handleCashOutEnd(e)
                   }}
                   onTouchStart={(e) => {
                     console.log('💰 Cash-out TOUCH START - Mobile touch detected')
