@@ -4688,95 +4688,68 @@ const AgarIOGame = () => {
       {/* Desktop Action Buttons Row */}
       {!isGameOver && !isMobile && (
         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
-          {/* Cash Out Button / Join Match Button */}
-          {isSpectatorMode ? (
-            // Join Match Button for Spectators
-            <button
-              onClick={() => {
-                console.log('🎮 Joining match from spectator mode')
-                setIsSpectatorMode(false)
-                // Initialize as active player
-                initializeGame(true) // Start multiplayer mode
-              }}
-              className="px-6 py-3 rounded-lg font-bold transition-all bg-green-500 hover:bg-green-400 text-white"
-            >
-              🎮 Join Match
-            </button>
-          ) : (
-            // Regular Cash Out Button for Players
-            <button
-              onMouseDown={startCashOut}
-              onMouseUp={cancelCashOut}
-              onMouseLeave={cancelCashOut}
-              className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                isCashingOut 
-                  ? 'bg-green-600 text-white' 
-                  : 'bg-yellow-500 hover:bg-yellow-400 text-black'
-              }`}
-              disabled={!gameRef.current?.game?.player?.alive}
-            >
-              {isCashingOut 
-                ? `Cashing Out... ${Math.floor(cashOutProgress)}%` 
-                : `💰 Hold E to Cash Out ($${gameStats.netWorth})`
+          {/* Regular Cash Out Button for Players */}
+          <button
+            className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+              isCashingOut
+                ? 'bg-yellow-600 hover:bg-yellow-500 text-white animate-pulse'
+                : 'bg-green-600 hover:bg-green-500 text-white'
+            }`}
+            disabled={!gameRef.current?.game?.player?.alive}
+            onClick={() => {
+              if (gameRef.current?.game?.player?.alive) {
+                startCashOut()
               }
-            </button>
-          )}
+            }}
+          >
+            <span className="text-lg">💰</span>
+            <span>
+              {isCashingOut
+                ? `Cashing Out... (${Math.ceil(cashOutCooldown / 1000)}s)`
+                : `Hold E to Cash Out ($${gameRef.current?.game?.player?.netWorth?.toFixed(0) || 0})`
+              }
+            </span>
+          </button>
 
-          {/* Split Button - HIDDEN in spectator mode */}
-          {!isSpectatorMode && (
-            <button
-              className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
-                splitCooldownActive
-                  ? 'bg-red-600 text-white cursor-not-allowed'
-                  : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
-                    ? 'bg-blue-500 hover:bg-blue-400 text-white'
-                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              }`}
-              disabled={!gameRef.current?.game?.player?.alive || !canPlayerSplit(gameRef.current?.game?.player || { cells: [] })}
-              onClick={() => {
-                if (gameRef.current?.game?.player?.alive && canPlayerSplit(gameRef.current.game.player)) {
-                  // Use last mouse position for split direction
-                  const canvas = canvasRef.current
-                  if (canvas) {
-                    const rect = canvas.getBoundingClientRect()
-                    const mouseX = lastMousePosition.current?.x || rect.width / 2
-                    const mouseY = lastMousePosition.current?.y || rect.height / 2
-                    
-                    // Convert screen coordinates to world coordinates
-                    const game = gameRef.current.game
-                    const worldX = mouseX - rect.width / 2 + game.camera.x
-                    const worldY = mouseY - rect.height / 2 + game.camera.y
-                    
-                    handleSplit(worldX, worldY)
-                  }
+          {/* Split Button */}
+          <button
+            className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+              splitCooldownActive
+                ? 'bg-red-600 text-white cursor-not-allowed'
+                : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                  ? 'bg-blue-500 hover:bg-blue-400 text-white'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+            }`}
+            disabled={!gameRef.current?.game?.player?.alive || !canPlayerSplit(gameRef.current?.game?.player || { cells: [] })}
+            onClick={() => {
+              if (gameRef.current?.game?.player?.alive && canPlayerSplit(gameRef.current.game.player)) {
+                // Use last mouse position for split direction
+                const canvas = canvasRef.current
+                if (canvas) {
+                  const rect = canvas.getBoundingClientRect()
+                  const mouseX = lastMousePosition.current?.x || rect.width / 2
+                  const mouseY = lastMousePosition.current?.y || rect.height / 2
+                  
+                  // Convert screen coordinates to world coordinates
+                  const game = gameRef.current.game
+                  const worldX = mouseX - rect.width / 2 + game.camera.x
+                  const worldY = mouseY - rect.height / 2 + game.camera.y
+                  
+                  handleSplit(worldX, worldY)
                 }
-              }}
-            >
-              <span className="text-lg">⚡</span>
-              <span>
-                {splitCooldownActive
-                  ? `Split (${Math.ceil(splitCooldown / 1000)}s)`
-                  : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
-                    ? 'Split (Space)'
-                    : 'Split (Need 20+ mass)'
-                }
-              </span>
-            </button>
-          )}
-
-          {/* Spectator Controls - SHOWN in spectator mode */}
-          {isSpectatorMode && (
-            <button
-              className="px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white"
-              onClick={() => {
-                // Simple spectator view (no cycling for now)
-                console.log('👁️ Spectator view button clicked')
-              }}
-            >
-              <span className="text-lg">👁️</span>
-              <span>Spectator View</span>
-            </button>
-          )}
+              }
+            }}
+          >
+            <span className="text-lg">⚡</span>
+            <span>
+              {splitCooldownActive
+                ? `Split (${Math.ceil(splitCooldown / 1000)}s)`
+                : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                  ? 'Split (Space)'
+                  : 'Split (Need 20+ mass)'
+              }
+            </span>
+          </button>
         </div>
       )}
 
