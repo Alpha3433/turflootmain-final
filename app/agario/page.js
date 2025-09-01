@@ -594,7 +594,7 @@ const AgarIOGame = () => {
         canvasRef.current.removeEventListener('contextmenu', handleContextMenu)
       }
     }
-  }, [isCashingOut, settings, isSpectatorMode])
+  }, [isCashingOut, settings])
 
   const startCashOut = async () => {
     if (isCashingOut) return
