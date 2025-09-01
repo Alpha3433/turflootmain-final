@@ -18,6 +18,7 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
   const canvasRef = useRef(null)
   const socketRef = useRef(null)
   const animationFrameRef = useRef()
+  const connectionTimeoutRef = useRef(null) // NEW: Store timeout ref
   const router = useRouter()
   const { user, getAccessToken } = usePrivy()
   
