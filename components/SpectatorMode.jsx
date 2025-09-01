@@ -282,20 +282,31 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
     let viewX = 0, viewY = 0, zoom = cameraZoom
 
     if (cameraMode === 'bird_eye') {
-      // Show entire game world
+      // Show entire game world - zoomed out map view
       viewX = 0
       viewY = 0
       zoom = Math.min(canvas.width / (gameState.worldBounds?.width || 2000), canvas.height / (gameState.worldBounds?.height || 2000)) * 0.8
     } else if (cameraMode === 'player_follow' && followingPlayer) {
-      // Follow specific player
+      // Follow specific player with smooth tracking
       const player = gameState.players.find(p => p.id === followingPlayer)
       if (player) {
         viewX = player.x
         viewY = player.y
-        zoom = 2
+        zoom = 2.5 // Closer zoom for player following
+      }
+    } else if (cameraMode === 'player_follow' && !followingPlayer && gameState.players.length > 0) {
+      // Auto-follow top player if no specific player selected
+      const topPlayer = gameState.players
+        .filter(p => p.alive)
+        .sort((a, b) => (b.mass || 0) - (a.mass || 0))[0]
+      if (topPlayer) {
+        viewX = topPlayer.x
+        viewY = topPlayer.y
+        zoom = 2.5
+        setFollowingPlayer(topPlayer.id) // Auto-set following player
       }
     } else if (cameraMode === 'free_camera') {
-      // Use manual camera position
+      // Use manual camera position with WASD/touch controls
       viewX = cameraPosition.x
       viewY = cameraPosition.y
       zoom = cameraZoom
