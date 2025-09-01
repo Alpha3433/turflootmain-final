@@ -5174,30 +5174,31 @@ const AgarIOGame = () => {
                    right: '20px' // Back to edge for horizontal layout
                  }}>
               
-              {/* Mobile Split Button - NOW FIRST */}
-              <div 
-                className={`relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
-                  splitCooldownActive 
-                    ? 'animate-pulse' 
-                    : ''
-                }`}
-                onPointerDown={(e) => {
-                  console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
-                  handleSplitStart(e)
-                }}
-                onPointerUp={(e) => {
-                  console.log('⚡ Split POINTER UP - Touch released')
-                  handleSplitEnd(e)
-                }}
-                onPointerLeave={(e) => {
-                  console.log('⚡ Split POINTER LEAVE')
-                  handleSplitEnd(e)
-                }}
-                onTouchStart={(e) => {
-                  console.log('⚡ Split TOUCH START - Mobile touch detected')
-                  handleSplitStart(e)
-                }}
-                onTouchEnd={(e) => {
+              {/* Mobile Split Button - HIDDEN in spectator mode */}
+              {!isSpectatorMode && (
+                <div 
+                  className={`relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 ${
+                    splitCooldownActive 
+                      ? 'animate-pulse' 
+                      : ''
+                  }`}
+                  onPointerDown={(e) => {
+                    console.log('⚡ Split POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
+                    handleSplitStart(e)
+                  }}
+                  onPointerUp={(e) => {
+                    console.log('⚡ Split POINTER UP - Touch released')
+                    handleSplitEnd(e)
+                  }}
+                  onPointerLeave={(e) => {
+                    console.log('⚡ Split POINTER LEAVE')
+                    handleSplitEnd(e)
+                  }}
+                  onTouchStart={(e) => {
+                    console.log('⚡ Split TOUCH START - Mobile touch detected')
+                    handleSplitStart(e)
+                  }}
+                  onTouchEnd={(e) => {
                   console.log('⚡ Split TOUCH END - Mobile touch released')
                   handleSplitEnd(e)
                 }}
