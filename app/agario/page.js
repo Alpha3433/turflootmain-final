@@ -2134,22 +2134,53 @@ const AgarIOGame = () => {
         socket.on('spectator_game_state', (gameState) => {
           console.log('👁️ Received spectator game state:', gameState)
           // Update the game with spectator data
-          if (gameRef.current?.game && gameState.players) {
-            // Update other players (bots) for spectating
+          if (gameRef.current?.game && gameState) {
             const game = gameRef.current.game
-            game.otherPlayers = gameState.players.map(player => ({
-              id: player.id,
-              x: player.x,
-              y: player.y,
-              mass: player.mass,
-              name: player.nickname,
-              alive: player.alive,
-              cells: [{ x: player.x, y: player.y, mass: player.mass }]
-            }))
             
-            // Update food
-            if (gameState.food) {
-              game.food = gameState.food
+            // FIXED: Update bots from server data (including virtual bots)
+            if (gameState.players && gameState.players.length > 0) {
+              console.log('👁️ Updating bots from server:', gameState.players.length, 'entities')
+              game.bots = gameState.players.map(player => ({
+                id: player.id,
+                x: player.x,
+                y: player.y,
+                mass: player.mass,
+                netWorth: player.netWorth || 0,
+                name: player.nickname || player.name || 'Bot',
+                alive: player.alive !== false,
+                color: player.color || `hsl(${Math.random() * 360}, 60%, 50%)`,
+                cells: [{ x: player.x, y: player.y, mass: player.mass }],
+                dir: player.dir || { x: 0, y: 0 },
+                kills: player.kills || 0,
+                deaths: player.deaths || 0,
+                streak: player.streak || 0,
+                isBounty: player.isBounty || false
+              }))
+            }
+            
+            // FIXED: Update orbs/food from server data  
+            if (gameState.food && gameState.food.length > 0) {
+              console.log('👁️ Updating orbs from server:', gameState.food.length, 'orbs')
+              game.orbs = gameState.food.map(food => ({
+                id: food.id,
+                x: food.x,
+                y: food.y,
+                massValue: food.massValue || 4.5,
+                color: food.color || '#FFD700'
+              }))
+            }
+            
+            // Also update otherPlayers for compatibility
+            if (gameState.players) {
+              game.otherPlayers = gameState.players.map(player => ({
+                id: player.id,
+                x: player.x,
+                y: player.y,
+                mass: player.mass,
+                name: player.nickname || player.name,
+                alive: player.alive !== false,
+                cells: [{ x: player.x, y: player.y, mass: player.mass }]
+              }))
             }
           }
         })
