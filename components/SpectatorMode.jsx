@@ -515,51 +515,49 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
             </div>
           </div>
 
-          {/* Camera Controls with Instructions */}
+          {/* Player Cycling Controls */}
           <div className="absolute top-20 left-4 z-10">
             <Card className="bg-black/80 border-gray-600">
               <CardContent className="p-4">
                 <div className="space-y-3">
-                  <div className="text-sm font-bold text-white">Camera Controls</div>
-                  <div className="flex flex-col space-y-2">
-                    <Button
-                      variant={cameraMode === 'bird_eye' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => handleCameraModeChange('bird_eye')}
-                      className="justify-start text-xs"
-                    >
-                      <Camera className="h-3 w-3 mr-2" />
-                      <div className="text-left">
-                        <div>Map View</div>
-                        <div className="text-xs opacity-70">See whole battlefield</div>
+                  <div className="text-sm font-bold text-white flex items-center">
+                    <Target className="h-4 w-4 mr-2 text-yellow-400" />
+                    Following Player
+                  </div>
+                  
+                  {currentPlayer && (
+                    <div className="bg-black/50 rounded-lg p-3 border border-yellow-400/30">
+                      <div className="text-yellow-400 font-bold text-base">{currentPlayer.nickname}</div>
+                      <div className="text-white text-sm">Mass: {Math.floor(currentPlayer.mass || 0)}</div>
+                      <div className="text-gray-400 text-xs">
+                        Player {followingPlayerIndex + 1} of {availablePlayers.length}
                       </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={previousPlayer}
+                      size="sm"
+                      variant="secondary"
+                      className="flex-1"
+                      disabled={availablePlayers.length <= 1}
+                    >
+                      ←
                     </Button>
                     <Button
-                      variant={cameraMode === 'player_follow' ? 'default' : 'ghost'}
+                      onClick={nextPlayer}
                       size="sm"
-                      onClick={() => handleCameraModeChange('player_follow')}
-                      className="justify-start text-xs"
+                      variant="secondary"
+                      className="flex-1"
+                      disabled={availablePlayers.length <= 1}
                     >
-                      <Target className="h-3 w-3 mr-2" />
-                      <div className="text-left">
-                        <div>Follow Top Player</div>
-                        <div className="text-xs opacity-70">Click leaderboard to switch</div>
-                      </div>
+                      →
                     </Button>
-                    <Button
-                      variant={cameraMode === 'free_camera' ? 'default' : 'ghost'}
-                      size="sm"
-                      onClick={() => handleCameraModeChange('free_camera')}
-                      className="justify-start text-xs"
-                    >
-                      <Move3D className="h-3 w-3 mr-2" />
-                      <div className="text-left">
-                        <div>Free Cam</div>
-                        <div className="text-xs opacity-70">
-                          {isMobile ? 'Swipe to move' : 'WASD or drag'}
-                        </div>
-                      </div>
-                    </Button>
+                  </div>
+                  
+                  <div className="text-xs text-gray-400 text-center">
+                    {isMobile ? 'Tap arrows to cycle' : 'Use A/D or ←/→ keys'}
                   </div>
                 </div>
               </CardContent>
