@@ -5044,72 +5044,104 @@ const AgarIOGame = () => {
                 
               </div>
 
-              {/* Circular Cash-Out Button - NOW SECOND */}
-              <div 
-                className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
-                onPointerDown={(e) => {
-                  console.log('💰 Cash-out POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
-                  handleCashOutStart(e)
-                }}
-                onPointerUp={(e) => {
-                  console.log('💰 Cash-out POINTER UP - Touch released')
-                  handleCashOutEnd(e)
-                }}
-                onPointerLeave={(e) => {
-                  console.log('💰 Cash-out POINTER LEAVE')
-                  handleCashOutEnd(e)
-                }}
-                onTouchStart={(e) => {
-                  console.log('💰 Cash-out TOUCH START - Mobile touch detected')
-                  handleCashOutStart(e)
-                }}
-                onTouchEnd={(e) => {
-                  console.log('💰 Cash-out TOUCH END - Mobile touch released')
-                  handleCashOutEnd(e)
-                }}
-                style={{ 
-                  touchAction: 'none',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  width: '90px', // Reduced for horizontal layout
-                  height: '90px', // Reduced for horizontal layout
-                  padding: '8px', // Reduced padding
-                  zIndex: 1001 // Higher z-index
-                }}
-              >
-                {/* Progress ring - ONLY show when cashing out */}
-                {isCashingOut && (
-                  <svg className="cashout-progress-ring absolute inset-0" width="90" height="90">
-                    <circle 
-                      cx="45" 
-                      cy="45" 
-                      r="40"
-                      fill="none"
-                      stroke="rgba(0, 255, 0, 0.8)"
-                      strokeWidth="4"
-                      style={{
-                        strokeDasharray: `${2 * Math.PI * 40}`,
-                        strokeDashoffset: `${2 * Math.PI * 40 * (1 - cashOutProgress / 100)}`,
-                        transform: 'rotate(-90deg)',
-                        transformOrigin: '45px 45px'
-                      }}
-                    />
-                  </svg>
-                )}
-                
-                {/* Button content - GOLD STYLING */}
-                <div className={`absolute inset-0 flex flex-col items-center justify-center text-black text-xs font-bold rounded-full border-2 transition-all duration-200 ${
-                  isCashingOut 
-                    ? 'bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-400' 
-                    : 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 border-yellow-400 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500'
-                }`}>
-                  <div className="text-lg">💰</div>
-                  <div className="text-center leading-tight">
-                    <div>{isCashingOut ? `${Math.floor(cashOutProgress)}%` : 'CASH'}</div>
-                    <div className="text-xs">{isCashingOut ? 'OUT' : `$${gameStats.netWorth}`}</div>
+              {/* Mobile Cash-Out/Join Match Button */}
+              {isSpectatorMode ? (
+                // Mobile Join Match Button for Spectators
+                <div 
+                  className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
+                  onClick={() => {
+                    console.log('🎮 Mobile: Joining match from spectator mode')
+                    setIsSpectatorMode(false)
+                    // Initialize as active player
+                    initializeGame(true) // Start multiplayer mode
+                  }}
+                  style={{ 
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    width: '90px',
+                    height: '90px',
+                    padding: '8px',
+                    zIndex: 1001
+                  }}
+                >
+                  {/* Button content - GREEN STYLING for Join */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-400 hover:from-green-300 hover:via-green-400 hover:to-green-500">
+                    <div className="text-lg">🎮</div>
+                    <div className="text-center leading-tight">
+                      <div>JOIN</div>
+                      <div className="text-xs">{spectatorStake === 'FREE' ? 'FREE' : `$${spectatorStake}`}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                // Regular Mobile Cash-Out Button
+                <div 
+                  className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
+                  onPointerDown={(e) => {
+                    console.log('💰 Cash-out POINTER DOWN - Touch detected at:', e.clientX, e.clientY)
+                    handleCashOutStart(e)
+                  }}
+                  onPointerUp={(e) => {
+                    console.log('💰 Cash-out POINTER UP - Touch released')
+                    handleCashOutEnd(e)
+                  }}
+                  onPointerLeave={(e) => {
+                    console.log('💰 Cash-out POINTER LEAVE')
+                    handleCashOutEnd(e)
+                  }}
+                  onTouchStart={(e) => {
+                    console.log('💰 Cash-out TOUCH START - Mobile touch detected')
+                    handleCashOutStart(e)
+                  }}
+                  onTouchEnd={(e) => {
+                    console.log('💰 Cash-out TOUCH END - Mobile touch released')
+                    handleCashOutEnd(e)
+                  }}
+                  style={{ 
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    width: '90px',
+                    height: '90px',
+                    padding: '8px',
+                    zIndex: 1001
+                  }}
+                >
+                  {/* Progress ring - ONLY show when cashing out */}
+                  {isCashingOut && (
+                    <svg className="cashout-progress-ring absolute inset-0" width="90" height="90">
+                      <circle 
+                        cx="45" 
+                        cy="45" 
+                        r="40"
+                        fill="none"
+                        stroke="rgba(0, 255, 0, 0.8)"
+                        strokeWidth="4"
+                        style={{
+                          strokeDasharray: `${2 * Math.PI * 40}`,
+                          strokeDashoffset: `${2 * Math.PI * 40 * (1 - cashOutProgress / 100)}`,
+                          transform: 'rotate(-90deg)',
+                          transformOrigin: '45px 45px'
+                        }}
+                      />
+                    </svg>
+                  )}
+                  
+                  {/* Button content - GOLD STYLING */}
+                  <div className={`absolute inset-0 flex flex-col items-center justify-center text-black text-xs font-bold rounded-full border-2 transition-all duration-200 ${
+                    isCashingOut 
+                      ? 'bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-400' 
+                      : 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 border-yellow-400 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500'
+                  }`}>
+                    <div className="text-lg">💰</div>
+                    <div className="text-center leading-tight">
+                      <div>{isCashingOut ? `${Math.floor(cashOutProgress)}%` : 'CASH'}</div>
+                      <div className="text-xs">{isCashingOut ? 'OUT' : `$${gameStats.netWorth}`}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
