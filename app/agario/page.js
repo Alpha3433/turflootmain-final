@@ -1929,7 +1929,7 @@ const AgarIOGame = () => {
     }, 100)
   }
 
-  const initializeMultiplayer = async (paramPartyId = null, paramPartySize = 1, paramMembers = null) => {
+  const initializeMultiplayer = async (paramPartyId = null, paramPartySize = 1, paramMembers = null, spectatorOnly = false) => {
     try {
       console.log('🔗 Initializing multiplayer connection...')
       console.log('🎉 Party parameters received:', { paramPartyId, paramPartySize, paramMembers })
