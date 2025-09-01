@@ -324,17 +324,50 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
     router.push('/')
   }
 
-  // Loading state
+  // Loading state with better feedback
   if (!isConnected) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Card className="w-96 bg-black/80 border-gray-700">
           <CardContent className="p-8 text-center">
-            <Eye className="h-16 w-16 text-blue-400 mx-auto mb-6 animate-pulse" />
-            <h2 className="text-2xl font-bold mb-3 text-white">Entering Match...</h2>
-            <p className="text-gray-400">
-              Connecting to {stake === 'FREE' ? 'practice' : `$${stake} cash`} game...
+            <div className="relative">
+              <Eye className="h-16 w-16 text-blue-400 mx-auto mb-6 animate-pulse" />
+              <div className="absolute -inset-2 bg-blue-400/20 rounded-full animate-ping"></div>
+            </div>
+            <h2 className="text-2xl font-bold mb-3 text-white">
+              {stake === 'FREE' ? 'Entering Practice Match...' : `Entering $${stake} Match...`}
+            </h2>
+            <p className="text-gray-400 mb-4">
+              {connectionError 
+                ? 'Connection issue - starting demo mode...'
+                : stake === 'FREE' 
+                  ? 'Connecting to practice game...'
+                  : `Connecting to $${stake} cash game...`
+              }
             </p>
+            <div className="flex justify-center mb-4">
+              <div className="w-8 h-1 bg-blue-400 rounded animate-pulse"></div>
+            </div>
+            
+            {/* Add manual proceed button after a delay */}
+            <Button
+              onClick={() => {
+                console.log('👁️ Manual connection fallback')
+                setIsConnected(true)
+                // Create demo players
+                const demoPlayers = [
+                  { id: 'demo1', nickname: 'Demo Bot 1', x: 100, y: 100, mass: 50, alive: true },
+                  { id: 'demo2', nickname: 'Demo Bot 2', x: -100, y: -100, mass: 75, alive: true },
+                  { id: 'demo3', nickname: 'Demo Bot 3', x: 200, y: -150, mass: 60, alive: true }
+                ]
+                setPlayers(demoPlayers)
+                setCurrentPlayer(demoPlayers[0])
+                setPlayerCount(demoPlayers.length)
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Continue Anyway
+            </Button>
           </CardContent>
         </Card>
       </div>
