@@ -282,6 +282,24 @@ const AgarIOGame = () => {
         setSpectatorStake(paramStake)
       }
       
+      // NEW: Skip game initialization if in spectator mode
+      if (paramSpectatorMode || paramAutoSpectate) {
+        console.log('👁️ Spectator mode detected - skipping player initialization')
+        console.log('👁️ User will spectate existing game without spawning as player') 
+        // Don't initialize game - just connect as spectator to watch others
+        if (paramMode === 'cash' && paramFee > 0) {
+          // For cash games, try to connect to multiplayer as spectator
+          console.log('👁️ Connecting to cash game as spectator')
+          initializeMultiplayer(paramPartyId, paramPartySize, paramMembers, true) // true = spectator only
+        } else {
+          // For free games, connect to multiplayer as spectator  
+          console.log('👁️ Connecting to practice game as spectator')
+          initializeMultiplayer(null, 1, null, true) // true = spectator only
+        }
+        return // Exit early - don't run regular initialization
+      }
+
+      // Regular game initialization (when not in spectator mode)
       // Enable multiplayer for cash games OR party games
       if ((paramMode === 'cash' && paramFee > 0) || paramMode === 'party') {
         console.log('💰 Multiplayer game detected:', paramMode === 'party' ? 'Party Mode' : 'Cash Mode')
