@@ -71,6 +71,10 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
     }
     
     checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // WASD Camera Movement for Desktop
   useEffect(() => {
     if (isMobile) return
@@ -133,9 +137,6 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
     const interval = setInterval(updateCamera, 16) // ~60fps
     return () => clearInterval(interval)
   }, [cameraMode, isMobile])
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   // Initialize spectator connection (optimized to prevent reconnection loops)
   useEffect(() => {
