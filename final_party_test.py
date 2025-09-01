@@ -9,7 +9,7 @@ import json
 import time
 
 # Configuration
-BASE_URL = "https://turfloot-party.preview.emergentagent.com"
+BASE_URL = "https://party-lobby-system-1.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
 # Real user IDs from server logs
