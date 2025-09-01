@@ -4817,19 +4817,12 @@ const AgarIOGame = () => {
             <button
               className="px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white"
               onClick={() => {
-                // Cycle through bots being spectated
-                setSpectatorTargetIndex(prev => {
-                  const game = gameRef.current?.game
-                  if (game && game.bots && game.bots.length > 0) {
-                    const aliveBots = game.bots.filter(bot => bot.alive)
-                    return (prev + 1) % Math.max(aliveBots.length, 1)
-                  }
-                  return 0
-                })
+                // Simple spectator view (no cycling for now)
+                console.log('👁️ Spectator view button clicked')
               }}
             >
               <span className="text-lg">👁️</span>
-              <span>Switch View (A/D)</span>
+              <span>Spectator View</span>
             </button>
           )}
         </div>
