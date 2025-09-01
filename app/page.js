@@ -1421,10 +1421,9 @@ export default function Home() {
     proceedToGame()
   }
 
-  // NEW: Handle player choice to spectate
-  const handleSpectate = () => {
-    setShowGameModeChoice(false)
-    console.log('👁️ User chose to spectate')
+  // NEW: Auto-spectate - enter lobby as spectator by default
+  const handleAutoSpectate = () => {
+    console.log('👁️ Auto-spectate mode - entering lobby as spectator')
     
     // For spectating, we don't need authentication for free games
     const gameMode = selectedStake === 'FREE' || selectedStake === 0 ? 'free' : 'cash'
@@ -1439,10 +1438,10 @@ export default function Home() {
       roomId = `us-east-1-cash-${gameFee}-1` // Could be made more sophisticated
     }
     
-    console.log('👁️ Navigating to spectator mode:', { roomId, gameMode, gameFee })
+    console.log('👁️ Auto-navigating to spectator mode:', { roomId, gameMode, gameFee })
     
-    // Navigate to spectator mode
-    router.push(`/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}`)
+    // Navigate directly to spectator mode - no choice modal
+    router.push(`/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&autoSpectate=true`)
   }
 
   const proceedToGame = () => {
