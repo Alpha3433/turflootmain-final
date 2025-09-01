@@ -1355,8 +1355,8 @@ export default function Home() {
   const handleJoinGame = () => {
     console.log('🎮 handleJoinGame called, selectedStake:', selectedStake, 'authenticated:', authenticated, 'user:', !!user)
     
-    // NEW: Show game mode choice modal (Play vs Spectate)
-    setShowGameModeChoice(true)
+    // NEW: Auto-spectate default - go directly to spectator mode for instant preview
+    handleAutoSpectate()
   }
 
   // NEW: Handle player choice to play as active player
