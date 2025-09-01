@@ -292,7 +292,6 @@ const AgarIOGame = () => {
     if (paramSpectatorMode || paramAutoSpectate) {
       console.log('👁️ Spectator mode detected - loading as spectator (no auth required)')
       setIsSpectatorMode(true)
-      setSpectatorStake(paramStake)
       
       console.log('👁️ Spectator mode detected - skipping player initialization')
       console.log('👁️ User will spectate existing game without spawning as player') 
