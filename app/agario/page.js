@@ -551,22 +551,36 @@ const AgarIOGame = () => {
         startCashOut()
       }
       
-      // Split functionality - Space key
-      if (e.code === 'Space' && gameRef.current?.game?.player?.alive) {
-        e.preventDefault() // Prevent page scroll
-        const canvas = canvasRef.current
-        if (canvas) {
-          const rect = canvas.getBoundingClientRect()
-          // Use current mouse position or center of screen
-          const mouseX = lastMousePosition.current?.x || rect.width / 2
-          const mouseY = lastMousePosition.current?.y || rect.height / 2
-          
-          // Convert screen coordinates to world coordinates
-          const game = gameRef.current.game
-          const worldX = mouseX - rect.width / 2 + game.camera.x
-          const worldY = mouseY - rect.height / 2 + game.camera.y
-          
-          handleSplit(worldX, worldY)
+      // Handle keyboard input
+      if (isSpectatorMode) {
+        // Spectator mode controls: cycle through bots
+        if (e.code === 'Space') {
+          e.preventDefault() // Prevent page scroll
+          const aliveBots = gameRef.current?.game?.bots?.filter(bot => bot.alive) || []
+          if (aliveBots.length > 0) {
+            setSpectatorTargetIndex((prev) => (prev + 1) % aliveBots.length)
+            console.log('👁️ Switching to next bot to spectate')
+          }
+        }
+      } else {
+        // Regular player controls
+        // Split functionality - Space key
+        if (e.code === 'Space' && gameRef.current?.game?.player?.alive) {
+          e.preventDefault() // Prevent page scroll
+          const canvas = canvasRef.current
+          if (canvas) {
+            const rect = canvas.getBoundingClientRect()
+            // Use current mouse position or center of screen
+            const mouseX = lastMousePosition.current?.x || rect.width / 2
+            const mouseY = lastMousePosition.current?.y || rect.height / 2
+            
+            // Convert screen coordinates to world coordinates
+            const game = gameRef.current.game
+            const worldX = mouseX - rect.width / 2 + game.camera.x
+            const worldY = mouseY - rect.height / 2 + game.camera.y
+            
+            handleSplit(worldX, worldY)
+          }
         }
       }
     }
