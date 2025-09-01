@@ -605,17 +605,25 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
             </div>
           )}
 
-          {/* Join Game Button */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
-            <Button
-              onClick={handleJoinGame}
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
-            >
-              <Play className="h-5 w-5 mr-2" />
-              Join Match {entryFee > 0 && `- $${entryFee}`}
-            </Button>
-          </div>
+          {/* Sticky Join Match Button - Always Visible */}
+          {showJoinButton && (
+            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+              <button
+                onClick={handleJoinGame}
+                className="bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 text-white font-bold py-4 px-8 rounded-2xl text-xl shadow-2xl border-2 border-green-300 transition-all duration-300 hover:scale-105 pulse-animation"
+                style={{
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}
+              >
+                <div className="flex items-center space-x-3">
+                  <Play className="h-6 w-6" />
+                  <span>
+                    Join Match {entryFee > 0 ? `- $${entryFee}` : '- FREE'}
+                  </span>
+                </div>
+              </button>
+            </div>
+          )}
 
           {/* Mobile-specific UI adjustments */}
           {isMobile && (
