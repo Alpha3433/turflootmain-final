@@ -341,22 +341,57 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
     }
   }, [renderCanvas, gameState])
 
-  // Camera control handlers
-  const handleCameraModeChange = (mode) => {
-    setCameraMode(mode)
+  // Player cycling handlers
+  const nextPlayer = () => {
+    if (availablePlayers.length === 0) return
+    
+    const nextIndex = (followingPlayerIndex + 1) % availablePlayers.length
+    setFollowingPlayerIndex(nextIndex)
+    setCurrentPlayer(availablePlayers[nextIndex])
+    
+    console.log(`👁️ Switched to player: ${availablePlayers[nextIndex].nickname}`)
+    
+    // Notify server of camera change
     if (socketRef.current) {
-      socketRef.current.emit('spectator_camera_control', { mode })
+      socketRef.current.emit('spectator_camera_control', { 
+        mode: 'player_follow', 
+        followingPlayer: availablePlayers[nextIndex].id 
+      })
+    }
+  }
+
+  const previousPlayer = () => {
+    if (availablePlayers.length === 0) return
+    
+    const prevIndex = followingPlayerIndex === 0 ? availablePlayers.length - 1 : followingPlayerIndex - 1
+    setFollowingPlayerIndex(prevIndex)
+    setCurrentPlayer(availablePlayers[prevIndex])
+    
+    console.log(`👁️ Switched to player: ${availablePlayers[prevIndex].nickname}`)
+    
+    // Notify server of camera change
+    if (socketRef.current) {
+      socketRef.current.emit('spectator_camera_control', { 
+        mode: 'player_follow', 
+        followingPlayer: availablePlayers[prevIndex].id 
+      })
     }
   }
 
   const handleFollowPlayer = (playerId) => {
-    setFollowingPlayer(playerId)
-    setCameraMode('player_follow')
-    if (socketRef.current) {
-      socketRef.current.emit('spectator_camera_control', { 
-        mode: 'player_follow', 
-        followingPlayer: playerId 
-      })
+    const playerIndex = availablePlayers.findIndex(p => p.id === playerId)
+    if (playerIndex !== -1) {
+      setFollowingPlayerIndex(playerIndex)
+      setCurrentPlayer(availablePlayers[playerIndex])
+      
+      console.log(`👁️ Following player: ${availablePlayers[playerIndex].nickname}`)
+      
+      if (socketRef.current) {
+        socketRef.current.emit('spectator_camera_control', { 
+          mode: 'player_follow', 
+          followingPlayer: playerId 
+        })
+      }
     }
   }
 
