@@ -1358,67 +1358,7 @@ export default function Home() {
     handleAutoSpectate()
   }
 
-  // NEW: Handle player choice to play as active player
-  const handlePlayAsPlayer = () => {
-    setShowGameModeChoice(false)
-    
-    // For FREE/Practice games, allow without authentication but still show loading
-    if ((selectedStake === 'FREE' || selectedStake === 0) && (!authenticated || !user)) {
-      console.log('🤖 Free practice game - showing loading popup before login')
-      
-      // Show loading popup for practice game
-      setGameLoadingInfo({
-        roomType: 'practice',
-        entryFee: 0,
-        partyMode: false,
-        partySize: 1
-      })
-      setIsJoiningGame(true)
-      
-      // Add delay before showing login
-      setTimeout(() => {
-        console.log('❌ User not authenticated - showing Privy login after loading')
-        setIsJoiningGame(false) // Hide loading popup
-        setShowWelcome(false)
-        login() // Trigger Privy login
-      }, 1500) // Show loading for 1.5 seconds before login
-      return
-    }
-    
-    // Require authentication for cash games
-    if (!authenticated || !user) {
-      console.log('❌ User not authenticated - showing Privy login')
-      setShowWelcome(false)
-      // Trigger Privy login directly instead of showing our modal
-      login()
-      return
-    }
-    
-    // Check mobile orientation before game entry
-    if (isMobile) {
-      const viewportWidth = window.innerWidth
-      const viewportHeight = window.innerHeight
-      const isCurrentlyLandscape = viewportWidth > viewportHeight
-      
-      if (!isCurrentlyLandscape) {
-        console.log('📱 Mobile user in portrait mode - showing orientation gate')
-        
-        // Store the pending game entry details
-        setPendingGameEntry({
-          stake: selectedStake,
-          mode: selectedStake === 'FREE' || selectedStake === 0 ? 'free' : 'cash',
-          fee: selectedStake === 'FREE' || selectedStake === 0 ? 0 : parseInt(selectedStake.toString().replace('$', ''))
-        })
-        
-        // Show orientation gate
-        setShowOrientationGate(true)
-        return
-      }
-    }
-    
-    // Proceed with normal game entry logic
-    proceedToGame()
-  }
+
 
   // NEW: Auto-spectate - enter lobby as spectator by default
   const handleAutoSpectate = () => {
