@@ -538,18 +538,8 @@ const AgarIOGame = () => {
         startCashOut()
       }
       
-      // Handle keyboard input
-      if (isSpectatorMode) {
-        // Spectator mode controls: cycle through bots
-        if (e.code === 'Space') {
-          e.preventDefault() // Prevent page scroll
-          const aliveBots = gameRef.current?.game?.bots?.filter(bot => bot.alive) || []
-          if (aliveBots.length > 0) {
-            console.log('👁️ Switching to next bot to spectate')
-          }
-        }
-      } else {
-        // Regular player controls
+      // Regular key controls (no spectator mode)
+      if (gameRef.current?.game?.player?.alive) {
         // Split functionality - Space key
         if (e.code === 'Space' && gameRef.current?.game?.player?.alive) {
           e.preventDefault() // Prevent page scroll
