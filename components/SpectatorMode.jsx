@@ -293,30 +293,31 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
         if (!player || !player.alive || typeof player.x !== 'number' || typeof player.y !== 'number') return
 
         const radius = Math.sqrt(player.mass || 10) * 2
+        const isCurrentlyFollowed = currentPlayer && player.id === currentPlayer.id
         
-        // Player body
-        ctx.fillStyle = player.id === followingPlayer ? '#00FF00' : (player.alive ? '#3B82F6' : '#999')
+        // Player body - highlight the one we're following
+        ctx.fillStyle = isCurrentlyFollowed ? '#00FF00' : '#3B82F6'
         ctx.beginPath()
         ctx.arc(player.x, player.y, radius, 0, 2 * Math.PI)
         ctx.fill()
         
-        // Player outline
-        ctx.strokeStyle = '#FFF'
-        ctx.lineWidth = 2 / zoom
+        // Player outline - thicker for followed player
+        ctx.strokeStyle = isCurrentlyFollowed ? '#FFFF00' : '#FFF'
+        ctx.lineWidth = isCurrentlyFollowed ? 4 / zoom : 2 / zoom
         ctx.stroke()
 
         // Player name
         if (player.nickname) {
-          ctx.fillStyle = '#FFF'
-          ctx.font = `${Math.max(12 / zoom, 8)}px Arial`
+          ctx.fillStyle = isCurrentlyFollowed ? '#FFFF00' : '#FFF'
+          ctx.font = `${Math.max(14 / zoom, 10)}px Arial`
           ctx.textAlign = 'center'
-          ctx.fillText(player.nickname, player.x, player.y - radius - 10 / zoom)
+          ctx.fillText(player.nickname, player.x, player.y - radius - 15 / zoom)
         }
         
         // Player stats
-        ctx.fillStyle = '#FFD700'
-        ctx.font = `${Math.max(10 / zoom, 6)}px Arial`
-        ctx.fillText(`${Math.floor(player.mass || 0)} mass`, player.x, player.y + radius + 15 / zoom)
+        ctx.fillStyle = isCurrentlyFollowed ? '#FFFF00' : '#FFD700'
+        ctx.font = `${Math.max(12 / zoom, 8)}px Arial`
+        ctx.fillText(`${Math.floor(player.mass || 0)} mass`, player.x, player.y + radius + 20 / zoom)
       })
     }
 
