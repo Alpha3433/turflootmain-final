@@ -2122,8 +2122,13 @@ const AgarIOGame = () => {
         socket.on('spectator_joined', (data) => {
           console.log('👁️ Successfully joined as spectator:', data)
           setIsWaitingForPlayers(false) // Don't wait for players as spectator
-          // Initialize game in spectator mode  
+          
+          // Initialize game in spectator mode with immediate bot spawning
           initializeGame(true, null, true) // true = multiplayer, null = no party, true = spectator mode
+          
+          // FIXED: Request immediate game state from server
+          console.log('👁️ Requesting initial game state for spectator mode')
+          socket.emit('request_game_state', { roomId: paramRoomId })
         })
 
         socket.on('spectator_game_state', (gameState) => {
