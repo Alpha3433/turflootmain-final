@@ -2780,8 +2780,8 @@ const AgarIOGame = () => {
       // Orb pickup (mass only, no money) - UPDATED for split cells
       const allEntities = [...game.bots].filter(e => e.alive)
       
-      // Add individual player cells for orb collection
-      if (game.player.alive && game.player.cells && game.player.cells.length > 0) {
+      // Add individual player cells for orb collection (skip in spectator mode)
+      if (!isSpectatorMode && game.player.alive && game.player.cells && game.player.cells.length > 0) {
         // Each player cell can collect orbs independently
         game.player.cells.forEach(cell => {
           allEntities.push({
