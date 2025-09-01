@@ -69,7 +69,7 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
         socketRef.current = socket
 
         // Add connection timeout
-        const connectionTimeout = setTimeout(() => {
+        connectionTimeoutRef.current = setTimeout(() => {
           if (!isConnected) {
             console.error('❌ Connection timeout - falling back to demo mode')
             setConnectionError('Connection timeout')
