@@ -2119,7 +2119,7 @@ const AgarIOGame = () => {
           console.log('👁️ Successfully joined as spectator:', data)
           setIsWaitingForPlayers(false) // Don't wait for players as spectator
           // Initialize game in spectator mode  
-          initializeGame(true, true) // true = multiplayer, true = spectator mode
+          initializeGame(true, null, true) // true = multiplayer, null = no party, true = spectator mode
         })
 
         socket.on('spectator_game_state', (gameState) => {
