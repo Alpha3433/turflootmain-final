@@ -89,6 +89,9 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
           if (!isMounted) return
           console.log('👁️ Socket connected, joining as spectator...')
           
+          // For debugging - try a simple connection first
+          console.log('👁️ Testing simple connection...')
+          
           // Join as spectator
           socket.emit('join_as_spectator', {
             roomId,
