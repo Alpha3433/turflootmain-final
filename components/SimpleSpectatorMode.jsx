@@ -361,15 +361,49 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
               onClick={() => {
                 console.log('👁️ Manual connection fallback')
                 setIsConnected(true)
-                // Create demo players
+                
+                // Create complete demo game state
                 const demoPlayers = [
-                  { id: 'demo1', nickname: 'Demo Bot 1', x: 100, y: 100, mass: 50, alive: true },
-                  { id: 'demo2', nickname: 'Demo Bot 2', x: -100, y: -100, mass: 75, alive: true },
-                  { id: 'demo3', nickname: 'Demo Bot 3', x: 200, y: -150, mass: 60, alive: true }
+                  { id: 'demo1', nickname: 'Demo Bot 1', x: 100, y: 100, mass: 50, alive: true, kills: 2, deaths: 0 },
+                  { id: 'demo2', nickname: 'Demo Bot 2', x: -100, y: -100, mass: 75, alive: true, kills: 1, deaths: 1 },
+                  { id: 'demo3', nickname: 'Demo Bot 3', x: 200, y: -150, mass: 60, alive: true, kills: 0, deaths: 2 }
                 ]
+                
+                // Create demo food
+                const demoFood = []
+                for (let i = 0; i < 50; i++) {
+                  demoFood.push({
+                    id: `food_${i}`,
+                    x: (Math.random() - 0.5) * 800,
+                    y: (Math.random() - 0.5) * 800
+                  })
+                }
+                
+                // Create complete demo game state
+                const demoGameState = {
+                  timestamp: Date.now(),
+                  players: demoPlayers,
+                  food: demoFood,
+                  running: true,
+                  worldBounds: {
+                    width: 1000,
+                    height: 1000,
+                    centerX: 0,
+                    centerY: 0
+                  },
+                  leaderboard: [
+                    { rank: 1, nickname: 'Demo Bot 2', mass: 75, kills: 1 },
+                    { rank: 2, nickname: 'Demo Bot 3', mass: 60, kills: 0 },
+                    { rank: 3, nickname: 'Demo Bot 1', mass: 50, kills: 2 }
+                  ],
+                  spectatorCount: 1
+                }
+                
+                setGameState(demoGameState)
                 setPlayers(demoPlayers)
                 setCurrentPlayer(demoPlayers[0])
                 setPlayerCount(demoPlayers.length)
+                setSpectatorCount(1)
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
