@@ -5264,7 +5264,7 @@ const AgarIOGame = () => {
                     <div className="text-lg">🎮</div>
                     <div className="text-center leading-tight">
                       <div>JOIN</div>
-                      <div className="text-xs">{spectatorStake === 'FREE' ? 'FREE' : `$${spectatorStake}`}</div>
+                      <div className="text-xs">FREE</div>
                     </div>
                   </div>
                 </div>
