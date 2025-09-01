@@ -29,6 +29,19 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
   const [currentPlayer, setCurrentPlayer] = useState(null)
   const [spectatorCount, setSpectatorCount] = useState(0)
   const [playerCount, setPlayerCount] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth <= 768
+      setIsMobile(isMobileDevice)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Initialize connection
   useEffect(() => {
