@@ -4754,45 +4754,68 @@ const AgarIOGame = () => {
             </button>
           )}
 
-          {/* Split Button */}
-          <button
-            className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
-              splitCooldownActive
-                ? 'bg-red-600 text-white cursor-not-allowed'
-                : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
-                  ? 'bg-blue-500 hover:bg-blue-400 text-white'
-                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-            }`}
-            disabled={!gameRef.current?.game?.player?.alive || !canPlayerSplit(gameRef.current?.game?.player || { cells: [] })}
-            onClick={() => {
-              if (gameRef.current?.game?.player?.alive && canPlayerSplit(gameRef.current.game.player)) {
-                // Use last mouse position for split direction
-                const canvas = canvasRef.current
-                if (canvas) {
-                  const rect = canvas.getBoundingClientRect()
-                  const mouseX = lastMousePosition.current?.x || rect.width / 2
-                  const mouseY = lastMousePosition.current?.y || rect.height / 2
-                  
-                  // Convert screen coordinates to world coordinates
-                  const game = gameRef.current.game
-                  const worldX = mouseX - rect.width / 2 + game.camera.x
-                  const worldY = mouseY - rect.height / 2 + game.camera.y
-                  
-                  handleSplit(worldX, worldY)
+          {/* Split Button - HIDDEN in spectator mode */}
+          {!isSpectatorMode && (
+            <button
+              className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+                splitCooldownActive
+                  ? 'bg-red-600 text-white cursor-not-allowed'
+                  : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                    ? 'bg-blue-500 hover:bg-blue-400 text-white'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={!gameRef.current?.game?.player?.alive || !canPlayerSplit(gameRef.current?.game?.player || { cells: [] })}
+              onClick={() => {
+                if (gameRef.current?.game?.player?.alive && canPlayerSplit(gameRef.current.game.player)) {
+                  // Use last mouse position for split direction
+                  const canvas = canvasRef.current
+                  if (canvas) {
+                    const rect = canvas.getBoundingClientRect()
+                    const mouseX = lastMousePosition.current?.x || rect.width / 2
+                    const mouseY = lastMousePosition.current?.y || rect.height / 2
+                    
+                    // Convert screen coordinates to world coordinates
+                    const game = gameRef.current.game
+                    const worldX = mouseX - rect.width / 2 + game.camera.x
+                    const worldY = mouseY - rect.height / 2 + game.camera.y
+                    
+                    handleSplit(worldX, worldY)
+                  }
                 }
-              }
-            }}
-          >
-            <span className="text-lg">⚡</span>
-            <span>
-              {splitCooldownActive
-                ? `Split (${Math.ceil(splitCooldown / 1000)}s)`
-                : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
-                  ? 'Split (Space)'
-                  : 'Split (Need 20+ mass)'
-              }
-            </span>
-          </button>
+              }}
+            >
+              <span className="text-lg">⚡</span>
+              <span>
+                {splitCooldownActive
+                  ? `Split (${Math.ceil(splitCooldown / 1000)}s)`
+                  : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                    ? 'Split (Space)'
+                    : 'Split (Need 20+ mass)'
+                }
+              </span>
+            </button>
+          )}
+
+          {/* Spectator Controls - SHOWN in spectator mode */}
+          {isSpectatorMode && (
+            <button
+              className="px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white"
+              onClick={() => {
+                // Cycle through bots being spectated
+                setSpectatorTargetIndex(prev => {
+                  const game = gameRef.current?.game
+                  if (game && game.bots && game.bots.length > 0) {
+                    const aliveBots = game.bots.filter(bot => bot.alive)
+                    return (prev + 1) % Math.max(aliveBots.length, 1)
+                  }
+                  return 0
+                })
+              }}
+            >
+              <span className="text-lg">👁️</span>
+              <span>Switch View (A/D)</span>
+            </button>
+          )}
         </div>
       )}
 
