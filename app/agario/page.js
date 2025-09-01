@@ -3313,7 +3313,7 @@ const AgarIOGame = () => {
       updateBounties()
 
       // Update camera
-      if (game.player.alive) {
+      if (game.player.alive || isSpectatorMode) {
         // Camera logic: follow player or bot depending on mode
         if (isSpectatorMode && game.bots.length > 0) {
           // Spectator mode: follow targeted bot (or first available)
@@ -3325,8 +3325,8 @@ const AgarIOGame = () => {
             game.camera.x = targetBot.x
             game.camera.y = targetBot.y
           }
-        } else {
-          // Regular mode: follow player
+        } else if (game.player.alive) {
+          // Regular mode: follow player (only if player is alive)
           game.camera.x = game.player.x
           game.camera.y = game.player.y
         }
