@@ -4748,7 +4748,7 @@ const AgarIOGame = () => {
               }}
               className="px-6 py-3 rounded-lg font-bold transition-all bg-green-500 hover:bg-green-400 text-white"
             >
-              🎮 Join Match {spectatorStake === 'FREE' ? '- FREE' : `- $${spectatorStake}`}
+              🎮 Join Match
             </button>
           ) : (
             // Regular Cash Out Button for Players
