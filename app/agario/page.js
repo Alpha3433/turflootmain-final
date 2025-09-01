@@ -3334,7 +3334,10 @@ const AgarIOGame = () => {
         // FIXED: Dynamic zoom based on player size - Use game's mobile state for consistency
         let targetZoom
         
-        if (game.isMobileGame) {
+        if (isSpectatorMode) {
+          // Spectator mode: use fixed moderate zoom for good overview
+          targetZoom = game.isMobileGame ? 0.9 : 1.0
+        } else if (game.isMobileGame) {
           // Mobile: LESS INTENSIVE Dynamic zoom that scales with player size for better overview
           const baseMass = 10 // Starting mass
           const currentMass = game.player.mass
