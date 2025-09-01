@@ -1360,9 +1360,9 @@ export default function Home() {
 
 
 
-  // NEW: Auto-spectate - enter lobby as spectator by default for ALL stakes
+  // NEW: Auto-spectate - load directly into real game in spectator mode
   const handleAutoSpectate = () => {
-    console.log('👁️ Auto-spectate mode - entering lobby as spectator for stake:', selectedStake)
+    console.log('👁️ Auto-spectate mode - loading real game as spectator for stake:', selectedStake)
     
     // Determine game mode and fee for all stakes
     const gameMode = selectedStake === 'FREE' || selectedStake === 0 ? 'free' : 'cash'
@@ -1379,7 +1379,7 @@ export default function Home() {
       roomId = `${selectedRegion}-cash-${gameFee}-1`
     }
     
-    console.log('👁️ Auto-navigating to spectator mode:', { 
+    console.log('👁️ Auto-navigating to real game in spectator mode:', { 
       roomId, 
       gameMode, 
       gameFee, 
@@ -1387,24 +1387,24 @@ export default function Home() {
       region: currentServer || 'US-East-1'
     })
     
-    // Navigate directly to spectator mode with fallback
-    const spectateUrl = `/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&autoSpectate=true&stake=${selectedStake}`
+    // Navigate directly to the real agario game page but in spectator mode
+    const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&spectatorMode=true&stake=${selectedStake}&autoSpectate=true`
     
     try {
-      router.push(spectateUrl)
-      console.log('✅ Router.push called for spectator mode')
+      router.push(gameUrl)
+      console.log('✅ Router.push called for game spectator mode')
       
       // Fallback navigation after a short delay
       setTimeout(() => {
         if (window.location.pathname === '/') {
-          console.log('🔄 Using window.location fallback for spectator mode')
-          window.location.href = spectateUrl
+          console.log('🔄 Using window.location fallback for game spectator mode')
+          window.location.href = gameUrl
         }
       }, 1000)
       
     } catch (error) {
-      console.error('❌ Router error for spectator mode:', error)
-      window.location.href = spectateUrl
+      console.error('❌ Router error for game spectator mode:', error)
+      window.location.href = gameUrl
     }
   }
 
