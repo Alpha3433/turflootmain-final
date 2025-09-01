@@ -1360,27 +1360,35 @@ export default function Home() {
 
 
 
-  // NEW: Auto-spectate - enter lobby as spectator by default
+  // NEW: Auto-spectate - enter lobby as spectator by default for ALL stakes
   const handleAutoSpectate = () => {
-    console.log('👁️ Auto-spectate mode - entering lobby as spectator')
+    console.log('👁️ Auto-spectate mode - entering lobby as spectator for stake:', selectedStake)
     
-    // For spectating, we don't need authentication for free games
+    // Determine game mode and fee for all stakes
     const gameMode = selectedStake === 'FREE' || selectedStake === 0 ? 'free' : 'cash'
     const gameFee = selectedStake === 'FREE' || selectedStake === 0 ? 0 : parseInt(selectedStake.toString().replace('$', ''))
     
-    // Determine room ID based on game type
+    // Generate room ID based on game type and region
     let roomId
     if (gameMode === 'free') {
       roomId = 'global-practice-bots' // Spectate the global practice room
     } else {
-      // For cash games, spectate a random server of the same stake
-      roomId = `us-east-1-cash-${gameFee}-1` // Could be made more sophisticated
+      // For cash games, generate room ID based on selected region and stake
+      const selectedRegion = region || 'us-east-1'
+      // Use room number 1 as default spectate target for each stake
+      roomId = `${selectedRegion}-cash-${gameFee}-1`
     }
     
-    console.log('👁️ Auto-navigating to spectator mode:', { roomId, gameMode, gameFee })
+    console.log('👁️ Auto-navigating to spectator mode:', { 
+      roomId, 
+      gameMode, 
+      gameFee, 
+      stake: selectedStake,
+      region: region || 'us-east-1'
+    })
     
     // Navigate directly to spectator mode with fallback
-    const spectateUrl = `/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&autoSpectate=true`
+    const spectateUrl = `/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&autoSpectate=true&stake=${selectedStake}`
     
     try {
       router.push(spectateUrl)
