@@ -198,6 +198,14 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
           if (!isMounted) return
           setRoomInfo(info)
         })
+  // Auto-spectate initialization - set default camera mode
+  useEffect(() => {
+    if (autoSpectate && gameState && gameState.players && gameState.players.length > 0) {
+      // Start with bird's eye view for auto-spectate mode
+      setCameraMode('bird_eye')
+      console.log('👁️ Auto-spectate initialized with bird\'s eye view')
+    }
+  }, [autoSpectate, gameState])
 
         socket.on('spectator_became_player', (data) => {
           if (!isMounted) return
