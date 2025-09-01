@@ -2060,24 +2060,33 @@ const AgarIOGame = () => {
         console.log('✅ Connected to game server:', socket.id)
         setIsConnected(true)
         
-        // Join game room with party information
-        const joinData = {
-          roomId: paramRoomId,
-          mode: paramMode,
-          fee: paramFee,
-          token: authToken,
-          fallback: true
+        if (spectatorOnly) {
+          // NEW: Join as spectator instead of active player
+          console.log('👁️ Connecting as spectator to room:', paramRoomId)
+          socket.emit('join_as_spectator', {
+            roomId: paramRoomId,
+            token: authToken || 'guest'
+          })
+        } else {
+          // Regular player connection
+          const joinData = {
+            roomId: paramRoomId,
+            mode: paramMode,
+            fee: paramFee,
+            token: authToken,
+            fallback: true
+          }
+          
+          // Add party information if this is a party game
+          if (paramMode === 'party' && paramPartyId) {
+            joinData.partyId = paramPartyId
+            joinData.partySize = paramPartySize
+            joinData.partyMembers = paramPartyMembers
+            console.log('🎉 Joining room with party data:', { partyId: paramPartyId, partySize: paramPartySize })
+          }
+          
+          socket.emit('join_room', joinData)
         }
-        
-        // Add party information if this is a party game
-        if (paramMode === 'party' && paramPartyId) {
-          joinData.partyId = paramPartyId
-          joinData.partySize = paramPartySize
-          joinData.partyMembers = paramPartyMembers
-          console.log('🎉 Joining room with party data:', { partyId: paramPartyId, partySize: paramPartySize })
-        }
-        
-        socket.emit('join_room', joinData)
       })
       
       socket.on('disconnect', () => {
