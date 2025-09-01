@@ -569,7 +569,6 @@ const AgarIOGame = () => {
           e.preventDefault() // Prevent page scroll
           const aliveBots = gameRef.current?.game?.bots?.filter(bot => bot.alive) || []
           if (aliveBots.length > 0) {
-            setSpectatorTargetIndex((prev) => (prev + 1) % aliveBots.length)
             console.log('👁️ Switching to next bot to spectate')
           }
         }
