@@ -543,21 +543,24 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
             </div>
           </div>
 
-          {/* Camera Controls */}
+          {/* Camera Controls with Instructions */}
           <div className="absolute top-20 left-4 z-10">
-            <Card className="bg-black/70 border-gray-700">
-              <CardContent className="p-3">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-white mb-2">Camera Mode</div>
-                  <div className="flex flex-col space-y-1">
+            <Card className="bg-black/80 border-gray-600">
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <div className="text-sm font-bold text-white">Camera Controls</div>
+                  <div className="flex flex-col space-y-2">
                     <Button
                       variant={cameraMode === 'bird_eye' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => handleCameraModeChange('bird_eye')}
                       className="justify-start text-xs"
                     >
-                      <Camera className="h-3 w-3 mr-1" />
-                      Bird's Eye
+                      <Camera className="h-3 w-3 mr-2" />
+                      <div className="text-left">
+                        <div>Map View</div>
+                        <div className="text-xs opacity-70">See whole battlefield</div>
+                      </div>
                     </Button>
                     <Button
                       variant={cameraMode === 'player_follow' ? 'default' : 'ghost'}
@@ -565,8 +568,11 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
                       onClick={() => handleCameraModeChange('player_follow')}
                       className="justify-start text-xs"
                     >
-                      <Target className="h-3 w-3 mr-1" />
-                      Follow Player
+                      <Target className="h-3 w-3 mr-2" />
+                      <div className="text-left">
+                        <div>Follow Top Player</div>
+                        <div className="text-xs opacity-70">Click leaderboard to switch</div>
+                      </div>
                     </Button>
                     <Button
                       variant={cameraMode === 'free_camera' ? 'default' : 'ghost'}
@@ -574,8 +580,13 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
                       onClick={() => handleCameraModeChange('free_camera')}
                       className="justify-start text-xs"
                     >
-                      <Move3D className="h-3 w-3 mr-1" />
-                      Free Camera
+                      <Move3D className="h-3 w-3 mr-2" />
+                      <div className="text-left">
+                        <div>Free Cam</div>
+                        <div className="text-xs opacity-70">
+                          {isMobile ? 'Swipe to move' : 'WASD or drag'}
+                        </div>
+                      </div>
                     </Button>
                   </div>
                 </div>
