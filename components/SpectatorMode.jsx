@@ -144,12 +144,16 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
           if (!isMounted) return
           setRoomInfo(info)
         })
-  // Auto-spectate initialization - set default camera mode
+  // Auto-spectate initialization - start following first player
   useEffect(() => {
     if (autoSpectate && gameState && gameState.players && gameState.players.length > 0) {
-      // Start with bird's eye view for auto-spectate mode
-      setCameraMode('bird_eye')
-      console.log('👁️ Auto-spectate initialized with bird\'s eye view')
+      console.log('👁️ Auto-spectate initialized - following players')
+      const alivePlayers = gameState.players.filter(p => p.alive)
+      if (alivePlayers.length > 0) {
+        setFollowingPlayerIndex(0)
+        setCurrentPlayer(alivePlayers[0])
+        console.log(`👁️ Now following: ${alivePlayers[0].nickname}`)
+      }
     }
   }, [autoSpectate, gameState])
 
