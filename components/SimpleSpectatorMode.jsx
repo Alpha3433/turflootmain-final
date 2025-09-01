@@ -104,7 +104,10 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
         socket.on('spectator_joined', (data) => {
           if (!isMounted) return
           console.log('👁️ Successfully joined as spectator:', data)
-          clearTimeout(connectionTimeout) // Clear timeout on successful connection
+          if (connectionTimeoutRef.current) {
+            clearTimeout(connectionTimeoutRef.current) // Clear timeout on successful connection
+            connectionTimeoutRef.current = null
+          }
           setIsConnected(true)  // Set connected only after successful join
           setSpectatorCount(data.spectatorCount || 0)
           setPlayerCount(data.playerCount || 0)
