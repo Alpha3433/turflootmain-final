@@ -2467,8 +2467,10 @@ const AgarIOGame = () => {
     }
 
     // Initialize bots or use real players
-    if (!game.isMultiplayer) {
-      // Only create bots in offline/demo mode - Initialize bots with varying mass and net worth
+    if (!game.isMultiplayer || spectatorMode) {
+      // FIXED: Create bots in offline mode OR spectator mode (for immediate visual feedback)
+      console.log('🤖 Spawning initial bots for', spectatorMode ? 'spectator mode' : 'offline mode')
+      
       for (let i = 0; i < config.botCount; i++) {
         const mass = config.startingMass + Math.random() * 15
         const netWorth = config.startingNetWorth + Math.random() * 200
@@ -2507,7 +2509,7 @@ const AgarIOGame = () => {
         })
       }
     } else {
-      // In multiplayer mode, bots array will be populated by real players from Socket.IO
+      // In regular multiplayer mode, bots array will be populated by real players from Socket.IO
       console.log('🔗 Multiplayer mode - waiting for real players from server')
     }
 
