@@ -389,7 +389,7 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
                right: '20px'
              }}>
           
-          {/* Mobile Next Player Button - Styled like Mobile Split */}
+          {/* Mobile Next Player Button - Purple with eye emoji */}
           <div 
             className="relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95"
             onClick={cyclePlayer}
@@ -406,9 +406,9 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
             <div className={`absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 ${
               players.length <= 1
                 ? 'bg-gray-800/60 border-gray-700'
-                : 'bg-blue-800/80 border-blue-600 hover:bg-blue-700/90'
+                : 'bg-purple-800/80 border-purple-600 hover:bg-purple-700/90'
             }`}>
-              <div className="text-lg">⚡</div>
+              <div className="text-lg">👁️</div>
               <div className="text-center leading-tight">
                 <div className="text-xs">NEXT</div>
                 <div className="text-xs">({players.length})</div>
@@ -416,7 +416,7 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
             </div>
           </div>
 
-          {/* Mobile Join Match Button - Styled like Mobile Cash Out */}
+          {/* Mobile Join Match Button - Green with game controller emoji */}
           <div 
             className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
             onClick={handleJoinMatch}
@@ -430,8 +430,8 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
               zIndex: 1001
             }}
           >
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-black text-xs font-bold rounded-full border-2 transition-all duration-200 bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 border-yellow-400 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500">
-              <div className="text-lg">💰</div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 bg-gradient-to-br from-green-400 via-green-500 to-green-600 border-green-400 hover:from-green-300 hover:via-green-400 hover:to-green-500">
+              <div className="text-lg">🎮</div>
               <div className="text-center leading-tight">
                 <div>JOIN</div>
                 <div className="text-xs">{stake === 'FREE' ? 'FREE' : `$${stake}`}</div>
