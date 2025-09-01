@@ -2859,100 +2859,105 @@ const AgarIOGame = () => {
         allEntities.push(game.player)
       }
       
-      for (let i = game.orbs.length - 1; i >= 0; i--) {
-        const orb = game.orbs[i]
-        
-        for (const entity of allEntities) {
-          const distance = getDistance(entity, orb)
-          const baseRadius = getRadius(entity.mass) * 2.0 // Base visual scaling
-          const visualRadius = (entity === game.player || entity.isPlayerCell) ? baseRadius * 3.0 : baseRadius // Player cells 3x bigger
+      // FIXED: Skip orb collection in spectator mode - spectators should just observe
+      if (!isSpectatorMode) {
+        for (let i = game.orbs.length - 1; i >= 0; i--) {
+          const orb = game.orbs[i]
           
-          if (distance <= visualRadius) {
-            const oldMass = entity.mass
-            const orbMass = config.orbMassValue
+          for (const entity of allEntities) {
+            const distance = getDistance(entity, orb)
+            const baseRadius = getRadius(entity.mass) * 2.0 // Base visual scaling
+            const visualRadius = (entity === game.player || entity.isPlayerCell) ? baseRadius * 3.0 : baseRadius // Player cells 3x bigger
             
-            // Handle orb collection for split cells
-            if (entity.isPlayerCell && entity.cellReference) {
-              // Update the specific cell that collected the orb
-              entity.cellReference.mass += orbMass
-              entity.cellReference.radius = Math.sqrt(entity.cellReference.mass / Math.PI) * 8
+            if (distance <= visualRadius) {
+              const oldMass = entity.mass
+              const orbMass = config.orbMassValue
               
-              // Update total player mass
-              game.player.mass = game.player.cells.reduce((total, cell) => total + cell.mass, 0)
-              
-              console.log(`🍽️ Cell ${entity.cellId} collected orb! Cell mass: ${entity.cellReference.mass}, Total mass: ${game.player.mass}`)
-              
-              // Add enhanced visual effects for individual cell collection
-              addFloatingText(`+${orbMass} mass`, entity.x, entity.y - 30, '#00ff88')
-              addCoinAnimation(orb.x, orb.y)
-              
-            } else if (entity === game.player) {
-              // Legacy single cell collection
-              entity.mass += orbMass
-              
-              // CRITICAL FIX: Also update the main cell's mass for split functionality
-              if (entity.cells && entity.cells.length > 0) {
-                entity.cells[0].mass = entity.mass // Keep main cell mass in sync
-                // Also update cell radius
-                entity.cells[0].radius = Math.sqrt(entity.mass / Math.PI) * 8
+              // Handle orb collection for split cells
+              if (entity.isPlayerCell && entity.cellReference) {
+                // Update the specific cell that collected the orb
+                entity.cellReference.mass += orbMass
+                entity.cellReference.radius = Math.sqrt(entity.cellReference.mass / Math.PI) * 8
+                
+                // Update total player mass
+                game.player.mass = game.player.cells.reduce((total, cell) => total + cell.mass, 0)
+                
+                console.log(`🍽️ Cell ${entity.cellId} collected orb! Cell mass: ${entity.cellReference.mass}, Total mass: ${game.player.mass}`)
+                
+                // Add enhanced visual effects for individual cell collection
+                addFloatingText(`+${orbMass} mass`, entity.x, entity.y - 30, '#00ff88')
+                addCoinAnimation(orb.x, orb.y)
+                
+              } else if (entity === game.player) {
+                // Legacy single cell collection
+                entity.mass += orbMass
+                
+                // CRITICAL FIX: Also update the main cell's mass for split functionality
+                if (entity.cells && entity.cells.length > 0) {
+                  entity.cells[0].mass = entity.mass // Keep main cell mass in sync
+                  // Also update cell radius
+                  entity.cells[0].radius = Math.sqrt(entity.mass / Math.PI) * 8
+                } else {
+                  // If cells array is missing or empty, recreate it
+                  entity.cells = [{
+                    id: 'main',
+                    x: entity.x,
+                    y: entity.y,
+                    mass: entity.mass,
+                    radius: Math.sqrt(entity.mass / Math.PI) * 8,
+                    velocity: { x: 0, y: 0 },
+                    splitTime: 0,
+                    mergeLocked: false
+                  }]
+                  console.log('🔧 Recreated missing cells array for player')
+                }
+                
+                // Add enhanced coin collection effects for player
+                addFloatingText(`+${orbMass} mass`, entity.x, entity.y - 30, '#00ff88')
+                addCoinAnimation(orb.x, orb.y) // New animated coin pickup
+                
               } else {
-                // If cells array is missing or empty, recreate it
-                entity.cells = [{
-                  id: 'main',
-                  x: entity.x,
-                  y: entity.y,
-                  mass: entity.mass,
-                  radius: Math.sqrt(entity.mass / Math.PI) * 8,
-                  velocity: { x: 0, y: 0 },
-                  splitTime: 0,
-                  mergeLocked: false
-                }]
-                console.log('🔧 Recreated missing cells array for player')
+                // Bot orb collection
+                entity.mass += orbMass
               }
-              
-              // Add enhanced coin collection effects for player
-              addFloatingText(`+${orbMass} mass`, entity.x, entity.y - 30, '#00ff88')
-              addCoinAnimation(orb.x, orb.y) // New animated coin pickup
-              
-            } else {
-              // Bot orb collection
-              entity.mass += orbMass
-            }
-              
-              // Increment coins collected counter (with safety check)
-              setGameSession(prev => ({
-                ...prev,
-                coinsCollected: (prev.coinsCollected || 0) + 1
-              }))
-              
-              // Update mission progress for collect type - FIXED: Use game.currentMission
-              if (game.currentMission && game.currentMission.type === 'collect') {
-                console.log('🎯 Collect mission progress update - Current progress:', game.currentMission.progress, 'Target:', game.currentMission.target)
-                setCurrentMission(prev => {
-                  if (prev) {
-                    const newProgress = prev.progress + 1
-                    console.log('🎯 New collect progress:', newProgress, '/', prev.target)
-                    setMissionProgress(newProgress)
-                    // CRITICAL: Update game.currentMission to keep it synchronized
-                    const updatedMission = { ...prev, progress: newProgress }
-                    game.currentMission = updatedMission
-                    if (newProgress >= prev.target) {
-                      console.log('🎯 Collect mission completed!')
-                      completeMission(updatedMission)
-                      game.currentMission = null // Clear from game object too
-                      return null // Clear mission when completed
+                
+                // Increment coins collected counter (with safety check)
+                setGameSession(prev => ({
+                  ...prev,
+                  coinsCollected: (prev.coinsCollected || 0) + 1
+                }))
+                
+                // Update mission progress for collect type - FIXED: Use game.currentMission
+                if (game.currentMission && game.currentMission.type === 'collect') {
+                  console.log('🎯 Collect mission progress update - Current progress:', game.currentMission.progress, 'Target:', game.currentMission.target)
+                  setCurrentMission(prev => {
+                    if (prev) {
+                      const newProgress = prev.progress + 1
+                      console.log('🎯 New collect progress:', newProgress, '/', prev.target)
+                      setMissionProgress(newProgress)
+                      // CRITICAL: Update game.currentMission to keep it synchronized
+                      const updatedMission = { ...prev, progress: newProgress }
+                      game.currentMission = updatedMission
+                      if (newProgress >= prev.target) {
+                        console.log('🎯 Collect mission completed!')
+                        completeMission(updatedMission)
+                        game.currentMission = null // Clear from game object too
+                        return null // Clear mission when completed
+                      }
+                      return updatedMission
                     }
-                    return updatedMission
-                  }
-                  return prev
-                })
-              }
-            
-            game.orbs.splice(i, 1)
-            break
+                    return prev
+                  })
+                }
+              
+              game.orbs.splice(i, 1)
+              break
+            }
           }
-        }
-      } // End orb collection loop
+        } // End orb collection loop
+      } else {
+        console.log('👁️ Spectator mode - skipping orb collection logic')
+      }
 
       // Replenish orbs (only in offline mode - server handles food in multiplayer)
       if (!game.isMultiplayer) {
