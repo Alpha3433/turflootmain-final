@@ -354,32 +354,94 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
         </Button>
       </div>
 
-      {/* Game Action Buttons - Styled exactly like in-game Cash Out & Split */}
-      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
-        {/* Next Player Button - Styled like Split Button */}
-        <button
-          onClick={cyclePlayer}
-          disabled={players.length <= 1}
-          className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
-            players.length <= 1
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-400 text-white'
-          }`}
-        >
-          <span className="text-lg">⚡</span>
-          <span>
-            Next Player ({players.length})
-          </span>
-        </button>
+      {/* Desktop Action Buttons - Styled exactly like in-game */}
+      {!isMobile && (
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
+          {/* Next Player Button - Styled like Split Button */}
+          <button
+            onClick={cyclePlayer}
+            disabled={players.length <= 1}
+            className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+              players.length <= 1
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-400 text-white'
+            }`}
+          >
+            <span className="text-lg">⚡</span>
+            <span>
+              Next Player ({players.length})
+            </span>
+          </button>
 
-        {/* Join Match Button - Styled like Cash Out Button */}
-        <button
-          onClick={handleJoinMatch}
-          className="px-6 py-3 rounded-lg font-bold transition-all bg-yellow-500 hover:bg-yellow-400 text-black"
-        >
-          💰 Join Match {stake === 'FREE' ? '- FREE' : `- $${stake}`}
-        </button>
-      </div>
+          {/* Join Match Button - Styled like Cash Out Button */}
+          <button
+            onClick={handleJoinMatch}
+            className="px-6 py-3 rounded-lg font-bold transition-all bg-yellow-500 hover:bg-yellow-400 text-black"
+          >
+            💰 Join Match {stake === 'FREE' ? '- FREE' : `- $${stake}`}
+          </button>
+        </div>
+      )}
+
+      {/* Mobile Action Buttons - Circular style like in-game */}
+      {isMobile && (
+        <div className="fixed bottom-5 right-5 flex flex-row gap-6 z-50"
+             style={{ 
+               bottom: 'calc(env(safe-area-inset-bottom, 0px) + 30px)',
+               right: '20px'
+             }}>
+          
+          {/* Mobile Next Player Button - Styled like Mobile Split */}
+          <div 
+            className="relative rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95"
+            onClick={cyclePlayer}
+            style={{ 
+              touchAction: 'none',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              width: '75px',
+              height: '75px', 
+              padding: '6px',
+              zIndex: 1001
+            }}
+          >
+            <div className={`absolute inset-0 flex flex-col items-center justify-center text-white text-xs font-bold rounded-full border-2 transition-all duration-200 ${
+              players.length <= 1
+                ? 'bg-gray-800/60 border-gray-700'
+                : 'bg-blue-800/80 border-blue-600 hover:bg-blue-700/90'
+            }`}>
+              <div className="text-lg">⚡</div>
+              <div className="text-center leading-tight">
+                <div className="text-xs">NEXT</div>
+                <div className="text-xs">({players.length})</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Join Match Button - Styled like Mobile Cash Out */}
+          <div 
+            className="relative rounded-full flex items-center justify-center cursor-pointer transition-transform duration-200 active:scale-95"
+            onClick={handleJoinMatch}
+            style={{ 
+              touchAction: 'none',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              width: '90px',
+              height: '90px',
+              padding: '8px',
+              zIndex: 1001
+            }}
+          >
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-black text-xs font-bold rounded-full border-2 transition-all duration-200 bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 border-yellow-400 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500">
+              <div className="text-lg">💰</div>
+              <div className="text-center leading-tight">
+                <div>JOIN</div>
+                <div className="text-xs">{stake === 'FREE' ? 'FREE' : `$${stake}`}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* No Game State Warning */}
       {!gameState && isConnected && (
