@@ -266,9 +266,7 @@ const AgarIOGame = () => {
     const paramPartySize = parseInt(urlParams.get('partySize')) || 1
     const paramMembers = urlParams.get('members')
     // NEW: Spectator mode parameters
-    const paramSpectatorMode = urlParams.get('spectatorMode') === 'true'
     const paramStake = urlParams.get('stake') || 'FREE'
-    const paramAutoSpectate = urlParams.get('autoSpectate') === 'true'
     const paramDirectPlay = urlParams.get('directPlay') === 'true' // NEW: Direct play parameter
     
     console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramDirectPlay })
