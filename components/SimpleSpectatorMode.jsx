@@ -328,44 +328,44 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
         </div>
       )}
 
-      {/* Simple Controls - Left Side */}
-      <div className="absolute left-4 bottom-4 z-10 flex flex-col space-y-3">
-        {/* Exit to Menu */}
+      {/* Exit to Menu - Top Left */}
+      <div className="absolute top-4 left-4 z-10">
         <Button
           onClick={handleExitToMenu}
           variant="secondary"
-          size="lg"
+          size="sm"
           className="bg-black/80 border-gray-600 text-white hover:bg-gray-700"
         >
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Exit to Menu
-        </Button>
-
-        {/* Cycle Player */}
-        <Button
-          onClick={cyclePlayer}
-          size="lg"
-          disabled={players.length <= 1}
-          className="bg-purple-600 hover:bg-purple-700 text-white"
-        >
-          <SkipForward className="h-5 w-5 mr-2" />
-          Next Player ({players.length})
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Exit
         </Button>
       </div>
 
-      {/* Join Match Button - Persistent Bottom Right */}
-      <div className="absolute bottom-4 right-4 z-10">
-        <Button
-          onClick={handleJoinMatch}
-          size="lg"
-          className="bg-gradient-to-r from-green-500 to-green-400 hover:from-green-400 hover:to-green-300 text-white font-bold px-8 py-4 text-xl shadow-2xl border-2 border-green-300 transition-all duration-300 hover:scale-105"
-          style={{
-            animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-          }}
+      {/* Game Action Buttons - Styled exactly like in-game Cash Out & Split */}
+      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
+        {/* Next Player Button - Styled like Split Button */}
+        <button
+          onClick={cyclePlayer}
+          disabled={players.length <= 1}
+          className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+            players.length <= 1
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-400 text-white'
+          }`}
         >
-          <Play className="h-6 w-6 mr-2" />
-          Join Match {stake === 'FREE' ? '- FREE' : `- $${stake}`}
-        </Button>
+          <span className="text-lg">⚡</span>
+          <span>
+            Next Player ({players.length})
+          </span>
+        </button>
+
+        {/* Join Match Button - Styled like Cash Out Button */}
+        <button
+          onClick={handleJoinMatch}
+          className="px-6 py-3 rounded-lg font-bold transition-all bg-yellow-500 hover:bg-yellow-400 text-black"
+        >
+          💰 Join Match {stake === 'FREE' ? '- FREE' : `- $${stake}`}
+        </button>
       </div>
 
       {/* No Game State Warning */}
