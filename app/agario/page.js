@@ -268,8 +268,19 @@ const AgarIOGame = () => {
       const paramPartyId = urlParams.get('partyId')
       const paramPartySize = parseInt(urlParams.get('partySize')) || 1
       const paramMembers = urlParams.get('members')
+      // NEW: Spectator mode parameters
+      const paramSpectatorMode = urlParams.get('spectatorMode') === 'true'
+      const paramStake = urlParams.get('stake') || 'FREE'
+      const paramAutoSpectate = urlParams.get('autoSpectate') === 'true'
       
-      console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers })
+      console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate })
+      
+      // NEW: Set spectator mode if detected
+      if (paramSpectatorMode || paramAutoSpectate) {
+        console.log('👁️ Spectator mode detected - loading as spectator')
+        setIsSpectatorMode(true)
+        setSpectatorStake(paramStake)
+      }
       
       // Enable multiplayer for cash games OR party games
       if ((paramMode === 'cash' && paramFee > 0) || paramMode === 'party') {
