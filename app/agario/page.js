@@ -260,46 +260,44 @@ const AgarIOGame = () => {
       mobileDetectionComplete 
     })
     
-    // Check if user is authenticated and determine game mode
+    // FIXED: Check URL parameters FIRST, before authentication check
+    const urlParams = new URLSearchParams(window.location.search)
+    const paramFee = parseFloat(urlParams.get('fee')) || 0
+    const paramMode = urlParams.get('mode') || 'free'
+    const paramPartyId = urlParams.get('partyId')
+    const paramPartySize = parseInt(urlParams.get('partySize')) || 1
+    const paramMembers = urlParams.get('members')
+    // NEW: Spectator mode parameters
+    const paramSpectatorMode = urlParams.get('spectatorMode') === 'true'
+    const paramStake = urlParams.get('stake') || 'FREE'
+    const paramAutoSpectate = urlParams.get('autoSpectate') === 'true'
+    
+    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate })
+    
+    // FIXED: Handle spectator mode BEFORE authentication check
+    if (paramSpectatorMode || paramAutoSpectate) {
+      console.log('👁️ Spectator mode detected - loading as spectator (no auth required)')
+      setIsSpectatorMode(true)
+      setSpectatorStake(paramStake)
+      
+      console.log('👁️ Spectator mode detected - skipping player initialization')
+      console.log('👁️ User will spectate existing game without spawning as player') 
+      
+      // Initialize spectator mode without authentication requirement
+      if (paramMode === 'cash' && paramFee > 0) {
+        // For cash games, try to connect to multiplayer as spectator
+        console.log('👁️ Connecting to cash game as spectator')
+        initializeMultiplayer(paramPartyId, paramPartySize, paramMembers, true) // true = spectator only
+      } else {
+        // For free games, connect to multiplayer as spectator  
+        console.log('👁️ Connecting to practice game as spectator')
+        initializeMultiplayer(null, 1, null, true) // true = spectator only
+      }
+      return // Exit early - don't run regular initialization
+    }
+    
+    // Check if user is authenticated and determine game mode (for non-spectator modes)
     if (user && getAccessToken) {
-      // Check URL parameters to see if this is a cash game or party game
-      const urlParams = new URLSearchParams(window.location.search)
-      const paramFee = parseFloat(urlParams.get('fee')) || 0
-      const paramMode = urlParams.get('mode') || 'free'
-      const paramPartyId = urlParams.get('partyId')
-      const paramPartySize = parseInt(urlParams.get('partySize')) || 1
-      const paramMembers = urlParams.get('members')
-      // NEW: Spectator mode parameters
-      const paramSpectatorMode = urlParams.get('spectatorMode') === 'true'
-      const paramStake = urlParams.get('stake') || 'FREE'
-      const paramAutoSpectate = urlParams.get('autoSpectate') === 'true'
-      
-      console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate })
-      
-      // NEW: Set spectator mode if detected
-      if (paramSpectatorMode || paramAutoSpectate) {
-        console.log('👁️ Spectator mode detected - loading as spectator')
-        setIsSpectatorMode(true)
-        setSpectatorStake(paramStake)
-      }
-      
-      // NEW: Skip game initialization if in spectator mode
-      if (paramSpectatorMode || paramAutoSpectate) {
-        console.log('👁️ Spectator mode detected - skipping player initialization')
-        console.log('👁️ User will spectate existing game without spawning as player') 
-        // Don't initialize game - just connect as spectator to watch others
-        if (paramMode === 'cash' && paramFee > 0) {
-          // For cash games, try to connect to multiplayer as spectator
-          console.log('👁️ Connecting to cash game as spectator')
-          initializeMultiplayer(paramPartyId, paramPartySize, paramMembers, true) // true = spectator only
-        } else {
-          // For free games, connect to multiplayer as spectator  
-          console.log('👁️ Connecting to practice game as spectator')
-          initializeMultiplayer(null, 1, null, true) // true = spectator only
-        }
-        return // Exit early - don't run regular initialization
-      }
-
       // Regular game initialization (when not in spectator mode)
       // Enable multiplayer for cash games OR party games
       if ((paramMode === 'cash' && paramFee > 0) || paramMode === 'party') {
