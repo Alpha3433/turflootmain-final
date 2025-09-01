@@ -574,23 +574,37 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
                     Leaderboard
                   </div>
                   <div className="space-y-1">
-                    {leaderboard.slice(0, 5).map((player, index) => (
-                      <div 
-                        key={player.nickname}
-                        className="flex justify-between items-center text-xs text-white cursor-pointer hover:bg-white/10 p-1 rounded"
-                        onClick={() => handleFollowPlayer(player.id)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <span className="text-yellow-500">#{index + 1}</span>
-                          <span>{player.nickname}</span>
+                    {leaderboard.slice(0, 5).map((player, index) => {
+                      const isCurrentlyFollowed = currentPlayer && player.nickname === currentPlayer.nickname
+                      return (
+                        <div 
+                          key={player.nickname}
+                          className={`flex justify-between items-center text-xs cursor-pointer hover:bg-white/10 p-2 rounded transition-colors ${
+                            isCurrentlyFollowed ? 'bg-yellow-500/20 border border-yellow-500/50 text-yellow-300' : 'text-white'
+                          }`}
+                          onClick={() => {
+                            // Find player in available players list and follow them
+                            const targetPlayer = availablePlayers.find(p => p.nickname === player.nickname)
+                            if (targetPlayer) {
+                              handleFollowPlayer(targetPlayer.id)
+                            }
+                          }}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <span className={isCurrentlyFollowed ? "text-yellow-400 font-bold" : "text-yellow-500"}>
+                              #{index + 1}
+                            </span>
+                            <span className={isCurrentlyFollowed ? "font-bold" : ""}>{player.nickname}</span>
+                            {isCurrentlyFollowed && <Target className="h-3 w-3 text-yellow-400" />}
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span>{player.mass}</span>
+                            <Skull className="h-3 w-3 text-red-500" />
+                            <span>{player.kills}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <span>{player.mass}</span>
-                          <Skull className="h-3 w-3 text-red-500" />
-                          <span>{player.kills}</span>
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </CardContent>
               </Card>
