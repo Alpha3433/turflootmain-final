@@ -3302,13 +3302,12 @@ const AgarIOGame = () => {
       if (game.player.alive) {
         // Camera logic: follow player or bot depending on mode
         if (isSpectatorMode && game.bots.length > 0) {
-          // Spectator mode: follow a random bot or the largest bot
+          // Spectator mode: follow targeted bot (or first available)
           const aliveBots = game.bots.filter(bot => bot.alive)
           if (aliveBots.length > 0) {
-            // Follow the largest bot for most interesting action
-            const targetBot = aliveBots.reduce((largest, bot) => 
-              bot.mass > largest.mass ? bot : largest
-            )
+            // Follow the bot at the current target index (or first if index is out of bounds)
+            const targetIndex = Math.min(spectatorTargetIndex, aliveBots.length - 1)
+            const targetBot = aliveBots[targetIndex]
             game.camera.x = targetBot.x
             game.camera.y = targetBot.y
           }
