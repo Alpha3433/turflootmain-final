@@ -52,15 +52,6 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
   
   // Mobile state
   const [isMobile, setIsMobile] = useState(false)
-  const [touchStartPos, setTouchStartPos] = useState({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false)
-  
-  // Desktop controls state
-  const [keys, setKeys] = useState({
-    w: false, a: false, s: false, d: false,
-    up: false, down: false, left: false, right: false
-  })
-  const keysRef = useRef(keys)
 
   // Initialize mobile detection
   useEffect(() => {
