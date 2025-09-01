@@ -271,24 +271,8 @@ const AgarIOGame = () => {
     const paramSpectatorMode = urlParams.get('spectatorMode') === 'true'
     const paramStake = urlParams.get('stake') || 'FREE'
     const paramAutoSpectate = urlParams.get('autoSpectate') === 'true'
-    const paramPracticeMode = urlParams.get('practiceMode') === 'true' // NEW: Practice mode parameter
     
-    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate, paramPracticeMode })
-    
-    // NEW: Handle practice mode - full game experience with bots
-    if (paramPracticeMode) {
-      console.log('🤖 Practice mode detected - loading full game experience with bots')
-      
-      // Initialize practice mode with full game experience
-      if (user && getAccessToken) {
-        console.log('🤖 Authenticated user - initializing practice mode with multiplayer connection')
-        initializeMultiplayer(null, 1, null, false) // false = not spectator, full player experience
-      } else {
-        console.log('🤖 Guest user - initializing practice mode with offline bots')
-        initializeGame(false) // false = offline mode with bots for guest users
-      }
-      return // Exit early - practice mode handled
-    }
+    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate })
     
     // FIXED: Handle spectator mode BEFORE authentication check
     if (paramSpectatorMode || paramAutoSpectate) {
