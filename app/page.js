@@ -1384,7 +1384,7 @@ export default function Home() {
       gameMode, 
       gameFee, 
       stake: selectedStake,
-      region: region || 'us-east-1'
+      region: currentServer || 'US-East-1'
     })
     
     // Navigate directly to spectator mode with fallback
