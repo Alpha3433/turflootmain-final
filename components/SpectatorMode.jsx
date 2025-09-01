@@ -458,11 +458,7 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
       {/* Main Game Canvas */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full absolute inset-0 cursor-crosshair"
-        onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleCanvasMouseMove}
-        onMouseUp={handleCanvasMouseUp}
-        onMouseLeave={handleCanvasMouseUp}
+        className="w-full h-full absolute inset-0"
       />
 
       {/* UI Overlay */}
