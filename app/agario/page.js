@@ -2097,6 +2097,43 @@ const AgarIOGame = () => {
           setIsGameOver(true)
         }
       })
+
+      // NEW: Spectator event handlers
+      if (spectatorOnly) {
+        socket.on('spectator_joined', (data) => {
+          console.log('👁️ Successfully joined as spectator:', data)
+          setIsWaitingForPlayers(false) // Don't wait for players as spectator
+          // Initialize game in spectator mode  
+          initializeGame(true, true) // true = multiplayer, true = spectator mode
+        })
+
+        socket.on('spectator_game_state', (gameState) => {
+          console.log('👁️ Received spectator game state:', gameState)
+          // Update the game with spectator data
+          if (gameRef.current?.game && gameState.players) {
+            // Update other players (bots) for spectating
+            const game = gameRef.current.game
+            game.otherPlayers = gameState.players.map(player => ({
+              id: player.id,
+              x: player.x,
+              y: player.y,
+              mass: player.mass,
+              name: player.nickname,
+              alive: player.alive,
+              cells: [{ x: player.x, y: player.y, mass: player.mass }]
+            }))
+            
+            // Update food
+            if (gameState.food) {
+              game.food = gameState.food
+            }
+          }
+        })
+
+        socket.on('spectator_count_update', (data) => {
+          console.log('👁️ Spectator count update:', data)
+        })
+      }
       
       socket.on('joined', (data) => {
         console.log('🎯 Joined room:', data)
