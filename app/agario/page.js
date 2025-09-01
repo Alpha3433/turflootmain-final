@@ -2524,7 +2524,9 @@ const AgarIOGame = () => {
     // Helper functions for game mechanics
 
     const updateBounties = () => {
-      const allPlayers = [game.player, ...game.bots].filter(p => p.alive)
+      // FIXED: Filter out undefined/null players and ensure they have required properties
+      const allPlayers = [game.player, ...game.bots]
+        .filter(p => p && p.alive && typeof p.netWorth === 'number')
       allPlayers.sort((a, b) => b.netWorth - a.netWorth)
       
       // Clear old bounties
@@ -2534,7 +2536,7 @@ const AgarIOGame = () => {
       // Mark top 25% as bounties if they have enough net worth
       const bountyCount = Math.max(1, Math.floor(allPlayers.length * 0.25))
       for (let i = 0; i < bountyCount; i++) {
-        if (allPlayers[i].netWorth >= config.bountyThreshold) {
+        if (allPlayers[i] && allPlayers[i].netWorth >= config.bountyThreshold) {
           game.bounties.add(allPlayers[i])
           allPlayers[i].isBounty = true
         }
