@@ -4560,23 +4560,39 @@ const AgarIOGame = () => {
       {/* Desktop Action Buttons Row */}
       {!isGameOver && !isMobile && (
         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
-          {/* Cash Out Button */}
-          <button
-            onMouseDown={startCashOut}
-            onMouseUp={cancelCashOut}
-            onMouseLeave={cancelCashOut}
-            className={`px-6 py-3 rounded-lg font-bold transition-all ${
-              isCashingOut 
-                ? 'bg-green-600 text-white' 
-                : 'bg-yellow-500 hover:bg-yellow-400 text-black'
-            }`}
-            disabled={!gameRef.current?.game?.player?.alive}
-          >
-            {isCashingOut 
-              ? `Cashing Out... ${Math.floor(cashOutProgress)}%` 
-              : `💰 Hold E to Cash Out ($${gameStats.netWorth})`
-            }
-          </button>
+          {/* Cash Out Button / Join Match Button */}
+          {isSpectatorMode ? (
+            // Join Match Button for Spectators
+            <button
+              onClick={() => {
+                console.log('🎮 Joining match from spectator mode')
+                setIsSpectatorMode(false)
+                // Initialize as active player
+                initializeGame(true) // Start multiplayer mode
+              }}
+              className="px-6 py-3 rounded-lg font-bold transition-all bg-green-500 hover:bg-green-400 text-white"
+            >
+              🎮 Join Match {spectatorStake === 'FREE' ? '- FREE' : `- $${spectatorStake}`}
+            </button>
+          ) : (
+            // Regular Cash Out Button for Players
+            <button
+              onMouseDown={startCashOut}
+              onMouseUp={cancelCashOut}
+              onMouseLeave={cancelCashOut}
+              className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                isCashingOut 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-yellow-500 hover:bg-yellow-400 text-black'
+              }`}
+              disabled={!gameRef.current?.game?.player?.alive}
+            >
+              {isCashingOut 
+                ? `Cashing Out... ${Math.floor(cashOutProgress)}%` 
+                : `💰 Hold E to Cash Out ($${gameStats.netWorth})`
+              }
+            </button>
+          )}
 
           {/* Split Button */}
           <button
