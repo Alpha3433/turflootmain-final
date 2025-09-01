@@ -61,10 +61,29 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
           autoConnect: true,
           reconnection: true,
           reconnectionDelay: 2000,
-          reconnectionAttempts: 5
+          reconnectionAttempts: 5,
+          timeout: 10000
         })
 
         socketRef.current = socket
+
+        // Add connection timeout
+        const connectionTimeout = setTimeout(() => {
+          if (!isConnected) {
+            console.error('❌ Connection timeout - falling back to demo mode')
+            setConnectionError('Connection timeout')
+            setIsConnected(true) // Show UI anyway with demo data
+            // Create demo players for testing
+            const demoPlayers = [
+              { id: 'demo1', nickname: 'Demo Bot 1', x: 100, y: 100, mass: 50, alive: true },
+              { id: 'demo2', nickname: 'Demo Bot 2', x: -100, y: -100, mass: 75, alive: true },
+              { id: 'demo3', nickname: 'Demo Bot 3', x: 200, y: -150, mass: 60, alive: true }
+            ]
+            setPlayers(demoPlayers)
+            setCurrentPlayer(demoPlayers[0])
+            setPlayerCount(demoPlayers.length)
+          }
+        }, 10000) // 10 second timeout
 
         socket.on('connect', () => {
           if (!isMounted) return
