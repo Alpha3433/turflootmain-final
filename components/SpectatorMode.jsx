@@ -37,11 +37,10 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
   const [roomInfo, setRoomInfo] = useState(null)
   const [leaderboard, setLeaderboard] = useState([])
   
-  // Camera control state
-  const [cameraMode, setCameraMode] = useState('bird_eye') // 'bird_eye', 'player_follow', 'free_camera'
-  const [followingPlayer, setFollowingPlayer] = useState(null)
-  const [cameraPosition, setCameraPosition] = useState({ x: 0, y: 0 })
-  const [cameraZoom, setCameraZoom] = useState(1)
+  // Player following state
+  const [followingPlayerIndex, setFollowingPlayerIndex] = useState(0)
+  const [availablePlayers, setAvailablePlayers] = useState([])
+  const [currentPlayer, setCurrentPlayer] = useState(null)
   
   // UI state - always show UI for auto-spectate mode
   const [showUI, setShowUI] = useState(true)
