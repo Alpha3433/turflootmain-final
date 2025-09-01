@@ -305,11 +305,11 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
         className="w-full h-full absolute inset-0"
       />
 
-      {/* Simple Top Info */}
+      {/* Game Info Panel */}
       <div className="absolute top-4 left-4 z-10">
         <Card className="bg-black/80 border-gray-600">
           <CardContent className="p-3">
-            <div className="flex items-center space-x-4 text-sm text-white">
+            <div className="flex items-center space-x-4 text-sm text-white mb-3">
               <div className="flex items-center space-x-1">
                 <Eye className="h-4 w-4 text-blue-400" />
                 <span>{spectatorCount} watching</span>
@@ -322,6 +322,17 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
                 {stake === 'FREE' ? 'PRACTICE' : `$${stake} CASH`}
               </div>
             </div>
+            
+            {/* Exit Button underneath stats */}
+            <Button
+              onClick={handleExitToMenu}
+              variant="secondary"
+              size="sm"
+              className="bg-black/80 border-gray-600 text-white hover:bg-gray-700 w-full"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Exit to Menu
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -340,19 +351,6 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
           </Card>
         </div>
       )}
-
-      {/* Exit to Menu - Top Left */}
-      <div className="absolute top-4 left-4 z-10">
-        <Button
-          onClick={handleExitToMenu}
-          variant="secondary"
-          size="sm"
-          className="bg-black/80 border-gray-600 text-white hover:bg-gray-700"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Exit
-        </Button>
-      </div>
 
       {/* Desktop Action Buttons - Styled exactly like in-game */}
       {!isMobile && (
