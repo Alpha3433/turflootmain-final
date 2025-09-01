@@ -3299,8 +3299,23 @@ const AgarIOGame = () => {
 
       // Update camera
       if (game.player.alive) {
-        game.camera.x = game.player.x
-        game.camera.y = game.player.y
+        // Camera logic: follow player or bot depending on mode
+        if (isSpectatorMode && game.bots.length > 0) {
+          // Spectator mode: follow a random bot or the largest bot
+          const aliveBots = game.bots.filter(bot => bot.alive)
+          if (aliveBots.length > 0) {
+            // Follow the largest bot for most interesting action
+            const targetBot = aliveBots.reduce((largest, bot) => 
+              bot.mass > largest.mass ? bot : largest
+            )
+            game.camera.x = targetBot.x
+            game.camera.y = targetBot.y
+          }
+        } else {
+          // Regular mode: follow player
+          game.camera.x = game.player.x
+          game.camera.y = game.player.y
+        }
         
         // FIXED: Dynamic zoom based on player size - Use game's mobile state for consistency
         let targetZoom
