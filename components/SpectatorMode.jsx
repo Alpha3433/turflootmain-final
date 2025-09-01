@@ -410,39 +410,21 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
     router.back()
   }
 
-  // Touch/mouse handlers for free camera mode
-  const handleCanvasMouseDown = (e) => {
-    if (cameraMode !== 'free_camera') return
-    
-    const rect = canvasRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    
-    setTouchStartPos({ x, y })
-    setIsDragging(true)
-  }
+  // Keyboard shortcuts for player cycling
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        e.preventDefault()
+        previousPlayer()
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        e.preventDefault()
+        nextPlayer()
+      }
+    }
 
-  const handleCanvasMouseMove = (e) => {
-    if (!isDragging || cameraMode !== 'free_camera') return
-    
-    const rect = canvasRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    
-    const deltaX = (x - touchStartPos.x) / cameraZoom
-    const deltaY = (y - touchStartPos.y) / cameraZoom
-    
-    setCameraPosition(prev => ({
-      x: prev.x - deltaX,
-      y: prev.y - deltaY
-    }))
-    
-    setTouchStartPos({ x, y })
-  }
-
-  const handleCanvasMouseUp = () => {
-    setIsDragging(false)
-  }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [availablePlayers, followingPlayerIndex])
 
   if (!isConnected) {
     return (
