@@ -11,6 +11,7 @@ function SpectatorPageContent() {
   const roomId = searchParams.get('roomId')
   const mode = searchParams.get('mode') || 'free'
   const fee = parseFloat(searchParams.get('fee')) || 0
+  const autoSpectate = searchParams.get('autoSpectate') === 'true'
 
   if (!roomId) {
     return (
@@ -33,6 +34,7 @@ function SpectatorPageContent() {
       roomId={roomId} 
       gameMode={mode}
       entryFee={fee}
+      autoSpectate={autoSpectate}
     />
   )
 }
