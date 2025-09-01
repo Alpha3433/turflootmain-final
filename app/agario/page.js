@@ -271,7 +271,7 @@ const AgarIOGame = () => {
     const paramAutoSpectate = urlParams.get('autoSpectate') === 'true'
     const paramDirectPlay = urlParams.get('directPlay') === 'true' // NEW: Direct play parameter
     
-    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate, paramDirectPlay })
+    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramDirectPlay })
     
     // NEW: Handle direct play mode - full game experience immediately
     if (paramDirectPlay) {
@@ -288,28 +288,7 @@ const AgarIOGame = () => {
       return // Exit early - direct play mode handled
     }
     
-    // FIXED: Handle spectator mode BEFORE authentication check
-    if (paramSpectatorMode || paramAutoSpectate) {
-      console.log('👁️ Spectator mode detected - loading as spectator (no auth required)')
-      setIsSpectatorMode(true)
-      
-      console.log('👁️ Spectator mode detected - skipping player initialization')
-      console.log('👁️ User will spectate existing game without spawning as player') 
-      
-      // Initialize spectator mode without authentication requirement
-      if (paramMode === 'cash' && paramFee > 0) {
-        // For cash games, try to connect to multiplayer as spectator
-        console.log('👁️ Connecting to cash game as spectator')
-        initializeMultiplayer(paramPartyId, paramPartySize, paramMembers, true) // true = spectator only
-      } else {
-        // For free games, connect to multiplayer as spectator  
-        console.log('👁️ Connecting to practice game as spectator')
-        initializeMultiplayer(null, 1, null, true) // true = spectator only
-      }
-      return // Exit early - don't run regular initialization
-    }
-    
-    // Check if user is authenticated and determine game mode (for non-spectator modes)
+    // Check if user is authenticated and determine game mode
     if (user && getAccessToken) {
       // Regular game initialization (when not in spectator mode)
       // Enable multiplayer for cash games OR party games
