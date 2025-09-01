@@ -122,9 +122,7 @@ const AgarIOGame = () => {
   const [roomId, setRoomId] = useState(null)
   const [realPlayers, setRealPlayers] = useState(new Map())
   const [gameMode, setGameMode] = useState('free') // 'free' or 'paid'
-  const [isSpectatorMode, setIsSpectatorMode] = useState(false) // NEW: Spectator mode state
-  const [spectatorStake, setSpectatorStake] = useState('FREE') // NEW: Track stake for join button
-  const [spectatorTargetIndex, setSpectatorTargetIndex] = useState(0) // NEW: Which bot to follow
+
   const [entryFee, setEntryFee] = useState(0)
   const [roomTier, setRoomTier] = useState(1) // For paid rooms: 1, 5, or 20
   const [matchId, setMatchId] = useState(null) // For paid room backend tracking
