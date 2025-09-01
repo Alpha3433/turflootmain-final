@@ -325,7 +325,7 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
 
     // Continue animation loop
     animationFrameRef.current = requestAnimationFrame(renderCanvas)
-  }, [gameState, cameraMode, followingPlayer, cameraPosition, cameraZoom])
+  }, [gameState, currentPlayer, availablePlayers, followingPlayerIndex])
 
   // Start/stop canvas rendering
   useEffect(() => {
