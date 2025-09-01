@@ -24,7 +24,7 @@ import {
   Minimize2
 } from 'lucide-react'
 
-const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate = false }) => {
+const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate = false, stake = 'FREE' }) => {
   const canvasRef = useRef(null)
   const socketRef = useRef(null)
   const router = useRouter()
