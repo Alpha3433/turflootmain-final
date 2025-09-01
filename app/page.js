@@ -1354,49 +1354,8 @@ export default function Home() {
   const handleJoinGame = () => {
     console.log('🎮 handleJoinGame called, selectedStake:', selectedStake, 'authenticated:', authenticated, 'user:', !!user)
     
-    // FIXED: For practice mode, go directly to full game experience with bots
-    if (selectedStake === 'FREE' || selectedStake === 0) {
-      handlePracticeMode()
-    } else {
-      // For cash games, use spectator mode first  
-      handleAutoSpectate()
-    }
-  }
-
-  // NEW: Practice mode - full game experience with bots
-  const handlePracticeMode = () => {
-    console.log('🤖 Practice mode - loading full game experience with bots')
-    
-    const roomId = 'global-practice-bots'
-    const gameMode = 'practice'
-    const gameFee = 0
-    
-    console.log('🎮 Navigating to practice room:', { 
-      roomId, 
-      gameMode, 
-      gameFee,
-      fullGameExperience: true
-    })
-    
-    // Navigate directly to the full agario game experience (NOT spectator mode)
-    const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&practiceMode=true`
-    
-    try {
-      router.push(gameUrl)
-      console.log('✅ Router.push called for practice mode')
-      
-      // Fallback navigation after a short delay
-      setTimeout(() => {
-        if (window.location.pathname === '/') {
-          console.log('🔄 Using window.location fallback for practice mode')
-          window.location.href = gameUrl
-        }
-      }, 1000)
-    } catch (error) {
-      console.error('❌ Navigation error:', error)
-      // Ultimate fallback
-      window.location.href = gameUrl
-    }
+    // Keep spectator-first experience for all games (including practice)
+    handleAutoSpectate()
   }
 
 
