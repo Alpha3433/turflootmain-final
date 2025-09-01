@@ -271,8 +271,24 @@ const AgarIOGame = () => {
     const paramSpectatorMode = urlParams.get('spectatorMode') === 'true'
     const paramStake = urlParams.get('stake') || 'FREE'
     const paramAutoSpectate = urlParams.get('autoSpectate') === 'true'
+    const paramDirectPlay = urlParams.get('directPlay') === 'true' // NEW: Direct play parameter
     
-    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate })
+    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramSpectatorMode, paramStake, paramAutoSpectate, paramDirectPlay })
+    
+    // NEW: Handle direct play mode - full game experience immediately
+    if (paramDirectPlay) {
+      console.log('🎮 Direct play mode detected - loading full game experience')
+      
+      // Initialize direct play mode
+      if (user && getAccessToken) {
+        console.log('🎮 Authenticated user - initializing direct play with multiplayer connection')
+        initializeMultiplayer(null, 1, null, false) // false = not spectator, full player experience
+      } else {
+        console.log('🎮 Guest user - initializing direct play with offline bots')
+        initializeGame(false) // false = offline mode with bots for guest users
+      }
+      return // Exit early - direct play mode handled
+    }
     
     // FIXED: Handle spectator mode BEFORE authentication check
     if (paramSpectatorMode || paramAutoSpectate) {
