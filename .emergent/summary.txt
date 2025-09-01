@@ -1,63 +1,123 @@
 <analysis>
-The trajectory details the AI engineer's work on the TurfLoot application, primarily focusing on stabilizing and expanding the Party Lobby system. Initial efforts involved resolving recurring frontend runtime errors (e.g.,  initialization, ,  undefined variables) that resulted in black screens, often claiming success despite persistent visual issues. The engineer then tackled UI/UX improvements for the Party Lobby modal: fixing cutoff, repositioning it to the far right, and ensuring the Invite Friends functionality transforms the modal content instead of opening a separate, interfering box. A significant backend fix addressed inconsistent user ID handling in party invitations. Later, core game logic was added, including balance checking for paid rooms, enforcing a 2-player limit, and implementing a robust party matchmaking system that auto-joins members to the same game instance. The final task addressed mobile responsiveness, redesigning the Party Lobby as a less intrusive bottom sheet, optimized for both portrait and landscape views. The recurring black screen during frontend tests remains an unaddressed visual problem throughout the trajectory.
+The AI engineer's work primarily focused on enhancing the TurfLoot application, moving from critical bug fixes to significant feature additions. Initially, the engineer tackled recurring black screen errors and 500 server errors, stabilizing the core application by correcting JavaScript scope issues, API route handling, and crucially, properly initializing the Socket.IO game server via supervisor configuration.
+
+A major development involved refining the Party Lobby system, addressing issues where party members failed to join the same game instance. This necessitated adjustments in game server logic, robust URL parameter parsing, and React state management. Subsequently, a game loading popup was introduced, backend API stability improved (e.g., global practice server fix), and client-side polling optimized to prevent 429 errors. Mobile UI enhancements included navigation bar scrolling fixes and conditional rendering for notifications.
+
+The most recent and extensive task was the implementation and iterative refinement of a Spectator Mode. This involved several design iterations, from initial broad camera controls to a simplified auto-spectate, player-following-only experience with matching in-game button styles. Key technical challenges included integrating spectator logic into the Socket.IO game server, preventing player spawning in spectator mode, correctly rendering the game canvas for spectators with virtual bots, and fixing numerous React hook and state management errors. The current state reflects a sophisticated auto-spectate feature directly integrated into the main game UI, allowing seamless transition to playing.
 </analysis>
 
 <product_requirements>
-TurfLoot is an Agar.io-style multiplayer online game with core mechanics, minimap, stats, leaderboards, and a persistent username system. The application faced  errors for  routes, necessitating bypass endpoints. The social system was re-architected for robust friend management including requests, blocking, searching, and real-time presence.
-
-The most recent overarching requirement was the Party Lobby system. Users should create parties, invite friends, and upon acceptance, the party owner should be able to join any game room, with all party members automatically following into that room. This system needed to:
-- Be a general party lobby, not room-specific.
-- Coordinate game joining for all party members to the same instance.
-- Implement balance checking for all party members before joining paid rooms.
-- Enforce a 2-player maximum cap for all lobbies.
-- Restrict game room selection to only the party owner.
-- Maintain party state and display it correctly upon browser refresh.
-- Provide a non-intrusive, optimized mobile experience (bottom sheet, responsive to portrait/landscape).
+TurfLoot is an Agar.io-style game with core mechanics, minimap, stats, leaderboards, and persistent usernames. Initial challenges included  errors and a need for a re-architected social system. The primary recent requirement was a Party Lobby system for creating parties, inviting friends, and ensuring all members join the same game instance, with a 2-player cap, owner-only room selection, persistent state, and mobile optimization. Further requirements included a game loading popup, minimap visualization for partied players, and mobile UI fixes (nav bar scrolling, logout button, non-intrusive notifications). The most recent, evolving requirement has been a Spectator Mode: initially, with advanced camera controls and UI overlay; then simplified to auto-spectate, following players/bots with cycle controls and matching in-game buttons; and finally, seamlessly loading the *real* game UI as a pure spectator, with an immediate Join Match transition, and ensuring bots are visible.
 </product_requirements>
 
 <key_technical_concepts>
-- **Next.js 14 (App Router)**: Full-stack framework for the application.
-- **React Hooks**: , ,  for component logic.
-- **Tailwind CSS & shadcn/ui**: For consistent styling and UI components.
-- **MongoDB**: Primary database for data persistence (users, friends, parties, lobbies).
-- **Next.js API Routes**: Backend endpoints for various functionalities (, , , ).
-- **Privy Authentication**: User authentication and profile management.
-- **Socket.IO**: Real-time communication (implicitly mentioned with advanced friends/party systems).
-- **Environment Variables**: ,  for configuration.
+- **Next.js 14 (App Router)**: Full-stack framework.
+- **React Hooks**: , , , .
+- **Socket.IO**: Real-time communication for multiplayer and spectator states.
+- **Tailwind CSS & shadcn/ui**: Styling and UI components.
+- **MongoDB**: Database.
+- **Supervisor**: Process control for Next.js and Socket.IO server.
+- **URL Parameters**: For game mode, room, and spectator state.
 </key_technical_concepts>
 
 <code_architecture>
 
+-   ****: Centralized API route for various backend services. Modified for balance checking and leaderboard format. Crucially, it now checks  to access the game server for browser endpoints.
+-   ****: Main landing page.
+    -   **Changes**: Integrated  and . Crucially,  was refactored multiple times to initiate the auto-spectate flow, directly navigating to  with  parameters.  state was removed.  variable was corrected to  to resolve a .
+-   ****: The main game page.
+    -   **Importance**: This file evolved to become the central point for the final Spectator Mode implementation.
+    -   **Changes**: Initially, it received party/game parameters. For spectator mode, it was extensively modified to:
+        - Detect  and  URL parameters.
+        - Prevent player spawning and rendering when in spectator mode.
+        - Modify the Cash Out button to Join Match when spectating.
+        - Add spectator-specific Socket.IO event handlers (, ).
+        - Implement camera logic to follow bots/players and allow cycling.
+        - Modify  and  to accommodate spectator-only connections.
+        - Remove player cell rendering logic when in spectator mode.
+        - Add keyboard controls for cycling through bots (A/D).
+-   ****: Core Socket.IO game server logic.
+    -   **Importance**: Manages real-time game state, player connections, and now bot simulation for spectators.
+    -   **Changes**: Updated to preserve party room IDs, store the game server instance in . A significant change was adding  to create virtual bots when a practice room has only spectators,  to include these bots, and stopping bot simulation in . Fixed a syntax error in  method.
+-   ****: Global styles. Minor changes for mobile UI.
+-   ****: Custom Node.js server for Socket.IO. Its execution via supervisor was critical.
+-   ****: Supervisor config. Updated to run [dotenv@17.2.1] injecting env (28) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+🔍 Environment variables loaded:
+NODE_ENV: development
+NEXT_PUBLIC_PRIVY_APP_ID: SET
+MONGO_URL: SET
+NEXT_PUBLIC_BASE_URL: https://None.preview.emergentagent.com
+[dotenv@17.2.1] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+✅ Loaded environment variables from .env file
+   Reload env: .env
+⚠️ Game server not available: Unexpected identifier 'validModes'
+🔌 Socket.IO server initialized
+🔌 Initializing lobby socket handlers
+✅ Lobby socket handlers initialized
+📡 Legacy WebSocket server initialized
+🚀 TurfLoot server ready on http://0.0.0.0:3000
+🎮 Lobby Manager initialized
+🧹 Old lobbies cleaned up
+✅ Lobby manager connected to database
+ ✓ Compiled /middleware in 262ms (73 modules)
+🔀 MIDDLEWARE: Processing request for path: /
+🔀 MIDDLEWARE: Method: GET
+🔀 MIDDLEWARE: Host: localhost:3000
+ ○ Compiling / ...
+🔀 MIDDLEWARE: Processing request for path: /
+🔀 MIDDLEWARE: Method: GET
+🔀 MIDDLEWARE: Host: localhost:3000
+ ✓ Compiled / in 18.5s (5671 modules)
+ ○ Compiling /_not-found ...
+🔀 MIDDLEWARE: Processing request for path: /
+🔀 MIDDLEWARE: Method: GET
+🔀 MIDDLEWARE: Host: localhost:3000
+ ✓ Compiled /_not-found in 6.6s (5672 modules)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 3.1s (5889 modules)
+ GET / 404 in 6796ms instead of yarn run v1.22.22
+$ NODE_OPTIONS='--max-old-space-size=2048' next dev --hostname 0.0.0.0 --port 3000
+[dotenv@17.2.1] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+✅ Loaded environment variables from .env file
+[dotenv@17.2.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+✅ Loaded environment variables from .env file
+  ▲ Next.js 14.2.4
+  - Local:        http://localhost:3000
+  - Network:      http://0.0.0.0:3000
+  - Environments: .env
+  - Experiments (use with caution):
+    · esmExternals
+    · outputFileTracingRoot
 
--   ****: Centralized API route. Used for debugging and routing.
--   ****: New API endpoints for party management.
-    -   **Changes**: Added , , and  actions. Improved error handling and debug logging for party status API. Fixed notifications API routing.
--   ****: New API endpoints for general lobby functionality, including coordinating party members joining rooms.
--   ****: Main landing page, where the Party Lobby UI is integrated.
-    -   **Changes**: Integrated  component. Removed old lobby functions and state variables (, , ). Fixed  router dependency issues. Updated  for coordinated party navigation.
--   ****: (NEW) Dedicated component for the Party Lobby UI.
-    -   **Changes**: Initial creation. Implemented positioning (top, right, height adjustments). Enhanced Invite Friends modal to transform within the same component using aggressive event isolation and  management. Updated  to use . Added automatic invitation refresh, console logging, balance checking, room access validation, and room selection updates. Implemented notification polling and auto-redirect logic for party members. Refined polling strategy with separated concerns and exponential backoff. Redesigned for mobile as a bottom sheet, optimized for portrait and landscape views. Implemented owner-only room selection logic and removed party member balance display.
--   ****: Core logic for the Party Lobby system.
-    -   **Changes**: Implemented  for party creation. Implemented  and notification methods (, , ). Fixed a critical bug in  (missing ,  fields). Fixed  to check for *any* party membership consistent with . Updated  to include 'in_game' status parties.
--   ****: Continuously updated with testing outcomes and progress summaries.
+ ✓ Starting...
+ ✓ Ready in 2.3s
+Done in 120.99s. to correctly launch the Socket.IO server.
+-   ****: (NEW) Component for game loading animation.
+-   ****: (NEW, then removed) Initial dedicated spectator component. Replaced by , then its core logic was integrated directly into .
+-   ****: (NEW, then largely deprecated) Attempted simplified spectator component. Its functionality was ultimately absorbed into  after the user requested the *real* game UI for spectating. It previously included connection handling, demo mode fallback, and UI elements for cycling players and joining.
+-   ****: (NEW, then removed) Dedicated page for Spectator Mode. Removed in favor of integrating spectator logic directly into .
 </code_architecture>
 
 <pending_tasks>
 -   **Real Blockchain Integration**: Implement full SOL deposits/withdrawals and smart contract interaction for game entry fees.
--   **Mobile Customization Screen Redesign**: General mobile UI improvement task, but not specific to the Party Lobby.
+-   **Mobile Customization Screen Redesign**: General mobile UI improvement task, not specific to Party Lobby.
 -   **Modernizing Social Popup**: General social UI improvement task.
--   **Production Infrastructure Stability**: Resolve persistent 502/404/ERR_ABORTED errors on the preview deployment for  calls.
--   **Resolve persistent black screen issue**: The frontend still frequently displays a black screen during tests despite backend success.
+-   **Production Infrastructure Stability**: Address persistent 502/404/ERR_ABORTED errors on the preview deployment for  calls.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary, the AI engineer completed the **redesign of the Party Lobby modal for mobile devices**. The user explicitly requested that the mobile experience be less intrusive and optimized for both portrait and landscape mobile views, without altering the desktop experience.
+Immediately before this summary, the AI engineer was addressing a critical user feedback: despite successfully implementing a true spectator mode on the  page (where the player character was not spawned), the user still observed a controllable blue player and the normal game UI, not the intended spectator experience of following bots/players.
 
-The AI engineer implemented a **responsive design system** within . For desktop (md+ breakpoints), the existing right-aligned modal is preserved. For mobile devices (< md breakpoints), a **bottom sheet design** was implemented, which slides up from the bottom of the screen. This bottom sheet is optimized for different mobile orientations:  for a 2x2 room button layout and  for a 4x1 horizontal room layout.
+The AI engineer identified that the rendering logic and camera controls in  were still drawing the You player and centering the camera on it, even when  was active. The work involved:
+1.  **Modifying camera logic** () to follow bots/other players instead of the  when in spectator mode.
+2.  **Preventing player cell rendering** by adding conditional checks () around various  loops responsible for drawing player cells.
+3.  **Adding keyboard controls** (A/D) for cycling through spectated bots.
+4.  **Updating camera logic** to follow the specific targeted bot/player.
 
-Mobile-specific UI elements such as a drag handle, compact headers, touch-friendly buttons, reduced spacing, and simplified indicators were also integrated. The solution leverages Tailwind CSS for responsive breakpoints and styling, aiming for a native feel and efficient use of mobile screen real estate. The implementation was confirmed with screenshots (albeit still showing a black screen, but confirming the structural changes) and a detailed summary of the applied mobile optimizations was provided.
+The last action was to restart the server after applying these changes, suggesting a readiness to test the refined pure spectator experience where the user truly observes and cycles through bots without controlling their own character, all within the real game UI.
 </current_work>
 
 <optional_next_step>
-Investigate and resolve the persistent black screen issue observed during frontend testing.
+Restart the Next.js server to apply recent changes for the refined spectator mode.
 </optional_next_step>
+
