@@ -30,6 +30,7 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
   const [spectatorCount, setSpectatorCount] = useState(0)
   const [playerCount, setPlayerCount] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  const [connectionError, setConnectionError] = useState(null)
 
   // Detect mobile
   useEffect(() => {
