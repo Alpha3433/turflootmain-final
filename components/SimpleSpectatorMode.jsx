@@ -171,6 +171,7 @@ const SimpleSpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, stake = 
 
     return () => {
       isMounted = false
+      clearTimeout(connectionTimeout) // Clear timeout on cleanup
       if (socketRef.current) {
         socketRef.current.removeAllListeners()
         socketRef.current.disconnect()
