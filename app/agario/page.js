@@ -3732,8 +3732,8 @@ const AgarIOGame = () => {
       // Draw entities (sorted by net worth) - UPDATED to support split cells
       const allEntities = [...game.bots].filter(e => e.alive)
       
-      // Add player cells individually for proper rendering
-      if (game.player.alive && game.player.cells && game.player.cells.length > 0) {
+      // Add player cells individually for proper rendering (skip in spectator mode)
+      if (!isSpectatorMode && game.player.alive && game.player.cells && game.player.cells.length > 0) {
         // Add each player cell as a separate entity for rendering
         game.player.cells.forEach(cell => {
           allEntities.push({
