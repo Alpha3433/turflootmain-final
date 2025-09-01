@@ -43,12 +43,13 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
   const [cameraPosition, setCameraPosition] = useState({ x: 0, y: 0 })
   const [cameraZoom, setCameraZoom] = useState(1)
   
-  // UI state
+  // UI state - always show UI for auto-spectate mode
   const [showUI, setShowUI] = useState(true)
   const [showLeaderboard, setShowLeaderboard] = useState(true)
   const [showPlayerInfo, setShowPlayerInfo] = useState(true)
   const [isMuted, setIsMuted] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showJoinButton, setShowJoinButton] = useState(true) // Always show join button
   
   // Mobile state
   const [isMobile, setIsMobile] = useState(false)
