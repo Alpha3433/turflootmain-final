@@ -5232,6 +5232,7 @@ const AgarIOGame = () => {
                 </div>
                 
               </div>
+              )}
 
               {/* Mobile Cash-Out/Join Match Button */}
               {isSpectatorMode ? (
