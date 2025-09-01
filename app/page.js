@@ -1374,7 +1374,7 @@ export default function Home() {
       roomId = 'global-practice-bots' // Spectate the global practice room
     } else {
       // For cash games, generate room ID based on selected region and stake
-      const selectedRegion = region || 'us-east-1'
+      const selectedRegion = currentServer ? currentServer.toLowerCase().replace('-', '-') : 'us-east-1'
       // Use room number 1 as default spectate target for each stake
       roomId = `${selectedRegion}-cash-${gameFee}-1`
     }
