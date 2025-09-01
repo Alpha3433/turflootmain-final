@@ -108,9 +108,9 @@ user_problem_statement: "Implement comprehensive Spectator Mode for TurfLoot Aga
 
 test_plan:
   current_focus:
-    - "Frontend Spectator UI and Controls"
+    - "Spectator Mode Frontend Black Screen Investigation"
   stuck_tasks:
-    - "Frontend Spectator UI and Controls"
+    - "Spectator Mode Frontend Black Screen Investigation"
 backend:
   - task: "Backend Socket.IO Spectator Support"
     implemented: true
