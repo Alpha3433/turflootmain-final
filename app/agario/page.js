@@ -2266,7 +2266,7 @@ const AgarIOGame = () => {
     }
   }
 
-  const initializeGame = (isMultiplayer = false, partyParams = null) => {
+  const initializeGame = (isMultiplayer = false, partyParams = null, spectatorMode = false) => {
     const canvas = canvasRef.current
     if (!canvas) return
 
