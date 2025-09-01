@@ -487,11 +487,11 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
               <div className="absolute -inset-2 bg-blue-400/20 rounded-full animate-ping"></div>
             </div>
             <h2 className="text-2xl font-bold mb-3 text-white">
-              {autoSpectate ? 'Entering Live Match...' : 'Connecting to Spectator Mode...'}
+              {autoSpectate ? `Entering ${stake === 'FREE' ? 'Practice' : `$${stake}`} Match...` : 'Connecting to Spectator Mode...'}
             </h2>
             <p className="text-gray-400 mb-4">
               {autoSpectate 
-                ? 'Get ready to see the action! You\'ll start spectating and can join anytime.'
+                ? `Get ready to watch ${stake === 'FREE' ? 'practice games' : `$${stake} cash games`}! You can join anytime.`
                 : 'Please wait while we connect you to the game.'
               }
             </p>
