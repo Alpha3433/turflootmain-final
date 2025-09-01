@@ -31,11 +31,10 @@ function SpectatorPageContent() {
   }
 
   return (
-    <SpectatorMode 
+    <SimpleSpectatorMode 
       roomId={roomId} 
       gameMode={mode}
       entryFee={fee}
-      autoSpectate={autoSpectate}
       stake={stake}
     />
   )
