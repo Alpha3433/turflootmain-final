@@ -1965,11 +1965,17 @@ const AgarIOGame = () => {
         }
       }
       
-      if (!authToken) {
+      if (!authToken && !spectatorOnly) {
         console.error('❌ No auth token available - user not authenticated')
         setGameResult('Authentication required to play')
         setIsGameOver(true)
         return
+      }
+      
+      // FIXED: Allow spectator mode without authentication
+      if (spectatorOnly && !authToken) {
+        console.log('👁️ Spectator mode - proceeding without authentication')
+        authToken = 'spectator-guest-token' // Use a placeholder token for spectator mode
       }
       
       // Validate token format but be more lenient with expiration
