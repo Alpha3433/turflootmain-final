@@ -1379,8 +1379,25 @@ export default function Home() {
     
     console.log('👁️ Auto-navigating to spectator mode:', { roomId, gameMode, gameFee })
     
-    // Navigate directly to spectator mode - no choice modal
-    router.push(`/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&autoSpectate=true`)
+    // Navigate directly to spectator mode with fallback
+    const spectateUrl = `/spectate?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&autoSpectate=true`
+    
+    try {
+      router.push(spectateUrl)
+      console.log('✅ Router.push called for spectator mode')
+      
+      // Fallback navigation after a short delay
+      setTimeout(() => {
+        if (window.location.pathname === '/') {
+          console.log('🔄 Using window.location fallback for spectator mode')
+          window.location.href = spectateUrl
+        }
+      }, 1000)
+      
+    } catch (error) {
+      console.error('❌ Router error for spectator mode:', error)
+      window.location.href = spectateUrl
+    }
   }
 
   const proceedToGame = () => {
