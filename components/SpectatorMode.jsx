@@ -478,12 +478,25 @@ const SpectatorMode = ({ roomId, gameMode = 'free', entryFee = 0, autoSpectate =
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
-        <Card className="w-96">
-          <CardContent className="p-6 text-center">
-            <Eye className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Connecting to Spectator Mode...</h2>
-            <p className="text-muted-foreground">Please wait while we connect you to the game.</p>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Card className="w-96 bg-black/80 border-gray-700">
+          <CardContent className="p-8 text-center">
+            <div className="relative">
+              <Eye className="h-16 w-16 text-blue-400 mx-auto mb-6 animate-pulse" />
+              <div className="absolute -inset-2 bg-blue-400/20 rounded-full animate-ping"></div>
+            </div>
+            <h2 className="text-2xl font-bold mb-3 text-white">
+              {autoSpectate ? 'Entering Live Match...' : 'Connecting to Spectator Mode...'}
+            </h2>
+            <p className="text-gray-400 mb-4">
+              {autoSpectate 
+                ? 'Get ready to see the action! You\'ll start spectating and can join anytime.'
+                : 'Please wait while we connect you to the game.'
+              }
+            </p>
+            <div className="flex justify-center">
+              <div className="w-8 h-1 bg-blue-400 rounded animate-pulse"></div>
+            </div>
           </CardContent>
         </Card>
       </div>
