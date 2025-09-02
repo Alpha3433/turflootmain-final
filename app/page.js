@@ -706,6 +706,43 @@ export default function Home() {
     }
   }, [showCustomization]) // Also reload when customization modal opens/closes
 
+  // FIXED: Function to update player elimination stats for dynamic leaderboard
+  const updatePlayerEliminationStats = (stats) => {
+    setPlayerEliminationStats(prev => ({
+      kills: stats.kills || prev.kills,
+      deaths: stats.deaths || prev.deaths,
+      streak: stats.streak || prev.streak
+    }))
+    
+    // Refresh leaderboard data to include current player's updated stats
+    if (stats.kills > 0) {
+      console.log(`📊 Player elimination stats updated: ${stats.kills} kills, ${stats.deaths} deaths, ${stats.streak} streak`)
+      
+      // Update leaderboard with current player's stats
+      setLeaderboardData(prev => {
+        // Remove any existing entry for current player
+        const filteredLeaderboard = prev.filter(player => player.name !== (displayName || 'You'))
+        
+        // Add current player with updated stats
+        const updatedLeaderboard = [
+          {
+            rank: 1, // Will be re-sorted
+            name: displayName || 'You',
+            eliminations: stats.kills,
+            earnings: `${stats.kills} eliminations`
+          },
+          ...filteredLeaderboard
+        ]
+        
+        // Sort by eliminations and assign proper ranks
+        return updatedLeaderboard
+          .sort((a, b) => b.eliminations - a.eliminations)
+          .slice(0, 3) // Keep top 3
+          .map((player, index) => ({ ...player, rank: index + 1 }))
+      })
+    }
+  }
+
   // Load user balance when component mounts
   useEffect(() => {
     loadUserBalance()
