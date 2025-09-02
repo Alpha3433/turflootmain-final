@@ -2138,7 +2138,7 @@ const AgarIOGame = () => {
           
           const connectionInfo = await hathoraClient.connectToGame({
             userId: user?.id,
-            roomId: paramRoomId,
+            roomId: paramRoomId, // Pass the roomId from URL/Server Browser
             socketOptions: {
               auth: {
                 token: authToken,
