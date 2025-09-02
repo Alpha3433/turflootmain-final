@@ -1562,13 +1562,13 @@ export default function Home() {
     
     // Add delay for better UX
     setTimeout(() => {
-      // For FREE games - route to Agario clone (with authentication)
+      // For FREE games - route to global multiplayer (with authentication)
       if (gameStake === 'FREE' || gameStake === 0) {
-        console.log('🆓 Free game selected - using bots for testing')
+        console.log('🌍 Free global multiplayer selected - connecting to worldwide servers')
         
-        console.log('✅ Navigating to global practice server')
+        console.log('✅ Navigating to global multiplayer servers')
         
-        // Try router.push with fallback - use global practice server
+        // Try router.push with fallback - use global multiplayer servers
         try {
           router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
           
