@@ -63,8 +63,8 @@ export default function Home() {
   const [showCustomization, setShowCustomization] = useState(false)
   const [showServerBrowser, setShowServerBrowser] = useState(false)
   const [showRegionDropdown, setShowRegionDropdown] = useState(false)
-  const [currentServer, setCurrentServer] = useState('US-East-1') // Default server
-  const [currentPing, setCurrentPing] = useState(null) // Initialize as null to prevent hydration mismatch
+  const [currentServer, setCurrentServer] = useState('Measuring...') // Will be updated with optimal region
+  const [currentPing, setCurrentPing] = useState(null) // Real ping to optimal region
   
   // Enhanced iOS Mobile Detection State - MISSING FROM LANDING PAGE!
   const [isMobile, setIsMobile] = useState(false)
@@ -72,16 +72,69 @@ export default function Home() {
   const [pendingGameEntry, setPendingGameEntry] = useState(null)
   const [showMobileLobby, setShowMobileLobby] = useState(false)
 
-  // Available regions for the dropdown with real-time ping measurement
+  // Hathora regions with ping measurement endpoints
   const availableRegions = [
-    { id: 'US-East-1', name: 'US East (Virginia)', ping: null, endpoint: 'https://www.google.com/generate_204' },
-    { id: 'US-West-1', name: 'US West (California)', ping: null, endpoint: 'https://www.google.com/generate_204' },
-    { id: 'EU-Central-1', name: 'Europe (Frankfurt)', ping: null, endpoint: 'https://www.google.de/generate_204' },
-    { id: 'Oceania-1', name: 'Oceania (Sydney)', ping: null, endpoint: 'https://www.google.com.au/generate_204' }
+    { 
+      id: 'washington-dc', 
+      name: 'US East (Washington DC)', 
+      ping: null, 
+      endpoint: 'https://ping-us-east.hathora.dev/ping',
+      displayName: 'US-East'
+    },
+    { 
+      id: 'seattle', 
+      name: 'US West (Seattle)', 
+      ping: null, 
+      endpoint: 'https://ping-us-west.hathora.dev/ping',
+      displayName: 'US-West'
+    },
+    { 
+      id: 'london', 
+      name: 'Europe West (London)', 
+      ping: null, 
+      endpoint: 'https://ping-eu-west.hathora.dev/ping',
+      displayName: 'EU-West'
+    },
+    { 
+      id: 'frankfurt', 
+      name: 'Europe Central (Frankfurt)', 
+      ping: null, 
+      endpoint: 'https://ping-eu-central.hathora.dev/ping',
+      displayName: 'EU-Central'
+    },
+    { 
+      id: 'singapore', 
+      name: 'Asia Southeast (Singapore)', 
+      ping: null, 
+      endpoint: 'https://ping-asia-southeast.hathora.dev/ping',
+      displayName: 'Asia-SE'
+    },
+    { 
+      id: 'tokyo', 
+      name: 'Asia East (Tokyo)', 
+      ping: null, 
+      endpoint: 'https://ping-asia-east.hathora.dev/ping',
+      displayName: 'Asia-East'
+    },
+    { 
+      id: 'mumbai', 
+      name: 'Asia South (Mumbai)', 
+      ping: null, 
+      endpoint: 'https://ping-asia-south.hathora.dev/ping',
+      displayName: 'Asia-South'
+    },
+    { 
+      id: 'sydney', 
+      name: 'Oceania (Sydney)', 
+      ping: null, 
+      endpoint: 'https://ping-oceania.hathora.dev/ping',
+      displayName: 'Oceania'
+    }
   ]
 
   const [regionPings, setRegionPings] = useState({})
   const [isLoadingPings, setIsLoadingPings] = useState(false)
+  const [optimalRegion, setOptimalRegion] = useState(null)
   
   // Router hook - MUST be declared early to avoid hoisting issues
   const router = useRouter()
