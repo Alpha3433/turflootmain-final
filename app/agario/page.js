@@ -4707,13 +4707,11 @@ const AgarIOGame = () => {
         </div>
       )}
       
-      {/* Enhanced Hathora Ping Monitor - Mobile Version */}
+      {/* Pure Hathora Ping Monitor - Mobile Version */}
       {!isGameOver && settings.showPingMonitor && isMobile && (
         <div className="absolute top-20 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
           <div className="flex items-center space-x-2 text-xs">
-            <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-              isOptimalRegion ? 'bg-cyan-400' : 'bg-green-400'
-            }`}></div>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-cyan-400"></div>
             <span className="text-gray-300">{currentRegion}:</span>
             <span className={`font-bold ${
               ping < 50 ? 'text-green-400' : 
@@ -4722,20 +4720,16 @@ const AgarIOGame = () => {
             }`}>
               {ping}ms
             </span>
-            {isOptimalRegion && (
-              <span className="text-cyan-400 text-xs">⚡</span>
-            )}
+            <span className="text-cyan-400 text-xs">⚡</span>
           </div>
         </div>
       )}
 
-      {/* Enhanced Hathora Ping Monitor - Desktop Version */}
+      {/* Pure Hathora Ping Monitor - Desktop Version */}
       {!isGameOver && settings.showPingMonitor && !isMobile && (
         <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
           <div className="flex items-center space-x-2 text-sm">
-            <div className={`w-2 h-2 rounded-full animate-pulse ${
-              isOptimalRegion ? 'bg-cyan-400' : 'bg-green-400'
-            }`}></div>
+            <div className="w-2 h-2 rounded-full animate-pulse bg-cyan-400"></div>
             <span className="text-gray-300">{currentRegion}:</span>
             <span className={`font-bold ${
               ping < 50 ? 'text-green-400' : 
@@ -4744,14 +4738,12 @@ const AgarIOGame = () => {
             }`}>
               {ping}ms
             </span>
-            {isOptimalRegion && (
-              <span className="text-cyan-400 text-xs" title="Connected to optimal Hathora region">
-                ⚡
-              </span>
-            )}
+            <span className="text-cyan-400 text-xs" title="Connected to Hathora Global Server">
+              ⚡
+            </span>
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            {isOptimalRegion ? 'Optimal Hathora Server' : 'Fallback Connection'}
+            Hathora Global Server
           </div>
         </div>
       )}
