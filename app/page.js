@@ -363,17 +363,52 @@ export default function Home() {
     return 'washington-dc' // Safe fallback
   }
 
-  // Measure pings on component mount and periodically
+  // Initialize optimal region and measure pings on component mount
   useEffect(() => {
     // Only run on client side to avoid SSR issues
     if (typeof window === 'undefined') {
       return
     }
     
+    // Try to load saved region preference first
+    try {
+      const savedPreference = localStorage.getItem('turfloot_user_region_preference')
+      const savedOptimal = localStorage.getItem('turfloot_optimal_region')
+      
+      if (savedPreference) {
+        const preference = JSON.parse(savedPreference)
+        // Use saved preference if it's recent (less than 24 hours old)
+        if (Date.now() - preference.timestamp < 86400000) {
+          const savedRegion = availableRegions.find(r => r.id === preference.regionId)
+          if (savedRegion) {
+            setCurrentServer(savedRegion.displayName)
+            setCurrentPing(preference.ping)
+            setOptimalRegion(savedRegion)
+            console.log(`🔄 Loaded saved region preference: ${savedRegion.displayName} (${preference.ping}ms)`)
+          }
+        }
+      } else if (savedOptimal) {
+        const optimal = JSON.parse(savedOptimal)
+        // Use saved optimal if it's recent (less than 1 hour old)
+        if (Date.now() - optimal.timestamp < 3600000) {
+          const optimalRegion = availableRegions.find(r => r.id === optimal.regionId)
+          if (optimalRegion) {
+            setCurrentServer(optimalRegion.displayName)
+            setCurrentPing(optimal.ping)
+            setOptimalRegion(optimalRegion)
+            console.log(`🎯 Loaded saved optimal region: ${optimalRegion.displayName} (${optimal.ping}ms)`)
+          }
+        }
+      }
+    } catch (e) {
+      console.log('Could not load saved region preferences')
+    }
+    
+    // Start ping measurements
     measureAllPings()
     
-    // Refresh pings every 30 seconds
-    const pingInterval = setInterval(measureAllPings, 30000)
+    // Refresh pings every 2 minutes for accurate real-time data
+    const pingInterval = setInterval(measureAllPings, 120000)
     
     return () => clearInterval(pingInterval)
   }, [])
