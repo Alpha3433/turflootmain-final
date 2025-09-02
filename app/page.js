@@ -2683,6 +2683,14 @@ export default function Home() {
                 </button>
               </div>
 
+              {/* Global Multiplayer Status - NEW */}
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center space-x-2 px-4 py-2 bg-cyan-500/10 border border-cyan-400/30 rounded-xl">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                  <span className="text-cyan-400 font-medium text-sm">🌍 Connected to Global Servers - Play with Players Worldwide</span>
+                </div>
+              </div>
+
               {/* Main Game Button - More compact on mobile */}
               <div className="flex justify-center">
                 <button 
