@@ -563,7 +563,7 @@ export default function PartyLobbySystem({
     setError(null)
 
     try {
-      const response = await fetch(`${getApiUrl('/api/party/accept-invitation')}`, {
+      const response = await fetch(`${getApiUrl('/party-api/accept-invitation')}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
