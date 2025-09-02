@@ -2538,9 +2538,17 @@ const AgarIOGame = () => {
     // Helper functions for game mechanics
 
     const updateBounties = () => {
-      // FIXED: Filter out undefined/null players and ensure they have required properties
-      const allPlayers = [game.player, ...game.bots]
+      // FIXED: Only include real players in multiplayer (no bots)
+      const allPlayers = [game.player]
         .filter(p => p && p.alive && typeof p.netWorth === 'number')
+      
+      // In multiplayer, bounties are handled by the server
+      if (game.isMultiplayer) {
+        // Real players' bounty status is managed by server
+        console.log('💰 Bounty system managed by multiplayer server')
+        return
+      }
+      
       allPlayers.sort((a, b) => b.netWorth - a.netWorth)
       
       // Clear old bounties
