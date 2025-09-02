@@ -2620,8 +2620,8 @@ const AgarIOGame = () => {
         game.player.x += game.player.dir.x * speed * deltaTime
         game.player.y += game.player.dir.y * speed * deltaTime
         
-        // CRITICAL FIX: Also update all cells in the cells array for split functionality (skip in spectator mode)
-        if (!isSpectatorMode && game.player.cells && game.player.cells.length > 0) {
+        // CRITICAL FIX: Also update all cells in the cells array for split functionality
+        if (game.player.cells && game.player.cells.length > 0) {
           game.player.cells.forEach(cell => {
             // Each cell moves independently based on player direction and its own mass
             const cellMass = Math.max(cell.mass, 1)
