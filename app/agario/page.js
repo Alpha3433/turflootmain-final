@@ -5227,7 +5227,6 @@ const AgarIOGame = () => {
                     </div>
                   </div>
                 </div>
-              )}
             </div>
           )}
 
