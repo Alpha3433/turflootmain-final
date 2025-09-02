@@ -886,26 +886,54 @@ export default function Home() {
           setGlobalWinnings(newWinnings)
         }
 
+        // FIXED: Dynamic leaderboard based on real elimination stats instead of mock API data
         if (leaderboardResponse.ok) {
           const leaderboardData = await leaderboardResponse.json()
-          console.log('📊 Leaderboard data received:', leaderboardData)
+          console.log('📊 Raw leaderboard data received:', leaderboardData)
           
-          // Process leaderboard data for display with null checks
+          // Process leaderboard data based on actual player eliminations
           if (leaderboardData && leaderboardData.users && Array.isArray(leaderboardData.users)) {
-            const processedLeaderboard = leaderboardData.users.slice(0, 3).map((user, index) => ({
-              rank: index + 1,
-              name: user.custom_name || user.email?.split('@')[0] || `Player${user.id?.slice(-4)}`,
-              earnings: `$${(user.stats?.total_earnings || 0).toFixed(2)}`
-            }))
+            const processedLeaderboard = leaderboardData.users
+              .slice(0, 10) // Get top 10 players
+              .filter(user => user.stats?.total_kills > 0) // Only show players with actual eliminations
+              .sort((a, b) => (b.stats?.total_kills || 0) - (a.stats?.total_kills || 0)) // Sort by kills descending
+              .slice(0, 3) // Show top 3
+              .map((user, index) => ({
+                rank: index + 1,
+                name: user.custom_name || user.email?.split('@')[0] || `Player${user.id?.slice(-4)}`,
+                eliminations: user.stats?.total_kills || 0,
+                earnings: `${user.stats?.total_kills || 0} eliminations` // Show eliminations instead of mock earnings
+              }))
             
             setLeaderboardData(processedLeaderboard)
+            console.log('📊 Processed dynamic leaderboard:', processedLeaderboard)
           } else {
-            console.log('⚠️ Invalid leaderboard data structure')
-            setLeaderboardData([])
+            console.log('⚠️ No users with eliminations found - showing current player if they have kills')
+            // Show current player if they have eliminations
+            if (playerEliminationStats.kills > 0) {
+              setLeaderboardData([{
+                rank: 1,
+                name: displayName || 'You',
+                eliminations: playerEliminationStats.kills,
+                earnings: `${playerEliminationStats.kills} eliminations`
+              }])
+            } else {
+              setLeaderboardData([])
+            }
           }
         } else {
-          console.log('⚠️ No leaderboard data available')
-          setLeaderboardData([])
+          console.log('⚠️ Leaderboard API unavailable - using local player stats')
+          // Fallback to local player stats if API fails
+          if (playerEliminationStats.kills > 0) {
+            setLeaderboardData([{
+              rank: 1,
+              name: displayName || 'You',
+              eliminations: playerEliminationStats.kills,
+              earnings: `${playerEliminationStats.kills} eliminations`
+            }])
+          } else {
+            setLeaderboardData([])
+          }
         }
 
         if (friendsResponse.ok) {
