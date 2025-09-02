@@ -297,7 +297,9 @@ export default function Home() {
 
   // TEMPORARY: Force mobile mode for testing - REMOVE AFTER VERIFICATION
   const [forceMobileMode, setForceMobileMode] = useState(false)
+  // FIXED: Dynamic leaderboard based on actual player eliminations instead of mock data
   const [leaderboardData, setLeaderboardData] = useState([])
+  const [playerEliminationStats, setPlayerEliminationStats] = useState({ kills: 0, deaths: 0, streak: 0 })
   const [playerCustomization, setPlayerCustomization] = useState({
     skin: 'default_blue'
   })
