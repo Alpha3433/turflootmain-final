@@ -139,22 +139,22 @@ const UserSettings = ({ isOpen, onClose, user }) => {
   )
 
   const renderAccountTab = () => (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Username Section */}
       <div>
-        <h3 className="text-lg font-bold text-white mb-4">Username</h3>
-        <div className="flex items-center space-x-4">
+        <h3 className="text-lg font-bold text-white mb-3">Username</h3>
+        <div className="flex items-center space-x-3">
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+            className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400"
             placeholder="Enter username"
           />
           <button
             onClick={handleUpdateUsername}
             disabled={isUpdatingUsername}
-            className={`px-6 py-3 text-white font-medium rounded-lg transition-colors ${
+            className={`px-4 py-2 text-white font-medium rounded-lg transition-colors ${
               isUpdatingUsername 
                 ? 'bg-gray-500 cursor-not-allowed' 
                 : 'bg-green-500 hover:bg-green-600'
@@ -167,14 +167,14 @@ const UserSettings = ({ isOpen, onClose, user }) => {
 
       {/* Wallet Information */}
       <div>
-        <h3 className="text-lg font-bold text-white mb-4">Wallet Information</h3>
-        <div className="bg-gray-800 rounded-lg p-4 border border-gray-600">
+        <h3 className="text-lg font-bold text-white mb-3">Wallet Information</h3>
+        <div className="bg-gray-800 rounded-lg p-3 border border-gray-600">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gray-600 rounded flex items-center justify-center">
+              <div className="w-7 h-7 bg-gray-600 rounded flex items-center justify-center">
                 💳
               </div>
-              <span className="text-white font-mono">
+              <span className="text-white font-mono text-sm">
                 {user?.wallet?.address || 'Connect wallet to view address'}
               </span>
             </div>
@@ -184,7 +184,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
               title="Copy wallet address"
               disabled={!user?.wallet?.address}
             >
-              {showCopySuccess ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
+              {showCopySuccess ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
             </button>
           </div>
         </div>
@@ -192,24 +192,24 @@ const UserSettings = ({ isOpen, onClose, user }) => {
 
       {/* Account Information */}
       <div>
-        <h3 className="text-lg font-bold text-white mb-4">Account Information</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between py-3 border-b border-gray-700">
+        <h3 className="text-lg font-bold text-white mb-3">Account Information</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between py-2 border-b border-gray-700">
             <div className="flex items-center space-x-3">
               <div className="text-gray-400">📅</div>
               <span className="text-gray-400">Member Since</span>
             </div>
-            <span className="text-white font-medium">
+            <span className="text-white font-medium text-sm">
               {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Login to view date'}
             </span>
           </div>
           
-          <div className="flex items-center justify-between py-3 border-b border-gray-700">
+          <div className="flex items-center justify-between py-2 border-b border-gray-700">
             <div className="flex items-center space-x-3">
               <div className="text-gray-400">🔥</div>
               <span className="text-gray-400">Login Streak</span>
             </div>
-            <span className="text-white font-medium">
+            <span className="text-white font-medium text-sm">
               {user?.loginStreak || 'Play games to build streak'}
             </span>
           </div>
