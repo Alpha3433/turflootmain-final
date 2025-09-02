@@ -365,21 +365,21 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
   ]
 
   const renderLeaderboard = () => (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Leaderboard Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-yellow-500/20 rounded-lg border border-yellow-500/30">
-            <Trophy className="w-6 h-6 text-yellow-400" />
+          <div className="p-1.5 bg-yellow-500/20 rounded-lg border border-yellow-500/30">
+            <Trophy className="w-5 h-5 text-yellow-400" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">Global Leaderboard</h3>
+            <h3 className="text-lg font-bold text-white">Global Leaderboard</h3>
             <p className="text-sm text-gray-400">Live rankings • Updated real-time</p>
           </div>
         </div>
         
         <select 
-          className={`${isLandscape ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-base'} bg-gray-800/60 border border-gray-700/60 rounded-xl text-white focus:outline-none focus:border-yellow-500/60 shadow-lg font-medium`}
+          className={`${isLandscape ? 'px-3 py-1.5 text-sm' : 'px-3 py-1.5 text-sm'} bg-gray-800/60 border border-gray-700/60 rounded-xl text-white focus:outline-none focus:border-yellow-500/60 shadow-lg font-medium`}
           value={leaderboardType}
           onChange={(e) => {
             setLeaderboardType(e.target.value)
@@ -393,22 +393,22 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center h-48 space-y-4">
-          <div className="text-4xl animate-pulse">🏆</div>
-          <div className="text-gray-400">Loading leaderboard...</div>
+        <div className="flex flex-col items-center justify-center h-40 space-y-3">
+          <div className="text-3xl animate-pulse">🏆</div>
+          <div className="text-gray-400 text-sm">Loading leaderboard...</div>
         </div>
       ) : leaderboard.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {leaderboard.map((player, index) => (
-            <div key={player.id || index} className={`p-4 rounded-2xl border-2 transition-all hover:scale-[1.02] ${
+            <div key={player.id || index} className={`p-3 rounded-xl border-2 transition-all hover:scale-[1.01] ${
               index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/40 shadow-lg shadow-yellow-500/20' :
               index === 1 ? 'bg-gradient-to-r from-gray-400/20 to-gray-500/20 border-gray-400/40' :
               index === 2 ? 'bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border-orange-500/40' :
               'bg-gray-800/50 border-gray-700/60 hover:border-gray-600/60'
             }`}>
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg border-2 ${
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm border-2 ${
                     index === 0 ? 'bg-yellow-500/30 border-yellow-500/60 text-yellow-200' :
                     index === 1 ? 'bg-gray-400/30 border-gray-400/60 text-gray-200' :
                     index === 2 ? 'bg-orange-500/30 border-orange-500/60 text-orange-200' :
@@ -418,8 +418,8 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
                   </div>
                   
                   <div>
-                    <div className="font-bold text-white text-lg">{player.username || `Player${(player.id || index).toString().slice(-4)}`}</div>
-                    <div className="text-sm text-gray-400">
+                    <div className="font-medium text-white text-sm">{player.username || `Player${(player.id || index).toString().slice(-4)}`}</div>
+                    <div className="text-xs text-gray-400">
                       {leaderboardType === 'winnings' && `$${(player.totalWinnings || 0).toFixed(2)} earned`}
                       {leaderboardType === 'wins' && `${player.gamesWon || 0} victories`}
                       {leaderboardType === 'kd' && `${((player.totalEliminations || 0) / Math.max(player.gamesPlayed || 1, 1)).toFixed(2)} K/D`}
@@ -428,7 +428,7 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
                 </div>
                 
                 <div className="text-right">
-                  <div className={`text-xl font-bold ${
+                  <div className={`text-sm font-bold ${
                     index === 0 ? 'text-yellow-400' :
                     index === 1 ? 'text-gray-300' :
                     index === 2 ? 'text-orange-400' : 'text-white'
