@@ -4689,12 +4689,14 @@ const AgarIOGame = () => {
         </div>
       )}
       
-      {/* Live Ping Monitor - Desktop Only */}
+      {/* Enhanced Hathora Ping Monitor - Desktop Only */}
       {!isGameOver && settings.showPingMonitor && !isMobile && (
         <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
           <div className="flex items-center space-x-2 text-sm">
-            <div className="w-2 h-2 rounded-full animate-pulse bg-green-400"></div>
-            <span className="text-gray-300">Ping:</span>
+            <div className={`w-2 h-2 rounded-full animate-pulse ${
+              isOptimalRegion ? 'bg-cyan-400' : 'bg-green-400'
+            }`}></div>
+            <span className="text-gray-300">{currentRegion}:</span>
             <span className={`font-bold ${
               ping < 50 ? 'text-green-400' : 
               ping < 100 ? 'text-yellow-400' : 
@@ -4702,6 +4704,14 @@ const AgarIOGame = () => {
             }`}>
               {ping}ms
             </span>
+            {isOptimalRegion && (
+              <span className="text-cyan-400 text-xs" title="Connected to optimal Hathora region">
+                ⚡
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            {isOptimalRegion ? 'Optimal Hathora Server' : 'Fallback Connection'}
           </div>
         </div>
       )}
