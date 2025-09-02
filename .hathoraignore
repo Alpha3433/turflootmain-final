@@ -1,0 +1,25 @@
+# Hathora ignore file - exclude these from deployment
+node_modules/
+.next/
+.git/
+*.log
+*.tar.gz
+.env.local
+.env.development
+test_result.md
+README.md
+*.md
+.gitignore
+.eslintrc.json
+.vercel/
+.vscode/
+coverage/
+dist/
+build/
+temp/
+tmp/
+.cache/
+.DS_Store
+*.test.js
+*.spec.js
+__tests__/
