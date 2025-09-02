@@ -631,7 +631,7 @@ export default function PartyLobbySystem({
     setError(null)
 
     try {
-      const response = await fetch(`${getApiUrl('/api/party/leave')}`, {
+      const response = await fetch(`${getApiUrl('/party-api/leave')}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
