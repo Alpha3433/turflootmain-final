@@ -2205,13 +2205,20 @@ export default function Home() {
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-green-400 font-medium text-xs leading-none hidden sm:inline group-hover:text-green-300 transition-colors duration-200">{currentServer}</span>
-                  <span className="text-green-400 font-medium text-xs leading-none sm:hidden group-hover:text-green-300 transition-colors duration-200">
-                    {currentServer.split('-')[0]}
+                  <span className="text-green-400 font-medium text-xs leading-none hidden sm:inline group-hover:text-green-300 transition-colors duration-200">
+                    {isLoadingPings ? 'Measuring...' : currentServer}
                   </span>
-                  {currentPing !== null && (
+                  <span className="text-green-400 font-medium text-xs leading-none sm:hidden group-hover:text-green-300 transition-colors duration-200">
+                    {isLoadingPings ? 'Ping...' : currentServer.split('-')[0]}
+                  </span>
+                  {currentPing !== null && !isLoadingPings && (
                     <span className="text-gray-400 text-xs leading-none group-hover:text-gray-300 transition-colors duration-200">
-                      {currentPing}ms
+                      {currentPing}ms {optimalRegion && currentServer === optimalRegion.displayName ? '⚡' : ''}
+                    </span>
+                  )}
+                  {isLoadingPings && (
+                    <span className="text-cyan-400 text-xs leading-none animate-pulse">
+                      Testing...
                     </span>
                   )}
                 </div>
