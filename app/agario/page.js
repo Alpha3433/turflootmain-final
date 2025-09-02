@@ -3114,40 +3114,35 @@ const AgarIOGame = () => {
         }
       }
 
-      // Enhanced PvP Combat (Split Cell vs Bots Detection)
-      if (game.player.alive && game.player.cells && game.player.cells.length > 1) {
-        // Check each split cell against bots for individual combat
+      // Enhanced PvP Combat (Split Cell vs Real Players Detection)
+      if (game.player.alive && game.player.cells && game.player.cells.length > 1 && game.isMultiplayer) {
+        // Check each split cell against real players for individual combat
         for (const cell of game.player.cells) {
           if (!cell) continue
           
-          for (const bot of game.bots) {
-            if (!bot.alive) continue
+          for (const [realPlayerId, realPlayer] of realPlayers) {
+            if (!realPlayer.alive || realPlayerId === playerData.id) continue
             
-            const distance = getDistance(cell, bot)
+            const distance = getDistance(cell, realPlayer)
             const baseCellRadius = getRadius(cell.mass) * 2.0
             const cellRadius = baseCellRadius * 3.0 // Split cell 3x bigger visually
-            const botRadius = getRadius(bot.mass) * 2.0
+            const playerRadius = getRadius(realPlayer.mass) * 2.0
             
-            if (distance < Math.max(cellRadius, botRadius)) {
+            if (distance < Math.max(cellRadius, playerRadius)) {
               // Check spawn protection
-              if (game.player.spawnProtected || bot.spawnProtected) {
+              if (game.player.spawnProtected || realPlayer.spawnProtected) {
                 continue
               }
               
-              if (cell.mass > bot.mass * 1.15) {
-                // Split cell kills bot
-                const bountyMultiplier = bot.isBounty ? 1.5 : 1.0
-                const killReward = Math.floor(config.killReward * bountyMultiplier)
-                
-                // Update individual cell mass
-                cell.mass += bot.mass * 0.3
-                cell.radius = Math.sqrt(cell.mass / Math.PI) * 8
-                
-                // Update total player mass and net worth
-                game.player.mass = game.player.cells.reduce((total, c) => total + c.mass, 0)
-                game.player.netWorth += killReward
-                game.player.kills += 1
-                game.player.streak += 1
+              if (cell.mass > realPlayer.mass * 1.15) {
+                // Split cell kills real player - handled by server
+                console.log('🎯 Split cell vs real player collision detected - server will handle')
+                // Server will handle the actual kill mechanics
+              }
+            }
+          }
+        }
+      }
                 
                 // Enhanced mobile feedback for split cell kills
                 if (isMobile) {
