@@ -3246,11 +3246,23 @@ const AgarIOGame = () => {
               game.player.streak += 1
               // Removed cashBadgeScale animation to fix flickering
               
-              // Update session tracking
+              // Update session tracking and emit elimination event for leaderboard
               setGameSession(prev => ({
                 ...prev,
                 kills: prev.kills + 1
               }))
+              
+              // FIXED: Emit elimination event to update main page leaderboard dynamically
+              const eliminationData = {
+                kills: game.player.kills,
+                deaths: game.player.deaths || 0,
+                streak: game.player.streak
+              }
+              
+              window.dispatchEvent(new CustomEvent('playerElimination', { 
+                detail: eliminationData 
+              }))
+              console.log('📊 Emitted player elimination event (regular):', eliminationData)
               
               bot.alive = false
               
