@@ -202,7 +202,7 @@ export default function Home() {
     }
   }
 
-  // Measure ping to all regions
+  // Measure ping to all Hathora regions and find optimal
   const measureAllPings = async () => {
     // Only run on client side to avoid SSR issues
     if (typeof window === 'undefined') {
@@ -212,11 +212,14 @@ export default function Home() {
     if (isLoadingPings) return
     
     setIsLoadingPings(true)
-    console.log('🌍 Measuring ping to all regions...')
+    setCurrentServer('Measuring...')
+    setCurrentPing(null)
+    console.log('🌍 Measuring ping to all Hathora regions...')
     
     const pingPromises = availableRegions.map(async (region) => {
       const ping = await measurePing(region.id, region.endpoint)
-      return { regionId: region.id, ping }
+      console.log(`📡 ${region.displayName}: ${ping}ms`)
+      return { regionId: region.id, region, ping }
     })
 
     try {
@@ -225,20 +228,64 @@ export default function Home() {
       
       results.forEach(({ regionId, ping }) => {
         newPings[regionId] = ping
-        console.log(`📡 ${regionId}: ${ping}ms`)
       })
       
       setRegionPings(newPings)
       
-      // Update current server ping if it's in the results
-      if (newPings[currentServer]) {
-        setCurrentPing(newPings[currentServer])
+      // Find the optimal region (lowest ping)
+      const optimalResult = results.reduce((best, current) => 
+        current.ping < best.ping ? current : best
+      )
+      
+      // Update UI with optimal region
+      setOptimalRegion(optimalResult.region)
+      setCurrentServer(optimalResult.region.displayName)
+      setCurrentPing(optimalResult.ping)
+      
+      console.log(`🎯 Optimal Hathora region: ${optimalResult.region.displayName} (${optimalResult.ping}ms)`)
+      
+      // Store the optimal region preference in localStorage for future sessions
+      try {
+        localStorage.setItem('turfloot_optimal_region', JSON.stringify({
+          regionId: optimalResult.region.id,
+          displayName: optimalResult.region.displayName,
+          ping: optimalResult.ping,
+          timestamp: Date.now()
+        }))
+      } catch (e) {
+        console.log('Could not save optimal region preference')
       }
+      
     } catch (error) {
-      console.error('❌ Failed to measure some pings:', error)
-    } finally {
-      setIsLoadingPings(false)
+      console.error('❌ Failed to measure region pings:', error)
+      // Fallback to estimated best region based on timezone
+      const fallbackRegion = availableRegions.find(r => r.id === getPreferredRegionByTimezone()) || availableRegions[0]
+      setCurrentServer(fallbackRegion.displayName)
+      setCurrentPing(getEstimatedLatencyOffset(fallbackRegion.id))
+      setOptimalRegion(fallbackRegion)
     }
+    
+    setIsLoadingPings(false)
+  }
+  
+  // Get preferred region based on user's timezone (matches Hathora client logic)
+  const getPreferredRegionByTimezone = () => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    
+    if (timezone.includes('America')) {
+      return timezone.includes('Los_Angeles') || timezone.includes('Vancouver') ? 'seattle' : 'washington-dc'
+    } else if (timezone.includes('Europe')) {
+      return timezone.includes('London') || timezone.includes('Dublin') ? 'london' : 'frankfurt'
+    } else if (timezone.includes('Asia')) {
+      if (timezone.includes('Tokyo') || timezone.includes('Japan')) return 'tokyo'
+      if (timezone.includes('Singapore') || timezone.includes('Malaysia')) return 'singapore'
+      if (timezone.includes('India') || timezone.includes('Kolkata')) return 'mumbai'
+      return 'singapore'
+    } else if (timezone.includes('Australia') || timezone.includes('Pacific') || timezone.includes('Auckland')) {
+      return 'sydney'
+    }
+    
+    return 'washington-dc' // Safe fallback
   }
 
   // Measure pings on component mount and periodically
