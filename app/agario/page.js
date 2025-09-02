@@ -4703,7 +4703,7 @@ const AgarIOGame = () => {
             <span className="text-lg">💰</span>
             <span>
               {isCashingOut
-                ? `Cashing Out... (${Math.ceil(cashOutCooldown / 1000)}s)`
+                ? `Cashing Out... ${Math.floor(cashOutProgress)}%`
                 : `Hold E to Cash Out ($${gameRef.current?.game?.player?.netWorth?.toFixed(0) || 0})`
               }
             </span>
