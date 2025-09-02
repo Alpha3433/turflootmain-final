@@ -16,20 +16,81 @@ const AgarIOGame = () => {
   const { settings } = useGameSettings()  // Add settings hook
   const { user, getAccessToken } = usePrivy() // Add Privy auth
   
-  // Ping monitoring function
-  const measurePing = async () => {
+  // Enhanced Hathora ping monitoring for real-time in-game latency
+  const [currentRegion, setCurrentRegion] = useState('Detecting...')
+  const [isOptimalRegion, setIsOptimalRegion] = useState(false)
+  
+  const measureHathoraPing = async () => {
     try {
-      const startTime = Date.now()
-      await fetch('/api/ping', { 
-        method: 'HEAD',
-        cache: 'no-cache' 
-      })
-      const endTime = Date.now()
-      const latency = endTime - startTime
+      // Get available Hathora regions (matching main page implementation)
+      const hathoraRegions = [
+        { id: 'washington-dc', name: 'US East', endpoint: 'https://ping-us-east.hathora.dev/ping' },
+        { id: 'seattle', name: 'US West', endpoint: 'https://ping-us-west.hathora.dev/ping' },
+        { id: 'london', name: 'EU West', endpoint: 'https://ping-eu-west.hathora.dev/ping' },
+        { id: 'frankfurt', name: 'EU Central', endpoint: 'https://ping-eu-central.hathora.dev/ping' },
+        { id: 'singapore', name: 'Asia SE', endpoint: 'https://ping-asia-southeast.hathora.dev/ping' },
+        { id: 'tokyo', name: 'Asia East', endpoint: 'https://ping-asia-east.hathora.dev/ping' },
+        { id: 'mumbai', name: 'Asia South', endpoint: 'https://ping-asia-south.hathora.dev/ping' },
+        { id: 'sydney', name: 'Oceania', endpoint: 'https://ping-oceania.hathora.dev/ping' }
+      ]
+      
+      // Try to detect current region from localStorage (set by main page)
+      let currentOptimalRegion = null
+      try {
+        const savedOptimal = localStorage.getItem('turfloot_optimal_region')
+        if (savedOptimal) {
+          const optimal = JSON.parse(savedOptimal)
+          currentOptimalRegion = hathoraRegions.find(r => r.id === optimal.regionId)
+          if (currentOptimalRegion) {
+            setCurrentRegion(currentOptimalRegion.name)
+            setIsOptimalRegion(true)
+          }
+        }
+      } catch (e) {
+        console.log('Could not load optimal region from storage')
+      }
+      
+      // Measure ping to current region or fallback to general ping
+      let latency = 999
+      
+      if (currentOptimalRegion) {
+        // Measure ping to optimal Hathora region
+        try {
+          const startTime = performance.now()
+          await fetch(currentOptimalRegion.endpoint, {
+            method: 'HEAD',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            signal: AbortSignal.timeout(3000)
+          })
+          const endTime = performance.now()
+          latency = Math.round(endTime - startTime)
+        } catch (regionError) {
+          // Fallback to local API ping if Hathora endpoint fails
+          console.log('Hathora ping failed, using fallback')
+          const startTime = Date.now()
+          await fetch('/api/ping', { method: 'HEAD', cache: 'no-cache' })
+          const endTime = Date.now()
+          latency = endTime - startTime
+          setIsOptimalRegion(false)
+        }
+      } else {
+        // Fallback to local API ping
+        const startTime = Date.now()
+        await fetch('/api/ping', { method: 'HEAD', cache: 'no-cache' })
+        const endTime = Date.now()
+        latency = endTime - startTime
+        setCurrentRegion('Local')
+        setIsOptimalRegion(false)
+      }
+      
       setPing(latency)
+      
     } catch (error) {
-      // If ping fails, set high ping value to indicate connection issues
+      console.log('Ping measurement failed:', error)
       setPing(999)
+      setCurrentRegion('Unknown')
+      setIsOptimalRegion(false)
     }
   }
   const [gameStats, setGameStats] = useState({ netWorth: 5, rank: 1, players: 1, kills: 0, deaths: 0, streak: 0 })
