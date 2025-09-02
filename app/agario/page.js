@@ -92,6 +92,7 @@ const AgarIOGame = () => {
   // Split mechanic state
   const [splitCooldown, setSplitCooldown] = useState(0)
   const [splitCooldownActive, setSplitCooldownActive] = useState(false)
+  const [cashOutCooldown, setCashOutCooldown] = useState(0)
   const [lastSplitTime, setLastSplitTime] = useState(0)
   const [liveEventFeed, setLiveEventFeed] = useState([])
   const [territoryGlowIntensity, setTerritoryGlowIntensity] = useState(0.3)
