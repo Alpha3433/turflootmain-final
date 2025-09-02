@@ -1363,9 +1363,18 @@ export default function Home() {
     }
   }
 
-  // NEW: Practice mode - direct full game experience with bots
+  // NEW: Practice mode - requires authentication first
   const handlePracticeMode = () => {
-    console.log('🤖 Practice mode - going directly to full game experience with bots')
+    console.log('🤖 Practice mode requested - checking authentication')
+    
+    // FIXED: Require authentication for practice mode
+    if (!authenticated || !user) {
+      console.log('❌ User not authenticated - showing login popup')
+      setShowAuthModal(true) // This will trigger the Privy login popup
+      return
+    }
+    
+    console.log('✅ User authenticated - proceeding to practice mode')
     
     const roomId = 'global-practice-bots'
     const gameMode = 'practice'
@@ -1375,7 +1384,8 @@ export default function Home() {
       roomId, 
       gameMode, 
       gameFee,
-      directPlay: true
+      directPlay: true,
+      userId: user.id
     })
     
     // Navigate directly to the full agario game experience (no spectator mode)
@@ -1383,7 +1393,7 @@ export default function Home() {
     
     try {
       router.push(gameUrl)
-      console.log('✅ Router.push called for direct practice mode')
+      console.log('✅ Router.push called for authenticated practice mode')
       
       // Fallback navigation after a short delay
       setTimeout(() => {
