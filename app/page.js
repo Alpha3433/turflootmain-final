@@ -1991,6 +1991,14 @@ export default function Home() {
                 </svg>
               </button>
 
+              {/* Global Connection Status Indicator */}
+              <div className="absolute -top-1 -right-1 flex items-center">
+                <div 
+                  className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg border border-cyan-300"
+                  title="Connected to Global Hathora Servers - Worldwide Multiplayer Enabled"
+                ></div>
+              </div>
+
               {/* Region Dropdown */}
               {showRegionDropdown && (
                 <div className="absolute top-full mt-2 left-0 w-64 bg-gray-800/95 backdrop-blur-sm border border-gray-700/60 rounded-xl shadow-2xl z-50 overflow-hidden">
