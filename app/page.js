@@ -758,21 +758,6 @@ export default function Home() {
       window.removeEventListener('playerElimination', handlePlayerElimination)
     }
   }, [displayName]) // Re-setup when display name changes
-    loadUserBalance()
-    
-    // Listen for mission completion events to update balance in real-time
-    const handleMissionComplete = (event) => {
-      const { rewardAmount, newBalance } = event.detail
-      console.log(`🎯 Mission completed! Earned ${rewardAmount} coins. New balance: ${newBalance}`)
-      setUserBalance(newBalance)
-    }
-    
-    window.addEventListener('missionRewardEarned', handleMissionComplete)
-    
-    return () => {
-      window.removeEventListener('missionRewardEarned', handleMissionComplete)
-    }
-  }, [])
 
   // Update notification timestamps every 30 seconds
   useEffect(() => {
