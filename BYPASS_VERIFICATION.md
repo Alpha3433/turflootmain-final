@@ -3,9 +3,9 @@
 ## What Is Confirmed Working
 
 ### ✅ Bypass API Endpoints (100% Functional)
-- **Health Check**: `https://playturf-global.preview.emergentagent.com/health` → Returns `{"status":"healthy"}`
-- **Name Saving**: `https://playturf-global.preview.emergentagent.com/names-api/update` → Successfully saves names
-- **Name Retrieval**: `https://playturf-global.preview.emergentagent.com/names-api/get?userId=X` → Successfully retrieves names
+- **Health Check**: `https://hathora-turfloot.preview.emergentagent.com/health` → Returns `{"status":"healthy"}`
+- **Name Saving**: `https://hathora-turfloot.preview.emergentagent.com/names-api/update` → Successfully saves names
+- **Name Retrieval**: `https://hathora-turfloot.preview.emergentagent.com/names-api/get?userId=X` → Successfully retrieves names
 
 ### ✅ End-to-End Workflow Verification
 ```bash
@@ -13,13 +13,13 @@
 USER_ID="did:privy:cmeksdeoe00gzl10bsienvnbk"
 
 # Save name:
-curl -X POST "https://playturf-global.preview.emergentagent.com/names-api/update" \
+curl -X POST "https://hathora-turfloot.preview.emergentagent.com/names-api/update" \
   -H "Content-Type: application/json" \
   -d '{"userId": "'$USER_ID'", "customName": "TestBypassUser"}'
 # Result: {"success":true,"message":"Name saved successfully via bypass route"}
 
 # Retrieve name:
-curl "https://playturf-global.preview.emergentagent.com/names-api/get?userId=$USER_ID"  
+curl "https://hathora-turfloot.preview.emergentagent.com/names-api/get?userId=$USER_ID"  
 # Result: {"success":true,"customName":"TestBypassUser"}
 ```
 
