@@ -257,8 +257,8 @@ export default function Home() {
         router.push(gameUrl)
         
       } else if (roomType === 'practice') {
-        // SOLO PRACTICE MODE: Navigate to practice mode
-        console.log('🎮 Solo Practice Mode: Navigating to practice game')
+        // SOLO GLOBAL MULTIPLAYER MODE: Navigate to global multiplayer
+        console.log('🌍 Solo Global Multiplayer Mode: Navigating to worldwide multiplayer')
         router.push('/agario?mode=practice&fee=0&roomId=global-practice-bots')
         
       } else {
