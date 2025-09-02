@@ -328,10 +328,10 @@ const UserSettings = ({ isOpen, onClose, user }) => {
   )
 
   const renderDisplayTab = () => (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-bold text-white mb-4">Interface Elements</h3>
-        <div className="space-y-6">
+        <h3 className="text-lg font-bold text-white mb-3">Interface Elements</h3>
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-white font-medium">Show Ping Monitor</div>
