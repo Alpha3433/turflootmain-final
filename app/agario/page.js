@@ -2749,8 +2749,8 @@ const AgarIOGame = () => {
       }
       // Note: Pure multiplayer mode - no local bot AI needed
 
-      // Orb pickup (mass only, no money) - UPDATED for split cells
-      const allEntities = [...game.bots].filter(e => e.alive)
+      // Orb pickup (mass only, no money) - UPDATED for split cells and multiplayer
+      const allEntities = [] // No bots in pure multiplayer - entities are managed by server
       
       // Add individual player cells for orb collection
       if (game.player.alive && game.player.cells && game.player.cells.length > 0) {
