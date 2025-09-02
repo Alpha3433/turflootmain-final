@@ -1168,11 +1168,22 @@ export default function PartyLobbySystem({
           {/* Party Invitations */}
           {partyInvitations.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-white font-semibold text-sm flex items-center space-x-2">
-                <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <span>Party Invites ({partyInvitations.length})</span>
+              <h3 className="text-white font-semibold text-sm flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>Party Invites ({partyInvitations.length})</span>
+                </div>
+                <button
+                  onClick={fetchPartyInvitations}
+                  className="p-1 text-gray-400 hover:text-white transition-colors"
+                  title="Refresh invitations"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.002 8.002 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
               </h3>
               {partyInvitations.map((invite) => (
                 <div key={invite.id} className="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
