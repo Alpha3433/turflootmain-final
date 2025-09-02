@@ -312,7 +312,7 @@ export default function PartyLobbySystem({
       await new Promise(resolve => setTimeout(resolve, 150)) // 150ms delay for notifications
       
       console.log('🔔 Checking for party game notifications...')
-      const response = await fetch(`${getApiUrl('/api/party/notifications')}?userId=${userId}`)
+      const response = await fetch(`${getApiUrl('/party-api/notifications')}?userId=${userId}`)
       
       if (response.status === 429) {
         console.warn('⚠️ Notification polling rate limited, backing off...')
