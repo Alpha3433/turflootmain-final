@@ -1370,7 +1370,15 @@ export default function Home() {
     // FIXED: Require authentication for practice mode
     if (!authenticated || !user) {
       console.log('❌ User not authenticated - showing login popup')
-      setShowAuthModal(true) // This will trigger the Privy login popup
+      
+      // Try to use Privy login first, fallback to login modal
+      if (privyAuth.ready && privyAuth.login) {
+        console.log('🔐 Triggering Privy login')
+        privyAuth.login()
+      } else {
+        console.log('🔐 Privy not ready, showing login modal')
+        setShowLoginModal(true) // This will trigger the login popup
+      }
       return
     }
     
