@@ -2746,61 +2746,8 @@ const AgarIOGame = () => {
         // Real players are managed by the server via Socket.IO
         // No local bot simulation needed
         console.log('🔗 Real multiplayer with', realPlayers.size, 'players')
-      } else if (!game.isMultiplayer) {
-        // Original bot AI logic (only in offline mode)
-      game.bots.forEach(bot => {
-        if (!bot.alive) return
-        
-        // Simple AI: change direction occasionally, chase orbs
-        if (Date.now() - bot.lastDirChange > 1000 + Math.random() * 2000) {
-          // Find nearest orb
-          let nearestOrb = null
-          let nearestDistance = Infinity
-          
-          game.orbs.forEach(orb => {
-            const distance = getDistance(bot, orb)
-            if (distance < nearestDistance) {
-              nearestDistance = distance
-              nearestOrb = orb
-            }
-          })
-          
-          if (nearestOrb && nearestDistance < 400) {
-            // Chase orb
-            const dx = nearestOrb.x - bot.x
-            const dy = nearestOrb.y - bot.y
-            bot.targetDir = normalizeVector({ x: dx, y: dy })
-          } else {
-            // Random movement
-            bot.targetDir = {
-              x: (Math.random() - 0.5) * 2,
-              y: (Math.random() - 0.5) * 2
-            }
-          }
-          bot.lastDirChange = Date.now()
-        }
-        
-        // Move towards target direction
-        bot.dir.x += (bot.targetDir.x - bot.dir.x) * deltaTime * 3
-        bot.dir.y += (bot.targetDir.y - bot.dir.y) * deltaTime * 3
-        bot.dir = normalizeVector(bot.dir)
-        
-        const speed = config.baseSpeed / Math.pow(Math.max(bot.mass, 1), 0.3) // Less aggressive decay (was sqrt = 0.5, now 0.3)
-        bot.x += bot.dir.x * speed * deltaTime
-        bot.y += bot.dir.y * speed * deltaTime
-        
-        // Circular world boundaries for bots
-        const worldRadius = config.worldSize / 2
-        const distanceFromCenter = Math.sqrt(bot.x * bot.x + bot.y * bot.y)
-        
-        if (distanceFromCenter > worldRadius) {
-          // Push bot back inside the circle
-          const angle = Math.atan2(bot.y, bot.x)
-          bot.x = Math.cos(angle) * worldRadius
-          bot.y = Math.sin(angle) * worldRadius
-        }
-      })
-      } // Close the multiplayer/offline mode conditional
+      }
+      // Note: Pure multiplayer mode - no local bot AI needed
 
       // Orb pickup (mass only, no money) - UPDATED for split cells
       const allEntities = [...game.bots].filter(e => e.alive)
