@@ -3024,8 +3024,8 @@ export default function Home() {
                         <span className="text-green-400 text-xl">🆓</span>
                       </div>
                       <div className="text-left">
-                        <div className="text-white font-medium">Practice Mode</div>
-                        <div className="text-gray-400 text-sm">Free • Learn the basics</div>
+                        <div className="text-white font-medium">Global Multiplayer</div>
+                        <div className="text-gray-400 text-sm">Free • Worldwide Players</div>
                       </div>
                     </div>
                     <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
