@@ -1430,11 +1430,11 @@ export default function Home() {
 
   // NEW: Practice mode - requires authentication for global multiplayer
   const handlePracticeMode = () => {
-    console.log('🌍 Global practice mode requested - checking authentication')
+    console.log('🌍 Global multiplayer practice requested - checking authentication')
     
     // FIXED: Require authentication for global multiplayer
     if (!authenticated || !user) {
-      console.log('❌ User not authenticated - showing login popup for global play')
+      console.log('❌ User not authenticated - showing login popup for global multiplayer access')
       
       // Try to use Privy login first, fallback to login modal
       if (privyAuth.ready && privyAuth.login) {
@@ -1447,7 +1447,7 @@ export default function Home() {
       return
     }
     
-    console.log('✅ User authenticated - connecting to global Hathora servers')
+    console.log('✅ User authenticated - connecting to global Hathora servers for worldwide multiplayer')
     
     const roomId = 'global-practice-bots'
     const gameMode = 'practice'
@@ -1459,7 +1459,8 @@ export default function Home() {
       gameFee,
       directPlay: true,
       userId: user.id,
-      globalMultiplayer: true
+      globalMultiplayer: true,
+      worldwide: true
     })
     
     // Navigate to global multiplayer experience
@@ -1467,12 +1468,12 @@ export default function Home() {
     
     try {
       router.push(gameUrl)
-      console.log('✅ Router.push called for global practice mode')
+      console.log('✅ Router.push called for global multiplayer practice mode')
       
       // Fallback navigation after a short delay
       setTimeout(() => {
         if (window.location.pathname === '/') {
-          console.log('🔄 Using window.location fallback for practice mode')
+          console.log('🔄 Using window.location fallback for global multiplayer practice')
           window.location.href = gameUrl
         }
       }, 1000)
