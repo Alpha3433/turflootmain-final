@@ -271,18 +271,15 @@ const AgarIOGame = () => {
     
     console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramDirectPlay })
     
-    // NEW: Handle direct play mode - full game experience immediately
+    // NEW: Handle direct play mode - full local game experience (like original agario) 
     if (paramDirectPlay) {
-      console.log('🎮 Direct play mode detected - loading full game experience')
+      console.log('🎮 Direct play mode detected - initializing as local game with bots')
       
-      // Initialize direct play mode
-      if (user && getAccessToken) {
-        console.log('🎮 Authenticated user - initializing direct play with multiplayer connection')
-        initializeMultiplayer(null, 1, null, false) // false = not spectator, full player experience
-      } else {
-        console.log('🎮 Guest user - initializing direct play with offline bots')
-        initializeGame(false) // false = offline mode with bots for guest users
-      }
+      // FIXED: Always use offline/local mode for direct play to mimic original agario behavior
+      // This creates a local game instance with bots, not connected to multiplayer servers
+      console.log('🤖 Initializing local game with bots (offline mode)')
+      initializeGame(false) // false = offline mode with local bots (like original agario)
+      
       return // Exit early - direct play mode handled
     }
     
