@@ -484,7 +484,7 @@ export default function PartyLobbySystem({
     try {
       console.log('🎉 Creating new party for user:', displayName)
       
-      const response = await fetch(`${getApiUrl('/api/party/create')}`, {
+      const response = await fetch(`${getApiUrl('/party-api/create')}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
