@@ -4709,7 +4709,7 @@ const AgarIOGame = () => {
       
       {/* Pure Hathora Ping Monitor - Mobile Version */}
       {!isGameOver && settings.showPingMonitor && isMobile && (
-        <div className="absolute top-20 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
+        <div className="absolute top-20 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
           <div className="flex items-center space-x-2 text-xs">
             <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-cyan-400"></div>
             <span className="text-gray-300">{currentRegion}:</span>
