@@ -1436,7 +1436,7 @@ export default function Home() {
     const gameMode = 'practice'
     const gameFee = 0
     
-    console.log('🌍 Navigating to global multiplayer:', { 
+    console.log('🌍 Preparing global multiplayer connection:', { 
       roomId, 
       gameMode, 
       gameFee,
@@ -1444,25 +1444,36 @@ export default function Home() {
       userAuthenticated: authenticated && user ? true : false
     })
     
-    // Navigate to global multiplayer experience (works for both auth and non-auth users)
-    const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}`
+    // Show loading popup with global multiplayer info
+    setGameLoadingInfo({
+      roomType: 'Global Multiplayer',
+      entryFee: 0,
+      partyMode: false,
+      partySize: 1
+    })
+    setIsJoiningGame(true)
     
-    try {
-      router.push(gameUrl)
-      console.log('✅ Router.push called for global multiplayer')
+    // Navigate to global multiplayer experience after loading delay
+    setTimeout(() => {
+      const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}`
       
-      // Fallback navigation after a short delay
-      setTimeout(() => {
-        if (window.location.pathname === '/') {
-          console.log('🔄 Using window.location fallback for global multiplayer')
-          window.location.href = gameUrl
-        }
-      }, 1000)
-    } catch (error) {
-      console.error('❌ Navigation error:', error)
-      // Ultimate fallback
-      window.location.href = gameUrl
-    }
+      try {
+        router.push(gameUrl)
+        console.log('✅ Router.push called for global multiplayer')
+        
+        // Fallback navigation after a short delay
+        setTimeout(() => {
+          if (window.location.pathname === '/') {
+            console.log('🔄 Using window.location fallback for global multiplayer')
+            window.location.href = gameUrl
+          }
+        }, 1000)
+      } catch (error) {
+        console.error('❌ Navigation error:', error)
+        // Ultimate fallback
+        window.location.href = gameUrl
+      }
+    }, 2000) // 2 second loading delay like party lobby
   }
 
 
