@@ -2039,48 +2039,67 @@ const AgarIOGame = () => {
         initializePaidRoom(paramMatchId, paramTier)
       }
       
-      // HATHORA INTEGRATION: Connect to optimal server (global or local)
+      // HATHORA GLOBAL MULTIPLAYER: Prioritize Hathora servers for all players
       let socket
+      let connectionSuccess = false
+      
+      console.log('🌍 TurfLoot: Connecting to global Hathora servers...')
       
       try {
-        // Try to use Hathora for global multiplayer
-        if (process.env.NEXT_PUBLIC_HATHORA_APP_ID) {
-          console.log('🌍 Attempting Hathora global connection...')
-          const { hathoraClient } = await import('/lib/hathoraClient')
+        // Always try Hathora first for global multiplayer
+        const { hathoraClient } = await import('/lib/hathoraClient')
+        
+        const hathoraInitialized = await hathoraClient.initialize()
+        if (hathoraInitialized) {
+          console.log('✅ Hathora initialized - connecting to optimal global server...')
           
-          const hathoraInitialized = await hathoraClient.initialize()
-          if (hathoraInitialized) {
-            const connectionInfo = await hathoraClient.connectToGame({
-              userId: user?.id,
-              roomId: paramRoomId,
-              socketOptions: {
-                auth: {
-                  token: authToken,
-                  fallback: true
-                },
-                transports: ['websocket']
-              }
-            })
-            
-            socket = connectionInfo.socket
-            console.log(`🌍 Connected to Hathora server in region: ${connectionInfo.serverInfo.region || 'unknown'}`)
-          } else {
-            throw new Error('Hathora initialization failed')
-          }
+          const connectionInfo = await hathoraClient.connectToGame({
+            userId: user?.id,
+            roomId: paramRoomId,
+            socketOptions: {
+              auth: {
+                token: authToken,
+                fallback: true
+              },
+              transports: ['websocket', 'polling'],
+              timeout: 15000
+            }
+          })
+          
+          socket = connectionInfo.socket
+          connectionSuccess = true
+          
+          console.log(`🌍 SUCCESS: Connected to Hathora server in region: ${connectionInfo.serverInfo.region || 'unknown'}`)
+          console.log(`🎮 Global multiplayer enabled - players worldwide can join this game!`)
+          
         } else {
-          throw new Error('Hathora not configured')
+          throw new Error('Hathora initialization failed')
         }
       } catch (error) {
-        console.log('🏠 Hathora unavailable, using local server:', error.message)
+        console.warn('⚠️ Hathora connection failed, trying local fallback:', error.message)
         
-        // Fallback to local Socket.IO server
-        socket = io({
-          auth: {
-            token: authToken,
-            fallback: true // Allow graceful degradation
-          },
-          transports: ['websocket', 'polling']
-        })
+        // Fallback to local server only if Hathora completely fails
+        try {
+          socket = io({
+            auth: {
+              token: authToken,
+              fallback: true
+            },
+            transports: ['websocket', 'polling'],
+            timeout: 10000
+          })
+          
+          connectionSuccess = true
+          console.log('🏠 Connected to local server as fallback')
+          
+        } catch (localError) {
+          console.error('❌ Both Hathora and local connection failed:', localError)
+          throw new Error('Unable to connect to any game server')
+        }
+      }
+      
+      if (!connectionSuccess) {
+        throw new Error('Failed to establish game connection')
       }
       
       socketRef.current = socket
