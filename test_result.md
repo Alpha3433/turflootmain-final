@@ -102,22 +102,26 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implement comprehensive Spectator Mode for TurfLoot Agario game. This feature allows users to observe live matches without participating, offering various camera controls (bird's-eye, player-locked, free-view), a UI overlay (leaderboard, player info, 'Join Match' button), and optimized for performance and cross-platform UX."
+user_problem_statement: "Complete Hathora Integration (Phase 1) - Update the main page UI to display global connection status and ensure users see they're connecting to global Hathora servers instead of local ones for worldwide multiplayer."
 
 # Test plan for this run
 
 test_plan:
   current_focus:
-    - "Spectator Mode Frontend Black Screen Investigation"
-  stuck_tasks:
-    - "Spectator Mode Frontend Black Screen Investigation"
+    - "Hathora Global Connection UI Updates"
+  stuck_tasks: []
 backend:
-  - task: "Backend Socket.IO Spectator Support"
+  - task: "Hathora Global Connection UI Updates"
     implemented: true
     working: true
-    file: "/app/lib/gameServer.js"
+    file: "/app/app/page.js"
     stuck_count: 0
     priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Updated main UI to show global connection status: 1) Changed JOIN GAME button text from '🤖 PRACTICE WITH BOTS' to '🌍 JOIN GLOBAL MULTIPLAYER', 2) Updated console messages to reflect 'global multiplayer' and 'worldwide multiplayer' instead of just 'practice mode', 3) Added global connection status indicator with cyan pulsing dot on server selector showing 'Connected to Global Hathora Servers', 4) Added prominent status message above JOIN button showing 'Connected to Global Servers - Play with Players Worldwide', 5) Updated mobile lobby text from 'Practice Mode' to 'Global Multiplayer • Worldwide Players'. All changes completed successfully and services are running."
     needs_retesting: false
     status_history:
         - working: "NA"
