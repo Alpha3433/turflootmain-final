@@ -380,9 +380,9 @@ const AgarIOGame = () => {
       setShowControls(false)
     }, 5000)
     
-    // Start ping monitoring
-    measurePing() // Initial measurement
-    const pingInterval = setInterval(measurePing, 2000) // Measure every 2 seconds
+    // Start Hathora ping monitoring
+    measureHathoraPing() // Initial measurement
+    const pingInterval = setInterval(measureHathoraPing, 3000) // Measure every 3 seconds
     
     return () => {
       clearTimeout(controlsTimer)
