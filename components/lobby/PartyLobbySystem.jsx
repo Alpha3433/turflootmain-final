@@ -28,6 +28,29 @@ export default function PartyLobbySystem({
   console.log('🔍 PARTY LOBBY DEBUG: user.privyId:', user?.privyId)
   console.log('🔍 PARTY LOBBY DEBUG: displayName:', displayName)
 
+  // Refresh invitations periodically
+  useEffect(() => {
+    let invitationRefreshInterval
+    
+    const refreshInvitations = () => {
+      // Only refresh if there's no active error and user is authenticated
+      if (!error && userId) {
+        fetchPartyInvitations().catch((err) => {
+          console.log('ℹ️ Background invitation refresh failed (silent):', err.message)
+        })
+      }
+    }
+    
+    // Refresh invitations every 10 seconds to catch new invites
+    invitationRefreshInterval = setInterval(refreshInvitations, 10000)
+    
+    return () => {
+      if (invitationRefreshInterval) {
+        clearInterval(invitationRefreshInterval)
+      }
+    }
+  }, [fetchPartyInvitations, error, userId])
+
   // Fetch user balance
   const fetchUserBalance = useCallback(async () => {
     if (!userId) return
