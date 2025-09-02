@@ -1,0 +1,46 @@
+# Hathora Configuration for TurfLoot
+appName: turfloot
+authConfiguration:
+  anonymous:
+    separator: "-"
+  # You can also use external auth with your Privy system
+build:
+  commands:
+    - yarn install
+    - yarn build
+  
+# Dockerfile configuration
+dockerfile: |
+  FROM node:18-alpine
+  WORKDIR /app
+  COPY package*.json yarn.lock ./
+  RUN yarn install --frozen-lockfile
+  COPY . .
+  EXPOSE 4000
+  CMD ["node", "hathora-server.js"]
+
+# Global regions for low latency worldwide
+regions:
+  - seattle        # US West
+  - washington-dc  # US East  
+  - london         # Europe West
+  - frankfurt      # Europe Central
+  - mumbai         # Asia South
+  - singapore      # Asia Southeast
+  - tokyo          # Asia East
+  - sydney         # Oceania
+
+# Room configuration
+roomsPerProcess: 20
+maxPlayersPerRoom: 20
+
+# Resource allocation
+resources:
+  planName: "standard-2x"  # Adjust based on your needs
+
+# Environment variables (will be set in Hathora dashboard)
+env:
+  - name: NODE_ENV
+    value: production
+  - name: HATHORA_PORT
+    value: "4000"
