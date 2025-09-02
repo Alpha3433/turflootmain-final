@@ -219,11 +219,11 @@ const UserSettings = ({ isOpen, onClose, user }) => {
   )
 
   const renderGameTab = () => (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Gameplay Settings */}
       <div>
-        <h3 className="text-lg font-bold text-white mb-4">Gameplay Settings</h3>
-        <div className="space-y-6">
+        <h3 className="text-lg font-bold text-white mb-3">Gameplay Settings</h3>
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-white font-medium">Auto Cash Out</div>
@@ -236,18 +236,18 @@ const UserSettings = ({ isOpen, onClose, user }) => {
           </div>
           
           {settings.autoCashOut && (
-            <div className="ml-4 flex items-center space-x-4">
-              <span className="text-white font-medium">Threshold:</span>
+            <div className="ml-4 flex items-center space-x-3">
+              <span className="text-white font-medium text-sm">Threshold:</span>
               <input
                 type="number"
                 value={settings.autoCashOutThreshold}
                 onChange={(e) => updateSetting('autoCashOutThreshold', parseInt(e.target.value))}
-                className="px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white w-24"
+                className="px-3 py-1 bg-gray-800 border border-gray-600 rounded text-white w-20 text-sm"
                 min="100"
                 max="10000"
                 step="50"
               />
-              <span className="text-gray-400">dollars</span>
+              <span className="text-gray-400 text-sm">dollars</span>
             </div>
           )}
           
@@ -266,7 +266,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
 
       {/* Performance Settings */}
       <div>
-        <h3 className="text-lg font-bold text-white mb-4">Performance</h3>
+        <h3 className="text-lg font-bold text-white mb-3">Performance</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -276,7 +276,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
             <select 
               value={settings.graphicsQuality}
               onChange={(e) => updateSetting('graphicsQuality', e.target.value)}
-              className="px-4 py-2 bg-gray-800 border border-gray-600 rounded text-white"
+              className="px-3 py-1 bg-gray-800 border border-gray-600 rounded text-white text-sm"
             >
               <option value="high">High</option>
               <option value="medium">Medium</option>
@@ -292,7 +292,7 @@ const UserSettings = ({ isOpen, onClose, user }) => {
             <select 
               value={settings.frameRate}
               onChange={(e) => updateSetting('frameRate', e.target.value)}
-              className="px-4 py-2 bg-gray-800 border border-gray-600 rounded text-white"
+              className="px-3 py-1 bg-gray-800 border border-gray-600 rounded text-white text-sm"
             >
               <option value="30">30 FPS</option>
               <option value="60">60 FPS</option>
