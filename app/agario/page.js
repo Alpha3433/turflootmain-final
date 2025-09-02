@@ -2894,37 +2894,53 @@ const AgarIOGame = () => {
                 addCoinAnimation(orb.x, orb.y) // New animated coin pickup
                 
               } else {
-                // Bot orb collection
+                // Bot orb collection - FIXED: Properly update bot properties when collecting orbs
                 entity.mass += orbMass
+                
+                // Update bot's visual properties to reflect increased mass
+                entity.radius = Math.sqrt(entity.mass / Math.PI) * 8
+                
+                // Update bot's netWorth based on new mass (for leaderboard accuracy)
+                entity.netWorth = entity.netWorth || 0
+                entity.netWorth += orbMass * 2 // Each orb mass contributes to net worth
+                
+                console.log(`🤖 Bot ${entity.name} collected orb! New mass: ${entity.mass}, Net worth: ${entity.netWorth}`)
               }
                 
-                // Increment coins collected counter (with safety check)
-                setGameSession(prev => ({
-                  ...prev,
-                  coinsCollected: (prev.coinsCollected || 0) + 1
-                }))
-                
-                // Update mission progress for collect type - FIXED: Use game.currentMission
-                if (game.currentMission && game.currentMission.type === 'collect') {
-                  console.log('🎯 Collect mission progress update - Current progress:', game.currentMission.progress, 'Target:', game.currentMission.target)
-                  setCurrentMission(prev => {
-                    if (prev) {
-                      const newProgress = prev.progress + 1
-                      console.log('🎯 New collect progress:', newProgress, '/', prev.target)
-                      setMissionProgress(newProgress)
-                      // CRITICAL: Update game.currentMission to keep it synchronized
-                      const updatedMission = { ...prev, progress: newProgress }
-                      game.currentMission = updatedMission
-                      if (newProgress >= prev.target) {
-                        console.log('🎯 Collect mission completed!')
-                        completeMission(updatedMission)
-                        game.currentMission = null // Clear from game object too
-                        return null // Clear mission when completed
+                // FIXED: Only increment coins collected counter for HUMAN PLAYER, not bots
+                if (entity === game.player || entity.isPlayerCell) {
+                  // Increment coins collected counter (with safety check) - ONLY for human player
+                  setGameSession(prev => ({
+                    ...prev,
+                    coinsCollected: (prev.coinsCollected || 0) + 1
+                  }))
+                  
+                  console.log('💰 Human player collected coin - updating counter')
+                  
+                  // Update mission progress for collect type - FIXED: Use game.currentMission
+                  if (game.currentMission && game.currentMission.type === 'collect') {
+                    console.log('🎯 Collect mission progress update - Current progress:', game.currentMission.progress, 'Target:', game.currentMission.target)
+                    setCurrentMission(prev => {
+                      if (prev) {
+                        const newProgress = prev.progress + 1
+                        console.log('🎯 New collect progress:', newProgress, '/', prev.target)
+                        setMissionProgress(newProgress)
+                        // CRITICAL: Update game.currentMission to keep it synchronized
+                        const updatedMission = { ...prev, progress: newProgress }
+                        game.currentMission = updatedMission
+                        if (newProgress >= prev.target) {
+                          console.log('🎯 Collect mission completed!')
+                          completeMission(updatedMission)
+                          game.currentMission = null // Clear from game object too
+                          return null // Clear mission when completed
+                        }
+                        return updatedMission
                       }
-                      return updatedMission
-                    }
-                    return prev
-                  })
+                      return prev
+                    })
+                  }
+                } else {
+                  console.log('🤖 Bot collected coin - not counting toward player stats')
                 }
               
               game.orbs.splice(i, 1)
