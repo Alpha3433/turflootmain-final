@@ -4,10 +4,14 @@
 import { execSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
+import { config } from 'dotenv'
+
+// Load environment variables from .env file
+config()
 
 console.log('🚀 TurfLoot Hathora Deployment Starting...')
 
-// Check if Hathora CLI is installed
+// Check if Hathora CLI is available
 try {
   execSync('npx @hathora/cli --version', { stdio: 'ignore' })
   console.log('✅ Hathora CLI is available')
