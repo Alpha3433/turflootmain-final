@@ -303,9 +303,14 @@ export default function Home() {
     return () => clearInterval(pingInterval)
   }, [])
 
-  // Region selection handler
+  // Region selection handler with optimal ping detection
   const handleRegionSelect = (regionId) => {
-    setCurrentServer(regionId)
+    const selectedRegion = availableRegions.find(r => r.id === regionId)
+    
+    if (!selectedRegion) return
+    
+    setCurrentServer(selectedRegion.displayName)
+    setOptimalRegion(selectedRegion)
     
     // Use real-time ping if available, otherwise use estimated value
     const realPing = regionPings[regionId]
@@ -315,16 +320,29 @@ export default function Home() {
     setCurrentPing(pingToUse)
     setShowRegionDropdown(false)
     
-    console.log(`🌍 Region changed to: ${regionId} (${pingToUse}ms)`)
+    console.log(`🌍 Region manually changed to: ${selectedRegion.displayName} (${pingToUse}ms)`)
     
-    // Re-measure ping for the selected region immediately
-    measurePing(regionId, availableRegions.find(r => r.id === regionId)?.endpoint)
+    // Save user's manual region preference
+    try {
+      localStorage.setItem('turfloot_user_region_preference', JSON.stringify({
+        regionId: selectedRegion.id,
+        displayName: selectedRegion.displayName,
+        ping: pingToUse,
+        manualSelection: true,
+        timestamp: Date.now()
+      }))
+    } catch (e) {
+      console.log('Could not save user region preference')
+    }
+    
+    // Re-measure ping for the selected region to get fresh data
+    measurePing(regionId, selectedRegion.endpoint)
       .then(newPing => {
         setCurrentPing(newPing)
         setRegionPings(prev => ({ ...prev, [regionId]: newPing }))
-        console.log(`📡 Updated ping for ${regionId}: ${newPing}ms`)
+        console.log(`📡 Updated ping for ${selectedRegion.displayName}: ${newPing}ms`)
       })
-      .catch(error => console.error(`❌ Failed to update ping for ${regionId}:`, error))
+      .catch(error => console.error(`❌ Failed to update ping for ${selectedRegion.displayName}:`, error))
   }
 
   // Party Lobby management
