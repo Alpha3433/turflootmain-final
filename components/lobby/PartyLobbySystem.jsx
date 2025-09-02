@@ -148,7 +148,7 @@ export default function PartyLobbySystem({
       // Rate limiting: add delay between requests
       await new Promise(resolve => setTimeout(resolve, 100)) // 100ms delay
       
-      const url = `${getApiUrl('/api/party/current')}?userId=${userId}`
+      const url = `${getApiUrl('/party-api/current')}?userId=${userId}`
       console.log('📡 Party status API URL:', url)
       
       const response = await fetch(url)
