@@ -3099,11 +3099,23 @@ const AgarIOGame = () => {
                   addFloatingText(`+$${killReward} (Cell Kill)`, cell.x, cell.y - 50, '#ff4444')
                 }
                 
-                // Update session tracking
+                // Update session tracking and emit elimination event for leaderboard
                 setGameSession(prev => ({
                   ...prev,
                   kills: prev.kills + 1
                 }))
+                
+                // FIXED: Emit elimination event to update main page leaderboard dynamically
+                const eliminationData = {
+                  kills: game.player.kills,
+                  deaths: game.player.deaths || 0,
+                  streak: game.player.streak
+                }
+                
+                window.dispatchEvent(new CustomEvent('playerElimination', { 
+                  detail: eliminationData 
+                }))
+                console.log('📊 Emitted player elimination event:', eliminationData)
                 
                 bot.alive = false
                 
