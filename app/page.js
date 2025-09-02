@@ -1428,59 +1428,77 @@ export default function Home() {
     }
   }
 
-  // NEW: Practice mode - requires authentication for global multiplayer
+  // NEW: Practice mode - supports both authenticated (global multiplayer) and unauthenticated (demo) users
   const handlePracticeMode = () => {
     console.log('🌍 Global multiplayer practice requested - checking authentication')
-    
-    // FIXED: Require authentication for global multiplayer
-    if (!authenticated || !user) {
-      console.log('❌ User not authenticated - showing login popup for global multiplayer access')
-      
-      // Try to use Privy login first, fallback to login modal
-      if (privyAuth.ready && privyAuth.login) {
-        console.log('🔐 Triggering Privy login for global multiplayer access')
-        privyAuth.login()
-      } else {
-        console.log('🔐 Privy not ready, showing login modal')
-        setShowLoginModal(true)
-      }
-      return
-    }
-    
-    console.log('✅ User authenticated - connecting to global Hathora servers for worldwide multiplayer')
     
     const roomId = 'global-practice-bots'
     const gameMode = 'practice'
     const gameFee = 0
     
-    console.log('🌍 Navigating to global multiplayer practice:', { 
-      roomId, 
-      gameMode, 
-      gameFee,
-      directPlay: true,
-      userId: user.id,
-      globalMultiplayer: true,
-      worldwide: true
-    })
-    
-    // Navigate to global multiplayer experience
-    const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&directPlay=true`
-    
-    try {
-      router.push(gameUrl)
-      console.log('✅ Router.push called for global multiplayer practice mode')
+    // Check authentication status
+    if (authenticated && user) {
+      console.log('✅ User authenticated - connecting to global Hathora servers for worldwide multiplayer')
       
-      // Fallback navigation after a short delay
-      setTimeout(() => {
-        if (window.location.pathname === '/') {
-          console.log('🔄 Using window.location fallback for global multiplayer practice')
-          window.location.href = gameUrl
-        }
-      }, 1000)
-    } catch (error) {
-      console.error('❌ Navigation error:', error)
-      // Ultimate fallback
-      window.location.href = gameUrl
+      console.log('🌍 Navigating to authenticated global multiplayer:', { 
+        roomId, 
+        gameMode, 
+        gameFee,
+        directPlay: true,
+        userId: user.id,
+        globalMultiplayer: true,
+        worldwide: true
+      })
+      
+      // Navigate to global multiplayer experience with authentication
+      const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&directPlay=true`
+      
+      try {
+        router.push(gameUrl)
+        console.log('✅ Router.push called for authenticated global multiplayer')
+        
+        // Fallback navigation after a short delay
+        setTimeout(() => {
+          if (window.location.pathname === '/') {
+            console.log('🔄 Using window.location fallback for authenticated global multiplayer')
+            window.location.href = gameUrl
+          }
+        }, 1000)
+      } catch (error) {
+        console.error('❌ Navigation error:', error)
+        // Ultimate fallback
+        window.location.href = gameUrl
+      }
+    } else {
+      console.log('👤 User not authenticated - providing demo global multiplayer experience')
+      
+      console.log('🌍 Navigating to demo global multiplayer:', { 
+        roomId, 
+        gameMode, 
+        gameFee,
+        demo: true,
+        globalMultiplayer: true
+      })
+      
+      // Navigate to demo global multiplayer experience
+      const demoGameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}`
+      
+      try {
+        router.push(demoGameUrl)
+        console.log('✅ Router.push called for demo global multiplayer')
+        
+        // Fallback navigation after a short delay
+        setTimeout(() => {
+          if (window.location.pathname === '/') {
+            console.log('🔄 Using window.location fallback for demo global multiplayer')
+            window.location.href = demoGameUrl
+          }
+        }, 1000)
+      } catch (error) {
+        console.error('❌ Navigation error:', error)
+        // Ultimate fallback
+        window.location.href = demoGameUrl
+      }
     }
   }
 
