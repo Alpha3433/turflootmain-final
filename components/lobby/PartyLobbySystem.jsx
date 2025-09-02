@@ -212,7 +212,7 @@ export default function PartyLobbySystem({
     console.log('📧 Fetching party invitations for user:', userId)
     
     try {
-      const url = `${getApiUrl('/api/party/invitations')}?userId=${userId}`
+      const url = `${getApiUrl('/party-api/invitations')}?userId=${userId}`
       console.log('📡 Invitation API URL:', url)
       
       const response = await fetch(url)
