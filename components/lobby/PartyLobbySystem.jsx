@@ -340,7 +340,7 @@ export default function PartyLobbySystem({
           
           // Mark notification as seen first
           try {
-            await fetch(`${getApiUrl('/api/party/mark-notification-seen')}`, {
+            await fetch(`${getApiUrl('/party-api/mark-notification-seen')}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
