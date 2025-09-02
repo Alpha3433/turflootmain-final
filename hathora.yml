@@ -19,7 +19,7 @@ dockerfile: |
   EXPOSE 4000
   CMD ["node", "hathora-server.js"]
 
-# Global regions for low latency worldwide
+# Global regions for low latency worldwide including Oceania
 regions:
   - seattle        # US West
   - washington-dc  # US East  
@@ -28,7 +28,7 @@ regions:
   - mumbai         # Asia South
   - singapore      # Asia Southeast
   - tokyo          # Asia East
-  - sydney         # Oceania
+  - sydney         # Oceania (Australia/New Zealand)
 
 # Room configuration
 roomsPerProcess: 20
