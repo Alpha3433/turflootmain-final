@@ -218,43 +218,50 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
   }
 
   const loadFriends = async () => {
+    if (!user?.id && !user?.privyId) {
+      console.log('❌ User not authenticated, cannot fetch friends')
+      setFriends([])
+      return
+    }
+
     try {
       setLoading(true)
-      console.log('👥 Loading real friends list')
+      console.log('👥 Loading friends from friends API for user:', user.id || user.privyId)
       
-      if (!user?.id && !user?.privyId) {
-        setFriends([])
-        return
-      }
-
-      const response = await fetch('/api/users/friends', {
-        method: 'GET',
+      // Use the same API endpoint as FriendsPanel for consistency
+      const userId = user.id || user.privyId
+      const apiUrl = `/friends-api/list?userId=${userId}`
+      console.log('🔗 DEBUG: Using friends API URL =', apiUrl)
+      
+      const response = await fetch(apiUrl, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`
-        },
+          'Content-Type': 'application/json'
+        }
       })
-
+      
       if (response.ok) {
-        const data = await response.json()
-        console.log('👥 Friends data received:', data)
+        const serverData = await response.json()
+        const serverFriends = serverData.friends || []
+        console.log('✅ Friends API successful:', serverFriends.length, 'friends loaded')
         
-        const processedFriends = data.friends?.map(friend => ({
-          id: friend.id,
-          name: friend.custom_name || friend.email?.split('@')[0] || `Player${friend.id?.slice(-4)}`,
-          status: friend.online_status || 'offline',
-          lastSeen: friend.last_seen ? new Date(friend.last_seen).toLocaleString() : 'Unknown',
-          wins: friend.stats?.games_won || 0,
+        // Transform the data to match UserProfile component structure
+        const processedFriends = serverFriends.map(friend => ({
+          id: friend.id || friend.friendId,
+          name: friend.name || friend.customName || friend.nickname || `Player${friend.id?.slice(-4) || 'Unknown'}`,
+          status: friend.isOnline ? 'online' : 'offline',
+          lastSeen: friend.lastActive ? new Date(friend.lastActive).toLocaleDateString() : 'Unknown',
+          wins: friend.stats?.wins || 0,
           avatar: '👤'
-        })) || []
+        }))
         
         setFriends(processedFriends)
+        console.log('✅ Processed friends for Social Hub:', processedFriends)
       } else {
-        console.error('Failed to load friends:', response.status)
+        console.error('Failed to load friends from friends API:', response.status)
         setFriends([])
       }
     } catch (error) {
-      console.error('Error loading friends:', error)
+      console.error('Error loading friends from friends API:', error)
       setFriends([])
     } finally {
       setLoading(false)
