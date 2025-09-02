@@ -271,15 +271,19 @@ const AgarIOGame = () => {
     
     console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramDirectPlay })
     
-    // NEW: Handle direct play mode - full local game experience (like original agario) 
+    // GLOBAL MULTIPLAYER: Handle direct play mode using Hathora global servers
     if (paramDirectPlay) {
-      console.log('🎮 Direct play mode detected - initializing as local game with bots')
+      console.log('🎮 Direct play mode detected - connecting to global Hathora servers for worldwide multiplayer')
       
-      // FIXED: Always use offline/local mode for direct play to mimic original agario behavior
-      // This creates a local game instance with bots, not connected to multiplayer servers
-      console.log('🤖 Initializing local game with bots (offline mode)')
-      initializeGame(false) // false = offline mode with local bots (like original agario)
-      
+      // CHANGED: Use global multiplayer instead of offline mode for cross-platform play
+      if (user && getAccessToken) {
+        console.log('🌍 Authenticated user - connecting to global Hathora servers')
+        initializeMultiplayer(null, 1, null, false) // Connect to global servers
+      } else {
+        console.log('🔐 User not authenticated - redirecting to login')
+        // Redirect to authentication as global play requires user accounts
+        router.push('/')
+      }
       return // Exit early - direct play mode handled
     }
     
