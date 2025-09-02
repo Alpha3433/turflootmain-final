@@ -2171,25 +2171,11 @@ const AgarIOGame = () => {
           if (gameRef.current?.game && gameState) {
             const game = gameRef.current.game
             
-            // FIXED: Update bots from server data (including virtual bots)
+            // FIXED: Update from server data (real players only in multiplayer)
             if (gameState.players && gameState.players.length > 0) {
-              console.log('👁️ Updating bots from server:', gameState.players.length, 'entities')
-              game.bots = gameState.players.map(player => ({
-                id: player.id,
-                x: player.x,
-                y: player.y,
-                mass: player.mass,
-                netWorth: player.netWorth || 0,
-                name: player.nickname || player.name || 'Bot',
-                alive: player.alive !== false,
-                color: player.color || `hsl(${Math.random() * 360}, 60%, 50%)`,
-                cells: [{ x: player.x, y: player.y, mass: player.mass }],
-                dir: player.dir || { x: 0, y: 0 },
-                kills: player.kills || 0,
-                deaths: player.deaths || 0,
-                streak: player.streak || 0,
-                isBounty: player.isBounty || false
-              }))
+              console.log('👁️ Updating real players from server:', gameState.players.length, 'entities')
+              // In multiplayer, these are real players from the server
+              // No local bot simulation needed
             }
             
             // FIXED: Update orbs/food from server data  
