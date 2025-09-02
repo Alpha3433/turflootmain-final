@@ -1428,45 +1428,46 @@ export default function Home() {
     }
   }
 
-  // NEW: Practice mode - requires authentication first
+  // NEW: Practice mode - requires authentication for global multiplayer
   const handlePracticeMode = () => {
-    console.log('🤖 Practice mode requested - checking authentication')
+    console.log('🌍 Global practice mode requested - checking authentication')
     
-    // FIXED: Require authentication for practice mode
+    // FIXED: Require authentication for global multiplayer
     if (!authenticated || !user) {
-      console.log('❌ User not authenticated - showing login popup')
+      console.log('❌ User not authenticated - showing login popup for global play')
       
       // Try to use Privy login first, fallback to login modal
       if (privyAuth.ready && privyAuth.login) {
-        console.log('🔐 Triggering Privy login')
+        console.log('🔐 Triggering Privy login for global multiplayer access')
         privyAuth.login()
       } else {
         console.log('🔐 Privy not ready, showing login modal')
-        setShowLoginModal(true) // This will trigger the login popup
+        setShowLoginModal(true)
       }
       return
     }
     
-    console.log('✅ User authenticated - proceeding to practice mode')
+    console.log('✅ User authenticated - connecting to global Hathora servers')
     
     const roomId = 'global-practice-bots'
     const gameMode = 'practice'
     const gameFee = 0
     
-    console.log('🎮 Navigating directly to practice game:', { 
+    console.log('🌍 Navigating to global multiplayer practice:', { 
       roomId, 
       gameMode, 
       gameFee,
       directPlay: true,
-      userId: user.id
+      userId: user.id,
+      globalMultiplayer: true
     })
     
-    // Navigate directly to the full agario game experience (no spectator mode)
+    // Navigate to global multiplayer experience
     const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${gameFee}&directPlay=true`
     
     try {
       router.push(gameUrl)
-      console.log('✅ Router.push called for authenticated practice mode')
+      console.log('✅ Router.push called for global practice mode')
       
       // Fallback navigation after a short delay
       setTimeout(() => {
