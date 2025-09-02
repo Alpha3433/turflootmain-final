@@ -191,15 +191,90 @@ export default function Home() {
     return Math.max(1, averagePing + variance)
   }
 
-  // Get estimated latency offset based on geographic distance
+  // Enhanced estimated latency for Hathora regions based on geographic distance
   const getEstimatedLatencyOffset = (regionId) => {
-    switch (regionId) {
-      case 'US-East-1': return 27
-      case 'US-West-1': return 42
-      case 'EU-Central-1': return 89
-      case 'Oceania-1': return 165 // Sydney is typically 150-180ms from most locations
-      default: return 50
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    
+    // Enhanced latency estimation based on real-world distances and network infrastructure
+    const latencyMap = {
+      'washington-dc': {
+        'America/New_York': 8, 'America/Chicago': 25, 'America/Denver': 35, 'America/Los_Angeles': 65,
+        'Europe/London': 85, 'Europe/Paris': 95, 'Europe/Berlin': 100,
+        'Asia/Tokyo': 180, 'Asia/Singapore': 220, 'Asia/Mumbai': 240,
+        'Australia/Sydney': 280
+      },
+      'seattle': {
+        'America/Los_Angeles': 12, 'America/Denver': 28, 'America/Chicago': 45, 'America/New_York': 70,
+        'Asia/Tokyo': 120, 'Asia/Singapore': 160, 'Asia/Mumbai': 200,
+        'Europe/London': 140, 'Europe/Paris': 150, 'Europe/Berlin': 155,
+        'Australia/Sydney': 170
+      },
+      'london': {
+        'Europe/London': 5, 'Europe/Paris': 15, 'Europe/Berlin': 25, 'Europe/Rome': 35,
+        'America/New_York': 80, 'America/Chicago': 110, 'America/Los_Angeles': 140,
+        'Asia/Mumbai': 120, 'Asia/Singapore': 170, 'Asia/Tokyo': 240,
+        'Australia/Sydney': 280
+      },
+      'frankfurt': {
+        'Europe/Berlin': 8, 'Europe/Paris': 20, 'Europe/London': 25, 'Europe/Rome': 30,
+        'America/New_York': 90, 'America/Chicago': 120, 'America/Los_Angeles': 150,
+        'Asia/Mumbai': 110, 'Asia/Singapore': 160, 'Asia/Tokyo': 230,
+        'Australia/Sydney': 270
+      },
+      'singapore': {
+        'Asia/Singapore': 5, 'Asia/Kuala_Lumpur': 8, 'Asia/Bangkok': 15, 'Asia/Jakarta': 20,
+        'Asia/Tokyo': 65, 'Asia/Mumbai': 85, 'Asia/Hong_Kong': 35,
+        'Australia/Sydney': 95, 'Australia/Melbourne': 100,
+        'Europe/London': 170, 'America/Los_Angeles': 180, 'America/New_York': 220
+      },
+      'tokyo': {
+        'Asia/Tokyo': 3, 'Asia/Seoul': 12, 'Asia/Shanghai': 25, 'Asia/Hong_Kong': 45,
+        'Asia/Singapore': 65, 'Asia/Mumbai': 120,
+        'Australia/Sydney': 110, 'Australia/Melbourne': 115,
+        'America/Los_Angeles': 120, 'America/New_York': 170,
+        'Europe/London': 240, 'Europe/Berlin': 250
+      },
+      'mumbai': {
+        'Asia/Mumbai': 2, 'Asia/Kolkata': 8, 'Asia/Dubai': 25, 'Asia/Karachi': 15,
+        'Asia/Singapore': 85, 'Asia/Tokyo': 120,
+        'Europe/London': 110, 'Europe/Berlin': 120,
+        'America/New_York': 240, 'America/Los_Angeles': 270,
+        'Australia/Sydney': 180
+      },
+      'sydney': {
+        'Australia/Sydney': 2, 'Australia/Melbourne': 8, 'Australia/Brisbane': 15, 'Australia/Perth': 45,
+        'Pacific/Auckland': 25, 'Pacific/Fiji': 35,
+        'Asia/Singapore': 95, 'Asia/Tokyo': 110, 'Asia/Mumbai': 180,
+        'America/Los_Angeles': 140, 'America/New_York': 200,
+        'Europe/London': 280, 'Europe/Berlin': 290
+      }
     }
+    
+    // Find closest timezone match
+    let estimatedPing = 50 // Default fallback
+    if (latencyMap[regionId]) {
+      const regionLatencies = latencyMap[regionId]
+      
+      // Direct match
+      if (regionLatencies[timezone]) {
+        estimatedPing = regionLatencies[timezone]
+      } else {
+        // Find closest match based on geographic region
+        const timezoneParts = timezone.split('/')
+        const continent = timezoneParts[0]
+        
+        for (const [tz, latency] of Object.entries(regionLatencies)) {
+          if (tz.startsWith(continent)) {
+            estimatedPing = latency
+            break
+          }
+        }
+      }
+    }
+    
+    // Add small random variation to simulate network conditions
+    const variation = Math.floor(Math.random() * 10) - 5 // -5 to +5ms
+    return Math.max(1, estimatedPing + variation)
   }
 
   // Measure ping to all Hathora regions and find optimal
