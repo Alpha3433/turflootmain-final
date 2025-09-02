@@ -743,8 +743,21 @@ export default function Home() {
     }
   }
 
-  // Load user balance when component mounts
+  // FIXED: Listen for elimination events from the game to update leaderboard dynamically
   useEffect(() => {
+    const handlePlayerElimination = (event) => {
+      const { kills, deaths, streak } = event.detail
+      console.log('📊 Received player elimination event:', { kills, deaths, streak })
+      updatePlayerEliminationStats({ kills, deaths, streak })
+    }
+
+    // Listen for custom elimination events from the game
+    window.addEventListener('playerElimination', handlePlayerElimination)
+    
+    return () => {
+      window.removeEventListener('playerElimination', handlePlayerElimination)
+    }
+  }, [displayName]) // Re-setup when display name changes
     loadUserBalance()
     
     // Listen for mission completion events to update balance in real-time
