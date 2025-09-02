@@ -678,7 +678,7 @@ export default function PartyLobbySystem({
         }
         
         // Create coordinated party room
-        const response = await fetch(`${getApiUrl('/api/party/start-game')}`, {
+        const response = await fetch(`${getApiUrl('/party-api/start-game')}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
