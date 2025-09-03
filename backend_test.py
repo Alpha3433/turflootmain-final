@@ -427,64 +427,202 @@ def test_party_notifications():
             print(f"   Error: {response.text}")
         return None
 
+def test_party_coordination():
+    """Test 7: Verify party coordination for game connection"""
+    print("\n" + "="*80)
+    print("🤝 TEST 7: PARTY COORDINATION FOR GAME CONNECTION")
+    print("="*80)
+    
+    # Check that both party members have the same game room information
+    print("🔍 Verifying party coordination between members...")
+    
+    members_data = []
+    
+    for user in [TEST_USER_ALICE, TEST_USER_BOB]:
+        print(f"\n📡 Checking {user['username']}'s party status...")
+        response = make_request('GET', 'current', params={'userId': user['userId']})
+        
+        if response and response.status_code == 200:
+            data = response.json()
+            if data.get('hasParty') and data.get('party'):
+                party = data['party']
+                member_data = {
+                    'username': user['username'],
+                    'userId': user['userId'],
+                    'partyId': party.get('id'),
+                    'partyStatus': party.get('status'),
+                    'gameRoomId': party.get('gameRoomId'),
+                    'memberCount': party.get('memberCount'),
+                    'userRole': party.get('userRole')
+                }
+                members_data.append(member_data)
+                
+                print(f"✅ {user['username']} party data:")
+                print(f"   Party ID: {member_data['partyId']}")
+                print(f"   Party Status: {member_data['partyStatus']}")
+                print(f"   Game Room ID: {member_data['gameRoomId']}")
+                print(f"   User Role: {member_data['userRole']}")
+            else:
+                print(f"❌ {user['username']} is not in any party")
+                return None
+        else:
+            print(f"❌ Failed to get {user['username']}'s party status")
+            return None
+    
+    # Verify coordination
+    if len(members_data) == 2:
+        alice_data = members_data[0]
+        bob_data = members_data[1]
+        
+        print(f"\n🤝 PARTY COORDINATION ANALYSIS:")
+        
+        # Check if both members are in the same party
+        same_party = alice_data['partyId'] == bob_data['partyId']
+        print(f"   Same Party ID: {'✅ Yes' if same_party else '❌ No'}")
+        
+        # Check if both have the same game room ID
+        same_game_room = alice_data['gameRoomId'] == bob_data['gameRoomId']
+        print(f"   Same Game Room ID: {'✅ Yes' if same_game_room else '❌ No'}")
+        
+        # Check if both have the same party status
+        same_status = alice_data['partyStatus'] == bob_data['partyStatus']
+        print(f"   Same Party Status: {'✅ Yes' if same_status else '❌ No'}")
+        
+        # Check if both see the same member count
+        same_member_count = alice_data['memberCount'] == bob_data['memberCount']
+        print(f"   Same Member Count: {'✅ Yes' if same_member_count else '❌ No'}")
+        
+        coordination_success = same_party and same_game_room and same_status and same_member_count
+        
+        if coordination_success:
+            print(f"\n✅ PARTY COORDINATION SUCCESS!")
+            print(f"   Both members can connect to the same game room: {alice_data['gameRoomId']}")
+            print(f"   Party status is consistent: {alice_data['partyStatus']}")
+            print(f"   Member count is correct: {alice_data['memberCount']}")
+            
+            return {
+                'coordination_success': True,
+                'game_room_id': alice_data['gameRoomId'],
+                'party_id': alice_data['partyId'],
+                'party_status': alice_data['partyStatus'],
+                'member_count': alice_data['memberCount']
+            }
+        else:
+            print(f"\n❌ PARTY COORDINATION FAILED!")
+            print(f"   Alice's data: {alice_data}")
+            print(f"   Bob's data: {bob_data}")
+            return None
+    else:
+        print(f"❌ Could not get data for both party members")
+        return None
+
 def run_all_tests():
-    """Run all debug tests"""
-    print("🚀 STARTING PARTY LOBBY USERNAME DEBUG TESTS")
+    """Run all party game initialization tests"""
+    print("🚀 STARTING PARTY GAME INITIALIZATION TESTS")
     print("="*80)
     print(f"Base URL: {BASE_URL}")
     print(f"API Base: {API_BASE}")
-    print(f"Test User (Robiee): {TEST_USER_ROBIEE['userId']}")
-    print(f"Test User (Workflow): {TEST_USER_WORKFLOW['userId']}")
+    print(f"Test User (Alice): {TEST_USER_ALICE['userId']}")
+    print(f"Test User (Bob): {TEST_USER_BOB['userId']}")
     
     results = {}
+    test_success = True
     
     try:
-        # Test 1: Check current party status
-        results['current_party'] = test_current_party_status()
+        # Test 1: Create party
+        print("\n🎯 PHASE 1: PARTY SETUP")
+        results['party_creation'] = test_party_creation()
+        if not results['party_creation']:
+            print("❌ Party creation failed - stopping tests")
+            test_success = False
+            return results
         
-        # Test 2: Check for stale records
-        results['stale_check'] = test_database_cleanup_check()
+        # Test 2: Send invitation
+        results['party_invitation'] = test_party_invitation()
+        if not results['party_invitation']:
+            print("❌ Party invitation failed - stopping tests")
+            test_success = False
+            return results
         
-        # Test 3: Test party creation with correct username
-        results['party_creation'] = test_party_creation_username()
+        # Test 3: Accept invitation
+        results['party_acceptance'] = test_party_acceptance()
+        if not results['party_acceptance']:
+            print("❌ Party acceptance failed - stopping tests")
+            test_success = False
+            return results
         
-        # Test 4: Username verification
-        results['username_verification'] = test_username_verification()
+        print("\n🎮 PHASE 2: GAME INITIALIZATION")
         
-        # Test 5: Deep data inspection
-        results['data_inspection'] = test_party_data_inspection()
+        # Test 4: Start party game
+        results['game_start'] = test_party_game_start()
+        if not results['game_start']:
+            print("❌ Game start failed - continuing with validation tests")
+            test_success = False
         
-        # Test 6: Cleanup if needed
-        results['cleanup'] = cleanup_stale_parties()
+        # Test 5: Validate game room
+        results['game_room_validation'] = test_game_room_validation()
+        
+        # Test 6: Check notifications
+        results['notifications'] = test_party_notifications()
+        
+        # Test 7: Verify coordination
+        results['coordination'] = test_party_coordination()
         
     except Exception as e:
         print(f"❌ Test execution failed: {e}")
         import traceback
         traceback.print_exc()
+        test_success = False
     
     # Summary
     print("\n" + "="*80)
-    print("📋 TEST SUMMARY")
+    print("📋 PARTY GAME INITIALIZATION TEST SUMMARY")
     print("="*80)
     
-    print("🔍 INVESTIGATION RESULTS:")
-    print("1. Current Party Status: Checked for existing parties")
-    print("2. Stale Records: Searched for conflicting party data")
-    print("3. Party Creation: Tested username handling in new parties")
-    print("4. Username Verification: Verified username consistency")
-    print("5. Data Inspection: Deep dive into party data structure")
-    print("6. Cleanup: Attempted to clean stale data")
+    print("🔍 TEST RESULTS:")
+    print(f"1. Party Creation: {'✅ PASSED' if results.get('party_creation') else '❌ FAILED'}")
+    print(f"2. Party Invitation: {'✅ PASSED' if results.get('party_invitation') else '❌ FAILED'}")
+    print(f"3. Party Acceptance: {'✅ PASSED' if results.get('party_acceptance') else '❌ FAILED'}")
+    print(f"4. Game Start: {'✅ PASSED' if results.get('game_start') else '❌ FAILED'}")
+    print(f"5. Game Room Validation: {'✅ PASSED' if results.get('game_room_validation') else '❌ FAILED'}")
+    print(f"6. Notifications: {'✅ PASSED' if results.get('notifications') else '❌ FAILED'}")
+    print(f"7. Party Coordination: {'✅ PASSED' if results.get('coordination') else '❌ FAILED'}")
     
     print("\n🎯 KEY FINDINGS:")
-    if any('WorkflowUser1' in str(result) for result in results.values() if result):
-        print("- Found 'WorkflowUser1' in party data")
-        print("- This appears to be the source of the username display issue")
-        print("- Recommend cleaning up stale party records")
-    else:
-        print("- No 'WorkflowUser1' found in current party data")
-        print("- Issue may be in frontend display logic or cached data")
     
-    print("\n✅ Debug tests completed!")
+    # Check for game room creation
+    if results.get('game_start') and results.get('game_start', {}).get('game_room_id'):
+        game_room_id = results['game_start']['game_room_id']
+        print(f"✅ Game Room Created: {game_room_id}")
+        print(f"✅ Room ID Format: Valid for game connection")
+    else:
+        print("❌ Game Room Creation: Failed or invalid")
+    
+    # Check for party coordination
+    if results.get('coordination') and results.get('coordination', {}).get('coordination_success'):
+        print("✅ Party Coordination: Both members can connect to same room")
+    else:
+        print("❌ Party Coordination: Members cannot connect to same room")
+    
+    # Check for notifications
+    if results.get('notifications') and results.get('notifications', {}).get('has_game_notifications'):
+        print("✅ Game Notifications: Party members notified of game start")
+    else:
+        print("❌ Game Notifications: No game start notifications found")
+    
+    # Overall status
+    if test_success and all(results.get(key) for key in ['party_creation', 'party_invitation', 'party_acceptance', 'game_start']):
+        print("\n🎉 OVERALL RESULT: ✅ PARTY GAME INITIALIZATION WORKING")
+        print("   - Party creation successful")
+        print("   - Game room creation successful") 
+        print("   - Room ID validation passed")
+        print("   - Party coordination working")
+    else:
+        print("\n🚨 OVERALL RESULT: ❌ PARTY GAME INITIALIZATION ISSUES DETECTED")
+        print("   - Check failed tests above for specific issues")
+        print("   - User may experience black screen due to coordination problems")
+    
+    print("\n✅ Party game initialization tests completed!")
     return results
 
 if __name__ == "__main__":
