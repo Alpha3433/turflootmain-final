@@ -2207,37 +2207,38 @@ const AgarIOGame = () => {
         console.log('✅ Connected to game server:', socket.id)
         setIsConnected(true)
         
-        // Track player joining game session for server browser
-        if (paramRoomId && user) {
-          const sessionData = {
-            roomId: paramRoomId,
-            playerId: user.id || user.privyId,
-            playerName: user.google?.name || user.email?.address || 'Player'
-          }
-          
-          console.log('🎮 TRACKING: Player joining game session for server browser')
-          console.log('📊 Session data:', sessionData)
-          
-          fetch('/api/game-sessions/join', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sessionData)
-          })
-          .then(response => response.json())
-          .then(result => {
-            console.log('✅ SESSION TRACKING SUCCESS:', result)
-          })
-          .catch(err => {
-            console.error('❌ SESSION TRACKING FAILED:', err)
-          })
-        } else {
-          console.log('⚠️ SESSION TRACKING SKIPPED:', { 
-            hasRoomId: !!paramRoomId, 
-            hasUser: !!user,
-            roomId: paramRoomId,
-            userId: user?.id || user?.privyId
-          })
+        // Track player joining game session for server browser - ALWAYS for global multiplayer
+        const roomId = paramRoomId || 'global-practice-bots' // Default to global room
+        const playerId = user?.id || user?.privyId || `guest_${Date.now()}`
+        const playerName = user?.google?.name || user?.email?.address || 'Player'
+        
+        const sessionData = {
+          roomId: roomId,
+          playerId: playerId,
+          playerName: playerName
         }
+        
+        console.log('🎮 TRACKING: Player joining game session for server browser')
+        console.log('📊 Session data:', sessionData)
+        console.log('🔍 Debug info:', { 
+          hasRoomId: !!paramRoomId, 
+          hasUser: !!user,
+          originalRoomId: paramRoomId,
+          userId: user?.id || user?.privyId
+        })
+        
+        fetch('/api/game-sessions/join', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sessionData)
+        })
+        .then(response => response.json())
+        .then(result => {
+          console.log('✅ SESSION TRACKING SUCCESS:', result)
+        })
+        .catch(err => {
+          console.error('❌ SESSION TRACKING FAILED:', err)
+        })
         
         if (spectatorOnly) {
           // NEW: Join as spectator instead of active player
