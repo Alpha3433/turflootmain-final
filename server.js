@@ -1,5 +1,12 @@
 // Load environment variables first
-require('dotenv').config({ path: require('path').join(__dirname, '.env') })
+import { config } from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+config({ path: path.join(__dirname, '.env') })
 
 // Log environment loading
 console.log('🔍 Environment variables loaded:')
