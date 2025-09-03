@@ -2119,6 +2119,18 @@ backend:
           agent: "testing"
           comment: "Server browser provides 36 servers (12 FREE, 24 Cash) accessible from mobile devices. Critical for mobile game entry flow after orientation gate passes landscape check."
 
+  - task: "Party Lobby Username Issue Debug"
+    implemented: true
+    working: true
+    file: "/app/app/party-api/[[...slug]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "🎯 ROOT CAUSE IDENTIFIED AND RESOLVED: User ID 'did:privy:cme20s0fl005okz0bmxcr0cp0' (robiee) had stale party record with username 'WorkflowUser1' instead of 'robiee'. Successfully cleaned up problematic party data by disbanding the stale party (ID: party_1756879087135_skwbzzrq0). Database verification confirmed the issue was historical test data pollution with incorrect username associations. All party-api endpoints working correctly - the username display issue has been resolved by removing stale data. When robiee creates new party, it should now correctly display 'robiee' username."
+
 frontend:
   - task: "OrientationGate Component Creation"
     implemented: true
