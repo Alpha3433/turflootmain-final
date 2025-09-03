@@ -152,7 +152,7 @@ backend:
   - task: "Real-Time Player Tracking System Debug"
     implemented: true
     working: true
-    file: "/app/app/api/[[...path]]/route.js"
+    file: "/app/app/agario/page.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
