@@ -22,7 +22,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://realtime-lobby.preview.emergentagent.com"
+BASE_URL = "https://game-server-hub-5.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Test configuration
