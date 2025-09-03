@@ -295,62 +295,77 @@ def test_party_game_start():
             print(f"   Error: {start_response.text}")
         return None
 
-def test_party_data_inspection():
-    """Test 5: Deep inspection of party data"""
+def test_game_room_validation():
+    """Test 5: Validate game room creation and accessibility"""
     print("\n" + "="*80)
-    print("🔬 TEST 5: DEEP PARTY DATA INSPECTION")
+    print("🔍 TEST 5: GAME ROOM VALIDATION AND ACCESSIBILITY")
     print("="*80)
     
-    # Get current party for robiee
-    response = make_request('GET', 'current', params={'userId': TEST_USER_ROBIEE['userId']})
+    # This test requires a game room to have been created in the previous test
+    # We'll check if we can access the game room data through the database
+    
+    # First, let's check if Alice's party is in 'in_game' status
+    print(f"🔍 Checking {TEST_USER_ALICE['username']}'s party status after game start...")
+    response = make_request('GET', 'current', params={'userId': TEST_USER_ALICE['userId']})
     
     if response and response.status_code == 200:
         data = response.json()
-        
-        print("📊 COMPLETE PARTY DATA DUMP:")
-        print(json.dumps(data, indent=2))
-        
-        if data.get('party'):
+        if data.get('hasParty') and data.get('party'):
             party = data['party']
+            party_status = party.get('status')
+            game_room_id = party.get('gameRoomId')
             
-            print(f"\n🔍 DETAILED ANALYSIS:")
-            print(f"Party ID: {party.get('id')}")
-            print(f"Owner ID: {party.get('ownerId')}")
-            print(f"Owner Username: {party.get('ownerUsername')}")
-            print(f"Party Name: {party.get('name')}")
-            print(f"Status: {party.get('status')}")
-            print(f"Member Count: {party.get('memberCount')}")
-            print(f"Max Members: {party.get('maxMembers')}")
-            print(f"Created At: {party.get('createdAt')}")
-            print(f"Updated At: {party.get('updatedAt')}")
+            print(f"✅ Party status: {party_status}")
+            print(f"✅ Game Room ID: {game_room_id}")
             
-            print(f"\n👥 MEMBER ANALYSIS:")
-            if party.get('members'):
-                for i, member in enumerate(party['members']):
-                    print(f"Member {i+1}:")
-                    print(f"  ID: {member.get('id')}")
-                    print(f"  Username: {member.get('username')}")
-                    print(f"  Role: {member.get('role')}")
-                    print(f"  Joined At: {member.get('joinedAt')}")
+            if party_status == 'in_game' and game_room_id:
+                print(f"🎯 GAME ROOM VALIDATION SUCCESS:")
+                print(f"   Party is in 'in_game' status")
+                print(f"   Game Room ID is present: {game_room_id}")
+                print(f"   Game Room ID format: {'✅ Valid' if game_room_id.startswith('game_') else '❌ Invalid'}")
+                
+                # Validate game room ID format
+                if game_room_id.startswith('game_') and len(game_room_id) > 20:
+                    print(f"✅ Game Room ID format is valid for game connection")
                     
-                    # Check for WorkflowUser1
-                    if member.get('username') == 'WorkflowUser1':
-                        print(f"  🚨 FOUND WORKFLOWUSER1!")
-                        print(f"     This member has the problematic username")
-                        print(f"     Member ID: {member.get('id')}")
-                        print(f"     Role: {member.get('role')}")
+                    # Check if both party members can see the game room
+                    print(f"\n🔍 Checking if both party members can access game room...")
+                    
+                    for member in party.get('members', []):
+                        member_id = member.get('id')
+                        member_username = member.get('username')
                         
-                        # Check if this member ID matches robiee's user ID
-                        if member.get('id') == TEST_USER_ROBIEE['userId']:
-                            print(f"     🎯 THIS IS THE ISSUE!")
-                            print(f"     Robiee's user ID ({TEST_USER_ROBIEE['userId']}) is associated with username 'WorkflowUser1'")
-                            print(f"     Expected username: {TEST_USER_ROBIEE['username']}")
+                        print(f"   Checking {member_username} ({member_id})...")
+                        member_response = make_request('GET', 'current', params={'userId': member_id})
+                        
+                        if member_response and member_response.status_code == 200:
+                            member_data = member_response.json()
+                            if member_data.get('party', {}).get('gameRoomId') == game_room_id:
+                                print(f"   ✅ {member_username} can access game room {game_room_id}")
+                            else:
+                                print(f"   ❌ {member_username} cannot access game room")
+                        else:
+                            print(f"   ❌ Failed to check {member_username}'s party status")
+                    
+                    return {
+                        'game_room_id': game_room_id,
+                        'party_status': party_status,
+                        'validation_success': True
+                    }
+                else:
+                    print(f"❌ Game Room ID format is invalid")
+                    return None
             else:
-                print("  No members found in party")
+                print(f"❌ Party is not in game mode or missing game room ID")
+                print(f"   Status: {party_status}")
+                print(f"   Game Room ID: {game_room_id}")
+                return None
         else:
-            print("ℹ️ No party data found")
+            print("❌ No party found for Alice")
+            return None
     else:
-        print(f"❌ Failed to get party data")
+        print("❌ Failed to get Alice's party status")
+        return None
 
 def cleanup_stale_parties():
     """Test 6: Cleanup stale party data"""
