@@ -348,7 +348,7 @@ export default function Home() {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     
     if (timezone.includes('America')) {
-      return timezone.includes('Los_Angeles') || timezone.includes('Vancouver') ? 'seattle' : 'washington-dc'
+      return timezone.includes('Los_Angeles') || timezone.includes('Vancouver') ? 'seattle' : 'washingtondc'
     } else if (timezone.includes('Europe')) {
       return timezone.includes('London') || timezone.includes('Dublin') ? 'london' : 'frankfurt'
     } else if (timezone.includes('Asia')) {
