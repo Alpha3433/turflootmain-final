@@ -19,21 +19,42 @@ print(f"🔗 API Base URL: {API_BASE}")
 print(f"📅 Test Started: {datetime.now().isoformat()}")
 print("=" * 80)
 
-class PartyNotificationTester:
-    def __init__(self):
-        self.test_results = []
-        self.party_id = None
-        self.game_room_id = None
+def test_api_endpoint(method, endpoint, data=None, expected_status=200):
+    """Test an API endpoint and return response"""
+    url = f"{API_BASE}/{endpoint}"
+    
+    try:
+        start_time = time.time()
         
-    def log_test(self, test_name, success, details="", response_time=0):
-        """Log test result"""
-        status = "✅ PASS" if success else "❌ FAIL"
-        self.test_results.append({
-            'test': test_name,
-            'success': success,
-            'details': details,
-            'response_time': response_time
-        })
+        if method.upper() == 'GET':
+            response = requests.get(url, timeout=10)
+        elif method.upper() == 'POST':
+            response = requests.post(url, json=data, timeout=10)
+        else:
+            raise ValueError(f"Unsupported method: {method}")
+            
+        end_time = time.time()
+        response_time = round(end_time - start_time, 3)
+        
+        print(f"  📡 {method} {endpoint} -> {response.status_code} ({response_time}s)")
+        
+        if response.status_code == expected_status:
+            try:
+                return response.json(), response_time
+            except:
+                return response.text, response_time
+        else:
+            print(f"  ❌ Expected {expected_status}, got {response.status_code}")
+            try:
+                error_data = response.json()
+                print(f"  📄 Error: {error_data}")
+                return error_data, response_time
+            except:
+                return {"error": response.text}, response_time
+                
+    except requests.exceptions.RequestException as e:
+        print(f"  ❌ Request failed: {str(e)}")
+        return {"error": str(e)}, 0
         print(f"{status} {test_name}")
         if details:
             print(f"    {details}")
