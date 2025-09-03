@@ -463,9 +463,7 @@ export async function GET(request, { params }) {
         
         try {
           // Connect to MongoDB to get real active game sessions
-          const { MongoClient } = await import('mongodb')
-          const client = await MongoClient.connect(process.env.MONGO_URL)
-          const db = client.db('turfloot')
+          const db = await getDb()
           
           // Get active game sessions from database
           const activeGameSessions = await db.collection('game_sessions').find({
