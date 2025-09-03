@@ -465,8 +465,18 @@ export default function PartyLobbySystem({
 
   // Create new party
   const createParty = async () => {
-    if (!userId || !displayName) {
-      setError('User information required to create party')
+    if (!userId) {
+      setError('User authentication required to create party')
+      return
+    }
+
+    // Create a proper username fallback
+    const effectiveUsername = displayName && displayName !== 'Click to set name' && displayName !== '' 
+      ? displayName 
+      : user?.google?.name || user?.email?.address || 'Player'
+    
+    if (!effectiveUsername || effectiveUsername === 'Click to set name') {
+      setError('Please set your display name first by clicking on the name field in the top right')
       return
     }
 
