@@ -1,83 +1,61 @@
 #!/usr/bin/env node
 
-// Hathora Server Entry Point for TurfLoot
-import { startServer } from '@hathora/server-sdk'
+// Hathora Server Entry Point for TurfLoot - Node.js 18 Compatible
+import { Server } from 'socket.io'
 import { gameServer } from './lib/gameServer.js'
 import http from 'http'
 
 const PORT = process.env.HATHORA_PORT || 4000
 
 console.log('🌍 Starting TurfLoot Hathora Server...')
+console.log(`📡 Port: ${PORT}`)
+console.log(`🔧 Node.js: ${process.version}`)
 
 // Create HTTP server
 const server = http.createServer()
 
-// Initialize our existing game server with Hathora
-gameServer.initialize(server)
-
-// Hathora-specific event handlers
-const hathoraHandlers = {
-  // Called when a new room should be created
-  subscribeUser: (roomId, userId) => {
-    console.log(`👤 Hathora: User ${userId} subscribing to room ${roomId}`)
-    
-    // Create or get existing room using our game server
-    const room = gameServer.getOrCreateRoom(roomId, 'multiplayer', 0)
-    
-    return {
-      type: 'room-created',
-      roomId: roomId,
-      state: {
-        players: room.players.size,
-        maxPlayers: 20,
-        gameMode: room.mode,
-        status: room.running ? 'active' : 'waiting'
-      }
-    }
+// Initialize Socket.IO server
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
   },
-
-  // Called when a user leaves a room  
-  unsubscribeUser: (roomId, userId) => {
-    console.log(`👋 Hathora: User ${userId} unsubscribing from room ${roomId}`)
-    
-    const room = gameServer.rooms.get(roomId)
-    if (room) {
-      // Clean up user from room
-      room.removePlayer(userId)
-    }
-  },
-
-  // Called when room should be destroyed
-  onRoomDestroy: (roomId) => {
-    console.log(`🗑️ Hathora: Destroying room ${roomId}`)
-    
-    const room = gameServer.rooms.get(roomId)
-    if (room) {
-      room.cleanup()
-      gameServer.rooms.delete(roomId)
-    }
-  }
-}
-
-// Start Hathora server with our handlers
-startServer({
-  port: PORT,
-  ...hathoraHandlers
-}, server)
-
-// Start our game server
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🎮 TurfLoot Hathora Server running on port ${PORT}`)
-  console.log(`🌍 Ready for global multiplayer connections!`)
+  transports: ['websocket', 'polling']
 })
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('📴 Received SIGTERM, shutting down gracefully...')
-  server.close(() => {
-    console.log('✅ Hathora server closed')
-    process.exit(0)
+// Initialize our existing game server with Socket.IO
+gameServer.initialize(io)
+
+console.log('✅ Game server initialized')
+
+// Start the server
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 TurfLoot Hathora server running on port ${PORT}`)
+  console.log(`🌐 WebSocket server ready for connections`)
+  
+  // Keep process alive and handle signals
+  process.on('SIGTERM', () => {
+    console.log('📤 Received SIGTERM, shutting down gracefully...')
+    server.close(() => {
+      console.log('✅ Server closed')
+      process.exit(0)
+    })
+  })
+  
+  process.on('SIGINT', () => {
+    console.log('📤 Received SIGINT, shutting down gracefully...')
+    server.close(() => {
+      console.log('✅ Server closed')
+      process.exit(0)
+    })
   })
 })
 
-export default server
+// Handle server errors
+server.on('error', (error) => {
+  console.error('❌ Server error:', error)
+  process.exit(1)
+})
+
+// Export for testing
+export { server, io }
