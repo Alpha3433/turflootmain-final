@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-// Hathora Server Entry Point for TurfLoot - Node.js 18 Compatible
-import { Server } from 'socket.io'
-import { gameServer } from './lib/gameServer.js'
-import http from 'http'
+// Hathora Server Entry Point for TurfLoot - Node.js 18/20 Compatible
+const { Server } = require('socket.io')
+const { gameServer } = require('./lib/gameServer.js')
+const http = require('http')
 
 const PORT = process.env.HATHORA_PORT || 4000
 
@@ -58,4 +58,4 @@ server.on('error', (error) => {
 })
 
 // Export for testing
-export { server, io }
+module.exports = { server, io }
