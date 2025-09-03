@@ -91,37 +91,59 @@ def test_party_creation():
             print(f"   Error: {response.text}")
         return None
 
-def test_database_cleanup_check():
-    """Test 2: Check for stale party records"""
+def test_party_invitation():
+    """Test 2: Invite second member to party"""
     print("\n" + "="*80)
-    print("🧹 TEST 2: CHECKING FOR STALE PARTY RECORDS")
+    print("📧 TEST 2: PARTY INVITATION FOR GAME SETUP")
     print("="*80)
     
-    # Check for both users to see if there are conflicting records
-    users_to_check = [TEST_USER_ROBIEE, TEST_USER_WORKFLOW]
+    # First get Alice's current party
+    print(f"🔍 Getting {TEST_USER_ALICE['username']}'s current party...")
+    response = make_request('GET', 'current', params={'userId': TEST_USER_ALICE['userId']})
     
-    for user in users_to_check:
-        print(f"\n📡 Checking party status for user: {user['username']} ({user['userId']})")
-        response = make_request('GET', 'current', params={'userId': user['userId']})
+    if not response or response.status_code != 200:
+        print("❌ Failed to get Alice's party status")
+        return None
         
-        if response and response.status_code == 200:
-            data = response.json()
-            if data.get('hasParty'):
-                party = data['party']
-                print(f"🎉 Found party for {user['username']}:")
-                print(f"   Party ID: {party.get('id')}")
-                print(f"   Party Name: {party.get('name')}")
-                print(f"   Created: {party.get('createdAt')}")
-                print(f"   Status: {party.get('status')}")
-                
-                # Check if this is a stale record
-                created_time = party.get('createdAt')
-                if created_time:
-                    print(f"   Age: {created_time}")
-            else:
-                print(f"ℹ️ No party found for {user['username']}")
+    data = response.json()
+    if not data.get('hasParty') or not data.get('party'):
+        print("❌ Alice doesn't have a party")
+        return None
+        
+    party = data['party']
+    party_id = party['id']
+    print(f"✅ Found Alice's party: {party_id}")
+    
+    # Send invitation to Bob
+    print(f"\n📤 Sending invitation to {TEST_USER_BOB['username']}")
+    invite_data = {
+        'partyId': party_id,
+        'fromUserId': TEST_USER_ALICE['userId'],
+        'toUserId': TEST_USER_BOB['userId'],
+        'toUsername': TEST_USER_BOB['username']
+    }
+    
+    print(f"📋 Invitation data: {json.dumps(invite_data, indent=2)}")
+    
+    invite_response = make_request('POST', 'invite', data=invite_data)
+    
+    if invite_response and invite_response.status_code == 200:
+        invite_result = invite_response.json()
+        print(f"✅ Invitation sent successfully!")
+        print(f"📊 Response: {json.dumps(invite_result, indent=2)}")
+        
+        invitation_id = invite_result.get('invitationId')
+        if invitation_id:
+            print(f"🎯 Invitation ID: {invitation_id}")
+            return {'party_id': party_id, 'invitation_id': invitation_id}
         else:
-            print(f"❌ Failed to check party for {user['username']}")
+            print("❌ No invitation ID returned")
+            return None
+    else:
+        print(f"❌ Failed to send invitation: {invite_response.status_code if invite_response else 'No response'}")
+        if invite_response:
+            print(f"   Error: {invite_response.text}")
+        return None
 
 def test_party_creation_username():
     """Test 3: Test party creation with robiee username"""
