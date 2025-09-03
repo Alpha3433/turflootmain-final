@@ -197,7 +197,7 @@ export default function Home() {
     
     // Enhanced latency estimation based on real-world distances and network infrastructure
     const latencyMap = {
-      'washington-dc': {
+      'washingtondc': {
         'America/New_York': 8, 'America/Chicago': 25, 'America/Denver': 35, 'America/Los_Angeles': 65,
         'Europe/London': 85, 'Europe/Paris': 95, 'Europe/Berlin': 100,
         'Asia/Tokyo': 180, 'Asia/Singapore': 220, 'Asia/Mumbai': 240,
