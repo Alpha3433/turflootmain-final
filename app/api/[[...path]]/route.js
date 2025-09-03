@@ -1163,6 +1163,69 @@ export async function POST(request, { params }) {
     const route = path.join('/')
     console.log(`🔍 POST Route requested: ${route}`)
 
+    // Game session tracking endpoints
+    if (route === 'game-sessions/join') {
+      try {
+        const { roomId, playerId, playerName } = body
+        
+        if (!roomId || !playerId) {
+          return NextResponse.json({ error: 'roomId and playerId required' }, { status: 400, headers: corsHeaders })
+        }
+        
+        console.log(`🎮 Player ${playerName || playerId} joining room ${roomId}`)
+        
+        // Connect to MongoDB
+        const db = await getDb()
+        
+        // Update or create game session
+        await db.collection('game_sessions').updateOne(
+          { playerId, roomId },
+          {
+            $set: {
+              playerId,
+              playerName,
+              roomId,
+              status: 'active',
+              joinedAt: new Date(),
+              lastActivity: new Date()
+            }
+          },
+          { upsert: true }
+        )
+        
+        return NextResponse.json({ success: true, message: 'Player joined session' }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error tracking game session join:', error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
+    // Game session leave endpoint
+    if (route === 'game-sessions/leave') {
+      try {
+        const { roomId, playerId } = body
+        
+        if (!roomId || !playerId) {
+          return NextResponse.json({ error: 'roomId and playerId required' }, { status: 400, headers: corsHeaders })
+        }
+        
+        console.log(`🚪 Player ${playerId} leaving room ${roomId}`)
+        
+        // Connect to MongoDB
+        const db = await getDb()
+        
+        // Remove game session
+        await db.collection('game_sessions').deleteOne({ playerId, roomId })
+        
+        return NextResponse.json({ success: true, message: 'Player left session' }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error tracking game session leave:', error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // User stats update route
     if (route === 'users/stats/update') {
       try {
