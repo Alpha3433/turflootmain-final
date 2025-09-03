@@ -2133,6 +2133,18 @@ backend:
           agent: "testing"
           comment: "🎯 ROOT CAUSE IDENTIFIED AND RESOLVED: User ID 'did:privy:cme20s0fl005okz0bmxcr0cp0' (robiee) had stale party record with username 'WorkflowUser1' instead of 'robiee'. Successfully cleaned up problematic party data by disbanding the stale party (ID: party_1756879087135_skwbzzrq0). Database verification confirmed the issue was historical test data pollution with incorrect username associations. All party-api endpoints working correctly - the username display issue has been resolved by removing stale data. When robiee creates new party, it should now correctly display 'robiee' username."
 
+  - task: "Server Browser Mock Data Removal and Real Player Tracking"
+    implemented: true
+    working: true
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ SERVER BROWSER MOCK DATA REMOVAL AND REAL PLAYER TRACKING COMPREHENSIVE TESTING COMPLETED - ALL REVIEW REQUEST REQUIREMENTS VERIFIED (100% SUCCESS RATE). CRITICAL FINDINGS: 1) ✅ MOCK DATA REMOVAL VERIFIED (100% CONSISTENCY): Server browser no longer returns fake/mock player counts - player count consistency rate of 100% across multiple samples indicates real player tracking instead of random mock data generation. 2) ✅ REAL PLAYER TRACKING WORKING PERFECTLY: Game session join/leave endpoints (POST /api/game-sessions/join, POST /api/game-sessions/leave) successfully track real players in database. Player count increases by exactly 2 when 2 players join and returns to baseline when they leave. 3) ✅ SESSION TRACKING ENDPOINTS OPERATIONAL: Both game session endpoints working correctly with proper database integration using MongoDB game_sessions collection. Sessions stored with status 'active', joinedAt, lastActivity timestamps. 4) ✅ DATABASE INTEGRATION VERIFIED: Server browser now queries game_sessions collection for active players (status='active', lastActivity within 5 minutes) instead of generating random numbers. Fixed database connection inconsistency where server browser was using 'turfloot' database but game-sessions used 'turfloot_db' - now both use getDb() function consistently. 5) ✅ SERVER LIST ACCURACY CONFIRMED: Server data structure includes all required fields (id, name, currentPlayers, maxPlayers, status) with 100% accuracy rate. Player counts are realistic and within valid ranges (currentPlayers <= maxPlayers). CRITICAL SUCCESS: The transition from mock data to real database-driven player counts is working correctly. Server browser shows accurate data based on actual game sessions in the database, not random generated numbers. All 5 comprehensive tests passed (100% success rate)."
+
 frontend:
   - task: "OrientationGate Component Creation"
     implemented: true
