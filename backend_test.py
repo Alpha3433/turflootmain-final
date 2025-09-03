@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Server Browser Mock Data Removal and Real Player Tracking
-Testing the transition from mock data to real database-driven player counts
+Global Multiplayer Shared Room Fix - Backend Testing
+Testing the fix for users connecting to separate Hathora room instances instead of shared game.
+
+TESTING FOCUS:
+1. Session tracking APIs work correctly for global-practice-bots room
+2. Multiple players connecting to global-practice-bots are in same game session
+3. Server browser shows "Global Multiplayer (US East)" entry correctly
+4. Room ID handling works properly for shared multiplayer experience
 """
 
 import requests
 import json
 import time
-import os
+import sys
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+# Configuration
+BASE_URL = "https://realtime-lobby.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 print(f"🎯 TESTING SERVER BROWSER MOCK DATA REMOVAL AND REAL PLAYER TRACKING")
