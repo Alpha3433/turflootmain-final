@@ -367,52 +367,65 @@ def test_game_room_validation():
         print("❌ Failed to get Alice's party status")
         return None
 
-def cleanup_stale_parties():
-    """Test 6: Cleanup stale party data"""
+def test_party_notifications():
+    """Test 6: Check party game notifications for members"""
     print("\n" + "="*80)
-    print("🧹 TEST 6: CLEANUP STALE PARTY DATA")
+    print("📢 TEST 6: PARTY GAME NOTIFICATIONS")
     print("="*80)
     
-    # Try to leave any existing parties for robiee
-    print(f"🚪 Attempting to leave all parties for robiee...")
-    
-    # First get current party
-    response = make_request('GET', 'current', params={'userId': TEST_USER_ROBIEE['userId']})
+    # Check notifications for Bob (non-owner member)
+    print(f"🔍 Checking notifications for {TEST_USER_BOB['username']}...")
+    response = make_request('GET', 'notifications', params={'userId': TEST_USER_BOB['userId']})
     
     if response and response.status_code == 200:
         data = response.json()
-        if data.get('hasParty') and data.get('party'):
-            party = data['party']
-            party_id = party.get('id')
-            
-            print(f"📤 Leaving party: {party_id}")
-            leave_response = make_request('POST', 'leave', data={
-                'partyId': party_id,
-                'userId': TEST_USER_ROBIEE['userId']
-            })
-            
-            if leave_response and leave_response.status_code == 200:
-                leave_data = leave_response.json()
-                print(f"✅ Successfully left party")
-                print(f"   Response: {json.dumps(leave_data, indent=2)}")
+        notifications = data.get('notifications', [])
+        notification_count = data.get('count', 0)
+        
+        print(f"✅ Retrieved {notification_count} notifications")
+        print(f"📊 Response: {json.dumps(data, indent=2)}")
+        
+        if notifications:
+            print(f"\n📢 NOTIFICATION ANALYSIS:")
+            for i, notification in enumerate(notifications):
+                print(f"Notification {i+1}:")
+                print(f"  ID: {notification.get('id')}")
+                print(f"  Type: {notification.get('type')}")
+                print(f"  Title: {notification.get('title')}")
+                print(f"  Message: {notification.get('message')}")
+                print(f"  Status: {notification.get('status')}")
+                print(f"  Created: {notification.get('createdAt')}")
+                print(f"  Expires: {notification.get('expiresAt')}")
                 
-                # Verify party is gone
-                verify_response = make_request('GET', 'current', params={'userId': TEST_USER_ROBIEE['userId']})
-                if verify_response and verify_response.status_code == 200:
-                    verify_data = verify_response.json()
-                    if not verify_data.get('hasParty'):
-                        print(f"✅ Confirmed: User is no longer in any party")
+                # Check notification data
+                notification_data = notification.get('data', {})
+                if notification_data:
+                    print(f"  Data:")
+                    print(f"    Game Room ID: {notification_data.get('gameRoomId')}")
+                    print(f"    Party ID: {notification_data.get('partyId')}")
+                    print(f"    Room Type: {notification_data.get('roomType')}")
+                    print(f"    Entry Fee: ${notification_data.get('entryFee')}")
+                    
+                    # Validate game room ID in notification
+                    game_room_id = notification_data.get('gameRoomId')
+                    if game_room_id and game_room_id.startswith('game_'):
+                        print(f"    ✅ Game Room ID format is valid: {game_room_id}")
                     else:
-                        print(f"⚠️ User still appears to be in a party")
-                        print(f"   Party: {verify_data.get('party', {}).get('name')}")
-            else:
-                print(f"❌ Failed to leave party: {leave_response.status_code if leave_response else 'No response'}")
-                if leave_response:
-                    print(f"   Error: {leave_response.text}")
+                        print(f"    ❌ Game Room ID format is invalid: {game_room_id}")
+            
+            return {
+                'notification_count': notification_count,
+                'notifications': notifications,
+                'has_game_notifications': any(n.get('type') == 'party_game_start' for n in notifications)
+            }
         else:
-            print("ℹ️ No party to leave")
+            print("ℹ️ No notifications found")
+            return {'notification_count': 0, 'notifications': [], 'has_game_notifications': False}
     else:
-        print(f"❌ Failed to check current party status")
+        print(f"❌ Failed to get notifications: {response.status_code if response else 'No response'}")
+        if response:
+            print(f"   Error: {response.text}")
+        return None
 
 def run_all_tests():
     """Run all debug tests"""
