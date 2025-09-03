@@ -16,9 +16,9 @@ console.log('MONGO_URL:', process.env.MONGO_URL ? 'SET' : 'NOT SET')
 console.log('NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL || 'NOT SET')
 
 // Custom server to handle WebSocket connections and TurfLoot game server
-const { createServer } = require('http')
-const next = require('next')
-const { parse } = require('url')
+import { createServer } from 'http'
+import next from 'next'
+import { parse } from 'url'
 
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = '0.0.0.0'
