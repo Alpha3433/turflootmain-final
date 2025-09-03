@@ -28,49 +28,6 @@ export default function PartyLobbySystem({
   console.log('🔍 PARTY LOBBY DEBUG: user.privyId:', user?.privyId)
   console.log('🔍 PARTY LOBBY DEBUG: displayName:', displayName)
 
-  // Fetch party invitations
-  const fetchPartyInvitations = useCallback(async () => {
-    if (!userId) {
-      console.log('❌ Cannot fetch invitations: No userId provided')
-      return
-    }
-    
-    console.log('📧 Fetching party invitations for user:', userId)
-    
-    try {
-      const url = `${getApiUrl('/party-api/invitations')}?userId=${userId}`
-      console.log('📡 Invitation API URL:', url)
-      
-      const response = await fetch(url)
-      const data = await response.json()
-      
-      console.log('📧 Invitation response:', { status: response.status, data })
-      
-      if (response.ok) {
-        const invitations = data.invitations || []
-        setPartyInvitations(invitations)
-        console.log('✅ Party invitations loaded:', invitations.length, 'invitations')
-        
-        if (invitations.length > 0) {
-          console.log('📋 Invitation details:', invitations.map(inv => ({
-            id: inv.id,
-            fromUsername: inv.fromUsername,
-            partyName: inv.partyName,
-            status: inv.status
-          })))
-        } else {
-          console.log('ℹ️ No pending invitations found for user')
-        }
-      } else {
-        console.error('❌ Failed to fetch invitations:', data.error)
-        setPartyInvitations([])
-      }
-    } catch (error) {
-      console.error('❌ Error fetching invitations:', error)
-      setPartyInvitations([])
-    }
-  }, [userId])
-
   // Refresh invitations periodically
   useEffect(() => {
     let invitationRefreshInterval
