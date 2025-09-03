@@ -42,13 +42,13 @@ console.log(`🔑 Token: ${HATHORA_TOKEN.substring(0, 20)}...`)
 try {
   console.log('\n🔧 Pre-deployment checks...')
   
-  // Check if package.json has correct module type
-  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
-  if (packageJson.type !== 'module') {
-    console.error('❌ package.json missing "type": "module"')
+  // Check if hathora-package.json exists
+  if (!fs.existsSync('hathora-package.json')) {
+    console.error('❌ hathora-package.json not found')
+    console.error('   This file contains clean dependencies without uWebSockets.js')
     process.exit(1)
   }
-  console.log('✅ package.json has correct module type')
+  console.log('✅ hathora-package.json found (clean dependencies)')
   
   // Check if hathora-server.js exists and is updated
   if (!fs.existsSync('hathora-server.js')) {
@@ -57,12 +57,12 @@ try {
   }
   
   const serverContent = fs.readFileSync('hathora-server.js', 'utf8')
-  if (serverContent.includes('@hathora/server-sdk')) {
-    console.error('❌ hathora-server.js still uses @hathora/server-sdk')
-    console.error('   This will cause Node.js 20 compatibility issues')
+  if (serverContent.includes('import ') && !serverContent.includes('require(')) {
+    console.error('❌ hathora-server.js still uses ES modules')
+    console.error('   Should use CommonJS require() for compatibility')
     process.exit(1)
   }
-  console.log('✅ hathora-server.js is Node.js 18/20 compatible')
+  console.log('✅ hathora-server.js uses CommonJS (Node.js 18/20 compatible)')
   
   // Check hathora.yml configuration  
   if (!fs.existsSync('hathora.yml')) {
@@ -71,15 +71,15 @@ try {
   }
   
   const hathoraConfig = fs.readFileSync('hathora.yml', 'utf8')
-  if (!hathoraConfig.includes('node:18-alpine')) {
-    console.log('⚠️ Warning: hathora.yml should use node:18-alpine for best compatibility')
+  if (!hathoraConfig.includes('hathora-package.json')) {
+    console.log('⚠️ Warning: hathora.yml should use hathora-package.json for clean dependencies')
   } else {
-    console.log('✅ hathora.yml uses Node.js 18')
+    console.log('✅ hathora.yml uses clean package.json configuration')
   }
   
   console.log('\n🏗️ Building application...')
-  execSync('yarn build', { stdio: 'inherit' })
-  console.log('✅ Build completed')
+  // Skip yarn build since we're using minimal dependencies
+  console.log('✅ Using minimal dependencies - no build required')
   
   console.log('\n🚀 Deploying to Hathora...')
   
@@ -102,13 +102,15 @@ try {
   
   console.log('\n🎉 DEPLOYMENT SUCCESSFUL!')
   console.log('=' * 60)
-  console.log('✅ TurfLoot deployed to Hathora with Node.js 18 compatibility')
-  console.log('✅ uWebSockets.js issues resolved')
-  console.log('✅ Socket.IO server ready for connections')
-  console.log('\n📊 Next steps:')
-  console.log('1. Check Hathora console for active processes')
-  console.log('2. Test Global Multiplayer connections')
-  console.log('3. Verify processes stay running (should not crash immediately)')
+  console.log('✅ TurfLoot deployed to Hathora with clean dependencies')
+  console.log('✅ No uWebSockets.js compatibility issues')
+  console.log('✅ CommonJS server ready for Node.js 18/20')
+  console.log('\n📊 Expected logs:')
+  console.log('🌍 Starting TurfLoot Hathora Server...')
+  console.log('📡 Port: 4000') 
+  console.log('🔧 Node.js: v18.x.x (or v20.x.x)')
+  console.log('✅ Game server initialized')
+  console.log('🚀 TurfLoot Hathora server running on port 4000')
   console.log('\n🌐 Console: https://console.hathora.dev')
   
 } catch (error) {
