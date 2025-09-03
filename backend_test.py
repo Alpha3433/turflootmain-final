@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Global Multiplayer Shared Room Fix - Backend Testing
-Testing the fix for users connecting to separate Hathora room instances instead of shared game.
+TurfLoot Hathora Integration Backend Testing Suite
+Testing the updated Hathora integration implementation
 
-TESTING FOCUS:
-1. Session tracking APIs work correctly for global-practice-bots room
-2. Multiple players connecting to global-practice-bots are in same game session
-3. Server browser shows "Global Multiplayer (US East)" entry correctly
-4. Room ID handling works properly for shared multiplayer experience
+TESTING FOCUS (Review Request):
+1. Test that session tracking APIs still work for global-practice-bots
+2. Verify Hathora client integration is working (authentication and lobby creation logs)
+3. Test server browser still shows Global Multiplayer entry
+4. Check for connection errors or fallback to local server
+5. Critical question: Does new implementation connect to deployed Hathora server?
 """
 
 import requests
