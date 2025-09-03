@@ -1,37 +1,23 @@
 #!/usr/bin/env python3
 """
-Party Game Start Notification System Testing
-============================================
-
-Testing the party game start notification system to identify why only one player loads into the game.
-Focus areas:
-1. POST /party-api/start-game properly creates notifications for all party members
-2. GET /party-api/notifications returns the game start notifications for non-owner party members  
-3. Notification contains all required game data (gameRoomId, roomType, entryFee, partyMembers)
-4. Multi-Member Coordination: Both party members receive identical notification data
-
-Test Scenario: 
-- Create party with 2 members (Alice as owner, Bob as member)
-- Alice starts a practice game 
-- Verify Bob receives auto-join notification with same gameRoomId
+Backend Testing Script for Server Browser Mock Data Removal and Real Player Tracking
+Testing the transition from mock data to real database-driven player counts
 """
 
 import requests
 import json
 import time
-import sys
+import os
 from datetime import datetime
 
-# Configuration
-BASE_URL = "http://localhost:3000"
-PARTY_API_BASE = f"{BASE_URL}/party-api"
+# Get base URL from environment
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+API_BASE = f"{BASE_URL}/api"
 
-# Test users - using realistic Privy DID format
-ALICE_USER_ID = "did:privy:alice_party_owner_test_123"
-ALICE_USERNAME = "AlicePartyOwner"
-
-BOB_USER_ID = "did:privy:bob_party_member_test_456"  
-BOB_USERNAME = "BobPartyMember"
+print(f"🎯 TESTING SERVER BROWSER MOCK DATA REMOVAL AND REAL PLAYER TRACKING")
+print(f"🔗 API Base URL: {API_BASE}")
+print(f"📅 Test Started: {datetime.now().isoformat()}")
+print("=" * 80)
 
 class PartyNotificationTester:
     def __init__(self):
