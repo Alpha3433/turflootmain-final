@@ -9,14 +9,21 @@ build:
     - yarn install
     - yarn build
   
-# Dockerfile configuration
+# Dockerfile configuration - Clean Node.js 18 build without uWebSockets.js
 dockerfile: |
   FROM node:18-alpine
   WORKDIR /app
-  COPY package*.json yarn.lock ./
+  
+  # Copy minimal package.json first
+  COPY hathora-package.json package.json
+  COPY yarn.lock ./
   RUN yarn install --frozen-lockfile --production
-  COPY . .
-  RUN yarn build
+  
+  # Copy only required files
+  COPY hathora-server.js ./
+  COPY lib/ ./lib/
+  COPY .env* ./
+  
   EXPOSE 4000
   CMD ["node", "hathora-server.js"]
 
