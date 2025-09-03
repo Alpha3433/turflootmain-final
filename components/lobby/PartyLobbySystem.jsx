@@ -415,8 +415,8 @@ export default function PartyLobbySystem({
         })
     }
     
-    // More conservative polling every 5 seconds to avoid rate limiting
-    notificationInterval = setInterval(pollNotifications, 5000)
+    // More aggressive polling during party games - check every 2 seconds for game starts
+    notificationInterval = setInterval(pollNotifications, 2000)
     
     // Initial check immediately
     pollNotifications()
