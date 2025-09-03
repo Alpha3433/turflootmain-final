@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Party Lobby Username Issue Debug
-Testing the specific issue where "WorkflowUser1" is displayed instead of "robiee"
+Backend Testing Script for Party Game Initialization
+Testing party game room creation, room ID validation, and party coordination
 """
 
 import requests
@@ -14,17 +14,17 @@ from urllib.parse import urljoin
 BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
 API_BASE = f"{BASE_URL}/party-api"
 
-# Test user data - using realistic Privy DID format
-TEST_USER_ROBIEE = {
-    'userId': 'did:privy:cme20s0fl005okz0bmxcr0cp0',  # Real user ID for robiee
-    'username': 'robiee',
-    'displayName': 'robiee'
+# Test user data - using realistic Privy DID format for party game testing
+TEST_USER_ALICE = {
+    'userId': 'did:privy:alice_test_party_game_001',
+    'username': 'AlicePartyPlayer',
+    'displayName': 'Alice'
 }
 
-TEST_USER_WORKFLOW = {
-    'userId': 'did:privy:cmeksdeoe00gzl10bsienvnbk',  # Real user ID that might be showing as WorkflowUser1
-    'username': 'WorkflowUser1',
-    'displayName': 'WorkflowUser1'
+TEST_USER_BOB = {
+    'userId': 'did:privy:bob_test_party_game_002',
+    'username': 'BobPartyPlayer',
+    'displayName': 'Bob'
 }
 
 def make_request(method, endpoint, data=None, params=None):
