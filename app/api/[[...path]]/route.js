@@ -555,7 +555,7 @@ export async function GET(request, { params }) {
             })
           }
           
-          await client.close()
+
           console.log(`✅ Server browser showing real data: ${serverData.length} servers with actual player counts`)
           
         } catch (hathoraError) {
