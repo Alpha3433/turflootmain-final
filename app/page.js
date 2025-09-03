@@ -92,42 +92,42 @@ export default function Home() {
       id: 'london', 
       name: 'Europe West (London)', 
       ping: null, 
-      endpoint: 'https://ping-eu-west.hathora.dev/ping',
+      endpoint: 'https://london.ping.hathora.dev',
       displayName: 'EU-West'
     },
     { 
       id: 'frankfurt', 
       name: 'Europe Central (Frankfurt)', 
       ping: null, 
-      endpoint: 'https://ping-eu-central.hathora.dev/ping',
+      endpoint: 'https://frankfurt.ping.hathora.dev',
       displayName: 'EU-Central'
     },
     { 
       id: 'singapore', 
       name: 'Asia Southeast (Singapore)', 
       ping: null, 
-      endpoint: 'https://ping-asia-southeast.hathora.dev/ping',
+      endpoint: 'https://singapore.ping.hathora.dev',
       displayName: 'Asia-SE'
     },
     { 
       id: 'tokyo', 
       name: 'Asia East (Tokyo)', 
       ping: null, 
-      endpoint: 'https://ping-asia-east.hathora.dev/ping',
+      endpoint: 'https://tokyo.ping.hathora.dev',
       displayName: 'Asia-East'
     },
     { 
       id: 'mumbai', 
       name: 'Asia South (Mumbai)', 
       ping: null, 
-      endpoint: 'https://ping-asia-south.hathora.dev/ping',
+      endpoint: 'https://mumbai.ping.hathora.dev',
       displayName: 'Asia-South'
     },
     { 
       id: 'sydney', 
       name: 'Oceania (Sydney)', 
       ping: null, 
-      endpoint: 'https://ping-oceania.hathora.dev/ping',
+      endpoint: 'https://sydney.ping.hathora.dev',
       displayName: 'Oceania'
     }
   ]
