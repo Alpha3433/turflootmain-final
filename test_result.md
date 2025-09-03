@@ -108,7 +108,7 @@ user_problem_statement: "Complete Hathora Integration (Phase 1) - Update the mai
 
 test_plan:
   current_focus:
-    - "Hathora Global Connection UI Updates"
+    - "Party Game Initialization Testing"
   stuck_tasks: []
 backend:
   - task: "Hathora Global Connection UI Updates"
