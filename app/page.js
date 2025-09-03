@@ -72,20 +72,20 @@ export default function Home() {
   const [pendingGameEntry, setPendingGameEntry] = useState(null)
   const [showMobileLobby, setShowMobileLobby] = useState(false)
 
-  // Hathora regions with ping measurement endpoints
+  // Hathora regions with REAL ping measurement endpoints
   const availableRegions = [
     { 
-      id: 'washington-dc', 
+      id: 'washingtondc', 
       name: 'US East (Washington DC)', 
       ping: null, 
-      endpoint: 'https://ping-us-east.hathora.dev/ping',
+      endpoint: 'https://washingtondc.ping.hathora.dev',
       displayName: 'US-East'
     },
     { 
       id: 'seattle', 
       name: 'US West (Seattle)', 
       ping: null, 
-      endpoint: 'https://ping-us-west.hathora.dev/ping',
+      endpoint: 'https://seattle.ping.hathora.dev',
       displayName: 'US-West'
     },
     { 
