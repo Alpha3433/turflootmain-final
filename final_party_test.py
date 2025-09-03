@@ -9,7 +9,7 @@ import json
 import time
 
 # Configuration
-BASE_URL = "https://hathora-turfloot.preview.emergentagent.com"
+BASE_URL = "https://realtime-lobby.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
 # Real user IDs from server logs
