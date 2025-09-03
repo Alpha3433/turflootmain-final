@@ -320,8 +320,23 @@ const AgarIOGame = () => {
       if (socketRef.current) {
         socketRef.current.disconnect()
       }
+      
+      // Clean up game session tracking when leaving page
+      const urlParams = new URLSearchParams(window.location.search)
+      const roomId = urlParams.get('roomId')
+      
+      if (roomId && user) {
+        fetch('/api/game-sessions/leave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId: roomId,
+            playerId: user.id || user.privyId
+          })
+        }).catch(err => console.log('Page cleanup failed:', err.message))
+      }
     }
-  }, [])
+  }, [user])
 
   // FIXED: Game initialization that waits for mobile detection completion
   useEffect(() => {
