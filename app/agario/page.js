@@ -2278,14 +2278,26 @@ const AgarIOGame = () => {
         
         // Track player leaving game session for server browser
         if (paramRoomId && user) {
+          const leaveData = {
+            roomId: paramRoomId,
+            playerId: user.id || user.privyId
+          }
+          
+          console.log('🚪 TRACKING: Player leaving game session')
+          console.log('📊 Leave data:', leaveData)
+          
           fetch('/api/game-sessions/leave', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              roomId: paramRoomId,
-              playerId: user.id || user.privyId
-            })
-          }).catch(err => console.log('Session cleanup failed:', err.message))
+            body: JSON.stringify(leaveData)
+          })
+          .then(response => response.json())
+          .then(result => {
+            console.log('✅ SESSION LEAVE SUCCESS:', result)
+          })
+          .catch(err => {
+            console.error('❌ SESSION LEAVE FAILED:', err)
+          })
         }
       })
 
