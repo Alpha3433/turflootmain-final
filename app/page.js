@@ -360,7 +360,7 @@ export default function Home() {
       return 'sydney'
     }
     
-    return 'washington-dc' // Safe fallback
+    return 'washingtondc' // Safe fallback
   }
 
   // Initialize optimal region and measure pings on component mount
