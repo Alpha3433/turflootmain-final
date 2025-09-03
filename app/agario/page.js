@@ -356,6 +356,7 @@ const AgarIOGame = () => {
     const urlParams = new URLSearchParams(window.location.search)
     const paramFee = parseFloat(urlParams.get('fee')) || 0
     const paramMode = urlParams.get('mode') || 'free'
+    const paramRoomId = urlParams.get('roomId') // NEW: Check for roomId parameter
     const paramPartyId = urlParams.get('partyId')
     const paramPartySize = parseInt(urlParams.get('partySize')) || 1
     const paramMembers = urlParams.get('members')
@@ -363,7 +364,7 @@ const AgarIOGame = () => {
     const paramStake = urlParams.get('stake') || 'FREE'
     const paramDirectPlay = urlParams.get('directPlay') === 'true' // NEW: Direct play parameter
     
-    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramPartyId, paramPartySize, paramMembers, paramDirectPlay })
+    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramRoomId, paramPartyId, paramPartySize, paramMembers, paramDirectPlay })
     
     // GLOBAL MULTIPLAYER: Handle direct play mode using Hathora global servers
     if (paramDirectPlay) {
@@ -379,6 +380,24 @@ const AgarIOGame = () => {
         router.push('/')
       }
       return // Exit early - direct play mode handled
+    }
+    
+    // FIXED: Handle roomId parameter - this indicates global multiplayer mode
+    if (paramRoomId) {
+      console.log('🌍 Room ID detected - connecting to global multiplayer:', paramRoomId)
+      
+      if (user && getAccessToken) {
+        console.log('🌍 Authenticated user - connecting to global multiplayer server')
+        // Use multiplayer mode for room-based games (includes session tracking)
+        initializeMultiplayer(paramPartyId, paramPartySize, paramMembers).catch((error) => {
+          console.error('🔄 Global multiplayer failed, falling back to offline mode:', error)
+          initializeGame(false) // Fallback to offline mode
+        })
+      } else {
+        console.log('🔐 User not authenticated for global multiplayer - redirecting to login')
+        router.push('/')
+      }
+      return // Exit early - roomId mode handled
     }
     
     // Check if user is authenticated and determine game mode
