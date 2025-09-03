@@ -44,49 +44,49 @@ def make_request(method, endpoint, data=None, params=None):
         print(f"❌ Request failed: {e}")
         return None
 
-def test_current_party_status():
-    """Test 1: Check current party status for robiee user"""
+def test_party_creation():
+    """Test 1: Create a party for game initialization testing"""
     print("\n" + "="*80)
-    print("🔍 TEST 1: CHECKING CURRENT PARTY STATUS FOR ROBIEE")
+    print("🎯 TEST 1: PARTY CREATION FOR GAME INITIALIZATION")
     print("="*80)
     
-    # Check party status for robiee
-    print(f"📡 Checking party status for user: {TEST_USER_ROBIEE['userId']}")
-    response = make_request('GET', 'current', params={'userId': TEST_USER_ROBIEE['userId']})
+    # Clean up any existing parties first
+    print("🧹 Cleaning up any existing parties...")
+    for user in [TEST_USER_ALICE, TEST_USER_BOB]:
+        cleanup_response = make_request('GET', 'current', params={'userId': user['userId']})
+        if cleanup_response and cleanup_response.status_code == 200:
+            data = cleanup_response.json()
+            if data.get('hasParty') and data.get('party'):
+                party_id = data['party']['id']
+                print(f"   Leaving existing party {party_id} for {user['username']}")
+                make_request('POST', 'leave', data={'partyId': party_id, 'userId': user['userId']})
+    
+    # Create new party with Alice as owner
+    print(f"\n🎉 Creating new party with {TEST_USER_ALICE['username']} as owner")
+    create_data = {
+        'ownerId': TEST_USER_ALICE['userId'],
+        'ownerUsername': TEST_USER_ALICE['username'],
+        'partyName': f"{TEST_USER_ALICE['username']}'s Game Party"
+    }
+    
+    print(f"📤 Party creation data: {json.dumps(create_data, indent=2)}")
+    
+    response = make_request('POST', 'create', data=create_data)
     
     if response and response.status_code == 200:
         data = response.json()
-        print(f"✅ Party status response: {response.status_code}")
-        print(f"📊 Response data: {json.dumps(data, indent=2)}")
+        print(f"✅ Party created successfully!")
+        print(f"📊 Response: {json.dumps(data, indent=2)}")
         
-        if data.get('hasParty') and data.get('party'):
-            party = data['party']
-            print(f"\n🎉 FOUND EXISTING PARTY:")
-            print(f"   Party ID: {party.get('id')}")
-            print(f"   Party Name: {party.get('name')}")
-            print(f"   Owner ID: {party.get('ownerId')}")
-            print(f"   Owner Username: {party.get('ownerUsername')}")
-            print(f"   Member Count: {party.get('memberCount')}")
-            
-            if party.get('members'):
-                print(f"   Members:")
-                for member in party['members']:
-                    print(f"     - ID: {member.get('id')}")
-                    print(f"       Username: {member.get('username')}")
-                    print(f"       Role: {member.get('role')}")
-                    
-                    # Check if this is where WorkflowUser1 is coming from
-                    if member.get('username') == 'WorkflowUser1':
-                        print(f"🚨 FOUND 'WorkflowUser1' IN PARTY MEMBERS!")
-                        print(f"   Member ID: {member.get('id')}")
-                        print(f"   This might be the source of the username issue")
-            
-            return party
+        party_id = data.get('partyId')
+        if party_id:
+            print(f"🎯 Party ID: {party_id}")
+            return party_id
         else:
-            print("ℹ️ User is not currently in any party")
+            print("❌ No party ID returned")
             return None
     else:
-        print(f"❌ Failed to get party status: {response.status_code if response else 'No response'}")
+        print(f"❌ Failed to create party: {response.status_code if response else 'No response'}")
         if response:
             print(f"   Error: {response.text}")
         return None
