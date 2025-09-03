@@ -1,0 +1,24 @@
+{
+  "name": "turfloot-hathora",
+  "version": "0.1.0",
+  "description": "TurfLoot Hathora Server - Node.js 18/20 Compatible",
+  "main": "hathora-server.js",
+  "scripts": {
+    "start": "node hathora-server.js",
+    "dev": "NODE_ENV=development node hathora-server.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.5",
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5",
+    "mongodb": "^6.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0 <21.0.0"
+  },
+  "keywords": ["hathora", "multiplayer", "game-server", "socket.io"],
+  "author": "TurfLoot",
+  "license": "MIT"
+}
