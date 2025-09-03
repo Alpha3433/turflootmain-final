@@ -2241,6 +2241,18 @@ const AgarIOGame = () => {
           setGameResult('Disconnected from server')
           setIsGameOver(true)
         }
+        
+        // Track player leaving game session for server browser
+        if (paramRoomId && user) {
+          fetch('/api/game-sessions/leave', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              roomId: paramRoomId,
+              playerId: user.id || user.privyId
+            })
+          }).catch(err => console.log('Session cleanup failed:', err.message))
+        }
       })
 
       // NEW: Spectator event handlers
