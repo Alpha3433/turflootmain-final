@@ -41,12 +41,19 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     }
   }
 
-  // Auto-refresh every 5 seconds when modal is open
+  // Auto-refresh every 3 seconds when modal is open (faster for real-time updates)
   useEffect(() => {
     if (isOpen) {
+      console.log('🌐 Server Browser opened - starting real-time updates')
       fetchServers()
-      const interval = setInterval(() => fetchServers(true), 5000)
-      return () => clearInterval(interval)
+      const interval = setInterval(() => {
+        console.log('🔄 Auto-refreshing server data for real-time player counts')
+        fetchServers(true)
+      }, 3000) // Changed from 5000ms to 3000ms for faster updates
+      return () => {
+        console.log('🌐 Server Browser closed - stopping real-time updates')
+        clearInterval(interval)
+      }
     }
   }, [isOpen])
 
