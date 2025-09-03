@@ -1,0 +1,16 @@
+{
+  "name": "turfloot-hathora-minimal",
+  "version": "0.1.0",
+  "description": "TurfLoot Hathora Server - Zero Dependencies",
+  "main": "hathora-server-standalone.js",
+  "scripts": {
+    "start": "node hathora-server-standalone.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0 <21.0.0"
+  },
+  "keywords": ["hathora", "multiplayer", "websocket", "nodejs"],
+  "author": "TurfLoot",
+  "license": "MIT"
+}
