@@ -9,23 +9,20 @@ build:
     - yarn install
     - yarn build
   
-# Dockerfile configuration - Clean Node.js 18 build without uWebSockets.js
+# Dockerfile configuration - Zero Dependencies to avoid uWebSockets.js
 dockerfile: |
   FROM node:18-alpine
   WORKDIR /app
   
-  # Copy minimal package.json first
-  COPY hathora-package.json package.json
-  COPY yarn.lock ./
+  # Copy minimal package.json with NO dependencies  
+  COPY hathora-minimal-package.json package.json
   RUN yarn install --frozen-lockfile --production
   
-  # Copy only required files
-  COPY hathora-server.js ./
-  COPY lib/ ./lib/
-  COPY .env* ./
+  # Copy only the standalone server (no lib/ dependencies)
+  COPY hathora-server-standalone.js ./
   
   EXPOSE 4000
-  CMD ["node", "hathora-server.js"]
+  CMD ["node", "hathora-server-standalone.js"]
 
 # Global regions for low latency worldwide including Oceania
 regions:
