@@ -76,7 +76,7 @@ const AgarIOGame = () => {
         if (timezone.includes('America')) {
           defaultRegion = timezone.includes('Los_Angeles') ? 
             hathoraRegions.find(r => r.id === 'seattle') : 
-            hathoraRegions.find(r => r.id === 'washington-dc')
+            hathoraRegions.find(r => r.id === 'washingtondc')
         } else if (timezone.includes('Europe')) {
           defaultRegion = hathoraRegions.find(r => r.id === 'london')
         } else if (timezone.includes('Asia')) {
