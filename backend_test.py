@@ -55,99 +55,66 @@ def test_api_endpoint(method, endpoint, data=None, expected_status=200):
     except requests.exceptions.RequestException as e:
         print(f"  ❌ Request failed: {str(e)}")
         return {"error": str(e)}, 0
-        print(f"{status} {test_name}")
-        if details:
-            print(f"    {details}")
-        if response_time > 0:
-            print(f"    Response time: {response_time:.3f}s")
-        print()
 
-    def test_1_party_creation_with_alice(self):
-        """Test 1: Create party with Alice as owner"""
-        print("🎯 TEST 1: PARTY CREATION WITH ALICE AS OWNER")
-        print("=" * 60)
+def test_server_browser_mock_data_removal():
+    """Test 1: Verify Server Browser no longer returns mock/fake player counts"""
+    print("\n🧪 TEST 1: MOCK DATA REMOVAL VERIFICATION")
+    print("-" * 50)
+    
+    # Get server browser data multiple times to check for consistency
+    server_data_samples = []
+    
+    for i in range(3):
+        print(f"  📊 Sample {i+1}/3: Fetching server browser data...")
+        data, response_time = test_api_endpoint('GET', 'servers/lobbies')
         
-        try:
-            start_time = time.time()
-            
-            # Create party with Alice as owner
-            create_data = {
-                "ownerId": ALICE_USER_ID,
-                "ownerUsername": ALICE_USERNAME,
-                "partyName": "Alice & Bob Test Party"
-            }
-            
-            response = requests.post(f"{PARTY_API_BASE}/create", json=create_data, timeout=10)
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('success') and data.get('partyId'):
-                    self.party_id = data['partyId']
-                    self.log_test(
-                        "Party Creation", 
-                        True, 
-                        f"Party created successfully: {self.party_id}",
-                        response_time
-                    )
-                    return True
-                else:
-                    self.log_test("Party Creation", False, f"Invalid response structure: {data}")
-                    return False
-            else:
-                self.log_test("Party Creation", False, f"HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Party Creation", False, f"Exception: {str(e)}")
+        if 'error' not in data:
+            server_data_samples.append(data)
+            print(f"  ✅ Retrieved {len(data.get('servers', []))} servers")
+        else:
+            print(f"  ❌ Failed to get server data: {data}")
             return False
-
-    def test_2_invite_bob_to_party(self):
-        """Test 2: Invite Bob to the party"""
-        print("🎯 TEST 2: INVITE BOB TO PARTY")
-        print("=" * 60)
         
-        if not self.party_id:
-            self.log_test("Bob Invitation", False, "No party ID available")
+        time.sleep(1)  # Small delay between requests
+    
+    # Analyze server data for mock patterns
+    print("\n  🔍 ANALYZING SERVER DATA FOR MOCK PATTERNS:")
+    
+    if len(server_data_samples) < 2:
+        print("  ❌ Insufficient data samples for analysis")
+        return False
+    
+    # Check if player counts are consistent (real data) vs random (mock data)
+    first_sample = server_data_samples[0]
+    second_sample = server_data_samples[1]
+    
+    first_servers = {s['id']: s['currentPlayers'] for s in first_sample.get('servers', [])}
+    second_servers = {s['id']: s['currentPlayers'] for s in second_sample.get('servers', [])}
+    
+    # Real player tracking should show consistent counts for same servers
+    consistent_counts = 0
+    total_servers = 0
+    
+    for server_id in first_servers:
+        if server_id in second_servers:
+            total_servers += 1
+            if first_servers[server_id] == second_servers[server_id]:
+                consistent_counts += 1
+    
+    if total_servers > 0:
+        consistency_rate = (consistent_counts / total_servers) * 100
+        print(f"  📊 Player count consistency: {consistency_rate:.1f}% ({consistent_counts}/{total_servers})")
+        
+        # Real player tracking should show high consistency (players don't change rapidly)
+        if consistency_rate >= 80:
+            print("  ✅ HIGH CONSISTENCY - Indicates real player tracking (not random mock data)")
+            return True
+        else:
+            print("  ⚠️ LOW CONSISTENCY - May indicate mock/random data generation")
             return False
-            
-        try:
-            start_time = time.time()
-            
-            invite_data = {
-                "partyId": self.party_id,
-                "fromUserId": ALICE_USER_ID,
-                "toUserId": BOB_USER_ID,
-                "toUsername": BOB_USERNAME
-            }
-            
-            response = requests.post(f"{PARTY_API_BASE}/invite", json=invite_data, timeout=10)
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('success'):
-                    self.log_test(
-                        "Bob Invitation", 
-                        True, 
-                        f"Invitation sent successfully: {data.get('invitationId')}",
-                        response_time
-                    )
-                    return True
-                else:
-                    self.log_test("Bob Invitation", False, f"Invitation failed: {data}")
-                    return False
-            else:
-                self.log_test("Bob Invitation", False, f"HTTP {response.status_code}: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Bob Invitation", False, f"Exception: {str(e)}")
-            return False
-
-    def test_3_bob_accept_invitation(self):
-        """Test 3: Bob accepts the party invitation"""
-        print("🎯 TEST 3: BOB ACCEPTS PARTY INVITATION")
+    else:
+        print("  ❌ No servers found for comparison")
+        return False
         print("=" * 60)
         
         try:
