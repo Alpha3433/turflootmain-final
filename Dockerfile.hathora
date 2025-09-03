@@ -1,0 +1,19 @@
+# Zero Dependencies Hathora Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy only the minimal package.json with ZERO dependencies
+COPY hathora-minimal-package.json package.json
+
+# Install dependencies (should be empty, but ensures clean state)
+RUN yarn install --frozen-lockfile --production
+
+# Copy ONLY the standalone server file
+COPY hathora-server-standalone.js hathora-server.js
+
+# Expose port
+EXPOSE 4000
+
+# Start the zero-dependency server
+CMD ["node", "hathora-server.js"]
