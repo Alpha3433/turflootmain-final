@@ -456,13 +456,26 @@ export async function GET(request, { params }) {
         // Import Hathora client for room management
         const hathoraClient = await import('../../../lib/hathoraClient.js')
         
-        // Get real Hathora rooms and server data
+        // Get real server data with actual player tracking
         let serverData = []
         
         try {
+          // Connect to MongoDB to get real active game sessions
+          const { MongoClient } = await import('mongodb')
+          const client = await MongoClient.connect(process.env.MONGO_URL)
+          const db = client.db('turfloot')
+          
+          // Get active game sessions from database
+          const activeGameSessions = await db.collection('game_sessions').find({
+            status: 'active',
+            lastActivity: { $gt: new Date(Date.now() - 5 * 60 * 1000) } // Active in last 5 minutes
+          }).toArray()
+          
+          console.log(`📊 Found ${activeGameSessions.length} active game sessions`)
+          
           // Get available Hathora regions
           const hathoraRegions = [
-            { id: 'washington-dc', name: 'US-East-1', displayName: 'US East' },
+            { id: 'washingtondc', name: 'US-East-1', displayName: 'US East' },
             { id: 'seattle', name: 'US-West-1', displayName: 'US West' },
             { id: 'london', name: 'EU-West-1', displayName: 'EU West' },
             { id: 'frankfurt', name: 'EU-Central-1', displayName: 'EU Central' },
@@ -472,86 +485,78 @@ export async function GET(request, { params }) {
             { id: 'sydney', name: 'Oceania-1', displayName: 'Oceania' }
           ]
           
-          // Game types available on Hathora
+          // Game types available on Hathora (without mock counts)
           const gameTypes = [
-            { stake: 0, mode: 'practice', name: 'Global Multiplayer', count: 1, maxPlayers: 50, description: 'Free worldwide multiplayer' },
-            { stake: 1, mode: 'cash', name: '$1 Cash Game', count: 2, maxPlayers: 6, description: 'Low stakes competitive' },
-            { stake: 5, mode: 'cash', name: '$5 Cash Game', count: 2, maxPlayers: 6, description: 'Medium stakes competitive' },
-            { stake: 20, mode: 'cash', name: '$20 High Stakes', count: 1, maxPlayers: 4, description: 'High stakes competitive' }
+            { stake: 0, mode: 'practice', name: 'Global Multiplayer', maxPlayers: 50, description: 'Free worldwide multiplayer' },
+            { stake: 1, mode: 'cash', name: '$1 Cash Game', maxPlayers: 6, description: 'Low stakes competitive' },
+            { stake: 5, mode: 'cash', name: '$5 Cash Game', maxPlayers: 6, description: 'Medium stakes competitive' },
+            { stake: 20, mode: 'cash', name: '$20 High Stakes', maxPlayers: 4, description: 'High stakes competitive' }
           ]
 
-          // Create real Hathora rooms
-          for (const region of hathoraRegions) {
-            for (const gameType of gameTypes) {
-              for (let serverNum = 1; serverNum <= gameType.count; serverNum++) {
-                const roomId = gameType.mode === 'practice' ? 
-                  'global-practice-bots' : 
-                  `${region.id}-${gameType.mode}-${gameType.stake}-${serverNum}`
-                
-                // Calculate regional ping estimates
-                const basePing = region.id.includes('washington') ? 25 : 
-                               region.id.includes('seattle') ? 35 : 
-                               region.id.includes('london') ? 85 :
-                               region.id.includes('frankfurt') ? 95 :
-                               region.id.includes('singapore') ? 180 :
-                               region.id.includes('tokyo') ? 190 :
-                               region.id.includes('mumbai') ? 220 :
-                               region.id.includes('sydney') ? 280 : 100
-                
-                const ping = basePing + Math.floor(Math.random() * 20) - 10
-                
-                // Simulate real player activity (would be replaced by actual Hathora room data)
-                const currentPlayers = gameType.mode === 'practice' ? 
-                  Math.floor(Math.random() * 8) + 2 : // Practice rooms: 2-10 players
-                  Math.floor(Math.random() * gameType.maxPlayers) // Cash games: 0-max players
-                
-                const isActive = currentPlayers > 0
-                const waitingPlayers = Math.max(0, Math.floor(Math.random() * 3) - 1)
-                
-                // Server status based on player activity
-                let status = 'waiting'
-                if (currentPlayers >= gameType.maxPlayers) {
-                  status = 'full'
-                } else if (isActive) {
-                  status = 'active'
-                }
-                
-                serverData.push({
-                  id: roomId,
-                  hathoraRoomId: roomId, // Actual Hathora room identifier
-                  name: gameType.mode === 'practice' ? 
-                    `${gameType.name} (${region.displayName})` :
-                    `${region.displayName} - ${gameType.name} #${serverNum}`,
-                  region: region.name,
-                  regionId: region.id, // Hathora region ID
-                  stake: gameType.stake,
-                  mode: gameType.mode,
-                  gameType: gameType.name,
-                  description: gameType.description,
-                  currentPlayers,
-                  maxPlayers: gameType.maxPlayers,
-                  minPlayers: gameType.mode === 'cash' ? 2 : 1,
-                  waitingPlayers,
-                  isRunning: isActive,
-                  ping,
-                  avgWaitTime: status === 'active' ? 'Join Now' : 
-                              status === 'full' ? 'Full' : '< 30s',
-                  difficulty: gameType.stake >= 20 ? 'High' : 
-                             gameType.stake >= 5 ? 'Medium' : 
-                             gameType.stake > 0 ? 'Easy' : 'Practice',
-                  entryFee: gameType.stake,
-                  potentialWinning: gameType.stake > 0 ? gameType.stake * gameType.maxPlayers * 0.85 : 0,
-                  status,
-                  // Hathora-specific data
-                  serverType: 'hathora',
-                  lastUpdated: new Date().toISOString(),
-                  canJoin: status !== 'full'
-                })
-              }
+          // Create room tracking map for real player counts
+          const roomPlayerCounts = new Map()
+          
+          // Count real players in each room from active sessions
+          activeGameSessions.forEach(session => {
+            const roomId = session.roomId || session.hathoraRoomId
+            if (roomId) {
+              const current = roomPlayerCounts.get(roomId) || 0
+              roomPlayerCounts.set(roomId, current + 1)
             }
+          })
+          
+          console.log(`🎮 Room player counts:`, Object.fromEntries(roomPlayerCounts))
+          
+          // Only show the Global Multiplayer room (no regional duplicates)
+          const globalGameType = gameTypes.find(gt => gt.mode === 'practice')
+          const primaryRegion = hathoraRegions.find(r => r.id === 'washingtondc') // Use US East as primary
+          
+          if (globalGameType && primaryRegion) {
+            const roomId = 'global-practice-bots'
+            const realPlayerCount = roomPlayerCounts.get(roomId) || 0
+            
+            // Calculate ping for primary region
+            const basePing = 25 // US East base ping
+            const ping = basePing + Math.floor(Math.random() * 10) // Small variation
+            
+            // Server status based on real player activity
+            let status = 'waiting'
+            if (realPlayerCount >= globalGameType.maxPlayers) {
+              status = 'full'
+            } else if (realPlayerCount > 0) {
+              status = 'active'
+            }
+            
+            serverData.push({
+              id: roomId,
+              hathoraRoomId: roomId,
+              name: `${globalGameType.name} (${primaryRegion.displayName})`,
+              region: primaryRegion.name,
+              regionId: primaryRegion.id,
+              stake: globalGameType.stake,
+              mode: globalGameType.mode,
+              gameType: globalGameType.name,
+              description: globalGameType.description,
+              currentPlayers: realPlayerCount, // REAL PLAYER COUNT
+              maxPlayers: globalGameType.maxPlayers,
+              minPlayers: 1,
+              waitingPlayers: 0, // No waiting queue for practice
+              isRunning: realPlayerCount > 0,
+              ping,
+              avgWaitTime: status === 'active' ? 'Join Now' : 
+                          status === 'full' ? 'Full' : 'Instant',
+              difficulty: 'Practice',
+              entryFee: 0,
+              potentialWinning: 0,
+              status,
+              serverType: 'hathora',
+              lastUpdated: new Date().toISOString(),
+              canJoin: status !== 'full'
+            })
           }
           
-          console.log(`✅ Generated ${serverData.length} Hathora server entries across ${hathoraRegions.length} regions`)
+          await client.close()
+          console.log(`✅ Server browser showing real data: ${serverData.length} servers with actual player counts`)
           
         } catch (hathoraError) {
           console.error('❌ Error generating Hathora server data:', hathoraError)
