@@ -360,21 +360,24 @@ export default function PartyLobbySystem({
             console.log('🎮 AUTO-JOINING PARTY GAME from notification!')
             console.log('🎯 Game data:', latestNotification.data)
             
-            const gameData = {
-              roomType: latestNotification.data.roomType,
-              entryFee: latestNotification.data.entryFee,
-              gameRoomId: latestNotification.data.gameRoomId,
-              partyMode: true,
-              partyId: latestNotification.data.partyId,
-              partySize: latestNotification.data.partyMembers?.length || 2,
-              partyMembers: latestNotification.data.partyMembers || []
-            }
-            
-            console.log('🚀 Calling onGameStart with:', gameData)
-            onGameStart(gameData)
-            
-            console.log('🔄 Closing Party Lobby modal')
-            onClose() // Close party lobby modal
+            // CRITICAL FIX: Add delay to ensure proper coordination
+            setTimeout(() => {
+              const gameData = {
+                roomType: latestNotification.data.roomType,
+                entryFee: latestNotification.data.entryFee,
+                gameRoomId: latestNotification.data.gameRoomId,
+                partyMode: true,
+                partyId: latestNotification.data.partyId,
+                partySize: latestNotification.data.partyMembers?.length || 2,
+                partyMembers: latestNotification.data.partyMembers || []
+              }
+              
+              console.log('🚀 Calling onGameStart with:', gameData)
+              onGameStart(gameData)
+              
+              console.log('🔄 Closing Party Lobby modal')
+              onClose() // Close party lobby modal
+            }, 2000) // 2 second delay to ensure proper game room setup
             
             return // Exit after successful auto-join
           } else {
