@@ -113,6 +113,18 @@ test_plan:
     - "Production Infrastructure Verification"
   stuck_tasks: []
 backend:
+  - task: "Fix Hathora Multiplayer Process Creation"
+    implemented: false
+    working: false
+    file: "/app/lib/hathoraClient.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "main"
+        - comment: "User reports no new Hathora processes appear when joining Global Multiplayer (US East) via Server Browser. Root cause identified: line 134 in hathoraClient.js has bypass logic that connects global-practice-bots to local server instead of creating Hathora processes. This was implemented due to previous deployment issues but prevents actual Hathora process creation."
+
   - task: "Mobile Customization Screen Redesign"
     implemented: false
     working: "NA"
