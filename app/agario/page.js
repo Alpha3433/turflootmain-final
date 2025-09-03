@@ -2192,6 +2192,19 @@ const AgarIOGame = () => {
         console.log('✅ Connected to game server:', socket.id)
         setIsConnected(true)
         
+        // Track player joining game session for server browser
+        if (paramRoomId && user) {
+          fetch('/api/game-sessions/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              roomId: paramRoomId,
+              playerId: user.id || user.privyId,
+              playerName: user.google?.name || user.email?.address || 'Player'
+            })
+          }).catch(err => console.log('Session tracking failed:', err.message))
+        }
+        
         if (spectatorOnly) {
           // NEW: Join as spectator instead of active player
           console.log('👁️ Connecting as spectator to room:', paramRoomId)
