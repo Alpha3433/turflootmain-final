@@ -21,16 +21,16 @@ const AgarIOGame = () => {
   
   const measureHathoraPing = async () => {
     try {
-      // Get available Hathora regions
+      // Get available Hathora regions with REAL ping endpoints
       const hathoraRegions = [
-        { id: 'washington-dc', name: 'US East', endpoint: 'https://ping-us-east.hathora.dev/ping' },
-        { id: 'seattle', name: 'US West', endpoint: 'https://ping-us-west.hathora.dev/ping' },
-        { id: 'london', name: 'EU West', endpoint: 'https://ping-eu-west.hathora.dev/ping' },
-        { id: 'frankfurt', name: 'EU Central', endpoint: 'https://ping-eu-central.hathora.dev/ping' },
-        { id: 'singapore', name: 'Asia SE', endpoint: 'https://ping-asia-southeast.hathora.dev/ping' },
-        { id: 'tokyo', name: 'Asia East', endpoint: 'https://ping-asia-east.hathora.dev/ping' },
-        { id: 'mumbai', name: 'Asia South', endpoint: 'https://ping-asia-south.hathora.dev/ping' },
-        { id: 'sydney', name: 'Oceania', endpoint: 'https://ping-oceania.hathora.dev/ping' }
+        { id: 'washingtondc', name: 'US East', endpoint: 'https://washingtondc.ping.hathora.dev' },
+        { id: 'seattle', name: 'US West', endpoint: 'https://seattle.ping.hathora.dev' },
+        { id: 'london', name: 'EU West', endpoint: 'https://london.ping.hathora.dev' },
+        { id: 'frankfurt', name: 'EU Central', endpoint: 'https://frankfurt.ping.hathora.dev' },
+        { id: 'singapore', name: 'Asia SE', endpoint: 'https://singapore.ping.hathora.dev' },
+        { id: 'tokyo', name: 'Asia East', endpoint: 'https://tokyo.ping.hathora.dev' },
+        { id: 'mumbai', name: 'Asia South', endpoint: 'https://mumbai.ping.hathora.dev' },
+        { id: 'sydney', name: 'Oceania', endpoint: 'https://sydney.ping.hathora.dev' }
       ]
       
       // Get current optimal region from localStorage (set by main page)
