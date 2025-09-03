@@ -145,74 +145,74 @@ def test_party_invitation():
             print(f"   Error: {invite_response.text}")
         return None
 
-def test_party_creation_username():
-    """Test 3: Test party creation with robiee username"""
+def test_party_acceptance():
+    """Test 3: Accept party invitation to form complete party"""
     print("\n" + "="*80)
-    print("🎯 TEST 3: TESTING PARTY CREATION WITH ROBIEE USERNAME")
+    print("✅ TEST 3: PARTY INVITATION ACCEPTANCE")
     print("="*80)
     
-    # First, try to leave any existing party
-    print("🚪 Attempting to leave any existing party first...")
-    leave_response = make_request('POST', 'leave', data={
-        'partyId': 'any',  # This should be handled gracefully
-        'userId': TEST_USER_ROBIEE['userId']
-    })
+    # First get Bob's pending invitations
+    print(f"🔍 Checking {TEST_USER_BOB['username']}'s pending invitations...")
+    response = make_request('GET', 'invitations', params={'userId': TEST_USER_BOB['userId']})
     
-    if leave_response:
-        print(f"   Leave response: {leave_response.status_code}")
+    if not response or response.status_code != 200:
+        print("❌ Failed to get Bob's invitations")
+        return None
+        
+    data = response.json()
+    invitations = data.get('invitations', [])
     
-    # Create new party with robiee username
-    print(f"\n🎉 Creating new party for {TEST_USER_ROBIEE['username']}")
-    create_data = {
-        'ownerId': TEST_USER_ROBIEE['userId'],
-        'ownerUsername': TEST_USER_ROBIEE['username'],
-        'partyName': f"{TEST_USER_ROBIEE['username']}'s Party"
+    if not invitations:
+        print("❌ No pending invitations found for Bob")
+        return None
+        
+    print(f"✅ Found {len(invitations)} pending invitation(s)")
+    invitation = invitations[0]  # Take the first invitation
+    invitation_id = invitation['id']
+    party_id = invitation['partyId']
+    
+    print(f"📋 Invitation details:")
+    print(f"   ID: {invitation_id}")
+    print(f"   Party ID: {party_id}")
+    print(f"   From: {invitation.get('fromUsername')}")
+    print(f"   Party Name: {invitation.get('partyName')}")
+    
+    # Accept the invitation
+    print(f"\n✅ Accepting invitation...")
+    accept_data = {
+        'invitationId': invitation_id,
+        'userId': TEST_USER_BOB['userId']
     }
     
-    print(f"📤 Party creation data: {json.dumps(create_data, indent=2)}")
+    accept_response = make_request('POST', 'accept-invitation', data=accept_data)
     
-    response = make_request('POST', 'create', data=create_data)
-    
-    if response and response.status_code == 200:
-        data = response.json()
-        print(f"✅ Party created successfully!")
-        print(f"📊 Response: {json.dumps(data, indent=2)}")
+    if accept_response and accept_response.status_code == 200:
+        accept_result = accept_response.json()
+        print(f"✅ Invitation accepted successfully!")
+        print(f"📊 Response: {json.dumps(accept_result, indent=2)}")
         
-        # Immediately check the party status to see what username is stored
-        print(f"\n🔍 Immediately checking party status to verify username...")
-        status_response = make_request('GET', 'current', params={'userId': TEST_USER_ROBIEE['userId']})
+        # Verify party membership
+        print(f"\n🔍 Verifying party membership...")
+        verify_response = make_request('GET', 'current', params={'userId': TEST_USER_BOB['userId']})
         
-        if status_response and status_response.status_code == 200:
-            status_data = status_response.json()
-            if status_data.get('party'):
-                party = status_data['party']
-                print(f"✅ Party verification:")
-                print(f"   Owner Username: {party.get('ownerUsername')}")
-                print(f"   Party Name: {party.get('name')}")
-                
-                if party.get('members'):
-                    for member in party['members']:
-                        print(f"   Member: {member.get('username')} (Role: {member.get('role')})")
-                        
-                        # Check if the username matches what we expect
-                        if member.get('role') == 'owner':
-                            expected_username = TEST_USER_ROBIEE['username']
-                            actual_username = member.get('username')
-                            
-                            if actual_username == expected_username:
-                                print(f"✅ Username matches expected: {actual_username}")
-                            else:
-                                print(f"🚨 USERNAME MISMATCH!")
-                                print(f"   Expected: {expected_username}")
-                                print(f"   Actual: {actual_username}")
-                                print(f"   This could be the source of the issue!")
-                
-                return party
-        
+        if verify_response and verify_response.status_code == 200:
+            verify_data = verify_response.json()
+            if verify_data.get('hasParty'):
+                party = verify_data['party']
+                print(f"✅ Bob is now in party: {party.get('name')}")
+                print(f"   Member count: {party.get('memberCount')}")
+                print(f"   Members: {[m.get('username') for m in party.get('members', [])]}")
+                return party_id
+            else:
+                print("❌ Bob is not in any party after accepting invitation")
+                return None
+        else:
+            print("❌ Failed to verify party membership")
+            return None
     else:
-        print(f"❌ Failed to create party: {response.status_code if response else 'No response'}")
-        if response:
-            print(f"   Error: {response.text}")
+        print(f"❌ Failed to accept invitation: {accept_response.status_code if accept_response else 'No response'}")
+        if accept_response:
+            print(f"   Error: {accept_response.text}")
         return None
 
 def test_username_verification():
