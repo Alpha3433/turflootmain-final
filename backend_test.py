@@ -410,44 +410,6 @@ def run_all_tests():
 
 if __name__ == "__main__":
     run_all_tests()
-        
-        # 1. Root API endpoint
-        self.test_api_endpoint("/api/", test_name="Root API Endpoint")
-        
-        # 2. Ping endpoint (specifically mentioned in review request)
-        self.test_api_endpoint("/api/ping", test_name="Ping Endpoint")
-        
-        # 3. Server Browser (core game API)
-        self.test_api_endpoint("/api/servers/lobbies", test_name="Server Browser API")
-        
-        # 4. Live Statistics APIs
-        self.test_api_endpoint("/api/stats/live-players", test_name="Live Players Statistics")
-        self.test_api_endpoint("/api/stats/global-winnings", test_name="Global Winnings Statistics")
-        
-        # 5. Leaderboard API
-        self.test_api_endpoint("/api/users/leaderboard", test_name="Leaderboard API")
-        
-        # 6. Wallet Balance (authentication endpoint)
-        self.test_api_endpoint("/api/wallet/balance", test_name="Wallet Balance API")
-        
-    def test_hathora_environment_config(self):
-        """Test Hathora environment variables are properly configured"""
-        print("🌍 TESTING HATHORA ENVIRONMENT CONFIGURATION")
-        print("=" * 50)
-        
-        # Check if environment variables are accessible through API
-        # Since we can't directly access env vars, we'll test if the system is working
-        success, data = self.test_api_endpoint("/api/", test_name="Environment Config Check")
-        
-        if success and data:
-            # Check if the API response indicates proper configuration
-            if isinstance(data, dict) and 'features' in data:
-                features = data.get('features', [])
-                if 'multiplayer' in features:
-                    self.log_test("Hathora Multiplayer Feature", True, "Multiplayer feature enabled in API response")
-                else:
-                    self.log_test("Hathora Multiplayer Feature", False, "Multiplayer feature not found in API response")
-            else:
                 self.log_test("Hathora Environment Config", True, "API responding normally, environment likely configured")
         
     def test_game_server_integration(self):
