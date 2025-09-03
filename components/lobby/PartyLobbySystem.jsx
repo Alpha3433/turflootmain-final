@@ -501,8 +501,8 @@ export default function PartyLobbySystem({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ownerId: userId,
-          ownerUsername: displayName,
-          partyName: `${displayName}'s Party`
+          ownerUsername: effectiveUsername,
+          partyName: `${effectiveUsername}'s Party`
         })
       })
 
