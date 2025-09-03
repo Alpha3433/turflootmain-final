@@ -2209,15 +2209,34 @@ const AgarIOGame = () => {
         
         // Track player joining game session for server browser
         if (paramRoomId && user) {
+          const sessionData = {
+            roomId: paramRoomId,
+            playerId: user.id || user.privyId,
+            playerName: user.google?.name || user.email?.address || 'Player'
+          }
+          
+          console.log('🎮 TRACKING: Player joining game session for server browser')
+          console.log('📊 Session data:', sessionData)
+          
           fetch('/api/game-sessions/join', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              roomId: paramRoomId,
-              playerId: user.id || user.privyId,
-              playerName: user.google?.name || user.email?.address || 'Player'
-            })
-          }).catch(err => console.log('Session tracking failed:', err.message))
+            body: JSON.stringify(sessionData)
+          })
+          .then(response => response.json())
+          .then(result => {
+            console.log('✅ SESSION TRACKING SUCCESS:', result)
+          })
+          .catch(err => {
+            console.error('❌ SESSION TRACKING FAILED:', err)
+          })
+        } else {
+          console.log('⚠️ SESSION TRACKING SKIPPED:', { 
+            hasRoomId: !!paramRoomId, 
+            hasUser: !!user,
+            roomId: paramRoomId,
+            userId: user?.id || user?.privyId
+          })
         }
         
         if (spectatorOnly) {
