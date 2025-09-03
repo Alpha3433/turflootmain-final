@@ -448,6 +448,77 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Game session tracking endpoint
+    if (route === 'game-sessions/join') {
+      try {
+        const { roomId, playerId, playerName } = await request.json()
+        
+        if (!roomId || !playerId) {
+          return NextResponse.json({ error: 'roomId and playerId required' }, { status: 400, headers: corsHeaders })
+        }
+        
+        console.log(`🎮 Player ${playerName || playerId} joining room ${roomId}`)
+        
+        // Connect to MongoDB
+        const { MongoClient } = await import('mongodb')
+        const client = await MongoClient.connect(process.env.MONGO_URL)
+        const db = client.db('turfloot')
+        
+        // Update or create game session
+        await db.collection('game_sessions').updateOne(
+          { playerId, roomId },
+          {
+            $set: {
+              playerId,
+              playerName,
+              roomId,
+              status: 'active',
+              joinedAt: new Date(),
+              lastActivity: new Date()
+            }
+          },
+          { upsert: true }
+        )
+        
+        await client.close()
+        
+        return NextResponse.json({ success: true, message: 'Player joined session' }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error tracking game session join:', error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500, headers: corsHeaders })
+      }
+    }
+    
+    // Game session leave endpoint
+    if (route === 'game-sessions/leave') {
+      try {
+        const { roomId, playerId } = await request.json()
+        
+        if (!roomId || !playerId) {
+          return NextResponse.json({ error: 'roomId and playerId required' }, { status: 400, headers: corsHeaders })
+        }
+        
+        console.log(`🚪 Player ${playerId} leaving room ${roomId}`)
+        
+        // Connect to MongoDB
+        const { MongoClient } = await import('mongodb')
+        const client = await MongoClient.connect(process.env.MONGO_URL)
+        const db = client.db('turfloot')
+        
+        // Remove game session
+        await db.collection('game_sessions').deleteOne({ playerId, roomId })
+        
+        await client.close()
+        
+        return NextResponse.json({ success: true, message: 'Player left session' }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error tracking game session leave:', error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // Enhanced Server Browser endpoint with Hathora integration
     if (route === 'servers/lobbies') {
       try {
