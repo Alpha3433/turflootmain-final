@@ -215,56 +215,85 @@ def test_party_acceptance():
             print(f"   Error: {accept_response.text}")
         return None
 
-def test_username_verification():
-    """Test 4: Verify username handling in party system"""
+def test_party_game_start():
+    """Test 4: Start party game and create game room"""
     print("\n" + "="*80)
-    print("🔍 TEST 4: USERNAME VERIFICATION IN PARTY SYSTEM")
+    print("🎮 TEST 4: PARTY GAME INITIALIZATION - START GAME")
     print("="*80)
     
-    # Test different username scenarios
-    test_scenarios = [
-        {
-            'name': 'Robiee User',
-            'userId': TEST_USER_ROBIEE['userId'],
-            'username': TEST_USER_ROBIEE['username']
-        },
-        {
-            'name': 'WorkflowUser1 User',
-            'userId': TEST_USER_WORKFLOW['userId'],
-            'username': TEST_USER_WORKFLOW['username']
-        }
-    ]
+    # Get Alice's current party (she should be the owner)
+    print(f"🔍 Getting {TEST_USER_ALICE['username']}'s current party...")
+    response = make_request('GET', 'current', params={'userId': TEST_USER_ALICE['userId']})
     
-    for scenario in test_scenarios:
-        print(f"\n📋 Testing scenario: {scenario['name']}")
-        print(f"   User ID: {scenario['userId']}")
-        print(f"   Username: {scenario['username']}")
+    if not response or response.status_code != 200:
+        print("❌ Failed to get Alice's party status")
+        return None
         
-        # Check current party status
-        response = make_request('GET', 'current', params={'userId': scenario['userId']})
+    data = response.json()
+    if not data.get('hasParty') or not data.get('party'):
+        print("❌ Alice doesn't have a party")
+        return None
         
-        if response and response.status_code == 200:
-            data = response.json()
-            if data.get('hasParty'):
-                party = data['party']
-                print(f"   ✅ Has party: {party.get('name')}")
-                print(f"   Owner Username: {party.get('ownerUsername')}")
-                
-                # Check member usernames
-                if party.get('members'):
-                    for member in party['members']:
-                        if member.get('id') == scenario['userId']:
-                            print(f"   Member Username: {member.get('username')}")
-                            
-                            # Verify username consistency
-                            if member.get('username') != scenario['username']:
-                                print(f"   🚨 USERNAME INCONSISTENCY DETECTED!")
-                                print(f"      Expected: {scenario['username']}")
-                                print(f"      Found: {member.get('username')}")
-            else:
-                print(f"   ℹ️ No party found")
+    party = data['party']
+    party_id = party['id']
+    member_count = party.get('memberCount', 0)
+    
+    print(f"✅ Found Alice's party: {party_id}")
+    print(f"   Member count: {member_count}")
+    print(f"   Members: {[m.get('username') for m in party.get('members', [])]}")
+    
+    if member_count != 2:
+        print(f"❌ Party must have exactly 2 members for game start (has {member_count})")
+        return None
+    
+    # Start party game
+    print(f"\n🎮 Starting party game...")
+    game_start_data = {
+        'partyId': party_id,
+        'roomType': 'FREE',  # Test with free room first
+        'entryFee': 0,
+        'ownerId': TEST_USER_ALICE['userId']
+    }
+    
+    print(f"📋 Game start data: {json.dumps(game_start_data, indent=2)}")
+    
+    start_response = make_request('POST', 'start-game', data=game_start_data)
+    
+    if start_response and start_response.status_code == 200:
+        start_result = start_response.json()
+        print(f"✅ Party game started successfully!")
+        print(f"📊 Response: {json.dumps(start_result, indent=2)}")
+        
+        game_room_id = start_result.get('gameRoomId')
+        party_members = start_result.get('partyMembers', [])
+        room_type = start_result.get('roomType')
+        entry_fee = start_result.get('entryFee')
+        
+        if game_room_id:
+            print(f"\n🎯 GAME ROOM CREATED:")
+            print(f"   Game Room ID: {game_room_id}")
+            print(f"   Room Type: {room_type}")
+            print(f"   Entry Fee: ${entry_fee}")
+            print(f"   Party Members: {len(party_members)}")
+            
+            for member in party_members:
+                print(f"     - {member.get('username')} ({member.get('userId')})")
+            
+            return {
+                'game_room_id': game_room_id,
+                'party_id': party_id,
+                'room_type': room_type,
+                'entry_fee': entry_fee,
+                'party_members': party_members
+            }
         else:
-            print(f"   ❌ Failed to check party status")
+            print("❌ No game room ID returned")
+            return None
+    else:
+        print(f"❌ Failed to start party game: {start_response.status_code if start_response else 'No response'}")
+        if start_response:
+            print(f"   Error: {start_response.text}")
+        return None
 
 def test_party_data_inspection():
     """Test 5: Deep inspection of party data"""
