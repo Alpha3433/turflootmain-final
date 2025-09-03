@@ -1,10 +1,5 @@
-import path from 'path'
-import fs from 'fs'
-import { fileURLToPath } from 'url'
-import { config as dotenvConfig } from 'dotenv'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const path = require('path')
+const fs = require('fs')
 
 // Disable telemetry and analytics
 process.env.NEXT_TELEMETRY_DISABLED = '1'
@@ -13,7 +8,7 @@ process.env.DISABLE_OPENCOLLECTIVE = 'true'
 // Load environment variables from .env file explicitly
 const envPath = path.join(__dirname, '.env')
 if (fs.existsSync(envPath)) {
-  const envConfig = dotenvConfig({ path: envPath })
+  const envConfig = require('dotenv').config({ path: envPath })
   if (envConfig.error) {
     console.warn('Warning: Could not load .env file:', envConfig.error)
   } else {
