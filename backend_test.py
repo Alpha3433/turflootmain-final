@@ -1,21 +1,31 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Hathora Global Connection UI Updates
-Testing all core API endpoints to ensure no regressions after UI changes.
+Backend Testing Script for Party Lobby Username Issue Debug
+Testing the specific issue where "WorkflowUser1" is displayed instead of "robiee"
 """
 
 import requests
 import json
 import time
-import sys
-from datetime import datetime
+import os
+from urllib.parse import urljoin
 
-# Test Configuration
-BASE_URL = "https://hathora-turfloot.preview.emergentagent.com"
-LOCAL_URL = "http://localhost:3000"
+# Configuration
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+API_BASE = f"{BASE_URL}/party-api"
 
-# Use localhost for testing as per environment configuration
-TEST_URL = LOCAL_URL
+# Test user data - using realistic Privy DID format
+TEST_USER_ROBIEE = {
+    'userId': 'did:privy:cme20s0fl005okz0bmxcr0cp0',  # Real user ID for robiee
+    'username': 'robiee',
+    'displayName': 'robiee'
+}
+
+TEST_USER_WORKFLOW = {
+    'userId': 'did:privy:cmeksdeoe00gzl10bsienvnbk',  # Real user ID that might be showing as WorkflowUser1
+    'username': 'WorkflowUser1',
+    'displayName': 'WorkflowUser1'
+}
 
 class BackendTester:
     def __init__(self):
