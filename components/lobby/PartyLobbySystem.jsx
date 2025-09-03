@@ -421,12 +421,23 @@ export default function PartyLobbySystem({
     // Initial check immediately
     pollNotifications()
     
+    // CRITICAL FIX: Add extra check after party status changes
+    if (currentParty && currentParty.status === 'in_game') {
+      console.log('🎮 Party is in game status - checking for notifications more aggressively')
+      setTimeout(() => {
+        pollNotifications()
+      }, 500) // Check again after 500ms
+      setTimeout(() => {
+        pollNotifications()
+      }, 1500) // And again after 1.5s
+    }
+    
     return () => {
       if (notificationInterval) {
         clearInterval(notificationInterval)
       }
     }
-  }, [checkPartyNotifications])
+  }, [checkPartyNotifications, currentParty?.status])
 
   // Fetch party member balances when party changes  
   useEffect(() => {
