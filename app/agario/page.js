@@ -2319,7 +2319,42 @@ const AgarIOGame = () => {
           partySize: partyData.partySize,
           partyMembers: partyData.partyMembers
         }
+        console.log('🎮 Initializing game with party parameters:', partyParams)
         initializeGame(true, partyParams) // true = multiplayer mode
+        
+        // PARTY MODE FIX: Ensure player spawns immediately in party games
+        setTimeout(() => {
+          if (gameRef.current?.game && !gameRef.current.game.player.alive) {
+            console.log('🚨 PARTY MODE FIX: Player not spawned, forcing spawn...')
+            const game = gameRef.current.game
+            if (game.player.cells.length === 0) {
+              // Re-spawn the player with proper cells
+              const spawnX = (Math.random() - 0.5) * (game.worldSize * 0.8)
+              const spawnY = (Math.random() - 0.5) * (game.worldSize * 0.8)
+              
+              game.player.cells = [{
+                id: 'main',
+                x: spawnX,
+                y: spawnY,
+                mass: 10,
+                radius: Math.sqrt(10 / Math.PI) * 8,
+                velocity: { x: 0, y: 0 },
+                splitTime: 0,
+                mergeLocked: false
+              }]
+              
+              game.player.x = spawnX
+              game.player.y = spawnY
+              game.player.mass = 10
+              game.player.totalMass = 10
+              game.player.alive = true
+              game.player.spawnProtected = true
+              game.player.spawnTime = Date.now()
+              
+              console.log('✅ PARTY MODE FIX: Player force-spawned successfully')
+            }
+          }
+        }, 1000) // Wait 1 second after connection
       })
       
       socket.on('game_state', (gameState) => {
