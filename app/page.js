@@ -1655,19 +1655,32 @@ function HomeContent() {
           </div>
           
           {/* Region Buttons */}
-          {availableRegions.map((region) => (
-            <button
-              key={region.id}
-              onClick={() => handleRegionSelect(region.id)}
-              className={`px-3 py-1 rounded-lg font-bold text-xs transition-all hover:scale-105 ${
-                currentServer === region.displayName
-                  ? 'bg-blue-600 text-white border border-blue-400'
-                  : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'
-              }`}
-            >
-              {region.displayName}
-            </button>
-          ))}
+          {availableRegions.map((region) => {
+            // Define colors for each region to match the reference
+            const getRegionColors = (displayName, isActive) => {
+              const colors = {
+                'Oceania': isActive ? 'bg-teal-600 text-white border-teal-400' : 'bg-teal-700/80 text-teal-200 border-teal-600 hover:bg-teal-600',
+                'Asia East': isActive ? 'bg-blue-600 text-white border-blue-400' : 'bg-blue-700/80 text-blue-200 border-blue-600 hover:bg-blue-600',
+                'US East': isActive ? 'bg-orange-600 text-white border-orange-400' : 'bg-orange-700/80 text-orange-200 border-orange-600 hover:bg-orange-600',
+                'US West': isActive ? 'bg-green-600 text-white border-green-400' : 'bg-green-700/80 text-green-200 border-green-600 hover:bg-green-600',
+                'Europe': isActive ? 'bg-purple-600 text-white border-purple-400' : 'bg-purple-700/80 text-purple-200 border-purple-600 hover:bg-purple-600',
+                'Global': isActive ? 'bg-red-600 text-white border-red-400' : 'bg-red-700/80 text-red-200 border-red-600 hover:bg-red-600'
+              }
+              return colors[displayName] || (isActive ? 'bg-gray-600 text-white border-gray-400' : 'bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600')
+            }
+            
+            return (
+              <button
+                key={region.id}
+                onClick={() => handleRegionSelect(region.id)}
+                className={`px-3 py-1 rounded-lg font-bold text-xs transition-all hover:scale-105 border ${
+                  getRegionColors(region.displayName, currentServer === region.displayName)
+                }`}
+              >
+                {region.displayName}
+              </button>
+            )
+          })}
           
           {/* LOGIN Button */}
           <button
