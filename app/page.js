@@ -1303,70 +1303,14 @@ function HomeContent() {
 
 
 
-  const handleLoginClick = async () => {
-    console.log('🔑 Login button clicked')
-    console.log('🔍 State:', { ready, authenticated, user: !!user })
-    
-    if (authenticated) {
-      console.log('✅ User already authenticated')
-      return
-    }
-    
+  const handleLoginClick = () => {
     if (!ready) {
-      console.log('⏳ Privy not ready yet, waiting...')
+      console.log('⚠️ Privy not ready yet')
       return
     }
     
-    try {
-      console.log('🚀 Triggering Privy login')
-      
-      // Try direct bridge access first
-      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
-        const bridge = window.__TURFLOOT_PRIVY__
-        console.log('🎯 Using Privy bridge - calling login function')
-        console.log('🔍 Bridge ready state:', bridge.ready)
-        console.log('🔍 Bridge authenticated:', bridge.authenticated)
-        
-        if (typeof bridge.login === 'function') {
-          console.log('✅ Executing bridge login...')
-          const result = await bridge.login()
-          console.log('✅ Bridge login completed:', result)
-        } else {
-          console.error('❌ Bridge login is not a function:', typeof bridge.login)
-          
-          // Fallback: try raw privy object
-          if (bridge._rawPrivy && typeof bridge._rawPrivy.login === 'function') {
-            console.log('🔄 Trying raw Privy login...')
-            const result = await bridge._rawPrivy.login()
-            console.log('✅ Raw Privy login completed:', result)
-          } else {
-            throw new Error('No valid login function found')
-          }
-        }
-      } else {
-        console.log('🔄 Bridge not available, using component login function')
-        
-        if (typeof login === 'function') {
-          console.log('✅ Executing component login...')
-          const result = await login()
-          console.log('✅ Component login completed:', result)
-        } else {
-          console.error('❌ Component login is not a function:', typeof login)
-          throw new Error('No login function available')
-        }
-      }
-      
-      console.log('🎉 Login process completed successfully')
-    } catch (error) {
-      console.error('❌ Login error:', error)
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack
-      })
-      
-      // Show user-friendly message
-      alert(`Authentication failed: ${error.message}. Please refresh the page and try again.`)
-    }
+    console.log('🚀 Starting login process...')
+    login()
   }
 
   const handleLogout = async () => {
