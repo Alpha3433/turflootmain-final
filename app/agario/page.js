@@ -2162,8 +2162,9 @@ const AgarIOGame = () => {
       console.log('🌍 TurfLoot: Connecting to global Hathora servers...')
       
       try {
-        // Always try Hathora first for global multiplayer
-        const { hathoraClient } = await import('/lib/hathoraClient')
+        // Always try Hathora for global multiplayer
+        const hathoraClientModule = await import('/lib/hathoraClient.js')
+        const hathoraClient = hathoraClientModule.default
         
         const hathoraInitialized = await hathoraClient.initialize()
         if (hathoraInitialized) {
@@ -2176,9 +2177,7 @@ const AgarIOGame = () => {
               auth: {
                 token: authToken,
                 fallback: true
-              },
-              transports: ['websocket', 'polling'],
-              timeout: 15000
+              }
             }
           })
           
@@ -2192,26 +2191,12 @@ const AgarIOGame = () => {
           throw new Error('Hathora initialization failed')
         }
       } catch (error) {
-        console.warn('⚠️ Hathora connection failed, trying local fallback:', error.message)
+        console.error('❌ Hathora connection failed:', error.message)
+        console.error('💥 Cannot connect to multiplayer - Hathora required for global games')
         
-        // Fallback to local server only if Hathora completely fails
-        try {
-          socket = io({
-            auth: {
-              token: authToken,
-              fallback: true
-            },
-            transports: ['websocket', 'polling'],
-            timeout: 10000
-          })
-          
-          connectionSuccess = true
-          console.log('🏠 Connected to local server as fallback')
-          
-        } catch (localError) {
-          console.error('❌ Both Hathora and local connection failed:', localError)
-          throw new Error('Unable to connect to any game server')
-        }
+        setGameResult('❌ Multiplayer connection failed')
+        setIsGameOver(true)
+        return
       }
       
       if (!connectionSuccess) {
