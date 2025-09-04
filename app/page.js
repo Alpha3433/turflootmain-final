@@ -140,9 +140,13 @@ export default function HomeContent() {
       minHeight: '100dvh'
     }}>
       
-      {/* Top Region Navigation Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700">
-        <div className="flex items-center justify-center px-4 py-2 space-x-2">
+      {/* Welcome Message - Top Left */}
+      <div className="fixed top-4 left-6 z-50">
+        <span className="text-white text-lg font-medium">Welcome, anth!</span>
+      </div>
+
+      {/* Top Region Navigation Bar - Positioned at top right */}
+      <div className="fixed top-4 right-6 z-50 flex items-center space-x-2">
           {/* COINS Display */}
           <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
             <div className="w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
