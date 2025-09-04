@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '@/components/MockPrivyProvider'
 import { X, Search, Users, Clock, Ban, CheckCircle, XCircle } from 'lucide-react'
 import { smartRouter } from '../../lib/smartApiRouter.js'
 
