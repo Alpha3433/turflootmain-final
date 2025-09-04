@@ -200,31 +200,85 @@ export default function TurfLootLanding() {
         </div>
       </div>
 
-      {/* Custom Styles */}
-      <style jsx>{`
+      {/* Global Styles for Animations */}
+      <style jsx global>{`
         @keyframes gridMove {
           0% { transform: translate(0, 0); }
           100% { transform: translate(50px, 50px); }
         }
         
         @keyframes float-0 {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(180deg); }
+          0%, 100% { 
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.6;
+          }
+          50% { 
+            transform: translateY(-20px) rotate(180deg);
+            opacity: 1;
+          }
         }
         
         @keyframes float-1 {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(-180deg); }
+          0%, 100% { 
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.7;
+          }
+          50% { 
+            transform: translateY(-15px) rotate(-180deg);
+            opacity: 1;
+          }
         }
         
         @keyframes float-2 {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-25px) rotate(90deg); }
+          0%, 100% { 
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.5;
+          }
+          50% { 
+            transform: translateY(-25px) rotate(90deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+          50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.8); }
         }
         
         .animate-float-0 { animation: float-0 6s ease-in-out infinite; }
         .animate-float-1 { animation: float-1 8s ease-in-out infinite; }
         .animate-float-2 { animation: float-2 7s ease-in-out infinite; }
+        
+        .shimmer-effect {
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          background-size: 200% 100%;
+          animation: shimmer 2s infinite;
+        }
+        
+        .glow-effect {
+          animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Ensure proper gradient rendering */
+        .bg-gradient-slate {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        }
+        
+        .bg-gradient-emerald {
+          background: linear-gradient(135deg, #10b981 0%, #06d6a0 100%);
+        }
+        
+        .text-gradient {
+          background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
       `}</style>
     </div>
   )
