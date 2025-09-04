@@ -34,7 +34,7 @@ export default function TurfLootLanding() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-slate text-white overflow-hidden relative">
       
       {/* Animated Background Grid */}
       <div className="absolute inset-0 opacity-20">
