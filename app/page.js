@@ -1313,48 +1313,8 @@ function HomeContent() {
     login()
   }
 
-  const handleLogout = async () => {
-    console.log('🔐 Logout clicked')
-    console.log('🔍 Current auth state:', { authenticated, user: !!user })
-    
-    try {
-      // Clear auth token for game
-      localStorage.removeItem('auth_token')
-      
-      // Call Privy logout through bridge
-      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
-        const bridge = window.__TURFLOOT_PRIVY__
-        console.log('🎯 Using Privy bridge logout')
-        
-        if (typeof bridge.logout === 'function') {
-          console.log('✅ Executing bridge logout...')
-          await bridge.logout()
-          console.log('✅ Bridge logout completed')
-        } else {
-          console.error('❌ Bridge logout is not a function:', typeof bridge.logout)
-          
-          // Fallback: try raw privy object
-          if (bridge._rawPrivy && typeof bridge._rawPrivy.logout === 'function') {
-            console.log('🔄 Trying raw Privy logout...')
-            await bridge._rawPrivy.logout()
-            console.log('✅ Raw Privy logout completed')
-          }
-        }
-      } else {
-        console.log('🔄 Bridge not available, using component logout')
-        await logout()
-      }
-      
-      // Clear local state
-      setUserProfile(null)
-      setDisplayName('')
-      setShowWelcome(false)
-      setHasShownWelcome(false)
-      
-      console.log('🎉 Logout completed successfully')
-    } catch (error) {
-      console.error('❌ Logout error:', error)
-    }
+  const handleLogout = () => {
+    logout()
   }
 
   const closeWelcome = () => {
