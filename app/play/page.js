@@ -250,9 +250,9 @@ const TurfLootGame = () => {
   const initializePhaser = () => {
     if (!gameContainerRef.current || gameInstanceRef.current) return
 
-    // Dynamic import of Phaser
+    // Dynamic import of Phaser - Temporarily disabled
     if (typeof window !== 'undefined') {
-      import('phaser').then((Phaser) => {
+      // import('phaser').then((Phaser) => {
         class TurfLootGameScene extends Phaser.default.Scene {
           constructor() {
             super('TurfLootGame')
