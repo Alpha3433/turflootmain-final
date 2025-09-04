@@ -178,6 +178,7 @@ export default function HomeContent() {
           </button>
         </div>
       </div>
+      </div>
 
       {/* Add top padding to account for fixed navigation */}
       <div className="pt-16"></div>
