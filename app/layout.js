@@ -1,7 +1,7 @@
 import { Inter, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { GameSettingsProvider } from '@/components/providers/GameSettingsProvider'
-import ClientOnlyPrivyWrapper from '@/components/ClientOnlyPrivyWrapper'
+import MockPrivyProvider from '@/components/MockPrivyProvider'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
@@ -35,9 +35,11 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-[#1E1E1E] text-white antialiased">
         <GameSettingsProvider>
-          <div className="min-h-screen bg-[#1E1E1E] text-white">
-            {children}
-          </div>
+          <MockPrivyProvider>
+            <div className="min-h-screen bg-[#1E1E1E] text-white">
+              {children}
+            </div>
+          </MockPrivyProvider>
         </GameSettingsProvider>
       </body>
     </html>
