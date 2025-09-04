@@ -1638,11 +1638,49 @@ function HomeContent() {
 
   // Main render - no loading state needed as ClientOnlyPrivyWrapper handles hydration
   return (
-    <div className="min-h-screen w-full text-white relative flex flex-col bg-black" style={{ 
+    <div className="min-h-screen w-full text-white relative flex flex-col bg-black" style={{
       background: 'linear-gradient(to bottom right, rgb(0, 0, 0), rgb(17, 24, 39), rgb(0, 0, 0))',
-      minHeight: '100vh',
-      minHeight: '100dvh' // Use dynamic viewport height for mobile
+      minHeight: '100dvh'
     }}>
+      
+      {/* Top Region Navigation Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700">
+        <div className="flex items-center justify-center px-4 py-2 space-x-2">
+          {/* COINS Display */}
+          <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+            <div className="w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
+              <span className="text-black font-bold text-xs">$</span>
+            </div>
+            <span className="text-yellow-400 font-bold text-sm">COINS</span>
+          </div>
+          
+          {/* Region Buttons */}
+          {servers.map((server) => (
+            <button
+              key={server.id}
+              onClick={() => setCurrentServer(server)}
+              className={`px-3 py-1 rounded-lg font-bold text-xs transition-all hover:scale-105 ${
+                currentServer.id === server.id
+                  ? getRegionButtonStyle(server.displayName, true)
+                  : getRegionButtonStyle(server.displayName, false)
+              }`}
+            >
+              {server.displayName}
+            </button>
+          ))}
+          
+          {/* LOGIN Button */}
+          <button
+            onClick={handleLoginClick}
+            className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-lg transition-all hover:scale-105"
+          >
+            LOGIN
+          </button>
+        </div>
+      </div>
+
+      {/* Add top padding to account for fixed navigation */}
+      <div className="pt-16"></div>
       {/* Game-Inspired Animated Background - Full Coverage */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-10" style={{ minHeight: '100vh', minHeight: '100dvh' }}>
         
