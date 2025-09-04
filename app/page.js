@@ -591,87 +591,8 @@ function HomeContent() {
     '#10AC84', '#F79F1F', '#A3CB38', '#FDA7DF', '#D63031', '#74B9FF'
   ]
   
-  // Get Privy hooks
-  // Use Privy through global bridge for proper authentication
-  const [isClient, setIsClient] = useState(false)
-  const [privyAuth, setPrivyAuth] = useState({
-    login: () => console.log('Login not available yet'),
-    ready: false,
-    authenticated: false,
-    user: null,
-    logout: () => console.log('Logout not available yet')
-  })
-
-  // Initialize client-side flag
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  // Access Privy through the global bridge with proper state updates
-  useEffect(() => {
-    if (isClient && typeof window !== 'undefined') {
-      const connectToPrivy = () => {
-        // Check for the global Privy bridge
-        if (window.__TURFLOOT_PRIVY__) {
-          const privyBridge = window.__TURFLOOT_PRIVY__
-          
-          // Update authentication state from the bridge
-          setPrivyAuth({
-            login: privyBridge.login,
-            ready: privyBridge.ready || true,
-            authenticated: privyBridge.authenticated || false,
-            user: privyBridge.user || null,
-            logout: privyBridge.logout
-          })
-          
-          console.log('✅ Connected to Privy bridge:', {
-            ready: privyBridge.ready,
-            authenticated: privyBridge.authenticated,
-            hasUser: !!privyBridge.user
-          })
-          
-          return true
-        }
-        return false
-      }
-
-      // Try to connect immediately
-      if (!connectToPrivy()) {
-        // If not available, poll for it
-        const pollForPrivy = setInterval(() => {
-          if (connectToPrivy()) {
-            clearInterval(pollForPrivy)
-          }
-        }, 500)
-
-        // Stop polling after 10 seconds
-        setTimeout(() => {
-          clearInterval(pollForPrivy)
-          console.warn('⚠️ Privy bridge not found - using fallback')
-          setPrivyAuth(prev => ({ ...prev, ready: true }))
-        }, 10000)
-
-        return () => clearInterval(pollForPrivy)
-      }
-      
-      // Set up a listener for Privy state changes
-      const checkAuthState = setInterval(() => {
-        if (window.__TURFLOOT_PRIVY__) {
-          const bridge = window.__TURFLOOT_PRIVY__
-          setPrivyAuth(prev => ({
-            ...prev,
-            ready: bridge.ready || true,
-            authenticated: bridge.authenticated || false,
-            user: bridge.user || null
-          }))
-        }
-      }, 1000) // Check every second for auth state changes
-
-      return () => clearInterval(checkAuthState)
-    }
-  }, [isClient])
-
-  const { login, ready, authenticated, user, logout } = privyAuth
+  // Get Privy authentication directly
+  const { ready, authenticated, user, login, logout } = usePrivy()
 
   // Close dropdown when clicking outside - moved here after state declarations
   useEffect(() => {
