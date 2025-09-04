@@ -2,45 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import { getApiUrl } from '../config/apiRouting'
-
-// Dynamic imports for components that might have SSR issues
-const WalletManager = dynamic(() => import('../components/wallet/WalletManager'), {
-  ssr: false,
-  loading: () => <div className="animate-pulse bg-gray-800 h-10 w-24 rounded"></div>
-})
-
-const UserProfile = dynamic(() => import('../components/UserProfile'), {
-  ssr: false
-})
-
-const FriendsPanel = dynamic(() => import('@/components/social/AdvancedFriendsPanel'), {
-  ssr: false,
-  loading: () => <div className="text-white">Loading Friends...</div>
-})
-
-const UserSettings = dynamic(() => import('../components/UserSettings'), {
-  ssr: false,
-  loading: () => <div className="text-white">Loading Settings...</div>
-})
-
-const PartyLobbySystem = dynamic(() => import('../components/lobby/PartyLobbySystem'), {
-  ssr: false,
-  loading: () => <div className="text-white">Loading Party Lobby...</div>
-})
-
-const GameLoadingPopup = dynamic(() => import('../components/GameLoadingPopup'), {
-  ssr: false
-})
-
-const CustomizationModal = dynamic(() => import('@/components/CustomizationModalClean'), {
-  ssr: false
-})
-
-const ServerBrowserModal = dynamic(() => import('../components/ServerBrowserModal'), {
-  ssr: false
-})
 
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
