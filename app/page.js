@@ -147,6 +147,7 @@ export default function HomeContent() {
 
       {/* Top Region Navigation Bar - Positioned at top right */}
       <div className="fixed top-4 right-6 z-50 flex items-center space-x-2">
+        <div className="flex items-center space-x-2">>
           {/* COINS Display */}
           <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
             <div className="w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
