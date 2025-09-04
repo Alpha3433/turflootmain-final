@@ -177,6 +177,14 @@ export default function HomeContent() {
       {/* Add top padding to account for fixed navigation */}
       <div className="pt-16"></div>
 
+      {/* Warning Message */}
+      <div className="text-center py-2 px-4">
+        <div className="inline-flex items-center space-x-2 text-yellow-400 text-sm">
+          <span>⚠️</span>
+          <span>Artificial prices are determined solely by player skill. Play responsibly.</span>
+        </div>
+      </div>
+
       {/* Floating Elements */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-10" style={{ minHeight: '100dvh' }}>
         {/* Floating Coins */}
