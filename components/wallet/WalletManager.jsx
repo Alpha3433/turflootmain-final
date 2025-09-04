@@ -2,16 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { usePrivy } from '@/components/MockPrivyProvider'
-
-// Mock the wallet functions for now
-const mockWalletsHook = () => ({ wallets: [] })
-const mockFundWalletHook = () => ({ fundWallet: () => console.log('Mock fund wallet') })
+import { usePrivy, useWallets, useFundWallet } from '@/components/MockPrivyProvider'
 
 const WalletManager = ({ onBalanceUpdate }) => {
-  const { authenticated, user, login } = usePrivy()
-  const { wallets } = mockWalletsHook()
-  const { fundWallet } = mockFundWalletHook()
+  const { authenticated, user, login, connectWallet } = usePrivy()
+  const { wallets } = useWallets()
+  const { fundWallet } = useFundWallet()
   const [balance, setBalance] = useState({ balance: 0, sol_balance: 0, usdc_balance: 0 })
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(false)
