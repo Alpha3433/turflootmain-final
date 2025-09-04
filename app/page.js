@@ -384,7 +384,7 @@ export default function HomeContent() {
                   </div>
                   <h3 className="text-white font-bold text-base lg:text-lg">Wallet</h3>
                 </div>
-                <SimpleWalletManager />
+                <SimpleWalletManager balance={userBalance} />
                 <div className="space-y-3">
                   <button className="w-full py-3 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-xl text-green-400 font-bold text-sm transition-all hover:scale-105">
                     Add Funds
