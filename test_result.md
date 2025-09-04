@@ -108,9 +108,10 @@ user_problem_statement: "Complete Hathora Integration (Phase 1) - Update the mai
 
 test_plan:
   current_focus:
-    - "Mobile Customization Screen Redesign"
-    - "Modernizing Social Popup Enhancement"
-    - "Production Infrastructure Verification"
+    - "Complete Global Multiplayer Hathora Flow Testing"
+    - "Hathora Client Integration Verification"
+    - "WebSocket Connection Flow Testing"
+    - "Session Tracking with Hathora Integration"
   stuck_tasks: []
 backend:
   - task: "Fix Hathora Multiplayer Process Creation"
