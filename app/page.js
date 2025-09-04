@@ -88,8 +88,8 @@ export default function TurfLootLanding() {
         
         {/* Title Section */}
         <div className={`text-center mb-12 transition-all duration-1000 delay-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <h1 className="text-7xl font-black mb-4 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-            TURF<span className="text-emerald-400">LOOT</span>
+          <h1 className="text-7xl font-black mb-4 text-gradient">
+            TURF<span style={{color: '#10b981'}}>LOOT</span>
           </h1>
           <p className="text-xl text-slate-400 font-medium tracking-wide">
             Skill-Based Grid Domination
