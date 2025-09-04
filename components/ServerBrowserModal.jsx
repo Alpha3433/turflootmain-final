@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '@/components/MockPrivyProvider'
 
 const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [servers, setServers] = useState([])
