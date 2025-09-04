@@ -133,10 +133,14 @@ export default function TurfLootLanding() {
         <div className={`mb-8 transition-all duration-1000 delay-900 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <button
             onClick={handleJoinGame}
-            className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white font-bold py-4 px-12 rounded-2xl text-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/25 relative overflow-hidden group"
+            className="bg-gradient-emerald text-white font-bold py-4 px-12 rounded-2xl text-xl transition-all duration-300 hover:scale-105 glow-effect relative overflow-hidden group"
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #06d6a0 100%)',
+              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)'
+            }}
           >
             <span className="relative z-10">🌍 JOIN GLOBAL MULTIPLAYER</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <div className="shimmer-effect absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </button>
         </div>
 
