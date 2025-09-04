@@ -2004,7 +2004,7 @@ function HomeContent() {
       </div>
 
       {/* Top Navigation - Enhanced Mobile Layout */}
-      <header className="sticky top-0 z-50 h-auto min-h-[64px] w-full backdrop-blur-sm bg-black/90 border-b border-gray-800">
+      <header className="sticky top-16 z-40 h-auto min-h-[64px] w-full backdrop-blur-sm bg-black/90 border-b border-gray-800">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-8 py-2 sm:py-0 sm:h-16">
           {/* Top Row on Mobile - Welcome message */}
           <div className="flex items-center space-x-4 w-full sm:w-auto mb-2 sm:mb-0">
