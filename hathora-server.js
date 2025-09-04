@@ -1,278 +1,274 @@
 #!/usr/bin/env node
 
 /**
- * Standalone Hathora Server - NO Socket.IO Dependencies
- * Pure Node.js HTTP + WebSocket implementation to avoid uWebSockets.js conflicts
+ * TurfLoot Hathora Server - Node.js 20 Compatible
+ * No uWebSockets.js dependency - uses native Node.js WebSocket
  */
 
-const http = require('http')
-const crypto = require('crypto')
+import { createServer } from 'http'
+import { WebSocketServer } from 'ws'
 
-const PORT = process.env.HATHORA_PORT || 4000
+const PORT = process.env.PORT || 7777
+const HOST = '0.0.0.0'
 
-console.log('🌍 Starting TurfLoot Hathora Server (Standalone)...')
-console.log(`📡 Port: ${PORT}`)
-console.log(`🔧 Node.js: ${process.version}`)
-console.log('⚡ Pure Node.js implementation - no uWebSockets.js dependency')
+console.log('🚀 TurfLoot Hathora Server Starting (Node.js 20 Compatible)')
+console.log(`📡 Node.js Version: ${process.version}`)
+console.log(`🌍 Listening on ${HOST}:${PORT}`)
 
-// Simple WebSocket implementation
-class SimpleWebSocket {
-  constructor() {
-    this.connections = new Map()
-    this.rooms = new Map()
-  }
+// Game state
+const gameState = {
+  players: new Map(),
+  food: [],
+  gameRunning: true,
+  lastUpdate: Date.now()
+}
 
-  handleUpgrade(request, socket, head) {
-    const key = request.headers['sec-websocket-key']
-    const acceptKey = crypto
-      .createHash('sha1')
-      .update(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
-      .digest('base64')
-
-    const responseHeaders = [
-      'HTTP/1.1 101 Switching Protocols',
-      'Upgrade: websocket',
-      'Connection: Upgrade',
-      `Sec-WebSocket-Accept: ${acceptKey}`,
-      'Sec-WebSocket-Protocol: chat',
-      ''
-    ].join('\r\n')
-
-    socket.write(responseHeaders)
-
-    const connectionId = crypto.randomUUID()
-    this.connections.set(connectionId, socket)
-
-    console.log(`🔌 WebSocket connection established: ${connectionId}`)
-
-    socket.on('data', (buffer) => {
-      try {
-        const frame = this.parseFrame(buffer)
-        if (frame) {
-          this.handleMessage(connectionId, frame.payload)
-        }
-      } catch (error) {
-        console.error('Frame parsing error:', error.message)
-      }
-    })
-
-    socket.on('close', () => {
-      console.log(`🔌 WebSocket connection closed: ${connectionId}`)
-      this.connections.delete(connectionId)
-    })
-
-    socket.on('error', (error) => {
-      console.error(`WebSocket error: ${error.message}`)
-      this.connections.delete(connectionId)
+// Initialize food
+function initializeFood() {
+  console.log('🍎 Initializing food...')
+  for (let i = 0; i < 200; i++) {
+    gameState.food.push({
+      id: Math.random().toString(36),
+      x: Math.random() * 3000 - 1500,
+      y: Math.random() * 3000 - 1500,
+      color: `hsl(${Math.random() * 360}, 70%, 60%)`
     })
   }
-
-  parseFrame(buffer) {
-    if (buffer.length < 2) return null
-
-    const firstByte = buffer[0]
-    const secondByte = buffer[1]
-
-    const fin = !!(firstByte & 0x80)
-    const opcode = firstByte & 0x0f
-
-    if (opcode === 0x8) return null // Close frame
-
-    const masked = !!(secondByte & 0x80)
-    let payloadLength = secondByte & 0x7f
-
-    let offset = 2
-
-    if (payloadLength === 126) {
-      payloadLength = buffer.readUInt16BE(offset)
-      offset += 2
-    } else if (payloadLength === 127) {
-      // Skip 64-bit length for simplicity
-      offset += 8
-      payloadLength = buffer.readUInt32BE(offset)
-      offset += 4
-    }
-
-    if (buffer.length < offset + (masked ? 4 : 0) + payloadLength) {
-      return null // Incomplete frame
-    }
-
-    let payload = buffer.slice(
-      offset + (masked ? 4 : 0), 
-      offset + (masked ? 4 : 0) + payloadLength
-    )
-
-    if (masked) {
-      const maskKey = buffer.slice(offset, offset + 4)
-      for (let i = 0; i < payload.length; i++) {
-        payload[i] ^= maskKey[i % 4]
-      }
-    }
-
-    return { fin, opcode, payload: payload.toString('utf8') }
-  }
-
-  sendFrame(socket, payload) {
-    const payloadBuffer = Buffer.from(payload, 'utf8')
-    const frame = Buffer.alloc(2 + payloadBuffer.length)
-    
-    frame[0] = 0x81 // FIN + text frame
-    frame[1] = payloadBuffer.length
-    payloadBuffer.copy(frame, 2)
-    
-    socket.write(frame)
-  }
-
-  handleMessage(connectionId, message) {
-    try {
-      const data = JSON.parse(message)
-      console.log(`📨 Message from ${connectionId}:`, data.type || 'unknown')
-
-      switch (data.type) {
-        case 'join_room':
-          this.handleJoinRoom(connectionId, data)
-          break
-        case 'game_action':
-          this.handleGameAction(connectionId, data)
-          break
-        case 'ping':
-          this.sendToConnection(connectionId, { type: 'pong', timestamp: Date.now() })
-          break
-        default:
-          console.log(`Unknown message type: ${data.type}`)
-      }
-    } catch (error) {
-      console.error('Message handling error:', error.message)
-    }
-  }
-
-  handleJoinRoom(connectionId, data) {
-    const roomId = data.roomId || 'global-practice-bots'
-    
-    if (!this.rooms.has(roomId)) {
-      this.rooms.set(roomId, {
-        id: roomId,
-        players: new Map(),
-        createdAt: Date.now()
-      })
-      console.log(`🏠 Created new room: ${roomId}`)
-    }
-
-    const room = this.rooms.get(roomId)
-    room.players.set(connectionId, {
-      id: connectionId,
-      nickname: data.nickname || 'Player',
-      joinedAt: Date.now()
-    })
-
-    console.log(`👤 Player ${data.nickname} joined room ${roomId} (${room.players.size} players)`)
-
-    // Send join confirmation
-    this.sendToConnection(connectionId, {
-      type: 'joined',
-      roomId: roomId,
-      playerId: connectionId,
-      players: room.players.size
-    })
-
-    // Broadcast to other players in room
-    this.broadcastToRoom(roomId, {
-      type: 'player_joined',
-      playerId: connectionId,
-      nickname: data.nickname,
-      totalPlayers: room.players.size
-    }, connectionId)
-  }
-
-  handleGameAction(connectionId, data) {
-    // Simple game action relay
-    const rooms = Array.from(this.rooms.values())
-    const playerRoom = rooms.find(room => room.players.has(connectionId))
-    
-    if (playerRoom) {
-      this.broadcastToRoom(playerRoom.id, {
-        type: 'game_update',
-        playerId: connectionId,
-        action: data.action,
-        data: data.data
-      }, connectionId)
-    }
-  }
-
-  sendToConnection(connectionId, message) {
-    const socket = this.connections.get(connectionId)
-    if (socket) {
-      this.sendFrame(socket, JSON.stringify(message))
-    }
-  }
-
-  broadcastToRoom(roomId, message, excludeId = null) {
-    const room = this.rooms.get(roomId)
-    if (!room) return
-
-    for (const [playerId] of room.players) {
-      if (playerId !== excludeId) {
-        this.sendToConnection(playerId, message)
-      }
-    }
-  }
+  console.log(`✅ Generated ${gameState.food.length} food items`)
 }
 
 // Create HTTP server
-const server = http.createServer((req, res) => {
-  // Simple health check
-  if (req.url === '/health') {
-    res.writeHead(200, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ 
-      status: 'ok', 
-      uptime: process.uptime(),
-      connections: wsHandler.connections.size,
-      rooms: wsHandler.rooms.size
-    }))
-  } else {
-    res.writeHead(404)
-    res.end('Not Found')
+const server = createServer()
+
+// Create WebSocket server
+const wss = new WebSocketServer({ 
+  server,
+  path: '/socket.io/',
+  perMessageDeflate: false
+})
+
+console.log('🔌 WebSocket server created')
+
+// Handle WebSocket connections
+wss.on('connection', (ws, req) => {
+  const playerId = Math.random().toString(36).substr(2, 9)
+  console.log(`🎮 Player ${playerId} connected from ${req.socket.remoteAddress}`)
+  
+  // Initialize player
+  const player = {
+    id: playerId,
+    x: Math.random() * 1000 - 500,
+    y: Math.random() * 1000 - 500,
+    mass: 20,
+    radius: 20,
+    color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+    name: `Player_${playerId.substr(0, 4)}`,
+    alive: true,
+    cells: [{
+      id: `${playerId}_0`,
+      x: Math.random() * 1000 - 500,
+      y: Math.random() * 1000 - 500,
+      mass: 20,
+      radius: 20
+    }],
+    lastUpdate: Date.now()
   }
-})
-
-// Initialize WebSocket handler
-const wsHandler = new SimpleWebSocket()
-
-// Handle WebSocket upgrades
-server.on('upgrade', (request, socket, head) => {
-  wsHandler.handleUpgrade(request, socket, head)
-})
-
-// Start the server
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 TurfLoot Hathora server running on port ${PORT}`)
-  console.log(`🌐 WebSocket server ready for connections`)
-  console.log(`✅ No external dependencies - pure Node.js implementation`)
   
-  // Keep process alive and handle signals
-  process.on('SIGTERM', () => {
-    console.log('📤 Received SIGTERM, shutting down gracefully...')
-    server.close(() => {
-      console.log('✅ Server closed')
-      process.exit(0)
-    })
+  gameState.players.set(playerId, player)
+  ws.playerId = playerId
+  
+  // Send initial game state
+  const initMessage = JSON.stringify({
+    type: 'init',
+    playerId: playerId,
+    player: player,
+    food: gameState.food,
+    players: Array.from(gameState.players.values()).filter(p => p.id !== playerId)
   })
   
-  process.on('SIGINT', () => {
-    console.log('📤 Received SIGINT, shutting down gracefully...')
-    server.close(() => {
-      console.log('✅ Server closed')
-      process.exit(0)
+  ws.send(initMessage)
+  console.log(`📤 Sent init data to player ${playerId}`)
+  
+  // Handle messages
+  ws.on('message', (data) => {
+    try {
+      const message = JSON.parse(data.toString())
+      handleMessage(ws, message)
+    } catch (error) {
+      console.error(`❌ Error parsing message from ${playerId}:`, error.message)
+    }
+  })
+  
+  // Handle disconnect
+  ws.on('close', () => {
+    console.log(`👋 Player ${playerId} disconnected`)
+    gameState.players.delete(playerId)
+    
+    // Broadcast player left
+    broadcast({
+      type: 'playerLeft',
+      playerId: playerId
+    }, playerId)
+  })
+  
+  ws.on('error', (error) => {
+    console.error(`❌ WebSocket error for player ${playerId}:`, error.message)
+  })
+  
+  // Broadcast new player to others
+  broadcast({
+    type: 'playerJoined',
+    player: player
+  }, playerId)
+})
+
+// Handle game messages
+function handleMessage(ws, message) {
+  const playerId = ws.playerId
+  const player = gameState.players.get(playerId)
+  
+  if (!player || !player.alive) return
+  
+  switch (message.type) {
+    case 'move':
+      if (message.direction) {
+        player.cells.forEach(cell => {
+          cell.x += message.direction.x * 2
+          cell.y += message.direction.y * 2
+          
+          // Keep within bounds
+          cell.x = Math.max(-1500, Math.min(1500, cell.x))
+          cell.y = Math.max(-1500, Math.min(1500, cell.y))
+        })
+        
+        // Update player position to largest cell
+        const largestCell = player.cells.reduce((largest, cell) => 
+          cell.mass > largest.mass ? cell : largest
+        )
+        player.x = largestCell.x
+        player.y = largestCell.y
+        player.lastUpdate = Date.now()
+      }
+      break
+      
+    case 'split':
+      if (player.cells.length < 16 && player.cells.some(cell => cell.mass >= 36)) {
+        const cellToSplit = player.cells.find(cell => cell.mass >= 36)
+        if (cellToSplit) {
+          const newMass = Math.floor(cellToSplit.mass / 2)
+          cellToSplit.mass = newMass
+          cellToSplit.radius = Math.sqrt(newMass / Math.PI) * 8
+          
+          const newCell = {
+            id: `${playerId}_${Date.now()}`,
+            x: cellToSplit.x + (message.direction?.x || 1) * 100,
+            y: cellToSplit.y + (message.direction?.y || 0) * 100,
+            mass: newMass,
+            radius: Math.sqrt(newMass / Math.PI) * 8
+          }
+          
+          player.cells.push(newCell)
+          console.log(`💥 Player ${playerId} split into ${player.cells.length} cells`)
+        }
+      }
+      break
+      
+    case 'ping':
+      ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() }))
+      break
+  }
+}
+
+// Broadcast message to all players except sender
+function broadcast(message, excludePlayerId = null) {
+  const messageStr = JSON.stringify(message)
+  
+  wss.clients.forEach(client => {
+    if (client.readyState === client.OPEN && client.playerId !== excludePlayerId) {
+      client.send(messageStr)
+    }
+  })
+}
+
+// Game loop
+function gameLoop() {
+  const now = Date.now()
+  
+  // Check for food consumption
+  gameState.players.forEach(player => {
+    if (!player.alive) return
+    
+    player.cells.forEach(cell => {
+      gameState.food = gameState.food.filter(food => {
+        const dx = food.x - cell.x
+        const dy = food.y - cell.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        
+        if (distance < cell.radius) {
+          cell.mass += 1
+          cell.radius = Math.sqrt(cell.mass / Math.PI) * 8
+          return false // Remove food
+        }
+        return true
+      })
     })
+    
+    // Update total mass
+    player.mass = player.cells.reduce((total, cell) => total + cell.mass, 0)
+  })
+  
+  // Replenish food
+  while (gameState.food.length < 200) {
+    gameState.food.push({
+      id: Math.random().toString(36),
+      x: Math.random() * 3000 - 1500,
+      y: Math.random() * 3000 - 1500,
+      color: `hsl(${Math.random() * 360}, 70%, 60%)`
+    })
+  }
+  
+  // Broadcast game state
+  if (gameState.players.size > 0) {
+    broadcast({
+      type: 'gameState',
+      players: Array.from(gameState.players.values()),
+      food: gameState.food,
+      timestamp: now
+    })
+  }
+  
+  gameState.lastUpdate = now
+}
+
+// Initialize and start
+initializeFood()
+
+// Start HTTP server
+server.listen(PORT, HOST, () => {
+  console.log('✅ Server started successfully!')
+  console.log(`🎮 Game server ready for connections`)
+  console.log(`📊 Initial food count: ${gameState.food.length}`)
+  
+  // Start game loop
+  setInterval(gameLoop, 1000 / 30) // 30 FPS
+  console.log('🔄 Game loop started at 30 FPS')
+})
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 Received SIGTERM, shutting down gracefully...')
+  server.close(() => {
+    console.log('✅ Server closed successfully')
+    process.exit(0)
   })
 })
 
-// Handle server errors
-server.on('error', (error) => {
-  console.error('❌ Server error:', error)
-  process.exit(1)
+process.on('SIGINT', () => {
+  console.log('🛑 Received SIGINT, shutting down gracefully...')
+  server.close(() => {
+    console.log('✅ Server closed successfully')
+    process.exit(0)
+  })
 })
 
-console.log('📊 Server statistics will be available at /health')
-
-module.exports = { server, wsHandler }
+console.log('🎯 TurfLoot Hathora Server fully initialized!')

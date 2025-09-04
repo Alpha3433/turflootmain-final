@@ -1,16 +1,19 @@
 {
-  "name": "turfloot-hathora-minimal",
-  "version": "0.1.0",
-  "description": "TurfLoot Hathora Server - Zero Dependencies",
-  "main": "hathora-server-standalone.js",
+  "name": "turfloot-hathora-node20",
+  "version": "1.0.0",
+  "description": "TurfLoot Hathora Server - Node.js 20 Compatible",
+  "main": "hathora-server-node20.js",
+  "type": "module",
   "scripts": {
-    "start": "node hathora-server-standalone.js"
+    "start": "node hathora-server-node20.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
   "engines": {
-    "node": ">=18.0.0 <21.0.0"
+    "node": ">=18.0.0"
   },
-  "keywords": ["hathora", "multiplayer", "websocket", "nodejs"],
+  "keywords": ["hathora", "multiplayer", "websocket", "nodejs", "agar.io"],
   "author": "TurfLoot",
   "license": "MIT"
 }
