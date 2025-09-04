@@ -11,8 +11,24 @@ import PartyLobbySystem from '../components/lobby/PartyLobbySystem'
 import GameLoadingPopup from '../components/GameLoadingPopup'
 import CustomizationModalClean from '@/components/CustomizationModalClean'
 import ServerBrowserModal from '../components/ServerBrowserModal'
+import { PrivyProvider, usePrivy } from '@privy-io/react-auth'
 
-export default function Home() {
+// Privy configuration
+const privyConfig = {
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets',
+    noPromptOnSignature: false
+  },
+  loginMethods: ['email', 'google', 'discord'],
+  appearance: {
+    theme: 'dark',
+    accentColor: '#14F195',
+    logo: undefined
+  }
+}
+
+// Main Home component wrapped with Privy
+function HomeContent() {
   const [userProfile, setUserProfile] = useState(null)
   const [showWelcome, setShowWelcome] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
