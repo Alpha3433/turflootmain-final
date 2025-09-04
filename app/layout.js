@@ -34,11 +34,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-[#1E1E1E] text-white antialiased">
-        <PrivyAuthProvider>
-          <GameSettingsProvider>
+        <GameSettingsProvider>
+          <div className="min-h-screen bg-[#1E1E1E] text-white">
             {children}
-          </GameSettingsProvider>
-        </PrivyAuthProvider>
+          </div>
+        </GameSettingsProvider>
       </body>
     </html>
   )
