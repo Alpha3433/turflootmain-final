@@ -405,13 +405,11 @@ export default function HomeContent() {
                 </div>
                 <div className="text-center">
                   <div className="relative w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-3 lg:mb-4">
-                    <div 
-                      className="w-16 h-16 lg:w-20 lg:h-20 rounded-full flex items-center justify-center border-2 border-cyan-300 bg-gradient-to-br from-cyan-300 via-blue-500 to-blue-600"
-                      style={{ backgroundColor: userProfile.character_color }}
-                    >
-                      <div className="w-2 h-2 bg-black rounded-full absolute top-4 lg:top-5 left-4 lg:left-6"></div>
-                      <div className="w-2 h-2 bg-black rounded-full absolute top-4 lg:top-5 right-4 lg:right-6"></div>
+                    <div className="w-16 h-16 lg:w-20 lg:h-20 bg-blue-500 rounded-full flex items-center justify-center border-2 border-blue-400 text-white text-2xl font-bold">
+                      A
                     </div>
+                    <div className="w-2 h-2 bg-black rounded-full absolute top-4 lg:top-5 left-4 lg:left-6"></div>
+                    <div className="w-2 h-2 bg-black rounded-full absolute top-4 lg:top-5 right-4 lg:right-6"></div>
                   </div>
                   <div className="text-gray-400 text-xs mb-3">Your Character</div>
                   <button className="w-full py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-xl text-purple-400 font-medium transition-all hover:scale-105 text-sm">
