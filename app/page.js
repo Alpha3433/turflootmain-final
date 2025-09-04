@@ -295,14 +295,14 @@ export default function HomeContent() {
               {/* Player Avatar */}
               <div className="flex justify-center">
                 <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl px-6 lg:px-8 py-4 lg:py-5 border border-gray-700/50 flex items-center space-x-4 lg:space-x-5">
-                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center text-lg lg:text-xl font-bold text-white">
-                    ?
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 bg-blue-500 rounded-xl flex items-center justify-center text-lg lg:text-xl font-bold text-white border-2 border-blue-400">
+                    A
                   </div>
                   <div className="flex flex-col">
                     <span className="text-white text-xl font-semibold cursor-pointer hover:text-cyan-400">
                       {userProfile.name}
                     </span>
-                    <span className="text-gray-400 text-sm font-medium">Choose your display name</span>
+                    <span className="text-gray-400 text-sm font-medium">Click to edit</span>
                   </div>
                 </div>
               </div>
