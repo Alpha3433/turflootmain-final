@@ -3245,14 +3245,5 @@ function HomeContent() {
   )
 }
 
-// Main export wrapped with Privy Provider
-export default function Home() {
-  return (
-    <PrivyProvider
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || 'cmdycgltk007ljs0bpjbjqx0a'}
-      config={privyConfig}
-    >
-      <HomeContent />
-    </PrivyProvider>
-  )
-}
+// Export the main component directly
+export default HomeContent
