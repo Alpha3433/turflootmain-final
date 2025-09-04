@@ -1,9 +1,24 @@
 import { Inter, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { GameSettingsProvider } from '@/components/providers/GameSettingsProvider'
+import { PrivyProvider } from '@privy-io/react-auth'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
+
+// Privy configuration
+const privyConfig = {
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets',
+    noPromptOnSignature: false
+  },
+  loginMethods: ['email', 'google', 'discord'],
+  appearance: {
+    theme: 'dark',
+    accentColor: '#14F195',
+    logo: undefined
+  }
+}
 
 export const metadata = {
   title: 'TurfLoot – Real-time blockchain skill gaming',
@@ -21,7 +36,6 @@ export const metadata = {
     description: 'Compete in skill-based territory battles. Earn real SOL rewards.',
     images: ['/og-image.png'],
   },
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
@@ -35,9 +49,14 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-[#1E1E1E] text-white antialiased">
         <GameSettingsProvider>
-          <div className="min-h-screen bg-[#1E1E1E] text-white">
-            {children}
-          </div>
+          <PrivyProvider
+            appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || 'cmdycgltk007ljs0bpjbjqx0a'}
+            config={privyConfig}
+          >
+            <div className="min-h-screen bg-[#1E1E1E] text-white">
+              {children}
+            </div>
+          </PrivyProvider>
         </GameSettingsProvider>
       </body>
     </html>
