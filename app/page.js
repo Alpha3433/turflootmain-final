@@ -44,17 +44,17 @@ export default function HomeContent() {
   const router = useRouter()
   
   // State management
-  const [currentServer, setCurrentServer] = useState('Asia-East')
+  const [currentServer, setCurrentServer] = useState('Global Servers')
   const [currentPing, setCurrentPing] = useState(35) 
-  const [userBalance, setUserBalance] = useState(0)
+  const [userBalance, setUserBalance] = useState(25.00) // Set to match the screenshot
   const [leaderboard, setLeaderboard] = useState([])
   const [liveStats, setLiveStats] = useState({ players: 0, globalWinnings: 0 })
   const [gameStake, setGameStake] = useState('FREE')
   const [friendsList, setFriendsList] = useState([])
   const [userProfile, setUserProfile] = useState({
-    name: 'Click to set name',
+    name: 'anth',
     avatar_url: null,
-    character_color: '#00f5ff'
+    character_color: '#3B82F6' // Blue color to match screenshot
   })
 
   // Available regions
