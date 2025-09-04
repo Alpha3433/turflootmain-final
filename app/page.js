@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function TurfLootLanding() {
+export default function TurfLootGaming() {
   const router = useRouter()
   const [selectedStake, setSelectedStake] = useState('FREE')
-  const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
+  const [liveStats, setLiveStats] = useState({ players: 21, winnings: 276639 })
+  const [userName, setUserName] = useState('anth')
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
@@ -14,10 +15,10 @@ export default function TurfLootLanding() {
     // Simulate live stats updates
     const interval = setInterval(() => {
       setLiveStats(prev => ({
-        players: Math.floor(Math.random() * 25),
-        winnings: Math.floor(Math.random() * 1000)
+        players: Math.floor(Math.random() * 50) + 15,
+        winnings: Math.floor(Math.random() * 100000) + 200000
       }))
-    }, 3000)
+    }, 4000)
     
     return () => clearInterval(interval)
   }, [])
@@ -26,264 +27,238 @@ export default function TurfLootLanding() {
     router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
   }
 
-  const stakes = [
-    { value: 'FREE', label: 'FREE', color: 'emerald' },
-    { value: '1', label: '$1', color: 'blue' },
-    { value: '5', label: '$5', color: 'purple' },
-    { value: '20', label: '$20', color: 'orange' }
-  ]
-
   return (
-    <div className="min-h-screen bg-gradient-slate text-white overflow-hidden relative">
+    <div className="min-h-screen bg-black text-white overflow-hidden relative">
       
-      {/* Animated Background Grid */}
-      <div className="absolute inset-0 opacity-20">
-        <div 
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-            animation: 'gridMove 20s linear infinite'
-          }}
-        />
-      </div>
-
-      {/* Floating Orbs */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className={`absolute w-4 h-4 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full opacity-60 animate-float-${i % 3}`}
-            style={{
-              left: `${15 + i * 15}%`,
-              top: `${20 + (i % 3) * 25}%`,
-              animationDelay: `${i * 0.5}s`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Header */}
-      <header className="relative z-10 flex justify-between items-center p-6">
-        <div className={`transition-all duration-1000 ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
-          <span className="text-lg font-medium text-slate-300">Welcome back, anth</span>
+      {/* Top Header */}
+      <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
+        <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+          🔥
         </div>
-        
-        <div className={`flex items-center gap-3 transition-all duration-1000 delay-200 ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}>
-          <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-lg px-4 py-2 flex items-center gap-2">
-            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-            <span className="text-sm font-medium">Global Servers</span>
+        <span className="text-orange-400 font-bold">Welcome, ty8898812</span>
+      </div>
+
+      <div className="absolute top-4 right-4 z-50 flex items-center gap-3">
+        <div className="w-6 h-6 bg-gray-600 rounded"></div>
+        <div className="w-6 h-6 bg-gray-600 rounded"></div>
+        <div className="w-6 h-6 bg-gray-600 rounded"></div>
+      </div>
+
+      {/* Floating Game Elements */}
+      <div className="absolute top-16 left-32 z-20">
+        <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full opacity-80 animate-pulse" />
+      </div>
+      <div className="absolute bottom-32 right-40 z-20">
+        <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full opacity-70 animate-bounce" />
+      </div>
+
+      {/* Main Title */}
+      <div className="absolute top-24 left-1/2 transform -translate-x-1/2 z-30 text-center">
+        <h1 className="text-6xl font-black mb-2">
+          <span className="text-white">TURF</span>
+          <span className="text-yellow-400">LOOT</span>
+        </h1>
+        <p className="text-white font-bold text-lg tracking-wider">SKILL-BASED GRID DOMINATION</p>
+      </div>
+
+      {/* Left Panel - Leaderboard */}
+      <div className="absolute left-6 top-40 w-80 z-40">
+        <div className="bg-gray-900/90 rounded-2xl border border-gray-700 p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 bg-yellow-500 rounded flex items-center justify-center">
+              🏆
+            </div>
+            <h3 className="text-white font-bold">Leaderboard</h3>
+            <div className="ml-auto">
+              <div className="px-2 py-1 bg-green-500/30 text-green-400 text-xs rounded border border-green-500/50">
+                Live
+              </div>
+            </div>
           </div>
-          <button className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-lg px-4 py-2 hover:bg-slate-700/50 transition-colors">
-            <span className="text-sm font-medium">Login</span>
+          
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between items-center py-1">
+              <span className="text-gray-300 text-sm">1. Quantum</span>
+              <span className="text-yellow-400 font-bold text-sm">$6,559.45</span>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <span className="text-gray-300 text-sm">2. Dernie237</span>
+              <span className="text-yellow-400 font-bold text-sm">$5,210.67</span>
+            </div>
+            <div className="flex justify-between items-center py-1">
+              <span className="text-gray-300 text-sm">3. Mr.TK216</span>
+              <span className="text-yellow-400 font-bold text-sm">$4,757.38</span>
+            </div>
+          </div>
+          
+          <button className="w-full py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 text-sm hover:bg-gray-700 transition-colors">
+            View Full Leaderboard
           </button>
         </div>
-      </header>
+      </div>
 
-      {/* Main Content */}
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-[80vh] px-6">
+      {/* Center Area - Game Controls */}
+      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 text-center">
         
-        {/* Title Section */}
-        <div className={`text-center mb-12 transition-all duration-1000 delay-300 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <h1 className="text-7xl font-black mb-4 text-gradient">
-            TURF<span style={{color: '#10b981'}}>LOOT</span>
-          </h1>
-          <p className="text-xl text-slate-400 font-medium tracking-wide">
-            Skill-Based Grid Domination
-          </p>
-        </div>
-
-        {/* Live Stats */}
-        <div className={`flex gap-12 mb-8 transition-all duration-1000 delay-500 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-emerald-400 mb-1 transition-all duration-500">
-              {liveStats.players}
+        {/* Player Name Input */}
+        <div className="mb-6">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center text-black font-bold text-xl">
+              0
             </div>
-            <div className="text-sm text-slate-500 uppercase tracking-wide">Players Online</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-emerald-400 mb-1 transition-all duration-500">
-              ${liveStats.winnings}
+            <input 
+              type="text" 
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              className="bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white font-semibold text-center w-40"
+              placeholder="Enter your name"
+            />
+            <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white font-bold">
+              ✓
             </div>
-            <div className="text-sm text-slate-500 uppercase tracking-wide">Total Winnings</div>
           </div>
         </div>
 
-        {/* Stake Selection */}
-        <div className={`flex gap-3 mb-8 transition-all duration-1000 delay-700 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          {stakes.map((stake) => (
+        {/* Stakes */}
+        <div className="flex gap-2 mb-6 justify-center">
+          {['$1', '$5', '$20'].map((stake) => (
             <button
-              key={stake.value}
-              onClick={() => setSelectedStake(stake.value)}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 ${
-                selectedStake === stake.value
-                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25'
-                  : 'bg-slate-800/50 backdrop-blur border border-slate-700 text-slate-300 hover:bg-slate-700/50'
+              key={stake}
+              onClick={() => setSelectedStake(stake)}
+              className={`px-6 py-3 rounded-lg font-bold text-lg transition-all ${
+                selectedStake === stake
+                  ? 'bg-yellow-500 text-black border-2 border-yellow-400'
+                  : 'bg-gray-800 text-white border border-gray-600 hover:bg-gray-700'
               }`}
             >
-              {stake.label}
+              {stake}
             </button>
           ))}
         </div>
 
-        {/* Main CTA Button */}
-        <div className={`mb-8 transition-all duration-1000 delay-900 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <button
-            onClick={handleJoinGame}
-            className="bg-gradient-emerald text-white font-bold py-4 px-12 rounded-2xl text-xl transition-all duration-300 hover:scale-105 glow-effect relative overflow-hidden group"
-            style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #06d6a0 100%)',
-              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)'
-            }}
-          >
-            <span className="relative z-10">🌍 JOIN GLOBAL MULTIPLAYER</span>
-            <div className="shimmer-effect absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        {/* Main Join Button */}
+        <button 
+          onClick={handleJoinGame}
+          className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold py-4 px-16 rounded-2xl text-xl mb-6 hover:scale-105 transition-all shadow-2xl border-2 border-yellow-400"
+        >
+          ▶ JOIN GAME
+        </button>
+
+        {/* Secondary Buttons */}
+        <div className="flex gap-4 justify-center">
+          <button className="px-6 py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+            AI EU
+          </button>
+          <button className="px-6 py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+            Browse Lobbies
           </button>
         </div>
+      </div>
 
-        {/* Secondary Actions */}
-        <div className={`flex gap-4 transition-all duration-1000 delay-1100 ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <button className="bg-slate-800/50 backdrop-blur border border-slate-700 text-slate-300 px-6 py-3 rounded-xl hover:bg-slate-700/50 transition-all duration-300 hover:scale-105">
-            🎮 Server Browser
-          </button>
-          <button className="bg-slate-800/50 backdrop-blur border border-slate-700 text-slate-300 px-6 py-3 rounded-xl hover:bg-slate-700/50 transition-all duration-300 hover:scale-105">
-            💬 Discord
-          </button>
-        </div>
-      </main>
-
-      {/* Side Panels */}
-      <div className="absolute inset-0 pointer-events-none">
-        
-        {/* Leaderboard Panel */}
-        <div className={`absolute left-6 top-1/2 -translate-y-1/2 w-64 pointer-events-auto transition-all duration-1000 delay-1300 ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}>
-          <div className="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-                🏆
-              </div>
-              <h3 className="text-lg font-semibold">Leaderboard</h3>
-              <div className="ml-auto w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+      {/* Right Panel - Wallet */}
+      <div className="absolute right-6 top-40 w-72 z-40">
+        <div className="bg-gray-900/90 rounded-2xl border border-cyan-400/30 p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 bg-cyan-400 rounded flex items-center justify-center">
+              💰
             </div>
-            <div className="text-center py-8">
-              <div className="text-4xl mb-3">🎯</div>
-              <div className="text-slate-400 text-sm mb-2">No champions yet</div>
-              <div className="text-slate-500 text-xs">Be the first to claim victory</div>
+            <h3 className="text-white font-bold">Wallet</h3>
+            <div className="ml-auto flex gap-2">
+              <button className="text-xs text-gray-400 hover:text-white">[?] Copy Address</button>
+              <button className="text-xs text-gray-400 hover:text-white">[↻] Refresh Balance</button>
             </div>
-            <button className="w-full bg-slate-800/50 border border-slate-700 text-slate-300 py-3 rounded-xl hover:bg-slate-700/50 transition-colors text-sm font-medium">
-              View Rankings
-            </button>
           </div>
-        </div>
-
-        {/* Wallet Panel */}
-        <div className={`absolute right-6 top-1/2 -translate-y-1/2 w-64 pointer-events-auto transition-all duration-1000 delay-1500 ${isLoaded ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
-          <div className="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-lg flex items-center justify-center">
-                💎
-              </div>
-              <h3 className="text-lg font-semibold">Wallet</h3>
-            </div>
-            <div className="text-center mb-6">
-              <div className="text-3xl font-bold text-emerald-400 mb-1">$25.00</div>
-              <div className="text-slate-500 text-sm">Available Balance</div>
-            </div>
-            <div className="space-y-3">
-              <button className="w-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 py-3 rounded-xl hover:bg-emerald-500/30 transition-colors text-sm font-medium">
-                Add Funds
-              </button>
-              <button className="w-full bg-slate-800/50 border border-slate-700 text-slate-300 py-3 rounded-xl hover:bg-slate-700/50 transition-colors text-sm font-medium">
-                Withdraw
-              </button>
-            </div>
+          
+          <div className="text-center mb-6">
+            <div className="text-4xl font-black text-yellow-400 mb-1">$0.00</div>
+            <div className="text-gray-400 text-sm">0.0000 SOL</div>
+          </div>
+          
+          <div className="flex gap-2 mb-4">
+            <button className="flex-1 py-3 bg-green-600/30 border border-green-500/50 rounded-lg text-green-300 font-bold hover:bg-green-600/50 transition-colors">
+              Add Funds
+            </button>
+            <button className="flex-1 py-3 bg-blue-600/30 border border-blue-500/50 rounded-lg text-blue-300 font-bold hover:bg-blue-600/50 transition-colors">
+              Cash Out
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Global Styles for Animations */}
-      <style jsx global>{`
-        @keyframes gridMove {
-          0% { transform: translate(0, 0); }
-          100% { transform: translate(50px, 50px); }
-        }
-        
-        @keyframes float-0 {
-          0%, 100% { 
-            transform: translateY(0px) rotate(0deg);
-            opacity: 0.6;
-          }
-          50% { 
-            transform: translateY(-20px) rotate(180deg);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes float-1 {
-          0%, 100% { 
-            transform: translateY(0px) rotate(0deg);
-            opacity: 0.7;
-          }
-          50% { 
-            transform: translateY(-15px) rotate(-180deg);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes float-2 {
-          0%, 100% { 
-            transform: translateY(0px) rotate(0deg);
-            opacity: 0.5;
-          }
-          50% { 
-            transform: translateY(-25px) rotate(90deg);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
-          50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.8); }
-        }
-        
-        .animate-float-0 { animation: float-0 6s ease-in-out infinite; }
-        .animate-float-1 { animation: float-1 8s ease-in-out infinite; }
-        .animate-float-2 { animation: float-2 7s ease-in-out infinite; }
-        
-        .shimmer-effect {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite;
-        }
-        
-        .glow-effect {
-          animation: glow 3s ease-in-out infinite;
-        }
+      {/* Bottom Left - Friends */}
+      <div className="absolute left-6 bottom-6 w-80 z-40">
+        <div className="bg-gray-900/90 rounded-2xl border border-gray-700 p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 bg-blue-500 rounded flex items-center justify-center">
+              👥
+            </div>
+            <h3 className="text-white font-bold">Friends</h3>
+            <div className="ml-auto flex gap-2">
+              <span className="text-xs text-gray-400">[↻] Refresh</span>
+              <span className="text-xs text-gray-400">0 playing</span>
+            </div>
+          </div>
+          
+          <div className="text-center py-8">
+            <div className="w-12 h-12 bg-gray-700 rounded-full mx-auto mb-3 flex items-center justify-center">
+              👤
+            </div>
+            <div className="text-gray-400 text-sm mb-2">No friends... add some!</div>
+          </div>
+          
+          <button className="w-full py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 text-sm hover:bg-gray-700 transition-colors">
+            Add Friends
+          </button>
+        </div>
+      </div>
 
-        /* Ensure proper gradient rendering */
-        .bg-gradient-slate {
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-        }
-        
-        .bg-gradient-emerald {
-          background: linear-gradient(135deg, #10b981 0%, #06d6a0 100%);
-        }
-        
-        .text-gradient {
-          background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-      `}</style>
+      {/* Bottom Center - Stats */}
+      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-30 text-center">
+        <div className="flex gap-16">
+          <div>
+            <div className="text-4xl font-black text-yellow-400 mb-1">{liveStats.players}</div>
+            <div className="text-gray-400 text-sm">Players in Game</div>
+          </div>
+          <div>
+            <div className="text-4xl font-black text-yellow-400 mb-1">${liveStats.winnings.toLocaleString()}</div>
+            <div className="text-gray-400 text-sm">Global Player Winnings</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Right - Customize */}
+      <div className="absolute right-6 bottom-6 w-72 z-40">
+        <div className="bg-gray-900/90 rounded-2xl border border-gray-700 p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 bg-purple-500 rounded flex items-center justify-center">
+              🎨
+            </div>
+            <h3 className="text-white font-bold">Customize</h3>
+          </div>
+          
+          <div className="text-center mb-4">
+            <div className="w-16 h-16 bg-pink-500 rounded-full mx-auto mb-3 flex items-center justify-center relative">
+              <div className="w-2 h-2 bg-black rounded-full absolute top-4 left-5"></div>
+              <div className="w-2 h-2 bg-black rounded-full absolute top-4 right-5"></div>
+            </div>
+          </div>
+          
+          <button className="w-full py-3 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition-colors mb-2">
+            👤 Manage Affiliate
+          </button>
+          
+          <button className="w-full py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 text-sm hover:bg-gray-700 transition-colors">
+            Change Appearance
+          </button>
+        </div>
+      </div>
+
+      {/* Discord Button */}
+      <div className="absolute bottom-4 left-4 z-40">
+        <button className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-2">
+          🎮 Join Discord!
+        </button>
+      </div>
     </div>
   )
 }
