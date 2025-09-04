@@ -13,16 +13,20 @@ export const metadata = {
     title: 'TurfLoot – Real-time blockchain skill gaming',
     description: 'Compete in skill-based territory battles. Earn real SOL rewards.',
     images: ['/og-image.png'],
+    type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TurfLoot – Real-time blockchain skill gaming',
+    description: 'Compete in skill-based territory battles. Earn real SOL rewards.',
+    images: ['/og-image.png'],
+  },
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
   manifest: '/manifest.webmanifest',
-  other: {
-    // iOS PWA Meta Tags
-    'apple-mobile-web-app-capable': 'yes',
-    'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'apple-mobile-web-app-title': 'TurfLoot',
-    'mobile-web-app-capable': 'yes',
-    // Viewport meta for mobile
-    'viewport': 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'TurfLoot',
   }
 }
 
