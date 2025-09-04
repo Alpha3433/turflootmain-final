@@ -440,8 +440,8 @@ const TurfLootGame = () => {
           scene: [new TurfLootGameScene()]
         }
 
-        gameInstanceRef.current = new Phaser.default.Game(config)
-      })
+        // gameInstanceRef.current = new Phaser.default.Game(config)
+      // })
     }
   }
 
