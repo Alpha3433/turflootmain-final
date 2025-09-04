@@ -100,15 +100,8 @@ const TurfLootGame = () => {
     // Socket.IO removed - using native WebSocket implementation
     if (typeof window !== 'undefined') {
       // Native WebSocket implementation would go here
-        // Initialize Socket.IO connection
-        socketRef.current = io.default('/', {
-          transports: ['websocket'],
-          upgrade: false
-        })
-
-        setupSocketHandlers()
-        initializePhaser()
-      })
+      console.log('WebSocket implementation would be initialized here')
+      initializePhaser()
     }
   }
 
