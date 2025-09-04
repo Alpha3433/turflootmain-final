@@ -3,6 +3,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { getApiUrl } from '../config/apiRouting'
+import WalletManager from '../components/wallet/WalletManager'
+import UserProfile from '../components/UserProfile'
+import AdvancedFriendsPanel from '@/components/social/AdvancedFriendsPanel'
+import UserSettings from '../components/UserSettings'
+import PartyLobbySystem from '../components/lobby/PartyLobbySystem'
+import GameLoadingPopup from '../components/GameLoadingPopup'
+import CustomizationModalClean from '@/components/CustomizationModalClean'
+import ServerBrowserModal from '../components/ServerBrowserModal'
 
 export default function Home() {
   const [userProfile, setUserProfile] = useState(null)
