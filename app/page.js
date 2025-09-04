@@ -1655,17 +1655,17 @@ function HomeContent() {
           </div>
           
           {/* Region Buttons */}
-          {servers.map((server) => (
+          {availableRegions.map((region) => (
             <button
-              key={server.id}
-              onClick={() => setCurrentServer(server)}
+              key={region.id}
+              onClick={() => handleRegionSelect(region.id)}
               className={`px-3 py-1 rounded-lg font-bold text-xs transition-all hover:scale-105 ${
-                currentServer.id === server.id
-                  ? getRegionButtonStyle(server.displayName, true)
-                  : getRegionButtonStyle(server.displayName, false)
+                currentServer === region.displayName
+                  ? 'bg-blue-600 text-white border border-blue-400'
+                  : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'
               }`}
             >
-              {server.displayName}
+              {region.displayName}
             </button>
           ))}
           
