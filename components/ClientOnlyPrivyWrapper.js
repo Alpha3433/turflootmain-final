@@ -19,20 +19,13 @@ const privyConfig = {
 
 export default function ClientOnlyPrivyWrapper({ children }) {
   const [isClient, setIsClient] = useState(false)
-  const [showContent, setShowContent] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
-    // Add a small delay to ensure proper hydration
-    const timer = setTimeout(() => {
-      setShowContent(true)
-    }, 100)
-    
-    return () => clearTimeout(timer)
   }, [])
 
-  // Show loading state during hydration
-  if (!isClient || !showContent) {
+  // Show loading state only during initial hydration
+  if (!isClient) {
     return (
       <div className="min-h-screen bg-[#1E1E1E] text-white flex items-center justify-center">
         <div className="text-center">
