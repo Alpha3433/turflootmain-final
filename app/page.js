@@ -586,8 +586,8 @@ function HomeContent() {
     '#10AC84', '#F79F1F', '#A3CB38', '#FDA7DF', '#D63031', '#74B9FF'
   ]
   
-  // Get Privy authentication directly
-  const { ready, authenticated, user, login, logout } = usePrivy()
+  // Get Privy authentication directly (mocked for now)
+  const { ready, authenticated, user, login, logout } = useMockPrivy()
 
   // Close dropdown when clicking outside - moved here after state declarations
   useEffect(() => {
