@@ -11,16 +11,7 @@ import PartyLobbySystem from '../components/lobby/PartyLobbySystem'
 import GameLoadingPopup from '../components/GameLoadingPopup'
 import CustomizationModalClean from '@/components/CustomizationModalClean'
 import ServerBrowserModal from '../components/ServerBrowserModal'
-// Mock Privy hook for now to show the interface
-function useMockPrivy() {
-  return {
-    ready: true,
-    authenticated: false,
-    user: null,
-    login: () => console.log('Mock login'),
-    logout: () => console.log('Mock logout')
-  }
-}
+import { usePrivy } from '@/components/MockPrivyProvider'
 
 // Main Home component
 function HomeContent() {
