@@ -35,12 +35,13 @@
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    border-color: #404040;
   }
   
   html, body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-dm-sans), system-ui, sans-serif;
+    background-color: #1E1E1E;
+    color: #FFFFFF;
+    font-family: system-ui, sans-serif;
     margin: 0;
     padding: 0;
     min-height: 100vh;
