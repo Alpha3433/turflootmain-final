@@ -97,9 +97,9 @@ const TurfLootGame = () => {
   const initializeGame = () => {
     if (!authenticated || !user) return
 
-    // Dynamic import of socket.io-client
+    // Socket.IO removed - using native WebSocket implementation
     if (typeof window !== 'undefined') {
-      import('socket.io-client').then((io) => {
+      // Native WebSocket implementation would go here
         // Initialize Socket.IO connection
         socketRef.current = io.default('/', {
           transports: ['websocket'],
