@@ -35,11 +35,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-[#1E1E1E] text-white antialiased">
         <GameSettingsProvider>
-          <ClientOnlyPrivyWrapper>
-            <div className="min-h-screen bg-[#1E1E1E] text-white">
-              {children}
-            </div>
-          </ClientOnlyPrivyWrapper>
+          <div className="min-h-screen bg-[#1E1E1E] text-white">
+            {children}
+          </div>
         </GameSettingsProvider>
       </body>
     </html>
