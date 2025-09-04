@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useGameSettings } from '@/components/providers/GameSettingsProvider'
 import { usePrivy } from '@privy-io/react-auth'
-import { io } from 'socket.io-client'
 import OrientationGate from '@/components/ui/OrientationGate'
 
 const AgarIOGame = () => {
