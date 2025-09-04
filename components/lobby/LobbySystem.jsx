@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 import { Users, Plus, Globe, Lock, Crown, Check, X, MessageCircle, Play, Copy, RefreshCw, Wifi } from 'lucide-react'
-import { io } from 'socket.io-client'
+// Socket.IO removed - using native WebSocket implementation
 
 const LobbySystem = () => {
   const { user, authenticated } = usePrivy()
