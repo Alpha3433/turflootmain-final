@@ -50,7 +50,7 @@ app.prepare().then(async () => {
 
   // Keep legacy WebSocket support for backwards compatibility
   try {
-    const { initializeWebSocket } = require('./lib/websocket.js')
+    const { initializeWebSocket } = await import('./lib/websocket.js')
     const io = initializeWebSocket(server)
     console.log('📡 Legacy WebSocket server initialized')
   } catch (error) {
