@@ -27,10 +27,10 @@ const SimpleFriendsPanel = () => (
   </div>
 )
 
-const SimpleWalletManager = () => (
+const SimpleWalletManager = ({ balance }) => (
   <div className="text-center py-4 relative">
     <div className="flex items-center justify-center gap-2 mb-2">
-      <div className="text-3xl font-black text-white">${userBalance.toFixed(2)}</div>
+      <div className="text-3xl font-black text-white">${balance.toFixed(2)}</div>
       <div className="w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
         <span className="text-black font-bold text-xs">$</span>
       </div>
