@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Test configuration
-BASE_URL = "https://game-server-hub-5.preview.emergentagent.com"
+BASE_URL = "https://game-landing-fix.preview.emergentagent.com"
 TEST_USER_ID = "did:privy:cmeksdeoe00gzl10bsienvnbk"
 TEST_USER_USERNAME = "anth"
 

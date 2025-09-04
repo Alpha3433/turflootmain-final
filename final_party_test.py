@@ -9,7 +9,7 @@ import json
 import time
 
 # Configuration
-BASE_URL = "https://game-server-hub-5.preview.emergentagent.com"
+BASE_URL = "https://game-landing-fix.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
 # Real user IDs from server logs
