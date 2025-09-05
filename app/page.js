@@ -1086,7 +1086,7 @@ export default function TurfLootTactical() {
         <div style={{
           position: 'absolute',
           left: '120px',
-          top: '405px',
+          top: '370px',
           width: '300px',
           zIndex: 20,
           ...tacticalPanelStyle
