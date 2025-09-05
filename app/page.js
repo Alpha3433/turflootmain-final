@@ -304,7 +304,7 @@ export default function TurfLootTactical() {
     return (
       <div style={containerStyle}>
         
-        {/* Tactical Animated Background */}
+        {/* Enhanced Tactical Animated Background */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -315,7 +315,43 @@ export default function TurfLootTactical() {
           overflow: 'hidden'
         }}>
           
-          {/* Radar Sweep */}
+          {/* Animated Background Layers */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: `
+              radial-gradient(circle at 20% 80%, rgba(104, 211, 145, 0.03) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(246, 173, 85, 0.03) 0%, transparent 50%),
+              radial-gradient(circle at 40% 40%, rgba(252, 129, 129, 0.02) 0%, transparent 50%)
+            `,
+            animation: 'backgroundPulse 20s ease-in-out infinite'
+          }} />
+
+          {/* Moving Scan Lines */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '2px',
+            background: 'linear-gradient(90deg, transparent 0%, #68d391 50%, transparent 100%)',
+            animation: 'scanLineVertical 8s linear infinite'
+          }} />
+          
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '2px',
+            height: '100%',
+            background: 'linear-gradient(0deg, transparent 0%, #f6ad55 50%, transparent 100%)',
+            animation: 'scanLineHorizontal 12s linear infinite'
+          }} />
+
+          {/* Enhanced Radar Sweep */}
           <div style={{
             position: 'absolute',
             top: '20%',
@@ -338,7 +374,7 @@ export default function TurfLootTactical() {
               transform: 'translate(-50%, -100%)',
               animation: 'radarLine 4s linear infinite'
             }} />
-            {/* Radar Blips */}
+            {/* Enhanced Radar Blips */}
             <div style={{
               position: 'absolute',
               top: '30%',
@@ -361,9 +397,20 @@ export default function TurfLootTactical() {
               boxShadow: '0 0 8px #fc8181',
               animation: 'radarBlip 4s linear infinite 1s'
             }} />
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '80%',
+              width: '2px',
+              height: '2px',
+              background: '#68d391',
+              borderRadius: '50%',
+              boxShadow: '0 0 6px #68d391',
+              animation: 'radarBlip 4s linear infinite 2s'
+            }} />
           </div>
 
-          {/* Tactical Grid */}
+          {/* Animated Tactical Grid */}
           <div style={{
             position: 'absolute',
             top: 0,
@@ -379,7 +426,44 @@ export default function TurfLootTactical() {
             animation: 'tacticalGrid 30s linear infinite'
           }} />
 
-          {/* HUD Elements */}
+          {/* Secondary Moving Grid */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '120%',
+            height: '120%',
+            opacity: 0.2,
+            backgroundImage: `
+              linear-gradient(rgba(246, 173, 85, 0.2) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(246, 173, 85, 0.2) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+            animation: 'tacticalGrid 45s linear infinite reverse'
+          }} />
+
+          {/* Pulsing Data Streams */}
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            left: '80%',
+            width: '2px',
+            height: '200px',
+            background: 'linear-gradient(to bottom, #fc8181, transparent)',
+            animation: 'dataStream 3s ease-in-out infinite'
+          }} />
+          
+          <div style={{
+            position: 'absolute',
+            top: '60%',
+            left: '5%',
+            width: '150px',
+            height: '2px',
+            background: 'linear-gradient(to right, #68d391, transparent)',
+            animation: 'dataStream 4s ease-in-out infinite 1s'
+          }} />
+
+          {/* Enhanced HUD Elements */}
           <div style={{
             position: 'absolute',
             top: '15%',
@@ -409,28 +493,96 @@ export default function TurfLootTactical() {
               fontFamily: '"Rajdhani", monospace',
               fontWeight: '600'
             }}>STATUS: ACTIVE</div>
+            {/* Animated progress bar */}
+            <div style={{
+              position: 'absolute',
+              bottom: '20px',
+              left: '5px',
+              right: '5px',
+              height: '4px',
+              background: 'rgba(104, 211, 145, 0.2)',
+              borderRadius: '2px'
+            }}>
+              <div style={{
+                height: '100%',
+                background: '#68d391',
+                borderRadius: '2px',
+                animation: 'progressBar 5s ease-in-out infinite',
+                boxShadow: '0 0 8px #68d391'
+              }} />
+            </div>
           </div>
 
-          {/* Floating Tactical Elements */}
-          {[...Array(12)].map((_, i) => (
+          {/* Secondary HUD Element */}
+          <div style={{
+            position: 'absolute',
+            bottom: '15%',
+            right: '5%',
+            width: '150px',
+            height: '80px',
+            border: '2px solid rgba(252, 129, 129, 0.6)',
+            borderRadius: '4px',
+            background: 'rgba(26, 32, 44, 0.7)',
+            animation: 'hudFlicker 4s ease-in-out infinite 2s'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '5px',
+              left: '5px',
+              color: '#fc8181',
+              fontSize: '10px',
+              fontFamily: '"Rajdhani", monospace',
+              fontWeight: '700'
+            }}>THREAT: LOW</div>
+            <div style={{
+              position: 'absolute',
+              bottom: '5px',
+              right: '5px',
+              color: '#68d391',
+              fontSize: '8px',
+              fontFamily: '"Rajdhani", monospace',
+              fontWeight: '600'
+            }}>SECURED</div>
+          </div>
+
+          {/* Enhanced Floating Tactical Elements */}
+          {[...Array(18)].map((_, i) => (
             <div
               key={`tactical-${i}`}
               style={{
                 position: 'absolute',
-                width: Math.random() * 3 + 2 + 'px',
-                height: Math.random() * 3 + 2 + 'px',
+                width: Math.random() * 4 + 1 + 'px',
+                height: Math.random() * 4 + 1 + 'px',
                 background: ['#68d391', '#f6ad55', '#fc8181'][Math.floor(Math.random() * 3)],
                 left: Math.random() * 100 + '%',
                 top: Math.random() * 100 + '%',
-                opacity: Math.random() * 0.7 + 0.3,
-                animation: `tacticalFloat ${Math.random() * 6 + 8}s ease-in-out infinite`,
+                opacity: Math.random() * 0.7 + 0.2,
+                animation: `tacticalFloat ${Math.random() * 8 + 6}s ease-in-out infinite`,
                 boxShadow: `0 0 8px currentColor`,
-                zIndex: 5
+                zIndex: 5,
+                borderRadius: Math.random() > 0.5 ? '50%' : '0'
               }}
             />
           ))}
 
-          {/* Crosshairs */}
+          {/* Matrix-style Code Rain */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={`code-${i}`}
+              style={{
+                position: 'absolute',
+                left: `${Math.random() * 100}%`,
+                top: '-20px',
+                width: '2px',
+                height: `${Math.random() * 300 + 100}px`,
+                background: `linear-gradient(to bottom, transparent, #68d391, transparent)`,
+                opacity: 0.3,
+                animation: `codeMatrix ${Math.random() * 5 + 3}s linear infinite ${Math.random() * 3}s`
+              }}
+            />
+          ))}
+
+          {/* Enhanced Crosshairs */}
           <div style={{
             position: 'absolute',
             top: '40%',
@@ -460,6 +612,49 @@ export default function TurfLootTactical() {
               transform: 'translateX(-50%)'
             }} />
           </div>
+
+          {/* Secondary Crosshair */}
+          <div style={{
+            position: 'absolute',
+            top: '70%',
+            right: '20%',
+            width: '30px',
+            height: '30px',
+            border: '1px solid rgba(104, 211, 145, 0.5)',
+            borderRadius: '50%',
+            animation: 'crosshairPulse 4s ease-in-out infinite 1.5s'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '-8px',
+              right: '-8px',
+              height: '1px',
+              background: '#68d391',
+              transform: 'translateY(-50%)'
+            }} />
+            <div style={{
+              position: 'absolute',
+              left: '50%',
+              top: '-8px',
+              bottom: '-8px',
+              width: '1px',
+              background: '#68d391',
+              transform: 'translateX(-50%)'
+            }} />
+          </div>
+
+          {/* Scanning Beams */}
+          <div style={{
+            position: 'absolute',
+            top: '30%',
+            left: '70%',
+            width: '200px',
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent 0%, #f6ad55 50%, transparent 100%)',
+            animation: 'scanBeam 6s ease-in-out infinite',
+            transformOrigin: 'left center'
+          }} />
         </div>
 
         {/* Desktop Header */}
