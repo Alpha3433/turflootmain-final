@@ -952,9 +952,9 @@ export default function TurfLootTactical() {
         {/* Right Panel - Arsenal */}
         <div style={{
           position: 'absolute',
-          right: '40px',
-          top: '220px',
-          width: '300px',
+          right: '30px',
+          top: '180px',
+          width: '280px',
           zIndex: 20,
           ...ambrerPanelStyle
         }}>
