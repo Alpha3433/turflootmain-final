@@ -1986,8 +1986,15 @@ export default function TurfLootTactical() {
       </div>
 
       {/* Mobile CSS Animations */}
-      <style jsx>{`
+      <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+        
+        html, body {
+          margin: 0;
+          padding: 0;
+          background: #0d1117;
+          overflow-x: hidden;
+        }
         
         @keyframes radarSweep {
           0% { 
