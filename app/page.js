@@ -944,7 +944,7 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            ACCESS FULL INTEL
+            VIEW FULL LEADERBOARD
           </button>
         </div>
 
