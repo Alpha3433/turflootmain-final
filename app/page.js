@@ -325,14 +325,15 @@ export default function TurfLootTactical() {
           {/* Animated Background Layers */}
           <div style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
+            top: '-50px',
+            left: '-50px',
+            width: 'calc(100% + 100px)',
+            height: 'calc(100% + 100px)',
             background: `
               radial-gradient(circle at 20% 80%, rgba(104, 211, 145, 0.03) 0%, transparent 50%),
               radial-gradient(circle at 80% 20%, rgba(246, 173, 85, 0.03) 0%, transparent 50%),
-              radial-gradient(circle at 40% 40%, rgba(252, 129, 129, 0.02) 0%, transparent 50%)
+              radial-gradient(circle at 40% 40%, rgba(252, 129, 129, 0.02) 0%, transparent 50%),
+              radial-gradient(ellipse at center, #2d3748 0%, #1a202c 50%, #0d1117 100%)
             `,
             animation: 'backgroundPulse 20s ease-in-out infinite'
           }} />
