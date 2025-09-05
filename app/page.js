@@ -420,10 +420,10 @@ export default function TurfLootTactical() {
           {/* Animated Tactical Grid */}
           <div style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '120%',
-            height: '120%',
+            top: '-100px',
+            left: '-100px',
+            width: '150%',
+            height: '150%',
             opacity: 0.4,
             backgroundImage: `
               linear-gradient(rgba(104, 211, 145, 0.3) 1px, transparent 1px),
@@ -436,10 +436,10 @@ export default function TurfLootTactical() {
           {/* Secondary Moving Grid */}
           <div style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '120%',
-            height: '120%',
+            top: '-100px',
+            left: '-100px',
+            width: '150%',
+            height: '150%',
             opacity: 0.2,
             backgroundImage: `
               linear-gradient(rgba(246, 173, 85, 0.2) 1px, transparent 1px),
