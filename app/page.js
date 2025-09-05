@@ -1223,7 +1223,7 @@ export default function TurfLootTactical() {
         }}>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>OPERATIVES DEPLOYED</div>
+            <div style={statLabelStyle}>PLAYERS ONLINE</div>
           </div>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
