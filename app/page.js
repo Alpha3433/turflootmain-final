@@ -1807,7 +1807,7 @@ export default function TurfLootTactical() {
                 fontFamily: '"Rajdhani", sans-serif',
                 textTransform: 'uppercase'
               }}>
-                EXTRACT
+                WITHDRAW
               </button>
             </div>
           </div>
