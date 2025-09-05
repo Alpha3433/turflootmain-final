@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function TurfLootSynthwave() {
+export default function TurfLootTactical() {
   const router = useRouter()
   const [selectedStake, setSelectedStake] = useState('$1')
-  const [liveStats, setLiveStats] = useState({ players: 42, winnings: 567891 })
+  const [liveStats, setLiveStats] = useState({ players: 38, winnings: 654321 })
   const [userName, setUserName] = useState('anth')
   const [isMobile, setIsMobile] = useState(false)
 
@@ -22,8 +22,8 @@ export default function TurfLootSynthwave() {
     // Simulate live stats updates
     const interval = setInterval(() => {
       setLiveStats(prev => ({
-        players: Math.floor(Math.random() * 60) + 30,
-        winnings: Math.floor(Math.random() * 300000) + 400000
+        players: Math.floor(Math.random() * 50) + 25,
+        winnings: Math.floor(Math.random() * 400000) + 500000
       }))
     }, 4000)
     
@@ -39,11 +39,11 @@ export default function TurfLootSynthwave() {
 
   const containerStyle = {
     minHeight: '100vh',
-    background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 30%, #16213e 70%, #0f3460 100%)',
-    color: '#ffffff',
+    background: 'radial-gradient(ellipse at center, #2d3748 0%, #1a202c 50%, #0d1117 100%)',
+    color: '#e2e8f0',
     overflow: 'hidden',
     position: 'relative',
-    fontFamily: '"Orbitron", "Courier New", monospace',
+    fontFamily: '"Rajdhani", "Arial Black", sans-serif',
     ...(isMobile && {
       overflow: 'auto',
       paddingBottom: '20px'
@@ -60,32 +60,34 @@ export default function TurfLootSynthwave() {
     zIndex: 20
   }
 
-  const neonPanelStyle = {
-    background: 'rgba(0, 0, 0, 0.8)',
+  const tacticalPanelStyle = {
+    background: 'linear-gradient(135deg, rgba(45, 55, 72, 0.9) 0%, rgba(26, 32, 44, 0.95) 100%)',
     backdropFilter: 'blur(10px)',
-    borderRadius: isMobile ? '12px' : '16px',
-    border: '2px solid #ff00ff',
+    borderRadius: isMobile ? '4px' : '6px',
+    border: '2px solid #68d391',
     boxShadow: `
-      0 0 20px #ff00ff,
-      0 0 40px rgba(255, 0, 255, 0.3),
-      inset 0 0 20px rgba(255, 0, 255, 0.1)
+      0 0 20px rgba(104, 211, 145, 0.4),
+      0 0 40px rgba(104, 211, 145, 0.2),
+      inset 0 1px 0 rgba(104, 211, 145, 0.1)
     `,
     padding: isMobile ? '16px' : '20px',
-    position: 'relative'
+    position: 'relative',
+    overflow: 'hidden'
   }
 
-  const cyanPanelStyle = {
-    background: 'rgba(0, 0, 0, 0.8)',
+  const ambrerPanelStyle = {
+    background: 'linear-gradient(135deg, rgba(45, 55, 72, 0.9) 0%, rgba(26, 32, 44, 0.95) 100%)',
     backdropFilter: 'blur(10px)',
-    borderRadius: isMobile ? '12px' : '16px',
-    border: '2px solid #00ffff',
+    borderRadius: isMobile ? '4px' : '6px',
+    border: '2px solid #f6ad55',
     boxShadow: `
-      0 0 20px #00ffff,
-      0 0 40px rgba(0, 255, 255, 0.3),
-      inset 0 0 20px rgba(0, 255, 255, 0.1)
+      0 0 20px rgba(246, 173, 85, 0.4),
+      0 0 40px rgba(246, 173, 85, 0.2),
+      inset 0 1px 0 rgba(246, 173, 85, 0.1)
     `,
     padding: isMobile ? '16px' : '20px',
-    position: 'relative'
+    position: 'relative',
+    overflow: 'hidden'
   }
 
   const headerStyle = {
@@ -118,24 +120,25 @@ export default function TurfLootSynthwave() {
     fontSize: isMobile ? '3rem' : '5.5rem',
     fontWeight: '900',
     margin: '0 0 8px 0',
-    background: 'linear-gradient(45deg, #ff00ff 0%, #00ffff 50%, #ff0080 100%)',
+    background: 'linear-gradient(45deg, #68d391 0%, #f6ad55 50%, #fc8181 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
-    textShadow: '0 0 30px #ff00ff, 0 0 60px #00ffff',
-    letterSpacing: '0.1em',
-    fontFamily: '"Orbitron", monospace'
+    textShadow: '0 0 30px rgba(104, 211, 145, 0.6)',
+    letterSpacing: '0.05em',
+    fontFamily: '"Rajdhani", sans-serif',
+    textTransform: 'uppercase'
   }
 
   const subtitleStyle = {
-    color: '#00ffff',
+    color: '#68d391',
     fontWeight: '700',
     fontSize: isMobile ? '12px' : '16px',
     letterSpacing: '0.3em',
     margin: 0,
     textTransform: 'uppercase',
-    textShadow: '0 0 10px #00ffff',
-    fontFamily: '"Orbitron", monospace'
+    textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
+    fontFamily: '"Rajdhani", sans-serif'
   }
 
   const centerControlsStyle = {
@@ -151,82 +154,88 @@ export default function TurfLootSynthwave() {
   }
 
   const nameInputStyle = {
-    background: 'rgba(0, 0, 0, 0.9)',
-    border: '2px solid #ff00ff',
-    borderRadius: '8px',
+    background: 'rgba(26, 32, 44, 0.9)',
+    border: '2px solid #68d391',
+    borderRadius: '4px',
     padding: isMobile ? '12px 16px' : '14px 20px',
-    color: '#ff00ff',
-    fontWeight: '600',
+    color: '#68d391',
+    fontWeight: '700',
     textAlign: 'center',
     width: isMobile ? '160px' : '200px',
     fontSize: isMobile ? '14px' : '16px',
-    boxShadow: '0 0 20px rgba(255, 0, 255, 0.5), inset 0 0 10px rgba(255, 0, 255, 0.1)',
+    boxShadow: '0 0 20px rgba(104, 211, 145, 0.3), inset 0 0 10px rgba(104, 211, 145, 0.1)',
     outline: 'none',
     transition: 'all 0.3s ease',
-    fontFamily: '"Orbitron", monospace'
+    fontFamily: '"Rajdhani", sans-serif',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em'
   }
 
   const stakeButtonStyle = {
     padding: isMobile ? '12px 20px' : '16px 32px',
-    borderRadius: '8px',
+    borderRadius: '4px',
     fontWeight: '700',
     fontSize: isMobile ? '14px' : '16px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     border: '2px solid',
     margin: isMobile ? '0 4px' : '0 8px',
-    fontFamily: '"Orbitron", monospace',
+    fontFamily: '"Rajdhani", sans-serif',
     textTransform: 'uppercase',
-    letterSpacing: '0.1em'
+    letterSpacing: '0.1em',
+    position: 'relative',
+    overflow: 'hidden'
   }
 
   const activeStakeStyle = {
     ...stakeButtonStyle,
-    background: 'linear-gradient(45deg, #ff00ff 0%, #ff0080 100%)',
-    color: '#ffffff',
-    borderColor: '#ff00ff',
-    boxShadow: '0 0 30px #ff00ff, 0 0 60px rgba(255, 0, 255, 0.3)',
+    background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+    color: '#1a202c',
+    borderColor: '#68d391',
+    boxShadow: '0 0 30px rgba(104, 211, 145, 0.6), 0 0 60px rgba(104, 211, 145, 0.3)',
     transform: 'scale(1.05)'
   }
 
   const inactiveStakeStyle = {
     ...stakeButtonStyle,
-    background: 'rgba(0, 0, 0, 0.8)',
-    color: '#00ffff',
-    borderColor: '#00ffff',
-    boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)'
+    background: 'rgba(26, 32, 44, 0.8)',
+    color: '#f6ad55',
+    borderColor: '#f6ad55',
+    boxShadow: '0 0 15px rgba(246, 173, 85, 0.3)'
   }
 
-  const joinButtonStyle = {
-    background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 50%, #8000ff 100%)',
+  const deployButtonStyle = {
+    background: 'linear-gradient(45deg, #fc8181 0%, #f56565 50%, #e53e3e 100%)',
     color: '#ffffff',
     fontWeight: '900',
     padding: isMobile ? '16px 48px' : '20px 64px',
-    borderRadius: '12px',
+    borderRadius: '6px',
     fontSize: isMobile ? '16px' : '20px',
     marginBottom: isMobile ? '20px' : '32px',
     cursor: 'pointer',
-    border: '2px solid #ff00ff',
-    boxShadow: '0 0 40px #ff00ff, 0 0 80px rgba(255, 0, 255, 0.4)',
+    border: '2px solid #fc8181',
+    boxShadow: '0 0 40px rgba(252, 129, 129, 0.6), 0 0 80px rgba(252, 129, 129, 0.3)',
     transition: 'all 0.3s ease',
     letterSpacing: '0.1em',
-    fontFamily: '"Orbitron", monospace',
-    textTransform: 'uppercase'
+    fontFamily: '"Rajdhani", sans-serif',
+    textTransform: 'uppercase',
+    position: 'relative',
+    overflow: 'hidden'
   }
 
   const secondaryButtonStyle = {
     padding: isMobile ? '10px 20px' : '12px 24px',
-    background: 'rgba(0, 0, 0, 0.8)',
-    border: '2px solid #00ffff',
-    borderRadius: '8px',
-    color: '#00ffff',
+    background: 'rgba(26, 32, 44, 0.8)',
+    border: '2px solid #68d391',
+    borderRadius: '4px',
+    color: '#68d391',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     margin: isMobile ? '0 6px' : '0 10px',
     fontWeight: '600',
     fontSize: isMobile ? '12px' : '14px',
-    boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)',
-    fontFamily: '"Orbitron", monospace',
+    boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
+    fontFamily: '"Rajdhani", sans-serif',
     textTransform: 'uppercase',
     letterSpacing: '0.05em'
   }
@@ -234,7 +243,7 @@ export default function TurfLootSynthwave() {
   const iconStyle = {
     width: isMobile ? '24px' : '32px',
     height: isMobile ? '24px' : '32px',
-    borderRadius: '6px',
+    borderRadius: '3px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -264,23 +273,23 @@ export default function TurfLootSynthwave() {
   const statNumberStyle = {
     fontSize: isMobile ? '28px' : '42px',
     fontWeight: '900',
-    background: 'linear-gradient(45deg, #ff00ff 0%, #00ffff 100%)',
+    background: 'linear-gradient(45deg, #68d391 0%, #f6ad55 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     marginBottom: '4px',
-    textShadow: '0 0 20px #ff00ff',
-    fontFamily: '"Orbitron", monospace'
+    textShadow: '0 0 20px rgba(104, 211, 145, 0.5)',
+    fontFamily: '"Rajdhani", sans-serif'
   }
 
   const statLabelStyle = {
-    color: '#00ffff',
+    color: '#68d391',
     fontSize: isMobile ? '11px' : '14px',
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
-    textShadow: '0 0 10px #00ffff',
-    fontFamily: '"Orbitron", monospace'
+    textShadow: '0 0 10px rgba(104, 211, 145, 0.5)',
+    fontFamily: '"Rajdhani", sans-serif'
   }
 
   const mobileGridStyle = {
@@ -295,7 +304,7 @@ export default function TurfLootSynthwave() {
     return (
       <div style={containerStyle}>
         
-        {/* Animated Synthwave Background */}
+        {/* Tactical Animated Background */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -306,79 +315,151 @@ export default function TurfLootSynthwave() {
           overflow: 'hidden'
         }}>
           
-          {/* Moving Grid */}
+          {/* Radar Sweep */}
+          <div style={{
+            position: 'absolute',
+            top: '20%',
+            right: '10%',
+            width: '300px',
+            height: '300px',
+            border: '2px solid rgba(104, 211, 145, 0.3)',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, transparent 70%, rgba(104, 211, 145, 0.1) 100%)',
+            animation: 'radarSweep 4s linear infinite'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              width: '2px',
+              height: '150px',
+              background: 'linear-gradient(to bottom, #68d391, transparent)',
+              transformOrigin: 'top center',
+              transform: 'translate(-50%, -100%)',
+              animation: 'radarLine 4s linear infinite'
+            }} />
+            {/* Radar Blips */}
+            <div style={{
+              position: 'absolute',
+              top: '30%',
+              left: '60%',
+              width: '4px',
+              height: '4px',
+              background: '#f6ad55',
+              borderRadius: '50%',
+              boxShadow: '0 0 10px #f6ad55',
+              animation: 'radarBlip 4s linear infinite'
+            }} />
+            <div style={{
+              position: 'absolute',
+              top: '70%',
+              left: '40%',
+              width: '3px',
+              height: '3px',
+              background: '#fc8181',
+              borderRadius: '50%',
+              boxShadow: '0 0 8px #fc8181',
+              animation: 'radarBlip 4s linear infinite 1s'
+            }} />
+          </div>
+
+          {/* Tactical Grid */}
           <div style={{
             position: 'absolute',
             top: 0,
             left: 0,
-            width: '200%',
-            height: '200%',
-            opacity: 0.6,
+            width: '120%',
+            height: '120%',
+            opacity: 0.4,
             backgroundImage: `
-              linear-gradient(#ff00ff 2px, transparent 2px),
-              linear-gradient(90deg, #ff00ff 2px, transparent 2px),
-              linear-gradient(#00ffff 1px, transparent 1px),
-              linear-gradient(90deg, #00ffff 1px, transparent 1px)
+              linear-gradient(rgba(104, 211, 145, 0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(104, 211, 145, 0.3) 1px, transparent 1px)
             `,
-            backgroundSize: '100px 100px, 100px 100px, 20px 20px, 20px 20px',
-            animation: 'synthGrid 20s linear infinite'
+            backgroundSize: '80px 80px',
+            animation: 'tacticalGrid 30s linear infinite'
           }} />
 
-          {/* Neon Particles */}
-          {[...Array(20)].map((_, i) => (
+          {/* HUD Elements */}
+          <div style={{
+            position: 'absolute',
+            top: '15%',
+            left: '5%',
+            width: '200px',
+            height: '100px',
+            border: '2px solid rgba(246, 173, 85, 0.6)',
+            borderRadius: '4px',
+            background: 'rgba(26, 32, 44, 0.7)',
+            animation: 'hudFlicker 6s ease-in-out infinite'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '5px',
+              left: '5px',
+              color: '#f6ad55',
+              fontSize: '12px',
+              fontFamily: '"Rajdhani", monospace',
+              fontWeight: '700'
+            }}>SECTOR: ALPHA-7</div>
+            <div style={{
+              position: 'absolute',
+              bottom: '5px',
+              right: '5px',
+              color: '#68d391',
+              fontSize: '10px',
+              fontFamily: '"Rajdhani", monospace',
+              fontWeight: '600'
+            }}>STATUS: ACTIVE</div>
+          </div>
+
+          {/* Floating Tactical Elements */}
+          {[...Array(12)].map((_, i) => (
             <div
-              key={`particle-${i}`}
+              key={`tactical-${i}`}
               style={{
                 position: 'absolute',
-                width: Math.random() * 4 + 2 + 'px',
-                height: Math.random() * 4 + 2 + 'px',
-                background: ['#ff00ff', '#00ffff', '#ff0080'][Math.floor(Math.random() * 3)],
-                borderRadius: '50%',
+                width: Math.random() * 3 + 2 + 'px',
+                height: Math.random() * 3 + 2 + 'px',
+                background: ['#68d391', '#f6ad55', '#fc8181'][Math.floor(Math.random() * 3)],
                 left: Math.random() * 100 + '%',
                 top: Math.random() * 100 + '%',
-                opacity: Math.random() * 0.8 + 0.2,
-                animation: `neonFloat ${Math.random() * 4 + 6}s ease-in-out infinite`,
-                boxShadow: `0 0 10px currentColor`,
+                opacity: Math.random() * 0.7 + 0.3,
+                animation: `tacticalFloat ${Math.random() * 6 + 8}s ease-in-out infinite`,
+                boxShadow: `0 0 8px currentColor`,
                 zIndex: 5
               }}
             />
           ))}
 
-          {/* Synthwave Sun */}
+          {/* Crosshairs */}
           <div style={{
             position: 'absolute',
-            bottom: '30%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '200px',
-            height: '200px',
-            background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 50%, transparent 70%)',
+            top: '40%',
+            left: '15%',
+            width: '40px',
+            height: '40px',
+            border: '2px solid rgba(252, 129, 129, 0.6)',
             borderRadius: '50%',
-            opacity: 0.3,
-            animation: 'synthPulse 4s ease-in-out infinite',
-            zIndex: 2
-          }} />
-
-          {/* Retro Triangles */}
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={`triangle-${i}`}
-              style={{
-                position: 'absolute',
-                width: 0,
-                height: 0,
-                borderLeft: `${Math.random() * 20 + 10}px solid transparent`,
-                borderRight: `${Math.random() * 20 + 10}px solid transparent`,
-                borderBottom: `${Math.random() * 30 + 20}px solid ${['#ff00ff', '#00ffff', '#ff0080'][Math.floor(Math.random() * 3)]}`,
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-                opacity: Math.random() * 0.3 + 0.1,
-                animation: `retroFloat ${Math.random() * 8 + 10}s ease-in-out infinite`,
-                filter: `drop-shadow(0 0 10px currentColor)`,
-                zIndex: 3
-              }}
-            />
-          ))}
+            animation: 'crosshairPulse 3s ease-in-out infinite'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '-10px',
+              right: '-10px',
+              height: '2px',
+              background: '#fc8181',
+              transform: 'translateY(-50%)'
+            }} />
+            <div style={{
+              position: 'absolute',
+              left: '50%',
+              top: '-10px',
+              bottom: '-10px',
+              width: '2px',
+              background: '#fc8181',
+              transform: 'translateX(-50%)'
+            }} />
+          </div>
         </div>
 
         {/* Desktop Header */}
@@ -387,24 +468,26 @@ export default function TurfLootSynthwave() {
             <div style={{
               width: '40px',
               height: '40px',
-              background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
-              borderRadius: '8px',
+              background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)',
+              borderRadius: '4px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '18px',
-              boxShadow: '0 0 20px #ff0080',
-              border: '2px solid #ff00ff'
+              boxShadow: '0 0 20px rgba(252, 129, 129, 0.6)',
+              border: '2px solid #fc8181'
             }}>
-              🔥
+              ⚡
             </div>
             <span style={{ 
-              color: '#00ffff', 
+              color: '#68d391', 
               fontWeight: '700', 
               fontSize: '16px',
-              textShadow: '0 0 10px #00ffff',
-              fontFamily: '"Orbitron", monospace'
-            }}>WELCOME, PLAYER_8812</span>
+              textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em'
+            }}>OPERATIVE: SHADOW_8812</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -414,10 +497,10 @@ export default function TurfLootSynthwave() {
                 style={{ 
                   width: '32px', 
                   height: '32px', 
-                  background: 'rgba(0, 0, 0, 0.8)', 
-                  border: '2px solid #00ffff',
-                  borderRadius: '6px',
-                  boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)'
+                  background: 'rgba(26, 32, 44, 0.8)', 
+                  border: '2px solid #68d391',
+                  borderRadius: '4px',
+                  boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)'
                 }}
               />
             ))}
@@ -428,13 +511,13 @@ export default function TurfLootSynthwave() {
         <div style={titleStyle}>
           <h1 style={mainTitleStyle}>
             TURF<span style={{ 
-              background: 'linear-gradient(45deg, #ff0080 0%, #ffff00 100%)',
+              background: 'linear-gradient(45deg, #f6ad55 0%, #fc8181 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
             }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>NEON GRID DOMINATION</p>
+          <p style={subtitleStyle}>TACTICAL GRID WARFARE</p>
         </div>
 
         {/* Desktop Center Controls */}
@@ -445,17 +528,17 @@ export default function TurfLootSynthwave() {
               <div style={{
                 width: '56px',
                 height: '56px',
-                background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
-                borderRadius: '8px',
+                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+                borderRadius: '4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ffffff',
+                color: '#1a202c',
                 fontWeight: '800',
                 fontSize: '24px',
-                boxShadow: '0 0 30px #ff0080',
-                border: '2px solid #ff00ff',
-                fontFamily: '"Orbitron", monospace'
+                boxShadow: '0 0 30px rgba(246, 173, 85, 0.6)',
+                border: '2px solid #f6ad55',
+                fontFamily: '"Rajdhani", sans-serif'
               }}>
                 0
               </div>
@@ -464,30 +547,30 @@ export default function TurfLootSynthwave() {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 style={nameInputStyle}
-                placeholder="ENTER_USERNAME"
+                placeholder="CALLSIGN"
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#00ffff'
-                  e.target.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.6), inset 0 0 15px rgba(0, 255, 255, 0.1)'
-                  e.target.style.color = '#00ffff'
+                  e.target.style.borderColor = '#f6ad55'
+                  e.target.style.boxShadow = '0 0 30px rgba(246, 173, 85, 0.6), inset 0 0 15px rgba(246, 173, 85, 0.1)'
+                  e.target.style.color = '#f6ad55'
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#ff00ff'
-                  e.target.style.boxShadow = '0 0 20px rgba(255, 0, 255, 0.5), inset 0 0 10px rgba(255, 0, 255, 0.1)'
-                  e.target.style.color = '#ff00ff'
+                  e.target.style.borderColor = '#68d391'
+                  e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.3), inset 0 0 10px rgba(104, 211, 145, 0.1)'
+                  e.target.style.color = '#68d391'
                 }}
               />
               <div style={{
                 width: '48px',
                 height: '48px',
-                background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)',
-                borderRadius: '8px',
+                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                borderRadius: '4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ffffff',
+                color: '#1a202c',
                 fontWeight: '600',
-                boxShadow: '0 0 20px #00ffff',
-                border: '2px solid #00ffff'
+                boxShadow: '0 0 20px rgba(104, 211, 145, 0.6)',
+                border: '2px solid #68d391'
               }}>
                 ✓
               </div>
@@ -504,13 +587,13 @@ export default function TurfLootSynthwave() {
                 onMouseOver={(e) => {
                   if (selectedStake !== stake) {
                     e.target.style.transform = 'scale(1.02)'
-                    e.target.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.5)'
+                    e.target.style.boxShadow = '0 0 25px rgba(246, 173, 85, 0.5)'
                   }
                 }}
                 onMouseOut={(e) => {
                   if (selectedStake !== stake) {
                     e.target.style.transform = 'scale(1)'
-                    e.target.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)'
+                    e.target.style.boxShadow = '0 0 15px rgba(246, 173, 85, 0.3)'
                   }
                 }}
               >
@@ -519,20 +602,20 @@ export default function TurfLootSynthwave() {
             ))}
           </div>
 
-          {/* Main Join Button */}
+          {/* Main Deploy Button */}
           <button 
             onClick={handleJoinGame}
-            style={joinButtonStyle}
+            style={deployButtonStyle}
             onMouseOver={(e) => {
               e.target.style.transform = 'scale(1.05)'
-              e.target.style.boxShadow = '0 0 60px #ff00ff, 0 0 100px rgba(255, 0, 255, 0.6)'
+              e.target.style.boxShadow = '0 0 60px rgba(252, 129, 129, 0.8), 0 0 100px rgba(252, 129, 129, 0.4)'
             }}
             onMouseOut={(e) => {
               e.target.style.transform = 'scale(1)'
-              e.target.style.boxShadow = '0 0 40px #ff00ff, 0 0 80px rgba(255, 0, 255, 0.4)'
+              e.target.style.boxShadow = '0 0 40px rgba(252, 129, 129, 0.6), 0 0 80px rgba(252, 129, 129, 0.3)'
             }}
           >
-            ▶ JACK IN
+            ▶ DEPLOY TO BATTLEFIELD
           </button>
 
           {/* Secondary Buttons */}
@@ -540,101 +623,114 @@ export default function TurfLootSynthwave() {
             <button 
               style={secondaryButtonStyle}
               onMouseOver={(e) => {
-                e.target.style.background = 'rgba(0, 255, 255, 0.1)'
+                e.target.style.background = 'rgba(104, 211, 145, 0.1)'
                 e.target.style.transform = 'scale(1.02)'
-                e.target.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.5)'
+                e.target.style.boxShadow = '0 0 25px rgba(104, 211, 145, 0.5)'
               }}
               onMouseOut={(e) => {
-                e.target.style.background = 'rgba(0, 0, 0, 0.8)'
+                e.target.style.background = 'rgba(26, 32, 44, 0.8)'
                 e.target.style.transform = 'scale(1)'
-                e.target.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)'
+                e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.3)'
               }}
             >
-              NEURAL NET
+              RECON MISSION
             </button>
             <button 
               style={secondaryButtonStyle}
               onMouseOver={(e) => {
-                e.target.style.background = 'rgba(0, 255, 255, 0.1)'
+                e.target.style.background = 'rgba(104, 211, 145, 0.1)'
                 e.target.style.transform = 'scale(1.02)'
-                e.target.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.5)'
+                e.target.style.boxShadow = '0 0 25px rgba(104, 211, 145, 0.5)'
               }}
               onMouseOut={(e) => {
-                e.target.style.background = 'rgba(0, 0, 0, 0.8)'
+                e.target.style.background = 'rgba(26, 32, 44, 0.8)'
                 e.target.style.transform = 'scale(1)'
-                e.target.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)'
+                e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.3)'
               }}
             >
-              DATA STREAMS
+              INTEL BRIEFING
             </button>
           </div>
         </div>
 
         {/* Desktop Panels */}
-        {/* Left Panel - Leaderboard */}
+        {/* Left Panel - Command */}
         <div style={{
           position: 'absolute',
           left: '40px',
           top: '220px',
           width: '320px',
           zIndex: 20,
-          ...neonPanelStyle
+          ...tacticalPanelStyle
         }}>
+          <div style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            width: '8px',
+            height: '8px',
+            background: '#68d391',
+            borderRadius: '50%',
+            boxShadow: '0 0 10px #68d391',
+            animation: 'statusBlink 2s ease-in-out infinite'
+          }} />
+          
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)', 
-              color: '#ffffff',
-              boxShadow: '0 0 20px #ff0080',
-              border: '2px solid #ff00ff'
-            }}>🏆</div>
-            <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #ff00ff' }}>RANKINGS</h3>
+              background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)', 
+              color: '#1a202c',
+              boxShadow: '0 0 20px rgba(246, 173, 85, 0.6)',
+              border: '2px solid #f6ad55'
+            }}>🎯</div>
+            <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>COMMAND</h3>
             <div style={{ marginLeft: 'auto' }}>
               <div style={{
                 padding: '4px 10px',
-                background: 'rgba(0, 255, 0, 0.1)',
-                color: '#00ff00',
+                background: 'rgba(104, 211, 145, 0.2)',
+                color: '#68d391',
                 fontSize: '12px',
-                borderRadius: '4px',
-                border: '1px solid #00ff00',
+                borderRadius: '3px',
+                border: '1px solid #68d391',
                 fontWeight: '600',
-                boxShadow: '0 0 10px #00ff00',
-                fontFamily: '"Orbitron", monospace'
+                boxShadow: '0 0 10px rgba(104, 211, 145, 0.3)',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
               }}>
-                LIVE
+                ACTIVE
               </div>
             </div>
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.3)' }}>
-              <span style={{ color: '#00ffff', fontSize: '15px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>01. QUANTUM_X</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.3)' }}>
+              <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>01. ALPHA_STRIKE</span>
               <span style={{ 
-                color: '#ffff00', 
+                color: '#f6ad55', 
                 fontWeight: '700', 
                 fontSize: '15px',
-                textShadow: '0 0 10px #ffff00',
-                fontFamily: '"Orbitron", monospace'
+                textShadow: '0 0 10px rgba(246, 173, 85, 0.6)',
+                fontFamily: '"Rajdhani", sans-serif'
               }}>$6,559.45</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.3)' }}>
-              <span style={{ color: '#00ffff', fontSize: '15px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>02. CIPHER_237</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.3)' }}>
+              <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>02. VIPER_UNIT</span>
               <span style={{ 
-                color: '#ffff00', 
+                color: '#f6ad55', 
                 fontWeight: '700', 
                 fontSize: '15px',
-                textShadow: '0 0 10px #ffff00',
-                fontFamily: '"Orbitron", monospace'
+                textShadow: '0 0 10px rgba(246, 173, 85, 0.6)',
+                fontFamily: '"Rajdhani", sans-serif'
               }}>$5,210.67</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
-              <span style={{ color: '#00ffff', fontSize: '15px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>03. MATRIX_216</span>
+              <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>03. GHOST_OPS</span>
               <span style={{ 
-                color: '#ffff00', 
+                color: '#f6ad55', 
                 fontWeight: '700', 
                 fontSize: '15px',
-                textShadow: '0 0 10px #ffff00',
-                fontFamily: '"Orbitron", monospace'
+                textShadow: '0 0 10px rgba(246, 173, 85, 0.6)',
+                fontFamily: '"Rajdhani", sans-serif'
               }}>$4,757.38</span>
             </div>
           </div>
@@ -642,43 +738,55 @@ export default function TurfLootSynthwave() {
           <button style={{
             width: '100%',
             padding: '12px',
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #ff00ff',
-            borderRadius: '8px',
-            color: '#ff00ff',
+            background: 'rgba(26, 32, 44, 0.8)',
+            border: '2px solid #68d391',
+            borderRadius: '4px',
+            color: '#68d391',
             fontSize: '14px',
             fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 0 15px rgba(255, 0, 255, 0.3)',
-            fontFamily: '"Orbitron", monospace',
+            boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
+            fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            ACCESS FULL DATA
+            ACCESS FULL INTEL
           </button>
         </div>
 
-        {/* Right Panel - Wallet */}
+        {/* Right Panel - Arsenal */}
         <div style={{
           position: 'absolute',
           right: '40px',
           top: '220px',
           width: '300px',
           zIndex: 20,
-          ...cyanPanelStyle
+          ...ambrerPanelStyle
         }}>
+          <div style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            width: '8px',
+            height: '8px',
+            background: '#f6ad55',
+            borderRadius: '50%',
+            boxShadow: '0 0 10px #f6ad55',
+            animation: 'statusBlink 2s ease-in-out infinite 0.5s'
+          }} />
+          
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)', 
-              color: '#ffffff',
-              boxShadow: '0 0 20px #00ffff',
-              border: '2px solid #00ffff'
-            }}>💎</div>
-            <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #00ffff' }}>CREDITS</h3>
+              background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)', 
+              color: '#1a202c',
+              boxShadow: '0 0 20px rgba(104, 211, 145, 0.6)',
+              border: '2px solid #68d391'
+            }}>💰</div>
+            <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(246, 173, 85, 0.6)', textTransform: 'uppercase' }}>ARSENAL</h3>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-              <button style={{ fontSize: '11px', color: '#00ffff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>[?] COPY_ADDR</button>
-              <button style={{ fontSize: '11px', color: '#00ffff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>[↻] REFRESH</button>
+              <button style={{ fontSize: '11px', color: '#f6ad55', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>[?] CACHE_LOC</button>
+              <button style={{ fontSize: '11px', color: '#f6ad55', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>[↻] RESUPPLY</button>
             </div>
           </div>
           
@@ -686,46 +794,46 @@ export default function TurfLootSynthwave() {
             <div style={{ 
               fontSize: '36px', 
               fontWeight: '800', 
-              background: 'linear-gradient(45deg, #ffff00 0%, #ff8000 100%)',
+              background: 'linear-gradient(45deg, #f6ad55 0%, #fc8181 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               marginBottom: '4px',
-              textShadow: '0 0 20px #ffff00',
-              fontFamily: '"Orbitron", monospace'
+              textShadow: '0 0 20px rgba(246, 173, 85, 0.6)',
+              fontFamily: '"Rajdhani", sans-serif'
             }}>$0.00</div>
-            <div style={{ color: '#00ffff', fontSize: '14px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>0.0000 SOL</div>
+            <div style={{ color: '#f6ad55', fontSize: '14px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>0.0000 SOL</div>
           </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
             <button style={{
               flex: 1,
               padding: '14px',
-              background: 'rgba(0, 255, 0, 0.1)',
-              border: '2px solid #00ff00',
-              borderRadius: '8px',
-              color: '#00ff00',
+              background: 'rgba(104, 211, 145, 0.2)',
+              border: '2px solid #68d391',
+              borderRadius: '4px',
+              color: '#68d391',
               fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 0 15px rgba(0, 255, 0, 0.3)',
-              fontFamily: '"Orbitron", monospace',
+              boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
+              fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
             }}>
-              UPLOAD
+              ACQUIRE
             </button>
             <button style={{
               flex: 1,
               padding: '14px',
-              background: 'rgba(255, 0, 0, 0.1)',
-              border: '2px solid #ff0040',
-              borderRadius: '8px',
-              color: '#ff0040',
+              background: 'rgba(252, 129, 129, 0.2)',
+              border: '2px solid #fc8181',
+              borderRadius: '4px',
+              color: '#fc8181',
               fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 0 15px rgba(255, 0, 64, 0.3)',
-              fontFamily: '"Orbitron", monospace',
+              boxShadow: '0 0 15px rgba(252, 129, 129, 0.3)',
+              fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
             }}>
               EXTRACT
@@ -733,27 +841,39 @@ export default function TurfLootSynthwave() {
           </div>
         </div>
 
-        {/* Bottom Left - Friends */}
+        {/* Bottom Left - Squad */}
         <div style={{
           position: 'absolute',
           left: '40px',
           bottom: '40px',
           width: '320px',
           zIndex: 20,
-          ...neonPanelStyle
+          ...tacticalPanelStyle
         }}>
+          <div style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            width: '8px',
+            height: '8px',
+            background: '#fc8181',
+            borderRadius: '50%',
+            boxShadow: '0 0 10px #fc8181',
+            animation: 'statusBlink 2s ease-in-out infinite 1s'
+          }} />
+          
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(45deg, #8000ff 0%, #ff00ff 100%)', 
+              background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)', 
               color: '#ffffff',
-              boxShadow: '0 0 20px #8000ff',
-              border: '2px solid #ff00ff'
+              boxShadow: '0 0 20px rgba(252, 129, 129, 0.6)',
+              border: '2px solid #fc8181'
             }}>👥</div>
-            <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #ff00ff' }}>NETWORK</h3>
+            <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>SQUAD</h3>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>[↻] SCAN</span>
-              <span style={{ fontSize: '11px', color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>0 ONLINE</span>
+              <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>[↻] SWEEP</span>
+              <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>0 ACTIVE</span>
             </div>
           </div>
           
@@ -761,38 +881,38 @@ export default function TurfLootSynthwave() {
             <div style={{
               width: '56px',
               height: '56px',
-              background: 'rgba(0, 0, 0, 0.8)',
-              border: '2px solid #ff00ff',
-              borderRadius: '8px',
+              background: 'rgba(26, 32, 44, 0.8)',
+              border: '2px solid #68d391',
+              borderRadius: '4px',
               margin: '0 auto 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '24px',
-              boxShadow: '0 0 20px rgba(255, 0, 255, 0.3)'
+              boxShadow: '0 0 20px rgba(104, 211, 145, 0.3)'
             }}>
               👤
             </div>
-            <div style={{ color: '#00ffff', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>NO CONNECTIONS FOUND</div>
-            <div style={{ color: '#ff00ff', fontSize: '12px', fontFamily: '"Orbitron", monospace' }}>ESTABLISH NEW LINKS</div>
+            <div style={{ color: '#e2e8f0', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>NO SQUAD MEMBERS</div>
+            <div style={{ color: '#68d391', fontSize: '12px', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>RECRUIT OPERATIVES</div>
           </div>
           
           <button style={{
             width: '100%',
             padding: '12px',
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #ff00ff',
-            borderRadius: '8px',
-            color: '#ff00ff',
+            background: 'rgba(26, 32, 44, 0.8)',
+            border: '2px solid #68d391',
+            borderRadius: '4px',
+            color: '#68d391',
             fontSize: '14px',
             fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 0 15px rgba(255, 0, 255, 0.3)',
-            fontFamily: '"Orbitron", monospace',
+            boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
+            fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            CONNECT NODES
+            RECRUIT SQUAD
           </button>
         </div>
 
@@ -800,67 +920,79 @@ export default function TurfLootSynthwave() {
         <div style={statsStyle}>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>USERS JACKED IN</div>
+            <div style={statLabelStyle}>OPERATIVES DEPLOYED</div>
           </div>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-            <div style={statLabelStyle}>TOTAL EXTRACTED</div>
+            <div style={statLabelStyle}>TOTAL SECURED</div>
           </div>
         </div>
 
-        {/* Bottom Right - Customize */}
+        {/* Bottom Right - Loadout */}
         <div style={{
           position: 'absolute',
           right: '40px',
           bottom: '40px',
           width: '300px',
           zIndex: 20,
-          ...cyanPanelStyle
+          ...ambrerPanelStyle
         }}>
+          <div style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            width: '8px',
+            height: '8px',
+            background: '#68d391',
+            borderRadius: '50%',
+            boxShadow: '0 0 10px #68d391',
+            animation: 'statusBlink 2s ease-in-out infinite 1.5s'
+          }} />
+          
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(45deg, #ff0080 0%, #ff8000 100%)', 
+              background: 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)', 
               color: '#ffffff',
-              boxShadow: '0 0 20px #ff0080',
-              border: '2px solid #ff0080'
-            }}>🎨</div>
-            <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #00ffff' }}>AVATAR</h3>
+              boxShadow: '0 0 20px rgba(139, 92, 246, 0.6)',
+              border: '2px solid #8b5cf6'
+            }}>🎯</div>
+            <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(246, 173, 85, 0.6)', textTransform: 'uppercase' }}>LOADOUT</h3>
           </div>
           
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <div style={{
               width: '72px',
               height: '72px',
-              background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 70%, rgba(255, 0, 255, 0.3) 100%)',
-              border: '2px solid #ff00ff',
-              borderRadius: '8px',
+              background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
+              border: '2px solid #fc8181',
+              borderRadius: '4px',
               margin: '0 auto 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
-              boxShadow: '0 0 30px rgba(255, 0, 128, 0.5)'
+              boxShadow: '0 0 30px rgba(252, 129, 129, 0.4)'
             }}>
               <div style={{
                 width: '10px',
                 height: '10px',
-                backgroundColor: '#00ffff',
+                backgroundColor: '#68d391',
                 borderRadius: '50%',
                 position: 'absolute',
                 top: '20px',
                 left: '22px',
-                boxShadow: '0 0 10px #00ffff'
+                boxShadow: '0 0 10px #68d391'
               }} />
               <div style={{
                 width: '10px',
                 height: '10px',
-                backgroundColor: '#00ffff',
+                backgroundColor: '#68d391',
                 borderRadius: '50%',
                 position: 'absolute',
                 top: '20px',
                 right: '22px',
-                boxShadow: '0 0 10px #00ffff'
+                boxShadow: '0 0 10px #68d391'
               }} />
             </div>
           </div>
@@ -868,41 +1000,41 @@ export default function TurfLootSynthwave() {
           <button style={{
             width: '100%',
             padding: '14px',
-            background: 'linear-gradient(45deg, #ff8000 0%, #ffff00 100%)',
-            color: '#000000',
+            background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+            color: '#1a202c',
             fontWeight: '700',
-            borderRadius: '8px',
-            border: '2px solid #ff8000',
+            borderRadius: '4px',
+            border: '2px solid #f6ad55',
             cursor: 'pointer',
             marginBottom: '12px',
-            boxShadow: '0 0 20px rgba(255, 128, 0, 0.4)',
+            boxShadow: '0 0 20px rgba(246, 173, 85, 0.4)',
             transition: 'all 0.3s ease',
-            fontFamily: '"Orbitron", monospace',
+            fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            👤 UPGRADE CORE
+            🎯 UPGRADE GEAR
           </button>
           
           <button style={{
             width: '100%',
             padding: '12px',
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #00ffff',
-            borderRadius: '8px',
-            color: '#00ffff',
+            background: 'rgba(26, 32, 44, 0.8)',
+            border: '2px solid #f6ad55',
+            borderRadius: '4px',
+            color: '#f6ad55',
             fontSize: '14px',
             fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)',
-            fontFamily: '"Orbitron", monospace',
+            boxShadow: '0 0 15px rgba(246, 173, 85, 0.3)',
+            fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            MODIFY SKIN
+            MODIFY CONFIG
           </button>
         </div>
 
-        {/* Discord Button */}
+        {/* Communications Button */}
         <div style={{
           position: 'absolute',
           bottom: '40px',
@@ -911,10 +1043,10 @@ export default function TurfLootSynthwave() {
         }}>
           <button style={{
             padding: '12px 20px',
-            background: 'linear-gradient(45deg, #5865f2 0%, #8000ff 100%)',
+            background: 'linear-gradient(45deg, #5865f2 0%, #4338ca 100%)',
             color: '#ffffff',
             fontWeight: '700',
-            borderRadius: '8px',
+            borderRadius: '4px',
             border: '2px solid #5865f2',
             cursor: 'pointer',
             display: 'flex',
@@ -922,64 +1054,102 @@ export default function TurfLootSynthwave() {
             gap: '10px',
             boxShadow: '0 0 25px rgba(88, 101, 242, 0.5)',
             transition: 'all 0.3s ease',
-            fontFamily: '"Orbitron", monospace',
+            fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            🎮 JACK INTO DISCORD
+            📡 TACTICAL COMMS
           </button>
         </div>
 
         {/* CSS Animations */}
         <style jsx>{`
-          @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
           
-          @keyframes synthGrid {
+          @keyframes radarSweep {
+            0% { 
+              transform: rotate(0deg);
+            }
+            100% { 
+              transform: rotate(360deg);
+            }
+          }
+          
+          @keyframes radarLine {
+            0% { 
+              transform: translate(-50%, -100%) rotate(0deg);
+              opacity: 1;
+            }
+            100% { 
+              transform: translate(-50%, -100%) rotate(360deg);
+              opacity: 1;
+            }
+          }
+          
+          @keyframes radarBlip {
+            0%, 90% { 
+              opacity: 0;
+              transform: scale(0.5);
+            }
+            95%, 100% { 
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          @keyframes tacticalGrid {
             0% { 
               transform: translateX(0) translateY(0);
             }
             100% { 
-              transform: translateX(-100px) translateY(-100px);
+              transform: translateX(-80px) translateY(-80px);
             }
           }
           
-          @keyframes neonFloat {
+          @keyframes tacticalFloat {
             0%, 100% { 
-              transform: translateY(0px) translateX(0px) rotate(0deg);
+              transform: translateY(0px) translateX(0px);
               opacity: 0.3;
             }
             25% { 
-              transform: translateY(-20px) translateX(10px) rotate(90deg);
-              opacity: 0.8;
+              transform: translateY(-15px) translateX(10px);
+              opacity: 0.7;
             }
             50% { 
-              transform: translateY(-10px) translateX(-15px) rotate(180deg);
+              transform: translateY(-25px) translateX(-5px);
               opacity: 1;
             }
             75% { 
-              transform: translateY(-30px) translateX(5px) rotate(270deg);
-              opacity: 0.6;
+              transform: translateY(-10px) translateX(8px);
+              opacity: 0.5;
             }
           }
           
-          @keyframes synthPulse {
+          @keyframes hudFlicker {
             0%, 100% { 
-              transform: translateX(-50%) scale(1);
-              opacity: 0.3;
+              opacity: 0.8;
             }
             50% { 
-              transform: translateX(-50%) scale(1.2);
-              opacity: 0.6;
+              opacity: 1;
             }
           }
           
-          @keyframes retroFloat {
+          @keyframes crosshairPulse {
             0%, 100% { 
-              transform: translateY(0px) rotate(0deg);
-              opacity: 0.1;
+              transform: scale(1);
+              opacity: 0.6;
             }
             50% { 
-              transform: translateY(-40px) rotate(180deg);
+              transform: scale(1.2);
+              opacity: 1;
+            }
+          }
+          
+          @keyframes statusBlink {
+            0%, 100% { 
               opacity: 0.4;
+            }
+            50% { 
+              opacity: 1;
             }
           }
         `}</style>
@@ -991,7 +1161,7 @@ export default function TurfLootSynthwave() {
   return (
     <div style={containerStyle}>
       
-      {/* Mobile Synthwave Background (Simplified) */}
+      {/* Mobile Tactical Background (Simplified) */}
       <div style={{
         position: 'fixed',
         top: 0,
@@ -1007,51 +1177,60 @@ export default function TurfLootSynthwave() {
           position: 'absolute',
           top: 0,
           left: 0,
-          width: '150%',
-          height: '150%',
-          opacity: 0.4,
+          width: '120%',
+          height: '120%',
+          opacity: 0.3,
           backgroundImage: `
-            linear-gradient(#ff00ff 1px, transparent 1px),
-            linear-gradient(90deg, #ff00ff 1px, transparent 1px)
+            linear-gradient(rgba(104, 211, 145, 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(104, 211, 145, 0.3) 1px, transparent 1px)
           `,
-          backgroundSize: '50px 50px',
-          animation: 'synthGrid 25s linear infinite'
+          backgroundSize: '40px 40px',
+          animation: 'tacticalGrid 35s linear infinite'
         }} />
 
+        {/* Mobile Radar (Smaller) */}
+        <div style={{
+          position: 'absolute',
+          top: '10%',
+          right: '5%',
+          width: '80px',
+          height: '80px',
+          border: '1px solid rgba(104, 211, 145, 0.4)',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, transparent 70%, rgba(104, 211, 145, 0.05) 100%)',
+          animation: 'radarSweep 6s linear infinite'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '1px',
+            height: '40px',
+            background: 'linear-gradient(to bottom, #68d391, transparent)',
+            transformOrigin: 'top center',
+            transform: 'translate(-50%, -100%)',
+            animation: 'radarLine 6s linear infinite'
+          }} />
+        </div>
+
         {/* Mobile Particles (Fewer) */}
-        {[...Array(8)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <div
-            key={`particle-${i}`}
+            key={`tactical-${i}`}
             style={{
               position: 'absolute',
-              width: '3px',
-              height: '3px',
-              background: ['#ff00ff', '#00ffff'][Math.floor(Math.random() * 2)],
-              borderRadius: '50%',
+              width: '2px',
+              height: '2px',
+              background: ['#68d391', '#f6ad55'][Math.floor(Math.random() * 2)],
               left: Math.random() * 100 + '%',
               top: Math.random() * 100 + '%',
-              opacity: Math.random() * 0.6 + 0.2,
-              animation: `neonFloat ${Math.random() * 6 + 8}s ease-in-out infinite`,
-              boxShadow: `0 0 8px currentColor`,
+              opacity: Math.random() * 0.5 + 0.2,
+              animation: `tacticalFloat ${Math.random() * 8 + 10}s ease-in-out infinite`,
+              boxShadow: `0 0 6px currentColor`,
               zIndex: 5
             }}
           />
         ))}
-
-        {/* Mobile Sun */}
-        <div style={{
-          position: 'absolute',
-          bottom: '40%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '120px',
-          height: '120px',
-          background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 50%, transparent 70%)',
-          borderRadius: '50%',
-          opacity: 0.2,
-          animation: 'synthPulse 4s ease-in-out infinite',
-          zIndex: 2
-        }} />
       </div>
 
       {/* Mobile Content Container */}
@@ -1063,24 +1242,25 @@ export default function TurfLootSynthwave() {
             <div style={{
               width: '32px',
               height: '32px',
-              background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
-              borderRadius: '6px',
+              background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)',
+              borderRadius: '3px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '14px',
-              boxShadow: '0 0 15px #ff0080',
-              border: '2px solid #ff00ff'
+              boxShadow: '0 0 15px rgba(252, 129, 129, 0.6)',
+              border: '2px solid #fc8181'
             }}>
-              🔥
+              ⚡
             </div>
             <span style={{ 
-              color: '#00ffff', 
+              color: '#68d391', 
               fontWeight: '700', 
               fontSize: '12px',
-              textShadow: '0 0 8px #00ffff',
-              fontFamily: '"Orbitron", monospace'
-            }}>PLAYER_8812</span>
+              textShadow: '0 0 8px rgba(104, 211, 145, 0.6)',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
+            }}>SHADOW_8812</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1090,10 +1270,10 @@ export default function TurfLootSynthwave() {
                 style={{ 
                   width: '24px', 
                   height: '24px', 
-                  background: 'rgba(0, 0, 0, 0.8)', 
-                  border: '2px solid #00ffff',
-                  borderRadius: '4px',
-                  boxShadow: '0 0 10px rgba(0, 255, 255, 0.3)'
+                  background: 'rgba(26, 32, 44, 0.8)', 
+                  border: '2px solid #68d391',
+                  borderRadius: '3px',
+                  boxShadow: '0 0 10px rgba(104, 211, 145, 0.3)'
                 }}
               />
             ))}
@@ -1104,13 +1284,13 @@ export default function TurfLootSynthwave() {
         <div style={titleStyle}>
           <h1 style={mainTitleStyle}>
             TURF<span style={{ 
-              background: 'linear-gradient(45deg, #ff0080 0%, #ffff00 100%)',
+              background: 'linear-gradient(45deg, #f6ad55 0%, #fc8181 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
             }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>NEON GRID DOMINATION</p>
+          <p style={subtitleStyle}>TACTICAL GRID WARFARE</p>
         </div>
 
         {/* Mobile Game Controls */}
@@ -1121,17 +1301,17 @@ export default function TurfLootSynthwave() {
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
-                borderRadius: '6px',
+                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+                borderRadius: '3px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ffffff',
+                color: '#1a202c',
                 fontWeight: '800',
                 fontSize: '18px',
-                boxShadow: '0 0 20px #ff0080',
-                border: '2px solid #ff00ff',
-                fontFamily: '"Orbitron", monospace'
+                boxShadow: '0 0 20px rgba(246, 173, 85, 0.6)',
+                border: '2px solid #f6ad55',
+                fontFamily: '"Rajdhani", sans-serif'
               }}>
                 0
               </div>
@@ -1140,20 +1320,20 @@ export default function TurfLootSynthwave() {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 style={nameInputStyle}
-                placeholder="USERNAME"
+                placeholder="CALLSIGN"
               />
               <div style={{
                 width: '36px',
                 height: '36px',
-                background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)',
-                borderRadius: '6px',
+                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                borderRadius: '3px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ffffff',
+                color: '#1a202c',
                 fontWeight: '600',
-                boxShadow: '0 0 15px #00ffff',
-                border: '2px solid #00ffff'
+                boxShadow: '0 0 15px rgba(104, 211, 145, 0.6)',
+                border: '2px solid #68d391'
               }}>
                 ✓
               </div>
@@ -1173,18 +1353,18 @@ export default function TurfLootSynthwave() {
             ))}
           </div>
 
-          {/* Main Join Button */}
+          {/* Main Deploy Button */}
           <button 
             onClick={handleJoinGame}
-            style={joinButtonStyle}
+            style={deployButtonStyle}
           >
-            ▶ JACK IN
+            ▶ DEPLOY
           </button>
 
           {/* Secondary Buttons */}
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <button style={secondaryButtonStyle}>NEURAL NET</button>
-            <button style={secondaryButtonStyle}>DATA STREAMS</button>
+            <button style={secondaryButtonStyle}>RECON</button>
+            <button style={secondaryButtonStyle}>INTEL</button>
           </div>
         </div>
 
@@ -1192,213 +1372,217 @@ export default function TurfLootSynthwave() {
         <div style={statsStyle}>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>USERS ONLINE</div>
+            <div style={statLabelStyle}>OPERATIVES</div>
           </div>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-            <div style={statLabelStyle}>TOTAL EXTRACTED</div>
+            <div style={statLabelStyle}>TOTAL SECURED</div>
           </div>
         </div>
 
         {/* Mobile Panels Grid */}
         <div style={mobileGridStyle}>
-          {/* Leaderboard Panel */}
-          <div style={neonPanelStyle}>
+          {/* Command Panel */}
+          <div style={tacticalPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)', 
-                color: '#ffffff',
-                boxShadow: '0 0 15px #ff0080',
-                border: '1px solid #ff00ff'
-              }}>🏆</div>
-              <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>RANKS</h3>
+                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)', 
+                color: '#1a202c',
+                boxShadow: '0 0 15px rgba(246, 173, 85, 0.6)',
+                border: '1px solid #f6ad55'
+              }}>🎯</div>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>COMMAND</h3>
             </div>
             
             <div style={{ marginBottom: '12px', fontSize: '11px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.2)' }}>
-                <span style={{ color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>QUANTUM_X</span>
-                <span style={{ color: '#ffff00', fontWeight: '700', fontFamily: '"Orbitron", monospace' }}>$6.5K</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.2)' }}>
+                <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>ALPHA_STRIKE</span>
+                <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>$6.5K</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.2)' }}>
-                <span style={{ color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>CIPHER_237</span>
-                <span style={{ color: '#ffff00', fontWeight: '700', fontFamily: '"Orbitron", monospace' }}>$5.2K</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.2)' }}>
+                <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>VIPER_UNIT</span>
+                <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>$5.2K</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
-                <span style={{ color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>MATRIX_216</span>
-                <span style={{ color: '#ffff00', fontWeight: '700', fontFamily: '"Orbitron", monospace' }}>$4.7K</span>
+                <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>GHOST_OPS</span>
+                <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>$4.7K</span>
               </div>
             </div>
             
             <button style={{
               width: '100%',
               padding: '8px',
-              background: 'rgba(0, 0, 0, 0.8)',
-              border: '1px solid #ff00ff',
-              borderRadius: '6px',
-              color: '#ff00ff',
+              background: 'rgba(26, 32, 44, 0.8)',
+              border: '1px solid #68d391',
+              borderRadius: '3px',
+              color: '#68d391',
               fontSize: '10px',
               fontWeight: '600',
               cursor: 'pointer',
-              fontFamily: '"Orbitron", monospace'
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
             }}>
-              ACCESS DATA
+              FULL INTEL
             </button>
           </div>
 
-          {/* Wallet Panel */}
-          <div style={cyanPanelStyle}>
+          {/* Arsenal Panel */}
+          <div style={ambrerPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)', 
-                color: '#ffffff',
-                boxShadow: '0 0 15px #00ffff',
-                border: '1px solid #00ffff'
-              }}>💎</div>
-              <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>CREDITS</h3>
+                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)', 
+                color: '#1a202c',
+                boxShadow: '0 0 15px rgba(104, 211, 145, 0.6)',
+                border: '1px solid #68d391'
+              }}>💰</div>
+              <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>ARSENAL</h3>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{ 
                 fontSize: '20px', 
                 fontWeight: '800', 
-                background: 'linear-gradient(45deg, #ffff00 0%, #ff8000 100%)',
+                background: 'linear-gradient(45deg, #f6ad55 0%, #fc8181 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 marginBottom: '2px',
-                fontFamily: '"Orbitron", monospace'
+                fontFamily: '"Rajdhani", sans-serif'
               }}>$0.00</div>
-              <div style={{ color: '#00ffff', fontSize: '9px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>0.0000 SOL</div>
+              <div style={{ color: '#f6ad55', fontSize: '9px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>0.0000 SOL</div>
             </div>
             
             <div style={{ display: 'flex', gap: '6px' }}>
               <button style={{
                 flex: 1,
                 padding: '8px',
-                background: 'rgba(0, 255, 0, 0.1)',
-                border: '1px solid #00ff00',
-                borderRadius: '6px',
-                color: '#00ff00',
+                background: 'rgba(104, 211, 145, 0.2)',
+                border: '1px solid #68d391',
+                borderRadius: '3px',
+                color: '#68d391',
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontSize: '9px',
-                fontFamily: '"Orbitron", monospace'
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
               }}>
-                UPLOAD
+                ACQUIRE
               </button>
               <button style={{
                 flex: 1,
                 padding: '8px',
-                background: 'rgba(255, 0, 0, 0.1)',
-                border: '1px solid #ff0040',
-                borderRadius: '6px',
-                color: '#ff0040',
+                background: 'rgba(252, 129, 129, 0.2)',
+                border: '1px solid #fc8181',
+                borderRadius: '3px',
+                color: '#fc8181',
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontSize: '9px',
-                fontFamily: '"Orbitron", monospace'
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
               }}>
                 EXTRACT
               </button>
             </div>
           </div>
 
-          {/* Friends Panel */}
-          <div style={neonPanelStyle}>
+          {/* Squad Panel */}
+          <div style={tacticalPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(45deg, #8000ff 0%, #ff00ff 100%)', 
+                background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)', 
                 color: '#ffffff',
-                boxShadow: '0 0 15px #8000ff',
-                border: '1px solid #ff00ff'
+                boxShadow: '0 0 15px rgba(252, 129, 129, 0.6)',
+                border: '1px solid #fc8181'
               }}>👥</div>
-              <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>NETWORK</h3>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>SQUAD</h3>
             </div>
             
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <div style={{
-                width: '32px',      
+                width: '32px',
                 height: '32px',
-                background: 'rgba(0, 0, 0, 0.8)',
-                border: '1px solid #ff00ff',
-                borderRadius: '6px',
+                background: 'rgba(26, 32, 44, 0.8)',
+                border: '1px solid #68d391',
+                borderRadius: '3px',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '14px',
-                boxShadow: '0 0 15px rgba(255, 0, 255, 0.3)'
+                boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)'
               }}>
                 👤
               </div>
-              <div style={{ color: '#00ffff', fontSize: '10px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>NO CONNECTIONS</div>
+              <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>NO SQUAD</div>
             </div>
             
             <button style={{
               width: '100%',
               padding: '8px',
-              background: 'rgba(0, 0, 0, 0.8)',
-              border: '1px solid #ff00ff',
-              borderRadius: '6px',
-              color: '#ff00ff',
+              background: 'rgba(26, 32, 44, 0.8)',
+              border: '1px solid #68d391',
+              borderRadius: '3px',
+              color: '#68d391',
               fontSize: '10px',
               fontWeight: '600',
               cursor: 'pointer',
-              fontFamily: '"Orbitron", monospace'
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
             }}>
-              CONNECT
+              RECRUIT
             </button>
           </div>
 
-          {/* Customize Panel */}
-          <div style={cyanPanelStyle}>
+          {/* Loadout Panel */}
+          <div style={ambrerPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(45deg, #ff0080 0%, #ff8000 100%)', 
+                background: 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)', 
                 color: '#ffffff',
-                boxShadow: '0 0 15px #ff0080',
-                border: '1px solid #ff0080'
-              }}>🎨</div>
-              <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>AVATAR</h3>
+                boxShadow: '0 0 15px rgba(139, 92, 246, 0.6)',
+                border: '1px solid #8b5cf6'
+              }}>🎯</div>
+              <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LOADOUT</h3>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 70%, rgba(255, 0, 255, 0.3) 100%)',
-                border: '1px solid #ff00ff',
-                borderRadius: '6px',
+                background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
+                border: '1px solid #fc8181',
+                borderRadius: '3px',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                boxShadow: '0 0 20px rgba(255, 0, 128, 0.4)'
+                boxShadow: '0 0 20px rgba(252, 129, 129, 0.4)'
               }}>
                 <div style={{
                   width: '5px',
                   height: '5px',
-                  backgroundColor: '#00ffff',
+                  backgroundColor: '#68d391',
                   borderRadius: '50%',
                   position: 'absolute',
                   top: '12px',
                   left: '12px',
-                  boxShadow: '0 0 5px #00ffff'
+                  boxShadow: '0 0 5px #68d391'
                 }} />
                 <div style={{
                   width: '5px',
                   height: '5px',
-                  backgroundColor: '#00ffff',
+                  backgroundColor: '#68d391',
                   borderRadius: '50%',
                   position: 'absolute',
                   top: '12px',
                   right: '12px',
-                  boxShadow: '0 0 5px #00ffff'
+                  boxShadow: '0 0 5px #68d391'
                 }} />
               </div>
             </div>
@@ -1406,44 +1590,46 @@ export default function TurfLootSynthwave() {
             <button style={{
               width: '100%',
               padding: '8px',
-              background: 'linear-gradient(45deg, #ff8000 0%, #ffff00 100%)',
-              color: '#000000',
+              background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+              color: '#1a202c',
               fontWeight: '700',
-              borderRadius: '6px',
-              border: '1px solid #ff8000',
+              borderRadius: '3px',
+              border: '1px solid #f6ad55',
               cursor: 'pointer',
               marginBottom: '6px',
               fontSize: '9px',
-              fontFamily: '"Orbitron", monospace'
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
             }}>
-              👤 UPGRADE
+              🎯 UPGRADE
             </button>
             
             <button style={{
               width: '100%',
               padding: '6px',
-              background: 'rgba(0, 0, 0, 0.8)',
-              border: '1px solid #00ffff',
-              borderRadius: '6px',
-              color: '#00ffff',
+              background: 'rgba(26, 32, 44, 0.8)',
+              border: '1px solid #f6ad55',
+              borderRadius: '3px',
+              color: '#f6ad55',
               fontSize: '9px',
               fontWeight: '600',
               cursor: 'pointer',
-              fontFamily: '"Orbitron", monospace'
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
             }}>
               MODIFY
             </button>
           </div>
         </div>
 
-        {/* Mobile Discord Button */}
+        {/* Mobile Communications Button */}
         <div style={{ textAlign: 'center' }}>
           <button style={{
             padding: '12px 20px',
-            background: 'linear-gradient(45deg, #5865f2 0%, #8000ff 100%)',
+            background: 'linear-gradient(45deg, #5865f2 0%, #4338ca 100%)',
             color: '#ffffff',
             fontWeight: '700',
-            borderRadius: '8px',
+            borderRadius: '4px',
             border: '2px solid #5865f2',
             cursor: 'pointer',
             display: 'inline-flex',
@@ -1451,45 +1637,62 @@ export default function TurfLootSynthwave() {
             gap: '8px',
             boxShadow: '0 0 20px rgba(88, 101, 242, 0.5)',
             fontSize: '12px',
-            fontFamily: '"Orbitron", monospace'
+            fontFamily: '"Rajdhani", sans-serif',
+            textTransform: 'uppercase'
           }}>
-            🎮 JACK INTO DISCORD
+            📡 TACTICAL COMMS
           </button>
         </div>
       </div>
 
       {/* Mobile CSS Animations */}
       <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
         
-        @keyframes synthGrid {
+        @keyframes radarSweep {
+          0% { 
+            transform: rotate(0deg);
+          }
+          100% { 
+            transform: rotate(360deg);
+          }
+        }
+        
+        @keyframes radarLine {
+          0% { 
+            transform: translate(-50%, -100%) rotate(0deg);
+          }
+          100% { 
+            transform: translate(-50%, -100%) rotate(360deg);
+          }
+        }
+        
+        @keyframes tacticalGrid {
           0% { 
             transform: translateX(0) translateY(0);
           }
           100% { 
-            transform: translateX(-50px) translateY(-50px);
+            transform: translateX(-40px) translateY(-40px);
           }
         }
         
-        @keyframes neonFloat {
+        @keyframes tacticalFloat {
           0%, 100% { 
-            transform: translateY(0px) rotate(0deg);
+            transform: translateY(0px);
             opacity: 0.2;
           }
           50% { 
-            transform: translateY(-20px) rotate(180deg);
-            opacity: 0.6;
+            transform: translateY(-20px);
+            opacity: 0.5;
           }
         }
         
-        @keyframes synthPulse {
+        @keyframes statusBlink {
           0%, 100% { 
-            transform: translateX(-50%) scale(1);
-            opacity: 0.2;
-          }
-          50% { 
-            transform: translateX(-50%) scale(1.1);
             opacity: 0.4;
+          }
+          50% { 
+            opacity: 1;
           }
         }
       `}</style>
