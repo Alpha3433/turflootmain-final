@@ -68,8 +68,19 @@ export default function TurfLootGaming() {
       </div>
 
       {/* Left Panel - Leaderboard */}
-      <div className="absolute left-6 top-40 w-80 z-40">
-        <div className="bg-gray-900/90 rounded-2xl border border-gray-700 p-4">
+      <div style={{
+        position: 'absolute',
+        left: '24px',
+        top: '160px',
+        width: '320px',
+        zIndex: 40
+      }}>
+        <div style={{
+          backgroundColor: 'rgba(17, 24, 39, 0.9)',
+          borderRadius: '16px',
+          border: '1px solid #374151',
+          padding: '16px'
+        }}>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-6 h-6 bg-yellow-500 rounded flex items-center justify-center">
               🏆
