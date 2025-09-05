@@ -28,7 +28,13 @@ export default function TurfLootGaming() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden relative">
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#000000',
+      color: '#ffffff',
+      overflow: 'hidden',
+      position: 'relative'
+    }}>
       
       {/* Top Header */}
       <div className="absolute top-4 left-4 z-50 flex items-center gap-2">
