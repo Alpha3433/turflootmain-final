@@ -19,13 +19,7 @@ export default function TurfLootTactical() {
     checkMobile()
     window.addEventListener('resize', checkMobile)
     
-    // Simulate live stats updates
-    const interval = setInterval(() => {
-      setLiveStats(prev => ({
-        players: Math.floor(Math.random() * 50) + 25,
-        winnings: Math.floor(Math.random() * 400000) + 500000
-      }))
-    }, 4000)
+    // Live stats will be updated when users join/leave games and cash out
     
     return () => {
       clearInterval(interval)
