@@ -86,7 +86,6 @@ export default function TurfLootTactical() {
       inset 0 1px 0 rgba(246, 173, 85, 0.1)
     `,
     padding: isMobile ? '16px' : '20px',
-    position: 'relative',
     overflow: 'hidden'
   }
 
