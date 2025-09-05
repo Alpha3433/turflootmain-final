@@ -151,7 +151,7 @@ export default function TurfLootTactical() {
       position: 'absolute',
       left: '50%',
       top: '50%',
-      transform: 'translate(-50%, -20%)'
+      transform: 'translate(-50%, -35%)'
     })
   }
 
