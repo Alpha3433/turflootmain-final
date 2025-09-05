@@ -567,21 +567,21 @@ export default function TurfLootTactical() {
           </div>
 
           {/* Enhanced Floating Tactical Elements */}
-          {[...Array(18)].map((_, i) => (
+          {floatingElements.map((element) => (
             <div
-              key={`tactical-${i}`}
+              key={`tactical-${element.id}`}
               style={{
                 position: 'absolute',
-                width: Math.random() * 4 + 1 + 'px',
-                height: Math.random() * 4 + 1 + 'px',
-                background: ['#68d391', '#f6ad55', '#fc8181'][Math.floor(Math.random() * 3)],
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-                opacity: Math.random() * 0.7 + 0.2,
-                animation: `tacticalFloat ${Math.random() * 8 + 6}s ease-in-out infinite`,
+                width: element.width + 'px',
+                height: element.height + 'px',
+                background: element.color,
+                left: element.left + '%',
+                top: element.top + '%',
+                opacity: element.opacity,
+                animation: `tacticalFloat ${element.animationDuration}s ease-in-out infinite`,
                 boxShadow: `0 0 8px currentColor`,
                 zIndex: 5,
-                borderRadius: Math.random() > 0.5 ? '50%' : '0'
+                borderRadius: element.isCircle ? '50%' : '0'
               }}
             />
           ))}
