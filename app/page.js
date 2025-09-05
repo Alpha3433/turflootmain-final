@@ -45,14 +45,9 @@ export default function TurfLootTactical() {
     background: 'radial-gradient(ellipse at center, #2d3748 0%, #1a202c 50%, #0d1117 100%)',
     color: '#e2e8f0',
     overflow: 'hidden',
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    position: 'relative',
     fontFamily: '"Rajdhani", "Arial Black", sans-serif',
     ...(isMobile && {
-      position: 'relative',
       overflow: 'auto',
       paddingBottom: '20px'
     })
