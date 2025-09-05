@@ -1682,7 +1682,7 @@ export default function TurfLootTactical() {
             onClick={handleJoinGame}
             style={deployButtonStyle}
           >
-            ▶ DEPLOY
+            ▶ PLAY
           </button>
 
           {/* Secondary Buttons */}
