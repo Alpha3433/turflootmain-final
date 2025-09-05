@@ -1238,20 +1238,7 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
-        {/* Bottom Center - Stats */}
-        <div style={{
-          ...statsStyle,
-          bottom: '60px'
-        }}>
-          <div style={statItemStyle}>
-            <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>PLAYERS ONLINE</div>
-          </div>
-          <div style={statItemStyle}>
-            <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-            <div style={statLabelStyle}>TOTAL WINNINGS</div>
-          </div>
-        </div>
+
 
         {/* Communications Button - Repositioned */}
         <div style={{
