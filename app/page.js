@@ -587,18 +587,18 @@ export default function TurfLootTactical() {
           ))}
 
           {/* Matrix-style Code Rain */}
-          {[...Array(8)].map((_, i) => (
+          {codeElements.map((element) => (
             <div
-              key={`code-${i}`}
+              key={`code-${element.id}`}
               style={{
                 position: 'absolute',
-                left: `${Math.random() * 100}%`,
+                left: `${element.left}%`,
                 top: '-20px',
                 width: '2px',
-                height: `${Math.random() * 300 + 100}px`,
+                height: `${element.height}px`,
                 background: `linear-gradient(to bottom, transparent, #68d391, transparent)`,
                 opacity: 0.3,
-                animation: `codeMatrix ${Math.random() * 5 + 3}s linear infinite ${Math.random() * 3}s`
+                animation: `codeMatrix ${element.animationDuration}s linear infinite ${element.animationDelay}s`
               }}
             />
           ))}
