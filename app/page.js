@@ -701,7 +701,7 @@ export default function TurfLootTactical() {
               WebkitTextFillColor: 'transparent'
             }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>MULTIPLAYER BATTLE ROYALE</p>
+          <p style={subtitleStyle}>SKILL-BASED GRID DOMINATION</p>
         </div>
 
         {/* Desktop Center Controls */}
