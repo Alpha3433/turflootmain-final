@@ -1088,7 +1088,7 @@ export default function TurfLootTactical() {
               👤
             </div>
             <div style={{ color: '#e2e8f0', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>NO PARTY MEMBERS</div>
-            <div style={{ color: '#68d391', fontSize: '12px', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>RECRUIT OPERATIVES</div>
+            <div style={{ color: '#68d391', fontSize: '12px', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>INVITE FRIENDS</div>
           </div>
           
           <button style={{
