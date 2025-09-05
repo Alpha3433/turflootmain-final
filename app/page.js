@@ -848,13 +848,13 @@ export default function TurfLootTactical() {
           </div>
         </div>
 
-        {/* Desktop Panels */}
+        {/* Desktop Panels - Optimized Layout */}
         {/* Left Panel - Command */}
         <div style={{
           position: 'absolute',
-          left: '40px',
-          top: '220px',
-          width: '320px',
+          left: '30px',
+          top: '180px',
+          width: '300px',
           zIndex: 20,
           ...tacticalPanelStyle
         }}>
