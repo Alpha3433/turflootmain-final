@@ -809,7 +809,7 @@ export default function TurfLootTactical() {
               e.target.style.boxShadow = '0 0 40px rgba(252, 129, 129, 0.6), 0 0 80px rgba(252, 129, 129, 0.3)'
             }}
           >
-            ▶ DEPLOY TO BATTLEFIELD
+            ▶ PLAY NOW
           </button>
 
           {/* Secondary Buttons */}
