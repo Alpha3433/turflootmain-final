@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function TurfLootGlass() {
+export default function TurfLootSynthwave() {
   const router = useRouter()
   const [selectedStake, setSelectedStake] = useState('$1')
-  const [liveStats, setLiveStats] = useState({ players: 28, winnings: 418237 })
+  const [liveStats, setLiveStats] = useState({ players: 42, winnings: 567891 })
   const [userName, setUserName] = useState('anth')
   const [isMobile, setIsMobile] = useState(false)
 
@@ -22,8 +22,8 @@ export default function TurfLootGlass() {
     // Simulate live stats updates
     const interval = setInterval(() => {
       setLiveStats(prev => ({
-        players: Math.floor(Math.random() * 45) + 25,
-        winnings: Math.floor(Math.random() * 250000) + 300000
+        players: Math.floor(Math.random() * 60) + 30,
+        winnings: Math.floor(Math.random() * 300000) + 400000
       }))
     }, 4000)
     
@@ -39,11 +39,11 @@ export default function TurfLootGlass() {
 
   const containerStyle = {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)',
-    color: '#1e293b',
+    background: 'linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 30%, #16213e 70%, #0f3460 100%)',
+    color: '#ffffff',
     overflow: 'hidden',
     position: 'relative',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontFamily: '"Orbitron", "Courier New", monospace',
     ...(isMobile && {
       overflow: 'auto',
       paddingBottom: '20px'
@@ -57,28 +57,35 @@ export default function TurfLootGlass() {
     padding: '15px',
     gap: '20px',
     position: 'relative',
-    zIndex: 10
+    zIndex: 20
   }
 
-  const glassStyle = {
-    background: 'rgba(255, 255, 255, 0.25)',
+  const neonPanelStyle = {
+    background: 'rgba(0, 0, 0, 0.8)',
     backdropFilter: 'blur(10px)',
-    borderRadius: isMobile ? '16px' : '24px',
-    border: '1px solid rgba(255, 255, 255, 0.18)',
-    boxShadow: isMobile 
-      ? '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
-      : '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
-    padding: isMobile ? '16px' : '24px'
+    borderRadius: isMobile ? '12px' : '16px',
+    border: '2px solid #ff00ff',
+    boxShadow: `
+      0 0 20px #ff00ff,
+      0 0 40px rgba(255, 0, 255, 0.3),
+      inset 0 0 20px rgba(255, 0, 255, 0.1)
+    `,
+    padding: isMobile ? '16px' : '20px',
+    position: 'relative'
   }
 
-  const neomorphStyle = {
-    background: '#f0f4f8',
-    borderRadius: isMobile ? '16px' : '20px',
-    boxShadow: isMobile
-      ? '9px 9px 16px #d1d9e6, -9px -9px 16px #ffffff'
-      : '15px 15px 30px #d1d9e6, -15px -15px 30px #ffffff',
-    border: 'none',
-    padding: isMobile ? '16px' : '20px'
+  const cyanPanelStyle = {
+    background: 'rgba(0, 0, 0, 0.8)',
+    backdropFilter: 'blur(10px)',
+    borderRadius: isMobile ? '12px' : '16px',
+    border: '2px solid #00ffff',
+    boxShadow: `
+      0 0 20px #00ffff,
+      0 0 40px rgba(0, 255, 255, 0.3),
+      inset 0 0 20px rgba(0, 255, 255, 0.1)
+    `,
+    padding: isMobile ? '16px' : '20px',
+    position: 'relative'
   }
 
   const headerStyle = {
@@ -86,7 +93,7 @@ export default function TurfLootGlass() {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: isMobile ? '0' : '20px 40px',
-    zIndex: 20,
+    zIndex: 30,
     ...(isMobile ? {} : {
       position: 'absolute',
       top: 0,
@@ -98,7 +105,7 @@ export default function TurfLootGlass() {
   const titleStyle = {
     textAlign: 'center',
     padding: isMobile ? '20px 0' : '0',
-    zIndex: 15,
+    zIndex: 25,
     ...(isMobile ? {} : {
       position: 'absolute',
       top: '100px',
@@ -108,119 +115,131 @@ export default function TurfLootGlass() {
   }
 
   const mainTitleStyle = {
-    fontSize: isMobile ? '2.8rem' : '5rem',
-    fontWeight: '800',
+    fontSize: isMobile ? '3rem' : '5.5rem',
+    fontWeight: '900',
     margin: '0 0 8px 0',
-    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%)',
+    background: 'linear-gradient(45deg, #ff00ff 0%, #00ffff 50%, #ff0080 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
-    letterSpacing: '-0.02em'
+    textShadow: '0 0 30px #ff00ff, 0 0 60px #00ffff',
+    letterSpacing: '0.1em',
+    fontFamily: '"Orbitron", monospace'
   }
 
   const subtitleStyle = {
-    color: '#64748b',
-    fontWeight: '600',
-    fontSize: isMobile ? '14px' : '18px',
-    letterSpacing: '0.05em',
+    color: '#00ffff',
+    fontWeight: '700',
+    fontSize: isMobile ? '12px' : '16px',
+    letterSpacing: '0.3em',
     margin: 0,
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
+    textShadow: '0 0 10px #00ffff',
+    fontFamily: '"Orbitron", monospace'
   }
 
   const centerControlsStyle = {
     textAlign: 'center',
     padding: isMobile ? '20px 0' : '0',
-    zIndex: 15,
+    zIndex: 25,
     ...(isMobile ? {} : {
       position: 'absolute',
       left: '50%',
       top: '50%',
-      transform: 'translate(-50%, -40%)'
+      transform: 'translate(-50%, -30%)'
     })
   }
 
   const nameInputStyle = {
-    background: 'rgba(255, 255, 255, 0.8)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(148, 163, 184, 0.3)',
-    borderRadius: '12px',
+    background: 'rgba(0, 0, 0, 0.9)',
+    border: '2px solid #ff00ff',
+    borderRadius: '8px',
     padding: isMobile ? '12px 16px' : '14px 20px',
-    color: '#1e293b',
-    fontWeight: '500',
+    color: '#ff00ff',
+    fontWeight: '600',
     textAlign: 'center',
     width: isMobile ? '160px' : '200px',
     fontSize: isMobile ? '14px' : '16px',
-    boxShadow: 'inset 2px 2px 4px rgba(148, 163, 184, 0.1)',
+    boxShadow: '0 0 20px rgba(255, 0, 255, 0.5), inset 0 0 10px rgba(255, 0, 255, 0.1)',
     outline: 'none',
-    transition: 'all 0.3s ease'
+    transition: 'all 0.3s ease',
+    fontFamily: '"Orbitron", monospace'
   }
 
   const stakeButtonStyle = {
     padding: isMobile ? '12px 20px' : '16px 32px',
-    borderRadius: '16px',
-    fontWeight: '600',
+    borderRadius: '8px',
+    fontWeight: '700',
     fontSize: isMobile ? '14px' : '16px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    border: 'none',
+    border: '2px solid',
     margin: isMobile ? '0 4px' : '0 8px',
-    backdropFilter: 'blur(10px)'
+    fontFamily: '"Orbitron", monospace',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em'
   }
 
   const activeStakeStyle = {
     ...stakeButtonStyle,
-    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+    background: 'linear-gradient(45deg, #ff00ff 0%, #ff0080 100%)',
     color: '#ffffff',
-    boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-    transform: 'translateY(-2px)'
+    borderColor: '#ff00ff',
+    boxShadow: '0 0 30px #ff00ff, 0 0 60px rgba(255, 0, 255, 0.3)',
+    transform: 'scale(1.05)'
   }
 
   const inactiveStakeStyle = {
     ...stakeButtonStyle,
-    background: 'rgba(255, 255, 255, 0.7)',
-    color: '#475569',
-    boxShadow: '0 4px 15px rgba(148, 163, 184, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+    background: 'rgba(0, 0, 0, 0.8)',
+    color: '#00ffff',
+    borderColor: '#00ffff',
+    boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)'
   }
 
   const joinButtonStyle = {
-    background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
+    background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 50%, #8000ff 100%)',
     color: '#ffffff',
-    fontWeight: '700',
+    fontWeight: '900',
     padding: isMobile ? '16px 48px' : '20px 64px',
-    borderRadius: '20px',
+    borderRadius: '12px',
     fontSize: isMobile ? '16px' : '20px',
     marginBottom: isMobile ? '20px' : '32px',
     cursor: 'pointer',
-    border: 'none',
-    boxShadow: '0 10px 30px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    border: '2px solid #ff00ff',
+    boxShadow: '0 0 40px #ff00ff, 0 0 80px rgba(255, 0, 255, 0.4)',
     transition: 'all 0.3s ease',
-    letterSpacing: '0.02em'
+    letterSpacing: '0.1em',
+    fontFamily: '"Orbitron", monospace',
+    textTransform: 'uppercase'
   }
 
   const secondaryButtonStyle = {
     padding: isMobile ? '10px 20px' : '12px 24px',
-    background: 'rgba(255, 255, 255, 0.6)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(148, 163, 184, 0.2)',
-    borderRadius: '12px',
-    color: '#475569',
+    background: 'rgba(0, 0, 0, 0.8)',
+    border: '2px solid #00ffff',
+    borderRadius: '8px',
+    color: '#00ffff',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     margin: isMobile ? '0 6px' : '0 10px',
-    fontWeight: '500',
+    fontWeight: '600',
     fontSize: isMobile ? '12px' : '14px',
-    boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+    boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)',
+    fontFamily: '"Orbitron", monospace',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em'
   }
 
   const iconStyle = {
     width: isMobile ? '24px' : '32px',
     height: isMobile ? '24px' : '32px',
-    borderRadius: '8px',
+    borderRadius: '6px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: isMobile ? '12px' : '16px',
-    fontWeight: '600'
+    fontWeight: '700'
   }
 
   const statsStyle = {
@@ -229,10 +248,10 @@ export default function TurfLootGlass() {
     gap: isMobile ? '48px' : '80px',
     justifyContent: 'center',
     padding: isMobile ? '20px 0' : '0',
-    zIndex: 15,
+    zIndex: 25,
     ...(isMobile ? {} : {
       position: 'absolute',
-      bottom: '120px',
+      bottom: '100px',
       left: '50%',
       transform: 'translateX(-50%)'
     })
@@ -244,20 +263,24 @@ export default function TurfLootGlass() {
 
   const statNumberStyle = {
     fontSize: isMobile ? '28px' : '42px',
-    fontWeight: '800',
-    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+    fontWeight: '900',
+    background: 'linear-gradient(45deg, #ff00ff 0%, #00ffff 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
-    marginBottom: '4px'
+    marginBottom: '4px',
+    textShadow: '0 0 20px #ff00ff',
+    fontFamily: '"Orbitron", monospace'
   }
 
   const statLabelStyle = {
-    color: '#64748b',
-    fontSize: isMobile ? '12px' : '14px',
-    fontWeight: '500',
+    color: '#00ffff',
+    fontSize: isMobile ? '11px' : '14px',
+    fontWeight: '600',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em'
+    letterSpacing: '0.1em',
+    textShadow: '0 0 10px #00ffff',
+    fontFamily: '"Orbitron", monospace'
   }
 
   const mobileGridStyle = {
@@ -272,67 +295,91 @@ export default function TurfLootGlass() {
     return (
       <div style={containerStyle}>
         
-        {/* Floating Glass Orbs */}
-        <div style={{
-          position: 'absolute',
-          top: '12%',
-          left: '8%',
-          zIndex: 5,
-          width: '100px',
-          height: '100px',
-          background: 'rgba(59, 130, 246, 0.1)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '50%',
-          border: '1px solid rgba(59, 130, 246, 0.2)',
-          boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)',
-          animation: 'gentleFloat 8s ease-in-out infinite'
-        }} />
-
-        <div style={{
-          position: 'absolute',
-          top: '65%',
-          right: '12%',
-          zIndex: 5,
-          width: '80px',
-          height: '80px',
-          background: 'rgba(139, 92, 246, 0.1)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '50%',
-          border: '1px solid rgba(139, 92, 246, 0.2)',
-          boxShadow: '0 8px 32px rgba(139, 92, 246, 0.3)',
-          animation: 'gentleFloat 10s ease-in-out infinite reverse'
-        }} />
-
-        <div style={{
-          position: 'absolute',
-          bottom: '20%',
-          left: '15%',
-          zIndex: 5,
-          width: '60px',
-          height: '60px',
-          background: 'rgba(16, 185, 129, 0.1)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: '50%',
-          border: '1px solid rgba(16, 185, 129, 0.2)',
-          boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)',
-          animation: 'gentleFloat 12s ease-in-out infinite'
-        }} />
-
-        {/* Subtle Grid Pattern */}
+        {/* Animated Synthwave Background */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          opacity: 0.03,
           zIndex: 1,
-          backgroundImage: `
-            linear-gradient(rgba(148, 163, 184, 0.4) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(148, 163, 184, 0.4) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px'
-        }} />
+          overflow: 'hidden'
+        }}>
+          
+          {/* Moving Grid */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '200%',
+            height: '200%',
+            opacity: 0.6,
+            backgroundImage: `
+              linear-gradient(#ff00ff 2px, transparent 2px),
+              linear-gradient(90deg, #ff00ff 2px, transparent 2px),
+              linear-gradient(#00ffff 1px, transparent 1px),
+              linear-gradient(90deg, #00ffff 1px, transparent 1px)
+            `,
+            backgroundSize: '100px 100px, 100px 100px, 20px 20px, 20px 20px',
+            animation: 'synthGrid 20s linear infinite'
+          }} />
+
+          {/* Neon Particles */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={`particle-${i}`}
+              style={{
+                position: 'absolute',
+                width: Math.random() * 4 + 2 + 'px',
+                height: Math.random() * 4 + 2 + 'px',
+                background: ['#ff00ff', '#00ffff', '#ff0080'][Math.floor(Math.random() * 3)],
+                borderRadius: '50%',
+                left: Math.random() * 100 + '%',
+                top: Math.random() * 100 + '%',
+                opacity: Math.random() * 0.8 + 0.2,
+                animation: `neonFloat ${Math.random() * 4 + 6}s ease-in-out infinite`,
+                boxShadow: `0 0 10px currentColor`,
+                zIndex: 5
+              }}
+            />
+          ))}
+
+          {/* Synthwave Sun */}
+          <div style={{
+            position: 'absolute',
+            bottom: '30%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '200px',
+            height: '200px',
+            background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 50%, transparent 70%)',
+            borderRadius: '50%',
+            opacity: 0.3,
+            animation: 'synthPulse 4s ease-in-out infinite',
+            zIndex: 2
+          }} />
+
+          {/* Retro Triangles */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={`triangle-${i}`}
+              style={{
+                position: 'absolute',
+                width: 0,
+                height: 0,
+                borderLeft: `${Math.random() * 20 + 10}px solid transparent`,
+                borderRight: `${Math.random() * 20 + 10}px solid transparent`,
+                borderBottom: `${Math.random() * 30 + 20}px solid ${['#ff00ff', '#00ffff', '#ff0080'][Math.floor(Math.random() * 3)]}`,
+                left: Math.random() * 100 + '%',
+                top: Math.random() * 100 + '%',
+                opacity: Math.random() * 0.3 + 0.1,
+                animation: `retroFloat ${Math.random() * 8 + 10}s ease-in-out infinite`,
+                filter: `drop-shadow(0 0 10px currentColor)`,
+                zIndex: 3
+              }}
+            />
+          ))}
+        </div>
 
         {/* Desktop Header */}
         <div style={headerStyle}>
@@ -340,22 +387,24 @@ export default function TurfLootGlass() {
             <div style={{
               width: '40px',
               height: '40px',
-              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-              borderRadius: '12px',
+              background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
+              borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '18px',
-              boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
+              boxShadow: '0 0 20px #ff0080',
+              border: '2px solid #ff00ff'
             }}>
               🔥
             </div>
             <span style={{ 
-              color: '#475569', 
-              fontWeight: '600', 
-              fontSize: '16px'
-            }}>Welcome, ty8898812</span>
+              color: '#00ffff', 
+              fontWeight: '700', 
+              fontSize: '16px',
+              textShadow: '0 0 10px #00ffff',
+              fontFamily: '"Orbitron", monospace'
+            }}>WELCOME, PLAYER_8812</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -365,11 +414,10 @@ export default function TurfLootGlass() {
                 style={{ 
                   width: '32px', 
                   height: '32px', 
-                  background: 'rgba(255, 255, 255, 0.6)', 
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(148, 163, 184, 0.2)',
-                  boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+                  background: 'rgba(0, 0, 0, 0.8)', 
+                  border: '2px solid #00ffff',
+                  borderRadius: '6px',
+                  boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)'
                 }}
               />
             ))}
@@ -379,9 +427,14 @@ export default function TurfLootGlass() {
         {/* Desktop Title */}
         <div style={titleStyle}>
           <h1 style={mainTitleStyle}>
-            TURF<span style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>LOOT</span>
+            TURF<span style={{ 
+              background: 'linear-gradient(45deg, #ff0080 0%, #ffff00 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>Skill-Based Grid Domination</p>
+          <p style={subtitleStyle}>NEON GRID DOMINATION</p>
         </div>
 
         {/* Desktop Center Controls */}
@@ -392,15 +445,17 @@ export default function TurfLootGlass() {
               <div style={{
                 width: '56px',
                 height: '56px',
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                borderRadius: '16px',
+                background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
+                borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#ffffff',
                 fontWeight: '800',
                 fontSize: '24px',
-                boxShadow: '0 8px 25px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                boxShadow: '0 0 30px #ff0080',
+                border: '2px solid #ff00ff',
+                fontFamily: '"Orbitron", monospace'
               }}>
                 0
               </div>
@@ -409,27 +464,30 @@ export default function TurfLootGlass() {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 style={nameInputStyle}
-                placeholder="Enter your name"
+                placeholder="ENTER_USERNAME"
                 onFocus={(e) => {
-                  e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 2px 2px 4px rgba(148, 163, 184, 0.1)'
+                  e.target.style.borderColor = '#00ffff'
+                  e.target.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.6), inset 0 0 15px rgba(0, 255, 255, 0.1)'
+                  e.target.style.color = '#00ffff'
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(148, 163, 184, 0.3)'
-                  e.target.style.boxShadow = 'inset 2px 2px 4px rgba(148, 163, 184, 0.1)'
+                  e.target.style.borderColor = '#ff00ff'
+                  e.target.style.boxShadow = '0 0 20px rgba(255, 0, 255, 0.5), inset 0 0 10px rgba(255, 0, 255, 0.1)'
+                  e.target.style.color = '#ff00ff'
                 }}
               />
               <div style={{
                 width: '48px',
                 height: '48px',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                borderRadius: '12px',
+                background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)',
+                borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#ffffff',
                 fontWeight: '600',
-                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
+                boxShadow: '0 0 20px #00ffff',
+                border: '2px solid #00ffff'
               }}>
                 ✓
               </div>
@@ -445,14 +503,14 @@ export default function TurfLootGlass() {
                 style={selectedStake === stake ? activeStakeStyle : inactiveStakeStyle}
                 onMouseOver={(e) => {
                   if (selectedStake !== stake) {
-                    e.target.style.transform = 'translateY(-1px)'
-                    e.target.style.boxShadow = '0 6px 20px rgba(148, 163, 184, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                    e.target.style.transform = 'scale(1.02)'
+                    e.target.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.5)'
                   }
                 }}
                 onMouseOut={(e) => {
                   if (selectedStake !== stake) {
-                    e.target.style.transform = 'translateY(0px)'
-                    e.target.style.boxShadow = '0 4px 15px rgba(148, 163, 184, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                    e.target.style.transform = 'scale(1)'
+                    e.target.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)'
                   }
                 }}
               >
@@ -466,15 +524,15 @@ export default function TurfLootGlass() {
             onClick={handleJoinGame}
             style={joinButtonStyle}
             onMouseOver={(e) => {
-              e.target.style.transform = 'translateY(-3px)'
-              e.target.style.boxShadow = '0 15px 40px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              e.target.style.transform = 'scale(1.05)'
+              e.target.style.boxShadow = '0 0 60px #ff00ff, 0 0 100px rgba(255, 0, 255, 0.6)'
             }}
             onMouseOut={(e) => {
-              e.target.style.transform = 'translateY(0px)'
-              e.target.style.boxShadow = '0 10px 30px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              e.target.style.transform = 'scale(1)'
+              e.target.style.boxShadow = '0 0 40px #ff00ff, 0 0 80px rgba(255, 0, 255, 0.4)'
             }}
           >
-            ▶ JOIN GAME
+            ▶ JACK IN
           </button>
 
           {/* Secondary Buttons */}
@@ -482,32 +540,32 @@ export default function TurfLootGlass() {
             <button 
               style={secondaryButtonStyle}
               onMouseOver={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.8)'
-                e.target.style.transform = 'translateY(-1px)'
-                e.target.style.boxShadow = '0 6px 20px rgba(148, 163, 184, 0.2)'
+                e.target.style.background = 'rgba(0, 255, 255, 0.1)'
+                e.target.style.transform = 'scale(1.02)'
+                e.target.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.5)'
               }}
               onMouseOut={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.6)'
-                e.target.style.transform = 'translateY(0px)'
-                e.target.style.boxShadow = '0 4px 15px rgba(148, 163, 184, 0.1)'
+                e.target.style.background = 'rgba(0, 0, 0, 0.8)'
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)'
               }}
             >
-              AI EU
+              NEURAL NET
             </button>
             <button 
               style={secondaryButtonStyle}
               onMouseOver={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.8)'
-                e.target.style.transform = 'translateY(-1px)'
-                e.target.style.boxShadow = '0 6px 20px rgba(148, 163, 184, 0.2)'
+                e.target.style.background = 'rgba(0, 255, 255, 0.1)'
+                e.target.style.transform = 'scale(1.02)'
+                e.target.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.5)'
               }}
               onMouseOut={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.6)'
-                e.target.style.transform = 'translateY(0px)'
-                e.target.style.boxShadow = '0 4px 15px rgba(148, 163, 184, 0.1)'
+                e.target.style.background = 'rgba(0, 0, 0, 0.8)'
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)'
               }}
             >
-              Browse Lobbies
+              DATA STREAMS
             </button>
           </div>
         </div>
@@ -519,55 +577,64 @@ export default function TurfLootGlass() {
           left: '40px',
           top: '220px',
           width: '320px',
-          zIndex: 10,
-          ...glassStyle
+          zIndex: 20,
+          ...neonPanelStyle
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', 
+              background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)', 
               color: '#ffffff',
-              boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)'
+              boxShadow: '0 0 20px #ff0080',
+              border: '2px solid #ff00ff'
             }}>🏆</div>
-            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Leaderboard</h3>
+            <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #ff00ff' }}>RANKINGS</h3>
             <div style={{ marginLeft: 'auto' }}>
               <div style={{
                 padding: '4px 10px',
-                background: 'rgba(16, 185, 129, 0.1)',
-                color: '#059669',
+                background: 'rgba(0, 255, 0, 0.1)',
+                color: '#00ff00',
                 fontSize: '12px',
-                borderRadius: '12px',
-                border: '1px solid rgba(16, 185, 129, 0.2)',
-                fontWeight: '600'
+                borderRadius: '4px',
+                border: '1px solid #00ff00',
+                fontWeight: '600',
+                boxShadow: '0 0 10px #00ff00',
+                fontFamily: '"Orbitron", monospace'
               }}>
-                Live
+                LIVE
               </div>
             </div>
           </div>
           
           <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
-              <span style={{ color: '#475569', fontSize: '15px', fontWeight: '500' }}>1. Quantum</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.3)' }}>
+              <span style={{ color: '#00ffff', fontSize: '15px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>01. QUANTUM_X</span>
               <span style={{ 
-                color: '#f59e0b', 
+                color: '#ffff00', 
                 fontWeight: '700', 
-                fontSize: '15px'
+                fontSize: '15px',
+                textShadow: '0 0 10px #ffff00',
+                fontFamily: '"Orbitron", monospace'
               }}>$6,559.45</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
-              <span style={{ color: '#475569', fontSize: '15px', fontWeight: '500' }}>2. Dernie237</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.3)' }}>
+              <span style={{ color: '#00ffff', fontSize: '15px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>02. CIPHER_237</span>
               <span style={{ 
-                color: '#f59e0b', 
+                color: '#ffff00', 
                 fontWeight: '700', 
-                fontSize: '15px'
+                fontSize: '15px',
+                textShadow: '0 0 10px #ffff00',
+                fontFamily: '"Orbitron", monospace'
               }}>$5,210.67</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
-              <span style={{ color: '#475569', fontSize: '15px', fontWeight: '500' }}>3. Mr.TK216</span>
+              <span style={{ color: '#00ffff', fontSize: '15px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>03. MATRIX_216</span>
               <span style={{ 
-                color: '#f59e0b', 
+                color: '#ffff00', 
                 fontWeight: '700', 
-                fontSize: '15px'
+                fontSize: '15px',
+                textShadow: '0 0 10px #ffff00',
+                fontFamily: '"Orbitron", monospace'
               }}>$4,757.38</span>
             </div>
           </div>
@@ -575,18 +642,19 @@ export default function TurfLootGlass() {
           <button style={{
             width: '100%',
             padding: '12px',
-            background: 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            borderRadius: '12px',
-            color: '#475569',
+            background: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #ff00ff',
+            borderRadius: '8px',
+            color: '#ff00ff',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+            boxShadow: '0 0 15px rgba(255, 0, 255, 0.3)',
+            fontFamily: '"Orbitron", monospace',
+            textTransform: 'uppercase'
           }}>
-            View Full Leaderboard
+            ACCESS FULL DATA
           </button>
         </div>
 
@@ -596,21 +664,21 @@ export default function TurfLootGlass() {
           right: '40px',
           top: '220px',
           width: '300px',
-          zIndex: 10,
-          ...glassStyle,
-          border: '1px solid rgba(6, 182, 212, 0.2)'
+          zIndex: 20,
+          ...cyanPanelStyle
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', 
+              background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)', 
               color: '#ffffff',
-              boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)'
+              boxShadow: '0 0 20px #00ffff',
+              border: '2px solid #00ffff'
             }}>💎</div>
-            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Wallet</h3>
+            <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #00ffff' }}>CREDITS</h3>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-              <button style={{ fontSize: '11px', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>[?] Copy Address</button>
-              <button style={{ fontSize: '11px', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>[↻] Refresh Balance</button>
+              <button style={{ fontSize: '11px', color: '#00ffff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>[?] COPY_ADDR</button>
+              <button style={{ fontSize: '11px', color: '#00ffff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>[↻] REFRESH</button>
             </div>
           </div>
           
@@ -618,45 +686,49 @@ export default function TurfLootGlass() {
             <div style={{ 
               fontSize: '36px', 
               fontWeight: '800', 
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              background: 'linear-gradient(45deg, #ffff00 0%, #ff8000 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              marginBottom: '4px'
+              marginBottom: '4px',
+              textShadow: '0 0 20px #ffff00',
+              fontFamily: '"Orbitron", monospace'
             }}>$0.00</div>
-            <div style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>0.0000 SOL</div>
+            <div style={{ color: '#00ffff', fontSize: '14px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>0.0000 SOL</div>
           </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
             <button style={{
               flex: 1,
               padding: '14px',
-              background: 'rgba(16, 185, 129, 0.1)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
-              borderRadius: '12px',
-              color: '#059669',
+              background: 'rgba(0, 255, 0, 0.1)',
+              border: '2px solid #00ff00',
+              borderRadius: '8px',
+              color: '#00ff00',
               fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 4px 15px rgba(16, 185, 129, 0.1)'
+              boxShadow: '0 0 15px rgba(0, 255, 0, 0.3)',
+              fontFamily: '"Orbitron", monospace',
+              textTransform: 'uppercase'
             }}>
-              Add Funds
+              UPLOAD
             </button>
             <button style={{
               flex: 1,
               padding: '14px',
-              background: 'rgba(59, 130, 246, 0.1)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              borderRadius: '12px',
-              color: '#2563eb',
+              background: 'rgba(255, 0, 0, 0.1)',
+              border: '2px solid #ff0040',
+              borderRadius: '8px',
+              color: '#ff0040',
               fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.1)'
+              boxShadow: '0 0 15px rgba(255, 0, 64, 0.3)',
+              fontFamily: '"Orbitron", monospace',
+              textTransform: 'uppercase'
             }}>
-              Cash Out
+              EXTRACT
             </button>
           </div>
         </div>
@@ -667,20 +739,21 @@ export default function TurfLootGlass() {
           left: '40px',
           bottom: '40px',
           width: '320px',
-          zIndex: 10,
-          ...glassStyle
+          zIndex: 20,
+          ...neonPanelStyle
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', 
+              background: 'linear-gradient(45deg, #8000ff 0%, #ff00ff 100%)', 
               color: '#ffffff',
-              boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'
+              boxShadow: '0 0 20px #8000ff',
+              border: '2px solid #ff00ff'
             }}>👥</div>
-            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Friends</h3>
+            <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #ff00ff' }}>NETWORK</h3>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '500' }}>[↻] Refresh</span>
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '500' }}>0 playing</span>
+              <span style={{ fontSize: '11px', color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>[↻] SCAN</span>
+              <span style={{ fontSize: '11px', color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>0 ONLINE</span>
             </div>
           </div>
           
@@ -688,37 +761,38 @@ export default function TurfLootGlass() {
             <div style={{
               width: '56px',
               height: '56px',
-              background: 'rgba(148, 163, 184, 0.1)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '50%',
+              background: 'rgba(0, 0, 0, 0.8)',
+              border: '2px solid #ff00ff',
+              borderRadius: '8px',
               margin: '0 auto 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '24px',
-              border: '1px solid rgba(148, 163, 184, 0.2)',
-              boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+              boxShadow: '0 0 20px rgba(255, 0, 255, 0.3)'
             }}>
               👤
             </div>
-            <div style={{ color: '#64748b', fontSize: '15px', marginBottom: '8px', fontWeight: '500' }}>No friends... add some!</div>
+            <div style={{ color: '#00ffff', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>NO CONNECTIONS FOUND</div>
+            <div style={{ color: '#ff00ff', fontSize: '12px', fontFamily: '"Orbitron", monospace' }}>ESTABLISH NEW LINKS</div>
           </div>
           
           <button style={{
             width: '100%',
             padding: '12px',
-            background: 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            borderRadius: '12px',
-            color: '#475569',
+            background: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #ff00ff',
+            borderRadius: '8px',
+            color: '#ff00ff',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+            boxShadow: '0 0 15px rgba(255, 0, 255, 0.3)',
+            fontFamily: '"Orbitron", monospace',
+            textTransform: 'uppercase'
           }}>
-            Add Friends
+            CONNECT NODES
           </button>
         </div>
 
@@ -726,11 +800,11 @@ export default function TurfLootGlass() {
         <div style={statsStyle}>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>Players in Game</div>
+            <div style={statLabelStyle}>USERS JACKED IN</div>
           </div>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-            <div style={statLabelStyle}>Global Player Winnings</div>
+            <div style={statLabelStyle}>TOTAL EXTRACTED</div>
           </div>
         </div>
 
@@ -740,51 +814,53 @@ export default function TurfLootGlass() {
           right: '40px',
           bottom: '40px',
           width: '300px',
-          zIndex: 10,
-          ...glassStyle
+          zIndex: 20,
+          ...cyanPanelStyle
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
               ...iconStyle, 
-              background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', 
+              background: 'linear-gradient(45deg, #ff0080 0%, #ff8000 100%)', 
               color: '#ffffff',
-              boxShadow: '0 4px 15px rgba(236, 72, 153, 0.3)'
+              boxShadow: '0 0 20px #ff0080',
+              border: '2px solid #ff0080'
             }}>🎨</div>
-            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Customize</h3>
+            <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Orbitron", monospace', textShadow: '0 0 10px #00ffff' }}>AVATAR</h3>
           </div>
           
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <div style={{
               width: '72px',
               height: '72px',
-              background: 'rgba(236, 72, 153, 0.1)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: '50%',
+              background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 70%, rgba(255, 0, 255, 0.3) 100%)',
+              border: '2px solid #ff00ff',
+              borderRadius: '8px',
               margin: '0 auto 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
-              boxShadow: '0 8px 25px rgba(236, 72, 153, 0.2)',
-              border: '1px solid rgba(236, 72, 153, 0.2)'
+              boxShadow: '0 0 30px rgba(255, 0, 128, 0.5)'
             }}>
               <div style={{
                 width: '10px',
                 height: '10px',
-                backgroundColor: '#1e293b',
+                backgroundColor: '#00ffff',
                 borderRadius: '50%',
                 position: 'absolute',
                 top: '20px',
-                left: '22px'
+                left: '22px',
+                boxShadow: '0 0 10px #00ffff'
               }} />
               <div style={{
                 width: '10px',
                 height: '10px',
-                backgroundColor: '#1e293b',
+                backgroundColor: '#00ffff',
                 borderRadius: '50%',
                 position: 'absolute',
                 top: '20px',
-                right: '22px'
+                right: '22px',
+                boxShadow: '0 0 10px #00ffff'
               }} />
             </div>
           </div>
@@ -792,34 +868,37 @@ export default function TurfLootGlass() {
           <button style={{
             width: '100%',
             padding: '14px',
-            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-            color: '#ffffff',
-            fontWeight: '600',
-            borderRadius: '12px',
-            border: 'none',
+            background: 'linear-gradient(45deg, #ff8000 0%, #ffff00 100%)',
+            color: '#000000',
+            fontWeight: '700',
+            borderRadius: '8px',
+            border: '2px solid #ff8000',
             cursor: 'pointer',
             marginBottom: '12px',
-            boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)',
-            transition: 'all 0.3s ease'
+            boxShadow: '0 0 20px rgba(255, 128, 0, 0.4)',
+            transition: 'all 0.3s ease',
+            fontFamily: '"Orbitron", monospace',
+            textTransform: 'uppercase'
           }}>
-            👤 Manage Affiliate
+            👤 UPGRADE CORE
           </button>
           
           <button style={{
             width: '100%',
             padding: '12px',
-            background: 'rgba(255, 255, 255, 0.8)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            borderRadius: '12px',
-            color: '#475569',
+            background: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #00ffff',
+            borderRadius: '8px',
+            color: '#00ffff',
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+            boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)',
+            fontFamily: '"Orbitron", monospace',
+            textTransform: 'uppercase'
           }}>
-            Change Appearance
+            MODIFY SKIN
           </button>
         </div>
 
@@ -828,36 +907,79 @@ export default function TurfLootGlass() {
           position: 'absolute',
           bottom: '40px',
           left: '40px',
-          zIndex: 10
+          zIndex: 20
         }}>
           <button style={{
             padding: '12px 20px',
-            background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
+            background: 'linear-gradient(45deg, #5865f2 0%, #8000ff 100%)',
             color: '#ffffff',
-            fontWeight: '600',
-            borderRadius: '12px',
-            border: 'none',
+            fontWeight: '700',
+            borderRadius: '8px',
+            border: '2px solid #5865f2',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            boxShadow: '0 4px 15px rgba(88, 101, 242, 0.3)',
-            transition: 'all 0.3s ease'
+            boxShadow: '0 0 25px rgba(88, 101, 242, 0.5)',
+            transition: 'all 0.3s ease',
+            fontFamily: '"Orbitron", monospace',
+            textTransform: 'uppercase'
           }}>
-            🎮 Join Discord!
+            🎮 JACK INTO DISCORD
           </button>
         </div>
 
         {/* CSS Animations */}
         <style jsx>{`
-          @keyframes gentleFloat {
+          @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+          
+          @keyframes synthGrid {
+            0% { 
+              transform: translateX(0) translateY(0);
+            }
+            100% { 
+              transform: translateX(-100px) translateY(-100px);
+            }
+          }
+          
+          @keyframes neonFloat {
             0%, 100% { 
-              transform: translateY(0px);
-              opacity: 0.7;
+              transform: translateY(0px) translateX(0px) rotate(0deg);
+              opacity: 0.3;
+            }
+            25% { 
+              transform: translateY(-20px) translateX(10px) rotate(90deg);
+              opacity: 0.8;
             }
             50% { 
-              transform: translateY(-20px);
+              transform: translateY(-10px) translateX(-15px) rotate(180deg);
               opacity: 1;
+            }
+            75% { 
+              transform: translateY(-30px) translateX(5px) rotate(270deg);
+              opacity: 0.6;
+            }
+          }
+          
+          @keyframes synthPulse {
+            0%, 100% { 
+              transform: translateX(-50%) scale(1);
+              opacity: 0.3;
+            }
+            50% { 
+              transform: translateX(-50%) scale(1.2);
+              opacity: 0.6;
+            }
+          }
+          
+          @keyframes retroFloat {
+            0%, 100% { 
+              transform: translateY(0px) rotate(0deg);
+              opacity: 0.1;
+            }
+            50% { 
+              transform: translateY(-40px) rotate(180deg);
+              opacity: 0.4;
             }
           }
         `}</style>
@@ -869,34 +991,68 @@ export default function TurfLootGlass() {
   return (
     <div style={containerStyle}>
       
-      {/* Mobile Floating Elements (Subtle) */}
+      {/* Mobile Synthwave Background (Simplified) */}
       <div style={{
         position: 'fixed',
-        top: '5%',
-        left: '5%',
-        zIndex: 2,
-        width: '40px',
-        height: '40px',
-        background: 'rgba(59, 130, 246, 0.05)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: '50%',
-        border: '1px solid rgba(59, 130, 246, 0.1)',
-        animation: 'gentleFloat 8s ease-in-out infinite'
-      }} />
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 1,
+        overflow: 'hidden'
+      }}>
+        
+        {/* Mobile Grid */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '150%',
+          height: '150%',
+          opacity: 0.4,
+          backgroundImage: `
+            linear-gradient(#ff00ff 1px, transparent 1px),
+            linear-gradient(90deg, #ff00ff 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+          animation: 'synthGrid 25s linear infinite'
+        }} />
 
-      <div style={{
-        position: 'fixed',
-        bottom: '15%',
-        right: '5%',
-        zIndex: 2,
-        width: '30px',
-        height: '30px',
-        background: 'rgba(139, 92, 246, 0.05)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: '50%',
-        border: '1px solid rgba(139, 92, 246, 0.1)',
-        animation: 'gentleFloat 10s ease-in-out infinite reverse'
-      }} />
+        {/* Mobile Particles (Fewer) */}
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={`particle-${i}`}
+            style={{
+              position: 'absolute',
+              width: '3px',
+              height: '3px',
+              background: ['#ff00ff', '#00ffff'][Math.floor(Math.random() * 2)],
+              borderRadius: '50%',
+              left: Math.random() * 100 + '%',
+              top: Math.random() * 100 + '%',
+              opacity: Math.random() * 0.6 + 0.2,
+              animation: `neonFloat ${Math.random() * 6 + 8}s ease-in-out infinite`,
+              boxShadow: `0 0 8px currentColor`,
+              zIndex: 5
+            }}
+          />
+        ))}
+
+        {/* Mobile Sun */}
+        <div style={{
+          position: 'absolute',
+          bottom: '40%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '120px',
+          height: '120px',
+          background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 50%, transparent 70%)',
+          borderRadius: '50%',
+          opacity: 0.2,
+          animation: 'synthPulse 4s ease-in-out infinite',
+          zIndex: 2
+        }} />
+      </div>
 
       {/* Mobile Content Container */}
       <div style={mobileContainerStyle}>
@@ -907,21 +1063,24 @@ export default function TurfLootGlass() {
             <div style={{
               width: '32px',
               height: '32px',
-              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-              borderRadius: '10px',
+              background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
+              borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '14px',
-              boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)'
+              boxShadow: '0 0 15px #ff0080',
+              border: '2px solid #ff00ff'
             }}>
               🔥
             </div>
             <span style={{ 
-              color: '#475569', 
-              fontWeight: '600', 
-              fontSize: '14px'
-            }}>Welcome, ty8898812</span>
+              color: '#00ffff', 
+              fontWeight: '700', 
+              fontSize: '12px',
+              textShadow: '0 0 8px #00ffff',
+              fontFamily: '"Orbitron", monospace'
+            }}>PLAYER_8812</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -931,11 +1090,10 @@ export default function TurfLootGlass() {
                 style={{ 
                   width: '24px', 
                   height: '24px', 
-                  background: 'rgba(255, 255, 255, 0.6)', 
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(148, 163, 184, 0.2)',
-                  boxShadow: '0 2px 8px rgba(148, 163, 184, 0.1)'
+                  background: 'rgba(0, 0, 0, 0.8)', 
+                  border: '2px solid #00ffff',
+                  borderRadius: '4px',
+                  boxShadow: '0 0 10px rgba(0, 255, 255, 0.3)'
                 }}
               />
             ))}
@@ -945,9 +1103,14 @@ export default function TurfLootGlass() {
         {/* Mobile Title */}
         <div style={titleStyle}>
           <h1 style={mainTitleStyle}>
-            TURF<span style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>LOOT</span>
+            TURF<span style={{ 
+              background: 'linear-gradient(45deg, #ff0080 0%, #ffff00 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>Skill-Based Grid Domination</p>
+          <p style={subtitleStyle}>NEON GRID DOMINATION</p>
         </div>
 
         {/* Mobile Game Controls */}
@@ -958,15 +1121,17 @@ export default function TurfLootGlass() {
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                borderRadius: '12px',
+                background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)',
+                borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#ffffff',
                 fontWeight: '800',
                 fontSize: '18px',
-                boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)'
+                boxShadow: '0 0 20px #ff0080',
+                border: '2px solid #ff00ff',
+                fontFamily: '"Orbitron", monospace'
               }}>
                 0
               </div>
@@ -975,19 +1140,20 @@ export default function TurfLootGlass() {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 style={nameInputStyle}
-                placeholder="Enter your name"
+                placeholder="USERNAME"
               />
               <div style={{
                 width: '36px',
                 height: '36px',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                borderRadius: '10px',
+                background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)',
+                borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#ffffff',
                 fontWeight: '600',
-                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
+                boxShadow: '0 0 15px #00ffff',
+                border: '2px solid #00ffff'
               }}>
                 ✓
               </div>
@@ -1012,13 +1178,13 @@ export default function TurfLootGlass() {
             onClick={handleJoinGame}
             style={joinButtonStyle}
           >
-            ▶ JOIN GAME
+            ▶ JACK IN
           </button>
 
           {/* Secondary Buttons */}
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <button style={secondaryButtonStyle}>AI EU</button>
-            <button style={secondaryButtonStyle}>Browse Lobbies</button>
+            <button style={secondaryButtonStyle}>NEURAL NET</button>
+            <button style={secondaryButtonStyle}>DATA STREAMS</button>
           </div>
         </div>
 
@@ -1026,205 +1192,213 @@ export default function TurfLootGlass() {
         <div style={statsStyle}>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>Players in Game</div>
+            <div style={statLabelStyle}>USERS ONLINE</div>
           </div>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-            <div style={statLabelStyle}>Global Player Winnings</div>
+            <div style={statLabelStyle}>TOTAL EXTRACTED</div>
           </div>
         </div>
 
         {/* Mobile Panels Grid */}
         <div style={mobileGridStyle}>
           {/* Leaderboard Panel */}
-          <div style={neomorphStyle}>
+          <div style={neonPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', 
+                background: 'linear-gradient(45deg, #ff0080 0%, #ff00ff 100%)', 
                 color: '#ffffff',
-                boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
+                boxShadow: '0 0 15px #ff0080',
+                border: '1px solid #ff00ff'
               }}>🏆</div>
-              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Leaderboard</h3>
+              <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>RANKS</h3>
             </div>
             
-            <div style={{ marginBottom: '12px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
-                <span style={{ color: '#475569', fontWeight: '500' }}>1. Quantum</span>
-                <span style={{ color: '#f59e0b', fontWeight: '700' }}>$6.5K</span>
+            <div style={{ marginBottom: '12px', fontSize: '11px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.2)' }}>
+                <span style={{ color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>QUANTUM_X</span>
+                <span style={{ color: '#ffff00', fontWeight: '700', fontFamily: '"Orbitron", monospace' }}>$6.5K</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
-                <span style={{ color: '#475569', fontWeight: '500' }}>2. Dernie237</span>
-                <span style={{ color: '#f59e0b', fontWeight: '700' }}>$5.2K</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255, 0, 255, 0.2)' }}>
+                <span style={{ color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>CIPHER_237</span>
+                <span style={{ color: '#ffff00', fontWeight: '700', fontFamily: '"Orbitron", monospace' }}>$5.2K</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
-                <span style={{ color: '#475569', fontWeight: '500' }}>3. Mr.TK216</span>
-                <span style={{ color: '#f59e0b', fontWeight: '700' }}>$4.7K</span>
+                <span style={{ color: '#00ffff', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>MATRIX_216</span>
+                <span style={{ color: '#ffff00', fontWeight: '700', fontFamily: '"Orbitron", monospace' }}>$4.7K</span>
               </div>
             </div>
             
             <button style={{
               width: '100%',
               padding: '8px',
-              background: '#f8fafc',
-              border: 'none',
-              borderRadius: '10px',
-              color: '#475569',
-              fontSize: '11px',
-              fontWeight: '500',
+              background: 'rgba(0, 0, 0, 0.8)',
+              border: '1px solid #ff00ff',
+              borderRadius: '6px',
+              color: '#ff00ff',
+              fontSize: '10px',
+              fontWeight: '600',
               cursor: 'pointer',
-              boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
+              fontFamily: '"Orbitron", monospace'
             }}>
-              View Full
+              ACCESS DATA
             </button>
           </div>
 
           {/* Wallet Panel */}
-          <div style={{...neomorphStyle, border: '1px solid rgba(6, 182, 212, 0.1)'}}>
+          <div style={cyanPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', 
+                background: 'linear-gradient(45deg, #00ffff 0%, #0080ff 100%)', 
                 color: '#ffffff',
-                boxShadow: '0 2px 8px rgba(6, 182, 212, 0.3)'
+                boxShadow: '0 0 15px #00ffff',
+                border: '1px solid #00ffff'
               }}>💎</div>
-              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Wallet</h3>
+              <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>CREDITS</h3>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{ 
-                fontSize: '24px', 
+                fontSize: '20px', 
                 fontWeight: '800', 
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                background: 'linear-gradient(45deg, #ffff00 0%, #ff8000 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '2px'
+                marginBottom: '2px',
+                fontFamily: '"Orbitron", monospace'
               }}>$0.00</div>
-              <div style={{ color: '#64748b', fontSize: '10px', fontWeight: '500' }}>0.0000 SOL</div>
+              <div style={{ color: '#00ffff', fontSize: '9px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>0.0000 SOL</div>
             </div>
             
             <div style={{ display: 'flex', gap: '6px' }}>
               <button style={{
                 flex: 1,
                 padding: '8px',
-                background: '#f0fdf4',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#059669',
+                background: 'rgba(0, 255, 0, 0.1)',
+                border: '1px solid #00ff00',
+                borderRadius: '6px',
+                color: '#00ff00',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontSize: '10px',
-                boxShadow: 'inset 1px 1px 2px #dcfce7, inset -1px -1px 2px #ffffff'
+                fontSize: '9px',
+                fontFamily: '"Orbitron", monospace'
               }}>
-                Add
+                UPLOAD
               </button>
               <button style={{
                 flex: 1,
                 padding: '8px',
-                background: '#eff6ff',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#2563eb',
+                background: 'rgba(255, 0, 0, 0.1)',
+                border: '1px solid #ff0040',
+                borderRadius: '6px',
+                color: '#ff0040',
                 fontWeight: '600',
                 cursor: 'pointer',
-                fontSize: '10px',
-                boxShadow: 'inset 1px 1px 2px #dbeafe, inset -1px -1px 2px #ffffff'
+                fontSize: '9px',
+                fontFamily: '"Orbitron", monospace'
               }}>
-                Cash Out
+                EXTRACT
               </button>
             </div>
           </div>
 
           {/* Friends Panel */}
-          <div style={neomorphStyle}>
+          <div style={neonPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', 
+                background: 'linear-gradient(45deg, #8000ff 0%, #ff00ff 100%)', 
                 color: '#ffffff',
-                boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)'
+                boxShadow: '0 0 15px #8000ff',
+                border: '1px solid #ff00ff'
               }}>👥</div>
-              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Friends</h3>
+              <h3 style={{ color: '#ff00ff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>NETWORK</h3>
             </div>
             
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <div style={{
-                width: '32px',
+                width: '32px',      
                 height: '32px',
-                background: '#f8fafc',
-                borderRadius: '50%',
+                background: 'rgba(0, 0, 0, 0.8)',
+                border: '1px solid #ff00ff',
+                borderRadius: '6px',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '14px',
-                boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
+                boxShadow: '0 0 15px rgba(255, 0, 255, 0.3)'
               }}>
                 👤
               </div>
-              <div style={{ color: '#64748b', fontSize: '11px', fontWeight: '500' }}>No friends yet</div>
+              <div style={{ color: '#00ffff', fontSize: '10px', fontWeight: '600', fontFamily: '"Orbitron", monospace' }}>NO CONNECTIONS</div>
             </div>
             
             <button style={{
               width: '100%',
               padding: '8px',
-              background: '#f8fafc',
-              border: 'none',
-              borderRadius: '10px',
-              color: '#475569',
-              fontSize: '11px',
-              fontWeight: '500',
+              background: 'rgba(0, 0, 0, 0.8)',
+              border: '1px solid #ff00ff',
+              borderRadius: '6px',
+              color: '#ff00ff',
+              fontSize: '10px',
+              fontWeight: '600',
               cursor: 'pointer',
-              boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
+              fontFamily: '"Orbitron", monospace'
             }}>
-              Add Friends
+              CONNECT
             </button>
           </div>
 
           {/* Customize Panel */}
-          <div style={neomorphStyle}>
+          <div style={cyanPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', 
+                background: 'linear-gradient(45deg, #ff0080 0%, #ff8000 100%)', 
                 color: '#ffffff',
-                boxShadow: '0 2px 8px rgba(236, 72, 153, 0.3)'
+                boxShadow: '0 0 15px #ff0080',
+                border: '1px solid #ff0080'
               }}>🎨</div>
-              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Customize</h3>
+              <h3 style={{ color: '#00ffff', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Orbitron", monospace' }}>AVATAR</h3>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: '#fdf2f8',
-                borderRadius: '50%',
+                background: 'radial-gradient(circle, #ff0080 0%, #ff00ff 70%, rgba(255, 0, 255, 0.3) 100%)',
+                border: '1px solid #ff00ff',
+                borderRadius: '6px',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                boxShadow: 'inset 2px 2px 4px #fce7f3, inset -2px -2px 4px #ffffff',
-                border: '1px solid rgba(236, 72, 153, 0.1)'
+                boxShadow: '0 0 20px rgba(255, 0, 128, 0.4)'
               }}>
                 <div style={{
                   width: '5px',
                   height: '5px',
-                  backgroundColor: '#1e293b',
+                  backgroundColor: '#00ffff',
                   borderRadius: '50%',
                   position: 'absolute',
                   top: '12px',
-                  left: '12px'
+                  left: '12px',
+                  boxShadow: '0 0 5px #00ffff'
                 }} />
                 <div style={{
                   width: '5px',
                   height: '5px',
-                  backgroundColor: '#1e293b',
+                  backgroundColor: '#00ffff',
                   borderRadius: '50%',
                   position: 'absolute',
                   top: '12px',
-                  right: '12px'
+                  right: '12px',
+                  boxShadow: '0 0 5px #00ffff'
                 }} />
               </div>
             </div>
@@ -1232,32 +1406,32 @@ export default function TurfLootGlass() {
             <button style={{
               width: '100%',
               padding: '8px',
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              color: '#ffffff',
-              fontWeight: '600',
-              borderRadius: '8px',
-              border: 'none',
+              background: 'linear-gradient(45deg, #ff8000 0%, #ffff00 100%)',
+              color: '#000000',
+              fontWeight: '700',
+              borderRadius: '6px',
+              border: '1px solid #ff8000',
               cursor: 'pointer',
               marginBottom: '6px',
-              fontSize: '10px',
-              boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
+              fontSize: '9px',
+              fontFamily: '"Orbitron", monospace'
             }}>
-              👤 Manage Affiliate
+              👤 UPGRADE
             </button>
             
             <button style={{
               width: '100%',
               padding: '6px',
-              background: '#f8fafc',
-              border: 'none',
-              borderRadius: '8px',
-              color: '#475569',
-              fontSize: '10px',
-              fontWeight: '500',
+              background: 'rgba(0, 0, 0, 0.8)',
+              border: '1px solid #00ffff',
+              borderRadius: '6px',
+              color: '#00ffff',
+              fontSize: '9px',
+              fontWeight: '600',
               cursor: 'pointer',
-              boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
+              fontFamily: '"Orbitron", monospace'
             }}>
-              Change Appearance
+              MODIFY
             </button>
           </div>
         </div>
@@ -1266,33 +1440,56 @@ export default function TurfLootGlass() {
         <div style={{ textAlign: 'center' }}>
           <button style={{
             padding: '12px 20px',
-            background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
+            background: 'linear-gradient(45deg, #5865f2 0%, #8000ff 100%)',
             color: '#ffffff',
-            fontWeight: '600',
-            borderRadius: '12px',
-            border: 'none',
+            fontWeight: '700',
+            borderRadius: '8px',
+            border: '2px solid #5865f2',
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 15px rgba(88, 101, 242, 0.3)',
-            fontSize: '14px'
+            boxShadow: '0 0 20px rgba(88, 101, 242, 0.5)',
+            fontSize: '12px',
+            fontFamily: '"Orbitron", monospace'
           }}>
-            🎮 Join Discord!
+            🎮 JACK INTO DISCORD
           </button>
         </div>
       </div>
 
       {/* Mobile CSS Animations */}
       <style jsx>{`
-        @keyframes gentleFloat {
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+        
+        @keyframes synthGrid {
+          0% { 
+            transform: translateX(0) translateY(0);
+          }
+          100% { 
+            transform: translateX(-50px) translateY(-50px);
+          }
+        }
+        
+        @keyframes neonFloat {
           0%, 100% { 
-            transform: translateY(0px);
-            opacity: 0.5;
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0.2;
           }
           50% { 
-            transform: translateY(-15px);
-            opacity: 0.8;
+            transform: translateY(-20px) rotate(180deg);
+            opacity: 0.6;
+          }
+        }
+        
+        @keyframes synthPulse {
+          0%, 100% { 
+            transform: translateX(-50%) scale(1);
+            opacity: 0.2;
+          }
+          50% { 
+            transform: translateX(-50%) scale(1.1);
+            opacity: 0.4;
           }
         }
       `}</style>
