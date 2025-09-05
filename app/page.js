@@ -720,6 +720,24 @@ export default function TurfLootTactical() {
 
         {/* Desktop Center Controls */}
         <div style={centerControlsStyle}>
+          {/* Stats - Moved Above Username */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '80px',
+            marginBottom: '40px',
+            zIndex: 25
+          }}>
+            <div style={statItemStyle}>
+              <div style={statNumberStyle}>{liveStats.players}</div>
+              <div style={statLabelStyle}>PLAYERS ONLINE</div>
+            </div>
+            <div style={statItemStyle}>
+              <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
+              <div style={statLabelStyle}>TOTAL WINNINGS</div>
+            </div>
+          </div>
+
           {/* Player Name Input */}
           <div style={{ marginBottom: '32px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', marginBottom: '24px' }}>
