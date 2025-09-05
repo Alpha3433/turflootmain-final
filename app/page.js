@@ -1716,7 +1716,7 @@ export default function TurfLootTactical() {
                 boxShadow: '0 0 15px rgba(246, 173, 85, 0.6)',
                 border: '1px solid #f6ad55'
               }}>🎯</div>
-              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>COMMAND</h3>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LEADERBOARD</h3>
             </div>
             
             <div style={{ marginBottom: '12px', fontSize: '11px' }}>
