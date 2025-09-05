@@ -1014,7 +1014,7 @@ export default function TurfLootTactical() {
               fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
             }}>
-              ACQUIRE
+              DEPOSIT
             </button>
             <button style={{
               flex: 1,
