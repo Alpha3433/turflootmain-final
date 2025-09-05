@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function TurfLootCosmic() {
+export default function TurfLootGlass() {
   const router = useRouter()
   const [selectedStake, setSelectedStake] = useState('$1')
-  const [liveStats, setLiveStats] = useState({ players: 31, winnings: 342876 })
+  const [liveStats, setLiveStats] = useState({ players: 28, winnings: 418237 })
   const [userName, setUserName] = useState('anth')
   const [isMobile, setIsMobile] = useState(false)
 
@@ -22,8 +22,8 @@ export default function TurfLootCosmic() {
     // Simulate live stats updates
     const interval = setInterval(() => {
       setLiveStats(prev => ({
-        players: Math.floor(Math.random() * 50) + 20,
-        winnings: Math.floor(Math.random() * 200000) + 250000
+        players: Math.floor(Math.random() * 45) + 25,
+        winnings: Math.floor(Math.random() * 250000) + 300000
       }))
     }, 4000)
     
@@ -39,11 +39,11 @@ export default function TurfLootCosmic() {
 
   const containerStyle = {
     minHeight: '100vh',
-    background: 'radial-gradient(ellipse at top, #1e1b4b 0%, #0f0a2e 50%, #000000 100%)',
-    color: '#ffffff',
+    background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)',
+    color: '#1e293b',
     overflow: 'hidden',
     position: 'relative',
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     ...(isMobile && {
       overflow: 'auto',
       paddingBottom: '20px'
@@ -54,167 +54,185 @@ export default function TurfLootCosmic() {
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
-    padding: '10px',
-    gap: '15px',
+    padding: '15px',
+    gap: '20px',
     position: 'relative',
-    zIndex: 30
+    zIndex: 10
+  }
+
+  const glassStyle = {
+    background: 'rgba(255, 255, 255, 0.25)',
+    backdropFilter: 'blur(10px)',
+    borderRadius: isMobile ? '16px' : '24px',
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    boxShadow: isMobile 
+      ? '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+      : '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+    padding: isMobile ? '16px' : '24px'
+  }
+
+  const neomorphStyle = {
+    background: '#f0f4f8',
+    borderRadius: isMobile ? '16px' : '20px',
+    boxShadow: isMobile
+      ? '9px 9px 16px #d1d9e6, -9px -9px 16px #ffffff'
+      : '15px 15px 30px #d1d9e6, -15px -15px 30px #ffffff',
+    border: 'none',
+    padding: isMobile ? '16px' : '20px'
   }
 
   const headerStyle = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: isMobile ? '10px 0' : '20px',
-    zIndex: 60,
+    padding: isMobile ? '0' : '20px 40px',
+    zIndex: 20,
     ...(isMobile ? {} : {
       position: 'absolute',
       top: 0,
-      left: '20px',
-      right: '20px'
+      left: 0,
+      right: 0
     })
   }
 
   const titleStyle = {
     textAlign: 'center',
     padding: isMobile ? '20px 0' : '0',
-    zIndex: 50,
+    zIndex: 15,
     ...(isMobile ? {} : {
       position: 'absolute',
-      top: '120px',
+      top: '100px',
       left: '50%',
       transform: 'translateX(-50%)'
     })
   }
 
   const mainTitleStyle = {
-    fontSize: isMobile ? '2.5rem' : '4.5rem',
-    fontWeight: '900',
-    marginBottom: '8px',
-    margin: 0,
-    textShadow: '0 0 30px rgba(139, 92, 246, 0.8), 0 0 60px rgba(59, 130, 246, 0.4)'
+    fontSize: isMobile ? '2.8rem' : '5rem',
+    fontWeight: '800',
+    margin: '0 0 8px 0',
+    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%)',
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    letterSpacing: '-0.02em'
   }
 
   const subtitleStyle = {
-    color: '#a855f7',
-    fontWeight: 'bold',
-    fontSize: isMobile ? '12px' : '18px',
-    letterSpacing: isMobile ? '2px' : '3px',
+    color: '#64748b',
+    fontWeight: '600',
+    fontSize: isMobile ? '14px' : '18px',
+    letterSpacing: '0.05em',
     margin: 0,
-    textShadow: '0 0 20px rgba(168, 85, 247, 0.6)'
-  }
-
-  const cosmicPanelStyle = {
-    background: 'linear-gradient(135deg, rgba(30, 27, 75, 0.8) 0%, rgba(15, 10, 46, 0.9) 100%)',
-    borderRadius: isMobile ? '12px' : '20px',
-    border: '1px solid rgba(139, 92, 246, 0.4)',
-    padding: isMobile ? '12px' : '20px',
-    boxShadow: '0 8px 32px rgba(139, 92, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(10px)',
-    margin: isMobile ? '0' : 'auto',
-    width: '100%'
+    textTransform: 'uppercase'
   }
 
   const centerControlsStyle = {
     textAlign: 'center',
-    padding: isMobile ? '15px 0' : '0',
-    zIndex: 40,
+    padding: isMobile ? '20px 0' : '0',
+    zIndex: 15,
     ...(isMobile ? {} : {
       position: 'absolute',
       left: '50%',
       top: '50%',
-      transform: 'translate(-50%, -50%)'
+      transform: 'translate(-50%, -40%)'
     })
   }
 
   const nameInputStyle = {
-    backgroundColor: 'rgba(30, 27, 75, 0.8)',
-    border: '2px solid rgba(139, 92, 246, 0.6)',
+    background: 'rgba(255, 255, 255, 0.8)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(148, 163, 184, 0.3)',
     borderRadius: '12px',
-    padding: isMobile ? '10px 16px' : '12px 20px',
-    color: '#ffffff',
-    fontWeight: '600',
+    padding: isMobile ? '12px 16px' : '14px 20px',
+    color: '#1e293b',
+    fontWeight: '500',
     textAlign: 'center',
-    width: isMobile ? '140px' : '180px',
+    width: isMobile ? '160px' : '200px',
     fontSize: isMobile ? '14px' : '16px',
-    boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)',
-    backdropFilter: 'blur(10px)'
+    boxShadow: 'inset 2px 2px 4px rgba(148, 163, 184, 0.1)',
+    outline: 'none',
+    transition: 'all 0.3s ease'
   }
 
   const stakeButtonStyle = {
-    padding: isMobile ? '10px 16px' : '14px 28px',
-    borderRadius: '12px',
-    fontWeight: 'bold',
-    fontSize: isMobile ? '14px' : '18px',
+    padding: isMobile ? '12px 20px' : '16px 32px',
+    borderRadius: '16px',
+    fontWeight: '600',
+    fontSize: isMobile ? '14px' : '16px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    border: '2px solid rgba(139, 92, 246, 0.4)',
-    margin: isMobile ? '0 3px' : '0 6px',
+    border: 'none',
+    margin: isMobile ? '0 4px' : '0 8px',
     backdropFilter: 'blur(10px)'
   }
 
   const activeStakeStyle = {
     ...stakeButtonStyle,
-    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
     color: '#ffffff',
-    border: '2px solid #a855f7',
-    boxShadow: '0 0 30px rgba(168, 85, 247, 0.6), 0 8px 20px rgba(139, 92, 246, 0.3)'
+    boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+    transform: 'translateY(-2px)'
   }
 
   const inactiveStakeStyle = {
     ...stakeButtonStyle,
-    backgroundColor: 'rgba(30, 27, 75, 0.6)',
-    color: '#e0e7ff'
+    background: 'rgba(255, 255, 255, 0.7)',
+    color: '#475569',
+    boxShadow: '0 4px 15px rgba(148, 163, 184, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
   }
 
   const joinButtonStyle = {
-    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%)',
+    background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
     color: '#ffffff',
-    fontWeight: 'bold',
-    padding: isMobile ? '14px 40px' : '18px 80px',
+    fontWeight: '700',
+    padding: isMobile ? '16px 48px' : '20px 64px',
     borderRadius: '20px',
-    fontSize: isMobile ? '16px' : '22px',
-    marginBottom: isMobile ? '15px' : '30px',
+    fontSize: isMobile ? '16px' : '20px',
+    marginBottom: isMobile ? '20px' : '32px',
     cursor: 'pointer',
     border: 'none',
-    boxShadow: '0 0 40px rgba(139, 92, 246, 0.6), 0 12px 30px rgba(59, 130, 246, 0.4)',
+    boxShadow: '0 10px 30px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
     transition: 'all 0.3s ease',
-    textShadow: '0 0 10px rgba(255, 255, 255, 0.8)'
+    letterSpacing: '0.02em'
   }
 
   const secondaryButtonStyle = {
-    padding: isMobile ? '8px 16px' : '10px 24px',
-    backgroundColor: 'rgba(30, 27, 75, 0.7)',
-    border: '1px solid rgba(139, 92, 246, 0.4)',
-    borderRadius: '10px',
-    color: '#c7d2fe',
+    padding: isMobile ? '10px 20px' : '12px 24px',
+    background: 'rgba(255, 255, 255, 0.6)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(148, 163, 184, 0.2)',
+    borderRadius: '12px',
+    color: '#475569',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    margin: isMobile ? '0 4px' : '0 8px',
-    backdropFilter: 'blur(5px)',
-    fontSize: isMobile ? '12px' : '14px'
+    margin: isMobile ? '0 6px' : '0 10px',
+    fontWeight: '500',
+    fontSize: isMobile ? '12px' : '14px',
+    boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
   }
 
-  const cosmicIconStyle = {
-    width: isMobile ? '20px' : '28px',
-    height: isMobile ? '20px' : '28px',
-    borderRadius: '6px',
+  const iconStyle = {
+    width: isMobile ? '24px' : '32px',
+    height: isMobile ? '24px' : '32px',
+    borderRadius: '8px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: isMobile ? '12px' : '16px',
-    boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)'
+    fontWeight: '600'
   }
 
   const statsStyle = {
     textAlign: 'center',
     display: 'flex',
-    gap: isMobile ? '40px' : '80px',
+    gap: isMobile ? '48px' : '80px',
     justifyContent: 'center',
-    padding: isMobile ? '15px 0' : '0',
-    zIndex: 40,
+    padding: isMobile ? '20px 0' : '0',
+    zIndex: 15,
     ...(isMobile ? {} : {
       position: 'absolute',
-      bottom: '80px',
+      bottom: '120px',
       left: '50%',
       transform: 'translateX(-50%)'
     })
@@ -225,26 +243,27 @@ export default function TurfLootCosmic() {
   }
 
   const statNumberStyle = {
-    fontSize: isMobile ? '24px' : '36px',
-    fontWeight: '900',
+    fontSize: isMobile ? '28px' : '42px',
+    fontWeight: '800',
     background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
-    marginBottom: '8px',
-    textShadow: '0 0 20px rgba(59, 130, 246, 0.5)'
+    marginBottom: '4px'
   }
 
   const statLabelStyle = {
-    color: '#c7d2fe',
-    fontSize: isMobile ? '11px' : '14px',
-    textShadow: '0 0 10px rgba(199, 210, 254, 0.5)'
+    color: '#64748b',
+    fontSize: isMobile ? '12px' : '14px',
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em'
   }
 
   const mobileGridStyle = {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: '10px',
+    gap: '16px',
     width: '100%'
   }
 
@@ -253,302 +272,135 @@ export default function TurfLootCosmic() {
     return (
       <div style={containerStyle}>
         
-        {/* Animated Starfield Background */}
+        {/* Floating Glass Orbs */}
         <div style={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 1,
-          overflow: 'hidden'
-        }}>
-          {/* Stars */}
-          {[...Array(100)].map((_, i) => (
-            <div
-              key={`star-${i}`}
-              style={{
-                position: 'absolute',
-                width: Math.random() * 3 + 1 + 'px',
-                height: Math.random() * 3 + 1 + 'px',
-                backgroundColor: '#ffffff',
-                borderRadius: '50%',
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-                opacity: Math.random() * 0.8 + 0.2,
-                animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Floating Game Orbs (Large Player-like) */}
-        <div style={{
-          position: 'absolute',
-          top: '15%',
-          left: '10%',
-          zIndex: 10,
-          width: '120px',
-          height: '120px',
-          background: 'radial-gradient(circle, #3b82f6 0%, #1e40af 70%, rgba(30, 64, 175, 0.3) 100%)',
-          borderRadius: '50%',
-          opacity: 0.7,
-          animation: 'cosmicFloat 8s ease-in-out infinite',
-          boxShadow: '0 0 40px rgba(59, 130, 246, 0.6), inset -10px -10px 20px rgba(30, 64, 175, 0.8)'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '25%',
-            left: '25%',
-            width: '15px',
-            height: '15px',
-            backgroundColor: '#ffffff',
-            borderRadius: '50%',
-            opacity: 0.9
-          }} />
-          <div style={{
-            position: 'absolute',
-            top: '25%',
-            right: '25%',
-            width: '15px',
-            height: '15px',
-            backgroundColor: '#ffffff',
-            borderRadius: '50%',
-            opacity: 0.9
-          }} />
-        </div>
-
-        <div style={{
-          position: 'absolute',
-          top: '60%',
-          right: '15%',
-          zIndex: 10,
+          top: '12%',
+          left: '8%',
+          zIndex: 5,
           width: '100px',
           height: '100px',
-          background: 'radial-gradient(circle, #ec4899 0%, #be185d 70%, rgba(190, 24, 93, 0.3) 100%)',
+          background: 'rgba(59, 130, 246, 0.1)',
+          backdropFilter: 'blur(20px)',
           borderRadius: '50%',
-          opacity: 0.8,
-          animation: 'cosmicFloat 10s ease-in-out infinite reverse',
-          boxShadow: '0 0 40px rgba(236, 72, 153, 0.6), inset -8px -8px 16px rgba(190, 24, 93, 0.8)'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '30%',
-            left: '30%',
-            width: '12px',
-            height: '12px',
-            backgroundColor: '#ffffff',
-            borderRadius: '50%',
-            opacity: 0.9
-          }} />
-          <div style={{
-            position: 'absolute',
-            top: '30%',
-            right: '30%',
-            width: '12px',
-            height: '12px',
-            backgroundColor: '#ffffff',
-            borderRadius: '50%',
-            opacity: 0.9
-          }} />
-        </div>
+          border: '1px solid rgba(59, 130, 246, 0.2)',
+          boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)',
+          animation: 'gentleFloat 8s ease-in-out infinite'
+        }} />
 
-        {/* Floating Food Pellets */}
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={`pellet-${i}`}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 8 + 4 + 'px',
-              height: Math.random() * 8 + 4 + 'px',
-              background: `radial-gradient(circle, ${['#22c55e', '#eab308', '#f97316', '#8b5cf6', '#06b6d4'][Math.floor(Math.random() * 5)]} 0%, transparent 70%)`,
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              opacity: Math.random() * 0.6 + 0.3,
-              animation: `floatPellet ${Math.random() * 6 + 4}s ease-in-out infinite`,
-              zIndex: 5,
-              boxShadow: '0 0 10px currentColor'
-            }}
-          />
-        ))}
+        <div style={{
+          position: 'absolute',
+          top: '65%',
+          right: '12%',
+          zIndex: 5,
+          width: '80px',
+          height: '80px',
+          background: 'rgba(139, 92, 246, 0.1)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '50%',
+          border: '1px solid rgba(139, 92, 246, 0.2)',
+          boxShadow: '0 8px 32px rgba(139, 92, 246, 0.3)',
+          animation: 'gentleFloat 10s ease-in-out infinite reverse'
+        }} />
 
-        {/* Cosmic Grid Lines */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20%',
+          left: '15%',
+          zIndex: 5,
+          width: '60px',
+          height: '60px',
+          background: 'rgba(16, 185, 129, 0.1)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '50%',
+          border: '1px solid rgba(16, 185, 129, 0.2)',
+          boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)',
+          animation: 'gentleFloat 12s ease-in-out infinite'
+        }} />
+
+        {/* Subtle Grid Pattern */}
         <div style={{
           position: 'absolute',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          opacity: 0.1,
-          zIndex: 2,
+          opacity: 0.03,
+          zIndex: 1,
           backgroundImage: `
-            linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
+            linear-gradient(rgba(148, 163, 184, 0.4) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.4) 1px, transparent 1px)
           `,
-          backgroundSize: '60px 60px',
-          animation: 'gridMove 25s linear infinite'
+          backgroundSize: '40px 40px'
         }} />
 
         {/* Desktop Header */}
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          left: '20px',
-          zIndex: 60,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            background: 'radial-gradient(circle, #3b82f6 0%, #1e40af 100%)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '18px',
-            boxShadow: '0 0 20px rgba(59, 130, 246, 0.6)'
-          }}>
-            🔥
+        <div style={headerStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '18px',
+              boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              🔥
+            </div>
+            <span style={{ 
+              color: '#475569', 
+              fontWeight: '600', 
+              fontSize: '16px'
+            }}>Welcome, ty8898812</span>
           </div>
-          <span style={{ 
-            color: '#fbbf24', 
-            fontWeight: 'bold', 
-            fontSize: '16px',
-            textShadow: '0 0 15px rgba(251, 191, 36, 0.8)' 
-          }}>Welcome, ty8898812</span>
-        </div>
-
-        <div style={{
-          position: 'absolute',
-          top: '20px',
-          right: '20px',
-          zIndex: 60,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '15px'
-        }}>
-          {[1, 2, 3].map(i => (
-            <div 
-              key={i}
-              style={{ 
-                width: '28px', 
-                height: '28px', 
-                background: 'rgba(75, 85, 99, 0.8)', 
-                borderRadius: '6px',
-                border: '1px solid rgba(139, 92, 246, 0.4)',
-                boxShadow: '0 0 10px rgba(139, 92, 246, 0.3)'
-              }}
-            />
-          ))}
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {[1, 2, 3].map(i => (
+              <div 
+                key={i}
+                style={{ 
+                  width: '32px', 
+                  height: '32px', 
+                  background: 'rgba(255, 255, 255, 0.6)', 
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Desktop Title */}
         <div style={titleStyle}>
           <h1 style={mainTitleStyle}>
-            <span style={{ color: '#ffffff' }}>TURF</span>
-            <span style={{ color: '#fbbf24' }}>LOOT</span>
+            TURF<span style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>SKILL-BASED GRID DOMINATION</p>
+          <p style={subtitleStyle}>Skill-Based Grid Domination</p>
         </div>
 
-        {/* Desktop Panels and Controls */}
-        {/* Left Panel - Leaderboard */}
-        <div style={{
-          position: 'absolute',
-          left: '30px',
-          top: '200px',
-          width: '320px',
-          zIndex: 50,
-          ...cosmicPanelStyle
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <div style={{ 
-              ...cosmicIconStyle, 
-              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', 
-              color: '#000000' 
-            }}>🏆</div>
-            <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '18px', margin: 0 }}>Leaderboard</h3>
-            <div style={{ marginLeft: 'auto' }}>
-              <div style={{
-                padding: '4px 10px',
-                background: 'rgba(34, 197, 94, 0.2)',
-                color: '#22c55e',
-                fontSize: '12px',
-                borderRadius: '15px',
-                border: '1px solid rgba(34, 197, 94, 0.6)',
-                boxShadow: '0 0 15px rgba(34, 197, 94, 0.3)'
-              }}>
-                Live
-              </div>
-            </div>
-          </div>
-          
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0' }}>
-              <span style={{ color: '#e0e7ff', fontSize: '15px' }}>1. Quantum</span>
-              <span style={{ 
-                color: '#fbbf24', 
-                fontWeight: 'bold', 
-                fontSize: '15px',
-                textShadow: '0 0 10px rgba(251, 191, 36, 0.6)'
-              }}>$6,559.45</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0' }}>
-              <span style={{ color: '#e0e7ff', fontSize: '15px' }}>2. Dernie237</span>
-              <span style={{ 
-                color: '#fbbf24', 
-                fontWeight: 'bold', 
-                fontSize: '15px',
-                textShadow: '0 0 10px rgba(251, 191, 36, 0.6)'
-              }}>$5,210.67</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0' }}>
-              <span style={{ color: '#e0e7ff', fontSize: '15px' }}>3. Mr.TK216</span>
-              <span style={{ 
-                color: '#fbbf24', 
-                fontWeight: 'bold', 
-                fontSize: '15px',
-                textShadow: '0 0 10px rgba(251, 191, 36, 0.6)'
-              }}>$4,757.38</span>
-            </div>
-          </div>
-          
-          <button style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: 'rgba(30, 27, 75, 0.8)',
-            border: '1px solid rgba(139, 92, 246, 0.4)',
-            borderRadius: '12px',
-            color: '#e0e7ff',
-            fontSize: '14px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            backdropFilter: 'blur(5px)'
-          }}>
-            View Full Leaderboard
-          </button>
-        </div>
-
-        {/* Desktop Center Controls and other panels... */}
+        {/* Desktop Center Controls */}
         <div style={centerControlsStyle}>
           {/* Player Name Input */}
-          <div style={{ marginBottom: '30px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', marginBottom: '24px' }}>
               <div style={{
                 width: '56px',
                 height: '56px',
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 borderRadius: '16px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#000000',
-                fontWeight: 'bold',
+                color: '#ffffff',
+                fontWeight: '800',
                 fontSize: '24px',
-                boxShadow: '0 0 25px rgba(251, 191, 36, 0.6)'
+                boxShadow: '0 8px 25px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
               }}>
                 0
               </div>
@@ -558,18 +410,26 @@ export default function TurfLootCosmic() {
                 onChange={(e) => setUserName(e.target.value)}
                 style={nameInputStyle}
                 placeholder="Enter your name"
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1), inset 2px 2px 4px rgba(148, 163, 184, 0.1)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(148, 163, 184, 0.3)'
+                  e.target.style.boxShadow = 'inset 2px 2px 4px rgba(148, 163, 184, 0.1)'
+                }}
               />
               <div style={{
-                width: '40px',
-                height: '40px',
-                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                borderRadius: '8px',
+                width: '48px',
+                height: '48px',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#ffffff',
-                fontWeight: 'bold',
-                boxShadow: '0 0 20px rgba(34, 197, 94, 0.6)'
+                fontWeight: '600',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
               }}>
                 ✓
               </div>
@@ -577,12 +437,24 @@ export default function TurfLootCosmic() {
           </div>
 
           {/* Stakes */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '30px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', justifyContent: 'center' }}>
             {['$1', '$5', '$20'].map((stake) => (
               <button
                 key={stake}
                 onClick={() => setSelectedStake(stake)}
                 style={selectedStake === stake ? activeStakeStyle : inactiveStakeStyle}
+                onMouseOver={(e) => {
+                  if (selectedStake !== stake) {
+                    e.target.style.transform = 'translateY(-1px)'
+                    e.target.style.boxShadow = '0 6px 20px rgba(148, 163, 184, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (selectedStake !== stake) {
+                    e.target.style.transform = 'translateY(0px)'
+                    e.target.style.boxShadow = '0 4px 15px rgba(148, 163, 184, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                  }
+                }}
               >
                 {stake}
               </button>
@@ -594,89 +466,195 @@ export default function TurfLootCosmic() {
             onClick={handleJoinGame}
             style={joinButtonStyle}
             onMouseOver={(e) => {
-              e.target.style.transform = 'scale(1.05)'
-              e.target.style.boxShadow = '0 0 60px rgba(139, 92, 246, 0.8), 0 15px 40px rgba(59, 130, 246, 0.6)'
+              e.target.style.transform = 'translateY(-3px)'
+              e.target.style.boxShadow = '0 15px 40px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
             }}
             onMouseOut={(e) => {
-              e.target.style.transform = 'scale(1)'
-              e.target.style.boxShadow = '0 0 40px rgba(139, 92, 246, 0.6), 0 12px 30px rgba(59, 130, 246, 0.4)'
+              e.target.style.transform = 'translateY(0px)'
+              e.target.style.boxShadow = '0 10px 30px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
             }}
           >
             ▶ JOIN GAME
           </button>
 
           {/* Secondary Buttons */}
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-            <button style={secondaryButtonStyle}>AI EU</button>
-            <button style={secondaryButtonStyle}>Browse Lobbies</button>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+            <button 
+              style={secondaryButtonStyle}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                e.target.style.transform = 'translateY(-1px)'
+                e.target.style.boxShadow = '0 6px 20px rgba(148, 163, 184, 0.2)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.6)'
+                e.target.style.transform = 'translateY(0px)'
+                e.target.style.boxShadow = '0 4px 15px rgba(148, 163, 184, 0.1)'
+              }}
+            >
+              AI EU
+            </button>
+            <button 
+              style={secondaryButtonStyle}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.8)'
+                e.target.style.transform = 'translateY(-1px)'
+                e.target.style.boxShadow = '0 6px 20px rgba(148, 163, 184, 0.2)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.6)'
+                e.target.style.transform = 'translateY(0px)'
+                e.target.style.boxShadow = '0 4px 15px rgba(148, 163, 184, 0.1)'
+              }}
+            >
+              Browse Lobbies
+            </button>
           </div>
+        </div>
+
+        {/* Desktop Panels */}
+        {/* Left Panel - Leaderboard */}
+        <div style={{
+          position: 'absolute',
+          left: '40px',
+          top: '220px',
+          width: '320px',
+          zIndex: 10,
+          ...glassStyle
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ 
+              ...iconStyle, 
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', 
+              color: '#ffffff',
+              boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)'
+            }}>🏆</div>
+            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Leaderboard</h3>
+            <div style={{ marginLeft: 'auto' }}>
+              <div style={{
+                padding: '4px 10px',
+                background: 'rgba(16, 185, 129, 0.1)',
+                color: '#059669',
+                fontSize: '12px',
+                borderRadius: '12px',
+                border: '1px solid rgba(16, 185, 129, 0.2)',
+                fontWeight: '600'
+              }}>
+                Live
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
+              <span style={{ color: '#475569', fontSize: '15px', fontWeight: '500' }}>1. Quantum</span>
+              <span style={{ 
+                color: '#f59e0b', 
+                fontWeight: '700', 
+                fontSize: '15px'
+              }}>$6,559.45</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
+              <span style={{ color: '#475569', fontSize: '15px', fontWeight: '500' }}>2. Dernie237</span>
+              <span style={{ 
+                color: '#f59e0b', 
+                fontWeight: '700', 
+                fontSize: '15px'
+              }}>$5,210.67</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+              <span style={{ color: '#475569', fontSize: '15px', fontWeight: '500' }}>3. Mr.TK216</span>
+              <span style={{ 
+                color: '#f59e0b', 
+                fontWeight: '700', 
+                fontSize: '15px'
+              }}>$4,757.38</span>
+            </div>
+          </div>
+          
+          <button style={{
+            width: '100%',
+            padding: '12px',
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '12px',
+            color: '#475569',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
+          }}>
+            View Full Leaderboard
+          </button>
         </div>
 
         {/* Right Panel - Wallet */}
         <div style={{
           position: 'absolute',
-          right: '30px',
-          top: '200px',
+          right: '40px',
+          top: '220px',
           width: '300px',
-          zIndex: 50,
-          ...cosmicPanelStyle,
-          borderColor: 'rgba(6, 182, 212, 0.5)'
+          zIndex: 10,
+          ...glassStyle,
+          border: '1px solid rgba(6, 182, 212, 0.2)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
-              ...cosmicIconStyle, 
+              ...iconStyle, 
               background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', 
-              color: '#ffffff' 
-            }}>💰</div>
-            <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '18px', margin: 0 }}>Wallet</h3>
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
-              <button style={{ fontSize: '11px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer' }}>[?] Copy Address</button>
-              <button style={{ fontSize: '11px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer' }}>[↻] Refresh Balance</button>
+              color: '#ffffff',
+              boxShadow: '0 4px 15px rgba(6, 182, 212, 0.3)'
+            }}>💎</div>
+            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Wallet</h3>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+              <button style={{ fontSize: '11px', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>[?] Copy Address</button>
+              <button style={{ fontSize: '11px', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '500' }}>[↻] Refresh Balance</button>
             </div>
           </div>
           
-          <div style={{ textAlign: 'center', marginBottom: '25px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
             <div style={{ 
               fontSize: '36px', 
-              fontWeight: '900', 
-              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+              fontWeight: '800', 
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              marginBottom: '6px',
-              textShadow: '0 0 20px rgba(251, 191, 36, 0.6)'
+              marginBottom: '4px'
             }}>$0.00</div>
-            <div style={{ color: '#9ca3af', fontSize: '14px' }}>0.0000 SOL</div>
+            <div style={{ color: '#64748b', fontSize: '14px', fontWeight: '500' }}>0.0000 SOL</div>
           </div>
           
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', gap: '12px' }}>
             <button style={{
               flex: 1,
               padding: '14px',
-              background: 'rgba(34, 197, 94, 0.2)',
-              border: '1px solid rgba(34, 197, 94, 0.6)',
+              background: 'rgba(16, 185, 129, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
               borderRadius: '12px',
-              color: '#22c55e',
-              fontWeight: 'bold',
+              color: '#059669',
+              fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 0 15px rgba(34, 197, 94, 0.3)',
-              backdropFilter: 'blur(5px)'
+              boxShadow: '0 4px 15px rgba(16, 185, 129, 0.1)'
             }}>
               Add Funds
             </button>
             <button style={{
               flex: 1,
               padding: '14px',
-              background: 'rgba(59, 130, 246, 0.2)',
-              border: '1px solid rgba(59, 130, 246, 0.6)',
+              background: 'rgba(59, 130, 246, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
               borderRadius: '12px',
-              color: '#3b82f6',
-              fontWeight: 'bold',
+              color: '#2563eb',
+              fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 0 15px rgba(59, 130, 246, 0.3)',
-              backdropFilter: 'blur(5px)'
+              boxShadow: '0 4px 15px rgba(59, 130, 246, 0.1)'
             }}>
               Cash Out
             </button>
@@ -686,55 +664,59 @@ export default function TurfLootCosmic() {
         {/* Bottom Left - Friends */}
         <div style={{
           position: 'absolute',
-          left: '30px',
-          bottom: '30px',
+          left: '40px',
+          bottom: '40px',
           width: '320px',
-          zIndex: 50,
-          ...cosmicPanelStyle
+          zIndex: 10,
+          ...glassStyle
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
-              ...cosmicIconStyle, 
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', 
-              color: '#ffffff' 
+              ...iconStyle, 
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', 
+              color: '#ffffff',
+              boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'
             }}>👥</div>
-            <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '18px', margin: 0 }}>Friends</h3>
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
-              <span style={{ fontSize: '11px', color: '#9ca3af' }}>[↻] Refresh</span>
-              <span style={{ fontSize: '11px', color: '#9ca3af' }}>0 playing</span>
+            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Friends</h3>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '500' }}>[↻] Refresh</span>
+              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '500' }}>0 playing</span>
             </div>
           </div>
           
-          <div style={{ textAlign: 'center', padding: '35px 0' }}>
+          <div style={{ textAlign: 'center', padding: '32px 0' }}>
             <div style={{
               width: '56px',
               height: '56px',
-              background: 'radial-gradient(circle, rgba(75, 85, 99, 0.8) 0%, rgba(55, 65, 81, 0.9) 100%)',
+              background: 'rgba(148, 163, 184, 0.1)',
+              backdropFilter: 'blur(10px)',
               borderRadius: '50%',
-              margin: '0 auto 15px',
+              margin: '0 auto 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '24px',
-              border: '2px solid rgba(139, 92, 246, 0.4)',
-              boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+              border: '1px solid rgba(148, 163, 184, 0.2)',
+              boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
             }}>
               👤
             </div>
-            <div style={{ color: '#c7d2fe', fontSize: '15px', marginBottom: '10px' }}>No friends... add some!</div>
+            <div style={{ color: '#64748b', fontSize: '15px', marginBottom: '8px', fontWeight: '500' }}>No friends... add some!</div>
           </div>
           
           <button style={{
             width: '100%',
             padding: '12px',
-            backgroundColor: 'rgba(30, 27, 75, 0.8)',
-            border: '1px solid rgba(139, 92, 246, 0.4)',
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
             borderRadius: '12px',
-            color: '#e0e7ff',
+            color: '#475569',
             fontSize: '14px',
+            fontWeight: '500',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            backdropFilter: 'blur(5px)'
+            boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
           }}>
             Add Friends
           </button>
@@ -755,54 +737,54 @@ export default function TurfLootCosmic() {
         {/* Bottom Right - Customize */}
         <div style={{
           position: 'absolute',
-          right: '30px',
-          bottom: '30px',
+          right: '40px',
+          bottom: '40px',
           width: '300px',
-          zIndex: 50,
-          ...cosmicPanelStyle
+          zIndex: 10,
+          ...glassStyle
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ 
-              ...cosmicIconStyle, 
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', 
-              color: '#ffffff' 
+              ...iconStyle, 
+              background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', 
+              color: '#ffffff',
+              boxShadow: '0 4px 15px rgba(236, 72, 153, 0.3)'
             }}>🎨</div>
-            <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '18px', margin: 0 }}>Customize</h3>
+            <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '18px', margin: 0 }}>Customize</h3>
           </div>
           
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <div style={{
               width: '72px',
               height: '72px',
-              background: 'radial-gradient(circle, #ec4899 0%, #be185d 70%, rgba(190, 24, 93, 0.3) 100%)',
+              background: 'rgba(236, 72, 153, 0.1)',
+              backdropFilter: 'blur(10px)',
               borderRadius: '50%',
-              margin: '0 auto 15px',
+              margin: '0 auto 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
-              boxShadow: '0 0 30px rgba(236, 72, 153, 0.5)',
-              border: '2px solid rgba(236, 72, 153, 0.6)'
+              boxShadow: '0 8px 25px rgba(236, 72, 153, 0.2)',
+              border: '1px solid rgba(236, 72, 153, 0.2)'
             }}>
               <div style={{
                 width: '10px',
                 height: '10px',
-                backgroundColor: '#ffffff',
+                backgroundColor: '#1e293b',
                 borderRadius: '50%',
                 position: 'absolute',
                 top: '20px',
-                left: '22px',
-                boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)'
+                left: '22px'
               }} />
               <div style={{
                 width: '10px',
                 height: '10px',
-                backgroundColor: '#ffffff',
+                backgroundColor: '#1e293b',
                 borderRadius: '50%',
                 position: 'absolute',
                 top: '20px',
-                right: '22px',
-                boxShadow: '0 0 5px rgba(255, 255, 255, 0.8)'
+                right: '22px'
               }} />
             </div>
           </div>
@@ -810,14 +792,14 @@ export default function TurfLootCosmic() {
           <button style={{
             width: '100%',
             padding: '14px',
-            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-            color: '#000000',
-            fontWeight: 'bold',
+            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+            color: '#ffffff',
+            fontWeight: '600',
             borderRadius: '12px',
             border: 'none',
             cursor: 'pointer',
-            marginBottom: '10px',
-            boxShadow: '0 0 20px rgba(251, 191, 36, 0.4)',
+            marginBottom: '12px',
+            boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)',
             transition: 'all 0.3s ease'
           }}>
             👤 Manage Affiliate
@@ -826,14 +808,16 @@ export default function TurfLootCosmic() {
           <button style={{
             width: '100%',
             padding: '12px',
-            backgroundColor: 'rgba(30, 27, 75, 0.8)',
-            border: '1px solid rgba(139, 92, 246, 0.4)',
+            background: 'rgba(255, 255, 255, 0.8)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
             borderRadius: '12px',
-            color: '#e0e7ff',
+            color: '#475569',
             fontSize: '14px',
+            fontWeight: '500',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            backdropFilter: 'blur(5px)'
+            boxShadow: '0 4px 15px rgba(148, 163, 184, 0.1)'
           }}>
             Change Appearance
           </button>
@@ -842,22 +826,22 @@ export default function TurfLootCosmic() {
         {/* Discord Button */}
         <div style={{
           position: 'absolute',
-          bottom: '20px',
-          left: '20px',
-          zIndex: 50
+          bottom: '40px',
+          left: '40px',
+          zIndex: 10
         }}>
           <button style={{
             padding: '12px 20px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+            background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
             color: '#ffffff',
-            fontWeight: 'bold',
+            fontWeight: '600',
             borderRadius: '12px',
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
-            boxShadow: '0 0 25px rgba(59, 130, 246, 0.5)',
+            boxShadow: '0 4px 15px rgba(88, 101, 242, 0.3)',
             transition: 'all 0.3s ease'
           }}>
             🎮 Join Discord!
@@ -866,61 +850,14 @@ export default function TurfLootCosmic() {
 
         {/* CSS Animations */}
         <style jsx>{`
-          @keyframes twinkle {
+          @keyframes gentleFloat {
             0%, 100% { 
-              opacity: 0.2;
-              transform: scale(1);
-            }
-            50% { 
-              opacity: 1;
-              transform: scale(1.2);
-            }
-          }
-          
-          @keyframes cosmicFloat {
-            0%, 100% { 
-              transform: translateY(0px) translateX(0px);
+              transform: translateY(0px);
               opacity: 0.7;
             }
-            25% { 
-              transform: translateY(-30px) translateX(20px);
-              opacity: 0.9;
-            }
             50% { 
-              transform: translateY(-15px) translateX(-10px);
+              transform: translateY(-20px);
               opacity: 1;
-            }
-            75% { 
-              transform: translateY(-40px) translateX(15px);
-              opacity: 0.8;
-            }
-          }
-          
-          @keyframes floatPellet {
-            0%, 100% { 
-              transform: translateY(0px) translateX(0px) scale(1);
-              opacity: 0.3;
-            }
-            25% { 
-              transform: translateY(-15px) translateX(10px) scale(1.1);
-              opacity: 0.6;
-            }
-            50% { 
-              transform: translateY(-25px) translateX(-5px) scale(0.9);
-              opacity: 0.8;
-            }
-            75% { 
-              transform: translateY(-10px) translateX(8px) scale(1.05);
-              opacity: 0.5;
-            }
-          }
-          
-          @keyframes gridMove {
-            0% { 
-              backgroundPosition: 0px 0px;
-            }
-            100% { 
-              backgroundPosition: 60px 60px;
             }
           }
         `}</style>
@@ -932,149 +869,58 @@ export default function TurfLootCosmic() {
   return (
     <div style={containerStyle}>
       
-      {/* Mobile Animated Background */}
+      {/* Mobile Floating Elements (Subtle) */}
       <div style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
-        {/* Fewer stars for mobile performance */}
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={`star-${i}`}
-            style={{
-              position: 'absolute',
-              width: Math.random() * 2 + 1 + 'px',
-              height: Math.random() * 2 + 1 + 'px',
-              backgroundColor: '#ffffff',
-              borderRadius: '50%',
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-              opacity: Math.random() * 0.8 + 0.2,
-              animation: `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Mobile Floating Elements (Smaller) */}
-      <div style={{
-        position: 'fixed',
-        top: '10%',
+        top: '5%',
         left: '5%',
-        zIndex: 5,
-        width: '60px',
-        height: '60px',
-        background: 'radial-gradient(circle, #3b82f6 0%, #1e40af 70%, rgba(30, 64, 175, 0.3) 100%)',
+        zIndex: 2,
+        width: '40px',
+        height: '40px',
+        background: 'rgba(59, 130, 246, 0.05)',
+        backdropFilter: 'blur(10px)',
         borderRadius: '50%',
-        opacity: 0.6,
-        animation: 'cosmicFloat 8s ease-in-out infinite',
-        boxShadow: '0 0 20px rgba(59, 130, 246, 0.4)'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: '35%',
-          left: '35%',
-          width: '6px',
-          height: '6px',
-          backgroundColor: '#ffffff',
-          borderRadius: '50%',
-          opacity: 0.9
-        }} />
-        <div style={{
-          position: 'absolute',
-          top: '35%',
-          right: '35%',
-          width: '6px',
-          height: '6px',
-          backgroundColor: '#ffffff',
-          borderRadius: '50%',
-          opacity: 0.9
-        }} />
-      </div>
+        border: '1px solid rgba(59, 130, 246, 0.1)',
+        animation: 'gentleFloat 8s ease-in-out infinite'
+      }} />
 
       <div style={{
         position: 'fixed',
-        bottom: '20%',
+        bottom: '15%',
         right: '5%',
-        zIndex: 5,
-        width: '50px',
-        height: '50px',
-        background: 'radial-gradient(circle, #ec4899 0%, #be185d 70%, rgba(190, 24, 93, 0.3) 100%)',
+        zIndex: 2,
+        width: '30px',
+        height: '30px',
+        background: 'rgba(139, 92, 246, 0.05)',
+        backdropFilter: 'blur(10px)',
         borderRadius: '50%',
-        opacity: 0.7,
-        animation: 'cosmicFloat 10s ease-in-out infinite reverse',
-        boxShadow: '0 0 20px rgba(236, 72, 153, 0.4)'
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: '40%',
-          left: '40%',
-          width: '5px',
-          height: '5px',
-          backgroundColor: '#ffffff',
-          borderRadius: '50%',
-          opacity: 0.9
-        }} />
-        <div style={{
-          position: 'absolute',
-          top: '40%',
-          right: '40%',
-          width: '5px',
-          height: '5px',
-          backgroundColor: '#ffffff',
-          borderRadius: '50%',
-          opacity: 0.9
-        }} />
-      </div>
-
-      {/* Mobile Floating Pellets (Fewer) */}
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={`pellet-${i}`}
-          style={{
-            position: 'fixed',
-            width: Math.random() * 5 + 2 + 'px',
-            height: Math.random() * 5 + 2 + 'px',
-            background: `radial-gradient(circle, ${['#22c55e', '#eab308', '#f97316', '#8b5cf6', '#06b6d4'][Math.floor(Math.random() * 5)]} 0%, transparent 70%)`,
-            borderRadius: '50%',
-            left: Math.random() * 100 + '%',
-            top: Math.random() * 100 + '%',
-            opacity: Math.random() * 0.5 + 0.2,
-            animation: `floatPellet ${Math.random() * 6 + 4}s ease-in-out infinite`,
-            zIndex: 3
-          }}
-        />
-      ))}
+        border: '1px solid rgba(139, 92, 246, 0.1)',
+        animation: 'gentleFloat 10s ease-in-out infinite reverse'
+      }} />
 
       {/* Mobile Content Container */}
       <div style={mobileContainerStyle}>
         
         {/* Mobile Header */}
         <div style={headerStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
-              width: '30px',
-              height: '30px',
-              background: 'radial-gradient(circle, #3b82f6 0%, #1e40af 100%)',
-              borderRadius: '50%',
+              width: '32px',
+              height: '32px',
+              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '14px',
-              boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
+              boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)'
             }}>
               🔥
             </div>
             <span style={{ 
-              color: '#fbbf24', 
-              fontWeight: 'bold', 
-              fontSize: '12px',
-              textShadow: '0 0 10px rgba(251, 191, 36, 0.8)' 
+              color: '#475569', 
+              fontWeight: '600', 
+              fontSize: '14px'
             }}>Welcome, ty8898812</span>
           </div>
           
@@ -1083,12 +929,13 @@ export default function TurfLootCosmic() {
               <div 
                 key={i}
                 style={{ 
-                  width: '20px', 
-                  height: '20px', 
-                  background: 'rgba(75, 85, 99, 0.8)', 
-                  borderRadius: '4px',
-                  border: '1px solid rgba(139, 92, 246, 0.4)',
-                  boxShadow: '0 0 8px rgba(139, 92, 246, 0.3)'
+                  width: '24px', 
+                  height: '24px', 
+                  background: 'rgba(255, 255, 255, 0.6)', 
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  boxShadow: '0 2px 8px rgba(148, 163, 184, 0.1)'
                 }}
               />
             ))}
@@ -1098,29 +945,28 @@ export default function TurfLootCosmic() {
         {/* Mobile Title */}
         <div style={titleStyle}>
           <h1 style={mainTitleStyle}>
-            <span style={{ color: '#ffffff' }}>TURF</span>
-            <span style={{ color: '#fbbf24' }}>LOOT</span>
+            TURF<span style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>SKILL-BASED GRID DOMINATION</p>
+          <p style={subtitleStyle}>Skill-Based Grid Domination</p>
         </div>
 
         {/* Mobile Game Controls */}
         <div style={centerControlsStyle}>
           {/* Player Name Input */}
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '15px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '20px' }}>
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 borderRadius: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#000000',
-                fontWeight: 'bold',
+                color: '#ffffff',
+                fontWeight: '800',
                 fontSize: '18px',
-                boxShadow: '0 0 20px rgba(251, 191, 36, 0.6)'
+                boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)'
               }}>
                 0
               </div>
@@ -1132,16 +978,16 @@ export default function TurfLootCosmic() {
                 placeholder="Enter your name"
               />
               <div style={{
-                width: '32px',
-                height: '32px',
-                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                borderRadius: '6px',
+                width: '36px',
+                height: '36px',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                borderRadius: '10px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#ffffff',
-                fontWeight: 'bold',
-                boxShadow: '0 0 15px rgba(34, 197, 94, 0.6)'
+                fontWeight: '600',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
               }}>
                 ✓
               </div>
@@ -1149,7 +995,7 @@ export default function TurfLootCosmic() {
           </div>
 
           {/* Stakes */}
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', justifyContent: 'center' }}>
             {['$1', '$5', '$20'].map((stake) => (
               <button
                 key={stake}
@@ -1191,93 +1037,99 @@ export default function TurfLootCosmic() {
         {/* Mobile Panels Grid */}
         <div style={mobileGridStyle}>
           {/* Leaderboard Panel */}
-          <div style={cosmicPanelStyle}>
+          <div style={neomorphStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
-                ...cosmicIconStyle, 
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', 
-                color: '#000000' 
+                ...iconStyle, 
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', 
+                color: '#ffffff',
+                boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
               }}>🏆</div>
-              <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '14px', margin: 0 }}>Leaderboard</h3>
+              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Leaderboard</h3>
             </div>
             
             <div style={{ marginBottom: '12px', fontSize: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}>
-                <span style={{ color: '#e0e7ff' }}>1. Quantum</span>
-                <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>$6.5K</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
+                <span style={{ color: '#475569', fontWeight: '500' }}>1. Quantum</span>
+                <span style={{ color: '#f59e0b', fontWeight: '700' }}>$6.5K</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}>
-                <span style={{ color: '#e0e7ff' }}>2. Dernie237</span>
-                <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>$5.2K</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
+                <span style={{ color: '#475569', fontWeight: '500' }}>2. Dernie237</span>
+                <span style={{ color: '#f59e0b', fontWeight: '700' }}>$5.2K</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}>
-                <span style={{ color: '#e0e7ff' }}>3. Mr.TK216</span>
-                <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>$4.7K</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
+                <span style={{ color: '#475569', fontWeight: '500' }}>3. Mr.TK216</span>
+                <span style={{ color: '#f59e0b', fontWeight: '700' }}>$4.7K</span>
               </div>
             </div>
             
             <button style={{
               width: '100%',
               padding: '8px',
-              backgroundColor: 'rgba(30, 27, 75, 0.8)',
-              border: '1px solid rgba(139, 92, 246, 0.4)',
-              borderRadius: '8px',
-              color: '#e0e7ff',
+              background: '#f8fafc',
+              border: 'none',
+              borderRadius: '10px',
+              color: '#475569',
               fontSize: '11px',
-              cursor: 'pointer'
+              fontWeight: '500',
+              cursor: 'pointer',
+              boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
             }}>
               View Full
             </button>
           </div>
 
           {/* Wallet Panel */}
-          <div style={{...cosmicPanelStyle, borderColor: 'rgba(6, 182, 212, 0.5)'}}>
+          <div style={{...neomorphStyle, border: '1px solid rgba(6, 182, 212, 0.1)'}}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
-                ...cosmicIconStyle, 
+                ...iconStyle, 
                 background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', 
-                color: '#ffffff' 
-              }}>💰</div>
-              <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '14px', margin: 0 }}>Wallet</h3>
+                color: '#ffffff',
+                boxShadow: '0 2px 8px rgba(6, 182, 212, 0.3)'
+              }}>💎</div>
+              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Wallet</h3>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{ 
-                fontSize: '20px', 
-                fontWeight: '900', 
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                fontSize: '24px', 
+                fontWeight: '800', 
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '3px'
+                marginBottom: '2px'
               }}>$0.00</div>
-              <div style={{ color: '#9ca3af', fontSize: '10px' }}>0.0000 SOL</div>
+              <div style={{ color: '#64748b', fontSize: '10px', fontWeight: '500' }}>0.0000 SOL</div>
             </div>
             
             <div style={{ display: 'flex', gap: '6px' }}>
               <button style={{
                 flex: 1,
                 padding: '8px',
-                background: 'rgba(34, 197, 94, 0.2)',
-                border: '1px solid rgba(34, 197, 94, 0.6)',
+                background: '#f0fdf4',
+                border: 'none',
                 borderRadius: '8px',
-                color: '#22c55e',
-                fontWeight: 'bold',
+                color: '#059669',
+                fontWeight: '600',
                 cursor: 'pointer',
-                fontSize: '10px'
+                fontSize: '10px',
+                boxShadow: 'inset 1px 1px 2px #dcfce7, inset -1px -1px 2px #ffffff'
               }}>
                 Add
               </button>
               <button style={{
                 flex: 1,
                 padding: '8px',
-                background: 'rgba(59, 130, 246, 0.2)',
-                border: '1px solid rgba(59, 130, 246, 0.6)',
+                background: '#eff6ff',
+                border: 'none',
                 borderRadius: '8px',
-                color: '#3b82f6',
-                fontWeight: 'bold',
+                color: '#2563eb',
+                fontWeight: '600',
                 cursor: 'pointer',
-                fontSize: '10px'
+                fontSize: '10px',
+                boxShadow: 'inset 1px 1px 2px #dbeafe, inset -1px -1px 2px #ffffff'
               }}>
                 Cash Out
               </button>
@@ -1285,77 +1137,81 @@ export default function TurfLootCosmic() {
           </div>
 
           {/* Friends Panel */}
-          <div style={cosmicPanelStyle}>
+          <div style={neomorphStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
-                ...cosmicIconStyle, 
-                background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', 
-                color: '#ffffff' 
+                ...iconStyle, 
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', 
+                color: '#ffffff',
+                boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)'
               }}>👥</div>
-              <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '14px', margin: 0 }}>Friends</h3>
+              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Friends</h3>
             </div>
             
-            <div style={{ textAlign: 'center', padding: '15px 0' }}>
+            <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <div style={{
                 width: '32px',
                 height: '32px',
-                background: 'radial-gradient(circle, rgba(75, 85, 99, 0.8) 0%, rgba(55, 65, 81, 0.9) 100%)',
+                background: '#f8fafc',
                 borderRadius: '50%',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '14px',
-                border: '1px solid rgba(139, 92, 246, 0.4)'
+                boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
               }}>
                 👤
               </div>
-              <div style={{ color: '#c7d2fe', fontSize: '11px' }}>No friends yet</div>
+              <div style={{ color: '#64748b', fontSize: '11px', fontWeight: '500' }}>No friends yet</div>
             </div>
             
             <button style={{
               width: '100%',
               padding: '8px',
-              backgroundColor: 'rgba(30, 27, 75, 0.8)',
-              border: '1px solid rgba(139, 92, 246, 0.4)',
-              borderRadius: '8px',
-              color: '#e0e7ff',
+              background: '#f8fafc',
+              border: 'none',
+              borderRadius: '10px',
+              color: '#475569',
               fontSize: '11px',
-              cursor: 'pointer'
+              fontWeight: '500',
+              cursor: 'pointer',
+              boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
             }}>
               Add Friends
             </button>
           </div>
 
           {/* Customize Panel */}
-          <div style={cosmicPanelStyle}>
+          <div style={neomorphStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
-                ...cosmicIconStyle, 
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', 
-                color: '#ffffff' 
+                ...iconStyle, 
+                background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', 
+                color: '#ffffff',
+                boxShadow: '0 2px 8px rgba(236, 72, 153, 0.3)'
               }}>🎨</div>
-              <h3 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '14px', margin: 0 }}>Customize</h3>
+              <h3 style={{ color: '#1e293b', fontWeight: '700', fontSize: '14px', margin: 0 }}>Customize</h3>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{
                 width: '40px',
                 height: '40px',
-                background: 'radial-gradient(circle, #ec4899 0%, #be185d 70%, rgba(190, 24, 93, 0.3) 100%)',
+                background: '#fdf2f8',
                 borderRadius: '50%',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                boxShadow: '0 0 15px rgba(236, 72, 153, 0.4)',
-                border: '1px solid rgba(236, 72, 153, 0.6)'
+                boxShadow: 'inset 2px 2px 4px #fce7f3, inset -2px -2px 4px #ffffff',
+                border: '1px solid rgba(236, 72, 153, 0.1)'
               }}>
                 <div style={{
                   width: '5px',
                   height: '5px',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: '#1e293b',
                   borderRadius: '50%',
                   position: 'absolute',
                   top: '12px',
@@ -1364,7 +1220,7 @@ export default function TurfLootCosmic() {
                 <div style={{
                   width: '5px',
                   height: '5px',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: '#1e293b',
                   borderRadius: '50%',
                   position: 'absolute',
                   top: '12px',
@@ -1376,14 +1232,15 @@ export default function TurfLootCosmic() {
             <button style={{
               width: '100%',
               padding: '8px',
-              background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-              color: '#000000',
-              fontWeight: 'bold',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: '#ffffff',
+              fontWeight: '600',
               borderRadius: '8px',
               border: 'none',
               cursor: 'pointer',
               marginBottom: '6px',
-              fontSize: '10px'
+              fontSize: '10px',
+              boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
             }}>
               👤 Manage Affiliate
             </button>
@@ -1391,12 +1248,14 @@ export default function TurfLootCosmic() {
             <button style={{
               width: '100%',
               padding: '6px',
-              backgroundColor: 'rgba(30, 27, 75, 0.8)',
-              border: '1px solid rgba(139, 92, 246, 0.4)',
+              background: '#f8fafc',
+              border: 'none',
               borderRadius: '8px',
-              color: '#e0e7ff',
+              color: '#475569',
               fontSize: '10px',
-              cursor: 'pointer'
+              fontWeight: '500',
+              cursor: 'pointer',
+              boxShadow: 'inset 2px 2px 4px #e2e8f0, inset -2px -2px 4px #ffffff'
             }}>
               Change Appearance
             </button>
@@ -1406,18 +1265,18 @@ export default function TurfLootCosmic() {
         {/* Mobile Discord Button */}
         <div style={{ textAlign: 'center' }}>
           <button style={{
-            padding: '10px 16px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+            padding: '12px 20px',
+            background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
             color: '#ffffff',
-            fontWeight: 'bold',
-            borderRadius: '10px',
+            fontWeight: '600',
+            borderRadius: '12px',
             border: 'none',
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)',
-            fontSize: '12px'
+            boxShadow: '0 4px 15px rgba(88, 101, 242, 0.3)',
+            fontSize: '14px'
           }}>
             🎮 Join Discord!
           </button>
@@ -1426,46 +1285,14 @@ export default function TurfLootCosmic() {
 
       {/* Mobile CSS Animations */}
       <style jsx>{`
-        @keyframes twinkle {
+        @keyframes gentleFloat {
           0%, 100% { 
-            opacity: 0.2;
-            transform: scale(1);
-          }
-          50% { 
-            opacity: 1;
-            transform: scale(1.2);
-          }
-        }
-        
-        @keyframes cosmicFloat {
-          0%, 100% { 
-            transform: translateY(0px) translateX(0px);
-            opacity: 0.6;
-          }
-          50% { 
-            transform: translateY(-20px) translateX(10px);
-            opacity: 0.8;
-          }
-        }
-        
-        @keyframes floatPellet {
-          0%, 100% { 
-            transform: translateY(0px) translateX(0px);
-            opacity: 0.2;
-          }
-          50% { 
-            transform: translateY(-15px) translateX(5px);
+            transform: translateY(0px);
             opacity: 0.5;
           }
-        }
-        
-        @media (orientation: landscape) and (max-height: 500px) {
-          .mobile-title {
-            font-size: 2rem !important;
-          }
-          .mobile-panels {
-            grid-template-columns: 1fr 1fr 1fr 1fr !important;
-            gap: 8px !important;
+          50% { 
+            transform: translateY(-15px);
+            opacity: 0.8;
           }
         }
       `}</style>
