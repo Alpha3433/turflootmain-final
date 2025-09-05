@@ -835,7 +835,7 @@ export default function TurfLootTactical() {
                 e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.3)'
               }}
             >
-              LEADERBOARD
+              SERVER BROWSER
             </button>
             <button 
               style={secondaryButtonStyle}
