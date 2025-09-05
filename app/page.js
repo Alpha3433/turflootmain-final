@@ -1212,7 +1212,7 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            MODIFY CONFIG
+            CHANGE SKIN
           </button>
         </div>
 
