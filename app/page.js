@@ -1227,7 +1227,7 @@ export default function TurfLootTactical() {
           </div>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-            <div style={statLabelStyle}>TOTAL SECURED</div>
+            <div style={statLabelStyle}>TOTAL WINNINGS</div>
           </div>
         </div>
 
