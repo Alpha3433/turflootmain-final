@@ -1502,7 +1502,16 @@ export default function TurfLootTactical() {
 
   // Mobile Layout
   return (
-    <div style={containerStyle}>
+    <>
+      <style jsx global>{`
+        html, body {
+          margin: 0;
+          padding: 0;
+          background: #0d1117;
+          overflow-x: hidden;
+        }
+      `}</style>
+      <div style={containerStyle}>
       
       {/* Mobile Tactical Background (Simplified) */}
       <div style={{
