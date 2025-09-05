@@ -22,7 +22,6 @@ export default function TurfLootTactical() {
     // Live stats will be updated when users join/leave games and cash out
     
     return () => {
-      clearInterval(interval)
       window.removeEventListener('resize', checkMobile)
     }
   }, [])
