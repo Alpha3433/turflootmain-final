@@ -1687,7 +1687,7 @@ export default function TurfLootTactical() {
 
           {/* Secondary Buttons */}
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <button style={secondaryButtonStyle}>RECON</button>
+            <button style={secondaryButtonStyle}>LEADERBOARD</button>
             <button style={secondaryButtonStyle}>INTEL</button>
           </div>
         </div>
