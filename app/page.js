@@ -10,30 +10,35 @@ export default function TurfLootTactical() {
   const [userName, setUserName] = useState('anth')
   const [isMobile, setIsMobile] = useState(false)
 
-  // Stable random values for background animations
-  const floatingElements = useMemo(() => 
-    Array.from({ length: 18 }, (_, i) => ({
-      id: i,
-      width: Math.random() * 4 + 1,
-      height: Math.random() * 4 + 1,
-      color: ['#68d391', '#f6ad55', '#fc8181'][Math.floor(Math.random() * 3)],
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      opacity: Math.random() * 0.7 + 0.2,
-      animationDuration: Math.random() * 8 + 6,
-      isCircle: Math.random() > 0.5
-    })), []
-  )
+  // Stable random values for background animations (client-side only)
+  const [floatingElements, setFloatingElements] = useState([])
+  const [codeElements, setCodeElements] = useState([])
 
-  const codeElements = useMemo(() => 
-    Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      height: Math.random() * 300 + 100,
-      animationDuration: Math.random() * 5 + 3,
-      animationDelay: Math.random() * 3
-    })), []
-  )
+  // Initialize random elements after component mounts (client-side only)
+  useEffect(() => {
+    setFloatingElements(
+      Array.from({ length: 18 }, (_, i) => ({
+        id: i,
+        width: Math.random() * 4 + 1,
+        height: Math.random() * 4 + 1,
+        color: ['#68d391', '#f6ad55', '#fc8181'][Math.floor(Math.random() * 3)],
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        opacity: Math.random() * 0.7 + 0.2,
+        animationDuration: Math.random() * 8 + 6,
+        isCircle: Math.random() > 0.5
+      }))
+    )
+    setCodeElements(
+      Array.from({ length: 8 }, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        height: Math.random() * 300 + 100,
+        animationDuration: Math.random() * 5 + 3,
+        animationDelay: Math.random() * 3
+      }))
+    )
+  }, []) // Only run once after mount
 
   useEffect(() => {
     // Check if mobile
