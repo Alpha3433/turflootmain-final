@@ -1106,7 +1106,7 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            RECRUIT SQUAD
+            CREATE PARTY
           </button>
         </div>
 
