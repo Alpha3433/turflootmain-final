@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 export default function TurfLootTactical() {
   const router = useRouter()
   const [selectedStake, setSelectedStake] = useState('$1')
-  const [liveStats, setLiveStats] = useState({ players: 38, winnings: 654321 })
+  const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('anth')
   const [isMobile, setIsMobile] = useState(false)
 
