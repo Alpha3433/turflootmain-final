@@ -1565,20 +1565,6 @@ export default function TurfLootTactical() {
         {/* Mobile Header */}
         <div style={headerStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)',
-              borderRadius: '3px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '14px',
-              boxShadow: '0 0 15px rgba(252, 129, 129, 0.6)',
-              border: '2px solid #fc8181'
-            }}>
-              ⚡
-            </div>
             <span style={{ 
               color: '#68d391', 
               fontWeight: '700', 
@@ -1586,7 +1572,7 @@ export default function TurfLootTactical() {
               textShadow: '0 0 8px rgba(104, 211, 145, 0.6)',
               fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
-            }}>SHADOW_8812</span>
+            }}>PLAYER: {userName.toUpperCase()}</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
