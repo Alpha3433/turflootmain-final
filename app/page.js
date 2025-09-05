@@ -779,19 +779,35 @@ export default function TurfLootTactical() {
                   e.target.style.color = '#68d391'
                 }}
               />
-              <div style={{
-                width: '48px',
-                height: '48px',
-                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#1a202c',
-                fontWeight: '600',
-                boxShadow: '0 0 20px rgba(104, 211, 145, 0.6)',
-                border: '2px solid #68d391'
-              }}>
+              <div 
+                onClick={() => {
+                  // Username confirmed - you can add any confirmation logic here
+                  console.log('Username confirmed:', userName)
+                }}
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#1a202c',
+                  fontWeight: '600',
+                  boxShadow: '0 0 20px rgba(104, 211, 145, 0.6)',
+                  border: '2px solid #68d391',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.transform = 'scale(1.05)'
+                  e.target.style.boxShadow = '0 0 30px rgba(104, 211, 145, 0.8)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.transform = 'scale(1)'
+                  e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.6)'
+                }}
+              >
                 ✓
               </div>
             </div>
