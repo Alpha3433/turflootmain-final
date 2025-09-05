@@ -1964,7 +1964,7 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            📡 TACTICAL COMMS
+            📡 DISCORD
           </button>
         </div>
       </div>
