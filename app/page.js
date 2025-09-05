@@ -681,7 +681,7 @@ export default function TurfLootTactical() {
               fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase',
               letterSpacing: '0.1em'
-            }}>OPERATIVE: SHADOW_8812</span>
+            }}>PLAYER: SHADOW_8812</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
