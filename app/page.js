@@ -1126,9 +1126,9 @@ export default function TurfLootTactical() {
         {/* Bottom Right - Loadout */}
         <div style={{
           position: 'absolute',
-          right: '40px',
-          bottom: '40px',
-          width: '300px',
+          right: '30px',
+          bottom: '180px',
+          width: '280px',
           zIndex: 20,
           ...ambrerPanelStyle
         }}>
