@@ -1269,8 +1269,15 @@ export default function TurfLootTactical() {
         </div>
 
         {/* Enhanced CSS Animations */}
-        <style jsx>{`
+        <style jsx global>{`
           @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+          
+          html, body {
+            margin: 0;
+            padding: 0;
+            background: #0d1117;
+            overflow-x: hidden;
+          }
           
           @keyframes backgroundPulse {
             0%, 100% { 
