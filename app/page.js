@@ -308,11 +308,11 @@ export default function TurfLootTactical() {
         
         {/* Enhanced Tactical Animated Background */}
         <div style={{
-          position: 'fixed',
-          top: '-50px',
-          left: '-50px',
-          width: 'calc(100vw + 100px)',
-          height: 'calc(100vh + 100px)',
+          position: 'absolute',
+          top: '-20px',
+          left: '-20px',
+          width: 'calc(100% + 40px)',
+          height: 'calc(100% + 40px)',
           zIndex: 1,
           overflow: 'hidden'
         }}>
