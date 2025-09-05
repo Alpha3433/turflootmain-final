@@ -952,7 +952,7 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            VIEW FULL LEADERBOARD
+            BROWSE SERVERS
           </button>
         </div>
 
