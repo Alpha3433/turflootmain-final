@@ -1112,7 +1112,10 @@ export default function TurfLootTactical() {
         </div>
 
         {/* Bottom Center - Stats */}
-        <div style={statsStyle}>
+        <div style={{
+          ...statsStyle,
+          bottom: '60px'
+        }}>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>{liveStats.players}</div>
             <div style={statLabelStyle}>OPERATIVES DEPLOYED</div>
