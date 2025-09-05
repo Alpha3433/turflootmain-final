@@ -741,7 +741,7 @@ export default function TurfLootTactical() {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 style={nameInputStyle}
-                placeholder="CALLSIGN"
+                placeholder="USERNAME"
                 onFocus={(e) => {
                   e.target.style.borderColor = '#f6ad55'
                   e.target.style.boxShadow = '0 0 30px rgba(246, 173, 85, 0.6), inset 0 0 15px rgba(246, 173, 85, 0.1)'
