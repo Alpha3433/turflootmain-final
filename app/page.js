@@ -848,8 +848,8 @@ export default function TurfLootTactical() {
           </div>
         </div>
 
-        {/* Desktop Panels - Optimized Layout */}
-        {/* Left Panel - Command */}
+        {/* Desktop 4-Panel Layout - Fixed */}
+        {/* Top Left - Command */}
         <div style={{
           position: 'absolute',
           left: '30px',
@@ -949,7 +949,7 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
-        {/* Right Panel - Arsenal */}
+        {/* Top Right - Arsenal */}
         <div style={{
           position: 'absolute',
           right: '30px',
@@ -1108,6 +1108,112 @@ export default function TurfLootTactical() {
             textTransform: 'uppercase'
           }}>
             RECRUIT SQUAD
+          </button>
+        </div>
+
+        {/* Bottom Right - Loadout */}
+        <div style={{
+          position: 'absolute',
+          right: '30px',
+          bottom: '180px',
+          width: '280px',
+          zIndex: 20,
+          ...ambrerPanelStyle
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            width: '8px',
+            height: '8px',
+            background: '#68d391',
+            borderRadius: '50%',
+            boxShadow: '0 0 10px #68d391',
+            animation: 'statusBlink 2s ease-in-out infinite 1.5s'
+          }} />
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ 
+              ...iconStyle, 
+              background: 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)', 
+              color: '#ffffff',
+              boxShadow: '0 0 20px rgba(139, 92, 246, 0.6)',
+              border: '2px solid #8b5cf6'
+            }}>🎯</div>
+            <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(246, 173, 85, 0.6)', textTransform: 'uppercase' }}>LOADOUT</h3>
+          </div>
+          
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <div style={{
+              width: '72px',
+              height: '72px',
+              background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
+              border: '2px solid #fc8181',
+              borderRadius: '4px',
+              margin: '0 auto 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              boxShadow: '0 0 30px rgba(252, 129, 129, 0.4)'
+            }}>
+              <div style={{
+                width: '10px',
+                height: '10px',
+                backgroundColor: '#68d391',
+                borderRadius: '50%',
+                position: 'absolute',
+                top: '20px',
+                left: '22px',
+                boxShadow: '0 0 10px #68d391'
+              }} />
+              <div style={{
+                width: '10px',
+                height: '10px',
+                backgroundColor: '#68d391',
+                borderRadius: '50%',
+                position: 'absolute',
+                top: '20px',
+                right: '22px',
+                boxShadow: '0 0 10px #68d391'
+              }} />
+            </div>
+          </div>
+          
+          <button style={{
+            width: '100%',
+            padding: '14px',
+            background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+            color: '#1a202c',
+            fontWeight: '700',
+            borderRadius: '4px',
+            border: '2px solid #f6ad55',
+            cursor: 'pointer',
+            marginBottom: '12px',
+            boxShadow: '0 0 20px rgba(246, 173, 85, 0.4)',
+            transition: 'all 0.3s ease',
+            fontFamily: '"Rajdhani", sans-serif',
+            textTransform: 'uppercase'
+          }}>
+            🎯 UPGRADE GEAR
+          </button>
+          
+          <button style={{
+            width: '100%',
+            padding: '12px',
+            background: 'rgba(26, 32, 44, 0.8)',
+            border: '2px solid #f6ad55',
+            borderRadius: '4px',
+            color: '#f6ad55',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 0 15px rgba(246, 173, 85, 0.3)',
+            fontFamily: '"Rajdhani", sans-serif',
+            textTransform: 'uppercase'
+          }}>
+            MODIFY CONFIG
           </button>
         </div>
 
