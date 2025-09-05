@@ -1644,7 +1644,7 @@ export default function TurfLootTactical() {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 style={nameInputStyle}
-                placeholder="CALLSIGN"
+                placeholder="USERNAME"
               />
               <div style={{
                 width: '36px',
