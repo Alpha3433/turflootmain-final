@@ -1256,9 +1256,103 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
-        {/* CSS Animations */}
+        {/* Enhanced CSS Animations */}
         <style jsx>{`
           @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+          
+          @keyframes backgroundPulse {
+            0%, 100% { 
+              opacity: 0.3;
+            }
+            50% { 
+              opacity: 0.6;
+            }
+          }
+          
+          @keyframes scanLineVertical {
+            0% { 
+              transform: translateY(-100vh);
+              opacity: 0;
+            }
+            5% { 
+              opacity: 1;
+            }
+            95% { 
+              opacity: 1;
+            }
+            100% { 
+              transform: translateY(100vh);
+              opacity: 0;
+            }
+          }
+          
+          @keyframes scanLineHorizontal {
+            0% { 
+              transform: translateX(-100vw);
+              opacity: 0;
+            }
+            5% { 
+              opacity: 1;
+            }
+            95% { 
+              opacity: 1;
+            }
+            100% { 
+              transform: translateX(100vw);
+              opacity: 0;
+            }
+          }
+          
+          @keyframes dataStream {
+            0%, 100% { 
+              opacity: 0.2;
+              transform: scaleY(0.5);
+            }
+            50% { 
+              opacity: 0.8;
+              transform: scaleY(1);
+            }
+          }
+          
+          @keyframes progressBar {
+            0% { 
+              width: 0%;
+            }
+            50% { 
+              width: 70%;
+            }
+            100% { 
+              width: 100%;
+            }
+          }
+          
+          @keyframes codeMatrix {
+            0% { 
+              transform: translateY(-100px);
+              opacity: 0;
+            }
+            10% { 
+              opacity: 0.5;
+            }
+            90% { 
+              opacity: 0.5;
+            }
+            100% { 
+              transform: translateY(100vh);
+              opacity: 0;
+            }
+          }
+          
+          @keyframes scanBeam {
+            0%, 100% { 
+              transform: rotate(-20deg);
+              opacity: 0.3;
+            }
+            50% { 
+              transform: rotate(20deg);
+              opacity: 0.8;
+            }
+          }
           
           @keyframes radarSweep {
             0% { 
@@ -1281,12 +1375,16 @@ export default function TurfLootTactical() {
           }
           
           @keyframes radarBlip {
-            0%, 90% { 
+            0%, 85% { 
               opacity: 0;
-              transform: scale(0.5);
+              transform: scale(0.3);
+            }
+            90% { 
+              opacity: 1;
+              transform: scale(1.2);
             }
             95%, 100% { 
-              opacity: 1;
+              opacity: 0.8;
               transform: scale(1);
             }
           }
@@ -1302,49 +1400,77 @@ export default function TurfLootTactical() {
           
           @keyframes tacticalFloat {
             0%, 100% { 
-              transform: translateY(0px) translateX(0px);
+              transform: translateY(0px) translateX(0px) rotate(0deg);
               opacity: 0.3;
             }
             25% { 
-              transform: translateY(-15px) translateX(10px);
-              opacity: 0.7;
+              transform: translateY(-20px) translateX(15px) rotate(90deg);
+              opacity: 0.8;
             }
             50% { 
-              transform: translateY(-25px) translateX(-5px);
+              transform: translateY(-35px) translateX(-10px) rotate(180deg);
               opacity: 1;
             }
             75% { 
-              transform: translateY(-10px) translateX(8px);
-              opacity: 0.5;
+              transform: translateY(-15px) translateX(12px) rotate(270deg);
+              opacity: 0.6;
             }
           }
           
           @keyframes hudFlicker {
             0%, 100% { 
+              opacity: 0.7;
+              boxShadow: 0 0 10px rgba(246, 173, 85, 0.3);
+            }
+            15% { 
+              opacity: 0.4;
+            }
+            30% { 
+              opacity: 1;
+              boxShadow: 0 0 20px rgba(246, 173, 85, 0.6);
+            }
+            45% { 
               opacity: 0.8;
             }
-            50% { 
+            60% { 
+              opacity: 0.9;
+            }
+            75% { 
+              opacity: 0.6;
+            }
+            90% { 
               opacity: 1;
+              boxShadow: 0 0 15px rgba(246, 173, 85, 0.5);
             }
           }
           
           @keyframes crosshairPulse {
             0%, 100% { 
-              transform: scale(1);
+              transform: scale(1) rotate(0deg);
               opacity: 0.6;
             }
+            25% { 
+              transform: scale(1.1) rotate(90deg);
+              opacity: 0.8;
+            }
             50% { 
-              transform: scale(1.2);
+              transform: scale(1.3) rotate(180deg);
               opacity: 1;
+            }
+            75% { 
+              transform: scale(1.1) rotate(270deg);
+              opacity: 0.8;
             }
           }
           
           @keyframes statusBlink {
             0%, 100% { 
               opacity: 0.4;
+              boxShadow: 0 0 5px currentColor;
             }
             50% { 
               opacity: 1;
+              boxShadow: 0 0 15px currentColor;
             }
           }
         `}</style>
