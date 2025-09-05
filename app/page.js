@@ -1232,15 +1232,16 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
-        {/* Communications Button */}
+        {/* Communications Button - Repositioned */}
         <div style={{
           position: 'absolute',
-          bottom: '40px',
-          left: '40px',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 20
         }}>
           <button style={{
-            padding: '12px 20px',
+            padding: '12px 24px',
             background: 'linear-gradient(45deg, #5865f2 0%, #4338ca 100%)',
             color: '#ffffff',
             fontWeight: '700',
