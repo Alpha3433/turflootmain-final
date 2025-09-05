@@ -1614,7 +1614,7 @@ export default function TurfLootTactical() {
               WebkitTextFillColor: 'transparent'
             }}>LOOT</span>
           </h1>
-          <p style={subtitleStyle}>TACTICAL GRID WARFARE</p>
+          <p style={subtitleStyle}>MULTIPLAYER BATTLE ROYALE</p>
         </div>
 
         {/* Mobile Game Controls */}
