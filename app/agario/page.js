@@ -358,6 +358,13 @@ const TacticalAgarIO = () => {
       // Show loading for at least 1.5 seconds for proper initialization feel
       await new Promise(resolve => setTimeout(resolve, 1500))
       
+      // Double check canvas is still available after async delay
+      if (!canvasRef.current) {
+        console.error('Canvas element not available after loading delay')
+        setGameLoading(false)
+        return
+      }
+      
       const canvas = canvasRef.current
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
