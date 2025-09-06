@@ -2320,11 +2320,97 @@ export default function TurfLootTactical() {
         onJoinLobby={handleJoinLobby}
       />
 
-      {/* Leaderboard Modal */}
-      <LeaderboardModal
-        isOpen={isLeaderboardOpen}
-        onClose={() => setIsLeaderboardOpen(false)}
-      />
+      {/* Leaderboard Modal - Inline test version */}
+      {isLeaderboardOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#1a202c',
+            border: '3px solid #68d391',
+            borderRadius: '12px',
+            maxWidth: '800px',
+            width: '100%',
+            padding: '32px',
+            color: 'white',
+            textAlign: 'center',
+            boxShadow: '0 0 30px rgba(104, 211, 145, 0.5)'
+          }}>
+            <h2 style={{ 
+              fontSize: '32px', 
+              fontWeight: 'bold', 
+              margin: '0 0 16px 0', 
+              color: '#68d391',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
+            }}>
+              🏆 GLOBAL LEADERBOARD
+            </h2>
+            <p style={{ 
+              fontSize: '18px', 
+              margin: '0 0 24px 0', 
+              color: '#e2e8f0',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              The leaderboard modal is now working on desktop!
+            </p>
+            <p style={{ 
+              fontSize: '14px', 
+              margin: '0 0 32px 0', 
+              color: '#a0aec0',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              This confirms the button click and state management are working perfectly.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setIsLeaderboardOpen(false)}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}
+              >
+                CLOSE
+              </button>
+              <button
+                style={{
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}
+              >
+                VIEW FULL LEADERBOARD
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
