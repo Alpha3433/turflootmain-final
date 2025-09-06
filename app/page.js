@@ -757,6 +757,235 @@ export default function TurfLootTactical() {
     console.log('💸 Withdraw popup created')
   }
 
+  const createGameLoadingPopup = () => {
+    // Remove any existing loading popup
+    const existing = document.getElementById('game-loading-popup')
+    if (existing) existing.remove()
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'game-loading-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(13, 17, 23, 0.98) !important;
+      backdrop-filter: blur(15px) !important;
+      z-index: 10000 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    `
+
+    // Create the modal
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%) !important;
+      border: 3px solid #68d391 !important;
+      border-radius: 20px !important;
+      width: 600px !important;
+      max-width: 90vw !important;
+      color: white !important;
+      box-shadow: 0 0 60px rgba(104, 211, 145, 0.6) !important;
+      font-family: "Rajdhani", sans-serif !important;
+      overflow: hidden !important;
+    `
+
+    const loadingHTML = `
+      <div style="padding: 32px; text-align: center;">
+        <!-- Game Logo/Icon -->
+        <div style="margin-bottom: 24px;">
+          <div style="width: 80px; height: 80px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto; border: 4px solid #68d391; animation: pulse 2s infinite;">
+            🎮
+          </div>
+        </div>
+
+        <!-- Loading Title -->
+        <h2 style="color: #68d391; font-size: 32px; font-weight: 700; margin: 0 0 16px 0; text-transform: uppercase; text-shadow: 0 0 15px rgba(104, 211, 145, 0.8);">
+          LOADING GAME
+        </h2>
+        
+        <!-- Status Message -->
+        <div id="loading-status" style="color: #a0aec0; font-size: 16px; margin-bottom: 32px; min-height: 24px;">
+          Initializing multiplayer connection...
+        </div>
+
+        <!-- Progress Bar Container -->
+        <div style="background: rgba(45, 55, 72, 0.8); border: 2px solid #4a5568; border-radius: 12px; height: 24px; margin-bottom: 24px; overflow: hidden; position: relative;">
+          <div id="progress-bar" style="
+            background: linear-gradient(90deg, #68d391 0%, #38a169 50%, #68d391 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(104, 211, 145, 0.5);
+            position: relative;
+            overflow: hidden;
+          ">
+            <div style="
+              position: absolute;
+              top: 0;
+              left: -100%;
+              width: 100%;
+              height: 100%;
+              background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+              animation: shimmer 2s infinite;
+            "></div>
+          </div>
+        </div>
+
+        <!-- Progress Percentage -->
+        <div id="progress-text" style="color: #68d391; font-size: 18px; font-weight: 700; margin-bottom: 24px;">
+          0%
+        </div>
+
+        <!-- Game Tips -->
+        <div style="background: rgba(104, 211, 145, 0.1); border: 1px solid #68d391; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+          <div style="color: #68d391; font-size: 14px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase;">
+            🎯 GAME TIP
+          </div>
+          <div id="game-tip" style="color: #e2e8f0; font-size: 14px; line-height: 1.6;">
+            Collect smaller players to grow larger and dominate the battlefield!
+          </div>
+        </div>
+
+        <!-- Cancel Button -->
+        <button id="cancel-loading" style="
+          padding: 12px 24px; 
+          background: rgba(252, 129, 129, 0.2); 
+          border: 2px solid #fc8181; 
+          border-radius: 8px; 
+          color: #fc8181; 
+          font-size: 14px; 
+          font-weight: 700; 
+          cursor: pointer; 
+          font-family: 'Rajdhani', sans-serif; 
+          text-transform: uppercase;
+          transition: all 0.3s ease;
+        ">
+          CANCEL
+        </button>
+      </div>
+
+      <style>
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(104, 211, 145, 0.4); }
+          50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(104, 211, 145, 0.8); }
+        }
+        
+        @keyframes shimmer {
+          0% { left: -100%; }
+          100% { left: 100%; }
+        }
+      </style>
+    `
+
+    modal.innerHTML = loadingHTML
+    popup.appendChild(modal)
+
+    // Game tips array
+    const gameTips = [
+      "Collect smaller players to grow larger and dominate the battlefield!",
+      "Split your cell with SPACE to catch smaller players or escape danger!",
+      "Press W to eject mass and feed teammates or sacrifice for speed!",
+      "Avoid larger players - they can absorb you in one bite!",
+      "Use viruses strategically - they split large players into smaller pieces!",
+      "Team up with friends for better survival and tactical advantages!",
+      "Stay near the edges to avoid being surrounded by larger players!",
+      "The leaderboard shows the top 10 players - climb your way up!"
+    ]
+
+    // Loading states and messages
+    const loadingStates = [
+      { progress: 10, message: "Connecting to Hathora servers...", delay: 800 },
+      { progress: 25, message: "Authenticating player credentials...", delay: 1000 },
+      { progress: 40, message: "Joining multiplayer lobby...", delay: 1200 },
+      { progress: 55, message: "Loading game assets...", delay: 900 },
+      { progress: 70, message: "Synchronizing with other players...", delay: 1100 },
+      { progress: 85, message: "Initializing game world...", delay: 800 },
+      { progress: 95, message: "Preparing battlefield...", delay: 600 },
+      { progress: 100, message: "Ready to play! Launching game...", delay: 500 }
+    ]
+
+    let currentStateIndex = 0
+    let currentTipIndex = 0
+
+    // Update progress function
+    const updateProgress = () => {
+      if (currentStateIndex >= loadingStates.length) return
+
+      const state = loadingStates[currentStateIndex]
+      const progressBar = modal.querySelector('#progress-bar')
+      const progressText = modal.querySelector('#progress-text')
+      const statusMessage = modal.querySelector('#loading-status')
+
+      // Update progress bar and text
+      progressBar.style.width = `${state.progress}%`
+      progressText.textContent = `${state.progress}%`
+      statusMessage.textContent = state.message
+
+      console.log(`🎮 Loading Progress: ${state.progress}% - ${state.message}`)
+
+      currentStateIndex++
+
+      // If loading is complete, proceed to game
+      if (state.progress === 100) {
+        setTimeout(() => {
+          console.log('✅ Loading complete - proceeding to game')
+          // The actual redirect happens in the calling function
+        }, state.delay)
+      } else {
+        // Schedule next update
+        setTimeout(updateProgress, state.delay)
+      }
+    }
+
+    // Rotate game tips
+    const rotateTips = () => {
+      const tipElement = modal.querySelector('#game-tip')
+      currentTipIndex = (currentTipIndex + 1) % gameTips.length
+      tipElement.textContent = gameTips[currentTipIndex]
+    }
+
+    // Cancel button handler
+    const cancelButton = modal.querySelector('#cancel-loading')
+    cancelButton.addEventListener('click', () => {
+      console.log('❌ Game loading cancelled by user')
+      popup.remove()
+    })
+
+    // Add hover effect to cancel button
+    cancelButton.addEventListener('mouseenter', () => {
+      cancelButton.style.background = 'rgba(252, 129, 129, 0.3)'
+      cancelButton.style.boxShadow = '0 0 15px rgba(252, 129, 129, 0.4)'
+    })
+
+    cancelButton.addEventListener('mouseleave', () => {
+      cancelButton.style.background = 'rgba(252, 129, 129, 0.2)'
+      cancelButton.style.boxShadow = 'none'
+    })
+
+    // Start loading animation
+    setTimeout(updateProgress, 500)
+
+    // Start tip rotation
+    const tipInterval = setInterval(rotateTips, 3000)
+
+    // Store cleanup function
+    popup.cleanup = () => {
+      clearInterval(tipInterval)
+      popup.remove()
+    }
+
+    // Add popup to DOM
+    document.body.appendChild(popup)
+
+    console.log('🎮 Game loading popup created')
+    return popup
+  }
+
   const createSkinStorePopup = () => {
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
