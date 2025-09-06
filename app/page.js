@@ -3623,7 +3623,9 @@ export default function TurfLootTactical() {
             </div>
             
             <div style={{ display: 'flex', gap: '6px' }}>
-              <button style={{
+              <button 
+                onClick={handleDeposit}
+                style={{
                 flex: 1,
                 padding: '8px',
                 background: 'rgba(104, 211, 145, 0.2)',
@@ -3638,7 +3640,9 @@ export default function TurfLootTactical() {
               }}>
                 DEPOSIT
               </button>
-              <button style={{
+              <button 
+                onClick={handleWithdraw}
+                style={{
                 flex: 1,
                 padding: '8px',
                 background: 'rgba(252, 129, 129, 0.2)',
