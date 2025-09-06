@@ -90,6 +90,20 @@ export default function TurfLootTactical() {
     router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
   }
 
+  const handleJoinLobby = (serverData) => {
+    console.log('Joining lobby:', serverData)
+    // Navigate to the agario game with server data
+    const queryParams = new URLSearchParams({
+      roomId: serverData.id || 'lobby-' + Date.now(),
+      mode: serverData.mode || 'practice',
+      fee: serverData.entryFee || 0,
+      region: serverData.region || 'US-East',
+      name: serverData.name || 'Unknown Server'
+    })
+    router.push(`/agario?${queryParams.toString()}`)
+    setIsServerBrowserOpen(false) // Close the modal after joining
+  }
+
   const handleLogin = async () => {
     try {
       if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
