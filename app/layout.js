@@ -1,7 +1,7 @@
 import { Inter, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { GameSettingsProvider } from '@/components/providers/GameSettingsProvider'
-import MockPrivyProvider from '@/components/MockPrivyProvider'
+import PrivyAuthProvider from '@/components/providers/PrivyAuthProvider'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
