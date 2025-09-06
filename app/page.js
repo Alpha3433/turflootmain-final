@@ -2215,7 +2215,9 @@ export default function TurfLootTactical() {
 
         {/* Mobile Communications Button */}
         <div style={{ textAlign: 'center' }}>
-          <button style={{
+          <button 
+            onClick={() => window.open('https://discord.gg/WbGTJPPTPs', '_blank')}
+            style={{
             padding: '12px 20px',
             background: 'linear-gradient(45deg, #5865f2 0%, #4338ca 100%)',
             color: '#ffffff',
@@ -2230,7 +2232,16 @@ export default function TurfLootTactical() {
             fontSize: '12px',
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
-          }}>
+          }}
+            onMouseOver={(e) => {
+              e.target.style.transform = 'scale(1.05)'
+              e.target.style.boxShadow = '0 0 30px rgba(88, 101, 242, 0.7)'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.transform = 'scale(1)'
+              e.target.style.boxShadow = '0 0 20px rgba(88, 101, 242, 0.5)'
+            }}
+          >
             📡 DISCORD
           </button>
         </div>
