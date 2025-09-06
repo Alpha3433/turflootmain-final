@@ -571,70 +571,20 @@ const TacticalAgarIO = () => {
     }
   }, [])
 
-  // Mouse handling
-  useEffect(() => {
-    if (!canvasRef.current || !gameInitialized) return
-
-    const canvas = canvasRef.current
-    let mouseX = canvas.width / 2
-    let mouseY = canvas.height / 2
-
-    const handleMouseMove = (e) => {
-      const rect = canvas.getBoundingClientRect()
-      mouseX = e.clientX - rect.left
-      mouseY = e.clientY - rect.top
-    }
-
-    const handleTouchMove = (e) => {
-      e.preventDefault()
-      const rect = canvas.getBoundingClientRect()
-      const touch = e.touches[0]
-      mouseX = touch.clientX - rect.left
-      mouseY = touch.clientY - rect.top
-    }
-
-    canvas.addEventListener('mousemove', handleMouseMove)
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
-
-    // Game update loop
-    const updateLoop = () => {
-      if (gameRef.current?.running) {
-        gameRef.current.update(mouseX, mouseY)
-      }
-      requestAnimationFrame(updateLoop)
-    }
-    updateLoop()
-
-    return () => {
-      canvas.removeEventListener('mousemove', handleMouseMove)
-      canvas.removeEventListener('touchmove', handleTouchMove)
-    }
-  }, [gameInitialized])
-
-  // Render loop
+  // Game loop
   useEffect(() => {
     if (!gameInitialized || !gameRef.current) return
 
-    const renderLoop = () => {
+    const gameLoop = () => {
       if (gameRef.current?.running) {
+        gameRef.current.update()
         gameRef.current.render()
-        
-        // Update stats
-        if (gameRef.current.operative) {
-          setTacticalStats({
-            mass: Math.floor(gameRef.current.operative.mass),
-            assets: gameRef.current.operative.assets,
-            eliminations: gameRef.current.operative.eliminations,
-            streak: gameRef.current.operative.eliminations,
-            resourcesCollected: gameRef.current.operative.assets,
-            rank: '#1'
-          })
-        }
       }
-      animationFrameRef.current = requestAnimationFrame(renderLoop)
+      animationFrameRef.current = requestAnimationFrame(gameLoop)
     }
+    
+    gameLoop()
 
-    renderLoop()
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
