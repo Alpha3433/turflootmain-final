@@ -898,7 +898,7 @@ export default function TurfLootTactical() {
         {/* Top Left - Command */}
         <div style={{
           position: 'absolute',
-          left: '120px',
+          left: '60px',
           top: '160px',
           width: '300px',  
           zIndex: 20,
