@@ -2070,9 +2070,7 @@ export default function TurfLootTactical() {
               style={secondaryButtonStyle}
               onClick={() => {
                 console.log('SERVER BROWSER button clicked!')
-                console.log('Current isServerBrowserOpen:', isServerBrowserOpen)
-                setIsServerBrowserOpen(true)
-                console.log('Set isServerBrowserOpen to true')
+                createDesktopServerBrowserPopup()
               }}
               onMouseOver={(e) => {
                 e.target.style.background = 'rgba(104, 211, 145, 0.1)'
