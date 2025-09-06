@@ -2278,6 +2278,13 @@ export default function TurfLootTactical() {
           }
         }
       `}</style>
+
+      {/* Server Browser Modal */}
+      <ServerBrowserModal
+        isOpen={isServerBrowserOpen}
+        onClose={() => setIsServerBrowserOpen(false)}
+        onJoinLobby={handleJoinLobby}
+      />
     </div>
   )
 }
