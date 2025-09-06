@@ -1702,13 +1702,35 @@ export default function TurfLootTactical() {
           if (progressBar) progressBar.style.width = '75%'
           if (progressText) progressText.textContent = '75%'
           
-          // Create actual Hathora room process 
-          console.log('🚀 Creating Hathora room process for global multiplayer...')
-          const finalRoomId = await hathoraClient.createOrJoinRoom(null, 'practice')
+          // Create actual Hathora room using the API endpoint
+          console.log('🚀 Creating Hathora room via API...')
+          const roomResponse = await fetch('/api/hathora/create-room', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              gameMode: 'practice',
+              region: server.region || 'US-East-1',
+              maxPlayers: 50
+            })
+          })
           
+          if (!roomResponse.ok) {
+            throw new Error(`Room creation failed: ${roomResponse.status}`)
+          }
+          
+          const roomData = await roomResponse.json()
+          
+          if (!roomData.success) {
+            throw new Error(`Room creation failed: ${roomData.message}`)
+          }
+          
+          const finalRoomId = roomData.roomId
           console.log('✅ Hathora room process created successfully:', finalRoomId)
+          
           let roomCreated = true
-          let finalRegion = hathoraClient.getPreferredRegion()
+          let finalRegion = roomData.region || 'US-East-1'
           
           // Update loading progress to complete
           if (statusElement) statusElement.textContent = 'Room ready! Launching game...'
