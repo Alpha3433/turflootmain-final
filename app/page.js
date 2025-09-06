@@ -298,14 +298,15 @@ export default function TurfLootTactical() {
       const embeddedWallet = user.wallet
       console.log('💰 Opening Privy fund wallet popup for wallet:', embeddedWallet.address)
       
-      // Use Privy's native fund wallet popup
+      // Use Privy's native fund wallet popup - pass just the address string
       if (privy.fundWallet) {
         try {
-          const result = await privy.fundWallet(embeddedWallet)
+          // Pass just the wallet address, not the full wallet object
+          const result = await privy.fundWallet(embeddedWallet.address)
           console.log('✅ Privy fund wallet completed:', result)
         } catch (error) {
           console.error('❌ Privy fund wallet error:', error)
-          if (error.message.includes('user_cancelled')) {
+          if (error.message && error.message.includes('user_cancelled')) {
             console.log('ℹ️ User cancelled the funding process')
           } else {
             alert('An error occurred during the funding process. Please try again.')
