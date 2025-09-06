@@ -351,15 +351,26 @@ const TacticalAgarIO = () => {
   useEffect(() => {
     if (!canvasRef.current || gameInitialized) return
 
-    const canvas = canvasRef.current
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    // Simulate loading time for better UX
+    const initializeGameWithLoading = async () => {
+      setGameLoading(true)
+      
+      // Show loading for at least 1.5 seconds for proper initialization feel
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      const canvas = canvasRef.current
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
 
-    const game = new TacticalGameEngine(canvas)
-    gameRef.current = game
-    
-    setGameInitialized(true)
-    game.start()
+      const game = new TacticalGameEngine(canvas)
+      gameRef.current = game
+      
+      setGameInitialized(true)
+      setGameLoading(false) // Hide loading when game is ready
+      game.start()
+    }
+
+    initializeGameWithLoading()
 
     return () => {
       if (animationFrameRef.current) {
