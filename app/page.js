@@ -1223,7 +1223,7 @@ export default function TurfLootTactical() {
               height: '72px',
               background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
               border: '2px solid #fc8181',
-              borderRadius: '4px',
+              borderRadius: '50%',
               margin: '0 auto 16px',
               display: 'flex',
               alignItems: 'center',
@@ -1231,25 +1231,73 @@ export default function TurfLootTactical() {
               position: 'relative',
               boxShadow: '0 0 30px rgba(252, 129, 129, 0.4)'
             }}>
+              {/* Central core */}
               <div style={{
-                width: '10px',
-                height: '10px',
+                width: '24px',
+                height: '24px',
+                backgroundColor: '#fc8181',
+                borderRadius: '50%',
+                boxShadow: '0 0 15px #fc8181',
+                position: 'relative'
+              }}>
+                {/* Inner glow */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '50%',
+                  opacity: 0.8
+                }} />
+              </div>
+              
+              {/* Orbital dots */}
+              <div style={{
+                position: 'absolute',
+                width: '8px',
+                height: '8px',
                 backgroundColor: '#68d391',
                 borderRadius: '50%',
-                position: 'absolute',
-                top: '20px',
-                left: '22px',
-                boxShadow: '0 0 10px #68d391'
+                top: '16px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                boxShadow: '0 0 8px #68d391'
               }} />
               <div style={{
-                width: '10px',
-                height: '10px',
+                position: 'absolute',
+                width: '8px',
+                height: '8px',
                 backgroundColor: '#68d391',
                 borderRadius: '50%',
+                bottom: '16px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                boxShadow: '0 0 8px #68d391'
+              }} />
+              <div style={{
                 position: 'absolute',
-                top: '20px',
-                right: '22px',
-                boxShadow: '0 0 10px #68d391'
+                width: '8px',
+                height: '8px',
+                backgroundColor: '#68d391',
+                borderRadius: '50%',
+                left: '16px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                boxShadow: '0 0 8px #68d391'
+              }} />
+              <div style={{
+                position: 'absolute',
+                width: '8px',
+                height: '8px',
+                backgroundColor: '#68d391',
+                borderRadius: '50%',
+                right: '16px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                boxShadow: '0 0 8px #68d391'
               }} />
             </div>
           </div>
