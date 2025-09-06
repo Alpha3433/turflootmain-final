@@ -630,54 +630,128 @@ const TacticalAgarIO = () => {
         </>
       )}
 
-      {/* Mission Complete Screen */}
+      {/* TACTICAL MISSION DEBRIEF - In-Game Overlay */}
       {missionComplete && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border border-red-500/50 max-w-md w-full mx-4 shadow-2xl">
-            <div className="bg-gradient-to-r from-red-600/20 to-orange-600/20 px-6 py-4 border-b border-red-500/30">
-              <div className="text-red-400 font-bold text-lg flex items-center gap-3">
-                <span>💀</span>
-                <span>MISSION TERMINATED</span>
+        <div className="absolute inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-40">
+          {/* Tactical Debrief Interface */}
+          <div className="bg-gradient-to-br from-gray-900/98 to-gray-800/98 backdrop-blur-lg border-2 max-w-2xl w-full mx-4 shadow-2xl" 
+               style={{
+                 borderImage: 'linear-gradient(45deg, #ef4444, #f97316, #ef4444) 1',
+                 borderRadius: '12px',
+                 boxShadow: '0 0 50px rgba(239, 68, 68, 0.3)'
+               }}>
+            
+            {/* Command Header */}
+            <div className="bg-gradient-to-r from-red-900/60 to-orange-900/60 px-6 py-4 border-b-2 border-red-500/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center border-2 border-red-400">
+                    <span className="text-2xl">⚠️</span>
+                  </div>
+                  <div>
+                    <div className="text-red-400 font-bold text-xl tracking-wide">MISSION STATUS</div>
+                    <div className="text-gray-300 text-sm">OPERATIONAL DEBRIEF</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-gray-400">CLASSIFICATION</div>
+                  <div className="text-red-400 font-bold">TACTICAL</div>
+                </div>
               </div>
             </div>
+
+            {/* Mission Result */}
             <div className="p-6">
               <div className="text-center mb-6">
-                <div className="text-gray-100 mb-4">
-                  {operativeAlive ? 'Mission Completed' : 'Operative KIA'}
+                <div className={`text-2xl font-bold mb-3 ${operativeAlive ? 'text-green-400' : 'text-red-400'}`}>
+                  {operativeAlive ? '✅ MISSION ACCOMPLISHED' : '💀 OPERATIVE DOWN'}
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-gray-800/50 rounded p-3 border border-gray-600/30">
-                    <div className="text-gray-400">Final Mass</div>
-                    <div className="text-white font-bold">{tacticalStats.mass} KG</div>
+                <div className="text-gray-300 text-sm mb-1">
+                  {operativeAlive ? 'Objective completed successfully' : 'Operative eliminated in the field'}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Mission Duration: {Math.floor(tacticalStats.missionTime / 60)}:{(tacticalStats.missionTime % 60).toString().padStart(2, '0')}
+                </div>
+              </div>
+
+              {/* Tactical Performance Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="bg-gradient-to-br from-blue-900/20 to-blue-800/20 border border-blue-500/30 rounded-lg p-4 text-center">
+                  <div className="text-blue-400 text-xs font-medium mb-1">FINAL MASS</div>
+                  <div className="text-white text-xl font-bold">{tacticalStats.mass}</div>
+                  <div className="text-blue-300 text-xs">KILOGRAMS</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-green-900/20 to-green-800/20 border border-green-500/30 rounded-lg p-4 text-center">
+                  <div className="text-green-400 text-xs font-medium mb-1">ELIMINATIONS</div>
+                  <div className="text-white text-xl font-bold">{tacticalStats.eliminations}</div>
+                  <div className="text-green-300 text-xs">CONFIRMED</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 border border-yellow-500/30 rounded-lg p-4 text-center">
+                  <div className="text-yellow-400 text-xs font-medium mb-1">ASSETS</div>
+                  <div className="text-white text-xl font-bold">${tacticalStats.assets}</div>
+                  <div className="text-yellow-300 text-xs">SECURED</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-cyan-900/20 to-cyan-800/20 border border-cyan-500/30 rounded-lg p-4 text-center">
+                  <div className="text-cyan-400 text-xs font-medium mb-1">FINAL RANK</div>
+                  <div className="text-white text-xl font-bold">{tacticalStats.rank}</div>
+                  <div className="text-cyan-300 text-xs">POSITION</div>
+                </div>
+              </div>
+
+              {/* Mission Assessment */}
+              <div className="bg-gray-800/30 border border-gray-600/30 rounded-lg p-4 mb-6">
+                <div className="text-amber-400 font-medium text-sm mb-2">📊 TACTICAL ASSESSMENT</div>
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Threat Neutralized:</span>
+                    <span className="text-green-400 font-medium">{tacticalStats.eliminations} hostiles</span>
                   </div>
-                  <div className="bg-gray-800/50 rounded p-3 border border-gray-600/30">
-                    <div className="text-gray-400">Eliminations</div>
-                    <div className="text-green-400 font-bold">{tacticalStats.eliminations}</div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Resources Secured:</span>
+                    <span className="text-blue-400 font-medium">{tacticalStats.resourcesCollected} units</span>
                   </div>
-                  <div className="bg-gray-800/50 rounded p-3 border border-gray-600/30">
-                    <div className="text-gray-400">Assets</div>
-                    <div className="text-yellow-400 font-bold">${tacticalStats.assets}</div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Kill Streak:</span>
+                    <span className="text-yellow-400 font-medium">{tacticalStats.streak} max</span>
                   </div>
-                  <div className="bg-gray-800/50 rounded p-3 border border-gray-600/30">
-                    <div className="text-gray-400">Final Rank</div>
-                    <div className="text-cyan-400 font-bold">{tacticalStats.rank}</div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Mission Grade:</span>
+                    <span className={`font-medium ${operativeAlive ? 'text-green-400' : 'text-red-400'}`}>
+                      {operativeAlive ? 'SUCCESS' : 'KIA'}
+                    </span>
                   </div>
                 </div>
               </div>
-              <div className="space-y-3">
+
+              {/* Command Buttons */}
+              <div className="flex gap-3">
                 <button
                   onClick={restartMission}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded border border-green-500 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-green-700 to-emerald-700 hover:from-green-600 hover:to-emerald-600 
+                           border border-green-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 
+                           flex items-center justify-center gap-3 shadow-lg hover:shadow-green-500/25"
                 >
-                  <span>🔄</span>
-                  <span>RESTART MISSION</span>
+                  <span className="text-lg">🔄</span>
+                  <div className="text-left">
+                    <div className="text-sm font-bold">REDEPLOY</div>
+                    <div className="text-xs opacity-80">New Mission</div>
+                  </div>
                 </button>
+                
                 <button
                   onClick={returnToBase}
-                  className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-3 px-6 rounded border border-gray-500 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 
+                           border border-gray-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 
+                           flex items-center justify-center gap-3 shadow-lg hover:shadow-gray-500/25"
                 >
-                  <span>🏠</span>
-                  <span>RETURN TO BASE</span>
+                  <span className="text-lg">🏠</span>
+                  <div className="text-left">
+                    <div className="text-sm font-bold">EXTRACT</div>
+                    <div className="text-xs opacity-80">Return to Base</div>
+                  </div>
                 </button>
               </div>
             </div>
