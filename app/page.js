@@ -757,6 +757,328 @@ export default function TurfLootTactical() {
     console.log('💸 Withdraw popup created')
   }
 
+  const createSkinStorePopup = () => {
+    // Only create popup on desktop
+    if (window.innerWidth <= 768) return
+
+    // Remove any existing skin store popup
+    const existing = document.getElementById('desktop-skin-store-popup')
+    if (existing) existing.remove()
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'desktop-skin-store-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(13, 17, 23, 0.95) !important;
+      backdrop-filter: blur(10px) !important;
+      z-index: 9999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    `
+
+    // Create the modal
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%) !important;
+      border: 2px solid #f6ad55 !important;
+      border-radius: 16px !important;
+      width: 900px !important;
+      max-width: 90vw !important;
+      max-height: 80vh !important;
+      overflow-y: auto !important;
+      color: white !important;
+      box-shadow: 0 0 50px rgba(246, 173, 85, 0.5) !important;
+      font-family: "Rajdhani", sans-serif !important;
+    `
+
+    // Mock skin data - in production this would come from API
+    const availableSkins = [
+      { id: 'default', name: 'Default Warrior', price: 0, owned: true, rarity: 'common', preview: '🔵' },
+      { id: 'stealth', name: 'Stealth Operative', price: 150, owned: false, rarity: 'uncommon', preview: '⚫' },
+      { id: 'flame', name: 'Flame Guardian', price: 300, owned: false, rarity: 'rare', preview: '🔴' },
+      { id: 'toxic', name: 'Toxic Assassin', price: 250, owned: false, rarity: 'uncommon', preview: '🟢' },
+      { id: 'electric', name: 'Electric Storm', price: 500, owned: false, rarity: 'epic', preview: '🟡' },
+      { id: 'shadow', name: 'Shadow Reaper', price: 450, owned: false, rarity: 'rare', preview: '🟣' },
+      { id: 'golden', name: 'Golden Emperor', price: 1000, owned: false, rarity: 'legendary', preview: '🟠' },
+      { id: 'diamond', name: 'Diamond Elite', price: 2000, owned: false, rarity: 'legendary', preview: '💎' }
+    ]
+
+    let currentSkin = 'default'
+    let playerCoins = 750 // Mock player currency - would come from API
+
+    const skinStoreHTML = `
+      <div style="padding: 24px; border-bottom: 2px solid #f6ad55; background: linear-gradient(45deg, rgba(246, 173, 85, 0.1) 0%, rgba(246, 173, 85, 0.05) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(45deg, #f6ad55 0%, #ed8936 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+              🛒
+            </div>
+            <div>
+              <h2 style="color: #f6ad55; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(246, 173, 85, 0.6);">
+                SKIN STORE
+              </h2>
+              <p style="color: #a0aec0; font-size: 14px; margin: 4px 0 0 0;">
+                Customize your warrior with exclusive skins
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: rgba(246, 173, 85, 0.1); border: 1px solid #f6ad55; border-radius: 8px;">
+              <div style="color: #f6ad55; font-size: 20px;">🪙</div>
+              <div style="color: #f6ad55; font-size: 18px; font-weight: 700;" id="player-coins">${playerCoins}</div>
+            </div>
+            <button id="close-skin-store" style="background: rgba(246, 173, 85, 0.2); border: 2px solid #f6ad55; border-radius: 8px; padding: 12px; color: #f6ad55; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 32px;">
+        <!-- Current Skin Display -->
+        <div style="margin-bottom: 24px; padding: 20px; background: rgba(104, 211, 145, 0.1); border: 2px solid #68d391; border-radius: 12px;">
+          <div style="color: #68d391; font-size: 16px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase;">
+            CURRENT SKIN
+          </div>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div id="current-skin-preview" style="width: 60px; height: 60px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid #68d391;">
+              🔵
+            </div>
+            <div>
+              <div id="current-skin-name" style="color: #68d391; font-size: 20px; font-weight: 700;">Default Warrior</div>
+              <div style="color: #a0aec0; font-size: 14px;">Currently equipped</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skin Categories -->
+        <div style="margin-bottom: 24px;">
+          <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+            <button class="category-tab" data-category="all" style="flex: 1; padding: 12px; background: linear-gradient(45deg, #f6ad55 0%, #ed8936 100%); border: 2px solid #f6ad55; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              ALL SKINS
+            </button>
+            <button class="category-tab" data-category="owned" style="flex: 1; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              OWNED
+            </button>
+            <button class="category-tab" data-category="shop" style="flex: 1; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              SHOP
+            </button>
+          </div>
+        </div>
+
+        <!-- Skins Grid -->
+        <div id="skins-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; max-height: 400px; overflow-y: auto;">
+          <!-- Skins will be populated here -->
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+          <button id="close-store" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+            CLOSE STORE
+          </button>
+        </div>
+      </div>
+    `
+
+    modal.innerHTML = skinStoreHTML
+    popup.appendChild(modal)
+
+    // Add interactivity
+    let currentCategory = 'all'
+    
+    // Rarity colors
+    const rarityColors = {
+      common: '#a0aec0',
+      uncommon: '#68d391', 
+      rare: '#3182ce',
+      epic: '#9f7aea',
+      legendary: '#f6ad55'
+    }
+
+    // Tab switching
+    const categoryTabs = modal.querySelectorAll('.category-tab')
+    
+    const switchCategory = (category) => {
+      currentCategory = category
+      
+      // Update tab styles
+      categoryTabs.forEach(tab => {
+        if (tab.dataset.category === category) {
+          tab.style.background = 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)'
+          tab.style.border = '2px solid #f6ad55'
+          tab.style.color = 'white'
+        } else {
+          tab.style.background = 'rgba(45, 55, 72, 0.5)'
+          tab.style.border = '2px solid #4a5568'
+          tab.style.color = '#a0aec0'
+        }
+      })
+      
+      renderSkins()
+    }
+    
+    categoryTabs.forEach(tab => {
+      tab.addEventListener('click', () => switchCategory(tab.dataset.category))
+    })
+
+    // Render skins function
+    const renderSkins = () => {
+      const skinsGrid = modal.querySelector('#skins-grid')
+      
+      let filteredSkins = availableSkins
+      if (currentCategory === 'owned') {
+        filteredSkins = availableSkins.filter(skin => skin.owned)
+      } else if (currentCategory === 'shop') {
+        filteredSkins = availableSkins.filter(skin => !skin.owned)
+      }
+      
+      skinsGrid.innerHTML = filteredSkins.map(skin => {
+        const rarityColor = rarityColors[skin.rarity]
+        const isEquipped = skin.id === currentSkin
+        const canAfford = playerCoins >= skin.price
+        
+        return `
+          <div class="skin-card" data-skin-id="${skin.id}" style="
+            padding: 16px; 
+            background: rgba(45, 55, 72, 0.5); 
+            border: 2px solid ${isEquipped ? '#68d391' : '#4a5568'}; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            ${isEquipped ? 'box-shadow: 0 0 20px rgba(104, 211, 145, 0.4);' : ''}
+          ">
+            <div style="text-align: center; margin-bottom: 12px;">
+              <div style="width: 80px; height: 80px; background: linear-gradient(45deg, ${rarityColor} 0%, ${rarityColor}aa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto; border: 3px solid ${rarityColor};">
+                ${skin.preview}
+              </div>
+            </div>
+            
+            <div style="text-align: center;">
+              <div style="color: ${rarityColor}; font-size: 16px; font-weight: 700; margin-bottom: 4px;">
+                ${skin.name}
+              </div>
+              <div style="color: ${rarityColor}; font-size: 12px; text-transform: uppercase; margin-bottom: 8px;">
+                ${skin.rarity}
+              </div>
+              
+              ${skin.owned ? 
+                (isEquipped ? 
+                  '<div style="color: #68d391; font-size: 12px; font-weight: 600;">✓ EQUIPPED</div>' :
+                  '<button class="equip-skin-btn" data-skin-id="' + skin.id + '" style="width: 100%; padding: 8px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border: 2px solid #68d391; border-radius: 6px; color: white; font-size: 12px; font-weight: 700; cursor: pointer; font-family: \'Rajdhani\', sans-serif; text-transform: uppercase;">EQUIP</button>'
+                ) : 
+                `<button class="buy-skin-btn" data-skin-id="${skin.id}" style="width: 100%; padding: 8px; background: ${canAfford ? 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)' : 'rgba(74, 85, 104, 0.5)'}; border: 2px solid ${canAfford ? '#f6ad55' : '#4a5568'}; border-radius: 6px; color: ${canAfford ? 'white' : '#a0aec0'}; font-size: 12px; font-weight: 700; cursor: ${canAfford ? 'pointer' : 'not-allowed'}; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+                  🪙 ${skin.price} COINS
+                </button>`
+              }
+            </div>
+          </div>
+        `
+      }).join('')
+      
+      // Add click handlers
+      const skinCards = skinsGrid.querySelectorAll('.skin-card')
+      const equipButtons = skinsGrid.querySelectorAll('.equip-skin-btn')
+      const buyButtons = skinsGrid.querySelectorAll('.buy-skin-btn')
+      
+      // Skin card hover effects
+      skinCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          if (card.dataset.skinId !== currentSkin) {
+            card.style.border = '2px solid #f6ad55'
+            card.style.background = 'rgba(246, 173, 85, 0.1)'
+          }
+        })
+        
+        card.addEventListener('mouseleave', () => {
+          if (card.dataset.skinId !== currentSkin) {
+            card.style.border = '2px solid #4a5568'
+            card.style.background = 'rgba(45, 55, 72, 0.5)'
+          }
+        })
+      })
+      
+      // Equip skin buttons
+      equipButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          const skinId = btn.dataset.skinId
+          const skin = availableSkins.find(s => s.id === skinId)
+          
+          currentSkin = skinId
+          
+          // Update current skin display
+          const currentSkinPreview = modal.querySelector('#current-skin-preview')
+          const currentSkinName = modal.querySelector('#current-skin-name')
+          currentSkinPreview.textContent = skin.preview
+          currentSkinName.textContent = skin.name
+          
+          console.log('🎨 Equipped skin:', skin.name)
+          alert(`Equipped ${skin.name}!`)
+          
+          renderSkins() // Re-render to update equipped status
+        })
+      })
+      
+      // Buy skin buttons
+      buyButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          const skinId = btn.dataset.skinId
+          const skin = availableSkins.find(s => s.id === skinId)
+          
+          if (playerCoins >= skin.price) {
+            // Purchase skin
+            playerCoins -= skin.price
+            skin.owned = true
+            
+            // Update UI
+            const coinsDisplay = modal.querySelector('#player-coins')
+            coinsDisplay.textContent = playerCoins
+            
+            console.log('🛒 Purchased skin:', skin.name, 'for', skin.price, 'coins')
+            alert(`Successfully purchased ${skin.name} for ${skin.price} coins!`)
+            
+            renderSkins() // Re-render to show as owned
+          } else {
+            alert(`Not enough coins! You need ${skin.price - playerCoins} more coins.`)
+          }
+        })
+      })
+    }
+
+    // Close popup handlers
+    const closeButton = modal.querySelector('#close-skin-store')
+    const closeStoreButton = modal.querySelector('#close-store')
+    
+    const closePopup = () => {
+      popup.remove()
+    }
+    
+    closeButton.addEventListener('click', closePopup)
+    closeStoreButton.addEventListener('click', closePopup)
+    
+    // Close on backdrop click
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        closePopup()
+      }
+    })
+
+    // Initial render
+    renderSkins()
+
+    // Add popup to DOM
+    document.body.appendChild(popup)
+
+    console.log('🛒 Skin store popup created with direct DOM manipulation')
+  }
+
   const createDesktopServerBrowserPopup = () => {
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
