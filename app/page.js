@@ -2306,31 +2306,26 @@ export default function TurfLootTactical() {
         }
       `}</style>
 
-      {/* Debug Info - Remove this later */}
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        background: 'rgba(255, 0, 0, 0.8)',
-        color: 'white',
-        padding: '10px',
-        zIndex: 100000,
-        fontSize: '12px',
-        borderRadius: '4px'
-      }}>
-        ServerBrowser State: {isServerBrowserOpen ? 'OPEN' : 'CLOSED'}
-      </div>
-
-      {/* Server Browser Modal */}
-      {console.log('Rendering ServerBrowserModal with isOpen:', isServerBrowserOpen)}
-      <ServerBrowserModal
-        isOpen={isServerBrowserOpen}
-        onClose={() => {
-          console.log('Closing server browser modal')
-          setIsServerBrowserOpen(false)
-        }}
-        onJoinLobby={handleJoinLobby}
-      />
+      {/* Server Browser Modal - Force render for testing */}
+      {isServerBrowserOpen && (
+        <div style={{
+          position: 'fixed',
+          top: '0',
+          left: '0',
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(255, 0, 0, 0.5)',
+          zIndex: 100000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: '24px',
+          fontWeight: 'bold'
+        }}>
+          TEST MODAL IS OPEN - STATE WORKING!
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
