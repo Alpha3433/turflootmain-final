@@ -3301,6 +3301,34 @@ export default function TurfLootTactical() {
               SERVER BROWSER
             </button>
             <button 
+              style={{
+                ...secondaryButtonStyle,
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '2px solid #3b82f6',
+                color: '#3b82f6'
+              }}
+              onClick={() => {
+                console.log('🤖 LOCAL PRACTICE button clicked!')
+                // Create completely local room with bots - no Hathora charges
+                const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
+                const gameUrl = `/agario?roomId=${localRoomId}&mode=local&fee=0&region=local&multiplayer=offline&server=local&bots=true`
+                console.log('🎮 Starting local practice with bots:', gameUrl)
+                window.location.href = gameUrl
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(59, 130, 246, 0.2)'
+                e.target.style.transform = 'scale(1.02)'
+                e.target.style.boxShadow = '0 0 25px rgba(59, 130, 246, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(59, 130, 246, 0.1)'
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.3)'
+              }}
+            >
+              🤖 LOCAL PRACTICE
+            </button>
+            <button 
               style={secondaryButtonStyle}
               onMouseOver={(e) => {
                 e.target.style.background = 'rgba(104, 211, 145, 0.1)'
