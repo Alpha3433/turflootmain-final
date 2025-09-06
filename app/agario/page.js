@@ -387,47 +387,150 @@ const TacticalAgarIO = () => {
         })
       }
     }
-          name: `HOSTILE-${i.toString().padStart(2, '0')}`,
-          velocity: { 
-            x: (Math.random() - 0.5) * 1.5, 
-            y: (Math.random() - 0.5) * 1.5 
-          },
-          ai: true
-        })
+
+    render() {
+      if (!this.ctx) return
+      
+      // Clear canvas
+      this.ctx.fillStyle = '#0a0a0a'
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+      
+      this.ctx.save()
+      
+      // Apply camera transform
+      this.ctx.translate(-this.camera.x, -this.camera.y)
+      
+      // Draw grid
+      this.drawGrid()
+      
+      // Draw food
+      this.food.forEach(food => this.drawFood(food))
+      
+      // Draw bots
+      this.bots.forEach(bot => {
+        if (bot.alive) this.drawBot(bot)
+      })
+      
+      // Draw player
+      if (this.player && this.player.alive) {
+        this.drawPlayer(this.player)
+      }
+      
+      this.ctx.restore()
+      
+      // Draw UI elements (not affected by camera)
+      this.drawUI()
+    }
+
+    drawGrid() {
+      this.ctx.strokeStyle = '#1a1a1a'
+      this.ctx.lineWidth = 1
+      const gridSize = 50
+      
+      const startX = Math.floor(this.camera.x / gridSize) * gridSize
+      const startY = Math.floor(this.camera.y / gridSize) * gridSize
+      const endX = startX + this.canvas.width + gridSize
+      const endY = startY + this.canvas.height + gridSize
+      
+      for (let x = startX; x <= endX; x += gridSize) {
+        this.ctx.beginPath()
+        this.ctx.moveTo(x, startY)
+        this.ctx.lineTo(x, endY)
+        this.ctx.stroke()
+      }
+      
+      for (let y = startY; y <= endY; y += gridSize) {
+        this.ctx.beginPath()
+        this.ctx.moveTo(startX, y)
+        this.ctx.lineTo(endX, y)
+        this.ctx.stroke()
       }
     }
 
-    update(mouseX, mouseY) {
-      if (!this.running || !this.operative?.alive) return
-
-      const now = Date.now()
-      const deltaTime = Math.min((now - this.lastUpdate) / 1000, 0.016) // Cap at 60fps
-      this.lastUpdate = now
-
-      // Update operative movement toward mouse
-      this.updateOperativeMovement(mouseX, mouseY, deltaTime)
-      
-      // Update hostiles AI
-      this.updateHostiles(deltaTime)
-      
-      // Check collisions
-      this.checkCollisions()
-      
-      // Update camera
-      this.updateCamera()
-      
-      // Update radar contacts
-      this.updateRadar()
+    drawFood(food) {
+      this.ctx.beginPath()
+      this.ctx.arc(food.x, food.y, food.radius, 0, Math.PI * 2)
+      this.ctx.fillStyle = food.color
+      this.ctx.fill()
+      this.ctx.strokeStyle = '#ffffff'
+      this.ctx.lineWidth = 1
+      this.ctx.stroke()
     }
 
-    updateOperativeMovement(mouseX, mouseY, deltaTime) {
-      if (!this.operative?.alive) return
-
-      const canvas = this.canvas
-      const rect = canvas.getBoundingClientRect()
+    drawBot(bot) {
+      // Bot body
+      this.ctx.beginPath()
+      this.ctx.arc(bot.x, bot.y, bot.radius, 0, Math.PI * 2)
+      this.ctx.fillStyle = bot.color
+      this.ctx.fill()
+      this.ctx.strokeStyle = '#ffffff'
+      this.ctx.lineWidth = 2
+      this.ctx.stroke()
       
-      const worldMouseX = mouseX - canvas.width / 2 + this.operative.x
-      const worldMouseY = mouseY - canvas.height / 2 + this.operative.y
+      // Bot name
+      this.ctx.fillStyle = '#ffffff'
+      this.ctx.font = 'bold 11px monospace'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillText(bot.name, bot.x, bot.y - bot.radius - 12)
+      
+      // Bot mass
+      this.ctx.fillStyle = '#ff6b6b'
+      this.ctx.font = 'bold 8px monospace'
+      this.ctx.fillText(`${Math.floor(bot.mass)}kg`, bot.x, bot.y + 3)
+    }
+
+    drawPlayer(player) {
+      // Player body
+      this.ctx.beginPath()
+      this.ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2)
+      this.ctx.fillStyle = player.color
+      this.ctx.fill()
+      this.ctx.strokeStyle = '#ffffff'
+      this.ctx.lineWidth = 3
+      this.ctx.stroke()
+      
+      // Player name
+      this.ctx.fillStyle = '#ffffff'
+      this.ctx.font = 'bold 12px monospace'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillText(player.name, player.x, player.y - player.radius - 15)
+      
+      // Player mass
+      this.ctx.fillStyle = '#22c55e'
+      this.ctx.font = 'bold 9px monospace'
+      this.ctx.fillText(`${Math.floor(player.mass)}kg`, player.x, player.y + 4)
+    }
+
+    drawUI() {
+      // Draw crosshair at mouse position
+      if (this.mouse.x && this.mouse.y) {
+        this.ctx.strokeStyle = '#22c55e'
+        this.ctx.lineWidth = 2
+        this.ctx.globalAlpha = 0.7
+        
+        // Crosshair
+        this.ctx.beginPath()
+        this.ctx.moveTo(this.mouse.x - 10, this.mouse.y)
+        this.ctx.lineTo(this.mouse.x + 10, this.mouse.y)
+        this.ctx.moveTo(this.mouse.x, this.mouse.y - 10)
+        this.ctx.lineTo(this.mouse.x, this.mouse.y + 10)
+        this.ctx.stroke()
+        
+        this.ctx.globalAlpha = 1
+      }
+    }
+
+    start() {
+      this.running = true
+      setGameRunning(true)
+      console.log('🎮 Enhanced Tactical Game Engine started!')
+    }
+
+    stop() {
+      this.running = false
+      setGameRunning(false)
+    }
+  }
 
       const dx = worldMouseX - this.operative.x
       const dy = worldMouseY - this.operative.y
