@@ -2186,7 +2186,7 @@ const AgarIOGame = () => {
       
       try {
         // Always try Hathora for global multiplayer
-        const hathoraClientModule = await import('/lib/hathoraClient.js')
+        const hathoraClientModule = await import('@/lib/hathoraClient.js')
         const hathoraClient = hathoraClientModule.default
         
         const hathoraInitialized = await hathoraClient.initialize()
