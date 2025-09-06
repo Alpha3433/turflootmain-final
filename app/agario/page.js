@@ -626,6 +626,46 @@ const TacticalAgarIO = () => {
       >
         {hudVisible ? '🔽' : '🔼'}
       </button>
+
+      {/* Game Loading Overlay */}
+      {gameLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 backdrop-blur-lg z-50 flex items-center justify-center">
+          <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-green-500 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl shadow-green-500/20">
+            {/* Game Logo/Icon */}
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 border-4 border-green-500 animate-pulse">
+                🎮
+              </div>
+              <h2 className="text-green-400 text-3xl font-bold uppercase tracking-wider mb-2">
+                TACTICAL DEPLOYMENT
+              </h2>
+              <p className="text-gray-300 text-sm">
+                Initializing combat zone...
+              </p>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="mb-6">
+              <div className="bg-gray-700 rounded-full h-3 mb-2 overflow-hidden">
+                <div className="bg-gradient-to-r from-green-400 to-green-600 h-full rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>
+              </div>
+              <div className="text-green-400 text-center text-sm font-semibold">
+                Loading tactical systems...
+              </div>
+            </div>
+
+            {/* Loading Tips */}
+            <div className="bg-green-900 bg-opacity-20 border border-green-500 rounded-lg p-4">
+              <div className="text-green-400 text-xs font-semibold mb-2 uppercase tracking-wide">
+                🎯 TACTICAL TIP
+              </div>
+              <div className="text-gray-300 text-sm">
+                Stay mobile and eliminate smaller operatives to increase your tactical advantage!
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
