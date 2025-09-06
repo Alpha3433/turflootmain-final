@@ -892,8 +892,8 @@ export default function TurfLootTactical() {
               </div>
               <input 
                 type="text" 
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                value={customUsername || userName}
+                onChange={(e) => setCustomUsername(e.target.value)}
                 style={nameInputStyle}
                 placeholder="USERNAME"
                 onFocus={(e) => {
