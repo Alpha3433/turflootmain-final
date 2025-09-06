@@ -974,36 +974,27 @@ export default function TurfLootTactical() {
           </div>
           
           <div style={{ marginBottom: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.3)' }}>
-              <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>01. ALPHA_STRIKE</span>
-              <span style={{ 
-                color: '#f6ad55', 
-                fontWeight: '700', 
-                fontSize: '15px',
-                textShadow: '0 0 10px rgba(246, 173, 85, 0.6)',
-                fontFamily: '"Rajdhani", sans-serif'
-              }}>$6,559.45</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.3)' }}>
-              <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>02. VIPER_UNIT</span>
-              <span style={{ 
-                color: '#f6ad55', 
-                fontWeight: '700', 
-                fontSize: '15px',
-                textShadow: '0 0 10px rgba(246, 173, 85, 0.6)',
-                fontFamily: '"Rajdhani", sans-serif'
-              }}>$5,210.67</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
-              <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>03. GHOST_OPS</span>
-              <span style={{ 
-                color: '#f6ad55', 
-                fontWeight: '700', 
-                fontSize: '15px',
-                textShadow: '0 0 10px rgba(246, 173, 85, 0.6)',
-                fontFamily: '"Rajdhani", sans-serif'
-              }}>$4,757.38</span>
-            </div>
+            {leaderboard.map((player, index) => (
+              <div key={player.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: index < leaderboard.length - 1 ? '1px solid rgba(104, 211, 145, 0.3)' : 'none' }}>
+                <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
+                  {String(index + 1).padStart(2, '0')}. {player.name}
+                </span>
+                <span style={{ 
+                  color: '#f6ad55', 
+                  fontWeight: '700', 
+                  fontSize: '15px',
+                  textShadow: '0 0 10px rgba(246, 173, 85, 0.6)',
+                  fontFamily: '"Rajdhani", sans-serif'
+                }}>
+                  ${player.cashout.toLocaleString()}
+                </span>
+              </div>
+            ))}
+            {leaderboard.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '20px 0', color: '#68d391', fontSize: '14px', fontFamily: '"Rajdhani", sans-serif' }}>
+                LOADING LEADERBOARD...
+              </div>
+            )}
           </div>
           
           <button style={{
