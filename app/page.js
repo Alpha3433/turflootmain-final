@@ -1809,7 +1809,7 @@ export default function TurfLootTactical() {
           
           // Redirect with on-demand room parameters
           const gameMode = server.mode || 'practice'
-          const gameUrl = \`/agario?roomId=\${roomId}&mode=\${gameMode}&fee=\${server.stake || 0}&region=\${server.region || 'unknown'}&multiplayer=hathora&server=\${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true\`
+          const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true`
           console.log('🎮 Redirecting to on-demand room:', gameUrl)
           window.location.href = gameUrl
         }, 5000)
