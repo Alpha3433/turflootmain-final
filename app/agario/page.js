@@ -4927,159 +4927,113 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Game Over Screen - Ultra-Minimal Mobile Design */}
+      {/* NEW GAME OVER MODAL - Clean and Simple */}
       {isGameOver && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 game-modal-overlay" style={{ zIndex: 1000 }}>
-          {/* Ultra-Minimal Mobile Game Over Popup */}
-          <div className={`
-            ${isMobile 
-              ? 'bg-black/95 backdrop-blur-sm rounded-2xl max-w-xs w-full border border-red-400/30 shadow-2xl' 
-              : 'bg-gray-900 rounded-2xl p-8 border border-cyan-400/30 max-w-md'
-            }
-          `} style={{ zIndex: 1001 }}>
-            
-            {isMobile ? (
-              /* REDESIGNED: Enhanced Mobile Layout with Better Stats Display */
-              <div className="p-5 text-center">
-                {/* Game Result Title with Icon */}
-                <div className="text-xl font-bold mb-4 text-red-400 flex items-center justify-center space-x-3">
-                  <span className="text-2xl">
-                    {gameResult.includes('Eliminated') ? '💀' : 
-                     gameResult.includes('Tab Closed') ? '🚪' : '💔'}
-                  </span>
-                  <span>
-                    {gameResult.includes('Eliminated') ? 'Eliminated' :
-                     gameResult.includes('Tab Closed') ? 'Game Left' : 'Game Over'}
-                  </span>
-                </div>
-                
-                {/* REDESIGNED: Enhanced Stats Display - Better Layout */}
-                <div className="bg-gray-800/50 rounded-xl p-3 mb-4 border border-gray-600/30">
-                  {/* Primary Stats Row */}
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-green-400">
-                        ${gameStats.netWorth}
-                      </div>
-                      <div className="text-xs text-gray-500">Net Worth</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-cyan-400">
-                        #{gameStats.rank}
-                      </div>
-                      <div className="text-xs text-gray-500">Position</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-yellow-400">
-                        {gameStats.kills}
-                      </div>
-                      <div className="text-xs text-gray-500">Kills</div>
-                    </div>
-                  </div>
-                  
-                  {/* REMOVED: Secondary Stats Row with Mass to prevent button cut-off */}
-                </div>
+        <div 
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            zIndex: 9999,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(10px)'
+          }}
+        >
+          <div 
+            className="bg-gray-900 rounded-2xl shadow-2xl border border-gray-600 max-w-md w-full mx-4"
+            style={{
+              backgroundColor: '#1f2937',
+              borderRadius: '16px',
+              padding: '32px',
+              border: '1px solid #4b5563',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              zIndex: 10000
+            }}
+          >
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">🚪</div>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Game Ended
+              </h2>
+              <p className="text-gray-400 text-sm">
+                {gameResult.replace(/^(🚪|💀|💔)\s*/, '')}
+              </p>
+            </div>
 
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      restartGame()
-                    }}
-                    onTouchEnd={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      restartGame()
-                    }}
-                    className="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-bold py-3 px-4 rounded-xl transition-all text-sm shadow-lg"
-                    style={{ touchAction: 'manipulation' }}
-                  >
-                    🔄 Play Again
-                  </button>
-                  
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      router.push('/')
-                    }}
-                    onTouchEnd={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      router.push('/')
-                    }}
-                    className="w-full bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white font-bold py-3 px-4 rounded-xl transition-all text-sm shadow-lg"
-                    style={{ touchAction: 'manipulation' }}
-                  >
-                    🏠 Lobby
-                  </button>
-                </div>
+            {/* Stats Display */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-gray-800 rounded-lg p-4 text-center">
+                <div className="text-green-400 text-sm font-medium mb-1">Net Worth</div>
+                <div className="text-white text-xl font-bold">${gameStats.netWorth || 0}</div>
               </div>
-            ) : (
-              /* Desktop Layout - Modern Redesign */
-              <>
-                {/* Header with gradient and icon */}
-                <div className="text-center mb-8">
-                  <div className="text-6xl mb-3">🚪</div>
-                  <div className="text-2xl font-bold text-white mb-2">
-                    Game Ended
-                  </div>
-                  <div className="text-sm text-gray-400 font-medium tracking-wide">
-                    {gameResult.replace('🚪 ', '')}
-                  </div>
-                </div>
-                
-                {/* Stats Cards Grid */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  {/* Net Worth Card */}
-                  <div className="bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/30 rounded-xl p-4 text-center">
-                    <div className="text-green-400 text-sm font-medium mb-1">NET WORTH</div>
-                    <div className="text-white text-2xl font-bold">${gameStats.netWorth}</div>
-                  </div>
-                  
-                  {/* Rank Card */}
-                  <div className="bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 border border-cyan-500/30 rounded-xl p-4 text-center">
-                    <div className="text-cyan-400 text-sm font-medium mb-1">FINAL RANK</div>
-                    <div className="text-white text-2xl font-bold">#{gameStats.rank}</div>
-                  </div>
-                  
-                  {/* K/D Ratio Card */}
-                  <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30 rounded-xl p-4 text-center">
-                    <div className="text-yellow-400 text-sm font-medium mb-1">K/D RATIO</div>
-                    <div className="text-white text-2xl font-bold">{gameStats.kills}/{gameStats.deaths}</div>
-                  </div>
-                  
-                  {/* Best Streak Card */}
-                  <div className="bg-gradient-to-br from-orange-500/20 to-red-600/10 border border-orange-500/30 rounded-xl p-4 text-center">
-                    <div className="text-orange-400 text-sm font-medium mb-1">BEST STREAK</div>
-                    <div className="text-white text-2xl font-bold flex items-center justify-center gap-1">
-                      {gameStats.streak} <span className="text-lg">🔥</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="bg-gray-800 rounded-lg p-4 text-center">
+                <div className="text-cyan-400 text-sm font-medium mb-1">Rank</div>
+                <div className="text-white text-xl font-bold">#{gameStats.rank || 'N/A'}</div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 text-center">
+                <div className="text-yellow-400 text-sm font-medium mb-1">Kills</div>
+                <div className="text-white text-xl font-bold">{gameStats.kills || 0}</div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 text-center">
+                <div className="text-red-400 text-sm font-medium mb-1">Deaths</div>
+                <div className="text-white text-xl font-bold">{gameStats.deaths || 0}</div>
+              </div>
+            </div>
 
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                  <button
-                    onClick={restartGame}
-                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 flex items-center justify-center gap-2"
-                  >
-                    <span className="text-xl">🎮</span>
-                    <span>Play Again</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => router.push('/')}
-                    className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-xl hover:shadow-gray-500/25 flex items-center justify-center gap-2 border border-gray-500/30"
-                  >
-                    <span className="text-xl">🏠</span>
-                    <span>Back to Lobby</span>
-                  </button>
-                </div>
-              </>
-            )}
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  restartGame()
+                }}
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: '#0891b2',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#0e7490'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#0891b2'}
+              >
+                <span>🎮</span>
+                <span>Play Again</span>
+              </button>
+              
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  router.push('/')
+                }}
+                className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                style={{
+                  backgroundColor: '#374151',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#4b5563'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#374151'}
+              >
+                <span>🏠</span>
+                <span>Back to Lobby</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
