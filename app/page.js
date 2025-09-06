@@ -1003,7 +1003,12 @@ export default function TurfLootTactical() {
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <button 
               style={secondaryButtonStyle}
-              onClick={() => setIsServerBrowserOpen(true)}
+              onClick={() => {
+                console.log('SERVER BROWSER button clicked!')
+                console.log('Current isServerBrowserOpen:', isServerBrowserOpen)
+                setIsServerBrowserOpen(true)
+                console.log('Set isServerBrowserOpen to true')
+              }}
               onMouseOver={(e) => {
                 e.target.style.background = 'rgba(104, 211, 145, 0.1)'
                 e.target.style.transform = 'scale(1.02)'
