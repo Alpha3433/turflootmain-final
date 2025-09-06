@@ -87,6 +87,34 @@ export default function TurfLootTactical() {
     router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
   }
 
+  const handleLogin = async () => {
+    try {
+      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
+        console.log('🔐 Attempting Privy login...')
+        await window.__TURFLOOT_PRIVY__.login()
+      } else {
+        console.error('❌ Privy not available')
+      }
+    } catch (error) {
+      console.error('❌ Login error:', error)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
+        console.log('🔐 Attempting Privy logout...')
+        await window.__TURFLOOT_PRIVY__.logout()
+        setIsAuthenticated(false)
+        setUser(null)
+      } else {
+        console.error('❌ Privy not available')
+      }
+    } catch (error) {
+      console.error('❌ Logout error:', error)
+    }
+  }
+
   const containerStyle = {
     minHeight: '100vh',
     width: '100vw',
