@@ -1796,65 +1796,64 @@ export default function TurfLootTactical() {
       // Show loading popup for other servers too
       const loadingPopup = createGameLoadingPopup()
       
-      try {
-        // Create ACTUAL Hathora room for multiplayer servers
-        setTimeout(async () => {
-          try {
-            console.log('🌍 Creating REAL Hathora room for server:', server.name)
-            
-            // Initialize Hathora client
-            const hathoraClientModule = await import('@/lib/hathoraClient.js')
-            const hathoraClient = hathoraClientModule.default
-            
-            const initialized = await hathoraClient.initialize()
-            if (!initialized) {
-              throw new Error('Hathora client initialization failed')
-            }
-            
-            console.log('🎯 Hathora client initialized, creating room process...')
-            
-            // Create actual Hathora room process
-            const roomConfig = {
-              gameMode: server.mode || 'practice',
-              maxPlayers: 50,
-              roomName: `${server.name} - Room`,
-              region: server.region || 'Seattle'
-            }
-            
-            console.log('🚀 Creating Hathora room with config:', roomConfig)
-            
-            // Use the client to create an actual room
-            const roomId = await hathoraClient.client.createRoom(roomConfig, server.region || 'Seattle')
-            console.log('✅ Created Hathora room process:', roomId)
-            
-            // Remove loading popup
-            if (loadingPopup && loadingPopup.cleanup) {
-              loadingPopup.cleanup()
-            }
-            
-            // Redirect to game with REAL Hathora room
-            const gameMode = server.mode || 'practice'
-            const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&realroom=true`
-            console.log('🎮 Redirecting to REAL Hathora room:', gameUrl)
-            window.location.href = gameUrl
-            
-          } catch (error) {
-            console.error('❌ REAL Hathora room creation failed:', error)
-            
-            // Remove loading popup
-            if (loadingPopup && loadingPopup.cleanup) {
-              loadingPopup.cleanup()
-            }
-            
-            // Show error to user
-            alert(`Failed to create multiplayer room: ${error.message}`)
-            
-            // Fallback to direct connection
-            const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=direct`
-            console.log('🎮 Fallback to direct game:', gameUrl)
-            window.location.href = gameUrl
+      // Create ACTUAL Hathora room for multiplayer servers
+      setTimeout(async () => {
+        try {
+          console.log('🌍 Creating REAL Hathora room for server:', server.name)
+          
+          // Initialize Hathora client
+          const hathoraClientModule = await import('@/lib/hathoraClient.js')
+          const hathoraClient = hathoraClientModule.default
+          
+          const initialized = await hathoraClient.initialize()
+          if (!initialized) {
+            throw new Error('Hathora client initialization failed')
           }
-        }, 2000) // Reduced delay
+          
+          console.log('🎯 Hathora client initialized, creating room process...')
+          
+          // Create actual Hathora room process
+          const roomConfig = {
+            gameMode: server.mode || 'practice',
+            maxPlayers: 50,
+            roomName: `${server.name} - Room`,
+            region: server.region || 'Seattle'
+          }
+          
+          console.log('🚀 Creating Hathora room with config:', roomConfig)
+          
+          // Use the client to create an actual room
+          const roomId = await hathoraClient.client.createRoom(roomConfig, server.region || 'Seattle')
+          console.log('✅ Created Hathora room process:', roomId)
+          
+          // Remove loading popup
+          if (loadingPopup && loadingPopup.cleanup) {
+            loadingPopup.cleanup()
+          }
+          
+          // Redirect to game with REAL Hathora room
+          const gameMode = server.mode || 'practice'
+          const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&realroom=true`
+          console.log('🎮 Redirecting to REAL Hathora room:', gameUrl)
+          window.location.href = gameUrl
+          
+        } catch (error) {
+          console.error('❌ REAL Hathora room creation failed:', error)
+          
+          // Remove loading popup
+          if (loadingPopup && loadingPopup.cleanup) {
+            loadingPopup.cleanup()
+          }
+          
+          // Show error to user
+          alert(`Failed to create multiplayer room: ${error.message}`)
+          
+          // Fallback to direct connection
+          const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=direct`
+          console.log('🎮 Fallback to direct game:', gameUrl)
+          window.location.href = gameUrl
+        }
+      }, 2000) // Reduced delay
     }
 
     // Search functionality
