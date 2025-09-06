@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { usePrivy } from '@privy-io/react-ui'
+import { usePrivy } from '@privy-io/react-auth'
 import { useGameSettings } from '@/components/providers/GameSettingsProvider'
 
 const TacticalAgarIO = () => {
