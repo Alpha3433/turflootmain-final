@@ -441,15 +441,17 @@ const AgarIOGame = () => {
     if (paramRoomId) {
       console.log('🌍 Room ID detected - connecting to global multiplayer:', paramRoomId)
       
-      if (user && getAccessToken) {
-        console.log('🌍 Authenticated user - connecting to global multiplayer server')
+      // For practice games (fee=0), allow without authentication
+      if ((user && getAccessToken) || (paramMode === 'practice' && paramFee === 0)) {
+        console.log('🌍 Connecting to global multiplayer server:', user ? 'Authenticated user' : 'Free practice mode')
         // Use multiplayer mode for room-based games (includes session tracking)
         initializeMultiplayer(paramPartyId, paramPartySize, paramMembers).catch((error) => {
           console.error('🔄 Global multiplayer failed, falling back to offline mode:', error)
           initializeGame(false) // Fallback to offline mode
         })
       } else {
-        console.log('🔐 User not authenticated for global multiplayer - redirecting to login')
+        console.log('🔐 Authentication required for paid games - redirecting to login')
+        alert('Please login to join paid multiplayer games.')
         router.push('/')
       }
       return // Exit early - roomId mode handled
