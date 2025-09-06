@@ -13,7 +13,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Test Configuration
-BASE_URL = "https://tactical-turfloot.preview.emergentagent.com"
+BASE_URL = "https://military-turf.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Use localhost for testing as external URL has ingress issues

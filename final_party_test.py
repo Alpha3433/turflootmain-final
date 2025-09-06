@@ -9,7 +9,7 @@ import json
 import time
 
 # Configuration
-BASE_URL = "https://tactical-turfloot.preview.emergentagent.com"
+BASE_URL = "https://military-turf.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
 # Real user IDs from server logs
