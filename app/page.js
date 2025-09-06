@@ -2653,7 +2653,28 @@ export default function TurfLootTactical() {
             <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(246, 173, 85, 0.6)', textTransform: 'uppercase' }}>WALLET</h3>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
               <button style={{ fontSize: '11px', color: '#f6ad55', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>[?] CACHE_LOC</button>
-              <button style={{ fontSize: '11px', color: '#f6ad55', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>[↻] RESUPPLY</button>
+              <button 
+                onClick={handleBalanceRefresh}
+                style={{ 
+                  fontSize: '11px', 
+                  color: '#f6ad55', 
+                  background: 'none', 
+                  border: 'none', 
+                  cursor: 'pointer', 
+                  fontWeight: '600', 
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textDecoration: 'none',
+                  padding: '0'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.color = '#fbb040'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.color = '#f6ad55'
+                }}
+              >
+                [↻] REFRESH BALANCE
+              </button>
             </div>
           </div>
           
