@@ -137,7 +137,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
         width: '100%',
         maxHeight: '600px',
         overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        padding: '24px',
+        color: 'white'
       }}>
         {/* Header */}
         <div style={{
