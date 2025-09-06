@@ -1684,6 +1684,11 @@ export default function TurfLootTactical() {
           // Use existing hathoraClient from lib/hathoraClient.js
           const { default: hathoraClient } = await import('../lib/hathoraClient.js')
           
+          // Update loading progress
+          if (statusElement) statusElement.textContent = 'Initializing Hathora client...'
+          if (progressBar) progressBar.style.width = '50%'
+          if (progressText) progressText.textContent = '50%'
+          
           // Initialize client
           const initialized = await hathoraClient.initialize()
           if (!initialized) {
@@ -1692,6 +1697,11 @@ export default function TurfLootTactical() {
           
           console.log('🔐 Hathora client initialized successfully')
           
+          // Update loading progress
+          if (statusElement) statusElement.textContent = 'Creating multiplayer room...'
+          if (progressBar) progressBar.style.width = '75%'
+          if (progressText) progressText.textContent = '75%'
+          
           // Create actual Hathora room process 
           console.log('🚀 Creating Hathora room process for global multiplayer...')
           const finalRoomId = await hathoraClient.createOrJoinRoom(null, 'practice')
@@ -1699,6 +1709,11 @@ export default function TurfLootTactical() {
           console.log('✅ Hathora room process created successfully:', finalRoomId)
           let roomCreated = true
           let finalRegion = hathoraClient.getPreferredRegion()
+          
+          // Update loading progress to complete
+          if (statusElement) statusElement.textContent = 'Room ready! Launching game...'
+          if (progressBar) progressBar.style.width = '100%'
+          if (progressText) progressText.textContent = '100%'
           
           if (roomCreated) {
             console.log('🎉 Room successfully created in ' + finalRegion)
