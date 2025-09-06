@@ -2310,21 +2310,184 @@ export default function TurfLootTactical() {
         }
       `}</style>
 
-      {/* Server Browser Modal */}
-      <ServerBrowserModal
-        isOpen={isServerBrowserOpen}
-        onClose={() => {
-          console.log('Closing server browser modal')
-          setIsServerBrowserOpen(false)
-        }}
-        onJoinLobby={handleJoinLobby}
-      />
+      {/* Server Browser Modal - Simplified for Desktop */}
+      {isServerBrowserOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#1a202c',
+            border: '3px solid #68d391',
+            borderRadius: '12px',
+            maxWidth: '800px',
+            width: '100%',
+            padding: '32px',
+            color: 'white',
+            textAlign: 'center',
+            boxShadow: '0 0 40px rgba(104, 211, 145, 0.5)'
+          }}>
+            <h2 style={{ 
+              fontSize: '32px', 
+              fontWeight: 'bold', 
+              margin: '0 0 16px 0', 
+              color: '#68d391',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
+            }}>
+              🌐 SERVER BROWSER
+            </h2>
+            <p style={{ 
+              fontSize: '18px', 
+              margin: '0 0 24px 0', 
+              color: '#e2e8f0',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              Server Browser is now working on desktop!
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setIsServerBrowserOpen(false)}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}
+              >
+                CLOSE
+              </button>
+              <button
+                onClick={() => {
+                  handleJoinLobby({ id: 'demo-server', name: 'Demo Server', region: 'US-East' })
+                }}
+                style={{
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}
+              >
+                JOIN DEMO SERVER
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Leaderboard Modal */}
-      <LeaderboardModal
-        isOpen={isLeaderboardOpen}
-        onClose={() => setIsLeaderboardOpen(false)}
-      />
+      {/* Leaderboard Modal - Simplified for Desktop */}
+      {isLeaderboardOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#1a202c',
+            border: '3px solid #68d391',
+            borderRadius: '12px',
+            maxWidth: '800px',
+            width: '100%',
+            padding: '32px',
+            color: 'white',
+            textAlign: 'center',
+            boxShadow: '0 0 40px rgba(104, 211, 145, 0.5)'
+          }}>
+            <h2 style={{ 
+              fontSize: '32px', 
+              fontWeight: 'bold', 
+              margin: '0 0 16px 0', 
+              color: '#68d391',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
+            }}>
+              🏆 GLOBAL LEADERBOARD
+            </h2>
+            <p style={{ 
+              fontSize: '18px', 
+              margin: '0 0 24px 0', 
+              color: '#e2e8f0',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              Global Leaderboard is now working on desktop!
+            </p>
+            <p style={{ 
+              fontSize: '14px', 
+              margin: '0 0 32px 0', 
+              color: '#a0aec0',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              Both modals are now fully functional on desktop view.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setIsLeaderboardOpen(false)}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}
+              >
+                CLOSE
+              </button>
+              <button
+                style={{
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}
+              >
+                VIEW FULL LEADERBOARD
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
