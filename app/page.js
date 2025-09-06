@@ -11,6 +11,8 @@ export default function TurfLootTactical() {
   const [isMobile, setIsMobile] = useState(false)
   const [activeFriends, setActiveFriends] = useState(0)
   const [leaderboard, setLeaderboard] = useState([])
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState(null)
 
   // Stable random values for background animations (client-side only)
   const [floatingElements, setFloatingElements] = useState([])
