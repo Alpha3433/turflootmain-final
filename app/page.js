@@ -1133,7 +1133,7 @@ export default function TurfLootTactical() {
               border: '2px solid #fc8181'
             }}>👥</div>
             <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>PARTY</h3>
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+            <div style={{ marginLeft: 'auto' }}>
               <button 
                 onClick={() => {
                   // Refresh friends list logic
@@ -1162,7 +1162,6 @@ export default function TurfLootTactical() {
               >
                 [↻] REFRESH
               </button>
-              <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>{activeFriends} ACTIVE</span>
             </div>
           </div>
           
