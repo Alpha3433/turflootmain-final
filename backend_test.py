@@ -297,8 +297,8 @@ class HathoraRoomCreationTester:
                             # Clean up
                             try:
                                 self.session.post(f"{API_BASE}/game-sessions/leave", json={
-                                    'sessionId': data.get('sessionId'),
-                                    'userId': f'test-auth-user-{i}'
+                                    'roomId': 'global-practice-bots',
+                                    'playerId': f'test-auth-user-{i}'
                                 })
                             except:
                                 pass
