@@ -116,42 +116,97 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 99999 }}>
-      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-gray-700 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        
-        {/* Simplified Header for Testing */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl flex items-center justify-center">
-              <span className="text-2xl">🌐</span>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Server Browser</h2>
-              <p className="text-gray-400 text-sm">Choose your battleground</p>
-            </div>
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 99999,
+      padding: '20px'
+    }}>
+      <div style={{
+        backgroundColor: '#1f2937',
+        border: '2px solid #374151',
+        borderRadius: '16px',
+        maxWidth: '800px',
+        width: '100%',
+        maxHeight: '600px',
+        padding: '24px',
+        color: 'white'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          borderBottom: '1px solid #374151',
+          paddingBottom: '16px'
+        }}>
+          <div>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>🌐 Server Browser</h2>
+            <p style={{ color: '#9ca3af', fontSize: '14px', margin: '4px 0 0 0' }}>Choose your battleground</p>
           </div>
-          
-          {/* Close Button */}
           <button
             onClick={onClose}
-            className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            style={{
+              backgroundColor: '#374151',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px',
+              color: '#9ca3af',
+              cursor: 'pointer',
+              fontSize: '18px'
+            }}
           >
-            <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            ✕
           </button>
         </div>
 
-        {/* Simplified Content */}
-        <div className="p-6">
-          <div className="text-white text-center">
-            <h3 className="text-xl mb-4">Server Browser is Working!</h3>
-            <p className="text-gray-400 mb-4">This modal is successfully opening when you click the SERVER BROWSER button.</p>
+        {/* Content */}
+        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <h3 style={{ fontSize: '20px', marginBottom: '16px', color: '#10b981' }}>
+            🎉 Server Browser is Working!
+          </h3>
+          <p style={{ color: '#9ca3af', marginBottom: '24px' }}>
+            This modal successfully opens when you click the SERVER BROWSER button.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all"
+              style={{
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 24px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
             >
               Close Modal
+            </button>
+            <button
+              onClick={() => {
+                // Demo join functionality
+                onJoinLobby({ id: 'demo-server', name: 'Demo Server', region: 'US-East' })
+              }}
+              style={{
+                backgroundColor: '#10b981',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 24px',
+                fontWeight: 'bold',
+                cursor: 'pointer'
+              }}
+            >
+              Join Demo Server
             </button>
           </div>
         </div>
