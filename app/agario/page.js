@@ -370,20 +370,46 @@ const AgarIOGame = () => {
     // HATHORA MULTIPLAYER: Handle Hathora-specific connections from server browser
     if (paramMultiplayer === 'hathora' && paramRoomId) {
       console.log('🌍 Hathora multiplayer mode detected - connecting to Hathora lobby:', paramRoomId)
+      console.log('🏗️ Using Hathora App ID:', paramHathoraApp || 'app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb')
       
       // Set game state for Hathora multiplayer
       setRoomId(paramRoomId)
       setGameMode(paramMode)
       setEntryFee(paramFee)
       
-      // Connect to Hathora multiplayer directly
+      // Connect to Hathora multiplayer directly with the working build
       if (user && getAccessToken) {
         console.log('✅ Authenticated user - initializing Hathora multiplayer connection')
-        // Use the existing initializeMultiplayer function but with Hathora lobby ID
-        initializeMultiplayer(paramRoomId, 1, null, false, true) // Last param = force Hathora
+        console.log('🚀 Connecting to working Hathora build (ID: 2) for global multiplayer')
+        
+        // Initialize with Hathora using the working build
+        try {
+          const hathoraClientModule = await import('@/lib/hathoraClient.js')
+          const hathoraClient = hathoraClientModule.default
+          
+          // Initialize Hathora with the working build configuration
+          const initialized = await hathoraClient.initialize()
+          if (initialized) {
+            console.log('🎯 Hathora client initialized successfully')
+            // Connect to the existing room or create a new one
+            const connectionInfo = await hathoraClient.createOrJoinRoom(user.id, paramMode || 'practice')
+            console.log('🌐 Hathora connection established:', connectionInfo)
+            
+            // Use the connection info to start the multiplayer game
+            initializeMultiplayer(paramRoomId, 1, null, false, true) // Force Hathora connection
+          } else {
+            console.log('⚠️ Hathora initialization failed, using fallback')
+            initializeGame() // Fallback to local game
+          }
+        } catch (error) {
+          console.error('❌ Hathora connection error:', error)
+          console.log('🔄 Falling back to local game mode')
+          initializeGame()
+        }
       } else {
         console.log('⚠️ User not authenticated - prompting login for multiplayer')
         // Could redirect to login or show login modal
+        alert('Please login to join multiplayer games.')
       }
       return
     }
