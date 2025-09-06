@@ -3559,8 +3559,12 @@ export default function TurfLootTactical() {
                 WebkitTextFillColor: 'transparent',
                 marginBottom: '2px',
                 fontFamily: '"Rajdhani", sans-serif'
-              }}>$0.00</div>
-              <div style={{ color: '#f6ad55', fontSize: '9px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>0.0000 SOL</div>
+              }}>
+                {walletBalance.loading ? 'Loading...' : `$${walletBalance.usd}`}
+              </div>
+              <div style={{ color: '#f6ad55', fontSize: '9px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
+                {walletBalance.loading ? 'Loading...' : `${walletBalance.sol} SOL`}
+              </div>
             </div>
             
             <div style={{ display: 'flex', gap: '6px' }}>
