@@ -686,7 +686,6 @@ export default function TurfLootTactical() {
 
     // Add interactivity
     let selectedPrivacy = 'public'
-    let selectedMaxPlayers = 4
 
     // Privacy option selection
     const publicOption = modal.querySelector('#public-option')
