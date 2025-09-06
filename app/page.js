@@ -2319,6 +2319,14 @@ export default function TurfLootTactical() {
         }}
         onJoinLobby={handleJoinLobby}
       />
+
+      {/* Leaderboard Modal */}
+      <UserProfile
+        isOpen={isLeaderboardOpen}
+        onClose={() => setIsLeaderboardOpen(false)}
+        user={user}
+        initialTab="leaderboard"
+      />
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
