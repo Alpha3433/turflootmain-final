@@ -1685,7 +1685,7 @@ export default function TurfLootTactical() {
           const roomConfig = {
             gameMode: 'global_multiplayer',
             maxPlayers: 8,
-            roomName: \`Global Room \${Math.floor(Math.random() * 1000)}\`,
+            roomName: 'Global Room ' + Math.floor(Math.random() * 1000),
             region: server.region || 'us-east',
             timestamp: Date.now()
           }
