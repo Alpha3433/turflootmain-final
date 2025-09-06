@@ -63,9 +63,23 @@ export default function TurfLootTactical() {
     // Leaderboard will be populated when users actually cash out
     // For now, it remains empty to show "LOADING LEADERBOARD..." state
     
+    // Check for Privy authentication state
+    const checkPrivyAuth = () => {
+      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
+        const privyState = window.__TURFLOOT_PRIVY__
+        setIsAuthenticated(privyState.authenticated || false)
+        setUser(privyState.user || null)
+      }
+    }
+    
+    // Check auth state periodically
+    checkPrivyAuth()
+    const authCheckInterval = setInterval(checkPrivyAuth, 1000)
+    
     return () => {
       window.removeEventListener('resize', checkMobile)
       clearTimeout(friendsTimer)
+      clearInterval(authCheckInterval)
     }
   }, [])
 
