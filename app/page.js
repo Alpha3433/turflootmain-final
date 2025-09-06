@@ -1656,7 +1656,7 @@ export default function TurfLootTactical() {
       })
     }
 
-    // Join server function - Updated to work with existing Hathora deployments
+    // Join server function - Updated with loading popup
     const joinServer = async (server) => {
       console.log('🎮 Joining server:', server)
       
@@ -1665,22 +1665,38 @@ export default function TurfLootTactical() {
         console.log('🚀 Direct game entry for Global Multiplayer server via Hathora')
         popup.remove()
         
+        // Show loading popup
+        const loadingPopup = createGameLoadingPopup()
+        
         try {
-          // Connect directly to Hathora with a fallback approach
-          console.log('🌍 Connecting to Hathora multiplayer servers...')
-          
-          // Generate a room ID for Hathora connection
-          const roomId = `room-${Math.random().toString(36).substring(2, 15)}`
-          console.log('🎯 Generated room ID for Hathora:', roomId)
-          
-          // Redirect to game with Hathora parameters - the game will handle Hathora connection
-          const gameUrl = `/agario?roomId=${roomId}&mode=practice&fee=0&region=${server.region || 'us-east'}&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb`
-          console.log('🎮 Redirecting to Hathora multiplayer game:', gameUrl)
-          window.location.href = gameUrl
+          // Wait for loading animation to complete (about 7 seconds)
+          setTimeout(() => {
+            // Connect directly to Hathora with a fallback approach
+            console.log('🌍 Connecting to Hathora multiplayer servers...')
+            
+            // Generate a room ID for Hathora connection
+            const roomId = `room-${Math.random().toString(36).substring(2, 15)}`
+            console.log('🎯 Generated room ID for Hathora:', roomId)
+            
+            // Remove loading popup and redirect to game
+            if (loadingPopup && loadingPopup.cleanup) {
+              loadingPopup.cleanup()
+            }
+            
+            // Redirect to game with Hathora parameters - the game will handle Hathora connection
+            const gameUrl = `/agario?roomId=${roomId}&mode=practice&fee=0&region=${server.region || 'us-east'}&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb`
+            console.log('🎮 Redirecting to Hathora multiplayer game:', gameUrl)
+            window.location.href = gameUrl
+          }, 7000) // Wait for loading animation to complete
           
         } catch (error) {
           console.error('❌ Hathora connection setup failed:', error)
           console.log('🔄 Falling back to direct game connection')
+          
+          // Remove loading popup
+          if (loadingPopup && loadingPopup.cleanup) {
+            loadingPopup.cleanup()
+          }
           
           // Fallback to direct game connection if Hathora setup fails
           const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'us-east'}&multiplayer=fallback`
@@ -1689,26 +1705,42 @@ export default function TurfLootTactical() {
         return
       }
       
-      // For other servers, show confirmation message first and use Hathora if available
+      // For other servers, show confirmation message first
       const serverType = server.stake > 0 ? 'paid' : 'free'
       const message = `Joining ${server.name}!\n\nRegion: ${server.region}\nMode: ${server.mode}\nPlayers: ${server.currentPlayers}/${server.maxPlayers}${server.stake > 0 ? `\nStake: $${server.stake}` : ''}\n\nConnecting via Hathora multiplayer infrastructure.`
       
       alert(message)
       popup.remove()
       
+      // Show loading popup for other servers too
+      const loadingPopup = createGameLoadingPopup()
+      
       try {
-        // Generate room ID for other servers too
-        const roomId = `room-${server.id}-${Math.random().toString(36).substring(2, 10)}`
-        console.log('🌍 Setting up Hathora connection for server:', server.name, 'Room:', roomId)
-        
-        // Redirect with Hathora parameters
-        const gameMode = server.mode || 'practice'
-        const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb`
-        console.log('🎮 Redirecting to Hathora multiplayer:', gameUrl)
-        window.location.href = gameUrl
+        // Wait for loading animation
+        setTimeout(() => {
+          // Generate room ID for other servers too
+          const roomId = `room-${server.id}-${Math.random().toString(36).substring(2, 10)}`
+          console.log('🌍 Setting up Hathora connection for server:', server.name, 'Room:', roomId)
+          
+          // Remove loading popup
+          if (loadingPopup && loadingPopup.cleanup) {
+            loadingPopup.cleanup()
+          }
+          
+          // Redirect with Hathora parameters
+          const gameMode = server.mode || 'practice'
+          const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb`
+          console.log('🎮 Redirecting to Hathora multiplayer:', gameUrl)
+          window.location.href = gameUrl
+        }, 7000)
         
       } catch (error) {
         console.error('❌ Hathora setup failed for server, using fallback:', error)
+        
+        // Remove loading popup
+        if (loadingPopup && loadingPopup.cleanup) {
+          loadingPopup.cleanup()
+        }
         
         // Fallback to direct connection
         const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=direct`
