@@ -9,6 +9,7 @@ export default function TurfLootTactical() {
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('anth')
   const [isMobile, setIsMobile] = useState(false)
+  const [activeFriends, setActiveFriends] = useState(0)
 
   // Stable random values for background animations (client-side only)
   const [floatingElements, setFloatingElements] = useState([])
