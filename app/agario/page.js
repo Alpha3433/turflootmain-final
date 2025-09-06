@@ -807,10 +807,10 @@ const TacticalAgarIO = () => {
         </div>
       )}
 
-      {/* HUD Toggle */}
+      {/* HUD Toggle - Desktop Only */}
       <button
         onClick={() => setHudVisible(!hudVisible)}
-        className="absolute top-4 right-40 bg-gray-900 bg-opacity-80 hover:bg-gray-800 text-gray-300 p-2 rounded border border-gray-600 transition-all"
+        className="hidden md:block absolute top-4 right-40 bg-gray-900 bg-opacity-80 hover:bg-gray-800 text-gray-300 p-2 rounded border border-gray-600 transition-all"
       >
         {hudVisible ? '🔽' : '🔼'}
       </button>
