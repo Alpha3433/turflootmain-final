@@ -1118,7 +1118,7 @@ export default function TurfLootTactical() {
             </div>
           </div>
           
-          <div style={{ textAlign: 'center', padding: '32px 0' }}>
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
             <div style={{
               width: '56px',
               height: '56px',
