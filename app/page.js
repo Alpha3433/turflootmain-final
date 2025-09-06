@@ -52,8 +52,14 @@ export default function TurfLootTactical() {
     
     // Live stats will be updated when users join/leave games and cash out
     
+    // Simulate friends coming online after a delay
+    const friendsTimer = setTimeout(() => {
+      setActiveFriends(2) // Simulate 2 friends coming online
+    }, 5000) // After 5 seconds
+    
     return () => {
       window.removeEventListener('resize', checkMobile)
+      clearTimeout(friendsTimer)
     }
   }, [])
 
