@@ -1441,7 +1441,7 @@ export default function TurfLootTactical() {
           console.log('🌍 Initializing Hathora client for global multiplayer...')
           
           // Import Hathora client dynamically
-          const { default: TurfLootHathoraClient } = await import('/lib/hathoraClient.js')
+          const { TurfLootHathoraClient } = await import('@/lib/hathoraClient.js')
           const hathoraClient = new TurfLootHathoraClient()
           
           // Initialize Hathora connection
