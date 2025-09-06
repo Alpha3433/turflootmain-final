@@ -1787,7 +1787,8 @@ export default function TurfLootTactical() {
       
       // For other servers, show confirmation and create room on-demand too
       const serverType = server.stake > 0 ? 'paid' : 'free'
-      const message = \`Joining \${server.name}!\n\nRegion: \${server.region}\nMode: \${server.mode}\nPlayers: \${server.currentPlayers}/\${server.maxPlayers}\${server.stake > 0 ? \`\nStake: $\${server.stake}\` : ''}\n\nCreating dedicated room for your session...\`
+      const stakeInfo = server.stake > 0 ? '\nStake: $' + server.stake : ''
+      const message = 'Joining ' + server.name + '!\n\nRegion: ' + server.region + '\nMode: ' + server.mode + '\nPlayers: ' + server.currentPlayers + '/' + server.maxPlayers + stakeInfo + '\n\nCreating dedicated room for your session...'
       
       alert(message)
       popup.remove()
