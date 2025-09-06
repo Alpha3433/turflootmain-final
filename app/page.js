@@ -908,8 +908,10 @@ export default function TurfLootTactical() {
               />
               <div 
                 onClick={() => {
-                  // Username confirmed - you can add any confirmation logic here
-                  console.log('Username confirmed:', userName)
+                  // Username confirmed - set the custom username to override any authenticated name
+                  const currentInputValue = customUsername || userName
+                  setCustomUsername(currentInputValue)
+                  console.log('Username confirmed and set:', currentInputValue)
                 }}
                 style={{
                   width: '48px',
