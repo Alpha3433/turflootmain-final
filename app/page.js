@@ -670,20 +670,6 @@ export default function TurfLootTactical() {
           </div>
         </div>
 
-        <!-- Max Players Setting -->
-        <div style="margin-bottom: 32px;">
-          <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px;">
-            MAX PLAYERS
-          </label>
-          <div style="display: flex; gap: 8px;">
-            ${[2, 4, 6, 8].map(num => `
-              <div style="flex: 1; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid ${num === 4 ? '#fc8181' : '#4a5568'}; border-radius: 8px; cursor: pointer; text-align: center; color: ${num === 4 ? '#fc8181' : '#a0aec0'}; font-weight: 600;" class="max-players-option" data-players="${num}">
-                ${num}
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
         <!-- Action Buttons -->
         <div style="display: flex; gap: 12px;">
           <button id="cancel-create-party" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
