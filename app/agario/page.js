@@ -12,26 +12,8 @@ const AgarIOGame = () => {
   const socketRef = useRef(null)
   const lastMousePosition = useRef({ x: 0, y: 0 }) // Track mouse for split direction
   const router = useRouter()
-  
-  // Safe hook usage with error handling
-  let settings = {}
-  let user = null
-  let getAccessToken = null
-  
-  try {
-    const gameSettings = useGameSettings()
-    settings = gameSettings?.settings || {}
-  } catch (error) {
-    console.warn('GameSettingsProvider not available:', error)
-  }
-  
-  try {
-    const privyHooks = usePrivy()
-    user = privyHooks?.user || null
-    getAccessToken = privyHooks?.getAccessToken || null
-  } catch (error) {
-    console.warn('Privy not available:', error)
-  }
+  const { settings } = useGameSettings()  // Add settings hook
+  const { user, getAccessToken } = usePrivy() // Add Privy auth
   
   // Pure Hathora ping monitoring for real-time in-game latency
   const [currentRegion, setCurrentRegion] = useState('Detecting...')
