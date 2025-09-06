@@ -616,11 +616,11 @@ const TacticalAgarIO = () => {
         style={{ background: '#0a0a0a' }}
       />
 
-      {/* WORKING Tactical HUD */}
+      {/* DESKTOP ONLY - Tactical HUD */}
       {hudVisible && gameRunning && operativeAlive && (
         <>
-          {/* Operative Status */}
-          <div className="absolute top-4 left-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-green-500 min-w-64 shadow-xl">
+          {/* Operative Status - Desktop Only */}
+          <div className="hidden md:block absolute top-4 left-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-green-500 min-w-64 shadow-xl">
             <div className="px-4 py-2 border-b border-green-500 bg-green-900 bg-opacity-30">
               <div className="text-green-400 font-bold text-sm flex items-center gap-2">
                 <span>🎖️</span>
@@ -643,8 +643,8 @@ const TacticalAgarIO = () => {
             </div>
           </div>
 
-          {/* Radar */}
-          <div className="absolute top-4 right-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-cyan-500 w-32 h-32 shadow-xl">
+          {/* Radar - Desktop Only */}
+          <div className="hidden md:block absolute top-4 right-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-cyan-500 w-32 h-32 shadow-xl">
             <div className="p-2 h-full">
               <div className="text-cyan-400 text-xs mb-1 text-center font-bold">RADAR</div>
               <div className="relative w-full h-20 bg-gray-800 rounded border border-cyan-500 bg-opacity-50">
