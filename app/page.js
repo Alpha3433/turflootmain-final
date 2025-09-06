@@ -1428,32 +1428,89 @@ export default function TurfLootTactical() {
     }
 
     // Join server function
-    const joinServer = (server) => {
+    const joinServer = async (server) => {
       console.log('🎮 Joining server:', server)
       
-      // Check if this is the Global Multiplayer (US East) server - go directly to game
+      // Check if this is the Global Multiplayer (US East) server - go directly to game with Hathora
       if (server.id === 'global-practice-bots' || server.name.includes('Global Multiplayer')) {
-        console.log('🚀 Direct game entry for Global Multiplayer server')
+        console.log('🚀 Direct game entry for Global Multiplayer server via Hathora')
         popup.remove()
         
-        // Redirect directly to game without confirmation
-        const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'us-east'}`
-        console.log('🎮 Redirecting to game:', gameUrl)
-        window.location.href = gameUrl
+        try {
+          // Initialize Hathora client for multiplayer
+          console.log('🌍 Initializing Hathora client for global multiplayer...')
+          
+          // Import Hathora client dynamically
+          const { default: TurfLootHathoraClient } = await import('/lib/hathoraClient.js')
+          const hathoraClient = new TurfLootHathoraClient()
+          
+          // Initialize Hathora connection
+          const initialized = await hathoraClient.initialize()
+          if (!initialized) {
+            console.log('⚠️ Hathora not available, using local fallback')
+            // Fallback to regular game URL
+            const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'us-east'}&multiplayer=local`
+            window.location.href = gameUrl
+            return
+          }
+          
+          // Create or join Hathora lobby for global multiplayer
+          console.log('🎯 Creating Hathora lobby for global multiplayer...')
+          const lobbyId = await hathoraClient.createOrJoinRoom(null, 'practice')
+          console.log('✅ Hathora lobby created/joined:', lobbyId)
+          
+          // Redirect to game with Hathora lobby ID
+          const gameUrl = `/agario?roomId=${lobbyId}&mode=practice&fee=0&region=${server.region || 'us-east'}&multiplayer=hathora&server=global`
+          console.log('🎮 Redirecting to Hathora multiplayer game:', gameUrl)
+          window.location.href = gameUrl
+          
+        } catch (error) {
+          console.error('❌ Hathora connection failed:', error)
+          console.log('🔄 Falling back to direct game connection')
+          
+          // Fallback to direct game connection if Hathora fails
+          const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'us-east'}&multiplayer=fallback`
+          window.location.href = gameUrl
+        }
         return
       }
       
-      // For other servers, show confirmation message first
+      // For other servers, show confirmation message first and use Hathora if available
       const serverType = server.stake > 0 ? 'paid' : 'free'
-      const message = `Joining ${server.name}!\n\nRegion: ${server.region}\nMode: ${server.mode}\nPlayers: ${server.currentPlayers}/${server.maxPlayers}${server.stake > 0 ? `\nStake: $${server.stake}` : ''}`
+      const message = `Joining ${server.name}!\n\nRegion: ${server.region}\nMode: ${server.mode}\nPlayers: ${server.currentPlayers}/${server.maxPlayers}${server.stake > 0 ? `\nStake: $${server.stake}` : ''}\n\nUsing Hathora multiplayer for real-time gameplay.`
       
       alert(message)
       popup.remove()
       
-      // Redirect to game with server parameters
-      const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}`
-      console.log('🎮 Redirecting to game:', gameUrl)
-      window.location.href = gameUrl
+      try {
+        // Try to use Hathora for all multiplayer servers
+        console.log('🌍 Attempting Hathora connection for server:', server.name)
+        
+        const { default: TurfLootHathoraClient } = await import('/lib/hathoraClient.js')
+        const hathoraClient = new TurfLootHathoraClient()
+        
+        const initialized = await hathoraClient.initialize()
+        if (initialized) {
+          console.log('✅ Hathora initialized, creating lobby...')
+          const gameMode = server.mode || 'practice'
+          const lobbyId = await hathoraClient.createOrJoinRoom(null, gameMode)
+          
+          // Redirect with Hathora lobby
+          const gameUrl = `/agario?roomId=${lobbyId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}`
+          console.log('🎮 Redirecting to Hathora multiplayer:', gameUrl)
+          window.location.href = gameUrl
+        } else {
+          throw new Error('Hathora initialization failed')
+        }
+        
+      } catch (error) {
+        console.error('❌ Hathora failed for server, using fallback:', error)
+        
+        // Fallback to direct connection
+        const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=direct`
+        console.log('🎮 Redirecting to direct game:', gameUrl)
+        window.location.href = gameUrl
+      }
     }
 
     // Search functionality
