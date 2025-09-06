@@ -385,6 +385,79 @@ export default function TurfLootTactical() {
     fetchWalletBalance()
   }
 
+  // Copy wallet address to clipboard
+  const handleCopyAddress = async () => {
+    try {
+      console.log('📋 Copy address button clicked')
+      
+      // Check if Privy is available and user is authenticated
+      if (!window.__TURFLOOT_PRIVY__ || !window.__TURFLOOT_PRIVY__.authenticated) {
+        alert('Please login first to copy your wallet address.')
+        return
+      }
+      
+      const privy = window.__TURFLOOT_PRIVY__
+      const user = privy.user
+      
+      if (!user || !user.wallet || !user.wallet.address) {
+        alert('No wallet address found. Please ensure your wallet is connected.')
+        return
+      }
+      
+      const walletAddress = user.wallet.address
+      console.log('📋 Copying wallet address:', walletAddress)
+      
+      // Copy to clipboard using modern API
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(walletAddress)
+          console.log('✅ Address copied to clipboard via Clipboard API')
+          
+          // Show success feedback
+          alert(`Wallet address copied to clipboard!\n\n${walletAddress}`)
+        } catch (clipboardError) {
+          console.log('⚠️ Clipboard API failed, trying fallback method')
+          copyToClipboardFallback(walletAddress)
+        }
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        copyToClipboardFallback(walletAddress)
+      }
+      
+    } catch (error) {
+      console.error('❌ Error copying wallet address:', error)
+      alert('Failed to copy wallet address. Please try again.')
+    }
+  }
+
+  // Fallback clipboard copy method
+  const copyToClipboardFallback = (text) => {
+    try {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      
+      const successful = document.execCommand('copy')
+      document.body.removeChild(textArea)
+      
+      if (successful) {
+        console.log('✅ Address copied to clipboard via fallback method')
+        alert(`Wallet address copied to clipboard!\n\n${text}`)
+      } else {
+        console.log('❌ Fallback copy method failed')
+        alert(`Failed to copy automatically. Your wallet address is:\n\n${text}\n\nPlease copy it manually.`)
+      }
+    } catch (fallbackError) {
+      console.error('❌ Fallback copy method error:', fallbackError)
+      alert(`Failed to copy automatically. Your wallet address is:\n\n${text}\n\nPlease copy it manually.`)
+    }
+  }
+
   // Wallet operations with Privy integration
   const handleDeposit = async () => {
     try {
