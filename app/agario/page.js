@@ -4541,12 +4541,18 @@ const AgarIOGame = () => {
   } // End initializeGame function
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden">
+    <div className="fixed inset-0 w-full h-full bg-black overflow-hidden" style={{ background: '#000000' }}>
       {/* Game Canvas */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 cursor-crosshair"
-        style={{ display: isGameOver ? 'none' : 'block' }}
+        className="absolute inset-0 cursor-crosshair bg-black"
+        style={{ 
+          display: isGameOver ? 'none' : 'block',
+          width: '100%',
+          height: '100%',
+          background: '#000000',
+          zIndex: 1
+        }}
       />
       
       {/* Multiplayer Status - Desktop Only */}
