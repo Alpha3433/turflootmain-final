@@ -1115,7 +1115,9 @@ export default function TurfLootTactical() {
             )}
           </div>
           
-          <button style={{
+          <button 
+            onClick={() => setIsLeaderboardOpen(true)}
+            style={{
             width: '100%',
             padding: '6px',
             background: 'rgba(26, 32, 44, 0.8)',
