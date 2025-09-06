@@ -1160,7 +1160,7 @@ export default function TurfLootTactical() {
         {/* Bottom Right - Loadout */}
         <div style={{
           position: 'absolute',
-          right: '60px',
+          right: '200px',
           bottom: '120px',
           width: '280px',
           zIndex: 20,
