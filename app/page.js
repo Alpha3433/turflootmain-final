@@ -1484,7 +1484,9 @@ export default function TurfLootTactical() {
           transform: 'translateX(-50%)',
           zIndex: 20
         }}>
-          <button style={{
+          <button 
+            onClick={() => window.open('https://discord.gg/WbGTJPPTPs', '_blank')}
+            style={{
             padding: '12px 24px',
             background: 'linear-gradient(45deg, #5865f2 0%, #4338ca 100%)',
             color: '#ffffff',
@@ -1499,7 +1501,16 @@ export default function TurfLootTactical() {
             transition: 'all 0.3s ease',
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
-          }}>
+          }}
+            onMouseOver={(e) => {
+              e.target.style.transform = 'scale(1.05)'
+              e.target.style.boxShadow = '0 0 35px rgba(88, 101, 242, 0.7)'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.transform = 'scale(1)'
+              e.target.style.boxShadow = '0 0 25px rgba(88, 101, 242, 0.5)'
+            }}
+          >
             📡 DISCORD
           </button>
         </div>
