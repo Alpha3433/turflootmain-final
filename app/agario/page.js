@@ -465,15 +465,15 @@ const AgarIOGame = () => {
       {gameStarted && !gameOver && (
         <>
           {/* Mission Timer - Top Center */}
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 rounded-lg px-6 py-3 border border-purple-500">
-            <div className="text-purple-400 text-xs font-bold mb-1 flex items-center gap-2">
+          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-80 rounded-lg px-4 py-2 border border-purple-500 z-10">
+            <div className="text-purple-400 text-xs font-bold mb-1 flex items-center gap-1">
               <span>⚡</span>
               <span>MISSION</span>
             </div>
-            <div className="text-white text-sm font-bold mb-2">Survive for 60 seconds</div>
-            <div className="bg-gray-700 rounded-full h-2 mb-2">
+            <div className="text-white text-sm font-bold mb-1">Survive for 60 seconds</div>
+            <div className="bg-gray-700 rounded-full h-1.5 mb-1">
               <div 
-                className="bg-purple-500 h-2 rounded-full transition-all duration-1000"
+                className="bg-purple-500 h-1.5 rounded-full transition-all duration-1000"
                 style={{ width: `${((60 - missionTime) / 60) * 100}%` }}
               />
             </div>
@@ -482,64 +482,51 @@ const AgarIOGame = () => {
             </div>
           </div>
 
-          {/* Connection Info - Top Right */}
-          <div className="absolute top-4 right-4 bg-black bg-opacity-70 rounded-lg px-4 py-2 border border-cyan-500">
-            <div className="text-cyan-400 text-xs font-bold">Oceania</div>
-            <div className="text-white text-xs">999ms ⚡</div>
-          </div>
-
-          {/* Leaderboard - Left Side */}
-          <div className="absolute top-4 left-4 bg-black bg-opacity-70 rounded-lg px-4 py-3 border border-yellow-500">
-            <div className="text-yellow-400 text-xs font-bold mb-2 flex items-center gap-2">
-              <span>🏆</span>
-              <span>Leaderboard</span>
-            </div>
-            <div className="text-white text-sm">
-              <div className="flex justify-between items-center">
-                <span>#1 You</span>
-                <span className="text-green-400">${score}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Mini Map - Top Right Corner */}
-          <div className="absolute top-20 right-4 w-32 h-32 bg-black bg-opacity-70 rounded-lg border border-cyan-500 p-2">
-            <div className="relative w-full h-full bg-gray-900 rounded">
+          {/* Mini Map - Top Right */}
+          <div className="absolute top-6 right-6 w-24 h-24 bg-black bg-opacity-80 rounded-lg border border-cyan-500 p-1 z-10">
+            <div className="relative w-full h-full bg-gray-900 rounded overflow-hidden">
               {/* Player dot on minimap */}
               <div 
-                className="absolute w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                className="absolute w-1.5 h-1.5 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 z-20"
                 style={{ 
                   left: `${getPlayerPosition().x}%`, 
                   top: `${getPlayerPosition().y}%` 
                 }}
               />
-              {/* Enemies on minimap */}
-              {gameRef.current?.enemies.map((enemy, i) => (
-                <div 
-                  key={i}
-                  className="absolute w-1 h-1 bg-red-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
-                  style={{ 
-                    left: `${(enemy.x / gameRef.current.world.width) * 100}%`, 
-                    top: `${(enemy.y / gameRef.current.world.height) * 100}%` 
-                  }}
-                />
-              ))}
+              {/* World border */}
+              <div className="absolute inset-0 border border-cyan-600 rounded"></div>
+            </div>
+            <div className="text-cyan-400 text-xs mt-1 text-center">Oceania</div>
+            <div className="text-white text-xs text-center">999ms ⚡</div>
+          </div>
+
+          {/* Leaderboard - Bottom Left */}
+          <div className="absolute bottom-6 left-6 bg-black bg-opacity-80 rounded-lg px-3 py-2 border border-yellow-500 z-10">
+            <div className="text-yellow-400 text-xs font-bold mb-1 flex items-center gap-1">
+              <span>🏆</span>
+              <span>Leaders</span>
+            </div>
+            <div className="text-white text-sm">
+              <div className="flex justify-between items-center">
+                <span>#1 You</span>
+                <span className="text-green-400 ml-2">${score}</span>
+              </div>
             </div>
           </div>
 
-          {/* Action Buttons - Right Side */}
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-4">
+          {/* Action Buttons - Bottom Right */}
+          <div className="absolute bottom-6 right-6 flex gap-3 z-10">
             <button 
               onClick={handleSplit}
-              className="w-20 h-20 bg-blue-600 rounded-full border-4 border-blue-400 text-white font-bold text-sm shadow-lg hover:bg-blue-700 transition-all flex flex-col items-center justify-center"
+              className="w-16 h-16 bg-blue-600 rounded-full border-3 border-blue-400 text-white font-bold text-xs shadow-lg hover:bg-blue-700 transition-all flex flex-col items-center justify-center"
             >
-              <span>⚡</span>
+              <span className="text-sm">⚡</span>
               <span>SPLIT</span>
             </button>
             <button 
-              className="w-20 h-20 bg-yellow-600 rounded-full border-4 border-yellow-400 text-white font-bold text-sm shadow-lg hover:bg-yellow-700 transition-all flex flex-col items-center justify-center"
+              className="w-16 h-16 bg-yellow-600 rounded-full border-3 border-yellow-400 text-white font-bold text-xs shadow-lg hover:bg-yellow-700 transition-all flex flex-col items-center justify-center"
             >
-              <span>$</span>
+              <span className="text-sm">$</span>
               <span>CASH</span>
               <span className="text-xs">${score}</span>
             </button>
