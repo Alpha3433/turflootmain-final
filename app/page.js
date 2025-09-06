@@ -1718,10 +1718,17 @@ export default function TurfLootTactical() {
           if (roomCreated) {
             console.log('🎉 Room successfully created in ' + finalRegion)
             
-            // Redirect to game with the newly created room immediately
-            const gameUrl = '/agario?roomId=' + finalRoomId + '&mode=practice&fee=0&region=' + finalRegion + '&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true'
-            console.log('🎮 Redirecting to newly created multiplayer room:', gameUrl)
-            window.location.href = gameUrl
+            // Wait a moment to show completion, then cleanup and redirect
+            setTimeout(() => {
+              if (loadingPopup && loadingPopup.cleanup) {
+                loadingPopup.cleanup()
+              }
+              
+              // Redirect to game with the newly created room
+              const gameUrl = '/agario?roomId=' + finalRoomId + '&mode=practice&fee=0&region=' + finalRegion + '&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true'
+              console.log('🎮 Redirecting to newly created multiplayer room:', gameUrl)
+              window.location.href = gameUrl
+            }, 1000) // Brief delay to show completion
             
           } else {
             throw new Error('Failed to create room in any region')
