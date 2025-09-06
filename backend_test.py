@@ -193,8 +193,8 @@ class HathoraRoomCreationTester:
             start_time = time.time()
             response = self.session.post(f"{API_BASE}/game-sessions/join", json={
                 'roomId': room_id,
-                'userId': 'test-user-hathora-room-creation',
-                'mode': 'practice'
+                'playerId': 'test-user-hathora-room-creation',
+                'playerName': 'HathoraTestUser'
             })
             response_time = time.time() - start_time
             
