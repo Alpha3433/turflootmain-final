@@ -1678,24 +1678,13 @@ export default function TurfLootTactical() {
           if (progressBar) progressBar.style.width = '25%'
           if (progressText) progressText.textContent = '25%'
           
-          // Create room on-demand using proper hathoraClient
-          console.log('🌍 Creating multiplayer room on-demand with TurfLoot Hathora Client...')
-          
-          // Use existing hathoraClient from lib/hathoraClient.js
-          const { default: hathoraClient } = await import('../lib/hathoraClient.js')
+          // Create room on-demand using proper hathoraClient via API
+          console.log('🌍 Creating multiplayer room on-demand with TurfLoot Hathora API...')
           
           // Update loading progress
-          if (statusElement) statusElement.textContent = 'Initializing Hathora client...'
+          if (statusElement) statusElement.textContent = 'Initializing room creation...'
           if (progressBar) progressBar.style.width = '50%'
           if (progressText) progressText.textContent = '50%'
-          
-          // Initialize client
-          const initialized = await hathoraClient.initialize()
-          if (!initialized) {
-            throw new Error('Failed to initialize Hathora client')
-          }
-          
-          console.log('🔐 Hathora client initialized successfully')
           
           // Update loading progress
           if (statusElement) statusElement.textContent = 'Creating multiplayer room...'
