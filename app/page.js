@@ -58,31 +58,12 @@ export default function TurfLootTactical() {
       setActiveFriends(2) // Simulate 2 friends coming online
     }, 5000) // After 5 seconds
     
-    // Initialize dynamic leaderboard with random cashout amounts
-    const initializeLeaderboard = () => {
-      const players = [
-        { name: 'PHANTOM_OPS', cashout: Math.floor(Math.random() * 10000) + 5000 },
-        { name: 'STORM_UNIT', cashout: Math.floor(Math.random() * 8000) + 4000 },
-        { name: 'VIPER_SQUAD', cashout: Math.floor(Math.random() * 6000) + 3000 },
-        { name: 'NIGHT_HAWK', cashout: Math.floor(Math.random() * 5000) + 2000 },
-        { name: 'STEEL_WOLF', cashout: Math.floor(Math.random() * 4000) + 1000 }
-      ]
-      // Sort by cashout amount descending and take top 3
-      const topPlayers = players.sort((a, b) => b.cashout - a.cashout).slice(0, 3)
-      setLeaderboard(topPlayers)
-    }
-    
-    initializeLeaderboard()
-    
-    // Update leaderboard every 10 seconds to simulate dynamic cashouts
-    const leaderboardTimer = setInterval(() => {
-      initializeLeaderboard()
-    }, 10000)
+    // Leaderboard will be populated when users actually cash out
+    // For now, it remains empty to show "LOADING LEADERBOARD..." state
     
     return () => {
       window.removeEventListener('resize', checkMobile)
       clearTimeout(friendsTimer)
-      clearInterval(leaderboardTimer)
     }
   }, [])
 
