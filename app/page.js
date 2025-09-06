@@ -978,7 +978,7 @@ export default function TurfLootTactical() {
           
           <button style={{
             width: '100%',
-            padding: '14px',
+            padding: '12px',
             background: 'rgba(26, 32, 44, 0.8)',
             border: '2px solid #68d391',
             borderRadius: '4px',
