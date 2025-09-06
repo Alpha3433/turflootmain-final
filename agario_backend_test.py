@@ -360,46 +360,46 @@ class AgarIOBackendTester:
         print("\n🔍 TESTING: Agar.io Specific Features")
         
         try:
-            # Test achievements system (relevant for Agar.io progression)
+            # Test wallet balance (for cash-out functionality in Agar.io)
             start_time = time.time()
-            response = self.session.get(f"{API_BASE}/achievements", timeout=10)
+            response = self.session.get(f"{API_BASE}/wallet/balance", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
-                achievements_data = response.json()
-                achievements = achievements_data.get('achievements', [])
+                balance_data = response.json()
+                balance = balance_data.get('balance', 0)
                 
                 self.log_test(
-                    "Achievements System", 
+                    "User Balance System", 
                     True, 
-                    f"Found {len(achievements)} achievements", 
+                    f"User balance: ${balance}", 
                     response_time
                 )
                 
-                # Test user balance (for cash-out functionality)
+                # Test leaderboard endpoint
                 start_time = time.time()
-                response = self.session.get(f"{API_BASE}/users/balance", timeout=10)
+                response = self.session.get(f"{API_BASE}/users/leaderboard", timeout=10)
                 response_time = time.time() - start_time
                 
                 if response.status_code == 200:
-                    balance_data = response.json()
-                    balance = balance_data.get('balance', 0)
+                    leaderboard_data = response.json()
+                    players = leaderboard_data.get('players', [])
                     return self.log_test(
-                        "User Balance System", 
+                        "Leaderboard System", 
                         True, 
-                        f"User balance: ${balance}", 
+                        f"Leaderboard with {len(players)} players", 
                         response_time
                     )
                 else:
                     return self.log_test(
-                        "User Balance System", 
+                        "Leaderboard System", 
                         False, 
                         f"HTTP {response.status_code}", 
                         response_time
                     )
             else:
                 return self.log_test(
-                    "Achievements System", 
+                    "User Balance System", 
                     False, 
                     f"HTTP {response.status_code}: {response.text[:100]}", 
                     response_time
