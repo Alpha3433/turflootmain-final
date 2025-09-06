@@ -446,38 +446,26 @@ const TacticalAgarIO = () => {
     }
   }, [gameInitialized])
 
-  // Game loop
+  // Initialize game engine
   useEffect(() => {
-    if (!gameRef.current) return
+    if (!canvasRef.current || gameInitialized) return
 
-    const gameLoop = () => {
-      if (gameRef.current?.running) {
-        gameRef.current.render()
-        
-        // Update tactical stats
-        if (gameRef.current.operative) {
-          setTacticalStats({
-            mass: Math.floor(gameRef.current.operative.mass),
-            assets: gameRef.current.operative.assets,
-            eliminations: gameRef.current.operative.eliminations,
-            kia: 0, // Will be updated on death
-            streak: gameRef.current.operative.eliminations,
-            resourcesCollected: gameRef.current.operative.assets,
-            missionTime: Math.floor((Date.now() - gameRef.current.lastUpdate) / 1000),
-            rank: '#1' // Placeholder
-          })
-        }
-      }
-      animationFrameRef.current = requestAnimationFrame(gameLoop)
-    }
+    const canvas = canvasRef.current
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
 
-    gameLoop()
+    const game = new TacticalGameEngine(canvas)
+    gameRef.current = game
+    
+    setGameInitialized(true)
+    game.start()
+
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [gameInitialized])
+  }, [])
 
   // Generate tactical objectives
   useEffect(() => {
