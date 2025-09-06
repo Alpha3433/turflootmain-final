@@ -1665,7 +1665,19 @@ export default function TurfLootTactical() {
         console.log('🚀 Direct game entry for Global Multiplayer server - creating room on-demand')
         popup.remove()
         
+        // Show loading popup during room creation
+        const loadingPopup = createGameLoadingPopup()
+        
         try {
+          // Update loading status
+          const statusElement = document.getElementById('loading-status')
+          const progressBar = document.getElementById('progress-bar')
+          const progressText = document.getElementById('progress-text')
+          
+          if (statusElement) statusElement.textContent = 'Connecting to Hathora servers...'
+          if (progressBar) progressBar.style.width = '25%'
+          if (progressText) progressText.textContent = '25%'
+          
           // Create room on-demand using proper hathoraClient
           console.log('🌍 Creating multiplayer room on-demand with TurfLoot Hathora Client...')
           
