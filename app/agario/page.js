@@ -4947,14 +4947,14 @@ const AgarIOGame = () => {
 
       {/* Game Over Screen - Ultra-Minimal Mobile Design */}
       {isGameOver && (
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-20 p-4">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 game-modal-overlay" style={{ zIndex: 1000 }}>
           {/* Ultra-Minimal Mobile Game Over Popup */}
           <div className={`
             ${isMobile 
               ? 'bg-black/95 backdrop-blur-sm rounded-2xl max-w-xs w-full border border-red-400/30 shadow-2xl' 
               : 'bg-gray-900 rounded-2xl p-8 border border-cyan-400/30 max-w-md'
             }
-          `}>
+          `} style={{ zIndex: 1001 }}>
             
             {isMobile ? (
               /* REDESIGNED: Enhanced Mobile Layout with Better Stats Display */
