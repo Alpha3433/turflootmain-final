@@ -1862,7 +1862,14 @@ export default function TurfLootTactical() {
                 style={nameInputStyle}
                 placeholder="USERNAME"
               />
-              <div style={{
+              <div 
+                onClick={() => {
+                  // Username confirmed - set the custom username to override any authenticated name
+                  const currentInputValue = customUsername || userName
+                  setCustomUsername(currentInputValue)
+                  console.log('Username confirmed and set:', currentInputValue)
+                }}
+                style={{
                 width: '36px',
                 height: '36px',
                 background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
@@ -1873,8 +1880,19 @@ export default function TurfLootTactical() {
                 color: '#1a202c',
                 fontWeight: '600',
                 boxShadow: '0 0 15px rgba(104, 211, 145, 0.6)',
-                border: '2px solid #68d391'
-              }}>
+                border: '2px solid #68d391',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+                onMouseOver={(e) => {
+                  e.target.style.transform = 'scale(1.05)'
+                  e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.8)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.transform = 'scale(1)'
+                  e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.6)'
+                }}
+              >
                 ✓
               </div>
             </div>
