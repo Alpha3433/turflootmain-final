@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import ServerBrowserModal from '@/components/ServerBrowserModal'
+import UserProfile from '@/components/UserProfile'
 
 export default function TurfLootTactical() {
   const router = useRouter()
