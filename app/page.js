@@ -1316,7 +1316,7 @@ export default function TurfLootTactical() {
           </div>
           
           <button 
-            onClick={() => setIsLeaderboardOpen(true)}
+            onClick={() => createDesktopLeaderboardPopup()}
             style={{
             width: '100%',
             padding: '6px',
