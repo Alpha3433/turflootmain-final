@@ -943,7 +943,7 @@ export default function TurfLootTactical() {
             </div>
           </div>
           
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.3)' }}>
               <span style={{ color: '#e2e8f0', fontSize: '15px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>01. ALPHA_STRIKE</span>
               <span style={{ 
