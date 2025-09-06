@@ -1431,8 +1431,19 @@ export default function TurfLootTactical() {
     const joinServer = (server) => {
       console.log('🎮 Joining server:', server)
       
-      // Here you would implement the actual server join logic
-      // For now, show success message and close popup
+      // Check if this is the Global Multiplayer (US East) server - go directly to game
+      if (server.id === 'global-practice-bots' || server.name.includes('Global Multiplayer')) {
+        console.log('🚀 Direct game entry for Global Multiplayer server')
+        popup.remove()
+        
+        // Redirect directly to game without confirmation
+        const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'us-east'}`
+        console.log('🎮 Redirecting to game:', gameUrl)
+        window.location.href = gameUrl
+        return
+      }
+      
+      // For other servers, show confirmation message first
       const serverType = server.stake > 0 ? 'paid' : 'free'
       const message = `Joining ${server.name}!\n\nRegion: ${server.region}\nMode: ${server.mode}\nPlayers: ${server.currentPlayers}/${server.maxPlayers}${server.stake > 0 ? `\nStake: $${server.stake}` : ''}`
       
@@ -1440,7 +1451,8 @@ export default function TurfLootTactical() {
       popup.remove()
       
       // Redirect to game with server parameters
-      const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}`
+      const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}`
+      console.log('🎮 Redirecting to game:', gameUrl)
       window.location.href = gameUrl
     }
 
