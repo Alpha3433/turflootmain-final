@@ -723,15 +723,17 @@ export default function TurfLootTactical() {
         return
       }
 
-      console.log('🎯 Creating party:', {
+      // Party is always limited to 2 players maximum
+      const partyData = {
         name: partyName,
         privacy: selectedPrivacy,
-        maxPlayers: selectedMaxPlayers
-      })
-
-      // Here you would typically make an API call to create the party
-      // For now, we'll show a success message and close
-      alert(`Party "${partyName}" created successfully!\\n\\nPrivacy: ${selectedPrivacy.toUpperCase()}\\nMax Players: ${selectedMaxPlayers}`)
+        maxPlayers: 2
+      }
+      
+      console.log('🎯 Creating party:', partyData)
+      // Here you would integrate with your party creation API
+      // For now, just show success and close popup
+      alert(`Party "${partyName}" created successfully! (Max 2 players, ${selectedPrivacy})`)
       popup.remove()
     })
 
