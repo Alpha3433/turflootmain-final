@@ -1799,7 +1799,7 @@ export default function TurfLootTactical() {
       try {
         // Create on-demand room for other server types too
         setTimeout(async () => {
-          const roomId = \`\${server.id}-\${Math.random().toString(36).substring(2, 10)}\`
+          const roomId = `${server.id}-${Math.random().toString(36).substring(2, 10)}`
           console.log('🌍 Creating on-demand room for server:', server.name, 'Room:', roomId)
           
           // Remove loading popup
