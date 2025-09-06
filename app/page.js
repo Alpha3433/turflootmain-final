@@ -2827,6 +2827,23 @@ export default function TurfLootTactical() {
               width: '100%',
               padding: '8px',
               background: 'rgba(26, 32, 44, 0.8)',
+              border: '1px solid #f6ad55',
+              borderRadius: '3px',
+              color: '#f6ad55',
+              fontSize: '10px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              marginBottom: '6px'
+            }}>
+              JOIN SQUAD
+            </button>
+            
+            <button style={{
+              width: '100%',
+              padding: '8px',
+              background: 'rgba(26, 32, 44, 0.8)',
               border: '1px solid #68d391',
               borderRadius: '3px',
               color: '#68d391',
