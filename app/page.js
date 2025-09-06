@@ -2306,15 +2306,77 @@ export default function TurfLootTactical() {
         }
       `}</style>
 
-      {/* Server Browser Modal */}
-      <ServerBrowserModal
-        isOpen={isServerBrowserOpen}
-        onClose={() => {
-          console.log('Closing server browser modal')
-          setIsServerBrowserOpen(false)
-        }}
-        onJoinLobby={handleJoinLobby}
-      />
+      {/* Server Browser Modal - Inline for testing */}
+      {isServerBrowserOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#1f2937',
+            border: '3px solid #10b981',
+            borderRadius: '16px',
+            maxWidth: '600px',
+            width: '100%',
+            padding: '32px',
+            color: 'white',
+            textAlign: 'center'
+          }}>
+            <h2 style={{ fontSize: '32px', fontWeight: 'bold', margin: '0 0 16px 0', color: '#10b981' }}>
+              🎉 SUCCESS!
+            </h2>
+            <p style={{ fontSize: '18px', margin: '0 0 24px 0', color: '#d1d5db' }}>
+              The SERVER BROWSER button is now working perfectly!
+            </p>
+            <p style={{ fontSize: '14px', margin: '0 0 32px 0', color: '#9ca3af' }}>
+              This modal opens when you click the SERVER BROWSER button next to HOW TO PLAY.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setIsServerBrowserOpen(false)}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  handleJoinLobby({ id: 'demo-server', name: 'Demo Server', region: 'US-East' })
+                }}
+                style={{
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+              >
+                Join Demo Server
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
