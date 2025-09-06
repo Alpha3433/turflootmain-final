@@ -1,34 +1,26 @@
 #!/usr/bin/env python3
 """
-Comprehensive Hathora Integration Testing - Real Room Process Verification
-========================================================================
+HATHORA ROOM CREATION VERIFICATION TEST
+=====================================
 
-This test suite verifies that real Hathora room processes are being created
-when users join "Global Multiplayer (US East)" instead of mock room IDs.
+This test specifically addresses the user's concern that no rooms are appearing 
+in the Hathora console when clicking "Global Multiplayer (US East)".
 
-SPECIFIC TESTING FOR REVIEW REQUEST:
-1. Test Hathora Room Creation - Verify createOrJoinRoom() creates real processes
-2. Check Global Multiplayer Flow - Test complete server browser → room creation
-3. Verify Room ID Format - Ensure no fake room IDs like 'room-washington_dc-1757173709750'
-4. Session Tracking - Test real Hathora room IDs are tracked properly
-5. Environment Variables - Verify Hathora configuration is correct
-
-CRITICAL VERIFICATION:
-- hathoraClient.createOrJoinRoom(null, 'practice') creates actual Hathora processes
-- No mock room ID generation with 'room-' + timestamp pattern
-- Real Hathora room processes would appear in Hathora console
-- Complete Global Multiplayer workflow operational
+CRITICAL TESTING FOCUS:
+- Test if ACTUAL Hathora room processes are being created
+- Verify Hathora authentication and configuration
+- Test the exact user flow that should create console-visible rooms
+- Debug any fallback logic that might bypass real room creation
 """
 
 import requests
 import json
 import time
-import os
 import sys
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://tactical-arena-7.preview.emergentagent.com')
+# Configuration
+BASE_URL = "https://tactical-arena-7.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraRoomCreationTester:
