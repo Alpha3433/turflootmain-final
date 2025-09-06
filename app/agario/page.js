@@ -359,11 +359,34 @@ const AgarIOGame = () => {
     const paramPartyId = urlParams.get('partyId')
     const paramPartySize = parseInt(urlParams.get('partySize')) || 1
     const paramMembers = urlParams.get('members')
+    const paramMultiplayer = urlParams.get('multiplayer') // NEW: Check multiplayer type
+    const paramServer = urlParams.get('server') // NEW: Check server type
     // NEW: Spectator mode parameters
     const paramStake = urlParams.get('stake') || 'FREE'
     const paramDirectPlay = urlParams.get('directPlay') === 'true' // NEW: Direct play parameter
     
-    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramRoomId, paramPartyId, paramPartySize, paramMembers, paramDirectPlay })
+    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramRoomId, paramPartyId, paramPartySize, paramMembers, paramDirectPlay, paramMultiplayer, paramServer })
+    
+    // HATHORA MULTIPLAYER: Handle Hathora-specific connections from server browser
+    if (paramMultiplayer === 'hathora' && paramRoomId) {
+      console.log('🌍 Hathora multiplayer mode detected - connecting to Hathora lobby:', paramRoomId)
+      
+      // Set game state for Hathora multiplayer
+      setRoomId(paramRoomId)
+      setGameMode(paramMode)
+      setEntryFee(paramFee)
+      
+      // Connect to Hathora multiplayer directly
+      if (user && getAccessToken) {
+        console.log('✅ Authenticated user - initializing Hathora multiplayer connection')
+        // Use the existing initializeMultiplayer function but with Hathora lobby ID
+        initializeMultiplayer(paramRoomId, 1, null, false, true) // Last param = force Hathora
+      } else {
+        console.log('⚠️ User not authenticated - prompting login for multiplayer')
+        // Could redirect to login or show login modal
+      }
+      return
+    }
     
     // GLOBAL MULTIPLAYER: Handle direct play mode using Hathora global servers
     if (paramDirectPlay) {
