@@ -706,6 +706,52 @@ const TacticalAgarIO = () => {
         </>
       )}
 
+      {/* MOBILE ONLY - Clean Game UI */}
+      {gameRunning && operativeAlive && (
+        <>
+          {/* Mobile Mission Timer */}
+          <div className="md:hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 backdrop-blur-sm rounded-lg px-4 py-2 border border-green-500">
+            <div className="text-green-400 text-sm font-bold text-center">
+              Survive for 60 seconds
+            </div>
+            <div className="text-white text-xs text-center">
+              {Math.floor(Date.now() / 1000) % 60}/60
+            </div>
+          </div>
+
+          {/* Mobile Top Right - Mini Map & Connection */}
+          <div className="md:hidden absolute top-4 right-4 bg-black bg-opacity-60 backdrop-blur-sm rounded-lg p-3 border border-cyan-500">
+            <div className="text-cyan-400 text-xs font-bold mb-1">Oceania</div>
+            <div className="text-white text-xs">999ms</div>
+          </div>
+
+          {/* Mobile Top Left - Player Stats */}
+          <div className="md:hidden absolute top-4 left-4 bg-black bg-opacity-60 backdrop-blur-sm rounded-lg px-3 py-2 border border-green-500">
+            <div className="text-green-400 text-xs font-bold">#1 You</div>
+            <div className="text-white text-xs">${tacticalStats.assets}</div>
+          </div>
+
+          {/* Mobile Right Side Action Buttons */}
+          <div className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-3">
+            <button 
+              onClick={() => {
+                if (gameRef.current?.player) {
+                  gameRef.current.splitPlayer()
+                }
+              }}
+              className="bg-red-600 bg-opacity-80 backdrop-blur-sm border-2 border-red-500 rounded-lg px-4 py-3 text-white font-bold text-sm shadow-lg"
+            >
+              SPLIT
+            </button>
+            <button 
+              className="bg-green-600 bg-opacity-80 backdrop-blur-sm border-2 border-green-500 rounded-lg px-4 py-3 text-white font-bold text-sm shadow-lg"
+            >
+              CASH ${tacticalStats.assets}
+            </button>
+          </div>
+        </>
+      )}
+
       {/* Mission Complete */}
       {missionComplete && (
         <div className="absolute inset-0 bg-black bg-opacity-90 backdrop-blur-sm flex items-center justify-center z-50">
