@@ -489,8 +489,8 @@ class HathoraRoomCreationTester:
                     for i, session_id in enumerate(session_ids):
                         try:
                             self.session.post(f"{API_BASE}/game-sessions/leave", json={
-                                'sessionId': session_id,
-                                'userId': f'console-test-user-{i}'
+                                'roomId': 'global-practice-bots',
+                                'playerId': f'console-test-user-{i}'
                             })
                         except:
                             pass
