@@ -403,8 +403,8 @@ class HathoraRoomCreationTester:
                 # Clean up the session
                 try:
                     self.session.post(f"{API_BASE}/game-sessions/leave", json={
-                        'sessionId': session_id,
-                        'userId': 'test-tracking-user'
+                        'roomId': 'global-practice-bots',
+                        'playerId': 'test-tracking-user'
                     })
                 except:
                     pass
