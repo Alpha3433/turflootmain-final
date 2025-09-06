@@ -44,22 +44,46 @@ class AgarIOBackendTester:
         """Test 1: API Health Check - Verify backend is accessible"""
         print("\n🔍 TESTING: API Health Check")
         try:
+            # Test root API endpoint
             start_time = time.time()
-            response = self.session.get(f"{API_BASE}/health", timeout=10)
+            response = self.session.get(f"{API_BASE}", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                server_info = data.get('server', 'unknown')
-                return self.log_test(
-                    "API Health Check", 
+                service_info = data.get('service', 'unknown')
+                features = data.get('features', [])
+                self.log_test(
+                    "Root API Endpoint", 
                     True, 
-                    f"API accessible, server: {server_info}", 
+                    f"Service: {service_info}, Features: {features}", 
                     response_time
                 )
+                
+                # Test ping endpoint
+                start_time = time.time()
+                response = self.session.get(f"{API_BASE}/ping", timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    ping_data = response.json()
+                    server_info = ping_data.get('server', 'unknown')
+                    return self.log_test(
+                        "Ping Endpoint", 
+                        True, 
+                        f"Server: {server_info}", 
+                        response_time
+                    )
+                else:
+                    return self.log_test(
+                        "Ping Endpoint", 
+                        False, 
+                        f"HTTP {response.status_code}", 
+                        response_time
+                    )
             else:
                 return self.log_test(
-                    "API Health Check", 
+                    "Root API Endpoint", 
                     False, 
                     f"HTTP {response.status_code}: {response.text[:100]}", 
                     response_time
