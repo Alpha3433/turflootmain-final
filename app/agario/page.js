@@ -396,45 +396,53 @@ const TacticalAgarIO = () => {
     }
   }
 
-  // Initialize game
+  // Mouse and touch handling
   useEffect(() => {
-    if (!canvasRef.current || gameInitialized) return
+    if (!canvasRef.current || !gameRef.current) return
 
     const canvas = canvasRef.current
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    let mouseX = canvas.width / 2
+    let mouseY = canvas.height / 2
 
-    const game = new TacticalGameEngine(canvas)
-    gameRef.current = game
-    
-    setGameInitialized(true)
-    game.start()
-
-    // Mouse movement handler
     const handleMouseMove = (e) => {
-      if (game.running && game.operative?.alive) {
-        game.update(e.clientX, e.clientY)
-      }
+      const rect = canvas.getBoundingClientRect()
+      mouseX = e.clientX - rect.left
+      mouseY = e.clientY - rect.top
     }
 
-    // Touch handler for mobile
     const handleTouchMove = (e) => {
       e.preventDefault()
+      const rect = canvas.getBoundingClientRect()
       const touch = e.touches[0]
-      if (game.running && game.operative?.alive) {
-        game.update(touch.clientX, touch.clientY)
+      mouseX = touch.clientX - rect.left
+      mouseY = touch.clientY - rect.top
+    }
+
+    const handleKeyPress = (e) => {
+      if (e.code === 'Space' && gameRef.current?.operative?.alive) {
+        e.preventDefault()
+        // Handle split action
+        console.log('Split activated')
       }
     }
 
     canvas.addEventListener('mousemove', handleMouseMove)
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+    window.addEventListener('keydown', handleKeyPress)
+
+    // Store mouse position for game engine
+    const updateLoop = () => {
+      if (gameRef.current && gameRef.current.running) {
+        gameRef.current.update(mouseX, mouseY)
+      }
+      requestAnimationFrame(updateLoop)
+    }
+    updateLoop()
 
     return () => {
       canvas.removeEventListener('mousemove', handleMouseMove)
       canvas.removeEventListener('touchmove', handleTouchMove)
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
+      window.removeEventListener('keydown', handleKeyPress)
     }
   }, [gameInitialized])
 
