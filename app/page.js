@@ -4340,9 +4340,29 @@ export default function TurfLootTactical() {
           </button>
 
           {/* Secondary Buttons */}
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button style={secondaryButtonStyle}>LEADERBOARD</button>
             <button style={secondaryButtonStyle}>HOW TO PLAY</button>
+            <button 
+              style={{
+                ...secondaryButtonStyle,
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid #3b82f6',
+                color: '#3b82f6',
+                fontSize: '10px',
+                padding: '8px 12px'
+              }}
+              onClick={() => {
+                console.log('🤖 MOBILE LOCAL PRACTICE button clicked!')
+                // Create completely local room with bots - no Hathora charges
+                const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
+                const gameUrl = `/agario?roomId=${localRoomId}&mode=local&fee=0&region=local&multiplayer=offline&server=local&bots=true`
+                console.log('🎮 Starting mobile local practice with bots:', gameUrl)
+                window.location.href = gameUrl
+              }}
+            >
+              🤖 LOCAL BOTS
+            </button>
           </div>
         </div>
 
