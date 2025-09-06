@@ -361,11 +361,12 @@ const AgarIOGame = () => {
     const paramMembers = urlParams.get('members')
     const paramMultiplayer = urlParams.get('multiplayer') // NEW: Check multiplayer type
     const paramServer = urlParams.get('server') // NEW: Check server type
+    const paramHathoraApp = urlParams.get('hathoraApp') // NEW: Hathora App ID
     // NEW: Spectator mode parameters
     const paramStake = urlParams.get('stake') || 'FREE'
     const paramDirectPlay = urlParams.get('directPlay') === 'true' // NEW: Direct play parameter
     
-    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramRoomId, paramPartyId, paramPartySize, paramMembers, paramDirectPlay, paramMultiplayer, paramServer })
+    console.log('🎮 URL Parameters:', { paramMode, paramFee, paramRoomId, paramPartyId, paramPartySize, paramMembers, paramDirectPlay, paramMultiplayer, paramServer, paramHathoraApp })
     
     // HATHORA MULTIPLAYER: Handle Hathora-specific connections from server browser
     if (paramMultiplayer === 'hathora' && paramRoomId) {
