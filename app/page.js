@@ -2464,23 +2464,6 @@ export default function TurfLootTactical() {
         }
       `}</style>
 
-      {/* Debug Panel - Remove after testing */}
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        backgroundColor: 'rgba(255, 0, 0, 0.9)',
-        color: 'white',
-        padding: '12px',
-        borderRadius: '8px',
-        zIndex: 1000000,
-        fontSize: '12px',
-        fontFamily: 'monospace'
-      }}>
-        <div>ServerBrowser: {isServerBrowserOpen ? 'OPEN' : 'CLOSED'}</div>
-        <div>Desktop Leaderboard: Direct DOM</div>
-      </div>
-
       {/* Server Browser Modal - Keep the existing one */}
       <ServerBrowserModal
         isOpen={isServerBrowserOpen}
