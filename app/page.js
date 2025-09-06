@@ -14,6 +14,7 @@ export default function TurfLootTactical() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [customUsername, setCustomUsername] = useState('')
+  const [customUsername, setCustomUsername] = useState('')
 
   // Stable random values for background animations (client-side only)
   const [floatingElements, setFloatingElements] = useState([])
