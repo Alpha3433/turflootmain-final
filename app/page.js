@@ -1120,7 +1120,34 @@ export default function TurfLootTactical() {
             }}>👥</div>
             <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>PARTY</h3>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>REFRESH</span>
+              <button 
+                onClick={() => {
+                  // Refresh friends list logic
+                  setActiveFriends(Math.floor(Math.random() * 5)) // Simulate refreshing with random count
+                }}
+                style={{ 
+                  fontSize: '11px', 
+                  color: '#f6ad55', 
+                  background: 'none', 
+                  border: 'none', 
+                  cursor: 'pointer', 
+                  fontWeight: '600', 
+                  fontFamily: '"Rajdhani", sans-serif',
+                  padding: '2px 4px',
+                  borderRadius: '2px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(246, 173, 85, 0.1)'
+                  e.target.style.boxShadow = '0 0 5px rgba(246, 173, 85, 0.3)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'none'
+                  e.target.style.boxShadow = 'none'
+                }}
+              >
+                [↻] REFRESH
+              </button>
               <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>{activeFriends} ACTIVE</span>
             </div>
           </div>
