@@ -155,47 +155,46 @@ class AgarIOBackendTester:
         print("\n🔍 TESTING: Game State Management")
         
         try:
-            # Test user stats endpoint
+            # Test live players stats endpoint
             start_time = time.time()
-            response = self.session.get(f"{API_BASE}/users/stats", timeout=10)
+            response = self.session.get(f"{API_BASE}/stats/live-players", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
                 stats_data = response.json()
-                total_games = stats_data.get('totalGames', 0)
-                total_winnings = stats_data.get('totalWinnings', 0)
+                live_players = stats_data.get('livePlayers', 0)
                 
                 self.log_test(
-                    "User Statistics Tracking", 
+                    "Live Player Statistics", 
                     True, 
-                    f"Games: {total_games}, Winnings: ${total_winnings}", 
+                    f"Live players: {live_players}", 
                     response_time
                 )
                 
-                # Test leaderboard endpoint
+                # Test global winnings endpoint
                 start_time = time.time()
-                response = self.session.get(f"{API_BASE}/leaderboard", timeout=10)
+                response = self.session.get(f"{API_BASE}/stats/global-winnings", timeout=10)
                 response_time = time.time() - start_time
                 
                 if response.status_code == 200:
-                    leaderboard = response.json()
-                    player_count = len(leaderboard.get('players', []))
+                    winnings_data = response.json()
+                    global_winnings = winnings_data.get('globalWinnings', 0)
                     return self.log_test(
-                        "Leaderboard System", 
+                        "Global Winnings Statistics", 
                         True, 
-                        f"Leaderboard with {player_count} players", 
+                        f"Global winnings: ${global_winnings}", 
                         response_time
                     )
                 else:
                     return self.log_test(
-                        "Leaderboard System", 
+                        "Global Winnings Statistics", 
                         False, 
                         f"HTTP {response.status_code}", 
                         response_time
                     )
             else:
                 return self.log_test(
-                    "User Statistics Tracking", 
+                    "Live Player Statistics", 
                     False, 
                     f"HTTP {response.status_code}: {response.text[:100]}", 
                     response_time
