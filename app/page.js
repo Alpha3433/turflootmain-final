@@ -260,6 +260,131 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
+  // State for wallet balance
+  const [walletBalance, setWalletBalance] = useState({
+    usd: '0.00',
+    sol: '0.0000',
+    loading: true
+  })
+
+  // Fetch wallet balance from Privy
+  const fetchWalletBalance = async () => {
+    try {
+      if (!window.__TURFLOOT_PRIVY__ || !window.__TURFLOOT_PRIVY__.authenticated) {
+        console.log('👛 User not authenticated, showing default balance')
+        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+        return
+      }
+
+      const privy = window.__TURFLOOT_PRIVY__
+      const user = privy.user
+
+      if (!user || !user.wallet) {
+        console.log('👛 No wallet found, showing default balance')
+        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+        return
+      }
+
+      console.log('💰 Fetching wallet balance for:', user.wallet.address)
+      setWalletBalance(prev => ({ ...prev, loading: true }))
+
+      // Get embedded wallet from Privy
+      const wallet = user.wallet
+      
+      if (wallet && wallet.address) {
+        try {
+          // For embedded wallets, we can use Privy's built-in balance methods if available
+          // Or make API calls to get balance from blockchain
+          
+          // Try to get balance from the wallet object itself if available
+          let solBalance = '0.0000'
+          let usdBalance = '0.00'
+          
+          // Check if Privy provides balance information directly
+          if (wallet.balance !== undefined) {
+            solBalance = parseFloat(wallet.balance).toFixed(4)
+          } else {
+            // Fallback: Make API call to get balance
+            try {
+              const response = await fetch('/api/wallet/balance', {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${user.privyAccessToken || 'privy-user'}`
+                }
+              })
+              
+              if (response.ok) {
+                const balanceData = await response.json()
+                solBalance = parseFloat(balanceData.sol_balance || 0).toFixed(4)
+                usdBalance = parseFloat(balanceData.balance || 0).toFixed(2)
+                console.log('✅ Fetched balance from API:', { sol: solBalance, usd: usdBalance })
+              } else {
+                console.log('⚠️ API balance fetch failed, using default values')
+              }
+            } catch (apiError) {
+              console.log('⚠️ API call failed:', apiError.message)
+            }
+          }
+          
+          // Update balance state
+          setWalletBalance({
+            usd: usdBalance,
+            sol: solBalance,
+            loading: false
+          })
+          
+          console.log('✅ Wallet balance updated:', { usd: usdBalance, sol: solBalance })
+          
+        } catch (error) {
+          console.error('❌ Error fetching wallet balance:', error)
+          setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+        }
+      } else {
+        console.log('⚠️ Wallet address not available')
+        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+      }
+      
+    } catch (error) {
+      console.error('❌ Wallet balance fetch error:', error)
+      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+    }
+  }
+
+  // Auto-fetch balance when Privy authentication changes
+  useEffect(() => {
+    const checkAndFetchBalance = () => {
+      if (window.__TURFLOOT_PRIVY__) {
+        const privy = window.__TURFLOOT_PRIVY__
+        if (privy.ready && privy.authenticated && privy.user) {
+          fetchWalletBalance()
+        } else {
+          setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+        }
+      } else {
+        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+      }
+    }
+
+    // Initial check
+    checkAndFetchBalance()
+    
+    // Set up interval to refresh balance every 30 seconds when authenticated
+    const balanceInterval = setInterval(() => {
+      if (window.__TURFLOOT_PRIVY__?.authenticated) {
+        fetchWalletBalance()
+      }
+    }, 30000)
+
+    return () => clearInterval(balanceInterval)
+  }, [])
+
+  // Manual refresh function for the refresh button
+  const handleBalanceRefresh = () => {
+    console.log('🔄 Manual balance refresh triggered')
+    fetchWalletBalance()
+  }
+
   // Wallet operations with Privy integration
   const handleDeposit = async () => {
     try {
