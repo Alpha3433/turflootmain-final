@@ -1703,11 +1703,6 @@ export default function TurfLootTactical() {
         } catch (error) {
           console.error('❌ On-demand room creation failed:', error)
           
-          // Remove loading popup
-          if (loadingPopup && loadingPopup.cleanup) {
-            loadingPopup.cleanup()
-          }
-          
           // Fallback: create a local room ID and let the game handle it
           const fallbackRoomId = 'local-' + Math.random().toString(36).substring(2, 15)
           const gameUrl = '/agario?roomId=' + fallbackRoomId + '&mode=practice&fee=0&region=' + (server.region || 'us-east') + '&multiplayer=fallback&server=global'
