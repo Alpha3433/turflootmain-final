@@ -53,6 +53,7 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
 // Bridge component to expose Privy functions globally
 function PrivyBridge({ children }) {
   const privy = usePrivy()
+  const { fundWallet } = useFundWallet()
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -88,11 +89,26 @@ function PrivyBridge({ children }) {
             throw error
           }
         },
+        fundWallet: async (wallet, options) => {
+          console.log('💰 Bridge fundWallet called - executing Privy fund wallet')
+          try {
+            if (typeof fundWallet === 'function') {
+              return await fundWallet(wallet, options)
+            } else {
+              console.error('❌ Privy fundWallet is not a function:', typeof fundWallet)
+              throw new Error('Privy fundWallet function not available')
+            }
+          } catch (error) {
+            console.error('❌ Bridge fundWallet error:', error)
+            throw error
+          }
+        },
         ready: privy.ready,
         authenticated: privy.authenticated,
         user: privy.user,
         // Add raw privy object for debugging
         _rawPrivy: privy,
+        _rawFundWallet: fundWallet,
         // Force refresh auth state
         refreshAuth: () => {
           console.log('🔄 Forcing authentication state refresh')
@@ -107,10 +123,11 @@ function PrivyBridge({ children }) {
         ready: privy.ready,
         authenticated: privy.authenticated,
         hasLogin: typeof privy.login === 'function',
-        hasLogout: typeof privy.logout === 'function'
+        hasLogout: typeof privy.logout === 'function',
+        hasFundWallet: typeof fundWallet === 'function'
       })
     }
-  }, [privy])
+  }, [privy, fundWallet])
   
   return children
 }
