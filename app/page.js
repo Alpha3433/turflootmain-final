@@ -2321,11 +2321,9 @@ export default function TurfLootTactical() {
       />
 
       {/* Leaderboard Modal */}
-      <UserProfile
+      <LeaderboardModal
         isOpen={isLeaderboardOpen}
         onClose={() => setIsLeaderboardOpen(false)}
-        user={user}
-        initialTab="leaderboard"
       />
       
       {/* Debug Info */}
