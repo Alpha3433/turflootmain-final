@@ -1269,7 +1269,7 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            🎯 UPGRADE SKIN
+            VIEW STORE
           </button>
           
           <button style={{
