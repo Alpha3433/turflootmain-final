@@ -396,11 +396,16 @@ const AgarIOGame = () => {
               console.log('🎯 Hathora client initialized successfully')
               // Connect to the existing room or create a new one
               const playerId = user?.id || `guest-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
-              const connectionInfo = await hathoraClient.createOrJoinRoom(playerId, paramMode || 'practice')
-              console.log('🌐 Hathora connection established:', connectionInfo)
               
-              // Use the connection info to start the multiplayer game
-              initializeMultiplayer(paramRoomId, 1, null, false, true) // Force Hathora connection
+              // Create actual Hathora room process (not just lobby)
+              const connectionInfo = await hathoraClient.connectToGame({
+                userId: playerId,
+                roomId: paramRoomId
+              })
+              console.log('🌐 Hathora room process created:', connectionInfo)
+              
+              // Use the connection info to start the REAL multiplayer game
+              initializeMultiplayer(connectionInfo.roomId, 1, null, connectionInfo.socket, true) // Pass actual socket
             } else {
               console.log('⚠️ Hathora initialization failed, using fallback')
               initializeGame() // Fallback to local game
