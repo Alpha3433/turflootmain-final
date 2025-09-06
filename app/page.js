@@ -1085,7 +1085,7 @@ export default function TurfLootTactical() {
         {/* Bottom Left - Squad */}
         <div style={{
           position: 'absolute',
-          left: '60px',
+          left: '200px',
           top: '210px',
           width: '300px',
           zIndex: 20,
