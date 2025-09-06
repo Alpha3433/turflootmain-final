@@ -313,7 +313,7 @@ class AgarIOBackendTester:
             }
             
             start_time = time.time()
-            response = self.session.get(f"{API_BASE}/health", 
+            response = self.session.get(f"{API_BASE}/ping", 
                                       headers=mobile_headers, timeout=10)
             response_time = time.time() - start_time
             
@@ -322,9 +322,7 @@ class AgarIOBackendTester:
                 start_time = time.time()
                 mobile_session_data = {
                     "roomId": "agario-mobile-test",
-                    "gameMode": "practice",
-                    "playerName": "MobilePlayer",
-                    "device": "mobile"
+                    "playerId": "mobile-player-123"
                 }
                 response = self.session.post(f"{API_BASE}/game-sessions/join", 
                                            json=mobile_session_data, 
