@@ -704,8 +704,9 @@ const TacticalAgarIO = () => {
               <span>SPLIT</span>
             </button>
           </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
 
       {/* MOBILE ONLY - Clean Game UI */}
       {gameRunning && operativeAlive && (
