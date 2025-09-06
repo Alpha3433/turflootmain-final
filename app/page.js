@@ -1737,13 +1737,22 @@ export default function TurfLootTactical() {
         } catch (error) {
           console.error('❌ On-demand room creation failed:', error)
           
-          // Fallback: create a local room ID and let the game handle it
-          const fallbackRoomId = 'local-' + Math.random().toString(36).substring(2, 15)
-          const gameUrl = '/agario?roomId=' + fallbackRoomId + '&mode=practice&fee=0&region=' + (server.region || 'us-east') + '&multiplayer=fallback&server=global'
-          console.log('🔄 Falling back to local room:', gameUrl)
+          // Update loading popup to show error
+          const statusElement = document.getElementById('loading-status')
+          if (statusElement) statusElement.textContent = 'Connection failed, using fallback...'
           
-          alert('Creating multiplayer room... You may be the first player in this session!')
-          window.location.href = gameUrl
+          setTimeout(() => {
+            // Cleanup loading popup
+            if (loadingPopup && loadingPopup.cleanup) {
+              loadingPopup.cleanup()
+            }
+            
+            // Fallback: create a local room ID and let the game handle it
+            const fallbackRoomId = 'local-' + Math.random().toString(36).substring(2, 15)
+            const gameUrl = '/agario?roomId=' + fallbackRoomId + '&mode=practice&fee=0&region=' + (server.region || 'us-east') + '&multiplayer=fallback&server=global'
+            console.log('🔄 Falling back to local room:', gameUrl)
+            window.location.href = gameUrl
+          }, 1000)
         }
         
         return
