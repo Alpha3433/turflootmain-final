@@ -1700,7 +1700,7 @@ export default function TurfLootTactical() {
           
           for (const region of regions) {
             try {
-              console.log(\`   Trying to create room in \${region}...\`)
+              console.log('   Trying to create room in ' + region + '...')
               const roomResult = await hathoraClient.createPublicLobby(region, JSON.stringify({
                 ...roomConfig,
                 region: region,
@@ -1708,7 +1708,7 @@ export default function TurfLootTactical() {
                 gameType: 'practice'
               }))
               
-              console.log(\`   ✅ Room creation successful in \${region}\`)
+              console.log('   ✅ Room creation successful in ' + region)
               roomCreated = true
               finalRegion = region
               
@@ -1720,27 +1720,27 @@ export default function TurfLootTactical() {
                 // Find the most recent lobby (likely ours)
                 const recentLobby = lobbies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]
                 finalRoomId = recentLobby.roomId
-                console.log(\`   🎯 Got room ID: \${finalRoomId}\`)
+                console.log('   🎯 Got room ID: ' + finalRoomId)
                 
                 // Test if connection details are available
                 try {
                   const connDetails = await hathoraClient.getConnectionDetailsForRoomId(finalRoomId)
                   if (connDetails?.exposedPort) {
-                    console.log(\`   🌐 Room is active with connection: \${connDetails.exposedPort.host}:\${connDetails.exposedPort.port}\`)
+                    console.log('   🌐 Room is active with connection: ' + connDetails.exposedPort.host + ':' + connDetails.exposedPort.port)
                   }
                 } catch (connError) {
-                  console.log(\`   ⚠️ Room created but connection pending: \${connError.message}\`)
+                  console.log('   ⚠️ Room created but connection pending: ' + connError.message)
                 }
                 
                 break
               } else {
-                console.log(\`   ⚠️ Room created in \${region} but not yet visible in lobby list\`)
-                finalRoomId = \`room-\${region}-\${Date.now()}\`
+                console.log('   ⚠️ Room created in ' + region + ' but not yet visible in lobby list')
+                finalRoomId = 'room-' + region + '-' + Date.now()
                 break
               }
               
             } catch (regionError) {
-              console.log(\`   ❌ Failed to create room in \${region}: \${regionError.message}\`)
+              console.log('   ❌ Failed to create room in ' + region + ': ' + regionError.message)
               continue
             }
           }
