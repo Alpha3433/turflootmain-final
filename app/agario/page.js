@@ -38,66 +38,355 @@ const TacticalAgarIO = () => {
     type: 'elimination'
   })
 
-  // Tactical Game Engine - FIXED VERSION
+  // Enhanced Tactical Game Engine with Full Agar.io Functionality
   class TacticalGameEngine {
     constructor(canvas) {
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
-      this.world = { width: 2000, height: 2000 }
+      this.world = { width: 3000, height: 3000 }
       this.camera = { x: 0, y: 0, zoom: 1 }
-      this.operative = null
-      this.hostiles = []
-      this.resources = []
+      this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
+      this.keys = new Set()
+      
+      // Game objects
+      this.player = null
+      this.bots = []
+      this.food = []
       this.running = false
       this.lastUpdate = Date.now()
       
-      this.initializeOperative()
-      this.generateResources()
-      this.generateHostiles()
+      // Game settings
+      this.maxFood = 400
+      this.maxBots = 15
+      this.gameSpeed = 60 // FPS
+      
+      this.initializePlayer()
+      this.generateFood()
+      this.generateBots()
+      this.bindEvents()
     }
 
-    initializeOperative() {
-      this.operative = {
-        id: 'operative-alpha',
+    initializePlayer() {
+      this.player = {
+        id: 'player',
         x: this.world.width / 2,
         y: this.world.height / 2,
-        mass: 10,
-        radius: 20,
+        mass: 20,
+        radius: this.massToRadius(20),
         color: '#22c55e',
         name: 'OPERATIVE',
         alive: true,
-        assets: 0,
+        speed: 2,
+        targetX: this.world.width / 2,
+        targetY: this.world.height / 2,
         eliminations: 0,
-        velocity: { x: 0, y: 0 }
+        assets: 0
       }
     }
 
-    generateResources() {
-      this.resources = []
-      for (let i = 0; i < 200; i++) {
-        this.resources.push({
-          id: `resource-${i}`,
+    massToRadius(mass) {
+      return Math.sqrt(mass / Math.PI) * 6
+    }
+
+    generateFood() {
+      this.food = []
+      for (let i = 0; i < this.maxFood; i++) {
+        this.addFood()
+      }
+    }
+
+    addFood() {
+      this.food.push({
+        id: Math.random().toString(36),
+        x: Math.random() * this.world.width,
+        y: Math.random() * this.world.height,
+        mass: 1,
+        radius: 3,
+        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+        type: 'food'
+      })
+    }
+
+    generateBots() {
+      this.bots = []
+      for (let i = 0; i < this.maxBots; i++) {
+        const mass = 15 + Math.random() * 30
+        this.bots.push({
+          id: `bot-${i}`,
           x: Math.random() * this.world.width,
           y: Math.random() * this.world.height,
-          mass: 1,
-          radius: 4,
-          color: `hsl(${Math.random() * 60 + 30}, 70%, 60%)`,
-          type: 'supply'
+          mass: mass,
+          radius: this.massToRadius(mass),
+          color: '#ef4444',
+          name: `HOSTILE-${String(i + 1).padStart(2, '0')}`,
+          alive: true,
+          speed: Math.max(0.5, 3 - mass * 0.02),
+          targetX: Math.random() * this.world.width,
+          targetY: Math.random() * this.world.height,
+          lastTargetChange: Date.now(),
+          aiType: Math.random() > 0.5 ? 'aggressive' : 'passive'
         })
       }
     }
 
-    generateHostiles() {
-      this.hostiles = []
-      for (let i = 0; i < 10; i++) {
-        const mass = 8 + Math.random() * 25
-        this.hostiles.push({
-          id: `hostile-${i}`,
-          x: Math.random() * this.world.width,
-          y: Math.random() * this.world.height,
-          mass: mass,
-          radius: Math.sqrt(mass) * 3,
-          color: '#ef4444',
+    bindEvents() {
+      // Mouse movement
+      this.canvas.addEventListener('mousemove', (e) => {
+        const rect = this.canvas.getBoundingClientRect()
+        this.mouse.x = e.clientX - rect.left
+        this.mouse.y = e.clientY - rect.top
+        
+        // Convert to world coordinates
+        this.mouse.worldX = this.mouse.x + this.camera.x
+        this.mouse.worldY = this.mouse.y + this.camera.y
+        
+        // Set player target
+        if (this.player && this.player.alive) {
+          this.player.targetX = this.mouse.worldX
+          this.player.targetY = this.mouse.worldY
+        }
+      })
+
+      // Touch events for mobile
+      this.canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault()
+        const rect = this.canvas.getBoundingClientRect()
+        const touch = e.touches[0]
+        this.mouse.x = touch.clientX - rect.left
+        this.mouse.y = touch.clientY - rect.top
+        
+        this.mouse.worldX = this.mouse.x + this.camera.x
+        this.mouse.worldY = this.mouse.worldY + this.camera.y
+        
+        if (this.player && this.player.alive) {
+          this.player.targetX = this.mouse.worldX
+          this.player.targetY = this.mouse.worldY
+        }
+      })
+
+      // Keyboard events
+      document.addEventListener('keydown', (e) => {
+        this.keys.add(e.code)
+        
+        // Split on space
+        if (e.code === 'Space' && this.player && this.player.alive && this.player.mass > 20) {
+          this.splitPlayer()
+        }
+      })
+
+      document.addEventListener('keyup', (e) => {
+        this.keys.delete(e.code)
+      })
+    }
+
+    splitPlayer() {
+      if (this.player.mass > 20) {
+        const halfMass = this.player.mass / 2
+        this.player.mass = halfMass
+        this.player.radius = this.massToRadius(halfMass)
+        
+        // Create split particle effect (visual feedback)
+        console.log('🔪 TACTICAL SPLIT executed!')
+      }
+    }
+
+    update() {
+      if (!this.running) return
+      
+      const now = Date.now()
+      const deltaTime = (now - this.lastUpdate) / 1000
+      this.lastUpdate = now
+
+      // Update player
+      this.updatePlayer(deltaTime)
+      
+      // Update bots
+      this.bots.forEach(bot => this.updateBot(bot, deltaTime))
+      
+      // Check collisions
+      this.checkCollisions()
+      
+      // Update camera
+      this.updateCamera()
+      
+      // Maintain food count
+      while (this.food.length < this.maxFood) {
+        this.addFood()
+      }
+      
+      // Update tactical stats
+      this.updateStats()
+    }
+
+    updatePlayer(deltaTime) {
+      if (!this.player || !this.player.alive) return
+      
+      // Calculate direction to target
+      const dx = this.player.targetX - this.player.x
+      const dy = this.player.targetY - this.player.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      
+      if (distance > 5) {
+        // Calculate speed based on mass
+        const speed = Math.max(0.5, this.player.speed - this.player.mass * 0.01)
+        
+        // Move towards target
+        const moveX = (dx / distance) * speed * deltaTime * 60
+        const moveY = (dy / distance) * speed * deltaTime * 60
+        
+        this.player.x += moveX
+        this.player.y += moveY
+        
+        // Keep player in bounds
+        this.player.x = Math.max(this.player.radius, Math.min(this.world.width - this.player.radius, this.player.x))
+        this.player.y = Math.max(this.player.radius, Math.min(this.world.height - this.player.radius, this.player.y))
+      }
+    }
+
+    updateBot(bot, deltaTime) {
+      if (!bot.alive) return
+      
+      const now = Date.now()
+      
+      // Change target occasionally
+      if (now - bot.lastTargetChange > 3000 + Math.random() * 2000) {
+        if (bot.aiType === 'aggressive' && this.player && this.player.alive) {
+          // Aggressive bots chase player if they're bigger
+          if (bot.mass > this.player.mass * 1.2) {
+            bot.targetX = this.player.x
+            bot.targetY = this.player.y
+          } else {
+            bot.targetX = Math.random() * this.world.width
+            bot.targetY = Math.random() * this.world.height
+          }
+        } else {
+          // Random movement
+          bot.targetX = Math.random() * this.world.width
+          bot.targetY = Math.random() * this.world.height
+        }
+        bot.lastTargetChange = now
+      }
+      
+      // Move towards target
+      const dx = bot.targetX - bot.x
+      const dy = bot.targetY - bot.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      
+      if (distance > 5) {
+        const speed = Math.max(0.3, bot.speed - bot.mass * 0.01)
+        const moveX = (dx / distance) * speed * deltaTime * 60
+        const moveY = (dy / distance) * speed * deltaTime * 60
+        
+        bot.x += moveX
+        bot.y += moveY
+        
+        // Keep bot in bounds
+        bot.x = Math.max(bot.radius, Math.min(this.world.width - bot.radius, bot.x))
+        bot.y = Math.max(bot.radius, Math.min(this.world.height - bot.radius, bot.y))
+      }
+    }
+
+    checkCollisions() {
+      // Player eating food
+      if (this.player && this.player.alive) {
+        for (let i = this.food.length - 1; i >= 0; i--) {
+          const food = this.food[i]
+          const dx = this.player.x - food.x
+          const dy = this.player.y - food.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance < this.player.radius + food.radius) {
+            // Eat food
+            this.player.mass += food.mass
+            this.player.radius = this.massToRadius(this.player.mass)
+            this.player.assets += 1
+            this.food.splice(i, 1)
+          }
+        }
+        
+        // Player vs bots
+        for (let i = this.bots.length - 1; i >= 0; i--) {
+          const bot = this.bots[i]
+          if (!bot.alive) continue
+          
+          const dx = this.player.x - bot.x
+          const dy = this.player.y - bot.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance < this.player.radius + bot.radius - 5) {
+            if (this.player.mass > bot.mass * 1.2) {
+              // Player eats bot
+              this.player.mass += bot.mass * 0.8
+              this.player.radius = this.massToRadius(this.player.mass)
+              this.player.eliminations += 1
+              this.player.assets += Math.floor(bot.mass / 5)
+              bot.alive = false
+              
+              // Respawn bot after delay
+              setTimeout(() => {
+                bot.alive = true
+                bot.mass = 15 + Math.random() * 30
+                bot.radius = this.massToRadius(bot.mass)
+                bot.x = Math.random() * this.world.width
+                bot.y = Math.random() * this.world.height
+              }, 5000)
+              
+            } else if (bot.mass > this.player.mass * 1.2) {
+              // Bot eats player
+              this.player.alive = false
+              setOperativeAlive(false)
+              setMissionComplete(true)
+            }
+          }
+        }
+      }
+      
+      // Bot vs food
+      this.bots.forEach(bot => {
+        if (!bot.alive) return
+        
+        for (let i = this.food.length - 1; i >= 0; i--) {
+          const food = this.food[i]
+          const dx = bot.x - food.x
+          const dy = bot.y - food.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance < bot.radius + food.radius) {
+            bot.mass += food.mass
+            bot.radius = this.massToRadius(bot.mass)
+            this.food.splice(i, 1)
+          }
+        }
+      })
+    }
+
+    updateCamera() {
+      if (this.player && this.player.alive) {
+        // Smooth camera follow
+        const targetX = this.player.x - this.canvas.width / 2
+        const targetY = this.player.y - this.canvas.height / 2
+        
+        this.camera.x += (targetX - this.camera.x) * 0.1
+        this.camera.y += (targetY - this.camera.y) * 0.1
+        
+        // Keep camera in bounds
+        this.camera.x = Math.max(0, Math.min(this.world.width - this.canvas.width, this.camera.x))
+        this.camera.y = Math.max(0, Math.min(this.world.height - this.canvas.height, this.camera.y))
+      }
+    }
+
+    updateStats() {
+      if (this.player && this.player.alive) {
+        setTacticalStats({
+          mass: Math.floor(this.player.mass),
+          assets: this.player.assets,
+          eliminations: this.player.eliminations,
+          streak: this.player.eliminations,
+          resourcesCollected: this.player.assets,
+          rank: '#1'
+        })
+      }
+    }
           name: `HOSTILE-${i.toString().padStart(2, '0')}`,
           velocity: { 
             x: (Math.random() - 0.5) * 1.5, 
