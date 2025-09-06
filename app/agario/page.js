@@ -4616,28 +4616,40 @@ const AgarIOGame = () => {
         </div>
       ))}
 
-      {/* Current Mission Display - Desktop Only */}
+      {/* TACTICAL MISSION BRIEFING - Military Style */}
       {currentMission && !isGameOver && !isMobile && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-sm rounded-lg p-4 border border-purple-400/50 max-w-xs">
-          <div className="text-purple-400 font-bold text-sm mb-2">🎯 MISSION</div>
-          <div className="text-white text-sm mb-2">{currentMission.description}</div>
-          <div className="bg-gray-700 rounded-full h-2 mb-2">
-            <div 
-              className="bg-purple-400 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(missionProgress / currentMission.target) * 100}%` }}
-            />
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-amber-500/50 max-w-sm shadow-2xl">
+          <div className="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 px-4 py-2 border-b border-amber-500/30">
+            <div className="text-amber-400 font-bold text-sm flex items-center gap-2">
+              <span>⚡</span>
+              <span>TACTICAL OBJECTIVE</span>
+              <span className="text-xs bg-amber-500/20 px-2 py-1 rounded">ACTIVE</span>
+            </div>
           </div>
-          <div className="flex justify-between text-xs text-gray-300">
-            <span>
-              {currentMission.type === 'survive' 
-                ? `${Math.floor(missionProgress / 1000)}/${Math.floor(currentMission.target / 1000)}s`
-                : `${missionProgress}/${currentMission.target}`
-              }
-            </span>
-            <span className="text-green-400">{currentMission.reward} SP</span>
-          </div>
-          <div className="text-xs text-gray-400 mt-1">
-            {Math.max(0, Math.ceil((currentMission.startTime + currentMission.duration - Date.now()) / 1000))}s left
+          <div className="p-4">
+            <div className="text-gray-100 text-sm mb-3 font-medium">{currentMission.description}</div>
+            <div className="bg-gray-800/60 rounded h-2 mb-3 border border-gray-600/50">
+              <div 
+                className="bg-gradient-to-r from-amber-500 to-yellow-500 h-2 rounded transition-all duration-300"
+                style={{ width: `${(missionProgress / currentMission.target) * 100}%` }}
+              />
+            </div>
+            <div className="flex justify-between items-center text-xs">
+              <div className="flex items-center gap-4">
+                <span className="text-gray-300">
+                  PROGRESS: <span className="text-white font-bold">
+                    {currentMission.type === 'survive' 
+                      ? `${Math.floor(missionProgress / 1000)}/${Math.floor(currentMission.target / 1000)}s`
+                      : `${missionProgress}/${currentMission.target}`
+                    }
+                  </span>
+                </span>
+                <span className="text-amber-400 font-bold">REWARD: {currentMission.reward} SP</span>
+              </div>
+              <div className="text-red-400 font-bold">
+                T-{Math.max(0, Math.ceil((currentMission.startTime + currentMission.duration - Date.now()) / 1000))}s
+              </div>
+            </div>
           </div>
         </div>
       )}
