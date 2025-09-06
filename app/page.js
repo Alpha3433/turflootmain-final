@@ -564,8 +564,12 @@ export default function TurfLootTactical() {
         <!-- Current Balance -->
         <div style="margin-bottom: 24px; padding: 16px; background: rgba(246, 173, 85, 0.1); border: 1px solid #f6ad55; border-radius: 8px;">
           <div style="color: #f6ad55; font-size: 14px; font-weight: 600; margin-bottom: 8px;">AVAILABLE BALANCE</div>
-          <div style="color: #e2e8f0; font-size: 24px; font-weight: 700;">$0.00 USD</div>
-          <div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">Connect wallet to view balance</div>
+          <div style="color: #e2e8f0; font-size: 24px; font-weight: 700;">
+            ${walletBalance.loading ? 'Loading...' : `$${walletBalance.usd} USD`}
+          </div>
+          <div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">
+            ${walletBalance.loading ? 'Fetching balance...' : `${walletBalance.sol} SOL available`}
+          </div>
         </div>
 
         <!-- Withdraw Amount -->
