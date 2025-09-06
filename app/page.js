@@ -998,7 +998,7 @@ export default function TurfLootTactical() {
         {/* Top Right - Arsenal */}
         <div style={{
           position: 'absolute',
-          right: '120px',
+          right: '60px',
           top: '160px',
           width: '280px',
           zIndex: 20,
