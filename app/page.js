@@ -150,6 +150,162 @@ export default function TurfLootTactical() {
     setIsServerBrowserOpen(false) // Close the modal after joining
   }
 
+  const createDesktopLeaderboardPopup = async () => {
+    // Only create popup on desktop
+    if (window.innerWidth <= 768) return
+
+    // Remove any existing leaderboard popup
+    const existing = document.getElementById('desktop-leaderboard-popup')
+    if (existing) existing.remove()
+
+    // Fetch leaderboard data
+    let leaderboardData = []
+    try {
+      console.log('🏆 Fetching leaderboard data...')
+      const response = await fetch('/api/users/leaderboard')
+      if (response.ok) {
+        const data = await response.json()
+        leaderboardData = data.users?.slice(0, 10) || [] // Top 10 players
+      }
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error)
+    }
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'desktop-leaderboard-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(0, 0, 0, 0.9) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 999999999 !important;
+      pointer-events: auto !important;
+    `
+
+    // Create the modal content
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background-color: #1a202c !important;
+      border: 3px solid #68d391 !important;
+      border-radius: 12px !important;
+      max-width: 900px !important;
+      width: 90% !important;
+      max-height: 80vh !important;
+      overflow-y: auto !important;
+      padding: 0 !important;
+      color: white !important;
+      box-shadow: 0 0 50px rgba(104, 211, 145, 0.5) !important;
+      font-family: "Rajdhani", sans-serif !important;
+    `
+
+    // Generate leaderboard HTML
+    const leaderboardHTML = `
+      <div style="padding: 24px; border-bottom: 2px solid #68d391; background: linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(45deg, #68d391 0%, #48bb78 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+              🏆
+            </div>
+            <div>
+              <h2 style="color: #68d391; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(104, 211, 145, 0.6);">
+                GLOBAL LEADERBOARD
+              </h2>
+              <p style="color: #a0aec0; font-size: 14px; margin: 4px 0 0 0;">
+                Top players by performance • Live Rankings
+              </p>
+            </div>
+          </div>
+          <button id="close-leaderboard" style="background: rgba(252, 129, 129, 0.2); border: 2px solid #fc8181; border-radius: 8px; padding: 12px; color: #fc8181; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 24px;">
+        ${leaderboardData.length > 0 ? `
+          <div style="display: grid; grid-template-columns: 60px 1fr 120px 120px 120px; gap: 16px; padding: 16px; background: rgba(104, 211, 145, 0.1); border-radius: 8px; font-size: 14px; font-weight: 700; color: #68d391; text-transform: uppercase; margin-bottom: 16px;">
+            <div>RANK</div>
+            <div>PLAYER</div>
+            <div>GAMES WON</div>
+            <div>GAMES PLAYED</div>
+            <div>WIN RATE</div>
+          </div>
+          ${leaderboardData.map((player, index) => {
+            const winRate = player.gamesPlayed > 0 ? ((player.gamesWon / player.gamesPlayed) * 100).toFixed(1) : '0.0'
+            const rankColor = index < 3 ? (index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : '#cd7f32') : '#68d391'
+            return `
+              <div style="display: grid; grid-template-columns: 60px 1fr 120px 120px 120px; gap: 16px; padding: 16px; background: ${index % 2 === 0 ? 'rgba(45, 55, 72, 0.3)' : 'rgba(26, 32, 44, 0.3)'}; border-radius: 8px; border-left: 4px solid ${rankColor}; margin-bottom: 8px;">
+                <div style="font-size: 18px; font-weight: 700; color: ${rankColor}; display: flex; align-items: center;">
+                  #${index + 1}
+                </div>
+                <div style="font-size: 16px; font-weight: 600; color: #e2e8f0; display: flex; align-items: center;">
+                  ${player.username || 'Anonymous'}
+                </div>
+                <div style="font-size: 16px; color: #68d391; font-weight: 600; display: flex; align-items: center;">
+                  ${player.gamesWon || 0}
+                </div>
+                <div style="font-size: 16px; color: #a0aec0; display: flex; align-items: center;">
+                  ${player.gamesPlayed || 0}
+                </div>
+                <div style="font-size: 16px; color: ${parseFloat(winRate) >= 70 ? '#68d391' : parseFloat(winRate) >= 50 ? '#f6ad55' : '#fc8181'}; font-weight: 600; display: flex; align-items: center;">
+                  ${winRate}%
+                </div>
+              </div>
+            `
+          }).join('')}
+        ` : `
+          <div style="text-align: center; padding: 60px 20px; color: #a0aec0;">
+            <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+            <div style="font-size: 18px; margin-bottom: 8px;">NO LEADERBOARD DATA</div>
+            <div style="font-size: 14px;">Play some games to see the rankings!</div>
+          </div>
+        `}
+      </div>
+
+      <div style="padding: 16px 24px; background: rgba(26, 32, 44, 0.8); border-top: 2px solid rgba(104, 211, 145, 0.2); text-align: center; border-radius: 0 0 8px 8px;">
+        <div style="font-size: 12px; color: #68d391; text-transform: uppercase;">
+          🔄 Live Rankings • Updated: ${new Date().toLocaleTimeString()}
+        </div>
+      </div>
+    `
+
+    modal.innerHTML = leaderboardHTML
+
+    // Add close functionality
+    modal.addEventListener('click', (e) => {
+      if (e.target.id === 'close-leaderboard') {
+        popup.remove()
+      }
+    })
+
+    // Close on backdrop click
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        popup.remove()
+      }
+    })
+
+    // Close on Escape key
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        popup.remove()
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+
+    popup.appendChild(modal)
+    document.body.appendChild(popup)
+
+    console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
+  }
+
   const handleLogin = async () => {
     try {
       if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
