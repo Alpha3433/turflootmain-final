@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
 
 const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
+  console.log('ServerBrowserModal rendered with isOpen:', isOpen)
+  
   const [servers, setServers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
