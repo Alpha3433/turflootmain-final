@@ -753,8 +753,8 @@ export default function TurfLootTactical() {
               letterSpacing: '0.1em'
             }}>
               PLAYER: {isAuthenticated ? 
-                (user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
-                userName.toUpperCase()
+                (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
+                (customUsername || userName).toUpperCase()
               }
             </span>
           </div>
