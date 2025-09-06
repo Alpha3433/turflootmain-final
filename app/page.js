@@ -707,20 +707,6 @@ export default function TurfLootTactical() {
       publicOption.querySelector('div:nth-child(2)').style.color = '#a0aec0'
     })
 
-    // Max players selection
-    const maxPlayersOptions = modal.querySelectorAll('.max-players-option')
-    maxPlayersOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        selectedMaxPlayers = parseInt(option.dataset.players)
-        maxPlayersOptions.forEach(opt => {
-          opt.style.border = '2px solid #4a5568'
-          opt.style.color = '#a0aec0'
-        })
-        option.style.border = '2px solid #fc8181'
-        option.style.color = '#fc8181'
-      })
-    })
-
     // Close functionality
     const closeButtons = modal.querySelectorAll('#close-create-party, #cancel-create-party')
     closeButtons.forEach(btn => {
