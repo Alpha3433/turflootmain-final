@@ -1774,8 +1774,8 @@ export default function TurfLootTactical() {
           }
           
           // Fallback: create a local room ID and let the game handle it
-          const fallbackRoomId = \`local-\${Math.random().toString(36).substring(2, 15)}\`
-          const gameUrl = \`/agario?roomId=\${fallbackRoomId}&mode=practice&fee=0&region=\${server.region || 'us-east'}&multiplayer=fallback&server=global\`
+          const fallbackRoomId = 'local-' + Math.random().toString(36).substring(2, 15)
+          const gameUrl = '/agario?roomId=' + fallbackRoomId + '&mode=practice&fee=0&region=' + (server.region || 'us-east') + '&multiplayer=fallback&server=global'
           console.log('🔄 Falling back to local room:', gameUrl)
           
           alert('Creating multiplayer room... You may be the first player in this session!')
