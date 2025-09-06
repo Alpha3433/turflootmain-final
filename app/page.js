@@ -1991,6 +1991,27 @@ export default function TurfLootTactical() {
           </div>
           
           <button 
+            onClick={() => createDesktopJoinPartyPopup()}
+            style={{
+            width: '100%',
+            padding: '12px',
+            background: 'rgba(26, 32, 44, 0.8)',
+            border: '2px solid #f6ad55',
+            borderRadius: '4px',
+            color: '#f6ad55',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 0 15px rgba(246, 173, 85, 0.3)',
+            fontFamily: '"Rajdhani", sans-serif',
+            textTransform: 'uppercase',
+            marginBottom: '12px'
+          }}>
+            JOIN PARTY
+          </button>
+          
+          <button 
             onClick={() => createDesktopCreatePartyPopup()}
             style={{
             width: '100%',
