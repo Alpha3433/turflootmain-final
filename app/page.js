@@ -766,6 +766,77 @@ export default function TurfLootTactical() {
                 }}
               />
             ))}
+            
+            {/* Login/Logout Button */}
+            {isAuthenticated ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  color: '#68d391',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}>
+                  {user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 6) + '...' || 'USER'}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    padding: '6px 12px',
+                    background: 'rgba(252, 129, 129, 0.2)',
+                    border: '2px solid #fc8181',
+                    borderRadius: '4px',
+                    color: '#fc8181',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 0 10px rgba(252, 129, 129, 0.3)',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+                    e.target.style.boxShadow = '0 0 15px rgba(252, 129, 129, 0.5)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                    e.target.style.boxShadow = '0 0 10px rgba(252, 129, 129, 0.3)'
+                  }}
+                >
+                  LOGOUT
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleLogin}
+                style={{
+                  padding: '8px 16px',
+                  background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                  border: '2px solid #68d391',
+                  borderRadius: '4px',
+                  color: '#1a202c',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.transform = 'scale(1.05)'
+                  e.target.style.boxShadow = '0 0 30px rgba(104, 211, 145, 0.6)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.transform = 'scale(1)'
+                  e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.4)'
+                }}
+              >
+                🔐 LOGIN
+              </button>
+            )}
           </div>
         </div>
 
