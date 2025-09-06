@@ -3396,7 +3396,9 @@ export default function TurfLootTactical() {
             </div>
           </div>
           
-          <button style={{
+          <button 
+            onClick={() => createSkinStorePopup()}
+            style={{
             width: '100%',
             padding: '14px',
             background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
@@ -3414,7 +3416,9 @@ export default function TurfLootTactical() {
             VIEW STORE
           </button>
           
-          <button style={{
+          <button 
+            onClick={() => createSkinStorePopup()}
+            style={{
             width: '100%',
             padding: '12px',
             background: 'rgba(26, 32, 44, 0.8)',
