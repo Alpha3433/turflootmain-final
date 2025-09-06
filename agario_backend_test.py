@@ -274,13 +274,13 @@ class AgarIOBackendTester:
         print("\n🔍 TESTING: Performance & Reliability")
         
         try:
-            # Test multiple rapid API calls
+            # Test multiple rapid API calls using ping endpoint
             response_times = []
             success_count = 0
             
             for i in range(5):
                 start_time = time.time()
-                response = self.session.get(f"{API_BASE}/health", timeout=5)
+                response = self.session.get(f"{API_BASE}/ping", timeout=5)
                 response_time = time.time() - start_time
                 response_times.append(response_time)
                 
