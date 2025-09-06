@@ -263,7 +263,7 @@ export default function TurfLootTactical() {
   // Wallet operations with Privy integration
   const handleDeposit = async () => {
     try {
-      console.log('💰 DEPOSIT button clicked')
+      console.log('💰 DEPOSIT button clicked - using native Privy popup')
       
       // Check if Privy is available
       if (!window.__TURFLOOT_PRIVY__) {
@@ -287,15 +287,34 @@ export default function TurfLootTactical() {
         }
       }
       
-      // Check if user has a wallet
-      if (!privy.user?.wallet?.address) {
-        console.log('👛 No wallet found, prompting wallet connection')
-        alert('Please connect a wallet to deposit funds. You can do this through your profile settings.')
+      // Get user's embedded wallet
+      const user = privy.user
+      if (!user || !user.wallet) {
+        console.log('👛 No embedded wallet found, user needs to set up wallet')
+        alert('Please set up your embedded wallet first through your profile settings.')
         return
       }
       
-      // Create deposit popup
-      createDepositPopup(privy.user)
+      const embeddedWallet = user.wallet
+      console.log('💰 Opening Privy fund wallet popup for wallet:', embeddedWallet.address)
+      
+      // Use Privy's native fund wallet popup
+      if (privy.fundWallet) {
+        try {
+          const result = await privy.fundWallet(embeddedWallet)
+          console.log('✅ Privy fund wallet completed:', result)
+        } catch (error) {
+          console.error('❌ Privy fund wallet error:', error)
+          if (error.message.includes('user_cancelled')) {
+            console.log('ℹ️ User cancelled the funding process')
+          } else {
+            alert('An error occurred during the funding process. Please try again.')
+          }
+        }
+      } else {
+        console.error('❌ Privy fundWallet not available')
+        alert('Wallet funding functionality is not available. Please ensure you are logged in.')
+      }
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
