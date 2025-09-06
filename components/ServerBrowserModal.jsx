@@ -122,7 +122,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      backgroundColor: 'rgba(0, 0, 0, 0.9)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
