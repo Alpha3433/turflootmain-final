@@ -4695,54 +4695,61 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Live Leaderboard (All Players) - Desktop Only */}
+      {/* COMMAND LEADERBOARD - Military Style */}
       {!isGameOver && !isMobile && (
-        <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 max-w-[280px]">
-          <div className="text-cyan-400 font-bold text-lg mb-3">💰 Live Leaderboard</div>
-          <div className="space-y-1 max-h-96 overflow-y-auto">
-            {leaderboard.slice(0, 5).map((player) => (
-              <div 
-                key={`${player.rank}-${player.name}`}
-                className={`flex justify-between items-center py-1 px-2 rounded text-sm ${
-                  player.isPlayer 
-                    ? 'bg-cyan-600/30 border border-cyan-400/50' 
-                    : 'hover:bg-gray-800/30'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <span className={`font-bold w-6 text-center ${
-                    player.rank === 1 ? 'text-yellow-400' : 
-                    player.rank === 2 ? 'text-gray-300' : 
-                    player.rank === 3 ? 'text-orange-400' : 'text-gray-400'
-                  }`}>
-                    #{player.rank}
-                  </span>
-                  <span className={`${player.isPlayer ? 'text-cyan-400 font-bold' : 'text-white'}`}>
-                    {player.name}
-                  </span>
-                  {player.isBounty && <span className="text-yellow-400">👑</span>}
-                </div>
-                <span className="text-green-400 font-bold">
-                  ${player.netWorth}
-                </span>
-              </div>
-            ))}
+        <div className="absolute top-4 left-4 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-cyan-500/50 max-w-[300px] shadow-2xl">
+          <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 px-4 py-2 border-b border-cyan-500/30">
+            <div className="text-cyan-400 font-bold text-sm flex items-center gap-2">
+              <span>🏆</span>
+              <span>COMMAND LEADERBOARD</span>
+            </div>
           </div>
-          
-          {/* Live Player Count */}
-          {leaderboard.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-600/30">
-              <div className="text-center text-gray-300 text-sm">
-                <span className="text-cyan-400 font-bold">{leaderboard.length}</span> players in game
+          <div className="p-4">
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {leaderboard.slice(0, 5).map((player) => (
+                <div 
+                  key={`${player.rank}-${player.name}`}
+                  className={`flex justify-between items-center p-2 rounded border ${
+                    player.isPlayer 
+                      ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300' 
+                      : 'bg-gray-800/50 border-gray-600/30 text-gray-300'
+                  }`}>
+                  <div className="flex items-center gap-3">
+                    <span className={`font-bold text-sm px-2 py-1 rounded ${
+                      player.rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
+                      player.rank === 2 ? 'bg-gray-400/20 text-gray-300' :
+                      player.rank === 3 ? 'bg-orange-500/20 text-orange-400' :
+                      'bg-gray-600/20 text-gray-400'
+                    }`}>
+                      #{player.rank}
+                    </span>
+                    <span className={`font-medium ${player.isPlayer ? 'text-cyan-200' : 'text-white'}`}>
+                      {player.name}
+                    </span>
+                    {player.isBounty && <span className="text-yellow-400">🎯</span>}
+                  </div>
+                  <span className="text-green-400 font-bold">
+                    ${player.netWorth}
+                  </span>
+                </div>
+              ))}
+            </div>
+            
+            {/* Active Operatives Count */}
+            {leaderboard.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-gray-600/30">
+                <div className="text-center text-gray-300 text-sm">
+                  <span className="text-cyan-400 font-bold">{leaderboard.length}</span> operatives in field
+                </div>
               </div>
-            </div>
-          )}
-          
-          {leaderboard.length === 0 && (
-            <div className="text-gray-400 text-sm text-center py-2">
-              No players in game
-            </div>
-          )}
+            )}
+            
+            {leaderboard.length === 0 && (
+              <div className="text-gray-400 text-sm text-center py-2">
+                No operatives deployed
+              </div>
+            )}
+          </div>
         </div>
       )}
 
