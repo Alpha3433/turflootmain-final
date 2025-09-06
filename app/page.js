@@ -2306,7 +2306,23 @@ export default function TurfLootTactical() {
         }
       `}</style>
 
+      {/* Debug Info - Remove this later */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        background: 'rgba(255, 0, 0, 0.8)',
+        color: 'white',
+        padding: '10px',
+        zIndex: 100000,
+        fontSize: '12px',
+        borderRadius: '4px'
+      }}>
+        ServerBrowser State: {isServerBrowserOpen ? 'OPEN' : 'CLOSED'}
+      </div>
+
       {/* Server Browser Modal */}
+      {console.log('Rendering ServerBrowserModal with isOpen:', isServerBrowserOpen)}
       <ServerBrowserModal
         isOpen={isServerBrowserOpen}
         onClose={() => {
