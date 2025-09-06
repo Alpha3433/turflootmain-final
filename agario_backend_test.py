@@ -95,13 +95,12 @@ class AgarIOBackendTester:
         """Test 2: Game Session APIs - Test session tracking for Agar.io game"""
         print("\n🔍 TESTING: Game Session APIs")
         
-        # Test session join
+        # Test game-sessions/join endpoint with proper parameters
         try:
             start_time = time.time()
             join_data = {
                 "roomId": "agario-test-room",
-                "gameMode": "practice",
-                "playerName": "TestPlayer"
+                "playerId": "test-player-123"
             }
             response = self.session.post(f"{API_BASE}/game-sessions/join", 
                                        json=join_data, timeout=10)
@@ -119,7 +118,10 @@ class AgarIOBackendTester:
                 
                 # Test session leave
                 start_time = time.time()
-                leave_data = {"sessionId": session_id}
+                leave_data = {
+                    "roomId": "agario-test-room",
+                    "playerId": "test-player-123"
+                }
                 response = self.session.post(f"{API_BASE}/game-sessions/leave", 
                                            json=leave_data, timeout=10)
                 response_time = time.time() - start_time
@@ -135,7 +137,7 @@ class AgarIOBackendTester:
                     return self.log_test(
                         "Game Session Leave", 
                         False, 
-                        f"HTTP {response.status_code}", 
+                        f"HTTP {response.status_code}: {response.text[:100]}", 
                         response_time
                     )
             else:
