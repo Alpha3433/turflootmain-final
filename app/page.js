@@ -1113,7 +1113,7 @@ export default function TurfLootTactical() {
             }}>👥</div>
             <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>PARTY</h3>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
-              <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>[↻] SWEEP</span>
+              <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>REFRESH</span>
               <span style={{ fontSize: '11px', color: '#f6ad55', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>0 ACTIVE</span>
             </div>
           </div>
