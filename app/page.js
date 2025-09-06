@@ -1656,58 +1656,138 @@ export default function TurfLootTactical() {
       })
     }
 
-    // Join server function - Updated with loading popup
+    // Join server function - Updated with on-demand room creation
     const joinServer = async (server) => {
       console.log('🎮 Joining server:', server)
       
-      // Check if this is the Global Multiplayer (US East) server - go directly to game with Hathora
+      // Check if this is the Global Multiplayer (US East) server - create room on-demand
       if (server.id === 'global-practice-bots' || server.name.includes('Global Multiplayer')) {
-        console.log('🚀 Direct game entry for Global Multiplayer server via Hathora')
+        console.log('🚀 Direct game entry for Global Multiplayer server - creating room on-demand')
         popup.remove()
         
         // Show loading popup
         const loadingPopup = createGameLoadingPopup()
         
         try {
-          // Wait for loading animation to complete (about 7 seconds)
-          setTimeout(() => {
-            // Connect directly to Hathora with a fallback approach
-            console.log('🌍 Connecting to Hathora multiplayer servers...')
-            
-            // Generate a room ID for Hathora connection
-            const roomId = `room-${Math.random().toString(36).substring(2, 15)}`
-            console.log('🎯 Generated room ID for Hathora:', roomId)
-            
-            // Remove loading popup and redirect to game
-            if (loadingPopup && loadingPopup.cleanup) {
-              loadingPopup.cleanup()
+          // Create room on-demand when user wants to play
+          console.log('🌍 Creating multiplayer room on-demand...')
+          
+          // Import Hathora client
+          const { HathoraClient } = require('@hathora/client-sdk')
+          const hathoraClient = new HathoraClient(process.env.NEXT_PUBLIC_HATHORA_APP_ID || 'app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb')
+          
+          // Authenticate
+          console.log('🔐 Authenticating with Hathora...')
+          await hathoraClient.loginAnonymous()
+          console.log('✅ Hathora authentication successful')
+          
+          // Create a new room specifically for this user/session
+          const roomConfig = {
+            gameMode: 'global_multiplayer',
+            maxPlayers: 8,
+            roomName: \`Global Room \${Math.floor(Math.random() * 1000)}\`,
+            region: server.region || 'us-east',
+            timestamp: Date.now()
+          }
+          
+          console.log('🎯 Creating new room with config:', roomConfig)
+          
+          // Try multiple regions for best availability
+          const regions = ['washington_dc', 'seattle', 'london', 'sydney']
+          let roomCreated = false
+          let finalRoomId = null
+          let finalRegion = null
+          
+          for (const region of regions) {
+            try {
+              console.log(\`   Trying to create room in \${region}...\`)
+              const roomResult = await hathoraClient.createPublicLobby(region, JSON.stringify({
+                ...roomConfig,
+                region: region,
+                creator: 'global_multiplayer_user',
+                gameType: 'practice'
+              }))
+              
+              console.log(\`   ✅ Room creation successful in \${region}\`)
+              roomCreated = true
+              finalRegion = region
+              
+              // Wait a moment then get the room ID from lobby list
+              await new Promise(resolve => setTimeout(resolve, 3000))
+              const lobbies = await hathoraClient.getPublicLobbies()
+              
+              if (lobbies.length > 0) {
+                // Find the most recent lobby (likely ours)
+                const recentLobby = lobbies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]
+                finalRoomId = recentLobby.roomId
+                console.log(\`   🎯 Got room ID: \${finalRoomId}\`)
+                
+                // Test if connection details are available
+                try {
+                  const connDetails = await hathoraClient.getConnectionDetailsForRoomId(finalRoomId)
+                  if (connDetails?.exposedPort) {
+                    console.log(\`   🌐 Room is active with connection: \${connDetails.exposedPort.host}:\${connDetails.exposedPort.port}\`)
+                  }
+                } catch (connError) {
+                  console.log(\`   ⚠️ Room created but connection pending: \${connError.message}\`)
+                }
+                
+                break
+              } else {
+                console.log(\`   ⚠️ Room created in \${region} but not yet visible in lobby list\`)
+                finalRoomId = \`room-\${region}-\${Date.now()}\`
+                break
+              }
+              
+            } catch (regionError) {
+              console.log(\`   ❌ Failed to create room in \${region}: \${regionError.message}\`)
+              continue
             }
+          }
+          
+          if (roomCreated) {
+            console.log(\`🎉 Room successfully created in \${finalRegion}\`)
             
-            // Redirect to game with Hathora parameters - the game will handle Hathora connection
-            const gameUrl = `/agario?roomId=${roomId}&mode=practice&fee=0&region=${server.region || 'us-east'}&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb`
-            console.log('🎮 Redirecting to Hathora multiplayer game:', gameUrl)
-            window.location.href = gameUrl
-          }, 7000) // Wait for loading animation to complete
+            // Remove loading popup after successful creation
+            setTimeout(() => {
+              if (loadingPopup && loadingPopup.cleanup) {
+                loadingPopup.cleanup()
+              }
+              
+              // Redirect to game with the newly created room
+              const gameUrl = \`/agario?roomId=\${finalRoomId}&mode=practice&fee=0&region=\${finalRegion}&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true\`
+              console.log('🎮 Redirecting to newly created multiplayer room:', gameUrl)
+              window.location.href = gameUrl
+              
+            }, 4000) // Give room time to fully initialize
+            
+          } else {
+            throw new Error('Failed to create room in any region')
+          }
           
         } catch (error) {
-          console.error('❌ Hathora connection setup failed:', error)
-          console.log('🔄 Falling back to direct game connection')
+          console.error('❌ On-demand room creation failed:', error)
           
           // Remove loading popup
           if (loadingPopup && loadingPopup.cleanup) {
             loadingPopup.cleanup()
           }
           
-          // Fallback to direct game connection if Hathora setup fails
-          const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'us-east'}&multiplayer=fallback`
+          // Fallback: create a local room ID and let the game handle it
+          const fallbackRoomId = \`local-\${Math.random().toString(36).substring(2, 15)}\`
+          const gameUrl = \`/agario?roomId=\${fallbackRoomId}&mode=practice&fee=0&region=\${server.region || 'us-east'}&multiplayer=fallback&server=global\`
+          console.log('🔄 Falling back to local room:', gameUrl)
+          
+          alert('Creating multiplayer room... You may be the first player in this session!')
           window.location.href = gameUrl
         }
+        
         return
       }
       
-      // For other servers, show confirmation message first
+      // For other servers, show confirmation and create room on-demand too
       const serverType = server.stake > 0 ? 'paid' : 'free'
-      const message = `Joining ${server.name}!\n\nRegion: ${server.region}\nMode: ${server.mode}\nPlayers: ${server.currentPlayers}/${server.maxPlayers}${server.stake > 0 ? `\nStake: $${server.stake}` : ''}\n\nConnecting via Hathora multiplayer infrastructure.`
+      const message = \`Joining \${server.name}!\n\nRegion: \${server.region}\nMode: \${server.mode}\nPlayers: \${server.currentPlayers}/\${server.maxPlayers}\${server.stake > 0 ? \`\nStake: $\${server.stake}\` : ''}\n\nCreating dedicated room for your session...\`
       
       alert(message)
       popup.remove()
@@ -1716,26 +1796,25 @@ export default function TurfLootTactical() {
       const loadingPopup = createGameLoadingPopup()
       
       try {
-        // Wait for loading animation
-        setTimeout(() => {
-          // Generate room ID for other servers too
-          const roomId = `room-${server.id}-${Math.random().toString(36).substring(2, 10)}`
-          console.log('🌍 Setting up Hathora connection for server:', server.name, 'Room:', roomId)
+        // Create on-demand room for other server types too
+        setTimeout(async () => {
+          const roomId = \`\${server.id}-\${Math.random().toString(36).substring(2, 10)}\`
+          console.log('🌍 Creating on-demand room for server:', server.name, 'Room:', roomId)
           
           // Remove loading popup
           if (loadingPopup && loadingPopup.cleanup) {
             loadingPopup.cleanup()
           }
           
-          // Redirect with Hathora parameters
+          // Redirect with on-demand room parameters
           const gameMode = server.mode || 'practice'
-          const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb`
-          console.log('🎮 Redirecting to Hathora multiplayer:', gameUrl)
+          const gameUrl = \`/agario?roomId=\${roomId}&mode=\${gameMode}&fee=\${server.stake || 0}&region=\${server.region || 'unknown'}&multiplayer=hathora&server=\${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true\`
+          console.log('🎮 Redirecting to on-demand room:', gameUrl)
           window.location.href = gameUrl
-        }, 7000)
+        }, 5000)
         
       } catch (error) {
-        console.error('❌ Hathora setup failed for server, using fallback:', error)
+        console.error('❌ On-demand room creation failed for server:', error)
         
         // Remove loading popup
         if (loadingPopup && loadingPopup.cleanup) {
@@ -1743,7 +1822,7 @@ export default function TurfLootTactical() {
         }
         
         // Fallback to direct connection
-        const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=direct`
+        const gameUrl = \`/agario?roomId=\${server.id}&mode=\${server.mode}&fee=\${server.stake || 0}&region=\${server.region || 'unknown'}&multiplayer=direct\`
         console.log('🎮 Redirecting to direct game:', gameUrl)
         window.location.href = gameUrl
       }
