@@ -260,6 +260,223 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
+  const createDesktopCreatePartyPopup = () => {
+    // Only create popup on desktop
+    if (window.innerWidth <= 768) return
+
+    // Remove any existing create party popup
+    const existing = document.getElementById('desktop-create-party-popup')
+    if (existing) existing.remove()
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'desktop-create-party-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: rgba(0, 0, 0, 0.9) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 999999999 !important;
+      pointer-events: auto !important;
+    `
+
+    // Create the modal content
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background-color: #1a202c !important;
+      border: 3px solid #fc8181 !important;
+      border-radius: 12px !important;
+      max-width: 600px !important;
+      width: 90% !important;
+      padding: 0 !important;
+      color: white !important;
+      box-shadow: 0 0 50px rgba(252, 129, 129, 0.5) !important;
+      font-family: "Rajdhani", sans-serif !important;
+    `
+
+    // Generate party creation HTML
+    const partyHTML = `
+      <div style="padding: 24px; border-bottom: 2px solid #fc8181; background: linear-gradient(45deg, rgba(252, 129, 129, 0.1) 0%, rgba(252, 129, 129, 0.05) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(45deg, #fc8181 0%, #e53e3e 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+              👥
+            </div>
+            <div>
+              <h2 style="color: #fc8181; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(252, 129, 129, 0.6);">
+                CREATE PARTY
+              </h2>
+              <p style="color: #a0aec0; font-size: 14px; margin: 4px 0 0 0;">
+                Set up your squad for tactical gameplay
+              </p>
+            </div>
+          </div>
+          <button id="close-create-party" style="background: rgba(252, 129, 129, 0.2); border: 2px solid #fc8181; border-radius: 8px; padding: 12px; color: #fc8181; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 32px;">
+        <!-- Party Name Input -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">
+            PARTY NAME
+          </label>
+          <input 
+            id="party-name-input" 
+            type="text" 
+            placeholder="Enter party name..." 
+            maxlength="20"
+            style="width: 100%; padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #fc8181; border-radius: 8px; color: #e2e8f0; font-size: 16px; font-family: 'Rajdhani', sans-serif; box-sizing: border-box;"
+          />
+        </div>
+
+        <!-- Party Privacy Settings -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px;">
+            PRIVACY SETTINGS
+          </label>
+          <div style="display: flex; gap: 12px;">
+            <div style="flex: 1; padding: 16px; background: rgba(45, 55, 72, 0.5); border: 2px solid #68d391; border-radius: 8px; cursor: pointer; text-align: center;" id="public-option">
+              <div style="font-size: 18px; margin-bottom: 8px;">🌐</div>
+              <div style="color: #68d391; font-weight: 600; font-size: 14px; text-transform: uppercase;">PUBLIC</div>
+              <div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">Anyone can join</div>
+            </div>
+            <div style="flex: 1; padding: 16px; background: rgba(45, 55, 72, 0.5); border: 2px solid #4a5568; border-radius: 8px; cursor: pointer; text-align: center;" id="private-option">
+              <div style="font-size: 18px; margin-bottom: 8px;">🔒</div>
+              <div style="color: #a0aec0; font-weight: 600; font-size: 14px; text-transform: uppercase;">PRIVATE</div>
+              <div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">Invite only</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Max Players Setting -->
+        <div style="margin-bottom: 32px;">
+          <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px;">
+            MAX PLAYERS
+          </label>
+          <div style="display: flex; gap: 8px;">
+            ${[2, 4, 6, 8].map(num => `
+              <div style="flex: 1; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid ${num === 4 ? '#fc8181' : '#4a5568'}; border-radius: 8px; cursor: pointer; text-align: center; color: ${num === 4 ? '#fc8181' : '#a0aec0'}; font-weight: 600;" class="max-players-option" data-players="${num}">
+                ${num}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+          <button id="cancel-create-party" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+            CANCEL
+          </button>
+          <button id="create-party-btn" style="flex: 1; padding: 16px; background: linear-gradient(45deg, #fc8181 0%, #e53e3e 100%); border: 2px solid #fc8181; border-radius: 8px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; box-shadow: 0 0 20px rgba(252, 129, 129, 0.4);">
+            CREATE PARTY
+          </button>
+        </div>
+      </div>
+    `
+
+    modal.innerHTML = partyHTML
+
+    // Add interactivity
+    let selectedPrivacy = 'public'
+    let selectedMaxPlayers = 4
+
+    // Privacy option selection
+    const publicOption = modal.querySelector('#public-option')
+    const privateOption = modal.querySelector('#private-option')
+    
+    publicOption.addEventListener('click', () => {
+      selectedPrivacy = 'public'
+      publicOption.style.border = '2px solid #68d391'
+      publicOption.querySelector('div:nth-child(2)').style.color = '#68d391'
+      privateOption.style.border = '2px solid #4a5568'
+      privateOption.querySelector('div:nth-child(2)').style.color = '#a0aec0'
+    })
+    
+    privateOption.addEventListener('click', () => {
+      selectedPrivacy = 'private'
+      privateOption.style.border = '2px solid #fc8181'
+      privateOption.querySelector('div:nth-child(2)').style.color = '#fc8181'
+      publicOption.style.border = '2px solid #4a5568'
+      publicOption.querySelector('div:nth-child(2)').style.color = '#a0aec0'
+    })
+
+    // Max players selection
+    const maxPlayersOptions = modal.querySelectorAll('.max-players-option')
+    maxPlayersOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        selectedMaxPlayers = parseInt(option.dataset.players)
+        maxPlayersOptions.forEach(opt => {
+          opt.style.border = '2px solid #4a5568'
+          opt.style.color = '#a0aec0'
+        })
+        option.style.border = '2px solid #fc8181'
+        option.style.color = '#fc8181'
+      })
+    })
+
+    // Close functionality
+    const closeButtons = modal.querySelectorAll('#close-create-party, #cancel-create-party')
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', () => popup.remove())
+    })
+
+    // Create party functionality
+    modal.querySelector('#create-party-btn').addEventListener('click', () => {
+      const partyName = modal.querySelector('#party-name-input').value.trim()
+      
+      if (!partyName) {
+        modal.querySelector('#party-name-input').style.border = '2px solid #e53e3e'
+        modal.querySelector('#party-name-input').focus()
+        return
+      }
+
+      console.log('🎯 Creating party:', {
+        name: partyName,
+        privacy: selectedPrivacy,
+        maxPlayers: selectedMaxPlayers
+      })
+
+      // Here you would typically make an API call to create the party
+      // For now, we'll show a success message and close
+      alert(`Party "${partyName}" created successfully!\\n\\nPrivacy: ${selectedPrivacy.toUpperCase()}\\nMax Players: ${selectedMaxPlayers}`)
+      popup.remove()
+    })
+
+    // Close on backdrop click
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        popup.remove()
+      }
+    })
+
+    // Close on Escape key
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        popup.remove()
+        document.removeEventListener('keydown', handleEscape)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+
+    // Focus on party name input
+    setTimeout(() => {
+      modal.querySelector('#party-name-input').focus()
+    }, 100)
+
+    popup.appendChild(modal)
+    document.body.appendChild(popup)
+
+    console.log('🎯 Desktop create party popup created with direct DOM manipulation')
+  }
+
   const handleLogin = async () => {
     try {
       if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
