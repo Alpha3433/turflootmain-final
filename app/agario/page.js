@@ -4654,36 +4654,41 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Stats Panel - Desktop Only */}
+      {/* TACTICAL HUD - Military Style */}
       {!isGameOver && !isMobile && (
-        <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-cyan-400/30 min-w-[200px]">
-          <div className="text-cyan-400 font-bold text-lg mb-2">You</div>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Net Worth:</span>
-              <span className="text-green-400 font-bold">${gameStats.netWorth}</span>
+        <div className="absolute bottom-4 right-4 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-green-500/50 min-w-[220px] shadow-2xl">
+          <div className="bg-gradient-to-r from-green-600/20 to-emerald-600/20 px-4 py-2 border-b border-green-500/30">
+            <div className="text-green-400 font-bold text-sm flex items-center gap-2">
+              <span>🎖️</span>
+              <span>OPERATIVE STATUS</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Total Mass:</span>
-              <span className="text-blue-400 font-bold">{Math.floor(gameStats.mass || 0)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">K/D:</span>
-              <span className="text-white">{gameStats.kills}/{gameStats.deaths}</span>
+          </div>
+          <div className="p-4 space-y-2 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300 font-medium">ASSETS:</span>
+              <span className="text-green-400 font-bold text-lg">${gameStats.netWorth}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-300">Streak:</span>
-              <div className="flex items-center">
-                <span className="text-yellow-400 mr-1">{gameStats.streak}</span>
+              <span className="text-gray-300 font-medium">MASS:</span>
+              <span className="text-blue-400 font-bold">{Math.floor(gameStats.mass || 0)} KG</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300 font-medium">K.I.A. RATIO:</span>
+              <span className="text-white font-bold">{gameStats.kills}:{gameStats.deaths}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300 font-medium">STREAK:</span>
+              <div className="flex items-center gap-1">
+                <span className="text-yellow-400 font-bold">{gameStats.streak}</span>
                 {gameStats.streak > 0 && <span>🔥</span>}
               </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Coins Collected:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300 font-medium">RESOURCES:</span>
               <span className="text-orange-400 font-bold">{gameSession.coinsCollected || 0}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Time Alive:</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300 font-medium">MISSION TIME:</span>
               <span className="text-purple-400 font-bold">{formatTimeAlive(timeAlive)}</span>
             </div>
           </div>
