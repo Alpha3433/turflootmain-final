@@ -4922,43 +4922,50 @@ const AgarIOGame = () => {
         </div>
       )}
       
-      {/* Pure Hathora Ping Monitor - Mobile Version */}
+      {/* TACTICAL NETWORK STATUS - Military Style Mobile */}
       {!isGameOver && settings.showPingMonitor && isMobile && (
-        <div className="absolute top-20 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
-          <div className="flex items-center space-x-2 text-xs">
-            <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-cyan-400"></div>
-            <span className="text-gray-300">{currentRegion}:</span>
-            <span className={`font-bold ${
-              ping < 50 ? 'text-green-400' : 
-              ping < 100 ? 'text-yellow-400' : 
-              ping < 200 ? 'text-orange-400' : 'text-red-400'
-            }`}>
-              {ping}ms
-            </span>
-            <span className="text-cyan-400 text-xs">⚡</span>
+        <div className="absolute top-20 left-4 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-green-500/50">
+          <div className="px-2 py-1">
+            <div className="flex items-center space-x-2 text-xs">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-green-400"></div>
+              <span className="text-gray-300">{currentRegion}:</span>
+              <span className={`font-bold ${
+                ping < 50 ? 'text-green-400' : 
+                ping < 100 ? 'text-yellow-400' : 
+                ping < 200 ? 'text-orange-400' : 'text-red-400'
+              }`}>
+                {ping}ms
+              </span>
+              <span className="text-green-400 text-xs">📡</span>
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5">
+              TACTICAL NET
+            </div>
           </div>
         </div>
       )}
 
-      {/* Pure Hathora Ping Monitor - Desktop Version */}
+      {/* TACTICAL NETWORK STATUS - Military Style Desktop */}
       {!isGameOver && settings.showPingMonitor && !isMobile && (
-        <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-2 border border-gray-600/30">
-          <div className="flex items-center space-x-2 text-sm">
-            <div className="w-2 h-2 rounded-full animate-pulse bg-cyan-400"></div>
-            <span className="text-gray-300">{currentRegion}:</span>
-            <span className={`font-bold ${
-              ping < 50 ? 'text-green-400' : 
-              ping < 100 ? 'text-yellow-400' : 
-              ping < 200 ? 'text-orange-400' : 'text-red-400'
-            }`}>
-              {ping}ms
-            </span>
-            <span className="text-cyan-400 text-xs" title="Connected to Hathora Global Server">
-              ⚡
-            </span>
-          </div>
-          <div className="text-xs text-gray-500 mt-1">
-            Hathora Global Server
+        <div className="absolute bottom-4 left-4 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-green-500/50 shadow-lg">
+          <div className="px-3 py-2">
+            <div className="flex items-center space-x-3 text-sm">
+              <div className="w-2 h-2 rounded-full animate-pulse bg-green-400"></div>
+              <span className="text-gray-300 font-medium">{currentRegion} SECTOR:</span>
+              <span className={`font-bold ${
+                ping < 50 ? 'text-green-400' : 
+                ping < 100 ? 'text-yellow-400' : 
+                ping < 200 ? 'text-orange-400' : 'text-red-400'
+              }`}>
+                {ping}ms
+              </span>
+              <span className="text-green-400 text-xs" title="Connected to Tactical Network">
+                📡
+              </span>
+            </div>
+            <div className="text-xs text-gray-400 mt-1 text-center">
+              HATHORA TACTICAL NETWORK
+            </div>
           </div>
         </div>
       )}
