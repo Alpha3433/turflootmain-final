@@ -1486,8 +1486,8 @@ export default function TurfLootTactical() {
         // Try to use Hathora for all multiplayer servers
         console.log('🌍 Attempting Hathora connection for server:', server.name)
         
-        const { TurfLootHathoraClient } = await import('@/lib/hathoraClient.js')
-        const hathoraClient = new TurfLootHathoraClient()
+        const hathoraClientModule = await import('@/lib/hathoraClient.js')
+        const hathoraClient = hathoraClientModule.default
         
         const initialized = await hathoraClient.initialize()
         if (initialized) {
