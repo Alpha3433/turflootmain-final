@@ -4831,15 +4831,15 @@ const AgarIOGame = () => {
 
 
 
-      {/* Desktop Action Buttons Row */}
+      {/* TACTICAL COMMAND BUTTONS - Military Style */}
       {!isGameOver && !isMobile && (
         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 flex gap-4">
-          {/* Regular Cash Out Button for Players */}
+          {/* Cash Out - EXTRACTION Button */}
           <button
-            className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+            className={`px-6 py-3 rounded border font-bold transition-all flex items-center gap-3 shadow-lg ${
               isCashingOut
-                ? 'bg-yellow-600 hover:bg-yellow-500 text-white animate-pulse'
-                : 'bg-green-600 hover:bg-green-500 text-white'
+                ? 'bg-gradient-to-r from-yellow-600 to-amber-600 border-yellow-500 text-white animate-pulse'
+                : 'bg-gradient-to-r from-green-700 to-emerald-700 border-green-500 hover:from-green-600 hover:to-emerald-600 text-white'
             }`}
             disabled={!gameRef.current?.game?.player?.alive}
             onClick={() => {
@@ -4848,23 +4848,28 @@ const AgarIOGame = () => {
               }
             }}
           >
-            <span className="text-lg">💰</span>
-            <span>
-              {isCashingOut
-                ? `Cashing Out... ${Math.floor(cashOutProgress)}%`
-                : `Hold E to Cash Out ($${gameRef.current?.game?.player?.netWorth?.toFixed(0) || 0})`
-              }
-            </span>
+            <span className="text-lg">🚁</span>
+            <div className="flex flex-col items-start">
+              <span className="text-xs font-medium">
+                {isCashingOut ? 'EXTRACTING' : 'EXTRACT'}
+              </span>
+              <span className="text-sm">
+                {isCashingOut
+                  ? `${Math.floor(cashOutProgress)}% COMPLETE`
+                  : `$${gameRef.current?.game?.player?.netWorth?.toFixed(0) || 0} ASSETS`
+                }
+              </span>
+            </div>
           </button>
 
-          {/* Split Button */}
+          {/* Split - TACTICAL SPLIT Button */}
           <button
-            className={`px-6 py-3 rounded-lg font-bold transition-all flex items-center gap-2 ${
+            className={`px-6 py-3 rounded border font-bold transition-all flex items-center gap-3 shadow-lg ${
               splitCooldownActive
-                ? 'bg-red-600 text-white cursor-not-allowed'
+                ? 'bg-gradient-to-r from-red-700 to-red-800 border-red-500 text-white cursor-not-allowed'
                 : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
-                  ? 'bg-blue-500 hover:bg-blue-400 text-white'
-                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  ? 'bg-gradient-to-r from-blue-700 to-cyan-700 border-blue-500 hover:from-blue-600 hover:to-cyan-600 text-white'
+                  : 'bg-gradient-to-r from-gray-700 to-gray-800 border-gray-600 text-gray-400 cursor-not-allowed'
             }`}
             disabled={!gameRef.current?.game?.player?.alive || !canPlayerSplit(gameRef.current?.game?.player || { cells: [] })}
             onClick={() => {
@@ -4887,14 +4892,19 @@ const AgarIOGame = () => {
             }}
           >
             <span className="text-lg">⚡</span>
-            <span>
-              {splitCooldownActive
-                ? `Split (${Math.ceil(splitCooldown / 1000)}s)`
-                : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
-                  ? 'Split (Space)'
-                  : 'Split (Need 20+ mass)'
-              }
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-xs font-medium">
+                {splitCooldownActive ? 'COOLDOWN' : 'TACTICAL'}
+              </span>
+              <span className="text-sm">
+                {splitCooldownActive
+                  ? `${Math.ceil(splitCooldown / 1000)}s WAIT`
+                  : canPlayerSplit(gameRef.current?.game?.player || { cells: [] })
+                    ? 'SPLIT (SPACE)'
+                    : 'NEED 20+ MASS'
+                }
+              </span>
+            </div>
           </button>
         </div>
       )}
