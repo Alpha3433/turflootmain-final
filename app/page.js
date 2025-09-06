@@ -741,17 +741,20 @@ export default function TurfLootTactical() {
         {/* Desktop Header */}
         <div style={headerStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {!isAuthenticated && (
-              <span style={{ 
-                color: '#68d391', 
-                fontWeight: '700', 
-                fontSize: '16px',
-                textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
-                fontFamily: '"Rajdhani", sans-serif',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em'
-              }}>PLAYER: {userName.toUpperCase()}</span>
-            )}
+            <span style={{ 
+              color: '#68d391', 
+              fontWeight: '700', 
+              fontSize: '16px',
+              textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em'
+            }}>
+              PLAYER: {isAuthenticated ? 
+                (user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
+                userName.toUpperCase()
+              }
+            </span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
