@@ -1746,7 +1746,7 @@ export default function TurfLootTactical() {
           }
           
           if (roomCreated) {
-            console.log(\`🎉 Room successfully created in \${finalRegion}\`)
+            console.log('🎉 Room successfully created in ' + finalRegion)
             
             // Remove loading popup after successful creation
             setTimeout(() => {
@@ -1755,7 +1755,7 @@ export default function TurfLootTactical() {
               }
               
               // Redirect to game with the newly created room
-              const gameUrl = \`/agario?roomId=\${finalRoomId}&mode=practice&fee=0&region=\${finalRegion}&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true\`
+              const gameUrl = '/agario?roomId=' + finalRoomId + '&mode=practice&fee=0&region=' + finalRegion + '&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true'
               console.log('🎮 Redirecting to newly created multiplayer room:', gameUrl)
               window.location.href = gameUrl
               
