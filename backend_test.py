@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Hathora Mock Room Creation Fix
-================================================================
+Comprehensive Hathora Integration Testing - Real Room Process Verification
+========================================================================
 
-This test suite verifies the critical Hathora mock room creation fix implemented
-to replace fake room IDs with actual Hathora room processes.
+This test suite verifies that real Hathora room processes are being created
+when users join "Global Multiplayer (US East)" instead of mock room IDs.
 
-TESTING FOCUS:
-1. Hathora Client Integration - Test hathoraClient.createOrJoinRoom() method
-2. Room Creation Verification - Verify actual Hathora room processes are created
-3. Server Browser Integration - Test real vs fake room IDs in server browser
-4. Backend API Support - Verify APIs support real Hathora room IDs
-5. End-to-End Workflow - Test complete Global Multiplayer flow
+SPECIFIC TESTING FOR REVIEW REQUEST:
+1. Test Hathora Room Creation - Verify createOrJoinRoom() creates real processes
+2. Check Global Multiplayer Flow - Test complete server browser → room creation
+3. Verify Room ID Format - Ensure no fake room IDs like 'room-washington_dc-1757173709750'
+4. Session Tracking - Test real Hathora room IDs are tracked properly
+5. Environment Variables - Verify Hathora configuration is correct
 
 CRITICAL VERIFICATION:
-- No room IDs starting with 'room-' + timestamp format are generated
-- Actual Hathora room processes are created (would appear in Hathora console)
-- Session tracking works with real Hathora room IDs
-- All mock room creation paths are eliminated
+- hathoraClient.createOrJoinRoom(null, 'practice') creates actual Hathora processes
+- No mock room ID generation with 'room-' + timestamp pattern
+- Real Hathora room processes would appear in Hathora console
+- Complete Global Multiplayer workflow operational
 """
 
 import requests
