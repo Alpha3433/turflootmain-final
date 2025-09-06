@@ -2524,122 +2524,18 @@ export default function TurfLootTactical() {
         fontFamily: 'monospace'
       }}>
         <div>ServerBrowser: {isServerBrowserOpen ? 'OPEN' : 'CLOSED'}</div>
-        <div>Leaderboard: {isLeaderboardOpen ? 'OPEN' : 'CLOSED'}</div>
+        <div>Desktop Leaderboard: Direct DOM</div>
       </div>
 
-      {/* Test Modal - Force visible to debug CSS */}
-      <div style={{
-        position: 'fixed',
-        top: '50px',
-        left: '50px',
-        width: '400px',
-        height: '200px',
-        backgroundColor: '#ff0000',
-        color: 'white',
-        zIndex: 1000001,
-        border: '5px solid #00ff00',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '18px',
-        fontWeight: 'bold'
-      }}>
-        🟢 TEST MODAL ALWAYS VISIBLE
-      </div>
-
-      {/* Server Browser Modal - Simplified with highest z-index */}
-      {isServerBrowserOpen && (
-        <div style={{
-          position: 'fixed',
-          top: '0px',
-          left: '0px',
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(255, 0, 0, 0.8)',
-          zIndex: 1000002,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{
-            width: '600px',
-            height: '400px',
-            backgroundColor: '#000000',
-            color: '#ffffff',
-            border: '5px solid #00ff00',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            fontWeight: 'bold',
-            gap: '20px'
-          }}>
-            <div>🌐 SERVER BROWSER MODAL</div>
-            <div>State: {isServerBrowserOpen ? 'OPEN' : 'CLOSED'}</div>
-            <button
-              onClick={() => setIsServerBrowserOpen(false)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#ff0000',
-                color: 'white',
-                border: 'none',
-                fontSize: '16px',
-                cursor: 'pointer'
-              }}
-            >
-              CLOSE
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Leaderboard Modal - Simplified with highest z-index */}
-      {isLeaderboardOpen && (
-        <div style={{
-          position: 'fixed',
-          top: '0px',
-          left: '0px',
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 255, 0.8)',
-          zIndex: 1000003,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <div style={{
-            width: '600px',
-            height: '400px',
-            backgroundColor: '#000000',
-            color: '#ffffff',
-            border: '5px solid #ffff00',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            fontWeight: 'bold',
-            gap: '20px'
-          }}>
-            <div>🏆 LEADERBOARD MODAL</div>
-            <div>State: {isLeaderboardOpen ? 'OPEN' : 'CLOSED'}</div>
-            <button
-              onClick={() => setIsLeaderboardOpen(false)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#0000ff',
-                color: 'white',
-                border: 'none',
-                fontSize: '16px',
-                cursor: 'pointer'
-              }}
-            >
-              CLOSE
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Server Browser Modal - Keep the existing one */}
+      <ServerBrowserModal
+        isOpen={isServerBrowserOpen}
+        onClose={() => {
+          console.log('Closing server browser modal')
+          setIsServerBrowserOpen(false)
+        }}
+        onJoinLobby={handleJoinLobby}
+      />
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
