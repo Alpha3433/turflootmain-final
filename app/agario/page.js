@@ -396,6 +396,39 @@ const TacticalAgarIO = () => {
     }
   }
 
+  // Game render loop
+  useEffect(() => {
+    if (!gameRef.current || !gameInitialized) return
+
+    const gameLoop = () => {
+      if (gameRef.current?.running) {
+        gameRef.current.render()
+        
+        // Update tactical stats
+        if (gameRef.current.operative) {
+          setTacticalStats({
+            mass: Math.floor(gameRef.current.operative.mass),
+            assets: gameRef.current.operative.assets,
+            eliminations: gameRef.current.operative.eliminations,
+            kia: 0,
+            streak: gameRef.current.operative.eliminations,
+            resourcesCollected: gameRef.current.operative.assets,
+            missionTime: Math.floor((Date.now() - gameRef.current.lastUpdate) / 1000),
+            rank: '#1'
+          })
+        }
+      }
+      animationFrameRef.current = requestAnimationFrame(gameLoop)
+    }
+
+    gameLoop()
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [gameInitialized])
+
   // Mouse and touch handling
   useEffect(() => {
     if (!canvasRef.current || !gameRef.current) return
