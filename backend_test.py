@@ -224,8 +224,8 @@ class HathoraRoomCreationTester:
                         # Clean up the test session
                         try:
                             cleanup_response = self.session.post(f"{API_BASE}/game-sessions/leave", json={
-                                'sessionId': session_id,
-                                'userId': 'test-user-hathora-room-creation'
+                                'roomId': room_id,
+                                'playerId': 'test-user-hathora-room-creation'
                             })
                             if cleanup_response.status_code == 200:
                                 print(f"   ✅ Test session cleaned up successfully")
