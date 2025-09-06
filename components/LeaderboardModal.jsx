@@ -66,7 +66,7 @@ const LeaderboardModal = ({ isOpen, onClose }) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 99999,
+      zIndex: 100000,
       padding: '20px'
     }}>
       <div style={{
