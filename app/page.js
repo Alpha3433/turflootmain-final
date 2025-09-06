@@ -260,6 +260,320 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
+  const createDesktopJoinPartyPopup = () => {
+    // Only create popup on desktop
+    if (window.innerWidth <= 768) return
+
+    // Remove any existing join party popup
+    const existing = document.getElementById('desktop-join-party-popup')
+    if (existing) existing.remove()
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'desktop-join-party-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(13, 17, 23, 0.95) !important;
+      backdrop-filter: blur(10px) !important;
+      z-index: 9999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    `
+
+    // Create the modal
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%) !important;
+      border: 2px solid #68d391 !important;
+      border-radius: 16px !important;
+      width: 600px !important;
+      max-width: 90vw !important;
+      max-height: 80vh !important;
+      overflow-y: auto !important;
+      color: white !important;
+      box-shadow: 0 0 50px rgba(104, 211, 145, 0.5) !important;
+      font-family: "Rajdhani", sans-serif !important;
+    `
+
+    // Generate party join HTML
+    const joinPartyHTML = `
+      <div style="padding: 24px; border-bottom: 2px solid #68d391; background: linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+              🚀
+            </div>
+            <div>
+              <h2 style="color: #68d391; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(104, 211, 145, 0.6);">
+                JOIN PARTY
+              </h2>
+              <p style="color: #a0aec0; font-size: 14px; margin: 4px 0 0 0;">
+                Join existing parties or friends' squads
+              </p>
+            </div>
+          </div>
+          <button id="close-join-party" style="background: rgba(104, 211, 145, 0.2); border: 2px solid #68d391; border-radius: 8px; padding: 12px; color: #68d391; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 32px;">
+        <!-- Search Party Input -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #68d391; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">
+            SEARCH PARTIES
+          </label>
+          <input 
+            id="party-search-input" 
+            type="text" 
+            placeholder="Search by party name or player..." 
+            style="width: 100%; padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #68d391; border-radius: 8px; color: #e2e8f0; font-size: 16px; font-family: 'Rajdhani', sans-serif; box-sizing: border-box;"
+          />
+        </div>
+
+        <!-- Party Type Tabs -->
+        <div style="margin-bottom: 24px;">
+          <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <button id="public-parties-tab" class="party-type-tab" data-type="public" style="flex: 1; padding: 12px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border: 2px solid #68d391; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              PUBLIC PARTIES
+            </button>
+            <button id="friends-parties-tab" class="party-type-tab" data-type="friends" style="flex: 1; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              FRIENDS PARTIES
+            </button>
+          </div>
+        </div>
+
+        <!-- Parties List -->
+        <div id="parties-list" style="margin-bottom: 24px; max-height: 300px; overflow-y: auto;">
+          <!-- This will be populated dynamically -->
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+          <button id="cancel-join-party" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+            CANCEL
+          </button>
+          <button id="refresh-parties-btn" style="flex: 1; padding: 16px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border: 2px solid #68d391; border-radius: 8px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; box-shadow: 0 0 20px rgba(104, 211, 145, 0.4);">
+            REFRESH PARTIES
+          </button>
+        </div>
+      </div>
+    `
+
+    modal.innerHTML = joinPartyHTML
+    popup.appendChild(modal)
+
+    // Add interactivity
+    let currentTab = 'public'
+    let selectedParty = null
+    
+    // Tab switching
+    const publicTab = modal.querySelector('#public-parties-tab')
+    const friendsTab = modal.querySelector('#friends-parties-tab')
+    
+    const switchTab = (tabType) => {
+      currentTab = tabType
+      if (tabType === 'public') {
+        publicTab.style.background = 'linear-gradient(45deg, #68d391 0%, #38a169 100%)'
+        publicTab.style.border = '2px solid #68d391'
+        publicTab.style.color = 'white'
+        friendsTab.style.background = 'rgba(45, 55, 72, 0.5)'
+        friendsTab.style.border = '2px solid #4a5568'
+        friendsTab.style.color = '#a0aec0'
+      } else {
+        friendsTab.style.background = 'linear-gradient(45deg, #68d391 0%, #38a169 100%)'
+        friendsTab.style.border = '2px solid #68d391'
+        friendsTab.style.color = 'white'
+        publicTab.style.background = 'rgba(45, 55, 72, 0.5)'
+        publicTab.style.border = '2px solid #4a5568'
+        publicTab.style.color = '#a0aec0'
+      }
+      loadParties()
+    }
+    
+    publicTab.addEventListener('click', () => switchTab('public'))
+    friendsTab.addEventListener('click', () => switchTab('friends'))
+
+    // Load parties function
+    const loadParties = () => {
+      const partiesList = modal.querySelector('#parties-list')
+      
+      // Mock data for demonstration - in production, this would fetch from API
+      const mockPublicParties = [
+        { id: 'party-1', name: 'Elite Squad', host: 'Player123', members: 2, maxMembers: 4, privacy: 'public' },
+        { id: 'party-2', name: 'Night Hawks', host: 'GamerX', members: 3, maxMembers: 6, privacy: 'public' },
+        { id: 'party-3', name: 'Thunder Force', host: 'ProPlayer', members: 1, maxMembers: 4, privacy: 'public' }
+      ]
+      
+      const mockFriendsParties = [
+        { id: 'party-4', name: 'Friends Squad', host: 'BestFriend', members: 2, maxMembers: 4, privacy: 'private' },
+        { id: 'party-5', name: 'Weekend Warriors', host: 'GameBuddy', members: 1, maxMembers: 3, privacy: 'private' }
+      ]
+      
+      const parties = currentTab === 'public' ? mockPublicParties : mockFriendsParties
+      
+      if (parties.length === 0) {
+        partiesList.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: #a0aec0;">
+            <div style="font-size: 48px; margin-bottom: 16px;">👥</div>
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No ${currentTab} parties found</div>
+            <div style="font-size: 14px;">Try refreshing or check back later</div>
+          </div>
+        `
+        return
+      }
+      
+      partiesList.innerHTML = parties.map(party => `
+        <div class="party-item" data-party-id="${party.id}" style="
+          padding: 16px; 
+          margin-bottom: 12px; 
+          background: rgba(45, 55, 72, 0.5); 
+          border: 2px solid #4a5568; 
+          border-radius: 8px; 
+          cursor: pointer; 
+          transition: all 0.3s ease;
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                <div style="color: #68d391; font-size: 18px; font-weight: 700;">
+                  ${party.name}
+                </div>
+                <div style="padding: 4px 8px; background: rgba(104, 211, 145, 0.2); border: 1px solid #68d391; border-radius: 4px; font-size: 10px; color: #68d391; text-transform: uppercase;">
+                  ${party.privacy}
+                </div>
+              </div>
+              <div style="color: #a0aec0; font-size: 14px;">
+                Host: ${party.host} • Members: ${party.members}/${party.maxMembers}
+              </div>
+            </div>
+            <div style="color: #68d391; font-size: 24px;">
+              ${party.privacy === 'private' ? '🔒' : '🌐'}
+            </div>
+          </div>
+        </div>
+      `).join('')
+      
+      // Add click handlers to party items
+      const partyItems = partiesList.querySelectorAll('.party-item')
+      partyItems.forEach(item => {
+        item.addEventListener('click', () => {
+          // Remove selection from all items
+          partyItems.forEach(p => {
+            p.style.border = '2px solid #4a5568'
+            p.style.background = 'rgba(45, 55, 72, 0.5)'
+          })
+          
+          // Select this item
+          item.style.border = '2px solid #68d391'
+          item.style.background = 'rgba(104, 211, 145, 0.1)'
+          selectedParty = item.dataset.partyId
+          
+          // Show join button
+          const joinButton = modal.querySelector('#join-selected-party-btn')
+          if (joinButton) {
+            joinButton.style.display = 'block'
+          } else {
+            // Create join button
+            const buttonContainer = modal.querySelector('.action-buttons-container')
+            if (buttonContainer) {
+              const joinButton = document.createElement('button')
+              joinButton.id = 'join-selected-party-btn'
+              joinButton.innerHTML = 'JOIN SELECTED PARTY'
+              joinButton.style.cssText = `
+                width: 100%; 
+                padding: 16px; 
+                background: linear-gradient(45deg, #f6ad55 0%, #ed8936 100%); 
+                border: 2px solid #f6ad55; 
+                border-radius: 8px; 
+                color: white; 
+                font-size: 16px; 
+                font-weight: 700; 
+                cursor: pointer; 
+                font-family: 'Rajdhani', sans-serif; 
+                text-transform: uppercase; 
+                box-shadow: 0 0 20px rgba(246, 173, 85, 0.4);
+                margin-top: 12px;
+              `
+              joinButton.addEventListener('click', () => {
+                console.log('🚀 Joining party:', selectedParty)
+                // Here you would implement the actual join party logic
+                // For now, just show a success message and close popup
+                alert('Successfully joined party! (Mock implementation)')
+                popup.remove()
+              })
+              buttonContainer.appendChild(joinButton)
+            }
+          }
+        })
+        
+        // Add hover effects
+        item.addEventListener('mouseenter', () => {
+          if (selectedParty !== item.dataset.partyId) {
+            item.style.background = 'rgba(45, 55, 72, 0.8)'
+          }
+        })
+        
+        item.addEventListener('mouseleave', () => {
+          if (selectedParty !== item.dataset.partyId) {
+            item.style.background = 'rgba(45, 55, 72, 0.5)'
+          }
+        })
+      })
+    }
+
+    // Search functionality
+    const searchInput = modal.querySelector('#party-search-input')
+    searchInput.addEventListener('input', () => {
+      // Implement search filtering logic here
+      // For now, just reload parties
+      loadParties()
+    })
+
+    // Close popup handlers
+    const closeButton = modal.querySelector('#close-join-party')
+    const cancelButton = modal.querySelector('#cancel-join-party')
+    
+    const closePopup = () => {
+      popup.remove()
+    }
+    
+    closeButton.addEventListener('click', closePopup)
+    cancelButton.addEventListener('click', closePopup)
+    
+    // Close on backdrop click
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        closePopup()
+      }
+    })
+
+    // Refresh parties button
+    const refreshButton = modal.querySelector('#refresh-parties-btn')
+    refreshButton.addEventListener('click', () => {
+      console.log('🔄 Refreshing parties...')
+      loadParties()
+    })
+
+    // Create action buttons container for join button
+    const actionButtonsContainer = modal.querySelector('div[style*="display: flex; gap: 12px"]:last-child')
+    actionButtonsContainer.classList.add('action-buttons-container')
+
+    // Initial load
+    loadParties()
+
+    // Add popup to DOM
+    document.body.appendChild(popup)
+
+    console.log('🚀 Desktop join party popup created with direct DOM manipulation')
+  }
+
   const createDesktopCreatePartyPopup = () => {
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
