@@ -1669,81 +1669,27 @@ export default function TurfLootTactical() {
         const loadingPopup = createGameLoadingPopup()
         
         try {
-          // Create room on-demand when user wants to play
-          console.log('🌍 Creating multiplayer room on-demand...')
+          // Create room on-demand using proper hathoraClient
+          console.log('🌍 Creating multiplayer room on-demand with TurfLoot Hathora Client...')
           
-          // Import Hathora client
-          const { HathoraClient } = require('@hathora/client-sdk')
-          const hathoraClient = new HathoraClient(process.env.NEXT_PUBLIC_HATHORA_APP_ID || 'app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb')
+          // Use existing hathoraClient from lib/hathoraClient.js
+          const { default: hathoraClient } = await import('../lib/hathoraClient.js')
           
-          // Authenticate
-          console.log('🔐 Authenticating with Hathora...')
-          await hathoraClient.loginAnonymous()
-          console.log('✅ Hathora authentication successful')
-          
-          // Create a new room specifically for this user/session
-          const roomConfig = {
-            gameMode: 'global_multiplayer',
-            maxPlayers: 8,
-            roomName: 'Global Room ' + Math.floor(Math.random() * 1000),
-            region: server.region || 'us-east',
-            timestamp: Date.now()
+          // Initialize client
+          const initialized = await hathoraClient.initialize()
+          if (!initialized) {
+            throw new Error('Failed to initialize Hathora client')
           }
           
-          console.log('🎯 Creating new room with config:', roomConfig)
+          console.log('🔐 Hathora client initialized successfully')
           
-          // Try multiple regions for best availability
-          const regions = ['washington_dc', 'seattle', 'london', 'sydney']
-          let roomCreated = false
-          let finalRoomId = null
-          let finalRegion = null
+          // Create actual Hathora room process 
+          console.log('🚀 Creating Hathora room process for global multiplayer...')
+          const finalRoomId = await hathoraClient.createOrJoinRoom(null, 'practice')
           
-          for (const region of regions) {
-            try {
-              console.log('   Trying to create room in ' + region + '...')
-              const roomResult = await hathoraClient.createPublicLobby(region, JSON.stringify({
-                ...roomConfig,
-                region: region,
-                creator: 'global_multiplayer_user',
-                gameType: 'practice'
-              }))
-              
-              console.log('   ✅ Room creation successful in ' + region)
-              roomCreated = true
-              finalRegion = region
-              
-              // Wait a moment then get the room ID from lobby list
-              await new Promise(resolve => setTimeout(resolve, 3000))
-              const lobbies = await hathoraClient.getPublicLobbies()
-              
-              if (lobbies.length > 0) {
-                // Find the most recent lobby (likely ours)
-                const recentLobby = lobbies.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]
-                finalRoomId = recentLobby.roomId
-                console.log('   🎯 Got room ID: ' + finalRoomId)
-                
-                // Test if connection details are available
-                try {
-                  const connDetails = await hathoraClient.getConnectionDetailsForRoomId(finalRoomId)
-                  if (connDetails?.exposedPort) {
-                    console.log('   🌐 Room is active with connection: ' + connDetails.exposedPort.host + ':' + connDetails.exposedPort.port)
-                  }
-                } catch (connError) {
-                  console.log('   ⚠️ Room created but connection pending: ' + connError.message)
-                }
-                
-                break
-              } else {
-                console.log('   ⚠️ Room created in ' + region + ' but not yet visible in lobby list')
-                finalRoomId = 'room-' + region + '-' + Date.now()
-                break
-              }
-              
-            } catch (regionError) {
-              console.log('   ❌ Failed to create room in ' + region + ': ' + regionError.message)
-              continue
-            }
-          }
+          console.log('✅ Hathora room process created successfully:', finalRoomId)
+          let roomCreated = true
+          let finalRegion = hathoraClient.getPreferredRegion()
           
           if (roomCreated) {
             console.log('🎉 Room successfully created in ' + finalRegion)
