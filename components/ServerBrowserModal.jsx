@@ -130,14 +130,14 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       padding: '20px'
     }}>
       <div style={{
-        backgroundColor: '#1f2937',
+        backgroundColor: '#1a202c',
         border: '2px solid #374151',
         borderRadius: '16px',
         maxWidth: '800px',
         width: '100%',
         maxHeight: '600px',
-        padding: '24px',
-        color: 'white'
+        overflow: 'hidden',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
       }}>
         {/* Header */}
         <div style={{
