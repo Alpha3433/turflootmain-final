@@ -4909,13 +4909,15 @@ const AgarIOGame = () => {
         </div>
       )}
 
-      {/* Controls - Desktop Only */}
+      {/* TACTICAL CONTROLS BRIEFING - Military Style */}
       {!isGameOver && showControls && settings.showControls && !isMobile && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-600/30">
-          <div className="text-xs text-gray-300 text-center space-y-1">
-            <div>🖱️ Move mouse to control • 💰 Collect orbs for growth</div>
-            <div>⚔️ Eliminate smaller players • 💵 Only kills give money</div>
-            <div>👑 Bounty players give bonus rewards</div>
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-amber-500/50 shadow-lg">
+          <div className="px-4 py-3">
+            <div className="text-xs text-gray-200 text-center space-y-1">
+              <div>🎯 <span className="text-amber-400 font-medium">TACTICAL CONTROL</span> • Navigate with cursor • <span className="text-green-400 font-medium">COLLECT</span> resources for growth</div>
+              <div>⚔️ <span className="text-red-400 font-medium">ELIMINATE</span> smaller operatives • 💰 <span className="text-yellow-400 font-medium">EARNINGS</span> from confirmed kills only</div>
+              <div>🎯 <span className="text-orange-400 font-medium">HIGH-VALUE TARGETS</span> marked with tactical indicators provide bonus rewards</div>
+            </div>
           </div>
         </div>
       )}
