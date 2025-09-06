@@ -14,6 +14,7 @@ const TacticalAgarIO = () => {
   const [gameRunning, setGameRunning] = useState(false)
   const [operativeAlive, setOperativeAlive] = useState(true)
   const [missionComplete, setMissionComplete] = useState(false)
+  const [gameLoading, setGameLoading] = useState(true) // Add loading state
   
   // Tactical Stats
   const [tacticalStats, setTacticalStats] = useState({
