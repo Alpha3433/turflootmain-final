@@ -759,7 +759,7 @@ export default function TurfLootTactical() {
         <div style={headerStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ 
-              color: '#68d391', 
+              color: isServerBrowserOpen ? '#ef4444' : '#68d391', 
               fontWeight: '700', 
               fontSize: '16px',
               textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
@@ -770,7 +770,7 @@ export default function TurfLootTactical() {
               PLAYER: {isAuthenticated ? 
                 (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
                 (customUsername || userName).toUpperCase()
-              }
+              } {isServerBrowserOpen ? ' - MODAL OPEN!' : ''}
             </span>
           </div>
           
