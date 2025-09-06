@@ -1072,7 +1072,17 @@ export default function TurfLootTactical() {
               boxShadow: '0 0 20px rgba(246, 173, 85, 0.6)',
               border: '2px solid #f6ad55'
             }}>🎯</div>
-            <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>LEADERBOARD</h3>
+            <h3 style={{ 
+              color: isLeaderboardOpen ? '#ef4444' : '#68d391', 
+              fontWeight: '700', 
+              fontSize: '18px', 
+              margin: 0, 
+              fontFamily: '"Rajdhani", sans-serif', 
+              textShadow: isLeaderboardOpen ? '0 0 10px rgba(239, 68, 68, 0.6)' : '0 0 10px rgba(104, 211, 145, 0.6)', 
+              textTransform: 'uppercase' 
+            }}>
+              LEADERBOARD {isLeaderboardOpen ? '(MODAL OPEN!)' : ''}
+            </h3>
             <div style={{ marginLeft: 'auto' }}>
               <div style={{
                 padding: '4px 10px',
