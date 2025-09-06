@@ -260,6 +260,411 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
+  const createDesktopServerBrowserPopup = () => {
+    // Only create popup on desktop
+    if (window.innerWidth <= 768) return
+
+    // Remove any existing server browser popup
+    const existing = document.getElementById('desktop-server-browser-popup')
+    if (existing) existing.remove()
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'desktop-server-browser-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(13, 17, 23, 0.95) !important;
+      backdrop-filter: blur(10px) !important;
+      z-index: 9999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    `
+
+    // Create the modal
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%) !important;
+      border: 2px solid #68d391 !important;
+      border-radius: 16px !important;
+      width: 800px !important;
+      max-width: 90vw !important;
+      max-height: 80vh !important;
+      overflow-y: auto !important;
+      color: white !important;
+      box-shadow: 0 0 50px rgba(104, 211, 145, 0.5) !important;
+      font-family: "Rajdhani", sans-serif !important;
+    `
+
+    // Generate server browser HTML
+    const serverBrowserHTML = `
+      <div style="padding: 24px; border-bottom: 2px solid #68d391; background: linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+              🌐
+            </div>
+            <div>
+              <h2 style="color: #68d391; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(104, 211, 145, 0.6);">
+                SERVER BROWSER
+              </h2>
+              <p style="color: #a0aec0; font-size: 14px; margin: 4px 0 0 0;">
+                Join active multiplayer servers worldwide
+              </p>
+            </div>
+          </div>
+          <button id="close-server-browser" style="background: rgba(104, 211, 145, 0.2); border: 2px solid #68d391; border-radius: 8px; padding: 12px; color: #68d391; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 32px;">
+        <!-- Server Filters -->
+        <div style="margin-bottom: 24px;">
+          <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <button id="all-servers-tab" class="server-filter-tab" data-filter="all" style="flex: 1; padding: 12px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border: 2px solid #68d391; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              ALL SERVERS
+            </button>
+            <button id="free-servers-tab" class="server-filter-tab" data-filter="free" style="flex: 1; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              FREE SERVERS
+            </button>
+            <button id="paid-servers-tab" class="server-filter-tab" data-filter="paid" style="flex: 1; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              PAID SERVERS
+            </button>
+          </div>
+          
+          <!-- Search and Refresh -->
+          <div style="display: flex; gap: 12px;">
+            <input 
+              id="server-search-input" 
+              type="text" 
+              placeholder="Search servers..." 
+              style="flex: 1; padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #68d391; border-radius: 8px; color: #e2e8f0; font-size: 16px; font-family: 'Rajdhani', sans-serif; box-sizing: border-box;"
+            />
+            <button id="refresh-servers-btn" style="padding: 12px 24px; background: linear-gradient(45deg, #f6ad55 0%, #ed8936 100%); border: 2px solid #f6ad55; border-radius: 8px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+              REFRESH
+            </button>
+          </div>
+        </div>
+
+        <!-- Server Status Info -->
+        <div id="server-status-info" style="margin-bottom: 20px; padding: 16px; background: rgba(104, 211, 145, 0.1); border: 1px solid #68d391; border-radius: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="color: #68d391; font-size: 14px; font-weight: 600;">
+              <span id="server-count">Loading...</span> • <span id="total-players">Loading...</span>
+            </div>
+            <div style="color: #68d391; font-size: 12px;">
+              Last updated: <span id="last-updated">--:--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Servers List -->
+        <div id="servers-list" style="margin-bottom: 24px; max-height: 400px; overflow-y: auto;">
+          <div style="text-align: center; padding: 40px; color: #a0aec0;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔄</div>
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Loading Servers...</div>
+            <div style="font-size: 14px;">Fetching available multiplayer servers</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+          <button id="cancel-server-browser" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+            CLOSE
+          </button>
+        </div>
+      </div>
+    `
+
+    modal.innerHTML = serverBrowserHTML
+    popup.appendChild(modal)
+
+    // Add interactivity
+    let currentFilter = 'all'
+    let serversData = []
+    let selectedServer = null
+    
+    // Tab switching
+    const allTab = modal.querySelector('#all-servers-tab')
+    const freeTab = modal.querySelector('#free-servers-tab')
+    const paidTab = modal.querySelector('#paid-servers-tab')
+    
+    const switchTab = (filterType) => {
+      currentFilter = filterType
+      
+      // Update tab styles
+      const tabs = [allTab, freeTab, paidTab]
+      tabs.forEach(tab => {
+        tab.style.background = 'rgba(45, 55, 72, 0.5)'
+        tab.style.border = '2px solid #4a5568'
+        tab.style.color = '#a0aec0'
+      })
+      
+      const activeTab = modal.querySelector(`[data-filter="${filterType}"]`)
+      activeTab.style.background = 'linear-gradient(45deg, #68d391 0%, #38a169 100%)'
+      activeTab.style.border = '2px solid #68d391'
+      activeTab.style.color = 'white'
+      
+      renderServers()
+    }
+    
+    allTab.addEventListener('click', () => switchTab('all'))
+    freeTab.addEventListener('click', () => switchTab('free'))
+    paidTab.addEventListener('click', () => switchTab('paid'))
+
+    // Load servers function
+    const loadServers = async () => {
+      try {
+        const response = await fetch('/api/servers/lobbies')
+        if (response.ok) {
+          const data = await response.json()
+          serversData = data.servers || []
+          
+          // Update status info
+          const serverCount = modal.querySelector('#server-count')
+          const totalPlayers = modal.querySelector('#total-players')
+          const lastUpdated = modal.querySelector('#last-updated')
+          
+          const totalPlayerCount = serversData.reduce((sum, server) => sum + (server.currentPlayers || 0), 0)
+          
+          serverCount.textContent = `${serversData.length} servers online`
+          totalPlayers.textContent = `${totalPlayerCount} players active`
+          lastUpdated.textContent = new Date().toLocaleTimeString()
+          
+          renderServers()
+        } else {
+          throw new Error(`HTTP ${response.status}`)
+        }
+      } catch (error) {
+        console.error('Failed to load servers:', error)
+        const serversList = modal.querySelector('#servers-list')
+        serversList.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: #fc8181;">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">Failed to Load Servers</div>
+            <div style="font-size: 14px;">Unable to fetch server list. Please try refreshing.</div>
+          </div>
+        `
+      }
+    }
+
+    // Render servers function
+    const renderServers = () => {
+      const serversList = modal.querySelector('#servers-list')
+      
+      // Filter servers based on selected tab
+      let filteredServers = serversData
+      if (currentFilter === 'free') {
+        filteredServers = serversData.filter(server => (server.stake || 0) === 0)
+      } else if (currentFilter === 'paid') {
+        filteredServers = serversData.filter(server => (server.stake || 0) > 0)
+      }
+      
+      // Apply search filter
+      const searchTerm = modal.querySelector('#server-search-input').value.toLowerCase()
+      if (searchTerm) {
+        filteredServers = filteredServers.filter(server => 
+          (server.name || '').toLowerCase().includes(searchTerm) ||
+          (server.region || '').toLowerCase().includes(searchTerm) ||
+          (server.mode || '').toLowerCase().includes(searchTerm)
+        )
+      }
+      
+      if (filteredServers.length === 0) {
+        serversList.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: #a0aec0;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No servers found</div>
+            <div style="font-size: 14px;">Try adjusting your filters or search terms</div>
+          </div>
+        `
+        return
+      }
+      
+      serversList.innerHTML = filteredServers.map(server => {
+        const playerPercentage = server.maxPlayers > 0 ? (server.currentPlayers / server.maxPlayers) * 100 : 0
+        const isNearFull = playerPercentage > 80
+        const isEmpty = server.currentPlayers === 0
+        
+        return `
+          <div class="server-item" data-server-id="${server.id}" style="
+            padding: 20px; 
+            margin-bottom: 12px; 
+            background: rgba(45, 55, 72, 0.5); 
+            border: 2px solid #4a5568; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+          ">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+                  <div style="color: #68d391; font-size: 20px; font-weight: 700;">
+                    ${server.name || 'Unknown Server'}
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                    <div style="padding: 4px 8px; background: rgba(104, 211, 145, 0.2); border: 1px solid #68d391; border-radius: 4px; font-size: 10px; color: #68d391; text-transform: uppercase;">
+                      ${server.region || 'Unknown'}
+                    </div>
+                    <div style="padding: 4px 8px; background: rgba(246, 173, 85, 0.2); border: 1px solid #f6ad55; border-radius: 4px; font-size: 10px; color: #f6ad55; text-transform: uppercase;">
+                      ${server.mode || 'Unknown'}
+                    </div>
+                    ${(server.stake || 0) > 0 ? `
+                      <div style="padding: 4px 8px; background: rgba(252, 129, 129, 0.2); border: 1px solid #fc8181; border-radius: 4px; font-size: 10px; color: #fc8181; text-transform: uppercase;">
+                        $${server.stake}
+                      </div>
+                    ` : `
+                      <div style="padding: 4px 8px; background: rgba(104, 211, 145, 0.2); border: 1px solid #68d391; border-radius: 4px; font-size: 10px; color: #68d391; text-transform: uppercase;">
+                        FREE
+                      </div>
+                    `}
+                  </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div style="color: #a0aec0; font-size: 14px;">
+                    Players: ${server.currentPlayers || 0}/${server.maxPlayers || 0}
+                    ${isEmpty ? ' • Empty Server' : isNearFull ? ' • Nearly Full' : ''}
+                  </div>
+                  
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <!-- Player count bar -->
+                    <div style="width: 120px; height: 8px; background: rgba(45, 55, 72, 0.8); border-radius: 4px; overflow: hidden;">
+                      <div style="width: ${playerPercentage}%; height: 100%; background: ${isNearFull ? '#fc8181' : isEmpty ? '#4a5568' : '#68d391'}; transition: all 0.3s ease;"></div>
+                    </div>
+                    
+                    <!-- Join button -->
+                    <button class="join-server-btn" data-server-id="${server.id}" style="
+                      padding: 8px 16px; 
+                      background: linear-gradient(45deg, #68d391 0%, #38a169 100%); 
+                      border: 2px solid #68d391; 
+                      border-radius: 6px; 
+                      color: white; 
+                      font-size: 12px; 
+                      font-weight: 700; 
+                      cursor: pointer; 
+                      font-family: 'Rajdhani', sans-serif; 
+                      text-transform: uppercase;
+                      ${server.currentPlayers >= server.maxPlayers ? 'opacity: 0.5; cursor: not-allowed;' : ''}
+                    ">
+                      ${server.currentPlayers >= server.maxPlayers ? 'FULL' : 'JOIN'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      }).join('')
+      
+      // Add click handlers to server items and join buttons
+      const serverItems = serversList.querySelectorAll('.server-item')
+      const joinButtons = serversList.querySelectorAll('.join-server-btn')
+      
+      serverItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          if (selectedServer !== item.dataset.serverId) {
+            item.style.background = 'rgba(45, 55, 72, 0.8)'
+            item.style.border = '2px solid #68d391'
+          }
+        })
+        
+        item.addEventListener('mouseleave', () => {
+          if (selectedServer !== item.dataset.serverId) {
+            item.style.background = 'rgba(45, 55, 72, 0.5)'
+            item.style.border = '2px solid #4a5568'
+          }
+        })
+        
+        item.addEventListener('click', () => {
+          selectedServer = item.dataset.serverId
+          
+          // Update selection visual feedback
+          serverItems.forEach(s => {
+            s.style.background = 'rgba(45, 55, 72, 0.5)'
+            s.style.border = '2px solid #4a5568'
+          })
+          item.style.background = 'rgba(104, 211, 145, 0.1)'
+          item.style.border = '2px solid #68d391'
+        })
+      })
+      
+      joinButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          const serverId = btn.dataset.serverId
+          const server = serversData.find(s => s.id === serverId)
+          
+          if (server && server.currentPlayers < server.maxPlayers) {
+            joinServer(server)
+          }
+        })
+      })
+    }
+
+    // Join server function
+    const joinServer = (server) => {
+      console.log('🎮 Joining server:', server)
+      
+      // Here you would implement the actual server join logic
+      // For now, show success message and close popup
+      const serverType = server.stake > 0 ? 'paid' : 'free'
+      const message = `Joining ${server.name}!\n\nRegion: ${server.region}\nMode: ${server.mode}\nPlayers: ${server.currentPlayers}/${server.maxPlayers}${server.stake > 0 ? `\nStake: $${server.stake}` : ''}`
+      
+      alert(message)
+      popup.remove()
+      
+      // Redirect to game with server parameters
+      const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}`
+      window.location.href = gameUrl
+    }
+
+    // Search functionality
+    const searchInput = modal.querySelector('#server-search-input')
+    searchInput.addEventListener('input', () => {
+      renderServers()
+    })
+
+    // Close popup handlers
+    const closeButton = modal.querySelector('#close-server-browser')
+    const cancelButton = modal.querySelector('#cancel-server-browser')
+    
+    const closePopup = () => {
+      popup.remove()
+    }
+    
+    closeButton.addEventListener('click', closePopup)
+    cancelButton.addEventListener('click', closePopup)
+    
+    // Close on backdrop click
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        closePopup()
+      }
+    })
+
+    // Refresh servers button
+    const refreshButton = modal.querySelector('#refresh-servers-btn')
+    refreshButton.addEventListener('click', () => {
+      console.log('🔄 Refreshing servers...')
+      loadServers()
+    })
+
+    // Initial load
+    loadServers()
+
+    // Add popup to DOM
+    document.body.appendChild(popup)
+
+    console.log('🌐 Desktop server browser popup created with direct DOM manipulation')
+  }
+
   const createDesktopJoinPartyPopup = () => {
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
