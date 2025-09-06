@@ -2284,9 +2284,9 @@ export default function TurfLootTactical() {
         }
       `}</style>
 
-      {/* Server Browser Modal */}
+      {/* Server Browser Modal - Test */}
       <ServerBrowserModal
-        isOpen={isServerBrowserOpen}
+        isOpen={true}
         onClose={() => {
           console.log('Closing server browser modal')
           setIsServerBrowserOpen(false)
