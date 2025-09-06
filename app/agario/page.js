@@ -366,8 +366,14 @@ const AgarIOGame = () => {
     if (!canvasRef.current) return
 
     const canvas = canvasRef.current
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    // Set canvas size properly
+    const setCanvasSize = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+    
+    setCanvasSize()
+    window.addEventListener('resize', setCanvasSize)
 
     const game = new GameEngine(canvas)
     gameRef.current = game
@@ -386,6 +392,7 @@ const AgarIOGame = () => {
 
     return () => {
       game.stop()
+      window.removeEventListener('resize', setCanvasSize)
     }
   }, [])
 
