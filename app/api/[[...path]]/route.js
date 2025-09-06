@@ -1224,6 +1224,60 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Hathora room creation endpoint
+    if (route === 'hathora/create-room') {
+      try {
+        const { gameMode = 'practice', region, maxPlayers = 50 } = body
+        
+        console.log(`🚀 Creating Hathora room with gameMode: ${gameMode}, region: ${region}`)
+        
+        // Import and initialize Hathora client
+        const hathoraClientModule = await import('../../../lib/hathoraClient.js')
+        const hathoraClient = hathoraClientModule.default
+        
+        // Initialize the client
+        const initialized = await hathoraClient.initialize()
+        if (!initialized) {
+          throw new Error('Failed to initialize Hathora client')
+        }
+        
+        console.log('✅ Hathora client initialized successfully')
+        
+        // Create actual Hathora room process
+        const roomId = await hathoraClient.createOrJoinRoom(null, gameMode)
+        
+        console.log(`🎉 Hathora room created successfully: ${roomId}`)
+        
+        // Get connection details for the room
+        let connectionInfo = null
+        try {
+          connectionInfo = await hathoraClient.client.getConnectionInfo(roomId)
+          console.log('🌐 Room connection info retrieved successfully')
+        } catch (connError) {
+          console.log('⚠️ Room created but connection info not yet available:', connError.message)
+        }
+        
+        return NextResponse.json({ 
+          success: true,
+          roomId: roomId,
+          gameMode: gameMode,
+          region: hathoraClient.getPreferredRegion(),
+          maxPlayers: maxPlayers,
+          connectionInfo: connectionInfo,
+          message: 'Hathora room created successfully',
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('❌ Hathora room creation failed:', error)
+        return NextResponse.json({ 
+          error: 'Failed to create Hathora room',
+          message: error.message,
+          success: false
+        }, { status: 500, headers: corsHeaders })
+      }
+    }
+
     // User stats update route
     if (route === 'users/stats/update') {
       try {
