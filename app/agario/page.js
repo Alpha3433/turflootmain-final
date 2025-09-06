@@ -666,8 +666,8 @@ const TacticalAgarIO = () => {
             </div>
           </div>
 
-          {/* Mission Objective */}
-          <div className="absolute bottom-4 left-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-amber-500 max-w-xs shadow-xl">
+          {/* Mission Objective - Desktop Only */}
+          <div className="hidden md:block absolute bottom-4 left-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-amber-500 max-w-xs shadow-xl">
             <div className="px-3 py-2 border-b border-amber-500 bg-amber-900 bg-opacity-30">
               <div className="text-amber-400 font-bold text-xs">⚡ MISSION</div>
             </div>
@@ -680,8 +680,8 @@ const TacticalAgarIO = () => {
             </div>
           </div>
 
-          {/* Network Status */}
-          <div className="absolute bottom-4 right-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-green-500 shadow-xl">
+          {/* Network Status - Desktop Only */}
+          <div className="hidden md:block absolute bottom-4 right-4 bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border border-green-500 shadow-xl">
             <div className="px-3 py-2">
               <div className="flex items-center gap-2 text-sm">
                 <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
@@ -691,8 +691,8 @@ const TacticalAgarIO = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4">
+          {/* Action Buttons - Desktop Only */}
+          <div className="hidden md:block absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4">
             <button className="px-4 py-2 bg-green-700 border border-green-500 rounded font-bold text-white hover:bg-green-600 transition-all flex items-center gap-2">
               <span>🚁</span>
               <span>EXTRACT</span>
