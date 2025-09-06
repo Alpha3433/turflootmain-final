@@ -80,6 +80,51 @@ export default function TurfLootTactical() {
     // Check auth state periodically
     checkPrivyAuth()
     const authCheckInterval = setInterval(checkPrivyAuth, 1000)
+
+    // DIAGNOSTIC: Create test modal directly attached to body to bypass any container issues
+    if (typeof window !== 'undefined') {
+      const createTestModal = () => {
+        // Remove any existing test modal
+        const existing = document.getElementById('direct-test-modal')
+        if (existing) existing.remove()
+
+        // Create test modal directly in body
+        const testModal = document.createElement('div')
+        testModal.id = 'direct-test-modal'
+        testModal.style.cssText = `
+          position: fixed !important;
+          top: 100px !important;
+          left: 100px !important;
+          width: 400px !important;
+          height: 200px !important;
+          background-color: red !important;
+          color: white !important;
+          z-index: 999999999 !important;
+          border: 5px solid yellow !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 18px !important;
+          font-weight: bold !important;
+          pointer-events: auto !important;
+        `
+        testModal.innerHTML = '🔍 DIRECT BODY MODAL TEST'
+        document.body.appendChild(testModal)
+        
+        console.log('🔍 Direct test modal created and attached to body')
+
+        // Clean up after 10 seconds
+        setTimeout(() => {
+          if (document.getElementById('direct-test-modal')) {
+            document.getElementById('direct-test-modal').remove()
+            console.log('🔍 Direct test modal removed')
+          }
+        }, 10000)
+      }
+
+      // Create test modal after 2 seconds
+      setTimeout(createTestModal, 2000)
+    }
     
     return () => {
       window.removeEventListener('resize', checkMobile)
