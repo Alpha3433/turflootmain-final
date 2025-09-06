@@ -499,131 +499,136 @@ const TacticalAgarIO = () => {
         style={{ background: '#0a0a0a' }}
       />
 
-      {/* Tactical HUD Overlay */}
+      {/* Tactical HUD Overlay - IMPROVED LAYOUT */}
       {hudVisible && gameRunning && operativeAlive && (
         <>
-          {/* Top Left - Tactical Status */}
-          <div className="absolute top-4 left-4 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-green-500/50 min-w-[280px] shadow-xl">
-            <div className="bg-gradient-to-r from-green-600/20 to-emerald-600/20 px-4 py-2 border-b border-green-500/30">
-              <div className="text-green-400 font-bold text-sm flex items-center gap-2">
-                <span>🎖️</span>
-                <span>OPERATIVE STATUS</span>
-                <div className="ml-auto w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          {/* Top Left - Compact Mission HUD Card */}
+          <div className="absolute top-4 left-4 bg-gradient-to-br from-gray-900/98 to-gray-800/98 backdrop-blur-lg rounded-lg border border-green-500/50 min-w-[300px] shadow-xl">
+            <div className="px-4 py-2 border-b border-green-500/30">
+              <div className="flex items-center justify-between">
+                <div className="text-green-400 font-bold text-sm flex items-center gap-2">
+                  <span>🎖️</span>
+                  <span>OPERATIVE</span>
+                </div>
+                <div className="text-xs text-gray-400">ACTIVE</div>
               </div>
             </div>
-            <div className="p-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-300">MASS:</span>
-                <span className="text-blue-400 font-bold">{tacticalStats.mass} KG</span>
+            <div className="p-3 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300 text-sm">MASS:</span>
+                <span className="text-blue-400 font-bold text-lg">{tacticalStats.mass}kg</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">ASSETS:</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300 text-sm">ASSETS:</span>
                 <span className="text-green-400 font-bold">${tacticalStats.assets}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">K.I.A. RATIO:</span>
-                <span className="text-white font-bold">{tacticalStats.eliminations}:{tacticalStats.kia}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-300">THREAT LEVEL:</span>
-                <span className="text-yellow-400 font-bold">MODERATE</span>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300 text-sm">THREAT:</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                  <span className="text-yellow-400 font-bold text-sm">MODERATE</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Top Right - Radar Display */}
-          <div className="absolute top-4 right-4 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-cyan-500/50 w-[200px] h-[200px] shadow-xl">
-            <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 px-3 py-2 border-b border-cyan-500/30">
-              <div className="text-cyan-400 font-bold text-xs flex items-center gap-2">
-                <span>📡</span>
-                <span>TACTICAL RADAR</span>
+          {/* Top Right - Compact Ping & Mini Leaderboard */}
+          <div className="absolute top-4 right-4 space-y-2">
+            {/* Ping Status */}
+            <div className="bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-green-500/50 px-3 py-2">
+              <div className="flex items-center gap-2 text-sm">
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-gray-300">Ping: {networkStatus.ping}ms</span>
+                <span className="text-green-400">|</span>
+                <span className="text-green-400">{networkStatus.region}</span>
               </div>
             </div>
-            <div className="p-3 h-full">
-              <div className="relative w-full h-[150px] bg-gray-900/50 rounded border border-cyan-500/20">
-                {/* Radar Grid */}
-                <div className="absolute inset-0 grid grid-cols-4 grid-rows-4 border-cyan-500/10">
-                  {[...Array(16)].map((_, i) => (
-                    <div key={i} className="border border-cyan-500/10"></div>
+            
+            {/* Mini Tactical Radar */}
+            <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-cyan-500/50 w-[120px] h-[120px]">
+              <div className="p-2 h-full">
+                <div className="text-cyan-400 text-xs mb-1 text-center">RADAR</div>
+                <div className="relative w-full h-[80px] bg-gray-900/50 rounded border border-cyan-500/20">
+                  {/* Radar Grid */}
+                  <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+                    {[...Array(9)].map((_, i) => (
+                      <div key={i} className="border border-cyan-500/10"></div>
+                    ))}
+                  </div>
+                  {/* Center dot (operative) */}
+                  <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-green-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+                  {/* Hostile contacts */}
+                  {radarContacts.slice(0, 3).map((contact, i) => (
+                    <div
+                      key={contact.id}
+                      className={`absolute w-0.5 h-0.5 rounded-full ${
+                        contact.threat === 'high' ? 'bg-red-400' : 'bg-yellow-400'
+                      }`}
+                      style={{
+                        left: `${50 + (contact.x / 800) * 30}%`,
+                        top: `${50 + (contact.y / 800) * 30}%`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                    ></div>
                   ))}
                 </div>
-                {/* Center dot (operative) */}
-                <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-green-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
-                {/* Radar sweep */}
-                <div className="absolute inset-0 rounded overflow-hidden">
-                  <div className="absolute top-1/2 left-1/2 w-1 h-16 bg-gradient-to-t from-cyan-400/50 to-transparent origin-bottom transform -translate-x-1/2 translate-y-full rotate-0 animate-spin"></div>
-                </div>
-                {/* Hostile contacts */}
-                {radarContacts.map(contact => (
-                  <div
-                    key={contact.id}
-                    className={`absolute w-1 h-1 rounded-full ${
-                      contact.threat === 'high' ? 'bg-red-400' : 'bg-yellow-400'
-                    }`}
-                    style={{
-                      left: `${50 + (contact.x / 800) * 40}%`,
-                      top: `${50 + (contact.y / 800) * 40}%`,
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                  ></div>
-                ))}
               </div>
             </div>
           </div>
 
-          {/* Bottom Left - Current Objective */}
+          {/* Bottom Left - Mission Objective with Progress Bar */}
           {currentObjective && (
-            <div className="absolute bottom-4 left-4 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-amber-500/50 max-w-sm shadow-xl">
-              <div className="bg-gradient-to-r from-amber-600/20 to-yellow-600/20 px-4 py-2 border-b border-amber-500/30">
-                <div className="text-amber-400 font-bold text-sm flex items-center gap-2">
+            <div className="absolute bottom-20 left-4 bg-gradient-to-br from-gray-900/98 to-gray-800/98 backdrop-blur-lg rounded border border-amber-500/50 max-w-xs shadow-xl">
+              <div className="px-3 py-2 border-b border-amber-500/30">
+                <div className="text-amber-400 font-bold text-xs flex items-center gap-2">
                   <span>⚡</span>
-                  <span>MISSION OBJECTIVE</span>
-                  <span className="text-xs bg-amber-500/20 px-2 py-1 rounded ml-auto">ACTIVE</span>
+                  <span>MISSION</span>
+                  <div className="ml-auto bg-amber-500/20 px-2 py-0.5 rounded text-xs">ACTIVE</div>
                 </div>
               </div>
-              <div className="p-4">
-                <div className="text-gray-100 text-sm mb-3">{currentObjective.description}</div>
-                <div className="bg-gray-800/60 rounded h-2 mb-2 border border-gray-600/50">
-                  <div className="bg-gradient-to-r from-amber-500 to-yellow-500 h-2 rounded w-1/3"></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-300">
-                  <span>PROGRESS: 33%</span>
-                  <span className="text-amber-400">REWARD: 1000 XP</span>
+              <div className="p-3">
+                <div className="text-gray-100 text-xs mb-2">{currentObjective.description}</div>
+                {/* Circular Progress Indicator */}
+                <div className="flex items-center gap-3">
+                  <div className="relative w-10 h-10">
+                    <div className="w-10 h-10 rounded-full border-2 border-gray-600"></div>
+                    <div 
+                      className="absolute top-0 left-0 w-10 h-10 rounded-full border-2 border-amber-400 transform -rotate-90"
+                      style={{
+                        clipPath: `polygon(50% 50%, 50% 0%, ${33 > 50 ? '100%' : '50%'} 0%, ${33 > 50 ? '100%' : '50%'} ${33 > 50 ? (33 - 50) * 2 : 0}%, ${33 <= 50 ? 50 + 33 * 2 : 100}% ${33 <= 50 ? 100 : (100 - 33) * 2}%)`
+                      }}
+                    ></div>
+                    <div className="absolute inset-0 flex items-center justify-center text-amber-400 text-xs font-bold">
+                      33%
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-amber-400 text-xs font-bold">+1000 XP</div>
+                    <div className="text-gray-400 text-xs">Progress: 33%</div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Bottom Right - Network Status */}
-          <div className="absolute bottom-4 right-4 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-md rounded border border-green-500/50 shadow-xl">
-            <div className="px-3 py-2">
-              <div className="flex items-center space-x-3 text-sm">
-                <div className="w-2 h-2 rounded-full animate-pulse bg-green-400"></div>
-                <span className="text-gray-300 font-medium">{networkStatus.region} SECTOR</span>
-                <span className="text-green-400 font-bold">{networkStatus.ping}ms</span>
-                <span className="text-green-400 text-xs">📡</span>
-              </div>
-              <div className="text-xs text-gray-400 text-center mt-1">
-                HATHORA TACTICAL NETWORK
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Center - Tactical Commands */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4">
-            <button className="px-6 py-3 bg-gradient-to-r from-green-700 to-emerald-700 border border-green-500 rounded font-bold text-white hover:from-green-600 hover:to-emerald-600 transition-all flex items-center gap-3 shadow-lg">
-              <span>🚁</span>
-              <div className="flex flex-col items-start">
-                <span className="text-xs">EXTRACT</span>
-                <span className="text-sm">${tacticalStats.assets} ASSETS</span>
+          {/* Bottom Center - Large Tactical Split Button */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+            <button className="bg-gradient-to-r from-blue-700 to-cyan-700 hover:from-blue-600 hover:to-cyan-600 border-2 border-blue-500 text-white font-bold px-8 py-4 rounded-lg transition-all shadow-lg hover:shadow-blue-500/25 flex items-center gap-3">
+              <span className="text-2xl">⚔️</span>
+              <div className="text-left">
+                <div className="text-lg font-bold">SPLIT</div>
+                <div className="text-xs opacity-80">SPACE</div>
               </div>
             </button>
-            
-            <button className="px-6 py-3 bg-gradient-to-r from-blue-700 to-cyan-700 border border-blue-500 rounded font-bold text-white hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center gap-3 shadow-lg">
-              <span>⚡</span>
-              <div className="flex flex-col items-start">
-                <span className="text-xs">TACTICAL</span>
-                <span className="text-sm">SPLIT</span>
+          </div>
+
+          {/* Top Center - Extract Menu */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+            <button className="bg-gradient-to-r from-green-700 to-emerald-700 hover:from-green-600 hover:to-emerald-600 border border-green-500 text-white font-bold px-4 py-2 rounded transition-all shadow-lg flex items-center gap-2">
+              <span>🚁</span>
+              <div className="text-left">
+                <div className="text-sm font-bold">EXTRACT</div>
+                <div className="text-xs opacity-80">${tacticalStats.assets}</div>
               </div>
             </button>
           </div>
