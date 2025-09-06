@@ -318,15 +318,21 @@ const TacticalAgarIO = () => {
         ctx.fill()
         ctx.stroke()
         
-        // Hostile name
+        // Enhanced hostile name with glow
+        ctx.shadowColor = '#ff6b6b'
+        ctx.shadowBlur = 8
         ctx.fillStyle = '#ffffff'
-        ctx.font = '12px monospace'
+        ctx.font = 'bold 11px monospace'
         ctx.textAlign = 'center'
-        ctx.fillText(hostile.name, hostile.x, hostile.y - hostile.radius - 10)
+        ctx.fillText(hostile.name, hostile.x, hostile.y - hostile.radius - 12)
+        ctx.shadowBlur = 0
       })
       
-      // Render operative
+      // Render operative with enhanced styling
       if (this.operative?.alive) {
+        // Operative glow effect
+        ctx.shadowColor = '#22c55e'
+        ctx.shadowBlur = 15
         ctx.fillStyle = this.operative.color
         ctx.strokeStyle = '#16a34a'
         ctx.lineWidth = 3
@@ -334,17 +340,21 @@ const TacticalAgarIO = () => {
         ctx.arc(this.operative.x, this.operative.y, this.operative.radius, 0, Math.PI * 2)
         ctx.fill()
         ctx.stroke()
+        ctx.shadowBlur = 0
         
-        // Operative callsign
+        // Enhanced operative callsign with glow
+        ctx.shadowColor = '#22c55e'
+        ctx.shadowBlur = 6
         ctx.fillStyle = '#ffffff'
-        ctx.font = 'bold 14px monospace'
+        ctx.font = 'bold 12px monospace'
         ctx.textAlign = 'center'
-        ctx.fillText(this.operative.name, this.operative.x, this.operative.y - this.operative.radius - 15)
+        ctx.fillText(this.operative.name, this.operative.x, this.operative.y - this.operative.radius - 18)
         
-        // Mass indicator
+        // Mass indicator with better styling
         ctx.fillStyle = '#22c55e'
-        ctx.font = '10px monospace'
-        ctx.fillText(`${Math.floor(this.operative.mass)}kg`, this.operative.x, this.operative.y + 5)
+        ctx.font = 'bold 9px monospace'
+        ctx.fillText(`${Math.floor(this.operative.mass)}kg`, this.operative.x, this.operative.y + 4)
+        ctx.shadowBlur = 0
       }
       
       ctx.restore()
