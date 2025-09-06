@@ -260,6 +260,489 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
+  // Wallet operations with Privy integration
+  const handleDeposit = async () => {
+    try {
+      console.log('💰 DEPOSIT button clicked')
+      
+      // Check if Privy is available
+      if (!window.__TURFLOOT_PRIVY__) {
+        console.log('⚠️ Privy not available, showing info message')
+        alert('Wallet functionality requires authentication. Please click the LOGIN button first.')
+        return
+      }
+      
+      const privy = window.__TURFLOOT_PRIVY__
+      
+      // Check if user is authenticated
+      if (!privy.authenticated) {
+        console.log('🔐 User not authenticated, initiating login')
+        try {
+          await privy.login()
+          console.log('✅ User logged in successfully')
+        } catch (error) {
+          console.error('❌ Login failed:', error)
+          alert('Login failed. Please try again.')
+          return
+        }
+      }
+      
+      // Check if user has a wallet
+      if (!privy.user?.wallet?.address) {
+        console.log('👛 No wallet found, prompting wallet connection')
+        alert('Please connect a wallet to deposit funds. You can do this through your profile settings.')
+        return
+      }
+      
+      // Create deposit popup
+      createDepositPopup(privy.user)
+      
+    } catch (error) {
+      console.error('❌ Deposit error:', error)
+      alert('An error occurred while initiating deposit. Please try again.')
+    }
+  }
+
+  const handleWithdraw = async () => {
+    try {
+      console.log('💸 WITHDRAW button clicked')
+      
+      // Check if Privy is available
+      if (!window.__TURFLOOT_PRIVY__) {
+        console.log('⚠️ Privy not available, showing info message')
+        alert('Wallet functionality requires authentication. Please click the LOGIN button first.')
+        return
+      }
+      
+      const privy = window.__TURFLOOT_PRIVY__
+      
+      // Check if user is authenticated
+      if (!privy.authenticated) {
+        console.log('🔐 User not authenticated, initiating login')
+        try {
+          await privy.login()
+          console.log('✅ User logged in successfully')
+        } catch (error) {
+          console.error('❌ Login failed:', error)
+          alert('Login failed. Please try again.')
+          return
+        }
+      }
+      
+      // Check if user has a wallet
+      if (!privy.user?.wallet?.address) {
+        console.log('👛 No wallet found, prompting wallet connection')
+        alert('Please connect a wallet to withdraw funds. You can do this through your profile settings.')
+        return
+      }
+      
+      // Create withdraw popup
+      createWithdrawPopup(privy.user)
+      
+    } catch (error) {
+      console.error('❌ Withdraw error:', error)
+      alert('An error occurred while initiating withdrawal. Please try again.')
+    }
+  }
+
+  const createDepositPopup = (user) => {
+    // Remove any existing deposit popup
+    const existing = document.getElementById('deposit-popup')
+    if (existing) existing.remove()
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'deposit-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(13, 17, 23, 0.95) !important;
+      backdrop-filter: blur(10px) !important;
+      z-index: 9999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    `
+
+    // Create the modal
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%) !important;
+      border: 2px solid #68d391 !important;
+      border-radius: 16px !important;
+      width: 500px !important;
+      max-width: 90vw !important;
+      color: white !important;
+      box-shadow: 0 0 50px rgba(104, 211, 145, 0.5) !important;
+      font-family: "Rajdhani", sans-serif !important;
+    `
+
+    const walletAddress = user?.wallet?.address || 'No wallet connected'
+    const shortAddress = walletAddress.length > 10 ? 
+      `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}` : 
+      walletAddress
+
+    const depositHTML = `
+      <div style="padding: 24px; border-bottom: 2px solid #68d391; background: linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+              💰
+            </div>
+            <div>
+              <h2 style="color: #68d391; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(104, 211, 145, 0.6);">
+                DEPOSIT FUNDS
+              </h2>
+              <p style="color: #a0aec0; font-size: 14px; margin: 4px 0 0 0;">
+                Add funds to your TurfLoot wallet
+              </p>
+            </div>
+          </div>
+          <button id="close-deposit" style="background: rgba(104, 211, 145, 0.2); border: 2px solid #68d391; border-radius: 8px; padding: 12px; color: #68d391; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 32px;">
+        <!-- Wallet Info -->
+        <div style="margin-bottom: 24px; padding: 16px; background: rgba(45, 55, 72, 0.5); border: 1px solid #68d391; border-radius: 8px;">
+          <div style="color: #68d391; font-size: 14px; font-weight: 600; margin-bottom: 8px;">CONNECTED WALLET</div>
+          <div style="color: #e2e8f0; font-size: 16px; font-family: monospace;">${shortAddress}</div>
+        </div>
+
+        <!-- Deposit Amount -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #68d391; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">
+            DEPOSIT AMOUNT
+          </label>
+          <div style="display: flex; gap: 12px;">
+            <input 
+              id="deposit-amount" 
+              type="number" 
+              placeholder="0.00" 
+              min="0"
+              step="0.01"
+              style="flex: 1; padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #68d391; border-radius: 8px; color: #e2e8f0; font-size: 16px; font-family: 'Rajdhani', sans-serif; box-sizing: border-box;"
+            />
+            <select id="deposit-currency" style="padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #68d391; border-radius: 8px; color: #e2e8f0; font-size: 16px; font-family: 'Rajdhani', sans-serif;">
+              <option value="SOL">SOL</option>
+              <option value="USDC">USDC</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Amount Buttons -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #68d391; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px;">
+            QUICK AMOUNTS
+          </label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            ${[0.1, 0.5, 1.0, 5.0].map(amount => `
+              <button class="quick-amount-btn" data-amount="${amount}" style="flex: 1; min-width: 80px; padding: 12px; background: rgba(45, 55, 72, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-weight: 600; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+                ${amount} SOL
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Important Notice -->
+        <div style="margin-bottom: 24px; padding: 16px; background: rgba(246, 173, 85, 0.1); border: 1px solid #f6ad55; border-radius: 8px;">
+          <div style="color: #f6ad55; font-size: 14px; font-weight: 600; margin-bottom: 8px;">⚠️ IMPORTANT</div>
+          <div style="color: #e2e8f0; font-size: 12px; line-height: 1.4;">
+            • Deposits are processed through your connected wallet<br>
+            • Minimum deposit: 0.01 SOL<br>
+            • Network fees may apply<br>
+            • Funds will appear in your TurfLoot balance after confirmation
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+          <button id="cancel-deposit" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+            CANCEL
+          </button>
+          <button id="confirm-deposit" style="flex: 1; padding: 16px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border: 2px solid #68d391; border-radius: 8px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; box-shadow: 0 0 20px rgba(104, 211, 145, 0.4);">
+            DEPOSIT FUNDS
+          </button>
+        </div>
+      </div>
+    `
+
+    modal.innerHTML = depositHTML
+
+    // Add interactivity
+    const quickAmountBtns = modal.querySelectorAll('.quick-amount-btn')
+    const amountInput = modal.querySelector('#deposit-amount')
+    const currencySelect = modal.querySelector('#deposit-currency')
+    
+    // Quick amount button functionality
+    quickAmountBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const amount = btn.dataset.amount
+        amountInput.value = amount
+        
+        // Update visual selection
+        quickAmountBtns.forEach(b => {
+          b.style.border = '2px solid #4a5568'
+          b.style.background = 'rgba(45, 55, 72, 0.5)'
+          b.style.color = '#a0aec0'
+        })
+        btn.style.border = '2px solid #68d391'
+        btn.style.background = 'rgba(104, 211, 145, 0.1)'
+        btn.style.color = '#68d391'
+      })
+    })
+
+    // Currency change handler
+    currencySelect.addEventListener('change', () => {
+      const currency = currencySelect.value
+      quickAmountBtns.forEach(btn => {
+        const amount = btn.dataset.amount
+        btn.textContent = `${amount} ${currency}`
+      })
+    })
+
+    // Confirm deposit handler
+    const confirmBtn = modal.querySelector('#confirm-deposit')
+    confirmBtn.addEventListener('click', async () => {
+      const amount = parseFloat(amountInput.value)
+      const currency = currencySelect.value
+      
+      if (!amount || amount <= 0) {
+        alert('Please enter a valid deposit amount')
+        return
+      }
+      
+      if (amount < 0.01) {
+        alert('Minimum deposit amount is 0.01')
+        return
+      }
+      
+      console.log('💰 Processing deposit:', { amount, currency, user: user.id })
+      
+      // Here you would integrate with Privy's wallet functionality
+      // For now, show success message
+      alert(`Deposit initiated: ${amount} ${currency}\n\nYour wallet will open to confirm the transaction.`)
+      popup.remove()
+      
+      // In a real implementation, you would:
+      // 1. Use Privy's embedded wallet or connected wallet
+      // 2. Create and sign the transaction
+      // 3. Submit to blockchain
+      // 4. Update user balance via API
+    })
+
+    // Close handlers
+    const closeBtn = modal.querySelector('#close-deposit')
+    const cancelBtn = modal.querySelector('#cancel-deposit')
+    
+    const closePopup = () => popup.remove()
+    
+    closeBtn.addEventListener('click', closePopup)
+    cancelBtn.addEventListener('click', closePopup)
+    
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) closePopup()
+    })
+
+    popup.appendChild(modal)
+    document.body.appendChild(popup)
+    
+    console.log('💰 Deposit popup created')
+  }
+
+  const createWithdrawPopup = (user) => {
+    // Remove any existing withdraw popup
+    const existing = document.getElementById('withdraw-popup')
+    if (existing) existing.remove()
+
+    // Create the popup container
+    const popup = document.createElement('div')
+    popup.id = 'withdraw-popup'
+    popup.style.cssText = `
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: rgba(13, 17, 23, 0.95) !important;
+      backdrop-filter: blur(10px) !important;
+      z-index: 9999 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    `
+
+    // Create the modal
+    const modal = document.createElement('div')
+    modal.style.cssText = `
+      background: linear-gradient(145deg, #2d3748 0%, #1a202c 100%) !important;
+      border: 2px solid #fc8181 !important;
+      border-radius: 16px !important;
+      width: 500px !important;
+      max-width: 90vw !important;
+      color: white !important;
+      box-shadow: 0 0 50px rgba(252, 129, 129, 0.5) !important;
+      font-family: "Rajdhani", sans-serif !important;
+    `
+
+    const walletAddress = user?.wallet?.address || 'No wallet connected'
+    const shortAddress = walletAddress.length > 10 ? 
+      `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}` : 
+      walletAddress
+
+    const withdrawHTML = `
+      <div style="padding: 24px; border-bottom: 2px solid #fc8181; background: linear-gradient(45deg, rgba(252, 129, 129, 0.1) 0%, rgba(252, 129, 129, 0.05) 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="width: 50px; height: 50px; background: linear-gradient(45deg, #fc8181 0%, #e53e3e 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+              💸
+            </div>
+            <div>
+              <h2 style="color: #fc8181; font-size: 28px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(252, 129, 129, 0.6);">
+                WITHDRAW FUNDS
+              </h2>
+              <p style="color: #a0aec0; font-size: 14px; margin: 4px 0 0 0;">
+                Withdraw funds from your TurfLoot wallet
+              </p>
+            </div>
+          </div>
+          <button id="close-withdraw" style="background: rgba(252, 129, 129, 0.2); border: 2px solid #fc8181; border-radius: 8px; padding: 12px; color: #fc8181; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div style="padding: 32px;">
+        <!-- Wallet Info -->
+        <div style="margin-bottom: 24px; padding: 16px; background: rgba(45, 55, 72, 0.5); border: 1px solid #fc8181; border-radius: 8px;">
+          <div style="color: #fc8181; font-size: 14px; font-weight: 600; margin-bottom: 8px;">CONNECTED WALLET</div>
+          <div style="color: #e2e8f0; font-size: 16px; font-family: monospace;">${shortAddress}</div>
+        </div>
+
+        <!-- Current Balance -->
+        <div style="margin-bottom: 24px; padding: 16px; background: rgba(246, 173, 85, 0.1); border: 1px solid #f6ad55; border-radius: 8px;">
+          <div style="color: #f6ad55; font-size: 14px; font-weight: 600; margin-bottom: 8px;">AVAILABLE BALANCE</div>
+          <div style="color: #e2e8f0; font-size: 24px; font-weight: 700;">$0.00 USD</div>
+          <div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">Connect wallet to view balance</div>
+        </div>
+
+        <!-- Withdraw Amount -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">
+            WITHDRAW AMOUNT
+          </label>
+          <div style="display: flex; gap: 12px;">
+            <input 
+              id="withdraw-amount" 
+              type="number" 
+              placeholder="0.00" 
+              min="0"
+              step="0.01"
+              style="flex: 1; padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #fc8181; border-radius: 8px; color: #e2e8f0; font-size: 16px; font-family: 'Rajdhani', sans-serif; box-sizing: border-box;"
+            />
+            <select id="withdraw-currency" style="padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #fc8181; border-radius: 8px; color: #e2e8f0; font-size: 16px; font-family: 'Rajdhani', sans-serif;">
+              <option value="SOL">SOL</option>
+              <option value="USDC">USDC</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Destination Address -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">
+            DESTINATION ADDRESS (OPTIONAL)
+          </label>
+          <input 
+            id="withdraw-address" 
+            type="text" 
+            placeholder="Use connected wallet address"
+            style="width: 100%; padding: 12px 16px; background: rgba(45, 55, 72, 0.8); border: 2px solid #fc8181; border-radius: 8px; color: #e2e8f0; font-size: 14px; font-family: monospace; box-sizing: border-box;"
+          />
+          <div style="color: #a0aec0; font-size: 12px; margin-top: 4px;">Leave empty to withdraw to your connected wallet</div>
+        </div>
+
+        <!-- Important Notice -->
+        <div style="margin-bottom: 24px; padding: 16px; background: rgba(252, 129, 129, 0.1); border: 1px solid #fc8181; border-radius: 8px;">
+          <div style="color: #fc8181; font-size: 14px; font-weight: 600; margin-bottom: 8px;">⚠️ WITHDRAWAL TERMS</div>
+          <div style="color: #e2e8f0; font-size: 12px; line-height: 1.4;">
+            • Minimum withdrawal: 0.01 SOL<br>
+            • Network fees will be deducted from withdrawal amount<br>
+            • Processing time: 1-5 minutes<br>
+            • Withdrawals are final and cannot be reversed
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+          <button id="cancel-withdraw" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+            CANCEL
+          </button>
+          <button id="confirm-withdraw" style="flex: 1; padding: 16px; background: linear-gradient(45deg, #fc8181 0%, #e53e3e 100%); border: 2px solid #fc8181; border-radius: 8px; color: white; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; box-shadow: 0 0 20px rgba(252, 129, 129, 0.4);">
+            WITHDRAW FUNDS
+          </button>
+        </div>
+      </div>
+    `
+
+    modal.innerHTML = withdrawHTML
+
+    // Add interactivity
+    const confirmBtn = modal.querySelector('#confirm-withdraw')
+    confirmBtn.addEventListener('click', async () => {
+      const amount = parseFloat(modal.querySelector('#withdraw-amount').value)
+      const currency = modal.querySelector('#withdraw-currency').value
+      const address = modal.querySelector('#withdraw-address').value.trim()
+      
+      if (!amount || amount <= 0) {
+        alert('Please enter a valid withdrawal amount')
+        return
+      }
+      
+      if (amount < 0.01) {
+        alert('Minimum withdrawal amount is 0.01')
+        return
+      }
+      
+      const destinationAddress = address || walletAddress
+      
+      console.log('💸 Processing withdrawal:', { amount, currency, address: destinationAddress, user: user.id })
+      
+      // Here you would integrate with Privy's wallet functionality
+      // For now, show success message
+      alert(`Withdrawal initiated: ${amount} ${currency}\n\nDestination: ${destinationAddress.substring(0, 10)}...\n\nProcessing time: 1-5 minutes`)
+      popup.remove()
+      
+      // In a real implementation, you would:
+      // 1. Verify user has sufficient balance
+      // 2. Create and sign the withdrawal transaction
+      // 3. Submit to blockchain
+      // 4. Update user balance via API
+    })
+
+    // Close handlers
+    const closeBtn = modal.querySelector('#close-withdraw')
+    const cancelBtn = modal.querySelector('#cancel-withdraw')
+    
+    const closePopup = () => popup.remove()
+    
+    closeBtn.addEventListener('click', closePopup)
+    cancelBtn.addEventListener('click', closePopup)
+    
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) closePopup()
+    })
+
+    popup.appendChild(modal)
+    document.body.appendChild(popup)
+    
+    console.log('💸 Withdraw popup created')
+  }
+
   const createDesktopServerBrowserPopup = () => {
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
