@@ -1676,7 +1676,9 @@ export default function TurfLootTactical() {
             <div style={{ color: '#68d391', fontSize: '12px', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>INVITE FRIENDS</div>
           </div>
           
-          <button style={{
+          <button 
+            onClick={() => createDesktopCreatePartyPopup()}
+            style={{
             width: '100%',
             padding: '12px',
             background: 'rgba(26, 32, 44, 0.8)',
