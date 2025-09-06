@@ -379,8 +379,9 @@ const AgarIOGame = () => {
       setEntryFee(paramFee)
       
       // Connect to Hathora multiplayer directly with the working build
-      if (user && getAccessToken) {
-        console.log('✅ Authenticated user - initializing Hathora multiplayer connection')
+      // For practice games (fee=0), allow without authentication
+      if ((user && getAccessToken) || (paramMode === 'practice' && paramFee === 0)) {
+        console.log('✅ Connecting to Hathora multiplayer:', user ? 'Authenticated user' : 'Free practice mode')
         console.log('🚀 Connecting to working Hathora build (ID: 2) for global multiplayer')
         
         // Initialize with Hathora using the working build
@@ -394,7 +395,8 @@ const AgarIOGame = () => {
             if (initialized) {
               console.log('🎯 Hathora client initialized successfully')
               // Connect to the existing room or create a new one
-              const connectionInfo = await hathoraClient.createOrJoinRoom(user.id, paramMode || 'practice')
+              const playerId = user?.id || `guest-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
+              const connectionInfo = await hathoraClient.createOrJoinRoom(playerId, paramMode || 'practice')
               console.log('🌐 Hathora connection established:', connectionInfo)
               
               // Use the connection info to start the multiplayer game
@@ -413,9 +415,8 @@ const AgarIOGame = () => {
         // Call the async function
         initializeHathoraConnection()
       } else {
-        console.log('⚠️ User not authenticated - prompting login for multiplayer')
-        // Could redirect to login or show login modal
-        alert('Please login to join multiplayer games.')
+        console.log('⚠️ Authentication required for paid games - prompting login')
+        alert('Please login to join paid multiplayer games.')
       }
       return
     }
