@@ -3891,7 +3891,7 @@ export default function TurfLootTactical() {
           </button>
           
           <button 
-            onClick={() => createSkinStorePopup()}
+            onClick={() => createSkinStorePopup(currency)}
             style={{
             width: '100%',
             padding: '12px',
