@@ -310,6 +310,45 @@ const AgarIOGame = () => {
       }
     }
 
+    drawWorldBoundary() {
+      // Draw red boundary ring around the playable area
+      const borderWidth = 20
+      const margin = 50 // Distance outside world bounds where red zone starts
+      
+      this.ctx.strokeStyle = '#ff4444'
+      this.ctx.fillStyle = 'rgba(255, 68, 68, 0.3)' // Semi-transparent red fill
+      this.ctx.lineWidth = borderWidth
+      
+      // Outer boundary (danger zone)
+      const outerLeft = -margin
+      const outerTop = -margin  
+      const outerRight = this.world.width + margin
+      const outerBottom = this.world.height + margin
+      
+      // Inner boundary (playable area)
+      const innerLeft = 0
+      const innerTop = 0
+      const innerRight = this.world.width
+      const innerBottom = this.world.height
+      
+      // Draw the red border zones (top, right, bottom, left)
+      
+      // Top border
+      this.ctx.fillRect(outerLeft, outerTop, outerRight - outerLeft, innerTop - outerTop)
+      
+      // Bottom border  
+      this.ctx.fillRect(outerLeft, innerBottom, outerRight - outerLeft, outerBottom - innerBottom)
+      
+      // Left border
+      this.ctx.fillRect(outerLeft, innerTop, innerLeft - outerLeft, innerBottom - innerTop)
+      
+      // Right border
+      this.ctx.fillRect(innerRight, innerTop, outerRight - innerRight, innerBottom - innerTop)
+      
+      // Draw the boundary line (inner edge of red zone)
+      this.ctx.strokeRect(innerLeft, innerTop, this.world.width, this.world.height)
+    }
+
     drawCoin(coin) {
       this.ctx.beginPath()
       this.ctx.arc(coin.x, coin.y, coin.radius, 0, Math.PI * 2)
