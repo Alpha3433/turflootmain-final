@@ -1114,7 +1114,7 @@ export default function TurfLootTactical() {
     ]
 
     let currentSkin = 'default'
-    let playerCoins = 750 // Mock player currency - would come from API
+    // Use dynamic currency from missions system instead of hardcoded value
 
     const skinStoreHTML = `
       <div style="padding: 24px; border-bottom: 2px solid #f6ad55; background: linear-gradient(45deg, rgba(246, 173, 85, 0.1) 0%, rgba(246, 173, 85, 0.05) 100%);">
