@@ -36,19 +36,52 @@ const AgarIOGame = () => {
     { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
   ]
 
-  // Initialize missions when game starts
-  useEffect(() => {
-    if (gameStarted && activeMissions.length === 0) {
-      // Assign 3 random missions when game starts
-      const shuffled = [...missionTypes].sort(() => 0.5 - Math.random())
-      const selectedMissions = shuffled.slice(0, 3).map(mission => ({
-        ...mission,
-        progress: 0,
-        completed: false
-      }))
-      setActiveMissions(selectedMissions)
-    }
-  }, [gameStarted])
+  // Mission progress tracking
+  const updateMissionProgress = (type, value) => {
+    setActiveMissions(prev => prev.map(mission => {
+      if (mission.completed) return mission
+
+      let newProgress = mission.progress
+      let shouldComplete = false
+
+      switch (type) {
+        case 'coin_collected':
+          if (mission.id.includes('collect_coins')) {
+            newProgress = Math.min(mission.progress + value, mission.target)
+            shouldComplete = newProgress >= mission.target
+          }
+          break
+        case 'mass_reached':
+          if (mission.id.includes('reach_mass')) {
+            newProgress = Math.max(mission.progress, value)
+            shouldComplete = newProgress >= mission.target
+          }
+          break
+        case 'elimination':
+          if (mission.id.includes('eliminate')) {
+            newProgress = Math.min(mission.progress + value, mission.target)
+            shouldComplete = newProgress >= mission.target
+          }
+          break
+        case 'survival_time':
+          if (mission.id.includes('survive')) {
+            newProgress = value
+            shouldComplete = newProgress >= mission.target
+          }
+          break
+      }
+
+      if (shouldComplete && !mission.completed) {
+        // Complete mission
+        setCurrency(prev => prev + mission.reward)
+        setShowMissionComplete(mission)
+        setTimeout(() => setShowMissionComplete(null), 3000)
+        return { ...mission, progress: newProgress, completed: true }
+      }
+
+      return { ...mission, progress: newProgress }
+    }))
+  }
   
   // Cash out state
   const [cashOutProgress, setCashOutProgress] = useState(0)
