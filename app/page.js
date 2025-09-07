@@ -1127,8 +1127,10 @@ export default function TurfLootTactical() {
             CURRENT SKIN
           </div>
           <div style="display: flex; align-items: center; gap: 16px;">
-            <div id="current-skin-preview" style="width: 60px; height: 60px; background: linear-gradient(45deg, #68d391 0%, #38a169 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid #68d391;">
-              🔵
+            <div id="current-skin-preview" style="width: 60px; height: 60px; background: #4A90E2; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #ffffff; position: relative; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);">
+              <!-- Black Eyes - Same as in-game character -->
+              <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; left: 16px; top: 20px;"></div>
+              <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; right: 16px; top: 20px;"></div>
             </div>
             <div>
               <div id="current-skin-name" style="color: #68d391; font-size: 20px; font-weight: 700;">Default Warrior</div>
