@@ -3497,6 +3497,189 @@ export default function TurfLootTactical() {
           </div>
         </div>
 
+        {/* Invite Friends Section */}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          top: '600px',
+          transform: 'translateX(-50%)',
+          width: '500px',
+          zIndex: 20,
+          background: 'rgba(26, 32, 44, 0.9)',
+          border: '2px solid #fc8181',
+          borderRadius: '8px',
+          padding: '24px',
+          boxShadow: '0 0 30px rgba(252, 129, 129, 0.4)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              border: '2px solid #fc8181',
+              boxShadow: '0 0 15px rgba(252, 129, 129, 0.5)'
+            }}>
+              👥
+            </div>
+            <h3 style={{
+              color: '#fc8181',
+              fontWeight: '700',
+              fontSize: '18px',
+              margin: 0,
+              fontFamily: '"Rajdhani", sans-serif',
+              textShadow: '0 0 10px rgba(252, 129, 129, 0.6)',
+              textTransform: 'uppercase'
+            }}>
+              INVITE FRIENDS
+            </h3>
+          </div>
+          
+          {/* Friends Search */}
+          <div style={{ marginBottom: '16px' }}>
+            <input 
+              type="text" 
+              placeholder="Search friends..." 
+              style={{
+                width: '100%',
+                padding: '10px 16px',
+                background: 'rgba(45, 55, 72, 0.6)',
+                border: '1px solid #4a5568',
+                borderRadius: '6px',
+                color: '#e2e8f0',
+                fontSize: '14px',
+                fontFamily: '"Rajdhani", sans-serif',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+          
+          {/* Friends List */}
+          <div style={{
+            maxHeight: '150px',
+            overflowY: 'auto',
+            background: 'rgba(45, 55, 72, 0.3)',
+            border: '1px solid #4a5568',
+            borderRadius: '6px',
+            padding: '8px',
+            marginBottom: '16px'
+          }}>
+            {/* Mock friends data - in production would come from friends system */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 12px',
+              marginBottom: '4px',
+              background: 'rgba(68, 90, 120, 0.3)',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  background: '#68d391',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 6px #68d391'
+                }}></div>
+                <span style={{ color: '#e2e8f0', fontSize: '14px', fontWeight: '500' }}>GameMaster_2024</span>
+                <span style={{ color: '#68d391', fontSize: '12px', fontWeight: '600' }}>● ONLINE</span>
+              </div>
+              <input type="checkbox" style={{ width: '16px', height: '16px', accentColor: '#fc8181' }} />
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 12px',
+              marginBottom: '4px',
+              background: 'rgba(68, 90, 120, 0.3)',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  background: '#68d391',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 6px #68d391'
+                }}></div>
+                <span style={{ color: '#e2e8f0', fontSize: '14px', fontWeight: '500' }}>ProPlayer_X</span>
+                <span style={{ color: '#68d391', fontSize: '12px', fontWeight: '600' }}>● ONLINE</span>
+              </div>
+              <input type="checkbox" style={{ width: '16px', height: '16px', accentColor: '#fc8181' }} />
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 12px',
+              marginBottom: '4px',
+              background: 'rgba(68, 90, 120, 0.2)',
+              borderRadius: '4px',
+              opacity: 0.7
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  background: '#a0aec0',
+                  borderRadius: '50%'
+                }}></div>
+                <span style={{ color: '#a0aec0', fontSize: '14px', fontWeight: '500' }}>SquadLeader99</span>
+                <span style={{ color: '#a0aec0', fontSize: '12px', fontWeight: '400' }}>● OFFLINE</span>
+              </div>
+              <input type="checkbox" disabled style={{ width: '16px', height: '16px', accentColor: '#fc8181', opacity: 0.5 }} />
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 12px',
+              marginBottom: '0',
+              background: 'rgba(68, 90, 120, 0.3)',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  background: '#ffd700',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 6px #ffd700'
+                }}></div>
+                <span style={{ color: '#e2e8f0', fontSize: '14px', fontWeight: '500' }}>TacticalSniper</span>
+                <span style={{ color: '#ffd700', fontSize: '12px', fontWeight: '600' }}>● IN GAME</span>
+              </div>
+              <input type="checkbox" style={{ width: '16px', height: '16px', accentColor: '#fc8181' }} />
+            </div>
+          </div>
+          
+          {/* Selected Friends Counter */}
+          <div style={{
+            marginTop: '8px',
+            color: '#a0aec0',
+            fontSize: '12px',
+            textAlign: 'center'
+          }}>
+            0 friends selected for invitation
+          </div>
+        </div>
+
         {/* Desktop 4-Panel Layout - Fixed */}
         {/* Top Left - Command */}
         <div style={{
