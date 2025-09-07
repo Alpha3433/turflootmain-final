@@ -540,7 +540,7 @@ export default function TurfLootTactical() {
       const user = privy.user
       if (!user || !user.wallet) {
         console.log('👛 No embedded wallet found, user needs to set up wallet')
-        alert('Please set up your embedded wallet first through your profile settings.')
+        // Removed popup - allow direct access to deposit functionality
         return
       }
       
