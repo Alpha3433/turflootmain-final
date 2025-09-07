@@ -1131,6 +1131,36 @@ const AgarIOGame = () => {
             )}
           </div>
         </div>
+        
+        {/* Mission Complete Notification */}
+        {showMissionComplete && (
+          <div style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            border: '3px solid #22c55e',
+            borderRadius: '12px',
+            padding: '20px 30px',
+            textAlign: 'center',
+            zIndex: 2000,
+            animation: 'missionPulse 0.5s ease-out'
+          }}>
+            <div style={{ color: '#22c55e', fontSize: '24px', marginBottom: '8px' }}>
+              ✅ MISSION COMPLETE!
+            </div>
+            <div style={{ color: '#ffffff', fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
+              {showMissionComplete.icon} {showMissionComplete.name}
+            </div>
+            <div style={{ color: '#9ca3af', fontSize: '12px', marginBottom: '8px' }}>
+              {showMissionComplete.description}
+            </div>
+            <div style={{ color: '#FFD700', fontSize: '18px', fontWeight: '700' }}>
+              +{showMissionComplete.reward} 💰 COINS EARNED!
+            </div>
+          </div>
+        )}
 
         {/* Action Buttons - Matching Reference Style */}
         
