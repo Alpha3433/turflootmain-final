@@ -31,6 +31,19 @@ export default function TurfLootTactical() {
     color: '#4A90E2'
   })
 
+  // Load saved skin from localStorage on component mount
+  useEffect(() => {
+    const savedSkin = localStorage.getItem('selectedSkin')
+    if (savedSkin) {
+      try {
+        const parsedSkin = JSON.parse(savedSkin)
+        setSelectedSkin(parsedSkin)
+      } catch (error) {
+        console.log('Error loading saved skin:', error)
+      }
+    }
+  }, [])
+
   // Track mouse movement for interactive eyes
   useEffect(() => {
     const handleMouseMove = (e) => {
