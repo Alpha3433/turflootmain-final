@@ -243,8 +243,8 @@ const AgarIOGame = () => {
         }
       }
       
-      // Player vs viruses (splits player if big enough)
-      for (let i = 0; i < this.viruses.length; i++) {
+      // Player vs viruses (authentic Agar.io mechanics)
+      for (let i = this.viruses.length - 1; i >= 0; i--) {
         const virus = this.viruses[i]
         const dx = this.player.x - virus.x
         const dy = this.player.y - virus.y
@@ -252,20 +252,42 @@ const AgarIOGame = () => {
         
         if (distance < this.player.radius + virus.radius) {
           if (this.player.mass > virus.mass) {
-            // Player is bigger than virus - split the player
-            this.player.mass = Math.max(20, this.player.mass * 0.7)
-            setMass(this.player.mass)
+            // Player is bigger than virus - split player into multiple pieces (authentic Agar.io)
+            const splitCount = Math.min(4, Math.floor(this.player.mass / 40)) // More mass = more splits
+            const pieceCount = Math.max(2, splitCount)
+            const pieceMass = this.player.mass / pieceCount
             
-            // Move virus to new random location
-            virus.x = Math.random() * this.world.width
-            virus.y = Math.random() * this.world.height
+            // Keep main player as one piece
+            this.player.mass = pieceMass
+            setMass(Math.floor(pieceMass))
+            
+            // Create additional player pieces (simplified - just reduce main player mass significantly)
+            // In full implementation, this would create multiple controllable pieces
+            this.player.mass = Math.max(20, this.player.mass * 0.4) // Much more severe penalty like real Agar.io
+            
+            // Eject player away from virus
+            const ejectDistance = 80
+            const ejectAngle = Math.atan2(dx, dy)
+            this.player.x += Math.sin(ejectAngle) * ejectDistance
+            this.player.y += Math.cos(ejectAngle) * ejectDistance
+            
+            // Remove the virus (consumed)
+            this.viruses.splice(i, 1)
+            
+            // Spawn a new virus elsewhere to maintain count
+            this.viruses.push({
+              x: Math.random() * this.world.width,
+              y: Math.random() * this.world.height,
+              radius: 35,
+              color: '#00FF41',
+              spikes: 12,
+              mass: 100
+            })
+            
           } else {
-            // Player is smaller - bounce back
-            const pushDistance = (this.player.radius + virus.radius) - distance + 5
-            const pushX = (dx / distance) * pushDistance
-            const pushY = (dy / distance) * pushDistance
-            this.player.x += pushX
-            this.player.y += pushY
+            // Player is smaller - can hide behind virus (no collision with small players)
+            // This allows small players to use viruses as protection like in real Agar.io
+            continue
           }
         }
       }
