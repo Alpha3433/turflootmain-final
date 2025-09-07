@@ -1338,6 +1338,166 @@ const AgarIOGame = () => {
           </div>
         </div>
 
+        {/* Cash Out Success Popup */}
+        {cashOutComplete && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999999,
+            pointerEvents: 'auto'
+          }}>
+            <div style={{
+              backgroundColor: '#1a202c',
+              border: '3px solid #68d391',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '90%',
+              padding: '0',
+              color: 'white',
+              boxShadow: '0 0 50px rgba(104, 211, 145, 0.5)',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '2px solid #68d391',
+                background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '30px',
+                  margin: '0 auto 16px'
+                }}>
+                  💰
+                </div>
+                <h2 style={{
+                  color: '#68d391',
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  margin: '0 0 8px',
+                  textTransform: 'uppercase',
+                  textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
+                }}>
+                  CASH OUT SUCCESSFUL!
+                </h2>
+                <p style={{
+                  color: '#e2e8f0',
+                  fontSize: '16px',
+                  margin: '0',
+                  opacity: '0.8'
+                }}>
+                  Congratulations! You've successfully cashed out!
+                </p>
+              </div>
+
+              {/* Cash Out Amount */}
+              <div style={{ padding: '24px' }}>
+                <div style={{
+                  backgroundColor: 'rgba(104, 211, 145, 0.1)',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  marginBottom: '24px',
+                  border: '1px solid rgba(104, 211, 145, 0.3)'
+                }}>
+                  <div style={{ color: '#68d391', fontSize: '28px', fontWeight: '700' }}>
+                    ${score}
+                  </div>
+                  <div style={{ color: '#a0aec0', fontSize: '14px' }}>Cash Out Amount</div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  flexDirection: 'column'
+                }}>
+                  <button
+                    onClick={() => {
+                      setCashOutComplete(false)
+                      setCashOutProgress(0)
+                      setScore(0)
+                      setMass(20)
+                      handleRestart()
+                    }}
+                    style={{
+                      backgroundColor: '#68d391',
+                      border: '2px solid #48bb78',
+                      borderRadius: '8px',
+                      color: '#1a202c',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      padding: '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#48bb78'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#68d391'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    🔄 Play Again
+                  </button>
+                  <button
+                    onClick={() => window.location.href = '/'}
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '2px solid #a0aec0',
+                      borderRadius: '8px',
+                      color: '#a0aec0',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      padding: '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#a0aec0'
+                      e.target.style.color = '#1a202c'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#a0aec0'
+                    }}
+                  >
+                    🏠 Back to Lobby
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Game Over Popup */}
         {gameOver && (
           <div style={{
