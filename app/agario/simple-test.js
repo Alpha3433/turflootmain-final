@@ -101,7 +101,7 @@ const SimpleTacticalTest = () => {
       ctx.fillText('OPERATIVE', this.player.x, this.player.y - this.player.radius - 10)
       
       // Draw black eyes instead of mass
-      const eyeRadius = Math.max(4, this.player.radius * 0.2)
+      const eyeRadius = Math.max(2, this.player.radius * 0.12) // Made eyes smaller
       const eyeOffset = this.player.radius * 0.35
       
       // Left eye
