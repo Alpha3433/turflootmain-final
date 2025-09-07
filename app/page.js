@@ -1080,11 +1080,11 @@ export default function TurfLootTactical() {
     // Mock skin data - in production this would come from API
     const availableSkins = [
       { id: 'default', name: 'Default Warrior', price: 0, owned: true, rarity: 'common', color: '#4A90E2' },
-      { id: 'stealth', name: 'Stealth Operative', price: 150, owned: false, rarity: 'uncommon', color: '#2C3E50' },
-      { id: 'flame', name: 'Flame Guardian', price: 300, owned: false, rarity: 'rare', color: '#E74C3C' },
-      { id: 'toxic', name: 'Toxic Assassin', price: 250, owned: false, rarity: 'uncommon', color: '#27AE60' },
-      { id: 'electric', name: 'Electric Storm', price: 500, owned: false, rarity: 'epic', color: '#F39C12' },
-      { id: 'shadow', name: 'Shadow Reaper', price: 450, owned: false, rarity: 'rare', color: '#8E44AD' },
+      { id: 'stealth', name: 'Stealth Operative', price: 150, owned: true, rarity: 'common', color: '#2C3E50' },
+      { id: 'flame', name: 'Flame Guardian', price: 300, owned: true, rarity: 'common', color: '#E74C3C' },
+      { id: 'toxic', name: 'Toxic Assassin', price: 250, owned: true, rarity: 'common', color: '#27AE60' },
+      { id: 'electric', name: 'Electric Storm', price: 500, owned: true, rarity: 'common', color: '#F39C12' },
+      { id: 'shadow', name: 'Shadow Reaper', price: 450, owned: true, rarity: 'common', color: '#8E44AD' },
       { id: 'golden', name: 'Golden Emperor', price: 1000, owned: false, rarity: 'legendary', color: '#FFD700' },
       { id: 'diamond', name: 'Diamond Elite', price: 2000, owned: false, rarity: 'legendary', color: '#E8F4FD' }
     ]
