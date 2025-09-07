@@ -921,24 +921,23 @@ const AgarIOGame = () => {
               zIndex: 1
             }} />
             
-            {/* Player dot on minimap - larger and more visible */}
+            {/* Player dot on minimap - using state data */}
             <div style={{
               position: 'absolute',
               width: '12px',
               height: '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${((gameRef.current?.player?.x || 2000) / 4000) * 210 + 5}px`,
-              top: `${((gameRef.current?.player?.y || 2000) / 4000) * 210 + 5}px`,
+              left: `${(minimapData.playerX / 4000) * 210 + 5}px`,
+              top: `${(minimapData.playerY / 4000) * 210 + 5}px`,
               transform: 'translate(-50%, -50%)',
               border: '3px solid #ffffff',
               boxShadow: '0 0 12px rgba(96, 165, 250, 1)',
-              zIndex: 10,
-              transition: 'all 50ms ease-out'
+              zIndex: 10
             }} />
             
-            {/* Enemy dots on minimap - larger and more visible */}
-            {gameRef.current?.enemies?.map((enemy, i) => (
+            {/* Enemy dots on minimap - using state data */}
+            {minimapData.enemies.map((enemy, i) => (
               <div
                 key={i}
                 style={{
@@ -952,16 +951,15 @@ const AgarIOGame = () => {
                   transform: 'translate(-50%, -50%)',
                   opacity: '0.9',
                   border: '1px solid #ffffff',
-                  transition: 'all 50ms ease-out',
                   zIndex: 8
                 }}
               />
             ))}
             
-            {/* Coin dots on minimap - larger and brighter */}
-            {gameRef.current?.coins?.map((coin, i) => (
+            {/* Coin dots on minimap - using state data */}
+            {minimapData.coins.map((coin, i) => (
               <div
-                key={i}
+                key={`coin-${i}`}
                 style={{
                   position: 'absolute',
                   width: '4px',
@@ -973,7 +971,6 @@ const AgarIOGame = () => {
                   transform: 'translate(-50%, -50%)',
                   opacity: '1',
                   boxShadow: '0 0 4px rgba(255, 215, 0, 0.8)',
-                  transition: 'all 50ms ease-out',
                   zIndex: 7
                 }}
               />
