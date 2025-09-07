@@ -82,6 +82,20 @@ const AgarIOGame = () => {
       return { ...mission, progress: newProgress }
     }))
   }
+
+  // Initialize missions when game starts
+  useEffect(() => {
+    if (gameStarted && activeMissions.length === 0) {
+      // Assign 3 random missions when game starts
+      const shuffled = [...missionTypes].sort(() => 0.5 - Math.random())
+      const selectedMissions = shuffled.slice(0, 3).map(mission => ({
+        ...mission,
+        progress: 0,
+        completed: false
+      }))
+      setActiveMissions(selectedMissions)
+    }
+  }, [gameStarted])
   
   // Cash out state
   const [cashOutProgress, setCashOutProgress] = useState(0)
