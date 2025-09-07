@@ -589,109 +589,90 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Action Buttons - Integrated Tooltip Style */}
+        {/* Action Buttons - Classic Style like reference */}
         <div style={{
           position: 'fixed',
-          bottom: '100px',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          bottom: '10px',
+          left: '10px',
           zIndex: 1000,
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: '8px',
-          alignItems: 'center',
-          pointerEvents: 'none'
+          display: 'flex',
+          gap: '8px'
         }}>
-          {/* SPLIT Button - Integrated Tooltip Style */}
+          {/* Split Button */}
           <div 
             onClick={handleSplit}
             style={{
-              backgroundColor: 'rgba(15, 23, 42, 0.92)',
-              border: '1px solid rgba(59, 130, 246, 0.4)',
-              borderRadius: '6px',
-              color: '#e2e8f0',
-              fontWeight: '500',
-              fontSize: '13px',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              border: '2px solid #333',
+              borderRadius: '4px',
+              color: '#fff',
+              fontSize: '11px',
               cursor: 'pointer',
-              padding: '8px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(8px)',
-              transition: 'all 150ms ease-out',
-              pointerEvents: 'auto',
-              position: 'relative',
-              minWidth: '160px',
-              justifyContent: 'center',
-              borderLeft: '3px solid #3b82f6'
+              padding: '6px 10px',
+              fontWeight: 'bold',
+              transition: 'all 150ms',
+              pointerEvents: 'auto'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(30, 41, 59, 0.95)'
-              e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
-              e.target.style.transform = 'translateY(-1px)'
-              e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+              e.target.style.backgroundColor = 'rgba(50, 50, 50, 0.9)'
+              e.target.style.borderColor = '#555'
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(15, 23, 42, 0.92)'
-              e.target.style.borderColor = 'rgba(59, 130, 246, 0.4)'
-              e.target.style.transform = 'translateY(0)'
-              e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+              e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+              e.target.style.borderColor = '#333'
             }}
           >
-            <span style={{ 
-              fontSize: '14px',
-              color: '#3b82f6',
-              fontWeight: 'bold'
-            }}>SPACE</span>
-            <span style={{ color: '#94a3b8' }}>•</span>
-            <span>Split Operative</span>
+            SPLIT
           </div>
+        </div>
 
-          {/* CASH Button - Integrated Tooltip Style */}
+        {/* Cash Out Button - Bottom Center like reference */}
+        <div style={{
+          position: 'fixed',
+          bottom: '10px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1000
+        }}>
           <div 
             style={{
-              backgroundColor: 'rgba(15, 23, 42, 0.92)',
-              border: '1px solid rgba(245, 158, 11, 0.4)',
-              borderRadius: '6px',
-              color: '#e2e8f0',
-              fontWeight: '500',
-              fontSize: '13px',
+              backgroundColor: '#FFA500',
+              border: '2px solid #FF8C00',
+              borderRadius: '4px',
+              color: '#000',
+              fontSize: '12px',
+              fontWeight: 'bold',
               cursor: 'pointer',
-              padding: '8px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(8px)',
-              transition: 'all 150ms ease-out',
+              padding: '8px 16px',
+              transition: 'all 150ms',
               pointerEvents: 'auto',
-              position: 'relative',
-              minWidth: '160px',
-              justifyContent: 'center',
-              borderLeft: '3px solid #f59e0b'
+              textAlign: 'center'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(30, 41, 59, 0.95)'
-              e.target.style.borderColor = 'rgba(245, 158, 11, 0.6)'
-              e.target.style.transform = 'translateY(-1px)'
-              e.target.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+              e.target.style.backgroundColor = '#FFB84D'
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(15, 23, 42, 0.92)'
-              e.target.style.borderColor = 'rgba(245, 158, 11, 0.4)'
-              e.target.style.transform = 'translateY(0)'
-              e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+              e.target.style.backgroundColor = '#FFA500'
             }}
           >
-            <span style={{ 
-              fontSize: '14px',
-              color: '#f59e0b',
-              fontWeight: 'bold'
-            }}>E</span>
-            <span style={{ color: '#94a3b8' }}>•</span>
-            <span>Cash Out ${score}</span>
+            💰 CASH OUT
           </div>
+        </div>
+
+        {/* Player Stats - Bottom Right */}
+        <div style={{
+          position: 'fixed',
+          bottom: '10px',
+          right: '10px',
+          zIndex: 1000,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          border: '2px solid #333',
+          borderRadius: '4px',
+          padding: '6px 10px',
+          fontSize: '11px',
+          color: '#ccc'
+        }}>
+          <div style={{ color: '#4CAF50', fontWeight: 'bold' }}>#{mass} FPS</div>
         </div>
       </div>
 
