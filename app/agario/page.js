@@ -155,8 +155,23 @@ const AgarIOGame = () => {
         this.player.x += moveX
         this.player.y += moveY
         
-        this.player.x = Math.max(this.player.radius, Math.min(this.world.width - this.player.radius, this.player.x))
-        this.player.y = Math.max(this.player.radius, Math.min(this.world.height - this.player.radius, this.player.y))
+        // Circular boundary constraints (synced with minimap)
+        const centerX = this.world.width / 2  // 2000
+        const centerY = this.world.height / 2 // 2000
+        const playableRadius = 1800 // Same as boundary radius
+        
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(this.player.x - centerX, 2) + 
+          Math.pow(this.player.y - centerY, 2)
+        )
+        
+        if (distanceFromCenter + this.player.radius > playableRadius) {
+          // Push player back inside circular boundary
+          const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
+          const maxDistance = playableRadius - this.player.radius
+          this.player.x = centerX + Math.cos(angle) * maxDistance
+          this.player.y = centerY + Math.sin(angle) * maxDistance
+        }
       }
       
       this.player.radius = Math.sqrt(this.player.mass) * 3
