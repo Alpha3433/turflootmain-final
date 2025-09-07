@@ -460,6 +460,9 @@ const AgarIOGame = () => {
         this.ctx.lineTo(endX, y)
         this.ctx.stroke()
       }
+      
+      // Reset alpha back to normal
+      this.ctx.globalAlpha = 1.0
     }
 
     drawWorldBoundary() {
