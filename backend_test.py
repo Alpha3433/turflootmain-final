@@ -140,9 +140,9 @@ class CashOutBackendTester:
     def test_user_balance_and_stats(self):
         """Test 3: Verify user balance and stats APIs for cash-out support"""
         try:
-            # Test user balance endpoint (GET)
+            # Test wallet balance endpoint (correct endpoint)
             start_time = time.time()
-            response = requests.get(f"{API_BASE}/users/balance?userId={self.test_player_id}", timeout=10)
+            response = requests.get(f"{API_BASE}/wallet/balance?userId={self.test_player_id}", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
