@@ -750,87 +750,130 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Action Buttons - Center of Page */}
+        {/* Action Buttons - Integrated Game Style */}
         <div style={{ 
           position: 'fixed', 
-          top: '50%', 
+          bottom: '120px', 
           left: '50%', 
-          transform: 'translate(-50%, -50%)', 
+          transform: 'translateX(-50%)', 
           zIndex: 1000, 
           display: 'flex', 
-          gap: '20px',
+          flexDirection: 'column',
+          gap: '12px',
+          alignItems: 'center',
           pointerEvents: 'none'
         }}>
+          {/* SPLIT Button - Tooltip Style */}
           <button 
             onClick={handleSplit}
             style={{
-              width: '80px',
-              height: '80px',
-              background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
-              border: '3px solid #60a5fa',
-              borderRadius: '12px',
+              backgroundColor: 'rgba(59, 130, 246, 0.95)',
+              border: '2px solid #3b82f6',
+              borderRadius: '8px',
               color: 'white',
               fontWeight: 'bold',
-              fontSize: '12px',
+              fontSize: '14px',
               cursor: 'pointer',
+              padding: '12px 20px',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
-              backdropFilter: 'blur(8px)',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(4px)',
               transition: 'all 200ms',
-              pointerEvents: 'auto'
+              pointerEvents: 'auto',
+              minWidth: '180px',
+              justifyContent: 'center'
             }}
             onMouseOver={(e) => {
-              e.target.style.transform = 'scale(1.05)'
-              e.target.style.background = 'linear-gradient(135deg, #1d4ed8, #2563eb)'
-              e.target.style.boxShadow = '0 12px 20px rgba(0, 0, 0, 0.5)'
+              e.target.style.backgroundColor = 'rgba(37, 99, 235, 0.95)'
+              e.target.style.transform = 'scale(1.02)'
             }}
             onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'rgba(59, 130, 246, 0.95)'
               e.target.style.transform = 'scale(1)'
-              e.target.style.background = 'linear-gradient(135deg, #2563eb, #3b82f6)'
-              e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.4)'
             }}
           >
-            <span style={{ fontSize: '24px', marginBottom: '4px' }}>⚡</span>
-            <span style={{ fontSize: '11px', fontWeight: 'bold' }}>SPLIT</span>
+            <span style={{ fontSize: '16px' }}>⚡</span>
+            <span>Press SPACE to Split</span>
           </button>
+
+          {/* CASH Button - Tooltip Style */}
           <button 
             style={{
-              width: '80px',
-              height: '80px',
-              background: 'linear-gradient(135deg, #d97706, #f59e0b)',
-              border: '3px solid #fbbf24',
-              borderRadius: '12px',
+              backgroundColor: 'rgba(245, 158, 11, 0.95)',
+              border: '2px solid #f59e0b', 
+              borderRadius: '8px',
               color: 'white',
               fontWeight: 'bold',
-              fontSize: '12px',
+              fontSize: '14px',
               cursor: 'pointer',
+              padding: '12px 20px',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
-              backdropFilter: 'blur(8px)',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(4px)',
               transition: 'all 200ms',
-              pointerEvents: 'auto'
+              pointerEvents: 'auto',
+              minWidth: '180px',
+              justifyContent: 'center'
             }}
             onMouseOver={(e) => {
-              e.target.style.transform = 'scale(1.05)'
-              e.target.style.background = 'linear-gradient(135deg, #b45309, #d97706)'
-              e.target.style.boxShadow = '0 12px 20px rgba(0, 0, 0, 0.5)'
+              e.target.style.backgroundColor = 'rgba(217, 119, 6, 0.95)'
+              e.target.style.transform = 'scale(1.02)'
             }}
             onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'rgba(245, 158, 11, 0.95)'
               e.target.style.transform = 'scale(1)'
-              e.target.style.background = 'linear-gradient(135deg, #d97706, #f59e0b)'
-              e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.4)'
             }}
           >
-            <span style={{ fontSize: '24px', marginBottom: '4px' }}>💰</span>
-            <span style={{ fontSize: '11px', fontWeight: 'bold' }}>CASH</span>
-            <span style={{ fontSize: '9px', fontWeight: '500' }}>${score}</span>
+            <span style={{ fontSize: '16px' }}>💰</span>
+            <span>Hold E to Cash Out (${score})</span>
           </button>
+        </div>
+
+        {/* Player Stats Panel - Bottom Right */}
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 1000,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          border: '1px solid #374151',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          minWidth: '140px'
+        }}>
+          <div style={{ color: '#22d3ee', fontSize: '12px', fontWeight: 'bold', marginBottom: '8px' }}>
+            You
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#9ca3af' }}>Net Worth:</span>
+              <span style={{ color: '#22c55e', fontWeight: 'bold' }}>${score}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#9ca3af' }}>Total Mass:</span>
+              <span style={{ color: '#60a5fa', fontWeight: 'bold' }}>{mass}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#9ca3af' }}>K/D:</span>
+              <span style={{ color: '#f87171', fontWeight: 'bold' }}>{eliminations}/0</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#9ca3af' }}>Streak:</span>
+              <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>{eliminations} 🔥</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#9ca3af' }}>Coins Collected:</span>
+              <span style={{ color: '#34d399', fontWeight: 'bold' }}>{score}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#9ca3af' }}>Time Alive:</span>
+              <span style={{ color: '#a78bfa', fontWeight: 'bold' }}>0:00</span>
+            </div>
+          </div>
         </div>
       </div>
 
