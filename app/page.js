@@ -3749,39 +3749,102 @@ export default function TurfLootTactical() {
           </div>
           
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            {/* Actual Game Circle Preview */}
-            <div style={{
-              width: '72px',
-              height: '72px',
-              backgroundColor: '#4A90E2', // Same blue as in-game player
-              border: '3px solid #ffffff', // White border like in-game
-              borderRadius: '50%',
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)'
-            }}>
-              {/* Black Eyes - Same as in-game */}
-              <div style={{
-                position: 'absolute',
-                width: '8px',
-                height: '8px',
-                backgroundColor: '#000000',
+            {/* Interactive Game Circle Preview */}
+            <div 
+              id="interactive-circle"
+              style={{
+                width: '72px',
+                height: '72px',
+                backgroundColor: '#4A90E2', // Same blue as in-game player
+                border: '3px solid #ffffff', // White border like in-game
                 borderRadius: '50%',
-                left: '18px',
-                top: '22px'
-              }} />
-              <div style={{
-                position: 'absolute', 
-                width: '8px',
-                height: '8px',
-                backgroundColor: '#000000',
-                borderRadius: '50%',
-                right: '18px',
-                top: '22px'
-              }} />
+                margin: '0 auto',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+                transition: 'transform 0.3s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'scale(1.1)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'scale(1)'
+              }}
+            >
+              {/* Interactive Black Eyes - Follow Mouse */}
+              {(() => {
+                if (typeof window === 'undefined') {
+                  // Server-side rendering fallback
+                  return (
+                    <>
+                      <div style={{
+                        position: 'absolute',
+                        width: '8px',
+                        height: '8px',
+                        backgroundColor: '#000000',
+                        borderRadius: '50%',
+                        left: '18px',
+                        top: '22px',
+                        transition: 'all 0.2s ease'
+                      }} />
+                      <div style={{
+                        position: 'absolute', 
+                        width: '8px',
+                        height: '8px',
+                        backgroundColor: '#000000',
+                        borderRadius: '50%',
+                        right: '18px',
+                        top: '22px',
+                        transition: 'all 0.2s ease'
+                      }} />
+                    </>
+                  )
+                }
+
+                // Calculate eye positions based on mouse
+                const circle = document.getElementById('interactive-circle')
+                if (!circle) return null
+
+                const rect = circle.getBoundingClientRect()
+                const centerX = rect.left + rect.width / 2
+                const centerY = rect.top + rect.height / 2
+                
+                const angle = Math.atan2(mousePosition.y - centerY, mousePosition.x - centerX)
+                const distance = Math.min(12, Math.sqrt(Math.pow(mousePosition.x - centerX, 2) + Math.pow(mousePosition.y - centerY, 2)) / 8)
+                
+                const eyeOffsetX = Math.cos(angle) * distance
+                const eyeOffsetY = Math.sin(angle) * distance
+
+                return (
+                  <>
+                    {/* Left Eye */}
+                    <div style={{
+                      position: 'absolute',
+                      width: '8px',
+                      height: '8px',
+                      backgroundColor: '#000000',
+                      borderRadius: '50%',
+                      left: `${18 + eyeOffsetX}px`,
+                      top: `${22 + eyeOffsetY}px`,
+                      transition: 'all 0.15s ease'
+                    }} />
+                    {/* Right Eye */}
+                    <div style={{
+                      position: 'absolute', 
+                      width: '8px',
+                      height: '8px',
+                      backgroundColor: '#000000',
+                      borderRadius: '50%',
+                      right: `${18 - eyeOffsetX}px`,
+                      top: `${22 + eyeOffsetY}px`,
+                      transition: 'all 0.15s ease'
+                    }} />
+                  </>
+                )
+              })()}
             </div>
           </div>
           
