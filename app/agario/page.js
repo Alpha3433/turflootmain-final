@@ -469,93 +469,91 @@ const AgarIOGame = () => {
         style={{ zIndex: 1 }}
       />
 
-      {/* UI Overlay - Only show during active gameplay */}
-      {gameStarted && !gameOver && (
-        <div className="absolute inset-0" style={{ zIndex: 100, pointerEvents: 'none' }}>
-          {/* Mission Timer - Top Center */}
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2" style={{ pointerEvents: 'auto' }}>
-            <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-purple-500 shadow-xl">
-              <div className="text-purple-400 text-xs font-bold mb-2 flex items-center justify-center gap-1">
-                <span>⚡</span>
-                <span>MISSION</span>
-              </div>
-              <div className="text-white text-sm font-bold mb-2 text-center">Survive for 60 seconds</div>
-              <div className="bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
-                <div 
-                  className="bg-purple-500 h-2 rounded-full transition-all duration-1000"
-                  style={{ width: `${((60 - missionTime) / 60) * 100}%` }}
-                />
-              </div>
-              <div className="text-white text-xs text-center font-mono">
-                {formatTime(missionTime)}/01:00
-              </div>
+      {/* UI Overlay - Always visible during gameplay */}
+      <div className="absolute inset-0" style={{ zIndex: 100, pointerEvents: 'none' }}>
+        {/* Mission Timer - Top Center */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2" style={{ pointerEvents: 'auto' }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-purple-500 shadow-xl">
+            <div className="text-purple-400 text-xs font-bold mb-2 flex items-center justify-center gap-1">
+              <span>⚡</span>
+              <span>MISSION</span>
             </div>
-          </div>
-
-          {/* Mini Map - Top Right */}
-          <div className="absolute top-4 right-4" style={{ pointerEvents: 'auto' }}>
-            <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border-2 border-cyan-500 shadow-xl p-2">
-              <div className="w-20 h-20 bg-gray-800 rounded border border-cyan-600 relative overflow-hidden mb-2">
-                {/* Player dot on minimap */}
-                <div 
-                  className="absolute w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
-                  style={{ 
-                    left: `${getPlayerPosition().x}%`, 
-                    top: `${getPlayerPosition().y}%` 
-                  }}
-                />
-                {/* Enemies on minimap */}
-                {gameRef.current?.enemies.map((enemy, i) => (
-                  <div 
-                    key={i}
-                    className="absolute w-1 h-1 bg-red-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
-                    style={{ 
-                      left: `${(enemy.x / gameRef.current.world.width) * 100}%`, 
-                      top: `${(enemy.y / gameRef.current.world.height) * 100}%` 
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="text-cyan-400 text-xs text-center font-bold">Oceania</div>
-              <div className="text-white text-xs text-center">999ms ⚡</div>
+            <div className="text-white text-sm font-bold mb-2 text-center">Survive for 60 seconds</div>
+            <div className="bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
+              <div 
+                className="bg-purple-500 h-2 rounded-full transition-all duration-1000"
+                style={{ width: `${gameStarted ? ((60 - missionTime) / 60) * 100 : 5}%` }}
+              />
             </div>
-          </div>
-
-          {/* Leaderboard - Bottom Left */}
-          <div className="absolute bottom-4 left-4" style={{ pointerEvents: 'auto' }}>
-            <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-yellow-500 shadow-xl">
-              <div className="text-yellow-400 text-xs font-bold mb-2 flex items-center gap-1">
-                <span>🏆</span>
-                <span>Leaders</span>
-              </div>
-              <div className="text-white text-sm">
-                <div className="flex justify-between items-center min-w-20">
-                  <span>#1 You</span>
-                  <span className="text-green-400 ml-3 font-bold">${score}</span>
-                </div>
-              </div>
+            <div className="text-white text-xs text-center font-mono">
+              {gameStarted ? formatTime(missionTime) : '1:00'}/01:00
             </div>
-          </div>
-
-          {/* Action Buttons - Bottom Right */}
-          <div className="absolute bottom-4 right-4 flex gap-3" style={{ pointerEvents: 'auto' }}>
-            <button 
-              onClick={handleSplit}
-              className="w-20 h-20 bg-blue-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-blue-400 text-white font-bold text-xs shadow-xl hover:bg-blue-700 transition-all flex flex-col items-center justify-center"
-            >
-              <span className="text-lg mb-1">⚡</span>
-              <span className="text-xs">SPLIT</span>
-            </button>
-            <button 
-              className="w-20 h-20 bg-yellow-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-yellow-400 text-white font-bold text-xs shadow-xl hover:bg-yellow-700 transition-all flex flex-col items-center justify-center"
-            >
-              <span className="text-lg mb-1">$</span>
-              <span className="text-xs">CASH</span>
-              <span className="text-xs">${score}</span>
-            </button>
           </div>
         </div>
-      )}
+
+        {/* Mini Map - Top Right */}
+        <div className="absolute top-4 right-4" style={{ pointerEvents: 'auto' }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border-2 border-cyan-500 shadow-xl p-2">
+            <div className="w-20 h-20 bg-gray-800 rounded border border-cyan-600 relative overflow-hidden mb-2">
+              {/* Player dot on minimap */}
+              <div 
+                className="absolute w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                style={{ 
+                  left: `${getPlayerPosition().x}%`, 
+                  top: `${getPlayerPosition().y}%` 
+                }}
+              />
+              {/* Enemies on minimap */}
+              {gameRef.current?.enemies.map((enemy, i) => (
+                <div 
+                  key={i}
+                  className="absolute w-1 h-1 bg-red-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                  style={{ 
+                    left: `${(enemy.x / gameRef.current.world.width) * 100}%`, 
+                    top: `${(enemy.y / gameRef.current.world.height) * 100}%` 
+                  }}
+                />
+              ))}
+            </div>
+            <div className="text-cyan-400 text-xs text-center font-bold">Oceania</div>
+            <div className="text-white text-xs text-center">999ms ⚡</div>
+          </div>
+        </div>
+
+        {/* Leaderboard - Bottom Left */}
+        <div className="absolute bottom-4 left-4" style={{ pointerEvents: 'auto' }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-yellow-500 shadow-xl">
+            <div className="text-yellow-400 text-xs font-bold mb-2 flex items-center gap-1">
+              <span>🏆</span>
+              <span>Leaders</span>
+            </div>
+            <div className="text-white text-sm">
+              <div className="flex justify-between items-center min-w-20">
+                <span>#1 You</span>
+                <span className="text-green-400 ml-3 font-bold">${score}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons - Bottom Right */}
+        <div className="absolute bottom-4 right-4 flex gap-3" style={{ pointerEvents: 'auto' }}>
+          <button 
+            onClick={handleSplit}
+            className="w-20 h-20 bg-blue-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-blue-400 text-white font-bold text-xs shadow-xl hover:bg-blue-700 transition-all flex flex-col items-center justify-center"
+          >
+            <span className="text-lg mb-1">⚡</span>
+            <span className="text-xs">SPLIT</span>
+          </button>
+          <button 
+            className="w-20 h-20 bg-yellow-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-yellow-400 text-white font-bold text-xs shadow-xl hover:bg-yellow-700 transition-all flex flex-col items-center justify-center"
+          >
+            <span className="text-lg mb-1">$</span>
+            <span className="text-xs">CASH</span>
+            <span className="text-xs">${score}</span>
+          </button>
+        </div>
+      </div>
 
       {/* Game Over Screen - Full Overlay */}
       {gameOver && (
