@@ -361,8 +361,14 @@ const AgarIOGame = () => {
     }
   }
 
-  // Initialize game
   useEffect(() => {
+    // Remove default body margins/padding that might cause white borders
+    document.body.style.margin = '0'
+    document.body.style.padding = '0'
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.margin = '0'
+    document.documentElement.style.padding = '0'
+    
     if (!canvasRef.current) return
 
     const canvas = canvasRef.current
@@ -393,6 +399,12 @@ const AgarIOGame = () => {
     return () => {
       game.stop()
       window.removeEventListener('resize', setCanvasSize)
+      // Reset body styles when component unmounts
+      document.body.style.margin = ''
+      document.body.style.padding = ''
+      document.body.style.overflow = ''
+      document.documentElement.style.margin = ''
+      document.documentElement.style.padding = ''
     }
   }, [])
 
