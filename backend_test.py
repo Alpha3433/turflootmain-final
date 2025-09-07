@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for NEW Hathora Room Creation API Endpoint
-Testing the new /api/hathora/create-room endpoint as requested in review.
+Backend Testing for TurfLoot Agar.io "Hold E to Cash Out" Functionality
+Testing Focus: Backend API support for cash-out feature and game operations
 
 CRITICAL TESTING REQUIREMENTS FROM REVIEW REQUEST:
-1. Test the new API endpoint POST /api/hathora/create-room
-2. Verify it creates real Hathora room processes (not just database sessions)
-3. Test response structure with proper room data including roomId, success, etc.
-4. Test multiple room creation to ensure distinct processes
-5. Verify authentication and proper Hathora client integration
+1. Game Loading Test - Verify the /agario page loads correctly without JavaScript errors
+2. Backend API Integration - Test that the game can communicate with backend APIs for score/session tracking
+3. Cash Out Functionality Backend Support - Verify any backend endpoints that support the cash-out process
+4. Session Management - Test game session tracking during cash-out operations
+5. API Performance - Ensure backend can handle cash-out related API calls without errors
 
 Expected Results:
-- API should return {"success": true, "roomId": "[REAL_HATHORA_ROOM_ID]", ...}
-- Each call should create distinct Hathora room processes
-- RoomId should be real Hathora room ID (not mock/fake)
-- Multiple API calls should create multiple distinct room processes
+- Backend APIs should support game session tracking
+- Cash-out related operations should be handled properly
+- API performance should be adequate for real-time game operations
+- No critical backend errors that would affect cash-out functionality
 """
 
 import requests
