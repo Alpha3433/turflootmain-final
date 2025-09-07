@@ -19,6 +19,7 @@ export default function TurfLootTactical() {
   
   // Mouse tracking for interactive eyes
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const circleRef = useRef(null)
 
   // Track mouse movement for interactive eyes
   useEffect(() => {
@@ -29,6 +30,36 @@ export default function TurfLootTactical() {
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
+
+  // Calculate eye positions based on mouse position
+  const getEyePositions = () => {
+    if (!circleRef.current) return { leftEye: { x: 18, y: 22 }, rightEye: { x: 46, y: 22 } }
+
+    const rect = circleRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    // Calculate angle from circle center to mouse
+    const angle = Math.atan2(mousePosition.y - centerY, mousePosition.x - centerX)
+    
+    // Limit eye movement within the circle (max 8px from default position)
+    const maxDistance = 8
+    const eyeOffsetX = Math.cos(angle) * maxDistance
+    const eyeOffsetY = Math.sin(angle) * maxDistance
+    
+    return {
+      leftEye: { 
+        x: 18 + eyeOffsetX, 
+        y: 22 + eyeOffsetY 
+      },
+      rightEye: { 
+        x: 46 + eyeOffsetX, 
+        y: 22 + eyeOffsetY 
+      }
+    }
+  }
+
+  const eyePositions = getEyePositions()
 
   // Stable random values for background animations (client-side only)
   const [floatingElements, setFloatingElements] = useState([])
