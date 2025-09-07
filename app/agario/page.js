@@ -831,33 +831,33 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Circular Minimap - Top Right (matching reference) */}
+        {/* Circular Minimap - Top Right (larger and faster updates) */}
         <div style={{
           position: 'fixed',
           top: '10px',
           right: '10px',
           zIndex: 1000,
-          width: '150px',
-          height: '150px'
+          width: '220px',
+          height: '220px'
         }}>
           {/* Minimap Container */}
           <div style={{
-            width: '150px',
-            height: '150px',
+            width: '220px',
+            height: '220px',
             borderRadius: '50%',
             backgroundColor: '#000000',
-            border: '3px solid #00ff00',
+            border: '4px solid #00ff00',
             position: 'relative',
             overflow: 'hidden',
-            boxShadow: '0 0 20px rgba(0, 255, 0, 0.4)'
+            boxShadow: '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
             {/* Green spiky border effect */}
             <div style={{
               position: 'absolute',
-              top: '-2px',
-              left: '-2px',
-              right: '-2px',
-              bottom: '-2px',
+              top: '-3px',
+              left: '-3px',
+              right: '-3px',
+              bottom: '-3px',
               borderRadius: '50%',
               background: `conic-gradient(
                 #00ff00 0deg, #00dd00 10deg, #00ff00 20deg, #00ee00 30deg,
@@ -873,53 +873,58 @@ const AgarIOGame = () => {
               zIndex: -1
             }} />
             
-            {/* Player dot on minimap */}
+            {/* Player dot on minimap - larger and more visible */}
             <div style={{
               position: 'absolute',
-              width: '8px',
-              height: '8px',
+              width: '12px',
+              height: '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${((gameRef.current?.player?.x || 2000) / 4000) * 140 + 5}px`,
-              top: `${((gameRef.current?.player?.y || 2000) / 4000) * 140 + 5}px`,
+              left: `${((gameRef.current?.player?.x || 2000) / 4000) * 210 + 5}px`,
+              top: `${((gameRef.current?.player?.y || 2000) / 4000) * 210 + 5}px`,
               transform: 'translate(-50%, -50%)',
-              border: '2px solid #ffffff',
-              boxShadow: '0 0 8px rgba(96, 165, 250, 0.8)',
-              zIndex: 10
+              border: '3px solid #ffffff',
+              boxShadow: '0 0 12px rgba(96, 165, 250, 1)',
+              zIndex: 10,
+              transition: 'all 50ms ease-out'
             }} />
             
-            {/* Enemy dots on minimap */}
+            {/* Enemy dots on minimap - larger and more visible */}
             {gameRef.current?.enemies?.map((enemy, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  width: '6px',
+                  height: '6px',
+                  backgroundColor: '#ff6b6b',
+                  borderRadius: '50%',
+                  left: `${(enemy.x / 4000) * 210 + 5}px`,
+                  top: `${(enemy.y / 4000) * 210 + 5}px`,
+                  transform: 'translate(-50%, -50%)',
+                  opacity: '0.9',
+                  border: '1px solid #ffffff',
+                  transition: 'all 50ms ease-out'
+                }}
+              />
+            ))}
+            
+            {/* Coin dots on minimap - larger and brighter */}
+            {gameRef.current?.coins?.map((coin, i) => (
               <div
                 key={i}
                 style={{
                   position: 'absolute',
                   width: '4px',
                   height: '4px',
-                  backgroundColor: '#ff6b6b',
-                  borderRadius: '50%',
-                  left: `${(enemy.x / 4000) * 140 + 5}px`,
-                  top: `${(enemy.y / 4000) * 140 + 5}px`,
-                  transform: 'translate(-50%, -50%)',
-                  opacity: '0.8'
-                }}
-              />
-            ))}
-            
-            {/* Coin dots on minimap */}
-            {gameRef.current?.coins?.map((coin, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  width: '3px',
-                  height: '3px',
                   backgroundColor: '#ffd700',
                   borderRadius: '50%',
-                  left: `${(coin.x / 4000) * 140 + 5}px`,
-                  top: `${(coin.y / 4000) * 140 + 5}px`,
+                  left: `${(coin.x / 4000) * 210 + 5}px`,
+                  top: `${(coin.y / 4000) * 210 + 5}px`,
                   transform: 'translate(-50%, -50%)',
-                  opacity: '0.9'
+                  opacity: '1',
+                  boxShadow: '0 0 4px rgba(255, 215, 0, 0.8)',
+                  transition: 'all 50ms ease-out'
                 }}
               />
             ))}
@@ -932,8 +937,8 @@ const AgarIOGame = () => {
               right: '0',
               bottom: '0',
               borderRadius: '50%',
-              border: '2px solid rgba(0, 255, 0, 0.6)',
-              boxShadow: 'inset 0 0 15px rgba(0, 255, 0, 0.3)'
+              border: '3px solid rgba(0, 255, 0, 0.8)',
+              boxShadow: 'inset 0 0 20px rgba(0, 255, 0, 0.4)'
             }} />
           </div>
         </div>
