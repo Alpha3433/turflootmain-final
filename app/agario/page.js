@@ -537,7 +537,7 @@ const AgarIOGame = () => {
 
       {/* DESKTOP HUD UI Elements - Always Visible */}
       <div>
-        {/* Live Leaderboard - Exact match to reference */}
+        {/* Live Leaderboard - Smaller Version */}
         <div 
           style={{ 
             position: 'fixed', 
@@ -546,45 +546,45 @@ const AgarIOGame = () => {
             zIndex: 1000,
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             border: '2px solid rgba(0, 255, 255, 0.3)',
-            borderRadius: '8px',
-            padding: '16px',
-            minWidth: '220px',
+            borderRadius: '6px',
+            padding: '10px',
+            minWidth: '160px',
             fontFamily: '"Rajdhani", sans-serif'
           }}
         >
           {/* Header */}
           <div style={{ 
             color: '#00ffff', 
-            fontSize: '18px', 
+            fontSize: '14px', 
             fontWeight: '700', 
-            marginBottom: '16px',
+            marginBottom: '10px',
             textAlign: 'center',
-            letterSpacing: '1px'
+            letterSpacing: '0.5px'
           }}>
             💰 Live Leaderboard
           </div>
           
           {/* Player Rankings */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '10px' }}>
             {/* 1st Place */}
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              padding: '8px 12px'
+              padding: '4px 8px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ 
                   color: '#ffdd44', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '700',
-                  marginRight: '12px'
+                  marginRight: '8px'
                 }}>
                   #1
                 </span>
                 <span style={{ 
                   color: '#ffffff', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '600' 
                 }}>
                   Player 13
@@ -592,7 +592,7 @@ const AgarIOGame = () => {
               </div>
               <span style={{ 
                 color: '#00ff88', 
-                fontSize: '16px', 
+                fontSize: '12px', 
                 fontWeight: '700'
               }}>
                 $277
@@ -604,23 +604,23 @@ const AgarIOGame = () => {
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              padding: '8px 12px',
-              border: '2px solid #00ffff',
-              borderRadius: '6px',
+              padding: '4px 8px',
+              border: '1px solid #00ffff',
+              borderRadius: '4px',
               backgroundColor: 'rgba(0, 255, 255, 0.1)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ 
                   color: '#ffffff', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '700',
-                  marginRight: '12px'
+                  marginRight: '8px'
                 }}>
                   #2
                 </span>
                 <span style={{ 
                   color: '#00ffff', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '700' 
                 }}>
                   You
@@ -628,7 +628,7 @@ const AgarIOGame = () => {
               </div>
               <span style={{ 
                 color: '#00ff88', 
-                fontSize: '16px', 
+                fontSize: '12px', 
                 fontWeight: '700'
               }}>
                 ${score}
@@ -640,20 +640,20 @@ const AgarIOGame = () => {
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              padding: '8px 12px'
+              padding: '4px 8px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ 
                   color: '#ff8844', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '700',
-                  marginRight: '12px'
+                  marginRight: '8px'
                 }}>
                   #3
                 </span>
                 <span style={{ 
                   color: '#ffffff', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '600' 
                 }}>
                   Player 14
@@ -661,7 +661,7 @@ const AgarIOGame = () => {
               </div>
               <span style={{ 
                 color: '#00ff88', 
-                fontSize: '16px', 
+                fontSize: '12px', 
                 fontWeight: '700'
               }}>
                 $196
@@ -673,20 +673,20 @@ const AgarIOGame = () => {
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              padding: '8px 12px'
+              padding: '4px 8px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ 
                   color: '#aaaaaa', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '700',
-                  marginRight: '12px'
+                  marginRight: '8px'
                 }}>
                   #4
                 </span>
                 <span style={{ 
                   color: '#ffffff', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '600' 
                 }}>
                   Player 2
@@ -694,7 +694,7 @@ const AgarIOGame = () => {
               </div>
               <span style={{ 
                 color: '#00ff88', 
-                fontSize: '16px', 
+                fontSize: '12px', 
                 fontWeight: '700'
               }}>
                 $193
@@ -706,20 +706,20 @@ const AgarIOGame = () => {
               display: 'flex', 
               justifyContent: 'space-between', 
               alignItems: 'center',
-              padding: '8px 12px'
+              padding: '4px 8px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ 
                   color: '#aaaaaa', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '700',
-                  marginRight: '12px'
+                  marginRight: '8px'
                 }}>
                   #5
                 </span>
                 <span style={{ 
                   color: '#ffffff', 
-                  fontSize: '16px', 
+                  fontSize: '12px', 
                   fontWeight: '600' 
                 }}>
                   Player 12
@@ -727,7 +727,7 @@ const AgarIOGame = () => {
               </div>
               <span style={{ 
                 color: '#00ff88', 
-                fontSize: '16px', 
+                fontSize: '12px', 
                 fontWeight: '700'
               }}>
                 $177
@@ -738,10 +738,10 @@ const AgarIOGame = () => {
           {/* Players in game counter */}
           <div style={{ 
             color: '#00ffff', 
-            fontSize: '14px', 
+            fontSize: '10px', 
             fontWeight: '600',
             textAlign: 'center',
-            paddingTop: '8px',
+            paddingTop: '6px',
             borderTop: '1px solid rgba(0, 255, 255, 0.3)'
           }}>
             11 players in game
