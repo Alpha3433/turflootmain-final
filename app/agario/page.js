@@ -92,6 +92,20 @@ const AgarIOGame = () => {
       }
     }
 
+    generateViruses() {
+      this.viruses = []
+      for (let i = 0; i < 15; i++) {
+        this.viruses.push({
+          x: Math.random() * this.world.width,
+          y: Math.random() * this.world.height,
+          radius: 35,
+          color: '#00FF41',
+          spikes: 12,
+          mass: 100
+        })
+      }
+    }
+
     bindEvents() {
       this.canvas.addEventListener('mousemove', (e) => {
         const rect = this.canvas.getBoundingClientRect()
