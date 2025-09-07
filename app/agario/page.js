@@ -1023,7 +1023,7 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Player Info Panel - Bottom Right (matching reference) */}
+        {/* Player Info Panel - Bottom Right (larger with landing page font) */}
         <div style={{
           position: 'fixed',
           bottom: '10px',
@@ -1032,50 +1032,50 @@ const AgarIOGame = () => {
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
           border: '2px solid #333',
           borderRadius: '4px',
-          padding: '8px 12px',
-          fontSize: '11px',
+          padding: '12px 16px',
+          fontSize: '13px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: '120px'
+          minWidth: '140px'
         }}>
           {/* Header */}
           <div style={{ 
             color: '#22d3ee', 
-            fontSize: '12px', 
-            fontWeight: 'bold', 
-            marginBottom: '6px',
+            fontSize: '14px', 
+            fontWeight: '700', 
+            marginBottom: '8px',
             borderBottom: '1px solid #333',
-            paddingBottom: '4px'
+            paddingBottom: '6px'
           }}>
             You
           </div>
           
           {/* Stats */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>Net Worth:</span>
-              <span style={{ color: '#22c55e', fontWeight: 'bold' }}>${score}</span>
+              <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>Total Mass:</span>
-              <span style={{ color: '#ffffff', fontWeight: 'bold' }}>{mass}</span>
+              <span style={{ color: '#ffffff', fontWeight: '700' }}>{mass}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>K/D:</span>
-              <span style={{ color: '#ffffff', fontWeight: 'bold' }}>{eliminations}/0</span>
+              <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations}/0</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>Streak:</span>
-              <span style={{ color: '#ffffff', fontWeight: 'bold' }}>{eliminations} 🔥</span>
+              <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations} 🔥</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>Coins Collected:</span>
-              <span style={{ color: '#ffffff', fontWeight: 'bold' }}>{score}</span>
+              <span style={{ color: '#ffffff', fontWeight: '700' }}>{score}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>Time Alive:</span>
-              <span style={{ color: '#ffffff', fontWeight: 'bold' }}>0:00</span>
+              <span style={{ color: '#ffffff', fontWeight: '700' }}>0:00</span>
             </div>
           </div>
         </div>
