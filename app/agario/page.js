@@ -270,6 +270,9 @@ const AgarIOGame = () => {
       // Draw grid
       this.drawGrid()
       
+      // Draw world boundary (red ring)
+      this.drawWorldBoundary()
+      
       // Draw coins
       this.coins.forEach(coin => this.drawCoin(coin))
       
