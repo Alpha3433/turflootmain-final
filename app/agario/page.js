@@ -17,6 +17,12 @@ const AgarIOGame = () => {
   const [mass, setMass] = useState(20)
   const [eliminations, setEliminations] = useState(0)
   
+  // Missions system
+  const [currency, setCurrency] = useState(0) // Coins earned from missions
+  const [completedMissions, setCompletedMissions] = useState([])
+  const [activeMissions, setActiveMissions] = useState([])
+  const [showMissionComplete, setShowMissionComplete] = useState(null)
+  
   // Cash out state
   const [cashOutProgress, setCashOutProgress] = useState(0)
   const [isCashingOut, setIsCashingOut] = useState(false)
