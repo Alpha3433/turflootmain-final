@@ -461,12 +461,22 @@ const AgarIOGame = () => {
   }
 
   return (
-    <div className="w-screen h-screen bg-black overflow-hidden" style={{ position: 'relative' }}>
-      {/* Game Canvas - Background Layer */}
+    <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
+      {/* Game Canvas - Full Screen */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full cursor-crosshair bg-black"
-        style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
+        className="w-full h-full cursor-crosshair bg-black m-0 p-0"
+        style={{ 
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          zIndex: 1,
+          margin: 0,
+          padding: 0,
+          border: 'none',
+          outline: 'none',
+          display: 'block'
+        }}
       />
 
       {/* Mission Timer - Overlaid Top Center */}
