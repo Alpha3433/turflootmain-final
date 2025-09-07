@@ -1038,6 +1038,9 @@ export default function TurfLootTactical() {
   }
 
   const createSkinStorePopup = () => {
+    // Get current currency value
+    const currentCurrency = currency;
+    
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
 
