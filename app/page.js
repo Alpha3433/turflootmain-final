@@ -2200,19 +2200,6 @@ export default function TurfLootTactical() {
     const renderParties = (parties) => {
       const partiesList = modal.querySelector('#parties-list')
       
-      const parties = currentTab === 'public' ? mockPublicParties : mockFriendsParties
-      
-      if (parties.length === 0) {
-        partiesList.innerHTML = `
-          <div style="text-align: center; padding: 40px; color: #a0aec0;">
-            <div style="font-size: 48px; margin-bottom: 16px;">👥</div>
-            <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No ${currentTab} parties found</div>
-            <div style="font-size: 14px;">Try refreshing or check back later</div>
-          </div>
-        `
-        return
-      }
-      
       partiesList.innerHTML = parties.map(party => `
         <div class="party-item" data-party-id="${party.id}" style="
           padding: 16px; 
