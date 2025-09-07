@@ -750,87 +750,109 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Action Buttons - Integrated Game Style */}
-        <div style={{ 
-          position: 'fixed', 
-          bottom: '120px', 
-          left: '50%', 
-          transform: 'translateX(-50%)', 
-          zIndex: 1000, 
+        {/* Action Buttons - Integrated Tooltip Style */}
+        <div style={{
+          position: 'fixed',
+          bottom: '100px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1000,
           display: 'flex', 
           flexDirection: 'column',
-          gap: '12px',
+          gap: '8px',
           alignItems: 'center',
           pointerEvents: 'none'
         }}>
-          {/* SPLIT Button - Tooltip Style */}
-          <button 
+          {/* SPLIT Button - Integrated Tooltip Style */}
+          <div 
             onClick={handleSplit}
             style={{
-              backgroundColor: 'rgba(59, 130, 246, 0.95)',
-              border: '2px solid #3b82f6',
-              borderRadius: '8px',
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: '14px',
+              backgroundColor: 'rgba(15, 23, 42, 0.92)',
+              border: '1px solid rgba(59, 130, 246, 0.4)',
+              borderRadius: '6px',
+              color: '#e2e8f0',
+              fontWeight: '500',
+              fontSize: '13px',
               cursor: 'pointer',
-              padding: '12px 20px',
+              padding: '8px 14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(4px)',
-              transition: 'all 200ms',
+              gap: '6px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(8px)',
+              transition: 'all 150ms ease-out',
               pointerEvents: 'auto',
-              minWidth: '180px',
-              justifyContent: 'center'
+              position: 'relative',
+              minWidth: '160px',
+              justifyContent: 'center',
+              borderLeft: '3px solid #3b82f6'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(37, 99, 235, 0.95)'
-              e.target.style.transform = 'scale(1.02)'
+              e.target.style.backgroundColor = 'rgba(30, 41, 59, 0.95)'
+              e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)'
+              e.target.style.transform = 'translateY(-1px)'
+              e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(59, 130, 246, 0.95)'
-              e.target.style.transform = 'scale(1)'
+              e.target.style.backgroundColor = 'rgba(15, 23, 42, 0.92)'
+              e.target.style.borderColor = 'rgba(59, 130, 246, 0.4)'
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
             }}
           >
-            <span style={{ fontSize: '16px' }}>⚡</span>
-            <span>Press SPACE to Split</span>
-          </button>
+            <span style={{ 
+              fontSize: '14px',
+              color: '#3b82f6',
+              fontWeight: 'bold'
+            }}>SPACE</span>
+            <span style={{ color: '#94a3b8' }}>•</span>
+            <span>Split Operative</span>
+          </div>
 
-          {/* CASH Button - Tooltip Style */}
-          <button 
+          {/* CASH Button - Integrated Tooltip Style */}
+          <div 
             style={{
-              backgroundColor: 'rgba(245, 158, 11, 0.95)',
-              border: '2px solid #f59e0b', 
-              borderRadius: '8px',
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: '14px',
+              backgroundColor: 'rgba(15, 23, 42, 0.92)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              borderRadius: '6px',
+              color: '#e2e8f0',
+              fontWeight: '500',
+              fontSize: '13px',
               cursor: 'pointer',
-              padding: '12px 20px',
+              padding: '8px 14px',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-              backdropFilter: 'blur(4px)',
-              transition: 'all 200ms',
+              gap: '6px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(8px)',
+              transition: 'all 150ms ease-out',
               pointerEvents: 'auto',
-              minWidth: '180px',
-              justifyContent: 'center'
+              position: 'relative',
+              minWidth: '160px',
+              justifyContent: 'center',
+              borderLeft: '3px solid #f59e0b'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(217, 119, 6, 0.95)'
-              e.target.style.transform = 'scale(1.02)'
+              e.target.style.backgroundColor = 'rgba(30, 41, 59, 0.95)'
+              e.target.style.borderColor = 'rgba(245, 158, 11, 0.6)'
+              e.target.style.transform = 'translateY(-1px)'
+              e.target.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(245, 158, 11, 0.95)'
-              e.target.style.transform = 'scale(1)'
+              e.target.style.backgroundColor = 'rgba(15, 23, 42, 0.92)'
+              e.target.style.borderColor = 'rgba(245, 158, 11, 0.4)'
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
             }}
           >
-            <span style={{ fontSize: '16px' }}>💰</span>
-            <span>Hold E to Cash Out (${score})</span>
-          </button>
+            <span style={{ 
+              fontSize: '14px',
+              color: '#f59e0b',
+              fontWeight: 'bold'
+            }}>E</span>
+            <span style={{ color: '#94a3b8' }}>•</span>
+            <span>Cash Out ${score}</span>
+          </div>
         </div>
 
         {/* Player Stats Panel - Bottom Right */}
