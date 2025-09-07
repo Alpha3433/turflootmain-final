@@ -116,7 +116,17 @@ test_plan:
   test_priority: "high_first"
 
 backend:
-  - task: "New Hathora Room Creation API Endpoint Testing"
+  - task: "Test Hold E to Cash Out Progress Bar Fix"
+    implemented: true
+    working: "NA"
+    file: "/app/app/agario/page.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "The previous engineer applied a fix for the cash-out progress bar being stuck at 0%. The fix involved managing the setInterval using useRef and ensuring state updates (cashOutProgress, isCashingOut) are properly triggered. Need to test if the progress bar now increments correctly from 0% to 100% over 5 seconds when 'E' key is held down."
     implemented: true
     working: true
     file: "/app/app/api/[[...path]]/route.js, /app/lib/hathoraClient.js"
