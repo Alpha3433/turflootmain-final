@@ -653,19 +653,21 @@ const AgarIOGame = () => {
   }, [])
 
   // Cash out handling
+  const cashOutIntervalRef = useRef(null)
+  
   useEffect(() => {
-    let cashOutInterval = null
-    
     const handleKeyDown = (e) => {
       if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameStarted) {
+        console.log('Starting cash out process') // Debug log
         setIsCashingOut(true)
         setCashOutProgress(0)
         
         // Start the 5-second fill animation
-        cashOutInterval = setInterval(() => {
+        cashOutIntervalRef.current = setInterval(() => {
           setCashOutProgress(prev => {
+            console.log('Progress:', prev) // Debug log
             if (prev >= 100) {
-              clearInterval(cashOutInterval)
+              clearInterval(cashOutIntervalRef.current)
               setIsCashingOut(false)
               setCashOutComplete(true)
               return 100
@@ -678,11 +680,13 @@ const AgarIOGame = () => {
     
     const handleKeyUp = (e) => {
       if (e.key.toLowerCase() === 'e' && isCashingOut) {
+        console.log('Canceling cash out') // Debug log
         // User released E before completion - reset
         setIsCashingOut(false)
         setCashOutProgress(0)
-        if (cashOutInterval) {
-          clearInterval(cashOutInterval)
+        if (cashOutIntervalRef.current) {
+          clearInterval(cashOutIntervalRef.current)
+          cashOutIntervalRef.current = null
         }
       }
     }
@@ -693,8 +697,9 @@ const AgarIOGame = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
-      if (cashOutInterval) {
-        clearInterval(cashOutInterval)
+      if (cashOutIntervalRef.current) {
+        clearInterval(cashOutIntervalRef.current)
+        cashOutIntervalRef.current = null
       }
     }
   }, [isCashingOut, cashOutComplete, gameStarted])
