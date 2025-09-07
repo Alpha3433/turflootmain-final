@@ -45,8 +45,8 @@ export default function TurfLootTactical() {
       // Calculate angle from circle center to mouse
       const angle = Math.atan2(mousePosition.y - centerY, mousePosition.x - centerX)
       
-      // Limit eye movement within the circle (max 6px from default position)
-      const maxDistance = 6
+      // Limit eye movement within the circle (max 4px from default position for subtle movement)
+      const maxDistance = 4
       const eyeOffsetX = Math.cos(angle) * maxDistance
       const eyeOffsetY = Math.sin(angle) * maxDistance
       
