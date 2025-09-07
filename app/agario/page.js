@@ -531,9 +531,21 @@ const AgarIOGame = () => {
       this.ctx.textAlign = 'center'
       this.ctx.fillText(player.name, player.x, player.y - player.radius - 15)
       
-      // Draw mass
-      this.ctx.font = '12px Arial'
-      this.ctx.fillText(Math.floor(player.mass), player.x, player.y + 4)
+      // Draw black eyes
+      const eyeRadius = Math.max(3, player.radius * 0.15) // Scale eyes with player size
+      const eyeOffset = player.radius * 0.25 // Distance from center
+      
+      // Left eye
+      this.ctx.beginPath()
+      this.ctx.arc(player.x - eyeOffset, player.y - eyeOffset * 0.5, eyeRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fill()
+      
+      // Right eye
+      this.ctx.beginPath()
+      this.ctx.arc(player.x + eyeOffset, player.y - eyeOffset * 0.5, eyeRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fill()
     }
 
     drawVirus(virus) {
