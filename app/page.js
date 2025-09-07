@@ -4370,7 +4370,7 @@ export default function TurfLootTactical() {
         <div style={statsStyle}>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>OPERATIVES</div>
+            <div style={statLabelStyle}>PLAYERS</div>
           </div>
           <div style={statItemStyle}>
             <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
