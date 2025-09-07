@@ -25,7 +25,7 @@ import sys
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://tactical-arena-7.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://tactical-arena-8.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraRoomCreationTester:

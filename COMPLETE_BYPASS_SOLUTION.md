@@ -55,24 +55,24 @@ const getApiUrl = (endpoint) => {
 ### Names Bypass (External Testing)
 ```bash
 # Save name
-curl -X POST "https://tactical-arena-7.preview.emergentagent.com/names-api/update" \
+curl -X POST "https://tactical-arena-8.preview.emergentagent.com/names-api/update" \
   -d '{"userId": "test", "customName": "TestUser"}'
 # Result: {"success":true,"message":"Name saved successfully via bypass route"}
 
 # Retrieve name  
-curl "https://tactical-arena-7.preview.emergentagent.com/names-api/get?userId=test"
+curl "https://tactical-arena-8.preview.emergentagent.com/names-api/get?userId=test"
 # Result: {"success":true,"customName":"TestUser"}
 ```
 
 ### Friends Bypass (External Testing)
 ```bash
 # Notifications count
-curl -X POST "https://tactical-arena-7.preview.emergentagent.com/friends-api/notifications/count" \
+curl -X POST "https://tactical-arena-8.preview.emergentagent.com/friends-api/notifications/count" \
   -d '{"userId": "test"}'
 # Result: {"count":0,"timestamp":"2025-08-28T17:42:44.532Z"}
 
 # Mark notifications as read
-curl -X POST "https://tactical-arena-7.preview.emergentagent.com/friends-api/notifications/mark-read" \
+curl -X POST "https://tactical-arena-8.preview.emergentagent.com/friends-api/notifications/mark-read" \
   -d '{"userId": "test"}'
 # Result: {"success":true,"message":"Notifications marked as read via bypass route"}
 ```

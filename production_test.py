@@ -10,7 +10,7 @@ import time
 import sys
 
 # Production URL from .env
-PRODUCTION_URL = "https://tactical-arena-7.preview.emergentagent.com"
+PRODUCTION_URL = "https://tactical-arena-8.preview.emergentagent.com"
 
 def test_production_endpoint():
     """Test the production endpoint with exact user payload"""

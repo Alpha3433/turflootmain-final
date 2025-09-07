@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Test configuration
-BASE_URL = "https://tactical-arena-7.preview.emergentagent.com"
+BASE_URL = "https://tactical-arena-8.preview.emergentagent.com"
 TEST_USER_ID = "did:privy:cmeksdeoe00gzl10bsienvnbk"
 TEST_USER_USERNAME = "anth"
 
