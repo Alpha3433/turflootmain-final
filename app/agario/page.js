@@ -313,42 +313,44 @@ const AgarIOGame = () => {
     }
 
     drawWorldBoundary() {
-      // Draw red boundary ring around the playable area
-      const borderWidth = 20
-      const margin = 50 // Distance outside world bounds where red zone starts
+      // Draw circular red boundary ring around the playable area (synced with minimap)
+      const centerX = this.world.width / 2  // 2000
+      const centerY = this.world.height / 2 // 2000
+      const playableRadius = 1800 // Circular play area radius
+      const dangerZoneWidth = 200 // Width of red danger zone
       
-      this.ctx.strokeStyle = '#ff4444'
-      this.ctx.fillStyle = 'rgba(255, 68, 68, 0.3)' // Semi-transparent red fill
-      this.ctx.lineWidth = borderWidth
+      // Draw danger zone (red circle outside playable area)
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius + dangerZoneWidth, 0, Math.PI * 2)
+      this.ctx.fillStyle = 'rgba(255, 68, 68, 0.4)'
+      this.ctx.fill()
       
-      // Outer boundary (danger zone)
-      const outerLeft = -margin
-      const outerTop = -margin  
-      const outerRight = this.world.width + margin
-      const outerBottom = this.world.height + margin
+      // Draw playable area (black circle to mask inner area)
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fill()
       
-      // Inner boundary (playable area)
-      const innerLeft = 0
-      const innerTop = 0
-      const innerRight = this.world.width
-      const innerBottom = this.world.height
+      // Draw the boundary circle (green border like minimap)
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = '#00ff00'
+      this.ctx.lineWidth = 8
+      this.ctx.stroke()
       
-      // Draw the red border zones (top, right, bottom, left)
+      // Add glowing effect
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)'
+      this.ctx.lineWidth = 16
+      this.ctx.stroke()
       
-      // Top border
-      this.ctx.fillRect(outerLeft, outerTop, outerRight - outerLeft, innerTop - outerTop)
-      
-      // Bottom border  
-      this.ctx.fillRect(outerLeft, innerBottom, outerRight - outerLeft, outerBottom - innerBottom)
-      
-      // Left border
-      this.ctx.fillRect(outerLeft, innerTop, innerLeft - outerLeft, innerBottom - innerTop)
-      
-      // Right border
-      this.ctx.fillRect(innerRight, innerTop, outerRight - innerRight, innerBottom - innerTop)
-      
-      // Draw the boundary line (inner edge of red zone)
-      this.ctx.strokeRect(innerLeft, innerTop, this.world.width, this.world.height)
+      // Add inner glow
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)'
+      this.ctx.lineWidth = 24
+      this.ctx.stroke()
     }
 
     drawCoin(coin) {
