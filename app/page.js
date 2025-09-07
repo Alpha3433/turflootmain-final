@@ -20,6 +20,16 @@ export default function TurfLootTactical() {
   // Mouse tracking for interactive eyes
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
+  // Track mouse movement for interactive eyes
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY })
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
   // Stable random values for background animations (client-side only)
   const [floatingElements, setFloatingElements] = useState([])
   const [codeElements, setCodeElements] = useState([])
