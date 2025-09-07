@@ -493,179 +493,99 @@ const AgarIOGame = () => {
 
       {/* DESKTOP HUD UI Elements - Always Visible */}
       <div>
-        {/* Mission Panel - Top Center - Minimalist Design */}
+        {/* Leaderboard - Top Right (like reference) */}
         <div 
           style={{ 
             position: 'fixed', 
-            top: '24px', 
+            top: '10px', 
+            right: '10px', 
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #333',
+            borderRadius: '4px',
+            padding: '8px 12px',
+            minWidth: '140px'
+          }}
+        >
+          <div style={{ 
+            color: '#fff', 
+            fontSize: '12px', 
+            fontWeight: 'bold', 
+            marginBottom: '6px',
+            textAlign: 'center',
+            borderBottom: '1px solid #555',
+            paddingBottom: '4px'
+          }}>
+            LEADERBOARD
+          </div>
+          <div style={{ fontSize: '11px', color: '#ccc' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+              <span>1. Player</span>
+              <span style={{ color: '#4CAF50' }}>{score}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+              <span>2. Bot_1</span>
+              <span>150</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>3. Bot_2</span>
+              <span>100</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Score Display - Top Left (simple) */}
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: '10px', 
+            left: '10px', 
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #333',
+            borderRadius: '4px',
+            padding: '8px 12px'
+          }}
+        >
+          <div style={{ 
+            color: '#4CAF50', 
+            fontSize: '16px', 
+            fontWeight: 'bold',
+            textAlign: 'center'
+          }}>
+            {score}
+          </div>
+          <div style={{ 
+            color: '#ccc', 
+            fontSize: '10px',
+            textAlign: 'center'
+          }}>
+            LENGTH: {mass}
+          </div>
+        </div>
+
+        {/* Timer - Bottom Center */}
+        <div 
+          style={{ 
+            position: 'fixed', 
+            bottom: '60px', 
             left: '50%', 
             transform: 'translateX(-50%)', 
             zIndex: 1000,
-            backgroundColor: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            borderRadius: '16px',
-            padding: '20px 28px',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-            minWidth: '280px'
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            border: '2px solid #333',
+            borderRadius: '4px',
+            padding: '6px 12px'
           }}
         >
           <div style={{ 
-            color: '#e2e8f0', 
-            fontSize: '13px', 
-            fontWeight: '500', 
-            marginBottom: '12px', 
+            color: '#fff', 
+            fontSize: '14px', 
+            fontWeight: 'bold',
             textAlign: 'center',
-            letterSpacing: '0.05em'
-          }}>
-            SURVIVE FOR 60 SECONDS
-          </div>
-          
-          <div style={{ 
-            backgroundColor: 'rgba(51, 65, 85, 0.6)', 
-            borderRadius: '12px', 
-            height: '8px', 
-            marginBottom: '12px', 
-            overflow: 'hidden',
-            position: 'relative'
-          }}>
-            <div 
-              style={{ 
-                background: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
-                height: '8px', 
-                borderRadius: '12px', 
-                transition: 'width 800ms ease-out',
-                width: `${gameStarted ? ((60 - missionTime) / 60) * 100 : 5}%`,
-                boxShadow: '0 0 16px rgba(59, 130, 246, 0.4)'
-              }}
-            />
-          </div>
-          
-          <div style={{ 
-            color: '#cbd5e1', 
-            fontSize: '16px', 
-            textAlign: 'center', 
-            fontFamily: 'monospace',
-            fontWeight: '600',
-            letterSpacing: '0.1em'
+            fontFamily: 'monospace'
           }}>
             {gameStarted ? formatTime(missionTime) : '1:00'}
-          </div>
-        </div>
-
-        {/* Status Panel - Top Left - Minimalist Design */}
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: '24px', 
-            left: '24px', 
-            zIndex: 1000,
-            backgroundColor: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            borderRadius: '16px',
-            padding: '20px',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-            minWidth: '200px'
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center'
-            }}>
-              <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>Mass</span>
-              <span style={{ color: '#e2e8f0', fontSize: '18px', fontWeight: '600' }}>{mass} KG</span>
-            </div>
-            
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center'
-            }}>
-              <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>Assets</span>
-              <span style={{ color: '#10b981', fontSize: '18px', fontWeight: '600' }}>${score}</span>
-            </div>
-            
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center'
-            }}>
-              <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>Rank</span>
-              <span style={{ color: '#f59e0b', fontSize: '18px', fontWeight: '600' }}>#1</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tactical Map - Top Right - Minimalist Design */}
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: '24px', 
-            right: '24px', 
-            zIndex: 1000,
-            backgroundColor: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            borderRadius: '16px',
-            padding: '20px',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
-          }}
-        >
-          <div style={{ 
-            width: '120px', 
-            height: '120px', 
-            backgroundColor: 'rgba(51, 65, 85, 0.4)', 
-            borderRadius: '12px', 
-            border: '1px solid rgba(148, 163, 184, 0.1)', 
-            position: 'relative', 
-            overflow: 'hidden', 
-            marginBottom: '12px'
-          }}>
-            {/* Player dot */}
-            <div 
-              style={{ 
-                position: 'absolute',
-                width: '10px', 
-                height: '10px', 
-                backgroundColor: '#3b82f6', 
-                borderRadius: '50%', 
-                transform: 'translate(-50%, -50%)',
-                left: `${getPlayerPosition().x}%`, 
-                top: `${getPlayerPosition().y}%`,
-                boxShadow: '0 0 12px rgba(59, 130, 246, 0.6)',
-                border: '2px solid rgba(59, 130, 246, 0.8)'
-              }}
-            />
-            {/* Enemies */}
-            {gameRef.current?.enemies.map((enemy, i) => (
-              <div 
-                key={i}
-                style={{ 
-                  position: 'absolute',
-                  width: '6px', 
-                  height: '6px', 
-                  backgroundColor: '#ef4444', 
-                  borderRadius: '50%', 
-                  transform: 'translate(-50%, -50%)',
-                  left: `${(enemy.x / gameRef.current.world.width) * 100}%`, 
-                  top: `${(enemy.y / gameRef.current.world.height) * 100}%`,
-                  opacity: '0.8'
-                }}
-              />
-            ))}
-          </div>
-          
-          <div style={{ 
-            color: '#94a3b8', 
-            fontSize: '11px', 
-            textAlign: 'center', 
-            fontWeight: '500',
-            letterSpacing: '0.05em'
-          }}>
-            OCEANIA SECTOR
           </div>
         </div>
 
