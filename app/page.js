@@ -4366,18 +4366,6 @@ export default function TurfLootTactical() {
           </div>
         </div>
 
-        {/* Mobile Stats */}
-        <div style={statsStyle}>
-          <div style={statItemStyle}>
-            <div style={statNumberStyle}>{liveStats.players}</div>
-            <div style={statLabelStyle}>PLAYERS</div>
-          </div>
-          <div style={statItemStyle}>
-            <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-            <div style={statLabelStyle}>TOTAL WINNINGS</div>
-          </div>
-        </div>
-
         {/* Mobile Panels Grid */}
         <div style={mobileGridStyle}>
           {/* Command Panel */}
