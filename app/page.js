@@ -2143,20 +2143,62 @@ export default function TurfLootTactical() {
     friendsTab.addEventListener('click', () => switchTab('friends'))
 
     // Load parties function
-    const loadParties = () => {
+    const loadParties = async () => {
       const partiesList = modal.querySelector('#parties-list')
       
-      // Mock data for demonstration - in production, this would fetch from API
-      const mockPublicParties = [
-        { id: 'party-1', name: 'Elite Squad', host: 'Player123', members: 2, maxMembers: 4, privacy: 'public' },
-        { id: 'party-2', name: 'Night Hawks', host: 'GamerX', members: 3, maxMembers: 6, privacy: 'public' },
-        { id: 'party-3', name: 'Thunder Force', host: 'ProPlayer', members: 1, maxMembers: 4, privacy: 'public' }
-      ]
+      try {
+        // Fetch live dynamic parties from API
+        const response = await fetch('/api/parties/live')
+        const liveParties = await response.json()
+        
+        if (!liveParties.success) {
+          console.warn('Failed to fetch live parties:', liveParties.error)
+          // Show empty state if API call fails
+          showEmptyState()
+          return
+        }
+        
+        // Filter parties based on current tab
+        const currentTab = modal.querySelector('.party-type-tab[style*="68d391"]')?.dataset?.type || 'public'
+        const filteredParties = liveParties.parties?.filter(party => 
+          currentTab === 'public' ? party.privacy === 'public' : party.privacy === 'private'
+        ) || []
+        
+        if (filteredParties.length === 0) {
+          showEmptyState()
+          return
+        }
+        
+        // Render live parties
+        renderParties(filteredParties)
+        
+      } catch (error) {
+        console.error('Error fetching live parties:', error)
+        showEmptyState()
+      }
+    }
+    
+    const showEmptyState = () => {
+      const partiesList = modal.querySelector('#parties-list')
+      const currentTab = modal.querySelector('.party-type-tab[style*="68d391"]')?.dataset?.type || 'public'
       
-      const mockFriendsParties = [
-        { id: 'party-4', name: 'Friends Squad', host: 'BestFriend', members: 2, maxMembers: 4, privacy: 'private' },
-        { id: 'party-5', name: 'Weekend Warriors', host: 'GameBuddy', members: 1, maxMembers: 3, privacy: 'private' }
-      ]
+      partiesList.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+          <div style="font-size: 48px; margin-bottom: 16px;">🏠</div>
+          <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #ffffff;">
+            No ${currentTab === 'public' ? 'Public' : 'Friends'} Parties Available
+          </div>
+          <div style="font-size: 14px; line-height: 1.4;">
+            ${currentTab === 'public' 
+              ? 'No active public lobbies found. Be the first to create one!' 
+              : 'Your friends haven\'t created any private parties yet.'}
+          </div>
+        </div>
+      `
+    }
+    
+    const renderParties = (parties) => {
+      const partiesList = modal.querySelector('#parties-list')
       
       const parties = currentTab === 'public' ? mockPublicParties : mockFriendsParties
       
