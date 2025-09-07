@@ -256,8 +256,10 @@ const AgarIOGame = () => {
       this.camera.x += (targetX - this.camera.x) * 0.1
       this.camera.y += (targetY - this.camera.y) * 0.1
       
-      this.camera.x = Math.max(0, Math.min(this.world.width - this.canvas.width, this.camera.x))
-      this.camera.y = Math.max(0, Math.min(this.world.height - this.canvas.height, this.camera.y))
+      // Allow camera to show red boundary areas (extend bounds by 100px)
+      const boundaryExtension = 100
+      this.camera.x = Math.max(-boundaryExtension, Math.min(this.world.width - this.canvas.width + boundaryExtension, this.camera.x))
+      this.camera.y = Math.max(-boundaryExtension, Math.min(this.world.height - this.canvas.height + boundaryExtension, this.camera.y))
     }
 
     render() {
