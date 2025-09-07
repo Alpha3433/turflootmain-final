@@ -317,6 +317,9 @@ const AgarIOGame = () => {
       // Draw coins
       this.coins.forEach(coin => this.drawCoin(coin))
       
+      // Draw viruses
+      this.viruses.forEach(virus => this.drawVirus(virus))
+      
       // Draw enemies
       this.enemies.forEach(enemy => this.drawPlayer(enemy))
       
