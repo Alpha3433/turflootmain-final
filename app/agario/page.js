@@ -1027,20 +1027,46 @@ const AgarIOGame = () => {
               fontFamily: '"Rajdhani", sans-serif',
               boxShadow: '0 4px 12px rgba(255, 165, 0, 0.4)',
               minWidth: '200px',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              position: 'relative',
+              overflow: 'hidden'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 200, 50, 0.98)'
-              e.target.style.transform = 'translateY(-2px)'
-              e.target.style.boxShadow = '0 6px 20px rgba(255, 165, 0, 0.5)'
+              if (!isCashingOut) {
+                e.target.style.backgroundColor = 'rgba(255, 200, 50, 0.98)'
+                e.target.style.transform = 'translateY(-2px)'
+                e.target.style.boxShadow = '0 6px 20px rgba(255, 165, 0, 0.5)'
+              }
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
-              e.target.style.transform = 'translateY(0)'
-              e.target.style.boxShadow = '0 4px 12px rgba(255, 165, 0, 0.4)'
+              if (!isCashingOut) {
+                e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
+                e.target.style.transform = 'translateY(0)'
+                e.target.style.boxShadow = '0 4px 12px rgba(255, 165, 0, 0.4)'
+              }
             }}
           >
-            🔥 Hold E to Cash Out (${score})
+            {/* Progress fill overlay */}
+            {isCashingOut && (
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                height: '100%',
+                width: `${cashOutProgress}%`,
+                backgroundColor: 'rgba(255, 200, 50, 0.8)',
+                transition: 'width 100ms linear',
+                zIndex: 1
+              }} />
+            )}
+            
+            {/* Button text */}
+            <span style={{ position: 'relative', zIndex: 2 }}>
+              {isCashingOut 
+                ? `🔥 Cashing Out... ${Math.floor(cashOutProgress)}%`
+                : `🔥 Hold E to Cash Out ($${score})`
+              }
+            </span>
           </div>
 
           {/* Split Button - Same height as Cash Out */}
