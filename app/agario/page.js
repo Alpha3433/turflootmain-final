@@ -364,6 +364,12 @@ const AgarIOGame = () => {
           setScore(prev => prev + coin.value)
           setMass(this.player.mass)
           this.coins.splice(i, 1)
+          
+          // Update mission progress for coin collection
+          if (typeof updateMissionProgress === 'function') {
+            updateMissionProgress('coin_collected', 1)
+            updateMissionProgress('mass_reached', this.player.mass)
+          }
         }
       }
       
