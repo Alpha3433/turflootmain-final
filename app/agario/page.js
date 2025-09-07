@@ -899,19 +899,6 @@ const AgarIOGame = () => {
               zIndex: 1
             }} />
             
-            {/* Playable area circle (inner green boundary) */}
-            <div style={{
-              position: 'absolute',
-              top: '32px',
-              left: '32px',
-              width: '156px',
-              height: '156px',
-              borderRadius: '50%',
-              border: '2px solid rgba(0, 255, 0, 0.8)',
-              boxShadow: 'inset 0 0 10px rgba(0, 255, 0, 0.3)',
-              zIndex: 2
-            }} />
-            
             {/* Player dot on minimap - larger and more visible */}
             <div style={{
               position: 'absolute',
@@ -984,6 +971,8 @@ const AgarIOGame = () => {
             }} />
           </div>
         </div>
+
+        {/* Ping Latency Meter - Bottom Left */}
         <div style={{
           position: 'fixed',
           bottom: '10px',
