@@ -1234,8 +1234,10 @@ export default function TurfLootTactical() {
             ${isEquipped ? 'box-shadow: 0 0 20px rgba(104, 211, 145, 0.4);' : ''}
           ">
             <div style="text-align: center; margin-bottom: 12px;">
-              <div style="width: 80px; height: 80px; background: linear-gradient(45deg, ${rarityColor} 0%, ${rarityColor}aa 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto; border: 3px solid ${rarityColor};">
-                ${skin.preview}
+              <div style="width: 80px; height: 80px; background: ${skin.color}; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 3px solid #ffffff; position: relative; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);">
+                <!-- Black Eyes - Same as in-game character -->
+                <div style="position: absolute; width: 8px; height: 8px; background: #000000; border-radius: 50%; left: 22px; top: 26px;"></div>
+                <div style="position: absolute; width: 8px; height: 8px; background: #000000; border-radius: 50%; right: 22px; top: 26px;"></div>
               </div>
             </div>
             
