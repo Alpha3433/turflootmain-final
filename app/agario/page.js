@@ -491,6 +491,160 @@ const AgarIOGame = () => {
         }}
       />
 
+      {/* DESKTOP ONLY - HUD UI Elements */}
+      <div className="hidden md:block">
+        {/* Mission Timer - Top Center */}
+        <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 50 }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-6 py-4 border-2 border-purple-500 shadow-xl">
+            <div className="text-purple-400 text-sm font-bold mb-2 flex items-center justify-center gap-2">
+              <span>⚡</span>
+              <span>TACTICAL MISSION</span>
+            </div>
+            <div className="text-white text-lg font-bold mb-3 text-center">Survive for 60 seconds</div>
+            <div className="bg-gray-700 rounded-full h-3 mb-3 overflow-hidden shadow-inner">
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-purple-400 h-3 rounded-full transition-all duration-1000 shadow-lg"
+                style={{ width: `${gameStarted ? ((60 - missionTime) / 60) * 100 : 5}%` }}
+              />
+            </div>
+            <div className="text-white text-sm text-center font-mono">
+              {gameStarted ? formatTime(missionTime) : '1:00'}/01:00
+            </div>
+          </div>
+        </div>
+
+        {/* Player Stats - Top Left */}
+        <div style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 50 }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-green-500 shadow-xl">
+            <div className="text-green-400 text-sm font-bold mb-3 flex items-center gap-2">
+              <span>🎖️</span>
+              <span>OPERATIVE STATUS</span>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">MASS:</span>
+                <span className="text-blue-400 font-bold">{mass} KG</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">ASSETS:</span>
+                <span className="text-green-400 font-bold">${score}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">ELIMINATIONS:</span>
+                <span className="text-red-400 font-bold">{eliminations}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">RANK:</span>
+                <span className="text-yellow-400 font-bold">#1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mini Map - Top Right */}
+        <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 50 }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border-2 border-cyan-500 shadow-xl p-3">
+            <div className="text-cyan-400 text-sm font-bold mb-2 flex items-center gap-2">
+              <span>🗺️</span>
+              <span>TACTICAL MAP</span>
+            </div>
+            <div className="w-32 h-32 bg-gray-800 rounded border-2 border-cyan-600 relative overflow-hidden mb-3 shadow-inner">
+              {/* Player dot */}
+              <div 
+                className="absolute w-3 h-3 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg animate-pulse"
+                style={{ 
+                  left: `${getPlayerPosition().x}%`, 
+                  top: `${getPlayerPosition().y}%` 
+                }}
+              />
+              {/* Enemies */}
+              {gameRef.current?.enemies.map((enemy, i) => (
+                <div 
+                  key={i}
+                  className="absolute w-2 h-2 bg-red-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-md"
+                  style={{ 
+                    left: `${(enemy.x / gameRef.current.world.width) * 100}%`, 
+                    top: `${(enemy.y / gameRef.current.world.height) * 100}%` 
+                  }}
+                />
+              ))}
+              {/* Grid overlay */}
+              <div className="absolute inset-0 border border-cyan-700 rounded opacity-30"></div>
+            </div>
+            <div className="text-cyan-400 text-xs text-center font-bold">SECTOR: Oceania</div>
+            <div className="text-white text-xs text-center">999ms ⚡ ONLINE</div>
+          </div>
+        </div>
+
+        {/* Leaderboard - Bottom Left */}
+        <div style={{ position: 'absolute', bottom: '20px', left: '20px', zIndex: 50 }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-yellow-500 shadow-xl">
+            <div className="text-yellow-400 text-sm font-bold mb-3 flex items-center gap-2">
+              <span>🏆</span>
+              <span>LEADERBOARD</span>
+            </div>
+            <div className="space-y-2 text-sm min-w-32">
+              <div className="flex justify-between items-center bg-yellow-900 bg-opacity-30 rounded px-2 py-1">
+                <span className="text-yellow-300 font-bold">#1 You</span>
+                <span className="text-green-400 font-bold">${score}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">#2 Player 3</span>
+                <span className="text-gray-400">$45</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">#3 Player 7</span>
+                <span className="text-gray-400">$38</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">#4 Player 8</span>
+                <span className="text-gray-400">$22</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons - Bottom Right */}
+        <div style={{ position: 'absolute', bottom: '20px', right: '20px', zIndex: 50 }} className="flex gap-4">
+          <button 
+            onClick={handleSplit}
+            className="w-24 h-24 bg-blue-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-blue-400 text-white font-bold text-sm shadow-xl hover:bg-blue-700 hover:scale-105 transition-all flex flex-col items-center justify-center group"
+          >
+            <span className="text-2xl mb-1 group-hover:animate-pulse">⚡</span>
+            <span className="text-xs">SPLIT</span>
+          </button>
+          <button 
+            className="w-24 h-24 bg-yellow-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-yellow-400 text-white font-bold text-sm shadow-xl hover:bg-yellow-700 hover:scale-105 transition-all flex flex-col items-center justify-center group"
+          >
+            <span className="text-2xl mb-1 group-hover:animate-pulse">💰</span>
+            <span className="text-xs">CASH</span>
+            <span className="text-xs">${score}</span>
+          </button>
+        </div>
+
+        {/* Connection Status - Bottom Center */}
+        <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 50 }}>
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-2 border-2 border-green-500 shadow-xl">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+                <span className="text-green-400 font-bold text-sm">TACTICAL LINK ACTIVE</span>
+              </div>
+              <div className="text-gray-400 text-sm">|</div>
+              <div className="text-white text-sm">12ms</div>
+              <div className="text-gray-400 text-sm">|</div>
+              <div className="text-cyan-400 text-sm font-bold">MULTIPLAYER</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Crosshair Indicator */}
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 30, pointerEvents: 'none' }}>
+          <div className="w-6 h-6 border border-green-400 border-opacity-50 rounded-full animate-pulse"></div>
+          <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-green-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 opacity-70"></div>
+        </div>
+      </div>
+
       {/* Mission Timer - Overlaid Top Center */}
       <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', zIndex: 50 }}>
         <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-purple-500 shadow-xl">
