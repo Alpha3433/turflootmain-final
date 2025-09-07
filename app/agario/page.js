@@ -461,15 +461,16 @@ const AgarIOGame = () => {
   }
 
   return (
-    <div className="w-screen h-screen relative bg-black overflow-hidden">
-      {/* Game Canvas - Base Layer */}
+    <div className="w-screen h-screen bg-black overflow-hidden" style={{ position: 'relative' }}>
+      {/* Game Canvas - Background Layer */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 cursor-crosshair bg-black"
+        className="w-full h-full cursor-crosshair bg-black"
+        style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
       />
 
-      {/* Mission Timer - Fixed Position Top Center */}
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+      {/* Mission Timer - Overlaid Top Center */}
+      <div style={{ position: 'absolute', top: '16px', left: '50%', transform: 'translateX(-50%)', zIndex: 50 }}>
         <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-purple-500 shadow-xl">
           <div className="text-purple-400 text-xs font-bold mb-2 flex items-center justify-center gap-1">
             <span>⚡</span>
@@ -488,11 +489,11 @@ const AgarIOGame = () => {
         </div>
       </div>
 
-      {/* Mini Map - Fixed Position Top Right */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Mini Map - Overlaid Top Right */}
+      <div style={{ position: 'absolute', top: '16px', right: '16px', zIndex: 50 }}>
         <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border-2 border-cyan-500 shadow-xl p-2">
           <div className="w-20 h-20 bg-gray-800 rounded border border-cyan-600 relative overflow-hidden mb-2">
-            {/* Player dot on minimap */}
+            {/* Player dot */}
             <div 
               className="absolute w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
               style={{ 
@@ -500,7 +501,7 @@ const AgarIOGame = () => {
                 top: `${getPlayerPosition().y}%` 
               }}
             />
-            {/* Enemies on minimap */}
+            {/* Enemies */}
             {gameRef.current?.enemies.map((enemy, i) => (
               <div 
                 key={i}
@@ -517,8 +518,8 @@ const AgarIOGame = () => {
         </div>
       </div>
 
-      {/* Leaderboard - Fixed Position Bottom Left */}
-      <div className="fixed bottom-4 left-4 z-50">
+      {/* Leaderboard - Overlaid Bottom Left */}
+      <div style={{ position: 'absolute', bottom: '16px', left: '16px', zIndex: 50 }}>
         <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-yellow-500 shadow-xl">
           <div className="text-yellow-400 text-xs font-bold mb-2 flex items-center gap-1">
             <span>🏆</span>
@@ -533,8 +534,8 @@ const AgarIOGame = () => {
         </div>
       </div>
 
-      {/* Action Buttons - Fixed Position Bottom Right */}
-      <div className="fixed bottom-4 right-4 flex gap-3 z-50">
+      {/* Action Buttons - Overlaid Bottom Right */}
+      <div style={{ position: 'absolute', bottom: '16px', right: '16px', zIndex: 50 }} className="flex gap-3">
         <button 
           onClick={handleSplit}
           className="w-20 h-20 bg-blue-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-blue-400 text-white font-bold text-xs shadow-xl hover:bg-blue-700 transition-all flex flex-col items-center justify-center"
@@ -551,9 +552,9 @@ const AgarIOGame = () => {
         </button>
       </div>
 
-      {/* Game Over Screen - Only show when game is over */}
+      {/* Game Over Screen */}
       {gameOver && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-100">
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 }} className="bg-black bg-opacity-90 flex items-center justify-center">
           <div className="bg-gray-900 rounded-2xl border border-red-500 max-w-md w-full mx-4 p-6">
             <div className="text-center mb-6">
               <div className="text-red-400 font-bold text-2xl mb-2 flex items-center justify-center gap-3">
@@ -604,6 +605,7 @@ const AgarIOGame = () => {
         </div>
       )}
     </div>
+  )
   )
 }
 
