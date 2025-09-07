@@ -753,7 +753,7 @@ const AgarIOGame = () => {
         {/* Cash Out Button - Bottom Center */}
         <div style={{
           position: 'fixed',
-          bottom: '10px',
+          bottom: '40px',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 1000,
