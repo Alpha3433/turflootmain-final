@@ -1348,7 +1348,7 @@ export default function TurfLootTactical() {
           
           if (currentCurrency >= skin.price) {
             // Purchase skin
-            setCurrency(prev => prev - skin.price)
+            setCurrencyCallback(prev => prev - skin.price)
             skin.owned = true
             
             // Update UI display immediately
