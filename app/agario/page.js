@@ -437,8 +437,9 @@ const AgarIOGame = () => {
     }
 
     drawGrid() {
-      this.ctx.strokeStyle = '#666666' // Even brighter grid lines
+      this.ctx.strokeStyle = '#808080' // Much brighter gray grid lines
       this.ctx.lineWidth = 1
+      this.ctx.globalAlpha = 0.3 // Add transparency so they don't interfere with gameplay
       const gridSize = 50
       
       const startX = Math.floor(this.camera.x / gridSize) * gridSize
