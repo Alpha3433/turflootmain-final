@@ -1330,7 +1330,7 @@ export default function TurfLootTactical() {
           
           currentSkin = skinId
           
-          // Update current skin display
+          // Update current skin display and landing page preview
           const currentSkinPreview = modal.querySelector('#current-skin-preview')
           const currentSkinName = modal.querySelector('#current-skin-name')
           
@@ -1341,6 +1341,20 @@ export default function TurfLootTactical() {
             <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; right: 16px; top: 20px;"></div>
           `
           currentSkinName.textContent = skin.name
+          
+          // Update landing page preview circle
+          setSelectedSkinCallback({
+            id: skin.id,
+            name: skin.name,
+            color: skin.color
+          })
+          
+          // Save to localStorage for persistence across sessions
+          localStorage.setItem('selectedSkin', JSON.stringify({
+            id: skin.id,
+            name: skin.name,
+            color: skin.color
+          }))
           
           console.log('🎨 Equipped skin:', skin.name)
           alert(`Equipped ${skin.name}!`)
