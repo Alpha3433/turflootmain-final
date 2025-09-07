@@ -169,10 +169,23 @@ const AgarIOGame = () => {
       this.updateCamera()
       
       // Maintain coin count
-      while (this.coins.length < 300) {
+      while (this.coins.length < 100) {
+        const centerX = this.world.width / 2  // 2000
+        const centerY = this.world.height / 2 // 2000
+        const playableRadius = 1800 // Same as boundary radius
+        
+        let x, y, distance
+        
+        // Keep generating random positions until we get one inside the circular boundary
+        do {
+          x = Math.random() * this.world.width
+          y = Math.random() * this.world.height
+          distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+        } while (distance > playableRadius - 20) // 20px buffer from edge
+        
         this.coins.push({
-          x: Math.random() * this.world.width,
-          y: Math.random() * this.world.height,
+          x: x,
+          y: y,
           radius: 8,
           color: '#FFD700',
           value: 1
