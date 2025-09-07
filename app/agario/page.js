@@ -457,6 +457,20 @@ const AgarIOGame = () => {
       if (game.running) {
         game.update()
         game.render()
+        
+        // Update minimap data for React state (every few frames to avoid performance issues)
+        if (Date.now() % 100 < 16) { // Update roughly every 100ms
+          setMinimapData({
+            playerX: game.player.x,
+            playerY: game.player.y,
+            enemies: game.enemies.map(enemy => ({ x: enemy.x, y: enemy.y })),
+            coins: game.coins.map(coin => ({ x: coin.x, y: coin.y }))
+          })
+          
+          // Update other game stats
+          setScore(Math.floor(game.player.mass - 20))
+          setMass(Math.floor(game.player.mass))
+        }
       }
       requestAnimationFrame(gameLoop)
     }
