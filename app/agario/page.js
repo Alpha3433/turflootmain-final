@@ -242,6 +242,33 @@ const AgarIOGame = () => {
         }
       }
       
+      // Player vs viruses (splits player if big enough)
+      for (let i = 0; i < this.viruses.length; i++) {
+        const virus = this.viruses[i]
+        const dx = this.player.x - virus.x
+        const dy = this.player.y - virus.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        
+        if (distance < this.player.radius + virus.radius) {
+          if (this.player.mass > virus.mass) {
+            // Player is bigger than virus - split the player
+            this.player.mass = Math.max(20, this.player.mass * 0.7)
+            setMass(this.player.mass)
+            
+            // Move virus to new random location
+            virus.x = Math.random() * this.world.width
+            virus.y = Math.random() * this.world.height
+          } else {
+            // Player is smaller - bounce back
+            const pushDistance = (this.player.radius + virus.radius) - distance + 5
+            const pushX = (dx / distance) * pushDistance
+            const pushY = (dy / distance) * pushDistance
+            this.player.x += pushX
+            this.player.y += pushY
+          }
+        }
+      }
+      
       // Player vs enemies
       for (let i = this.enemies.length - 1; i >= 0; i--) {
         const enemy = this.enemies[i]
