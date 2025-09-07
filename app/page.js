@@ -765,6 +765,68 @@ export default function TurfLootTactical() {
           </div>
         </div>
 
+        <!-- Invite Friends Section -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px;">
+            👥 INVITE FRIENDS
+          </label>
+          
+          <!-- Friends Search -->
+          <div style="margin-bottom: 16px;">
+            <input 
+              id="friend-search-input" 
+              type="text" 
+              placeholder="Search friends..." 
+              style="width: 100%; padding: 10px 16px; background: rgba(45, 55, 72, 0.6); border: 1px solid #4a5568; border-radius: 6px; color: #e2e8f0; font-size: 14px; font-family: 'Rajdhani', sans-serif; box-sizing: border-box;"
+            />
+          </div>
+          
+          <!-- Friends List -->
+          <div id="friends-invite-list" style="max-height: 150px; overflow-y: auto; background: rgba(45, 55, 72, 0.3); border: 1px solid #4a5568; border-radius: 6px; padding: 8px;">
+            <!-- Mock friends data - in production would come from friends system -->
+            <div class="friend-invite-item" data-friend-id="friend1" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; margin-bottom: 4px; background: rgba(68, 90, 120, 0.3); border-radius: 4px; cursor: pointer; transition: all 0.2s ease;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 8px; height: 8px; background: #68d391; border-radius: 50%; box-shadow: 0 0 6px #68d391;"></div>
+                <span style="color: #e2e8f0; font-size: 14px; font-weight: 500;">GameMaster_2024</span>
+                <span style="color: #68d391; font-size: 12px; font-weight: 600;">● ONLINE</span>
+              </div>
+              <input type="checkbox" class="friend-checkbox" style="width: 16px; height: 16px; accent-color: #fc8181;">
+            </div>
+            
+            <div class="friend-invite-item" data-friend-id="friend2" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; margin-bottom: 4px; background: rgba(68, 90, 120, 0.3); border-radius: 4px; cursor: pointer; transition: all 0.2s ease;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 8px; height: 8px; background: #68d391; border-radius: 50%; box-shadow: 0 0 6px #68d391;"></div>
+                <span style="color: #e2e8f0; font-size: 14px; font-weight: 500;">ProPlayer_X</span>
+                <span style="color: #68d391; font-size: 12px; font-weight: 600;">● ONLINE</span>
+              </div>
+              <input type="checkbox" class="friend-checkbox" style="width: 16px; height: 16px; accent-color: #fc8181;">
+            </div>
+            
+            <div class="friend-invite-item" data-friend-id="friend3" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; margin-bottom: 4px; background: rgba(68, 90, 120, 0.2); border-radius: 4px; opacity: 0.7;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 8px; height: 8px; background: #a0aec0; border-radius: 50%;"></div>
+                <span style="color: #a0aec0; font-size: 14px; font-weight: 500;">SquadLeader99</span>
+                <span style="color: #a0aec0; font-size: 12px; font-weight: 400;">● OFFLINE</span>
+              </div>
+              <input type="checkbox" class="friend-checkbox" disabled style="width: 16px; height: 16px; accent-color: #fc8181; opacity: 0.5;">
+            </div>
+            
+            <div class="friend-invite-item" data-friend-id="friend4" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; margin-bottom: 0; background: rgba(68, 90, 120, 0.3); border-radius: 4px; cursor: pointer; transition: all 0.2s ease;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 8px; height: 8px; background: #ffd700; border-radius: 50%; box-shadow: 0 0 6px #ffd700;"></div>
+                <span style="color: #e2e8f0; font-size: 14px; font-weight: 500;">TacticalSniper</span>
+                <span style="color: #ffd700; font-size: 12px; font-weight: 600;">● IN GAME</span>
+              </div>
+              <input type="checkbox" class="friend-checkbox" style="width: 16px; height: 16px; accent-color: #fc8181;">
+            </div>
+          </div>
+          
+          <!-- Selected Friends Counter -->
+          <div id="selected-friends-counter" style="margin-top: 8px; color: #a0aec0; font-size: 12px; text-align: center;">
+            0 friends selected for invitation
+          </div>
+        </div>
+
         <!-- Action Buttons -->
         <div style="display: flex; gap: 12px;">
           <button id="cancel-withdraw" style="flex: 1; padding: 16px; background: rgba(74, 85, 104, 0.5); border: 2px solid #4a5568; border-radius: 8px; color: #a0aec0; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
