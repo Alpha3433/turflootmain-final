@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://tactical-arena-8.preview.emergentagent.com"
+BASE_URL = "https://milblob-game.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraRoomCreationTester:
