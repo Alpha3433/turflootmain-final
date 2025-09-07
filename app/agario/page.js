@@ -17,6 +17,11 @@ const AgarIOGame = () => {
   const [mass, setMass] = useState(20)
   const [eliminations, setEliminations] = useState(0)
   
+  // Cash out state
+  const [cashOutProgress, setCashOutProgress] = useState(0)
+  const [isCashingOut, setIsCashingOut] = useState(false)
+  const [cashOutComplete, setCashOutComplete] = useState(false)
+  
   // Minimap state for real-time updates
   const [minimapData, setMinimapData] = useState({
     playerX: 2000,
