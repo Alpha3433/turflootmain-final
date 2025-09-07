@@ -22,7 +22,8 @@ const AgarIOGame = () => {
     playerX: 2000,
     playerY: 2000,
     enemies: [],
-    coins: []
+    coins: [],
+    viruses: []
   })
 
   // Game Engine Class
