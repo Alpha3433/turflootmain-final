@@ -601,7 +601,7 @@ export default function TurfLootTactical() {
       // Check if user has a wallet
       if (!privy.user?.wallet?.address) {
         console.log('👛 No wallet found, prompting wallet connection')
-        alert('Please connect a wallet to withdraw funds. You can do this through your profile settings.')
+        // Removed popup - allow direct access to withdraw functionality
         return
       }
       
