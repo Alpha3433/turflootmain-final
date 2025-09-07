@@ -332,15 +332,12 @@ const AgarIOGame = () => {
       const centerX = this.world.width / 2  // 2000
       const centerY = this.world.height / 2 // 2000
       const playableRadius = 1800 // Circular play area radius
-      const dangerZoneWidth = 200 // Width of red danger zone
       
-      // Draw danger zone (red circle outside playable area)
-      this.ctx.beginPath()
-      this.ctx.arc(centerX, centerY, playableRadius + dangerZoneWidth, 0, Math.PI * 2)
+      // Fill entire canvas with red first (out of bounds area)
       this.ctx.fillStyle = 'rgba(255, 68, 68, 0.4)'
-      this.ctx.fill()
+      this.ctx.fillRect(-1000, -1000, this.world.width + 2000, this.world.height + 2000)
       
-      // Draw playable area (black circle to mask inner area)
+      // Draw playable area (black circle to create the safe zone)
       this.ctx.beginPath()
       this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
       this.ctx.fillStyle = '#000000'
