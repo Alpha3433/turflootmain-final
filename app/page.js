@@ -3837,7 +3837,7 @@ export default function TurfLootTactical() {
               style={{
                 width: '72px',
                 height: '72px',
-                backgroundColor: '#4A90E2', // Same blue as in-game player
+                backgroundColor: selectedSkin.color, // Dynamic skin color instead of hardcoded blue
                 border: '3px solid #ffffff', // White border like in-game
                 borderRadius: '50%',
                 margin: '0 auto',
@@ -3846,7 +3846,7 @@ export default function TurfLootTactical() {
                 justifyContent: 'center',
                 position: 'relative',
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-                transition: 'transform 0.3s ease',
+                transition: 'transform 0.3s ease, background-color 0.3s ease', // Added transition for skin changes
                 cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
