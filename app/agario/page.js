@@ -437,7 +437,7 @@ const AgarIOGame = () => {
     }
 
     drawGrid() {
-      this.ctx.strokeStyle = '#1a1a1a'
+      this.ctx.strokeStyle = '#333333' // Made grid lines more visible (was #1a1a1a)
       this.ctx.lineWidth = 1
       const gridSize = 50
       
