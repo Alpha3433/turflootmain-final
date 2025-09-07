@@ -2611,6 +2611,7 @@ export default function TurfLootTactical() {
     // Create party functionality
     modal.querySelector('#create-party-btn').addEventListener('click', () => {
       const partyName = modal.querySelector('#party-name-input').value.trim()
+      const selectedFriends = Array.from(modal.querySelectorAll('.friend-checkbox:checked')).map(cb => cb.closest('.friend-invite-item').dataset.friendId)
       
       if (!partyName) {
         modal.querySelector('#party-name-input').style.border = '2px solid #e53e3e'
@@ -2626,10 +2627,38 @@ export default function TurfLootTactical() {
       }
       
       console.log('🎯 Creating party:', partyData)
-      // Here you would integrate with your party creation API
-      // For now, just show success and close popup
-      alert(`Party "${partyName}" created successfully! (Max 2 players, ${selectedPrivacy})`)
+      console.log('🎯 Invited friends:', selectedFriends)
+      
+      // Here you would create the party and send invitations
+      alert(`Party "${partyName}" created successfully! ${selectedFriends.length} friends invited. (Max 2 players, ${selectedPrivacy})`)
       popup.remove()
+    })
+
+    // Friends search functionality
+    modal.querySelector('#friend-search-input').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase()
+      const friendItems = modal.querySelectorAll('.friend-invite-item')
+      
+      friendItems.forEach(item => {
+        const friendName = item.querySelector('span').textContent.toLowerCase()
+        if (friendName.includes(searchTerm)) {
+          item.style.display = 'flex'
+        } else {
+          item.style.display = 'none'
+        }
+      })
+    })
+
+    // Friends selection counter
+    const updateSelectedCounter = () => {
+      const selectedCount = modal.querySelectorAll('.friend-checkbox:checked').length
+      const counter = modal.querySelector('#selected-friends-counter')
+      counter.textContent = `${selectedCount} friend${selectedCount !== 1 ? 's' : ''} selected for invitation`
+    }
+
+    // Add event listeners to all friend checkboxes
+    modal.querySelectorAll('.friend-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', updateSelectedCounter)
     })
 
     // Close on backdrop click
