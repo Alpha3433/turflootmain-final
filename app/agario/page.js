@@ -773,44 +773,50 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Action Buttons - Classic Style like reference */}
+        {/* Action Buttons - Matching Reference Style */}
+        
+        {/* Split Button - Bottom Left */}
         <div style={{
           position: 'fixed',
           bottom: '10px',
           left: '10px',
-          zIndex: 1000,
-          display: 'flex',
-          gap: '8px'
+          zIndex: 1000
         }}>
-          {/* Split Button */}
           <div 
             onClick={handleSplit}
             style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              border: '2px solid #333',
-              borderRadius: '4px',
-              color: '#fff',
-              fontSize: '11px',
+              backgroundColor: 'rgba(255, 0, 0, 0.9)',
+              border: '2px solid #ff0000',
+              borderRadius: '8px',
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: '700',
               cursor: 'pointer',
-              padding: '6px 10px',
-              fontWeight: 'bold',
+              padding: '10px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
               transition: 'all 150ms',
-              pointerEvents: 'auto'
+              pointerEvents: 'auto',
+              fontFamily: '"Rajdhani", sans-serif',
+              boxShadow: '0 4px 12px rgba(255, 0, 0, 0.3)'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(50, 50, 50, 0.9)'
-              e.target.style.borderColor = '#555'
+              e.target.style.backgroundColor = 'rgba(255, 50, 50, 0.95)'
+              e.target.style.transform = 'translateY(-2px)'
+              e.target.style.boxShadow = '0 6px 20px rgba(255, 0, 0, 0.4)'
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
-              e.target.style.borderColor = '#333'
+              e.target.style.backgroundColor = 'rgba(255, 0, 0, 0.9)'
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 4px 12px rgba(255, 0, 0, 0.3)'
             }}
           >
-            SPLIT
+            ⚡ Split (S)
           </div>
         </div>
 
-        {/* Cash Out Button - Bottom Center like reference */}
+        {/* Cash Out Button - Bottom Center */}
         <div style={{
           position: 'fixed',
           bottom: '10px',
@@ -820,26 +826,37 @@ const AgarIOGame = () => {
         }}>
           <div 
             style={{
-              backgroundColor: '#FFA500',
-              border: '2px solid #FF8C00',
-              borderRadius: '4px',
-              color: '#000',
-              fontSize: '12px',
-              fontWeight: 'bold',
+              backgroundColor: 'rgba(255, 165, 0, 0.95)',
+              border: '2px solid #ff8c00',
+              borderRadius: '8px',
+              color: '#000000',
+              fontSize: '16px',
+              fontWeight: '700',
               cursor: 'pointer',
-              padding: '8px 16px',
+              padding: '12px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
               transition: 'all 150ms',
               pointerEvents: 'auto',
-              textAlign: 'center'
+              textAlign: 'center',
+              fontFamily: '"Rajdhani", sans-serif',
+              boxShadow: '0 4px 12px rgba(255, 165, 0, 0.4)',
+              minWidth: '200px',
+              justifyContent: 'center'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = '#FFB84D'
+              e.target.style.backgroundColor = 'rgba(255, 200, 50, 0.98)'
+              e.target.style.transform = 'translateY(-2px)'
+              e.target.style.boxShadow = '0 6px 20px rgba(255, 165, 0, 0.5)'
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = '#FFA500'
+              e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 4px 12px rgba(255, 165, 0, 0.4)'
             }}
           >
-            💰 CASH OUT
+            🔥 Hold E to Cash Out (${score})
           </div>
         </div>
 
