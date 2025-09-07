@@ -899,58 +899,7 @@ const AgarIOGame = () => {
         </div>
       </div>
 
-      {/* Game Over Screen */}
-      {gameOver && (
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 }} className="bg-black bg-opacity-90 flex items-center justify-center">
-          <div className="bg-gray-900 rounded-2xl border border-red-500 max-w-md w-full mx-4 p-6">
-            <div className="text-center mb-6">
-              <div className="text-red-400 font-bold text-2xl mb-2 flex items-center justify-center gap-3">
-                <span>💀</span>
-                <span>MISSION {missionTime === 0 ? 'COMPLETED' : 'TERMINATED'}</span>
-              </div>
-              <div className="text-gray-300">
-                {missionTime === 0 ? 'Mission Completed Successfully!' : 'Operative KIA'}
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 text-sm mb-6">
-              <div className="bg-gray-800 rounded p-3 border border-gray-600">
-                <div className="text-gray-400">Final Mass</div>
-                <div className="text-white font-bold">{mass} KG</div>
-              </div>
-              <div className="bg-gray-800 rounded p-3 border border-gray-600">
-                <div className="text-gray-400">Eliminations</div>
-                <div className="text-green-400 font-bold">{eliminations}</div>
-              </div>
-              <div className="bg-gray-800 rounded p-3 border border-gray-600">
-                <div className="text-gray-400">Assets</div>
-                <div className="text-yellow-400 font-bold">${score}</div>
-              </div>
-              <div className="bg-gray-800 rounded p-3 border border-gray-600">
-                <div className="text-gray-400">Rank</div>
-                <div className="text-blue-400 font-bold">#1</div>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              <button
-                onClick={handleRestart}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded border border-green-500 transition-all flex items-center justify-center gap-2"
-              >
-                <span>🔄</span>
-                <span>RESTART MISSION</span>
-              </button>
-              <button
-                onClick={() => router.push('/')}
-                className="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded border border-gray-500 transition-all flex items-center justify-center gap-2"
-              >
-                <span>🏠</span>
-                <span>RETURN TO BASE</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }
