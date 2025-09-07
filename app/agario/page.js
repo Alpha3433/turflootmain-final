@@ -1017,6 +1017,120 @@ const AgarIOGame = () => {
             11 players in game
           </div>
         </div>
+        
+        {/* Missions Panel */}
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: '10px', 
+            right: '220px', 
+            width: '280px',
+            backgroundColor: 'rgba(0, 0, 0, 0.85)', 
+            border: '2px solid #333', 
+            borderRadius: '6px', 
+            padding: '8px 12px',
+            fontSize: '11px',
+            color: '#ffffff',
+            zIndex: 1000,
+            maxHeight: '200px',
+            overflowY: 'auto'
+          }}>
+          
+          {/* Header */}
+          <div style={{ 
+            color: '#22c55e', 
+            fontSize: '13px', 
+            fontWeight: '700', 
+            marginBottom: '8px',
+            textAlign: 'center',
+            letterSpacing: '0.5px',
+            borderBottom: '1px solid #333',
+            paddingBottom: '4px'
+          }}>
+            🎯 MISSIONS
+          </div>
+          
+          {/* Currency Display */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: '8px',
+            padding: '4px 8px',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            borderRadius: '4px',
+            border: '1px solid rgba(34, 197, 94, 0.3)'
+          }}>
+            <span style={{ color: '#FFD700', fontWeight: '700' }}>💰 {currency} coins</span>
+          </div>
+          
+          {/* Active Missions */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {activeMissions.map((mission, index) => (
+              <div key={mission.id} style={{ 
+                backgroundColor: mission.completed ? 'rgba(34, 197, 94, 0.2)' : 'rgba(59, 130, 246, 0.1)',
+                border: `1px solid ${mission.completed ? 'rgba(34, 197, 94, 0.4)' : 'rgba(59, 130, 246, 0.3)'}`,
+                borderRadius: '4px',
+                padding: '6px 8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                  <span style={{ 
+                    fontSize: '10px', 
+                    fontWeight: '600',
+                    color: mission.completed ? '#22c55e' : '#ffffff'
+                  }}>
+                    {mission.icon} {mission.name}
+                  </span>
+                  <span style={{ 
+                    fontSize: '9px', 
+                    color: mission.completed ? '#22c55e' : '#22c55e',
+                    fontWeight: '700'
+                  }}>
+                    +{mission.reward}💰
+                  </span>
+                </div>
+                <div style={{ fontSize: '9px', color: '#9ca3af', marginBottom: '3px' }}>
+                  {mission.description}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{
+                    flex: 1,
+                    height: '4px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    borderRadius: '2px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      width: `${Math.min(100, (mission.progress / mission.target) * 100)}%`,
+                      height: '100%',
+                      backgroundColor: mission.completed ? '#22c55e' : '#3b82f6',
+                      transition: 'width 0.3s ease'
+                    }}></div>
+                  </div>
+                  <span style={{ 
+                    fontSize: '9px', 
+                    color: mission.completed ? '#22c55e' : '#ffffff',
+                    fontWeight: '600',
+                    minWidth: '35px'
+                  }}>
+                    {mission.progress}/{mission.target}
+                  </span>
+                </div>
+              </div>
+            ))}
+            
+            {activeMissions.length === 0 && (
+              <div style={{ 
+                textAlign: 'center', 
+                color: '#9ca3af', 
+                fontSize: '10px',
+                padding: '12px 0'
+              }}>
+                Start playing to get missions!
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Action Buttons - Matching Reference Style */}
         
