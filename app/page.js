@@ -23,6 +23,13 @@ export default function TurfLootTactical() {
 
   // Currency system for skin store (matches the game page)
   const [currency, setCurrency] = useState(0) // Coins for purchasing skins
+  
+  // Selected skin system for cross-component synchronization
+  const [selectedSkin, setSelectedSkin] = useState({
+    id: 'default',
+    name: 'Default Warrior', 
+    color: '#4A90E2'
+  })
 
   // Track mouse movement for interactive eyes
   useEffect(() => {
