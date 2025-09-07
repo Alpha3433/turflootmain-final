@@ -548,7 +548,8 @@ const AgarIOGame = () => {
             playerX: game.player.x,
             playerY: game.player.y,
             enemies: game.enemies.map(enemy => ({ x: enemy.x, y: enemy.y })),
-            coins: game.coins.map(coin => ({ x: coin.x, y: coin.y }))
+            coins: game.coins.map(coin => ({ x: coin.x, y: coin.y })),
+            viruses: game.viruses.map(virus => ({ x: virus.x, y: virus.y }))
           })
           
           // Update other game stats
