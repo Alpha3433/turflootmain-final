@@ -75,11 +75,11 @@ export default function TurfLootTactical() {
       
       return {
         leftEye: { 
-          x: 18 + eyeOffsetX, 
+          x: 25 + eyeOffsetX, // Moved closer to center (was 18)
           y: 22 + eyeOffsetY 
         },
         rightEye: { 
-          x: 54 + eyeOffsetX, 
+          x: 47 + eyeOffsetX, // Moved closer to center (was 54)
           y: 22 + eyeOffsetY 
         }
       }
