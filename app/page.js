@@ -1299,7 +1299,13 @@ export default function TurfLootTactical() {
           // Update current skin display
           const currentSkinPreview = modal.querySelector('#current-skin-preview')
           const currentSkinName = modal.querySelector('#current-skin-name')
-          currentSkinPreview.textContent = skin.preview
+          
+          // Update preview with actual character appearance
+          currentSkinPreview.style.background = skin.color
+          currentSkinPreview.innerHTML = `
+            <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; left: 16px; top: 20px;"></div>
+            <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; right: 16px; top: 20px;"></div>
+          `
           currentSkinName.textContent = skin.name
           
           console.log('🎨 Equipped skin:', skin.name)
