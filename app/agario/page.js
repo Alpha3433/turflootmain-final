@@ -845,175 +845,66 @@ const AgarIOGame = () => {
             💰 Live Leaderboard
           </div>
           
-          {/* Player Rankings */}
+          {/* Player Rankings - Dynamic Leaderboard */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '10px' }}>
-            {/* 1st Place */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              padding: '4px 8px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ 
-                  color: '#ffdd44', 
-                  fontSize: '12px', 
-                  fontWeight: '700',
-                  marginRight: '8px'
+            {(() => {
+              if (!gameRef.current) return null;
+              
+              // Create leaderboard data combining player and enemies
+              const leaderboardData = [
+                {
+                  name: 'You',
+                  score: score,
+                  isPlayer: true
+                },
+                ...gameRef.current.enemies.map((enemy, index) => ({
+                  name: enemy.name,
+                  score: Math.floor(enemy.mass - 20), // Convert mass to score like player
+                  isPlayer: false
+                }))
+              ];
+              
+              // Sort by score in descending order
+              leaderboardData.sort((a, b) => b.score - a.score);
+              
+              // Take top 5 players
+              return leaderboardData.slice(0, 5).map((player, index) => (
+                <div key={player.name} style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  padding: '4px 8px',
+                  backgroundColor: player.isPlayer ? 'rgba(0, 255, 255, 0.1)' : 'transparent',
+                  borderRadius: '4px',
+                  border: player.isPlayer ? '1px solid rgba(0, 255, 255, 0.3)' : 'none'
                 }}>
-                  #1
-                </span>
-                <span style={{ 
-                  color: '#ffffff', 
-                  fontSize: '12px', 
-                  fontWeight: '600' 
-                }}>
-                  Player 13
-                </span>
-              </div>
-              <span style={{ 
-                color: '#00ff88', 
-                fontSize: '12px', 
-                fontWeight: '700'
-              }}>
-                $277
-              </span>
-            </div>
-            
-            {/* 2nd Place - You (highlighted) */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              padding: '4px 8px',
-              border: '1px solid #00ffff',
-              borderRadius: '4px',
-              backgroundColor: 'rgba(0, 255, 255, 0.1)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ 
-                  color: '#ffffff', 
-                  fontSize: '12px', 
-                  fontWeight: '700',
-                  marginRight: '8px'
-                }}>
-                  #2
-                </span>
-                <span style={{ 
-                  color: '#00ffff', 
-                  fontSize: '12px', 
-                  fontWeight: '700' 
-                }}>
-                  You
-                </span>
-              </div>
-              <span style={{ 
-                color: '#00ff88', 
-                fontSize: '12px', 
-                fontWeight: '700'
-              }}>
-                ${score}
-              </span>
-            </div>
-            
-            {/* 3rd Place */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              padding: '4px 8px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ 
-                  color: '#ff8844', 
-                  fontSize: '12px', 
-                  fontWeight: '700',
-                  marginRight: '8px'
-                }}>
-                  #3
-                </span>
-                <span style={{ 
-                  color: '#ffffff', 
-                  fontSize: '12px', 
-                  fontWeight: '600' 
-                }}>
-                  Player 14
-                </span>
-              </div>
-              <span style={{ 
-                color: '#00ff88', 
-                fontSize: '12px', 
-                fontWeight: '700'
-              }}>
-                $196
-              </span>
-            </div>
-            
-            {/* 4th Place */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              padding: '4px 8px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ 
-                  color: '#aaaaaa', 
-                  fontSize: '12px', 
-                  fontWeight: '700',
-                  marginRight: '8px'
-                }}>
-                  #4
-                </span>
-                <span style={{ 
-                  color: '#ffffff', 
-                  fontSize: '12px', 
-                  fontWeight: '600' 
-                }}>
-                  Player 2
-                </span>
-              </div>
-              <span style={{ 
-                color: '#00ff88', 
-                fontSize: '12px', 
-                fontWeight: '700'
-              }}>
-                $193
-              </span>
-            </div>
-            
-            {/* 5th Place */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              padding: '4px 8px'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ 
-                  color: '#aaaaaa', 
-                  fontSize: '12px', 
-                  fontWeight: '700',
-                  marginRight: '8px'
-                }}>
-                  #5
-                </span>
-                <span style={{ 
-                  color: '#ffffff', 
-                  fontSize: '12px', 
-                  fontWeight: '600' 
-                }}>
-                  Player 12
-                </span>
-              </div>
-              <span style={{ 
-                color: '#00ff88', 
-                fontSize: '12px', 
-                fontWeight: '700'
-              }}>
-                $177
-              </span>
-            </div>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <span style={{ 
+                      color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
+                      fontSize: '12px', 
+                      fontWeight: '700',
+                      marginRight: '8px'
+                    }}>
+                      #{index + 1}
+                    </span>
+                    <span style={{ 
+                      color: player.isPlayer ? '#00ffff' : '#ffffff', 
+                      fontSize: '12px', 
+                      fontWeight: '600' 
+                    }}>
+                      {player.name}
+                    </span>
+                  </div>
+                  <span style={{ 
+                    color: '#00ff88', 
+                    fontSize: '12px', 
+                    fontWeight: '700'
+                  }}>
+                    ${player.score}
+                  </span>
+                </div>
+              ));
+            })()}
           </div>
           
           {/* Players in game counter */}
