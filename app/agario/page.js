@@ -450,6 +450,12 @@ const AgarIOGame = () => {
             setEliminations(prev => prev + 1)
             setMass(this.player.mass)
             
+            // Update mission progress for elimination
+            if (typeof updateMissionProgress === 'function') {
+              updateMissionProgress('elimination', 1)
+              updateMissionProgress('mass_reached', this.player.mass)
+            }
+            
             // Respawn enemy
             enemy.mass = 15 + Math.random() * 40
             enemy.radius = Math.sqrt(enemy.mass) * 3
