@@ -1061,6 +1061,27 @@ const AgarIOGame = () => {
               />
             ))}
             
+            {/* Virus dots on minimap - using state data */}
+            {minimapData.viruses.map((virus, i) => (
+              <div
+                key={`virus-${i}`}
+                style={{
+                  position: 'absolute',
+                  width: '8px',
+                  height: '8px',
+                  backgroundColor: '#00ff41',
+                  borderRadius: '50%',
+                  left: `${(virus.x / 4000) * 210 + 5}px`,
+                  top: `${(virus.y / 4000) * 210 + 5}px`,
+                  transform: 'translate(-50%, -50%)',
+                  opacity: '1',
+                  border: '1px solid #00aa00',
+                  boxShadow: '0 0 6px rgba(0, 255, 65, 0.8)',
+                  zIndex: 6
+                }}
+              />
+            ))}
+            
             {/* Border spikes effect overlay */}
             <div style={{
               position: 'absolute',
