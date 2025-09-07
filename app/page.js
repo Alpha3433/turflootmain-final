@@ -3238,18 +3238,6 @@ export default function TurfLootTactical() {
             </div>
           </div>
 
-          {/* Mobile Stats - Moved above stakes */}
-          <div style={statsStyle}>
-            <div style={statItemStyle}>
-              <div style={statNumberStyle}>{liveStats.players}</div>
-              <div style={statLabelStyle}>PLAYERS</div>
-            </div>
-            <div style={statItemStyle}>
-              <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
-              <div style={statLabelStyle}>TOTAL WINNINGS</div>
-            </div>
-          </div>
-
           {/* Stakes */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', justifyContent: 'center' }}>
             {['$1', '$5', '$20'].map((stake) => (
