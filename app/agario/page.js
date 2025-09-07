@@ -537,46 +537,147 @@ const AgarIOGame = () => {
 
       {/* DESKTOP HUD UI Elements - Always Visible */}
       <div>
-        {/* Leaderboard - Top Left (moved from right, updated font) */}
+        {/* Leaderboard - Top Left (redesigned to match landing page) */}
         <div 
           style={{ 
             position: 'fixed', 
             top: '10px', 
             left: '10px', 
             zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #333',
-            borderRadius: '4px',
-            padding: '8px 12px',
-            minWidth: '140px',
-            fontFamily: '"Rajdhani", sans-serif'
+            backgroundColor: 'rgba(26, 32, 44, 0.95)',
+            border: '1px solid rgba(104, 211, 145, 0.3)',
+            borderRadius: '12px',
+            padding: '16px',
+            minWidth: '180px',
+            fontFamily: '"Rajdhani", sans-serif',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
           }}
         >
+          {/* Header */}
           <div style={{ 
-            color: '#fff', 
-            fontSize: '14px', 
+            color: '#68d391', 
+            fontSize: '16px', 
             fontWeight: '700', 
-            marginBottom: '6px',
+            marginBottom: '12px',
             textAlign: 'center',
-            borderBottom: '1px solid #555',
-            paddingBottom: '4px',
             textTransform: 'uppercase',
-            letterSpacing: '0.5px'
+            letterSpacing: '1px',
+            background: 'rgba(104, 211, 145, 0.1)',
+            padding: '8px',
+            borderRadius: '6px',
+            border: '1px solid rgba(104, 211, 145, 0.2)'
           }}>
-            LEADERBOARD
+            🏆 LEADERBOARD
           </div>
-          <div style={{ fontSize: '12px', color: '#ccc', fontWeight: '600' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-              <span>1. Player</span>
-              <span style={{ color: '#4CAF50', fontWeight: '700' }}>{score}</span>
+          
+          {/* Player Rankings */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {/* 1st Place */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              padding: '8px 12px',
+              background: 'rgba(45, 55, 72, 0.4)',
+              borderRadius: '6px',
+              borderLeft: '3px solid #ffd700'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ 
+                  color: '#ffd700', 
+                  fontSize: '16px', 
+                  fontWeight: '700' 
+                }}>
+                  #1
+                </span>
+                <span style={{ 
+                  color: '#e2e8f0', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>
+                  Player
+                </span>
+              </div>
+              <span style={{ 
+                color: '#68d391', 
+                fontSize: '16px', 
+                fontWeight: '700',
+                background: 'rgba(104, 211, 145, 0.2)',
+                padding: '2px 8px',
+                borderRadius: '4px'
+              }}>
+                {score}
+              </span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-              <span>2. Bot_1</span>
-              <span style={{ fontWeight: '700' }}>150</span>
+            
+            {/* 2nd Place */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              padding: '8px 12px',
+              background: 'rgba(26, 32, 44, 0.4)',
+              borderRadius: '6px',
+              borderLeft: '3px solid #c0c0c0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ 
+                  color: '#c0c0c0', 
+                  fontSize: '16px', 
+                  fontWeight: '700' 
+                }}>
+                  #2
+                </span>
+                <span style={{ 
+                  color: '#e2e8f0', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>
+                  Bot_1
+                </span>
+              </div>
+              <span style={{ 
+                color: '#a0aec0', 
+                fontSize: '16px', 
+                fontWeight: '700' 
+              }}>
+                150
+              </span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>3. Bot_2</span>
-              <span style={{ fontWeight: '700' }}>100</span>
+            
+            {/* 3rd Place */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              padding: '8px 12px',
+              background: 'rgba(45, 55, 72, 0.4)',
+              borderRadius: '6px',
+              borderLeft: '3px solid #cd7f32'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ 
+                  color: '#cd7f32', 
+                  fontSize: '16px', 
+                  fontWeight: '700' 
+                }}>
+                  #3
+                </span>
+                <span style={{ 
+                  color: '#e2e8f0', 
+                  fontSize: '14px', 
+                  fontWeight: '600' 
+                }}>
+                  Bot_2
+                </span>
+              </div>
+              <span style={{ 
+                color: '#a0aec0', 
+                fontSize: '16px', 
+                fontWeight: '700' 
+              }}>
+                100
+              </span>
             </div>
           </div>
         </div>
