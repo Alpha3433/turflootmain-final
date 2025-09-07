@@ -831,7 +831,112 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Ping Latency Meter - Bottom Left */}
+        {/* Circular Minimap - Top Right (matching reference) */}
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          width: '150px',
+          height: '150px'
+        }}>
+          {/* Minimap Container */}
+          <div style={{
+            width: '150px',
+            height: '150px',
+            borderRadius: '50%',
+            backgroundColor: '#000000',
+            border: '3px solid #00ff00',
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 0 20px rgba(0, 255, 0, 0.4)'
+          }}>
+            {/* Green spiky border effect */}
+            <div style={{
+              position: 'absolute',
+              top: '-2px',
+              left: '-2px',
+              right: '-2px',
+              bottom: '-2px',
+              borderRadius: '50%',
+              background: `conic-gradient(
+                #00ff00 0deg, #00dd00 10deg, #00ff00 20deg, #00ee00 30deg,
+                #00ff00 40deg, #00cc00 50deg, #00ff00 60deg, #00dd00 70deg,
+                #00ff00 80deg, #00ee00 90deg, #00ff00 100deg, #00dd00 110deg,
+                #00ff00 120deg, #00cc00 130deg, #00ff00 140deg, #00ee00 150deg,
+                #00ff00 160deg, #00dd00 170deg, #00ff00 180deg, #00cc00 190deg,
+                #00ff00 200deg, #00ee00 210deg, #00ff00 220deg, #00dd00 230deg,
+                #00ff00 240deg, #00cc00 250deg, #00ff00 260deg, #00ee00 270deg,
+                #00ff00 280deg, #00dd00 290deg, #00ff00 300deg, #00cc00 310deg,
+                #00ff00 320deg, #00ee00 330deg, #00ff00 340deg, #00dd00 350deg
+              )`,
+              zIndex: -1
+            }} />
+            
+            {/* Player dot on minimap */}
+            <div style={{
+              position: 'absolute',
+              width: '8px',
+              height: '8px',
+              backgroundColor: '#60a5fa',
+              borderRadius: '50%',
+              left: `${((gameRef.current?.player?.x || 2000) / 4000) * 140 + 5}px`,
+              top: `${((gameRef.current?.player?.y || 2000) / 4000) * 140 + 5}px`,
+              transform: 'translate(-50%, -50%)',
+              border: '2px solid #ffffff',
+              boxShadow: '0 0 8px rgba(96, 165, 250, 0.8)',
+              zIndex: 10
+            }} />
+            
+            {/* Enemy dots on minimap */}
+            {gameRef.current?.enemies?.map((enemy, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  width: '4px',
+                  height: '4px',
+                  backgroundColor: '#ff6b6b',
+                  borderRadius: '50%',
+                  left: `${(enemy.x / 4000) * 140 + 5}px`,
+                  top: `${(enemy.y / 4000) * 140 + 5}px`,
+                  transform: 'translate(-50%, -50%)',
+                  opacity: '0.8'
+                }}
+              />
+            ))}
+            
+            {/* Coin dots on minimap */}
+            {gameRef.current?.coins?.map((coin, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  width: '3px',
+                  height: '3px',
+                  backgroundColor: '#ffd700',
+                  borderRadius: '50%',
+                  left: `${(coin.x / 4000) * 140 + 5}px`,
+                  top: `${(coin.y / 4000) * 140 + 5}px`,
+                  transform: 'translate(-50%, -50%)',
+                  opacity: '0.9'
+                }}
+              />
+            ))}
+            
+            {/* Border spikes effect overlay */}
+            <div style={{
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              right: '0',
+              bottom: '0',
+              borderRadius: '50%',
+              border: '2px solid rgba(0, 255, 0, 0.6)',
+              boxShadow: 'inset 0 0 15px rgba(0, 255, 0, 0.3)'
+            }} />
+          </div>
+        </div>
         <div style={{
           position: 'fixed',
           bottom: '10px',
