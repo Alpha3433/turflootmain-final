@@ -194,7 +194,7 @@ class CashOutBackendTester:
         """Test 4: Verify server browser works for game discovery"""
         try:
             start_time = time.time()
-            response = requests.get(f"{API_BASE}/servers", timeout=10)
+            response = requests.get(f"{API_BASE}/servers/lobbies", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
