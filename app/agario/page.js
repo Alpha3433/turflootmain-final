@@ -426,6 +426,43 @@ const AgarIOGame = () => {
       this.ctx.fillText(Math.floor(player.mass), player.x, player.y + 4)
     }
 
+    drawVirus(virus) {
+      // Draw virus with spiky appearance
+      this.ctx.save()
+      this.ctx.translate(virus.x, virus.y)
+      
+      // Draw spikes
+      this.ctx.beginPath()
+      for (let i = 0; i < virus.spikes; i++) {
+        const angle = (i / virus.spikes) * Math.PI * 2
+        const spikeLength = virus.radius + 8
+        const innerRadius = virus.radius - 5
+        
+        if (i === 0) {
+          this.ctx.moveTo(Math.cos(angle) * spikeLength, Math.sin(angle) * spikeLength)
+        } else {
+          this.ctx.lineTo(Math.cos(angle) * spikeLength, Math.sin(angle) * spikeLength)
+        }
+        
+        const nextAngle = ((i + 0.5) / virus.spikes) * Math.PI * 2
+        this.ctx.lineTo(Math.cos(nextAngle) * innerRadius, Math.sin(nextAngle) * innerRadius)
+      }
+      this.ctx.closePath()
+      this.ctx.fillStyle = virus.color
+      this.ctx.fill()
+      this.ctx.strokeStyle = '#00AA00'
+      this.ctx.lineWidth = 2
+      this.ctx.stroke()
+      
+      // Draw inner circle
+      this.ctx.beginPath()
+      this.ctx.arc(0, 0, virus.radius - 10, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#004400'
+      this.ctx.fill()
+      
+      this.ctx.restore()
+    }
+
     start() {
       this.running = true
       setGameStarted(true)
