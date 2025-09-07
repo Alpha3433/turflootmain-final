@@ -653,6 +653,52 @@ export async function GET(request, { params }) {
       }
     }
 
+    // Live Parties endpoint - Returns actual user-created lobbies
+    if (route === 'parties/live') {
+      try {
+        const db = await getDb()
+        const parties = db.collection('parties')
+        
+        // Get all active parties created by users
+        const activeParties = await parties.find({
+          status: 'active',
+          expires_at: { $gt: new Date() }
+        })
+        .sort({ created_at: -1 })
+        .limit(20)
+        .toArray()
+        
+        // Format parties for frontend
+        const formattedParties = activeParties.map(party => ({
+          id: party._id.toString(),
+          name: party.name,
+          host: party.host_username || party.host_name || 'Anonymous',
+          members: party.current_members || 0,
+          maxMembers: party.max_members || 4,
+          privacy: party.privacy || 'public',
+          created_at: party.created_at,
+          region: party.region || 'global',
+          game_mode: party.game_mode || 'classic'
+        }))
+        
+        return NextResponse.json({
+          success: true,
+          parties: formattedParties,
+          total: formattedParties.length,
+          timestamp: new Date().toISOString()
+        }, { headers: corsHeaders })
+        
+      } catch (error) {
+        console.error('Error fetching live parties:', error)
+        return NextResponse.json({
+          success: false,
+          error: 'Failed to fetch live parties',
+          parties: [],
+          total: 0
+        }, { headers: corsHeaders })
+      }
+    }
+
     // Leaderboard endpoint
     if (route === 'users/leaderboard') {
       try {
