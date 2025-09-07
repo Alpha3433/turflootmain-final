@@ -22,6 +22,33 @@ const AgarIOGame = () => {
   const [completedMissions, setCompletedMissions] = useState([])
   const [activeMissions, setActiveMissions] = useState([])
   const [showMissionComplete, setShowMissionComplete] = useState(null)
+
+  // Mission definitions
+  const missionTypes = [
+    { id: 'collect_coins_10', name: 'Coin Hunter I', description: 'Collect 10 coins', target: 10, reward: 50, icon: '🪙' },
+    { id: 'collect_coins_25', name: 'Coin Hunter II', description: 'Collect 25 coins', target: 25, reward: 100, icon: '🪙' },
+    { id: 'collect_coins_50', name: 'Coin Master', description: 'Collect 50 coins', target: 50, reward: 200, icon: '💰' },
+    { id: 'reach_mass_50', name: 'Growing Strong', description: 'Reach 50 mass', target: 50, reward: 75, icon: '💪' },
+    { id: 'reach_mass_100', name: 'Heavy Weight', description: 'Reach 100 mass', target: 100, reward: 150, icon: '🏋️' },
+    { id: 'eliminate_1', name: 'First Blood', description: 'Eliminate 1 enemy', target: 1, reward: 100, icon: '⚔️' },
+    { id: 'eliminate_3', name: 'Warrior', description: 'Eliminate 3 enemies', target: 3, reward: 250, icon: '🗡️' },
+    { id: 'survive_60', name: 'Survivor', description: 'Survive for 60 seconds', target: 60, reward: 100, icon: '⏰' },
+    { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
+  ]
+
+  // Initialize missions when game starts
+  useEffect(() => {
+    if (gameStarted && activeMissions.length === 0) {
+      // Assign 3 random missions when game starts
+      const shuffled = [...missionTypes].sort(() => 0.5 - Math.random())
+      const selectedMissions = shuffled.slice(0, 3).map(mission => ({
+        ...mission,
+        progress: 0,
+        completed: false
+      }))
+      setActiveMissions(selectedMissions)
+    }
+  }, [gameStarted])
   
   // Cash out state
   const [cashOutProgress, setCashOutProgress] = useState(0)
