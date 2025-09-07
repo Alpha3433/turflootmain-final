@@ -1138,7 +1138,7 @@ export default function TurfLootTactical() {
           <div style="display: flex; align-items: center; gap: 16px;">
             <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: rgba(246, 173, 85, 0.1); border: 1px solid #f6ad55; border-radius: 8px;">
               <div style="color: #f6ad55; font-size: 20px;">💰</div>
-              <div style="color: #f6ad55; font-size: 18px; font-weight: 700;" id="player-coins">${currency}</div>
+              <div style="color: #f6ad55; font-size: 18px; font-weight: 700;" id="player-coins">${currentCurrency}</div>
             </div>
             <button id="close-skin-store" style="background: rgba(246, 173, 85, 0.2); border: 2px solid #f6ad55; border-radius: 8px; padding: 12px; color: #f6ad55; cursor: pointer; font-size: 24px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
               ✕
