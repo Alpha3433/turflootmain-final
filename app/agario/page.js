@@ -206,7 +206,7 @@ const AgarIOGame = () => {
           y: y,
           radius: 8,
           color: '#FFD700',
-          value: 1
+          value: 5 // Increased from 1 to 5 for better mass gain
         })
       }
     }
