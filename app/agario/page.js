@@ -461,7 +461,6 @@ const AgarIOGame = () => {
   }
 
   return (
-  return (
     <div className="fixed inset-0 bg-black overflow-hidden">
       {/* Game Canvas - Base Layer */}
       <canvas
