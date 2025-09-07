@@ -4255,6 +4255,18 @@ export default function TurfLootTactical() {
 
         {/* Mobile Game Controls */}
         <div style={centerControlsStyle}>
+          {/* Mobile Stats - Moved above username input */}
+          <div style={statsStyle}>
+            <div style={statItemStyle}>
+              <div style={statNumberStyle}>{liveStats.players}</div>
+              <div style={statLabelStyle}>PLAYERS</div>
+            </div>
+            <div style={statItemStyle}>
+              <div style={statNumberStyle}>${liveStats.winnings.toLocaleString()}</div>
+              <div style={statLabelStyle}>TOTAL WINNINGS</div>
+            </div>
+          </div>
+
           {/* Player Name Input */}
           <div style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '20px' }}>
