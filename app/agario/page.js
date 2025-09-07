@@ -103,7 +103,7 @@ const AgarIOGame = () => {
           radius: Math.sqrt(mass) * 3,
           color: colors[i % colors.length],
           name: `Player ${i + 2}`,
-          speed: Math.max(0.3, 86 / Math.sqrt(mass)), // Authentic Agar.io speed formula
+          speed: Math.max(0.3, 50 / Math.sqrt(mass)), // Reduced from 86 to 50 for slower, more controlled movement
           targetX: Math.random() * this.world.width,
           targetY: Math.random() * this.world.height,
           lastTargetChange: Date.now()
