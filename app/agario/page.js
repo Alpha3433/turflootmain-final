@@ -878,6 +878,176 @@ const AgarIOGame = () => {
         }}>
           <div style={{ color: '#4CAF50', fontWeight: 'bold' }}>#{mass} FPS</div>
         </div>
+
+        {/* Game Over Popup */}
+        {gameOver && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999999,
+            pointerEvents: 'auto'
+          }}>
+            <div style={{
+              backgroundColor: '#1a202c',
+              border: '3px solid #ff4444',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '90%',
+              padding: '0',
+              color: 'white',
+              boxShadow: '0 0 50px rgba(255, 68, 68, 0.5)',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '2px solid #ff4444',
+                background: 'linear-gradient(45deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 68, 68, 0.05) 100%)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  background: 'linear-gradient(45deg, #ff4444 0%, #cc3333 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '30px',
+                  margin: '0 auto 16px'
+                }}>
+                  💀
+                </div>
+                <h2 style={{
+                  color: '#ff4444',
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  margin: '0 0 8px',
+                  textTransform: 'uppercase',
+                  textShadow: '0 0 10px rgba(255, 68, 68, 0.6)'
+                }}>
+                  GAME OVER
+                </h2>
+                <p style={{
+                  color: '#e2e8f0',
+                  fontSize: '16px',
+                  margin: '0',
+                  opacity: '0.8'
+                }}>
+                  Your operative has been eliminated!
+                </p>
+              </div>
+
+              {/* Stats */}
+              <div style={{ padding: '24px' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '16px',
+                  marginBottom: '24px'
+                }}>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>
+                      ${score}
+                    </div>
+                    <div style={{ color: '#a0aec0', fontSize: '14px' }}>Final Score</div>
+                  </div>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ color: '#60a5fa', fontSize: '24px', fontWeight: '700' }}>
+                      {mass} KG
+                    </div>
+                    <div style={{ color: '#a0aec0', fontSize: '14px' }}>Final Mass</div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  flexDirection: 'column'
+                }}>
+                  <button
+                    onClick={handleRestart}
+                    style={{
+                      backgroundColor: '#68d391',
+                      border: '2px solid #48bb78',
+                      borderRadius: '8px',
+                      color: '#1a202c',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      padding: '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#48bb78'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#68d391'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    🔄 Play Again
+                  </button>
+                  <button
+                    onClick={() => window.location.href = '/'}
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '2px solid #a0aec0',
+                      borderRadius: '8px',
+                      color: '#a0aec0',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      padding: '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#a0aec0'
+                      e.target.style.color = '#1a202c'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#a0aec0'
+                    }}
+                  >
+                    🏠 Back to Lobby
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
 
