@@ -187,7 +187,7 @@ const AgarIOGame = () => {
       this.updateCamera()
       
       // Maintain coin count
-      while (this.coins.length < 100) {
+      while (this.coins.length < 250) { // Increased from 100 to 250 to match generateCoins()
         const centerX = this.world.width / 2  // 2000
         const centerY = this.world.height / 2 // 2000
         const playableRadius = 1800 // Same as boundary radius
