@@ -796,7 +796,7 @@ const AgarIOGame = () => {
             🔥 Hold E to Cash Out (${score})
           </div>
 
-          {/* Split Button - Right of Cash Out */}
+          {/* Split Button - Same height as Cash Out */}
           <div 
             onClick={handleSplit}
             style={{
@@ -804,10 +804,10 @@ const AgarIOGame = () => {
               border: '2px solid #ff0000',
               borderRadius: '8px',
               color: '#ffffff',
-              fontSize: '14px',
+              fontSize: '16px',
               fontWeight: '700',
               cursor: 'pointer',
-              padding: '10px 16px',
+              padding: '12px 24px',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -828,6 +828,38 @@ const AgarIOGame = () => {
             }}
           >
             ⚡ Split (S)
+          </div>
+        </div>
+
+        {/* Ping Latency Meter - Bottom Left */}
+        <div style={{
+          position: 'fixed',
+          bottom: '10px',
+          left: '10px',
+          zIndex: 1000,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          border: '2px solid #333',
+          borderRadius: '4px',
+          padding: '6px 10px',
+          fontSize: '11px',
+          color: '#ccc',
+          fontFamily: '"Rajdhani", sans-serif',
+          fontWeight: '600'
+        }}>
+          <div style={{ 
+            color: '#00ff88', 
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            <div style={{ 
+              width: '8px', 
+              height: '8px', 
+              backgroundColor: '#00ff88', 
+              borderRadius: '50%' 
+            }}></div>
+            <span>24ms</span>
           </div>
         </div>
 
