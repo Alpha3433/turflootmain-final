@@ -16,6 +16,14 @@ const AgarIOGame = () => {
   const [score, setScore] = useState(0)
   const [mass, setMass] = useState(20)
   const [eliminations, setEliminations] = useState(0)
+  
+  // Minimap state for real-time updates
+  const [minimapData, setMinimapData] = useState({
+    playerX: 2000,
+    playerY: 2000,
+    enemies: [],
+    coins: []
+  })
 
   // Game Engine Class
   class GameEngine {
