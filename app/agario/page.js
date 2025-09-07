@@ -750,78 +750,86 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Action Buttons - Bottom Right */}
+        {/* Action Buttons - Center of Page */}
         <div style={{ 
           position: 'fixed', 
-          bottom: '20px', 
-          right: '20px', 
+          top: '50%', 
+          left: '50%', 
+          transform: 'translate(-50%, -50%)', 
           zIndex: 1000, 
           display: 'flex', 
-          gap: '16px' 
+          gap: '20px',
+          pointerEvents: 'none'
         }}>
           <button 
             onClick={handleSplit}
             style={{
-              width: '112px',
-              height: '112px',
+              width: '80px',
+              height: '80px',
               background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
-              border: '4px solid #60a5fa',
-              borderRadius: '50%',
+              border: '3px solid #60a5fa',
+              borderRadius: '12px',
               color: 'white',
               fontWeight: 'bold',
-              fontSize: '14px',
+              fontSize: '12px',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)',
+              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
               backdropFilter: 'blur(8px)',
-              transition: 'all 200ms'
+              transition: 'all 200ms',
+              pointerEvents: 'auto'
             }}
             onMouseOver={(e) => {
               e.target.style.transform = 'scale(1.05)'
               e.target.style.background = 'linear-gradient(135deg, #1d4ed8, #2563eb)'
+              e.target.style.boxShadow = '0 12px 20px rgba(0, 0, 0, 0.5)'
             }}
             onMouseOut={(e) => {
               e.target.style.transform = 'scale(1)'
               e.target.style.background = 'linear-gradient(135deg, #2563eb, #3b82f6)'
+              e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.4)'
             }}
           >
-            <span style={{ fontSize: '32px', marginBottom: '4px' }}>⚡</span>
-            <span style={{ fontSize: '12px' }}>SPLIT</span>
+            <span style={{ fontSize: '24px', marginBottom: '4px' }}>⚡</span>
+            <span style={{ fontSize: '11px', fontWeight: 'bold' }}>SPLIT</span>
           </button>
           <button 
             style={{
-              width: '112px',
-              height: '112px',
+              width: '80px',
+              height: '80px',
               background: 'linear-gradient(135deg, #d97706, #f59e0b)',
-              border: '4px solid #fbbf24',
-              borderRadius: '50%',
+              border: '3px solid #fbbf24',
+              borderRadius: '12px',
               color: 'white',
               fontWeight: 'bold',
-              fontSize: '14px',
+              fontSize: '12px',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)',
+              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.4)',
               backdropFilter: 'blur(8px)',
-              transition: 'all 200ms'
+              transition: 'all 200ms',
+              pointerEvents: 'auto'
             }}
             onMouseOver={(e) => {
               e.target.style.transform = 'scale(1.05)'
               e.target.style.background = 'linear-gradient(135deg, #b45309, #d97706)'
+              e.target.style.boxShadow = '0 12px 20px rgba(0, 0, 0, 0.5)'
             }}
             onMouseOut={(e) => {
               e.target.style.transform = 'scale(1)'
               e.target.style.background = 'linear-gradient(135deg, #d97706, #f59e0b)'
+              e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.4)'
             }}
           >
-            <span style={{ fontSize: '32px', marginBottom: '4px' }}>💰</span>
-            <span style={{ fontSize: '12px' }}>CASH</span>
-            <span style={{ fontSize: '10px' }}>${score}</span>
+            <span style={{ fontSize: '24px', marginBottom: '4px' }}>💰</span>
+            <span style={{ fontSize: '11px', fontWeight: 'bold' }}>CASH</span>
+            <span style={{ fontSize: '9px', fontWeight: '500' }}>${score}</span>
           </button>
         </div>
       </div>
