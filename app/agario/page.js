@@ -655,26 +655,13 @@ const AgarIOGame = () => {
   // Cash out handling
   const cashOutIntervalRef = useRef(null)
   
+  // Cash out key event handlers (separated from the interval logic)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameStarted) {
         console.log('Starting cash out process') // Debug log
         setIsCashingOut(true)
         setCashOutProgress(0)
-        
-        // Start the 5-second fill animation
-        cashOutIntervalRef.current = setInterval(() => {
-          setCashOutProgress(prev => {
-            console.log('Progress:', prev) // Debug log
-            if (prev >= 100) {
-              clearInterval(cashOutIntervalRef.current)
-              setIsCashingOut(false)
-              setCashOutComplete(true)
-              return 100
-            }
-            return prev + 2 // 2% every 100ms = 5 seconds total
-          })
-        }, 100)
       }
     }
     
@@ -697,12 +684,38 @@ const AgarIOGame = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [isCashingOut, cashOutComplete, gameStarted])
+  
+  // Cash out progress interval (separate effect)
+  useEffect(() => {
+    if (isCashingOut && !cashOutComplete) {
+      console.log('Starting progress interval') // Debug log
+      
+      // Start the 5-second fill animation
+      cashOutIntervalRef.current = setInterval(() => {
+        setCashOutProgress(prev => {
+          console.log('Progress update:', prev) // Debug log
+          if (prev >= 100) {
+            clearInterval(cashOutIntervalRef.current)
+            cashOutIntervalRef.current = null
+            setIsCashingOut(false)
+            setCashOutComplete(true)
+            return 100
+          }
+          return prev + 2 // 2% every 100ms = 5 seconds total
+        })
+      }, 100)
+    }
+    
+    // Cleanup interval if not cashing out
+    return () => {
       if (cashOutIntervalRef.current) {
         clearInterval(cashOutIntervalRef.current)
         cashOutIntervalRef.current = null
       }
     }
-  }, [isCashingOut, cashOutComplete, gameStarted])
+  }, [isCashingOut, cashOutComplete])
 
   // Mission timer
   useEffect(() => {
