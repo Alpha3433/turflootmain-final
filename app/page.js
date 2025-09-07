@@ -1370,7 +1370,7 @@ export default function TurfLootTactical() {
           }))
           
           console.log('🎨 Equipped skin:', skin.name)
-          alert(`Equipped ${skin.name}!`)
+          // Removed popup notification for smoother UX
           
           renderSkins() // Re-render to update equipped status
         })
