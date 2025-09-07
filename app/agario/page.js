@@ -748,81 +748,18 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Timer - Bottom Center */}
-        <div 
-          style={{ 
-            position: 'fixed', 
-            bottom: '60px', 
-            left: '50%', 
-            transform: 'translateX(-50%)', 
-            zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #333',
-            borderRadius: '4px',
-            padding: '6px 12px'
-          }}
-        >
-          <div style={{ 
-            color: '#fff', 
-            fontSize: '14px', 
-            fontWeight: 'bold',
-            textAlign: 'center',
-            fontFamily: 'monospace'
-          }}>
-            {gameStarted ? formatTime(missionTime) : '1:00'}
-          </div>
-        </div>
-
         {/* Action Buttons - Matching Reference Style */}
         
-        {/* Split Button - Bottom Left */}
-        <div style={{
-          position: 'fixed',
-          bottom: '10px',
-          left: '10px',
-          zIndex: 1000
-        }}>
-          <div 
-            onClick={handleSplit}
-            style={{
-              backgroundColor: 'rgba(255, 0, 0, 0.9)',
-              border: '2px solid #ff0000',
-              borderRadius: '8px',
-              color: '#ffffff',
-              fontSize: '14px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              padding: '10px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 150ms',
-              pointerEvents: 'auto',
-              fontFamily: '"Rajdhani", sans-serif',
-              boxShadow: '0 4px 12px rgba(255, 0, 0, 0.3)'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 50, 50, 0.95)'
-              e.target.style.transform = 'translateY(-2px)'
-              e.target.style.boxShadow = '0 6px 20px rgba(255, 0, 0, 0.4)'
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 0, 0, 0.9)'
-              e.target.style.transform = 'translateY(0)'
-              e.target.style.boxShadow = '0 4px 12px rgba(255, 0, 0, 0.3)'
-            }}
-          >
-            ⚡ Split (S)
-          </div>
-        </div>
-
         {/* Cash Out Button - Bottom Center */}
         <div style={{
           position: 'fixed',
           bottom: '10px',
           left: '50%',
           transform: 'translateX(-50%)',
-          zIndex: 1000
+          zIndex: 1000,
+          display: 'flex',
+          gap: '12px',
+          alignItems: 'center'
         }}>
           <div 
             style={{
@@ -857,6 +794,40 @@ const AgarIOGame = () => {
             }}
           >
             🔥 Hold E to Cash Out (${score})
+          </div>
+
+          {/* Split Button - Right of Cash Out */}
+          <div 
+            onClick={handleSplit}
+            style={{
+              backgroundColor: 'rgba(255, 0, 0, 0.9)',
+              border: '2px solid #ff0000',
+              borderRadius: '8px',
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              padding: '10px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 150ms',
+              pointerEvents: 'auto',
+              fontFamily: '"Rajdhani", sans-serif',
+              boxShadow: '0 4px 12px rgba(255, 0, 0, 0.3)'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 50, 50, 0.95)'
+              e.target.style.transform = 'translateY(-2px)'
+              e.target.style.boxShadow = '0 6px 20px rgba(255, 0, 0, 0.4)'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 0, 0, 0.9)'
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 4px 12px rgba(255, 0, 0, 0.3)'
+            }}
+          >
+            ⚡ Split (S)
           </div>
         </div>
 
