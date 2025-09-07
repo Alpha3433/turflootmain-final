@@ -532,7 +532,7 @@ const AgarIOGame = () => {
       this.ctx.fillText(player.name, player.x, player.y - player.radius - 15)
       
       // Draw black eyes
-      const eyeRadius = Math.max(4, player.radius * 0.2) // Increased eye size
+      const eyeRadius = Math.max(2, player.radius * 0.12) // Made eyes smaller
       const eyeOffset = player.radius * 0.35 // Increased distance from center
       
       // Left eye
