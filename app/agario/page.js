@@ -493,213 +493,150 @@ const AgarIOGame = () => {
 
       {/* DESKTOP HUD UI Elements - Always Visible */}
       <div>
-        {/* Mission Timer - Top Center */}
+        {/* Mission Panel - Top Center - Minimalist Design */}
         <div 
           style={{ 
             position: 'fixed', 
-            top: '20px', 
+            top: '24px', 
             left: '50%', 
             transform: 'translateX(-50%)', 
             zIndex: 1000,
-            backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            border: '2px solid #8b5cf6',
-            borderRadius: '12px',
-            padding: '16px 24px',
-            backdropFilter: 'blur(12px)',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)',
-            minWidth: '300px'
+            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '16px',
+            padding: '20px 28px',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+            minWidth: '280px'
           }}
         >
           <div style={{ 
-            color: '#a78bfa', 
-            fontSize: '14px', 
-            fontWeight: 'bold', 
-            marginBottom: '8px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            gap: '8px' 
-          }}>
-            <span style={{ fontSize: '18px' }}>⚡</span>
-            <span>TACTICAL MISSION</span>
-          </div>
-          <div style={{ 
-            color: 'white', 
-            fontSize: '18px', 
-            fontWeight: 'bold', 
+            color: '#e2e8f0', 
+            fontSize: '13px', 
+            fontWeight: '500', 
             marginBottom: '12px', 
-            textAlign: 'center' 
+            textAlign: 'center',
+            letterSpacing: '0.05em'
           }}>
-            Survive for 60 seconds
+            SURVIVE FOR 60 SECONDS
           </div>
+          
           <div style={{ 
-            backgroundColor: '#374151', 
-            borderRadius: '9999px', 
-            height: '12px', 
+            backgroundColor: 'rgba(51, 65, 85, 0.6)', 
+            borderRadius: '12px', 
+            height: '8px', 
             marginBottom: '12px', 
             overflow: 'hidden',
-            border: '1px solid #4b5563'
+            position: 'relative'
           }}>
             <div 
               style={{ 
-                background: 'linear-gradient(to right, #8b5cf6, #a78bfa)',
-                height: '12px', 
-                borderRadius: '9999px', 
-                transition: 'width 1000ms',
+                background: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
+                height: '8px', 
+                borderRadius: '12px', 
+                transition: 'width 800ms ease-out',
                 width: `${gameStarted ? ((60 - missionTime) / 60) * 100 : 5}%`,
-                boxShadow: '0 0 10px rgba(139, 92, 246, 0.5)'
+                boxShadow: '0 0 16px rgba(59, 130, 246, 0.4)'
               }}
             />
           </div>
+          
           <div style={{ 
-            color: 'white', 
-            fontSize: '14px', 
+            color: '#cbd5e1', 
+            fontSize: '16px', 
             textAlign: 'center', 
             fontFamily: 'monospace',
-            backgroundColor: '#374151',
-            borderRadius: '6px',
-            padding: '4px 8px'
+            fontWeight: '600',
+            letterSpacing: '0.1em'
           }}>
-            {gameStarted ? formatTime(missionTime) : '1:00'}/01:00
+            {gameStarted ? formatTime(missionTime) : '1:00'}
           </div>
         </div>
 
-        {/* Player Stats - Top Left */}
+        {/* Status Panel - Top Left - Minimalist Design */}
         <div 
           style={{ 
             position: 'fixed', 
-            top: '20px', 
-            left: '20px', 
+            top: '24px', 
+            left: '24px', 
             zIndex: 1000,
-            backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            border: '2px solid #10b981',
-            borderRadius: '12px',
-            padding: '16px',
-            backdropFilter: 'blur(12px)',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)',
-            minWidth: '250px'
+            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '16px',
+            padding: '20px',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+            minWidth: '200px'
           }}
         >
-          <div style={{ 
-            color: '#34d399', 
-            fontSize: '14px', 
-            fontWeight: 'bold', 
-            marginBottom: '12px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px',
-            borderBottom: '1px solid #059669',
-            paddingBottom: '8px'
-          }}>
-            <span style={{ fontSize: '18px' }}>🎖️</span>
-            <span>OPERATIVE STATUS</span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
-              alignItems: 'center',
-              backgroundColor: '#374151',
-              borderRadius: '8px',
-              padding: '8px 12px'
+              alignItems: 'center'
             }}>
-              <span style={{ color: '#d1d5db', fontWeight: '500' }}>MASS:</span>
-              <span style={{ color: '#60a5fa', fontWeight: 'bold', fontSize: '18px' }}>{mass} KG</span>
+              <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>Mass</span>
+              <span style={{ color: '#e2e8f0', fontSize: '18px', fontWeight: '600' }}>{mass} KG</span>
             </div>
+            
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
-              alignItems: 'center',
-              backgroundColor: '#374151',
-              borderRadius: '8px',
-              padding: '8px 12px'
+              alignItems: 'center'
             }}>
-              <span style={{ color: '#d1d5db', fontWeight: '500' }}>ASSETS:</span>
-              <span style={{ color: '#34d399', fontWeight: 'bold', fontSize: '18px' }}>${score}</span>
+              <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>Assets</span>
+              <span style={{ color: '#10b981', fontSize: '18px', fontWeight: '600' }}>${score}</span>
             </div>
+            
             <div style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 
-              alignItems: 'center',
-              backgroundColor: '#374151',
-              borderRadius: '8px',
-              padding: '8px 12px'
+              alignItems: 'center'
             }}>
-              <span style={{ color: '#d1d5db', fontWeight: '500' }}>ELIMINATIONS:</span>
-              <span style={{ color: '#f87171', fontWeight: 'bold', fontSize: '18px' }}>{eliminations}</span>
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              backgroundColor: 'rgba(180, 83, 9, 0.3)',
-              border: '1px solid #d97706',
-              borderRadius: '8px',
-              padding: '8px 12px'
-            }}>
-              <span style={{ color: '#d1d5db', fontWeight: '500' }}>RANK:</span>
-              <span style={{ color: '#fbbf24', fontWeight: 'bold', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span>🏆</span>
-                <span>#1</span>
-              </span>
+              <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: '500' }}>Rank</span>
+              <span style={{ color: '#f59e0b', fontSize: '18px', fontWeight: '600' }}>#1</span>
             </div>
           </div>
         </div>
 
-        {/* Mini Map - Top Right */}
+        {/* Tactical Map - Top Right - Minimalist Design */}
         <div 
           style={{ 
             position: 'fixed', 
-            top: '20px', 
-            right: '20px', 
+            top: '24px', 
+            right: '24px', 
             zIndex: 1000,
-            backgroundColor: 'rgba(17, 24, 39, 0.95)',
-            border: '2px solid #06b6d4',
-            borderRadius: '12px',
-            padding: '16px',
-            backdropFilter: 'blur(12px)',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4)'
+            backgroundColor: 'rgba(15, 23, 42, 0.85)',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '16px',
+            padding: '20px',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
           }}
         >
           <div style={{ 
-            color: '#22d3ee', 
-            fontSize: '14px', 
-            fontWeight: 'bold', 
-            marginBottom: '12px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px',
-            borderBottom: '1px solid #0891b2',
-            paddingBottom: '8px'
-          }}>
-            <span style={{ fontSize: '18px' }}>🗺️</span>
-            <span>TACTICAL MAP</span>
-          </div>
-          <div style={{ 
-            width: '144px', 
-            height: '144px', 
-            backgroundColor: '#374151', 
-            borderRadius: '8px', 
-            border: '2px solid #0891b2', 
+            width: '120px', 
+            height: '120px', 
+            backgroundColor: 'rgba(51, 65, 85, 0.4)', 
+            borderRadius: '12px', 
+            border: '1px solid rgba(148, 163, 184, 0.1)', 
             position: 'relative', 
             overflow: 'hidden', 
-            marginBottom: '12px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.4) inset'
+            marginBottom: '12px'
           }}>
             {/* Player dot */}
             <div 
               style={{ 
                 position: 'absolute',
-                width: '12px', 
-                height: '12px', 
-                backgroundColor: '#60a5fa', 
+                width: '10px', 
+                height: '10px', 
+                backgroundColor: '#3b82f6', 
                 borderRadius: '50%', 
                 transform: 'translate(-50%, -50%)',
                 left: `${getPlayerPosition().x}%`, 
                 top: `${getPlayerPosition().y}%`,
-                boxShadow: '0 0 10px rgba(96, 165, 250, 0.8)',
-                border: '2px solid #93c5fd',
-                animation: 'pulse 2s infinite'
+                boxShadow: '0 0 12px rgba(59, 130, 246, 0.6)',
+                border: '2px solid rgba(59, 130, 246, 0.8)'
               }}
             />
             {/* Enemies */}
@@ -708,45 +645,27 @@ const AgarIOGame = () => {
                 key={i}
                 style={{ 
                   position: 'absolute',
-                  width: '8px', 
-                  height: '8px', 
-                  backgroundColor: '#f87171', 
+                  width: '6px', 
+                  height: '6px', 
+                  backgroundColor: '#ef4444', 
                   borderRadius: '50%', 
                   transform: 'translate(-50%, -50%)',
                   left: `${(enemy.x / gameRef.current.world.width) * 100}%`, 
                   top: `${(enemy.y / gameRef.current.world.height) * 100}%`,
-                  border: '1px solid #fca5a5'
+                  opacity: '0.8'
                 }}
               />
             ))}
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ 
-              color: '#22d3ee', 
-              fontSize: '12px', 
-              fontWeight: 'bold', 
-              marginBottom: '4px',
-              backgroundColor: 'rgba(6, 182, 212, 0.2)',
-              borderRadius: '4px',
-              padding: '4px 8px'
-            }}>
-              SECTOR: Oceania
-            </div>
-            <div style={{ 
-              color: 'white', 
-              fontSize: '12px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              gap: '4px',
-              backgroundColor: '#374151',
-              borderRadius: '4px',
-              padding: '4px 8px'
-            }}>
-              <div style={{ width: '8px', height: '8px', backgroundColor: '#34d399', borderRadius: '50%' }}></div>
-              <span>999ms</span>
-              <span style={{ color: '#34d399' }}>⚡ ONLINE</span>
-            </div>
+          
+          <div style={{ 
+            color: '#94a3b8', 
+            fontSize: '11px', 
+            textAlign: 'center', 
+            fontWeight: '500',
+            letterSpacing: '0.05em'
+          }}>
+            OCEANIA SECTOR
           </div>
         </div>
 
