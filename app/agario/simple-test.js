@@ -99,7 +99,22 @@ const SimpleTacticalTest = () => {
       ctx.font = 'bold 12px Arial'
       ctx.textAlign = 'center'
       ctx.fillText('OPERATIVE', this.player.x, this.player.y - this.player.radius - 10)
-      ctx.fillText(`${this.player.mass}kg`, this.player.x, this.player.y + 5)
+      
+      // Draw black eyes instead of mass
+      const eyeRadius = Math.max(4, this.player.radius * 0.2)
+      const eyeOffset = this.player.radius * 0.35
+      
+      // Left eye
+      ctx.beginPath()
+      ctx.arc(this.player.x - eyeOffset, this.player.y - eyeOffset * 0.3, eyeRadius, 0, Math.PI * 2)
+      ctx.fillStyle = '#000000'
+      ctx.fill()
+      
+      // Right eye
+      ctx.beginPath()
+      ctx.arc(this.player.x + eyeOffset, this.player.y - eyeOffset * 0.3, eyeRadius, 0, Math.PI * 2)
+      ctx.fillStyle = '#000000'
+      ctx.fill()
     }
   }
 
