@@ -239,7 +239,7 @@ class CashOutBackendTester:
         """Test 5: Verify live player statistics for game state tracking"""
         try:
             start_time = time.time()
-            response = requests.get(f"{API_BASE}/live-players", timeout=10)
+            response = requests.get(f"{API_BASE}/stats/live-players", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
@@ -247,7 +247,7 @@ class CashOutBackendTester:
                 live_count = live_data.get('count', 0)
                 
                 # Test global winnings endpoint
-                winnings_response = requests.get(f"{API_BASE}/global-winnings", timeout=10)
+                winnings_response = requests.get(f"{API_BASE}/stats/global-winnings", timeout=10)
                 
                 if winnings_response.status_code == 200:
                     winnings_data = winnings_response.json()
