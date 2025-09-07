@@ -1346,21 +1346,21 @@ export default function TurfLootTactical() {
           const skinId = btn.dataset.skinId
           const skin = availableSkins.find(s => s.id === skinId)
           
-          if (playerCoins >= skin.price) {
+          if (currency >= skin.price) {
             // Purchase skin
-            playerCoins -= skin.price
+            setCurrency(prev => prev - skin.price)
             skin.owned = true
             
-            // Update UI
+            // Update UI display immediately
             const coinsDisplay = modal.querySelector('#player-coins')
-            coinsDisplay.textContent = playerCoins
+            coinsDisplay.textContent = currency - skin.price
             
             console.log('🛒 Purchased skin:', skin.name, 'for', skin.price, 'coins')
             alert(`Successfully purchased ${skin.name} for ${skin.price} coins!`)
             
             renderSkins() // Re-render to show as owned
           } else {
-            alert(`Not enough coins! You need ${skin.price - playerCoins} more coins.`)
+            alert(`Not enough coins! You need ${skin.price - currency} more coins.`)
           }
         })
       })
