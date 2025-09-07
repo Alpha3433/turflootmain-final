@@ -890,6 +890,31 @@ const AgarIOGame = () => {
               zIndex: -1
             }} />
             
+            {/* Red danger zone ring (outer area) */}
+            <div style={{
+              position: 'absolute',
+              top: '5px',
+              left: '5px',
+              right: '5px',
+              bottom: '5px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, transparent 75%, rgba(255, 68, 68, 0.4) 85%, rgba(255, 68, 68, 0.6) 100%)',
+              zIndex: 1
+            }} />
+            
+            {/* Playable area circle (inner green boundary) */}
+            <div style={{
+              position: 'absolute',
+              top: '32px',
+              left: '32px',
+              width: '156px',
+              height: '156px',
+              borderRadius: '50%',
+              border: '2px solid rgba(0, 255, 0, 0.8)',
+              boxShadow: 'inset 0 0 10px rgba(0, 255, 0, 0.3)',
+              zIndex: 2
+            }} />
+            
             {/* Player dot on minimap - larger and more visible */}
             <div style={{
               position: 'absolute',
@@ -921,7 +946,8 @@ const AgarIOGame = () => {
                   transform: 'translate(-50%, -50%)',
                   opacity: '0.9',
                   border: '1px solid #ffffff',
-                  transition: 'all 50ms ease-out'
+                  transition: 'all 50ms ease-out',
+                  zIndex: 8
                 }}
               />
             ))}
@@ -941,7 +967,8 @@ const AgarIOGame = () => {
                   transform: 'translate(-50%, -50%)',
                   opacity: '1',
                   boxShadow: '0 0 4px rgba(255, 215, 0, 0.8)',
-                  transition: 'all 50ms ease-out'
+                  transition: 'all 50ms ease-out',
+                  zIndex: 7
                 }}
               />
             ))}
@@ -955,7 +982,8 @@ const AgarIOGame = () => {
               bottom: '0',
               borderRadius: '50%',
               border: '3px solid rgba(0, 255, 0, 0.8)',
-              boxShadow: 'inset 0 0 20px rgba(0, 255, 0, 0.4)'
+              boxShadow: 'inset 0 0 20px rgba(0, 255, 0, 0.4)',
+              zIndex: 3
             }} />
           </div>
         </div>
