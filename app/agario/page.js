@@ -466,13 +466,14 @@ const AgarIOGame = () => {
       <canvas
         ref={canvasRef}
         className="absolute inset-0 cursor-crosshair"
+        style={{ zIndex: 1 }}
       />
 
-      {/* Game UI - Always Visible */}
-      <>
+      {/* Game UI Overlay */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
         {/* Mission Timer - Top Center */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-gray-900 bg-opacity-90 backdrop-blur-sm rounded-lg px-4 py-3 border-2 border-purple-500 shadow-lg">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 pointer-events-auto">
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-purple-500 shadow-xl">
             <div className="text-purple-400 text-xs font-bold mb-2 flex items-center justify-center gap-1">
               <span>⚡</span>
               <span>MISSION</span>
@@ -491,12 +492,12 @@ const AgarIOGame = () => {
         </div>
 
         {/* Mini Map - Top Right */}
-        <div className="absolute top-4 right-4 z-10">
-          <div className="bg-gray-900 bg-opacity-90 backdrop-blur-sm rounded-lg border-2 border-cyan-500 shadow-lg p-2">
+        <div className="absolute top-4 right-4 pointer-events-auto">
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg border-2 border-cyan-500 shadow-xl p-2">
             <div className="w-20 h-20 bg-gray-800 rounded border border-cyan-600 relative overflow-hidden mb-2">
               {/* Player dot on minimap */}
               <div 
-                className="absolute w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2 z-20"
+                className="absolute w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1/2 -translate-y-1/2"
                 style={{ 
                   left: `${getPlayerPosition().x}%`, 
                   top: `${getPlayerPosition().y}%` 
@@ -520,8 +521,8 @@ const AgarIOGame = () => {
         </div>
 
         {/* Leaderboard - Bottom Left */}
-        <div className="absolute bottom-4 left-4 z-10">
-          <div className="bg-gray-900 bg-opacity-90 backdrop-blur-sm rounded-lg px-4 py-3 border-2 border-yellow-500 shadow-lg">
+        <div className="absolute bottom-4 left-4 pointer-events-auto">
+          <div className="bg-gray-900 bg-opacity-95 backdrop-blur-md rounded-lg px-4 py-3 border-2 border-yellow-500 shadow-xl">
             <div className="text-yellow-400 text-xs font-bold mb-2 flex items-center gap-1">
               <span>🏆</span>
               <span>Leaders</span>
@@ -536,23 +537,23 @@ const AgarIOGame = () => {
         </div>
 
         {/* Action Buttons - Bottom Right */}
-        <div className="absolute bottom-4 right-4 flex gap-3 z-10">
+        <div className="absolute bottom-4 right-4 flex gap-3 pointer-events-auto">
           <button 
             onClick={handleSplit}
-            className="w-20 h-20 bg-blue-600 bg-opacity-90 backdrop-blur-sm rounded-full border-4 border-blue-400 text-white font-bold text-xs shadow-lg hover:bg-blue-700 transition-all flex flex-col items-center justify-center"
+            className="w-20 h-20 bg-blue-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-blue-400 text-white font-bold text-xs shadow-xl hover:bg-blue-700 transition-all flex flex-col items-center justify-center"
           >
             <span className="text-lg mb-1">⚡</span>
             <span className="text-xs">SPLIT</span>
           </button>
           <button 
-            className="w-20 h-20 bg-yellow-600 bg-opacity-90 backdrop-blur-sm rounded-full border-4 border-yellow-400 text-white font-bold text-xs shadow-lg hover:bg-yellow-700 transition-all flex flex-col items-center justify-center"
+            className="w-20 h-20 bg-yellow-600 bg-opacity-95 backdrop-blur-md rounded-full border-4 border-yellow-400 text-white font-bold text-xs shadow-xl hover:bg-yellow-700 transition-all flex flex-col items-center justify-center"
           >
             <span className="text-lg mb-1">$</span>
             <span className="text-xs">CASH</span>
             <span className="text-xs">${score}</span>
           </button>
         </div>
-      </>
+      </div>
 
       {/* Game Over Screen */}
       {gameOver && (
