@@ -1072,7 +1072,7 @@ const AgarIOGame = () => {
                 top: 0,
                 height: '100%',
                 width: `${cashOutProgress}%`,
-                backgroundColor: 'rgba(255, 200, 50, 0.8)',
+                backgroundColor: 'rgba(34, 197, 94, 0.8)',
                 transition: 'width 100ms linear',
                 zIndex: 1
               }} />
