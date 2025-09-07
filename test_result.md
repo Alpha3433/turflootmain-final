@@ -108,9 +108,9 @@ user_problem_statement: "Test the fixed 'Hold E to Cash Out' functionality to ve
 
 test_plan:
   current_focus:
-    - "Replace Mock Room Creation Logic with Real Hathora Integration"
-    - "Verify Actual Hathora Room Processes are Created"
-    - "Ensure No More Fake Room IDs Generated"
+    - "Test Hold E to Cash Out Progress Bar Fix"
+    - "Verify Cash Out Progress Animation Works"
+    - "Confirm Cash Out Success Popup Functionality"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
