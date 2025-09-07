@@ -825,17 +825,23 @@ const AgarIOGame = () => {
     }
   }, [isCashingOut, cashOutComplete])
 
-  // Mission timer
+  // Mission timer and survival tracking
   useEffect(() => {
     if (!gameStarted || gameOver) return
 
     const timer = setInterval(() => {
       setMissionTime(prev => {
-        if (prev <= 1) {
+        const newTime = prev - 1
+        
+        // Update survival mission progress
+        const survivalSeconds = 60 - newTime
+        updateMissionProgress('survival_time', survivalSeconds)
+        
+        if (newTime <= 0) {
           setGameOver(true)
           return 0
         }
-        return prev - 1
+        return newTime
       })
     }, 1000)
 
