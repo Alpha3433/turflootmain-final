@@ -1004,22 +1004,6 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Player Stats - Bottom Right */}
-        <div style={{
-          position: 'fixed',
-          bottom: '10px',
-          right: '10px',
-          zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          border: '2px solid #333',
-          borderRadius: '4px',
-          padding: '6px 10px',
-          fontSize: '11px',
-          color: '#ccc'
-        }}>
-          <div style={{ color: '#4CAF50', fontWeight: 'bold' }}>#{mass} FPS</div>
-        </div>
-
         {/* Game Over Popup */}
         {gameOver && (
           <div style={{
