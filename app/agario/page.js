@@ -49,11 +49,13 @@ const AgarIOGame = () => {
       
       this.coins = []
       this.enemies = []
+      this.viruses = []
       this.running = false
       this.lastUpdate = Date.now()
       
       this.generateCoins()
       this.generateEnemies()
+      this.generateViruses()
       this.bindEvents()
     }
 
