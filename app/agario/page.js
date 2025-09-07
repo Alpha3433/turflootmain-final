@@ -773,49 +773,6 @@ const AgarIOGame = () => {
             <span>Cash Out ${score}</span>
           </div>
         </div>
-
-        {/* Player Stats Panel - Bottom Right */}
-        <div style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          border: '1px solid #374151',
-          borderRadius: '8px',
-          padding: '12px 16px',
-          minWidth: '140px'
-        }}>
-          <div style={{ color: '#22d3ee', fontSize: '12px', fontWeight: 'bold', marginBottom: '8px' }}>
-            You
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Net Worth:</span>
-              <span style={{ color: '#22c55e', fontWeight: 'bold' }}>${score}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Total Mass:</span>
-              <span style={{ color: '#60a5fa', fontWeight: 'bold' }}>{mass}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>K/D:</span>
-              <span style={{ color: '#f87171', fontWeight: 'bold' }}>{eliminations}/0</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Streak:</span>
-              <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>{eliminations} 🔥</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Coins Collected:</span>
-              <span style={{ color: '#34d399', fontWeight: 'bold' }}>{score}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Time Alive:</span>
-              <span style={{ color: '#a78bfa', fontWeight: 'bold' }}>0:00</span>
-            </div>
-          </div>
-        </div>
       </div>
 
 
