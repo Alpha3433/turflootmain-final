@@ -217,7 +217,7 @@ const AgarIOGame = () => {
       const distance = Math.sqrt(dx * dx + dy * dy)
       
       if (distance > 5) {
-        const speed = Math.max(0.5, this.player.speed - this.player.mass * 0.01)
+        const speed = Math.max(0.3, 86 / Math.sqrt(this.player.mass)) // Authentic Agar.io speed formula
         const moveX = (dx / distance) * speed * 60 * deltaTime
         const moveY = (dy / distance) * speed * 60 * deltaTime
         
