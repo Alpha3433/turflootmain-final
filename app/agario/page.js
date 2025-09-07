@@ -71,7 +71,7 @@ const AgarIOGame = () => {
       const centerY = this.world.height / 2 // 2000
       const playableRadius = 1800 // Same as boundary radius
       
-      for (let i = 0; i < 250; i++) { // Increased from 100 to 250 coins for more coin spawns
+      for (let i = 0; i < 1000; i++) { // Increased to 1000 coins to match Agar.io food density
         let x, y, distance
         
         // Keep generating random positions until we get one inside the circular boundary
