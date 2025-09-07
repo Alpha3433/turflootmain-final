@@ -605,7 +605,6 @@ const AgarIOGame = () => {
       )}
     </div>
   )
-  )
 }
 
 export default AgarIOGame
