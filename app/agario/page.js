@@ -537,48 +537,7 @@ const AgarIOGame = () => {
 
       {/* DESKTOP HUD UI Elements - Always Visible */}
       <div>
-        {/* Leaderboard - Top Right (like reference) */}
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: '10px', 
-            right: '10px', 
-            zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            border: '2px solid #333',
-            borderRadius: '4px',
-            padding: '8px 12px',
-            minWidth: '140px'
-          }}
-        >
-          <div style={{ 
-            color: '#fff', 
-            fontSize: '12px', 
-            fontWeight: 'bold', 
-            marginBottom: '6px',
-            textAlign: 'center',
-            borderBottom: '1px solid #555',
-            paddingBottom: '4px'
-          }}>
-            LEADERBOARD
-          </div>
-          <div style={{ fontSize: '11px', color: '#ccc' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-              <span>1. Player</span>
-              <span style={{ color: '#4CAF50' }}>{score}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-              <span>2. Bot_1</span>
-              <span>150</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>3. Bot_2</span>
-              <span>100</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Score Display - Top Left (simple) */}
+        {/* Leaderboard - Top Left (moved from right, updated font) */}
         <div 
           style={{ 
             position: 'fixed', 
@@ -588,23 +547,37 @@ const AgarIOGame = () => {
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             border: '2px solid #333',
             borderRadius: '4px',
-            padding: '8px 12px'
+            padding: '8px 12px',
+            minWidth: '140px',
+            fontFamily: '"Rajdhani", sans-serif'
           }}
         >
           <div style={{ 
-            color: '#4CAF50', 
-            fontSize: '16px', 
-            fontWeight: 'bold',
-            textAlign: 'center'
+            color: '#fff', 
+            fontSize: '14px', 
+            fontWeight: '700', 
+            marginBottom: '6px',
+            textAlign: 'center',
+            borderBottom: '1px solid #555',
+            paddingBottom: '4px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
           }}>
-            {score}
+            LEADERBOARD
           </div>
-          <div style={{ 
-            color: '#ccc', 
-            fontSize: '10px',
-            textAlign: 'center'
-          }}>
-            LENGTH: {mass}
+          <div style={{ fontSize: '12px', color: '#ccc', fontWeight: '600' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+              <span>1. Player</span>
+              <span style={{ color: '#4CAF50', fontWeight: '700' }}>{score}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+              <span>2. Bot_1</span>
+              <span style={{ fontWeight: '700' }}>150</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>3. Bot_2</span>
+              <span style={{ fontWeight: '700' }}>100</span>
+            </div>
           </div>
         </div>
 
