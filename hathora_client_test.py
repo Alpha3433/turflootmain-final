@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://milblob-game.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://agar-military.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraEnvironmentTester:
