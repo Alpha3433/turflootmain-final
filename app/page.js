@@ -624,20 +624,28 @@ export default function TurfLootTactical() {
       }
 
       const privy = window.__TURFLOOT_PRIVY__
-      const user = privy.user
 
-      if (!user?.wallet?.address) {
-        console.log('👛 No wallet found, prompting wallet connection')
-        alert('No wallet found. Please ensure you are logged in and have a wallet connected.')
+      // Check if user has a valid wallet address
+      if (!privy.user?.wallet?.address) {
+        console.log('👛 No wallet address found, prompting wallet setup')
+        alert('No wallet found. Please ensure you are logged in and have a wallet connected. Try logging out and back in if the issue persists.')
         return
       }
 
+      console.log('✅ Wallet address confirmed for withdrawal:', privy.user.wallet.address)
+
       // Show withdrawal instructions
-      alert(`To withdraw funds:\n\n1. Use your wallet to send funds to another address\n2. Your wallet address: ${user.wallet.address}\n3. You can access your wallet through the Privy interface\n\nNote: Always verify recipient addresses before sending funds.`)
+      alert(`To withdraw funds:\n\n1. Use your wallet to send funds to another address\n2. Your wallet address: ${privy.user.wallet.address}\n3. You can access your wallet through the Privy interface\n\nNote: Always verify recipient addresses before sending funds.`)
       
     } catch (error) {
       console.error('❌ Withdraw error:', error)
-      alert('An error occurred while accessing withdrawal functionality. Please try again.')
+      
+      // More specific error handling
+      if (error.message?.includes('invalid address')) {
+        alert('Wallet address error. Please try logging out and back in to refresh your wallet connection.')
+      } else {
+        alert('An error occurred while accessing withdrawal functionality. Please try again or contact support.')
+      }
     }
   }
 
