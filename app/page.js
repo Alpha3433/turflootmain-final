@@ -3613,6 +3613,10 @@ export default function TurfLootTactical() {
                 fontSize: '16px'
               }}
               title="Friends"
+              onClick={() => {
+                console.log('👥 Friends icon clicked!')
+                setIsFriendsModalOpen(true)
+              }}
               onMouseOver={(e) => {
                 e.target.style.transform = 'scale(1.1)'
                 e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.5)'
