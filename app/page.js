@@ -5968,7 +5968,6 @@ export default function TurfLootTactical() {
               border: '4px solid rgba(59, 130, 246, 0.3)',
               borderTop: '4px solid #3b82f6',
               borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
               margin: '0 auto 24px auto'
             }} />
             
@@ -5995,46 +5994,33 @@ export default function TurfLootTactical() {
               Initializing Local World...
             </p>
             
-            {/* Additional loading dots animation */}
+            {/* Simple loading dots */}
             <div style={{
               marginTop: '20px',
               display: 'flex',
               justifyContent: 'center',
               gap: '8px'
             }}>
-              {[0, 1, 2].map(i => (
-                <div
-                  key={i}
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    background: '#3b82f6',
-                    borderRadius: '50%',
-                    animation: `bounce 1.5s infinite ${i * 0.2}s`
-                  }}
-                />
-              ))}
+              <div style={{
+                width: '8px',
+                height: '8px',
+                background: '#3b82f6',
+                borderRadius: '50%'
+              }} />
+              <div style={{
+                width: '8px',
+                height: '8px',
+                background: 'rgba(59, 130, 246, 0.6)',
+                borderRadius: '50%'
+              }} />
+              <div style={{
+                width: '8px',
+                height: '8px',
+                background: 'rgba(59, 130, 246, 0.3)',
+                borderRadius: '50%'
+              }} />
             </div>
           </div>
-          
-          {/* CSS Animations */}
-          <style jsx>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-            
-            @keyframes bounce {
-              0%, 60%, 100% { 
-                transform: translateY(0); 
-                opacity: 0.4;
-              }
-              30% { 
-                transform: translateY(-10px); 
-                opacity: 1;
-              }
-            }
-          `}</style>
         </div>
       )}
       
