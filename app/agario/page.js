@@ -1485,6 +1485,14 @@ const AgarIOGame = () => {
             clearInterval(cashOutIntervalRef.current)
             cashOutIntervalRef.current = null
             setIsCashingOut(false)
+            
+            // Calculate survival time for cash out
+            if (gameRef.current && gameRef.current.gameStartTime) {
+              const finalTime = Math.floor((Date.now() - gameRef.current.gameStartTime) / 1000)
+              setTimeSurvived(finalTime)
+              console.log(`💰 Cash Out - Survived for ${finalTime} seconds`)
+            }
+            
             setCashOutComplete(true)
             return 100
           }
