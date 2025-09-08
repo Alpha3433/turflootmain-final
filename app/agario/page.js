@@ -922,10 +922,22 @@ const AgarIOGame = () => {
 
     updateEnemy(enemy, deltaTime) {
       const now = Date.now()
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
       
+      // Update target selection to stay within playable area
       if (now - enemy.lastTargetChange > 3000 + Math.random() * 2000) {
-        enemy.targetX = Math.random() * this.world.width
-        enemy.targetY = Math.random() * this.world.height
+        // Generate new target within the circular playable area
+        let targetX, targetY, distance
+        do {
+          targetX = Math.random() * this.world.width
+          targetY = Math.random() * this.world.height
+          distance = Math.sqrt(Math.pow(targetX - centerX, 2) + Math.pow(targetY - centerY, 2))
+        } while (distance > playableRadius - enemy.radius - 50) // 50px buffer from edge
+        
+        enemy.targetX = targetX
+        enemy.targetY = targetY
         enemy.lastTargetChange = now
       }
       
@@ -945,8 +957,26 @@ const AgarIOGame = () => {
         enemy.x += smoothMoveX
         enemy.y += smoothMoveY
         
-        enemy.x = Math.max(enemy.radius, Math.min(this.world.width - enemy.radius, enemy.x))
-        enemy.y = Math.max(enemy.radius, Math.min(this.world.height - enemy.radius, enemy.y))
+        // Constrain enemies to circular playable boundary (same as player)
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(enemy.x - centerX, 2) + 
+          Math.pow(enemy.y - centerY, 2)
+        )
+        
+        if (distanceFromCenter + enemy.radius > playableRadius) {
+          // Push enemy back inside circular boundary
+          const angle = Math.atan2(enemy.y - centerY, enemy.x - centerX)
+          const maxDistance = playableRadius - enemy.radius
+          enemy.x = centerX + Math.cos(angle) * maxDistance
+          enemy.y = centerY + Math.sin(angle) * maxDistance
+          
+          // When hitting boundary, choose a new target toward center
+          const angleToCenter = Math.atan2(centerY - enemy.y, centerX - enemy.x)
+          const targetDistance = Math.random() * (playableRadius * 0.8) // Target within 80% of playable area
+          enemy.targetX = centerX + Math.cos(angleToCenter + (Math.random() - 0.5) * Math.PI) * targetDistance
+          enemy.targetY = centerY + Math.sin(angleToCenter + (Math.random() - 0.5) * Math.PI) * targetDistance
+          enemy.lastTargetChange = now // Reset target timer
+        }
       }
     }
 
