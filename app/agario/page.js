@@ -2417,70 +2417,187 @@ const AgarIOGame = () => {
           }}>
             <div style={{
               backgroundColor: '#1a202c',
-              border: '3px solid #68d391',
+              border: '3px solid #ffd700',
               borderRadius: '12px',
               maxWidth: '500px',
               width: '90%',
               padding: '0',
               color: 'white',
-              boxShadow: '0 0 50px rgba(104, 211, 145, 0.5)',
+              boxShadow: '0 0 60px rgba(255, 215, 0, 0.6)',
               fontFamily: '"Rajdhani", sans-serif'
             }}>
               {/* Header */}
               <div style={{
                 padding: '24px',
-                borderBottom: '2px solid #68d391',
-                background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+                borderBottom: '2px solid #ffd700',
+                background: 'linear-gradient(45deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%)',
                 textAlign: 'center'
               }}>
                 <div style={{
-                  width: '60px',
-                  height: '60px',
-                  background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                  width: '70px',
+                  height: '70px',
+                  background: 'linear-gradient(45deg, #ffd700 0%, #ffb000 100%)',
                   borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '30px',
-                  margin: '0 auto 16px'
+                  fontSize: '36px',
+                  margin: '0 auto 16px',
+                  boxShadow: '0 0 20px rgba(255, 215, 0, 0.6)'
                 }}>
-                  💰
+                  🏆
                 </div>
                 <h2 style={{
-                  color: '#68d391',
-                  fontSize: '32px',
+                  color: '#ffd700',
+                  fontSize: '28px',
                   fontWeight: '700',
                   margin: '0 0 8px',
                   textTransform: 'uppercase',
-                  textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
+                  textShadow: '0 0 15px rgba(255, 215, 0, 0.8)',
+                  letterSpacing: '1px'
                 }}>
-                  CASH OUT SUCCESSFUL!
+                  Cashout Successful!
                 </h2>
                 <p style={{
                   color: '#e2e8f0',
                   fontSize: '16px',
                   margin: '0',
-                  opacity: '0.8'
+                  opacity: '0.9'
                 }}>
                   Congratulations! You've successfully cashed out!
                 </p>
               </div>
 
-              {/* Cash Out Amount */}
+              {/* Body Content */}
               <div style={{ padding: '24px' }}>
+                {/* Amount Received Section - Only for paid rooms */}
+                {(() => {
+                  const urlParams = new URLSearchParams(window.location.search)
+                  const fee = urlParams.get('fee')
+                  const isPaidRoom = fee && parseFloat(fee) > 0
+                  
+                  if (!isPaidRoom) return null
+                  
+                  return (
+                    <div style={{
+                      backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                      border: '1px solid rgba(255, 215, 0, 0.3)',
+                      borderRadius: '8px',
+                      padding: '16px',
+                      marginBottom: '24px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ 
+                        color: '#ffd700', 
+                        fontSize: '14px', 
+                        fontWeight: '600',
+                        marginBottom: '8px',
+                        textTransform: 'uppercase'
+                      }}>
+                        AMOUNT RECEIVED
+                      </div>
+                      <div style={{ 
+                        color: '#ffffff', 
+                        fontSize: '24px', 
+                        fontWeight: '700',
+                        marginBottom: '4px'
+                      }}>
+                        ${(score * 0.54).toFixed(2)}
+                      </div>
+                      <div style={{ 
+                        color: '#a0aec0', 
+                        fontSize: '12px',
+                        fontWeight: '400'
+                      }}>
+                        {(score * 0.026).toFixed(6)} SOL
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                {/* Stats Section */}
                 <div style={{
-                  backgroundColor: 'rgba(104, 211, 145, 0.1)',
-                  padding: '20px',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                  marginBottom: '24px',
-                  border: '1px solid rgba(104, 211, 145, 0.3)'
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '16px',
+                  marginBottom: '24px'
                 }}>
-                  <div style={{ color: '#68d391', fontSize: '28px', fontWeight: '700' }}>
-                    ${score}
+                  {/* Time Survived */}
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <div style={{ fontSize: '24px' }}>⏱️</div>
+                    <div style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700' }}>
+                      {Math.floor(timeSurvived / 60)}m {timeSurvived % 60}s
+                    </div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>
+                      Time Survived
+                    </div>
                   </div>
-                  <div style={{ color: '#a0aec0', fontSize: '14px' }}>Cash Out Amount</div>
+                  
+                  {/* Eliminations */}
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <div style={{ fontSize: '24px' }}>⚔️</div>
+                    <div style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700' }}>
+                      {eliminations}
+                    </div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>
+                      Eliminations
+                    </div>
+                  </div>
                 </div>
+
+                {/* Balance Section - Only for paid rooms */}
+                {(() => {
+                  const urlParams = new URLSearchParams(window.location.search)
+                  const fee = urlParams.get('fee')
+                  const isPaidRoom = fee && parseFloat(fee) > 0
+                  
+                  if (!isPaidRoom) return null
+                  
+                  return (
+                    <div style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      padding: '16px',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      marginBottom: '24px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                      <div style={{ 
+                        color: '#a0aec0', 
+                        fontSize: '12px', 
+                        marginBottom: '8px',
+                        textTransform: 'uppercase'
+                      }}>
+                        Current Balance
+                      </div>
+                      <div style={{ 
+                        color: '#ffffff', 
+                        fontSize: '18px', 
+                        fontWeight: '700'
+                      }}>
+                        ${(14.69 + (score * 0.54)).toFixed(2)} / {(0.070710 + (score * 0.026)).toFixed(6)} SOL
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* Action Buttons */}
                 <div style={{
@@ -2488,20 +2605,23 @@ const AgarIOGame = () => {
                   gap: '12px',
                   flexDirection: 'column'
                 }}>
+                  {/* Join Another Game Button */}
                   <button
                     onClick={() => {
                       setCashOutComplete(false)
                       setCashOutProgress(0)
                       setScore(0)
                       setMass(20)
+                      setEliminations(0)
+                      setTimeSurvived(0)
                       handleRestart()
                     }}
                     style={{
-                      backgroundColor: '#68d391',
-                      border: '2px solid #48bb78',
+                      backgroundColor: '#ffd700',
+                      border: '2px solid #ffb000',
                       borderRadius: '8px',
                       color: '#1a202c',
-                      fontSize: '18px',
+                      fontSize: '16px',
                       fontWeight: '700',
                       padding: '12px 24px',
                       cursor: 'pointer',
@@ -2514,16 +2634,18 @@ const AgarIOGame = () => {
                       gap: '8px'
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.backgroundColor = '#48bb78'
+                      e.target.style.backgroundColor = '#ffb000'
                       e.target.style.transform = 'translateY(-2px)'
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.backgroundColor = '#68d391'
+                      e.target.style.backgroundColor = '#ffd700'
                       e.target.style.transform = 'translateY(0)'
                     }}
                   >
-                    🔄 Play Again
+                    JOINING...
                   </button>
+                  
+                  {/* Home Button */}
                   <button
                     onClick={() => window.location.href = '/'}
                     style={{
@@ -2552,7 +2674,7 @@ const AgarIOGame = () => {
                       e.target.style.color = '#a0aec0'
                     }}
                   >
-                    🏠 Back to Lobby
+                    🏠 Home
                   </button>
                 </div>
               </div>
