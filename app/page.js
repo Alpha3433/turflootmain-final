@@ -4785,13 +4785,14 @@ export default function TurfLootTactical() {
                 borderRadius: '16px',
                 maxWidth: '600px',
                 width: '100%',
-                maxHeight: '90vh',
-                overflowY: 'auto',
+                maxHeight: '85vh',
+                display: 'flex',
+                flexDirection: 'column',
                 boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.3)',
                 fontFamily: '"Rajdhani", sans-serif'
               }}
             >
-              {/* Header */}
+              {/* Header - Fixed */}
               <div style={{
                 padding: '24px',
                 borderBottom: '2px solid rgba(104, 211, 145, 0.3)',
@@ -4799,7 +4800,8 @@ export default function TurfLootTactical() {
                 borderRadius: '13px 13px 0 0',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                flexShrink: 0
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <div style={{
@@ -4869,12 +4871,19 @@ export default function TurfLootTactical() {
                 </button>
               </div>
 
-              {/* Content */}
-              <div style={{ padding: '24px' }}>
+              {/* Scrollable Content Area */}
+              <div style={{ 
+                flex: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '24px'
+              }}>
                 
                 {/* Identity Section */}
                 <div style={{
-                  marginBottom: '32px',
                   padding: '20px',
                   background: 'rgba(45, 55, 72, 0.5)',
                   border: '1px solid rgba(104, 211, 145, 0.2)',
@@ -4897,7 +4906,8 @@ export default function TurfLootTactical() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      position: 'relative'
+                      position: 'relative',
+                      flexShrink: 0
                     }}>
                       {/* Eyes like in-game */}
                       <div style={{
@@ -4921,12 +4931,13 @@ export default function TurfLootTactical() {
                     </div>
                     
                     {/* User Info */}
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <h3 style={{
                         margin: '0 0 12px 0',
                         color: '#68d391',
                         fontSize: '20px',
-                        fontWeight: '700'
+                        fontWeight: '700',
+                        wordBreak: 'break-word'
                       }}>
                         {isAuthenticated ? 
                           (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
@@ -4996,11 +5007,111 @@ export default function TurfLootTactical() {
                   </div>
                 </div>
 
+                {/* Account Settings Section */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 16px 0',
+                    color: '#68d391',
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Account Settings
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{
+                      padding: '12px',
+                      background: 'rgba(104, 211, 145, 0.1)',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}>
+                      <span style={{ color: '#a0aec0', fontSize: '14px' }}>Username</span>
+                      <input
+                        type="text"
+                        value={customUsername || (isAuthenticated ? user?.email?.address?.split('@')[0] || 'User' : userName)}
+                        onChange={(e) => setCustomUsername(e.target.value)}
+                        style={{
+                          background: 'rgba(26, 32, 44, 0.8)',
+                          border: '1px solid rgba(104, 211, 145, 0.3)',
+                          borderRadius: '6px',
+                          padding: '8px 12px',
+                          color: '#68d391',
+                          fontSize: '14px',
+                          fontFamily: '"Rajdhani", sans-serif',
+                          maxWidth: '200px'
+                        }}
+                        placeholder="Enter username"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Game Statistics Section */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 16px 0',
+                    color: '#68d391',
+                    fontSize: '18px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Statistics
+                  </h4>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                    gap: '12px' 
+                  }}>
+                    <div style={{
+                      padding: '12px',
+                      background: 'rgba(104, 211, 145, 0.1)',
+                      borderRadius: '8px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>0</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px' }}>Games Played</div>
+                    </div>
+                    <div style={{
+                      padding: '12px',
+                      background: 'rgba(104, 211, 145, 0.1)',
+                      borderRadius: '8px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>0</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px' }}>Wins</div>
+                    </div>
+                    <div style={{
+                      padding: '12px',
+                      background: 'rgba(104, 211, 145, 0.1)',
+                      borderRadius: '8px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>0</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px' }}>Best Score</div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Action Buttons */}
                 <div style={{
                   display: 'flex',
                   gap: '12px',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  flexWrap: 'wrap'
                 }}>
                   <button
                     onClick={() => {
@@ -5018,7 +5129,8 @@ export default function TurfLootTactical() {
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.05em'
+                      letterSpacing: '0.05em',
+                      minWidth: '120px'
                     }}
                     onMouseOver={(e) => {
                       e.target.style.background = 'rgba(104, 211, 145, 0.3)'
@@ -5049,7 +5161,8 @@ export default function TurfLootTactical() {
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em'
+                        letterSpacing: '0.05em',
+                        minWidth: '120px'
                       }}
                       onMouseOver={(e) => {
                         e.target.style.background = 'rgba(252, 129, 129, 0.3)'
@@ -5079,7 +5192,8 @@ export default function TurfLootTactical() {
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em'
+                        letterSpacing: '0.05em',
+                        minWidth: '120px'
                       }}
                       onMouseOver={(e) => {
                         e.target.style.background = 'rgba(104, 211, 145, 0.3)'
