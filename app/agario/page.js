@@ -1528,6 +1528,12 @@ const AgarIOGame = () => {
               console.log(`💰 Cash Out - Survived for ${finalTime} seconds`)
             }
             
+            // Stop the game to prevent player from being eaten after cash out
+            if (gameRef.current) {
+              gameRef.current.running = false
+              console.log('🛑 Game stopped after successful cash out')
+            }
+            
             setCashOutComplete(true)
             return 100
           }
