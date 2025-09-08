@@ -840,12 +840,20 @@ const AgarIOGame = () => {
     updatePlayer(deltaTime) {
       const dx = this.player.targetX - this.player.x
       const dy = this.player.targetY - this.player.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
       
-      // Reduced speed but maintain snappy responsiveness
-      const moveSpeed = 0.08 // Reduced from 0.15 to 0.08 for better speed control
-      
-      this.player.x += dx * moveSpeed
-      this.player.y += dy * moveSpeed
+      // Constant speed regardless of mouse distance
+      if (distance > 1) {
+        const constantSpeed = 3.5 // Fixed pixels per frame - constant speed
+        const moveDistance = Math.min(constantSpeed, distance) // Don't overshoot target
+        
+        // Normalize direction and apply constant speed
+        const moveX = (dx / distance) * moveDistance
+        const moveY = (dy / distance) * moveDistance
+        
+        this.player.x += moveX
+        this.player.y += moveY
+      }
       
       // Quick boundary check - keep it simple
       const centerX = this.world.width / 2
