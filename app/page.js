@@ -54,7 +54,7 @@ export default function TurfLootTactical() {
           localStorage.setItem(userCurrencyKey, '2500')
         }
       } else {
-        // Non-authenticated user - use guest currency
+        // Non-authenticated user - use guest currency (0 to encourage authentication)
         console.log('👤 Loading guest currency')
         const guestCurrency = localStorage.getItem('guestCurrency')
         if (guestCurrency) {
@@ -62,12 +62,12 @@ export default function TurfLootTactical() {
             const parsedCurrency = parseInt(guestCurrency)
             setCurrency(parsedCurrency)
           } catch (error) {
-            setCurrency(750) // Lower amount for guest users
-            localStorage.setItem('guestCurrency', '750')
+            setCurrency(0) // No coins for guest users
+            localStorage.setItem('guestCurrency', '0')
           }
         } else {
-          setCurrency(750)
-          localStorage.setItem('guestCurrency', '750')
+          setCurrency(0) // No coins for guest users
+          localStorage.setItem('guestCurrency', '0')
         }
       }
     }
