@@ -5030,13 +5030,6 @@ export default function TurfLootTactical() {
           {/* Arsenal Panel */}
           <div style={ambrerPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ 
-                ...iconStyle, 
-                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)', 
-                color: '#1a202c',
-                boxShadow: '0 0 15px rgba(104, 211, 145, 0.6)',
-                border: '1px solid #68d391'
-              }}></div>
               <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>WALLET</h3>
             </div>
             
