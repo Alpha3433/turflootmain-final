@@ -38,6 +38,20 @@ const AgarIOGame = () => {
     { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
   ]
 
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   // Mission progress tracking
   const updateMissionProgress = (type, value) => {
     setActiveMissions(prev => prev.map(mission => {
