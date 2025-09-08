@@ -368,6 +368,18 @@
   }
 }
 
+/* Slide in right animation for mission notifications */
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* Custom animation classes for blue circle */
 .animate-breathe {
   animation: animate-breathe 2s ease-in-out infinite;
