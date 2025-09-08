@@ -1877,6 +1877,184 @@ const AgarIOGame = () => {
           </div>
         )}
 
+        {/* Cheating Ban Popup */}
+        {cheatingBan && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999999,
+            pointerEvents: 'auto'
+          }}>
+            <div style={{
+              backgroundColor: '#1a202c',
+              border: '3px solid #ff3333',
+              borderRadius: '12px',
+              maxWidth: '500px',
+              width: '90%',
+              padding: '0',
+              color: 'white',
+              boxShadow: '0 0 60px rgba(255, 51, 51, 0.8)',
+              fontFamily: '"Rajdhani", sans-serif',
+              animation: 'pulse 2s infinite'
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '2px solid #ff3333',
+                background: 'linear-gradient(45deg, rgba(255, 51, 51, 0.2) 0%, rgba(255, 51, 51, 0.1) 100%)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '70px',
+                  height: '70px',
+                  background: 'linear-gradient(45deg, #ff3333 0%, #cc0000 100%)',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '36px',
+                  margin: '0 auto 16px',
+                  boxShadow: '0 0 20px rgba(255, 51, 51, 0.6)'
+                }}>
+                  🚫
+                </div>
+                <h2 style={{
+                  color: '#ff3333',
+                  fontSize: '28px',
+                  fontWeight: '700',
+                  margin: '0 0 8px',
+                  textTransform: 'uppercase',
+                  textShadow: '0 0 15px rgba(255, 51, 51, 0.8)',
+                  letterSpacing: '2px'
+                }}>
+                  ACCOUNT SUSPENDED
+                </h2>
+                <p style={{
+                  color: '#ff6b6b',
+                  fontSize: '16px',
+                  margin: '0',
+                  fontWeight: '600'
+                }}>
+                  Kicked for suspected cheating
+                </p>
+              </div>
+
+              {/* Details */}
+              <div style={{ padding: '24px' }}>
+                <div style={{
+                  backgroundColor: 'rgba(255, 51, 51, 0.1)',
+                  border: '1px solid rgba(255, 51, 51, 0.3)',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  marginBottom: '24px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    color: '#ffffff', 
+                    fontSize: '18px', 
+                    fontWeight: '700',
+                    marginBottom: '8px'
+                  }}>
+                    🛡️ FAIR PLAY VIOLATION
+                  </div>
+                  <div style={{ 
+                    color: '#e2e8f0', 
+                    fontSize: '14px',
+                    lineHeight: '1.4'
+                  }}>
+                    Our anti-cheat system detected suspicious activity including speed hacks, automation scripts, or memory manipulation attempts.
+                  </div>
+                </div>
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '16px',
+                  marginBottom: '24px'
+                }}>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ color: '#ff6b6b', fontSize: '24px', fontWeight: '700' }}>
+                      3/3
+                    </div>
+                    <div style={{ color: '#a0aec0', fontSize: '14px' }}>Violations</div>
+                  </div>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ color: '#ff6b6b', fontSize: '24px', fontWeight: '700' }}>
+                      PERMANENT
+                    </div>
+                    <div style={{ color: '#a0aec0', fontSize: '14px' }}>Ban Status</div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  flexDirection: 'column'
+                }}>
+                  <button
+                    onClick={() => window.location.href = '/'}
+                    style={{
+                      backgroundColor: '#4a5568',
+                      border: '2px solid #718096',
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      padding: '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#718096'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#4a5568'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    🏠 Return to Lobby
+                  </button>
+                  <div style={{
+                    textAlign: 'center',
+                    fontSize: '12px',
+                    color: '#a0aec0',
+                    marginTop: '8px',
+                    lineHeight: '1.4'
+                  }}>
+                    Contact support if you believe this is an error.<br/>
+                    Email: support@turfloot.com
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Action Buttons - Matching Reference Style */}
         
         {/* Cash Out Button - Bottom Center */}
