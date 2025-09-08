@@ -1944,32 +1944,71 @@ const AgarIOGame = () => {
           </div>
         )}
         
-        {/* Mission Complete Notification */}
+        {/* Mission Complete Notification - Less Intrusive */}
         {showMissionComplete && (
           <div style={{
             position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            backgroundColor: 'rgba(0, 0, 0, 0.95)',
-            border: '3px solid #22c55e',
-            borderRadius: '12px',
-            padding: '20px 30px',
-            textAlign: 'center',
-            zIndex: 2000,
-            animation: 'missionPulse 0.5s ease-out'
+            top: '80px',
+            right: '20px',
+            transform: 'translateY(0)',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            border: '2px solid #22c55e',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            color: '#ffffff',
+            fontFamily: '"Rajdhani", sans-serif',
+            maxWidth: '280px',
+            zIndex: 1500,
+            animation: 'slideInRight 0.4s ease-out',
+            boxShadow: '0 4px 20px rgba(34, 197, 94, 0.4)'
           }}>
-            <div style={{ color: '#22c55e', fontSize: '24px', marginBottom: '8px' }}>
-              ✅ MISSION COMPLETE!
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px',
+              marginBottom: '8px'
+            }}>
+              <div style={{
+                width: '30px',
+                height: '30px',
+                background: 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px'
+              }}>
+                ✅
+              </div>
+              <div>
+                <div style={{ 
+                  color: '#22c55e', 
+                  fontSize: '14px', 
+                  fontWeight: '700',
+                  textTransform: 'uppercase'
+                }}>
+                  Mission Complete!
+                </div>
+                <div style={{ 
+                  color: '#ffffff', 
+                  fontSize: '12px', 
+                  fontWeight: '600'
+                }}>
+                  {showMissionComplete.icon} {showMissionComplete.name}
+                </div>
+              </div>
             </div>
-            <div style={{ color: '#ffffff', fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
-              {showMissionComplete.icon} {showMissionComplete.name}
-            </div>
-            <div style={{ color: '#9ca3af', fontSize: '12px', marginBottom: '8px' }}>
-              {showMissionComplete.description}
-            </div>
-            <div style={{ color: '#FFD700', fontSize: '18px', fontWeight: '700' }}>
-              +{showMissionComplete.reward} 💰 COINS EARNED!
+            <div style={{ 
+              color: '#FFD700', 
+              fontSize: '14px', 
+              fontWeight: '700',
+              textAlign: 'center',
+              padding: '6px 12px',
+              backgroundColor: 'rgba(255, 215, 0, 0.1)',
+              borderRadius: '4px',
+              border: '1px solid rgba(255, 215, 0, 0.3)'
+            }}>
+              +{showMissionComplete.reward} 💰 Coins Earned!
             </div>
           </div>
         )}
