@@ -189,7 +189,10 @@ const AgarIOGame = () => {
           speed: Math.max(0.3, 50 / Math.sqrt(mass)), // Reduced from 86 to 50 for slower, more controlled movement
           targetX: Math.random() * this.world.width,
           targetY: Math.random() * this.world.height,
-          lastTargetChange: Date.now()
+          lastTargetChange: Date.now(),
+          spawnProtection: true,
+          spawnProtectionTime: 4000, // 4 seconds in milliseconds
+          spawnProtectionStart: Date.now() + (i * 200) // Stagger spawn times slightly
         })
       }
     }
