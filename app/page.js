@@ -1356,24 +1356,6 @@ export default function TurfLootTactical() {
       </div>
 
       <div style="padding: 32px;">
-        <!-- Current Skin Display -->
-        <div style="margin-bottom: 24px; padding: 20px; background: rgba(104, 211, 145, 0.1); border: 2px solid #68d391; border-radius: 12px;">
-          <div style="color: #68d391; font-size: 16px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase;">
-            CURRENT SKIN
-          </div>
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <div id="current-skin-preview" style="width: 60px; height: 60px; background: ${selectedSkinData.color}; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #ffffff; position: relative; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);">
-              <!-- Black Eyes - Same as in-game character -->
-              <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; left: 16px; top: 20px;"></div>
-              <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; right: 16px; top: 20px;"></div>
-            </div>
-            <div>
-              <div id="current-skin-name" style="color: #68d391; font-size: 20px; font-weight: 700;">${selectedSkinData.name}</div>
-              <div style="color: #a0aec0; font-size: 14px;">Currently equipped</div>
-            </div>
-          </div>
-        </div>
-
         <!-- Skin Categories -->
         <div style="margin-bottom: 24px;">
           <div style="display: flex; gap: 12px; margin-bottom: 20px;">
