@@ -656,7 +656,15 @@ export default function TurfLootTactical() {
   // Wallet operations with Privy integration
   const handleDeposit = async () => {
     try {
-      console.log('💰 DEPOSIT button clicked - attempting to access Privy fundWallet')
+      console.log('💰 DEPOSIT button clicked - requiring authentication')
+      
+      const authenticated = await requireAuthentication('DEPOSIT')
+      if (!authenticated) {
+        console.log('❌ Authentication failed, blocking access to DEPOSIT')
+        return
+      }
+      
+      console.log('💰 User authenticated, proceeding with deposit...')
       
       // Check if Privy is available
       if (!window.__TURFLOOT_PRIVY__) {
@@ -666,41 +674,76 @@ export default function TurfLootTactical() {
       }
       
       const privy = window.__TURFLOOT_PRIVY__
+      
+      // Ensure user is authenticated
+      if (!privy.authenticated || !privy.user) {
+        console.log('❌ User not properly authenticated')
+        alert('Please ensure you are logged in before depositing funds.')
+        return
+      }
+      
+      console.log('✅ User authenticated:', privy.user.id)
       console.log('🔍 Available Privy methods:', Object.keys(privy))
       console.log('🔍 FundWallet function type:', typeof privy.fundWallet)
-      console.log('🔍 Raw fundWallet type:', typeof privy._rawFundWallet)
       
-      // Try to call fundWallet directly to test if it works
-      console.log('💰 Attempting to call Privy fundWallet...')
+      // Get or create the user's wallet
+      let wallet = privy.user.wallet
       
-      if (typeof privy.fundWallet === 'function') {
-        console.log('📱 Calling fundWallet via bridge...')
+      if (!wallet) {
+        console.log('🏗️ No wallet found, creating embedded wallet...')
+        
         try {
-          await privy.fundWallet()
-          console.log('✅ Privy fundWallet called successfully!')
-        } catch (fundError) {
-          console.error('❌ FundWallet error:', fundError)
-          throw fundError
+          // Try to create an embedded wallet if one doesn't exist
+          if (typeof privy._rawPrivy.createWallet === 'function') {
+            console.log('📱 Creating embedded wallet...')
+            wallet = await privy._rawPrivy.createWallet()
+            console.log('✅ Embedded wallet created successfully')
+            
+            // Wait for wallet to be fully initialized
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            
+            // Refresh user data to get the new wallet
+            wallet = privy.user.wallet
+            
+          } else {
+            console.log('❌ createWallet function not available')
+            throw new Error('Wallet creation not available')
+          }
+        } catch (walletError) {
+          console.error('❌ Wallet creation failed:', walletError)
+          alert('Failed to create wallet. Please try refreshing the page and logging in again.')
+          return
         }
-      } else if (typeof privy._rawFundWallet === 'function') {
-        console.log('📱 Calling raw fundWallet...')
-        try {
-          await privy._rawFundWallet()
-          console.log('✅ Raw fundWallet called successfully!')
-        } catch (fundError) {
-          console.error('❌ Raw fundWallet error:', fundError)
-          throw fundError
-        }
-      } else {
-        throw new Error('fundWallet function not available - neither bridge nor raw version found')
+      }
+      
+      // Validate wallet address exists
+      if (!wallet || !wallet.address) {
+        console.log('❌ Wallet address not available after initialization')
+        alert('Wallet initialization failed. Please try refreshing the page and logging in again.')
+        return
+      }
+      
+      console.log('✅ Wallet confirmed:', wallet.address)
+      
+      // Use Privy's native fundWallet functionality
+      console.log('💰 Opening Privy deposit interface...')
+      
+      try {
+        await privy.fundWallet()
+        console.log('✅ Privy deposit interface opened successfully')
+      } catch (fundError) {
+        console.error('❌ FundWallet error:', fundError)
+        
+        // Provide fallback manual instructions if fundWallet fails
+        alert(`💰 MANUAL DEPOSIT\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
+        console.log('💰 Wallet address for manual deposit:', wallet.address)
       }
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
       console.log('🔍 Error details:', error.message, error.stack)
       
-      // Provide user-friendly error message
-      alert(`💰 FUND WALLET TEST\n\nDebugging Info:\n- Privy bridge: ${window.__TURFLOOT_PRIVY__ ? 'Available' : 'Not available'}\n- FundWallet function: ${typeof window.__TURFLOOT_PRIVY__?.fundWallet}\n- Error: ${error.message}\n\nCheck console for detailed logs.`)
+      alert('Deposit functionality encountered an error. Please try logging in again or refresh the page.')
     }
   }
 
