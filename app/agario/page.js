@@ -274,6 +274,382 @@ const AgarIOGame = () => {
       }
     }
 
+    // === ANTI-CHEAT SYSTEM ===
+    
+    initAntiCheat() {
+      if (!this.antiCheat.enabled) return
+      
+      console.log('🛡️ Initializing comprehensive anti-cheat system...')
+      
+      // Override critical functions to detect tampering
+      this.protectCriticalFunctions()
+      
+      // Start periodic integrity checks
+      this.startIntegrityMonitoring()
+      
+      // Enhanced input monitoring
+      this.enhanceInputMonitoring()
+      
+      // Performance profiling to detect automation
+      this.startPerformanceProfiling()
+      
+      console.log('🛡️ Anti-cheat system fully initialized')
+    }
+    
+    protectCriticalFunctions() {
+      // Store original function references
+      const originalConsoleLog = console.log
+      const originalSetInterval = setInterval
+      const originalRequestAnimationFrame = requestAnimationFrame
+      
+      // Monitor console usage (bots often use excessive logging)
+      let consoleCallCount = 0
+      console.log = (...args) => {
+        consoleCallCount++
+        if (consoleCallCount > 100) { // Excessive console usage
+          this.recordViolation('EXCESSIVE_CONSOLE_USAGE', 'High console.log usage detected')
+        }
+        return originalConsoleLog.apply(console, args)
+      }
+      
+      // Detect memory manipulation attempts
+      this.protectGameVariables()
+    }
+    
+    protectGameVariables() {
+      const self = this
+      
+      // Protect player mass
+      let _mass = this.player.mass
+      Object.defineProperty(this.player, 'mass', {
+        get() { return _mass },
+        set(value) {
+          const oldMass = _mass
+          _mass = value
+          
+          // Validate mass changes
+          if (value > oldMass * 2) { // Suspicious mass jump
+            self.recordViolation('SUSPICIOUS_MASS_CHANGE', `Mass jumped from ${oldMass} to ${value}`)
+          }
+          if (value < 0) { // Invalid mass
+            self.recordViolation('INVALID_MASS_VALUE', `Negative mass: ${value}`)
+            _mass = 20 // Reset to default
+          }
+        }
+      })
+      
+      // Protect player position
+      this.lastValidPosition = { x: this.player.x, y: this.player.y }
+    }
+    
+    startIntegrityMonitoring() {
+      setInterval(() => {
+        if (!this.antiCheat.enabled || this.antiCheat.banned) return
+        
+        // Check game state integrity
+        this.validateGameState()
+        
+        // Analyze behavioral patterns
+        this.analyzePlayerBehavior()
+        
+        // Check for automation patterns
+        this.detectAutomation()
+        
+        // Monitor network patterns
+        this.analyzeNetworkPatterns()
+        
+        this.antiCheat.integrityChecks++
+      }, 2000) // Check every 2 seconds
+    }
+    
+    enhanceInputMonitoring() {
+      // Track mouse movement patterns
+      document.addEventListener('mousemove', (e) => {
+        if (!this.antiCheat.enabled) return
+        
+        const now = Date.now()
+        this.antiCheat.mouseMovements.push({
+          x: e.clientX,
+          y: e.clientY,
+          timestamp: now,
+          deltaTime: now - this.antiCheat.lastInputTime
+        })
+        
+        // Keep only last 100 movements
+        if (this.antiCheat.mouseMovements.length > 100) {
+          this.antiCheat.mouseMovements.shift()
+        }
+        
+        this.antiCheat.lastInputTime = now
+        this.analyzeMousePattern()
+      })
+      
+      // Track click patterns
+      document.addEventListener('click', (e) => {
+        if (!this.antiCheat.enabled) return
+        
+        this.antiCheat.clickPattern.push({
+          x: e.clientX,
+          y: e.clientY,
+          timestamp: Date.now(),
+          button: e.button
+        })
+        
+        if (this.antiCheat.clickPattern.length > 50) {
+          this.antiCheat.clickPattern.shift()
+        }
+      })
+      
+      // Track keyboard patterns
+      document.addEventListener('keydown', (e) => {
+        if (!this.antiCheat.enabled) return
+        
+        this.antiCheat.keyPresses.push({
+          key: e.key,
+          timestamp: Date.now(),
+          ctrlKey: e.ctrlKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
+        })
+        
+        if (this.antiCheat.keyPresses.length > 100) {
+          this.antiCheat.keyPresses.shift()
+        }
+        
+        // Detect suspicious key combinations
+        if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+          this.recordViolation('DEV_TOOLS_ATTEMPT', 'Developer tools access attempted')
+        }
+      })
+    }
+    
+    startPerformanceProfiling() {
+      // Monitor frame timing consistency
+      let lastFrameTime = performance.now()
+      const frameTimes = []
+      
+      const checkFrameRate = () => {
+        const currentTime = performance.now()
+        const deltaTime = currentTime - lastFrameTime
+        frameTimes.push(deltaTime)
+        
+        if (frameTimes.length > 60) { // Check last 60 frames
+          frameTimes.shift()
+          
+          // Detect too-consistent frame timing (indicates automation)
+          const variance = this.calculateVariance(frameTimes)
+          if (variance < 0.1) { // Too consistent
+            this.recordViolation('AUTOMATED_TIMING', `Frame timing too consistent: ${variance}`)
+          }
+        }
+        
+        lastFrameTime = currentTime
+        if (this.running && this.antiCheat.enabled) {
+          requestAnimationFrame(checkFrameRate)
+        }
+      }
+      
+      if (this.antiCheat.enabled) {
+        requestAnimationFrame(checkFrameRate)
+      }
+    }
+    
+    validateGameState() {
+      // Check for impossible game states
+      if (this.player.mass < 0) {
+        this.recordViolation('INVALID_GAME_STATE', 'Negative player mass')
+        this.player.mass = 20
+      }
+      
+      if (this.player.radius > this.player.mass * 10) {
+        this.recordViolation('INVALID_GAME_STATE', 'Radius-mass ratio violation')
+      }
+      
+      // Check position bounds
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const distance = Math.sqrt(Math.pow(this.player.x - centerX, 2) + Math.pow(this.player.y - centerY, 2))
+      
+      if (distance > this.currentPlayableRadius + 100) {
+        this.recordViolation('POSITION_VIOLATION', 'Player outside valid boundaries')
+        // Teleport back to safe zone
+        this.player.x = centerX
+        this.player.y = centerY
+      }
+    }
+    
+    analyzePlayerBehavior() {
+      const now = Date.now()
+      
+      // Track mass gain rate
+      this.antiCheat.massGainRate.push({
+        mass: this.player.mass,
+        timestamp: now
+      })
+      
+      if (this.antiCheat.massGainRate.length > 10) {
+        this.antiCheat.massGainRate.shift()
+        
+        // Check for impossible mass gain
+        const oldest = this.antiCheat.massGainRate[0]
+        const newest = this.antiCheat.massGainRate[this.antiCheat.massGainRate.length - 1]
+        const timeDiff = (newest.timestamp - oldest.timestamp) / 1000 // seconds
+        const massGain = newest.mass - oldest.mass
+        
+        if (massGain > 100 && timeDiff < 5) { // Gained 100+ mass in under 5 seconds
+          this.recordViolation('IMPOSSIBLE_MASS_GAIN', `Gained ${massGain} mass in ${timeDiff}s`)
+        }
+      }
+    }
+    
+    detectAutomation() {
+      if (this.antiCheat.mouseMovements.length < 20) return
+      
+      // Analyze mouse movement patterns
+      const movements = this.antiCheat.mouseMovements.slice(-20)
+      
+      // Check for too-perfect circular movements (common in bots)
+      let circularScore = 0
+      for (let i = 2; i < movements.length; i++) {
+        const prev = movements[i-2]
+        const curr = movements[i-1]
+        const next = movements[i]
+        
+        const angle1 = Math.atan2(curr.y - prev.y, curr.x - prev.x)
+        const angle2 = Math.atan2(next.y - curr.y, next.x - curr.x)
+        const angleDiff = Math.abs(angle1 - angle2)
+        
+        if (angleDiff < 0.1) circularScore++ // Very small angle changes
+      }
+      
+      if (circularScore > 15) { // Too many perfect movements
+        this.recordViolation('AUTOMATED_MOVEMENT', `Robotic movement pattern detected: ${circularScore}/18`)
+        this.antiCheat.botLikeScore += 10
+      }
+      
+      // Check for inhuman reaction times
+      const reactionTimes = []
+      for (let i = 1; i < movements.length; i++) {
+        reactionTimes.push(movements[i].deltaTime)
+      }
+      
+      const avgReactionTime = reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length
+      if (avgReactionTime < 10) { // Less than 10ms average - impossible for humans
+        this.recordViolation('INHUMAN_REACTION_TIME', `Average reaction time: ${avgReactionTime}ms`)
+        this.antiCheat.botLikeScore += 15
+      }
+    }
+    
+    analyzeNetworkPatterns() {
+      // Monitor action frequency
+      const now = Date.now()
+      const recentActions = this.antiCheat.actionQueue.filter(action => 
+        now - action.timestamp < 1000 // Last second
+      )
+      
+      if (recentActions.length > this.antiCheat.actionRateLimit) {
+        this.recordViolation('RATE_LIMIT_EXCEEDED', `${recentActions.length} actions per second`)
+      }
+    }
+    
+    analyzeMousePattern() {
+      if (this.antiCheat.mouseMovements.length < 10) return
+      
+      const recent = this.antiCheat.mouseMovements.slice(-10)
+      
+      // Check for linear movement patterns (bot-like)
+      let linearityScore = 0
+      for (let i = 2; i < recent.length; i++) {
+        const p1 = recent[i-2]
+        const p2 = recent[i-1]
+        const p3 = recent[i]
+        
+        // Calculate if points are nearly collinear
+        const area = Math.abs((p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y))
+        if (area < 5) linearityScore++ // Points are very close to a straight line
+      }
+      
+      if (linearityScore > 6) { // Too many linear movements
+        this.recordViolation('LINEAR_MOVEMENT_PATTERN', `Bot-like linear movement: ${linearityScore}/8`)
+      }
+    }
+    
+    recordViolation(type, description) {
+      this.antiCheat.violations++
+      this.antiCheat.suspiciousActions++
+      
+      console.warn(`🚨 ANTI-CHEAT VIOLATION [${this.antiCheat.violations}/${this.antiCheat.maxViolations}]: ${type} - ${description}`)
+      
+      // Log violation for server reporting
+      this.reportViolation(type, description)
+      
+      // Progressive penalties
+      if (this.antiCheat.violations >= 3) {
+        this.applyPenalty('speed_reduction')
+      }
+      
+      if (this.antiCheat.violations >= this.antiCheat.maxViolations) {
+        this.banPlayer()
+      }
+    }
+    
+    applyPenalty(type) {
+      switch (type) {
+        case 'speed_reduction':
+          this.player.speed *= 0.8 // Reduce speed by 20%
+          console.warn('🐌 PENALTY: Movement speed reduced for suspicious activity')
+          break
+        case 'mass_penalty':
+          this.player.mass *= 0.9 // Reduce mass by 10%
+          console.warn('📉 PENALTY: Mass reduced for cheating attempt')
+          break
+      }
+    }
+    
+    banPlayer() {
+      this.antiCheat.banned = true
+      this.running = false
+      
+      console.error('🔒 PLAYER BANNED: Multiple anti-cheat violations detected')
+      
+      // Show ban message
+      alert('⚠️ ACCOUNT SUSPENDED\n\nMultiple violations of fair play policies detected.\nContact support if you believe this is an error.')
+      
+      // Redirect to main page
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 3000)
+    }
+    
+    reportViolation(type, description) {
+      // In a real implementation, this would send to server
+      const violationData = {
+        type,
+        description,
+        timestamp: Date.now(),
+        playerData: {
+          mass: this.player.mass,
+          position: { x: this.player.x, y: this.player.y },
+          violations: this.antiCheat.violations
+        },
+        gameData: {
+          isCashGame: this.isCashGame,
+          roomId: new URLSearchParams(window.location.search).get('roomId')
+        }
+      }
+      
+      console.log('📊 Violation report:', violationData)
+      // TODO: Send to backend API for logging and analysis
+    }
+    
+    calculateVariance(numbers) {
+      const mean = numbers.reduce((a, b) => a + b, 0) / numbers.length
+      const squareDiffs = numbers.map(n => Math.pow(n - mean, 2))
+      return squareDiffs.reduce((a, b) => a + b, 0) / numbers.length
+    }
+    
+    // === END ANTI-CHEAT SYSTEM ===
+
     generateCoins() {
       this.coins = []
       const centerX = this.world.width / 2  // 2000
