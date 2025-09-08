@@ -734,7 +734,8 @@ const AgarIOGame = () => {
       const centerY = this.world.height / 2
       const playableRadius = this.currentPlayableRadius
       
-      for (let i = 0; i < 6; i++) {
+      // Increased virus count from 6 to 12 for more challenging gameplay
+      for (let i = 0; i < 12; i++) {
         let x, y, distance
         
         // Generate virus within the playable radius
