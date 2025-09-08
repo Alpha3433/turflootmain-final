@@ -1140,15 +1140,15 @@ const AgarIOGame = () => {
     }
 
     updateCamera() {
+      // Agar.io style camera - smooth but responsive
       const targetX = this.player.x - this.canvas.width / 2
       const targetY = this.player.y - this.canvas.height / 2
       
-      // Enhanced camera smoothing for better movement feel
-      const cameraSmoothing = 0.15 // Increased from 0.1 for more responsive camera
-      this.camera.x += (targetX - this.camera.x) * cameraSmoothing
-      this.camera.y += (targetY - this.camera.y) * cameraSmoothing
+      // Simple linear interpolation like Agar.io (around 10% per frame)
+      this.camera.x += (targetX - this.camera.x) * 0.1
+      this.camera.y += (targetY - this.camera.y) * 0.1
       
-      // Allow camera to show red boundary areas (extend bounds by 100px)
+      // Keep camera within world bounds
       const boundaryExtension = 100
       this.camera.x = Math.max(-boundaryExtension, Math.min(this.world.width - this.canvas.width + boundaryExtension, this.camera.x))
       this.camera.y = Math.max(-boundaryExtension, Math.min(this.world.height - this.canvas.height + boundaryExtension, this.camera.y))
