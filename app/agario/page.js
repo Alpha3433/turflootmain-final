@@ -1667,7 +1667,7 @@ const AgarIOGame = () => {
 
       {/* DESKTOP HUD UI Elements - Always Visible */}
       <div>
-        {/* Live Leaderboard - Smaller Version */}
+        {/* Live Leaderboard - Mobile Optimized */}
         <div 
           style={{ 
             position: 'fixed', 
@@ -1676,26 +1676,27 @@ const AgarIOGame = () => {
             zIndex: 1000,
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             border: '2px solid rgba(0, 255, 255, 0.3)',
-            borderRadius: '6px',
-            padding: '10px',
-            minWidth: '160px',
+            borderRadius: isMobile ? '12px' : '6px',
+            padding: isMobile ? '12px' : '10px',
+            minWidth: isMobile ? '140px' : '160px',
+            maxWidth: isMobile ? '160px' : '180px',
             fontFamily: '"Rajdhani", sans-serif'
           }}
         >
           {/* Header */}
           <div style={{ 
             color: '#00ffff', 
-            fontSize: '14px', 
+            fontSize: isMobile ? '13px' : '14px', 
             fontWeight: '700', 
-            marginBottom: '10px',
+            marginBottom: isMobile ? '8px' : '10px',
             textAlign: 'center',
             letterSpacing: '0.5px'
           }}>
-            💰 Live Leaderboard
+            {isMobile ? '🏆 Top 5' : '💰 Live Leaderboard'}
           </div>
           
           {/* Player Rankings - Dynamic Leaderboard */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '3px' : '4px', marginBottom: isMobile ? '8px' : '10px' }}>
             {(() => {
               if (!gameRef.current) return null;
               
