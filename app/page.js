@@ -18,6 +18,7 @@ export default function TurfLootTactical() {
   const [isServerBrowserOpen, setIsServerBrowserOpen] = useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isFriendsModalOpen, setIsFriendsModalOpen] = useState(false)
+  const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false)
   const [isLoadingLocalPractice, setIsLoadingLocalPractice] = useState(false)
   
   // Mouse tracking for interactive eyes
