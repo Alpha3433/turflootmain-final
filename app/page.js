@@ -5388,8 +5388,8 @@ export default function TurfLootTactical() {
                 }}>
                   <button
                     onClick={() => {
-                      // Handle add friend
                       console.log('Add Friend clicked')
+                      setIsAddFriendModalOpen(true)
                     }}
                     style={{
                       background: 'rgba(104, 211, 145, 0.2)',
