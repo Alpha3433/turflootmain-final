@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the fixed 'Hold E to Cash Out' functionality to verify that the progress bar now increments correctly when the 'E' key is held. The previous engineer applied a fix for the progress bar being stuck at 0%."
+user_problem_statement: "Fix User Profile Modal Bug: The user profile popup modal, triggered by clicking the 👤 icon in the navigation bar, was failing to open for authenticated users. Debug logs showed the click handler was working but authentication state was showing as false even when users should be authenticated."
 
 # Test plan for this run
 
