@@ -3629,8 +3629,31 @@ export default function TurfLootTactical() {
               }}
               title="User Profile"
               onClick={() => {
-                console.log('🔍 Profile icon clicked! Authentication state:', isAuthenticated)
+                console.log('🔍 Profile icon clicked!')
+                console.log('🔍 Current authentication state:', isAuthenticated)
+                console.log('🔍 Current user:', user)
                 console.log('🔍 Current profile modal state:', isProfileModalOpen)
+                
+                // Force a fresh authentication check before opening modal
+                if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
+                  const privyState = window.__TURFLOOT_PRIVY__
+                  console.log('🔍 Fresh Privy state check:', {
+                    ready: privyState.ready,
+                    authenticated: privyState.authenticated,
+                    hasUser: !!privyState.user,
+                    userEmail: privyState.user?.email?.address,
+                    userWallet: privyState.user?.wallet?.address?.slice(0, 8) + '...'
+                  })
+                  
+                  // Update local state with fresh Privy data
+                  if (privyState.ready !== undefined) {
+                    setIsAuthenticated(privyState.authenticated || false)
+                    setUser(privyState.user || null)
+                  }
+                } else {
+                  console.log('⚠️ Privy bridge not available when profile clicked')
+                }
+                
                 setIsProfileModalOpen(true)
                 console.log('🔍 Setting profile modal to true')
               }}
