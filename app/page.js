@@ -5329,6 +5329,385 @@ export default function TurfLootTactical() {
           </div>
         )}
 
+        {/* Friends Modal */}
+        {isFriendsModalOpen && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 10000,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+              boxSizing: 'border-box'
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsFriendsModalOpen(false)
+              }
+            }}
+          >
+            <div 
+              style={{
+                background: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
+                border: '3px solid #68d391',
+                borderRadius: '16px',
+                maxWidth: '500px',
+                width: '100%',
+                maxHeight: '85vh',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.3)',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}
+            >
+              {/* Header - Fixed */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '2px solid rgba(104, 211, 145, 0.3)',
+                background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+                borderRadius: '13px 13px 0 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexShrink: 0
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    color: '#1a202c',
+                    fontWeight: '700',
+                    boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)'
+                  }}>
+                    👥
+                  </div>
+                  <div>
+                    <h2 style={{
+                      margin: 0,
+                      color: '#68d391',
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em'
+                    }}>
+                      FRIENDS
+                    </h2>
+                    <p style={{
+                      margin: '4px 0 0 0',
+                      color: '#a0aec0',
+                      fontSize: '14px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      TACTICAL NETWORK
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsFriendsModalOpen(false)}
+                  style={{
+                    background: 'rgba(252, 129, 129, 0.2)',
+                    border: '2px solid #fc8181',
+                    borderRadius: '8px',
+                    color: '#fc8181',
+                    fontSize: '20px',
+                    width: '40px',
+                    height: '40px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+                    e.target.style.transform = 'scale(1.1)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                    e.target.style.transform = 'scale(1)'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Scrollable Content Area */}
+              <div style={{ 
+                flex: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px'
+              }}>
+                
+                {/* Quick Actions */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '12px'
+                }}>
+                  <button
+                    onClick={() => {
+                      // Handle add friend
+                      console.log('Add Friend clicked')
+                    }}
+                    style={{
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '2px solid #68d391',
+                      borderRadius: '8px',
+                      color: '#68d391',
+                      padding: '12px 16px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    👤 ADD FRIEND
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Handle create party
+                      console.log('Create Party clicked')
+                    }}
+                    style={{
+                      background: 'rgba(59, 130, 246, 0.2)',
+                      border: '2px solid #3b82f6',
+                      borderRadius: '8px',
+                      color: '#3b82f6',
+                      padding: '12px 16px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(59, 130, 246, 0.3)'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(59, 130, 246, 0.2)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    🎯 CREATE PARTY
+                  </button>
+                </div>
+
+                {/* Online Friends */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '16px'
+                  }}>
+                    <h3 style={{
+                      margin: 0,
+                      color: '#68d391',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      🟢 ONLINE FRIENDS
+                    </h3>
+                    <span style={{
+                      color: '#a0aec0',
+                      fontSize: '12px',
+                      textTransform: 'uppercase'
+                    }}>
+                      0 ONLINE
+                    </span>
+                  </div>
+                  
+                  <div style={{
+                    padding: '32px 20px',
+                    textAlign: 'center',
+                    color: '#a0aec0',
+                    fontSize: '14px'
+                  }}>
+                    <div style={{ 
+                      fontSize: '48px', 
+                      marginBottom: '12px',
+                      opacity: 0.5 
+                    }}>
+                      👥
+                    </div>
+                    <div style={{ marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
+                      No friends online
+                    </div>
+                    <div style={{ fontSize: '12px', opacity: 0.7 }}>
+                      Add friends to see them here when they're playing
+                    </div>
+                  </div>
+                </div>
+
+                {/* All Friends */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '16px'
+                  }}>
+                    <h3 style={{
+                      margin: 0,
+                      color: '#9f7aea',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      👤 ALL FRIENDS
+                    </h3>
+                    <span style={{
+                      color: '#a0aec0',
+                      fontSize: '12px',
+                      textTransform: 'uppercase'
+                    }}>
+                      0 TOTAL
+                    </span>
+                  </div>
+                  
+                  <div style={{
+                    padding: '32px 20px',
+                    textAlign: 'center',
+                    color: '#a0aec0',
+                    fontSize: '14px'
+                  }}>
+                    <div style={{ 
+                      fontSize: '48px', 
+                      marginBottom: '12px',
+                      opacity: 0.5 
+                    }}>
+                      🤝
+                    </div>
+                    <div style={{ marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
+                      Your friends list is empty
+                    </div>
+                    <div style={{ fontSize: '12px', opacity: 0.7, marginBottom: '16px' }}>
+                      Start building your tactical network by adding friends
+                    </div>
+                    <button
+                      onClick={() => {
+                        // Handle add first friend
+                        console.log('Add first friend clicked')
+                      }}
+                      style={{
+                        background: 'rgba(104, 211, 145, 0.2)',
+                        border: '2px solid #68d391',
+                        borderRadius: '8px',
+                        color: '#68d391',
+                        padding: '10px 20px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                      }}
+                    >
+                      👤 ADD YOUR FIRST FRIEND
+                    </button>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <h3 style={{
+                    margin: '0 0 16px 0',
+                    color: '#f6ad55',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    📈 RECENT ACTIVITY
+                  </h3>
+                  
+                  <div style={{
+                    padding: '24px 20px',
+                    textAlign: 'center',
+                    color: '#a0aec0',
+                    fontSize: '14px'
+                  }}>
+                    <div style={{ 
+                      fontSize: '32px', 
+                      marginBottom: '8px',
+                      opacity: 0.5 
+                    }}>
+                      📊
+                    </div>
+                    <div style={{ fontSize: '12px', opacity: 0.7 }}>
+                      No recent friend activity
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     )
   }
