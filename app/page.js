@@ -5016,19 +5016,19 @@ export default function TurfLootTactical() {
                     marginBottom: '16px'
                   }}>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ color: '#f6ad55', fontSize: '32px', fontWeight: '700' }}>127</div>
+                      <div style={{ color: '#f6ad55', fontSize: '32px', fontWeight: '700' }}>0</div>
                       <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Games Played</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ color: '#68d391', fontSize: '32px', fontWeight: '700' }}>34</div>
+                      <div style={{ color: '#68d391', fontSize: '32px', fontWeight: '700' }}>0</div>
                       <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Wins</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ color: '#9f7aea', fontSize: '32px', fontWeight: '700' }}>2,847</div>
+                      <div style={{ color: '#9f7aea', fontSize: '32px', fontWeight: '700' }}>0</div>
                       <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Highest Size</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ color: '#fc8181', fontSize: '32px', fontWeight: '700' }}>7</div>
+                      <div style={{ color: '#fc8181', fontSize: '32px', fontWeight: '700' }}>0</div>
                       <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Win Streak</div>
                     </div>
                   </div>
@@ -5041,7 +5041,7 @@ export default function TurfLootTactical() {
                     textAlign: 'center'
                   }}>
                     <span style={{ color: '#f6ad55', fontSize: '14px', fontWeight: '600' }}>
-                      💰 LIFETIME EARNINGS: $2,847.50
+                      💰 LIFETIME EARNINGS: $0.00
                     </span>
                   </div>
                 </div>
