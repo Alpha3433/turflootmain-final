@@ -4207,7 +4207,16 @@ export default function TurfLootTactical() {
           </button>
           
           <button 
-            onClick={() => createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin)}
+            onClick={async () => {
+              console.log('CHANGE SKIN button clicked!')
+              const authenticated = await requireAuthentication('CHANGE SKIN')
+              if (authenticated) {
+                console.log('🎨 User authenticated, opening change skin...')
+                createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin)
+              } else {
+                console.log('❌ Authentication failed, blocking access to CHANGE SKIN')
+              }
+            }}
             style={{
             width: '100%',
             padding: '12px',
