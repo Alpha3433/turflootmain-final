@@ -348,6 +348,9 @@ const AgarIOGame = () => {
       // Update player
       this.updatePlayer(deltaTime)
       
+      // Update dynamic zone for cash games
+      this.updateDynamicZone(deltaTime / 1000) // Convert to seconds
+      
       // Update spawn protection timers
       this.updateSpawnProtection()
       
