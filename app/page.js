@@ -571,43 +571,38 @@ export default function TurfLootTactical() {
 
   const handleWithdraw = async () => {
     try {
-      console.log('💸 WITHDRAW button clicked')
+      console.log('💸 WITHDRAW button clicked - requiring authentication')
       
+      const authenticated = await requireAuthentication('WITHDRAW')
+      if (!authenticated) {
+        console.log('❌ Authentication failed, blocking access to WITHDRAW')
+        return
+      }
+      
+      console.log('💸 User authenticated, proceeding with withdraw...')
+
       // Check if Privy is available
       if (!window.__TURFLOOT_PRIVY__) {
         console.log('⚠️ Privy not available, showing info message')
         alert('Wallet functionality requires authentication. Please click the LOGIN button first.')
         return
       }
-      
+
       const privy = window.__TURFLOOT_PRIVY__
-      
-      // Check if user is authenticated
-      if (!privy.authenticated) {
-        console.log('🔐 User not authenticated, initiating login')
-        try {
-          await privy.login()
-          console.log('✅ User logged in successfully')
-        } catch (error) {
-          console.error('❌ Login failed:', error)
-          alert('Login failed. Please try again.')
-          return
-        }
-      }
-      
-      // Check if user has a wallet
-      if (!privy.user?.wallet?.address) {
+      const user = privy.user
+
+      if (!user?.wallet?.address) {
         console.log('👛 No wallet found, prompting wallet connection')
-        // Removed popup - allow direct access to withdraw functionality
+        alert('No wallet found. Please ensure you are logged in and have a wallet connected.')
         return
       }
-      
-      // Create withdraw popup
-      createWithdrawPopup(privy.user)
+
+      // Show withdrawal instructions
+      alert(`To withdraw funds:\n\n1. Use your wallet to send funds to another address\n2. Your wallet address: ${user.wallet.address}\n3. You can access your wallet through the Privy interface\n\nNote: Always verify recipient addresses before sending funds.`)
       
     } catch (error) {
       console.error('❌ Withdraw error:', error)
-      alert('An error occurred while initiating withdrawal. Please try again.')
+      alert('An error occurred while accessing withdrawal functionality. Please try again.')
     }
   }
 
