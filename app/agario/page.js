@@ -1433,7 +1433,13 @@ const AgarIOGame = () => {
       console.log('⚠️ Error loading selected skin, using default:', error)
     }
 
-    const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin)
+    // Pass game states to engine for player visibility control
+    const gameStates = {
+      cashOutComplete,
+      gameOver
+    }
+
+    const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
     gameRef.current = game
     
     game.start()
