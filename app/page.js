@@ -3495,7 +3495,7 @@ export default function TurfLootTactical() {
                 transition: 'all 0.3s ease',
                 fontSize: '16px'
               }}
-              title="Settings"
+              title="User Profile"
               onMouseOver={(e) => {
                 e.target.style.transform = 'scale(1.1)'
                 e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.5)'
@@ -3505,7 +3505,7 @@ export default function TurfLootTactical() {
                 e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.3)'
               }}
             >
-              ⚙️
+              👤
             </div>
             
             {/* Login/Logout Button */}
