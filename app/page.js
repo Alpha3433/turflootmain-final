@@ -4296,7 +4296,7 @@ export default function TurfLootTactical() {
               color: '#ffffff',
               boxShadow: '0 0 20px rgba(139, 92, 246, 0.6)',
               border: '2px solid #8b5cf6'
-            }}>🎯</div>
+            }}></div>
             <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(246, 173, 85, 0.6)', textTransform: 'uppercase' }}>CUSTOMIZE</h3>
           </div>
           
