@@ -1838,7 +1838,7 @@ const AgarIOGame = () => {
         })()}
         
         {/* Missions Panel - Top Center */}
-        {activeMissions.length > 0 && (
+        {activeMissions.length > 0 && gameRef.current && gameRef.current.detectCashGame() && (
           <div style={{
             position: 'fixed',
             top: '20px',
