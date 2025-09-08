@@ -210,18 +210,69 @@ export default function TurfLootTactical() {
     // Leaderboard will be populated when users actually cash out
     // For now, it remains empty to show "LOADING LEADERBOARD..." state
     
-    // Check for Privy authentication state
+    // Check for Privy authentication state with improved logic
     const checkPrivyAuth = () => {
       if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
         const privyState = window.__TURFLOOT_PRIVY__
-        setIsAuthenticated(privyState.authenticated || false)
-        setUser(privyState.user || null)
+        
+        // Debug logging to track authentication state changes
+        console.log('🔍 Privy Auth Check:', {
+          ready: privyState.ready,
+          authenticated: privyState.authenticated,
+          hasUser: !!privyState.user,
+          userEmail: privyState.user?.email?.address,
+          userWallet: privyState.user?.wallet?.address?.slice(0, 8) + '...'
+        })
+        
+        // Only update state if Privy is ready to avoid false negatives
+        if (privyState.ready !== undefined) {
+          const newAuthState = privyState.authenticated || false
+          const newUser = privyState.user || null
+          
+          // Only update if state actually changed to reduce unnecessary re-renders
+          setIsAuthenticated(prevAuth => {
+            if (prevAuth !== newAuthState) {
+              console.log('🔄 Authentication state changed:', prevAuth, '->', newAuthState)
+              return newAuthState
+            }
+            return prevAuth
+          })
+          
+          setUser(prevUser => {
+            const prevUserId = prevUser?.id
+            const newUserId = newUser?.id
+            if (prevUserId !== newUserId) {
+              console.log('👤 User state changed:', prevUserId, '->', newUserId)
+              return newUser
+            }
+            return prevUser
+          })
+        }
+      } else {
+        console.log('⏳ Privy bridge not yet available, waiting...')
       }
     }
     
-    // Check auth state periodically
+    // Initial auth check
     checkPrivyAuth()
-    const authCheckInterval = setInterval(checkPrivyAuth, 1000)
+    
+    // More frequent initial checks, then less frequent maintenance checks
+    let checkCount = 0
+    const authCheckInterval = setInterval(() => {
+      checkPrivyAuth()
+      checkCount++
+      
+      // After 30 seconds (30 checks), reduce frequency to every 5 seconds
+      if (checkCount >= 30) {
+        clearInterval(authCheckInterval)
+        const maintCheckInterval = setInterval(checkPrivyAuth, 5000)
+        
+        // Clean up maintenance interval on unmount
+        return () => {
+          clearInterval(maintCheckInterval)
+        }
+      }
+    }, 1000)
     
     return () => {
       window.removeEventListener('resize', checkMobile)
