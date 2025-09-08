@@ -584,26 +584,9 @@ const AgarIOGame = () => {
       // Log violation for server reporting
       this.reportViolation(type, description)
       
-      // Progressive penalties
-      if (this.antiCheat.violations >= 3) {
-        this.applyPenalty('speed_reduction')
-      }
-      
+      // Immediate ban after 3 strikes (no progressive penalties)
       if (this.antiCheat.violations >= this.antiCheat.maxViolations) {
         this.banPlayer()
-      }
-    }
-    
-    applyPenalty(type) {
-      switch (type) {
-        case 'speed_reduction':
-          this.player.speed *= 0.8 // Reduce speed by 20%
-          console.warn('🐌 PENALTY: Movement speed reduced for suspicious activity')
-          break
-        case 'mass_penalty':
-          this.player.mass *= 0.9 // Reduce mass by 10%
-          console.warn('📉 PENALTY: Mass reduced for cheating attempt')
-          break
       }
     }
     
@@ -613,13 +596,16 @@ const AgarIOGame = () => {
       
       console.error('🔒 PLAYER BANNED: Multiple anti-cheat violations detected')
       
-      // Show ban message
-      alert('⚠️ ACCOUNT SUSPENDED\n\nMultiple violations of fair play policies detected.\nContact support if you believe this is an error.')
-      
-      // Redirect to main page
-      setTimeout(() => {
-        window.location.href = '/'
-      }, 3000)
+      // Trigger the cheating ban modal instead of alert
+      if (typeof setCheatingBan === 'function') {
+        setCheatingBan(true)
+      } else {
+        // Fallback if state setter is not available
+        alert('⚠️ ACCOUNT SUSPENDED\n\nMultiple violations of fair play policies detected.\nContact support if you believe this is an error.')
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 3000)
+      }
     }
     
     reportViolation(type, description) {
