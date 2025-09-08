@@ -114,12 +114,13 @@ const AgarIOGame = () => {
 
   // Game Engine Class
   class GameEngine {
-    constructor(canvas) {
+    constructor(canvas, setCheatingBan) {
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
       this.world = { width: 4000, height: 4000 }
       this.camera = { x: 0, y: 0 }
       this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
+      this.setCheatingBan = setCheatingBan // Store the function reference
       
       // Dynamic zone system for cash games
       this.isCashGame = this.detectCashGame()
