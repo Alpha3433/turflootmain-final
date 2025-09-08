@@ -5336,6 +5336,584 @@ export default function TurfLootTactical() {
         }}
         onJoinLobby={handleJoinLobby}
       />
+
+      {/* User Profile Modal */}
+      {isProfileModalOpen && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            boxSizing: 'border-box'
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsProfileModalOpen(false)
+            }
+          }}
+        >
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
+              border: '3px solid #68d391',
+              borderRadius: '16px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.3)',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}
+          >
+            {/* Header */}
+            <div style={{
+              padding: '24px',
+              borderBottom: '2px solid rgba(104, 211, 145, 0.3)',
+              background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+              borderRadius: '13px 13px 0 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  width: '50px',
+                  height: '50px',
+                  background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  color: '#1a202c',
+                  fontWeight: '700',
+                  boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)'
+                }}>
+                  👤
+                </div>
+                <div>
+                  <h2 style={{
+                    margin: 0,
+                    color: '#68d391',
+                    fontSize: '24px',
+                    fontWeight: '700',
+                    textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em'
+                  }}>
+                    USER PROFILE
+                  </h2>
+                  <p style={{
+                    margin: '4px 0 0 0',
+                    color: '#a0aec0',
+                    fontSize: '14px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    TACTICAL OPERATIVE
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsProfileModalOpen(false)}
+                style={{
+                  background: 'rgba(252, 129, 129, 0.2)',
+                  border: '2px solid #fc8181',
+                  borderRadius: '8px',
+                  color: '#fc8181',
+                  fontSize: '20px',
+                  width: '40px',
+                  height: '40px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+                  e.target.style.transform = 'scale(1.1)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                  e.target.style.transform = 'scale(1)'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '24px' }}>
+              
+              {/* Identity Section */}
+              <div style={{
+                marginBottom: '32px',
+                padding: '20px',
+                background: 'rgba(45, 55, 72, 0.5)',
+                border: '1px solid rgba(104, 211, 145, 0.2)',
+                borderRadius: '12px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '24px',
+                  marginBottom: '20px'
+                }}>
+                  {/* Avatar/Skin Preview */}
+                  <div style={{
+                    width: '120px',
+                    height: '120px',
+                    background: selectedSkin.color,
+                    borderRadius: '50%',
+                    border: '4px solid #68d391',
+                    boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative'
+                  }}>
+                    {/* Eyes like in-game */}
+                    <div style={{
+                      position: 'absolute',
+                      width: '12px',
+                      height: '12px',
+                      background: '#1a202c',
+                      borderRadius: '50%',
+                      top: '35px',
+                      left: '35px'
+                    }} />
+                    <div style={{
+                      position: 'absolute',
+                      width: '12px',
+                      height: '12px',
+                      background: '#1a202c',
+                      borderRadius: '50%',
+                      top: '35px',
+                      right: '35px'
+                    }} />
+                  </div>
+                  
+                  {/* Status & Info */}
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{
+                      margin: '0 0 8px 0',
+                      color: '#e2e8f0',
+                      fontSize: '20px',
+                      fontWeight: '700'
+                    }}>
+                      {isAuthenticated ? 
+                        (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
+                        (customUsername || userName).toUpperCase()
+                      }
+                    </h3>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '12px'
+                    }}>
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        background: '#68d391',
+                        borderRadius: '50%',
+                        boxShadow: '0 0 8px #68d391',
+                        animation: 'pulse 2s infinite'
+                      }} />
+                      <span style={{
+                        color: '#68d391',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        textTransform: 'uppercase'
+                      }}>
+                        ONLINE
+                      </span>
+                    </div>
+                    <button style={{
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '2px solid #68d391',
+                      borderRadius: '6px',
+                      color: '#68d391',
+                      padding: '8px 16px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      ✏️ EDIT PROFILE
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats & Progression */}
+              <div style={{
+                marginBottom: '32px',
+                padding: '20px',
+                background: 'rgba(45, 55, 72, 0.5)',
+                border: '1px solid rgba(246, 173, 85, 0.2)',
+                borderRadius: '12px'
+              }}>
+                <h3 style={{
+                  margin: '0 0 16px 0',
+                  color: '#f6ad55',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  📊 STATS & PROGRESSION
+                </h3>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                  gap: '16px'
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#f6ad55', fontSize: '24px', fontWeight: '700' }}>127</div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Games Played</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>34</div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Wins</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#9f7aea', fontSize: '24px', fontWeight: '700' }}>2,847</div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Highest Size</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: '#fc8181', fontSize: '24px', fontWeight: '700' }}>7</div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Win Streak</div>
+                  </div>
+                </div>
+                <div style={{
+                  marginTop: '16px',
+                  padding: '12px',
+                  background: 'rgba(246, 173, 85, 0.1)',
+                  border: '1px solid rgba(246, 173, 85, 0.3)',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ color: '#f6ad55', fontSize: '16px', fontWeight: '600' }}>
+                    💰 LIFETIME EARNINGS: $2,847.50
+                  </div>
+                </div>
+              </div>
+
+              {/* Wallet Snapshot */}
+              <div style={{
+                marginBottom: '32px',
+                padding: '20px',
+                background: 'rgba(45, 55, 72, 0.5)',
+                border: '1px solid rgba(104, 211, 145, 0.2)',
+                borderRadius: '12px'
+              }}>
+                <h3 style={{
+                  margin: '0 0 16px 0',
+                  color: '#68d391',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  💰 WALLET SNAPSHOT
+                </h3>
+                <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                  <div style={{
+                    flex: 1,
+                    padding: '16px',
+                    background: 'rgba(104, 211, 145, 0.1)',
+                    border: '1px solid rgba(104, 211, 145, 0.3)',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ color: '#68d391', fontSize: '20px', fontWeight: '700' }}>
+                      {currency.toLocaleString()}
+                    </div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Coins</div>
+                  </div>
+                  <div style={{
+                    flex: 1,
+                    padding: '16px',
+                    background: 'rgba(159, 122, 234, 0.1)',
+                    border: '1px solid rgba(159, 122, 234, 0.3)',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ color: '#9f7aea', fontSize: '20px', fontWeight: '700' }}>0.0000</div>
+                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>SOL</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={{
+                    flex: 1,
+                    background: 'rgba(104, 211, 145, 0.2)',
+                    border: '2px solid #68d391',
+                    borderRadius: '6px',
+                    color: '#68d391',
+                    padding: '10px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}>
+                    💳 DEPOSIT
+                  </button>
+                  <button style={{
+                    flex: 1,
+                    background: 'rgba(252, 129, 129, 0.2)',
+                    border: '2px solid #fc8181',
+                    borderRadius: '6px',
+                    color: '#fc8181',
+                    padding: '10px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}>
+                    💸 WITHDRAW
+                  </button>
+                  <button style={{
+                    background: 'rgba(74, 85, 104, 0.5)',
+                    border: '2px solid #4a5568',
+                    borderRadius: '6px',
+                    color: '#a0aec0',
+                    padding: '10px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    minWidth: '40px'
+                  }}>
+                    📋
+                  </button>
+                </div>
+              </div>
+
+              {/* Customization */}
+              <div style={{
+                marginBottom: '32px',
+                padding: '20px',
+                background: 'rgba(45, 55, 72, 0.5)',
+                border: '1px solid rgba(159, 122, 234, 0.2)',
+                borderRadius: '12px'
+              }}>
+                <h3 style={{
+                  margin: '0 0 16px 0',
+                  color: '#9f7aea',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  🎨 CUSTOMIZATION
+                </h3>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button style={{
+                    flex: 1,
+                    background: 'rgba(159, 122, 234, 0.2)',
+                    border: '2px solid #9f7aea',
+                    borderRadius: '6px',
+                    color: '#9f7aea',
+                    padding: '12px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}>
+                    🎨 CHANGE SKIN
+                  </button>
+                  <button style={{
+                    flex: 1,
+                    background: 'rgba(246, 173, 85, 0.2)',
+                    border: '2px solid #f6ad55',
+                    borderRadius: '6px',
+                    color: '#f6ad55',
+                    padding: '12px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}>
+                    🛒 VIEW STORE
+                  </button>
+                </div>
+              </div>
+
+              {/* Social/Party */}
+              <div style={{
+                marginBottom: '32px',
+                padding: '20px',
+                background: 'rgba(45, 55, 72, 0.5)',
+                border: '1px solid rgba(66, 153, 225, 0.2)',
+                borderRadius: '12px'
+              }}>
+                <h3 style={{
+                  margin: '0 0 16px 0',
+                  color: '#4299e1',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  👥 SOCIAL & PARTY
+                </h3>
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{
+                    color: '#a0aec0',
+                    fontSize: '12px',
+                    textTransform: 'uppercase',
+                    marginBottom: '8px'
+                  }}>
+                    FRIENDS ONLINE (3/24)
+                  </div>
+                  {['TacticalAce', 'SniperPro', 'StealthOp'].map((friend, index) => (
+                    <div key={friend} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 12px',
+                      background: 'rgba(66, 153, 225, 0.1)',
+                      border: '1px solid rgba(66, 153, 225, 0.2)',
+                      borderRadius: '6px',
+                      marginBottom: '4px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{
+                          width: '8px',
+                          height: '8px',
+                          background: '#68d391',
+                          borderRadius: '50%',
+                          boxShadow: '0 0 6px #68d391'
+                        }} />
+                        <span style={{ color: '#e2e8f0', fontSize: '14px' }}>{friend}</span>
+                      </div>
+                      <button style={{
+                        background: 'rgba(66, 153, 225, 0.2)',
+                        border: '1px solid #4299e1',
+                        borderRadius: '4px',
+                        color: '#4299e1',
+                        padding: '4px 8px',
+                        fontSize: '10px',
+                        cursor: 'pointer'
+                      }}>
+                        INVITE
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Settings Shortcuts */}
+              <div style={{
+                marginBottom: '24px',
+                padding: '20px',
+                background: 'rgba(45, 55, 72, 0.5)',
+                border: '1px solid rgba(74, 85, 104, 0.2)',
+                borderRadius: '12px'
+              }}>
+                <h3 style={{
+                  margin: '0 0 16px 0',
+                  color: '#a0aec0',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  ⚙️ SETTINGS
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button style={{
+                    background: 'rgba(74, 85, 104, 0.5)',
+                    border: '2px solid #4a5568',
+                    borderRadius: '6px',
+                    color: '#a0aec0',
+                    padding: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}>
+                    👤 ACCOUNT
+                  </button>
+                  <button style={{
+                    background: 'rgba(74, 85, 104, 0.5)',
+                    border: '2px solid #4a5568',
+                    borderRadius: '6px',
+                    color: '#a0aec0',
+                    padding: '12px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}>
+                    🎮 GAME
+                  </button>
+                </div>
+                <button 
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    marginTop: '12px',
+                    background: 'rgba(252, 129, 129, 0.2)',
+                    border: '2px solid #fc8181',
+                    borderRadius: '6px',
+                    color: '#fc8181',
+                    padding: '12px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  🚪 LOGOUT
+                </button>
+              </div>
+
+              {/* Fair Play Notice */}
+              <div style={{
+                padding: '16px',
+                background: 'rgba(252, 129, 129, 0.1)',
+                border: '1px solid rgba(252, 129, 129, 0.3)',
+                borderRadius: '8px',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  color: '#fc8181',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  marginBottom: '4px'
+                }}>
+                  🔒 FAIR PLAY COMMITMENT
+                </div>
+                <div style={{
+                  color: '#a0aec0',
+                  fontSize: '12px',
+                  lineHeight: '1.4'
+                }}>
+                  Zero tolerance for cheats. Report suspicious players to maintain competitive integrity.
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
