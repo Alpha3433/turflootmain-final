@@ -24,6 +24,7 @@ const AgarIOGame = () => {
   const [completedMissions, setCompletedMissions] = useState([])
   const [activeMissions, setActiveMissions] = useState([])
   const [showMissionComplete, setShowMissionComplete] = useState(null)
+  const [currentMissionIndex, setCurrentMissionIndex] = useState(0) // For cycling through missions
 
   // Mission definitions
   const missionTypes = [
