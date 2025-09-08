@@ -167,7 +167,7 @@ const AgarIOGame = () => {
         
         // Movement validation
         lastPosition: { x: this.player.x, y: this.player.y, timestamp: Date.now() },
-        maxSpeed: 8, // Maximum pixels per frame at minimum mass
+        maxSpeed: 6, // Maximum pixels per frame at minimum mass - reduced from 8 to 6
         speedViolations: 0,
         
         // Input monitoring
