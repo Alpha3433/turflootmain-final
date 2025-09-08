@@ -154,6 +154,8 @@ const AgarIOGame = () => {
       this.viruses = []
       this.running = false
       this.lastUpdate = Date.now()
+      this.gameStartTime = null // Track when game starts
+      this.timeSurvivedSeconds = 0
       
       // Anti-cheat system
       this.antiCheat = {
