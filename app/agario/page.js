@@ -2455,7 +2455,7 @@ const AgarIOGame = () => {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>Total Mass:</span>
-              <span style={{ color: '#ffffff', fontWeight: '700' }}>{mass}</span>
+              <span style={{ color: '#ffffff', fontWeight: '700' }}>{Math.floor(mass)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>K/D:</span>
