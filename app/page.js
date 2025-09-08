@@ -4719,19 +4719,115 @@ export default function TurfLootTactical() {
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {[1, 2, 3].map(i => (
-              <div 
-                key={i}
-                style={{ 
-                  width: '24px', 
-                  height: '24px', 
-                  background: 'rgba(26, 32, 44, 0.8)', 
-                  border: '2px solid #68d391',
-                  borderRadius: '3px',
-                  boxShadow: '0 0 10px rgba(104, 211, 145, 0.3)'
-                }}
-              />
-            ))}
+            {/* Mobile Navigation Icons */}
+            <div 
+              style={{ 
+                width: '24px', 
+                height: '24px', 
+                background: 'rgba(26, 32, 44, 0.8)', 
+                border: '2px solid #68d391',
+                borderRadius: '3px',
+                boxShadow: '0 0 10px rgba(104, 211, 145, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '12px'
+              }}
+              title="Home"
+              onMouseOver={(e) => {
+                e.target.style.transform = 'scale(1.1)'
+                e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = '0 0 10px rgba(104, 211, 145, 0.3)'
+              }}
+            >
+              🏠
+            </div>
+            <div 
+              style={{ 
+                width: '24px', 
+                height: '24px', 
+                background: 'rgba(26, 32, 44, 0.8)', 
+                border: '2px solid #68d391',
+                borderRadius: '3px',
+                boxShadow: '0 0 10px rgba(104, 211, 145, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '12px'
+              }}
+              title="Friends"
+              onMouseOver={(e) => {
+                e.target.style.transform = 'scale(1.1)'
+                e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = '0 0 10px rgba(104, 211, 145, 0.3)'
+              }}
+            >
+              👥
+            </div>
+            <div 
+              style={{ 
+                width: '24px', 
+                height: '24px', 
+                background: 'rgba(26, 32, 44, 0.8)', 
+                border: '2px solid #68d391',
+                borderRadius: '3px',
+                boxShadow: '0 0 10px rgba(104, 211, 145, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '12px'
+              }}
+              title="Wallet"
+              onMouseOver={(e) => {
+                e.target.style.transform = 'scale(1.1)'
+                e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = '0 0 10px rgba(104, 211, 145, 0.3)'
+              }}
+            >
+              💰
+            </div>
+            <div 
+              style={{ 
+                width: '24px', 
+                height: '24px', 
+                background: 'rgba(26, 32, 44, 0.8)', 
+                border: '2px solid #68d391',
+                borderRadius: '3px',
+                boxShadow: '0 0 10px rgba(104, 211, 145, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '12px'
+              }}
+              title="Settings"
+              onMouseOver={(e) => {
+                e.target.style.transform = 'scale(1.1)'
+                e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = '0 0 10px rgba(104, 211, 145, 0.3)'
+              }}
+            >
+              ⚙️
+            </div>
           </div>
         </div>
 
