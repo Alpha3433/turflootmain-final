@@ -3923,7 +3923,7 @@ export default function TurfLootTactical() {
               color: '#1a202c',
               boxShadow: '0 0 20px rgba(246, 173, 85, 0.6)',
               border: '2px solid #f6ad55'
-            }}>🎯</div>
+            }}></div>
             <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>LEADERBOARD</h3>
             <div style={{ marginLeft: 'auto' }}>
               <div style={{
