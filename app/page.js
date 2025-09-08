@@ -2688,6 +2688,49 @@ export default function TurfLootTactical() {
     console.log('🎯 Desktop create party popup created with direct DOM manipulation')
   }
 
+  // Authentication check function
+  const requireAuthentication = async (actionName) => {
+    if (typeof window === 'undefined') return false
+    
+    // Check if Privy is available
+    if (!window.__TURFLOOT_PRIVY__) {
+      console.log('⚠️ Privy not available for:', actionName)
+      alert('Authentication service is loading. Please wait a moment and try again.')
+      return false
+    }
+
+    const privy = window.__TURFLOOT_PRIVY__
+    
+    // Check if user is already authenticated
+    if (privy.authenticated && privy.user) {
+      console.log('✅ User already authenticated for:', actionName)
+      setIsAuthenticated(true)
+      setUser(privy.user)
+      return true
+    }
+
+    // Force login popup
+    try {
+      console.log('🔐 Forcing login for:', actionName)
+      await privy.login()
+      
+      // Double check authentication after login
+      if (privy.authenticated && privy.user) {
+        console.log('✅ Login successful for:', actionName)
+        setIsAuthenticated(true)
+        setUser(privy.user)
+        return true
+      } else {
+        console.log('❌ Login failed - user not authenticated after login attempt')
+        return false
+      }
+    } catch (error) {
+      console.error('❌ Login error for:', actionName, error)
+      alert('Login failed. Please try again.')
+      return false
+    }
+  }
+
   const handleLogin = async () => {
     try {
       if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
