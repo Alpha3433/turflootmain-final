@@ -3441,7 +3441,7 @@ export default function TurfLootTactical() {
                 transition: 'all 0.3s ease',
                 fontSize: '16px'
               }}
-              title="Home"
+              title="Wallet"
               onMouseOver={(e) => {
                 e.target.style.transform = 'scale(1.1)'
                 e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.5)'
@@ -3451,7 +3451,7 @@ export default function TurfLootTactical() {
                 e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.3)'
               }}
             >
-              🏠
+              💰
             </div>
             <div 
               style={{ 
@@ -3479,33 +3479,6 @@ export default function TurfLootTactical() {
               }}
             >
               👥
-            </div>
-            <div 
-              style={{ 
-                width: '32px', 
-                height: '32px', 
-                background: 'rgba(26, 32, 44, 0.8)', 
-                border: '2px solid #68d391',
-                borderRadius: '4px',
-                boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontSize: '16px'
-              }}
-              title="Wallet"
-              onMouseOver={(e) => {
-                e.target.style.transform = 'scale(1.1)'
-                e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.5)'
-              }}
-              onMouseOut={(e) => {
-                e.target.style.transform = 'scale(1)'
-                e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.3)'
-              }}
-            >
-              💰
             </div>
             <div 
               style={{ 
