@@ -688,14 +688,13 @@ const AgarIOGame = () => {
     }
 
     drawWorldBoundary() {
-      // Draw circular red boundary ring around the playable area (synced with minimap)
-      const centerX = this.world.width / 2  // 2000
-      const centerY = this.world.height / 2 // 2000
-      const playableRadius = 1800 // Circular play area radius
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
       
-      // Fill entire canvas with red first (out of bounds area)
-      this.ctx.fillStyle = 'rgba(255, 68, 68, 0.4)'
-      this.ctx.fillRect(-1000, -1000, this.world.width + 2000, this.world.height + 2000)
+      // Draw red danger zone outside playable area
+      this.ctx.fillStyle = '#1a0000'
+      this.ctx.fillRect(0, 0, this.world.width, this.world.height)
       
       // Draw playable area (black circle to create the safe zone)
       this.ctx.beginPath()
@@ -703,26 +702,48 @@ const AgarIOGame = () => {
       this.ctx.fillStyle = '#000000'
       this.ctx.fill()
       
-      // Draw the boundary circle (green border like minimap)
+      // Dynamic zone color based on size changes
+      let zoneColor = '#00ff00' // Default green
+      if (Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
+        // Zone is changing - use yellow color
+        zoneColor = '#ffff00'
+      }
+      if (this.isCashGame) {
+        // Cash games get a distinctive blue-green color
+        zoneColor = this.targetPlayableRadius > this.currentPlayableRadius ? '#00ffff' : '#0080ff'
+      }
+      
+      // Draw the boundary circle
       this.ctx.beginPath()
       this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
-      this.ctx.strokeStyle = '#00ff00'
+      this.ctx.strokeStyle = zoneColor
       this.ctx.lineWidth = 8
       this.ctx.stroke()
       
       // Add glowing effect
       this.ctx.beginPath()
       this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
-      this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)'
+      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.6)')
       this.ctx.lineWidth = 16
       this.ctx.stroke()
       
       // Add inner glow
       this.ctx.beginPath()
       this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
-      this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)'
+      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.3)')
       this.ctx.lineWidth = 24
       this.ctx.stroke()
+      
+      // Show zone info for cash games
+      if (this.isCashGame && Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
+        this.ctx.fillStyle = '#ffffff'
+        this.ctx.font = 'bold 16px Arial'
+        this.ctx.textAlign = 'center'
+        const direction = this.targetPlayableRadius > this.currentPlayableRadius ? 'EXPANDING' : 'SHRINKING'
+        this.ctx.fillText(`ZONE ${direction}`, centerX, centerY - playableRadius - 40)
+        this.ctx.font = 'bold 12px Arial'
+        this.ctx.fillText(`Players: ${this.realPlayerCount} | Radius: ${Math.floor(playableRadius)}`, centerX, centerY - playableRadius - 20)
+      }
     }
 
     drawCoin(coin) {
