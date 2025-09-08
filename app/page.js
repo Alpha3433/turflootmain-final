@@ -25,32 +25,73 @@ export default function TurfLootTactical() {
   // Currency system for skin store (matches the game page)
   const [currency, setCurrency] = useState(0) // Coins for purchasing skins
   
-  // Load saved currency from localStorage on component mount
+  // Load user-specific currency based on authentication state
   useEffect(() => {
-    const savedCurrency = localStorage.getItem('userCurrency')
-    if (savedCurrency) {
-      try {
-        const parsedCurrency = parseInt(savedCurrency)
-        setCurrency(parsedCurrency)
-      } catch (error) {
-        console.log('Error loading saved currency:', error)
-        // Set some default coins for demonstration
-        setCurrency(1250)
-        localStorage.setItem('userCurrency', '1250')
+    const loadUserCurrency = () => {
+      if (isAuthenticated && user) {
+        // Create a unique key for this user based on wallet address or email
+        const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id || 'unknown'
+        const userCurrencyKey = `userCurrency_${userIdentifier}`
+        
+        console.log('🪙 Loading currency for authenticated user:', userIdentifier.substring(0, 8) + '...')
+        
+        const savedUserCurrency = localStorage.getItem(userCurrencyKey)
+        if (savedUserCurrency) {
+          try {
+            const parsedCurrency = parseInt(savedUserCurrency)
+            setCurrency(parsedCurrency)
+            console.log(`💰 Loaded user currency: ${parsedCurrency} coins`)
+          } catch (error) {
+            console.log('Error loading user currency:', error)
+            // Set default coins for new authenticated users
+            setCurrency(2500) // Higher starting amount for authenticated users
+            localStorage.setItem(userCurrencyKey, '2500')
+          }
+        } else {
+          // New authenticated user - give them starter coins
+          console.log('🎁 New authenticated user - granting starter coins')
+          setCurrency(2500)
+          localStorage.setItem(userCurrencyKey, '2500')
+        }
+      } else {
+        // Non-authenticated user - use guest currency
+        console.log('👤 Loading guest currency')
+        const guestCurrency = localStorage.getItem('guestCurrency')
+        if (guestCurrency) {
+          try {
+            const parsedCurrency = parseInt(guestCurrency)
+            setCurrency(parsedCurrency)
+          } catch (error) {
+            setCurrency(750) // Lower amount for guest users
+            localStorage.setItem('guestCurrency', '750')
+          }
+        } else {
+          setCurrency(750)
+          localStorage.setItem('guestCurrency', '750')
+        }
       }
-    } else {
-      // Set some default coins for demonstration
-      setCurrency(1250)
-      localStorage.setItem('userCurrency', '1250')
     }
-  }, [])
 
-  // Save currency to localStorage whenever it changes
+    // Load currency when authentication state or user changes
+    loadUserCurrency()
+  }, [isAuthenticated, user])
+
+  // Save currency to appropriate localStorage key whenever it changes
   useEffect(() => {
     if (currency > 0) {
-      localStorage.setItem('userCurrency', currency.toString())
+      if (isAuthenticated && user) {
+        // Save to user-specific key
+        const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id || 'unknown'
+        const userCurrencyKey = `userCurrency_${userIdentifier}`
+        localStorage.setItem(userCurrencyKey, currency.toString())
+        console.log(`💾 Saved user currency: ${currency} coins for ${userIdentifier.substring(0, 8)}...`)
+      } else {
+        // Save to guest key
+        localStorage.setItem('guestCurrency', currency.toString())
+        console.log(`💾 Saved guest currency: ${currency} coins`)
+      }
     }
-  }, [currency])
+  }, [currency, isAuthenticated, user])
   
   // Selected skin system for cross-component synchronization
   const [selectedSkin, setSelectedSkin] = useState({
