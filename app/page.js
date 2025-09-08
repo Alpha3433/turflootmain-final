@@ -5931,6 +5931,112 @@ export default function TurfLootTactical() {
           </div>
         </div>
       )}
+
+      {/* Loading Local Practice Modal */}
+      {isLoadingLocalPractice && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0, 0, 0, 0.9)',
+            backdropFilter: 'blur(15px)',
+            zIndex: 10001,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: '"Rajdhani", sans-serif'
+          }}
+        >
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(59, 130, 246, 0.2) 100%)',
+              border: '3px solid #3b82f6',
+              borderRadius: '20px',
+              padding: '40px',
+              textAlign: 'center',
+              boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(59, 130, 246, 0.5)',
+              minWidth: '300px'
+            }}
+          >
+            {/* Loading Spinner */}
+            <div style={{
+              width: '60px',
+              height: '60px',
+              border: '4px solid rgba(59, 130, 246, 0.3)',
+              borderTop: '4px solid #3b82f6',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 24px auto'
+            }} />
+            
+            {/* Loading Text */}
+            <h2 style={{
+              margin: '0 0 12px 0',
+              color: '#3b82f6',
+              fontSize: '24px',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              textShadow: '0 0 10px rgba(59, 130, 246, 0.6)'
+            }}>
+              LOADING PRACTICE
+            </h2>
+            
+            <p style={{
+              margin: 0,
+              color: '#a0aec0',
+              fontSize: '16px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              Initializing Local World...
+            </p>
+            
+            {/* Additional loading dots animation */}
+            <div style={{
+              marginTop: '20px',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '8px'
+            }}>
+              {[0, 1, 2].map(i => (
+                <div
+                  key={i}
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    background: '#3b82f6',
+                    borderRadius: '50%',
+                    animation: `bounce 1.5s infinite ${i * 0.2}s`
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* CSS Animations */}
+          <style jsx>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+            
+            @keyframes bounce {
+              0%, 60%, 100% { 
+                transform: translateY(0); 
+                opacity: 0.4;
+              }
+              30% { 
+                transform: translateY(-10px); 
+                opacity: 1;
+              }
+            }
+          `}</style>
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
