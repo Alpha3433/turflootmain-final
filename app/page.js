@@ -547,14 +547,14 @@ export default function TurfLootTactical() {
       
       // Check if Privy is available
       if (!window.__TURFLOOT_PRIVY__) {
-        console.log('⚠️ Privy not available, showing info message')
-        alert('Wallet functionality requires authentication. Please click the LOGIN button first.')
+        console.log('⚠️ Privy not available')
+        alert('Wallet functionality requires authentication. Please refresh the page and try again.')
         return
       }
       
       const privy = window.__TURFLOOT_PRIVY__
       
-      // Step 1: Ensure user is authenticated
+      // Ensure user is authenticated
       if (!privy.authenticated || !privy.user) {
         console.log('❌ User not properly authenticated')
         alert('Please ensure you are logged in before depositing funds.')
@@ -563,68 +563,72 @@ export default function TurfLootTactical() {
       
       console.log('✅ User authenticated:', privy.user.id)
       
-      // Step 2: Check if user has an embedded wallet
+      // Check if user has an embedded wallet, create if needed
       let wallet = privy.user.wallet
       
       if (!wallet || !wallet.address) {
-        console.log('🏗️ No embedded wallet found, creating one...')
+        console.log('🏗️ Creating embedded wallet...')
         
         try {
-          // Try to create an embedded wallet
           if (privy.createWallet) {
             console.log('📱 Creating embedded wallet...')
-            const newWallet = await privy.createWallet()
-            console.log('✅ Embedded wallet created:', newWallet?.address)
-            wallet = newWallet
+            wallet = await privy.createWallet()
+            console.log('✅ Embedded wallet created successfully')
+            
+            // Wait a moment for wallet to be fully initialized
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            
+            // Refresh user data to get the new wallet
+            if (privy.getAccessToken) {
+              await privy.getAccessToken()
+            }
+            
+            // Get the updated wallet from user object
+            wallet = privy.user.wallet
+            
           } else {
             console.log('❌ createWallet function not available')
-            alert('Unable to create wallet. Please try refreshing the page and logging in again.')
+            alert('Wallet creation unavailable. Please refresh the page and try again.')
             return
           }
         } catch (walletError) {
           console.error('❌ Wallet creation failed:', walletError)
-          alert('Failed to create wallet. Please try logging out and back in, or contact support.')
+          alert('Failed to create wallet. Please refresh the page and try logging in again.')
           return
         }
       }
       
-      // Step 3: Final validation of wallet address
+      // Final validation - ensure wallet address exists
       if (!wallet?.address) {
-        console.log('❌ Wallet address still not available after creation attempt')
-        // Provide manual deposit instructions as fallback
-        alert(`Wallet setup incomplete. For manual deposit:\n\n1. Please try logging out and back in\n2. If the issue persists, contact support\n3. Include your user ID: ${privy.user.id}`)
+        console.log('❌ Wallet address not available after initialization')
+        alert('Wallet initialization failed. Please refresh the page and try again.')
         return
       }
       
-      console.log('✅ Valid wallet address confirmed:', wallet.address)
+      console.log('✅ Wallet address confirmed:', wallet.address)
       
-      // Step 4: Try Privy funding flow with enhanced error handling
-      try {
-        if (privy.fundWallet) {
-          console.log('💳 Attempting Privy funding flow...')
-          
-          // Add a small delay to ensure wallet state is fully propagated
-          await new Promise(resolve => setTimeout(resolve, 1000))
-          
-          await privy.fundWallet()
-          console.log('✅ Privy funding flow completed successfully')
-        } else {
-          console.log('⚠️ Privy funding flow not available, showing custom deposit modal')
-          setDepositWalletAddress(wallet.address)
-          setShowCustomDepositModal(true)
-        }
-      } catch (fundingError) {
-        console.error('❌ Privy funding flow error:', fundingError)
+      // Call Privy funding flow with proper error handling
+      if (privy.fundWallet) {
+        console.log('💳 Opening Privy funding flow...')
         
-        // Use custom deposit modal as fallback for any Privy errors
-        console.log('🔄 Falling back to custom deposit modal')
-        setDepositWalletAddress(wallet.address)
-        setShowCustomDepositModal(true)
+        // Ensure wallet state is fully propagated
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        await privy.fundWallet()
+        console.log('✅ Privy funding flow completed successfully')
+      } else {
+        console.log('❌ Privy funding flow not available')
+        alert('Deposit functionality is currently unavailable. Please try again later.')
       }
       
     } catch (error) {
-      console.error('❌ Critical deposit error:', error)
-      alert('A system error occurred. Please try again later or contact support.')
+      console.error('❌ Deposit error:', error)
+      
+      if (error.message?.includes('invalid address') || error.code === 'INVALID_ARGUMENT') {
+        alert('Wallet address validation failed. Please refresh the page and log in again.')
+      } else {
+        alert('Deposit failed. Please refresh the page and try again.')
+      }
     }
   }
 
