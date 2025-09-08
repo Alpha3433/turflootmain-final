@@ -4733,6 +4733,361 @@ export default function TurfLootTactical() {
           }
         `}</style>
 
+        {/* Server Browser Modal */}
+        <ServerBrowserModal
+          isOpen={isServerBrowserOpen}
+          onClose={() => {
+            console.log('Closing server browser modal')
+            setIsServerBrowserOpen(false)
+          }}
+          onJoinLobby={handleJoinLobby}
+        />
+
+        {/* User Profile Modal */}
+        {isProfileModalOpen && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 10000,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+              boxSizing: 'border-box'
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsProfileModalOpen(false)
+              }
+            }}
+          >
+            <div 
+              style={{
+                background: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
+                border: '3px solid #68d391',
+                borderRadius: '16px',
+                maxWidth: '600px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.3)',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '2px solid rgba(104, 211, 145, 0.3)',
+                background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+                borderRadius: '13px 13px 0 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    color: '#1a202c',
+                    fontWeight: '700',
+                    boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)'
+                  }}>
+                    👤
+                  </div>
+                  <div>
+                    <h2 style={{
+                      margin: 0,
+                      color: '#68d391',
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em'
+                    }}>
+                      USER PROFILE
+                    </h2>
+                    <p style={{
+                      margin: '4px 0 0 0',
+                      color: '#a0aec0',
+                      fontSize: '14px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      TACTICAL OPERATIVE
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsProfileModalOpen(false)}
+                  style={{
+                    background: 'rgba(252, 129, 129, 0.2)',
+                    border: '2px solid #fc8181',
+                    borderRadius: '8px',
+                    color: '#fc8181',
+                    fontSize: '20px',
+                    width: '40px',
+                    height: '40px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+                    e.target.style.transform = 'scale(1.1)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                    e.target.style.transform = 'scale(1)'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Content */}
+              <div style={{ padding: '24px' }}>
+                
+                {/* Identity Section */}
+                <div style={{
+                  marginBottom: '32px',
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '24px',
+                    marginBottom: '20px'
+                  }}>
+                    {/* Avatar/Skin Preview */}
+                    <div style={{
+                      width: '120px',
+                      height: '120px',
+                      background: selectedSkin.color,
+                      borderRadius: '50%',
+                      border: '4px solid #68d391',
+                      boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative'
+                    }}>
+                      {/* Eyes like in-game */}
+                      <div style={{
+                        position: 'absolute',
+                        width: '12px',
+                        height: '12px',
+                        background: '#1a202c',
+                        borderRadius: '50%',
+                        top: '35px',
+                        left: '35px'
+                      }} />
+                      <div style={{
+                        position: 'absolute',
+                        width: '12px',
+                        height: '12px',
+                        background: '#1a202c',
+                        borderRadius: '50%',
+                        top: '35px',
+                        right: '35px'
+                      }} />
+                    </div>
+                    
+                    {/* User Info */}
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{
+                        margin: '0 0 12px 0',
+                        color: '#68d391',
+                        fontSize: '20px',
+                        fontWeight: '700'
+                      }}>
+                        {isAuthenticated ? 
+                          (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
+                          (customUsername || userName).toUpperCase()
+                        }
+                      </h3>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <span style={{
+                            color: '#a0aec0',
+                            fontSize: '14px'
+                          }}>Status:</span>
+                          <span style={{
+                            color: isAuthenticated ? '#68d391' : '#f6ad55',
+                            fontSize: '14px',
+                            fontWeight: '600'
+                          }}>
+                            {isAuthenticated ? '🟢 AUTHENTICATED' : '🟡 GUEST MODE'}
+                          </span>
+                        </div>
+                        
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <span style={{
+                            color: '#a0aec0',
+                            fontSize: '14px'
+                          }}>Skin:</span>
+                          <span style={{
+                            color: '#68d391',
+                            fontSize: '14px',
+                            fontWeight: '600'
+                          }}>
+                            {selectedSkin.name}
+                          </span>
+                        </div>
+                        
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <span style={{
+                            color: '#a0aec0',
+                            fontSize: '14px'
+                          }}>Coins:</span>
+                          <span style={{
+                            color: '#f6ad55',
+                            fontSize: '14px',
+                            fontWeight: '600'
+                          }}>
+                            {currency.toLocaleString()} 🪙
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  justifyContent: 'center'
+                }}>
+                  <button
+                    onClick={() => {
+                      setIsProfileModalOpen(false)
+                      // Could add logic to open customization here
+                    }}
+                    style={{
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '2px solid #68d391',
+                      borderRadius: '8px',
+                      color: '#68d391',
+                      padding: '12px 24px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    ⚙️ CUSTOMIZE
+                  </button>
+                  
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => {
+                        setIsProfileModalOpen(false)
+                        handleLogout()
+                      }}
+                      style={{
+                        background: 'rgba(252, 129, 129, 0.2)',
+                        border: '2px solid #fc8181',
+                        borderRadius: '8px',
+                        color: '#fc8181',
+                        padding: '12px 24px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+                        e.target.style.transform = 'translateY(-2px)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                        e.target.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      🚪 LOGOUT
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setIsProfileModalOpen(false)
+                        handleLogin()
+                      }}
+                      style={{
+                        background: 'rgba(104, 211, 145, 0.2)',
+                        border: '2px solid #68d391',
+                        borderRadius: '8px',
+                        color: '#68d391',
+                        padding: '12px 24px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                        e.target.style.transform = 'translateY(-2px)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                        e.target.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      🔐 LOGIN
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     )
   }
