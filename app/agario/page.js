@@ -77,8 +77,7 @@ const AgarIOGame = () => {
       if (shouldComplete && !mission.completed) {
         // Complete mission
         setCurrency(prev => prev + mission.reward)
-        setShowMissionComplete(mission)
-        setTimeout(() => setShowMissionComplete(null), 3000)
+        // Mission complete popup removed - no longer shows over minimap
         return { ...mission, progress: newProgress, completed: true }
       }
 
