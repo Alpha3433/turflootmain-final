@@ -613,19 +613,17 @@ export default function TurfLootTactical() {
           await privy.fundWallet()
           console.log('✅ Privy funding flow completed successfully')
         } else {
-          console.log('⚠️ Privy funding flow not available, showing manual instructions')
-          alert(`Manual deposit instructions:\n\n1. Send SOL to your wallet address:\n${wallet.address}\n2. Your balance will update automatically\n3. Contact support if you need assistance`)
+          console.log('⚠️ Privy funding flow not available, showing custom deposit modal')
+          setDepositWalletAddress(wallet.address)
+          setShowCustomDepositModal(true)
         }
       } catch (fundingError) {
         console.error('❌ Privy funding flow error:', fundingError)
         
-        // Check if it's the specific address error
-        if (fundingError.message?.includes('invalid address') || fundingError.code === 'INVALID_ARGUMENT') {
-          console.log('🔄 Address validation error detected, providing manual instructions')
-          alert(`Wallet integration issue detected.\n\nManual deposit option:\n1. Send SOL to: ${wallet.address}\n2. Your balance will update automatically\n\nIf you continue having issues, please contact support with error code: WALLET_ADDR_ERR`)
-        } else {
-          alert(`Deposit system temporarily unavailable.\n\nManual deposit:\n1. Send SOL to: ${wallet.address}\n2. Contact support if needed\n\nError: ${fundingError.message || 'Unknown error'}`)
-        }
+        // Use custom deposit modal as fallback for any Privy errors
+        console.log('🔄 Falling back to custom deposit modal')
+        setDepositWalletAddress(wallet.address)
+        setShowCustomDepositModal(true)
       }
       
     } catch (error) {
