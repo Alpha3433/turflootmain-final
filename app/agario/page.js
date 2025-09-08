@@ -842,12 +842,16 @@ const AgarIOGame = () => {
       const dy = this.player.targetY - this.player.y
       const distance = Math.sqrt(dx * dx + dy * dy)
       
-      // Constant speed regardless of mouse distance
+      // Dynamic speed based on mass - larger players move slower
       if (distance > 1) {
-        const constantSpeed = 3.5 // Fixed pixels per frame - constant speed
-        const moveDistance = Math.min(constantSpeed, distance) // Don't overshoot target
+        // Speed decreases as mass increases (like Agar.io)
+        const baseSpeed = 6.0  // Base speed for small players
+        const massSpeedFactor = Math.sqrt(this.player.mass / 20) // Gradual slowdown
+        const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor) // Minimum speed of 1.5
         
-        // Normalize direction and apply constant speed
+        const moveDistance = Math.min(dynamicSpeed, distance) // Don't overshoot target
+        
+        // Normalize direction and apply dynamic speed
         const moveX = (dx / distance) * moveDistance
         const moveY = (dy / distance) * moveDistance
         
