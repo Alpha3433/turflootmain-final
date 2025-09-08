@@ -14,7 +14,16 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [selectedGameType, setSelectedGameType] = useState('All')
   const [regions, setRegions] = useState([])
   const [gameTypes, setGameTypes] = useState([])
-  const { user } = usePrivy()
+  
+  // Safely get user from Privy with error handling
+  let user = null
+  try {
+    const privyHook = usePrivy()
+    user = privyHook?.user || null
+  } catch (error) {
+    console.warn('Privy hook not available in ServerBrowserModal:', error)
+    user = null
+  }
 
   // Fetch server data
   const fetchServers = async (showRefresh = false) => {
