@@ -684,55 +684,48 @@ export default function TurfLootTactical() {
       
       console.log('✅ User authenticated:', privy.user.id)
       
-      // Check if user has an embedded wallet, create if needed
-      let wallet = privy.user.wallet
-      
-      if (!wallet || !wallet.address) {
-        console.log('🏗️ Creating embedded wallet...')
-        
-        try {
-          if (privy.createWallet) {
-            console.log('📱 Creating embedded wallet...')
-            wallet = await privy.createWallet()
-            console.log('✅ Embedded wallet created successfully')
-            
-            // Wait for wallet to be fully initialized
-            await new Promise(resolve => setTimeout(resolve, 2000))
-            
-            // Refresh user data to get the new wallet
-            wallet = privy.user.wallet
-            
-          } else {
-            console.log('❌ createWallet function not available')
-            alert('Wallet creation unavailable. Please refresh the page and try again.')
-            return
-          }
-        } catch (walletError) {
-          console.error('❌ Wallet creation failed:', walletError)
-          alert('Failed to create wallet. Please refresh the page and try logging in again.')
-          return
-        }
-      }
-      
-      // Validate wallet address exists
-      if (!wallet?.address) {
-        console.log('❌ Wallet address not available after initialization')
-        alert('Wallet initialization failed. Please refresh the page and try again.')
+      // Get the user's wallet
+      const wallet = privy.user.wallet
+      if (!wallet) {
+        console.log('❌ No wallet found, prompting wallet creation')
+        alert('No wallet found. Please ensure you are logged in and have a wallet connected. Try logging out and back in if the issue persists.')
         return
       }
       
-      console.log('✅ Wallet address confirmed:', wallet.address)
+      console.log('✅ Wallet found:', wallet.address)
       
-      // Instead of calling privy.fundWallet() which causes the error,
-      // show manual deposit instructions with the wallet address
-      alert(`💰 DEPOSIT INSTRUCTIONS\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
+      // Use Privy's native fundWallet functionality
+      console.log('💰 Opening Privy deposit interface...')
+      await privy.fundWallet(wallet, {
+        chain: 'solana' // Specify Solana chain for SOL deposits
+      })
       
-      // Also log to console for easy copying
-      console.log('💰 Wallet address for deposit:', wallet.address)
+      console.log('✅ Privy deposit interface opened successfully')
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
-      alert('Deposit functionality is temporarily unavailable. Please try refreshing the page and logging in again.')
+      
+      // If fundWallet is not available or fails, provide fallback instructions
+      if (error.message && error.message.includes('fundWallet')) {
+        console.log('⚠️ fundWallet not available, showing manual instructions')
+        
+        try {
+          const privy = window.__TURFLOOT_PRIVY__
+          const wallet = privy?.user?.wallet
+          
+          if (wallet && wallet.address) {
+            alert(`💰 MANUAL DEPOSIT\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
+            console.log('💰 Wallet address for manual deposit:', wallet.address)
+          } else {
+            alert('Unable to retrieve wallet address. Please try logging out and back in.')
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback error:', fallbackError)
+          alert('Deposit functionality is temporarily unavailable. Please try refreshing the page and logging in again.')
+        }
+      } else {
+        alert('Deposit functionality encountered an error. Please try again or refresh the page.')
+      }
     }
   }
 
