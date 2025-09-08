@@ -360,6 +360,28 @@ const AgarIOGame = () => {
       }
     }
 
+    updateSpawnProtection() {
+      const now = Date.now()
+      
+      // Update player spawn protection
+      if (this.player.spawnProtection) {
+        if (now - this.player.spawnProtectionStart >= this.player.spawnProtectionTime) {
+          this.player.spawnProtection = false
+          console.log('Player spawn protection ended')
+        }
+      }
+      
+      // Update enemy spawn protection
+      this.enemies.forEach(enemy => {
+        if (enemy.spawnProtection) {
+          if (now - enemy.spawnProtectionStart >= enemy.spawnProtectionTime) {
+            enemy.spawnProtection = false
+            console.log(`Enemy ${enemy.name} spawn protection ended`)
+          }
+        }
+      })
+    }
+
     checkCollisions() {
       // Player eating coins
       for (let i = this.coins.length - 1; i >= 0; i--) {
