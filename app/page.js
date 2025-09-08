@@ -5559,8 +5559,8 @@ export default function TurfLootTactical() {
                     </div>
                     <button
                       onClick={() => {
-                        // Handle add first friend
                         console.log('Add first friend clicked')
+                        setIsAddFriendModalOpen(true)
                       }}
                       style={{
                         background: 'rgba(104, 211, 145, 0.2)',
