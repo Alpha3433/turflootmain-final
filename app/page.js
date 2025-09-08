@@ -4036,7 +4036,16 @@ export default function TurfLootTactical() {
           </div>
           
           <button 
-            onClick={() => createDesktopJoinPartyPopup()}
+            onClick={async () => {
+              console.log('JOIN PARTY button clicked!')
+              const authenticated = await requireAuthentication('JOIN PARTY')
+              if (authenticated) {
+                console.log('👥 User authenticated, opening join party...')
+                createDesktopJoinPartyPopup()
+              } else {
+                console.log('❌ Authentication failed, blocking access to JOIN PARTY')
+              }
+            }}
             style={{
             width: '100%',
             padding: '12px',
