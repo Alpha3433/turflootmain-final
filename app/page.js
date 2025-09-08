@@ -4933,9 +4933,9 @@ export default function TurfLootTactical() {
                     {/* User Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <h3 style={{
-                        margin: '0 0 12px 0',
+                        margin: '0 0 8px 0',
                         color: '#68d391',
-                        fontSize: '20px',
+                        fontSize: '24px',
                         fontWeight: '700',
                         wordBreak: 'break-word'
                       }}>
@@ -4946,115 +4946,49 @@ export default function TurfLootTactical() {
                       </h3>
                       <div style={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginBottom: '16px'
                       }}>
                         <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px'
-                        }}>
-                          <span style={{
-                            color: '#a0aec0',
-                            fontSize: '14px'
-                          }}>Status:</span>
-                          <span style={{
-                            color: isAuthenticated ? '#68d391' : '#f6ad55',
-                            fontSize: '14px',
-                            fontWeight: '600'
-                          }}>
-                            {isAuthenticated ? '🟢 AUTHENTICATED' : '🟡 GUEST MODE'}
-                          </span>
-                        </div>
-                        
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px'
-                        }}>
-                          <span style={{
-                            color: '#a0aec0',
-                            fontSize: '14px'
-                          }}>Skin:</span>
-                          <span style={{
-                            color: '#68d391',
-                            fontSize: '14px',
-                            fontWeight: '600'
-                          }}>
-                            {selectedSkin.name}
-                          </span>
-                        </div>
-                        
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px'
-                        }}>
-                          <span style={{
-                            color: '#a0aec0',
-                            fontSize: '14px'
-                          }}>Coins:</span>
-                          <span style={{
-                            color: '#f6ad55',
-                            fontSize: '14px',
-                            fontWeight: '600'
-                          }}>
-                            {currency.toLocaleString()} 🪙
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Account Settings Section */}
-                <div style={{
-                  padding: '20px',
-                  background: 'rgba(45, 55, 72, 0.5)',
-                  border: '1px solid rgba(104, 211, 145, 0.2)',
-                  borderRadius: '12px'
-                }}>
-                  <h4 style={{
-                    margin: '0 0 16px 0',
-                    color: '#68d391',
-                    fontSize: '18px',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    Account Settings
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{
-                      padding: '12px',
-                      background: 'rgba(104, 211, 145, 0.1)',
-                      borderRadius: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
-                    }}>
-                      <span style={{ color: '#a0aec0', fontSize: '14px' }}>Username</span>
-                      <input
-                        type="text"
-                        value={customUsername || (isAuthenticated ? user?.email?.address?.split('@')[0] || 'User' : userName)}
-                        onChange={(e) => setCustomUsername(e.target.value)}
-                        style={{
-                          background: 'rgba(26, 32, 44, 0.8)',
-                          border: '1px solid rgba(104, 211, 145, 0.3)',
-                          borderRadius: '6px',
-                          padding: '8px 12px',
-                          color: '#68d391',
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: isAuthenticated ? '#68d391' : '#f6ad55'
+                        }} />
+                        <span style={{
+                          color: isAuthenticated ? '#68d391' : '#f6ad55',
                           fontSize: '14px',
-                          fontFamily: '"Rajdhani", sans-serif',
-                          maxWidth: '200px'
+                          fontWeight: '600',
+                          textTransform: 'uppercase'
+                        }}>
+                          {isAuthenticated ? 'ONLINE' : 'GUEST'}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          // Handle edit profile
                         }}
-                        placeholder="Enter username"
-                      />
+                        style={{
+                          background: 'rgba(104, 211, 145, 0.2)',
+                          border: '2px solid #68d391',
+                          borderRadius: '8px',
+                          color: '#68d391',
+                          padding: '8px 16px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em'
+                        }}
+                      >
+                        📝 EDIT PROFILE
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                {/* Game Statistics Section */}
+                {/* Stats & Progression */}
                 <div style={{
                   padding: '20px',
                   background: 'rgba(45, 55, 72, 0.5)',
@@ -5063,46 +4997,279 @@ export default function TurfLootTactical() {
                 }}>
                   <h4 style={{
                     margin: '0 0 16px 0',
-                    color: '#68d391',
-                    fontSize: '18px',
+                    color: '#f6ad55',
+                    fontSize: '16px',
                     fontWeight: '600',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
+                    letterSpacing: '0.05em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
                   }}>
-                    Statistics
+                    📊 STATS & PROGRESSION
                   </h4>
+                  
                   <div style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-                    gap: '12px' 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
+                    gap: '16px',
+                    marginBottom: '16px'
+                  }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ color: '#f6ad55', fontSize: '32px', fontWeight: '700' }}>127</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Games Played</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ color: '#68d391', fontSize: '32px', fontWeight: '700' }}>34</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Wins</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ color: '#9f7aea', fontSize: '32px', fontWeight: '700' }}>2,847</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Highest Size</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ color: '#fc8181', fontSize: '32px', fontWeight: '700' }}>7</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>Win Streak</div>
+                    </div>
+                  </div>
+                  
+                  <div style={{
+                    padding: '12px',
+                    background: 'rgba(246, 173, 85, 0.1)',
+                    border: '1px solid rgba(246, 173, 85, 0.3)',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <span style={{ color: '#f6ad55', fontSize: '14px', fontWeight: '600' }}>
+                      💰 LIFETIME EARNINGS: $2,847.50
+                    </span>
+                  </div>
+                </div>
+
+                {/* Wallet Snapshot */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 16px 0',
+                    color: '#f6ad55',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    💰 WALLET SNAPSHOT
+                  </h4>
+                  
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: '1fr 1fr', 
+                    gap: '12px',
+                    marginBottom: '16px'
                   }}>
                     <div style={{
-                      padding: '12px',
+                      padding: '16px',
                       background: 'rgba(104, 211, 145, 0.1)',
+                      border: '1px solid rgba(104, 211, 145, 0.3)',
                       borderRadius: '8px',
                       textAlign: 'center'
                     }}>
-                      <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>0</div>
-                      <div style={{ color: '#a0aec0', fontSize: '12px' }}>Games Played</div>
+                      <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>{currency.toLocaleString()}</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>COINS</div>
                     </div>
                     <div style={{
-                      padding: '12px',
-                      background: 'rgba(104, 211, 145, 0.1)',
+                      padding: '16px',
+                      background: 'rgba(159, 122, 234, 0.1)',
+                      border: '1px solid rgba(159, 122, 234, 0.3)',
                       borderRadius: '8px',
                       textAlign: 'center'
                     }}>
-                      <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>0</div>
-                      <div style={{ color: '#a0aec0', fontSize: '12px' }}>Wins</div>
+                      <div style={{ color: '#9f7aea', fontSize: '24px', fontWeight: '700' }}>0.0000</div>
+                      <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>SOL</div>
                     </div>
-                    <div style={{
-                      padding: '12px',
-                      background: 'rgba(104, 211, 145, 0.1)',
-                      borderRadius: '8px',
-                      textAlign: 'center'
-                    }}>
-                      <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>0</div>
-                      <div style={{ color: '#a0aec0', fontSize: '12px' }}>Best Score</div>
-                    </div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button
+                      onClick={handleDeposit}
+                      style={{
+                        flex: 1,
+                        background: 'rgba(104, 211, 145, 0.2)',
+                        border: '2px solid #68d391',
+                        borderRadius: '8px',
+                        color: '#68d391',
+                        padding: '12px 16px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}
+                    >
+                      💳 DEPOSIT
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Handle withdraw
+                      }}
+                      style={{
+                        flex: 1,
+                        background: 'rgba(252, 129, 129, 0.2)',
+                        border: '2px solid #fc8181',
+                        borderRadius: '8px',
+                        color: '#fc8181',
+                        padding: '12px 16px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}
+                    >
+                      💸 WITHDRAW
+                    </button>
+                  </div>
+                </div>
+
+                {/* Customization */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 16px 0',
+                    color: '#9f7aea',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    🎨 CUSTOMIZATION
+                  </h4>
+                  
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button
+                      onClick={() => {
+                        setIsProfileModalOpen(false)
+                        // Open customization
+                      }}
+                      style={{
+                        flex: 1,
+                        background: 'rgba(159, 122, 234, 0.2)',
+                        border: '2px solid #9f7aea',
+                        borderRadius: '8px',
+                        color: '#9f7aea',
+                        padding: '12px 16px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}
+                    >
+                      🎯 CHANGE SKIN
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsProfileModalOpen(false)
+                        // Open store
+                      }}
+                      style={{
+                        flex: 1,
+                        background: 'rgba(246, 173, 85, 0.2)',
+                        border: '2px solid #f6ad55',
+                        borderRadius: '8px',
+                        color: '#f6ad55',
+                        padding: '12px 16px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}
+                    >
+                      🛒 VIEW STORE
+                    </button>
+                  </div>
+                </div>
+
+                {/* Social & Party */}
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '12px'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 8px 0',
+                    color: '#68d391',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    👥 SOCIAL & PARTY
+                  </h4>
+                  
+                  <div style={{
+                    color: '#a0aec0',
+                    fontSize: '12px',
+                    marginBottom: '16px',
+                    textTransform: 'uppercase'
+                  }}>
+                    FRIENDS ONLINE (3/24)
+                  </div>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {['TacticalAce', 'SniperPro', 'StealthOp'].map((friendName, index) => (
+                      <div key={index} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '8px 12px',
+                        background: 'rgba(26, 32, 44, 0.5)',
+                        borderRadius: '6px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: '#68d391'
+                          }} />
+                          <span style={{ color: '#e2e8f0', fontSize: '14px' }}>{friendName}</span>
+                        </div>
+                        <button
+                          style={{
+                            background: 'rgba(59, 130, 246, 0.2)',
+                            border: '1px solid #3b82f6',
+                            borderRadius: '4px',
+                            color: '#3b82f6',
+                            padding: '4px 12px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            textTransform: 'uppercase'
+                          }}
+                        >
+                          INVITE
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -5113,37 +5280,6 @@ export default function TurfLootTactical() {
                   justifyContent: 'center',
                   flexWrap: 'wrap'
                 }}>
-                  <button
-                    onClick={() => {
-                      setIsProfileModalOpen(false)
-                      // Could add logic to open customization here
-                    }}
-                    style={{
-                      background: 'rgba(104, 211, 145, 0.2)',
-                      border: '2px solid #68d391',
-                      borderRadius: '8px',
-                      color: '#68d391',
-                      padding: '12px 24px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      minWidth: '120px'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = 'rgba(104, 211, 145, 0.3)'
-                      e.target.style.transform = 'translateY(-2px)'
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.background = 'rgba(104, 211, 145, 0.2)'
-                      e.target.style.transform = 'translateY(0)'
-                    }}
-                  >
-                    ⚙️ CUSTOMIZE
-                  </button>
-                  
                   {isAuthenticated ? (
                     <button
                       onClick={() => {
