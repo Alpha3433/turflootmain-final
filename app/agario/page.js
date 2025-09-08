@@ -115,7 +115,7 @@ const AgarIOGame = () => {
 
   // Game Engine Class
   class GameEngine {
-    constructor(canvas, setCheatingBan, setTimeSurvived) {
+    constructor(canvas, setCheatingBan, setTimeSurvived, selectedSkin) {
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
       this.world = { width: 4000, height: 4000 }
@@ -123,6 +123,7 @@ const AgarIOGame = () => {
       this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
       this.setCheatingBan = setCheatingBan // Store the function reference
       this.setTimeSurvived = setTimeSurvived // Store the function reference
+      this.selectedSkin = selectedSkin || { id: 'default', name: 'Default Warrior', color: '#4A90E2' } // Store selected skin
       
       // Dynamic zone system for cash games
       this.isCashGame = this.detectCashGame()
