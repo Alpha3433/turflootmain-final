@@ -1693,6 +1693,59 @@ const AgarIOGame = () => {
           </div>
         </div>
         
+        {/* Anti-Cheat Status Indicator - Only show for cash games */}
+        {(() => {
+          const urlParams = new URLSearchParams(window.location.search)
+          const fee = urlParams.get('fee')
+          const isCashGame = fee && parseFloat(fee) > 0
+          
+          if (!isCashGame) return null
+          
+          return (
+            <div style={{ 
+              position: 'fixed', 
+              top: '180px', 
+              left: '10px', 
+              zIndex: 1000,
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              border: '2px solid rgba(255, 69, 58, 0.6)',
+              borderRadius: '6px',
+              padding: '8px 12px',
+              fontFamily: '"Rajdhani", sans-serif',
+              minWidth: '160px'
+            }}>
+              <div style={{ 
+                color: '#ff453a', 
+                fontSize: '12px', 
+                fontWeight: '700', 
+                marginBottom: '4px',
+                textAlign: 'center',
+                letterSpacing: '0.5px'
+              }}>
+                🛡️ ANTI-CHEAT ACTIVE
+              </div>
+              <div style={{ 
+                color: '#ffffff', 
+                fontSize: '10px', 
+                fontWeight: '500',
+                textAlign: 'center',
+                lineHeight: '1.3'
+              }}>
+                Fair play monitoring enabled
+              </div>
+              <div style={{ 
+                color: '#00ff88', 
+                fontSize: '10px', 
+                fontWeight: '600',
+                textAlign: 'center',
+                marginTop: '2px'
+              }}>
+                Status: PROTECTED
+              </div>
+            </div>
+          )
+        })()}
+        
         {/* Missions Panel */}
         <div 
           style={{ 
