@@ -841,8 +841,8 @@ const AgarIOGame = () => {
       const dx = this.player.targetX - this.player.x
       const dy = this.player.targetY - this.player.y
       
-      // Super snappy movement - move a fixed percentage toward target each frame
-      const moveSpeed = 0.15 // 15% of distance per frame - very snappy
+      // Reduced speed but maintain snappy responsiveness
+      const moveSpeed = 0.08 // Reduced from 0.15 to 0.08 for better speed control
       
       this.player.x += dx * moveSpeed
       this.player.y += dy * moveSpeed
