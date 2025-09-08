@@ -160,6 +160,79 @@ const AgarIOGame = () => {
       console.log(`🎯 Game initialized - Cash game: ${this.isCashGame}, Player count: ${this.realPlayerCount}, Zone radius: ${this.currentPlayableRadius}`)
     }
 
+    detectCashGame() {
+      // Check URL parameters to determine if this is a cash game
+      const urlParams = new URLSearchParams(window.location.search)
+      const fee = urlParams.get('fee')
+      const mode = urlParams.get('mode')
+      
+      // Cash games have fee > 0 and mode !== 'local' and mode !== 'practice'
+      return fee && parseFloat(fee) > 0 && mode !== 'local' && mode !== 'practice'
+    }
+
+    getRealPlayerCount() {
+      // In a real implementation, this would fetch actual player count from server
+      // For now, simulate varying player counts based on fee tier
+      const urlParams = new URLSearchParams(window.location.search)
+      const fee = parseFloat(urlParams.get('fee') || 0)
+      
+      if (fee === 1) return Math.floor(Math.random() * 8) + 2 // 2-10 players
+      if (fee === 5) return Math.floor(Math.random() * 12) + 4 // 4-16 players  
+      if (fee === 20) return Math.floor(Math.random() * 16) + 6 // 6-22 players
+      
+      return 8 // Default for practice
+    }
+
+    calculatePlayableRadius() {
+      if (!this.isCashGame) {
+        return 1800 // Fixed size for practice games
+      }
+      
+      // Dynamic scaling for cash games
+      const minPlayers = 2
+      const maxPlayers = 24
+      const playerCount = Math.max(minPlayers, Math.min(maxPlayers, this.realPlayerCount))
+      
+      // Calculate radius based on player count (more players = bigger zone)
+      const playerRatio = (playerCount - minPlayers) / (maxPlayers - minPlayers)
+      const radiusDiff = this.maxPlayableRadius - this.basePlayableRadius
+      
+      return Math.floor(this.basePlayableRadius + (radiusDiff * playerRatio))
+    }
+
+    updateDynamicZone(deltaTime) {
+      if (!this.isCashGame) return
+      
+      // Check for player count updates every 5 seconds
+      const now = Date.now()
+      if (now - this.lastPlayerCountCheck > 5000) {
+        const newPlayerCount = this.getRealPlayerCount()
+        if (newPlayerCount !== this.realPlayerCount) {
+          console.log(`🔄 Player count changed: ${this.realPlayerCount} → ${newPlayerCount}`)
+          this.realPlayerCount = newPlayerCount
+          this.targetPlayableRadius = this.calculatePlayableRadius()
+          console.log(`🎯 Zone target changed: ${this.currentPlayableRadius} → ${this.targetPlayableRadius}`)
+        }
+        this.lastPlayerCountCheck = now
+      }
+      
+      // Smoothly transition zone size
+      if (Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
+        const direction = this.targetPlayableRadius > this.currentPlayableRadius ? 1 : -1
+        const change = this.zoneTransitionSpeed * deltaTime * direction
+        this.currentPlayableRadius += change
+        
+        // Prevent overshooting
+        if (direction > 0 && this.currentPlayableRadius > this.targetPlayableRadius) {
+          this.currentPlayableRadius = this.targetPlayableRadius
+        } else if (direction < 0 && this.currentPlayableRadius < this.targetPlayableRadius) {
+          this.currentPlayableRadius = this.targetPlayableRadius
+        }
+        
+        console.log(`🔄 Zone transitioning: ${Math.floor(this.currentPlayableRadius)}px`)
+      }
+    }
+
     generateCoins() {
       this.coins = []
       const centerX = this.world.width / 2  // 2000
