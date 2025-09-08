@@ -925,8 +925,13 @@ const AgarIOGame = () => {
         const moveX = (dx / distance) * enemy.speed * 60 * deltaTime
         const moveY = (dy / distance) * enemy.speed * 60 * deltaTime
         
-        enemy.x += moveX
-        enemy.y += moveY
+        // Add movement smoothing to enemies for more fluid motion
+        const smoothingFactor = 0.7 // Slightly less smoothing than player for more varied movement
+        const smoothMoveX = moveX * smoothingFactor
+        const smoothMoveY = moveY * smoothingFactor
+        
+        enemy.x += smoothMoveX
+        enemy.y += smoothMoveY
         
         enemy.x = Math.max(enemy.radius, Math.min(this.world.width - enemy.radius, enemy.x))
         enemy.y = Math.max(enemy.radius, Math.min(this.world.height - enemy.radius, enemy.y))
