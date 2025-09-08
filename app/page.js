@@ -554,18 +554,53 @@ export default function TurfLootTactical() {
       
       const privy = window.__TURFLOOT_PRIVY__
       
+      // Check if user has a wallet before attempting funding
+      if (!privy.user?.wallet?.address) {
+        console.log('⚠️ User wallet not properly initialized, creating wallet first...')
+        try {
+          // Try to create or connect a wallet first
+          if (privy.createWallet) {
+            console.log('📱 Creating embedded wallet...')
+            await privy.createWallet()
+          } else {
+            console.log('❌ Wallet creation not available')
+            alert('Please ensure your wallet is properly set up before depositing funds.')
+            return
+          }
+        } catch (walletError) {
+          console.error('❌ Wallet creation error:', walletError)
+          alert('Failed to initialize wallet. Please try logging out and back in.')
+          return
+        }
+      }
+      
+      // Verify wallet address is now available
+      if (!privy.user?.wallet?.address) {
+        console.log('❌ Wallet address still not available after initialization')
+        alert('Unable to initialize wallet address. Please contact support.')
+        return
+      }
+      
+      console.log('✅ Wallet address confirmed:', privy.user.wallet.address)
+      
       // Show native Privy funding flow
       if (privy.fundWallet) {
         console.log('💳 Opening Privy funding flow...')
         await privy.fundWallet()
       } else {
         console.log('⚠️ Privy funding flow not available, showing manual deposit instructions')
-        alert('To deposit funds:\n1. Copy your wallet address\n2. Send SOL to your wallet address\n3. Your balance will update automatically')
+        alert(`To deposit funds:\n1. Send SOL to your wallet address:\n${privy.user.wallet.address}\n2. Your balance will update automatically`)
       }
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
-      alert('An error occurred while initiating deposit. Please try again.')
+      
+      // More specific error handling
+      if (error.message?.includes('invalid address')) {
+        alert('Wallet address error. Please try logging out and back in to refresh your wallet connection.')
+      } else {
+        alert('An error occurred while initiating deposit. Please try again or contact support.')
+      }
     }
   }
 
