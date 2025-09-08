@@ -827,9 +827,14 @@ const AgarIOGame = () => {
       const distance = Math.sqrt(dx * dx + dy * dy)
       
       if (distance > 5) {
-        const speed = Math.max(0.3, 50 / Math.sqrt(this.player.mass)) // Reduced from 86 to 50 for slower, more controlled movement
+        const speed = Math.max(0.2, 35 / Math.sqrt(this.player.mass)) // Reduced from 50 to 35 for slower, more controlled movement
         const moveX = (dx / distance) * speed * 60 * deltaTime
         const moveY = (dy / distance) * speed * 60 * deltaTime
+        
+        // Add movement smoothing to reduce choppy motion
+        const smoothingFactor = 0.8 // Higher value = more smoothing
+        const smoothMoveX = moveX * smoothingFactor
+        const smoothMoveY = moveY * smoothingFactor
         
         // Anti-cheat: Validate movement speed
         if (this.antiCheat.enabled) {
