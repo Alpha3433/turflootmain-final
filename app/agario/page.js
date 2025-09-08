@@ -474,6 +474,11 @@ const AgarIOGame = () => {
         const distance = Math.sqrt(dx * dx + dy * dy)
         
         if (distance < this.player.radius + enemy.radius - 10) {
+          // Check spawn protection - no collisions if either player has protection
+          if (this.player.spawnProtection || enemy.spawnProtection) {
+            continue // Skip collision if anyone has spawn protection
+          }
+          
           if (this.player.mass > enemy.mass * 1.2) {
             // Player eats enemy
             this.player.mass += enemy.mass * 0.8
