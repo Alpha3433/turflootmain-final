@@ -535,7 +535,15 @@ export default function TurfLootTactical() {
   // Wallet operations with Privy integration
   const handleDeposit = async () => {
     try {
-      console.log('💰 DEPOSIT button clicked - using native Privy popup')
+      console.log('💰 DEPOSIT button clicked - requiring authentication')
+      
+      const authenticated = await requireAuthentication('DEPOSIT')
+      if (!authenticated) {
+        console.log('❌ Authentication failed, blocking access to DEPOSIT')
+        return
+      }
+      
+      console.log('💰 User authenticated, proceeding with deposit...')
       
       // Check if Privy is available
       if (!window.__TURFLOOT_PRIVY__) {
@@ -546,47 +554,13 @@ export default function TurfLootTactical() {
       
       const privy = window.__TURFLOOT_PRIVY__
       
-      // Check if user is authenticated
-      if (!privy.authenticated) {
-        console.log('🔐 User not authenticated, initiating login')
-        try {
-          await privy.login()
-          console.log('✅ User logged in successfully')
-        } catch (error) {
-          console.error('❌ Login failed:', error)
-          alert('Login failed. Please try again.')
-          return
-        }
-      }
-      
-      // Get user's embedded wallet
-      const user = privy.user
-      if (!user || !user.wallet) {
-        console.log('👛 No embedded wallet found, user needs to set up wallet')
-        // Removed popup - allow direct access to deposit functionality
-        return
-      }
-      
-      const embeddedWallet = user.wallet
-      console.log('💰 Opening Privy fund wallet popup for wallet:', embeddedWallet.address)
-      
-      // Use Privy's native fund wallet popup - pass just the address string
+      // Show native Privy funding flow
       if (privy.fundWallet) {
-        try {
-          // Pass just the wallet address, not the full wallet object
-          const result = await privy.fundWallet(embeddedWallet.address)
-          console.log('✅ Privy fund wallet completed:', result)
-        } catch (error) {
-          console.error('❌ Privy fund wallet error:', error)
-          if (error.message && error.message.includes('user_cancelled')) {
-            console.log('ℹ️ User cancelled the funding process')
-          } else {
-            alert('An error occurred during the funding process. Please try again.')
-          }
-        }
+        console.log('💳 Opening Privy funding flow...')
+        await privy.fundWallet()
       } else {
-        console.error('❌ Privy fundWallet not available')
-        alert('Wallet funding functionality is not available. Please ensure you are logged in.')
+        console.log('⚠️ Privy funding flow not available, showing manual deposit instructions')
+        alert('To deposit funds:\n1. Copy your wallet address\n2. Send SOL to your wallet address\n3. Your balance will update automatically')
       }
       
     } catch (error) {
