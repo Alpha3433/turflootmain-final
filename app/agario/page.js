@@ -264,11 +264,24 @@ const AgarIOGame = () => {
     generateEnemies() {
       this.enemies = []
       const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
+      
       for (let i = 0; i < 8; i++) {
         const mass = 15 + Math.random() * 40
+        let x, y, distance
+        
+        // Generate enemy within the playable radius
+        do {
+          x = Math.random() * this.world.width
+          y = Math.random() * this.world.height
+          distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+        } while (distance > playableRadius - 50) // 50px buffer from edge
+        
         this.enemies.push({
-          x: Math.random() * this.world.width,
-          y: Math.random() * this.world.height,
+          x: x,
+          y: y,
           mass: mass,
           radius: Math.sqrt(mass) * 3,
           color: colors[i % colors.length],
@@ -282,6 +295,8 @@ const AgarIOGame = () => {
           spawnProtectionStart: Date.now() + (i * 200) // Stagger spawn times slightly
         })
       }
+      
+      console.log(`👥 Generated ${this.enemies.length} enemies within radius ${Math.floor(playableRadius)}px`)
     }
 
     generateViruses() {
