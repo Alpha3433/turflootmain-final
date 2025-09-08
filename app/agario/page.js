@@ -1127,13 +1127,13 @@ const AgarIOGame = () => {
     }
 
     updateCamera() {
-      // Agar.io style camera - smooth but responsive
+      // Super snappy camera - move more aggressively toward player
       const targetX = this.player.x - this.canvas.width / 2
       const targetY = this.player.y - this.canvas.height / 2
       
-      // Simple linear interpolation like Agar.io (around 10% per frame)
-      this.camera.x += (targetX - this.camera.x) * 0.1
-      this.camera.y += (targetY - this.camera.y) * 0.1
+      // Increased from 0.1 to 0.2 for snappier camera
+      this.camera.x += (targetX - this.camera.x) * 0.2
+      this.camera.y += (targetY - this.camera.y) * 0.2
       
       // Keep camera within world bounds
       const boundaryExtension = 100
