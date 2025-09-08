@@ -152,12 +152,53 @@ const AgarIOGame = () => {
       this.running = false
       this.lastUpdate = Date.now()
       
+      // Anti-cheat system
+      this.antiCheat = {
+        enabled: this.isCashGame, // Only active for cash games
+        violations: 0,
+        maxViolations: 5,
+        banned: false,
+        
+        // Movement validation
+        lastPosition: { x: this.player.x, y: this.player.y, timestamp: Date.now() },
+        maxSpeed: 8, // Maximum pixels per frame at minimum mass
+        speedViolations: 0,
+        
+        // Input monitoring
+        mouseMovements: [],
+        clickPattern: [],
+        keyPresses: [],
+        lastInputTime: Date.now(),
+        humanLikeThreshold: 0.7,
+        
+        // Behavioral analysis
+        massGainRate: [],
+        eliminationPattern: [],
+        survivalTime: Date.now(),
+        suspiciousActions: 0,
+        
+        // Network monitoring
+        actionQueue: [],
+        lastActionTime: Date.now(),
+        actionRateLimit: 60, // Max actions per second
+        
+        // Memory protection
+        gameStateHash: '',
+        integrityChecks: 0,
+        
+        // Pattern detection
+        botLikeScore: 0,
+        humanScore: 100
+      }
+      
       this.generateCoins()
       this.generateEnemies()
       this.generateViruses()
       this.bindEvents()
+      this.initAntiCheat()
       
       console.log(`🎯 Game initialized - Cash game: ${this.isCashGame}, Player count: ${this.realPlayerCount}, Zone radius: ${this.currentPlayableRadius}`)
+      console.log(`🛡️ Anti-cheat system: ${this.antiCheat.enabled ? 'ENABLED' : 'DISABLED'}`)
     }
 
     detectCashGame() {
