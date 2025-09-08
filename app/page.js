@@ -24,6 +24,33 @@ export default function TurfLootTactical() {
   // Currency system for skin store (matches the game page)
   const [currency, setCurrency] = useState(0) // Coins for purchasing skins
   
+  // Load saved currency from localStorage on component mount
+  useEffect(() => {
+    const savedCurrency = localStorage.getItem('userCurrency')
+    if (savedCurrency) {
+      try {
+        const parsedCurrency = parseInt(savedCurrency)
+        setCurrency(parsedCurrency)
+      } catch (error) {
+        console.log('Error loading saved currency:', error)
+        // Set some default coins for demonstration
+        setCurrency(1250)
+        localStorage.setItem('userCurrency', '1250')
+      }
+    } else {
+      // Set some default coins for demonstration
+      setCurrency(1250)
+      localStorage.setItem('userCurrency', '1250')
+    }
+  }, [])
+
+  // Save currency to localStorage whenever it changes
+  useEffect(() => {
+    if (currency > 0) {
+      localStorage.setItem('userCurrency', currency.toString())
+    }
+  }, [currency])
+  
   // Selected skin system for cross-component synchronization
   const [selectedSkin, setSelectedSkin] = useState({
     id: 'default',
