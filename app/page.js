@@ -3692,10 +3692,21 @@ export default function TurfLootTactical() {
             </button>
             <button 
               style={secondaryButtonStyle}
+              onClick={async () => {
+                console.log('HOW TO PLAY button clicked!')
+                const authenticated = await requireAuthentication('HOW TO PLAY')
+                if (authenticated) {
+                  console.log('📖 User authenticated, showing how to play...')
+                  // Add your how to play functionality here
+                  alert('HOW TO PLAY: Move with mouse, collect coins to grow, hold E to cash out!')
+                } else {
+                  console.log('❌ Authentication failed, blocking access to HOW TO PLAY')
+                }
+              }}
               onMouseOver={(e) => {
                 e.target.style.background = 'rgba(104, 211, 145, 0.1)'
                 e.target.style.transform = 'scale(1.02)'
-                e.target.style.boxShadow = '0 0 25px rgba(104, 211, 145, 0.5)'
+                e.target.style.boxShadow = '0 0 25px rgba(104, 211, 145, 0.4)'
               }}
               onMouseOut={(e) => {
                 e.target.style.background = 'rgba(26, 32, 44, 0.8)'
