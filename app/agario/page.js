@@ -2153,54 +2153,58 @@ const AgarIOGame = () => {
           </div>
         )}
 
-        {/* Action Buttons - Matching Reference Style */}
-        
-        {/* Cash Out Button - Bottom Center */}
+        {/* Action Buttons - Mobile Optimized Circular Design */}
         <div style={{
           position: 'fixed',
-          bottom: '40px',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          bottom: isMobile ? '20px' : '40px',
+          right: isMobile ? '15px' : '50%',
+          transform: isMobile ? 'none' : 'translateX(50%)',
+          left: isMobile ? 'auto' : '50%',
           zIndex: 1000,
           display: 'flex',
-          gap: '12px',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '15px' : '12px',
           alignItems: 'center'
         }}>
+          {/* Cash Out Button - Circular for mobile, rectangular for desktop */}
           <div 
             style={{
               backgroundColor: 'rgba(255, 165, 0, 0.95)',
-              border: '2px solid #ff8c00',
-              borderRadius: '8px',
+              border: '3px solid #ff8c00',
+              borderRadius: isMobile ? '50%' : '8px',
               color: '#000000',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '700',
               cursor: 'pointer',
-              padding: '12px 24px',
+              padding: isMobile ? '0' : '12px 24px',
+              width: isMobile ? '65px' : 'auto',
+              height: isMobile ? '65px' : 'auto',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              justifyContent: 'center',
+              gap: isMobile ? '0' : '8px',
               transition: 'all 150ms',
               pointerEvents: 'auto',
               textAlign: 'center',
               fontFamily: '"Rajdhani", sans-serif',
-              boxShadow: '0 4px 12px rgba(255, 165, 0, 0.4)',
-              minWidth: '200px',
-              justifyContent: 'center',
+              boxShadow: isMobile ? '0 4px 20px rgba(255, 165, 0, 0.6)' : '0 4px 12px rgba(255, 165, 0, 0.4)',
+              minWidth: isMobile ? '65px' : '200px',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              flexDirection: isMobile ? 'column' : 'row'
             }}
             onMouseOver={(e) => {
               if (!isCashingOut) {
                 e.target.style.backgroundColor = 'rgba(255, 200, 50, 0.98)'
-                e.target.style.transform = 'translateY(-2px)'
-                e.target.style.boxShadow = '0 6px 20px rgba(255, 165, 0, 0.5)'
+                e.target.style.transform = isMobile ? 'scale(1.05)' : 'translateY(-2px)'
+                e.target.style.boxShadow = isMobile ? '0 6px 25px rgba(255, 165, 0, 0.8)' : '0 6px 20px rgba(255, 165, 0, 0.5)'
               }
             }}
             onMouseOut={(e) => {
               if (!isCashingOut) {
                 e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
-                e.target.style.transform = 'translateY(0)'
-                e.target.style.boxShadow = '0 4px 12px rgba(255, 165, 0, 0.4)'
+                e.target.style.transform = 'scale(1)'
+                e.target.style.boxShadow = isMobile ? '0 4px 20px rgba(255, 165, 0, 0.6)' : '0 4px 12px rgba(255, 165, 0, 0.4)'
               }
             }}
           >
@@ -2214,51 +2218,80 @@ const AgarIOGame = () => {
                 width: `${cashOutProgress}%`,
                 backgroundColor: 'rgba(34, 197, 94, 0.8)',
                 transition: 'width 100ms linear',
-                zIndex: 1
+                zIndex: 1,
+                borderRadius: isMobile ? '50%' : '0'
               }} />
             )}
             
-            {/* Button text */}
-            <span style={{ position: 'relative', zIndex: 2 }}>
-              {isCashingOut 
-                ? `🔥 Cashing Out... ${Math.floor(cashOutProgress)}%`
-                : `🔥 Hold E to Cash Out ($${score})`
-              }
+            {/* Button content */}
+            <span style={{ position: 'relative', zIndex: 2, lineHeight: isMobile ? '1.2' : 'normal' }}>
+              {isMobile ? (
+                // Mobile: Show icon and short text
+                isCashingOut ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ fontSize: '18px' }}>🔥</div>
+                    <div style={{ fontSize: '10px', fontWeight: '600' }}>{Math.floor(cashOutProgress)}%</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ fontSize: '18px' }}>💰</div>
+                    <div style={{ fontSize: '9px', fontWeight: '600' }}>CASH</div>
+                  </div>
+                )
+              ) : (
+                // Desktop: Show full text
+                isCashingOut 
+                  ? `🔥 Cashing Out... ${Math.floor(cashOutProgress)}%`
+                  : `🔥 Hold E to Cash Out ($${score})`
+              )}
             </span>
           </div>
 
-          {/* Split Button - Same height as Cash Out */}
+          {/* Split Button - Circular for mobile, rectangular for desktop */}
           <div 
             onClick={handleSplit}
             style={{
               backgroundColor: 'rgba(255, 0, 0, 0.9)',
-              border: '2px solid #ff0000',
-              borderRadius: '8px',
+              border: '3px solid #ff0000',
+              borderRadius: isMobile ? '50%' : '8px',
               color: '#ffffff',
-              fontSize: '16px',
+              fontSize: isMobile ? '14px' : '16px',
               fontWeight: '700',
               cursor: 'pointer',
-              padding: '12px 24px',
+              padding: isMobile ? '0' : '12px 24px',
+              width: isMobile ? '65px' : 'auto',
+              height: isMobile ? '65px' : 'auto',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              justifyContent: 'center',
+              gap: isMobile ? '0' : '8px',
               transition: 'all 150ms',
               pointerEvents: 'auto',
               fontFamily: '"Rajdhani", sans-serif',
-              boxShadow: '0 4px 12px rgba(255, 0, 0, 0.3)'
+              boxShadow: isMobile ? '0 4px 20px rgba(255, 0, 0, 0.6)' : '0 4px 12px rgba(255, 0, 0, 0.3)',
+              flexDirection: isMobile ? 'column' : 'row'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = 'rgba(255, 50, 50, 0.95)'
-              e.target.style.transform = 'translateY(-2px)'
-              e.target.style.boxShadow = '0 6px 20px rgba(255, 0, 0, 0.4)'
+              e.target.style.transform = isMobile ? 'scale(1.05)' : 'translateY(-2px)'
+              e.target.style.boxShadow = isMobile ? '0 6px 25px rgba(255, 0, 0, 0.8)' : '0 6px 20px rgba(255, 0, 0, 0.4)'
             }}
             onMouseOut={(e) => {
               e.target.style.backgroundColor = 'rgba(255, 0, 0, 0.9)'
-              e.target.style.transform = 'translateY(0)'
-              e.target.style.boxShadow = '0 4px 12px rgba(255, 0, 0, 0.3)'
+              e.target.style.transform = 'scale(1)'
+              e.target.style.boxShadow = isMobile ? '0 4px 20px rgba(255, 0, 0, 0.6)' : '0 4px 12px rgba(255, 0, 0, 0.3)'
             }}
           >
-            ⚡ Split (S)
+            {isMobile ? (
+              // Mobile: Show icon and short text
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ fontSize: '18px' }}>⚡</div>
+                <div style={{ fontSize: '9px', fontWeight: '600' }}>SPLIT</div>
+              </div>
+            ) : (
+              // Desktop: Show full text
+              '⚡ Split (S)'
+            )}
           </div>
         </div>
 
