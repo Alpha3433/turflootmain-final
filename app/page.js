@@ -5663,46 +5663,6 @@ export default function TurfLootTactical() {
                     </button>
                   </div>
                 </div>
-
-                {/* Recent Activity */}
-                <div style={{
-                  padding: '20px',
-                  background: 'rgba(45, 55, 72, 0.5)',
-                  border: '1px solid rgba(104, 211, 145, 0.2)',
-                  borderRadius: '12px'
-                }}>
-                  <h3 style={{
-                    margin: '0 0 16px 0',
-                    color: '#f6ad55',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    📈 RECENT ACTIVITY
-                  </h3>
-                  
-                  <div style={{
-                    padding: '24px 20px',
-                    textAlign: 'center',
-                    color: '#a0aec0',
-                    fontSize: '14px'
-                  }}>
-                    <div style={{ 
-                      fontSize: '32px', 
-                      marginBottom: '8px',
-                      opacity: 0.5 
-                    }}>
-                      📊
-                    </div>
-                    <div style={{ fontSize: '12px', opacity: 0.7 }}>
-                      No recent friend activity
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
