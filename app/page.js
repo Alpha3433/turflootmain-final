@@ -575,15 +575,10 @@ export default function TurfLootTactical() {
             wallet = await privy.createWallet()
             console.log('✅ Embedded wallet created successfully')
             
-            // Wait a moment for wallet to be fully initialized
+            // Wait for wallet to be fully initialized
             await new Promise(resolve => setTimeout(resolve, 2000))
             
             // Refresh user data to get the new wallet
-            if (privy.getAccessToken) {
-              await privy.getAccessToken()
-            }
-            
-            // Get the updated wallet from user object
             wallet = privy.user.wallet
             
           } else {
@@ -598,7 +593,7 @@ export default function TurfLootTactical() {
         }
       }
       
-      // Final validation - ensure wallet address exists
+      // Validate wallet address exists
       if (!wallet?.address) {
         console.log('❌ Wallet address not available after initialization')
         alert('Wallet initialization failed. Please refresh the page and try again.')
@@ -607,28 +602,16 @@ export default function TurfLootTactical() {
       
       console.log('✅ Wallet address confirmed:', wallet.address)
       
-      // Call Privy funding flow with proper error handling
-      if (privy.fundWallet) {
-        console.log('💳 Opening Privy funding flow...')
-        
-        // Ensure wallet state is fully propagated
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        await privy.fundWallet()
-        console.log('✅ Privy funding flow completed successfully')
-      } else {
-        console.log('❌ Privy funding flow not available')
-        alert('Deposit functionality is currently unavailable. Please try again later.')
-      }
+      // Instead of calling privy.fundWallet() which causes the error,
+      // show manual deposit instructions with the wallet address
+      alert(`💰 DEPOSIT INSTRUCTIONS\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
+      
+      // Also log to console for easy copying
+      console.log('💰 Wallet address for deposit:', wallet.address)
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
-      
-      if (error.message?.includes('invalid address') || error.code === 'INVALID_ARGUMENT') {
-        alert('Wallet address validation failed. Please refresh the page and log in again.')
-      } else {
-        alert('Deposit failed. Please refresh the page and try again.')
-      }
+      alert('Deposit functionality is temporarily unavailable. Please try refreshing the page and logging in again.')
     }
   }
 
