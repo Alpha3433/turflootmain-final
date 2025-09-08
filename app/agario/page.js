@@ -807,14 +807,21 @@ const AgarIOGame = () => {
       if (!this.running) return
       
       const now = Date.now()
-      const deltaTime = (now - this.lastUpdate) / 1000
+      let deltaTime = (now - this.lastUpdate) / 1000
+      
+      // Cap deltaTime to prevent huge jumps that cause stuttering
+      deltaTime = Math.min(deltaTime, 0.033) // Max 33ms (30fps minimum)
+      
+      // Ensure minimum deltaTime for consistency
+      if (deltaTime < 0.008) return // Skip frame if too fast (125fps cap)
+      
       this.lastUpdate = now
 
       // Update player
       this.updatePlayer(deltaTime)
       
       // Update dynamic zone for cash games
-      this.updateDynamicZone(deltaTime / 1000) // Convert to seconds
+      this.updateDynamicZone(deltaTime) // Already in seconds
       
       // Update spawn protection timers
       this.updateSpawnProtection()
