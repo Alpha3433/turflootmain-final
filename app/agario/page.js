@@ -130,7 +130,10 @@ const AgarIOGame = () => {
         name: 'You',
         speed: 2,
         targetX: this.world.width / 2,
-        targetY: this.world.height / 2
+        targetY: this.world.height / 2,
+        spawnProtection: true,
+        spawnProtectionTime: 4000, // 4 seconds in milliseconds
+        spawnProtectionStart: Date.now()
       }
       
       this.coins = []
