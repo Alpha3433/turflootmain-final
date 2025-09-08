@@ -4269,14 +4269,7 @@ export default function TurfLootTactical() {
           }} />
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <div style={{ 
-              ...iconStyle, 
-              background: 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)', 
-              color: '#ffffff',
-              boxShadow: '0 0 20px rgba(139, 92, 246, 0.6)',
-              border: '2px solid #8b5cf6'
-            }}></div>
-            <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(246, 173, 85, 0.6)', textTransform: 'uppercase' }}>CUSTOMIZE</h3>
+            <h3 style={{ color: '#8b5cf6', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(139, 92, 246, 0.6)', textTransform: 'uppercase' }}>CUSTOMIZE</h3>
           </div>
           
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
