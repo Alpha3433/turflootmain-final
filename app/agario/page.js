@@ -1206,8 +1206,10 @@ const AgarIOGame = () => {
       const targetX = this.player.x - this.canvas.width / 2
       const targetY = this.player.y - this.canvas.height / 2
       
-      this.camera.x += (targetX - this.camera.x) * 0.1
-      this.camera.y += (targetY - this.camera.y) * 0.1
+      // Enhanced camera smoothing for better movement feel
+      const cameraSmoothing = 0.15 // Increased from 0.1 for more responsive camera
+      this.camera.x += (targetX - this.camera.x) * cameraSmoothing
+      this.camera.y += (targetY - this.camera.y) * cameraSmoothing
       
       // Allow camera to show red boundary areas (extend bounds by 100px)
       const boundaryExtension = 100
