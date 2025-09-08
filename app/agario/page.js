@@ -657,6 +657,31 @@ const AgarIOGame = () => {
       this.ctx.lineWidth = 3
       this.ctx.stroke()
       
+      // Draw spawn protection ring
+      if (player.spawnProtection) {
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, player.radius + 8, 0, Math.PI * 2)
+        this.ctx.strokeStyle = '#3B82F6' // Bright blue color
+        this.ctx.lineWidth = 4
+        this.ctx.setLineDash([10, 5]) // Dashed line pattern
+        this.ctx.stroke()
+        this.ctx.setLineDash([]) // Reset line dash
+        
+        // Add pulsing effect
+        const time = Date.now() / 1000
+        const pulseIntensity = Math.sin(time * 4) * 0.3 + 0.7 // Pulse between 0.4 and 1.0
+        this.ctx.globalAlpha = pulseIntensity
+        
+        // Draw inner glow ring
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, player.radius + 6, 0, Math.PI * 2)
+        this.ctx.strokeStyle = '#60A5FA' // Lighter blue
+        this.ctx.lineWidth = 2
+        this.ctx.stroke()
+        
+        this.ctx.globalAlpha = 1.0 // Reset alpha
+      }
+      
       // Draw player name
       this.ctx.fillStyle = '#ffffff'
       this.ctx.font = 'bold 14px Arial'
