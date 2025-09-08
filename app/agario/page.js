@@ -1381,7 +1381,7 @@ const AgarIOGame = () => {
     setCanvasSize()
     window.addEventListener('resize', setCanvasSize)
 
-    const game = new GameEngine(canvas)
+    const game = new GameEngine(canvas, setCheatingBan)
     gameRef.current = game
     
     game.start()
