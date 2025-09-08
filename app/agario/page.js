@@ -844,7 +844,8 @@ const AgarIOGame = () => {
       const distance = Math.sqrt(dx * dx + dy * dy)
       
       // Dynamic speed based on mass - larger players move slower
-      if (distance > 1) {
+      // Use a much smaller threshold to prevent stopping when mouse is still
+      if (distance > 0.1) {
         // Speed decreases as mass increases (like Agar.io)
         const baseSpeed = 6.0  // Base speed for small players
         const massSpeedFactor = Math.sqrt(this.player.mass / 20) // Gradual slowdown
