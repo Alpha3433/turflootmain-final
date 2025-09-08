@@ -975,6 +975,9 @@ const AgarIOGame = () => {
     }
 
     checkCollisions() {
+      // Skip all collisions if game is not running (prevents being eaten after cash out)
+      if (!this.running) return
+      
       // Player eating coins
       for (let i = this.coins.length - 1; i >= 0; i--) {
         const coin = this.coins[i]
