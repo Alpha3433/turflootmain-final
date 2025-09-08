@@ -2890,7 +2890,7 @@ const AgarIOGame = () => {
                       e.target.style.transform = 'translateY(0)'
                     }}
                   >
-                    🔄 Play Again
+                    PLAY AGAIN
                   </button>
                   <button
                     onClick={() => window.location.href = '/'}
