@@ -1176,7 +1176,7 @@ const AgarIOGame = () => {
       this.enemies.forEach(enemy => this.drawPlayer(enemy))
       
       // Draw player only if game is running and no modals are showing
-      if (this.running && !cashOutComplete && !gameOver) {
+      if (this.running && !this.gameStates.cashOutComplete && !this.gameStates.gameOver) {
         this.drawPlayer(this.player)
       }
       
