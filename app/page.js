@@ -5591,6 +5591,268 @@ export default function TurfLootTactical() {
           </div>
         )}
 
+        {/* Add Friend Modal */}
+        {isAddFriendModalOpen && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 10001,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+              boxSizing: 'border-box'
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsAddFriendModalOpen(false)
+              }
+            }}
+          >
+            <div 
+              style={{
+                background: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
+                border: '3px solid #68d391',
+                borderRadius: '16px',
+                maxWidth: '450px',
+                width: '100%',
+                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.3)',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}
+            >
+              {/* Header */}
+              <div style={{
+                padding: '24px',
+                borderBottom: '2px solid rgba(104, 211, 145, 0.3)',
+                background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+                borderRadius: '13px 13px 0 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    color: '#1a202c',
+                    fontWeight: '700',
+                    boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)'
+                  }}>
+                    👤
+                  </div>
+                  <div>
+                    <h2 style={{
+                      margin: 0,
+                      color: '#68d391',
+                      fontSize: '24px',
+                      fontWeight: '700',
+                      textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em'
+                    }}>
+                      ADD FRIEND
+                    </h2>
+                    <p style={{
+                      margin: '4px 0 0 0',
+                      color: '#a0aec0',
+                      fontSize: '14px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}>
+                      EXPAND YOUR NETWORK
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsAddFriendModalOpen(false)}
+                  style={{
+                    background: 'rgba(252, 129, 129, 0.2)',
+                    border: '2px solid #fc8181',
+                    borderRadius: '8px',
+                    color: '#fc8181',
+                    fontSize: '20px',
+                    width: '40px',
+                    height: '40px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+                    e.target.style.transform = 'scale(1.1)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                    e.target.style.transform = 'scale(1)'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Content */}
+              <div style={{ padding: '24px' }}>
+                
+                {/* Add Friend Form */}
+                <div style={{
+                  marginBottom: '24px'
+                }}>
+                  <label style={{
+                    display: 'block',
+                    color: '#68d391',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    marginBottom: '8px',
+                    letterSpacing: '0.05em'
+                  }}>
+                    Friend's Username or Email
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter username or email address"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      background: 'rgba(26, 32, 44, 0.8)',
+                      border: '2px solid rgba(104, 211, 145, 0.3)',
+                      borderRadius: '8px',
+                      color: '#e2e8f0',
+                      fontSize: '16px',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      outline: 'none',
+                      transition: 'all 0.3s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#68d391'
+                      e.target.style.boxShadow = '0 0 0 3px rgba(104, 211, 145, 0.1)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(104, 211, 145, 0.3)'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  />
+                </div>
+
+                {/* Instructions */}
+                <div style={{
+                  padding: '16px',
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
+                  borderRadius: '8px',
+                  marginBottom: '24px'
+                }}>
+                  <div style={{
+                    color: '#3b82f6',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    💡 HOW TO ADD FRIENDS
+                  </div>
+                  <ul style={{
+                    color: '#a0aec0',
+                    fontSize: '12px',
+                    margin: 0,
+                    paddingLeft: '16px',
+                    lineHeight: '1.5'
+                  }}>
+                    <li>Enter their exact username or email address</li>
+                    <li>Make sure they have a TurfLoot account</li>
+                    <li>They'll receive a friend request notification</li>
+                    <li>Once accepted, you can invite them to parties</li>
+                  </ul>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px'
+                }}>
+                  <button
+                    onClick={() => {
+                      // Handle send friend request
+                      console.log('Send friend request clicked')
+                      // Here you would implement the actual friend request logic
+                      alert('Friend request functionality will be implemented soon!')
+                      setIsAddFriendModalOpen(false)
+                    }}
+                    style={{
+                      flex: 1,
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '2px solid #68d391',
+                      borderRadius: '8px',
+                      color: '#68d391',
+                      padding: '14px 20px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    📤 SEND REQUEST
+                  </button>
+                  <button
+                    onClick={() => setIsAddFriendModalOpen(false)}
+                    style={{
+                      flex: 1,
+                      background: 'rgba(160, 174, 192, 0.2)',
+                      border: '2px solid #a0aec0',
+                      borderRadius: '8px',
+                      color: '#a0aec0',
+                      padding: '14px 20px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(160, 174, 192, 0.3)'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(160, 174, 192, 0.2)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    ❌ CANCEL
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     )
   }
