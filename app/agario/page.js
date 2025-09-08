@@ -99,6 +99,17 @@ const AgarIOGame = () => {
       setActiveMissions(selectedMissions)
     }
   }, [gameStarted])
+
+  // Cycle through missions every 4 seconds
+  useEffect(() => {
+    if (activeMissions.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentMissionIndex(prev => (prev + 1) % activeMissions.length)
+      }, 4000) // Change mission every 4 seconds
+      
+      return () => clearInterval(interval)
+    }
+  }, [activeMissions.length])
   
   // Cash out state
   const [cashOutProgress, setCashOutProgress] = useState(0)
