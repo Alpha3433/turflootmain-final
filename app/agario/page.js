@@ -597,9 +597,9 @@ const AgarIOGame = () => {
       
       console.error('🔒 PLAYER BANNED: Multiple anti-cheat violations detected')
       
-      // Trigger the cheating ban modal instead of alert
-      if (typeof setCheatingBan === 'function') {
-        setCheatingBan(true)
+      // Trigger the cheating ban modal
+      if (this.setCheatingBan) {
+        this.setCheatingBan(true)
       } else {
         // Fallback if state setter is not available
         alert('⚠️ ACCOUNT SUSPENDED\n\nMultiple violations of fair play policies detected.\nContact support if you believe this is an error.')
