@@ -1723,31 +1723,35 @@ const AgarIOGame = () => {
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
-                  padding: '4px 8px',
+                  padding: isMobile ? '3px 6px' : '4px 8px',
                   backgroundColor: player.isPlayer ? 'rgba(0, 255, 255, 0.1)' : 'transparent',
-                  borderRadius: '4px',
+                  borderRadius: isMobile ? '6px' : '4px',
                   border: player.isPlayer ? '1px solid rgba(0, 255, 255, 0.3)' : 'none'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '6px' }}>
                     <span style={{ 
                       color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
-                      fontSize: '12px', 
+                      fontSize: isMobile ? '10px' : '12px', 
                       fontWeight: '700',
-                      marginRight: '8px'
+                      minWidth: isMobile ? '12px' : '14px'
                     }}>
                       #{index + 1}
                     </span>
                     <span style={{ 
                       color: player.isPlayer ? '#00ffff' : '#ffffff', 
-                      fontSize: '12px', 
-                      fontWeight: '600' 
+                      fontSize: isMobile ? '10px' : '12px', 
+                      fontWeight: '600',
+                      maxWidth: isMobile ? '50px' : '60px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
                     }}>
                       {player.name}
                     </span>
                   </div>
                   <span style={{ 
                     color: '#00ff88', 
-                    fontSize: '12px', 
+                    fontSize: isMobile ? '10px' : '12px', 
                     fontWeight: '700'
                   }}>
                     ${player.score}
