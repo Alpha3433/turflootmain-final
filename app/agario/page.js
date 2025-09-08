@@ -120,6 +120,16 @@ const AgarIOGame = () => {
       this.camera = { x: 0, y: 0 }
       this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
       
+      // Dynamic zone system for cash games
+      this.isCashGame = this.detectCashGame()
+      this.realPlayerCount = this.isCashGame ? this.getRealPlayerCount() : 8 // Mock 8 for practice
+      this.basePlayableRadius = 800 // Minimum zone for 2 players
+      this.maxPlayableRadius = 1800 // Maximum zone for full lobby
+      this.currentPlayableRadius = this.calculatePlayableRadius()
+      this.targetPlayableRadius = this.currentPlayableRadius
+      this.zoneTransitionSpeed = 50 // Pixels per second zone change
+      this.lastPlayerCountCheck = Date.now()
+      
       // Game objects
       this.player = {
         x: this.world.width / 2,
@@ -146,6 +156,8 @@ const AgarIOGame = () => {
       this.generateEnemies()
       this.generateViruses()
       this.bindEvents()
+      
+      console.log(`🎯 Game initialized - Cash game: ${this.isCashGame}, Player count: ${this.realPlayerCount}, Zone radius: ${this.currentPlayableRadius}`)
     }
 
     generateCoins() {
