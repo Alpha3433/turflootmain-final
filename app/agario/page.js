@@ -2920,7 +2920,7 @@ const AgarIOGame = () => {
                       e.target.style.color = '#a0aec0'
                     }}
                   >
-                    🏠 Back to Lobby
+                    BACK TO LOBBY
                   </button>
                 </div>
               </div>
