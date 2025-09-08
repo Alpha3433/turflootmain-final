@@ -497,6 +497,10 @@ const AgarIOGame = () => {
             enemy.radius = Math.sqrt(enemy.mass) * 3
             enemy.x = Math.random() * this.world.width
             enemy.y = Math.random() * this.world.height
+            // Reset spawn protection for respawned enemy
+            enemy.spawnProtection = true
+            enemy.spawnProtectionStart = Date.now()
+            console.log(`Enemy ${enemy.name} respawned with spawn protection`)
           } else if (enemy.mass > this.player.mass * 1.2) {
             // Enemy eats player - Game Over
             this.running = false
