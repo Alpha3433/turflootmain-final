@@ -141,7 +141,7 @@ const AgarIOGame = () => {
         y: this.world.height / 2,
         mass: 20,
         radius: 25,
-        color: '#4A90E2',
+        color: this.selectedSkin.color, // Use selected skin color instead of hardcoded blue
         name: 'You',
         speed: 2,
         targetX: this.world.width / 2,
