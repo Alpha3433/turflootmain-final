@@ -17,6 +17,7 @@ const AgarIOGame = () => {
   const [score, setScore] = useState(0)
   const [mass, setMass] = useState(20)
   const [eliminations, setEliminations] = useState(0)
+  const [timeSurvived, setTimeSurvived] = useState(0)
   
   // Missions system
   const [currency, setCurrency] = useState(0) // Coins earned from missions
