@@ -237,7 +237,7 @@ const AgarIOGame = () => {
       this.coins = []
       const centerX = this.world.width / 2  // 2000
       const centerY = this.world.height / 2 // 2000
-      const playableRadius = 1800 // Same as boundary radius
+      const playableRadius = this.currentPlayableRadius
       
       for (let i = 0; i < 1000; i++) { // Increased to 1000 coins to match Agar.io food density
         let x, y, distance
@@ -257,6 +257,8 @@ const AgarIOGame = () => {
           color: '#FFD700'
         })
       }
+      
+      console.log(`🪙 Generated ${this.coins.length} coins within radius ${Math.floor(playableRadius)}px`)
     }
 
     generateEnemies() {
