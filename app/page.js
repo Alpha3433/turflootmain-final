@@ -4706,7 +4706,8 @@ export default function TurfLootTactical() {
             {/* Mobile Navigation Icons */}
             <div 
               style={{ 
-                width: '24px', 
+                width: 'auto', 
+                minWidth: '24px',
                 height: '24px', 
                 background: 'rgba(26, 32, 44, 0.8)', 
                 border: '2px solid #68d391',
@@ -4717,7 +4718,9 @@ export default function TurfLootTactical() {
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                fontSize: '12px'
+                fontSize: '10px',
+                padding: '0 6px',
+                gap: '3px'
               }}
               title="Wallet"
               onMouseOver={(e) => {
@@ -4729,7 +4732,15 @@ export default function TurfLootTactical() {
                 e.target.style.boxShadow = '0 0 10px rgba(104, 211, 145, 0.3)'
               }}
             >
-              💰
+              <span style={{ fontSize: '12px' }}>💰</span>
+              <span style={{ 
+                color: '#68d391', 
+                fontFamily: '"Rajdhani", sans-serif',
+                fontWeight: '700',
+                fontSize: '10px'
+              }}>
+                {currency.toLocaleString()}
+              </span>
             </div>
             <div 
               style={{ 
