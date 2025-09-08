@@ -825,6 +825,11 @@ const AgarIOGame = () => {
     }
 
     updatePlayer(deltaTime) {
+      // Store previous position for anti-cheat validation
+      const prevX = this.player.x
+      const prevY = this.player.y
+      const now = Date.now()
+      
       const dx = this.player.targetX - this.player.x
       const dy = this.player.targetY - this.player.y
       const distance = Math.sqrt(dx * dx + dy * dy)
@@ -834,13 +839,46 @@ const AgarIOGame = () => {
         const moveX = (dx / distance) * speed * 60 * deltaTime
         const moveY = (dy / distance) * speed * 60 * deltaTime
         
-        this.player.x += moveX
-        this.player.y += moveY
+        // Anti-cheat: Validate movement speed
+        if (this.antiCheat.enabled) {
+          const proposedX = this.player.x + moveX
+          const proposedY = this.player.y + moveY
+          const actualDistance = Math.sqrt(Math.pow(proposedX - prevX, 2) + Math.pow(proposedY - prevY, 2))
+          const timeDelta = now - this.antiCheat.lastPosition.timestamp
+          const maxAllowedDistance = this.antiCheat.maxSpeed * (timeDelta / 16.67) // Normalize to 60fps
+          
+          if (actualDistance > maxAllowedDistance && timeDelta < 1000) { // Ignore if too much time passed
+            this.recordViolation('SPEED_HACK', `Movement too fast: ${actualDistance.toFixed(2)} > ${maxAllowedDistance.toFixed(2)}`)
+            // Limit the movement
+            const ratio = maxAllowedDistance / actualDistance
+            this.player.x += moveX * ratio
+            this.player.y += moveY * ratio
+          } else {
+            this.player.x += moveX
+            this.player.y += moveY
+          }
+          
+          // Update anti-cheat position tracking
+          this.antiCheat.lastPosition = {
+            x: this.player.x,
+            y: this.player.y,
+            timestamp: now
+          }
+          
+          // Track action for rate limiting
+          this.antiCheat.actionQueue.push({
+            type: 'movement',
+            timestamp: now
+          })
+        } else {
+          this.player.x += moveX
+          this.player.y += moveY
+        }
         
-        // Circular boundary constraints (synced with minimap)
-        const centerX = this.world.width / 2  // 2000
-        const centerY = this.world.height / 2 // 2000
-        const playableRadius = 1800 // Same as boundary radius
+        // Circular boundary constraints (use dynamic radius)
+        const centerX = this.world.width / 2
+        const centerY = this.world.height / 2
+        const playableRadius = this.currentPlayableRadius
         
         const distanceFromCenter = Math.sqrt(
           Math.pow(this.player.x - centerX, 2) + 
@@ -853,10 +891,24 @@ const AgarIOGame = () => {
           const maxDistance = playableRadius - this.player.radius
           this.player.x = centerX + Math.cos(angle) * maxDistance
           this.player.y = centerY + Math.sin(angle) * maxDistance
+          
+          // Anti-cheat: Record boundary violation attempt
+          if (this.antiCheat.enabled) {
+            this.recordViolation('BOUNDARY_VIOLATION', `Attempted to move outside playable area`)
+          }
         }
       }
       
       this.player.radius = Math.sqrt(this.player.mass) * 3
+      
+      // Anti-cheat: Validate radius-mass relationship
+      if (this.antiCheat.enabled) {
+        const expectedRadius = Math.sqrt(this.player.mass) * 3
+        if (Math.abs(this.player.radius - expectedRadius) > 1) {
+          this.recordViolation('RADIUS_MANIPULATION', `Invalid radius: ${this.player.radius} vs expected: ${expectedRadius}`)
+          this.player.radius = expectedRadius // Force correct radius
+        }
+      }
     }
 
     updateEnemy(enemy, deltaTime) {
