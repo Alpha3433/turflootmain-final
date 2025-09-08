@@ -758,9 +758,6 @@ const AgarIOGame = () => {
     }
 
     bindEvents() {
-      // Throttle mouse movement updates to prevent excessive target changes
-      let mouseUpdateTimeout = null
-      
       this.canvas.addEventListener('mousemove', (e) => {
         const rect = this.canvas.getBoundingClientRect()
         this.mouse.x = e.clientX - rect.left
@@ -770,15 +767,9 @@ const AgarIOGame = () => {
         this.mouse.worldX = this.mouse.x + this.camera.x
         this.mouse.worldY = this.mouse.y + this.camera.y
         
-        // Throttle target updates to reduce stuttering
-        if (mouseUpdateTimeout) {
-          clearTimeout(mouseUpdateTimeout)
-        }
-        
-        mouseUpdateTimeout = setTimeout(() => {
-          this.player.targetX = this.mouse.worldX
-          this.player.targetY = this.mouse.worldY
-        }, 8) // Small delay to throttle rapid mouse movements
+        // Direct target update like Agar.io
+        this.player.targetX = this.mouse.worldX
+        this.player.targetY = this.mouse.worldY
       })
 
       this.canvas.addEventListener('touchmove', (e) => {
@@ -791,15 +782,8 @@ const AgarIOGame = () => {
         this.mouse.worldX = this.mouse.x + this.camera.x
         this.mouse.worldY = this.mouse.y + this.camera.y
         
-        // Apply the same throttling for touch
-        if (mouseUpdateTimeout) {
-          clearTimeout(mouseUpdateTimeout)
-        }
-        
-        mouseUpdateTimeout = setTimeout(() => {
-          this.player.targetX = this.mouse.worldX
-          this.player.targetY = this.mouse.worldY
-        }, 8)
+        this.player.targetX = this.mouse.worldX
+        this.player.targetY = this.mouse.worldY
       }, { passive: false })
     }
 
