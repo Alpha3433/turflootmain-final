@@ -4135,14 +4135,7 @@ export default function TurfLootTactical() {
           }} />
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <div style={{ 
-              ...iconStyle, 
-              background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)', 
-              color: '#ffffff',
-              boxShadow: '0 0 20px rgba(252, 129, 129, 0.6)',
-              border: '2px solid #fc8181'
-            }}></div>
-            <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(104, 211, 145, 0.6)', textTransform: 'uppercase' }}>PARTY</h3>
+            <h3 style={{ color: '#fc8181', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(252, 129, 129, 0.6)', textTransform: 'uppercase' }}>PARTY</h3>
             <div style={{ marginLeft: 'auto' }}>
               <button 
                 onClick={() => {
