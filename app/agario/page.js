@@ -12,6 +12,7 @@ const AgarIOGame = () => {
   // Game state
   const [gameStarted, setGameStarted] = useState(false)
   const [gameOver, setGameOver] = useState(false)
+  const [cheatingBan, setCheatingBan] = useState(false)
   const [missionTime, setMissionTime] = useState(60)
   const [score, setScore] = useState(0)
   const [mass, setMass] = useState(20)
