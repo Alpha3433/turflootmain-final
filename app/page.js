@@ -4525,6 +4525,208 @@ export default function TurfLootTactical() {
             }
           }
         `}</style>
+        
+        {/* Navigation Bar - Bottom */}
+        <div style={{
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          width: '100%',
+          height: '70px',
+          backgroundColor: 'rgba(26, 32, 44, 0.95)',
+          borderTop: '2px solid rgba(104, 211, 145, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+          zIndex: 1000,
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.5)'
+        }}>
+          {/* Home / Dashboard */}
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}
+            onMouseOver={(e) => {
+              e.target.closest('button').style.backgroundColor = 'rgba(104, 211, 145, 0.1)'
+              e.target.closest('button').style.transform = 'translateY(-2px)'
+            }}
+            onMouseOut={(e) => {
+              e.target.closest('button').style.backgroundColor = 'transparent'
+              e.target.closest('button').style.transform = 'translateY(0)'
+            }}
+          >
+            <div style={{
+              fontSize: '24px',
+              color: '#68d391',
+              textShadow: '0 0 10px rgba(104, 211, 145, 0.6)'
+            }}>
+              🏠
+            </div>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: '600',
+              color: '#68d391',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              HOME
+            </span>
+          </button>
+
+          {/* Friends / Party */}
+          <button
+            onClick={() => {
+              // Toggle friends/party panel or modal
+              console.log('Friends/Party clicked')
+              alert('Friends & Party system - coming soon!')
+            }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}
+            onMouseOver={(e) => {
+              e.target.closest('button').style.backgroundColor = 'rgba(246, 173, 85, 0.1)'
+              e.target.closest('button').style.transform = 'translateY(-2px)'
+            }}
+            onMouseOut={(e) => {
+              e.target.closest('button').style.backgroundColor = 'transparent'
+              e.target.closest('button').style.transform = 'translateY(0)'
+            }}
+          >
+            <div style={{
+              fontSize: '24px',
+              color: '#f6ad55',
+              textShadow: '0 0 10px rgba(246, 173, 85, 0.6)'
+            }}>
+              👥
+            </div>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: '600',
+              color: '#f6ad55',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              FRIENDS
+            </span>
+          </button>
+
+          {/* Wallet / Balance */}
+          <button
+            onClick={() => {
+              // Open wallet overlay
+              console.log('Wallet clicked')
+              // Trigger the existing wallet functionality
+              document.querySelector('[style*="WALLET"]')?.parentElement?.style.setProperty('display', 'block')
+              alert('💰 Wallet:\n\n• DEPOSIT: Add funds to your account\n• WITHDRAW: Send funds to external wallet\n• BALANCE: Current account balance\n\nUse the wallet section in the top-right corner.')
+            }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}
+            onMouseOver={(e) => {
+              e.target.closest('button').style.backgroundColor = 'rgba(255, 215, 0, 0.1)'
+              e.target.closest('button').style.transform = 'translateY(-2px)'
+            }}
+            onMouseOut={(e) => {
+              e.target.closest('button').style.backgroundColor = 'transparent'
+              e.target.closest('button').style.transform = 'translateY(0)'
+            }}
+          >
+            <div style={{
+              fontSize: '24px',
+              color: '#FFD700',
+              textShadow: '0 0 10px rgba(255, 215, 0, 0.6)'
+            }}>
+              💰
+            </div>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: '600',
+              color: '#FFD700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              WALLET
+            </span>
+          </button>
+
+          {/* Settings / Profile */}
+          <button
+            onClick={() => {
+              console.log('Settings clicked')
+              alert('⚙️ SETTINGS & PROFILE:\n\n• Audio/Video Controls\n• Keybind Configuration\n• Account Management\n• Game Preferences\n\nSettings panel coming soon!')
+            }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}
+            onMouseOver={(e) => {
+              e.target.closest('button').style.backgroundColor = 'rgba(139, 92, 246, 0.1)'
+              e.target.closest('button').style.transform = 'translateY(-2px)'
+            }}
+            onMouseOut={(e) => {
+              e.target.closest('button').style.backgroundColor = 'transparent'
+              e.target.closest('button').style.transform = 'translateY(0)'
+            }}
+          >
+            <div style={{
+              fontSize: '24px',
+              color: '#8b5cf6',
+              textShadow: '0 0 10px rgba(139, 92, 246, 0.6)'
+            }}>
+              ⚙️
+            </div>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: '600',
+              color: '#8b5cf6',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              SETTINGS
+            </span>
+          </button>
+        </div>
       </div>
     )
   }
