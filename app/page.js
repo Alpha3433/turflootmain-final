@@ -4814,6 +4814,7 @@ export default function TurfLootTactical() {
                 fontSize: '12px'
               }}
               title="User Profile"
+              onClick={() => setIsProfileModalOpen(true)}
               onMouseOver={(e) => {
                 e.target.style.transform = 'scale(1.1)'
                 e.target.style.boxShadow = '0 0 15px rgba(104, 211, 145, 0.5)'
