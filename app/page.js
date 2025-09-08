@@ -5231,45 +5231,20 @@ export default function TurfLootTactical() {
                     marginBottom: '16px',
                     textTransform: 'uppercase'
                   }}>
-                    FRIENDS ONLINE (3/24)
+                    FRIENDS ONLINE (0/0)
                   </div>
                   
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {['TacticalAce', 'SniperPro', 'StealthOp'].map((friendName, index) => (
-                      <div key={index} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '8px 12px',
-                        background: 'rgba(26, 32, 44, 0.5)',
-                        borderRadius: '6px'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div style={{
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '50%',
-                            background: '#68d391'
-                          }} />
-                          <span style={{ color: '#e2e8f0', fontSize: '14px' }}>{friendName}</span>
-                        </div>
-                        <button
-                          style={{
-                            background: 'rgba(59, 130, 246, 0.2)',
-                            border: '1px solid #3b82f6',
-                            borderRadius: '4px',
-                            color: '#3b82f6',
-                            padding: '4px 12px',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            textTransform: 'uppercase'
-                          }}
-                        >
-                          INVITE
-                        </button>
-                      </div>
-                    ))}
+                  <div style={{
+                    padding: '20px',
+                    textAlign: 'center',
+                    color: '#a0aec0',
+                    fontSize: '14px'
+                  }}>
+                    <div style={{ marginBottom: '8px' }}>👥</div>
+                    <div>No friends online</div>
+                    <div style={{ fontSize: '12px', marginTop: '4px' }}>
+                      Add friends to see them here
+                    </div>
                   </div>
                 </div>
 
