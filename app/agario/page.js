@@ -156,7 +156,7 @@ const AgarIOGame = () => {
       this.antiCheat = {
         enabled: this.isCashGame, // Only active for cash games
         violations: 0,
-        maxViolations: 5,
+        maxViolations: 3, // Changed from 5 to 3 strikes
         banned: false,
         
         // Movement validation
