@@ -840,42 +840,29 @@ const AgarIOGame = () => {
     updatePlayer(deltaTime) {
       const dx = this.player.targetX - this.player.x
       const dy = this.player.targetY - this.player.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
       
-      // Agar.io style: Always move toward target if there's any distance
-      if (distance > 0) {
-        // Simple speed calculation based on mass (like Agar.io)
-        const baseSpeed = 45
-        const speed = baseSpeed / Math.sqrt(this.player.mass / 10)
-        
-        // Calculate movement vector
-        const normalizedDx = dx / distance
-        const normalizedDy = dy / distance
-        
-        // Apply movement (simple linear interpolation like Agar.io)
-        const moveDistance = Math.min(speed * deltaTime * 60, distance)
-        
-        this.player.x += normalizedDx * moveDistance
-        this.player.y += normalizedDy * moveDistance
-        
-        // Simple boundary constraint (circular world like Agar.io)
-        const centerX = this.world.width / 2
-        const centerY = this.world.height / 2
-        const maxRadius = this.currentPlayableRadius - this.player.radius
-        
-        const distanceFromCenter = Math.sqrt(
-          Math.pow(this.player.x - centerX, 2) + 
-          Math.pow(this.player.y - centerY, 2)
-        )
-        
-        if (distanceFromCenter > maxRadius) {
-          const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
-          this.player.x = centerX + Math.cos(angle) * maxRadius
-          this.player.y = centerY + Math.sin(angle) * maxRadius
-        }
+      // Super snappy movement - move a fixed percentage toward target each frame
+      const moveSpeed = 0.15 // 15% of distance per frame - very snappy
+      
+      this.player.x += dx * moveSpeed
+      this.player.y += dy * moveSpeed
+      
+      // Quick boundary check - keep it simple
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const maxRadius = this.currentPlayableRadius - this.player.radius
+      
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(this.player.x - centerX, 2) + 
+        Math.pow(this.player.y - centerY, 2)
+      )
+      
+      if (distanceFromCenter > maxRadius) {
+        const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
+        this.player.x = centerX + Math.cos(angle) * maxRadius
+        this.player.y = centerY + Math.sin(angle) * maxRadius
       }
       
-      // Update radius based on mass
       this.player.radius = Math.sqrt(this.player.mass) * 3
       
       // Anti-cheat: Validate radius-mass relationship
