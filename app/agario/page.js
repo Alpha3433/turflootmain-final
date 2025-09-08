@@ -838,107 +838,44 @@ const AgarIOGame = () => {
     }
 
     updatePlayer(deltaTime) {
-      // Store previous position for anti-cheat validation
-      const prevX = this.player.x
-      const prevY = this.player.y
-      const now = Date.now()
-      
       const dx = this.player.targetX - this.player.x
       const dy = this.player.targetY - this.player.y
       const distance = Math.sqrt(dx * dx + dy * dy)
       
-      // Only move if there's a meaningful distance
-      if (distance > 0.5) {
-        // Simplified speed calculation for LOCAL PRACTICE mode
-        const urlParams = new URLSearchParams(window.location.search)
-        const mode = urlParams.get('mode')
-        const isLocalPractice = mode === 'local'
+      // Agar.io style: Always move toward target if there's any distance
+      if (distance > 0) {
+        // Simple speed calculation based on mass (like Agar.io)
+        const baseSpeed = 45
+        const speed = baseSpeed / Math.sqrt(this.player.mass / 10)
         
-        let speed
-        if (isLocalPractice) {
-          // Simplified speed for local practice to reduce stuttering
-          speed = Math.max(1, 45 / Math.sqrt(this.player.mass))
-        } else {
-          // Original speed calculation for other modes
-          speed = Math.max(0.3, 40 / Math.sqrt(this.player.mass))
-        }
+        // Calculate movement vector
+        const normalizedDx = dx / distance
+        const normalizedDy = dy / distance
         
-        // Simplified movement calculation
-        const normalizedSpeed = speed * deltaTime * 60 // 60fps reference
-        const moveDistance = Math.min(normalizedSpeed, distance * 0.8) // Don't overshoot
+        // Apply movement (simple linear interpolation like Agar.io)
+        const moveDistance = Math.min(speed * deltaTime * 60, distance)
         
-        const moveX = (dx / distance) * moveDistance
-        const moveY = (dy / distance) * moveDistance
+        this.player.x += normalizedDx * moveDistance
+        this.player.y += normalizedDy * moveDistance
         
-        // Simplified smoothing for local practice
-        let smoothMoveX, smoothMoveY
-        if (isLocalPractice) {
-          // Less aggressive smoothing for local practice
-          const smoothingFactor = 0.85
-          smoothMoveX = moveX * smoothingFactor
-          smoothMoveY = moveY * smoothingFactor
-        } else {
-          // More complex smoothing for other modes
-          const baseSmoothingFactor = 0.95
-          const distanceFactor = Math.min(1, distance / 50)
-          const smoothingFactor = baseSmoothingFactor * distanceFactor + (1 - distanceFactor) * 0.7
-          smoothMoveX = moveX * smoothingFactor
-          smoothMoveY = moveY * smoothingFactor
-        }
-        
-        // Calculate proposed position
-        let proposedX = this.player.x + smoothMoveX
-        let proposedY = this.player.y + smoothMoveY
-        
-        // Simplified boundary constraints
+        // Simple boundary constraint (circular world like Agar.io)
         const centerX = this.world.width / 2
         const centerY = this.world.height / 2
-        const playableRadius = this.currentPlayableRadius
+        const maxRadius = this.currentPlayableRadius - this.player.radius
         
         const distanceFromCenter = Math.sqrt(
-          Math.pow(proposedX - centerX, 2) + 
-          Math.pow(proposedY - centerY, 2)
+          Math.pow(this.player.x - centerX, 2) + 
+          Math.pow(this.player.y - centerY, 2)
         )
         
-        // Smooth boundary handling
-        if (distanceFromCenter + this.player.radius > playableRadius) {
-          const angle = Math.atan2(proposedY - centerY, proposedX - centerX)
-          const maxDistance = playableRadius - this.player.radius - 3
-          
-          // Gentle pushback
-          const pushBackFactor = 0.9
-          const idealX = centerX + Math.cos(angle) * maxDistance
-          const idealY = centerY + Math.sin(angle) * maxDistance
-          
-          proposedX = this.player.x + (idealX - this.player.x) * pushBackFactor
-          proposedY = this.player.y + (idealY - this.player.y) * pushBackFactor
+        if (distanceFromCenter > maxRadius) {
+          const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
+          this.player.x = centerX + Math.cos(angle) * maxRadius
+          this.player.y = centerY + Math.sin(angle) * maxRadius
         }
-        
-        // Simplified anti-cheat for local practice
-        if (this.antiCheat.enabled && !isLocalPractice) {
-          const actualDistance = Math.sqrt(Math.pow(proposedX - prevX, 2) + Math.pow(proposedY - prevY, 2))
-          const timeDelta = Math.max(16.67, now - this.antiCheat.lastPosition.timestamp)
-          const maxAllowedDistance = this.antiCheat.maxSpeed * (timeDelta / 16.67) * 1.3 // More tolerance
-          
-          if (actualDistance > maxAllowedDistance && timeDelta < 1000) {
-            const ratio = maxAllowedDistance / actualDistance
-            proposedX = prevX + (proposedX - prevX) * ratio
-            proposedY = prevY + (proposedY - prevY) * ratio
-          }
-          
-          // Update anti-cheat tracking less frequently
-          this.antiCheat.lastPosition = {
-            x: proposedX,
-            y: proposedY,
-            timestamp: now
-          }
-        }
-        
-        // Apply the movement
-        this.player.x = proposedX
-        this.player.y = proposedY
       }
       
+      // Update radius based on mass
       this.player.radius = Math.sqrt(this.player.mass) * 3
       
       // Anti-cheat: Validate radius-mass relationship
