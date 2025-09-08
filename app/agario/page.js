@@ -301,29 +301,31 @@ const AgarIOGame = () => {
 
     generateViruses() {
       this.viruses = []
-      const centerX = this.world.width / 2  // 2000
-      const centerY = this.world.height / 2 // 2000
-      const playableRadius = 1800 // Same as boundary radius
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
       
-      for (let i = 0; i < 25; i++) { // Increased from 15 to 25 viruses
+      for (let i = 0; i < 6; i++) {
         let x, y, distance
         
-        // Keep generating random positions until we get one inside the circular boundary
+        // Generate virus within the playable radius
         do {
           x = Math.random() * this.world.width
           y = Math.random() * this.world.height
           distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
-        } while (distance > playableRadius - 50) // 50px buffer from edge (larger for viruses)
+        } while (distance > playableRadius - 100) // 100px buffer from edge for viruses
         
         this.viruses.push({
           x: x,
           y: y,
-          radius: 35,
+          radius: 40 + Math.random() * 20,
           color: '#00FF41',
           spikes: 12,
           mass: 100
         })
       }
+      
+      console.log(`🦠 Generated ${this.viruses.length} viruses within radius ${Math.floor(playableRadius)}px`)
     }
 
     bindEvents() {
