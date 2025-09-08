@@ -94,6 +94,9 @@ export default function TurfLootTactical() {
   // State for custom deposit modal
   const [showCustomDepositModal, setShowCustomDepositModal] = useState(false)
   const [depositWalletAddress, setDepositWalletAddress] = useState('')
+  
+  // Stable random values for background animations (client-side only)
+  const [floatingElements, setFloatingElements] = useState([])
   const [codeElements, setCodeElements] = useState([])
 
   // Initialize random elements after component mounts (client-side only)
