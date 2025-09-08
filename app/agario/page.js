@@ -1406,7 +1406,19 @@ const AgarIOGame = () => {
     setCanvasSize()
     window.addEventListener('resize', setCanvasSize)
 
-    const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived)
+    // Get selected skin from localStorage
+    let selectedSkin = { id: 'default', name: 'Default Warrior', color: '#4A90E2' } // Default skin
+    try {
+      const savedSkin = localStorage.getItem('selectedSkin')
+      if (savedSkin) {
+        selectedSkin = JSON.parse(savedSkin)
+        console.log('🎨 Loaded selected skin for game:', selectedSkin.name, selectedSkin.color)
+      }
+    } catch (error) {
+      console.log('⚠️ Error loading selected skin, using default:', error)
+    }
+
+    const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin)
     gameRef.current = game
     
     game.start()
