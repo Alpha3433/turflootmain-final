@@ -1350,6 +1350,8 @@ const AgarIOGame = () => {
 
     start() {
       this.running = true
+      this.gameStartTime = Date.now() // Start the timer
+      this.timeSurvivedSeconds = 0
       setGameStarted(true)
     }
 
