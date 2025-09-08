@@ -683,6 +683,9 @@ export default function TurfLootTactical() {
       }
       
       console.log('✅ User authenticated:', privy.user.id)
+      console.log('🔍 Available Privy methods:', Object.keys(privy))
+      console.log('🔍 FundWallet function type:', typeof privy.fundWallet)
+      console.log('🔍 Raw fundWallet type:', typeof privy._rawFundWallet)
       
       // Get the user's wallet
       const wallet = privy.user.wallet
@@ -692,39 +695,46 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('✅ Wallet found:', wallet.address)
+      console.log('✅ Wallet found:', wallet)
+      console.log('🔍 Wallet address:', wallet.address)
+      console.log('🔍 Wallet type:', typeof wallet)
       
-      // Use Privy's native fundWallet functionality
+      // Use Privy's native fundWallet functionality with proper parameters
       console.log('💰 Opening Privy deposit interface...')
-      await privy.fundWallet(wallet, {
-        chain: 'solana' // Specify Solana chain for SOL deposits
-      })
+      
+      // Try different approaches to call fundWallet
+      if (typeof privy.fundWallet === 'function') {
+        console.log('📱 Calling fundWallet via bridge...')
+        await privy.fundWallet()  // Call without parameters first to see what happens
+      } else if (typeof privy._rawFundWallet === 'function') {
+        console.log('📱 Calling raw fundWallet...')
+        await privy._rawFundWallet()
+      } else {
+        throw new Error('fundWallet function not available')
+      }
       
       console.log('✅ Privy deposit interface opened successfully')
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
+      console.log('🔍 Error details:', error.message, error.stack)
       
-      // If fundWallet is not available or fails, provide fallback instructions
-      if (error.message && error.message.includes('fundWallet')) {
-        console.log('⚠️ fundWallet not available, showing manual instructions')
+      // Provide fallback manual instructions
+      console.log('⚠️ Using fallback manual deposit instructions')
+      
+      try {
+        const privy = window.__TURFLOOT_PRIVY__
+        const wallet = privy?.user?.wallet
         
-        try {
-          const privy = window.__TURFLOOT_PRIVY__
-          const wallet = privy?.user?.wallet
-          
-          if (wallet && wallet.address) {
-            alert(`💰 MANUAL DEPOSIT\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
-            console.log('💰 Wallet address for manual deposit:', wallet.address)
-          } else {
-            alert('Unable to retrieve wallet address. Please try logging out and back in.')
-          }
-        } catch (fallbackError) {
-          console.error('❌ Fallback error:', fallbackError)
-          alert('Deposit functionality is temporarily unavailable. Please try refreshing the page and logging in again.')
+        if (wallet && wallet.address) {
+          alert(`💰 MANUAL DEPOSIT\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
+          console.log('💰 Wallet address for manual deposit:', wallet.address)
+        } else {
+          alert('Unable to retrieve wallet address. Please try logging out and back in.')
         }
-      } else {
-        alert('Deposit functionality encountered an error. Please try again or refresh the page.')
+      } catch (fallbackError) {
+        console.error('❌ Fallback error:', fallbackError)
+        alert('Deposit functionality is temporarily unavailable. Please try refreshing the page and logging in again.')
       }
     }
   }
