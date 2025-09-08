@@ -3612,7 +3612,16 @@ export default function TurfLootTactical() {
 
           {/* Main Deploy Button */}
           <button 
-            onClick={handleJoinGame}
+            onClick={async () => {
+              console.log('▶ PLAY NOW button clicked!')
+              const authenticated = await requireAuthentication('PLAY NOW')
+              if (authenticated) {
+                console.log('🎮 User authenticated, redirecting to game...')
+                router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
+              } else {
+                console.log('❌ Authentication failed, blocking access to PLAY NOW')
+              }
+            }}
             style={deployButtonStyle}
             onMouseOver={(e) => {
               e.target.style.transform = 'scale(1.05)'
