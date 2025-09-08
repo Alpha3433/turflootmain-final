@@ -838,8 +838,8 @@ const AgarIOGame = () => {
         
         // Anti-cheat: Validate movement speed
         if (this.antiCheat.enabled) {
-          const proposedX = this.player.x + moveX
-          const proposedY = this.player.y + moveY
+          const proposedX = this.player.x + smoothMoveX
+          const proposedY = this.player.y + smoothMoveY
           const actualDistance = Math.sqrt(Math.pow(proposedX - prevX, 2) + Math.pow(proposedY - prevY, 2))
           const timeDelta = now - this.antiCheat.lastPosition.timestamp
           const maxAllowedDistance = this.antiCheat.maxSpeed * (timeDelta / 16.67) // Normalize to 60fps
@@ -848,11 +848,11 @@ const AgarIOGame = () => {
             this.recordViolation('SPEED_HACK', `Movement too fast: ${actualDistance.toFixed(2)} > ${maxAllowedDistance.toFixed(2)}`)
             // Limit the movement
             const ratio = maxAllowedDistance / actualDistance
-            this.player.x += moveX * ratio
-            this.player.y += moveY * ratio
+            this.player.x += smoothMoveX * ratio
+            this.player.y += smoothMoveY * ratio
           } else {
-            this.player.x += moveX
-            this.player.y += moveY
+            this.player.x += smoothMoveX
+            this.player.y += smoothMoveY
           }
           
           // Update anti-cheat position tracking
@@ -868,8 +868,8 @@ const AgarIOGame = () => {
             timestamp: now
           })
         } else {
-          this.player.x += moveX
-          this.player.y += moveY
+          this.player.x += smoothMoveX
+          this.player.y += smoothMoveY
         }
         
         // Circular boundary constraints (use dynamic radius)
