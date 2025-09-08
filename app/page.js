@@ -3657,7 +3657,7 @@ export default function TurfLootTactical() {
                 e.target.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.3)'
               }}
             >
-              🤖 LOCAL PRACTICE
+              LOCAL PRACTICE
             </button>
             <button 
               style={secondaryButtonStyle}
