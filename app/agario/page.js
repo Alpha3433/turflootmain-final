@@ -1085,6 +1085,14 @@ const AgarIOGame = () => {
           } else if (enemy.mass > this.player.mass * 1.2) {
             // Enemy eats player - Game Over
             this.running = false
+            
+            // Calculate final survival time
+            if (this.gameStartTime && this.setTimeSurvived) {
+              const finalTime = Math.floor((Date.now() - this.gameStartTime) / 1000)
+              this.setTimeSurvived(finalTime)
+              console.log(`🏁 Game Over - Survived for ${finalTime} seconds`)
+            }
+            
             setGameOver(true)
           }
         }
