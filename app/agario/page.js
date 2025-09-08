@@ -263,6 +263,9 @@ const AgarIOGame = () => {
       // Update player
       this.updatePlayer(deltaTime)
       
+      // Update spawn protection timers
+      this.updateSpawnProtection()
+      
       // Update enemies
       this.enemies.forEach(enemy => this.updateEnemy(enemy, deltaTime))
       
