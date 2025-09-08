@@ -84,17 +84,25 @@ const AgarIOGame = () => {
     }))
   }
 
-  // Initialize missions when game starts
+  // Initialize missions when game starts (only for cash games)
   useEffect(() => {
     if (gameStarted && activeMissions.length === 0) {
-      // Assign 3 random missions when game starts
-      const shuffled = [...missionTypes].sort(() => 0.5 - Math.random())
-      const selectedMissions = shuffled.slice(0, 3).map(mission => ({
-        ...mission,
-        progress: 0,
-        completed: false
-      }))
-      setActiveMissions(selectedMissions)
+      // Check if this is a cash game (only show missions for paid rooms)
+      const urlParams = new URLSearchParams(window.location.search)
+      const fee = urlParams.get('fee')
+      const mode = urlParams.get('mode')
+      const isCashGame = fee && parseFloat(fee) > 0 && mode !== 'local' && mode !== 'practice'
+      
+      if (isCashGame) {
+        // Assign 3 random missions when game starts
+        const shuffled = [...missionTypes].sort(() => 0.5 - Math.random())
+        const selectedMissions = shuffled.slice(0, 3).map(mission => ({
+          ...mission,
+          progress: 0,
+          completed: false
+        }))
+        setActiveMissions(selectedMissions)
+      }
     }
   }, [gameStarted])
 
