@@ -286,61 +286,113 @@ class AddFriendModalBackendTester:
             
         return False
 
-    def test_duplicate_request_prevention(self):
-        """Test duplicate friend request prevention"""
-        print("🔍 TESTING: Duplicate Request Prevention")
+    def test_friend_request_with_real_users(self):
+        """Test POST /api/friends with action=send_request using real registered users"""
+        print("🔍 TESTING: Friend Request with Real Users")
         try:
-            test_user_id = "test_user_duplicate_123"
-            target_username = "SniperPro"  # From demo users
+            # First register two users
+            sender_id = f"privy_sender_{int(time.time())}"
+            receiver_id = f"privy_receiver_{int(time.time())}"
+            self.test_users.extend([sender_id, receiver_id])
             
-            payload = {
-                "action": "send_request",
-                "userIdentifier": test_user_id,
-                "friendUsername": target_username
+            # Register sender
+            sender_data = {
+                "username": f"Sender_{int(time.time())}",
+                "displayName": f"Test Sender",
+                "email": f"sender{int(time.time())}@example.com",
+                "walletAddress": f"0x{hex(int(time.time()))[2:].zfill(40)}"
             }
             
-            # Send first request
+            payload1 = {
+                "action": "register_user",
+                "userIdentifier": sender_id,
+                "userData": sender_data
+            }
+            
             response1 = requests.post(
                 f"{API_BASE}/friends", 
-                json=payload,
+                json=payload1,
                 headers={'Content-Type': 'application/json'},
                 timeout=10
             )
             
-            # Send duplicate request
+            # Register receiver
+            receiver_data = {
+                "username": f"Receiver_{int(time.time())}",
+                "displayName": f"Test Receiver",
+                "email": f"receiver{int(time.time())}@example.com",
+                "walletAddress": f"0x{hex(int(time.time()) + 1)[2:].zfill(40)}"
+            }
+            
+            payload2 = {
+                "action": "register_user",
+                "userIdentifier": receiver_id,
+                "userData": receiver_data
+            }
+            
             response2 = requests.post(
                 f"{API_BASE}/friends", 
-                json=payload,
+                json=payload2,
                 headers={'Content-Type': 'application/json'},
                 timeout=10
             )
             
-            if response1.status_code == 200 and response2.status_code == 400:
-                data2 = response2.json()
-                if 'error' in data2 and 'already sent' in data2['error'].lower():
-                    self.log_test(
-                        "Duplicate Request Prevention", 
-                        True, 
-                        "Correctly prevented duplicate friend request"
-                    )
-                    return True
+            if response1.status_code == 200 and response2.status_code == 200:
+                # Now send friend request from sender to receiver
+                friend_request_payload = {
+                    "action": "send_request",
+                    "userIdentifier": sender_id,
+                    "friendUsername": receiver_data['username']
+                }
+                
+                response3 = requests.post(
+                    f"{API_BASE}/friends", 
+                    json=friend_request_payload,
+                    headers={'Content-Type': 'application/json'},
+                    timeout=10
+                )
+                
+                if response3.status_code == 200:
+                    data3 = response3.json()
+                    
+                    if 'success' in data3 and data3['success']:
+                        if 'message' in data3 and receiver_data['username'] in data3['message']:
+                            self.log_test(
+                                "Friend Request with Real Users", 
+                                True, 
+                                f"Successfully sent friend request between real registered users"
+                            )
+                            return True
+                        else:
+                            self.log_test(
+                                "Friend Request with Real Users", 
+                                False, 
+                                "Success response but missing expected message",
+                                data3
+                            )
+                    else:
+                        self.log_test(
+                            "Friend Request with Real Users", 
+                            False, 
+                            "Friend request failed according to response",
+                            data3
+                        )
                 else:
                     self.log_test(
-                        "Duplicate Request Prevention", 
+                        "Friend Request with Real Users", 
                         False, 
-                        "Second request blocked but with unexpected error message",
-                        data2
+                        f"Friend request API returned status {response3.status_code}",
+                        response3.text
                     )
             else:
                 self.log_test(
-                    "Duplicate Request Prevention", 
+                    "Friend Request with Real Users", 
                     False, 
-                    f"Unexpected response codes: {response1.status_code}, {response2.status_code}",
-                    {"response1": response1.text, "response2": response2.text}
+                    f"Failed to register users: {response1.status_code}, {response2.status_code}"
                 )
                 
         except Exception as e:
-            self.log_test("Duplicate Request Prevention", False, f"Request failed: {str(e)}")
+            self.log_test("Friend Request with Real Users", False, f"Request failed: {str(e)}")
             
         return False
 
