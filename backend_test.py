@@ -140,15 +140,23 @@ def test_party_creation_and_invitation_system():
         requests.post(f"{API_BASE}/friends", json=friend1_data, timeout=10)
         requests.post(f"{API_BASE}/friends", json=friend2_data, timeout=10)
         
-        # Step 2: Send friend request
-        friend_request_data = {
-            "action": "send_request",
-            "userIdentifier": test_user_1,
-            "friendUsername": "TransformTestUser2"
+        # Step 2: Create party with invites
+        party_creation_data = {
+            "action": "create_and_invite",
+            "userIdentifier": party_creator,
+            "partyData": {
+                "name": "Test Gaming Party",
+                "privacy": "public",
+                "maxPlayers": 4
+            },
+            "invitedFriends": [
+                {"id": party_friend_1, "username": "PartyFriend1"},
+                {"id": party_friend_2, "username": "PartyFriend2"}
+            ]
         }
         
-        print("📤 Sending friend request...")
-        request_response = requests.post(f"{API_BASE}/friends", json=friend_request_data, timeout=10)
+        print("🎮 Creating party with invites...")
+        party_response = requests.post(f"{API_BASE}/party", json=party_creation_data, timeout=10)
         
         if request_response.status_code == 200:
             request_data = request_response.json()
