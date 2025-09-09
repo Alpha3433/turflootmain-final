@@ -1415,10 +1415,59 @@ const AgarIOGame = () => {
     }
 
     split() {
-      if (this.player.mass > 20) {
-        this.player.mass = this.player.mass * 0.8
-        setMass(this.player.mass)
+      // Check if split is allowed (minimum mass and cooldown)
+      if (this.player.mass < 36 || this.splitCooldown > 0) {
+        return
       }
+      
+      // Limit maximum number of pieces (authentic Agar.io limit)
+      const currentPieces = 1 + this.playerPieces.length
+      if (currentPieces >= 16) {
+        return
+      }
+      
+      // Calculate mass for each piece (split in half)
+      const halfMass = this.player.mass / 2
+      const halfRadius = Math.sqrt(halfMass / Math.PI) * 6
+      
+      // Create new player piece
+      const angle = Math.random() * 2 * Math.PI // Random split direction
+      const splitDistance = 60 // Distance pieces are ejected
+      
+      const newPiece = {
+        x: this.player.x + Math.cos(angle) * splitDistance,
+        y: this.player.y + Math.sin(angle) * splitDistance,
+        mass: halfMass,
+        radius: halfRadius,
+        color: this.player.color,
+        name: 'You',
+        speed: this.player.speed,
+        targetX: this.player.x + Math.cos(angle) * splitDistance,
+        targetY: this.player.y + Math.sin(angle) * splitDistance,
+        splitTime: Date.now(), // Track when split occurred
+        recombineReady: false,
+        vx: Math.cos(angle) * 8, // Initial velocity
+        vy: Math.sin(angle) * 8
+      }
+      
+      // Update main player
+      this.player.mass = halfMass
+      this.player.radius = halfRadius
+      this.player.x = this.player.x - Math.cos(angle) * splitDistance
+      this.player.y = this.player.y - Math.sin(angle) * splitDistance
+      this.player.targetX = this.player.x
+      this.player.targetY = this.player.y
+      
+      // Add new piece to array
+      this.playerPieces.push(newPiece)
+      
+      // Update UI
+      setMass(Math.floor(this.player.mass + this.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)))
+      
+      // Set cooldown (1 second)
+      this.splitCooldown = 60 // 60 frames = ~1 second at 60fps
+      
+      console.log(`🔄 Player split! Now ${currentPieces + 1} pieces. Total mass: ${Math.floor(this.player.mass + this.playerPieces.reduce((sum, piece) => sum + piece.mass, 0))}`)
     }
   }
 
