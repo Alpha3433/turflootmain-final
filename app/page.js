@@ -15,6 +15,122 @@ export default function TurfLootTactical() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [customUsername, setCustomUsername] = useState('')
+
+  // Username persistence functions
+  const saveUsernameToPrivy = async (username) => {
+    if (!username.trim()) return false
+    
+    try {
+      console.log('💾 Saving username to Privy account:', username)
+      
+      // Get current user identifier
+      const userIdentifier = isAuthenticated ? 
+        (user?.wallet?.address || user?.email?.address || user?.id) : 
+        'guest'
+      
+      if (userIdentifier && userIdentifier !== 'guest') {
+        // Save to localStorage with user-specific key for persistence
+        const userKey = `turfloot_username_${userIdentifier.slice(0, 10)}`
+        localStorage.setItem(userKey, username)
+        
+        // Also save to a general authenticated user key
+        localStorage.setItem('turfloot_auth_username', username)
+        
+        console.log('✅ Username saved successfully for user:', userKey)
+        return true
+      } else {
+        // Save as guest username
+        localStorage.setItem('turfloot_guest_username', username)
+        console.log('✅ Username saved as guest:', username)
+        return true
+      }
+    } catch (error) {
+      console.error('❌ Error saving username:', error)
+      return false
+    }
+  }
+
+  const loadUsernameFromPrivy = () => {
+    try {
+      console.log('📖 Loading username from Privy account')
+      
+      // Get current user identifier
+      const userIdentifier = isAuthenticated ? 
+        (user?.wallet?.address || user?.email?.address || user?.id) : 
+        'guest'
+      
+      if (userIdentifier && userIdentifier !== 'guest') {
+        // Try user-specific key first
+        const userKey = `turfloot_username_${userIdentifier.slice(0, 10)}`
+        const savedUsername = localStorage.getItem(userKey) || 
+                            localStorage.getItem('turfloot_auth_username')
+        
+        if (savedUsername) {
+          console.log('✅ Loaded username for authenticated user:', savedUsername)
+          return savedUsername
+        }
+      } else {
+        // Load guest username
+        const guestUsername = localStorage.getItem('turfloot_guest_username')
+        if (guestUsername) {
+          console.log('✅ Loaded guest username:', guestUsername)
+          return guestUsername
+        }
+      }
+      
+      console.log('ℹ️ No saved username found, using default')
+      return null
+    } catch (error) {
+      console.error('❌ Error loading username:', error)
+      return null
+    }
+  }
+
+  const getDisplayUsername = () => {
+    // Priority: customUsername > saved username > default based on auth status
+    if (customUsername.trim()) {
+      return customUsername.trim()
+    }
+    
+    const savedUsername = loadUsernameFromPrivy()
+    if (savedUsername) {
+      return savedUsername
+    }
+    
+    // Generate default username based on auth status
+    if (isAuthenticated && user) {
+      if (user.email?.address) {
+        return user.email.address.split('@')[0].toUpperCase()
+      } else if (user.wallet?.address) {
+        return `PLAYER_${user.wallet.address.slice(-4).toUpperCase()}`
+      } else {
+        return 'AUTHENTICATED_USER'
+      }
+    } else {
+      return userName || 'GUEST_PLAYER'
+    }
+  }
+
+  // Load username when authentication state changes
+  useEffect(() => {
+    console.log('🔄 Auth state changed, loading username...')
+    const savedUsername = loadUsernameFromPrivy()
+    if (savedUsername && !customUsername) {
+      setCustomUsername(savedUsername)
+      console.log('✅ Username loaded and set:', savedUsername)
+    }
+  }, [isAuthenticated, user])
+
+  // Save username whenever customUsername changes
+  useEffect(() => {
+    if (customUsername.trim()) {
+      const timeoutId = setTimeout(() => {
+        saveUsernameToPrivy(customUsername)
+      }, 1000) // Debounce saving by 1 second
+      
+      return () => clearTimeout(timeoutId)
+    }
+  }, [customUsername, isAuthenticated, user])
   const [isServerBrowserOpen, setIsServerBrowserOpen] = useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isFriendsModalOpen, setIsFriendsModalOpen] = useState(false)
