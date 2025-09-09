@@ -129,10 +129,20 @@ export default function TurfLootTactical() {
 
   const registerPrivyUser = async () => {
     try {
-      if (!user) return
+      if (!user) {
+        console.log('⚠️ No user object available for registration')
+        return
+      }
 
       const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
-      if (!userIdentifier) return
+      if (!userIdentifier) {
+        console.log('⚠️ No valid userIdentifier found:', { 
+          wallet: user?.wallet?.address,
+          email: user?.email?.address,
+          id: user?.id
+        })
+        return
+      }
 
       const userData = {
         username: getDisplayUsername(),
@@ -141,7 +151,7 @@ export default function TurfLootTactical() {
         walletAddress: user?.wallet?.address
       }
 
-      console.log('📝 Registering Privy user:', userIdentifier)
+      console.log('📝 Registering Privy user:', userIdentifier, userData)
 
       const response = await fetch('/api/friends', {
         method: 'POST',
