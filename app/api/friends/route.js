@@ -156,7 +156,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { action, userIdentifier, friendIdentifier, friendUsername, requestId } = await request.json()
+    const { action, userIdentifier, friendIdentifier, friendUsername, requestId, userData } = await request.json()
     
     console.log('👥 Friend action request:', { action, userIdentifier, friendIdentifier, friendUsername, requestId })
     
@@ -168,6 +168,9 @@ export async function POST(request) {
     }
     
     switch (action) {
+      case 'register_user':
+        return await handleRegisterPrivyUser(userIdentifier, userData)
+      
       case 'send_request':
         return await handleSendFriendRequest(userIdentifier, friendUsername)
       
@@ -194,6 +197,24 @@ export async function POST(request) {
     console.error('❌ Error handling friend action:', error)
     return NextResponse.json(
       { error: 'Failed to process friend action' },
+      { status: 500 }
+    )
+  }
+}
+
+async function handleRegisterPrivyUser(userIdentifier, userData) {
+  console.log('📝 Registering/updating Privy user:', { userIdentifier, userData })
+  
+  const success = await storePrivyUser(userIdentifier, userData)
+  
+  if (success) {
+    return NextResponse.json({
+      success: true,
+      message: 'User registered/updated successfully'
+    })
+  } else {
+    return NextResponse.json(
+      { error: 'Failed to register/update user' },
       { status: 500 }
     )
   }
