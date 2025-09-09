@@ -346,18 +346,6 @@ def run_comprehensive_friends_system_test():
 if __name__ == "__main__":
     success = run_comprehensive_friends_system_test()
     exit(0 if success else 1)
-            {
-                "userIdentifier": "test_user_3_mongodb",
-                "username": "TestUser3", 
-                "displayName": "Test User Three",
-                "email": "testuser3@turfloot.com",
-                "walletAddress": "0x1111222233334444555566667777888899990000"
-            }
-        ]
-        
-    def log_test(self, test_name, passed, details="", error_msg=""):
-        """Log test results"""
-        self.total_tests += 1
         if passed:
             self.passed_tests += 1
             status = "✅ PASSED"
