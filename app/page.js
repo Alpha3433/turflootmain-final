@@ -3001,7 +3001,12 @@ export default function TurfLootTactical() {
           // Select this item
           item.style.border = '2px solid #68d391'
           item.style.background = 'rgba(104, 211, 145, 0.1)'
-          selectedParty = item.dataset.partyId
+          
+          // Store the full party object instead of just the ID
+          const partyId = item.dataset.partyId
+          selectedParty = parties.find(p => p.id === partyId)
+          
+          console.log('🎯 Party selected:', selectedParty)
           
           // Show join button
           const joinButton = modal.querySelector('#join-selected-party-btn')
