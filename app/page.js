@@ -8,7 +8,7 @@ export default function TurfLootTactical() {
   const router = useRouter()
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
-  const [userName, setUserName] = useState('anth')
+  const [userName, setUserName] = useState('PLAYER')
   const [isMobile, setIsMobile] = useState(false)
   const [activeFriends, setActiveFriends] = useState(0)
   const [leaderboard, setLeaderboard] = useState([])
