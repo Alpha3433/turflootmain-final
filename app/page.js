@@ -1786,7 +1786,7 @@ export default function TurfLootTactical() {
       { id: 'cosmic', name: 'Cosmic Entity', price: 2500, owned: false, rarity: 'legendary', color: '#4B0082' }
     ]
 
-    let currentSkin = 'default'
+    let currentSkin = selectedSkinData.id || 'default' // Initialize with current selected skin
     // Use dynamic currency from missions system instead of hardcoded value
 
     const skinStoreHTML = `
