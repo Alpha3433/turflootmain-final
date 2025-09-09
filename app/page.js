@@ -6343,14 +6343,23 @@ export default function TurfLootTactical() {
                                     } : null
                                   })
                                   
-                                  const userIdentifier = isAuthenticated ? 
-                                    (user?.wallet?.address || user?.email?.address || user?.id) : 
-                                    'guest'
+                                  // Check if user is authenticated AND user object is loaded
+                                  if (!isAuthenticated) {
+                                    alert('Please log in to add friends')
+                                    return
+                                  }
+                                  
+                                  if (!user || (!user.wallet?.address && !user.email?.address && !user.id)) {
+                                    alert('User data is still loading. Please wait a moment and try again.')
+                                    return
+                                  }
+                                  
+                                  const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
                                   
                                   console.log('🔍 Computed userIdentifier:', userIdentifier)
                                   
-                                  if (!isAuthenticated || userIdentifier === 'guest' || !userIdentifier) {
-                                    alert('Please log in to add friends')
+                                  if (!userIdentifier) {
+                                    alert('Unable to identify user. Please try refreshing the page.')
                                     return
                                   }
                                   
