@@ -1,29 +1,30 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for MongoDB-Only Friends System
-Testing the completely migrated friends system that uses ONLY real Privy users with no mock structures.
+Backend Testing Script for Updated Friends System
+Tests the cleanup of test/mock users and validation of real Privy accounts
 
-CRITICAL CHANGES TESTED:
-1. Removed ALL mock data structures - Eliminated mockFriends and mockFriendRequests Maps
-2. Full MongoDB migration - All friend data now stored in MongoDB collections
-3. No mock user creation - Only real Privy users from database are allowed
-4. Complete database integration - All CRUD operations use MongoDB
+TESTING REQUIREMENTS FROM REVIEW REQUEST:
+1. Database Cleanup Verification - Test GET /api/friends?type=users to trigger cleanup
+2. Real User Validation - Confirm only users with email OR wallet address are returned
+3. Clean User List - Verify available users list contains no test data
 
-DATABASE COLLECTIONS:
-- users - Stores real Privy users
-- friends - Stores friendship relationships  
-- friend_requests - Stores pending friend requests
+CLEANUP PATTERNS TESTED:
+- test, debug, mock, demo, cashout.test, debug.test patterns
+- Users without email AND wallet address
+- Test user identifiers with test_/mock_/debug_/cashout_ prefixes
 """
 
 import requests
 import json
 import time
 import sys
+import os
 from datetime import datetime
+from urllib.parse import urljoin
 
 # Configuration
-BASE_URL = "https://turfloot-social.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-social.preview.emergentagent.com')
+API_BASE = urljoin(BASE_URL, '/api/')
 
 class FriendsSystemTester:
     def __init__(self):
