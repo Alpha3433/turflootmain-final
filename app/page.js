@@ -1978,6 +1978,13 @@ export default function TurfLootTactical() {
           const skinId = btn.dataset.skinId
           const skin = availableSkins.find(s => s.id === skinId)
           
+          if (!skin) {
+            console.error('❌ Skin not found for ID:', skinId)
+            return
+          }
+          
+          console.log('✅ Found skin to equip:', skin.name, skin.id)
+          
           currentSkin = skinId
           
           // Update current skin display and landing page preview
