@@ -111,7 +111,7 @@ export default function TurfLootTactical() {
     }
   }
 
-  // Load username when authentication state changes
+  // Load username when authentication state changes and register Privy user
   useEffect(() => {
     console.log('🔄 Auth state changed, loading username...')
     const savedUsername = loadUsernameFromPrivy()
@@ -119,7 +119,52 @@ export default function TurfLootTactical() {
       setCustomUsername(savedUsername)
       console.log('✅ Username loaded and set:', savedUsername)
     }
+
+    // Register/update Privy user in database when authenticated
+    if (isAuthenticated && user) {
+      registerPrivyUser()
+    }
   }, [isAuthenticated, user])
+
+  const registerPrivyUser = async () => {
+    try {
+      if (!user) return
+
+      const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
+      if (!userIdentifier) return
+
+      const userData = {
+        username: getDisplayUsername(),
+        displayName: getDisplayUsername(),
+        email: user?.email?.address,
+        walletAddress: user?.wallet?.address
+      }
+
+      console.log('📝 Registering Privy user:', userIdentifier)
+
+      const response = await fetch('/api/friends', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'register_user',
+          userIdentifier,
+          userData
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        console.log('✅ Privy user registered successfully')
+      } else {
+        console.error('❌ Failed to register Privy user:', result.error)
+      }
+    } catch (error) {
+      console.error('❌ Error registering Privy user:', error)
+    }
+  }
 
   // Save username whenever customUsername changes
   useEffect(() => {
