@@ -2970,6 +2970,12 @@ export default function TurfLootTactical() {
       `
       console.log('ℹ️ No friends available, showing empty state')
     }
+    
+    // Update the friends section label with count
+    const friendsLabel = modal.querySelector('#friends-section-label')
+    if (friendsLabel) {
+      friendsLabel.textContent = `👥 INVITE FRIENDS (${currentFriends.length} Available)`
+    }
 
     // Add interactivity
     let selectedPrivacy = 'public'
