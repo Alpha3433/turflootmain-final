@@ -858,6 +858,11 @@ const AgarIOGame = () => {
     }
 
     updatePlayer(deltaTime) {
+      // Update split cooldown
+      if (this.splitCooldown > 0) {
+        this.splitCooldown--
+      }
+      
       const dx = this.player.targetX - this.player.x
       const dy = this.player.targetY - this.player.y
       const distance = Math.sqrt(dx * dx + dy * dy)
@@ -879,6 +884,9 @@ const AgarIOGame = () => {
         this.player.x += moveX
         this.player.y += moveY
       }
+      
+      // Update all player pieces
+      this.updatePlayerPieces(deltaTime)
       
       // Quick boundary check - keep it simple
       const centerX = this.world.width / 2
