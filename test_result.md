@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Complete AddFriendModal Enhancement: The AddFriendModal was updated to show a list of all TurfLoot users instead of instructional text, with individual ADD buttons for each user and proper integration with the friends API. Testing needed to verify the backend API and user list functionality work correctly."
+user_problem_statement: "Test Completely Rewritten Privy Deposit Function: The Privy deposit function was completely rewritten to fix persistent 'invalid address' errors and momentary sign-out/sign-in issues when users click DEPOSIT button. The rewrite eliminates fallbacks and creates a clean, simple implementation for proper Privy authentication and wallet state handling. Critical testing needed to verify the deposit functionality works correctly without errors."
 
 # Test plan for this run
 
