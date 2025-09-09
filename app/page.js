@@ -1121,245 +1121,104 @@ export default function TurfLootTactical() {
     }
   }
 
-  // Wallet operations with Privy integration
+  // COMPLETELY REWRITTEN Wallet operations with clean Privy integration
   const handleDeposit = async () => {
+    console.log('💰 DEPOSIT button clicked - clean Privy implementation')
+    
     try {
-      console.log('💰 DEPOSIT button clicked - starting authentication flow')
-      
-      // Check if Privy is available
-      if (!window.__TURFLOOT_PRIVY__) {
-        console.error('❌ Privy not available')
-        alert('❌ Wallet system not ready. Please refresh the page and try again.')
-        return
-      }
-      
-      const privy = window.__TURFLOOT_PRIVY__
-      
-      // Check if user is already authenticated
-      if (privy.authenticated && privy.user) {
-        console.log('✅ User already authenticated, proceeding to deposit...')
-        await proceedWithDeposit()
-        return
-      }
-      
-      console.log('🔐 User not authenticated, starting login process...')
-      
-      // Trigger authentication and wait for completion
-      const authenticated = await requireAuthentication('DEPOSIT')
-      if (!authenticated) {
-        console.log('❌ Authentication failed or cancelled by user')
-        return
-      }
-      
-      // Wait a bit for Privy state to fully update after authentication
-      console.log('⏳ Waiting for Privy state to update after authentication...')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Get fresh Privy state after authentication
-      const freshPrivy = window.__TURFLOOT_PRIVY__
-      
-      // Double-check authentication state
-      if (!freshPrivy.authenticated || !freshPrivy.user) {
-        console.error('❌ Authentication completed but user state not updated')
-        console.error('❌ Current Privy state:', {
-          authenticated: freshPrivy.authenticated,
-          hasUser: !!freshPrivy.user,
-          ready: freshPrivy.ready
-        })
-        alert('❌ Authentication completed but user state not ready. Please try the deposit again.')
-        return
-      }
-      
-      console.log('✅ Authentication successful, proceeding to deposit...')
-      await proceedWithDeposit()
-      
-    } catch (error) {
-      console.error('❌ Complete deposit error:', error)
-      throw error
-    }
-  }
-  
-  // Separate function to handle the actual deposit after authentication
-  const proceedWithDeposit = async () => {
-    try {
-      console.log('✅ Starting deposit process for authenticated user...')
-      
-      // Get fresh Privy instance
-      const privy = window.__TURFLOOT_PRIVY__
-      
-      // COMPREHENSIVE DEBUGGING - LOG EVERYTHING
-      console.log('🔍 FULL PRIVY OBJECT:', privy)
-      console.log('🔍 PRIVY USER:', privy.user)
-      console.log('🔍 PRIVY AUTHENTICATED:', privy.authenticated)
-      console.log('🔍 PRIVY READY:', privy.ready)
-      
-      if (privy.user) {
-        console.log('🔍 USER ID:', privy.user.id)
-        console.log('🔍 USER EMAIL:', privy.user.email)
-        console.log('🔍 USER WALLET:', privy.user.wallet)
-        console.log('🔍 USER LINKED ACCOUNTS:', privy.user.linkedAccounts)
-        console.log('🔍 USER LINKED ACCOUNTS LENGTH:', privy.user.linkedAccounts?.length)
+      // Simple authentication check without complex bridge calls
+      if (!isAuthenticated || !user) {
+        console.log('🔐 User not authenticated, opening Privy login...')
         
-        // Check each linked account with detailed info
-        privy.user.linkedAccounts?.forEach((account, index) => {
-          console.log(`🔍 LINKED ACCOUNT ${index}:`, {
-            type: account.type,
-            address: account.address,
-            connectorType: account.connectorType,
-            walletClient: account.walletClient,
-            walletClientType: account.walletClientType,
-            chainId: account.chainId,
-            fullAccount: account
-          })
-        })
-      }
-      
-      console.log('🔍 AVAILABLE PRIVY METHODS:', Object.keys(privy))
-      console.log('🔍 FUND WALLET METHOD:', typeof privy.fundWallet)
-      console.log('🔍 CREATE WALLET METHOD:', typeof privy.createWallet)
-      
-      // Final authentication checks
-      if (!privy.authenticated) {
-        throw new Error('User not authenticated with Privy')
-      }
-      
-      if (!privy.ready) {
-        throw new Error('Privy not ready')
-      }
-      
-      if (!privy.user) {
-        throw new Error('No user object from Privy')
-      }
-      
-      // ENHANCED WALLET DETECTION AND CREATION
-      let wallet = privy.user.wallet
-      console.log('🔍 INITIAL WALLET OBJECT:', wallet)
-      
-      // Check ALL linked accounts for any wallet type
-      const allWalletAccounts = privy.user.linkedAccounts?.filter(account => 
-        account.type === 'wallet' || 
-        account.type === 'ethereum_wallet' || 
-        account.type === 'solana_wallet' ||
-        account.type === 'smart_wallet' ||
-        account.connectorType === 'embedded' ||
-        account.address // Any account with an address
-      )
-      console.log('🔍 ALL WALLET ACCOUNTS FROM LINKED ACCOUNTS:', allWalletAccounts)
-      
-      // If no embedded wallet but we have external wallets, try to use them
-      if (!wallet && allWalletAccounts && allWalletAccounts.length > 0) {
-        console.log('🔍 No embedded wallet, but found external wallets')
-        wallet = allWalletAccounts[0]
-        console.log('🔍 USING EXTERNAL WALLET:', wallet)
-      }
-      
-      // If still no wallet, force creation of embedded wallet
-      if (!wallet || !wallet.address) {
-        console.log('🔑 No usable wallet found, forcing embedded wallet creation...')
-        
-        try {
-          console.log('🔑 Calling createWallet()...')
-          await privy.createWallet()
-          console.log('✅ createWallet() completed')
+        // Use simple Privy login without custom bridge
+        const privy = window.__TURFLOOT_PRIVY__
+        if (privy && privy.login) {
+          await privy.login()
           
-          // Wait longer for wallet creation to fully complete
-          console.log('⏳ Waiting 3 seconds for wallet creation to complete...')
-          await new Promise(resolve => setTimeout(resolve, 3000))
-          
-          // Get fresh Privy state after wallet creation
-          const freshPrivy = window.__TURFLOOT_PRIVY__
-          console.log('🔍 FRESH PRIVY STATE AFTER WALLET CREATION:', freshPrivy.user)
-          
-          wallet = freshPrivy.user.wallet
-          console.log('🔍 WALLET AFTER CREATION:', wallet)
-          
-          // Also check linked accounts again
-          const newWalletAccounts = freshPrivy.user.linkedAccounts?.filter(account => 
-            account.type === 'wallet' || 
-            account.type === 'ethereum_wallet' || 
-            account.type === 'solana_wallet' ||
-            account.connectorType === 'embedded' ||
-            account.address
-          )
-          console.log('🔍 NEW WALLET ACCOUNTS AFTER CREATION:', newWalletAccounts)
-          
-          if (!wallet && newWalletAccounts && newWalletAccounts.length > 0) {
-            wallet = newWalletAccounts[0]
-            console.log('🔍 USING NEWLY CREATED WALLET FROM LINKED ACCOUNTS:', wallet)
+          // Wait for authentication to complete
+          let attempts = 0
+          while (attempts < 10 && !privy.authenticated) {
+            await new Promise(resolve => setTimeout(resolve, 500))
+            attempts++
           }
           
-        } catch (createError) {
-          console.error('❌ Failed to create wallet:', createError)
-          console.error('❌ Create wallet error details:', {
-            message: createError.message,
-            stack: createError.stack
-          })
-          throw new Error(`Failed to create wallet: ${createError.message}`)
+          if (!privy.authenticated) {
+            console.log('❌ Authentication timeout or cancelled')
+            return
+          }
+          
+          console.log('✅ Authentication completed via Privy login')
+        } else {
+          console.error('❌ Privy not available')
+          alert('❌ Wallet system not available. Please refresh the page.')
+          return
         }
       }
       
-      // Final wallet validation with enhanced checking
-      if (!wallet) {
-        console.error('❌ Still no wallet available after all attempts')
-        console.error('❌ Final Privy user state:', privy.user)
-        console.error('❌ Final linked accounts:', privy.user.linkedAccounts)
-        throw new Error('No wallet available after creation attempts. Please disconnect and reconnect your account.')
+      // Get fresh Privy state after authentication
+      const privy = window.__TURFLOOT_PRIVY__
+      
+      if (!privy || !privy.authenticated || !privy.user) {
+        console.error('❌ Privy state invalid after authentication')
+        alert('❌ Authentication failed. Please try again.')
+        return
       }
       
-      console.log('✅ Final wallet object:', wallet)
-      console.log('✅ Final wallet address:', wallet.address)
-      console.log('✅ Final wallet type:', wallet.type)
-      console.log('✅ Final wallet connector:', wallet.connectorType)
+      console.log('✅ Privy authenticated, proceeding with deposit...')
+      console.log('🔍 User ID:', privy.user.id)
+      console.log('🔍 Has embedded wallet:', !!privy.user.wallet)
+      console.log('🔍 Linked accounts:', privy.user.linkedAccounts?.length)
       
-      // Enhanced wallet address validation
-      if (!wallet.address) {
-        console.error('❌ Wallet object exists but no address')
-        console.error('❌ Wallet details:', JSON.stringify(wallet, null, 2))
-        throw new Error('Wallet has no address. The wallet may not be fully initialized.')
-      }
-      
-      // Validate address format based on wallet type
-      if (wallet.address && typeof wallet.address === 'string') {
-        if (wallet.address.startsWith('0x') && wallet.address.length !== 42) {
-          console.error('❌ Invalid Ethereum address length:', wallet.address)
-          throw new Error('Invalid Ethereum address format')
+      // Simple wallet check and creation
+      if (!privy.user.wallet) {
+        console.log('🔑 No embedded wallet found, creating one...')
+        
+        try {
+          await privy.createWallet()
+          
+          // Simple wait for wallet creation
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          
+          if (!privy.user.wallet) {
+            throw new Error('Wallet creation failed')
+          }
+          
+          console.log('✅ Embedded wallet created:', privy.user.wallet.address)
+        } catch (error) {
+          console.error('❌ Wallet creation failed:', error)
+          alert('❌ Failed to create wallet. Please try again or contact support.')
+          return
         }
-        console.log('✅ Wallet address format validated:', wallet.address)
-      } else {
-        console.error('❌ Wallet address is not a valid string:', wallet.address)
-        throw new Error('Wallet address is not in a valid format')
       }
       
-      // FINAL PRIVY STATE CHECK BEFORE CALLING FUNDWALLET
-      console.log('💰 PRE-FUNDWALLET STATE CHECK:')
-      console.log('💰 - Privy authenticated:', privy.authenticated)
-      console.log('💰 - Privy ready:', privy.ready)
-      console.log('💰 - User ID:', privy.user?.id)
-      console.log('💰 - Wallet address:', wallet.address)
-      console.log('💰 - Wallet type:', wallet.type)
-      console.log('💰 - Linked accounts count:', privy.user?.linkedAccounts?.length)
-      console.log('💰 - All linked account addresses:', privy.user?.linkedAccounts?.map(acc => acc.address))
+      // Final validation
+      const wallet = privy.user.wallet
+      if (!wallet || !wallet.address) {
+        console.error('❌ No valid wallet available')
+        alert('❌ No wallet available. Please disconnect and reconnect your account.')
+        return
+      }
       
-      // Try to call fundWallet with the validated wallet
-      console.log('💰 Calling fundWallet() with validated state...')
+      console.log('✅ Valid wallet found:', wallet.address)
       
-      // Add a small delay to ensure all React state updates have completed
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Call fundWallet with minimal complexity
+      console.log('💰 Opening Privy funding interface...')
       
       await privy.fundWallet()
-      console.log('✅ fundWallet() completed successfully!')
+      
+      console.log('✅ Privy funding interface opened successfully!')
       
     } catch (error) {
-      console.error('❌ proceedWithDeposit error:', error)
-      console.error('❌ Error details:', {
-        message: error.message,
-        code: error.code,
-        name: error.name,
-        stack: error.stack
-      })
+      console.error('❌ Deposit error:', error)
       
-      // Don't rethrow, show user-friendly message
-      alert(`❌ Deposit failed: ${error.message}\n\nPlease try:\n1. Refresh the page\n2. Disconnect and reconnect your wallet\n3. Contact support if the issue persists`)
+      // Handle specific errors
+      if (error.message?.includes('invalid address')) {
+        alert('❌ Wallet address issue detected. Please:\n\n1. Refresh the page\n2. Disconnect and reconnect your wallet\n3. Try the deposit again')
+      } else if (error.message?.includes('User rejected')) {
+        console.log('ℹ️ User cancelled the operation')
+      } else {
+        alert(`❌ Deposit failed: ${error.message}\n\nPlease refresh the page and try again.`)
+      }
     }
   }
 
