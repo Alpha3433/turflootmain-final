@@ -3012,10 +3012,13 @@ export default function TurfLootTactical() {
       counter.textContent = `${selectedCount} friend${selectedCount !== 1 ? 's' : ''} selected for invitation`
     }
 
-    // Add event listeners to all friend checkboxes
+    // Add event listeners to all friend checkboxes (now dynamically generated)
     modal.querySelectorAll('.friend-checkbox').forEach(checkbox => {
       checkbox.addEventListener('change', updateSelectedCounter)
     })
+    
+    // Update the initial counter display
+    updateSelectedCounter()
 
     // Close on backdrop click
     popup.addEventListener('click', (e) => {
