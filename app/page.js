@@ -5698,6 +5698,19 @@ export default function TurfLootTactical() {
                       const authenticated = await requireAuthentication('CREATE PARTY')
                       if (authenticated) {
                         console.log('🎯 User authenticated, opening create party popup...')
+                        
+                        // Ensure friends list is loaded before opening modal
+                        if (friendsList.length === 0) {
+                          console.log('🔄 Loading friends list before opening party modal...')
+                          await loadFriendsList()
+                        }
+                        
+                        console.log('🔍 Friends data before modal:', {
+                          totalFriends: friendsList.length,
+                          acceptedFriends: friendsList.filter(f => f.status === 'accepted').length,
+                          friendsData: friendsList
+                        })
+                        
                         createDesktopCreatePartyPopup()
                       } else {
                         console.log('❌ Authentication failed, blocking access to CREATE PARTY')
