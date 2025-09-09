@@ -137,11 +137,14 @@ export default function TurfLootTactical() {
   const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false)
   const [friendsList, setFriendsList] = useState([])
   const [loadingFriends, setLoadingFriends] = useState(false)
+  const [friendRequests, setFriendRequests] = useState({ sent: [], received: [] })
+  const [loadingRequests, setLoadingRequests] = useState(false)
 
   // Load friends when modal opens
   useEffect(() => {
     if (isFriendsModalOpen && isAuthenticated) {
       loadFriendsList()
+      loadFriendRequests()
     }
   }, [isFriendsModalOpen, isAuthenticated])
 
@@ -151,7 +154,7 @@ export default function TurfLootTactical() {
     setLoadingFriends(true)
     try {
       const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
-      const response = await fetch(`/api/friends?userIdentifier=${encodeURIComponent(userIdentifier)}`)
+      const response = await fetch(`/api/friends?userIdentifier=${encodeURIComponent(userIdentifier)}&type=friends`)
       const result = await response.json()
       
       if (result.success) {
@@ -164,6 +167,27 @@ export default function TurfLootTactical() {
       console.error('❌ Error loading friends:', error)
     }
     setLoadingFriends(false)
+  }
+
+  const loadFriendRequests = async () => {
+    if (!isAuthenticated) return
+    
+    setLoadingRequests(true)
+    try {
+      const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
+      const response = await fetch(`/api/friends?userIdentifier=${encodeURIComponent(userIdentifier)}&type=requests`)
+      const result = await response.json()
+      
+      if (result.success) {
+        setFriendRequests(result.requests)
+        console.log('✅ Friend requests loaded:', result.requests)
+      } else {
+        console.error('❌ Failed to load friend requests:', result.error)
+      }
+    } catch (error) {
+      console.error('❌ Error loading friend requests:', error)
+    }
+    setLoadingRequests(false)
   }
   const [isLoadingLocalPractice, setIsLoadingLocalPractice] = useState(false)
   
