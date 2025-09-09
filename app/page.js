@@ -2045,6 +2045,11 @@ export default function TurfLootTactical() {
               
               if (response.ok) {
                 console.log('✅ Equipped skin saved to backend successfully')
+                
+                // Refresh party data to show updated skin
+                console.log('🔄 Refreshing party data to show updated skin...')
+                await loadCurrentParty()
+                
               } else {
                 console.error('❌ Failed to save equipped skin to backend:', response.status)
               }
