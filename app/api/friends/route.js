@@ -398,8 +398,10 @@ async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
     const friendRequest = {
       id: requestId,
       fromUserIdentifier: fromUserIdentifier,
+      fromUserId: fromUserIdentifier, // Add for database index compatibility
       fromUsername: fromUser.username,
       toUserIdentifier: toUserIdentifier,
+      toUserId: toUserIdentifier, // Add for database index compatibility
       toUsername: targetUser.username,
       sentAt: timestamp,
       status: 'pending'
