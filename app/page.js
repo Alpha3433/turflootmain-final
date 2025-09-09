@@ -4983,10 +4983,7 @@ export default function TurfLootTactical() {
                         fontWeight: '700',
                         wordBreak: 'break-word'
                       }}>
-                        {isAuthenticated ? 
-                          (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
-                          (customUsername || userName).toUpperCase()
-                        }
+                        {getDisplayUsername().toUpperCase()}
                       </h3>
                       <div style={{
                         display: 'flex',
