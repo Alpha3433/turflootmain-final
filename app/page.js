@@ -5296,42 +5296,6 @@ export default function TurfLootTactical() {
                       +{currentParty.members.length - 4}
                     </div>
                   )}
-                </div>
-                
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
-                }}>
-                  {currentParty.members?.slice(0, 2).map((member) => (
-                    <div key={member.userIdentifier} style={{
-                      color: member.isOnline ? '#e2e8f0' : '#9ca3af',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px'
-                    }}>
-                      <div style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: member.isOnline ? '#22c55e' : '#6b7280'
-                      }} />
-                      {member.username}
-                    </div>
-                  ))}
-                  {currentParty.members?.length > 2 && (
-                    <div style={{
-                      color: '#a0aec0',
-                      fontSize: '11px',
-                      marginTop: '2px'
-                    }}>
-                      +{currentParty.members.length - 2} more member{currentParty.members.length - 2 !== 1 ? 's' : ''}
-                    </div>
-                  )}
-                </div>
               </div>
             ) : loadingParty ? (
               // Loading state
