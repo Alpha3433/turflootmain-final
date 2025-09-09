@@ -7694,7 +7694,7 @@ export default function TurfLootTactical() {
                 border: currentParty ? '1px solid #68d391' : '1px solid #fc8181'
               }}>👥</div>
               <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>
-                {currentParty ? 'PARTY' : 'SQUAD'}
+                PARTY
               </h3>
             </div>
             
