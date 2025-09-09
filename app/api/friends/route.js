@@ -462,7 +462,10 @@ async function handleAcceptFriendRequest(userIdentifier, requestId) {
     // Find the friend request in database
     const request = await db.collection('friend_requests').findOne({
       id: requestId,
-      toUserIdentifier: userIdentifier,
+      $or: [
+        { toUserIdentifier: userIdentifier },
+        { toUserId: userIdentifier }
+      ],
       status: 'pending'
     })
     
