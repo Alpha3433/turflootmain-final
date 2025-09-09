@@ -5930,23 +5930,39 @@ export default function TurfLootTactical() {
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           padding: '8px 10px',
-                          background: 'rgba(246, 173, 85, 0.1)',
+                          background: request.type === 'party_invite' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(246, 173, 85, 0.1)',
                           borderRadius: '6px',
-                          border: '1px solid rgba(246, 173, 85, 0.3)'
+                          border: request.type === 'party_invite' ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(246, 173, 85, 0.3)'
                         }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div style={{
-                              width: '8px',
-                              height: '8px',
+                              width: '12px',
+                              height: '12px',
                               borderRadius: '50%',
-                              background: '#f6ad55'
-                            }} />
-                            <div style={{ 
-                              color: '#e2e8f0', 
-                              fontSize: '12px', 
-                              fontWeight: '600' 
+                              background: request.type === 'party_invite' ? '#3b82f6' : '#f6ad55',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '8px'
                             }}>
-                              {request.fromUsername}
+                              {request.type === 'party_invite' ? '🎯' : '👥'}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <div style={{ 
+                                color: '#e2e8f0', 
+                                fontSize: '12px', 
+                                fontWeight: '600' 
+                              }}>
+                                {request.fromUsername}
+                              </div>
+                              {request.type === 'party_invite' && (
+                                <div style={{ 
+                                  color: '#a0aec0', 
+                                  fontSize: '10px'
+                                }}>
+                                  Party: "{request.partyName}"
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div style={{ display: 'flex', gap: '4px' }}>
