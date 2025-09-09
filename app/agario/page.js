@@ -2163,8 +2163,8 @@ const AgarIOGame = () => {
         <div style={{
           position: 'fixed',
           bottom: isMobile ? '20px' : '40px',
-          right: isMobile ? '15px' : '50%',
-          transform: isMobile ? 'none' : 'translateX(50%)',
+          right: isMobile ? '15px' : 'auto',
+          transform: isMobile ? 'none' : 'translateX(-50%)',
           left: isMobile ? 'auto' : '50%',
           zIndex: 1000,
           display: 'flex',
