@@ -100,28 +100,20 @@ export async function GET(request) {
     console.log('👥 Friends/Requests/Users list request:', { userIdentifier, requestType })
     
     if (!userIdentifier || userIdentifier === 'guest') {
-      if (requestType === 'users') {
-        // Return demo users for guest users to see
-        return NextResponse.json({
-          success: true,
-          users: getDemoUsers(),
-          message: 'Demo users list for guest'
-        })
-      }
       return NextResponse.json({
         success: true,
         friends: [],
         requests: { sent: [], received: [] },
         users: [],
-        message: 'Guest users have no friends list'
+        message: 'Please log in to see other users'
       })
     }
     
     if (requestType === 'users') {
-      // Get list of all available users to add as friends
-      const availableUsers = getAvailableUsers(userIdentifier)
+      // Get list of all available Privy users to add as friends
+      const availableUsers = await getPrivyUsers(userIdentifier)
       
-      console.log('✅ Available users retrieved:', availableUsers.length, 'users')
+      console.log('✅ Available Privy users retrieved:', availableUsers.length, 'users')
       
       return NextResponse.json({
         success: true,
