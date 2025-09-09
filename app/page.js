@@ -2958,6 +2958,9 @@ export default function TurfLootTactical() {
     const renderParties = (parties) => {
       const partiesList = modal.querySelector('#parties-list')
       
+      // Store parties data for selection
+      currentParties = parties
+      
       partiesList.innerHTML = parties.map(party => `
         <div class="party-item" data-party-id="${party.id}" style="
           padding: 16px; 
