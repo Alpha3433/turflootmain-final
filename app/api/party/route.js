@@ -362,3 +362,83 @@ async function handleAcceptPartyInvite(userIdentifier, inviteId, partyId) {
     )
   }
 }
+
+export async function DELETE(request) {
+  try {
+    const { userIdentifier, partyId } = await request.json()
+    
+    console.log('🚪 Party LEAVE request:', { userIdentifier, partyId })
+    
+    if (!userIdentifier || userIdentifier === 'guest') {
+      return NextResponse.json(
+        { error: 'User authentication required' },
+        { status: 401 }
+      )
+    }
+    
+    if (!partyId) {
+      return NextResponse.json(
+        { error: 'Party ID required' },
+        { status: 400 }
+      )
+    }
+    
+    const { db } = await connectToDatabase()
+    
+    // Find the party
+    const party = await db.collection('parties').findOne({ id: partyId })
+    
+    if (!party) {
+      return NextResponse.json(
+        { error: 'Party not found' },
+        { status: 404 }
+      )
+    }
+    
+    // Check if user is in the party
+    if (!party.currentPlayers.includes(userIdentifier)) {
+      return NextResponse.json(
+        { error: 'User not in this party' },
+        { status: 400 }
+      )
+    }
+    
+    // Remove user from party
+    await db.collection('parties').updateOne(
+      { id: partyId },
+      { $pull: { currentPlayers: userIdentifier } }
+    )
+    
+    // Check if party is now empty
+    const updatedParty = await db.collection('parties').findOne({ id: partyId })
+    
+    if (updatedParty.currentPlayers.length === 0) {
+      // If party is empty, mark it as finished or delete it
+      await db.collection('parties').updateOne(
+        { id: partyId },
+        { $set: { status: 'finished', finishedAt: new Date().toISOString() } }
+      )
+      console.log('🏁 Party marked as finished - no remaining members')
+    }
+    
+    console.log('✅ User successfully left party:', {
+      userIdentifier,
+      partyId,
+      partyName: party.name,
+      remainingMembers: updatedParty.currentPlayers.length
+    })
+    
+    return NextResponse.json({
+      success: true,
+      message: `Successfully left party "${party.name}"`,
+      remainingMembers: updatedParty.currentPlayers.length
+    })
+    
+  } catch (error) {
+    console.error('❌ Error leaving party:', error)
+    return NextResponse.json(
+      { error: 'Failed to leave party' },
+      { status: 500 }
+    )
+  }
+}
