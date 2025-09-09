@@ -1,38 +1,57 @@
 import { NextResponse } from 'next/server'
 
 // Mock friends data for development - will be replaced with database
-let mockFriends = new Map()
+// Using a more persistent structure to simulate cross-user functionality
+let mockFriends = new Map() // userIdentifier -> friends array
+let mockFriendRequests = new Map() // userIdentifier -> { sent: [], received: [] }
+let mockUsers = new Map() // username -> userIdentifier mapping
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url)
     const userIdentifier = searchParams.get('userIdentifier')
+    const requestType = searchParams.get('type') // 'friends' or 'requests'
     
-    console.log('👥 Friends list request:', { userIdentifier })
+    console.log('👥 Friends/Requests list request:', { userIdentifier, requestType })
     
     if (!userIdentifier || userIdentifier === 'guest') {
       return NextResponse.json({
         success: true,
         friends: [],
+        requests: { sent: [], received: [] },
         message: 'Guest users have no friends list'
       })
     }
     
-    // Get user's friends from mock data
-    const userFriends = mockFriends.get(userIdentifier) || []
-    
-    console.log('✅ Friends list retrieved:', userFriends.length, 'friends')
-    
-    return NextResponse.json({
-      success: true,
-      friends: userFriends,
-      count: userFriends.length
-    })
+    if (requestType === 'requests') {
+      // Get friend requests for this user
+      const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
+      
+      console.log('✅ Friend requests retrieved:', userRequests)
+      
+      return NextResponse.json({
+        success: true,
+        requests: userRequests,
+        sentCount: userRequests.sent.length,
+        receivedCount: userRequests.received.length
+      })
+    } else {
+      // Get user's friends from mock data
+      const userFriends = mockFriends.get(userIdentifier) || []
+      
+      console.log('✅ Friends list retrieved:', userFriends.length, 'friends')
+      
+      return NextResponse.json({
+        success: true,
+        friends: userFriends,
+        count: userFriends.length
+      })
+    }
     
   } catch (error) {
-    console.error('❌ Error fetching friends:', error)
+    console.error('❌ Error fetching friends/requests:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch friends list' },
+      { error: 'Failed to fetch friends/requests list' },
       { status: 500 }
     )
   }
@@ -40,9 +59,9 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { action, userIdentifier, friendIdentifier, friendUsername } = await request.json()
+    const { action, userIdentifier, friendIdentifier, friendUsername, requestId } = await request.json()
     
-    console.log('👥 Friend action request:', { action, userIdentifier, friendIdentifier, friendUsername })
+    console.log('👥 Friend action request:', { action, userIdentifier, friendIdentifier, friendUsername, requestId })
     
     if (!userIdentifier || userIdentifier === 'guest') {
       return NextResponse.json(
@@ -53,13 +72,16 @@ export async function POST(request) {
     
     switch (action) {
       case 'send_request':
-        return await handleSendFriendRequest(userIdentifier, friendIdentifier, friendUsername)
+        return await handleSendFriendRequest(userIdentifier, friendUsername)
       
       case 'accept_request':
-        return await handleAcceptFriendRequest(userIdentifier, friendIdentifier)
+        return await handleAcceptFriendRequest(userIdentifier, requestId)
       
       case 'decline_request':
-        return await handleDeclineFriendRequest(userIdentifier, friendIdentifier)
+        return await handleDeclineFriendRequest(userIdentifier, requestId)
+      
+      case 'cancel_request':
+        return await handleCancelFriendRequest(userIdentifier, requestId)
       
       case 'remove_friend':
         return await handleRemoveFriend(userIdentifier, friendIdentifier)
@@ -80,76 +102,185 @@ export async function POST(request) {
   }
 }
 
-async function handleSendFriendRequest(userIdentifier, friendIdentifier, friendUsername) {
-  // Mock implementation - in production this would:
-  // 1. Check if friend exists
-  // 2. Check if already friends
-  // 3. Send notification to friend
-  // 4. Store pending request
+async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
+  console.log('📤 Sending friend request:', { fromUserIdentifier, toUsername })
   
-  console.log('📤 Sending friend request:', { userIdentifier, friendIdentifier, friendUsername })
-  
-  // For now, just add to mock friends list for demonstration
-  const userFriends = mockFriends.get(userIdentifier) || []
-  const newFriend = {
-    id: friendIdentifier || `mock_${Date.now()}`,
-    username: friendUsername,
-    status: 'pending',
-    addedAt: new Date().toISOString(),
-    lastSeen: new Date().toISOString(),
-    isOnline: Math.random() > 0.5 // Random online status for demo
+  // Find the target user by username (in real app, this would be a database lookup)
+  let toUserIdentifier = null
+  for (const [username, userId] of mockUsers.entries()) {
+    if (username.toLowerCase() === toUsername.toLowerCase()) {
+      toUserIdentifier = userId
+      break
+    }
   }
   
-  // Check if already exists
-  const existingFriend = userFriends.find(f => f.id === newFriend.id || f.username === friendUsername)
-  if (existingFriend) {
+  // If user not found, create a mock user identifier for demo purposes
+  if (!toUserIdentifier) {
+    toUserIdentifier = `mock_user_${toUsername.toLowerCase()}_${Date.now()}`
+    mockUsers.set(toUsername.toLowerCase(), toUserIdentifier)
+    console.log('🔍 Created mock user for demo:', { toUsername, toUserIdentifier })
+  }
+  
+  // Check if already friends or request exists
+  const fromUserRequests = mockFriendRequests.get(fromUserIdentifier) || { sent: [], received: [] }
+  const toUserRequests = mockFriendRequests.get(toUserIdentifier) || { sent: [], received: [] }
+  
+  // Check if request already sent
+  const existingSentRequest = fromUserRequests.sent.find(r => r.toUsername.toLowerCase() === toUsername.toLowerCase())
+  if (existingSentRequest) {
     return NextResponse.json(
-      { error: 'Friend request already sent or user is already a friend' },
+      { error: 'Friend request already sent to this user' },
       { status: 400 }
     )
   }
   
-  userFriends.push(newFriend)
-  mockFriends.set(userIdentifier, userFriends)
+  // Check if they're already friends
+  const fromUserFriends = mockFriends.get(fromUserIdentifier) || []
+  const existingFriend = fromUserFriends.find(f => f.username.toLowerCase() === toUsername.toLowerCase())
+  if (existingFriend) {
+    return NextResponse.json(
+      { error: 'This user is already your friend' },
+      { status: 400 }
+    )
+  }
+  
+  // Create the friend request
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  const timestamp = new Date().toISOString()
+  
+  // Get sender's username (for demo, extract from identifier or use placeholder)
+  const fromUsername = `User_${fromUserIdentifier.slice(-4)}`
+  
+  const sentRequest = {
+    id: requestId,
+    toUsername: toUsername,
+    toUserIdentifier: toUserIdentifier,
+    sentAt: timestamp,
+    status: 'pending'
+  }
+  
+  const receivedRequest = {
+    id: requestId,
+    fromUsername: fromUsername,
+    fromUserIdentifier: fromUserIdentifier,
+    receivedAt: timestamp,
+    status: 'pending'
+  }
+  
+  // Add to sender's sent requests
+  fromUserRequests.sent.push(sentRequest)
+  mockFriendRequests.set(fromUserIdentifier, fromUserRequests)
+  
+  // Add to receiver's received requests
+  toUserRequests.received.push(receivedRequest)
+  mockFriendRequests.set(toUserIdentifier, toUserRequests)
   
   console.log('✅ Friend request sent successfully')
+  console.log('📤 Sender requests:', fromUserRequests)
+  console.log('📥 Receiver requests:', toUserRequests)
   
   return NextResponse.json({
     success: true,
-    message: `Friend request sent to ${friendUsername}`,
-    friend: newFriend
+    message: `Friend request sent to ${toUsername}`,
+    request: sentRequest
   })
 }
 
-async function handleAcceptFriendRequest(userIdentifier, friendIdentifier) {
-  console.log('✅ Accepting friend request:', { userIdentifier, friendIdentifier })
+async function handleAcceptFriendRequest(userIdentifier, requestId) {
+  console.log('✅ Accepting friend request:', { userIdentifier, requestId })
   
-  const userFriends = mockFriends.get(userIdentifier) || []
-  const friendIndex = userFriends.findIndex(f => f.id === friendIdentifier)
+  const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
+  const requestIndex = userRequests.received.findIndex(r => r.id === requestId)
   
-  if (friendIndex === -1) {
+  if (requestIndex === -1) {
     return NextResponse.json(
       { error: 'Friend request not found' },
       { status: 404 }
     )
   }
   
-  userFriends[friendIndex].status = 'accepted'
-  mockFriends.set(userIdentifier, userFriends)
+  const request = userRequests.received[requestIndex]
+  const fromUserIdentifier = request.fromUserIdentifier
+  const fromUsername = request.fromUsername
+  
+  // Remove from received requests
+  userRequests.received.splice(requestIndex, 1)
+  mockFriendRequests.set(userIdentifier, userRequests)
+  
+  // Remove from sender's sent requests
+  const senderRequests = mockFriendRequests.get(fromUserIdentifier) || { sent: [], received: [] }
+  const senderRequestIndex = senderRequests.sent.findIndex(r => r.id === requestId)
+  if (senderRequestIndex !== -1) {
+    senderRequests.sent.splice(senderRequestIndex, 1)
+    mockFriendRequests.set(fromUserIdentifier, senderRequests)
+  }
+  
+  // Add to both users' friends lists
+  const currentUserFriends = mockFriends.get(userIdentifier) || []
+  const senderFriends = mockFriends.get(fromUserIdentifier) || []
+  
+  const currentUsername = `User_${userIdentifier.slice(-4)}`
+  
+  const newFriendForCurrentUser = {
+    id: fromUserIdentifier,
+    username: fromUsername,
+    status: 'accepted',
+    addedAt: new Date().toISOString(),
+    lastSeen: new Date().toISOString(),
+    isOnline: Math.random() > 0.5
+  }
+  
+  const newFriendForSender = {
+    id: userIdentifier,
+    username: currentUsername,
+    status: 'accepted',
+    addedAt: new Date().toISOString(),
+    lastSeen: new Date().toISOString(),
+    isOnline: true
+  }
+  
+  currentUserFriends.push(newFriendForCurrentUser)
+  senderFriends.push(newFriendForSender)
+  
+  mockFriends.set(userIdentifier, currentUserFriends)
+  mockFriends.set(fromUserIdentifier, senderFriends)
+  
+  console.log('✅ Friend request accepted, both users are now friends')
   
   return NextResponse.json({
     success: true,
-    message: 'Friend request accepted',
-    friend: userFriends[friendIndex]
+    message: `You and ${fromUsername} are now friends!`,
+    friend: newFriendForCurrentUser
   })
 }
 
-async function handleDeclineFriendRequest(userIdentifier, friendIdentifier) {
-  console.log('❌ Declining friend request:', { userIdentifier, friendIdentifier })
+async function handleDeclineFriendRequest(userIdentifier, requestId) {
+  console.log('❌ Declining friend request:', { userIdentifier, requestId })
   
-  const userFriends = mockFriends.get(userIdentifier) || []
-  const updatedFriends = userFriends.filter(f => f.id !== friendIdentifier)
-  mockFriends.set(userIdentifier, updatedFriends)
+  const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
+  const requestIndex = userRequests.received.findIndex(r => r.id === requestId)
+  
+  if (requestIndex === -1) {
+    return NextResponse.json(
+      { error: 'Friend request not found' },
+      { status: 404 }
+    )
+  }
+  
+  const request = userRequests.received[requestIndex]
+  const fromUserIdentifier = request.fromUserIdentifier
+  
+  // Remove from received requests
+  userRequests.received.splice(requestIndex, 1)
+  mockFriendRequests.set(userIdentifier, userRequests)
+  
+  // Remove from sender's sent requests
+  const senderRequests = mockFriendRequests.get(fromUserIdentifier) || { sent: [], received: [] }
+  const senderRequestIndex = senderRequests.sent.findIndex(r => r.id === requestId)
+  if (senderRequestIndex !== -1) {
+    senderRequests.sent.splice(senderRequestIndex, 1)
+    mockFriendRequests.set(fromUserIdentifier, senderRequests)
+  }
   
   return NextResponse.json({
     success: true,
@@ -157,12 +288,51 @@ async function handleDeclineFriendRequest(userIdentifier, friendIdentifier) {
   })
 }
 
+async function handleCancelFriendRequest(userIdentifier, requestId) {
+  console.log('🚫 Canceling friend request:', { userIdentifier, requestId })
+  
+  const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
+  const requestIndex = userRequests.sent.findIndex(r => r.id === requestId)
+  
+  if (requestIndex === -1) {
+    return NextResponse.json(
+      { error: 'Friend request not found' },
+      { status: 404 }
+    )
+  }
+  
+  const request = userRequests.sent[requestIndex]
+  const toUserIdentifier = request.toUserIdentifier
+  
+  // Remove from sent requests
+  userRequests.sent.splice(requestIndex, 1)
+  mockFriendRequests.set(userIdentifier, userRequests)
+  
+  // Remove from receiver's received requests
+  const receiverRequests = mockFriendRequests.get(toUserIdentifier) || { sent: [], received: [] }
+  const receiverRequestIndex = receiverRequests.received.findIndex(r => r.id === requestId)
+  if (receiverRequestIndex !== -1) {
+    receiverRequests.received.splice(receiverRequestIndex, 1)
+    mockFriendRequests.set(toUserIdentifier, receiverRequests)
+  }
+  
+  return NextResponse.json({
+    success: true,
+    message: 'Friend request canceled'
+  })
+}
+
 async function handleRemoveFriend(userIdentifier, friendIdentifier) {
   console.log('🗑️ Removing friend:', { userIdentifier, friendIdentifier })
   
   const userFriends = mockFriends.get(userIdentifier) || []
-  const updatedFriends = userFriends.filter(f => f.id !== friendIdentifier)
-  mockFriends.set(userIdentifier, updatedFriends)
+  const updatedUserFriends = userFriends.filter(f => f.id !== friendIdentifier)
+  mockFriends.set(userIdentifier, updatedUserFriends)
+  
+  // Also remove from the friend's list
+  const friendFriends = mockFriends.get(friendIdentifier) || []
+  const updatedFriendFriends = friendFriends.filter(f => f.id !== userIdentifier)
+  mockFriends.set(friendIdentifier, updatedFriendFriends)
   
   return NextResponse.json({
     success: true,
