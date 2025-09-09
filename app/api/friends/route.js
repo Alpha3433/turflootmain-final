@@ -6,6 +6,45 @@ let mockFriends = new Map() // userIdentifier -> friends array
 let mockFriendRequests = new Map() // userIdentifier -> { sent: [], received: [] }
 let mockUsers = new Map() // username -> userIdentifier mapping
 
+// Demo users for discovery
+function getDemoUsers() {
+  return [
+    { username: 'TacticalAce', status: 'online', joinedAt: '2024-01-15', gamesPlayed: 127 },
+    { username: 'SniperPro', status: 'online', joinedAt: '2024-02-03', gamesPlayed: 89 },
+    { username: 'StealthWarrior', status: 'offline', joinedAt: '2024-01-28', gamesPlayed: 156 },
+    { username: 'CombatVet', status: 'online', joinedAt: '2024-02-10', gamesPlayed: 203 },
+    { username: 'ElitePlayer', status: 'in-game', joinedAt: '2024-01-20', gamesPlayed: 178 },
+    { username: 'ProGamer2024', status: 'online', joinedAt: '2024-02-15', gamesPlayed: 92 },
+    { username: 'WarMachine', status: 'offline', joinedAt: '2024-01-12', gamesPlayed: 234 },
+    { username: 'TacticalSniper', status: 'online', joinedAt: '2024-02-08', gamesPlayed: 145 },
+    { username: 'GameMaster', status: 'in-game', joinedAt: '2024-01-25', gamesPlayed: 189 },
+    { username: 'BattleRoyale', status: 'online', joinedAt: '2024-02-12', gamesPlayed: 67 }
+  ]
+}
+
+function getAvailableUsers(currentUserIdentifier) {
+  // Get demo users
+  const demoUsers = getDemoUsers()
+  
+  // Get current user's friends and pending requests to filter out
+  const userFriends = mockFriends.get(currentUserIdentifier) || []
+  const userRequests = mockFriendRequests.get(currentUserIdentifier) || { sent: [], received: [] }
+  
+  const friendUsernames = userFriends.map(f => f.username.toLowerCase())
+  const sentRequestUsernames = userRequests.sent.map(r => r.toUsername.toLowerCase())
+  const receivedRequestUsernames = userRequests.received.map(r => r.fromUsername.toLowerCase())
+  
+  // Filter out users who are already friends or have pending requests
+  const availableUsers = demoUsers.filter(user => {
+    const username = user.username.toLowerCase()
+    return !friendUsernames.includes(username) && 
+           !sentRequestUsernames.includes(username) && 
+           !receivedRequestUsernames.includes(username)
+  })
+  
+  return availableUsers
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url)
