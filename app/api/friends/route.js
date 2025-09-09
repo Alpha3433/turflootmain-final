@@ -352,69 +352,93 @@ async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
 async function handleAcceptFriendRequest(userIdentifier, requestId) {
   console.log('✅ Accepting friend request:', { userIdentifier, requestId })
   
-  const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
-  const requestIndex = userRequests.received.findIndex(r => r.id === requestId)
-  
-  if (requestIndex === -1) {
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Find the friend request in database
+    const request = await db.collection('friend_requests').findOne({
+      id: requestId,
+      toUserIdentifier: userIdentifier,
+      status: 'pending'
+    })
+    
+    if (!request) {
+      return NextResponse.json(
+        { error: 'Friend request not found' },
+        { status: 404 }
+      )
+    }
+    
+    const fromUserIdentifier = request.fromUserIdentifier
+    const fromUsername = request.fromUsername
+    const currentUsername = request.toUsername
+    
+    // Get both user details from database
+    const currentUser = await db.collection('users').findOne({ userIdentifier })
+    const senderUser = await db.collection('users').findOne({ userIdentifier: fromUserIdentifier })
+    
+    if (!currentUser || !senderUser) {
+      return NextResponse.json(
+        { error: 'One or both users not found in database' },
+        { status: 404 }
+      )
+    }
+    
+    // Update request status to accepted and remove
+    await db.collection('friend_requests').deleteOne({
+      id: requestId
+    })
+    
+    // Add friendship records for both users
+    const timestamp = new Date().toISOString()
+    
+    const friendshipForCurrentUser = {
+      userIdentifier: userIdentifier,
+      friendUserIdentifier: fromUserIdentifier,
+      friendUsername: fromUsername,
+      status: 'accepted',
+      addedAt: timestamp,
+      lastSeen: senderUser.lastSeenAt || timestamp,
+      isOnline: senderUser.isOnline || false
+    }
+    
+    const friendshipForSender = {
+      userIdentifier: fromUserIdentifier,
+      friendUserIdentifier: userIdentifier,
+      friendUsername: currentUsername,
+      status: 'accepted',
+      addedAt: timestamp,
+      lastSeen: currentUser.lastSeenAt || timestamp,
+      isOnline: currentUser.isOnline || true
+    }
+    
+    // Insert both friendship records
+    await db.collection('friends').insertMany([
+      friendshipForCurrentUser,
+      friendshipForSender
+    ])
+    
+    console.log('✅ Friend request accepted, friendship stored in database')
+    
+    return NextResponse.json({
+      success: true,
+      message: `You and ${fromUsername} are now friends!`,
+      friend: {
+        userIdentifier: fromUserIdentifier,
+        username: fromUsername,
+        status: 'accepted',
+        addedAt: timestamp,
+        isOnline: senderUser.isOnline || false
+      }
+    })
+    
+  } catch (error) {
+    console.error('❌ Error accepting friend request:', error)
     return NextResponse.json(
-      { error: 'Friend request not found' },
-      { status: 404 }
+      { error: 'Failed to accept friend request' },
+      { status: 500 }
     )
   }
-  
-  const request = userRequests.received[requestIndex]
-  const fromUserIdentifier = request.fromUserIdentifier
-  const fromUsername = request.fromUsername
-  
-  // Remove from received requests
-  userRequests.received.splice(requestIndex, 1)
-  mockFriendRequests.set(userIdentifier, userRequests)
-  
-  // Remove from sender's sent requests
-  const senderRequests = mockFriendRequests.get(fromUserIdentifier) || { sent: [], received: [] }
-  const senderRequestIndex = senderRequests.sent.findIndex(r => r.id === requestId)
-  if (senderRequestIndex !== -1) {
-    senderRequests.sent.splice(senderRequestIndex, 1)
-    mockFriendRequests.set(fromUserIdentifier, senderRequests)
-  }
-  
-  // Add to both users' friends lists
-  const currentUserFriends = mockFriends.get(userIdentifier) || []
-  const senderFriends = mockFriends.get(fromUserIdentifier) || []
-  
-  const currentUsername = `User_${userIdentifier.slice(-4)}`
-  
-  const newFriendForCurrentUser = {
-    id: fromUserIdentifier,
-    username: fromUsername,
-    status: 'accepted',
-    addedAt: new Date().toISOString(),
-    lastSeen: new Date().toISOString(),
-    isOnline: Math.random() > 0.5
-  }
-  
-  const newFriendForSender = {
-    id: userIdentifier,
-    username: currentUsername,
-    status: 'accepted',
-    addedAt: new Date().toISOString(),
-    lastSeen: new Date().toISOString(),
-    isOnline: true
-  }
-  
-  currentUserFriends.push(newFriendForCurrentUser)
-  senderFriends.push(newFriendForSender)
-  
-  mockFriends.set(userIdentifier, currentUserFriends)
-  mockFriends.set(fromUserIdentifier, senderFriends)
-  
-  console.log('✅ Friend request accepted, both users are now friends')
-  
-  return NextResponse.json({
-    success: true,
-    message: `You and ${fromUsername} are now friends!`,
-    friend: newFriendForCurrentUser
-  })
 }
 
 async function handleDeclineFriendRequest(userIdentifier, requestId) {
