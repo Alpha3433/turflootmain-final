@@ -189,8 +189,15 @@ export async function POST(request) {
     const { action, userIdentifier, friendIdentifier, friendUsername, requestId, userData } = await request.json()
     
     console.log('👥 Friend action request:', { action, userIdentifier, friendIdentifier, friendUsername, requestId })
+    console.log('🔍 Authentication debug:', {
+      userIdentifier: userIdentifier || 'undefined',
+      userIdentifierType: typeof userIdentifier,
+      isGuest: userIdentifier === 'guest',
+      isEmpty: !userIdentifier
+    })
     
     if (!userIdentifier || userIdentifier === 'guest') {
+      console.log('❌ Authentication failed:', { userIdentifier })
       return NextResponse.json(
         { error: 'User authentication required' },
         { status: 401 }
