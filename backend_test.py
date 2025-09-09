@@ -241,31 +241,29 @@ def test_party_creation_and_invitation_system():
                     test_results["test_details"].append(f"❌ Party Invite Check - FAILED ({invite_check_response.status_code})")
                     test_results["critical_issues"].append("Cannot retrieve party invites after creation")
             else:
-                print(f"❌ Friend request sending failed: {request_data}")
+                print(f"❌ Party creation failed: {party_data}")
                 test_results["failed_tests"] += 1
-                test_results["test_details"].append("❌ Friend Request Sending - FAILED")
+                test_results["test_details"].append("❌ Party Creation - FAILED")
+                test_results["critical_issues"].append("Party creation endpoint not working correctly")
         else:
-            # Check if it's a duplicate or user not found error (acceptable for testing)
-            if request_response.status_code == 400 or request_response.status_code == 404:
-                print("ℹ️ Friend request failed (user not found or duplicate) - testing with existing data")
-                # Still test the friends list format even if we can't create new friendships
-                friends_response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier={test_user_1}", timeout=10)
-                if friends_response.status_code == 200:
-                    friends_data = friends_response.json()
-                    if friends_data.get("success") and isinstance(friends_data.get("friends"), list):
-                        print("✅ Friends list format correct (empty list)")
-                        test_results["passed_tests"] += 1
-                        test_results["test_details"].append("✅ Friends List Format - PASSED")
-                    else:
-                        test_results["failed_tests"] += 1
-                        test_results["test_details"].append("❌ Friends List Format - FAILED")
-                else:
-                    test_results["failed_tests"] += 1
-                    test_results["test_details"].append("❌ Friends List Request - FAILED")
-            else:
-                print(f"❌ Friend request HTTP error: {request_response.status_code}")
+            # Check if it's a user not found error or other issue
+            if party_response.status_code == 401:
+                print("⚠️ Party creation failed - authentication required")
+                print("   This suggests the party system requires user registration in database")
                 test_results["failed_tests"] += 1
-                test_results["test_details"].append(f"❌ Friend Request - HTTP ERROR ({request_response.status_code})")
+                test_results["test_details"].append("❌ Party Creation - FAILED (authentication required)")
+                test_results["critical_issues"].append("Party creation requires database user registration")
+            elif party_response.status_code == 404:
+                print("❌ Party creation endpoint not found")
+                test_results["failed_tests"] += 1
+                test_results["test_details"].append("❌ Party Creation - FAILED (endpoint not found)")
+                test_results["critical_issues"].append("Party creation endpoint not implemented")
+            else:
+                print(f"❌ Party creation HTTP error: {party_response.status_code}")
+                print(f"   Response: {party_response.text}")
+                test_results["failed_tests"] += 1
+                test_results["test_details"].append(f"❌ Party Creation - HTTP ERROR ({party_response.status_code})")
+                test_results["critical_issues"].append("Party creation endpoint error")
                 
     except Exception as e:
         print(f"❌ Friends list data transformation test error: {e}")
