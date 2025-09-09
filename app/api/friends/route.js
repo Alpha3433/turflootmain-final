@@ -22,6 +22,32 @@ async function connectToDatabase() {
 
 // All friend data now stored in MongoDB - no mock data structures
 
+async function cleanupTestUsers(db) {
+  try {
+    // Remove test users created during development/testing
+    const result = await db.collection('users').deleteMany({
+      $or: [
+        { userIdentifier: { $regex: /(test|debug|mock|demo|cashout\.test|debug\.test)/i } },
+        { username: { $regex: /(test|debug|mock|demo|cashout\.test|debug\.test)/i } },
+        // Remove users without proper Privy identifiers
+        { 
+          $and: [
+            { email: { $in: [null, ''] } },
+            { walletAddress: { $in: [null, ''] } },
+            { userIdentifier: { $regex: /^(test_|mock_|debug_|cashout_)/i } }
+          ]
+        }
+      ]
+    })
+    
+    if (result.deletedCount > 0) {
+      console.log(`🧹 Cleaned up ${result.deletedCount} test users from database`)
+    }
+  } catch (error) {
+    console.error('❌ Error cleaning up test users:', error)
+  }
+}
+
 async function getPrivyUsers(currentUserIdentifier) {
   try {
     const { db } = await connectToDatabase()
