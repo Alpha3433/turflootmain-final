@@ -74,7 +74,12 @@ export async function GET(request) {
           members: memberUsers.map(member => ({
             userIdentifier: member.userIdentifier,
             username: member.username || member.displayName || 'Unknown User',
-            isOnline: member.isOnline || false
+            isOnline: member.isOnline || false,
+            equippedSkin: member.equippedSkin || {
+              type: 'circle',
+              color: '#3b82f6',
+              pattern: 'solid'
+            }
           }))
         }
         
