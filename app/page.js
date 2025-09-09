@@ -7426,10 +7426,46 @@ export default function TurfLootTactical() {
             ▶ PLAY
           </button>
 
-          {/* Secondary Buttons */}
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button style={secondaryButtonStyle} onClick={() => setIsServerBrowserOpen(true)}>SERVER BROWSER</button>
-            <button style={secondaryButtonStyle}>HOW TO PLAY</button>
+          {/* Secondary Buttons - Enhanced with Desktop Features */}
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button 
+              style={{
+                ...secondaryButtonStyle,
+                fontSize: '10px',
+                padding: '8px 12px'
+              }}
+              onClick={async () => {
+                console.log('SERVER BROWSER button clicked!')
+                const authenticated = await requireAuthentication('SERVER BROWSER')
+                if (authenticated) {
+                  console.log('🌐 User authenticated, opening server browser...')
+                  createDesktopServerBrowserPopup()
+                } else {
+                  console.log('❌ Authentication failed, blocking access to SERVER BROWSER')
+                }
+              }}
+            >
+              SERVER BROWSER
+            </button>
+            <button 
+              style={{
+                ...secondaryButtonStyle,
+                fontSize: '10px',
+                padding: '8px 12px'
+              }}
+              onClick={async () => {
+                console.log('HOW TO PLAY button clicked!')
+                const authenticated = await requireAuthentication('HOW TO PLAY')
+                if (authenticated) {
+                  console.log('📖 User authenticated, showing how to play...')
+                  alert('HOW TO PLAY: Move with mouse, collect coins to grow, hold E to cash out!')
+                } else {
+                  console.log('❌ Authentication failed, blocking access to HOW TO PLAY')
+                }
+              }}
+            >
+              HOW TO PLAY
+            </button>
             <button 
               style={{
                 ...secondaryButtonStyle,
@@ -7453,7 +7489,33 @@ export default function TurfLootTactical() {
                 }, 500)
               }}
             >
-              🤖 LOCAL BOTS
+              {isLoadingLocalPractice ? '⏳ LOADING...' : '🤖 LOCAL BOTS'}
+            </button>
+            <button 
+              style={{
+                ...secondaryButtonStyle,
+                fontSize: '10px',
+                padding: '8px 12px'
+              }}
+              onClick={async () => {
+                console.log('🎯 Mobile CREATE PARTY button clicked!')
+                const authenticated = await requireAuthentication('CREATE PARTY')
+                if (authenticated) {
+                  console.log('🎯 User authenticated, opening create party...')
+                  
+                  // Ensure friends list is loaded before opening modal
+                  if (friendsList.length === 0) {
+                    console.log('🔄 Loading friends list before opening party modal...')
+                    await loadFriendsList()
+                  }
+                  
+                  createDesktopCreatePartyPopup()
+                } else {
+                  console.log('❌ Authentication failed, blocking access to CREATE PARTY')
+                }
+              }}
+            >
+              🎯 CREATE PARTY
             </button>
           </div>
         </div>
