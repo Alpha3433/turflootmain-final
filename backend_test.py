@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for AddFriendModal API Functionality
-Testing Focus: Friends API endpoints and user discovery system
+Comprehensive Backend Testing for Updated AddFriendModal API with Real Privy Users
+Testing Focus: MongoDB integration, user registration, and real Privy user data handling
+Review Request: Test transition from demo data to real Privy user system
 """
 
 import requests
