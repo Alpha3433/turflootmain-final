@@ -3115,13 +3115,13 @@ export default function TurfLootTactical() {
         
         // Add hover effects
         item.addEventListener('mouseenter', () => {
-          if (selectedParty !== item.dataset.partyId) {
+          if (!selectedParty || selectedParty.id !== item.dataset.partyId) {
             item.style.background = 'rgba(45, 55, 72, 0.8)'
           }
         })
         
         item.addEventListener('mouseleave', () => {
-          if (selectedParty !== item.dataset.partyId) {
+          if (!selectedParty || selectedParty.id !== item.dataset.partyId) {
             item.style.background = 'rgba(45, 55, 72, 0.5)'
           }
         })
