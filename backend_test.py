@@ -299,55 +299,71 @@ def test_party_creation_and_invitation_system():
         test_results["test_details"].append(f"❌ Database Collections - ERROR ({e})")
         test_results["critical_issues"].append("Database connection issues")
     
-    # Test 5: Frontend Compatibility Test
-    print("\n5️⃣ FRONTEND COMPATIBILITY TEST")
+    # Test 5: Complete Party Flow Validation
+    print("\n5️⃣ COMPLETE PARTY FLOW VALIDATION")
     test_results["total_tests"] += 1
     try:
-        response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier=frontend_compatibility_test", timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            friends_list = data.get("friends", [])
-            
-            # Simulate frontend processing
-            frontend_compatible = True
-            compatibility_issues = []
-            
-            for friend in friends_list:
-                # Check if frontend can access username (not friendUsername)
-                if "username" not in friend:
-                    frontend_compatible = False
-                    compatibility_issues.append("Missing 'username' field")
+        # Test the complete flow: create party → send invites → retrieve invites
+        flow_test_creator = "flow_test_creator"
+        flow_test_recipient = "flow_test_recipient"
+        
+        # Step 1: Create a simple party with one invite
+        simple_party_data = {
+            "action": "create_and_invite",
+            "userIdentifier": flow_test_creator,
+            "partyData": {
+                "name": "Flow Test Party",
+                "privacy": "public",
+                "maxPlayers": 2
+            },
+            "invitedFriends": [
+                {"id": flow_test_recipient, "username": "FlowTestRecipient"}
+            ]
+        }
+        
+        print("🔄 Testing complete party flow...")
+        flow_party_response = requests.post(f"{API_BASE}/party", json=simple_party_data, timeout=10)
+        
+        if flow_party_response.status_code == 200:
+            flow_party_data = flow_party_response.json()
+            if flow_party_data.get("success"):
+                print("✅ Step 1: Party creation successful")
                 
-                # Check if frontend can access id (not friendUserIdentifier)
-                if "id" not in friend:
-                    frontend_compatible = False
-                    compatibility_issues.append("Missing 'id' field")
+                # Step 2: Wait and check for invites
+                time.sleep(1)
+                flow_invite_response = requests.get(f"{API_BASE}/party?type=invites&userIdentifier={flow_test_recipient}", timeout=10)
                 
-                # Check if old field names are still present (would cause confusion)
-                if "friendUsername" in friend:
-                    frontend_compatible = False
-                    compatibility_issues.append("Old 'friendUsername' field still present")
-                
-                if "friendUserIdentifier" in friend:
-                    frontend_compatible = False
-                    compatibility_issues.append("Old 'friendUserIdentifier' field still present")
-            
-            if frontend_compatible:
-                print("✅ Frontend compatibility verified - all fields correctly transformed")
-                test_results["passed_tests"] += 1
-                test_results["test_details"].append("✅ Frontend Compatibility - PASSED")
+                if flow_invite_response.status_code == 200:
+                    flow_invite_data = flow_invite_response.json()
+                    flow_invites = flow_invite_data.get("invites", [])
+                    
+                    if len(flow_invites) > 0:
+                        print("✅ Step 2: Party invite retrieval successful")
+                        print(f"   Complete flow working: create → store → retrieve")
+                        test_results["passed_tests"] += 1
+                        test_results["test_details"].append("✅ Complete Party Flow - PASSED")
+                    else:
+                        print("❌ Step 2: No invites found after party creation")
+                        test_results["failed_tests"] += 1
+                        test_results["test_details"].append("❌ Complete Party Flow - FAILED (no invites)")
+                        test_results["critical_issues"].append("Party invites not being stored correctly")
+                else:
+                    print(f"❌ Step 2: Invite retrieval failed: {flow_invite_response.status_code}")
+                    test_results["failed_tests"] += 1
+                    test_results["test_details"].append("❌ Complete Party Flow - FAILED (retrieval error)")
             else:
-                print(f"❌ Frontend compatibility issues: {compatibility_issues}")
+                print("❌ Step 1: Party creation failed")
                 test_results["failed_tests"] += 1
-                test_results["test_details"].append(f"❌ Frontend Compatibility - FAILED ({compatibility_issues})")
+                test_results["test_details"].append("❌ Complete Party Flow - FAILED (creation failed)")
         else:
-            print(f"❌ Frontend compatibility test failed: {response.status_code}")
+            print(f"❌ Step 1: Party creation HTTP error: {flow_party_response.status_code}")
             test_results["failed_tests"] += 1
-            test_results["test_details"].append(f"❌ Frontend Compatibility - FAILED ({response.status_code})")
+            test_results["test_details"].append("❌ Complete Party Flow - FAILED (HTTP error)")
+            
     except Exception as e:
-        print(f"❌ Frontend compatibility test error: {e}")
+        print(f"❌ Complete party flow test error: {e}")
         test_results["failed_tests"] += 1
-        test_results["test_details"].append(f"❌ Frontend Compatibility - ERROR ({e})")
+        test_results["test_details"].append(f"❌ Complete Party Flow - ERROR ({e})")
     
     # Test 6: Database Connection and MongoDB Integration
     print("\n6️⃣ DATABASE CONNECTION AND MONGODB INTEGRATION")
