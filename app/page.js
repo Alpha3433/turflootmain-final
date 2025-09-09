@@ -289,6 +289,77 @@ export default function TurfLootTactical() {
     }
   }
 
+  // Function to render skin avatar based on equipped skin
+  const renderSkinAvatar = (skin, size = 32, showOnlineDot = false, isOnline = false) => {
+    const avatarStyle = {
+      width: `${size}px`,
+      height: `${size}px`,
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      fontSize: `${size * 0.4}px`,
+      fontWeight: 'bold',
+      border: `2px solid ${isOnline ? '#68d391' : '#6b7280'}`,
+      boxShadow: isOnline ? '0 0 10px rgba(104, 211, 145, 0.4)' : 'none'
+    };
+
+    // Generate background based on skin type and color
+    if (skin?.type === 'circle') {
+      const color = skin.color || '#3b82f6';
+      if (skin.pattern === 'gradient') {
+        avatarStyle.background = `linear-gradient(135deg, ${color} 0%, ${adjustColorBrightness(color, -20)} 100%)`;
+      } else if (skin.pattern === 'stripes') {
+        avatarStyle.background = `repeating-linear-gradient(45deg, ${color}, ${color} 10px, ${adjustColorBrightness(color, -20)} 10px, ${adjustColorBrightness(color, -20)} 20px)`;
+      } else {
+        avatarStyle.background = color;
+      }
+    } else {
+      // Default skin
+      avatarStyle.background = 'linear-gradient(135deg, rgba(104, 211, 145, 0.3) 0%, rgba(104, 211, 145, 0.6) 100%)';
+    }
+
+    return (
+      <div style={avatarStyle}>
+        {/* Skin content - could be emoji, pattern, or custom design */}
+        <div style={{ 
+          width: '70%', 
+          height: '70%', 
+          borderRadius: '50%', 
+          background: 'rgba(255, 255, 255, 0.2)' 
+        }} />
+        
+        {/* Online status dot */}
+        {showOnlineDot && isOnline && (
+          <div style={{
+            position: 'absolute',
+            top: '-2px',
+            right: '-2px',
+            width: '8px',
+            height: '8px',
+            background: '#22c55e',
+            borderRadius: '50%',
+            border: '1px solid rgba(26, 32, 44, 1)',
+            boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
+          }} />
+        )}
+      </div>
+    );
+  };
+
+  // Helper function to adjust color brightness
+  const adjustColorBrightness = (color, percent) => {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+      (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+      (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+  };
+
   const createPartyAndSendInvites = async (partyData, selectedFriends) => {
     try {
       const userIdentifier = isAuthenticated ? 
