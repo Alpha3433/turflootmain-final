@@ -3313,10 +3313,13 @@ export default function TurfLootTactical() {
         return
       }
       
-      if (selectedFriends.length === 0) {
-        alert('Please select at least one friend to invite to the party!')
+      // Only require friend selection for private parties
+      if (selectedPrivacy === 'private' && selectedFriends.length === 0) {
+        alert('Please select at least one friend to invite to your private party!')
         return
       }
+      
+      // For public parties, no friend selection is required - anyone can join
 
       // Party is always limited to 2 players maximum
       const partyData = {
