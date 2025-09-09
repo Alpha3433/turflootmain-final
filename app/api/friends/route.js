@@ -132,22 +132,41 @@ export async function GET(request) {
         count: availableUsers.length
       })
     } else if (requestType === 'requests') {
-      // Get friend requests for this user
-      const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
+      // Get friend requests for this user from database
+      const { db } = await connectToDatabase()
       
-      console.log('✅ Friend requests retrieved:', userRequests)
+      const sentRequests = await db.collection('friend_requests').find({
+        fromUserIdentifier: userIdentifier,
+        status: 'pending'
+      }).toArray()
+      
+      const receivedRequests = await db.collection('friend_requests').find({
+        toUserIdentifier: userIdentifier,
+        status: 'pending'
+      }).toArray()
+      
+      const userRequests = {
+        sent: sentRequests,
+        received: receivedRequests
+      }
+      
+      console.log('✅ Friend requests retrieved from database:', userRequests)
       
       return NextResponse.json({
         success: true,
         requests: userRequests,
-        sentCount: userRequests.sent.length,
-        receivedCount: userRequests.received.length
+        sentCount: sentRequests.length,
+        receivedCount: receivedRequests.length
       })
     } else {
-      // Get user's friends from mock data
-      const userFriends = mockFriends.get(userIdentifier) || []
+      // Get user's friends from database
+      const { db } = await connectToDatabase()
       
-      console.log('✅ Friends list retrieved:', userFriends.length, 'friends')
+      const userFriends = await db.collection('friends').find({
+        userIdentifier: userIdentifier
+      }).toArray()
+      
+      console.log('✅ Friends list retrieved from database:', userFriends.length, 'friends')
       
       return NextResponse.json({
         success: true,
