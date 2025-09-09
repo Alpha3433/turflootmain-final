@@ -34,10 +34,14 @@ export async function GET(request) {
       
       const publicParties = await db.collection('parties').find({
         privacy: 'public',
-        status: 'waiting',
-        currentPlayers: { $exists: true, $type: 'array' },
-        $expr: { $lt: [{ $size: "$currentPlayers" }, "$maxPlayers"] } // Party not full
+        status: 'waiting'
       }).toArray()
+      
+      // Filter parties that aren't full (client-side filtering)
+      const availableParties = publicParties.filter(party => 
+        Array.isArray(party.currentPlayers) && 
+        party.currentPlayers.length < (party.maxPlayers || 2)
+      )
       
       // Get party details with member information
       const partiesWithDetails = await Promise.all(
