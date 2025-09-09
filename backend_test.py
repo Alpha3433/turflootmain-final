@@ -26,17 +26,18 @@ from urllib.parse import urljoin
 BASE_URL = "https://turfloot-social.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-def test_friends_list_data_transformation():
+def test_party_creation_and_invitation_system():
     """
-    Test the friends list data transformation fix to ensure friend names appear correctly.
+    Test the party creation and invitation system to identify why party invites are not being received.
     
-    CRITICAL FIX BEING TESTED:
-    - Transform database records from `friendUsername` to `username` field
-    - Map `friendUserIdentifier` to `id` field  
-    - Include all necessary fields (status, isOnline, etc.) for frontend display
+    CRITICAL TESTING FOCUS:
+    1. Party Creation Flow - POST /api/party with action=create_and_invite
+    2. Party Invite Retrieval - GET /api/party?type=invites&userIdentifier=test_user
+    3. Data Flow Validation - complete flow from creation to retrieval
+    4. Database Collection Structure - verify 'parties' and 'party_invites' collections
     """
-    print("🧪 TESTING FRIENDS LIST DATA TRANSFORMATION")
-    print("=" * 60)
+    print("🎮 TESTING PARTY CREATION AND INVITATION SYSTEM")
+    print("=" * 80)
     
     test_results = {
         "total_tests": 0,
