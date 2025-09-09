@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Party Creation and Invitation System
-Testing the fixed party creation and invitation system with flexible user lookup.
+Comprehensive Backend Testing for Skin Avatar System Integration
+Tests the complete skin avatar system to ensure party members show their equipped skins.
 """
 
 import requests
 import json
 import time
-import os
-from datetime import datetime
+import sys
+from typing import Dict, List, Any, Optional
 
-# Get base URL from environment
+# Configuration
 BASE_URL = "https://turfloot-social.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-class PartySystemTester:
+class SkinAvatarSystemTester:
     def __init__(self):
         self.test_results = []
         self.test_users = []
