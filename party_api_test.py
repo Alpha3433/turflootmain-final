@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Test Configuration
-BASE_URL = "https://turfloot-social.preview.emergentagent.com"
+BASE_URL = "https://party-play-system.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Use localhost for testing as per environment configuration

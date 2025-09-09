@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "https://turfloot-social.preview.emergentagent.com"
+BASE_URL = "https://party-play-system.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class AgarIOBackendTester:

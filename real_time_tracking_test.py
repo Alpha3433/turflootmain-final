@@ -22,7 +22,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://turfloot-social.preview.emergentagent.com"
+BASE_URL = "https://party-play-system.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Test configuration

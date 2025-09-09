@@ -16,7 +16,7 @@ from datetime import datetime
 
 # Configuration - Use localhost for testing as per environment
 LOCALHOST_URL = "http://localhost:3000"
-PRODUCTION_URL = "https://turfloot-social.preview.emergentagent.com"
+PRODUCTION_URL = "https://party-play-system.preview.emergentagent.com"
 
 # Test configuration
 TEST_TIMEOUT = 10
