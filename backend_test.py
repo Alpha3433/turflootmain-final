@@ -581,67 +581,102 @@ class AddFriendModalBackendTester:
             
         return False
 
-    def test_demo_users_data_structure(self):
-        """Test that demo users have all required fields with correct data types"""
-        print("🔍 TESTING: Demo Users Data Structure Validation")
+    def test_mongodb_connection_validation(self):
+        """Test MongoDB connection and user document structure"""
+        print("🔍 TESTING: MongoDB Connection and Document Structure")
         try:
-            response = requests.get(f"{API_BASE}/friends?type=users&userIdentifier=guest", timeout=10)
+            # Register a user to test MongoDB document structure
+            test_user_id = f"privy_mongo_test_{int(time.time())}"
+            self.test_users.append(test_user_id)
             
-            if response.status_code == 200:
-                data = response.json()
-                users = data.get('users', [])
+            user_data = {
+                "username": f"MongoTest_{int(time.time())}",
+                "displayName": f"MongoDB Test User",
+                "email": f"mongotest{int(time.time())}@example.com",
+                "walletAddress": f"0x{hex(int(time.time()))[2:].zfill(40)}"
+            }
+            
+            payload = {
+                "action": "register_user",
+                "userIdentifier": test_user_id,
+                "userData": user_data
+            }
+            
+            response1 = requests.post(
+                f"{API_BASE}/friends", 
+                json=payload,
+                headers={'Content-Type': 'application/json'},
+                timeout=10
+            )
+            
+            if response1.status_code == 200:
+                # Now retrieve the user to validate MongoDB document structure
+                response2 = requests.get(f"{API_BASE}/friends?type=users&userIdentifier=different_user", timeout=10)
                 
-                if len(users) > 0:
-                    validation_errors = []
+                if response2.status_code == 200:
+                    data2 = response2.json()
+                    users = data2.get('users', [])
                     
-                    for i, user in enumerate(users):
-                        # Check required fields
+                    # Find our registered user
+                    our_user = None
+                    for user in users:
+                        if user.get('username') == user_data['username']:
+                            our_user = user
+                            break
+                    
+                    if our_user:
+                        # Validate MongoDB document structure
                         required_fields = ['username', 'status', 'joinedAt', 'gamesPlayed']
+                        validation_errors = []
+                        
                         for field in required_fields:
-                            if field not in user:
-                                validation_errors.append(f"User {i}: Missing field '{field}'")
+                            if field not in our_user:
+                                validation_errors.append(f"Missing field '{field}'")
                         
-                        # Validate data types and values
-                        if 'username' in user and not isinstance(user['username'], str):
-                            validation_errors.append(f"User {i}: username should be string")
+                        # Validate data types
+                        if 'username' in our_user and not isinstance(our_user['username'], str):
+                            validation_errors.append("username should be string")
                         
-                        if 'status' in user and user['status'] not in ['online', 'offline', 'in-game']:
-                            validation_errors.append(f"User {i}: invalid status '{user['status']}'")
+                        if 'status' in our_user and our_user['status'] not in ['online', 'offline']:
+                            validation_errors.append(f"invalid status '{our_user['status']}'")
                         
-                        if 'gamesPlayed' in user and not isinstance(user['gamesPlayed'], int):
-                            validation_errors.append(f"User {i}: gamesPlayed should be integer")
+                        if 'gamesPlayed' in our_user and not isinstance(our_user['gamesPlayed'], int):
+                            validation_errors.append("gamesPlayed should be integer")
                         
-                        if 'joinedAt' in user and not isinstance(user['joinedAt'], str):
-                            validation_errors.append(f"User {i}: joinedAt should be string")
-                    
-                    if len(validation_errors) == 0:
-                        self.log_test(
-                            "Demo Users Data Structure", 
-                            True, 
-                            f"All {len(users)} demo users have valid data structure"
-                        )
-                        return True
+                        if len(validation_errors) == 0:
+                            self.log_test(
+                                "MongoDB Connection and Document Structure", 
+                                True, 
+                                f"MongoDB user document has valid structure: {list(our_user.keys())}"
+                            )
+                            return True
+                        else:
+                            self.log_test(
+                                "MongoDB Connection and Document Structure", 
+                                False, 
+                                f"Document validation errors: {'; '.join(validation_errors)}"
+                            )
                     else:
                         self.log_test(
-                            "Demo Users Data Structure", 
+                            "MongoDB Connection and Document Structure", 
                             False, 
-                            f"Validation errors: {'; '.join(validation_errors[:5])}"  # Show first 5 errors
+                            f"Registered user {user_data['username']} not found in user list"
                         )
                 else:
                     self.log_test(
-                        "Demo Users Data Structure", 
+                        "MongoDB Connection and Document Structure", 
                         False, 
-                        "No demo users returned"
+                        f"Failed to retrieve users: {response2.status_code}"
                     )
             else:
                 self.log_test(
-                    "Demo Users Data Structure", 
+                    "MongoDB Connection and Document Structure", 
                     False, 
-                    f"Failed to get demo users: {response.status_code}"
+                    f"Failed to register user: {response1.status_code}"
                 )
                 
         except Exception as e:
-            self.log_test("Demo Users Data Structure", False, f"Request failed: {str(e)}")
+            self.log_test("MongoDB Connection and Document Structure", False, f"Request failed: {str(e)}")
             
         return False
 
