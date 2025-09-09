@@ -282,8 +282,9 @@ class PartySystemTester:
             self.log_test("Party Invite Delivery Test", False, error="Not enough test users")
             return
             
-        # Test invite retrieval for each invited user
-        for i, user in enumerate(self.test_users[1:3], 1):  # Users 2 and 3 were invited
+        # Test invite retrieval for each invited user (skip creator at index 0)
+        invited_users = self.test_users[1:min(len(self.test_users), 3)]
+        for i, user in enumerate(invited_users, 1):
             try:
                 response = requests.get(
                     f"{API_BASE}/party",
