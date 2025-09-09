@@ -6355,17 +6355,27 @@ export default function TurfLootTactical() {
                                     return
                                   }
                                   
-                                  if (!user || (!user.wallet?.address && !user.email?.address && !user.id)) {
-                                    alert('User data is still loading. Please wait a moment and try again.')
-                                    return
+                                  // Try to get user identifier from multiple sources including Privy bridge
+                                  let userIdentifier = null
+                                  
+                                  // Method 1: From user object
+                                  if (user && (user.wallet?.address || user.email?.address || user.id)) {
+                                    userIdentifier = user.wallet?.address || user.email?.address || user.id
                                   }
                                   
-                                  const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
+                                  // Method 2: Try getting from Privy bridge directly
+                                  if (!userIdentifier && typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
+                                    const privyUser = window.__TURFLOOT_PRIVY__.user
+                                    if (privyUser) {
+                                      userIdentifier = privyUser.wallet?.address || privyUser.email?.address || privyUser.id
+                                    }
+                                  }
                                   
                                   console.log('🔍 Computed userIdentifier:', userIdentifier)
+                                  console.log('🔍 User object state:', user ? Object.keys(user) : 'null')
                                   
                                   if (!userIdentifier) {
-                                    alert('Unable to identify user. Please try refreshing the page.')
+                                    alert('Unable to identify your account. Please try refreshing the page or logging out and back in.')
                                     return
                                   }
                                   
