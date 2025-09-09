@@ -6230,7 +6230,7 @@ export default function TurfLootTactical() {
                         letterSpacing: '0.05em'
                       }}
                     >
-                      💳 DEPOSIT
+                      💳 DEPOSIT SOL
                     </button>
                     <button
                       onClick={() => {
