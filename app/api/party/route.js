@@ -20,6 +20,55 @@ async function connectToDatabase() {
   return { client, db }
 }
 
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const userIdentifier = searchParams.get('userIdentifier')
+    const requestType = searchParams.get('type') // 'invites'
+    
+    console.log('🎯 Party GET request:', { userIdentifier, requestType })
+    
+    if (!userIdentifier || userIdentifier === 'guest') {
+      return NextResponse.json({
+        success: true,
+        invites: [],
+        message: 'Please log in to see party invites'
+      })
+    }
+    
+    if (requestType === 'invites') {
+      // Get party invites for this user
+      const { db } = await connectToDatabase()
+      
+      const partyInvites = await db.collection('party_invites').find({
+        toUserIdentifier: userIdentifier,
+        status: 'pending'
+      }).toArray()
+      
+      console.log('✅ Party invites retrieved:', partyInvites.length, 'invites')
+      
+      return NextResponse.json({
+        success: true,
+        invites: partyInvites,
+        count: partyInvites.length
+      })
+    }
+    
+    return NextResponse.json({
+      success: true,
+      invites: [],
+      count: 0
+    })
+    
+  } catch (error) {
+    console.error('❌ Error fetching party data:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch party data' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request) {
   try {
     const { action, userIdentifier, partyData, invitedFriends } = await request.json()
