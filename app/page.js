@@ -1211,18 +1211,21 @@ export default function TurfLootTactical() {
       
       // Use Privy's native fundWallet functionality
       console.log('💰 Opening Privy deposit interface...')
+      console.log('💰 Privy user object:', privy.user)
+      console.log('💰 Available wallets:', privy.user.linkedAccounts)
       
       try {
-        // Pass wallet address explicitly to fundWallet if needed
-        const fundOptions = {
-          address: wallet.address
-        }
-        
-        console.log('💰 Calling fundWallet with options:', fundOptions)
-        await privy.fundWallet(fundOptions)
+        // Try calling fundWallet without parameters first (latest Privy API)
+        console.log('💰 Calling fundWallet() without parameters...')
+        await privy.fundWallet()
         console.log('✅ Privy deposit interface opened successfully')
       } catch (fundError) {
         console.error('❌ FundWallet error:', fundError)
+        console.error('❌ FundWallet error details:', {
+          message: fundError.message,
+          code: fundError.code,
+          stack: fundError.stack
+        })
         
         // Enhanced error handling for specific Privy errors
         if (fundError.message?.includes('invalid address')) {
