@@ -1193,17 +1193,48 @@ export default function TurfLootTactical() {
       
       console.log('✅ Wallet confirmed:', wallet.address)
       
+      // Validate wallet address before calling fundWallet
+      if (!wallet.address || wallet.address === 'undefined') {
+        console.error('❌ Invalid wallet address:', wallet.address)
+        alert('❌ Wallet address is invalid. Please try reconnecting your wallet.')
+        return
+      }
+      
+      // Additional validation for proper Ethereum address format
+      if (!/^0x[a-fA-F0-9]{40}$/.test(wallet.address)) {
+        console.error('❌ Wallet address format invalid:', wallet.address)
+        alert('❌ Wallet address format is invalid. Please try reconnecting your wallet.')
+        return
+      }
+      
+      console.log('✅ Wallet address validated:', wallet.address)
+      
       // Use Privy's native fundWallet functionality
       console.log('💰 Opening Privy deposit interface...')
       
       try {
-        await privy.fundWallet()
+        // Pass wallet address explicitly to fundWallet if needed
+        const fundOptions = {
+          address: wallet.address
+        }
+        
+        console.log('💰 Calling fundWallet with options:', fundOptions)
+        await privy.fundWallet(fundOptions)
         console.log('✅ Privy deposit interface opened successfully')
       } catch (fundError) {
         console.error('❌ FundWallet error:', fundError)
         
-        // Provide fallback manual instructions if fundWallet fails
-        alert(`💰 MANUAL DEPOSIT\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
+        // Enhanced error handling for specific Privy errors
+        if (fundError.message?.includes('invalid address')) {
+          console.error('❌ Address validation failed in Privy')
+          alert('❌ Wallet address validation failed. Please disconnect and reconnect your wallet, then try again.')
+        } else if (fundError.message?.includes('undefined')) {
+          console.error('❌ Undefined value passed to Privy')
+          alert('❌ Wallet connection issue detected. Please refresh the page and reconnect your wallet.')
+        } else {
+          // Provide fallback manual instructions if fundWallet fails
+          alert(`💰 MANUAL DEPOSIT\n\nYour Wallet Address:\n${wallet.address}\n\n📋 Instructions:\n1. Copy the wallet address above\n2. Send SOL from your preferred wallet\n3. Your balance will update automatically\n4. Minimum deposit: 0.001 SOL\n\nNote: This address is your secure embedded wallet managed by Privy.`)
+        }
         console.log('💰 Wallet address for manual deposit:', wallet.address)
       }
       
