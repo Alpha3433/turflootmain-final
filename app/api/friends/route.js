@@ -444,35 +444,37 @@ async function handleAcceptFriendRequest(userIdentifier, requestId) {
 async function handleDeclineFriendRequest(userIdentifier, requestId) {
   console.log('❌ Declining friend request:', { userIdentifier, requestId })
   
-  const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
-  const requestIndex = userRequests.received.findIndex(r => r.id === requestId)
-  
-  if (requestIndex === -1) {
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Find and remove the friend request from database
+    const result = await db.collection('friend_requests').deleteOne({
+      id: requestId,
+      toUserIdentifier: userIdentifier,
+      status: 'pending'
+    })
+    
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: 'Friend request not found' },
+        { status: 404 }
+      )
+    }
+    
+    console.log('✅ Friend request declined and removed from database')
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Friend request declined'
+    })
+    
+  } catch (error) {
+    console.error('❌ Error declining friend request:', error)
     return NextResponse.json(
-      { error: 'Friend request not found' },
-      { status: 404 }
+      { error: 'Failed to decline friend request' },
+      { status: 500 }
     )
   }
-  
-  const request = userRequests.received[requestIndex]
-  const fromUserIdentifier = request.fromUserIdentifier
-  
-  // Remove from received requests
-  userRequests.received.splice(requestIndex, 1)
-  mockFriendRequests.set(userIdentifier, userRequests)
-  
-  // Remove from sender's sent requests
-  const senderRequests = mockFriendRequests.get(fromUserIdentifier) || { sent: [], received: [] }
-  const senderRequestIndex = senderRequests.sent.findIndex(r => r.id === requestId)
-  if (senderRequestIndex !== -1) {
-    senderRequests.sent.splice(senderRequestIndex, 1)
-    mockFriendRequests.set(fromUserIdentifier, senderRequests)
-  }
-  
-  return NextResponse.json({
-    success: true,
-    message: 'Friend request declined'
-  })
 }
 
 async function handleCancelFriendRequest(userIdentifier, requestId) {
