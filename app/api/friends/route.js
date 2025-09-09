@@ -116,6 +116,20 @@ async function storePrivyUser(userIdentifier, userData) {
   try {
     const { db } = await connectToDatabase()
     
+    // Validate that this is a real Privy user, not a test user
+    if (!userIdentifier || 
+        userIdentifier.match(/(test|debug|mock|demo|cashout\.test|debug\.test)/i) ||
+        (!userData.email && !userData.walletAddress)) {
+      console.log('⚠️ Skipping test/invalid user storage:', userIdentifier)
+      return false
+    }
+    
+    // Only store users with valid email or wallet address (real Privy accounts)
+    if (!userData.email && !userData.walletAddress) {
+      console.log('⚠️ Skipping user without email or wallet:', userIdentifier)
+      return false
+    }
+    
     const userDoc = {
       userIdentifier,
       username: userData.username || userData.displayName || `User_${userIdentifier.slice(-4)}`,
@@ -134,7 +148,7 @@ async function storePrivyUser(userIdentifier, userData) {
       { upsert: true }
     )
     
-    console.log('✅ Privy user stored/updated:', userIdentifier)
+    console.log('✅ Real Privy user stored/updated:', userIdentifier)
     return true
   } catch (error) {
     console.error('❌ Error storing Privy user:', error)
