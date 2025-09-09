@@ -260,6 +260,9 @@ export async function POST(request) {
       case 'accept_invite':
         return await handleAcceptPartyInvite(userIdentifier, inviteId, partyId)
       
+      case 'cleanup_test_parties':
+        return await handleCleanupTestParties()
+      
       default:
         return NextResponse.json(
           { error: 'Invalid action' },
