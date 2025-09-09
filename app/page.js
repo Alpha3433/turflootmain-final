@@ -7810,6 +7810,83 @@ export default function TurfLootTactical() {
               <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>
                 PARTY
               </h3>
+              <div style={{ marginLeft: 'auto' }}>
+                <button 
+                  onClick={async () => {
+                    console.log('🔄 Mobile PARTY REFRESH button clicked - refreshing lobby data...')
+                    
+                    try {
+                      // Show loading state
+                      setLoadingParty(true)
+                      
+                      console.log('🔄 Mobile Step 1: Refreshing current party data...')
+                      await loadCurrentParty()
+                      
+                      console.log('🔄 Mobile Step 2: Refreshing friends list with updated skin data...')
+                      await loadFriendsList()
+                      
+                      console.log('🔄 Mobile Step 3: Refreshing friend requests and party invites...')
+                      await loadFriendRequests()
+                      
+                      console.log('🔄 Mobile Step 4: Refreshing available users list...')
+                      await loadAvailableUsers()
+                      
+                      // Force re-register user to update skin data
+                      if (isAuthenticated && user) {
+                        console.log('🔄 Mobile Step 5: Updating user skin data...')
+                        await registerPrivyUser()
+                      }
+                      
+                      console.log('✅ Mobile PARTY REFRESH completed successfully!')
+                      
+                      // Brief success indicator for mobile
+                      const refreshButton = document.querySelector('[data-mobile-refresh-text]')
+                      if (refreshButton) {
+                        refreshButton.textContent = '✅'
+                        setTimeout(() => {
+                          refreshButton.textContent = '↻'
+                        }, 1500)
+                      }
+                      
+                    } catch (error) {
+                      console.error('❌ Mobile PARTY REFRESH failed:', error)
+                      
+                      // Show error feedback for mobile
+                      const refreshButton = document.querySelector('[data-mobile-refresh-text]')
+                      if (refreshButton) {
+                        refreshButton.textContent = '❌'
+                        setTimeout(() => {
+                          refreshButton.textContent = '↻'
+                        }, 1500)
+                      }
+                    } finally {
+                      setLoadingParty(false)
+                    }
+                  }}
+                  style={{ 
+                    fontSize: '9px', 
+                    color: '#f6ad55', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
+                    fontFamily: '"Rajdhani", sans-serif',
+                    padding: '1px 3px',
+                    borderRadius: '2px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(246, 173, 85, 0.1)'
+                    e.target.style.boxShadow = '0 0 3px rgba(246, 173, 85, 0.3)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'none'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                >
+                  <span data-mobile-refresh-text>↻</span>
+                </button>
+              </div>
             </div>
             
             {currentParty ? (
