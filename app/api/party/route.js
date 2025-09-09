@@ -71,7 +71,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { action, userIdentifier, partyData, invitedFriends } = await request.json()
+    const { action, userIdentifier, partyData, invitedFriends, inviteId, partyId } = await request.json()
     
     console.log('🎯 Party API request:', { action, userIdentifier, partyData, invitedFriendsCount: invitedFriends?.length })
     
