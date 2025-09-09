@@ -2861,6 +2861,7 @@ export default function TurfLootTactical() {
     // Add interactivity
     let currentTab = 'public'
     let selectedParty = null
+    let currentParties = [] // Store parties data for party selection
     
     // Tab switching
     const publicTab = modal.querySelector('#public-parties-tab')
