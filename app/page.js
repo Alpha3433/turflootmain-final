@@ -6244,7 +6244,7 @@ export default function TurfLootTactical() {
                     marginBottom: '12px',
                     letterSpacing: '0.05em'
                   }}>
-                    TurfLoot Users ({availableUsers.length} Available)
+                    Authenticated Users ({availableUsers.length} Available)
                   </label>
                   
                   <div style={{
