@@ -177,6 +177,7 @@ export async function GET(request) {
         privacy: 'private',
         status: 'waiting',
         createdBy: { $in: friendIds },
+        currentPlayers: { $exists: true, $type: 'array' },
         $expr: { $lt: [{ $size: "$currentPlayers" }, "$maxPlayers"] } // Party not full
       }).toArray()
       
