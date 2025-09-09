@@ -5644,19 +5644,154 @@ export default function TurfLootTactical() {
                       fontSize: '11px',
                       textTransform: 'uppercase'
                     }}>
-                      0 PENDING
+                      {friendRequests.received.length} PENDING
                     </span>
                   </div>
                   
-                  <div style={{
-                    padding: '12px 8px',
-                    textAlign: 'center',
-                    color: '#a0aec0',
-                    fontSize: '12px'
-                  }}>
-                    <div style={{ fontSize: '20px', marginBottom: '4px', opacity: 0.6 }}>📤</div>
-                    <div style={{ fontSize: '11px' }}>No pending requests</div>
-                  </div>
+                  {loadingRequests ? (
+                    <div style={{
+                      padding: '12px 8px',
+                      textAlign: 'center',
+                      color: '#a0aec0',
+                      fontSize: '12px'
+                    }}>
+                      <div style={{ fontSize: '20px', marginBottom: '4px' }}>⏳</div>
+                      <div style={{ fontSize: '11px' }}>Loading requests...</div>
+                    </div>
+                  ) : friendRequests.received.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {friendRequests.received.slice(0, 2).map((request) => (
+                        <div key={request.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 10px',
+                          background: 'rgba(246, 173, 85, 0.1)',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(246, 173, 85, 0.3)'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{
+                              width: '8px',
+                              height: '8px',
+                              borderRadius: '50%',
+                              background: '#f6ad55'
+                            }} />
+                            <div style={{ 
+                              color: '#e2e8f0', 
+                              fontSize: '12px', 
+                              fontWeight: '600' 
+                            }}>
+                              {request.fromUsername}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
+                                  const response = await fetch('/api/friends', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      action: 'accept_request',
+                                      userIdentifier,
+                                      requestId: request.id
+                                    })
+                                  })
+                                  
+                                  const result = await response.json()
+                                  if (result.success) {
+                                    alert(`✅ ${request.fromUsername} is now your friend!`)
+                                    loadFriendRequests()
+                                    loadFriendsList()
+                                  } else {
+                                    alert(`❌ Failed to accept request: ${result.error}`)
+                                  }
+                                } catch (error) {
+                                  console.error('Error accepting friend request:', error)
+                                  alert('❌ Failed to accept friend request')
+                                }
+                              }}
+                              style={{
+                                background: 'rgba(34, 197, 94, 0.2)',
+                                border: '1px solid #22c55e',
+                                borderRadius: '3px',
+                                color: '#22c55e',
+                                padding: '3px 6px',
+                                fontSize: '10px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase'
+                              }}
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
+                                  const response = await fetch('/api/friends', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                      action: 'decline_request',
+                                      userIdentifier,
+                                      requestId: request.id
+                                    })
+                                  })
+                                  
+                                  const result = await response.json()
+                                  if (result.success) {
+                                    alert(`❌ Friend request from ${request.fromUsername} declined`)
+                                    loadFriendRequests()
+                                  } else {
+                                    alert(`❌ Failed to decline request: ${result.error}`)
+                                  }
+                                } catch (error) {
+                                  console.error('Error declining friend request:', error)
+                                  alert('❌ Failed to decline friend request')
+                                }
+                              }}
+                              style={{
+                                background: 'rgba(252, 129, 129, 0.2)',
+                                border: '1px solid #fc8181',
+                                borderRadius: '3px',
+                                color: '#fc8181',
+                                padding: '3px 6px',
+                                fontSize: '10px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase'
+                              }}
+                            >
+                              ✗
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {friendRequests.received.length > 2 && (
+                        <div style={{
+                          textAlign: 'center',
+                          color: '#a0aec0',
+                          fontSize: '11px',
+                          padding: '4px'
+                        }}>
+                          +{friendRequests.received.length - 2} more requests
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{
+                      padding: '12px 8px',
+                      textAlign: 'center',
+                      color: '#a0aec0',
+                      fontSize: '12px'
+                    }}>
+                      <div style={{ fontSize: '20px', marginBottom: '4px', opacity: 0.6 }}>📤</div>
+                      <div style={{ fontSize: '11px' }}>No pending requests</div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Online Friends - Compact */}
