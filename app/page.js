@@ -5382,7 +5382,7 @@ export default function TurfLootTactical() {
               const authenticated = await requireAuthentication('VIEW STORE')
               if (authenticated) {
                 console.log('🛒 User authenticated, opening view store...')
-                createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin)
+                createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'shop')
               } else {
                 console.log('❌ Authentication failed, blocking access to VIEW STORE')
               }
