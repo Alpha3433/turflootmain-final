@@ -480,35 +480,37 @@ async function handleDeclineFriendRequest(userIdentifier, requestId) {
 async function handleCancelFriendRequest(userIdentifier, requestId) {
   console.log('🚫 Canceling friend request:', { userIdentifier, requestId })
   
-  const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
-  const requestIndex = userRequests.sent.findIndex(r => r.id === requestId)
-  
-  if (requestIndex === -1) {
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Find and remove the friend request from database
+    const result = await db.collection('friend_requests').deleteOne({
+      id: requestId,
+      fromUserIdentifier: userIdentifier,
+      status: 'pending'
+    })
+    
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: 'Friend request not found' },
+        { status: 404 }
+      )
+    }
+    
+    console.log('✅ Friend request canceled and removed from database')
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Friend request canceled'
+    })
+    
+  } catch (error) {
+    console.error('❌ Error canceling friend request:', error)
     return NextResponse.json(
-      { error: 'Friend request not found' },
-      { status: 404 }
+      { error: 'Failed to cancel friend request' },
+      { status: 500 }
     )
   }
-  
-  const request = userRequests.sent[requestIndex]
-  const toUserIdentifier = request.toUserIdentifier
-  
-  // Remove from sent requests
-  userRequests.sent.splice(requestIndex, 1)
-  mockFriendRequests.set(userIdentifier, userRequests)
-  
-  // Remove from receiver's received requests
-  const receiverRequests = mockFriendRequests.get(toUserIdentifier) || { sent: [], received: [] }
-  const receiverRequestIndex = receiverRequests.received.findIndex(r => r.id === requestId)
-  if (receiverRequestIndex !== -1) {
-    receiverRequests.received.splice(receiverRequestIndex, 1)
-    mockFriendRequests.set(toUserIdentifier, receiverRequests)
-  }
-  
-  return NextResponse.json({
-    success: true,
-    message: 'Friend request canceled'
-  })
 }
 
 async function handleRemoveFriend(userIdentifier, friendIdentifier) {
