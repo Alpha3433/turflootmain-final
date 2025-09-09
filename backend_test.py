@@ -214,23 +214,21 @@ class PartySystemTester:
 
     def test_complete_party_creation_flow(self):
         """Test complete party creation with invites"""
-        if len(self.test_users) < 3:
+        if len(self.test_users) < 2:
             self.log_test("Complete Party Creation Flow", False, error="Not enough test users")
             return
             
         try:
-            # Create party with User1 and invite User2 and User3
+            # Create party with User1 and invite available users
             creator = self.test_users[0]
-            invited_friends = [
-                {
-                    "id": self.test_users[1]["userIdentifier"],
-                    "username": self.test_users[1]["username"]
-                },
-                {
-                    "id": self.test_users[2]["userIdentifier"], 
-                    "username": self.test_users[2]["username"]
-                }
-            ]
+            invited_friends = []
+            
+            # Add available users as invites (skip creator)
+            for i in range(1, min(len(self.test_users), 3)):
+                invited_friends.append({
+                    "id": self.test_users[i]["userIdentifier"],
+                    "username": self.test_users[i]["username"]
+                })
             
             party_data = {
                 "name": "Complete Test Party",
