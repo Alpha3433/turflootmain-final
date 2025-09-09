@@ -66,29 +66,33 @@ def test_party_creation_and_invitation_system():
         test_results["failed_tests"] += 1
         test_results["test_details"].append(f"❌ API Health Check - ERROR ({e})")
     
-    # Test 2: Friends List Data Format - Guest User (Should return empty)
-    print("\n2️⃣ FRIENDS LIST DATA FORMAT - GUEST USER")
+    # Test 2: Party Invite Retrieval Endpoint
+    print("\n2️⃣ PARTY INVITE RETRIEVAL ENDPOINT")
     test_results["total_tests"] += 1
     try:
-        response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier=guest", timeout=10)
+        test_user = "test_party_recipient"
+        response = requests.get(f"{API_BASE}/party?type=invites&userIdentifier={test_user}", timeout=10)
         if response.status_code == 200:
             data = response.json()
-            if data.get("success") and isinstance(data.get("friends"), list):
-                print(f"✅ Guest user friends list: {len(data['friends'])} friends (expected: 0)")
+            if data.get("success") is not None and isinstance(data.get("invites"), list):
+                print(f"✅ Party invite retrieval working: {len(data['invites'])} invites found")
+                print(f"   Response structure: success={data.get('success')}, count={data.get('count')}")
                 test_results["passed_tests"] += 1
-                test_results["test_details"].append("✅ Guest Friends List Format - PASSED")
+                test_results["test_details"].append("✅ Party Invite Retrieval - PASSED")
             else:
-                print(f"❌ Invalid friends list format for guest: {data}")
+                print(f"❌ Invalid party invite response format: {data}")
                 test_results["failed_tests"] += 1
-                test_results["test_details"].append("❌ Guest Friends List Format - FAILED")
+                test_results["test_details"].append("❌ Party Invite Retrieval - FAILED (invalid format)")
         else:
-            print(f"❌ Friends list request failed: {response.status_code}")
+            print(f"❌ Party invite retrieval failed: {response.status_code}")
             test_results["failed_tests"] += 1
-            test_results["test_details"].append(f"❌ Guest Friends List Format - FAILED ({response.status_code})")
+            test_results["test_details"].append(f"❌ Party Invite Retrieval - FAILED ({response.status_code})")
+            test_results["critical_issues"].append("Party invite retrieval endpoint not working")
     except Exception as e:
-        print(f"❌ Friends list request error: {e}")
+        print(f"❌ Party invite retrieval error: {e}")
         test_results["failed_tests"] += 1
-        test_results["test_details"].append(f"❌ Guest Friends List Format - ERROR ({e})")
+        test_results["test_details"].append(f"❌ Party Invite Retrieval - ERROR ({e})")
+        test_results["critical_issues"].append("Party invite retrieval endpoint error")
     
     # Test 3: Create Test Friendship Data and Verify Transformation
     print("\n3️⃣ CREATE TEST FRIENDSHIP DATA AND VERIFY TRANSFORMATION")
