@@ -6186,7 +6186,7 @@ export default function TurfLootTactical() {
               {/* Content */}
               <div style={{ padding: '24px' }}>
                 
-                {/* Add Friend Form */}
+                {/* TurfLoot Users List */}
                 <div style={{
                   marginBottom: '24px'
                 }}>
@@ -6196,69 +6196,178 @@ export default function TurfLootTactical() {
                     fontSize: '14px',
                     fontWeight: '600',
                     textTransform: 'uppercase',
-                    marginBottom: '8px',
+                    marginBottom: '12px',
                     letterSpacing: '0.05em'
                   }}>
-                    Friend's Username or Email
+                    TurfLoot Users ({availableUsers.length} Available)
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Enter username or email address"
-                    style={{
-                      width: '100%',
-                      padding: '16px',
-                      background: 'rgba(26, 32, 44, 0.8)',
-                      border: '2px solid rgba(104, 211, 145, 0.3)',
-                      borderRadius: '8px',
-                      color: '#e2e8f0',
-                      fontSize: '16px',
-                      fontFamily: '"Rajdhani", sans-serif',
-                      outline: 'none',
-                      transition: 'all 0.3s ease',
-                      boxSizing: 'border-box'
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = '#68d391'
-                      e.target.style.boxShadow = '0 0 0 3px rgba(104, 211, 145, 0.1)'
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(104, 211, 145, 0.3)'
-                      e.target.style.boxShadow = 'none'
-                    }}
-                  />
-                </div>
-
-                {/* Instructions */}
-                <div style={{
-                  padding: '16px',
-                  background: 'rgba(59, 130, 246, 0.1)',
-                  border: '1px solid rgba(59, 130, 246, 0.3)',
-                  borderRadius: '8px',
-                  marginBottom: '24px'
-                }}>
+                  
                   <div style={{
-                    color: '#3b82f6',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    border: '2px solid rgba(104, 211, 145, 0.3)',
+                    borderRadius: '8px',
+                    background: 'rgba(26, 32, 44, 0.8)'
                   }}>
-                    💡 HOW TO ADD FRIENDS
+                    {loadingUsers ? (
+                      <div style={{
+                        padding: '20px',
+                        textAlign: 'center',
+                        color: '#a0aec0',
+                        fontSize: '14px'
+                      }}>
+                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏳</div>
+                        Loading TurfLoot users...
+                      </div>
+                    ) : availableUsers.length > 0 ? (
+                      <div style={{ padding: '8px' }}>
+                        {availableUsers.map((user, index) => (
+                          <div key={user.username} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            margin: '4px 0',
+                            background: 'rgba(45, 55, 72, 0.6)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(104, 211, 145, 0.2)',
+                            transition: 'all 0.3s ease'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              {/* Status Indicator */}
+                              <div style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                background: user.status === 'online' ? '#22c55e' : 
+                                           user.status === 'in-game' ? '#f59e0b' : '#6b7280',
+                                boxShadow: user.status === 'online' ? '0 0 8px rgba(34, 197, 94, 0.6)' :
+                                          user.status === 'in-game' ? '0 0 8px rgba(245, 158, 11, 0.6)' : 'none'
+                              }} />
+                              
+                              {/* User Info */}
+                              <div>
+                                <div style={{
+                                  color: '#e2e8f0',
+                                  fontSize: '16px',
+                                  fontWeight: '600',
+                                  marginBottom: '2px'
+                                }}>
+                                  {user.username}
+                                </div>
+                                <div style={{
+                                  color: user.status === 'online' ? '#22c55e' : 
+                                        user.status === 'in-game' ? '#f59e0b' : '#6b7280',
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  textTransform: 'uppercase',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px'
+                                }}>
+                                  {user.status === 'online' ? '🟢 ONLINE' :
+                                   user.status === 'in-game' ? '🎮 IN GAME' : '⚫ OFFLINE'}
+                                  <span style={{ color: '#a0aec0', fontSize: '11px' }}>
+                                    • {user.gamesPlayed} games
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Add Friend Button */}
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const userIdentifier = isAuthenticated ? 
+                                    (user?.wallet?.address || user?.email?.address || user?.id) : 
+                                    'guest'
+                                  
+                                  if (userIdentifier === 'guest') {
+                                    alert('Please log in to add friends')
+                                    return
+                                  }
+                                  
+                                  const response = await fetch('/api/friends', {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                      action: 'send_request',
+                                      userIdentifier,
+                                      friendUsername: user.username,
+                                      friendIdentifier: null
+                                    })
+                                  })
+                                  
+                                  const result = await response.json()
+                                  
+                                  if (result.success) {
+                                    alert(`✅ Friend request sent to ${user.username}!`)
+                                    console.log('✅ Friend request sent successfully:', result)
+                                    
+                                    // Refresh available users and friend requests
+                                    loadAvailableUsers()
+                                    if (isFriendsModalOpen) {
+                                      loadFriendRequests()
+                                    }
+                                  } else {
+                                    alert(`❌ Failed to send friend request: ${result.error}`)
+                                    console.error('❌ Friend request failed:', result.error)
+                                  }
+                                  
+                                } catch (error) {
+                                  console.error('❌ Error sending friend request:', error)
+                                  alert('❌ Failed to send friend request. Please try again.')
+                                }
+                              }}
+                              style={{
+                                background: 'rgba(104, 211, 145, 0.2)',
+                                border: '2px solid #68d391',
+                                borderRadius: '6px',
+                                color: '#68d391',
+                                padding: '8px 16px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.05em',
+                                transition: 'all 0.3s ease',
+                                minWidth: '80px'
+                              }}
+                              onMouseOver={(e) => {
+                                e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                                e.target.style.transform = 'translateY(-1px)'
+                                e.target.parentElement.parentElement.style.background = 'rgba(45, 55, 72, 0.8)'
+                                e.target.parentElement.parentElement.style.borderColor = 'rgba(104, 211, 145, 0.4)'
+                              }}
+                              onMouseOut={(e) => {
+                                e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                                e.target.style.transform = 'translateY(0)'
+                                e.target.parentElement.parentElement.style.background = 'rgba(45, 55, 72, 0.6)'
+                                e.target.parentElement.parentElement.style.borderColor = 'rgba(104, 211, 145, 0.2)'
+                              }}
+                            >
+                              👤 ADD
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{
+                        padding: '20px',
+                        textAlign: 'center',
+                        color: '#a0aec0',
+                        fontSize: '14px'
+                      }}>
+                        <div style={{ fontSize: '32px', marginBottom: '8px', opacity: 0.6 }}>👥</div>
+                        <div style={{ marginBottom: '4px' }}>No users available to add</div>
+                        <div style={{ fontSize: '12px', opacity: 0.7 }}>
+                          All TurfLoot users are already your friends!
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <ul style={{
-                    color: '#a0aec0',
-                    fontSize: '12px',
-                    margin: 0,
-                    paddingLeft: '16px',
-                    lineHeight: '1.5'
-                  }}>
-                    <li>Enter their exact username or email address</li>
-                    <li>Make sure they have a TurfLoot account</li>
-                    <li>They'll receive a friend request notification</li>
-                    <li>Once accepted, you can invite them to parties</li>
-                  </ul>
                 </div>
 
                 {/* Action Buttons */}
