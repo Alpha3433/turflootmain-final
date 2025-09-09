@@ -1710,7 +1710,7 @@ export default function TurfLootTactical() {
     return popup
   }
 
-  const createSkinStorePopup = (currentCurrency, setCurrencyCallback, selectedSkinData, setSelectedSkinCallback) => {
+  const createSkinStorePopup = (currentCurrency, setCurrencyCallback, selectedSkinData, setSelectedSkinCallback, defaultTab = 'owned') => {
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
 
