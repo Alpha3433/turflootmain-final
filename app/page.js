@@ -1851,7 +1851,7 @@ export default function TurfLootTactical() {
     popup.appendChild(modal)
 
     // Add interactivity
-    let currentCategory = 'all'
+    let currentCategory = defaultTab // Use the passed defaultTab parameter
     
     // Rarity colors
     const rarityColors = {
