@@ -1126,6 +1126,15 @@ export default function TurfLootTactical() {
     try {
       console.log('💰 DEPOSIT button clicked - starting authentication flow')
       
+      // Check if Privy is available
+      if (!window.__TURFLOOT_PRIVY__) {
+        console.error('❌ Privy not available')
+        alert('❌ Wallet system not ready. Please refresh the page and try again.')
+        return
+      }
+      
+      const privy = window.__TURFLOOT_PRIVY__
+      
       // Check if user is already authenticated
       if (privy.authenticated && privy.user) {
         console.log('✅ User already authenticated, proceeding to deposit...')
@@ -1146,13 +1155,16 @@ export default function TurfLootTactical() {
       console.log('⏳ Waiting for Privy state to update after authentication...')
       await new Promise(resolve => setTimeout(resolve, 1000))
       
+      // Get fresh Privy state after authentication
+      const freshPrivy = window.__TURFLOOT_PRIVY__
+      
       // Double-check authentication state
-      if (!privy.authenticated || !privy.user) {
+      if (!freshPrivy.authenticated || !freshPrivy.user) {
         console.error('❌ Authentication completed but user state not updated')
         console.error('❌ Current Privy state:', {
-          authenticated: privy.authenticated,
-          hasUser: !!privy.user,
-          ready: privy.ready
+          authenticated: freshPrivy.authenticated,
+          hasUser: !!freshPrivy.user,
+          ready: freshPrivy.ready
         })
         alert('❌ Authentication completed but user state not ready. Please try the deposit again.')
         return
@@ -1171,6 +1183,9 @@ export default function TurfLootTactical() {
   const proceedWithDeposit = async () => {
     try {
       console.log('✅ Starting deposit process for authenticated user...')
+      
+      // Get fresh Privy instance
+      const privy = window.__TURFLOOT_PRIVY__
       
       // COMPREHENSIVE DEBUGGING - LOG EVERYTHING
       console.log('🔍 FULL PRIVY OBJECT:', privy)
@@ -1230,9 +1245,9 @@ export default function TurfLootTactical() {
           // Wait for wallet creation to fully complete
           await new Promise(resolve => setTimeout(resolve, 2000))
           
-          // Refresh user data after wallet creation
-          console.log('🔄 Refreshing user data after wallet creation...')
-          wallet = privy.user.wallet
+          // Get fresh Privy state after wallet creation
+          const freshPrivy = window.__TURFLOOT_PRIVY__
+          wallet = freshPrivy.user.wallet
           console.log('🔍 WALLET AFTER CREATION:', wallet)
           
         } catch (createError) {
