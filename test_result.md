@@ -117,13 +117,13 @@ test_plan:
   test_priority: "high_first"
 
 backend:
-  - task: "Fix User Profile Modal Authentication Bug"
+  - task: "AddFriendModal Backend API Integration"
     implemented: true
     working: true
-    file: "/app/app/page.js"
+    file: "/app/app/api/friends/route.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
         - agent: "main"
