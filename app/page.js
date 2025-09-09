@@ -4738,9 +4738,62 @@ export default function TurfLootTactical() {
             <h3 style={{ color: '#fc8181', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(252, 129, 129, 0.6)', textTransform: 'uppercase' }}>PARTY</h3>
             <div style={{ marginLeft: 'auto' }}>
               <button 
-                onClick={() => {
-                  // Refresh friends list logic
-                  setActiveFriends(Math.floor(Math.random() * 5)) // Simulate refreshing with random count
+                onClick={async () => {
+                  console.log('🔄 PARTY REFRESH button clicked - refreshing lobby data...')
+                  
+                  try {
+                    // Show loading state
+                    setLoadingParty(true)
+                    
+                    console.log('🔄 Step 1: Refreshing current party data...')
+                    await loadCurrentParty()
+                    
+                    console.log('🔄 Step 2: Refreshing friends list with updated skin data...')
+                    await loadFriendsList()
+                    
+                    console.log('🔄 Step 3: Refreshing friend requests and party invites...')
+                    await loadFriendRequests()
+                    
+                    console.log('🔄 Step 4: Refreshing available users list...')
+                    await loadAvailableUsers()
+                    
+                    // Force re-register user to update skin data
+                    if (isAuthenticated && user) {
+                      console.log('🔄 Step 5: Updating user skin data...')
+                      await registerPrivyUser()
+                    }
+                    
+                    console.log('✅ PARTY REFRESH completed successfully!')
+                    
+                    // Show success feedback
+                    const successMessage = currentParty 
+                      ? `🎯 Party "${currentParty.name}" refreshed - ${currentParty.members?.length || 0} member${currentParty.members?.length !== 1 ? 's' : ''} online`
+                      : '👥 Lobby refreshed - Party data updated'
+                    
+                    // Brief success indicator
+                    const originalText = document.querySelector('[data-refresh-text]')?.textContent
+                    const refreshButton = document.querySelector('[data-refresh-text]')
+                    if (refreshButton) {
+                      refreshButton.textContent = '✅ REFRESHED'
+                      setTimeout(() => {
+                        refreshButton.textContent = originalText || '[↻] REFRESH'
+                      }, 2000)
+                    }
+                    
+                  } catch (error) {
+                    console.error('❌ PARTY REFRESH failed:', error)
+                    
+                    // Show error feedback
+                    const refreshButton = document.querySelector('[data-refresh-text]')
+                    if (refreshButton) {
+                      refreshButton.textContent = '❌ FAILED'
+                      setTimeout(() => {
+                        refreshButton.textContent = '[↻] REFRESH'
+                      }, 2000)
+                    }
+                  } finally {
+                    setLoadingParty(false)
+                  }
                 }}
                 style={{ 
                   fontSize: '11px', 
@@ -4763,7 +4816,7 @@ export default function TurfLootTactical() {
                   e.target.style.boxShadow = 'none'
                 }}
               >
-                [↻] REFRESH
+                <span data-refresh-text>[↻] REFRESH</span>
               </button>
             </div>
           </div>
