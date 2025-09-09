@@ -182,6 +182,27 @@ async function handleCreatePartyAndInvite(userIdentifier, partyData, invitedFrie
     
     // Send party invites to friends
     const invitePromises = invitedFriends.map(async (friend) => {
+      console.log('🔍 Debug: Processing friend invite for:', friend)
+      
+      // Validate friend exists in database
+      let friendUser = await db.collection('users').findOne({ userIdentifier: friend.id })
+      
+      if (!friendUser) {
+        // Try flexible lookup for friend as well
+        friendUser = await db.collection('users').findOne({
+          $or: [
+            { userIdentifier: friend.id },
+            { email: friend.id },
+            { walletAddress: friend.id }
+          ]
+        })
+      }
+      
+      if (!friendUser) {
+        console.log(`⚠️ Warning: Friend ${friend.username} (${friend.id}) not found in database, skipping invite`)
+        return
+      }
+      
       const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       
       const partyInvite = {
@@ -190,19 +211,19 @@ async function handleCreatePartyAndInvite(userIdentifier, partyData, invitedFrie
         partyId: partyId,
         partyName: partyData.name,
         fromUserIdentifier: userIdentifier,
-        fromUsername: user.username,
+        fromUsername: user.username || user.displayName || 'Unknown User',
         toUserIdentifier: friend.id,
-        toUsername: friend.username,
+        toUsername: friend.username || friendUser.username || friendUser.displayName || 'Unknown Friend',
         sentAt: timestamp,
         status: 'pending',
         privacy: partyData.privacy,
         maxPlayers: partyData.maxPlayers
       }
       
-      // Store in party_invites collection (or reuse friend_requests with type field)
+      // Store in party_invites collection
       await db.collection('party_invites').insertOne(partyInvite)
       
-      console.log(`📤 Party invite sent to ${friend.username}`)
+      console.log(`📤 Party invite sent to ${friend.username} (${friend.id})`)
     })
     
     await Promise.all(invitePromises)
