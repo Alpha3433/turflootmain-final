@@ -5646,7 +5646,7 @@ export default function TurfLootTactical() {
                       textTransform: 'uppercase',
                       letterSpacing: '0.1em'
                     }}>
-                      FRIENDS
+                      SOCIAL
                     </h2>
                     <p style={{
                       margin: '4px 0 0 0',
@@ -5655,7 +5655,7 @@ export default function TurfLootTactical() {
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em'
                     }}>
-                      TACTICAL NETWORK
+                      CONNECT & PLAY
                     </p>
                   </div>
                 </div>
