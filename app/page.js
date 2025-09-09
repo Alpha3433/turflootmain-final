@@ -2856,33 +2856,31 @@ export default function TurfLootTactical() {
       const partiesList = modal.querySelector('#parties-list')
       
       try {
-        // Fetch live dynamic parties from API
-        const response = await fetch('/api/parties/live')
-        const liveParties = await response.json()
-        
-        if (!liveParties.success) {
-          console.warn('Failed to fetch live parties:', liveParties.error)
-          // Show empty state if API call fails
-          showEmptyState()
-          return
-        }
-        
-        // Filter parties based on current tab
+        // Determine current tab
         const currentTab = modal.querySelector('.party-type-tab[style*="68d391"]')?.dataset?.type || 'public'
-        const filteredParties = liveParties.parties?.filter(party => 
-          currentTab === 'public' ? party.privacy === 'public' : party.privacy === 'private'
-        ) || []
         
-        if (filteredParties.length === 0) {
+        // Fetch parties from API based on current tab
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party?type=${currentTab}`)
+        const partiesData = await response.json()
+        
+        if (!partiesData.success) {
+          console.warn('Failed to fetch parties:', partiesData.error)
           showEmptyState()
           return
         }
         
-        // Render live parties
-        renderParties(filteredParties)
+        const parties = partiesData.parties || []
+        
+        if (parties.length === 0) {
+          showEmptyState()
+          return
+        }
+        
+        // Render parties
+        renderParties(parties)
         
       } catch (error) {
-        console.error('Error fetching live parties:', error)
+        console.error('Error fetching parties:', error)
         showEmptyState()
       }
     }
