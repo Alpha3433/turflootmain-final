@@ -7983,6 +7983,103 @@ export default function TurfLootTactical() {
                 >
                   <span data-mobile-refresh-text>↻</span>
                 </button>
+                
+                {/* Mobile Leave Party Button - Only show when in a party */}
+                {currentParty && (
+                  <button 
+                    onClick={async () => {
+                      console.log('🚪 Mobile LEAVE PARTY button clicked!')
+                      
+                      try {
+                        if (!isAuthenticated || !user) {
+                          console.log('❌ User not authenticated for leaving party')
+                          return
+                        }
+                        
+                        const userIdentifier = user.wallet?.address || user.email || user.id
+                        console.log('🚪 Mobile leaving party for user:', userIdentifier)
+                        
+                        // Show loading feedback
+                        const leaveButton = document.querySelector('[data-mobile-leave-text]')
+                        if (leaveButton) {
+                          leaveButton.textContent = '⏳'
+                        }
+                        
+                        // API call to leave party
+                        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party`, {
+                          method: 'DELETE',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            userIdentifier: userIdentifier,
+                            partyId: currentParty.id
+                          })
+                        })
+                        
+                        if (response.ok) {
+                          console.log('✅ Mobile successfully left party!')
+                          
+                          // Clear current party state
+                          setCurrentParty(null)
+                          
+                          // Show success feedback
+                          if (leaveButton) {
+                            leaveButton.textContent = '✅'
+                            setTimeout(() => {
+                              leaveButton.textContent = '✕'
+                            }, 1500)
+                          }
+                          
+                          // Refresh party data
+                          await loadCurrentParty()
+                          
+                        } else {
+                          console.error('❌ Mobile failed to leave party:', response.status)
+                          if (leaveButton) {
+                            leaveButton.textContent = '❌'
+                            setTimeout(() => {
+                              leaveButton.textContent = '✕'
+                            }, 1500)
+                          }
+                        }
+                        
+                      } catch (error) {
+                        console.error('❌ Mobile error leaving party:', error)
+                        const leaveButton = document.querySelector('[data-mobile-leave-text]')
+                        if (leaveButton) {
+                          leaveButton.textContent = '❌'
+                          setTimeout(() => {
+                            leaveButton.textContent = '✕'
+                          }, 1500)
+                        }
+                      }
+                    }}
+                    style={{ 
+                      fontSize: '9px', 
+                      color: '#fc8181', 
+                      background: 'none', 
+                      border: 'none', 
+                      cursor: 'pointer', 
+                      fontWeight: '600', 
+                      fontFamily: '"Rajdhani", sans-serif',
+                      padding: '1px 3px',
+                      borderRadius: '2px',
+                      transition: 'all 0.2s ease',
+                      marginLeft: '4px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(252, 129, 129, 0.1)'
+                      e.target.style.boxShadow = '0 0 3px rgba(252, 129, 129, 0.3)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'none'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  >
+                    <span data-mobile-leave-text>✕</span>
+                  </button>
+                )}
               </div>
             </div>
             
