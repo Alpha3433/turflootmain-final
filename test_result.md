@@ -108,9 +108,10 @@ user_problem_statement: "Complete AddFriendModal Enhancement: The AddFriendModal
 
 test_plan:
   current_focus:
-    - "Test Hold E to Cash Out Progress Bar Fix"
-    - "Verify Cash Out Progress Animation Works"
-    - "Confirm Cash Out Success Popup Functionality"
+    - "Test AddFriendModal Backend API"
+    - "Verify User List Loading from /api/friends?type=users"
+    - "Test Friend Request Sending Functionality"
+    - "Verify Available Users Filtering Logic"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
