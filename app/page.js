@@ -480,7 +480,9 @@ export default function TurfLootTactical() {
           authenticated: privyState.authenticated,
           hasUser: !!privyState.user,
           userEmail: privyState.user?.email?.address,
-          userWallet: privyState.user?.wallet?.address?.slice(0, 8) + '...'
+          userWallet: privyState.user?.wallet?.address?.slice(0, 8) + '...',
+          userId: privyState.user?.id,
+          userKeys: privyState.user ? Object.keys(privyState.user) : []
         })
         
         // Only update state if Privy is ready to avoid false negatives
@@ -498,10 +500,14 @@ export default function TurfLootTactical() {
           })
           
           setUser(prevUser => {
-            const prevUserId = prevUser?.id
-            const newUserId = newUser?.id
-            if (prevUserId !== newUserId) {
-              console.log('👤 User state changed:', prevUserId, '->', newUserId)
+            // Check if user object has meaningful changes
+            const prevUserStr = JSON.stringify(prevUser)
+            const newUserStr = JSON.stringify(newUser)
+            if (prevUserStr !== newUserStr) {
+              console.log('👤 User state changed:', {
+                prev: prevUser ? { id: prevUser.id, wallet: prevUser.wallet?.address } : null,
+                new: newUser ? { id: newUser.id, wallet: newUser.wallet?.address } : null
+              })
               return newUser
             }
             return prevUser
