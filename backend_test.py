@@ -680,18 +680,39 @@ class AddFriendModalBackendTester:
             
         return False
 
-    def test_api_response_format(self):
-        """Test that API responses match expected format for frontend"""
+    def test_api_response_format_consistency(self):
+        """Test that API responses match expected format for frontend integration"""
         print("🔍 TESTING: API Response Format Consistency")
         try:
+            format_issues = []
+            
             # Test user list response format
             response1 = requests.get(f"{API_BASE}/friends?type=users&userIdentifier=test_user", timeout=10)
             
-            # Test friend request response format
+            if response1.status_code == 200:
+                data1 = response1.json()
+                if 'success' not in data1:
+                    format_issues.append("User list response missing 'success' field")
+                if 'users' not in data1:
+                    format_issues.append("User list response missing 'users' field")
+                if 'count' not in data1:
+                    format_issues.append("User list response missing 'count' field")
+            else:
+                format_issues.append(f"User list request failed: {response1.status_code}")
+            
+            # Test user registration response format
+            test_user_id = f"privy_format_test_{int(time.time())}"
+            user_data = {
+                "username": f"FormatTest_{int(time.time())}",
+                "displayName": f"Format Test User",
+                "email": f"format{int(time.time())}@example.com",
+                "walletAddress": f"0x{hex(int(time.time()))[2:].zfill(40)}"
+            }
+            
             payload = {
-                "action": "send_request",
-                "userIdentifier": "test_user_format_123",
-                "friendUsername": "StealthWarrior"
+                "action": "register_user",
+                "userIdentifier": test_user_id,
+                "userData": user_data
             }
             
             response2 = requests.post(
@@ -701,50 +722,51 @@ class AddFriendModalBackendTester:
                 timeout=10
             )
             
-            format_issues = []
-            
-            # Validate user list response
-            if response1.status_code == 200:
-                data1 = response1.json()
-                if 'success' not in data1:
-                    format_issues.append("User list response missing 'success' field")
-                if 'users' not in data1:
-                    format_issues.append("User list response missing 'users' field")
-            else:
-                format_issues.append(f"User list request failed: {response1.status_code}")
-            
-            # Validate friend request response
             if response2.status_code == 200:
                 data2 = response2.json()
                 if 'success' not in data2:
-                    format_issues.append("Friend request response missing 'success' field")
+                    format_issues.append("User registration response missing 'success' field")
                 if 'message' not in data2:
-                    format_issues.append("Friend request response missing 'message' field")
+                    format_issues.append("User registration response missing 'message' field")
             else:
-                # This might be expected if it's a duplicate, check error format
-                if response2.status_code == 400:
-                    data2 = response2.json()
-                    if 'error' not in data2:
-                        format_issues.append("Error response missing 'error' field")
-                else:
-                    format_issues.append(f"Friend request failed unexpectedly: {response2.status_code}")
+                format_issues.append(f"User registration failed: {response2.status_code}")
+            
+            # Test invalid request error format
+            invalid_payload = {
+                "action": "invalid_action",
+                "userIdentifier": "test_user"
+            }
+            
+            response3 = requests.post(
+                f"{API_BASE}/friends", 
+                json=invalid_payload,
+                headers={'Content-Type': 'application/json'},
+                timeout=10
+            )
+            
+            if response3.status_code >= 400:
+                data3 = response3.json()
+                if 'error' not in data3:
+                    format_issues.append("Error response missing 'error' field")
+            else:
+                format_issues.append("Invalid request should return error status")
             
             if len(format_issues) == 0:
                 self.log_test(
-                    "API Response Format", 
+                    "API Response Format Consistency", 
                     True, 
                     "All API responses have consistent format matching frontend expectations"
                 )
                 return True
             else:
                 self.log_test(
-                    "API Response Format", 
+                    "API Response Format Consistency", 
                     False, 
                     f"Format issues: {'; '.join(format_issues)}"
                 )
                 
         except Exception as e:
-            self.log_test("API Response Format", False, f"Request failed: {str(e)}")
+            self.log_test("API Response Format Consistency", False, f"Request failed: {str(e)}")
             
         return False
 
