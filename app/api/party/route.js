@@ -87,7 +87,7 @@ export async function POST(request) {
         return await handleCreatePartyAndInvite(userIdentifier, partyData, invitedFriends)
       
       case 'accept_invite':
-        return await handleAcceptPartyInvite(userIdentifier, request.body.inviteId, request.body.partyId)
+        return await handleAcceptPartyInvite(userIdentifier, inviteId, partyId)
       
       default:
         return NextResponse.json(
