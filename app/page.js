@@ -6323,14 +6323,28 @@ export default function TurfLootTactical() {
                             <button
                               onClick={async () => {
                                 try {
+                                  console.log('🔍 Friend request debug:', {
+                                    isAuthenticated,
+                                    user: user ? {
+                                      id: user.id,
+                                      wallet: user.wallet?.address,
+                                      email: user.email?.address
+                                    } : null
+                                  })
+                                  
                                   const userIdentifier = isAuthenticated ? 
                                     (user?.wallet?.address || user?.email?.address || user?.id) : 
                                     'guest'
                                   
-                                  if (userIdentifier === 'guest') {
+                                  console.log('🔍 Computed userIdentifier:', userIdentifier)
+                                  
+                                  if (!isAuthenticated || userIdentifier === 'guest' || !userIdentifier) {
                                     alert('Please log in to add friends')
                                     return
                                   }
+                                  
+                                  // Ensure current user is registered in database
+                                  await registerPrivyUser()
                                   
                                   const response = await fetch('/api/friends', {
                                     method: 'POST',
