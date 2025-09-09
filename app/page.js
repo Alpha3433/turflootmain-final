@@ -3335,8 +3335,14 @@ export default function TurfLootTactical() {
       const result = await createPartyAndSendInvites(partyData, selectedFriends)
       
       if (result && result.success) {
-        // Show success confirmation to sender
-        alert(`🎯 Party "${partyData.name}" created successfully! Invites sent to ${selectedFriends.length} friend${selectedFriends.length !== 1 ? 's' : ''}.`)
+        // Show different success messages based on party type and invites
+        if (selectedPrivacy === 'public' && selectedFriends.length === 0) {
+          alert(`🎯 Public party "${partyData.name}" created successfully! Other players can now find and join your party.`)
+        } else if (selectedFriends.length > 0) {
+          alert(`🎯 Party "${partyData.name}" created successfully! Invites sent to ${selectedFriends.length} friend${selectedFriends.length !== 1 ? 's' : ''}.`)
+        } else {
+          alert(`🎯 Party "${partyData.name}" created successfully!`)
+        }
       }
       
       popup.remove()
