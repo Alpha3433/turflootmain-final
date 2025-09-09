@@ -7943,13 +7943,21 @@ export default function TurfLootTactical() {
             <button 
               style={{
                 ...secondaryButtonStyle,
-                background: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid #3b82f6',
-                color: '#3b82f6',
+                background: (currentParty && currentParty.members && currentParty.members.length > 1) ? 'rgba(107, 114, 128, 0.3)' : 'rgba(59, 130, 246, 0.1)',
+                border: (currentParty && currentParty.members && currentParty.members.length > 1) ? '1px solid #6b7280' : '1px solid #3b82f6',
+                color: (currentParty && currentParty.members && currentParty.members.length > 1) ? '#9ca3af' : '#3b82f6',
                 fontSize: '10px',
-                padding: '8px 12px'
+                padding: '8px 12px',
+                cursor: (currentParty && currentParty.members && currentParty.members.length > 1) ? 'not-allowed' : 'pointer',
+                opacity: (currentParty && currentParty.members && currentParty.members.length > 1) ? 0.6 : 1
               }}
-              onClick={() => {
+              onClick={(e) => {
+                if (currentParty && currentParty.members && currentParty.members.length > 1) {
+                  console.log('🔒 MOBILE LOCAL PRACTICE blocked - user is in a duo')
+                  e.preventDefault()
+                  return
+                }
+                
                 console.log('🤖 MOBILE LOCAL PRACTICE button clicked!')
                 setIsLoadingLocalPractice(true)
                 
@@ -7962,8 +7970,45 @@ export default function TurfLootTactical() {
                   window.location.href = gameUrl
                 }, 500)
               }}
+              onMouseOver={(e) => {
+                if (currentParty && currentParty.members && currentParty.members.length > 1) {
+                  // Show tooltip for disabled state on mobile
+                  const tooltip = document.createElement('div')
+                  tooltip.id = 'mobile-local-practice-tooltip'
+                  tooltip.textContent = 'Local Practice is only available for solo players. Leave your party to play offline with bots.'
+                  tooltip.style.cssText = `
+                    position: absolute;
+                    background: rgba(0, 0, 0, 0.9);
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    font-size: 11px;
+                    font-weight: 500;
+                    max-width: 200px;
+                    z-index: 10000;
+                    pointer-events: none;
+                    border: 1px solid #374151;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                  `
+                  
+                  // Position tooltip above the button (mobile optimized)
+                  const rect = e.target.getBoundingClientRect()
+                  tooltip.style.left = `${Math.max(10, rect.left)}px`
+                  tooltip.style.top = `${rect.top - 70}px`
+                  
+                  document.body.appendChild(tooltip)
+                }
+              }}
+              onMouseOut={(e) => {
+                // Remove mobile tooltip
+                const tooltip = document.getElementById('mobile-local-practice-tooltip')
+                if (tooltip) {
+                  tooltip.remove()
+                }
+              }}
+              disabled={currentParty && currentParty.members && currentParty.members.length > 1}
             >
-              {isLoadingLocalPractice ? '⏳ LOADING...' : '🤖 LOCAL BOTS'}
+              {isLoadingLocalPractice ? '⏳ LOADING...' : ((currentParty && currentParty.members && currentParty.members.length > 1) ? '🔒 LOCAL BOTS' : '🤖 LOCAL BOTS')}
             </button>
             <button 
               style={{
