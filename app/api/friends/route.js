@@ -12,7 +12,7 @@ async function connectToDatabase() {
 
   const client = new MongoClient(process.env.MONGO_URL)
   await client.connect()
-  const db = client.db('turfloot')
+  const db = client.db(process.env.DB_NAME || 'turfloot_db')
 
   cachedClient = client
   cachedDb = db
