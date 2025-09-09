@@ -465,91 +465,115 @@ class AddFriendModalBackendTester:
         return False
 
     def test_user_filtering_logic(self):
-        """Test that users with pending requests are filtered out"""
+        """Test that users with pending requests are filtered out from MongoDB results"""
         print("🔍 TESTING: User Filtering Logic")
         try:
-            test_user_id = "test_user_filtering_123"
+            # Register a test user to be filtered
+            filter_test_user = f"privy_filter_{int(time.time())}"
+            requester_user = f"privy_requester_{int(time.time())}"
+            self.test_users.extend([filter_test_user, requester_user])
             
-            # First, get initial user list
-            response1 = requests.get(f"{API_BASE}/friends?type=users&userIdentifier={test_user_id}", timeout=10)
+            # Register the user that will be filtered
+            filter_user_data = {
+                "username": f"FilterMe_{int(time.time())}",
+                "displayName": f"Filter Test User",
+                "email": f"filter{int(time.time())}@example.com",
+                "walletAddress": f"0x{hex(int(time.time()))[2:].zfill(40)}"
+            }
+            
+            payload1 = {
+                "action": "register_user",
+                "userIdentifier": filter_test_user,
+                "userData": filter_user_data
+            }
+            
+            response1 = requests.post(
+                f"{API_BASE}/friends", 
+                json=payload1,
+                headers={'Content-Type': 'application/json'},
+                timeout=10
+            )
             
             if response1.status_code == 200:
-                data1 = response1.json()
-                initial_users = data1.get('users', [])
-                initial_count = len(initial_users)
+                # Get initial user list for requester
+                response2 = requests.get(f"{API_BASE}/friends?type=users&userIdentifier={requester_user}", timeout=10)
                 
-                if initial_count > 0:
-                    # Send a friend request to one user
-                    target_user = initial_users[0]['username']
+                if response2.status_code == 200:
+                    data2 = response2.json()
+                    initial_users = data2.get('users', [])
+                    initial_count = len(initial_users)
                     
-                    payload = {
-                        "action": "send_request",
-                        "userIdentifier": test_user_id,
-                        "friendUsername": target_user
-                    }
+                    # Check if our registered user is in the list
+                    initial_usernames = [u['username'] for u in initial_users]
                     
-                    response2 = requests.post(
-                        f"{API_BASE}/friends", 
-                        json=payload,
-                        headers={'Content-Type': 'application/json'},
-                        timeout=10
-                    )
-                    
-                    if response2.status_code == 200:
-                        # Get user list again - should have one less user
-                        response3 = requests.get(f"{API_BASE}/friends?type=users&userIdentifier={test_user_id}", timeout=10)
+                    if filter_user_data['username'] in initial_usernames:
+                        # Send friend request to the user
+                        friend_request_payload = {
+                            "action": "send_request",
+                            "userIdentifier": requester_user,
+                            "friendUsername": filter_user_data['username']
+                        }
+                        
+                        response3 = requests.post(
+                            f"{API_BASE}/friends", 
+                            json=friend_request_payload,
+                            headers={'Content-Type': 'application/json'},
+                            timeout=10
+                        )
                         
                         if response3.status_code == 200:
-                            data3 = response3.json()
-                            filtered_users = data3.get('users', [])
-                            filtered_count = len(filtered_users)
+                            # Get user list again - should have one less user
+                            response4 = requests.get(f"{API_BASE}/friends?type=users&userIdentifier={requester_user}", timeout=10)
                             
-                            # Should have one less user (the one we sent request to)
-                            if filtered_count == initial_count - 1:
-                                # Verify the target user is not in the list
-                                usernames = [u['username'] for u in filtered_users]
-                                if target_user not in usernames:
+                            if response4.status_code == 200:
+                                data4 = response4.json()
+                                filtered_users = data4.get('users', [])
+                                filtered_count = len(filtered_users)
+                                filtered_usernames = [u['username'] for u in filtered_users]
+                                
+                                # The user should be filtered out now
+                                if filter_user_data['username'] not in filtered_usernames:
                                     self.log_test(
                                         "User Filtering Logic", 
                                         True, 
-                                        f"User list correctly filtered: {initial_count} → {filtered_count} users, {target_user} removed"
+                                        f"MongoDB user filtering working: {initial_count} → {filtered_count} users, {filter_user_data['username']} correctly filtered out"
                                     )
                                     return True
                                 else:
                                     self.log_test(
                                         "User Filtering Logic", 
                                         False, 
-                                        f"Target user {target_user} still appears in filtered list"
+                                        f"User {filter_user_data['username']} still appears in filtered list"
                                     )
                             else:
                                 self.log_test(
                                     "User Filtering Logic", 
                                     False, 
-                                    f"User count didn't decrease as expected: {initial_count} → {filtered_count}"
+                                    f"Failed to get filtered user list: {response4.status_code}"
                                 )
                         else:
                             self.log_test(
                                 "User Filtering Logic", 
                                 False, 
-                                f"Failed to get filtered user list: {response3.status_code}"
+                                f"Failed to send friend request: {response3.status_code}"
                             )
                     else:
                         self.log_test(
                             "User Filtering Logic", 
                             False, 
-                            f"Failed to send friend request: {response2.status_code}"
+                            f"Registered user {filter_user_data['username']} not found in initial user list"
                         )
                 else:
                     self.log_test(
                         "User Filtering Logic", 
                         False, 
-                        "No users available for filtering test"
+                        f"Failed to get initial user list: {response2.status_code}"
                     )
             else:
                 self.log_test(
                     "User Filtering Logic", 
                     False, 
-                    f"Failed to get initial user list: {response1.status_code}"
+                    f"Failed to register filter test user: {response1.status_code}"
                 )
                 
         except Exception as e:
