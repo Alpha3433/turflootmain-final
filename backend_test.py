@@ -57,10 +57,10 @@ class FriendsSystemTester:
             }
         ]
         
-    def log_test(self, test_name, success, details="", response_data=None):
-        """Log test results with detailed information"""
+    def log_test(self, test_name, passed, details="", error_msg=""):
+        """Log test results"""
         self.total_tests += 1
-        if success:
+        if passed:
             self.passed_tests += 1
             status = "✅ PASSED"
         else:
@@ -68,18 +68,19 @@ class FriendsSystemTester:
             status = "❌ FAILED"
             
         result = {
-            'test': test_name,
-            'status': status,
-            'details': details,
-            'response_data': response_data,
-            'timestamp': datetime.now().isoformat()
+            "test": test_name,
+            "status": status,
+            "details": details,
+            "error": error_msg,
+            "timestamp": datetime.now().isoformat()
         }
+        
         self.test_results.append(result)
         print(f"{status}: {test_name}")
         if details:
             print(f"   Details: {details}")
-        if response_data and not success:
-            print(f"   Response: {json.dumps(response_data, indent=2)}")
+        if error_msg:
+            print(f"   Error: {error_msg}")
         print()
 
     def test_api_health_check(self):
