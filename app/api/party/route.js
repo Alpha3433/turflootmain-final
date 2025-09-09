@@ -86,6 +86,9 @@ export async function POST(request) {
       case 'create_and_invite':
         return await handleCreatePartyAndInvite(userIdentifier, partyData, invitedFriends)
       
+      case 'accept_invite':
+        return await handleAcceptPartyInvite(userIdentifier, request.body.inviteId, request.body.partyId)
+      
       default:
         return NextResponse.json(
           { error: 'Invalid action' },
