@@ -7567,10 +7567,44 @@ export default function TurfLootTactical() {
             </button>
           </div>
 
-          {/* Arsenal Panel */}
+          {/* Arsenal Panel - Enhanced with Desktop Features */}
           <div style={ambrerPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>WALLET</h3>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+                <button 
+                  onClick={handleCopyAddress}
+                  style={{ 
+                    fontSize: '8px', 
+                    color: '#f6ad55', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textDecoration: 'none',
+                    padding: '0'
+                  }}
+                >
+                  📋
+                </button>
+                <button 
+                  onClick={handleBalanceRefresh}
+                  style={{ 
+                    fontSize: '8px', 
+                    color: '#f6ad55', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textDecoration: 'none',
+                    padding: '0'
+                  }}
+                >
+                  ↻
+                </button>
+              </div>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
