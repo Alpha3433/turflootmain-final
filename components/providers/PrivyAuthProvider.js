@@ -90,16 +90,18 @@ function PrivyBridge({ children }) {
           }
         },
         fundWallet: async (wallet, options) => {
-          console.log('💰 Bridge fundWallet called - executing Privy fund wallet')
+          console.log('💰 Bridge fundWallet called - executing Privy Solana fund wallet')
           try {
             if (typeof fundWallet === 'function') {
+              // Call fundWallet specifically for Solana deposits
+              console.log('🔗 Calling Privy fundWallet for Solana deposits...')
               return await fundWallet(wallet, options)
             } else {
               console.error('❌ Privy fundWallet is not a function:', typeof fundWallet)
-              throw new Error('Privy fundWallet function not available')
+              throw new Error('Privy Solana fundWallet function not available')
             }
           } catch (error) {
-            console.error('❌ Bridge fundWallet error:', error)
+            console.error('❌ Bridge Solana fundWallet error:', error)
             throw error
           }
         },
