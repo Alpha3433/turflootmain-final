@@ -270,7 +270,7 @@ class SkinAvatarSystemTester:
         
         # Create a party with skin-enabled users
         party_data = {
-            "name": "Skin Avatar Test Party",
+            "name": "Avatar Display Party",
             "privacy": "public",
             "maxPlayers": 4
         }
