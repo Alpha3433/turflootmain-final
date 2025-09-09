@@ -596,7 +596,10 @@ async function handleCancelFriendRequest(userIdentifier, requestId) {
     // Find and remove the friend request from database
     const result = await db.collection('friend_requests').deleteOne({
       id: requestId,
-      fromUserIdentifier: userIdentifier,
+      $or: [
+        { fromUserIdentifier: userIdentifier },
+        { fromUserId: userIdentifier }
+      ],
       status: 'pending'
     })
     
