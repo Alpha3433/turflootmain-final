@@ -6253,6 +6253,7 @@ export default function TurfLootTactical() {
                                     if (result.success) {
                                       alert(`🎯 Joined party "${request.partyName}"!`)
                                       loadFriendRequests()
+                                      loadCurrentParty() // Refresh party status
                                     } else {
                                       alert(`❌ Failed to join party: ${result.error}`)
                                     }
