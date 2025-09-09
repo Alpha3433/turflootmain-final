@@ -629,3 +629,104 @@ async function handleCleanupTestParties() {
     )
   }
 }
+
+async function handleJoinParty(userIdentifier, partyId) {
+  try {
+    console.log('🚀 Handling join party request:', { userIdentifier, partyId })
+    
+    if (!partyId) {
+      return NextResponse.json(
+        { error: 'Party ID is required' },
+        { status: 400 }
+      )
+    }
+    
+    const { db } = await connectToDatabase()
+    
+    // Find the party
+    const party = await db.collection('parties').findOne({ id: partyId })
+    
+    if (!party) {
+      return NextResponse.json(
+        { error: 'Party not found' },
+        { status: 404 }
+      )
+    }
+    
+    // Check if party is still active and accepting members
+    if (party.status !== 'waiting') {
+      return NextResponse.json(
+        { error: 'Party is no longer accepting new members' },
+        { status: 400 }
+      )
+    }
+    
+    // Check if party is full
+    if (party.currentPlayers.length >= party.maxPlayers) {
+      return NextResponse.json(
+        { error: 'Party is full' },
+        { status: 400 }
+      )
+    }
+    
+    // Check if user is already in the party
+    if (party.currentPlayers.includes(userIdentifier)) {
+      return NextResponse.json(
+        { error: 'You are already in this party' },
+        { status: 400 }
+      )
+    }
+    
+    // Add user to the party
+    await db.collection('parties').updateOne(
+      { id: partyId },
+      { $push: { currentPlayers: userIdentifier } }
+    )
+    
+    // Get updated party with member details
+    const updatedParty = await db.collection('parties').findOne({ id: partyId })
+    
+    // Get member details for the response
+    const memberUsers = await db.collection('users').find({
+      userIdentifier: { $in: updatedParty.currentPlayers }
+    }).toArray()
+    
+    const partyWithMembers = {
+      id: updatedParty.id,
+      name: updatedParty.name,
+      privacy: updatedParty.privacy,
+      maxPlayers: updatedParty.maxPlayers,
+      currentPlayerCount: updatedParty.currentPlayers.length,
+      members: memberUsers.map(member => ({
+        userIdentifier: member.userIdentifier,
+        username: member.username || member.displayName || 'Unknown User',
+        isOnline: member.isOnline || true, // Assume online when joining
+        equippedSkin: member.equippedSkin || {
+          type: 'circle',
+          color: '#3b82f6',
+          pattern: 'solid'
+        }
+      }))
+    }
+    
+    console.log('✅ User successfully joined party:', {
+      userIdentifier,
+      partyId,
+      partyName: party.name,
+      newMemberCount: updatedParty.currentPlayers.length
+    })
+    
+    return NextResponse.json({
+      success: true,
+      message: `Successfully joined "${party.name}"`,
+      party: partyWithMembers
+    })
+    
+  } catch (error) {
+    console.error('❌ Error joining party:', error)
+    return NextResponse.json(
+      { error: 'Failed to join party' },
+      { status: 500 }
+    )
+  }
+}
