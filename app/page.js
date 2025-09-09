@@ -1979,20 +1979,54 @@ export default function TurfLootTactical() {
           const currentSkinPreview = modal.querySelector('#current-skin-preview')
           const currentSkinName = modal.querySelector('#current-skin-name')
           
-          // Update preview with actual character appearance
-          currentSkinPreview.style.background = skin.color
-          currentSkinPreview.innerHTML = `
-            <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; left: 16px; top: 20px;"></div>
-            <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; right: 16px; top: 20px;"></div>
-          `
-          currentSkinName.textContent = skin.name
+          // Only update preview elements if they exist
+          if (currentSkinPreview) {
+            currentSkinPreview.style.background = skin.color
+            currentSkinPreview.innerHTML = `
+              <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; left: 16px; top: 20px;"></div>
+              <div style="position: absolute; width: 6px; height: 6px; background: #000000; border-radius: 50%; right: 16px; top: 20px;"></div>
+            `
+          }
           
-          // Update landing page preview circle
+          if (currentSkinName) {
+            currentSkinName.textContent = skin.name
+          }
+          
+          // Update landing page preview circle and state
           setSelectedSkinCallback({
             id: skin.id,
             name: skin.name,
-            color: skin.color
+            color: skin.color,
+            type: skin.type || 'circle',
+            pattern: skin.pattern || 'solid'
           })
+          
+          // Update the selected skin state
+          setSelectedSkin({
+            id: skin.id,
+            name: skin.name,
+            color: skin.color,
+            type: skin.type || 'circle',
+            pattern: skin.pattern || 'solid'
+          })
+          
+          console.log('✅ Skin equipped successfully:', {
+            skinId: skin.id,
+            skinName: skin.name,
+            skinColor: skin.color
+          })
+          
+          // Visual feedback for successful equip
+          btn.textContent = 'EQUIPPED!'
+          btn.style.background = 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)'
+          btn.style.borderColor = '#22c55e'
+          
+          // Reset button text after 2 seconds
+          setTimeout(() => {
+            btn.textContent = 'EQUIP'
+            btn.style.background = 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)'
+            btn.style.borderColor = '#f6ad55'
+          }, 2000)
           
           // Save to localStorage for persistence across sessions
           localStorage.setItem('selectedSkin', JSON.stringify({
