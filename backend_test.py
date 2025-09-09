@@ -19,26 +19,50 @@ class SkinAvatarSystemTester:
         self.test_results = []
         self.test_users = []
         self.created_parties = []
-        self.created_invites = []
+        self.created_friendships = []
         
-    def log_test(self, test_name, success, details="", error=""):
-        """Log test results"""
+    def log_test(self, test_name: str, passed: bool, details: str = ""):
+        """Log test result"""
+        status = "✅ PASSED" if passed else "❌ FAILED"
         result = {
             "test": test_name,
-            "success": success,
+            "status": status,
+            "passed": passed,
             "details": details,
-            "error": error,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": time.strftime("%H:%M:%S")
         }
         self.test_results.append(result)
-        
-        status = "✅ PASSED" if success else "❌ FAILED"
         print(f"{status}: {test_name}")
         if details:
             print(f"   Details: {details}")
-        if error:
-            print(f"   Error: {error}")
-        print()
+        return passed
+
+    def make_request(self, method: str, endpoint: str, data: Dict = None, params: Dict = None) -> Optional[Dict]:
+        """Make HTTP request with error handling"""
+        try:
+            url = f"{API_BASE}/{endpoint.lstrip('/')}"
+            
+            if method.upper() == "GET":
+                response = requests.get(url, params=params, timeout=10)
+            elif method.upper() == "POST":
+                response = requests.post(url, json=data, timeout=10)
+            else:
+                raise ValueError(f"Unsupported method: {method}")
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"⚠️ Request failed: {method} {url} - Status: {response.status_code}")
+                try:
+                    error_data = response.json()
+                    print(f"   Error: {error_data}")
+                    return {"error": error_data, "status_code": response.status_code}
+                except:
+                    return {"error": response.text, "status_code": response.status_code}
+                    
+        except Exception as e:
+            print(f"❌ Request exception: {method} {endpoint} - {str(e)}")
+            return {"error": str(e)}
 
     def test_api_health(self):
         """Test basic API connectivity"""
