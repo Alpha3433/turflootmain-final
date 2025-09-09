@@ -198,34 +198,6 @@ export default function PrivyAuthProvider({ children }) {
     mfa: {
       noPromptOnMfaRequired: false,
     },
-    // Configure Solana-only support
-    supportedChains: [
-      {
-        id: 101, // Solana mainnet
-        name: 'Solana',
-        network: 'mainnet-beta',
-        nativeCurrency: {
-          name: 'Solana',
-          symbol: 'SOL',
-          decimals: 9,
-        },
-        rpcUrls: {
-          default: {
-            http: ['https://api.mainnet-beta.solana.com'],
-          },
-        },
-        blockExplorers: {
-          default: {
-            name: 'Solscan',
-            url: 'https://solscan.io',
-          },
-        },
-      }
-    ],
-    defaultChain: {
-      id: 101,
-      name: 'Solana',
-    },
   }
 
   return (
