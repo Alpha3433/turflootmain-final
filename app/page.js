@@ -5678,8 +5678,8 @@ export default function TurfLootTactical() {
                   </button>
                   <button
                     onClick={() => {
-                      // Handle create party
-                      console.log('Create Party clicked')
+                      console.log('🎯 Opening Create Party modal')
+                      setIsCreatePartyModalOpen(true)
                     }}
                     style={{
                       background: 'rgba(59, 130, 246, 0.2)',
