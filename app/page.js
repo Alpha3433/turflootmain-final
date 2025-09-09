@@ -325,9 +325,9 @@ export default function TurfLootTactical() {
       if (result.success) {
         console.log('✅ Party created and invites sent successfully')
         
-        // Update UI to show party status - you could update state here
-        // For now, let's reload the friends list to refresh any status
+        // Update UI to show party status
         await loadFriendsList()
+        await loadCurrentParty() // Refresh party status
         
         return { success: true, result }
       } else {
