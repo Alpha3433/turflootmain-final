@@ -7567,37 +7567,158 @@ export default function TurfLootTactical() {
             </div>
           </div>
 
-          {/* Squad Panel */}
+          {/* Squad Panel - Dynamic Party Display */}
           <div style={tacticalPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
                 ...iconStyle, 
-                background: 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)', 
+                background: currentParty ? 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)' : 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)', 
                 color: '#ffffff',
-                boxShadow: '0 0 15px rgba(252, 129, 129, 0.6)',
-                border: '1px solid #fc8181'
+                boxShadow: currentParty ? '0 0 15px rgba(104, 211, 145, 0.6)' : '0 0 15px rgba(252, 129, 129, 0.6)',
+                border: currentParty ? '1px solid #68d391' : '1px solid #fc8181'
               }}>👥</div>
-              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>SQUAD</h3>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>
+                {currentParty ? 'PARTY' : 'SQUAD'}
+              </h3>
             </div>
             
-            <div style={{ textAlign: 'center', padding: '16px 0' }}>
-              <div style={{
-                width: '32px',
-                height: '32px',
-                background: 'rgba(26, 32, 44, 0.8)',
-                border: '1px solid #68d391',
-                borderRadius: '3px',
-                margin: '0 auto 8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '14px',
-                boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)'
-              }}>
-                👤
+            {currentParty ? (
+              // Show current party members - mobile version
+              <div style={{ padding: '12px 0' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  marginBottom: '8px'
+                }}>
+                  <div style={{
+                    color: '#68d391',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textAlign: 'center'
+                  }}>
+                    {currentParty.name}
+                  </div>
+                  <div style={{
+                    padding: '1px 4px',
+                    background: 'rgba(104, 211, 145, 0.2)',
+                    border: '1px solid #68d391',
+                    borderRadius: '2px',
+                    fontSize: '8px',
+                    color: '#68d391',
+                    textTransform: 'uppercase',
+                    fontFamily: '"Rajdhani", sans-serif'
+                  }}>
+                    {currentParty.privacy}
+                  </div>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  marginBottom: '6px'
+                }}>
+                  {currentParty.members?.slice(0, 3).map((member, index) => (
+                    <div key={member.userIdentifier} style={getSkinAvatarStyle(member.equippedSkin, 24, member.isOnline)}>
+                      {/* Mobile skin inner content */}
+                      <div style={{ 
+                        width: '60%', 
+                        height: '60%', 
+                        borderRadius: '50%', 
+                        background: 'rgba(255, 255, 255, 0.2)' 
+                      }} />
+                      
+                      {/* Mobile online status dot */}
+                      {member.isOnline && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '-1px',
+                          right: '-1px',
+                          width: '6px',
+                          height: '6px',
+                          background: '#22c55e',
+                          borderRadius: '50%',
+                          border: '1px solid rgba(26, 32, 44, 1)',
+                          boxShadow: '0 0 3px rgba(34, 197, 94, 0.6)'
+                        }} />
+                      )}
+                    </div>
+                  ))}
+                  {currentParty.members?.length > 3 && (
+                    <div style={{
+                      width: '24px',
+                      height: '24px',
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '1px solid #68d391',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '8px',
+                      color: '#68d391',
+                      fontWeight: 'bold',
+                      fontFamily: '"Rajdhani", sans-serif'
+                    }}>
+                      +{currentParty.members.length - 3}
+                    </div>
+                  )}
+                </div>
+                
+                <div style={{
+                  textAlign: 'center',
+                  color: '#a0aec0',
+                  fontSize: '9px',
+                  fontFamily: '"Rajdhani", sans-serif'
+                }}>
+                  {currentParty.members?.length} member{currentParty.members?.length !== 1 ? 's' : ''}
+                </div>
               </div>
-              <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>NO SQUAD</div>
-            </div>
+            ) : loadingParty ? (
+              // Loading state - mobile
+              <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  background: 'rgba(26, 32, 44, 0.8)',
+                  border: '1px solid #68d391',
+                  borderRadius: '3px',
+                  margin: '0 auto 8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
+                  animation: 'pulse 2s infinite'
+                }}>
+                  🔄
+                </div>
+                <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>LOADING...</div>
+              </div>
+            ) : (
+              // No party state - mobile
+              <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  background: 'rgba(26, 32, 44, 0.8)',
+                  border: '1px solid #68d391',
+                  borderRadius: '3px',
+                  margin: '0 auto 8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)'
+                }}>
+                  👤
+                </div>
+                <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>NO SQUAD</div>
+              </div>
+            )}
             
             <button style={{
               width: '100%',
