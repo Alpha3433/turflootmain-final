@@ -516,17 +516,39 @@ async function handleCancelFriendRequest(userIdentifier, requestId) {
 async function handleRemoveFriend(userIdentifier, friendIdentifier) {
   console.log('🗑️ Removing friend:', { userIdentifier, friendIdentifier })
   
-  const userFriends = mockFriends.get(userIdentifier) || []
-  const updatedUserFriends = userFriends.filter(f => f.id !== friendIdentifier)
-  mockFriends.set(userIdentifier, updatedUserFriends)
-  
-  // Also remove from the friend's list
-  const friendFriends = mockFriends.get(friendIdentifier) || []
-  const updatedFriendFriends = friendFriends.filter(f => f.id !== userIdentifier)
-  mockFriends.set(friendIdentifier, updatedFriendFriends)
-  
-  return NextResponse.json({
-    success: true,
-    message: 'Friend removed successfully'
-  })
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Remove friendship records for both users
+    const result1 = await db.collection('friends').deleteOne({
+      userIdentifier: userIdentifier,
+      friendUserIdentifier: friendIdentifier
+    })
+    
+    const result2 = await db.collection('friends').deleteOne({
+      userIdentifier: friendIdentifier,
+      friendUserIdentifier: userIdentifier
+    })
+    
+    if (result1.deletedCount === 0 && result2.deletedCount === 0) {
+      return NextResponse.json(
+        { error: 'Friendship not found' },
+        { status: 404 }
+      )
+    }
+    
+    console.log('✅ Friendship removed from database')
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Friend removed successfully'
+    })
+    
+  } catch (error) {
+    console.error('❌ Error removing friend:', error)
+    return NextResponse.json(
+      { error: 'Failed to remove friend' },
+      { status: 500 }
+    )
+  }
 }
