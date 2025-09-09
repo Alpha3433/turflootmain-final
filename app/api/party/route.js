@@ -28,6 +28,56 @@ export async function GET(request) {
     
     console.log('🎯 Party GET request:', { userIdentifier, requestType })
     
+    if (requestType === 'public') {
+      // Get all public parties that are waiting for players - no auth required
+      const { db } = await connectToDatabase()
+      
+      const publicParties = await db.collection('parties').find({
+        privacy: 'public',
+        status: 'waiting',
+        $expr: { $lt: [{ $size: "$currentPlayers" }, "$maxPlayers"] } // Party not full
+      }).toArray()
+      
+      // Get party details with member information
+      const partiesWithDetails = await Promise.all(
+        publicParties.map(async (party) => {
+          // Get member details
+          const memberUsers = await db.collection('users').find({
+            userIdentifier: { $in: party.currentPlayers }
+          }).toArray()
+          
+          return {
+            id: party.id,
+            name: party.name,
+            privacy: party.privacy,
+            maxPlayers: party.maxPlayers,
+            currentPlayerCount: party.currentPlayers.length,
+            createdBy: party.createdBy,
+            createdByUsername: party.createdByUsername,
+            createdAt: party.createdAt,
+            members: memberUsers.map(member => ({
+              userIdentifier: member.userIdentifier,
+              username: member.username || member.displayName || 'Unknown User',
+              isOnline: member.isOnline || false,
+              equippedSkin: member.equippedSkin || {
+                type: 'circle',
+                color: '#3b82f6',
+                pattern: 'solid'
+              }
+            }))
+          }
+        })
+      )
+      
+      console.log('✅ Public parties retrieved:', partiesWithDetails.length, 'parties')
+      
+      return NextResponse.json({
+        success: true,
+        parties: partiesWithDetails,
+        count: partiesWithDetails.length
+      })
+    }
+    
     if (!userIdentifier || userIdentifier === 'guest') {
       return NextResponse.json({
         success: true,
