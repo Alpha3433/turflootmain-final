@@ -195,6 +195,8 @@ export default function TurfLootTactical() {
   const [loadingFriends, setLoadingFriends] = useState(false)
   const [friendRequests, setFriendRequests] = useState({ sent: [], received: [] })
   const [loadingRequests, setLoadingRequests] = useState(false)
+  const [currentParty, setCurrentParty] = useState(null)
+  const [loadingParty, setLoadingParty] = useState(false)
   const [availableUsers, setAvailableUsers] = useState([])
   const [loadingUsers, setLoadingUsers] = useState(false)
 
