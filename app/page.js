@@ -2859,8 +2859,19 @@ export default function TurfLootTactical() {
         // Determine current tab
         const currentTab = modal.querySelector('.party-type-tab[style*="68d391"]')?.dataset?.type || 'public'
         
+        // Build API URL based on current tab
+        let apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/party?type=${currentTab}`
+        
+        // For friends parties, we need to pass the user identifier
+        if (currentTab === 'friends' && isAuthenticated && user) {
+          const userIdentifier = user.wallet?.address || user.email || user.id
+          apiUrl += `&userIdentifier=${userIdentifier}`
+        }
+        
+        console.log('🔍 Fetching parties from:', apiUrl)
+        
         // Fetch parties from API based on current tab
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party?type=${currentTab}`)
+        const response = await fetch(apiUrl)
         const partiesData = await response.json()
         
         if (!partiesData.success) {
@@ -2870,6 +2881,7 @@ export default function TurfLootTactical() {
         }
         
         const parties = partiesData.parties || []
+        console.log(`✅ Loaded ${parties.length} ${currentTab} parties:`, parties)
         
         if (parties.length === 0) {
           showEmptyState()
