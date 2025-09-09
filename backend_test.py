@@ -771,11 +771,18 @@ class AddFriendModalBackendTester:
         return False
 
     def run_comprehensive_tests(self):
-        """Run all AddFriendModal backend tests"""
-        print("🚀 STARTING COMPREHENSIVE ADDFRIENDMODAL BACKEND API TESTING")
+        """Run all updated AddFriendModal backend tests for real Privy user system"""
+        print("🚀 STARTING COMPREHENSIVE UPDATED ADDFRIENDMODAL BACKEND API TESTING")
         print("=" * 80)
+        print("🔄 TESTING: Transition from Demo Data to Real Privy Users with MongoDB")
         print(f"Testing against: {BASE_URL}")
         print(f"API Base URL: {API_BASE}")
+        print("=" * 80)
+        print("📋 KEY CHANGES BEING TESTED:")
+        print("   • Removed demo users - getDemoUsers() function removed")
+        print("   • Added MongoDB integration - stores/retrieves actual Privy users")
+        print("   • Added user registration - POST endpoint for Privy user registration")
+        print("   • Updated user filtering - getPrivyUsers() queries 'users' collection")
         print("=" * 80)
         print()
         
