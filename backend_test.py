@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for TurfLoot Friends List Data Transformation
-Testing the friends list API response format to ensure friend names appear correctly.
+Backend Testing Suite for TurfLoot Party Creation and Invitation System
+Testing the party creation, invitation sending, and retrieval functionality.
 
-CRITICAL FIX BEING TESTED:
-- Transform database records from `friendUsername` to `username` field
-- Map `friendUserIdentifier` to `id` field  
-- Include all necessary fields (status, isOnline, etc.) for frontend display
+CRITICAL TESTING FOCUS:
+1. Party Creation Flow - POST /api/party with action=create_and_invite
+2. Party Invite Retrieval - GET /api/party?type=invites&userIdentifier=test_user
+3. Data Flow Validation - complete flow from creation to retrieval
+4. Database Collection Structure - verify 'parties' and 'party_invites' collections
 
 TESTING REQUIREMENTS:
-1. Friends List Data Format - GET /api/friends?type=friends returns properly transformed data
-2. Data Structure Validation - verify response includes `username` field (not `friendUsername`)
-3. Field Mapping - confirm `id` field mapping from `friendUserIdentifier`
-4. Frontend Compatibility - ensure transformed data matches what frontend expects
+1. Party creation creates proper database records
+2. Party invites are stored with correct recipient identifiers
+3. Party invites can be retrieved by recipients
+4. No data structure mismatches between sender and recipient
 """
 
 import requests
