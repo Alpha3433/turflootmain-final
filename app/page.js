@@ -7522,7 +7522,7 @@ export default function TurfLootTactical() {
 
         {/* Mobile Panels Grid */}
         <div style={mobileGridStyle}>
-          {/* Command Panel */}
+          {/* Command Panel - Enhanced Leaderboard */}
           <div style={tacticalPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <div style={{ 
@@ -7532,38 +7532,58 @@ export default function TurfLootTactical() {
                 boxShadow: '0 0 15px rgba(246, 173, 85, 0.6)',
                 border: '1px solid #f6ad55'
               }}>🎯</div>
-              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>SERVER BROWSER</h3>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LEADERBOARD</h3>
+              <div style={{ marginLeft: 'auto' }}>
+                <div style={{
+                  padding: '2px 4px',
+                  background: 'rgba(104, 211, 145, 0.2)',
+                  color: '#68d391',
+                  fontSize: '8px',
+                  borderRadius: '2px',
+                  border: '1px solid #68d391',
+                  fontWeight: '600',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}>
+                  LIVE
+                </div>
+              </div>
             </div>
             
             <div style={{ marginBottom: '12px', fontSize: '11px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.2)' }}>
-                <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>ALPHA_STRIKE</span>
-                <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>$6.5K</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(104, 211, 145, 0.2)' }}>
-                <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>VIPER_UNIT</span>
-                <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>$5.2K</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
-                <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>GHOST_OPS</span>
-                <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>$4.7K</span>
-              </div>
+              {leaderboard.slice(0, 3).map((player, index) => (
+                <div key={player.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: index < 2 ? '1px solid rgba(104, 211, 145, 0.2)' : 'none' }}>
+                  <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
+                    {String(index + 1).padStart(2, '0')}. {player.name}
+                  </span>
+                  <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>
+                    ${player.cashout.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+              {leaderboard.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '12px 0', color: '#68d391', fontSize: '10px', fontFamily: '"Rajdhani", sans-serif' }}>
+                  LOADING LEADERBOARD...
+                </div>
+              )}
             </div>
             
-            <button style={{
-              width: '100%',
-              padding: '8px',
-              background: 'rgba(26, 32, 44, 0.8)',
-              border: '1px solid #68d391',
-              borderRadius: '3px',
-              color: '#68d391',
-              fontSize: '10px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Rajdhani", sans-serif',
-              textTransform: 'uppercase'
-            }}>
-              FULL INTEL
+            <button 
+              onClick={() => createDesktopLeaderboardPopup()}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(26, 32, 44, 0.8)',
+                border: '1px solid #68d391',
+                borderRadius: '3px',
+                color: '#68d391',
+                fontSize: '10px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
+              }}>
+              VIEW LEADERBOARD
             </button>
           </div>
 
