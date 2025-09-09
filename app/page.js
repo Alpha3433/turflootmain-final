@@ -5620,30 +5620,103 @@ export default function TurfLootTactical() {
                       fontSize: '12px',
                       textTransform: 'uppercase'
                     }}>
-                      0 ONLINE
+                      {friendsList.filter(f => f.isOnline && f.status === 'accepted').length} ONLINE
                     </span>
                   </div>
                   
-                  <div style={{
-                    padding: '32px 20px',
-                    textAlign: 'center',
-                    color: '#a0aec0',
-                    fontSize: '14px'
-                  }}>
-                    <div style={{ 
-                      fontSize: '48px', 
-                      marginBottom: '12px',
-                      opacity: 0.5 
+                  {loadingFriends ? (
+                    <div style={{
+                      padding: '20px',
+                      textAlign: 'center',
+                      color: '#a0aec0',
+                      fontSize: '14px'
                     }}>
-                      👥
+                      <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏳</div>
+                      Loading friends...
                     </div>
-                    <div style={{ marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
-                      No friends online
+                  ) : friendsList.filter(f => f.isOnline && f.status === 'accepted').length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {friendsList.filter(f => f.isOnline && f.status === 'accepted').map((friend) => (
+                        <div key={friend.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '12px',
+                          background: 'rgba(26, 32, 44, 0.5)',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(104, 211, 145, 0.2)'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{
+                              width: '10px',
+                              height: '10px',
+                              borderRadius: '50%',
+                              background: '#22c55e',
+                              boxShadow: '0 0 8px rgba(34, 197, 94, 0.6)'
+                            }} />
+                            <div>
+                              <div style={{ 
+                                color: '#e2e8f0', 
+                                fontSize: '14px', 
+                                fontWeight: '600' 
+                              }}>
+                                {friend.username}
+                              </div>
+                              <div style={{ 
+                                color: '#22c55e', 
+                                fontSize: '12px', 
+                                fontWeight: '500' 
+                              }}>
+                                🟢 ONLINE
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              onClick={() => {
+                                console.log('Inviting friend to party:', friend.username)
+                                alert(`🎯 Party invite sent to ${friend.username}!`)
+                              }}
+                              style={{
+                                background: 'rgba(59, 130, 246, 0.2)',
+                                border: '1px solid #3b82f6',
+                                borderRadius: '4px',
+                                color: '#3b82f6',
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                textTransform: 'uppercase'
+                              }}
+                            >
+                              INVITE
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div style={{ fontSize: '12px', opacity: 0.7 }}>
-                      Add friends to see them here when they're playing
+                  ) : (
+                    <div style={{
+                      padding: '32px 20px',
+                      textAlign: 'center',
+                      color: '#a0aec0',
+                      fontSize: '14px'
+                    }}>
+                      <div style={{ 
+                        fontSize: '48px', 
+                        marginBottom: '12px',
+                        opacity: 0.5 
+                      }}>
+                        👥
+                      </div>
+                      <div style={{ marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
+                        No friends online
+                      </div>
+                      <div style={{ fontSize: '12px', opacity: 0.7 }}>
+                        Add friends to see them here when they're playing
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* All Friends */}
