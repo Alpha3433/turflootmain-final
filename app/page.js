@@ -5517,10 +5517,10 @@ export default function TurfLootTactical() {
                 flex: 1,
                 overflowY: 'auto',
                 overflowX: 'hidden',
-                padding: '24px',
+                padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '20px'
+                gap: '16px'
               }}>
                 
                 {/* Quick Actions */}
@@ -5539,8 +5539,8 @@ export default function TurfLootTactical() {
                       border: '2px solid #68d391',
                       borderRadius: '8px',
                       color: '#68d391',
-                      padding: '12px 16px',
-                      fontSize: '14px',
+                      padding: '10px 14px',
+                      fontSize: '12px',
                       fontWeight: '600',
                       cursor: 'pointer',
                       textTransform: 'uppercase',
@@ -5568,8 +5568,8 @@ export default function TurfLootTactical() {
                       border: '2px solid #3b82f6',
                       borderRadius: '8px',
                       color: '#3b82f6',
-                      padding: '12px 16px',
-                      fontSize: '14px',
+                      padding: '10px 14px',
+                      fontSize: '12px',
                       fontWeight: '600',
                       cursor: 'pointer',
                       textTransform: 'uppercase',
@@ -5589,35 +5589,81 @@ export default function TurfLootTactical() {
                   </button>
                 </div>
 
-                {/* Online Friends */}
+                {/* Friend Requests Section */}
                 <div style={{
-                  padding: '20px',
+                  padding: '12px',
                   background: 'rgba(45, 55, 72, 0.5)',
-                  border: '1px solid rgba(104, 211, 145, 0.2)',
-                  borderRadius: '12px'
+                  border: '1px solid rgba(246, 173, 85, 0.3)',
+                  borderRadius: '8px'
                 }}>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '16px'
+                    marginBottom: '8px'
                   }}>
                     <h3 style={{
                       margin: 0,
-                      color: '#68d391',
-                      fontSize: '16px',
+                      color: '#f6ad55',
+                      fontSize: '14px',
                       fontWeight: '600',
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px'
+                      gap: '6px'
+                    }}>
+                      📬 FRIEND REQUESTS
+                    </h3>
+                    <span style={{
+                      color: '#a0aec0',
+                      fontSize: '11px',
+                      textTransform: 'uppercase'
+                    }}>
+                      0 PENDING
+                    </span>
+                  </div>
+                  
+                  <div style={{
+                    padding: '12px 8px',
+                    textAlign: 'center',
+                    color: '#a0aec0',
+                    fontSize: '12px'
+                  }}>
+                    <div style={{ fontSize: '20px', marginBottom: '4px', opacity: 0.6 }}>📤</div>
+                    <div style={{ fontSize: '11px' }}>No pending requests</div>
+                  </div>
+                </div>
+
+                {/* Online Friends - Compact */}
+                <div style={{
+                  padding: '12px',
+                  background: 'rgba(45, 55, 72, 0.5)',
+                  border: '1px solid rgba(104, 211, 145, 0.2)',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '8px'
+                  }}>
+                    <h3 style={{
+                      margin: 0,
+                      color: '#68d391',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
                     }}>
                       🟢 ONLINE FRIENDS
                     </h3>
                     <span style={{
                       color: '#a0aec0',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       textTransform: 'uppercase'
                     }}>
                       {friendsList.filter(f => f.isOnline && f.status === 'accepted').length} ONLINE
@@ -5626,181 +5672,208 @@ export default function TurfLootTactical() {
                   
                   {loadingFriends ? (
                     <div style={{
-                      padding: '20px',
+                      padding: '12px 8px',
                       textAlign: 'center',
                       color: '#a0aec0',
-                      fontSize: '14px'
+                      fontSize: '12px'
                     }}>
-                      <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏳</div>
-                      Loading friends...
+                      <div style={{ fontSize: '20px', marginBottom: '4px' }}>⏳</div>
+                      <div style={{ fontSize: '11px' }}>Loading...</div>
                     </div>
                   ) : friendsList.filter(f => f.isOnline && f.status === 'accepted').length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {friendsList.filter(f => f.isOnline && f.status === 'accepted').map((friend) => (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {friendsList.filter(f => f.isOnline && f.status === 'accepted').slice(0, 3).map((friend) => (
                         <div key={friend.id} style={{
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'space-between',
-                          padding: '12px',
+                          padding: '8px 10px',
                           background: 'rgba(26, 32, 44, 0.5)',
-                          borderRadius: '8px',
+                          borderRadius: '6px',
                           border: '1px solid rgba(104, 211, 145, 0.2)'
                         }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div style={{
-                              width: '10px',
-                              height: '10px',
+                              width: '8px',
+                              height: '8px',
                               borderRadius: '50%',
                               background: '#22c55e',
-                              boxShadow: '0 0 8px rgba(34, 197, 94, 0.6)'
+                              boxShadow: '0 0 6px rgba(34, 197, 94, 0.6)'
                             }} />
-                            <div>
-                              <div style={{ 
-                                color: '#e2e8f0', 
-                                fontSize: '14px', 
-                                fontWeight: '600' 
-                              }}>
-                                {friend.username}
-                              </div>
-                              <div style={{ 
-                                color: '#22c55e', 
-                                fontSize: '12px', 
-                                fontWeight: '500' 
-                              }}>
-                                🟢 ONLINE
-                              </div>
+                            <div style={{ 
+                              color: '#e2e8f0', 
+                              fontSize: '12px', 
+                              fontWeight: '600' 
+                            }}>
+                              {friend.username}
                             </div>
                           </div>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                              onClick={() => {
-                                console.log('Inviting friend to party:', friend.username)
-                                alert(`🎯 Party invite sent to ${friend.username}!`)
-                              }}
-                              style={{
-                                background: 'rgba(59, 130, 246, 0.2)',
-                                border: '1px solid #3b82f6',
-                                borderRadius: '4px',
-                                color: '#3b82f6',
-                                padding: '6px 12px',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                textTransform: 'uppercase'
-                              }}
-                            >
-                              INVITE
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => {
+                              console.log('Inviting friend to party:', friend.username)
+                              alert(`🎯 Party invite sent to ${friend.username}!`)
+                            }}
+                            style={{
+                              background: 'rgba(59, 130, 246, 0.2)',
+                              border: '1px solid #3b82f6',
+                              borderRadius: '4px',
+                              color: '#3b82f6',
+                              padding: '4px 8px',
+                              fontSize: '10px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              textTransform: 'uppercase'
+                            }}
+                          >
+                            INVITE
+                          </button>
                         </div>
                       ))}
+                      {friendsList.filter(f => f.isOnline && f.status === 'accepted').length > 3 && (
+                        <div style={{
+                          textAlign: 'center',
+                          color: '#a0aec0',
+                          fontSize: '11px',
+                          padding: '4px'
+                        }}>
+                          +{friendsList.filter(f => f.isOnline && f.status === 'accepted').length - 3} more online
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div style={{
-                      padding: '32px 20px',
+                      padding: '12px 8px',
                       textAlign: 'center',
                       color: '#a0aec0',
-                      fontSize: '14px'
+                      fontSize: '12px'
                     }}>
-                      <div style={{ 
-                        fontSize: '48px', 
-                        marginBottom: '12px',
-                        opacity: 0.5 
-                      }}>
-                        👥
-                      </div>
-                      <div style={{ marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
-                        No friends online
-                      </div>
-                      <div style={{ fontSize: '12px', opacity: 0.7 }}>
-                        Add friends to see them here when they're playing
-                      </div>
+                      <div style={{ fontSize: '20px', marginBottom: '4px', opacity: 0.6 }}>👥</div>
+                      <div style={{ fontSize: '11px' }}>No friends online</div>
                     </div>
                   )}
                 </div>
 
-                {/* All Friends */}
+                {/* All Friends - Compact */}
                 <div style={{
-                  padding: '20px',
+                  padding: '12px',
                   background: 'rgba(45, 55, 72, 0.5)',
                   border: '1px solid rgba(104, 211, 145, 0.2)',
-                  borderRadius: '12px'
+                  borderRadius: '8px'
                 }}>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '16px'
+                    marginBottom: '8px'
                   }}>
                     <h3 style={{
                       margin: 0,
                       color: '#9f7aea',
-                      fontSize: '16px',
+                      fontSize: '14px',
                       fontWeight: '600',
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px'
+                      gap: '6px'
                     }}>
                       👤 ALL FRIENDS
                     </h3>
                     <span style={{
                       color: '#a0aec0',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       textTransform: 'uppercase'
                     }}>
-                      0 TOTAL
+                      {friendsList.filter(f => f.status === 'accepted').length} TOTAL
                     </span>
                   </div>
                   
-                  <div style={{
-                    padding: '32px 20px',
-                    textAlign: 'center',
-                    color: '#a0aec0',
-                    fontSize: '14px'
-                  }}>
-                    <div style={{ 
-                      fontSize: '48px', 
-                      marginBottom: '12px',
-                      opacity: 0.5 
+                  {friendsList.filter(f => f.status === 'accepted').length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {friendsList.filter(f => f.status === 'accepted').slice(0, 3).map((friend) => (
+                        <div key={friend.id} style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 10px',
+                          background: 'rgba(26, 32, 44, 0.5)',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(159, 122, 234, 0.2)'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{
+                              width: '8px',
+                              height: '8px',
+                              borderRadius: '50%',
+                              background: friend.isOnline ? '#22c55e' : '#6b7280'
+                            }} />
+                            <div style={{ 
+                              color: friend.isOnline ? '#e2e8f0' : '#9ca3af', 
+                              fontSize: '12px', 
+                              fontWeight: '500' 
+                            }}>
+                              {friend.username}
+                            </div>
+                          </div>
+                          <div style={{
+                            color: friend.isOnline ? '#22c55e' : '#6b7280',
+                            fontSize: '10px',
+                            fontWeight: '500',
+                            textTransform: 'uppercase'
+                          }}>
+                            {friend.isOnline ? 'ONLINE' : 'OFFLINE'}
+                          </div>
+                        </div>
+                      ))}
+                      {friendsList.filter(f => f.status === 'accepted').length > 3 && (
+                        <div style={{
+                          textAlign: 'center',
+                          color: '#a0aec0',
+                          fontSize: '11px',
+                          padding: '4px'
+                        }}>
+                          +{friendsList.filter(f => f.status === 'accepted').length - 3} more friends
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{
+                      padding: '12px 8px',
+                      textAlign: 'center',
+                      color: '#a0aec0',
+                      fontSize: '12px'
                     }}>
-                      🤝
+                      <div style={{ fontSize: '20px', marginBottom: '4px', opacity: 0.6 }}>🤝</div>
+                      <div style={{ fontSize: '11px', marginBottom: '8px' }}>Your friends list is empty</div>
+                      <button
+                        onClick={() => {
+                          console.log('Add first friend clicked')
+                          setIsAddFriendModalOpen(true)
+                        }}
+                        style={{
+                          background: 'rgba(104, 211, 145, 0.2)',
+                          border: '1px solid #68d391',
+                          borderRadius: '4px',
+                          color: '#68d391',
+                          padding: '6px 12px',
+                          fontSize: '10px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                        }}
+                      >
+                        👤 ADD YOUR FIRST FRIEND
+                      </button>
                     </div>
-                    <div style={{ marginBottom: '8px', fontSize: '16px', fontWeight: '600' }}>
-                      Your friends list is empty
-                    </div>
-                    <div style={{ fontSize: '12px', opacity: 0.7, marginBottom: '16px' }}>
-                      Start building your tactical network by adding friends
-                    </div>
-                    <button
-                      onClick={() => {
-                        console.log('Add first friend clicked')
-                        setIsAddFriendModalOpen(true)
-                      }}
-                      style={{
-                        background: 'rgba(104, 211, 145, 0.2)',
-                        border: '2px solid #68d391',
-                        borderRadius: '8px',
-                        color: '#68d391',
-                        padding: '10px 20px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseOver={(e) => {
-                        e.target.style.background = 'rgba(104, 211, 145, 0.3)'
-                      }}
-                      onMouseOut={(e) => {
-                        e.target.style.background = 'rgba(104, 211, 145, 0.2)'
-                      }}
-                    >
-                      👤 ADD YOUR FIRST FRIEND
-                    </button>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
