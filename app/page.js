@@ -8520,7 +8520,7 @@ export default function TurfLootTactical() {
                 const authenticated = await requireAuthentication('CHANGE SKIN')
                 if (authenticated) {
                   console.log('🎨 User authenticated, opening change skin...')
-                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin)
+                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'owned')
                 } else {
                   console.log('❌ Authentication failed, blocking access to CHANGE SKIN')
                 }
