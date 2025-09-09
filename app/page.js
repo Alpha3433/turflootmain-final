@@ -2140,6 +2140,28 @@ export default function TurfLootTactical() {
       }
     })
 
+    // Initialize the correct tab based on defaultTab parameter
+    const allTab = modal.querySelector('[data-category="all"]')
+    const ownedTab = modal.querySelector('[data-category="owned"]')
+    const shopTab = modal.querySelector('[data-category="shop"]')
+    
+    // Reset all tabs to inactive state
+    ;[allTab, ownedTab, shopTab].forEach(tab => {
+      if (tab) {
+        tab.style.background = 'rgba(45, 55, 72, 0.5)'
+        tab.style.border = '2px solid #4a5568'
+        tab.style.color = '#a0aec0'
+      }
+    })
+    
+    // Set the default tab to active state
+    const defaultTabElement = modal.querySelector(`[data-category="${defaultTab}"]`)
+    if (defaultTabElement) {
+      defaultTabElement.style.background = 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)'
+      defaultTabElement.style.border = '2px solid #f6ad55'
+      defaultTabElement.style.color = 'white'
+    }
+
     // Initial render
     renderSkins()
 
