@@ -84,28 +84,40 @@ class FriendsSystemTester:
         print()
 
     def test_api_health_check(self):
-        """Test basic API connectivity"""
-        print("🔍 TESTING: API Health Check")
+        """Test 1: API Health Check - Verify core API endpoints are working"""
         try:
             response = requests.get(f"{API_BASE}/ping", timeout=10)
+            
             if response.status_code == 200:
                 data = response.json()
-                self.log_test(
-                    "API Health Check", 
-                    True, 
-                    f"API responding correctly - Server: {data.get('server', 'unknown')}"
-                )
-                return True
+                if data.get('status') == 'ok' and data.get('server') == 'turfloot-api':
+                    self.log_test(
+                        "API Health Check",
+                        True,
+                        f"API accessible with server: {data.get('server')}, timestamp: {data.get('timestamp')}"
+                    )
+                    return True
+                else:
+                    self.log_test(
+                        "API Health Check", 
+                        False,
+                        f"Unexpected response format: {data}"
+                    )
+                    return False
             else:
                 self.log_test(
-                    "API Health Check", 
+                    "API Health Check",
                     False, 
-                    f"API returned status {response.status_code}",
-                    response.text
+                    f"HTTP {response.status_code}: {response.text}"
                 )
                 return False
+                
         except Exception as e:
-            self.log_test("API Health Check", False, f"Connection failed: {str(e)}")
+            self.log_test(
+                "API Health Check",
+                False,
+                error_msg=str(e)
+            )
             return False
 
     def test_empty_database_initial_state(self):
