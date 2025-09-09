@@ -122,52 +122,69 @@ class AddFriendModalBackendTester:
             
         return False
 
-    def test_user_list_loading_authenticated(self):
-        """Test GET /api/friends?type=users for authenticated users"""
-        print("🔍 TESTING: User List Loading (Authenticated User)")
+    def test_user_registration(self):
+        """Test POST /api/friends with action=register_user"""
+        print("🔍 TESTING: User Registration")
         try:
-            # Test with mock authenticated user
-            test_user_id = "test_user_12345"
-            response = requests.get(f"{API_BASE}/friends?type=users&userIdentifier={test_user_id}", timeout=10)
+            # Test registering a new Privy user
+            test_user_id = f"privy_user_{int(time.time())}"
+            self.test_users.append(test_user_id)
+            
+            user_data = {
+                "username": f"TestUser_{int(time.time())}",
+                "displayName": f"Test User {int(time.time())}",
+                "email": f"test{int(time.time())}@example.com",
+                "walletAddress": f"0x{hex(int(time.time()))[2:].zfill(40)}"
+            }
+            
+            payload = {
+                "action": "register_user",
+                "userIdentifier": test_user_id,
+                "userData": user_data
+            }
+            
+            response = requests.post(
+                f"{API_BASE}/friends", 
+                json=payload,
+                headers={'Content-Type': 'application/json'},
+                timeout=10
+            )
             
             if response.status_code == 200:
                 data = response.json()
                 
-                if 'success' in data and data['success'] and 'users' in data:
-                    users = data['users']
-                    
-                    # Should return available users (filtered list)
-                    if len(users) >= 0:  # Could be empty if all users are already friends
+                if 'success' in data and data['success']:
+                    if 'message' in data and 'registered' in data['message'].lower():
                         self.log_test(
-                            "User List Loading (Authenticated)", 
+                            "User Registration", 
                             True, 
-                            f"Retrieved {len(users)} available users for authenticated user"
+                            f"Successfully registered Privy user {test_user_id} in MongoDB"
                         )
                         return True
                     else:
                         self.log_test(
-                            "User List Loading (Authenticated)", 
+                            "User Registration", 
                             False, 
-                            "Unexpected response format",
+                            "Success response but missing expected message",
                             data
                         )
                 else:
                     self.log_test(
-                        "User List Loading (Authenticated)", 
+                        "User Registration", 
                         False, 
-                        "Invalid response structure",
+                        "Registration failed according to response",
                         data
                     )
             else:
                 self.log_test(
-                    "User List Loading (Authenticated)", 
+                    "User Registration", 
                     False, 
                     f"API returned status {response.status_code}",
                     response.text
                 )
                 
         except Exception as e:
-            self.log_test("User List Loading (Authenticated)", False, f"Request failed: {str(e)}")
+            self.log_test("User Registration", False, f"Request failed: {str(e)}")
             
         return False
 
