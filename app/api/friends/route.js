@@ -261,6 +261,16 @@ async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
       username: { $regex: new RegExp(`^${toUsername}$`, 'i') } // Case-insensitive match
     })
     
+    console.log('🔍 Debug - Target user lookup:', { 
+      toUsername, 
+      targetUser: targetUser ? {
+        userIdentifier: targetUser.userIdentifier,
+        username: targetUser.username,
+        displayName: targetUser.displayName,
+        keys: Object.keys(targetUser)
+      } : null
+    })
+    
     if (!targetUser) {
       return NextResponse.json(
         { error: 'User not found. Only authenticated TurfLoot users can receive friend requests.' },
