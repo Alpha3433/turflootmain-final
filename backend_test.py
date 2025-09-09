@@ -365,31 +365,53 @@ def test_party_creation_and_invitation_system():
         test_results["failed_tests"] += 1
         test_results["test_details"].append(f"❌ Complete Party Flow - ERROR ({e})")
     
-    # Test 6: Database Connection and MongoDB Integration
-    print("\n6️⃣ DATABASE CONNECTION AND MONGODB INTEGRATION")
+    # Test 6: UserIdentifier Format Consistency Check
+    print("\n6️⃣ USERIDENTIFIER FORMAT CONSISTENCY CHECK")
     test_results["total_tests"] += 1
     try:
-        # Test that the API can connect to MongoDB and retrieve data
-        response = requests.get(f"{API_BASE}/friends?type=users&userIdentifier=db_connection_test", timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("success") is not None:
-                print("✅ Database connection working - API can query MongoDB")
-                print(f"   - Available users: {len(data.get('users', []))}")
-                test_results["passed_tests"] += 1
-                test_results["test_details"].append("✅ Database Connection - PASSED")
+        # Test different userIdentifier formats to identify potential mismatches
+        test_formats = [
+            "test_user_format_1",
+            "0x1234567890abcdef1234567890abcdef12345678",  # Ethereum address format
+            "user@example.com",  # Email format
+            "privy:did:123456789"  # Privy DID format
+        ]
+        
+        format_test_results = []
+        
+        for test_format in test_formats:
+            print(f"   Testing format: {test_format}")
+            
+            # Test party invite retrieval with different formats
+            format_response = requests.get(f"{API_BASE}/party?type=invites&userIdentifier={test_format}", timeout=10)
+            
+            if format_response.status_code == 200:
+                format_data = format_response.json()
+                if format_data.get("success") is not None:
+                    format_test_results.append(f"✅ {test_format[:20]}... - WORKING")
+                else:
+                    format_test_results.append(f"❌ {test_format[:20]}... - INVALID RESPONSE")
             else:
-                print("❌ Database connection issue - invalid response format")
-                test_results["failed_tests"] += 1
-                test_results["test_details"].append("❌ Database Connection - FAILED (invalid response)")
+                format_test_results.append(f"❌ {test_format[:20]}... - HTTP ERROR ({format_response.status_code})")
+        
+        print("✅ UserIdentifier format consistency test completed")
+        for result in format_test_results:
+            print(f"   {result}")
+        
+        # All formats should work (return success=true even if empty)
+        working_formats = [r for r in format_test_results if "WORKING" in r]
+        if len(working_formats) == len(test_formats):
+            test_results["passed_tests"] += 1
+            test_results["test_details"].append("✅ UserIdentifier Format Consistency - PASSED")
         else:
-            print(f"❌ Database connection test failed: {response.status_code}")
             test_results["failed_tests"] += 1
-            test_results["test_details"].append(f"❌ Database Connection - FAILED ({response.status_code})")
+            test_results["test_details"].append("❌ UserIdentifier Format Consistency - FAILED")
+            test_results["critical_issues"].append("Some userIdentifier formats not supported")
+            
     except Exception as e:
-        print(f"❌ Database connection test error: {e}")
+        print(f"❌ UserIdentifier format test error: {e}")
         test_results["failed_tests"] += 1
-        test_results["test_details"].append(f"❌ Database Connection - ERROR ({e})")
+        test_results["test_details"].append(f"❌ UserIdentifier Format Consistency - ERROR ({e})")
     
     # Print final results
     print("\n" + "=" * 60)
