@@ -6244,17 +6244,35 @@ export default function TurfLootTactical() {
               </div>
               <input 
                 type="text" 
-                value={customUsername || userName}
-                onChange={(e) => setCustomUsername(e.target.value)}
+                value={getDisplayUsername()}
+                onChange={(e) => {
+                  const newUsername = e.target.value
+                  setCustomUsername(newUsername)
+                  console.log('🎮 Username updated:', newUsername)
+                }}
                 style={nameInputStyle}
                 placeholder="USERNAME"
               />
               <div 
-                onClick={() => {
-                  // Username confirmed - set the custom username to override any authenticated name
-                  const currentInputValue = customUsername || userName
-                  setCustomUsername(currentInputValue)
-                  console.log('Username confirmed and set:', currentInputValue)
+                onClick={async () => {
+                  const currentUsername = getDisplayUsername()
+                  const saved = await saveUsernameToPrivy(currentUsername)
+                  
+                  if (saved) {
+                    console.log('✅ Username confirmed and saved:', currentUsername)
+                    // Visual feedback
+                    const confirmButton = event.target
+                    const originalBg = confirmButton.style.background
+                    confirmButton.style.background = 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)'
+                    confirmButton.innerHTML = '✓'
+                    
+                    setTimeout(() => {
+                      confirmButton.style.background = originalBg
+                      confirmButton.innerHTML = '→'
+                    }, 1000)
+                  } else {
+                    console.log('❌ Failed to save username')
+                  }
                 }}
                 style={{
                 width: '36px',
