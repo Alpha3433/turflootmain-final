@@ -4702,23 +4702,180 @@ export default function TurfLootTactical() {
             </div>
           </div>
           
-          <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              background: 'rgba(26, 32, 44, 0.8)',
-              border: '2px solid #68d391',
-              borderRadius: '4px',
-              margin: '0 auto 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '24px',
-              boxShadow: '0 0 20px rgba(104, 211, 145, 0.3)'
-            }}>
-              👤
-            </div>
-            <div style={{ color: '#e2e8f0', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>NO PARTY MEMBERS</div>
+          <div style={{ 
+            background: currentParty ? 'rgba(26, 32, 44, 0.8)' : 'rgba(26, 32, 44, 0.6)', 
+            borderRadius: '8px', 
+            padding: '16px', 
+            textAlign: 'center',
+            border: currentParty ? '2px solid rgba(104, 211, 145, 0.6)' : '2px solid rgba(104, 211, 145, 0.3)',
+            marginBottom: '16px',
+            boxShadow: currentParty ? '0 0 20px rgba(104, 211, 145, 0.4)' : 'none'
+          }}>
+            {currentParty ? (
+              // Show current party members
+              <div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginBottom: '12px'
+                }}>
+                  <div style={{
+                    color: '#68d391',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    fontFamily: '"Rajdhani", sans-serif'
+                  }}>
+                    {currentParty.name}
+                  </div>
+                  <div style={{
+                    padding: '2px 6px',
+                    background: 'rgba(104, 211, 145, 0.2)',
+                    border: '1px solid #68d391',
+                    borderRadius: '3px',
+                    fontSize: '10px',
+                    color: '#68d391',
+                    textTransform: 'uppercase'
+                  }}>
+                    {currentParty.privacy}
+                  </div>
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  marginBottom: '8px'
+                }}>
+                  {currentParty.members?.slice(0, 4).map((member, index) => (
+                    <div key={member.userIdentifier} style={{
+                      width: '32px',
+                      height: '32px',
+                      background: member.isOnline ? 
+                        'linear-gradient(135deg, rgba(104, 211, 145, 0.3) 0%, rgba(104, 211, 145, 0.6) 100%)' :
+                        'linear-gradient(135deg, rgba(107, 114, 128, 0.3) 0%, rgba(107, 114, 128, 0.6) 100%)',
+                      border: member.isOnline ? '2px solid #68d391' : '2px solid #6b7280',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '14px',
+                      boxShadow: member.isOnline ? '0 0 10px rgba(104, 211, 145, 0.4)' : 'none',
+                      position: 'relative'
+                    }}>
+                      👤
+                      {member.isOnline && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '-2px',
+                          right: '-2px',
+                          width: '8px',
+                          height: '8px',
+                          background: '#22c55e',
+                          borderRadius: '50%',
+                          border: '1px solid rgba(26, 32, 44, 1)',
+                          boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
+                        }} />
+                      )}
+                    </div>
+                  ))}
+                  {currentParty.members?.length > 4 && (
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '2px solid #68d391',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      color: '#68d391',
+                      fontWeight: 'bold'
+                    }}>
+                      +{currentParty.members.length - 4}
+                    </div>
+                  )}
+                </div>
+                
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px'
+                }}>
+                  {currentParty.members?.slice(0, 2).map((member) => (
+                    <div key={member.userIdentifier} style={{
+                      color: member.isOnline ? '#e2e8f0' : '#9ca3af',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}>
+                      <div style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: member.isOnline ? '#22c55e' : '#6b7280'
+                      }} />
+                      {member.username}
+                    </div>
+                  ))}
+                  {currentParty.members?.length > 2 && (
+                    <div style={{
+                      color: '#a0aec0',
+                      fontSize: '11px',
+                      marginTop: '2px'
+                    }}>
+                      +{currentParty.members.length - 2} more member{currentParty.members.length - 2 !== 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : loadingParty ? (
+              // Loading state
+              <div>
+                <div style={{
+                  width: '50px',
+                  height: '50px',
+                  background: 'linear-gradient(135deg, rgba(104, 211, 145, 0.2) 0%, rgba(104, 211, 145, 0.4) 100%)',
+                  border: '2px solid #68d391',
+                  borderRadius: '4px',
+                  margin: '0 auto 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  animation: 'pulse 2s infinite'
+                }}>
+                  🔄
+                </div>
+                <div style={{ color: '#e2e8f0', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>LOADING PARTY...</div>
+              </div>
+            ) : (
+              // No party state
+              <div>
+                <div style={{
+                  width: '50px',
+                  height: '50px',
+                  background: 'linear-gradient(135deg, rgba(104, 211, 145, 0.2) 0%, rgba(104, 211, 145, 0.4) 100%)',
+                  border: '2px solid #68d391',
+                  borderRadius: '4px',
+                  margin: '0 auto 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  boxShadow: '0 0 20px rgba(104, 211, 145, 0.3)'
+                }}>
+                  👤
+                </div>
+                <div style={{ color: '#e2e8f0', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>NO PARTY MEMBERS</div>
+              </div>
+            )}
           </div>
           
           <button 
