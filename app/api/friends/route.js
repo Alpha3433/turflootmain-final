@@ -31,20 +31,33 @@ async function getPrivyUsers(currentUserIdentifier) {
       userIdentifier: { $ne: currentUserIdentifier } // Exclude current user
     }).toArray()
     
-    // Get current user's friends and pending requests to filter out
-    const userFriends = mockFriends.get(currentUserIdentifier) || []
-    const userRequests = mockFriendRequests.get(currentUserIdentifier) || { sent: [], received: [] }
+    // Get current user's friends from database
+    const userFriends = await db.collection('friends').find({
+      userIdentifier: currentUserIdentifier
+    }).toArray()
     
-    const friendUsernames = userFriends.map(f => f.username.toLowerCase())
-    const sentRequestUsernames = userRequests.sent.map(r => r.toUsername.toLowerCase())
-    const receivedRequestUsernames = userRequests.received.map(r => r.fromUsername.toLowerCase())
+    // Get pending friend requests from database
+    const sentRequests = await db.collection('friend_requests').find({
+      fromUserIdentifier: currentUserIdentifier,
+      status: 'pending'
+    }).toArray()
+    
+    const receivedRequests = await db.collection('friend_requests').find({
+      toUserIdentifier: currentUserIdentifier,
+      status: 'pending'
+    }).toArray()
+    
+    // Create sets of userIdentifiers to exclude
+    const friendUserIdentifiers = new Set(userFriends.map(f => f.friendUserIdentifier))
+    const sentRequestUserIdentifiers = new Set(sentRequests.map(r => r.toUserIdentifier))
+    const receivedRequestUserIdentifiers = new Set(receivedRequests.map(r => r.fromUserIdentifier))
     
     // Filter out users who are already friends or have pending requests
     const availableUsers = users.filter(user => {
-      const username = (user.username || user.displayName || 'Unknown').toLowerCase()
-      return !friendUsernames.includes(username) && 
-             !sentRequestUsernames.includes(username) && 
-             !receivedRequestUsernames.includes(username)
+      const userIdentifier = user.userIdentifier
+      return !friendUserIdentifiers.has(userIdentifier) && 
+             !sentRequestUserIdentifiers.has(userIdentifier) && 
+             !receivedRequestUserIdentifiers.has(userIdentifier)
     }).map(user => ({
       username: user.username || user.displayName || `User_${user.userIdentifier.slice(-4)}`,
       status: user.isOnline ? 'online' : 'offline',
