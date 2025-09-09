@@ -3008,7 +3008,7 @@ export default function TurfLootTactical() {
           
           // Store the full party object instead of just the ID
           const partyId = item.dataset.partyId
-          selectedParty = parties.find(p => p.id === partyId)
+          selectedParty = currentParties.find(p => p.id === partyId)
           
           console.log('🎯 Party selected:', selectedParty)
           
