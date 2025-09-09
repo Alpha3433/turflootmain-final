@@ -7909,7 +7909,7 @@ export default function TurfLootTactical() {
                 boxShadow: '0 0 15px rgba(139, 92, 246, 0.6)',
                 border: '1px solid #8b5cf6'
               }}>🎯</div>
-              <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LOADOUT</h3>
+              <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>CUSTOMIZE</h3>
             </div>
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
