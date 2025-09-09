@@ -779,17 +779,16 @@ class AddFriendModalBackendTester:
         print("=" * 80)
         print()
         
-        # Run all tests
+        # Run all tests for updated Privy user system
         test_methods = [
             self.test_api_health_check,
-            self.test_user_list_loading_guest,
-            self.test_user_list_loading_authenticated,
-            self.test_friend_request_sending,
-            self.test_duplicate_request_prevention,
-            self.test_invalid_data_handling,
+            self.test_empty_database_initial_state,
+            self.test_user_registration,
+            self.test_user_list_after_registration,
+            self.test_friend_request_with_real_users,
             self.test_user_filtering_logic,
-            self.test_demo_users_data_structure,
-            self.test_api_response_format
+            self.test_mongodb_connection_validation,
+            self.test_api_response_format_consistency
         ]
         
         for test_method in test_methods:
