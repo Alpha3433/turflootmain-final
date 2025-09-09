@@ -2257,8 +2257,8 @@ const AgarIOGame = () => {
           <div 
             onClick={handleSplit}
             style={{
-              backgroundColor: 'rgba(255, 0, 0, 0.9)',
-              border: '3px solid #ff0000',
+              backgroundColor: 'rgba(0, 100, 255, 0.9)',
+              border: '3px solid #0064ff',
               borderRadius: isMobile ? '50%' : '8px',
               color: '#ffffff',
               fontSize: isMobile ? '14px' : '16px',
@@ -2274,13 +2274,13 @@ const AgarIOGame = () => {
               transition: 'all 150ms',
               pointerEvents: 'auto',
               fontFamily: '"Rajdhani", sans-serif',
-              boxShadow: isMobile ? '0 4px 20px rgba(255, 0, 0, 0.6)' : '0 4px 12px rgba(255, 0, 0, 0.3)',
+              boxShadow: isMobile ? '0 4px 20px rgba(0, 100, 255, 0.6)' : '0 4px 12px rgba(0, 100, 255, 0.3)',
               flexDirection: isMobile ? 'column' : 'row'
             }}
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 50, 50, 0.95)'
+              e.target.style.backgroundColor = 'rgba(50, 120, 255, 0.95)'
               e.target.style.transform = isMobile ? 'scale(1.05)' : 'translateY(-2px)'
-              e.target.style.boxShadow = isMobile ? '0 6px 25px rgba(255, 0, 0, 0.8)' : '0 6px 20px rgba(255, 0, 0, 0.4)'
+              e.target.style.boxShadow = isMobile ? '0 6px 25px rgba(0, 100, 255, 0.8)' : '0 6px 20px rgba(0, 100, 255, 0.4)'
             }}
             onMouseOut={(e) => {
               e.target.style.backgroundColor = 'rgba(255, 0, 0, 0.9)'
