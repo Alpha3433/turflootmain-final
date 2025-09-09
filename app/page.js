@@ -135,6 +135,36 @@ export default function TurfLootTactical() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isFriendsModalOpen, setIsFriendsModalOpen] = useState(false)
   const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false)
+  const [friendsList, setFriendsList] = useState([])
+  const [loadingFriends, setLoadingFriends] = useState(false)
+
+  // Load friends when modal opens
+  useEffect(() => {
+    if (isFriendsModalOpen && isAuthenticated) {
+      loadFriendsList()
+    }
+  }, [isFriendsModalOpen, isAuthenticated])
+
+  const loadFriendsList = async () => {
+    if (!isAuthenticated) return
+    
+    setLoadingFriends(true)
+    try {
+      const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
+      const response = await fetch(`/api/friends?userIdentifier=${encodeURIComponent(userIdentifier)}`)
+      const result = await response.json()
+      
+      if (result.success) {
+        setFriendsList(result.friends)
+        console.log('✅ Friends loaded:', result.friends.length, 'friends')
+      } else {
+        console.error('❌ Failed to load friends:', result.error)
+      }
+    } catch (error) {
+      console.error('❌ Error loading friends:', error)
+    }
+    setLoadingFriends(false)
+  }
   const [isLoadingLocalPractice, setIsLoadingLocalPractice] = useState(false)
   
   // Mouse tracking for interactive eyes
