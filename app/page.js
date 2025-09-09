@@ -2978,7 +2978,7 @@ export default function TurfLootTactical() {
                 </div>
               </div>
               <div style="color: #a0aec0; font-size: 14px;">
-                Host: ${party.host} • Members: ${party.members}/${party.maxMembers}
+                Host: ${party.createdByUsername || 'Unknown'} • Members: ${party.currentPlayerCount || 0}/${party.maxPlayers || 2}
               </div>
             </div>
             <div style="color: #68d391; font-size: 24px;">
