@@ -1901,7 +1901,7 @@ export default function TurfLootTactical() {
       
       skinsGrid.innerHTML = filteredSkins.map(skin => {
         const rarityColor = rarityColors[skin.rarity]
-        const isEquipped = skin.id === currentSkin
+        const isEquipped = skin.id === selectedSkinData.id // Use the current selected skin instead of static currentSkin
         const canAfford = currentCurrency >= skin.price
         
         return `
