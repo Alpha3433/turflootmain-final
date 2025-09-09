@@ -158,6 +158,9 @@ def test_party_creation_and_invitation_system():
         print("🎮 Creating party with invites...")
         party_response = requests.post(f"{API_BASE}/party", json=party_creation_data, timeout=10)
         
+        print(f"   Party creation response status: {party_response.status_code}")
+        print(f"   Party creation response: {party_response.text}")
+        
         if party_response.status_code == 200:
             party_data = party_response.json()
             if party_data.get("success"):
