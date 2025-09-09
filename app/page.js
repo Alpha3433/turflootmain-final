@@ -7720,37 +7720,66 @@ export default function TurfLootTactical() {
               </div>
             )}
             
-            <button style={{
-              width: '100%',
-              padding: '8px',
-              background: 'rgba(26, 32, 44, 0.8)',
-              border: '1px solid #f6ad55',
-              borderRadius: '3px',
-              color: '#f6ad55',
-              fontSize: '10px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Rajdhani", sans-serif',
-              textTransform: 'uppercase',
-              marginBottom: '6px'
-            }}>
-              JOIN SQUAD
+            <button 
+              onClick={() => {
+                console.log('👥 Mobile Friends button clicked!')
+                setIsFriendsModalOpen(true)
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(26, 32, 44, 0.8)',
+                border: '1px solid #f6ad55',
+                borderRadius: '3px',
+                color: '#f6ad55',
+                fontSize: '10px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase',
+                marginBottom: '6px'
+              }}>
+              👥 SOCIAL
             </button>
             
-            <button style={{
-              width: '100%',
-              padding: '8px',
-              background: 'rgba(26, 32, 44, 0.8)',
-              border: '1px solid #68d391',
-              borderRadius: '3px',
-              color: '#68d391',
-              fontSize: '10px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Rajdhani", sans-serif',
-              textTransform: 'uppercase'
-            }}>
-              RECRUIT
+            <button
+              onClick={async () => {
+                console.log('🎯 Mobile CREATE PARTY button clicked!')
+                const authenticated = await requireAuthentication('CREATE PARTY')
+                if (authenticated) {
+                  console.log('🎯 User authenticated, opening create party...')
+                  
+                  // Ensure friends list is loaded before opening modal
+                  if (friendsList.length === 0) {
+                    console.log('🔄 Loading friends list before opening party modal...')
+                    await loadFriendsList()
+                  }
+                  
+                  console.log('🔍 Friends data before modal:', {
+                    totalFriends: friendsList.length,
+                    acceptedFriends: friendsList.filter(f => f.status === 'accepted').length,
+                    friendsData: friendsList
+                  })
+                  
+                  createDesktopCreatePartyPopup()
+                } else {
+                  console.log('❌ Authentication failed, blocking access to CREATE PARTY')
+                }
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(26, 32, 44, 0.8)',
+                border: '1px solid #68d391',
+                borderRadius: '3px',
+                color: '#68d391',
+                fontSize: '10px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
+              }}>
+              🎯 CREATE PARTY
             </button>
           </div>
 
