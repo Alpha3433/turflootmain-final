@@ -78,12 +78,18 @@ async function getPrivyUsers(currentUserIdentifier) {
     
     // Get pending friend requests from database
     const sentRequests = await db.collection('friend_requests').find({
-      fromUserIdentifier: currentUserIdentifier,
+      $or: [
+        { fromUserIdentifier: currentUserIdentifier },
+        { fromUserId: currentUserIdentifier }
+      ],
       status: 'pending'
     }).toArray()
     
     const receivedRequests = await db.collection('friend_requests').find({
-      toUserIdentifier: currentUserIdentifier,
+      $or: [
+        { toUserIdentifier: currentUserIdentifier },
+        { toUserId: currentUserIdentifier }
+      ],
       status: 'pending'
     }).toArray()
     
