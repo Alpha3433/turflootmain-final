@@ -325,16 +325,14 @@ export default function TurfLootTactical() {
         // For now, let's reload the friends list to refresh any status
         await loadFriendsList()
         
-        // Show success in SOCIAL modal instead of popup
-        if (setFriendsModalStatus) {
-          setFriendsModalStatus(`🎯 Party "${partyData.name}" created! Invites sent to ${selectedFriends.length} friends.`)
-        }
-        
+        return { success: true, result }
       } else {
         console.error('❌ Failed to create party:', result.error)
+        return { success: false, error: result.error }
       }
     } catch (error) {
       console.error('❌ Error creating party:', error)
+      return { success: false, error: error.message }
     }
   }
 
