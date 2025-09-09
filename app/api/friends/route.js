@@ -372,9 +372,18 @@ async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
     
     // Check if request already exists
     const existingRequest = await db.collection('friend_requests').findOne({
-      fromUserIdentifier: fromUserIdentifier,
-      toUserIdentifier: toUserIdentifier,
-      status: 'pending'
+      $or: [
+        {
+          fromUserIdentifier: fromUserIdentifier,
+          toUserIdentifier: toUserIdentifier,
+          status: 'pending'
+        },
+        {
+          fromUserId: fromUserIdentifier,
+          toUserId: toUserIdentifier,
+          status: 'pending'
+        }
+      ]
     })
     
     if (existingRequest) {
