@@ -212,6 +212,29 @@ export default function TurfLootTactical() {
       loadAvailableUsers()
     }
   }, [isAddFriendModalOpen, isAuthenticated])
+  // Load friends list and requests on authentication change
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadFriendsList()
+      loadFriendRequests()
+    } else {
+      // Reset state for guest users
+      setFriendsList([])
+      setFriendRequests({ sent: [], received: [] })
+    }
+  }, [isAuthenticated, user])
+  
+  // Auto-refresh friend requests every 30 seconds to catch new invites
+  useEffect(() => {
+    if (!isAuthenticated || !user) return
+    
+    const interval = setInterval(() => {
+      console.log('🔄 Auto-refreshing friend requests and party invites...')
+      loadFriendRequests()
+    }, 30000) // Refresh every 30 seconds
+    
+    return () => clearInterval(interval)
+  }, [isAuthenticated, user])
 
   const loadAvailableUsers = async () => {
     setLoadingUsers(true)
