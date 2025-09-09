@@ -3029,12 +3029,75 @@ export default function TurfLootTactical() {
                 box-shadow: 0 0 20px rgba(246, 173, 85, 0.4);
                 margin-top: 12px;
               `
-              joinButton.addEventListener('click', () => {
+              joinButton.addEventListener('click', async () => {
                 console.log('🚀 Joining party:', selectedParty)
-                // Here you would implement the actual join party logic
-                // For now, just show a success message and close popup
-                alert('Successfully joined party! (Mock implementation)')
-                popup.remove()
+                
+                try {
+                  if (!isAuthenticated || !user) {
+                    alert('Please log in to join a party!')
+                    return
+                  }
+                  
+                  const userIdentifier = user.wallet?.address || user.email || user.id
+                  console.log('🎯 User joining party:', userIdentifier, 'Party ID:', selectedParty.id)
+                  
+                  // Show loading state
+                  joinButton.textContent = 'JOINING...'
+                  joinButton.disabled = true
+                  
+                  // API call to join the party
+                  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      action: 'join_party',
+                      userIdentifier: userIdentifier,
+                      partyId: selectedParty.id
+                    })
+                  })
+                  
+                  const result = await response.json()
+                  
+                  if (response.ok && result.success) {
+                    console.log('✅ Successfully joined party:', result)
+                    
+                    // Update current party state
+                    setCurrentParty({
+                      id: selectedParty.id,
+                      name: selectedParty.name,
+                      members: result.party?.members || [],
+                      maxPlayers: selectedParty.maxPlayers,
+                      privacy: selectedParty.privacy
+                    })
+                    
+                    // Show success message
+                    alert(`🎉 Successfully joined "${selectedParty.name}"! You are now part of the party.`)
+                    
+                    // Close the popup
+                    popup.remove()
+                    
+                    // Refresh party data to show updated state
+                    await loadCurrentParty()
+                    
+                  } else {
+                    console.error('❌ Failed to join party:', result.error)
+                    alert(`Failed to join party: ${result.error || 'Unknown error'}`)
+                    
+                    // Reset button
+                    joinButton.textContent = 'JOIN SELECTED PARTY'
+                    joinButton.disabled = false
+                  }
+                  
+                } catch (error) {
+                  console.error('❌ Error joining party:', error)
+                  alert('Error joining party. Please try again.')
+                  
+                  // Reset button
+                  joinButton.textContent = 'JOIN SELECTED PARTY'
+                  joinButton.disabled = false
+                }
               })
               buttonContainer.appendChild(joinButton)
             }
