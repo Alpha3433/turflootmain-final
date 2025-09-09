@@ -45,7 +45,7 @@ export async function GET(request) {
       
       // Get party details with member information
       const partiesWithDetails = await Promise.all(
-        publicParties.map(async (party) => {
+        availableParties.map(async (party) => {
           // Get member details
           const memberUsers = await db.collection('users').find({
             userIdentifier: { $in: party.currentPlayers }
