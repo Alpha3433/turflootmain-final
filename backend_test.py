@@ -1,34 +1,20 @@
 #!/usr/bin/env python3
 """
-Backend Testing for TurfLoot Agar.io "Hold E to Cash Out" Functionality
-Testing Focus: Backend API support for cash-out feature and game operations
-
-CRITICAL TESTING REQUIREMENTS FROM REVIEW REQUEST:
-1. Game Loading Test - Verify the /agario page loads correctly without JavaScript errors
-2. Backend API Integration - Test that the game can communicate with backend APIs for score/session tracking
-3. Cash Out Functionality Backend Support - Verify any backend endpoints that support the cash-out process
-4. Session Management - Test game session tracking during cash-out operations
-5. API Performance - Ensure backend can handle cash-out related API calls without errors
-
-Expected Results:
-- Backend APIs should support game session tracking
-- Cash-out related operations should be handled properly
-- API performance should be adequate for real-time game operations
-- No critical backend errors that would affect cash-out functionality
+Comprehensive Backend Testing for AddFriendModal API Functionality
+Testing Focus: Friends API endpoints and user discovery system
 """
 
 import requests
 import json
 import time
-import os
 import sys
 from datetime import datetime
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-social.preview.emergentagent.com')
+# Configuration
+BASE_URL = "https://turfloot-social.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-class CashOutBackendTester:
+class AddFriendModalBackendTester:
     def __init__(self):
         self.test_results = []
         self.start_time = time.time()
