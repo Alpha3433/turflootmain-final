@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Updated AddFriendModal API with Real Privy Users
-Testing Focus: MongoDB integration, user registration, and real Privy user data handling
-Review Request: Test transition from demo data to real Privy user system
+Comprehensive Backend Testing for MongoDB-Only Friends System
+Testing the completely migrated friends system that uses ONLY real Privy users with no mock structures.
+
+CRITICAL CHANGES TESTED:
+1. Removed ALL mock data structures - Eliminated mockFriends and mockFriendRequests Maps
+2. Full MongoDB migration - All friend data now stored in MongoDB collections
+3. No mock user creation - Only real Privy users from database are allowed
+4. Complete database integration - All CRUD operations use MongoDB
+
+DATABASE COLLECTIONS:
+- users - Stores real Privy users
+- friends - Stores friendship relationships  
+- friend_requests - Stores pending friend requests
 """
 
 import requests
@@ -15,7 +25,7 @@ from datetime import datetime
 BASE_URL = "https://turfloot-social.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-class AddFriendModalBackendTester:
+class FriendsSystemTester:
     def __init__(self):
         self.test_results = []
         self.total_tests = 0
