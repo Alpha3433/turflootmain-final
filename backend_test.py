@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Privy Deposit Function Rewrite
-=================================================
+TurfLoot Solana-Only Deposit Functionality Backend Testing
+=========================================================
 
-This script tests the backend APIs that support the rewritten Privy deposit function,
-focusing on wallet functionality, authentication, and error handling.
+This script tests the new Solana-only deposit functionality that was implemented 
+to simplify and fix previous deposit issues.
 
-Test Categories:
-1. Privy Authentication & Wallet Integration Testing
-2. Deposit Function Backend Support  
-3. Error Handling Verification
-4. Authentication State Management
+CRITICAL TESTING REQUIREMENTS:
+1. Solana-Only Deposit Function Backend Support
+2. No EVM/Multi-Chain Conflicts  
+3. DEPOSIT SOL Button Functionality
+4. Simplified Implementation Benefits
+
+Test Focus: Backend APIs supporting Solana-only deposits
 """
 
 import requests
