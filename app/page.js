@@ -5970,34 +5970,58 @@ export default function TurfLootTactical() {
                               onClick={async () => {
                                 try {
                                   const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
-                                  const response = await fetch('/api/friends', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                      action: 'accept_request',
-                                      userIdentifier,
-                                      requestId: request.id
-                                    })
-                                  })
                                   
-                                  const result = await response.json()
-                                  if (result.success) {
-                                    alert(`✅ ${request.fromUsername} is now your friend!`)
-                                    loadFriendRequests()
-                                    loadFriendsList()
+                                  if (request.type === 'party_invite') {
+                                    // Handle party invite acceptance
+                                    const response = await fetch('/api/party', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        action: 'accept_invite',
+                                        userIdentifier,
+                                        inviteId: request.id,
+                                        partyId: request.partyId
+                                      })
+                                    })
+                                    
+                                    const result = await response.json()
+                                    if (result.success) {
+                                      alert(`🎯 Joined party "${request.partyName}"!`)
+                                      loadFriendRequests()
+                                    } else {
+                                      alert(`❌ Failed to join party: ${result.error}`)
+                                    }
                                   } else {
-                                    alert(`❌ Failed to accept request: ${result.error}`)
+                                    // Handle friend request acceptance
+                                    const response = await fetch('/api/friends', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        action: 'accept_request',
+                                        userIdentifier,
+                                        requestId: request.id
+                                      })
+                                    })
+                                    
+                                    const result = await response.json()
+                                    if (result.success) {
+                                      alert(`✅ ${request.fromUsername} is now your friend!`)
+                                      loadFriendRequests()
+                                      loadFriendsList()
+                                    } else {
+                                      alert(`❌ Failed to accept request: ${result.error}`)
+                                    }
                                   }
                                 } catch (error) {
-                                  console.error('Error accepting friend request:', error)
-                                  alert('❌ Failed to accept friend request')
+                                  console.error('Error accepting request/invite:', error)
+                                  alert('❌ Failed to accept request/invite')
                                 }
                               }}
                               style={{
-                                background: 'rgba(34, 197, 94, 0.2)',
-                                border: '1px solid #22c55e',
+                                background: request.type === 'party_invite' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                                border: request.type === 'party_invite' ? '1px solid #3b82f6' : '1px solid #22c55e',
                                 borderRadius: '3px',
-                                color: '#22c55e',
+                                color: request.type === 'party_invite' ? '#3b82f6' : '#22c55e',
                                 padding: '3px 6px',
                                 fontSize: '10px',
                                 fontWeight: '600',
@@ -6005,7 +6029,7 @@ export default function TurfLootTactical() {
                                 textTransform: 'uppercase'
                               }}
                             >
-                              ✓
+                              {request.type === 'party_invite' ? 'JOIN' : '✓'}
                             </button>
                             <button
                               onClick={async () => {
