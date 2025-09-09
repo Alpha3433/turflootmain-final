@@ -173,95 +173,73 @@ def test_party_creation_and_invitation_system():
                 # Step 4: Check if invites were received
                 invite_check_response = requests.get(f"{API_BASE}/party?type=invites&userIdentifier={party_friend_1}", timeout=10)
                 
-                if accept_response.status_code == 200:
-                    accept_result = accept_response.json()
-                    if accept_result.get("success"):
-                        print("✅ Friend request accepted successfully")
+                if invite_check_response.status_code == 200:
+                    invite_data = invite_check_response.json()
+                    invites_received = invite_data.get("invites", [])
+                    
+                    print(f"✅ Party invite check completed: {len(invites_received)} invites found")
+                    
+                    if len(invites_received) > 0:
+                        sample_invite = invites_received[0]
+                        print(f"🔍 Sample party invite data: {json.dumps(sample_invite, indent=2)}")
                         
-                        # Step 4: Test friends list data transformation
-                        print("🔍 Testing friends list data transformation...")
-                        friends_response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier={test_user_1}", timeout=10)
+                        # Verify required fields are present in party invite
+                        required_invite_fields = ["id", "partyId", "partyName", "fromUserIdentifier", "toUserIdentifier", "status"]
+                        missing_invite_fields = []
+                        invite_structure_correct = True
                         
-                        if friends_response.status_code == 200:
-                            friends_data = friends_response.json()
-                            friends_list = friends_data.get("friends", [])
+                        for field in required_invite_fields:
+                            if field not in sample_invite:
+                                missing_invite_fields.append(field)
+                        
+                        if not missing_invite_fields:
+                            print("✅ All required fields present in party invite")
                             
-                            print(f"✅ Friends list retrieved: {len(friends_list)} friends")
-                            
-                            if len(friends_list) > 0:
-                                sample_friend = friends_list[0]
-                                print(f"🔍 Sample friend data: {json.dumps(sample_friend, indent=2)}")
-                                
-                                # Verify required fields are present and correctly mapped
-                                required_fields = ["id", "username", "status", "addedAt", "isOnline"]
-                                missing_fields = []
-                                transformation_correct = True
-                                
-                                for field in required_fields:
-                                    if field not in sample_friend:
-                                        missing_fields.append(field)
-                                
-                                if not missing_fields:
-                                    print("✅ All required fields present in friend data")
-                                    
-                                    # Verify field mappings
-                                    if "friendUsername" not in sample_friend and "username" in sample_friend:
-                                        print("✅ Field mapping correct: 'friendUsername' → 'username'")
-                                    else:
-                                        print("❌ Field mapping incorrect: 'friendUsername' still present or 'username' missing")
-                                        transformation_correct = False
-                                    
-                                    if "friendUserIdentifier" not in sample_friend and "id" in sample_friend:
-                                        print("✅ Field mapping correct: 'friendUserIdentifier' → 'id'")
-                                    else:
-                                        print("❌ Field mapping incorrect: 'friendUserIdentifier' still present or 'id' missing")
-                                        transformation_correct = False
-                                    
-                                    # Verify status field
-                                    if sample_friend.get("status") == "accepted":
-                                        print("✅ Status field correct: 'accepted'")
-                                    else:
-                                        print(f"⚠️ Status field: {sample_friend.get('status')} (expected: 'accepted')")
-                                    
-                                    # Verify isOnline field exists
-                                    if "isOnline" in sample_friend:
-                                        print(f"✅ isOnline field present: {sample_friend['isOnline']}")
-                                    else:
-                                        print("❌ isOnline field missing")
-                                        transformation_correct = False
-                                    
-                                    # Verify username value is correct
-                                    if sample_friend.get("username") == "TransformTestUser2":
-                                        print("✅ Username value correct: 'TransformTestUser2'")
-                                    else:
-                                        print(f"⚠️ Username value: {sample_friend.get('username')} (expected: 'TransformTestUser2')")
-                                    
-                                    if transformation_correct and not missing_fields:
-                                        test_results["passed_tests"] += 1
-                                        test_results["test_details"].append("✅ Friends List Data Transformation - PASSED")
-                                    else:
-                                        test_results["failed_tests"] += 1
-                                        test_results["test_details"].append("❌ Friends List Data Transformation - FAILED")
-                                else:
-                                    print(f"❌ Missing required fields: {missing_fields}")
-                                    test_results["failed_tests"] += 1
-                                    test_results["test_details"].append(f"❌ Friends List Data Structure - FAILED (missing: {missing_fields})")
+                            # Verify field values
+                            if sample_invite.get("toUserIdentifier") == party_friend_1:
+                                print("✅ toUserIdentifier correct: matches recipient")
                             else:
-                                print("❌ No friends found after creating friendship")
+                                print(f"❌ toUserIdentifier mismatch: {sample_invite.get('toUserIdentifier')} != {party_friend_1}")
+                                invite_structure_correct = False
+                            
+                            if sample_invite.get("fromUserIdentifier") == party_creator:
+                                print("✅ fromUserIdentifier correct: matches creator")
+                            else:
+                                print(f"❌ fromUserIdentifier mismatch: {sample_invite.get('fromUserIdentifier')} != {party_creator}")
+                                invite_structure_correct = False
+                            
+                            if sample_invite.get("status") == "pending":
+                                print("✅ Status field correct: 'pending'")
+                            else:
+                                print(f"⚠️ Status field: {sample_invite.get('status')} (expected: 'pending')")
+                            
+                            if sample_invite.get("partyName") == "Test Gaming Party":
+                                print("✅ Party name correct: 'Test Gaming Party'")
+                            else:
+                                print(f"⚠️ Party name: {sample_invite.get('partyName')} (expected: 'Test Gaming Party')")
+                            
+                            if invite_structure_correct and not missing_invite_fields:
+                                test_results["passed_tests"] += 1
+                                test_results["test_details"].append("✅ Party Creation and Invitation - PASSED")
+                            else:
                                 test_results["failed_tests"] += 1
-                                test_results["test_details"].append("❌ Friends List Data Transformation - FAILED (no friends found)")
+                                test_results["test_details"].append("❌ Party Creation and Invitation - FAILED")
+                                test_results["critical_issues"].append("Party invite data structure issues")
                         else:
-                            print(f"❌ Friends list request failed: {friends_response.status_code}")
+                            print(f"❌ Missing required fields in party invite: {missing_invite_fields}")
                             test_results["failed_tests"] += 1
-                            test_results["test_details"].append(f"❌ Friends List Request - FAILED ({friends_response.status_code})")
+                            test_results["test_details"].append(f"❌ Party Invite Structure - FAILED (missing: {missing_invite_fields})")
+                            test_results["critical_issues"].append("Party invite missing required fields")
                     else:
-                        print(f"❌ Friend request acceptance failed: {accept_result}")
+                        print("❌ No party invites found after party creation")
                         test_results["failed_tests"] += 1
-                        test_results["test_details"].append("❌ Friend Request Acceptance - FAILED")
+                        test_results["test_details"].append("❌ Party Creation and Invitation - FAILED (no invites received)")
+                        test_results["critical_issues"].append("Party invites not being stored or retrieved correctly")
                 else:
-                    print(f"❌ Friend request acceptance HTTP error: {accept_response.status_code}")
+                    print(f"❌ Party invite check failed: {invite_check_response.status_code}")
                     test_results["failed_tests"] += 1
-                    test_results["test_details"].append(f"❌ Friend Request Acceptance - HTTP ERROR ({accept_response.status_code})")
+                    test_results["test_details"].append(f"❌ Party Invite Check - FAILED ({invite_check_response.status_code})")
+                    test_results["critical_issues"].append("Cannot retrieve party invites after creation")
             else:
                 print(f"❌ Friend request sending failed: {request_data}")
                 test_results["failed_tests"] += 1
