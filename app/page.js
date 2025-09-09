@@ -1124,15 +1124,53 @@ export default function TurfLootTactical() {
   // Wallet operations with Privy integration
   const handleDeposit = async () => {
     try {
-      console.log('💰 DEPOSIT button clicked - requiring authentication')
+      console.log('💰 DEPOSIT button clicked - starting authentication flow')
       
-      const authenticated = await requireAuthentication('DEPOSIT')
-      if (!authenticated) {
-        console.log('❌ Authentication failed, blocking access to DEPOSIT')
+      // Check if user is already authenticated
+      if (privy.authenticated && privy.user) {
+        console.log('✅ User already authenticated, proceeding to deposit...')
+        await proceedWithDeposit()
         return
       }
       
-      console.log('✅ User authenticated, starting comprehensive wallet debugging...')
+      console.log('🔐 User not authenticated, starting login process...')
+      
+      // Trigger authentication and wait for completion
+      const authenticated = await requireAuthentication('DEPOSIT')
+      if (!authenticated) {
+        console.log('❌ Authentication failed or cancelled by user')
+        return
+      }
+      
+      // Wait a bit for Privy state to fully update after authentication
+      console.log('⏳ Waiting for Privy state to update after authentication...')
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Double-check authentication state
+      if (!privy.authenticated || !privy.user) {
+        console.error('❌ Authentication completed but user state not updated')
+        console.error('❌ Current Privy state:', {
+          authenticated: privy.authenticated,
+          hasUser: !!privy.user,
+          ready: privy.ready
+        })
+        alert('❌ Authentication completed but user state not ready. Please try the deposit again.')
+        return
+      }
+      
+      console.log('✅ Authentication successful, proceeding to deposit...')
+      await proceedWithDeposit()
+      
+    } catch (error) {
+      console.error('❌ Complete deposit error:', error)
+      throw error
+    }
+  }
+  
+  // Separate function to handle the actual deposit after authentication
+  const proceedWithDeposit = async () => {
+    try {
+      console.log('✅ Starting deposit process for authenticated user...')
       
       // COMPREHENSIVE DEBUGGING - LOG EVERYTHING
       console.log('🔍 FULL PRIVY OBJECT:', privy)
@@ -1159,24 +1197,17 @@ export default function TurfLootTactical() {
       console.log('🔍 FUND WALLET METHOD:', typeof privy.fundWallet)
       console.log('🔍 CREATE WALLET METHOD:', typeof privy.createWallet)
       
-      // Check if user is properly authenticated
+      // Final authentication checks
       if (!privy.authenticated) {
-        console.error('❌ User not authenticated with Privy')
-        alert('❌ Please complete authentication first')
-        return
+        throw new Error('User not authenticated with Privy')
       }
       
       if (!privy.ready) {
-        console.error('❌ Privy not ready')
-        alert('❌ Privy is still loading, please wait and try again')
-        return
+        throw new Error('Privy not ready')
       }
       
-      // Check if user exists
       if (!privy.user) {
-        console.error('❌ No user object from Privy')
-        alert('❌ No user found, please reconnect your account')
-        return
+        throw new Error('No user object from Privy')
       }
       
       // Check wallet status
@@ -1196,6 +1227,9 @@ export default function TurfLootTactical() {
           await privy.createWallet()
           console.log('✅ Wallet creation completed')
           
+          // Wait for wallet creation to fully complete
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          
           // Refresh user data after wallet creation
           console.log('🔄 Refreshing user data after wallet creation...')
           wallet = privy.user.wallet
@@ -1203,8 +1237,7 @@ export default function TurfLootTactical() {
           
         } catch (createError) {
           console.error('❌ Failed to create wallet:', createError)
-          alert('❌ Failed to create wallet. Please try again.')
-          return
+          throw new Error(`Failed to create wallet: ${createError.message}`)
         }
       }
       
@@ -1217,8 +1250,7 @@ export default function TurfLootTactical() {
       if (!wallet) {
         console.error('❌ Still no wallet available after all attempts')
         console.error('❌ Privy user state:', privy.user)
-        alert('❌ No wallet available. Please disconnect and reconnect your account.')
-        return
+        throw new Error('No wallet available. Please disconnect and reconnect your account.')
       }
       
       console.log('✅ Final wallet object:', wallet)
@@ -1228,8 +1260,7 @@ export default function TurfLootTactical() {
       if (!wallet.address) {
         console.error('❌ Wallet object exists but no address')
         console.error('❌ Wallet details:', wallet)
-        alert('❌ Wallet has no address. Please reconnect your wallet.')
-        return
+        throw new Error('Wallet has no address. Please reconnect your wallet.')
       }
       
       // Call fundWallet with maximum debugging
@@ -1242,25 +1273,11 @@ export default function TurfLootTactical() {
         linkedAccountsCount: privy.user?.linkedAccounts?.length
       })
       
-      try {
-        await privy.fundWallet()
-        console.log('✅ fundWallet() completed successfully')
-      } catch (fundError) {
-        console.error('❌ fundWallet() failed with error:', fundError)
-        console.error('❌ Error message:', fundError.message)
-        console.error('❌ Error code:', fundError.code)
-        console.error('❌ Error stack:', fundError.stack)
-        throw fundError // Re-throw to see the full error
-      }
+      await privy.fundWallet()
+      console.log('✅ fundWallet() completed successfully')
       
     } catch (error) {
-      console.error('❌ Complete deposit error:', error)
-      console.error('❌ Error details:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
-      })
-      // Don't show fallback, let the error bubble up for debugging
+      console.error('❌ proceedWithDeposit error:', error)
       throw error
     }
   }
