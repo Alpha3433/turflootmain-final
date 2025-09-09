@@ -84,23 +84,24 @@ class SkinAvatarSystemTester:
         print("\n🎨 Testing User Skin Registration...")
         
         # Test users with different identifiers for deterministic skin generation
+        # Note: Avoid "test", "debug", "mock", "demo" in usernames as they get cleaned up
         test_users_data = [
             {
                 "userIdentifier": "0x1A2B3C4D5E6F7890123456789ABCDEF012345678",
-                "username": "SkinTestUser1",
-                "email": "skintest1@turfloot.com",
+                "username": "AlphaPlayer",
+                "email": "alpha@turfloot.com",
                 "walletAddress": "0x1A2B3C4D5E6F7890123456789ABCDEF012345678"
             },
             {
                 "userIdentifier": "0x9876543210FEDCBA0987654321ABCDEF98765432",
-                "username": "SkinTestUser2", 
-                "email": "skintest2@turfloot.com",
+                "username": "BetaGamer", 
+                "email": "beta@turfloot.com",
                 "walletAddress": "0x9876543210FEDCBA0987654321ABCDEF98765432"
             },
             {
                 "userIdentifier": "0xABCDEF1234567890ABCDEF1234567890ABCDEF12",
-                "username": "SkinTestUser3",
-                "email": "skintest3@turfloot.com", 
+                "username": "GammaWarrior",
+                "email": "gamma@turfloot.com", 
                 "walletAddress": "0xABCDEF1234567890ABCDEF1234567890ABCDEF12"
             }
         ]
