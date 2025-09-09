@@ -2925,6 +2925,52 @@ export default function TurfLootTactical() {
 
     modal.innerHTML = partyHTML
 
+    // Populate friends list dynamically
+    const friendsListContainer = modal.querySelector('#friends-invite-list')
+    if (currentFriends.length > 0) {
+      // Clear the container and add friends
+      friendsListContainer.innerHTML = ''
+      
+      currentFriends.forEach(friend => {
+        const friendItem = document.createElement('div')
+        friendItem.className = 'friend-invite-item'
+        friendItem.dataset.friendId = friend.id
+        friendItem.style.cssText = `
+          display: flex; 
+          align-items: center; 
+          justify-content: space-between; 
+          padding: 10px 12px; 
+          margin-bottom: 8px; 
+          background: rgba(26, 32, 44, 0.6); 
+          border-radius: 6px; 
+          border: 1px solid rgba(104, 211, 145, 0.2);
+        `
+        
+        friendItem.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: ${friend.isOnline ? '#22c55e' : '#6b7280'}; ${friend.isOnline ? 'box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);' : ''}"></div>
+            <span style="color: ${friend.isOnline ? '#e2e8f0' : '#9ca3af'}; font-size: 14px; font-weight: 500;">${friend.username}</span>
+            <span style="color: #a0aec0; font-size: 11px; opacity: 0.7;">${friend.isOnline ? 'Online' : 'Offline'}</span>
+          </div>
+          <input type="checkbox" class="friend-checkbox" style="width: 16px; height: 16px; cursor: pointer; accent-color: #fc8181;" />
+        `
+        
+        friendsListContainer.appendChild(friendItem)
+      })
+      
+      console.log('✅ Populated friends list with', currentFriends.length, 'friends')
+    } else {
+      // Show empty state
+      friendsListContainer.innerHTML = `
+        <div style="text-align: center; color: #a0aec0; font-size: 14px; padding: 20px 0;">
+          <div style="font-size: 32px; margin-bottom: 8px; opacity: 0.5;">👥</div>
+          <div style="margin-bottom: 4px;">No friends to invite</div>
+          <div style="font-size: 12px; opacity: 0.7;">Add friends to see them here</div>
+        </div>
+      `
+      console.log('ℹ️ No friends available, showing empty state')
+    }
+
     // Add interactivity
     let selectedPrivacy = 'public'
 
