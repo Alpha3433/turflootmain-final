@@ -31,7 +31,31 @@ class FriendsSystemTester:
         self.total_tests = 0
         self.passed_tests = 0
         self.failed_tests = 0
-        self.test_users = []  # Track test users for cleanup
+        
+        # Test users for MongoDB-only system
+        self.test_users = [
+            {
+                "userIdentifier": "test_user_1_mongodb",
+                "username": "TestUser1",
+                "displayName": "Test User One",
+                "email": "testuser1@turfloot.com",
+                "walletAddress": "0x1234567890123456789012345678901234567890"
+            },
+            {
+                "userIdentifier": "test_user_2_mongodb", 
+                "username": "TestUser2",
+                "displayName": "Test User Two",
+                "email": "testuser2@turfloot.com",
+                "walletAddress": "0x0987654321098765432109876543210987654321"
+            },
+            {
+                "userIdentifier": "test_user_3_mongodb",
+                "username": "TestUser3", 
+                "displayName": "Test User Three",
+                "email": "testuser3@turfloot.com",
+                "walletAddress": "0x1111222233334444555566667777888899990000"
+            }
+        ]
         
     def log_test(self, test_name, success, details="", response_data=None):
         """Log test results with detailed information"""
