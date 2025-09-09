@@ -5296,6 +5296,7 @@ export default function TurfLootTactical() {
                       +{currentParty.members.length - 4}
                     </div>
                   )}
+                </div>
               </div>
             ) : loadingParty ? (
               // Loading state
