@@ -5808,7 +5808,7 @@ export default function TurfLootTactical() {
                       alignItems: 'center',
                       gap: '6px'
                     }}>
-                      📬 FRIEND REQUESTS
+                      📬 REQUESTS & INVITES
                     </h3>
                     <span style={{
                       color: '#a0aec0',
