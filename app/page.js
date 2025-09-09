@@ -2010,6 +2010,49 @@ export default function TurfLootTactical() {
             pattern: skin.pattern || 'solid'
           })
           
+          // Save equipped skin to localStorage
+          localStorage.setItem('selectedSkin', JSON.stringify({
+            id: skin.id,
+            name: skin.name,
+            color: skin.color,
+            type: skin.type || 'circle',
+            pattern: skin.pattern || 'solid'
+          }))
+          
+          // Save equipped skin to backend/database
+          if (isAuthenticated && user) {
+            try {
+              const userIdentifier = user.wallet?.address || user.email || user.id
+              console.log('💾 Saving equipped skin to backend for user:', userIdentifier)
+              
+              const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/friends`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  action: 'update_equipped_skin',
+                  userIdentifier: userIdentifier,
+                  equippedSkin: {
+                    id: skin.id,
+                    name: skin.name,
+                    color: skin.color,
+                    type: skin.type || 'circle',
+                    pattern: skin.pattern || 'solid'
+                  }
+                })
+              })
+              
+              if (response.ok) {
+                console.log('✅ Equipped skin saved to backend successfully')
+              } else {
+                console.error('❌ Failed to save equipped skin to backend:', response.status)
+              }
+            } catch (error) {
+              console.error('❌ Error saving equipped skin to backend:', error)
+            }
+          }
+          
           console.log('✅ Skin equipped successfully:', {
             skinId: skin.id,
             skinName: skin.name,
