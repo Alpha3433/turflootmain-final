@@ -916,6 +916,121 @@ const AgarIOGame = () => {
       }
     }
 
+    updatePlayerPieces(deltaTime) {
+      const currentTime = Date.now()
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const maxRadius = this.currentPlayableRadius
+      
+      // Update each player piece
+      for (let i = this.playerPieces.length - 1; i >= 0; i--) {
+        const piece = this.playerPieces[i]
+        
+        // Move piece towards mouse (same logic as main player)
+        const dx = piece.targetX - piece.x
+        const dy = piece.targetY - piece.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        
+        // Apply initial split velocity (gradually decreases)
+        if (piece.vx || piece.vy) {
+          piece.x += piece.vx * deltaTime
+          piece.y += piece.vy * deltaTime
+          
+          // Friction - reduce velocity over time
+          piece.vx *= 0.95
+          piece.vy *= 0.95
+          
+          // Stop very small velocities
+          if (Math.abs(piece.vx) < 0.1) piece.vx = 0
+          if (Math.abs(piece.vy) < 0.1) piece.vy = 0
+        }
+        
+        // Move towards mouse target if no split velocity
+        if (distance > 0.1 && !piece.vx && !piece.vy) {
+          const baseSpeed = 6.0
+          const massSpeedFactor = Math.sqrt(piece.mass / 20)
+          const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
+          
+          const moveDistance = Math.min(dynamicSpeed, distance)
+          const moveX = (dx / distance) * moveDistance
+          const moveY = (dy / distance) * moveDistance
+          
+          piece.x += moveX
+          piece.y += moveY
+        }
+        
+        // Update piece properties
+        piece.radius = Math.sqrt(piece.mass) * 3
+        piece.targetX = this.player.targetX // Follow main player's target
+        piece.targetY = this.player.targetY
+        
+        // Boundary check for pieces
+        const distanceFromCenter = Math.sqrt(
+          Math.pow(piece.x - centerX, 2) + Math.pow(piece.y - centerY, 2)
+        )
+        
+        if (distanceFromCenter > maxRadius - piece.radius) {
+          const angle = Math.atan2(piece.y - centerY, piece.x - centerX)
+          piece.x = centerX + Math.cos(angle) * (maxRadius - piece.radius)
+          piece.y = centerY + Math.sin(angle) * (maxRadius - piece.radius)
+        }
+        
+        // Check for recombination after 30 seconds
+        if (currentTime - piece.splitTime > 30000) { // 30 seconds
+          piece.recombineReady = true
+        }
+        
+        // Auto-recombine if pieces are close and ready
+        if (piece.recombineReady) {
+          const distanceToMain = Math.sqrt(
+            Math.pow(piece.x - this.player.x, 2) + 
+            Math.pow(piece.y - this.player.y, 2)
+          )
+          
+          // Recombine if pieces are touching
+          if (distanceToMain < (piece.radius + this.player.radius) * 0.8) {
+            // Merge mass back to main player
+            this.player.mass += piece.mass
+            this.player.radius = Math.sqrt(this.player.mass) * 3
+            
+            // Remove piece from array
+            this.playerPieces.splice(i, 1)
+            
+            console.log(`🔄 Player piece recombined! Total mass: ${Math.floor(this.player.mass)}`)
+          }
+        }
+        
+        // Check recombination between pieces
+        for (let j = i + 1; j < this.playerPieces.length; j++) {
+          const otherPiece = this.playerPieces[j]
+          if (piece.recombineReady && otherPiece.recombineReady) {
+            const pieceToPieceDistance = Math.sqrt(
+              Math.pow(piece.x - otherPiece.x, 2) + 
+              Math.pow(piece.y - otherPiece.y, 2)
+            )
+            
+            if (pieceToPieceDistance < (piece.radius + otherPiece.radius) * 0.8) {
+              // Merge the larger piece with the smaller one
+              if (piece.mass >= otherPiece.mass) {
+                piece.mass += otherPiece.mass
+                piece.radius = Math.sqrt(piece.mass) * 3
+                this.playerPieces.splice(j, 1)
+              } else {
+                otherPiece.mass += piece.mass
+                otherPiece.radius = Math.sqrt(otherPiece.mass) * 3
+                this.playerPieces.splice(i, 1)
+                break
+              }
+            }
+          }
+        }
+      }
+      
+      // Update total mass display
+      const totalMass = this.player.mass + this.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
+      setMass(Math.floor(totalMass))
+    }
+
     updateEnemy(enemy, deltaTime) {
       const now = Date.now()
       const centerX = this.world.width / 2
