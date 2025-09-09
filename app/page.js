@@ -197,6 +197,7 @@ export default function TurfLootTactical() {
   const [loadingRequests, setLoadingRequests] = useState(false)
   const [availableUsers, setAvailableUsers] = useState([])
   const [loadingUsers, setLoadingUsers] = useState(false)
+  const [isCreatePartyModalOpen, setIsCreatePartyModalOpen] = useState(false)
 
   // Load friends when modal opens
   useEffect(() => {
