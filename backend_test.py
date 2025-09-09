@@ -1,53 +1,29 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Friend Request System MongoDB Index Compatibility Fix
-Testing the fixed friend request system that handles MongoDB index compatibility.
+Backend Testing Suite for TurfLoot Friends List Data Transformation
+Testing the friends list API response format to ensure friend names appear correctly.
 
 CRITICAL FIX BEING TESTED:
-- Fixed MongoDB E11000 duplicate key error by adding compatibility for database index fields
-- Added both `fromUserIdentifier` and `fromUserId` fields  
-- Added both `toUserIdentifier` and `toUserId` fields
-- Updated all queries to handle both field naming conventions
+- Transform database records from `friendUsername` to `username` field
+- Map `friendUserIdentifier` to `id` field  
+- Include all necessary fields (status, isOnline, etc.) for frontend display
 
 TESTING REQUIREMENTS:
-1. Friend Request Creation - POST /api/friends with action=send_request
-2. Database Query Compatibility - test friend request queries work with $or conditions
-3. Complete Friend Request Flow - test sending friend request between real users
+1. Friends List Data Format - GET /api/friends?type=friends returns properly transformed data
+2. Data Structure Validation - verify response includes `username` field (not `friendUsername`)
+3. Field Mapping - confirm `id` field mapping from `friendUserIdentifier`
+4. Frontend Compatibility - ensure transformed data matches what frontend expects
 """
 
 import requests
 import json
 import time
 import sys
-from datetime import datetime
+from urllib.parse import urljoin
 
-# Configuration
+# Get base URL from environment
 BASE_URL = "https://turfloot-social.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
-
-class FriendRequestTester:
-    def __init__(self):
-        self.test_results = []
-        self.total_tests = 0
-        self.passed_tests = 0
-        
-    def log_test(self, test_name, passed, details="", response_time=0):
-        """Log test result"""
-        self.total_tests += 1
-        if passed:
-            self.passed_tests += 1
-            status = "✅ PASSED"
-        else:
-            status = "❌ FAILED"
-            
-        result = {
-            'test': test_name,
-            'status': status,
-            'passed': passed,
-            'details': details,
-            'response_time': f"{response_time:.3f}s" if response_time > 0 else "N/A",
-            'timestamp': datetime.now().isoformat()
-        }
         self.test_results.append(result)
         print(f"{status}: {test_name}")
         if details:
