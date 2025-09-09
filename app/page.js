@@ -2064,17 +2064,22 @@ export default function TurfLootTactical() {
             skinColor: skin.color
           })
           
-          // Visual feedback for successful equip
-          btn.textContent = 'EQUIPPED!'
-          btn.style.background = 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)'
-          btn.style.borderColor = '#22c55e'
+          // Immediately update the skin store display to show new equipped status
+          renderSkins()
           
-          // Reset button text after 2 seconds
-          setTimeout(() => {
-            btn.textContent = 'EQUIP'
-            btn.style.background = 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)'
-            btn.style.borderColor = '#f6ad55'
-          }, 2000)
+          // Visual feedback for successful equip
+          const equipButton = document.querySelector(`[data-skin-id="${skin.id}"]`)?.querySelector('.equip-skin-btn')
+          if (equipButton) {
+            const originalText = equipButton.textContent
+            equipButton.textContent = 'EQUIPPED!'
+            equipButton.style.background = 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)'
+            equipButton.style.borderColor = '#22c55e'
+            
+            // Reset button text after 2 seconds, but then re-render to show proper equipped state
+            setTimeout(() => {
+              renderSkins() // Re-render to show the proper "✓ EQUIPPED" status
+            }, 2000)
+          }
           
           // Save to localStorage for persistence across sessions
           localStorage.setItem('selectedSkin', JSON.stringify({
