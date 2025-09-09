@@ -219,10 +219,12 @@ export default function TurfLootTactical() {
     if (isAuthenticated && user) {
       loadFriendsList()
       loadFriendRequests()
+      loadCurrentParty()
     } else {
       // Reset state for guest users
       setFriendsList([])
       setFriendRequests({ sent: [], received: [] })
+      setCurrentParty(null)
     }
   }, [isAuthenticated, user])
   
