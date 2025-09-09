@@ -270,42 +270,34 @@ def test_party_creation_and_invitation_system():
         test_results["failed_tests"] += 1
         test_results["test_details"].append(f"❌ Friends List Data Transformation - ERROR ({e})")
     
-    # Test 4: API Response Structure Validation
-    print("\n4️⃣ API RESPONSE STRUCTURE VALIDATION")
+    # Test 4: Database Collections Verification
+    print("\n4️⃣ DATABASE COLLECTIONS VERIFICATION")
     test_results["total_tests"] += 1
     try:
-        response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier=test_structure_validation", timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            
-            # Check required response fields
-            required_response_fields = ["success", "friends", "count"]
-            missing_response_fields = []
-            
-            for field in required_response_fields:
-                if field not in data:
-                    missing_response_fields.append(field)
-            
-            if not missing_response_fields:
-                print("✅ API response structure valid")
-                print(f"   - success: {data.get('success')}")
-                print(f"   - friends: {type(data.get('friends'))} with {len(data.get('friends', []))} items")
-                print(f"   - count: {data.get('count')}")
-                
+        # Test if parties collection exists by checking parties/live endpoint
+        parties_response = requests.get(f"{API_BASE}/parties/live", timeout=10)
+        
+        if parties_response.status_code == 200:
+            parties_data = parties_response.json()
+            if parties_data.get("success") is not None and isinstance(parties_data.get("parties"), list):
+                print(f"✅ Parties collection accessible: {len(parties_data.get('parties', []))} active parties")
+                print(f"   - Database connection working for parties collection")
                 test_results["passed_tests"] += 1
-                test_results["test_details"].append("✅ API Response Structure - PASSED")
+                test_results["test_details"].append("✅ Database Collections - PASSED")
             else:
-                print(f"❌ Missing response fields: {missing_response_fields}")
+                print("❌ Parties collection response format invalid")
                 test_results["failed_tests"] += 1
-                test_results["test_details"].append(f"❌ API Response Structure - FAILED (missing: {missing_response_fields})")
+                test_results["test_details"].append("❌ Database Collections - FAILED (invalid format)")
         else:
-            print(f"❌ API response structure test failed: {response.status_code}")
+            print(f"❌ Parties collection test failed: {parties_response.status_code}")
             test_results["failed_tests"] += 1
-            test_results["test_details"].append(f"❌ API Response Structure - FAILED ({response.status_code})")
+            test_results["test_details"].append(f"❌ Database Collections - FAILED ({parties_response.status_code})")
+            test_results["critical_issues"].append("Cannot access parties collection")
     except Exception as e:
-        print(f"❌ API response structure test error: {e}")
+        print(f"❌ Database collections test error: {e}")
         test_results["failed_tests"] += 1
-        test_results["test_details"].append(f"❌ API Response Structure - ERROR ({e})")
+        test_results["test_details"].append(f"❌ Database Collections - ERROR ({e})")
+        test_results["critical_issues"].append("Database connection issues")
     
     # Test 5: Frontend Compatibility Test
     print("\n5️⃣ FRONTEND COMPATIBILITY TEST")
