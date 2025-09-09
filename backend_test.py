@@ -64,14 +64,20 @@ class SkinAvatarSystemTester:
             print(f"❌ Request exception: {method} {endpoint} - {str(e)}")
             return {"error": str(e)}
 
-    def test_api_health(self):
-        """Test basic API connectivity"""
-        try:
-            response = requests.get(f"{API_BASE}/party", timeout=10)
-            success = response.status_code in [200, 400, 401]  # Any valid response
-            
-            if success:
-                self.log_test("API Health Check", True, f"Party API accessible (Status: {response.status_code})")
+    def test_api_health_check(self) -> bool:
+        """Test 1: API Health Check"""
+        print("\n🔍 Testing API Health Check...")
+        
+        # Test root API endpoint
+        response = self.make_request("GET", "/")
+        if not response or "error" in response:
+            return self.log_test("API Health Check", False, "Root API endpoint not accessible")
+        
+        # Check if it's the TurfLoot API
+        if response.get("service") != "turfloot-backend":
+            return self.log_test("API Health Check", False, f"Unexpected service: {response.get('service')}")
+        
+        return self.log_test("API Health Check", True, f"Service: {response.get('service')}, Features: {response.get('features')}")
             else:
                 self.log_test("API Health Check", False, error=f"Unexpected status code: {response.status_code}")
                 
