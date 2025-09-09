@@ -246,6 +246,11 @@ export async function POST(request) {
     
     console.log('🎯 Party API request:', { action, userIdentifier, partyData, invitedFriendsCount: invitedFriends?.length })
     
+    // Allow cleanup without authentication for admin tasks
+    if (action === 'cleanup_test_parties') {
+      return await handleCleanupTestParties()
+    }
+    
     if (!userIdentifier || userIdentifier === 'guest') {
       return NextResponse.json(
         { error: 'User authentication required' },
