@@ -108,10 +108,10 @@ user_problem_statement: "Test Completely Rewritten Privy Deposit Function: The P
 
 test_plan:
   current_focus:
-    - "Test AddFriendModal Backend API"
-    - "Verify User List Loading from /api/friends?type=users"
-    - "Test Friend Request Sending Functionality"
-    - "Verify Available Users Filtering Logic"
+    - "Test Privy Deposit Function Rewrite"
+    - "Verify No Invalid Address Errors"
+    - "Test Wallet State Handling" 
+    - "Verify Clean Authentication Flow"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
