@@ -127,7 +127,7 @@ class SkinAvatarTester:
         
         for user_id in test_users:
             print(f"   🔍 Checking party for user: {user_id[:10]}...")
-            response = self.make_request("GET", "/party", {
+            response = self.make_request("GET", "/party", params={
                 "type": "current",
                 "userIdentifier": user_id
             })
