@@ -1967,8 +1967,13 @@ export default function TurfLootTactical() {
       })
       
       // Equip skin buttons
-      equipButtons.forEach(btn => {
+      const equipButtons = modal.querySelectorAll('.equip-skin-btn')
+      console.log('🔧 Found equip buttons:', equipButtons.length)
+      
+      equipButtons.forEach((btn, index) => {
+        console.log(`🔧 Attaching event listener to button ${index + 1}:`, btn.dataset.skinId)
         btn.addEventListener('click', async (e) => {
+          console.log('🎯 EQUIP button clicked!', btn.dataset.skinId)
           e.stopPropagation()
           const skinId = btn.dataset.skinId
           const skin = availableSkins.find(s => s.id === skinId)
