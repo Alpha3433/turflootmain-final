@@ -107,7 +107,7 @@ export default function TurfLootTactical() {
         return 'AUTHENTICATED_USER'
       }
     } else {
-      return userName || 'GUEST_PLAYER'
+      return userName || 'PLAYER'
     }
   }
 
