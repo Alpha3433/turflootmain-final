@@ -35,6 +35,7 @@ export async function GET(request) {
       const publicParties = await db.collection('parties').find({
         privacy: 'public',
         status: 'waiting',
+        currentPlayers: { $exists: true, $type: 'array' },
         $expr: { $lt: [{ $size: "$currentPlayers" }, "$maxPlayers"] } // Party not full
       }).toArray()
       
