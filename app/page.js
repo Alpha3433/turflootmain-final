@@ -4821,35 +4821,8 @@ export default function TurfLootTactical() {
                   marginBottom: '8px'
                 }}>
                   {currentParty.members?.slice(0, 4).map((member, index) => (
-                    <div key={member.userIdentifier} style={{
-                      width: '32px',
-                      height: '32px',
-                      background: member.isOnline ? 
-                        'linear-gradient(135deg, rgba(104, 211, 145, 0.3) 0%, rgba(104, 211, 145, 0.6) 100%)' :
-                        'linear-gradient(135deg, rgba(107, 114, 128, 0.3) 0%, rgba(107, 114, 128, 0.6) 100%)',
-                      border: member.isOnline ? '2px solid #68d391' : '2px solid #6b7280',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '14px',
-                      boxShadow: member.isOnline ? '0 0 10px rgba(104, 211, 145, 0.4)' : 'none',
-                      position: 'relative'
-                    }}>
-                      👤
-                      {member.isOnline && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '-2px',
-                          right: '-2px',
-                          width: '8px',
-                          height: '8px',
-                          background: '#22c55e',
-                          borderRadius: '50%',
-                          border: '1px solid rgba(26, 32, 44, 1)',
-                          boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
-                        }} />
-                      )}
+                    <div key={member.userIdentifier}>
+                      {renderSkinAvatar(member.equippedSkin, 32, true, member.isOnline)}
                     </div>
                   ))}
                   {currentParty.members?.length > 4 && (
