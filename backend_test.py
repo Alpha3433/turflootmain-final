@@ -94,39 +94,51 @@ def test_party_creation_and_invitation_system():
         test_results["test_details"].append(f"❌ Party Invite Retrieval - ERROR ({e})")
         test_results["critical_issues"].append("Party invite retrieval endpoint error")
     
-    # Test 3: Create Test Friendship Data and Verify Transformation
-    print("\n3️⃣ CREATE TEST FRIENDSHIP DATA AND VERIFY TRANSFORMATION")
+    # Test 3: Party Creation Endpoint
+    print("\n3️⃣ PARTY CREATION ENDPOINT")
     test_results["total_tests"] += 1
     try:
-        # Step 1: Register test users
-        test_user_1 = "transform_test_user_1"
-        test_user_2 = "transform_test_user_2"
+        # Step 1: Register test users for party creation
+        party_creator = "party_creator_test"
+        party_friend_1 = "party_friend_1_test"
+        party_friend_2 = "party_friend_2_test"
         
-        # Register user 1
-        user1_data = {
+        # Register party creator
+        creator_data = {
             "action": "register_user",
-            "userIdentifier": test_user_1,
+            "userIdentifier": party_creator,
             "userData": {
-                "username": "TransformTestUser1",
-                "email": "transform1@test.com",
-                "displayName": "Transform Test User 1"
+                "username": "PartyCreator",
+                "email": "creator@test.com",
+                "displayName": "Party Creator"
             }
         }
         
-        # Register user 2
-        user2_data = {
+        # Register friends to invite
+        friend1_data = {
             "action": "register_user", 
-            "userIdentifier": test_user_2,
+            "userIdentifier": party_friend_1,
             "userData": {
-                "username": "TransformTestUser2",
-                "email": "transform2@test.com",
-                "displayName": "Transform Test User 2"
+                "username": "PartyFriend1",
+                "email": "friend1@test.com",
+                "displayName": "Party Friend 1"
             }
         }
         
-        print("📝 Registering test users...")
-        requests.post(f"{API_BASE}/friends", json=user1_data, timeout=10)
-        requests.post(f"{API_BASE}/friends", json=user2_data, timeout=10)
+        friend2_data = {
+            "action": "register_user", 
+            "userIdentifier": party_friend_2,
+            "userData": {
+                "username": "PartyFriend2",
+                "email": "friend2@test.com",
+                "displayName": "Party Friend 2"
+            }
+        }
+        
+        print("📝 Registering test users for party creation...")
+        requests.post(f"{API_BASE}/friends", json=creator_data, timeout=10)
+        requests.post(f"{API_BASE}/friends", json=friend1_data, timeout=10)
+        requests.post(f"{API_BASE}/friends", json=friend2_data, timeout=10)
         
         # Step 2: Send friend request
         friend_request_data = {
