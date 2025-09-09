@@ -87,82 +87,186 @@ def test_friends_list_data_transformation():
         test_results["failed_tests"] += 1
         test_results["test_details"].append(f"❌ Guest Friends List Format - ERROR ({e})")
     
-    # Test 3: Friends List Data Format - Test User with Mock Data
-    print("\n3️⃣ FRIENDS LIST DATA FORMAT - TEST USER")
+    # Test 3: Create Test Friendship Data and Verify Transformation
+    print("\n3️⃣ CREATE TEST FRIENDSHIP DATA AND VERIFY TRANSFORMATION")
     test_results["total_tests"] += 1
     try:
-        test_user_id = "test_user_friends_transform"
-        response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier={test_user_id}", timeout=10)
+        # Step 1: Register test users
+        test_user_1 = "transform_test_user_1"
+        test_user_2 = "transform_test_user_2"
         
-        if response.status_code == 200:
-            data = response.json()
-            friends_list = data.get("friends", [])
-            
-            print(f"✅ Friends list retrieved: {len(friends_list)} friends")
-            
-            # Test data structure validation
-            if len(friends_list) > 0:
-                sample_friend = friends_list[0]
-                print(f"🔍 Sample friend data: {json.dumps(sample_friend, indent=2)}")
+        # Register user 1
+        user1_data = {
+            "action": "register_user",
+            "userIdentifier": test_user_1,
+            "userData": {
+                "username": "TransformTestUser1",
+                "email": "transform1@test.com",
+                "displayName": "Transform Test User 1"
+            }
+        }
+        
+        # Register user 2
+        user2_data = {
+            "action": "register_user", 
+            "userIdentifier": test_user_2,
+            "userData": {
+                "username": "TransformTestUser2",
+                "email": "transform2@test.com",
+                "displayName": "Transform Test User 2"
+            }
+        }
+        
+        print("📝 Registering test users...")
+        requests.post(f"{API_BASE}/friends", json=user1_data, timeout=10)
+        requests.post(f"{API_BASE}/friends", json=user2_data, timeout=10)
+        
+        # Step 2: Send friend request
+        friend_request_data = {
+            "action": "send_request",
+            "userIdentifier": test_user_1,
+            "friendUsername": "TransformTestUser2"
+        }
+        
+        print("📤 Sending friend request...")
+        request_response = requests.post(f"{API_BASE}/friends", json=friend_request_data, timeout=10)
+        
+        if request_response.status_code == 200:
+            request_data = request_response.json()
+            if request_data.get("success"):
+                request_id = request_data.get("request", {}).get("id")
+                print(f"✅ Friend request sent successfully: {request_id}")
                 
-                # Verify required fields are present and correctly mapped
-                required_fields = ["id", "username", "status", "addedAt", "isOnline"]
-                missing_fields = []
+                # Step 3: Accept friend request
+                accept_data = {
+                    "action": "accept_request",
+                    "userIdentifier": test_user_2,
+                    "requestId": request_id
+                }
                 
-                for field in required_fields:
-                    if field not in sample_friend:
-                        missing_fields.append(field)
+                print("✅ Accepting friend request...")
+                accept_response = requests.post(f"{API_BASE}/friends", json=accept_data, timeout=10)
                 
-                if not missing_fields:
-                    print("✅ All required fields present in friend data")
-                    
-                    # Verify field mappings
-                    if "friendUsername" not in sample_friend and "username" in sample_friend:
-                        print("✅ Field mapping correct: 'friendUsername' → 'username'")
+                if accept_response.status_code == 200:
+                    accept_result = accept_response.json()
+                    if accept_result.get("success"):
+                        print("✅ Friend request accepted successfully")
+                        
+                        # Step 4: Test friends list data transformation
+                        print("🔍 Testing friends list data transformation...")
+                        friends_response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier={test_user_1}", timeout=10)
+                        
+                        if friends_response.status_code == 200:
+                            friends_data = friends_response.json()
+                            friends_list = friends_data.get("friends", [])
+                            
+                            print(f"✅ Friends list retrieved: {len(friends_list)} friends")
+                            
+                            if len(friends_list) > 0:
+                                sample_friend = friends_list[0]
+                                print(f"🔍 Sample friend data: {json.dumps(sample_friend, indent=2)}")
+                                
+                                # Verify required fields are present and correctly mapped
+                                required_fields = ["id", "username", "status", "addedAt", "isOnline"]
+                                missing_fields = []
+                                transformation_correct = True
+                                
+                                for field in required_fields:
+                                    if field not in sample_friend:
+                                        missing_fields.append(field)
+                                
+                                if not missing_fields:
+                                    print("✅ All required fields present in friend data")
+                                    
+                                    # Verify field mappings
+                                    if "friendUsername" not in sample_friend and "username" in sample_friend:
+                                        print("✅ Field mapping correct: 'friendUsername' → 'username'")
+                                    else:
+                                        print("❌ Field mapping incorrect: 'friendUsername' still present or 'username' missing")
+                                        transformation_correct = False
+                                    
+                                    if "friendUserIdentifier" not in sample_friend and "id" in sample_friend:
+                                        print("✅ Field mapping correct: 'friendUserIdentifier' → 'id'")
+                                    else:
+                                        print("❌ Field mapping incorrect: 'friendUserIdentifier' still present or 'id' missing")
+                                        transformation_correct = False
+                                    
+                                    # Verify status field
+                                    if sample_friend.get("status") == "accepted":
+                                        print("✅ Status field correct: 'accepted'")
+                                    else:
+                                        print(f"⚠️ Status field: {sample_friend.get('status')} (expected: 'accepted')")
+                                    
+                                    # Verify isOnline field exists
+                                    if "isOnline" in sample_friend:
+                                        print(f"✅ isOnline field present: {sample_friend['isOnline']}")
+                                    else:
+                                        print("❌ isOnline field missing")
+                                        transformation_correct = False
+                                    
+                                    # Verify username value is correct
+                                    if sample_friend.get("username") == "TransformTestUser2":
+                                        print("✅ Username value correct: 'TransformTestUser2'")
+                                    else:
+                                        print(f"⚠️ Username value: {sample_friend.get('username')} (expected: 'TransformTestUser2')")
+                                    
+                                    if transformation_correct and not missing_fields:
+                                        test_results["passed_tests"] += 1
+                                        test_results["test_details"].append("✅ Friends List Data Transformation - PASSED")
+                                    else:
+                                        test_results["failed_tests"] += 1
+                                        test_results["test_details"].append("❌ Friends List Data Transformation - FAILED")
+                                else:
+                                    print(f"❌ Missing required fields: {missing_fields}")
+                                    test_results["failed_tests"] += 1
+                                    test_results["test_details"].append(f"❌ Friends List Data Structure - FAILED (missing: {missing_fields})")
+                            else:
+                                print("❌ No friends found after creating friendship")
+                                test_results["failed_tests"] += 1
+                                test_results["test_details"].append("❌ Friends List Data Transformation - FAILED (no friends found)")
+                        else:
+                            print(f"❌ Friends list request failed: {friends_response.status_code}")
+                            test_results["failed_tests"] += 1
+                            test_results["test_details"].append(f"❌ Friends List Request - FAILED ({friends_response.status_code})")
                     else:
-                        print("❌ Field mapping incorrect: 'friendUsername' still present or 'username' missing")
-                    
-                    if "friendUserIdentifier" not in sample_friend and "id" in sample_friend:
-                        print("✅ Field mapping correct: 'friendUserIdentifier' → 'id'")
-                    else:
-                        print("❌ Field mapping incorrect: 'friendUserIdentifier' still present or 'id' missing")
-                    
-                    # Verify status field
-                    if sample_friend.get("status") == "accepted":
-                        print("✅ Status field correct: 'accepted'")
-                    else:
-                        print(f"⚠️ Status field: {sample_friend.get('status')} (expected: 'accepted')")
-                    
-                    # Verify isOnline field exists
-                    if "isOnline" in sample_friend:
-                        print(f"✅ isOnline field present: {sample_friend['isOnline']}")
-                    else:
-                        print("❌ isOnline field missing")
-                    
-                    test_results["passed_tests"] += 1
-                    test_results["test_details"].append("✅ Friends List Data Structure - PASSED")
+                        print(f"❌ Friend request acceptance failed: {accept_result}")
+                        test_results["failed_tests"] += 1
+                        test_results["test_details"].append("❌ Friend Request Acceptance - FAILED")
                 else:
-                    print(f"❌ Missing required fields: {missing_fields}")
+                    print(f"❌ Friend request acceptance HTTP error: {accept_response.status_code}")
                     test_results["failed_tests"] += 1
-                    test_results["test_details"].append(f"❌ Friends List Data Structure - FAILED (missing: {missing_fields})")
+                    test_results["test_details"].append(f"❌ Friend Request Acceptance - HTTP ERROR ({accept_response.status_code})")
             else:
-                print("ℹ️ No friends found for test user - testing empty list format")
-                if data.get("success") and isinstance(friends_list, list):
-                    print("✅ Empty friends list format correct")
-                    test_results["passed_tests"] += 1
-                    test_results["test_details"].append("✅ Empty Friends List Format - PASSED")
-                else:
-                    print("❌ Empty friends list format incorrect")
-                    test_results["failed_tests"] += 1
-                    test_results["test_details"].append("❌ Empty Friends List Format - FAILED")
+                print(f"❌ Friend request sending failed: {request_data}")
+                test_results["failed_tests"] += 1
+                test_results["test_details"].append("❌ Friend Request Sending - FAILED")
         else:
-            print(f"❌ Friends list request failed: {response.status_code}")
-            test_results["failed_tests"] += 1
-            test_results["test_details"].append(f"❌ Friends List Data Format - FAILED ({response.status_code})")
+            # Check if it's a duplicate or user not found error (acceptable for testing)
+            if request_response.status_code == 400 or request_response.status_code == 404:
+                print("ℹ️ Friend request failed (user not found or duplicate) - testing with existing data")
+                # Still test the friends list format even if we can't create new friendships
+                friends_response = requests.get(f"{API_BASE}/friends?type=friends&userIdentifier={test_user_1}", timeout=10)
+                if friends_response.status_code == 200:
+                    friends_data = friends_response.json()
+                    if friends_data.get("success") and isinstance(friends_data.get("friends"), list):
+                        print("✅ Friends list format correct (empty list)")
+                        test_results["passed_tests"] += 1
+                        test_results["test_details"].append("✅ Friends List Format - PASSED")
+                    else:
+                        test_results["failed_tests"] += 1
+                        test_results["test_details"].append("❌ Friends List Format - FAILED")
+                else:
+                    test_results["failed_tests"] += 1
+                    test_results["test_details"].append("❌ Friends List Request - FAILED")
+            else:
+                print(f"❌ Friend request HTTP error: {request_response.status_code}")
+                test_results["failed_tests"] += 1
+                test_results["test_details"].append(f"❌ Friend Request - HTTP ERROR ({request_response.status_code})")
+                
     except Exception as e:
-        print(f"❌ Friends list data format test error: {e}")
+        print(f"❌ Friends list data transformation test error: {e}")
         test_results["failed_tests"] += 1
-        test_results["test_details"].append(f"❌ Friends List Data Format - ERROR ({e})")
+        test_results["test_details"].append(f"❌ Friends List Data Transformation - ERROR ({e})")
     
     # Test 4: API Response Structure Validation
     print("\n4️⃣ API RESPONSE STRUCTURE VALIDATION")
