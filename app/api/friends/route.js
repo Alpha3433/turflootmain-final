@@ -223,20 +223,27 @@ async function handleRegisterPrivyUser(userIdentifier, userData) {
 async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
   console.log('📤 Sending friend request:', { fromUserIdentifier, toUsername })
   
-  // Find the target user by username (in real app, this would be a database lookup)
-  let toUserIdentifier = null
-  for (const [username, userId] of mockUsers.entries()) {
-    if (username.toLowerCase() === toUsername.toLowerCase()) {
-      toUserIdentifier = userId
-      break
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Find the target user by username in MongoDB
+    const targetUser = await db.collection('users').findOne({
+      username: { $regex: new RegExp(`^${toUsername}$`, 'i') } // Case-insensitive match
+    })
+    
+    let toUserIdentifier = null
+    if (targetUser) {
+      toUserIdentifier = targetUser.userIdentifier
+      console.log('✅ Found target user in database:', { toUsername, toUserIdentifier })
+    } else {
+      // If user not found, create a mock user identifier for demo purposes
+      toUserIdentifier = `mock_user_${toUsername.toLowerCase()}_${Date.now()}`
+      console.log('🔍 Created mock user for demo:', { toUsername, toUserIdentifier })
     }
-  }
-  
-  // If user not found, create a mock user identifier for demo purposes
-  if (!toUserIdentifier) {
+  } catch (error) {
+    console.error('❌ Error finding target user:', error)
+    // Fallback to mock user
     toUserIdentifier = `mock_user_${toUsername.toLowerCase()}_${Date.now()}`
-    mockUsers.set(toUsername.toLowerCase(), toUserIdentifier)
-    console.log('🔍 Created mock user for demo:', { toUsername, toUserIdentifier })
   }
   
   // Check if already friends or request exists
