@@ -3152,7 +3152,13 @@ export default function TurfLootTactical() {
       console.log('🎯 Invited friends:', selectedFriends)
       
       // Create the party and send invitations
-      await createPartyAndSendInvites(partyData, selectedFriends)
+      const result = await createPartyAndSendInvites(partyData, selectedFriends)
+      
+      if (result && result.success) {
+        // Show success confirmation to sender
+        alert(`🎯 Party "${partyData.name}" created successfully! Invites sent to ${selectedFriends.length} friend${selectedFriends.length !== 1 ? 's' : ''}.`)
+      }
+      
       popup.remove()
     })
 
