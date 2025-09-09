@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Updated Friends System
-Tests the cleanup of test/mock users and validation of real Privy accounts
+Backend Testing Script for Friend Request System MongoDB Index Compatibility Fix
+Testing the fixed friend request system that handles MongoDB index compatibility.
 
-TESTING REQUIREMENTS FROM REVIEW REQUEST:
-1. Database Cleanup Verification - Test GET /api/friends?type=users to trigger cleanup
-2. Real User Validation - Confirm only users with email OR wallet address are returned
-3. Clean User List - Verify available users list contains no test data
+CRITICAL FIX BEING TESTED:
+- Fixed MongoDB E11000 duplicate key error by adding compatibility for database index fields
+- Added both `fromUserIdentifier` and `fromUserId` fields  
+- Added both `toUserIdentifier` and `toUserId` fields
+- Updated all queries to handle both field naming conventions
 
-CLEANUP PATTERNS TESTED:
-- test, debug, mock, demo, cashout.test, debug.test patterns
-- Users without email AND wallet address
-- Test user identifiers with test_/mock_/debug_/cashout_ prefixes
+TESTING REQUIREMENTS:
+1. Friend Request Creation - POST /api/friends with action=send_request
+2. Database Query Compatibility - test friend request queries work with $or conditions
+3. Complete Friend Request Flow - test sending friend request between real users
 """
 
 import requests
