@@ -537,7 +537,7 @@ export default function TurfLootTactical() {
           clearInterval(maintCheckInterval)
         }
       }
-    }, 1000)
+    }, 200)
     
     return () => {
       window.removeEventListener('resize', checkMobile)
