@@ -2799,7 +2799,12 @@ export default function TurfLootTactical() {
 
     // Get the current friends list
     const currentFriends = friendsList.filter(f => f.status === 'accepted') || []
-    console.log('🎯 Loading friends for party creation:', currentFriends.length, 'friends')
+    console.log('🎯 Loading friends for party creation:', {
+      totalFriendsInList: friendsList.length,
+      acceptedFriends: currentFriends.length,
+      allFriends: friendsList,
+      acceptedFriendsData: currentFriends
+    })
 
     // Create the popup container
     const popup = document.createElement('div')
