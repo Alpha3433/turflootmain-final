@@ -286,6 +286,16 @@ async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
       userIdentifier: fromUserIdentifier
     })
     
+    console.log('🔍 Debug - Sender user lookup:', { 
+      fromUserIdentifier, 
+      fromUser: fromUser ? {
+        userIdentifier: fromUser.userIdentifier,
+        username: fromUser.username,
+        displayName: fromUser.displayName,
+        keys: Object.keys(fromUser)
+      } : null
+    })
+    
     if (!fromUser) {
       return NextResponse.json(
         { error: 'Sender user not found in database' },
