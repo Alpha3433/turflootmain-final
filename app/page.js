@@ -379,6 +379,38 @@ export default function TurfLootTactical() {
       setLoadingRequests(false)
     }
   }
+
+  const loadCurrentParty = async () => {
+    try {
+      setLoadingParty(true)
+      const userIdentifier = isAuthenticated ? 
+        (user?.wallet?.address || user?.email?.address || user?.id) : 
+        'guest'
+      
+      if (userIdentifier === 'guest') {
+        setCurrentParty(null)
+        return
+      }
+      
+      console.log('🎯 Loading current party for user:', userIdentifier)
+      
+      const response = await fetch(`/api/party?userIdentifier=${userIdentifier}&type=current`)
+      const result = await response.json()
+      
+      if (result.success && result.party) {
+        setCurrentParty(result.party)
+        console.log('✅ Current party loaded:', result.party)
+      } else {
+        setCurrentParty(null)
+        console.log('ℹ️ No current party found')
+      }
+    } catch (error) {
+      console.error('❌ Error loading current party:', error)
+      setCurrentParty(null)
+    } finally {
+      setLoadingParty(false)
+    }
+  }
   const [isLoadingLocalPractice, setIsLoadingLocalPractice] = useState(false)
   
   // Mouse tracking for interactive eyes
