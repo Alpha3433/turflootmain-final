@@ -109,38 +109,53 @@ async function handleCreatePartyAndInvite(userIdentifier, partyData, invitedFrie
   try {
     const { db } = await connectToDatabase()
     
-    // Get user info with debugging
+    // Get user info with flexible lookup
     console.log('🔍 Debug: Looking for user with userIdentifier:', userIdentifier)
     
-    // First check what fields exist in the users collection
-    const sampleUsers = await db.collection('users').find().limit(3).toArray()
-    console.log('🔍 Debug: Sample user documents:', sampleUsers.map(u => ({ 
-      fields: Object.keys(u),
-      userIdentifier: u.userIdentifier,
-      id: u._id,
-      email: u.email 
-    })))
-    
-    const user = await db.collection('users').findOne({ userIdentifier })
-    console.log('🔍 Debug: User lookup result:', user ? 'Found' : 'Not found')
+    // Try multiple lookup methods to find the user
+    let user = await db.collection('users').findOne({ userIdentifier })
+    let lookupMethod = 'userIdentifier'
     
     if (!user) {
-      // Try alternative lookup methods
-      const userByEmail = await db.collection('users').findOne({ email: userIdentifier })
-      const userByWallet = await db.collection('users').findOne({ walletAddress: userIdentifier })
-      
-      console.log('🔍 Debug: Alternative lookups - by email:', !!userByEmail, 'by wallet:', !!userByWallet)
-      
-      if (userByEmail || userByWallet) {
-        console.log('⚠️ Found user with alternative lookup, but userIdentifier field mismatch')
-        return NextResponse.json(
-          { error: 'User found but userIdentifier field mismatch - check database structure' },
-          { status: 404 }
-        )
-      }
+      // Try looking up by email (if userIdentifier is an email)
+      user = await db.collection('users').findOne({ email: userIdentifier })
+      lookupMethod = 'email'
+    }
+    
+    if (!user) {
+      // Try looking up by wallet address (if userIdentifier is a wallet)
+      user = await db.collection('users').findOne({ walletAddress: userIdentifier })
+      lookupMethod = 'walletAddress'
+    }
+    
+    if (!user) {
+      // Try looking up by any field that matches the userIdentifier
+      user = await db.collection('users').findOne({
+        $or: [
+          { userIdentifier: userIdentifier },
+          { email: userIdentifier },
+          { walletAddress: userIdentifier },
+          { id: userIdentifier },
+          { _id: userIdentifier }
+        ]
+      })
+      lookupMethod = 'flexible'
+    }
+    
+    console.log('🔍 Debug: User lookup result:', user ? `Found via ${lookupMethod}` : 'Not found')
+    
+    if (!user) {
+      // Debug: Check what users exist in the database
+      const sampleUsers = await db.collection('users').find().limit(3).toArray()
+      console.log('🔍 Debug: Sample user documents:', sampleUsers.map(u => ({ 
+        fields: Object.keys(u),
+        userIdentifier: u.userIdentifier,
+        email: u.email,
+        walletAddress: u.walletAddress
+      })))
       
       return NextResponse.json(
-        { error: 'User not found in database' },
+        { error: 'User not found in database. Check server logs for debugging info.' },
         { status: 404 }
       )
     }
