@@ -126,10 +126,13 @@ class SkinAvatarTester:
         total_members_with_skins = 0
         
         for user_id in test_users:
+            print(f"   🔍 Checking party for user: {user_id[:10]}...")
             response = self.make_request("GET", "/party", {
                 "type": "current",
                 "userIdentifier": user_id
             })
+            
+            print(f"   📝 Response: {response}")
             
             if response and response.get("success") and response.get("party"):
                 party = response.get("party")
@@ -147,6 +150,8 @@ class SkinAvatarTester:
                         else:
                             print(f"     - {member.get('username')}: No skin data")
                     break  # Found a party, no need to check other users
+            else:
+                print(f"   ⚠️ No party found for user {user_id[:10]}...")
         
         success = parties_with_skin_data > 0 and total_members_with_skins > 0
         details = f"Found {parties_with_skin_data} parties, {total_members_with_skins} members with skin data"
