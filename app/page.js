@@ -521,16 +521,16 @@ export default function TurfLootTactical() {
     // Initial auth check
     checkPrivyAuth()
     
-    // More frequent initial checks, then less frequent maintenance checks
+    // More frequent initial checks to catch Privy user loading, then less frequent maintenance checks
     let checkCount = 0
     const authCheckInterval = setInterval(() => {
       checkPrivyAuth()
       checkCount++
       
-      // After 30 seconds (30 checks), reduce frequency to every 5 seconds
-      if (checkCount >= 30) {
+      // After 50 checks (10 seconds at 200ms), reduce frequency to every 3 seconds
+      if (checkCount >= 50) {
         clearInterval(authCheckInterval)
-        const maintCheckInterval = setInterval(checkPrivyAuth, 5000)
+        const maintCheckInterval = setInterval(checkPrivyAuth, 3000)
         
         // Clean up maintenance interval on unmount
         return () => {
