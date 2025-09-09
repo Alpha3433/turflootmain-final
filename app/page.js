@@ -9244,7 +9244,7 @@ export default function TurfLootTactical() {
                     cursor: 'pointer',
                     textTransform: 'uppercase'
                   }}>
-                    💳 DEPOSIT
+                    💳 DEPOSIT SOL
                   </button>
                   <button style={{
                     flex: 1,
