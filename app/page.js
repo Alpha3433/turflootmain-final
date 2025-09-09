@@ -2892,7 +2892,7 @@ export default function TurfLootTactical() {
         <!-- Invite Friends Section -->
         <div style="margin-bottom: 24px;">
           <label style="display: block; color: #fc8181; font-size: 14px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px;">
-            👥 INVITE FRIENDS
+            👥 INVITE FRIENDS (${currentFriends.length} Available)
           </label>
           
           <!-- Friends Search -->
