@@ -295,12 +295,57 @@ def test_cleanup_function_logs():
         print(f"❌ Cleanup function logs test error: {e}")
         return False
 
-class FriendsSystemTester:
-    def __init__(self):
-        self.test_results = []
-        self.total_tests = 0
-        self.passed_tests = 0
-        self.failed_tests = 0
+def run_comprehensive_friends_system_test():
+    """Run all friends system tests"""
+    print("🚀 COMPREHENSIVE FRIENDS SYSTEM TESTING - UPDATED CLEANUP & REAL PRIVY USERS")
+    print("=" * 80)
+    
+    test_results = []
+    
+    # Test 1: API Health Check
+    test_results.append(("API Health Check", test_api_health()))
+    
+    # Test 2: Database Cleanup Verification
+    test_results.append(("Database Cleanup Verification", test_database_cleanup_verification()))
+    
+    # Test 3: Real User Validation
+    test_results.append(("Real User Validation", test_real_user_validation()))
+    
+    # Test 4: Clean User List
+    test_results.append(("Clean User List", test_clean_user_list()))
+    
+    # Test 5: Cleanup Function Logs
+    test_results.append(("Cleanup Function Logs", test_cleanup_function_logs()))
+    
+    # Summary
+    print("\n" + "=" * 80)
+    print("📊 FRIENDS SYSTEM TEST RESULTS SUMMARY")
+    print("=" * 80)
+    
+    passed_tests = 0
+    total_tests = len(test_results)
+    
+    for test_name, result in test_results:
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"{status}: {test_name}")
+        if result:
+            passed_tests += 1
+    
+    success_rate = (passed_tests / total_tests) * 100
+    print(f"\n📈 Overall Success Rate: {passed_tests}/{total_tests} ({success_rate:.1f}%)")
+    
+    if success_rate >= 80:
+        print("🎉 FRIENDS SYSTEM TESTING: SUCCESSFUL")
+        print("✅ Updated friends system with cleanup and real Privy user validation is working correctly")
+    else:
+        print("⚠️ FRIENDS SYSTEM TESTING: NEEDS ATTENTION")
+        print("❌ Some critical issues found in the updated friends system")
+    
+    return success_rate >= 80
+
+if __name__ == "__main__":
+    success = run_comprehensive_friends_system_test()
+    exit(0 if success else 1)
             {
                 "userIdentifier": "test_user_3_mongodb",
                 "username": "TestUser3", 
