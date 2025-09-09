@@ -1,26 +1,28 @@
 import { NextResponse } from 'next/server'
+import { MongoClient } from 'mongodb'
 
-// Mock friends data for development - will be replaced with database
-// Using a more persistent structure to simulate cross-user functionality
+// MongoDB connection
+let cachedClient = null
+let cachedDb = null
+
+async function connectToDatabase() {
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb }
+  }
+
+  const client = new MongoClient(process.env.MONGO_URL)
+  await client.connect()
+  const db = client.db('turfloot')
+
+  cachedClient = client
+  cachedDb = db
+
+  return { client, db }
+}
+
+// Mock friends data for development - will be replaced with database queries
 let mockFriends = new Map() // userIdentifier -> friends array
 let mockFriendRequests = new Map() // userIdentifier -> { sent: [], received: [] }
-let mockUsers = new Map() // username -> userIdentifier mapping
-
-// Demo users for discovery
-function getDemoUsers() {
-  return [
-    { username: 'TacticalAce', status: 'online', joinedAt: '2024-01-15', gamesPlayed: 127 },
-    { username: 'SniperPro', status: 'online', joinedAt: '2024-02-03', gamesPlayed: 89 },
-    { username: 'StealthWarrior', status: 'offline', joinedAt: '2024-01-28', gamesPlayed: 156 },
-    { username: 'CombatVet', status: 'online', joinedAt: '2024-02-10', gamesPlayed: 203 },
-    { username: 'ElitePlayer', status: 'in-game', joinedAt: '2024-01-20', gamesPlayed: 178 },
-    { username: 'ProGamer2024', status: 'online', joinedAt: '2024-02-15', gamesPlayed: 92 },
-    { username: 'WarMachine', status: 'offline', joinedAt: '2024-01-12', gamesPlayed: 234 },
-    { username: 'TacticalSniper', status: 'online', joinedAt: '2024-02-08', gamesPlayed: 145 },
-    { username: 'GameMaster', status: 'in-game', joinedAt: '2024-01-25', gamesPlayed: 189 },
-    { username: 'BattleRoyale', status: 'online', joinedAt: '2024-02-12', gamesPlayed: 67 }
-  ]
-}
 
 function getAvailableUsers(currentUserIdentifier) {
   // Get demo users
