@@ -256,89 +256,97 @@ async function handleSendFriendRequest(fromUserIdentifier, toUsername) {
   try {
     const { db } = await connectToDatabase()
     
-    // Find the target user by username in MongoDB
+    // Find the target user by username in MongoDB (only real Privy users)
     const targetUser = await db.collection('users').findOne({
       username: { $regex: new RegExp(`^${toUsername}$`, 'i') } // Case-insensitive match
     })
     
-    let toUserIdentifier = null
-    if (targetUser) {
-      toUserIdentifier = targetUser.userIdentifier
-      console.log('✅ Found target user in database:', { toUsername, toUserIdentifier })
-    } else {
-      // If user not found, create a mock user identifier for demo purposes
-      toUserIdentifier = `mock_user_${toUsername.toLowerCase()}_${Date.now()}`
-      console.log('🔍 Created mock user for demo:', { toUsername, toUserIdentifier })
+    if (!targetUser) {
+      return NextResponse.json(
+        { error: 'User not found. Only authenticated TurfLoot users can receive friend requests.' },
+        { status: 404 }
+      )
     }
+    
+    const toUserIdentifier = targetUser.userIdentifier
+    console.log('✅ Found target user in database:', { toUsername, toUserIdentifier })
+    
+    // Get sender user info
+    const fromUser = await db.collection('users').findOne({
+      userIdentifier: fromUserIdentifier
+    })
+    
+    if (!fromUser) {
+      return NextResponse.json(
+        { error: 'Sender user not found in database' },
+        { status: 404 }
+      )
+    }
+    
+    // Check if request already exists
+    const existingRequest = await db.collection('friend_requests').findOne({
+      fromUserIdentifier: fromUserIdentifier,
+      toUserIdentifier: toUserIdentifier,
+      status: 'pending'
+    })
+    
+    if (existingRequest) {
+      return NextResponse.json(
+        { error: 'Friend request already sent to this user' },
+        { status: 400 }
+      )
+    }
+    
+    // Check if they're already friends
+    const existingFriend = await db.collection('friends').findOne({
+      userIdentifier: fromUserIdentifier,
+      friendUserIdentifier: toUserIdentifier
+    })
+    
+    if (existingFriend) {
+      return NextResponse.json(
+        { error: 'This user is already your friend' },
+        { status: 400 }
+      )
+    }
+    
+    // Create the friend request in database
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const timestamp = new Date().toISOString()
+    
+    const friendRequest = {
+      id: requestId,
+      fromUserIdentifier: fromUserIdentifier,
+      fromUsername: fromUser.username,
+      toUserIdentifier: toUserIdentifier,
+      toUsername: targetUser.username,
+      sentAt: timestamp,
+      status: 'pending'
+    }
+    
+    // Store in database
+    await db.collection('friend_requests').insertOne(friendRequest)
+    
+    console.log('✅ Friend request stored in database successfully')
+    
+    return NextResponse.json({
+      success: true,
+      message: `Friend request sent to ${toUsername}`,
+      request: {
+        id: requestId,
+        toUsername: toUsername,
+        sentAt: timestamp,
+        status: 'pending'
+      }
+    })
+    
   } catch (error) {
-    console.error('❌ Error finding target user:', error)
-    // Fallback to mock user
-    toUserIdentifier = `mock_user_${toUsername.toLowerCase()}_${Date.now()}`
-  }
-  
-  // Check if already friends or request exists
-  const fromUserRequests = mockFriendRequests.get(fromUserIdentifier) || { sent: [], received: [] }
-  const toUserRequests = mockFriendRequests.get(toUserIdentifier) || { sent: [], received: [] }
-  
-  // Check if request already sent
-  const existingSentRequest = fromUserRequests.sent.find(r => r.toUsername.toLowerCase() === toUsername.toLowerCase())
-  if (existingSentRequest) {
+    console.error('❌ Error sending friend request:', error)
     return NextResponse.json(
-      { error: 'Friend request already sent to this user' },
-      { status: 400 }
+      { error: 'Failed to send friend request' },
+      { status: 500 }
     )
   }
-  
-  // Check if they're already friends
-  const fromUserFriends = mockFriends.get(fromUserIdentifier) || []
-  const existingFriend = fromUserFriends.find(f => f.username.toLowerCase() === toUsername.toLowerCase())
-  if (existingFriend) {
-    return NextResponse.json(
-      { error: 'This user is already your friend' },
-      { status: 400 }
-    )
-  }
-  
-  // Create the friend request
-  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  const timestamp = new Date().toISOString()
-  
-  // Get sender's username (for demo, extract from identifier or use placeholder)
-  const fromUsername = `User_${fromUserIdentifier.slice(-4)}`
-  
-  const sentRequest = {
-    id: requestId,
-    toUsername: toUsername,
-    toUserIdentifier: toUserIdentifier,
-    sentAt: timestamp,
-    status: 'pending'
-  }
-  
-  const receivedRequest = {
-    id: requestId,
-    fromUsername: fromUsername,
-    fromUserIdentifier: fromUserIdentifier,
-    receivedAt: timestamp,
-    status: 'pending'
-  }
-  
-  // Add to sender's sent requests
-  fromUserRequests.sent.push(sentRequest)
-  mockFriendRequests.set(fromUserIdentifier, fromUserRequests)
-  
-  // Add to receiver's received requests
-  toUserRequests.received.push(receivedRequest)
-  mockFriendRequests.set(toUserIdentifier, toUserRequests)
-  
-  console.log('✅ Friend request sent successfully')
-  console.log('📤 Sender requests:', fromUserRequests)
-  console.log('📥 Receiver requests:', toUserRequests)
-  
-  return NextResponse.json({
-    success: true,
-    message: `Friend request sent to ${toUsername}`,
-    request: sentRequest
-  })
 }
 
 async function handleAcceptFriendRequest(userIdentifier, requestId) {
