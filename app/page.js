@@ -5066,32 +5066,44 @@ export default function TurfLootTactical() {
                   gap: '6px',
                   marginBottom: '8px'
                 }}>
-                  {currentParty.members?.slice(0, 4).map((member, index) => (
-                    <div key={member.userIdentifier} style={getSkinAvatarStyle(member.equippedSkin, 32, member.isOnline)}>
-                      {/* Skin inner content */}
-                      <div style={{ 
-                        width: '70%', 
-                        height: '70%', 
-                        borderRadius: '50%', 
-                        background: 'rgba(255, 255, 255, 0.2)' 
-                      }} />
-                      
-                      {/* Online status dot */}
-                      {member.isOnline && (
-                        <div style={{
-                          position: 'absolute',
-                          top: '-2px',
-                          right: '-2px',
-                          width: '8px',
-                          height: '8px',
-                          background: '#22c55e',
-                          borderRadius: '50%',
-                          border: '1px solid rgba(26, 32, 44, 1)',
-                          boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
+                  {currentParty.members?.slice(0, 4).map((member, index) => {
+                    // Use current user's selected skin for their own avatar, otherwise use member's equipped skin
+                    const isCurrentUser = isAuthenticated && user && (
+                      member.userIdentifier === (user.wallet?.address || user.email || user.id)
+                    )
+                    const skinToUse = isCurrentUser ? selectedSkin : (member.equippedSkin || {
+                      type: 'circle',
+                      color: '#3b82f6',
+                      pattern: 'solid'
+                    })
+                    
+                    return (
+                      <div key={member.userIdentifier} style={getSkinAvatarStyle(skinToUse, 32, member.isOnline)}>
+                        {/* Skin inner content */}
+                        <div style={{ 
+                          width: '70%', 
+                          height: '70%', 
+                          borderRadius: '50%', 
+                          background: 'rgba(255, 255, 255, 0.2)' 
                         }} />
-                      )}
-                    </div>
-                  ))}
+                        
+                        {/* Online status dot */}
+                        {member.isOnline && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '-2px',
+                            right: '-2px',
+                            width: '8px',
+                            height: '8px',
+                            background: '#22c55e',
+                            borderRadius: '50%',
+                            border: '1px solid rgba(26, 32, 44, 1)',
+                            boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
+                          }} />
+                        )}
+                      </div>
+                    )
+                  })}
                   {currentParty.members?.length > 4 && (
                     <div style={{
                       width: '32px',
