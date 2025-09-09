@@ -2283,9 +2283,9 @@ const AgarIOGame = () => {
               e.target.style.boxShadow = isMobile ? '0 6px 25px rgba(0, 100, 255, 0.8)' : '0 6px 20px rgba(0, 100, 255, 0.4)'
             }}
             onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 0, 0, 0.9)'
+              e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
               e.target.style.transform = 'scale(1)'
-              e.target.style.boxShadow = isMobile ? '0 4px 20px rgba(255, 0, 0, 0.6)' : '0 4px 12px rgba(255, 0, 0, 0.3)'
+              e.target.style.boxShadow = isMobile ? '0 4px 20px rgba(0, 100, 255, 0.6)' : '0 4px 12px rgba(0, 100, 255, 0.3)'
             }}
           >
             {isMobile ? (
