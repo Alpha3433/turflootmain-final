@@ -1967,7 +1967,6 @@ export default function TurfLootTactical() {
       })
       
       // Equip skin buttons
-      const equipButtons = modal.querySelectorAll('.equip-skin-btn')
       console.log('🔧 Found equip buttons:', equipButtons.length)
       
       equipButtons.forEach((btn, index) => {
