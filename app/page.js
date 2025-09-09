@@ -113,7 +113,7 @@ export default function TurfLootTactical() {
 
   // Load username when authentication state changes and register Privy user
   useEffect(() => {
-    console.log('🔄 Auth state changed, loading username...')
+    console.log('🔄 Auth state changed:', { isAuthenticated, hasUser: !!user })
     const savedUsername = loadUsernameFromPrivy()
     if (savedUsername && !customUsername) {
       setCustomUsername(savedUsername)
@@ -122,6 +122,7 @@ export default function TurfLootTactical() {
 
     // Register/update Privy user in database when authenticated
     if (isAuthenticated && user) {
+      console.log('📝 Registering authenticated user...')
       registerPrivyUser()
     }
   }, [isAuthenticated, user])
