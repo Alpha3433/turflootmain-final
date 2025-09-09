@@ -6883,6 +6883,7 @@ export default function TurfLootTactical() {
             </div>
             <div 
               style={{ 
+                position: 'relative',
                 width: '24px', 
                 height: '24px', 
                 background: 'rgba(26, 32, 44, 0.8)', 
@@ -6911,6 +6912,29 @@ export default function TurfLootTactical() {
               }}
             >
               👥
+              {/* Notification Badge - Mobile */}
+              {friendRequests.received.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-4px',
+                  background: '#ef4444',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '14px',
+                  height: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '8px',
+                  fontWeight: 'bold',
+                  boxShadow: '0 0 6px rgba(239, 68, 68, 0.6)',
+                  border: '1px solid rgba(26, 32, 44, 1)',
+                  zIndex: 10
+                }}>
+                  {friendRequests.received.length > 9 ? '9+' : friendRequests.received.length}
+                </div>
+              )}
             </div>
             <div 
               style={{ 
