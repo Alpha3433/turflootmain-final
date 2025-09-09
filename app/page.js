@@ -236,24 +236,83 @@ export default function TurfLootTactical() {
   }
 
   const loadFriendsList = async () => {
-    if (!isAuthenticated) return
-    
-    setLoadingFriends(true)
     try {
-      const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
-      const response = await fetch(`/api/friends?userIdentifier=${encodeURIComponent(userIdentifier)}&type=friends`)
+      setLoadingFriends(true)
+      const userIdentifier = isAuthenticated ? 
+        (user?.wallet?.address || user?.email?.address || user?.id) : 
+        'guest'
+      
+      console.log('👥 Loading friends list for user:', userIdentifier)
+      
+      const response = await fetch(`/api/friends?userIdentifier=${userIdentifier}&type=friends`)
       const result = await response.json()
       
       if (result.success) {
         setFriendsList(result.friends)
-        console.log('✅ Friends loaded:', result.friends.length, 'friends')
+        console.log('✅ Friends list loaded:', result.friends.length, 'friends')
       } else {
         console.error('❌ Failed to load friends:', result.error)
+        setFriendsList([])
       }
     } catch (error) {
       console.error('❌ Error loading friends:', error)
+      setFriendsList([])
+    } finally {
+      setLoadingFriends(false)
     }
-    setLoadingFriends(false)
+  }
+
+  const createPartyAndSendInvites = async (partyData, selectedFriends) => {
+    try {
+      const userIdentifier = isAuthenticated ? 
+        (user?.wallet?.address || user?.email?.address || user?.id) : 
+        'guest'
+      
+      if (!userIdentifier || userIdentifier === 'guest') {
+        console.error('❌ User not authenticated for party creation')
+        return
+      }
+
+      console.log('🎯 Creating party and sending invites:', {
+        party: partyData,
+        invitedFriends: selectedFriends.length,
+        userIdentifier
+      })
+
+      // Create party and send invites via API
+      const response = await fetch('/api/party', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'create_and_invite',
+          userIdentifier,
+          partyData,
+          invitedFriends: selectedFriends
+        })
+      })
+
+      const result = await response.json()
+      
+      if (result.success) {
+        console.log('✅ Party created and invites sent successfully')
+        
+        // Update UI to show party status - you could update state here
+        // For now, let's reload the friends list to refresh any status
+        await loadFriendsList()
+        
+        // Show success in SOCIAL modal instead of popup
+        if (setFriendsModalStatus) {
+          setFriendsModalStatus(`🎯 Party "${partyData.name}" created! Invites sent to ${selectedFriends.length} friends.`)
+        }
+        
+      } else {
+        console.error('❌ Failed to create party:', result.error)
+      }
+    } catch (error) {
+      console.error('❌ Error creating party:', error)
+    }
   }
 
   const loadFriendRequests = async () => {
