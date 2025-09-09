@@ -21,6 +21,7 @@ class AddFriendModalBackendTester:
         self.total_tests = 0
         self.passed_tests = 0
         self.failed_tests = 0
+        self.test_users = []  # Track test users for cleanup
         
     def log_test(self, test_name, success, details="", response_data=None):
         """Log test results with detailed information"""
