@@ -191,3 +191,63 @@ async function handleCreatePartyAndInvite(userIdentifier, partyData, invitedFrie
     )
   }
 }
+
+async function handleAcceptPartyInvite(userIdentifier, inviteId, partyId) {
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Get user info
+    const user = await db.collection('users').findOne({ userIdentifier })
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
+    
+    // Find and remove the party invite
+    const invite = await db.collection('party_invites').findOne({
+      id: inviteId,
+      toUserIdentifier: userIdentifier,
+      status: 'pending'
+    })
+    
+    if (!invite) {
+      return NextResponse.json(
+        { error: 'Party invite not found' },
+        { status: 404 }
+      )
+    }
+    
+    // Remove the invite
+    await db.collection('party_invites').deleteOne({ id: inviteId })
+    
+    // Add user to the party
+    await db.collection('parties').updateOne(
+      { id: partyId },
+      { $addToSet: { currentPlayers: userIdentifier } }
+    )
+    
+    console.log('✅ Party invite accepted:', {
+      userIdentifier,
+      partyId,
+      partyName: invite.partyName
+    })
+    
+    return NextResponse.json({
+      success: true,
+      message: `Successfully joined party "${invite.partyName}"`,
+      party: {
+        id: partyId,
+        name: invite.partyName
+      }
+    })
+    
+  } catch (error) {
+    console.error('❌ Error accepting party invite:', error)
+    return NextResponse.json(
+      { error: 'Failed to accept party invite' },
+      { status: 500 }
+    )
+  }
+}
