@@ -458,15 +458,22 @@ def test_party_creation_and_invitation_system():
         return False
 
 if __name__ == "__main__":
-    print("🚀 Starting Friends List Data Transformation Backend Testing")
+    print("🚀 Starting Party Creation and Invitation System Backend Testing")
     print(f"🌐 Testing against: {BASE_URL}")
     print(f"📡 API Base URL: {API_BASE}")
+    print("\n🎯 TESTING FOCUS:")
+    print("   1. Party Creation Flow - POST /api/party with action=create_and_invite")
+    print("   2. Party Invite Retrieval - GET /api/party?type=invites&userIdentifier=test_user")
+    print("   3. Data Flow Validation - complete flow from creation to retrieval")
+    print("   4. Database Collection Structure - verify 'parties' and 'party_invites' collections")
     
-    success = test_friends_list_data_transformation()
+    success = test_party_creation_and_invitation_system()
     
     if success:
         print("\n✅ TESTING COMPLETED SUCCESSFULLY")
+        print("🎉 Party system is working correctly!")
         sys.exit(0)
     else:
         print("\n❌ TESTING COMPLETED WITH FAILURES")
+        print("🔍 Issues identified that may explain why party invites are not appearing")
         sys.exit(1)
