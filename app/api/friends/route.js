@@ -681,3 +681,60 @@ async function handleRemoveFriend(userIdentifier, friendIdentifier) {
     )
   }
 }
+
+export async function PUT(request) {
+  try {
+    const { action, userIdentifier, equippedSkin } = await request.json()
+    
+    console.log('⚙️ Friends PUT request:', { action, userIdentifier })
+    
+    if (!userIdentifier || userIdentifier === 'guest') {
+      return NextResponse.json(
+        { error: 'User authentication required' },
+        { status: 401 }
+      )
+    }
+    
+    if (action === 'update_equipped_skin') {
+      const { db } = await connectToDatabase()
+      
+      // Update user's equipped skin in database
+      const result = await db.collection('users').updateOne(
+        { userIdentifier: userIdentifier },
+        { 
+          $set: { 
+            equippedSkin: equippedSkin,
+            lastSkinUpdate: new Date().toISOString()
+          } 
+        }
+      )
+      
+      if (result.matchedCount === 0) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404 }
+        )
+      }
+      
+      console.log('✅ Equipped skin updated for user:', userIdentifier, equippedSkin)
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Equipped skin updated successfully',
+        equippedSkin: equippedSkin
+      })
+    }
+    
+    return NextResponse.json(
+      { error: 'Invalid action' },
+      { status: 400 }
+    )
+    
+  } catch (error) {
+    console.error('❌ Error handling PUT request:', error)
+    return NextResponse.json(
+      { error: 'Failed to process request' },
+      { status: 500 }
+    )
+  }
+}
