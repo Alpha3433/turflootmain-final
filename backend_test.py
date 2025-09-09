@@ -188,62 +188,101 @@ class AddFriendModalBackendTester:
             
         return False
 
-    def test_friend_request_sending(self):
-        """Test POST /api/friends with action=send_request"""
-        print("🔍 TESTING: Friend Request Sending")
+    def test_user_list_after_registration(self):
+        """Test GET /api/friends?type=users after registering users"""
+        print("🔍 TESTING: User List After Registration")
         try:
-            # Test sending a friend request
-            test_user_id = "test_user_sender_123"
-            target_username = "TacticalAce"  # From demo users
-            
-            payload = {
-                "action": "send_request",
-                "userIdentifier": test_user_id,
-                "friendUsername": target_username
-            }
-            
-            response = requests.post(
-                f"{API_BASE}/friends", 
-                json=payload,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
+            # First register a few test users
+            registered_users = []
+            for i in range(2):
+                test_user_id = f"privy_user_list_{int(time.time())}_{i}"
+                self.test_users.append(test_user_id)
                 
-                if 'success' in data and data['success']:
-                    if 'message' in data and target_username in data['message']:
-                        self.log_test(
-                            "Friend Request Sending", 
-                            True, 
-                            f"Successfully sent friend request to {target_username}"
-                        )
-                        return True
+                user_data = {
+                    "username": f"ListTestUser_{int(time.time())}_{i}",
+                    "displayName": f"List Test User {i}",
+                    "email": f"listtest{int(time.time())}_{i}@example.com",
+                    "walletAddress": f"0x{hex(int(time.time()) + i)[2:].zfill(40)}"
+                }
+                
+                payload = {
+                    "action": "register_user",
+                    "userIdentifier": test_user_id,
+                    "userData": user_data
+                }
+                
+                response = requests.post(
+                    f"{API_BASE}/friends", 
+                    json=payload,
+                    headers={'Content-Type': 'application/json'},
+                    timeout=10
+                )
+                
+                if response.status_code == 200:
+                    registered_users.append((test_user_id, user_data['username']))
+                
+                time.sleep(0.1)  # Small delay between registrations
+            
+            if len(registered_users) > 0:
+                # Now test getting user list from a different user
+                test_requester = f"privy_requester_{int(time.time())}"
+                response = requests.get(f"{API_BASE}/friends?type=users&userIdentifier={test_requester}", timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if 'success' in data and data['success'] and 'users' in data:
+                        users = data['users']
+                        
+                        # Should return the registered users
+                        if len(users) >= len(registered_users):
+                            # Check if our registered users are in the list
+                            returned_usernames = [u['username'] for u in users]
+                            registered_usernames = [u[1] for u in registered_users]
+                            
+                            found_users = [u for u in registered_usernames if u in returned_usernames]
+                            
+                            if len(found_users) >= 1:  # At least one of our users should be found
+                                self.log_test(
+                                    "User List After Registration", 
+                                    True, 
+                                    f"Retrieved {len(users)} users from MongoDB, found {len(found_users)} registered test users"
+                                )
+                                return True
+                            else:
+                                self.log_test(
+                                    "User List After Registration", 
+                                    False, 
+                                    f"Registered users not found in user list. Expected: {registered_usernames}, Got: {returned_usernames[:5]}"
+                                )
+                        else:
+                            self.log_test(
+                                "User List After Registration", 
+                                False, 
+                                f"Expected at least {len(registered_users)} users, got {len(users)}"
+                            )
                     else:
                         self.log_test(
-                            "Friend Request Sending", 
+                            "User List After Registration", 
                             False, 
-                            "Success response but missing expected message",
+                            "Invalid response structure",
                             data
                         )
                 else:
                     self.log_test(
-                        "Friend Request Sending", 
+                        "User List After Registration", 
                         False, 
-                        "Request failed according to response",
-                        data
+                        f"Failed to get user list: {response.status_code}"
                     )
             else:
                 self.log_test(
-                    "Friend Request Sending", 
+                    "User List After Registration", 
                     False, 
-                    f"API returned status {response.status_code}",
-                    response.text
+                    "Failed to register any test users"
                 )
                 
         except Exception as e:
-            self.log_test("Friend Request Sending", False, f"Request failed: {str(e)}")
+            self.log_test("User List After Registration", False, f"Request failed: {str(e)}")
             
         return False
 
