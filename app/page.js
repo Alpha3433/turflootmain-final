@@ -1123,14 +1123,13 @@ export default function TurfLootTactical() {
 
   // COMPLETELY REWRITTEN Wallet operations with clean Privy integration
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT button clicked - clean Privy implementation')
+    console.log('💰 DEPOSIT button clicked - Solana-only implementation')
     
     try {
-      // Simple authentication check without complex bridge calls
+      // Simple authentication check
       if (!isAuthenticated || !user) {
         console.log('🔐 User not authenticated, opening Privy login...')
         
-        // Use simple Privy login without custom bridge
         const privy = window.__TURFLOOT_PRIVY__
         if (privy && privy.login) {
           await privy.login()
@@ -1164,60 +1163,72 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('✅ Privy authenticated, proceeding with deposit...')
+      console.log('✅ Privy authenticated, proceeding with Solana deposit...')
       console.log('🔍 User ID:', privy.user.id)
       console.log('🔍 Has embedded wallet:', !!privy.user.wallet)
-      console.log('🔍 Linked accounts:', privy.user.linkedAccounts?.length)
       
-      // Simple wallet check and creation
+      // Ensure user has a Solana wallet
       if (!privy.user.wallet) {
-        console.log('🔑 No embedded wallet found, creating one...')
+        console.log('🔑 No embedded wallet found, creating Solana wallet...')
         
         try {
           await privy.createWallet()
           
-          // Simple wait for wallet creation
+          // Wait for wallet creation
           await new Promise(resolve => setTimeout(resolve, 2000))
           
           if (!privy.user.wallet) {
-            throw new Error('Wallet creation failed')
+            throw new Error('Solana wallet creation failed')
           }
           
-          console.log('✅ Embedded wallet created:', privy.user.wallet.address)
+          console.log('✅ Solana wallet created:', privy.user.wallet.address)
         } catch (error) {
-          console.error('❌ Wallet creation failed:', error)
-          alert('❌ Failed to create wallet. Please try again or contact support.')
+          console.error('❌ Solana wallet creation failed:', error)
+          alert('❌ Failed to create Solana wallet. Please try again or contact support.')
           return
         }
       }
       
-      // Final validation
+      // Validate Solana wallet
       const wallet = privy.user.wallet
       if (!wallet || !wallet.address) {
-        console.error('❌ No valid wallet available')
-        alert('❌ No wallet available. Please disconnect and reconnect your account.')
+        console.error('❌ No valid Solana wallet available')
+        alert('❌ No Solana wallet available. Please disconnect and reconnect your account.')
         return
       }
       
-      console.log('✅ Valid wallet found:', wallet.address)
+      console.log('✅ Valid Solana wallet found:', wallet.address)
       
-      // Call fundWallet with minimal complexity
-      console.log('💰 Opening Privy funding interface...')
+      // Call Privy's fundWallet for Solana deposits
+      console.log('💰 Opening Privy Solana funding interface...')
       
-      await privy.fundWallet()
-      
-      console.log('✅ Privy funding interface opened successfully!')
+      // Use the exposed fundWallet function from the bridge
+      if (privy.fundWallet && typeof privy.fundWallet === 'function') {
+        await privy.fundWallet()
+        console.log('✅ Privy Solana funding interface opened successfully!')
+      } else {
+        // Fallback to raw fundWallet if bridge function is not available
+        const { _rawFundWallet } = privy
+        if (_rawFundWallet && typeof _rawFundWallet === 'function') {
+          await _rawFundWallet()
+          console.log('✅ Privy Solana funding interface opened via raw function!')
+        } else {
+          throw new Error('Privy fundWallet function not available')
+        }
+      }
       
     } catch (error) {
-      console.error('❌ Deposit error:', error)
+      console.error('❌ Solana deposit error:', error)
       
       // Handle specific errors
       if (error.message?.includes('invalid address')) {
-        alert('❌ Wallet address issue detected. Please:\n\n1. Refresh the page\n2. Disconnect and reconnect your wallet\n3. Try the deposit again')
+        alert('❌ Solana wallet address issue detected. Please:\n\n1. Refresh the page\n2. Disconnect and reconnect your wallet\n3. Try the deposit again')
       } else if (error.message?.includes('User rejected')) {
-        console.log('ℹ️ User cancelled the operation')
+        console.log('ℹ️ User cancelled the Solana deposit operation')
+      } else if (error.message?.includes('not available')) {
+        alert('❌ Solana deposit functionality not available. Please refresh the page and try again.')
       } else {
-        alert(`❌ Deposit failed: ${error.message}\n\nPlease refresh the page and try again.`)
+        alert(`❌ Solana deposit failed: ${error.message}\n\nPlease refresh the page and try again.`)
       }
     }
   }
