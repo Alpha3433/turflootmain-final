@@ -184,6 +184,11 @@ const AgarIOGame = () => {
         spawnProtectionStart: Date.now()
       }
       
+      // Player pieces for splitting (Agar.io style)
+      this.playerPieces = []
+      this.splitCooldown = 0 // Prevent spam splitting
+      this.recombineTime = 30 // Seconds before pieces can recombine
+      
       this.coins = []
       this.enemies = []
       this.viruses = []
