@@ -6281,6 +6281,11 @@ export default function TurfLootTactical() {
                           // Clear input and close modal
                           friendUsernameInput.value = ''
                           setIsAddFriendModalOpen(false)
+                          
+                          // Refresh friend requests to show in sent list
+                          if (isFriendsModalOpen) {
+                            loadFriendRequests()
+                          }
                         } else {
                           alert(`❌ Failed to send friend request: ${result.error}`)
                           console.error('❌ Friend request failed:', result.error)
