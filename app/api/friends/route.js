@@ -24,27 +24,71 @@ async function connectToDatabase() {
 let mockFriends = new Map() // userIdentifier -> friends array
 let mockFriendRequests = new Map() // userIdentifier -> { sent: [], received: [] }
 
-function getAvailableUsers(currentUserIdentifier) {
-  // Get demo users
-  const demoUsers = getDemoUsers()
-  
-  // Get current user's friends and pending requests to filter out
-  const userFriends = mockFriends.get(currentUserIdentifier) || []
-  const userRequests = mockFriendRequests.get(currentUserIdentifier) || { sent: [], received: [] }
-  
-  const friendUsernames = userFriends.map(f => f.username.toLowerCase())
-  const sentRequestUsernames = userRequests.sent.map(r => r.toUsername.toLowerCase())
-  const receivedRequestUsernames = userRequests.received.map(r => r.fromUsername.toLowerCase())
-  
-  // Filter out users who are already friends or have pending requests
-  const availableUsers = demoUsers.filter(user => {
-    const username = user.username.toLowerCase()
-    return !friendUsernames.includes(username) && 
-           !sentRequestUsernames.includes(username) && 
-           !receivedRequestUsernames.includes(username)
-  })
-  
-  return availableUsers
+async function getPrivyUsers(currentUserIdentifier) {
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Get all Privy users who have signed up
+    const users = await db.collection('users').find({
+      userIdentifier: { $ne: currentUserIdentifier } // Exclude current user
+    }).toArray()
+    
+    // Get current user's friends and pending requests to filter out
+    const userFriends = mockFriends.get(currentUserIdentifier) || []
+    const userRequests = mockFriendRequests.get(currentUserIdentifier) || { sent: [], received: [] }
+    
+    const friendUsernames = userFriends.map(f => f.username.toLowerCase())
+    const sentRequestUsernames = userRequests.sent.map(r => r.toUsername.toLowerCase())
+    const receivedRequestUsernames = userRequests.received.map(r => r.fromUsername.toLowerCase())
+    
+    // Filter out users who are already friends or have pending requests
+    const availableUsers = users.filter(user => {
+      const username = (user.username || user.displayName || 'Unknown').toLowerCase()
+      return !friendUsernames.includes(username) && 
+             !sentRequestUsernames.includes(username) && 
+             !receivedRequestUsernames.includes(username)
+    }).map(user => ({
+      username: user.username || user.displayName || `User_${user.userIdentifier.slice(-4)}`,
+      status: user.isOnline ? 'online' : 'offline',
+      joinedAt: user.createdAt || user.joinedAt || new Date().toISOString(),
+      gamesPlayed: user.gamesPlayed || 0
+    }))
+    
+    return availableUsers
+  } catch (error) {
+    console.error('❌ Error fetching Privy users:', error)
+    return []
+  }
+}
+
+async function storePrivyUser(userIdentifier, userData) {
+  try {
+    const { db } = await connectToDatabase()
+    
+    const userDoc = {
+      userIdentifier,
+      username: userData.username || userData.displayName || `User_${userIdentifier.slice(-4)}`,
+      displayName: userData.displayName,
+      email: userData.email,
+      walletAddress: userData.walletAddress,
+      createdAt: new Date().toISOString(),
+      lastSeenAt: new Date().toISOString(),
+      isOnline: true,
+      gamesPlayed: 0
+    }
+    
+    await db.collection('users').updateOne(
+      { userIdentifier },
+      { $set: userDoc },
+      { upsert: true }
+    )
+    
+    console.log('✅ Privy user stored/updated:', userIdentifier)
+    return true
+  } catch (error) {
+    console.error('❌ Error storing Privy user:', error)
+    return false
+  }
 }
 
 export async function GET(request) {
