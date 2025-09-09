@@ -250,12 +250,18 @@ def test_party_creation_and_invitation_system():
                 test_results["critical_issues"].append("Party creation endpoint not working correctly")
         else:
             # Check if it's a user not found error or other issue
-            if party_response.status_code == 401:
+            if party_response.status_code == 404 and "User not found" in party_response.text:
+                print("⚠️ Party creation failed - User not found in database")
+                print("   ROOT CAUSE IDENTIFIED: Party creation requires users to exist in 'users' collection")
+                print("   This explains why party invites are not appearing - creation fails at user lookup")
+                test_results["failed_tests"] += 1
+                test_results["test_details"].append("❌ Party Creation - FAILED (user not found)")
+                test_results["critical_issues"].append("Party creation requires users to be registered in database first")
+            elif party_response.status_code == 401:
                 print("⚠️ Party creation failed - authentication required")
-                print("   This suggests the party system requires user registration in database")
                 test_results["failed_tests"] += 1
                 test_results["test_details"].append("❌ Party Creation - FAILED (authentication required)")
-                test_results["critical_issues"].append("Party creation requires database user registration")
+                test_results["critical_issues"].append("Party creation authentication issue")
             elif party_response.status_code == 404:
                 print("❌ Party creation endpoint not found")
                 test_results["failed_tests"] += 1
