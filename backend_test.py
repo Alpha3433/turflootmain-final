@@ -120,54 +120,45 @@ class FriendsSystemTester:
             )
             return False
 
-    def test_empty_database_initial_state(self):
-        """Test GET /api/friends?type=users when no users registered yet"""
-        print("🔍 TESTING: Empty Database Initial State")
+    def test_real_users_only_validation_guest(self):
+        """Test 2: Real Users Only Validation - Verify GET /api/friends?type=users returns only authenticated users from database"""
         try:
-            # Test guest user scenario - should return empty array
+            # Test guest user access (should return empty with message)
             response = requests.get(f"{API_BASE}/friends?type=users&userIdentifier=guest", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                
-                # Validate response structure
-                if 'success' in data and data['success'] and 'users' in data:
-                    users = data['users']
-                    
-                    # For guest users, should return empty array with message
-                    if len(users) == 0 and 'message' in data:
-                        self.log_test(
-                            "Empty Database Initial State", 
-                            True, 
-                            f"Guest user correctly returns empty array with message: '{data['message']}'"
-                        )
-                        return True
-                    else:
-                        self.log_test(
-                            "Empty Database Initial State", 
-                            False, 
-                            f"Expected empty array for guest, got {len(users)} users",
-                            data
-                        )
+                if (data.get('success') == True and 
+                    data.get('users') == [] and 
+                    'log in' in data.get('message', '').lower()):
+                    self.log_test(
+                        "Real Users Only Validation - Guest Access",
+                        True,
+                        f"Guest users correctly blocked: {data.get('message')}"
+                    )
+                    return True
                 else:
                     self.log_test(
-                        "Empty Database Initial State", 
-                        False, 
-                        "Invalid response structure - missing success or users field",
-                        data
+                        "Real Users Only Validation - Guest Access",
+                        False,
+                        f"Unexpected guest response: {data}"
                     )
+                    return False
             else:
                 self.log_test(
-                    "Empty Database Initial State", 
-                    False, 
-                    f"API returned status {response.status_code}",
-                    response.text
+                    "Real Users Only Validation - Guest Access",
+                    False,
+                    f"HTTP {response.status_code}: {response.text}"
                 )
+                return False
                 
         except Exception as e:
-            self.log_test("Empty Database Initial State", False, f"Request failed: {str(e)}")
-            
-        return False
+            self.log_test(
+                "Real Users Only Validation - Guest Access",
+                False,
+                error_msg=str(e)
+            )
+            return False
 
     def test_user_registration(self):
         """Test POST /api/friends with action=register_user"""
