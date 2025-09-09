@@ -96,7 +96,7 @@ class SkinAvatarTester:
         # Verify user appears in user list (may take a moment due to cleanup)
         time.sleep(1)
         
-        users_response = self.make_request("GET", "/friends", {
+        users_response = self.make_request("GET", "/friends", params={
             "type": "users",
             "userIdentifier": "verification_user_12345"
         })
