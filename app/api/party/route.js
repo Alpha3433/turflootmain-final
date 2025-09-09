@@ -54,6 +54,49 @@ export async function GET(request) {
       })
     }
     
+    if (requestType === 'current') {
+      // Get user's current party
+      const { db } = await connectToDatabase()
+      
+      const currentParty = await db.collection('parties').findOne({
+        currentPlayers: userIdentifier,
+        status: { $ne: 'finished' }
+      })
+      
+      if (currentParty) {
+        // Get party member details
+        const memberUsers = await db.collection('users').find({
+          userIdentifier: { $in: currentParty.currentPlayers }
+        }).toArray()
+        
+        const partyWithMembers = {
+          ...currentParty,
+          members: memberUsers.map(member => ({
+            userIdentifier: member.userIdentifier,
+            username: member.username || member.displayName || 'Unknown User',
+            isOnline: member.isOnline || false
+          }))
+        }
+        
+        console.log('✅ Current party retrieved:', {
+          partyId: currentParty.id,
+          partyName: currentParty.name,
+          memberCount: currentParty.currentPlayers.length
+        })
+        
+        return NextResponse.json({
+          success: true,
+          party: partyWithMembers
+        })
+      } else {
+        console.log('ℹ️ No current party found for user')
+        return NextResponse.json({
+          success: true,
+          party: null
+        })
+      }
+    }
+    
     return NextResponse.json({
       success: true,
       invites: [],
