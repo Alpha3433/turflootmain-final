@@ -26,9 +26,23 @@ async function getPrivyUsers(currentUserIdentifier) {
   try {
     const { db } = await connectToDatabase()
     
-    // Get all Privy users who have signed up
+    // Clean up test/mock users first
+    await cleanupTestUsers(db)
+    
+    // Get only real Privy users who have signed up (exclude test users)
     const users = await db.collection('users').find({
-      userIdentifier: { $ne: currentUserIdentifier } // Exclude current user
+      userIdentifier: { 
+        $ne: currentUserIdentifier,
+        // Exclude test users with these patterns
+        $not: {
+          $regex: /(test|debug|mock|demo|cashout\.test|debug\.test)/i
+        }
+      },
+      // Only include users with valid email or wallet address (real Privy accounts)
+      $or: [
+        { email: { $exists: true, $ne: null, $ne: '' } },
+        { walletAddress: { $exists: true, $ne: null, $ne: '' } }
+      ]
     }).toArray()
     
     // Get current user's friends from database
