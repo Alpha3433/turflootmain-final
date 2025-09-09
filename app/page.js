@@ -316,24 +316,45 @@ export default function TurfLootTactical() {
   }
 
   const loadFriendRequests = async () => {
-    if (!isAuthenticated) return
-    
-    setLoadingRequests(true)
     try {
-      const userIdentifier = user?.wallet?.address || user?.email?.address || user?.id
-      const response = await fetch(`/api/friends?userIdentifier=${encodeURIComponent(userIdentifier)}&type=requests`)
-      const result = await response.json()
+      setLoadingRequests(true)
+      const userIdentifier = isAuthenticated ? 
+        (user?.wallet?.address || user?.email?.address || user?.id) : 
+        'guest'
       
-      if (result.success) {
-        setFriendRequests(result.requests)
-        console.log('✅ Friend requests loaded:', result.requests)
+      console.log('📬 Loading requests and invites for user:', userIdentifier)
+      
+      // Load both friend requests and party invites
+      const [friendResponse, partyResponse] = await Promise.all([
+        fetch(`/api/friends?userIdentifier=${userIdentifier}&type=requests`),
+        fetch(`/api/party?userIdentifier=${userIdentifier}&type=invites`).catch(() => ({ json: () => ({ success: false, invites: [] }) }))
+      ])
+      
+      const friendResult = await friendResponse.json()
+      const partyResult = await partyResponse.json()
+      
+      if (friendResult.success) {
+        // Combine friend requests and party invites
+        const combinedRequests = {
+          sent: friendResult.requests.sent || [],
+          received: (friendResult.requests.received || []).concat(partyResult.invites || [])
+        }
+        
+        setFriendRequests(combinedRequests)
+        console.log('✅ Requests and invites loaded:', {
+          friendRequests: friendResult.requests,
+          partyInvites: partyResult.invites?.length || 0
+        })
       } else {
-        console.error('❌ Failed to load friend requests:', result.error)
+        console.error('❌ Failed to load requests:', friendResult.error)
+        setFriendRequests({ sent: [], received: [] })
       }
     } catch (error) {
-      console.error('❌ Error loading friend requests:', error)
+      console.error('❌ Error loading requests and invites:', error)
+      setFriendRequests({ sent: [], received: [] })
+    } finally {
+      setLoadingRequests(false)
     }
-    setLoadingRequests(false)
   }
   const [isLoadingLocalPractice, setIsLoadingLocalPractice] = useState(false)
   
