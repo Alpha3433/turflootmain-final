@@ -145,7 +145,12 @@ async function storePrivyUser(userIdentifier, userData) {
       createdAt: new Date().toISOString(),
       lastSeenAt: new Date().toISOString(),
       isOnline: true,
-      gamesPlayed: 0
+      gamesPlayed: 0,
+      equippedSkin: userData.equippedSkin || {
+        type: 'circle',
+        color: '#3b82f6',
+        pattern: 'solid'
+      }
     }
     
     await db.collection('users').updateOne(
