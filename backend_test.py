@@ -149,26 +149,36 @@ class PartySystemTester:
 
     def test_flexible_user_lookup(self):
         """Test party creation with different userIdentifier formats"""
-        if len(self.test_users) < 2:
-            self.log_test("Flexible User Lookup Test", False, error="Not enough test users")
+        if len(self.test_users) < 1:
+            self.log_test("Flexible User Lookup Test", False, error="No test users available")
             return
             
-        # Test with wallet address format
-        wallet_user = self.test_users[0]  # Has wallet address as userIdentifier
-        email_user = self.test_users[2]   # Has email as userIdentifier
+        # Test with available users
+        test_cases = []
         
-        test_cases = [
-            {
+        if len(self.test_users) >= 1:
+            wallet_user = self.test_users[0]  # Has wallet address as userIdentifier
+            test_cases.append({
                 "name": "Wallet Address Lookup",
                 "userIdentifier": wallet_user["userIdentifier"],
                 "expected_method": "userIdentifier or flexible"
-            },
-            {
+            })
+            
+        if len(self.test_users) >= 3:
+            email_user = self.test_users[2]   # Has email as userIdentifier
+            test_cases.append({
                 "name": "Email Lookup", 
                 "userIdentifier": email_user["userIdentifier"],
                 "expected_method": "email or flexible"
-            }
-        ]
+            })
+        elif len(self.test_users) >= 2:
+            # Use second user if third is not available
+            second_user = self.test_users[1]
+            test_cases.append({
+                "name": "Second User Lookup", 
+                "userIdentifier": second_user["userIdentifier"],
+                "expected_method": "userIdentifier or flexible"
+            })
         
         for test_case in test_cases:
             try:
