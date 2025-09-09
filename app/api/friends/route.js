@@ -232,12 +232,23 @@ export async function GET(request) {
         userIdentifier: userIdentifier
       }).toArray()
       
-      console.log('✅ Friends list retrieved from database:', userFriends.length, 'friends')
+      // Transform the data to match frontend expectations
+      const transformedFriends = userFriends.map(friend => ({
+        id: friend.friendUserIdentifier,
+        username: friend.friendUsername,
+        status: friend.status,
+        addedAt: friend.addedAt,
+        lastSeen: friend.lastSeen,
+        isOnline: friend.isOnline || false
+      }))
+      
+      console.log('✅ Friends list retrieved from database:', transformedFriends.length, 'friends')
+      console.log('🔍 Friend data sample:', transformedFriends[0] || 'No friends')
       
       return NextResponse.json({
         success: true,
-        friends: userFriends,
-        count: userFriends.length
+        friends: transformedFriends,
+        count: transformedFriends.length
       })
     }
     
