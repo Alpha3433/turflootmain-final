@@ -7832,7 +7832,7 @@ export default function TurfLootTactical() {
                 }}>
                   👤
                 </div>
-                <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>NO SQUAD</div>
+                <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>NO PARTY</div>
               </div>
             )}
             
