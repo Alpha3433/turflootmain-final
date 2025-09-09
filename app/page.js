@@ -3112,11 +3112,32 @@ export default function TurfLootTactical() {
     // Create party functionality
     modal.querySelector('#create-party-btn').addEventListener('click', async () => {
       const partyName = modal.querySelector('#party-name-input').value.trim()
-      const selectedFriends = Array.from(modal.querySelectorAll('.friend-checkbox:checked')).map(cb => cb.closest('.friend-invite-item').dataset.friendId)
+      
+      // Get selected friends with better error handling
+      const checkedBoxes = modal.querySelectorAll('.friend-checkbox:checked')
+      console.log('🔍 Debug: Found checked boxes:', checkedBoxes.length)
+      
+      const selectedFriends = Array.from(checkedBoxes).map(cb => {
+        const item = cb.closest('.friend-invite-item')
+        const friendId = item ? item.dataset.friendId : null
+        const friendName = item ? item.querySelector('span').textContent : 'Unknown'
+        console.log('🔍 Debug: Processing friend:', { friendId, friendName })
+        return {
+          id: friendId,
+          username: friendName
+        }
+      }).filter(friend => friend.id) // Remove any invalid entries
+      
+      console.log('🎯 Debug: Selected friends for invitation:', selectedFriends)
       
       if (!partyName) {
         modal.querySelector('#party-name-input').style.border = '2px solid #e53e3e'
         modal.querySelector('#party-name-input').focus()
+        return
+      }
+      
+      if (selectedFriends.length === 0) {
+        alert('Please select at least one friend to invite to the party!')
         return
       }
 
