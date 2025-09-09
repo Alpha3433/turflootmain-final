@@ -8220,7 +8220,7 @@ export default function TurfLootTactical() {
                 fontFamily: '"Rajdhani", sans-serif',
                 textTransform: 'uppercase'
               }}>
-                DEPOSIT
+                DEPOSIT SOL
               </button>
               <button 
                 onClick={handleWithdraw}
