@@ -5228,29 +5228,54 @@ export default function TurfLootTactical() {
                     })
                     
                     return (
-                      <div key={member.userIdentifier} style={getSkinAvatarStyle(skinToUse, 32, member.isOnline)}>
-                        {/* Skin inner content */}
-                        <div style={{ 
-                          width: '70%', 
-                          height: '70%', 
-                          borderRadius: '50%', 
-                          background: 'rgba(255, 255, 255, 0.2)' 
-                        }} />
-                        
-                        {/* Online status dot */}
-                        {member.isOnline && (
-                          <div style={{
-                            position: 'absolute',
-                            top: '-2px',
-                            right: '-2px',
-                            width: '8px',
-                            height: '8px',
-                            background: '#22c55e',
-                            borderRadius: '50%',
-                            border: '1px solid rgba(26, 32, 44, 1)',
-                            boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
+                      <div key={member.userIdentifier} style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        {/* Member avatar circle */}
+                        <div style={getSkinAvatarStyle(skinToUse, 32, member.isOnline)}>
+                          {/* Skin inner content */}
+                          <div style={{ 
+                            width: '70%', 
+                            height: '70%', 
+                            borderRadius: '50%', 
+                            background: 'rgba(255, 255, 255, 0.2)' 
                           }} />
-                        )}
+                          
+                          {/* Online status dot */}
+                          {member.isOnline && (
+                            <div style={{
+                              position: 'absolute',
+                              top: '-2px',
+                              right: '-2px',
+                              width: '8px',
+                              height: '8px',
+                              background: '#22c55e',
+                              borderRadius: '50%',
+                              border: '1px solid rgba(26, 32, 44, 1)',
+                              boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
+                            }} />
+                          )}
+                        </div>
+                        
+                        {/* Username directly below the circle */}
+                        <div style={{
+                          color: member.isOnline ? '#e2e8f0' : '#9ca3af',
+                          fontSize: '10px',
+                          fontWeight: '500',
+                          textAlign: 'center',
+                          fontFamily: '"Rajdhani", sans-serif',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          maxWidth: '40px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {member.username || 'USER'}
+                        </div>
                       </div>
                     )
                   })}
