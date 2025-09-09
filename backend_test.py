@@ -158,21 +158,20 @@ def test_party_creation_and_invitation_system():
         print("🎮 Creating party with invites...")
         party_response = requests.post(f"{API_BASE}/party", json=party_creation_data, timeout=10)
         
-        if request_response.status_code == 200:
-            request_data = request_response.json()
-            if request_data.get("success"):
-                request_id = request_data.get("request", {}).get("id")
-                print(f"✅ Friend request sent successfully: {request_id}")
+        if party_response.status_code == 200:
+            party_data = party_response.json()
+            if party_data.get("success"):
+                party_id = party_data.get("party", {}).get("id")
+                print(f"✅ Party created successfully: {party_id}")
+                print(f"   Party name: {party_data.get('party', {}).get('name')}")
+                print(f"   Invites sent: {party_data.get('party', {}).get('invitesSent')}")
                 
-                # Step 3: Accept friend request
-                accept_data = {
-                    "action": "accept_request",
-                    "userIdentifier": test_user_2,
-                    "requestId": request_id
-                }
+                # Step 3: Wait for data to propagate
+                print("⏳ Waiting for party invites to propagate...")
+                time.sleep(2)
                 
-                print("✅ Accepting friend request...")
-                accept_response = requests.post(f"{API_BASE}/friends", json=accept_data, timeout=10)
+                # Step 4: Check if invites were received
+                invite_check_response = requests.get(f"{API_BASE}/party?type=invites&userIdentifier={party_friend_1}", timeout=10)
                 
                 if accept_response.status_code == 200:
                     accept_result = accept_response.json()
