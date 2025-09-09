@@ -196,12 +196,18 @@ export async function GET(request) {
       const { db } = await connectToDatabase()
       
       const sentRequests = await db.collection('friend_requests').find({
-        fromUserIdentifier: userIdentifier,
+        $or: [
+          { fromUserIdentifier: userIdentifier },
+          { fromUserId: userIdentifier }
+        ],
         status: 'pending'
       }).toArray()
       
       const receivedRequests = await db.collection('friend_requests').find({
-        toUserIdentifier: userIdentifier,
+        $or: [
+          { toUserIdentifier: userIdentifier },
+          { toUserId: userIdentifier }
+        ],
         status: 'pending'
       }).toArray()
       
