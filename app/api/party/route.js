@@ -152,6 +152,73 @@ export async function GET(request) {
       })
     }
     
+    if (requestType === 'friends') {
+      // Get private parties from friends (parties where user was invited or could join)
+      const { db } = await connectToDatabase()
+      
+      // First, get user's friends list
+      const userFriends = await db.collection('friends').find({
+        $or: [
+          { userIdentifier, status: 'accepted' },
+          { friendIdentifier: userIdentifier, status: 'accepted' }
+        ]
+      }).toArray()
+      
+      // Extract friend identifiers
+      const friendIds = userFriends.map(friendship => 
+        friendship.userIdentifier === userIdentifier 
+          ? friendship.friendIdentifier 
+          : friendship.userIdentifier
+      )
+      
+      // Get private parties created by friends
+      const friendsParties = await db.collection('parties').find({
+        privacy: 'private',
+        status: 'waiting',
+        createdBy: { $in: friendIds },
+        $expr: { $lt: [{ $size: "$currentPlayers" }, "$maxPlayers"] } // Party not full
+      }).toArray()
+      
+      // Get party details with member information
+      const partiesWithDetails = await Promise.all(
+        friendsParties.map(async (party) => {
+          // Get member details
+          const memberUsers = await db.collection('users').find({
+            userIdentifier: { $in: party.currentPlayers }
+          }).toArray()
+          
+          return {
+            id: party.id,
+            name: party.name,
+            privacy: party.privacy,
+            maxPlayers: party.maxPlayers,
+            currentPlayerCount: party.currentPlayers.length,
+            createdBy: party.createdBy,
+            createdByUsername: party.createdByUsername,
+            createdAt: party.createdAt,
+            members: memberUsers.map(member => ({
+              userIdentifier: member.userIdentifier,
+              username: member.username || member.displayName || 'Unknown User',
+              isOnline: member.isOnline || false,
+              equippedSkin: member.equippedSkin || {
+                type: 'circle',
+                color: '#3b82f6',
+                pattern: 'solid'
+              }
+            }))
+          }
+        })
+      )
+      
+      console.log('✅ Friends parties retrieved:', partiesWithDetails.length, 'parties')
+      
+      return NextResponse.json({
+        success: true,
+        parties: partiesWithDetails,
+        count: partiesWithDetails.length
+      })
+    }
+    
     return NextResponse.json({
       success: true,
       invites: [],
