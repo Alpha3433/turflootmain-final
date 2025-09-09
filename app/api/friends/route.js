@@ -10,20 +10,40 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url)
     const userIdentifier = searchParams.get('userIdentifier')
-    const requestType = searchParams.get('type') // 'friends' or 'requests'
+    const requestType = searchParams.get('type') // 'friends', 'requests', or 'users'
     
-    console.log('👥 Friends/Requests list request:', { userIdentifier, requestType })
+    console.log('👥 Friends/Requests/Users list request:', { userIdentifier, requestType })
     
     if (!userIdentifier || userIdentifier === 'guest') {
+      if (requestType === 'users') {
+        // Return demo users for guest users to see
+        return NextResponse.json({
+          success: true,
+          users: getDemoUsers(),
+          message: 'Demo users list for guest'
+        })
+      }
       return NextResponse.json({
         success: true,
         friends: [],
         requests: { sent: [], received: [] },
+        users: [],
         message: 'Guest users have no friends list'
       })
     }
     
-    if (requestType === 'requests') {
+    if (requestType === 'users') {
+      // Get list of all available users to add as friends
+      const availableUsers = getAvailableUsers(userIdentifier)
+      
+      console.log('✅ Available users retrieved:', availableUsers.length, 'users')
+      
+      return NextResponse.json({
+        success: true,
+        users: availableUsers,
+        count: availableUsers.length
+      })
+    } else if (requestType === 'requests') {
       // Get friend requests for this user
       const userRequests = mockFriendRequests.get(userIdentifier) || { sent: [], received: [] }
       
@@ -49,9 +69,9 @@ export async function GET(request) {
     }
     
   } catch (error) {
-    console.error('❌ Error fetching friends/requests:', error)
+    console.error('❌ Error fetching friends/requests/users:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch friends/requests list' },
+      { error: 'Failed to fetch friends/requests/users list' },
       { status: 500 }
     )
   }
