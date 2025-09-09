@@ -4818,6 +4818,103 @@ export default function TurfLootTactical() {
               >
                 <span data-refresh-text>[↻] REFRESH</span>
               </button>
+              
+              {/* Leave Party Button - Only show when in a party */}
+              {currentParty && (
+                <button 
+                  onClick={async () => {
+                    console.log('🚪 LEAVE PARTY button clicked!')
+                    
+                    try {
+                      if (!isAuthenticated || !user) {
+                        console.log('❌ User not authenticated for leaving party')
+                        return
+                      }
+                      
+                      const userIdentifier = user.wallet?.address || user.email || user.id
+                      console.log('🚪 Leaving party for user:', userIdentifier)
+                      
+                      // Show loading feedback
+                      const leaveButton = document.querySelector('[data-leave-text]')
+                      if (leaveButton) {
+                        leaveButton.textContent = '⏳ LEAVING...'
+                      }
+                      
+                      // API call to leave party
+                      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party`, {
+                        method: 'DELETE',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          userIdentifier: userIdentifier,
+                          partyId: currentParty.id
+                        })
+                      })
+                      
+                      if (response.ok) {
+                        console.log('✅ Successfully left party!')
+                        
+                        // Clear current party state
+                        setCurrentParty(null)
+                        
+                        // Show success feedback
+                        if (leaveButton) {
+                          leaveButton.textContent = '✅ LEFT'
+                          setTimeout(() => {
+                            leaveButton.textContent = '[✕] LEAVE'
+                          }, 2000)
+                        }
+                        
+                        // Refresh party data
+                        await loadCurrentParty()
+                        
+                      } else {
+                        console.error('❌ Failed to leave party:', response.status)
+                        if (leaveButton) {
+                          leaveButton.textContent = '❌ FAILED'
+                          setTimeout(() => {
+                            leaveButton.textContent = '[✕] LEAVE'
+                          }, 2000)
+                        }
+                      }
+                      
+                    } catch (error) {
+                      console.error('❌ Error leaving party:', error)
+                      const leaveButton = document.querySelector('[data-leave-text]')
+                      if (leaveButton) {
+                        leaveButton.textContent = '❌ ERROR'
+                        setTimeout(() => {
+                          leaveButton.textContent = '[✕] LEAVE'
+                        }, 2000)
+                      }
+                    }
+                  }}
+                  style={{ 
+                    fontSize: '11px', 
+                    color: '#fc8181', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
+                    fontFamily: '"Rajdhani", sans-serif',
+                    padding: '2px 4px',
+                    borderRadius: '2px',
+                    transition: 'all 0.2s ease',
+                    marginLeft: '8px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.1)'
+                    e.target.style.boxShadow = '0 0 5px rgba(252, 129, 129, 0.3)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'none'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                >
+                  <span data-leave-text>[✕] LEAVE</span>
+                </button>
+              )}
             </div>
           </div>
           
