@@ -73,11 +73,11 @@ class AddFriendModalBackendTester:
             self.log_test("API Health Check", False, f"Connection failed: {str(e)}")
             return False
 
-    def test_user_list_loading_guest(self):
-        """Test GET /api/friends?type=users for guest users"""
-        print("🔍 TESTING: User List Loading (Guest User)")
+    def test_empty_database_initial_state(self):
+        """Test GET /api/friends?type=users when no users registered yet"""
+        print("🔍 TESTING: Empty Database Initial State")
         try:
-            # Test guest user scenario
+            # Test guest user scenario - should return empty array
             response = requests.get(f"{API_BASE}/friends?type=users&userIdentifier=guest", timeout=10)
             
             if response.status_code == 200:
@@ -87,62 +87,38 @@ class AddFriendModalBackendTester:
                 if 'success' in data and data['success'] and 'users' in data:
                     users = data['users']
                     
-                    # Validate demo users structure
-                    if len(users) > 0:
-                        user = users[0]
-                        required_fields = ['username', 'status', 'joinedAt', 'gamesPlayed']
-                        
-                        if all(field in user for field in required_fields):
-                            # Validate status values
-                            valid_statuses = ['online', 'offline', 'in-game']
-                            statuses = [u['status'] for u in users]
-                            
-                            if all(status in valid_statuses for status in statuses):
-                                self.log_test(
-                                    "User List Loading (Guest)", 
-                                    True, 
-                                    f"Retrieved {len(users)} demo users with valid structure and status values"
-                                )
-                                return True
-                            else:
-                                self.log_test(
-                                    "User List Loading (Guest)", 
-                                    False, 
-                                    f"Invalid status values found: {set(statuses) - set(valid_statuses)}",
-                                    data
-                                )
-                        else:
-                            missing_fields = [f for f in required_fields if f not in user]
-                            self.log_test(
-                                "User List Loading (Guest)", 
-                                False, 
-                                f"Missing required fields: {missing_fields}",
-                                data
-                            )
+                    # For guest users, should return empty array with message
+                    if len(users) == 0 and 'message' in data:
+                        self.log_test(
+                            "Empty Database Initial State", 
+                            True, 
+                            f"Guest user correctly returns empty array with message: '{data['message']}'"
+                        )
+                        return True
                     else:
                         self.log_test(
-                            "User List Loading (Guest)", 
+                            "Empty Database Initial State", 
                             False, 
-                            "No users returned in response",
+                            f"Expected empty array for guest, got {len(users)} users",
                             data
                         )
                 else:
                     self.log_test(
-                        "User List Loading (Guest)", 
+                        "Empty Database Initial State", 
                         False, 
                         "Invalid response structure - missing success or users field",
                         data
                     )
             else:
                 self.log_test(
-                    "User List Loading (Guest)", 
+                    "Empty Database Initial State", 
                     False, 
                     f"API returned status {response.status_code}",
                     response.text
                 )
                 
         except Exception as e:
-            self.log_test("User List Loading (Guest)", False, f"Request failed: {str(e)}")
+            self.log_test("Empty Database Initial State", False, f"Request failed: {str(e)}")
             
         return False
 
