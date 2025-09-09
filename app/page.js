@@ -139,6 +139,8 @@ export default function TurfLootTactical() {
   const [loadingFriends, setLoadingFriends] = useState(false)
   const [friendRequests, setFriendRequests] = useState({ sent: [], received: [] })
   const [loadingRequests, setLoadingRequests] = useState(false)
+  const [availableUsers, setAvailableUsers] = useState([])
+  const [loadingUsers, setLoadingUsers] = useState(false)
 
   // Load friends when modal opens
   useEffect(() => {
@@ -147,6 +149,35 @@ export default function TurfLootTactical() {
       loadFriendRequests()
     }
   }, [isFriendsModalOpen, isAuthenticated])
+
+  // Load available users when Add Friend modal opens
+  useEffect(() => {
+    if (isAddFriendModalOpen) {
+      loadAvailableUsers()
+    }
+  }, [isAddFriendModalOpen, isAuthenticated])
+
+  const loadAvailableUsers = async () => {
+    setLoadingUsers(true)
+    try {
+      const userIdentifier = isAuthenticated ? 
+        (user?.wallet?.address || user?.email?.address || user?.id) : 
+        'guest'
+      
+      const response = await fetch(`/api/friends?userIdentifier=${encodeURIComponent(userIdentifier)}&type=users`)
+      const result = await response.json()
+      
+      if (result.success) {
+        setAvailableUsers(result.users)
+        console.log('✅ Available users loaded:', result.users.length, 'users')
+      } else {
+        console.error('❌ Failed to load users:', result.error)
+      }
+    } catch (error) {
+      console.error('❌ Error loading users:', error)
+    }
+    setLoadingUsers(false)
+  }
 
   const loadFriendsList = async () => {
     if (!isAuthenticated) return
