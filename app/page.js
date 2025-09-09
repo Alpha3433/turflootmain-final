@@ -144,14 +144,34 @@ export default function TurfLootTactical() {
         return
       }
 
+      // Generate a unique skin based on user identifier
+      const generateUserSkin = (identifier) => {
+        const colors = [
+          '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+          '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
+        ];
+        const patterns = ['solid', 'gradient', 'stripes'];
+        
+        // Use user identifier to deterministically select skin
+        const colorIndex = Math.abs(identifier.slice(-2).charCodeAt(0)) % colors.length;
+        const patternIndex = Math.abs(identifier.slice(-3).charCodeAt(0)) % patterns.length;
+        
+        return {
+          type: 'circle',
+          color: colors[colorIndex],
+          pattern: patterns[patternIndex]
+        };
+      };
+
       const userData = {
         username: getDisplayUsername(),
         displayName: getDisplayUsername(),
         email: user?.email?.address,
-        walletAddress: user?.wallet?.address
+        walletAddress: user?.wallet?.address,
+        equippedSkin: generateUserSkin(userIdentifier)
       }
 
-      console.log('📝 Registering Privy user:', userIdentifier, userData)
+      console.log('📝 Registering Privy user with skin:', userIdentifier, userData)
 
       const response = await fetch('/api/friends', {
         method: 'POST',
@@ -168,7 +188,7 @@ export default function TurfLootTactical() {
       const result = await response.json()
       
       if (result.success) {
-        console.log('✅ Privy user registered successfully')
+        console.log('✅ Privy user registered successfully with custom skin')
       } else {
         console.error('❌ Failed to register Privy user:', result.error)
       }
