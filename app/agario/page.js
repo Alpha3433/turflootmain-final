@@ -1688,6 +1688,13 @@ const AgarIOGame = () => {
         setIsCashingOut(true)
         setCashOutProgress(0)
       }
+      
+      // Handle SPACE key for splitting
+      if (e.key === ' ' && gameStarted && gameRef.current) {
+        e.preventDefault() // Prevent page scrolling
+        console.log('SPACE pressed - attempting split') // Debug log
+        gameRef.current.split()
+      }
     }
     
     const handleKeyUp = (e) => {
