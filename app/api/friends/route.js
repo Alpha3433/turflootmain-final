@@ -20,9 +20,7 @@ async function connectToDatabase() {
   return { client, db }
 }
 
-// Mock friends data for development - will be replaced with database queries
-let mockFriends = new Map() // userIdentifier -> friends array
-let mockFriendRequests = new Map() // userIdentifier -> { sent: [], received: [] }
+// All friend data now stored in MongoDB - no mock data structures
 
 async function getPrivyUsers(currentUserIdentifier) {
   try {
