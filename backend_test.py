@@ -43,7 +43,8 @@ def test_party_creation_and_invitation_system():
         "total_tests": 0,
         "passed_tests": 0,
         "failed_tests": 0,
-        "test_details": []
+        "test_details": [],
+        "critical_issues": []
     }
     
     # Test 1: API Health Check
