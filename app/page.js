@@ -6406,9 +6406,12 @@ export default function TurfLootTactical() {
                         fontSize: '14px'
                       }}>
                         <div style={{ fontSize: '32px', marginBottom: '8px', opacity: 0.6 }}>👥</div>
-                        <div style={{ marginBottom: '4px' }}>No users available to add</div>
+                        <div style={{ marginBottom: '4px' }}>No TurfLoot users available</div>
                         <div style={{ fontSize: '12px', opacity: 0.7 }}>
-                          All TurfLoot users are already your friends!
+                          {isAuthenticated ? 
+                            'No other authenticated users have signed up yet. Invite friends to join TurfLoot!' :
+                            'Please log in to see other TurfLoot users'
+                          }
                         </div>
                       </div>
                     )}
