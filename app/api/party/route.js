@@ -568,3 +568,56 @@ export async function DELETE(request) {
     )
   }
 }
+
+async function handleCleanupTestParties() {
+  try {
+    const { db } = await connectToDatabase()
+    
+    // Remove test parties by name patterns
+    const testPartyPatterns = [
+      /test.*party/i,
+      /dynamic.*display/i,
+      /skin.*avatar.*test/i,
+      /avatar.*display/i,
+      /test.*user.*lookup/i
+    ]
+    
+    const testPartyQuery = {
+      $or: testPartyPatterns.map(pattern => ({ name: { $regex: pattern } }))
+    }
+    
+    // Find test parties first to log what we're removing
+    const testParties = await db.collection('parties').find(testPartyQuery).toArray()
+    console.log('🧹 Found test parties to remove:', testParties.map(p => ({ id: p.id, name: p.name })))
+    
+    // Remove test parties
+    const deleteResult = await db.collection('parties').deleteMany(testPartyQuery)
+    
+    // Also remove any related party invites for these parties
+    const partyIds = testParties.map(p => p.id)
+    if (partyIds.length > 0) {
+      const inviteDeleteResult = await db.collection('party_invites').deleteMany({
+        partyId: { $in: partyIds }
+      })
+      console.log('🧹 Removed related party invites:', inviteDeleteResult.deletedCount)
+    }
+    
+    console.log('✅ Test party cleanup completed:', {
+      partiesRemoved: deleteResult.deletedCount,
+      invitesRemoved: partyIds.length > 0 ? await db.collection('party_invites').countDocuments({ partyId: { $in: partyIds } }) : 0
+    })
+    
+    return NextResponse.json({
+      success: true,
+      message: `Cleanup completed: ${deleteResult.deletedCount} test parties removed`,
+      partiesRemoved: deleteResult.deletedCount
+    })
+    
+  } catch (error) {
+    console.error('❌ Error cleaning up test parties:', error)
+    return NextResponse.json(
+      { error: 'Failed to cleanup test parties' },
+      { status: 500 }
+    )
+  }
+}
