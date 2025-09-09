@@ -2787,6 +2787,10 @@ export default function TurfLootTactical() {
     const existing = document.getElementById('desktop-create-party-popup')
     if (existing) existing.remove()
 
+    // Get the current friends list
+    const currentFriends = friendsList.filter(f => f.status === 'accepted') || []
+    console.log('🎯 Loading friends for party creation:', currentFriends.length, 'friends')
+
     // Create the popup container
     const popup = document.createElement('div')
     popup.id = 'desktop-create-party-popup'
