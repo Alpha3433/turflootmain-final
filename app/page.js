@@ -5677,9 +5677,15 @@ export default function TurfLootTactical() {
                     👤 ADD FRIEND
                   </button>
                   <button
-                    onClick={() => {
-                      console.log('🎯 Opening Create Party modal')
-                      setIsCreatePartyModalOpen(true)
+                    onClick={async () => {
+                      console.log('🎯 CREATE PARTY button clicked from Friends modal!')
+                      const authenticated = await requireAuthentication('CREATE PARTY')
+                      if (authenticated) {
+                        console.log('🎯 User authenticated, opening create party popup...')
+                        createDesktopCreatePartyPopup()
+                      } else {
+                        console.log('❌ Authentication failed, blocking access to CREATE PARTY')
+                      }
                     }}
                     style={{
                       background: 'rgba(59, 130, 246, 0.2)',
