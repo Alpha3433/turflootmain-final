@@ -171,7 +171,7 @@ class SkinAvatarTester:
         total_skins_checked = 0
         
         for user_id in test_users:
-            response = self.make_request("GET", "/party", {
+            response = self.make_request("GET", "/party", params={
                 "type": "current",
                 "userIdentifier": user_id
             })
