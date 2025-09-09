@@ -414,29 +414,47 @@ def test_party_creation_and_invitation_system():
         test_results["test_details"].append(f"❌ UserIdentifier Format Consistency - ERROR ({e})")
     
     # Print final results
-    print("\n" + "=" * 60)
-    print("🏁 FRIENDS LIST DATA TRANSFORMATION TEST RESULTS")
-    print("=" * 60)
+    print("\n" + "=" * 80)
+    print("🏁 PARTY CREATION AND INVITATION SYSTEM TEST RESULTS")
+    print("=" * 80)
     
     success_rate = (test_results["passed_tests"] / test_results["total_tests"]) * 100 if test_results["total_tests"] > 0 else 0
     
     print(f"📊 SUMMARY:")
     print(f"   Total Tests: {test_results['total_tests']}")
-    print(f"   Passed: {test_results['passed_tests']}")
-    print(f"   Failed: {test_results['failed_tests']}")
+    print(f"   Passed: {test_results['passed_tests']} ✅")
+    print(f"   Failed: {test_results['failed_tests']} ❌")
     print(f"   Success Rate: {success_rate:.1f}%")
     
     print(f"\n📋 DETAILED RESULTS:")
     for detail in test_results["test_details"]:
         print(f"   {detail}")
     
-    # Determine overall test result
+    if test_results["critical_issues"]:
+        print(f"\n🚨 CRITICAL ISSUES IDENTIFIED:")
+        for issue in test_results["critical_issues"]:
+            print(f"   • {issue}")
+    
+    # Determine overall test result and provide specific findings
     if test_results["failed_tests"] == 0:
-        print(f"\n🎉 ALL TESTS PASSED - Friends list data transformation is working correctly!")
-        print("✅ Friend names will display correctly in the frontend")
+        print(f"\n🎉 ALL TESTS PASSED - Party creation and invitation system is working correctly!")
+        print("✅ Party invites should appear in REQUESTS & INVITES section")
         return True
     else:
-        print(f"\n⚠️ {test_results['failed_tests']} TEST(S) FAILED - Issues found with friends list data transformation")
+        print(f"\n⚠️ {test_results['failed_tests']} TEST(S) FAILED - Issues found with party system")
+        
+        # Provide specific diagnosis based on critical issues
+        if "Party invites not being stored correctly" in test_results["critical_issues"]:
+            print("\n🔍 ROOT CAUSE ANALYSIS:")
+            print("   The party creation endpoint works, but invites are not being stored")
+            print("   or retrieved correctly. This explains why party invites don't appear")
+            print("   in the REQUESTS & INVITES section.")
+        elif "Party creation requires database user registration" in test_results["critical_issues"]:
+            print("\n🔍 ROOT CAUSE ANALYSIS:")
+            print("   Party creation requires users to be registered in the database first.")
+            print("   The system may be failing because test users don't exist in the")
+            print("   'users' collection, causing authentication failures.")
+        
         return False
 
 if __name__ == "__main__":
