@@ -557,7 +557,10 @@ async function handleDeclineFriendRequest(userIdentifier, requestId) {
     // Find and remove the friend request from database
     const result = await db.collection('friend_requests').deleteOne({
       id: requestId,
-      toUserIdentifier: userIdentifier,
+      $or: [
+        { toUserIdentifier: userIdentifier },
+        { toUserId: userIdentifier }
+      ],
       status: 'pending'
     })
     
