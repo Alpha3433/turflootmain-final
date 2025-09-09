@@ -108,10 +108,10 @@ user_problem_statement: "Implement Solana-Only Deposit Functionality: Simplified
 
 test_plan:
   current_focus:
-    - "Test Privy Deposit Function Rewrite"
-    - "Verify No Invalid Address Errors"
-    - "Test Wallet State Handling" 
-    - "Verify Clean Authentication Flow"
+    - "Test Solana-Only Deposit Function"
+    - "Verify DEPOSIT SOL Button Functionality"
+    - "Test Solana Wallet Creation and Authentication" 
+    - "Verify No EVM/Multi-Chain Conflicts"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
