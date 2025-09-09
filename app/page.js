@@ -1968,7 +1968,7 @@ export default function TurfLootTactical() {
       
       // Equip skin buttons
       equipButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
           e.stopPropagation()
           const skinId = btn.dataset.skinId
           const skin = availableSkins.find(s => s.id === skinId)
