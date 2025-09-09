@@ -537,36 +537,74 @@ export async function DELETE(request) {
       )
     }
     
-    // Remove user from party
-    await db.collection('parties').updateOne(
-      { id: partyId },
-      { $pull: { currentPlayers: userIdentifier } }
-    )
+    // Check if the leaving user is the party creator/owner
+    const isPartyOwner = party.createdBy === userIdentifier
+    console.log('🔍 Checking if user is party owner:', { userIdentifier, createdBy: party.createdBy, isOwner: isPartyOwner })
     
-    // Check if party is now empty
-    const updatedParty = await db.collection('parties').findOne({ id: partyId })
-    
-    if (updatedParty.currentPlayers.length === 0) {
-      // If party is empty, mark it as finished or delete it
+    if (isPartyOwner) {
+      console.log('👑 Party owner is leaving - deleting entire party')
+      
+      // Delete the entire party when owner leaves
+      await db.collection('parties').deleteOne({ id: partyId })
+      
+      // Also remove any related party invites
+      const inviteDeleteResult = await db.collection('party_invites').deleteMany({
+        partyId: partyId
+      })
+      
+      console.log('🗑️ Party and related data deleted:', {
+        partyId,
+        partyName: party.name,
+        invitesRemoved: inviteDeleteResult.deletedCount
+      })
+      
+      return NextResponse.json({
+        success: true,
+        message: `Party "${party.name}" has been disbanded`,
+        partyDisbanded: true,
+        isOwner: true
+      })
+    } else {
+      console.log('👤 Regular member leaving party')
+      
+      // Remove user from party (regular member)
       await db.collection('parties').updateOne(
         { id: partyId },
-        { $set: { status: 'finished', finishedAt: new Date().toISOString() } }
+        { $pull: { currentPlayers: userIdentifier } }
       )
-      console.log('🏁 Party marked as finished - no remaining members')
+      
+      // Check if party is now empty after member leaves
+      const updatedParty = await db.collection('parties').findOne({ id: partyId })
+      
+      if (updatedParty.currentPlayers.length === 0) {
+        // If party is empty after member leaves, delete it too
+        await db.collection('parties').deleteOne({ id: partyId })
+        await db.collection('party_invites').deleteMany({ partyId: partyId })
+        console.log('🏁 Party deleted - no remaining members after member left')
+        
+        return NextResponse.json({
+          success: true,
+          message: `Party "${party.name}" has been disbanded - no members remaining`,
+          partyDisbanded: true,
+          isOwner: false
+        })
+      }
+      
+      console.log('✅ Member successfully left party:', {
+        userIdentifier,
+        partyId,
+        partyName: party.name,
+        remainingMembers: updatedParty.currentPlayers.length
+      })
+      
+      return NextResponse.json({
+        success: true,
+        message: `Successfully left party "${party.name}"`,
+        remainingMembers: updatedParty.currentPlayers.length,
+        partyDisbanded: false,
+        isOwner: false
+      })
     }
-    
-    console.log('✅ User successfully left party:', {
-      userIdentifier,
-      partyId,
-      partyName: party.name,
-      remainingMembers: updatedParty.currentPlayers.length
-    })
-    
-    return NextResponse.json({
-      success: true,
-      message: `Successfully left party "${party.name}"`,
-      remainingMembers: updatedParty.currentPlayers.length
-    })
     
   } catch (error) {
     console.error('❌ Error leaving party:', error)
