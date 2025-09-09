@@ -3087,7 +3087,7 @@ export default function TurfLootTactical() {
     })
 
     // Create party functionality
-    modal.querySelector('#create-party-btn').addEventListener('click', () => {
+    modal.querySelector('#create-party-btn').addEventListener('click', async () => {
       const partyName = modal.querySelector('#party-name-input').value.trim()
       const selectedFriends = Array.from(modal.querySelectorAll('.friend-checkbox:checked')).map(cb => cb.closest('.friend-invite-item').dataset.friendId)
       
