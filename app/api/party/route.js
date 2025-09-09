@@ -109,11 +109,38 @@ async function handleCreatePartyAndInvite(userIdentifier, partyData, invitedFrie
   try {
     const { db } = await connectToDatabase()
     
-    // Get user info
+    // Get user info with debugging
+    console.log('🔍 Debug: Looking for user with userIdentifier:', userIdentifier)
+    
+    // First check what fields exist in the users collection
+    const sampleUsers = await db.collection('users').find().limit(3).toArray()
+    console.log('🔍 Debug: Sample user documents:', sampleUsers.map(u => ({ 
+      fields: Object.keys(u),
+      userIdentifier: u.userIdentifier,
+      id: u._id,
+      email: u.email 
+    })))
+    
     const user = await db.collection('users').findOne({ userIdentifier })
+    console.log('🔍 Debug: User lookup result:', user ? 'Found' : 'Not found')
+    
     if (!user) {
+      // Try alternative lookup methods
+      const userByEmail = await db.collection('users').findOne({ email: userIdentifier })
+      const userByWallet = await db.collection('users').findOne({ walletAddress: userIdentifier })
+      
+      console.log('🔍 Debug: Alternative lookups - by email:', !!userByEmail, 'by wallet:', !!userByWallet)
+      
+      if (userByEmail || userByWallet) {
+        console.log('⚠️ Found user with alternative lookup, but userIdentifier field mismatch')
+        return NextResponse.json(
+          { error: 'User found but userIdentifier field mismatch - check database structure' },
+          { status: 404 }
+        )
+      }
+      
       return NextResponse.json(
-        { error: 'User not found' },
+        { error: 'User not found in database' },
         { status: 404 }
       )
     }
