@@ -5251,21 +5251,53 @@ export default function TurfLootTactical() {
                         })
                       })
                       
+                      const result = await response.json()
+                      
                       if (response.ok) {
-                        console.log('✅ Successfully left party!')
+                        console.log('✅ Successfully left party:', result)
                         
-                        // Clear current party state
-                        setCurrentParty(null)
-                        
-                        // Show success feedback
-                        if (leaveButton) {
-                          leaveButton.textContent = '✅ LEFT'
-                          setTimeout(() => {
-                            leaveButton.textContent = '[✕] LEAVE'
-                          }, 2000)
+                        // Check if the party was disbanded (owner left or party became empty)
+                        if (result.partyDisbanded) {
+                          console.log('🗑️ Party was disbanded:', {
+                            isOwner: result.isOwner,
+                            message: result.message
+                          })
+                          
+                          // Show appropriate message based on whether user was owner
+                          if (result.isOwner) {
+                            // Show success feedback for party owner
+                            if (leaveButton) {
+                              leaveButton.textContent = '✅ DISBANDED'
+                              setTimeout(() => {
+                                leaveButton.textContent = '[✕] LEAVE'
+                              }, 2000)
+                            }
+                            alert(`👑 ${result.message}\n\nAs the party owner, your party has been completely removed.`)
+                          } else {
+                            // Show success feedback for member leaving empty party
+                            if (leaveButton) {
+                              leaveButton.textContent = '✅ LEFT'
+                              setTimeout(() => {
+                                leaveButton.textContent = '[✕] LEAVE'
+                              }, 2000)
+                            }
+                            alert(`🏁 ${result.message}`)
+                          }
+                        } else {
+                          // Regular member left, party still exists
+                          if (leaveButton) {
+                            leaveButton.textContent = '✅ LEFT'
+                            setTimeout(() => {
+                              leaveButton.textContent = '[✕] LEAVE'
+                            }, 2000)
+                          }
+                          alert(`👋 ${result.message}`)
                         }
                         
-                        // Refresh party data
+                        // Clear current party state regardless of disbandment
+                        setCurrentParty(null)
+                        
+                        // Refresh party data to show updated state
                         await loadCurrentParty()
                         
                       } else {
