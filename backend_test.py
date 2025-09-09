@@ -374,8 +374,72 @@ def test_party_creation_and_invitation_system():
         test_results["failed_tests"] += 1
         test_results["test_details"].append(f"❌ Complete Party Flow - ERROR ({e})")
     
-    # Test 6: UserIdentifier Format Consistency Check
-    print("\n6️⃣ USERIDENTIFIER FORMAT CONSISTENCY CHECK")
+    # Test 6: Real User Database Check
+    print("\n6️⃣ REAL USER DATABASE CHECK")
+    test_results["total_tests"] += 1
+    try:
+        # Check if there are real users in the database we could use for testing
+        users_response = requests.get(f"{API_BASE}/friends?type=users&userIdentifier=database_check", timeout=10)
+        
+        if users_response.status_code == 200:
+            users_data = users_response.json()
+            available_users = users_data.get("users", [])
+            
+            if len(available_users) > 0:
+                print(f"✅ Found {len(available_users)} real users in database")
+                print("   Testing party creation with real user...")
+                
+                # Try party creation with a real user
+                real_user = available_users[0]
+                real_user_id = real_user.get("id") or real_user.get("userIdentifier")
+                
+                if real_user_id:
+                    real_party_data = {
+                        "action": "create_and_invite",
+                        "userIdentifier": real_user_id,
+                        "partyData": {
+                            "name": "Real User Test Party",
+                            "privacy": "public",
+                            "maxPlayers": 2
+                        },
+                        "invitedFriends": []  # Empty for now to test basic creation
+                    }
+                    
+                    real_party_response = requests.post(f"{API_BASE}/party", json=real_party_data, timeout=10)
+                    print(f"   Real user party creation status: {real_party_response.status_code}")
+                    print(f"   Real user party creation response: {real_party_response.text}")
+                    
+                    if real_party_response.status_code == 200:
+                        print("✅ Party creation works with real users!")
+                        test_results["passed_tests"] += 1
+                        test_results["test_details"].append("✅ Real User Database Check - PASSED")
+                    else:
+                        print("❌ Party creation still fails with real users")
+                        test_results["failed_tests"] += 1
+                        test_results["test_details"].append("❌ Real User Database Check - FAILED")
+                        test_results["critical_issues"].append("Party creation fails even with real users")
+                else:
+                    print("❌ Real user data missing userIdentifier")
+                    test_results["failed_tests"] += 1
+                    test_results["test_details"].append("❌ Real User Database Check - FAILED (no userIdentifier)")
+            else:
+                print("⚠️ No real users found in database")
+                print("   This confirms that party creation requires user registration first")
+                test_results["failed_tests"] += 1
+                test_results["test_details"].append("❌ Real User Database Check - FAILED (no users)")
+                test_results["critical_issues"].append("No users in database - party creation will always fail")
+        else:
+            print(f"❌ Cannot check users database: {users_response.status_code}")
+            test_results["failed_tests"] += 1
+            test_results["test_details"].append("❌ Real User Database Check - FAILED (API error)")
+            
+    except Exception as e:
+        print(f"❌ Real user database check error: {e}")
+        test_results["failed_tests"] += 1
+        test_results["test_details"].append(f"❌ Real User Database Check - ERROR ({e})")
+    
+    # Test 7: UserIdentifier Format Consistency Check
+    print("\n7️⃣ USERIDENTIFIER FORMAT CONSISTENCY CHECK")
     test_results["total_tests"] += 1
     try:
         # Test different userIdentifier formats to identify potential mismatches
