@@ -7949,7 +7949,18 @@ export default function TurfLootTactical() {
               </div>
             </div>
             
-            <button style={{
+            <button 
+              onClick={async () => {
+                console.log('VIEW STORE button clicked!')
+                const authenticated = await requireAuthentication('VIEW STORE')
+                if (authenticated) {
+                  console.log('🛒 User authenticated, opening view store...')
+                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin)
+                } else {
+                  console.log('❌ Authentication failed, blocking access to VIEW STORE')
+                }
+              }}
+              style={{
               width: '100%',
               padding: '8px',
               background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
@@ -7963,7 +7974,7 @@ export default function TurfLootTactical() {
               fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
             }}>
-              🎯 UPGRADE
+              🛒 VIEW STORE
             </button>
             
             <button style={{
