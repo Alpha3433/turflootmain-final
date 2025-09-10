@@ -1182,20 +1182,17 @@ export default function TurfLootTactical() {
         chainType: 'Solana'
       })
       
-      // Call Privy's fundWallet - simplified approach for cross-chain support
+      // Call Privy's fundWallet - using proper hooks instead of bridge
       console.log('💰 Opening Privy funding interface...')
       
       try {
-        // Use the standard fundWallet from Privy hooks with no parameters
-        // Let Privy auto-detect the wallet and handle cross-chain bridging
-        if (privy.fundWallet && typeof privy.fundWallet === 'function') {
-          console.log('🔗 Calling Privy fundWallet()...')
-          await privy.fundWallet()
+        // Use the login/logout functions from usePrivy hook
+        console.log('🔗 Calling Privy fundWallet with Solana wallet...')
+        
+        // Check if fundWallet is available from the proper hooks
+        if (window.__TURFLOOT_PRIVY__ && typeof window.__TURFLOOT_PRIVY__.fundWallet === 'function') {
+          await window.__TURFLOOT_PRIVY__.fundWallet()
           console.log('✅ Privy funding interface opened successfully!')
-        } else if (window.__TURFLOOT_PRIVY__ && window.__TURFLOOT_PRIVY__._rawFundWallet) {
-          console.log('🔗 Calling raw Privy fundWallet()...')
-          await window.__TURFLOOT_PRIVY__._rawFundWallet()
-          console.log('✅ Privy funding interface opened via raw function!')
         } else {
           throw new Error('Privy fundWallet function not available')
         }
