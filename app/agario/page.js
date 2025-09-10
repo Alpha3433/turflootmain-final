@@ -1038,20 +1038,20 @@ const AgarIOGame = () => {
           piece.y = centerY + Math.sin(angle) * (maxRadius - piece.radius)
         }
         
-        // Check for recombination after 30 seconds
-        if (currentTime - piece.splitTime > 30000) { // 30 seconds
+        // Check for recombination after shorter cooldown (15 seconds like real Agar.io)
+        if (currentTime - piece.splitTime > 15000) { // 15 seconds instead of 30
           piece.recombineReady = true
         }
         
-        // Auto-recombine if pieces are close and ready
+        // Auto-recombine if pieces are close and ready (more generous distance)
         if (piece.recombineReady) {
           const distanceToMain = Math.sqrt(
             Math.pow(piece.x - this.player.x, 2) + 
             Math.pow(piece.y - this.player.y, 2)
           )
           
-          // Recombine if pieces are touching
-          if (distanceToMain < (piece.radius + this.player.radius) * 0.8) {
+          // Recombine if pieces are touching (more generous collision detection)
+          if (distanceToMain < (piece.radius + this.player.radius) * 1.0) {
             // Merge mass back to main player
             this.player.mass += piece.mass
             this.player.radius = Math.sqrt(this.player.mass) * 3
@@ -1059,11 +1059,11 @@ const AgarIOGame = () => {
             // Remove piece from array
             this.playerPieces.splice(i, 1)
             
-            console.log(`🔄 Player piece recombined! Total mass: ${Math.floor(this.player.mass)}`)
+            console.log(`🔄 Player piece recombined with main! Total mass: ${Math.floor(this.player.mass)}`)
           }
         }
         
-        // Check recombination between pieces
+        // Check recombination between pieces (more lenient conditions)
         for (let j = i + 1; j < this.playerPieces.length; j++) {
           const otherPiece = this.playerPieces[j]
           if (piece.recombineReady && otherPiece.recombineReady) {
@@ -1072,12 +1072,24 @@ const AgarIOGame = () => {
               Math.pow(piece.y - otherPiece.y, 2)
             )
             
-            if (pieceToPieceDistance < (piece.radius + otherPiece.radius) * 0.8) {
-              // Merge the larger piece with the smaller one
+            // More generous collision detection for piece-to-piece merging
+            if (pieceToPieceDistance < (piece.radius + otherPiece.radius) * 1.0) {
+              // Always merge into the larger piece (create one bigger circle)
               if (piece.mass >= otherPiece.mass) {
                 piece.mass += otherPiece.mass
                 piece.radius = Math.sqrt(piece.mass) * 3
                 this.playerPieces.splice(j, 1)
+                console.log(`🔄 Player pieces merged! New mass: ${Math.floor(piece.mass)}`)
+              } else {
+                otherPiece.mass += piece.mass
+                otherPiece.radius = Math.sqrt(otherPiece.mass) * 3
+                this.playerPieces.splice(i, 1)
+                console.log(`🔄 Player pieces merged! New mass: ${Math.floor(otherPiece.mass)}`)
+                break
+              }
+            }
+          }
+        }
               } else {
                 otherPiece.mass += piece.mass
                 otherPiece.radius = Math.sqrt(otherPiece.mass) * 3
