@@ -1250,6 +1250,9 @@ export default function TurfLootTactical() {
       if (error.message?.includes('invalid address') || error.code === 'INVALID_ARGUMENT') {
         console.error('❌ Address validation error - wallet state may be invalid')
         alert('❌ Wallet address validation failed!\n\nThis usually happens when:\n• Wallet is not fully initialized\n• Connection is unstable\n\nSolution:\n1. Refresh the page\n2. Sign out and sign back in\n3. Try the deposit again')
+      } else if (error.message?.includes('CNR-2 format') || error.message?.includes('Chain ID not compatible')) {
+        console.error('❌ CNR-2 format compatibility error')
+        alert('❌ Solana deposit failed: Chain configuration error\n\nThis is a temporary issue with Coinbase Onramp integration.\n\nPlease try:\n1. Refresh the page\n2. Wait a moment and try again\n3. Contact support if the issue persists\n\nThe wallet is properly configured for Solana deposits.')
       } else if (error.message?.includes('User rejected')) {
         console.log('ℹ️ User cancelled the Solana deposit operation')
       } else if (error.message?.includes('not available')) {
