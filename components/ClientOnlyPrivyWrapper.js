@@ -6,9 +6,17 @@ import { PrivyProvider } from '@privy-io/react-auth'
 // Privy configuration
 const privyConfig = {
   embeddedWallets: {
-    createOnLogin: 'users-without-wallets',
+    solana: { createOnLogin: 'users-without-wallets' },
+    evm: { createOnLogin: 'none' },
     noPromptOnSignature: false
   },
+  externalWallets: {
+    solana: { wallets: ['phantom', 'solflare', 'backpack'] }
+  },
+  solanaClusters: [
+    { name: 'mainnet-beta', rpcUrl: 'https://api.mainnet-beta.solana.com' }
+  ],
+  smartWallets: { enabled: false },
   loginMethods: ['email', 'google', 'discord'],
   appearance: {
     theme: 'dark',

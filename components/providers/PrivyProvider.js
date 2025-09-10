@@ -26,8 +26,16 @@ export default function PrivyAuthProvider({ children }) {
     },
     loginMethods: ['email', 'wallet'],
     embeddedWallets: {
-      createOnLogin: 'users-without-wallets',
+      solana: { createOnLogin: 'users-without-wallets' },
+      evm: { createOnLogin: 'none' },
     },
+    externalWallets: {
+      solana: { wallets: ['phantom', 'solflare', 'backpack'] },
+    },
+    solanaClusters: [
+      { name: 'mainnet-beta', rpcUrl: 'https://api.mainnet-beta.solana.com' }
+    ],
+    smartWallets: { enabled: false },
   }
 
   return (
