@@ -1239,16 +1239,23 @@ export default function TurfLootTactical() {
       
     } catch (error) {
       console.error('❌ Solana deposit error:', error)
+      console.error('❌ Error details:', {
+        message: error.message,
+        code: error.code,
+        argument: error.argument,
+        value: error.value
+      })
       
-      // Handle specific errors
-      if (error.message?.includes('invalid address')) {
-        alert('❌ Solana wallet address issue detected. Please:\n\n1. Refresh the page\n2. Disconnect and reconnect your wallet\n3. Try the deposit again')
+      // Handle specific errors with better messaging
+      if (error.message?.includes('invalid address') || error.code === 'INVALID_ARGUMENT') {
+        console.error('❌ Address validation error - wallet state may be invalid')
+        alert('❌ Wallet address validation failed!\n\nThis usually happens when:\n• Wallet is not fully initialized\n• Connection is unstable\n\nSolution:\n1. Refresh the page\n2. Sign out and sign back in\n3. Try the deposit again')
       } else if (error.message?.includes('User rejected')) {
         console.log('ℹ️ User cancelled the Solana deposit operation')
       } else if (error.message?.includes('not available')) {
         alert('❌ Solana deposit functionality not available. Please refresh the page and try again.')
       } else {
-        alert(`❌ Solana deposit failed: ${error.message}\n\nPlease refresh the page and try again.`)
+        alert(`❌ Solana deposit failed: ${error.message}\n\nPlease try:\n1. Refreshing the page\n2. Signing out and back in\n3. Contacting support if the issue persists`)
       }
     }
   }
