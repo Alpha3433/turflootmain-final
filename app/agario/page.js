@@ -1327,8 +1327,9 @@ const AgarIOGame = () => {
             enemy.spawnProtection = true
             enemy.spawnProtectionStart = Date.now()
             console.log(`Enemy ${enemy.name} respawned with spawn protection within zone radius ${Math.floor(playableRadius)}px`)
-          } else if (enemy.mass > this.player.mass * 1.2) {
+          } else if (enemy.mass > this.player.mass * 1.25) { // Increased threshold for fairer elimination
             // Enemy eats player - Game Over
+            console.log(`💀 Player eliminated by ${enemy.name}! Player mass: ${this.player.mass.toFixed(1)}, Enemy mass: ${enemy.mass.toFixed(1)}`)
             this.running = false
             
             // Calculate final survival time
