@@ -777,6 +777,69 @@ const AgarIOGame = () => {
       console.log(`🦠 Generated ${this.viruses.length} viruses within radius ${Math.floor(playableRadius)}px`)
     }
 
+    spawnEnemy() {
+      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
+      
+      const mass = 15 + Math.random() * 40
+      let x, y, distance
+      
+      // Generate enemy within the playable radius
+      do {
+        x = Math.random() * this.world.width
+        y = Math.random() * this.world.height
+        distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+      } while (distance > playableRadius - 50) // 50px buffer from edge
+      
+      const newEnemy = {
+        x: x,
+        y: y,
+        mass: mass,
+        radius: Math.sqrt(mass) * 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        name: `Player ${this.enemies.length + 2}`,
+        speed: Math.max(0.2, 35 / Math.sqrt(mass)),
+        targetX: Math.random() * this.world.width,
+        targetY: Math.random() * this.world.height,
+        lastTargetChange: Date.now(),
+        spawnProtection: true,
+        spawnProtectionTime: 4000,
+        spawnProtectionStart: Date.now()
+      }
+      
+      this.enemies.push(newEnemy)
+      console.log(`👥 Spawned new enemy within radius ${Math.floor(playableRadius)}px`)
+    }
+
+    spawnVirus() {
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
+      
+      let x, y, distance
+      
+      // Generate virus within the playable radius
+      do {
+        x = Math.random() * this.world.width
+        y = Math.random() * this.world.height
+        distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+      } while (distance > playableRadius - 100) // 100px buffer from edge for viruses
+      
+      const newVirus = {
+        x: x,
+        y: y,
+        radius: 40 + Math.random() * 20,
+        color: '#00FF41',
+        spikes: 12,
+        mass: 100
+      }
+      
+      this.viruses.push(newVirus)
+      console.log(`🦠 Spawned new virus within radius ${Math.floor(playableRadius)}px`)
+    }
+
     bindEvents() {
       this.canvas.addEventListener('mousemove', (e) => {
         const rect = this.canvas.getBoundingClientRect()
