@@ -1797,9 +1797,9 @@ const AgarIOGame = () => {
         directionY = 0
       }
       
-      // Split distance and velocity (authentic Agar.io values)
-      const splitDistance = 80 // Distance pieces are ejected toward mouse
-      const splitVelocity = 12 // Initial ejection speed
+      // Split distance and velocity (enhanced for visible ejection)
+      const splitDistance = 100 // Increased distance pieces are ejected toward mouse
+      const splitVelocity = 20 // Increased initial ejection speed for dramatic launch
       
       const newPiece = {
         x: this.player.x + directionX * splitDistance,
