@@ -623,14 +623,19 @@ const AgarIOGame = () => {
       this.antiCheat.violations++
       this.antiCheat.suspiciousActions++
       
-      console.warn(`🚨 ANTI-CHEAT VIOLATION [${this.antiCheat.violations}/${this.antiCheat.maxViolations}]: ${type} - ${description}`)
+      console.warn(`🚨 ANTI-CHEAT VIOLATION [${this.antiCheat.violations}/${this.antiCheat.maxViolations}]: ${type} - ${description} (Mass: ${this.player.mass.toFixed(1)})`)
       
       // Log violation for server reporting
       this.reportViolation(type, description)
       
-      // Immediate ban after 3 strikes (no progressive penalties)
-      if (this.antiCheat.violations >= this.antiCheat.maxViolations) {
+      // More lenient banning - require more violations at high mass
+      const banThreshold = this.player.mass > 1000 ? 8 : this.antiCheat.maxViolations // Higher threshold for high mass players
+      
+      if (this.antiCheat.violations >= banThreshold) {
+        console.log(`🔒 PLAYER BAN TRIGGERED: ${this.antiCheat.violations}/${banThreshold} violations (Mass: ${this.player.mass.toFixed(1)})`)
         this.banPlayer()
+      } else {
+        console.log(`⚠️ Violation count: ${this.antiCheat.violations}/${banThreshold} (Mass: ${this.player.mass.toFixed(1)})`)
       }
     }
     
