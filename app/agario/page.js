@@ -2997,7 +2997,9 @@ const AgarIOGame = () => {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: '#9ca3af' }}>Time Alive:</span>
-              <span style={{ color: '#ffffff', fontWeight: '700' }}>0:00</span>
+              <span style={{ color: '#ffffff', fontWeight: '700' }}>
+                {Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}
+              </span>
             </div>
           </div>
         </div>
