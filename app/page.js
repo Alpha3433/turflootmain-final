@@ -1214,31 +1214,32 @@ export default function TurfLootTactical() {
         console.log('✅ Found existing Solana wallet:', solanaWallet.address)
       }
       
-      // Validate Solana wallet with enhanced checks
-      const wallet = solanaWallet || privy.user.wallet
+      // Validate the Solana wallet
+      const wallet = solanaWallet
       if (!wallet) {
-        console.error('❌ No embedded wallet available')
-        alert('❌ No wallet found. Please disconnect and reconnect your account to create a wallet.')
+        console.error('❌ No Solana wallet available after creation attempts')
+        alert('❌ No Solana wallet found. Please disconnect and reconnect your account to create a wallet.')
         return
       }
       
       if (!wallet.address) {
-        console.error('❌ Wallet exists but has no address')
-        alert('❌ Wallet address not available. Please refresh and try again.')
+        console.error('❌ Solana wallet exists but has no address')
+        alert('❌ Solana wallet address not available. Please refresh and try again.')
         return
       }
       
       // Check if it's actually a Solana address format (not EVM)
       const isEVMAddress = wallet.address.startsWith('0x') && wallet.address.length === 42
       if (isEVMAddress) {
-        console.log('⚠️ EVM wallet detected - checking if cross-chain bridging is supported')
-        // With Privy's cross-chain bridging, EVM wallets can fund Solana operations
-        // Let's proceed but inform the user about cross-chain bridging
+        console.log('⚠️ EVM wallet detected - this should not happen with proper Solana wallet selection')
+        // With cross-chain bridging enabled, we can still proceed
         console.log('✅ Cross-chain bridging enabled - EVM wallet can fund Solana operations')
         alert('✅ Cross-chain funding detected!\n\nYou have an Ethereum wallet, but Privy will help you fund Solana operations through cross-chain bridging.\n\nClick OK to continue with the deposit process.')
+      } else {
+        console.log('✅ Valid Solana wallet detected:', wallet.address)
       }
       
-      console.log('✅ Wallet found:', wallet.address)
+      console.log('✅ Using wallet:', wallet.address)
       console.log('🔍 Wallet details:', { 
         address: wallet.address, 
         walletClientType: wallet.walletClientType,
