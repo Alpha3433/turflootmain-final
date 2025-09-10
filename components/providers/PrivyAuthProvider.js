@@ -193,28 +193,27 @@ export default function PrivyAuthProvider({ children }) {
       showWalletLoginFirst: false,
     },
     loginMethods: ['google', 'email', 'wallet'],
+    // Solana-only embedded wallets configuration
     embeddedWallets: {
-      createOnLogin: 'all-users',
-      requireUserPasswordOnCreate: false,
+      solana: { 
+        createOnLogin: 'users-without-wallets' 
+      }
     },
+    // External Solana wallets support
+    externalWallets: {
+      solana: { 
+        wallets: ['phantom', 'solflare', 'backpack'] 
+      }
+    },
+    // Solana clusters configuration
+    solanaClusters: [
+      { 
+        name: 'mainnet-beta', 
+        rpcUrl: 'https://api.mainnet-beta.solana.com'
+      }
+    ],
     mfa: {
       noPromptOnMfaRequired: false,
-    },
-    // Updated Solana configuration for better compatibility
-    solanaClusters: [
-      {
-        name: 'mainnet-beta',
-        rpcUrl: 'https://api.mainnet-beta.solana.com',
-      },
-    ],
-    // Simplified funding configuration
-    fundingMethodConfig: {
-      moonpay: {
-        useSandbox: false,
-      },
-      coinbaseOnramp: {
-        useSandbox: false,
-      },
     },
   }
 
