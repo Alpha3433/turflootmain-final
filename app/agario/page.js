@@ -1285,6 +1285,148 @@ const AgarIOGame = () => {
       this.checkPlayerPiecesCollisions()
     }
 
+    checkPlayerPiecesCollisions() {
+      // Check collisions for each player piece
+      for (let pieceIndex = this.playerPieces.length - 1; pieceIndex >= 0; pieceIndex--) {
+        const piece = this.playerPieces[pieceIndex]
+        
+        // Player pieces eating coins
+        for (let i = this.coins.length - 1; i >= 0; i--) {
+          const coin = this.coins[i]
+          const dx = piece.x - coin.x
+          const dy = piece.y - coin.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance < piece.radius + coin.radius) {
+            piece.mass += coin.value
+            piece.radius = Math.sqrt(piece.mass) * 3
+            setScore(prev => prev + coin.value)
+            this.coins.splice(i, 1)
+            
+            // Update mission progress for coin collection
+            if (typeof updateMissionProgress === 'function') {
+              updateMissionProgress('coin_collected', 1)
+              updateMissionProgress('mass_reached', piece.mass)
+            }
+          }
+        }
+        
+        // Player pieces vs enemies
+        for (let i = this.enemies.length - 1; i >= 0; i--) {
+          const enemy = this.enemies[i]
+          const dx = piece.x - enemy.x
+          const dy = piece.y - enemy.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance < piece.radius + enemy.radius - 10) {
+            // Check spawn protection - no collisions if either has protection
+            if (enemy.spawnProtection) {
+              continue // Skip collision if enemy has spawn protection
+            }
+            
+            if (piece.mass > enemy.mass * 1.2) {
+              // Player piece eats enemy
+              piece.mass += enemy.mass * 0.8
+              piece.radius = Math.sqrt(piece.mass) * 3
+              setScore(prev => prev + Math.floor(enemy.mass))
+              setEliminations(prev => prev + 1)
+              
+              // Remove enemy
+              this.enemies.splice(i, 1)
+              
+              // Respawn enemy elsewhere
+              this.spawnEnemy()
+              
+              // Update mission progress
+              if (typeof updateMissionProgress === 'function') {
+                updateMissionProgress('elimination', 1)
+                updateMissionProgress('mass_reached', piece.mass)
+              }
+              
+              console.log(`🔥 Player piece eliminated enemy! Piece mass: ${Math.floor(piece.mass)}`)
+              
+            } else if (enemy.mass > piece.mass * 1.2) {
+              // Enemy eats player piece
+              enemy.mass += piece.mass * 0.8
+              enemy.radius = Math.sqrt(enemy.mass) * 3
+              
+              // Remove the player piece
+              this.playerPieces.splice(pieceIndex, 1)
+              
+              console.log(`💀 Player piece was eliminated by enemy! Remaining pieces: ${this.playerPieces.length}`)
+              
+              // Check if all pieces are gone
+              if (this.playerPieces.length === 0 && this.player.mass <= 20) {
+                // Game over - no pieces left and main player is too small
+                const finalTime = Math.floor((Date.now() - this.gameStartTime) / 1000)
+                setTimeSurvived(finalTime)
+                this.setTimeSurvived(finalTime)
+                console.log(`🏁 Game Over - All pieces eliminated! Survived for ${finalTime} seconds`)
+                setGameOver(true)
+              }
+              
+              break // Exit enemy loop since this piece was destroyed
+            }
+          }
+        }
+        
+        // Player pieces vs viruses
+        for (let i = this.viruses.length - 1; i >= 0; i--) {
+          const virus = this.viruses[i]
+          const dx = piece.x - virus.x
+          const dy = piece.y - virus.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance < piece.radius + virus.radius) {
+            if (piece.mass > virus.mass) {
+              // Player piece hits virus - split the piece further
+              if (piece.mass > 40) { // Only split if piece has enough mass
+                const halfMass = piece.mass / 2
+                
+                // Update current piece
+                piece.mass = halfMass
+                piece.radius = Math.sqrt(piece.mass) * 3
+                
+                // Create new piece from split
+                const newPiece = {
+                  x: piece.x + Math.random() * 60 - 30,
+                  y: piece.y + Math.random() * 60 - 30,
+                  mass: halfMass,
+                  radius: Math.sqrt(halfMass) * 3,
+                  color: piece.color,
+                  name: 'You',
+                  speed: piece.speed,
+                  targetX: piece.targetX,
+                  targetY: piece.targetY,
+                  splitTime: Date.now(),
+                  recombineReady: false,
+                  vx: (Math.random() - 0.5) * 6,
+                  vy: (Math.random() - 0.5) * 6
+                }
+                
+                // Add to pieces array if under limit
+                if (this.playerPieces.length < 15) {
+                  this.playerPieces.push(newPiece)
+                }
+                
+                console.log(`🦠 Player piece hit virus and split! Now ${this.playerPieces.length + 1} total pieces`)
+              }
+              
+              // Remove the virus
+              this.viruses.splice(i, 1)
+              
+              // Respawn virus elsewhere
+              this.spawnVirus()
+            }
+          }
+        }
+      }
+      
+      // Update total mass display including all pieces
+      const totalMass = this.player.mass + this.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
+      setMass(Math.floor(totalMass))
+    }
+
     updateCamera() {
       // Super snappy camera - move more aggressively toward player
       const targetX = this.player.x - this.canvas.width / 2
