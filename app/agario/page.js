@@ -3387,7 +3387,7 @@ const AgarIOGame = () => {
                       e.target.style.color = '#a0aec0'
                     }}
                   >
-                    🏠 Home
+                    HOME
                   </button>
                 </div>
               </div>
