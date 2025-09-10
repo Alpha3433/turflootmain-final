@@ -257,6 +257,7 @@ const AgarIOGame = () => {
 
     detectCashGame() {
       // Check URL parameters to determine if this is a cash game
+      if (typeof window === 'undefined') return false
       const urlParams = new URLSearchParams(window.location.search)
       const fee = urlParams.get('fee')
       const mode = urlParams.get('mode')
