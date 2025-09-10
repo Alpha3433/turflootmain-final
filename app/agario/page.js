@@ -1090,15 +1090,6 @@ const AgarIOGame = () => {
             }
           }
         }
-              } else {
-                otherPiece.mass += piece.mass
-                otherPiece.radius = Math.sqrt(otherPiece.mass) * 3
-                this.playerPieces.splice(i, 1)
-                break
-              }
-            }
-          }
-        }
       }
       
       // Update total mass display
