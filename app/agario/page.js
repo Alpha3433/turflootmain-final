@@ -3187,6 +3187,7 @@ const AgarIOGame = () => {
 
                 {/* Balance Section - Only for paid rooms */}
                 {(() => {
+                  if (typeof window === 'undefined') return null
                   const urlParams = new URLSearchParams(window.location.search)
                   const fee = urlParams.get('fee')
                   const isPaidRoom = fee && parseFloat(fee) > 0
