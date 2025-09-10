@@ -1888,7 +1888,9 @@ const AgarIOGame = () => {
     // Pass game states to engine for player visibility control
     const gameStates = {
       cashOutComplete,
-      gameOver
+      gameOver,
+      isCashingOut,
+      cashOutProgress
     }
 
     const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
