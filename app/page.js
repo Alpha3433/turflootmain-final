@@ -1210,21 +1210,35 @@ export default function TurfLootTactical() {
         connectorType: wallet.connectorType 
       })
       
-      // Call Privy's fundWallet for Solana deposits with proper error handling
+      // Call Privy's Solana fundWallet with proper configuration
       console.log('💰 Opening Privy Solana funding interface...')
       
       try {
-        // Use the direct fundWallet from Privy hooks
+        // Use the Solana-specific fundWallet from the bridge
         if (privy.fundWallet && typeof privy.fundWallet === 'function') {
-          // Call with no parameters - let Privy handle wallet detection
-          await privy.fundWallet()
+          // Call with Solana wallet address and configuration
+          await privy.fundWallet(wallet.address, {
+            cluster: { name: 'mainnet-beta' },
+            uiConfig: {
+              receiveFundsTitle: 'Add SOL to Your Wallet',
+              receiveFundsSubtitle: 'Choose a method to fund your Solana wallet.',
+            },
+            defaultFundingMethod: 'card',
+          })
           console.log('✅ Privy Solana funding interface opened successfully!')
         } else if (window.__TURFLOOT_PRIVY__ && window.__TURFLOOT_PRIVY__._rawFundWallet) {
-          // Alternative: use the raw function if available
-          await window.__TURFLOOT_PRIVY__._rawFundWallet()
+          // Alternative: use the raw function with Solana wallet address
+          await window.__TURFLOOT_PRIVY__._rawFundWallet(wallet.address, {
+            cluster: { name: 'mainnet-beta' },
+            uiConfig: {
+              receiveFundsTitle: 'Add SOL to Your Wallet',  
+              receiveFundsSubtitle: 'Choose a method to fund your Solana wallet.',
+            },
+            defaultFundingMethod: 'card',
+          })
           console.log('✅ Privy Solana funding interface opened via raw function!')
         } else {
-          throw new Error('Privy fundWallet function not available')
+          throw new Error('Privy Solana fundWallet function not available')
         }
       } catch (fundingError) {
         console.error('❌ Funding interface error:', fundingError)
