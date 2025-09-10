@@ -145,6 +145,19 @@ const AgarIOGame = () => {
   const [isCashingOut, setIsCashingOut] = useState(false)
   const [cashOutComplete, setCashOutComplete] = useState(false)
   
+  // Update game engine's gameStates when cash out state changes
+  useEffect(() => {
+    if (gameRef.current && gameRef.current.updateGameStates) {
+      console.log('🔄 Updating game states:', { isCashingOut, cashOutProgress, cashOutComplete, gameOver })
+      gameRef.current.updateGameStates({
+        isCashingOut,
+        cashOutProgress,
+        cashOutComplete,
+        gameOver
+      })
+    }
+  }, [isCashingOut, cashOutProgress, cashOutComplete, gameOver])
+  
   // Minimap state for real-time updates
   const [minimapData, setMinimapData] = useState({
     playerX: 2000,
