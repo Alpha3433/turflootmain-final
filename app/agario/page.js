@@ -1767,33 +1767,52 @@ const AgarIOGame = () => {
       const halfMass = this.player.mass / 2
       const halfRadius = Math.sqrt(halfMass / Math.PI) * 6
       
-      // Create new player piece
-      const angle = Math.random() * 2 * Math.PI // Random split direction
-      const splitDistance = 60 // Distance pieces are ejected
+      // Calculate direction toward mouse cursor (Agar.io style)
+      const dx = this.mouse.worldX - this.player.x
+      const dy = this.mouse.worldY - this.player.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      
+      // Normalize direction vector (prevent division by zero)
+      let directionX = 0
+      let directionY = 0
+      if (distance > 0) {
+        directionX = dx / distance
+        directionY = dy / distance
+      } else {
+        // Default direction if mouse is exactly on player (shouldn't happen, but safety check)
+        directionX = 1
+        directionY = 0
+      }
+      
+      // Split distance and velocity (authentic Agar.io values)
+      const splitDistance = 80 // Distance pieces are ejected toward mouse
+      const splitVelocity = 12 // Initial ejection speed
       
       const newPiece = {
-        x: this.player.x + Math.cos(angle) * splitDistance,
-        y: this.player.y + Math.sin(angle) * splitDistance,
+        x: this.player.x + directionX * splitDistance,
+        y: this.player.y + directionY * splitDistance,
         mass: halfMass,
         radius: halfRadius,
         color: this.player.color,
         name: 'You',
         speed: this.player.speed,
-        targetX: this.player.x + Math.cos(angle) * splitDistance,
-        targetY: this.player.y + Math.sin(angle) * splitDistance,
+        targetX: this.mouse.worldX, // Target the mouse position
+        targetY: this.mouse.worldY,
         splitTime: Date.now(), // Track when split occurred
         recombineReady: false,
-        vx: Math.cos(angle) * 8, // Initial velocity
-        vy: Math.sin(angle) * 8
+        vx: directionX * splitVelocity, // Initial velocity toward mouse
+        vy: directionY * splitVelocity
       }
       
-      // Update main player
+      // Update main player with recoil effect (opposite direction)
       this.player.mass = halfMass
       this.player.radius = halfRadius
-      this.player.x = this.player.x - Math.cos(angle) * splitDistance
-      this.player.y = this.player.y - Math.sin(angle) * splitDistance
-      this.player.targetX = this.player.x
-      this.player.targetY = this.player.y
+      // Small recoil movement in opposite direction
+      const recoilDistance = 20
+      this.player.x = this.player.x - directionX * recoilDistance
+      this.player.y = this.player.y - directionY * recoilDistance
+      this.player.targetX = this.mouse.worldX // Keep following mouse
+      this.player.targetY = this.mouse.worldY
       
       // Add new piece to array
       this.playerPieces.push(newPiece)
