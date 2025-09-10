@@ -3355,7 +3355,7 @@ const AgarIOGame = () => {
                       e.target.style.transform = 'translateY(0)'
                     }}
                   >
-                    JOINING...
+                    PLAY AGAIN
                   </button>
                   
                   {/* Home Button */}
