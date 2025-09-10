@@ -1199,21 +1199,22 @@ export default function TurfLootTactical() {
         chainType: isEVMAddress ? 'EVM (Cross-chain enabled)' : 'Solana'
       })
       
-      // Call Privy's fundWallet for Solana deposits with standard configuration
-      console.log('💰 Opening Privy Solana funding interface...')
+      // Call Privy's fundWallet - simplified approach for cross-chain support
+      console.log('💰 Opening Privy funding interface...')
       
       try {
-        // Use the standard fundWallet from Privy hooks
+        // Use the standard fundWallet from Privy hooks with no parameters
+        // Let Privy auto-detect the wallet and handle cross-chain bridging
         if (privy.fundWallet && typeof privy.fundWallet === 'function') {
-          // Call with wallet as parameter for Solana funding
-          await privy.fundWallet(wallet)
-          console.log('✅ Privy Solana funding interface opened successfully!')
+          console.log('🔗 Calling Privy fundWallet()...')
+          await privy.fundWallet()
+          console.log('✅ Privy funding interface opened successfully!')
         } else if (window.__TURFLOOT_PRIVY__ && window.__TURFLOOT_PRIVY__._rawFundWallet) {
-          // Alternative: use the raw function with wallet parameter
-          await window.__TURFLOOT_PRIVY__._rawFundWallet(wallet)
-          console.log('✅ Privy Solana funding interface opened via raw function!')
+          console.log('🔗 Calling raw Privy fundWallet()...')
+          await window.__TURFLOOT_PRIVY__._rawFundWallet()
+          console.log('✅ Privy funding interface opened via raw function!')
         } else {
-          throw new Error('Privy Solana fundWallet function not available')
+          throw new Error('Privy fundWallet function not available')
         }
       } catch (fundingError) {
         console.error('❌ Funding interface error:', fundingError)
