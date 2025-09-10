@@ -1200,7 +1200,7 @@ export default function TurfLootTactical() {
       }
       
       // Validate Solana wallet with enhanced checks
-      const wallet = privy.user.wallet
+      const wallet = solanaWallet || privy.user.wallet
       if (!wallet) {
         console.error('❌ No embedded wallet available')
         alert('❌ No wallet found. Please disconnect and reconnect your account to create a wallet.')
@@ -1213,11 +1213,20 @@ export default function TurfLootTactical() {
         return
       }
       
+      // Check if it's actually a Solana address format (not EVM)
+      const isEVMAddress = wallet.address.startsWith('0x') && wallet.address.length === 42
+      if (isEVMAddress) {
+        console.error('❌ EVM wallet detected, but Solana wallet required')
+        alert('❌ Wrong wallet type detected!\n\nYour account has an Ethereum wallet, but this app requires a Solana wallet.\n\nTo fix this:\n1. Check your Privy console settings\n2. Ensure Solana is set as the primary chain\n3. Create a new account or contact support')
+        return
+      }
+      
       console.log('✅ Valid Solana wallet found:', wallet.address)
       console.log('🔍 Wallet details:', { 
         address: wallet.address, 
         walletClientType: wallet.walletClientType,
-        connectorType: wallet.connectorType 
+        connectorType: wallet.connectorType,
+        addressFormat: isEVMAddress ? 'EVM (0x...)' : 'Solana (base58)'
       })
       
       // Call Privy's fundWallet for Solana deposits with standard configuration
