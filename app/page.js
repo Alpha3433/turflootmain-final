@@ -1228,26 +1228,40 @@ export default function TurfLootTactical() {
         return
       }
       
+      // STRICT Solana address validation (NO EVM allowed)
       if (!solanaWallet.address) {
         console.error('❌ Solana wallet exists but has no address')
         alert('❌ Solana wallet address not available. Please refresh and try again.')
         return
       }
       
-      // Verify it's actually a Solana address format
+      // CRITICAL: Verify it's actually a Solana address format (NOT EVM)
       const isEVMAddress = solanaWallet.address.startsWith('0x') && solanaWallet.address.length === 42
       if (isEVMAddress) {
-        console.error('❌ EVM wallet detected in Solana wallets - configuration issue')
-        alert('⚠️ Configuration issue detected.\n\nPlease contact support - Solana wallet configuration is not working properly.')
+        console.error('❌ CRITICAL ERROR: EVM wallet detected despite Solana-only configuration!')
+        console.error('❌ Wallet details:', {
+          address: solanaWallet.address,
+          chainType: solanaWallet.chainType,
+          walletClientType: solanaWallet.walletClientType
+        })
+        alert('❌ CRITICAL CONFIGURATION ERROR!\n\nAn EVM wallet was detected despite Solana-only settings.\n\nThis indicates a serious configuration issue.\n\nPlease contact support immediately with this error message.')
         return
       }
       
-      console.log('✅ Solana wallet confirmed:', solanaWallet.address)
-      console.log('🔍 Wallet details:', { 
-        address: solanaWallet.address, 
+      // STRICT: Verify chainType is explicitly 'solana'
+      if (solanaWallet.chainType && solanaWallet.chainType !== 'solana') {
+        console.error('❌ CRITICAL ERROR: Wallet chainType is not Solana:', solanaWallet.chainType)
+        alert('❌ CRITICAL CONFIGURATION ERROR!\n\nWallet chainType is not Solana.\n\nPlease contact support immediately.')
+        return
+      }
+      
+      console.log('✅ SOLANA WALLET VERIFIED:', {
+        address: solanaWallet.address,
+        chainType: solanaWallet.chainType || 'solana',
         walletClientType: solanaWallet.walletClientType,
         connectorType: solanaWallet.connectorType,
-        chainType: 'Solana'
+        addressFormat: 'Solana (base58)',
+        isEVM: false
       })
       
       // Call Privy's fundWallet - using proper hooks instead of bridge
