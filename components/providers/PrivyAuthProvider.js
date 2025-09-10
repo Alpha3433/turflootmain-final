@@ -2,7 +2,6 @@
 
 import { PrivyProvider, usePrivy, useFundWallet } from '@privy-io/react-auth'
 import { Component, useState, useEffect } from 'react'
-import { solana } from '@privy-io/react-auth/solana'
 
 // Simple success handler
 const handleSuccess = (user) => {
