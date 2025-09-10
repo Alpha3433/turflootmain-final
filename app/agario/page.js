@@ -1435,13 +1435,14 @@ const AgarIOGame = () => {
               
               console.log(`💀 Player piece was eliminated by enemy! Remaining pieces: ${this.playerPieces.length}`)
               
-              // Check if all pieces are gone
-              if (this.playerPieces.length === 0 && this.player.mass <= 20) {
-                // Game over - no pieces left and main player is too small
+              // Only trigger game over if main player is also very small and vulnerable
+              if (this.playerPieces.length === 0 && this.player.mass <= 15) {
+                // Game over - no pieces left and main player is critically small
+                console.log(`🏁 Game Over - All pieces eliminated and main player critically small (mass: ${this.player.mass})!`)
+                this.running = false
                 const finalTime = Math.floor((Date.now() - this.gameStartTime) / 1000)
                 setTimeSurvived(finalTime)
                 this.setTimeSurvived(finalTime)
-                console.log(`🏁 Game Over - All pieces eliminated! Survived for ${finalTime} seconds`)
                 setGameOver(true)
               }
               
