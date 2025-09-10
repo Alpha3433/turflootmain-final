@@ -1133,76 +1133,52 @@ export default function TurfLootTactical() {
     console.log('💰 DEPOSIT button clicked - Solana-only implementation')
     
     try {
-      // Simple authentication check
-      if (!isAuthenticated || !user) {
+      // Check authentication using proper Privy hooks
+      if (!authenticated || !privyUser) {
         console.log('🔐 User not authenticated, opening Privy login...')
-        
-        const privy = window.__TURFLOOT_PRIVY__
-        if (privy && privy.login) {
-          await privy.login()
-          
-          // Wait for authentication to complete
-          let attempts = 0
-          while (attempts < 10 && !privy.authenticated) {
-            await new Promise(resolve => setTimeout(resolve, 500))
-            attempts++
-          }
-          
-          if (!privy.authenticated) {
-            console.log('❌ Authentication timeout or cancelled')
-            return
-          }
-          
-          console.log('✅ Authentication completed via Privy login')
-        } else {
-          console.error('❌ Privy not available')
-          alert('❌ Wallet system not available. Please refresh the page.')
-          return
-        }
-      }
-      
-      // Get fresh Privy state after authentication
-      const privy = window.__TURFLOOT_PRIVY__
-      
-      if (!privy || !privy.authenticated || !privy.user) {
-        console.error('❌ Privy state invalid after authentication')
-        alert('❌ Authentication failed. Please try again.')
+        await login()
         return
       }
       
       console.log('✅ Privy authenticated, proceeding with Solana deposit...')
-      console.log('🔍 User ID:', privy.user.id)
-      console.log('🔍 Has embedded wallet:', !!privy.user.wallet)
+      console.log('🔍 User ID:', privyUser.id)
+      console.log('🔍 Solana wallets ready:', solanaReady)
+      console.log('🔍 Available Solana wallets:', solanaWallets.length)
       
-      // Use Solana wallet with simplified approach
-      console.log('🔍 Checking for Solana wallet...')
-      
-      const wallet = privy.user.wallet
-      if (!wallet) {
-        console.error('❌ No wallet available')
-        alert('❌ No wallet found. Please refresh the page and sign in again to create a Solana wallet.')
+      // Wait for Solana wallets to be ready
+      if (!solanaReady) {
+        console.log('⏳ Waiting for Solana wallets to load...')
+        alert('⏳ Loading wallet information, please wait a moment and try again.')
         return
       }
       
-      if (!wallet.address) {
-        console.error('❌ Wallet exists but has no address')
-        alert('❌ Wallet address not available. Please refresh and try again.')
+      // Use proper Solana wallet access per documentation
+      const solanaWallet = solanaWallets[0] // Get first Solana wallet
+      if (!solanaWallet) {
+        console.error('❌ No Solana wallet available')
+        alert('❌ No Solana wallet found. Please refresh the page and sign in again to create a Solana wallet.')
         return
       }
       
-      // With Solana-only config, all wallets should be Solana
-      const isEVMAddress = wallet.address.startsWith('0x') && wallet.address.length === 42
+      if (!solanaWallet.address) {
+        console.error('❌ Solana wallet exists but has no address')
+        alert('❌ Solana wallet address not available. Please refresh and try again.')
+        return
+      }
+      
+      // Verify it's actually a Solana address format
+      const isEVMAddress = solanaWallet.address.startsWith('0x') && solanaWallet.address.length === 42
       if (isEVMAddress) {
-        console.log('⚠️ EVM wallet detected - this should not happen with Solana-only config')
-        alert('⚠️ Configuration mismatch detected.\n\nPlease refresh the page and sign in again to get a proper Solana wallet.')
+        console.error('❌ EVM wallet detected in Solana wallets - configuration issue')
+        alert('⚠️ Configuration issue detected.\n\nPlease contact support - Solana wallet configuration is not working properly.')
         return
       }
       
-      console.log('✅ Solana wallet confirmed:', wallet.address)
+      console.log('✅ Solana wallet confirmed:', solanaWallet.address)
       console.log('🔍 Wallet details:', { 
-        address: wallet.address, 
-        walletClientType: wallet.walletClientType,
-        connectorType: wallet.connectorType,
+        address: solanaWallet.address, 
+        walletClientType: solanaWallet.walletClientType,
+        connectorType: solanaWallet.connectorType,
         chainType: 'Solana'
       })
       
