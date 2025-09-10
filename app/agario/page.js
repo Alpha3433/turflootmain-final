@@ -2694,7 +2694,7 @@ const AgarIOGame = () => {
 
           {/* Split Button - Circular for mobile, rectangular for desktop */}
           <div 
-            onClick={handleSplit}
+            onClick={(e) => handleSplit(e)}
             style={{
               backgroundColor: 'rgba(0, 100, 255, 0.9)',
               border: '3px solid #0064ff',
