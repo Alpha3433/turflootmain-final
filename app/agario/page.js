@@ -180,7 +180,7 @@ const AgarIOGame = () => {
         targetX: this.world.width / 2,
         targetY: this.world.height / 2,
         spawnProtection: true,
-        spawnProtectionTime: 4000, // 4 seconds in milliseconds
+        spawnProtectionTime: 6000, // Increased from 4 to 6 seconds for better protection
         spawnProtectionStart: Date.now()
       }
       
