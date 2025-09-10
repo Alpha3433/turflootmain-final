@@ -994,22 +994,29 @@ const AgarIOGame = () => {
         const dy = piece.targetY - piece.y
         const distance = Math.sqrt(dx * dx + dy * dy)
         
-        // Apply initial split velocity (gradually decreases)
-        if (piece.vx || piece.vy) {
-          piece.x += piece.vx * deltaTime
-          piece.y += piece.vy * deltaTime
+        // Apply initial split velocity (strong initial launch like Agar.io)
+        if (piece.vx !== 0 || piece.vy !== 0) {
+          // Apply velocity with proper scaling - stronger initial movement
+          const velocityMultiplier = deltaTime * 60 // Normalize for 60fps equivalent
+          piece.x += piece.vx * velocityMultiplier
+          piece.y += piece.vy * velocityMultiplier
           
-          // Friction - reduce velocity over time
-          piece.vx *= 0.95
-          piece.vy *= 0.95
+          // Friction - reduce velocity over time (authentic Agar.io decay)
+          piece.vx *= 0.92 // Slightly more aggressive friction
+          piece.vy *= 0.92
           
-          // Stop very small velocities
-          if (Math.abs(piece.vx) < 0.1) piece.vx = 0
-          if (Math.abs(piece.vy) < 0.1) piece.vy = 0
+          // Stop very small velocities to prevent floating point issues
+          if (Math.abs(piece.vx) < 0.05) piece.vx = 0
+          if (Math.abs(piece.vy) < 0.05) piece.vy = 0
+          
+          // Debug log for initial frames
+          if (Math.abs(piece.vx) > 0.05 || Math.abs(piece.vy) > 0.05) {
+            console.log(`🚀 Piece ejecting: vx=${piece.vx.toFixed(2)}, vy=${piece.vy.toFixed(2)}, pos=(${piece.x.toFixed(0)}, ${piece.y.toFixed(0)})`)
+          }
         }
         
-        // Move towards mouse target if no split velocity
-        if (distance > 0.1 && !piece.vx && !piece.vy) {
+        // Move towards mouse target only when no split velocity remains
+        if (distance > 0.1 && Math.abs(piece.vx) < 0.05 && Math.abs(piece.vy) < 0.05) {
           const baseSpeed = 6.0
           const massSpeedFactor = Math.sqrt(piece.mass / 20)
           const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
