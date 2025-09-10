@@ -12,7 +12,7 @@ export default function TurfLootTactical() {
   // Privy hooks - CORRECT way to access wallets per documentation
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets: allWallets } = useWallets()
-  const { wallets: solanaWallets, ready: solanaReady } = useSolanaWallets()
+  const { wallets: solanaWallets, ready: solanaReady, createWallet: createSolanaWallet } = useSolanaWallets()
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
