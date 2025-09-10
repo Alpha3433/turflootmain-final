@@ -1167,84 +1167,36 @@ export default function TurfLootTactical() {
       console.log('🔍 User ID:', privy.user.id)
       console.log('🔍 Has embedded wallet:', !!privy.user.wallet)
       
-      // Ensure user has a Solana wallet - prioritize Solana over EVM
-      const userWallets = privy.user.linkedAccounts?.filter(account => account.type === 'wallet') || []
-      let solanaWallet = userWallets.find(wallet => wallet.chainType === 'solana')
+      // Use existing wallet with cross-chain bridging support
+      console.log('🔍 Checking user wallet for cross-chain funding...')
       
-      console.log('🔍 Available wallets:', userWallets.map(w => ({ 
-        address: w.address, 
-        chainType: w.chainType,
-        walletClientType: w.walletClientType 
-      })))
-      
-      if (!solanaWallet) {
-        console.log('🔑 No Solana wallet found in linked accounts, checking default wallet...')
-        
-        // Check if the default wallet is Solana
-        if (privy.user.wallet && !privy.user.wallet.address?.startsWith('0x')) {
-          solanaWallet = privy.user.wallet
-          console.log('✅ Default wallet appears to be Solana format')
-        } else {
-          console.log('🔑 No Solana wallet found, creating Solana wallet...')
-          
-          try {
-            // Try to create a Solana-specific wallet
-            await privy.createWallet()
-            
-            // Wait for wallet creation
-            await new Promise(resolve => setTimeout(resolve, 2000))
-            
-            // Refresh user data to get the new wallet
-            const updatedUser = privy.user
-            const updatedWallets = updatedUser.linkedAccounts?.filter(account => account.type === 'wallet') || []
-            solanaWallet = updatedWallets.find(account => account.chainType === 'solana')
-            
-            if (!solanaWallet) {
-              throw new Error('Solana wallet creation failed - only EVM wallet may have been created')
-            }
-            
-            console.log('✅ Solana wallet created:', solanaWallet.address)
-          } catch (error) {
-            console.error('❌ Solana wallet creation failed:', error)
-            alert('❌ Failed to create Solana wallet. This may be due to Privy console configuration.\n\nPlease check that Solana is enabled as the primary chain in your Privy dashboard.')
-            return
-          }
-        }
-      } else {
-        console.log('✅ Found existing Solana wallet:', solanaWallet.address)
-      }
-      
-      // Validate the Solana wallet
-      const wallet = solanaWallet
+      const wallet = privy.user.wallet
       if (!wallet) {
-        console.error('❌ No Solana wallet available after creation attempts')
-        alert('❌ No Solana wallet found. Please disconnect and reconnect your account to create a wallet.')
+        console.error('❌ No embedded wallet available')
+        alert('❌ No wallet found. Please disconnect and reconnect your account to create a wallet.')
         return
       }
       
       if (!wallet.address) {
-        console.error('❌ Solana wallet exists but has no address')
-        alert('❌ Solana wallet address not available. Please refresh and try again.')
+        console.error('❌ Wallet exists but has no address')
+        alert('❌ Wallet address not available. Please refresh and try again.')
         return
       }
       
-      // Check if it's actually a Solana address format (not EVM)
+      // Check wallet type and inform user about cross-chain support
       const isEVMAddress = wallet.address.startsWith('0x') && wallet.address.length === 42
       if (isEVMAddress) {
-        console.log('⚠️ EVM wallet detected - this should not happen with proper Solana wallet selection')
-        // With cross-chain bridging enabled, we can still proceed
-        console.log('✅ Cross-chain bridging enabled - EVM wallet can fund Solana operations')
-        alert('✅ Cross-chain funding detected!\n\nYou have an Ethereum wallet, but Privy will help you fund Solana operations through cross-chain bridging.\n\nClick OK to continue with the deposit process.')
+        console.log('✅ EVM wallet detected - using cross-chain bridging for Solana funding')
       } else {
-        console.log('✅ Valid Solana wallet detected:', wallet.address)
+        console.log('✅ Solana wallet detected - direct funding')
       }
       
-      console.log('✅ Using wallet:', wallet.address)
+      console.log('✅ Using wallet for funding:', wallet.address)
       console.log('🔍 Wallet details:', { 
         address: wallet.address, 
         walletClientType: wallet.walletClientType,
         connectorType: wallet.connectorType,
-        addressFormat: isEVMAddress ? 'EVM (0x...) - Cross-chain enabled' : 'Solana (base58)'
+        chainType: isEVMAddress ? 'EVM (Cross-chain enabled)' : 'Solana'
       })
       
       // Call Privy's fundWallet for Solana deposits with standard configuration
