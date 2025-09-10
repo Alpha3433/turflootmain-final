@@ -16,7 +16,7 @@ from datetime import datetime
 
 # Configuration - Use localhost for testing as per environment
 LOCALHOST_URL = "http://localhost:3000"
-PRODUCTION_URL = "https://battle-buddies-7.preview.emergentagent.com"
+PRODUCTION_URL = "https://solana-battle.preview.emergentagent.com"
 
 # Test configuration
 TEST_TIMEOUT = 10

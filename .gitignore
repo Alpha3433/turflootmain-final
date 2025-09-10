@@ -91,3 +91,7 @@ node_modules/next/next-swc-fallback/@next/swc-linux-arm64-gnu/next-swc.linux-arm
 .next/cache/webpack/server-production/3.pack
 .next/cache/webpack/client-production/1.pack
 .next/cache/webpack/client-production/5.pack
+-e 
+# Environment files
+*.env
+*.env.*

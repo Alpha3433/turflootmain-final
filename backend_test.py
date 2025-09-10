@@ -24,7 +24,7 @@ from datetime import datetime, timedelta
 import os
 
 # Configuration
-BASE_URL = "https://battle-buddies-7.preview.emergentagent.com"
+BASE_URL = "https://solana-battle.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 # Test data for realistic wallet addresses
