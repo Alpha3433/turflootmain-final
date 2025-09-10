@@ -200,30 +200,21 @@ export default function PrivyAuthProvider({ children }) {
     mfa: {
       noPromptOnMfaRequired: false,
     },
-    // Add proper Solana configuration for CNR-2 format compatibility
-    supportedChains: [
+    // Add Solana wallet configuration for CNR-2 format compatibility
+    solanaClusters: [
       {
-        id: 101, // Solana Mainnet
-        name: 'Solana',
-        network: 'solana-mainnet',
-        nativeCurrency: {
-          name: 'Solana',
-          symbol: 'SOL',
-          decimals: 9,
-        },
-        rpcUrls: {
-          default: {
-            http: ['https://api.mainnet-beta.solana.com'],
-          },
-          public: {
-            http: ['https://api.mainnet-beta.solana.com'],
-          },
-        },
+        name: 'mainnet-beta',
+        rpcUrl: 'https://api.mainnet-beta.solana.com',
       },
     ],
-    // Configure funding with Solana-specific settings
-    fiatOnRamp: {
-      useSandbox: false, // Set to true for testing
+    // Configure funding with Coinbase Onramp
+    fundingMethodConfig: {
+      moonpay: {
+        useSandbox: false,
+      },
+      coinbaseOnramp: {
+        useSandbox: false,
+      },
     },
   }
 
