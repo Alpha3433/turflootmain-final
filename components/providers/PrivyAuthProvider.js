@@ -211,15 +211,18 @@ export default function PrivyAuthProvider({ children }) {
     loginMethods: ['google', 'email', 'wallet'],
     // Solana-only embedded wallets configuration
     embeddedWallets: {
+      createOnLogin: 'users-without-wallets', // Global setting
       solana: { 
         createOnLogin: 'users-without-wallets' 
       }
+      // Explicitly NO evm section to disable EVM wallets
     },
     // External Solana wallets support
     externalWallets: {
       solana: { 
         wallets: ['phantom', 'solflare', 'backpack'] 
       }
+      // Explicitly NO evm section to disable EVM wallets
     },
     // Solana clusters configuration
     solanaClusters: [
@@ -230,6 +233,10 @@ export default function PrivyAuthProvider({ children }) {
     ],
     mfa: {
       noPromptOnMfaRequired: false,
+    },
+    // Explicitly disable smart wallets to prevent EVM wallet creation
+    smartWallets: {
+      enabled: false
     },
   }
 
