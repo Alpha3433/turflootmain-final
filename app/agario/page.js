@@ -1717,8 +1717,9 @@ const AgarIOGame = () => {
         this.ctx.globalAlpha = 1.0 // Reset alpha
       }
       
-      // Draw cash out progress ring - visible to ALL players
-      if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0) {
+      // Draw cash out progress ring - visible to ALL players when the main player is cashing out
+      const isMainPlayer = player === this.player
+      if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0 && isMainPlayer) {
         const ringRadius = player.radius + 16  // Increased from +12 to +16 for better visibility
         const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
         
