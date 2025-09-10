@@ -1167,24 +1167,34 @@ export default function TurfLootTactical() {
       console.log('🔍 User ID:', privy.user.id)
       console.log('🔍 Has embedded wallet:', !!privy.user.wallet)
       
-      // Ensure user has a Solana wallet
-      if (!privy.user.wallet) {
-        console.log('🔑 No embedded wallet found, creating Solana wallet...')
+      // Ensure user has a Solana wallet (not EVM)
+      const userWallets = privy.user.linkedAccounts?.filter(account => account.type === 'wallet') || []
+      const solanaWallet = userWallets.find(wallet => wallet.chainType === 'solana') || privy.user.wallet
+      
+      if (!solanaWallet) {
+        console.log('🔑 No Solana wallet found, creating Solana wallet...')
         
         try {
+          // Try to create a Solana-specific wallet
           await privy.createWallet()
           
           // Wait for wallet creation
           await new Promise(resolve => setTimeout(resolve, 2000))
           
-          if (!privy.user.wallet) {
-            throw new Error('Solana wallet creation failed')
+          // Refresh user data to get the new wallet
+          const updatedUser = privy.user
+          const newSolanaWallet = updatedUser.linkedAccounts?.find(account => 
+            account.type === 'wallet' && account.chainType === 'solana'
+          ) || updatedUser.wallet
+          
+          if (!newSolanaWallet) {
+            throw new Error('Solana wallet creation failed - only EVM wallet may have been created')
           }
           
-          console.log('✅ Solana wallet created:', privy.user.wallet.address)
+          console.log('✅ Solana wallet created:', newSolanaWallet.address)
         } catch (error) {
           console.error('❌ Solana wallet creation failed:', error)
-          alert('❌ Failed to create Solana wallet. Please try again or contact support.')
+          alert('❌ Failed to create Solana wallet. This may be due to Privy console configuration.\n\nPlease check that Solana is enabled as the primary chain in your Privy dashboard.')
           return
         }
       }
