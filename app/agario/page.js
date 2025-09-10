@@ -2113,7 +2113,7 @@ const AgarIOGame = () => {
 
   // Real-time survival timer - updates every second during gameplay
   useEffect(() => {
-    if (!gameStarted || gameOver) return
+    if (!gameStarted || gameOver || cashOutComplete) return
 
     const survivalTimer = setInterval(() => {
       if (gameRef.current && gameRef.current.gameStartTime) {
@@ -2123,7 +2123,7 @@ const AgarIOGame = () => {
     }, 1000)
 
     return () => clearInterval(survivalTimer)
-  }, [gameStarted, gameOver])
+  }, [gameStarted, gameOver, cashOutComplete])
 
   // Mission timer and survival tracking
   useEffect(() => {
