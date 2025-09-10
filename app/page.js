@@ -1189,31 +1189,51 @@ export default function TurfLootTactical() {
         }
       }
       
-      // Validate Solana wallet
+      // Validate Solana wallet with enhanced checks
       const wallet = privy.user.wallet
-      if (!wallet || !wallet.address) {
-        console.error('❌ No valid Solana wallet available')
-        alert('❌ No Solana wallet available. Please disconnect and reconnect your account.')
+      if (!wallet) {
+        console.error('❌ No embedded wallet available')
+        alert('❌ No wallet found. Please disconnect and reconnect your account to create a wallet.')
+        return
+      }
+      
+      if (!wallet.address) {
+        console.error('❌ Wallet exists but has no address')
+        alert('❌ Wallet address not available. Please refresh and try again.')
         return
       }
       
       console.log('✅ Valid Solana wallet found:', wallet.address)
+      console.log('🔍 Wallet details:', { 
+        address: wallet.address, 
+        walletClientType: wallet.walletClientType,
+        connectorType: wallet.connectorType 
+      })
       
-      // Call Privy's fundWallet for Solana deposits
+      // Call Privy's fundWallet for Solana deposits with proper error handling
       console.log('💰 Opening Privy Solana funding interface...')
       
-      // Use the exposed fundWallet function from the bridge
-      if (privy.fundWallet && typeof privy.fundWallet === 'function') {
-        await privy.fundWallet()
-        console.log('✅ Privy Solana funding interface opened successfully!')
-      } else {
-        // Fallback to raw fundWallet if bridge function is not available
-        const { _rawFundWallet } = privy
-        if (_rawFundWallet && typeof _rawFundWallet === 'function') {
-          await _rawFundWallet()
+      try {
+        // Use the direct fundWallet from Privy hooks
+        if (privy.fundWallet && typeof privy.fundWallet === 'function') {
+          // Call with no parameters - let Privy handle wallet detection
+          await privy.fundWallet()
+          console.log('✅ Privy Solana funding interface opened successfully!')
+        } else if (window.__TURFLOOT_PRIVY__ && window.__TURFLOOT_PRIVY__._rawFundWallet) {
+          // Alternative: use the raw function if available
+          await window.__TURFLOOT_PRIVY__._rawFundWallet()
           console.log('✅ Privy Solana funding interface opened via raw function!')
         } else {
           throw new Error('Privy fundWallet function not available')
+        }
+      } catch (fundingError) {
+        console.error('❌ Funding interface error:', fundingError)
+        
+        // More specific error handling
+        if (fundingError.message?.includes('invalid address')) {
+          alert('❌ Wallet address validation failed. Please:\n\n1. Disconnect your wallet\n2. Refresh the page\n3. Reconnect and try again')
+        } else {
+          throw fundingError // Re-throw for main error handler
         }
       }
       
