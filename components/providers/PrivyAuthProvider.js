@@ -231,10 +231,6 @@ export default function PrivyAuthProvider({ children }) {
         rpcUrl: 'https://api.mainnet-beta.solana.com'
       }
     ],
-    // Disable ALL EVM-related features
-    chains: undefined, // ❌ No EVM chains configured
-    defaultChain: undefined, // ❌ No default EVM chain
-    supportedChains: [], // ❌ Empty to prevent EVM chain support
     mfa: {
       noPromptOnMfaRequired: false,
     },
@@ -242,6 +238,8 @@ export default function PrivyAuthProvider({ children }) {
     smartWallets: {
       enabled: false
     },
+    // Remove problematic supportedChains configuration
+    // Let Privy use default behavior with Solana-only settings above
   }
 
   return (
