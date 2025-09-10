@@ -973,9 +973,15 @@ const AgarIOGame = () => {
       if (this.antiCheat.enabled) {
         const expectedRadius = Math.sqrt(this.player.mass) * 3
         if (Math.abs(this.player.radius - expectedRadius) > 1) {
+          console.log(`⚠️ RADIUS VIOLATION: Player mass: ${this.player.mass}, Current radius: ${this.player.radius}, Expected radius: ${expectedRadius}`)
           this.recordViolation('RADIUS_MANIPULATION', `Invalid radius: ${this.player.radius} vs expected: ${expectedRadius}`)
           this.player.radius = expectedRadius // Force correct radius
         }
+      }
+      
+      // Add debugging for high mass (around 1050)
+      if (this.player.mass > 1000) {
+        console.log(`🔍 HIGH MASS DEBUG: Mass=${this.player.mass.toFixed(1)}, Radius=${this.player.radius.toFixed(1)}, Zone=${this.currentPlayableRadius}, MaxRadius=${(this.currentPlayableRadius - this.player.radius).toFixed(1)}`)
       }
     }
 
