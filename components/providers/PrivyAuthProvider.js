@@ -200,29 +200,20 @@ export default function PrivyAuthProvider({ children }) {
     mfa: {
       noPromptOnMfaRequired: false,
     },
-    // Updated Solana configuration for v1.76+
-    supportedChains: [
+    // Updated Solana configuration for better compatibility
+    solanaClusters: [
       {
-        id: 'solana:mainnet',
-        name: 'Solana Mainnet',
-        network: 'mainnet-beta',
+        name: 'mainnet-beta',
         rpcUrl: 'https://api.mainnet-beta.solana.com',
-        nativeCurrency: {
-          name: 'Solana',
-          symbol: 'SOL',
-          decimals: 9,
-        },
       },
     ],
-    // Updated funding configuration
+    // Simplified funding configuration
     fundingMethodConfig: {
       moonpay: {
         useSandbox: false,
-        supportedChains: ['solana:mainnet'],
       },
       coinbaseOnramp: {
         useSandbox: false,
-        supportedChains: ['solana:mainnet'],
       },
     },
   }
