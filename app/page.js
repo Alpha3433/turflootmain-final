@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { usePrivy, useWallets, useSolanaWallets } from '@privy-io/react-auth'
 import ServerBrowserModal from '@/components/ServerBrowserModal'
 
 export default function TurfLootTactical() {
