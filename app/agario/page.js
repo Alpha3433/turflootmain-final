@@ -2691,7 +2691,7 @@ const AgarIOGame = () => {
               </div>
             ) : (
               // Desktop: Show full text
-              '⚡ Split (S)'
+              '⚡ Split (Space)'
             )}
           </div>
         </div>
