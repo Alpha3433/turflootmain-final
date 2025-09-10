@@ -1823,7 +1823,7 @@ const AgarIOGame = () => {
       // Set cooldown (1 second)
       this.splitCooldown = 60 // 60 frames = ~1 second at 60fps
       
-      console.log(`🔄 Player split! Now ${currentPieces + 1} pieces. Total mass: ${Math.floor(this.player.mass + this.playerPieces.reduce((sum, piece) => sum + piece.mass, 0))}`)
+      console.log(`🚀 Player split toward mouse! Now ${currentPieces + 1} pieces. Total mass: ${Math.floor(this.player.mass + this.playerPieces.reduce((sum, piece) => sum + piece.mass, 0))}. Direction: (${directionX.toFixed(2)}, ${directionY.toFixed(2)})`)
     }
   }
 
