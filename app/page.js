@@ -1200,12 +1200,17 @@ export default function TurfLootTactical() {
         console.log('🔑 No Solana wallet found, creating SOLANA-ONLY wallet...')
         
         try {
-          console.log('⚡ Creating Solana wallet using useSolanaWallets.createWallet()...')
-          solanaWallet = await createSolanaWallet()
+          console.log('⚡ Creating Solana wallet using standard createWallet()...')
+          // Use the standard createWallet from usePrivy or fallback to Privy bridge
+          if (window.__TURFLOOT_PRIVY__ && window.__TURFLOOT_PRIVY__.createWallet) {
+            solanaWallet = await window.__TURFLOOT_PRIVY__.createWallet()
+          } else {
+            throw new Error('Wallet creation not available')
+          }
           
           // Verify the created wallet is actually Solana
           if (solanaWallet) {
-            console.log('✅ Solana wallet created successfully!')
+            console.log('✅ Wallet created successfully!')
             console.log('🔍 New wallet details:', {
               address: solanaWallet.address,
               chainType: solanaWallet.chainType,
