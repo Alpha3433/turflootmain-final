@@ -1940,7 +1940,9 @@ const AgarIOGame = () => {
 
     return () => {
       game.stop()
-      window.removeEventListener('resize', setCanvasSize)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', setCanvasSize)
+      }
       // Reset body styles when component unmounts
       document.body.style.margin = ''
       document.body.style.padding = ''
