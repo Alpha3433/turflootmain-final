@@ -1717,6 +1717,48 @@ const AgarIOGame = () => {
         this.ctx.globalAlpha = 1.0 // Reset alpha
       }
       
+      // Draw cash out progress ring - visible to ALL players
+      if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0) {
+        const ringRadius = player.radius + 12
+        const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
+        
+        // Draw background ring
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
+        this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)' // Semi-transparent green background
+        this.ctx.lineWidth = 6
+        this.ctx.stroke()
+        
+        // Draw progress arc
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = '#22c55e' // Bright green
+        this.ctx.lineWidth = 6
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+        
+        // Add pulsing effect for cash out ring
+        const time = Date.now() / 1000
+        const pulseIntensity = Math.sin(time * 6) * 0.4 + 0.8 // Faster pulse for urgency
+        this.ctx.globalAlpha = pulseIntensity
+        
+        // Draw inner glow for cash out
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = '#4ade80' // Lighter green glow
+        this.ctx.lineWidth = 3
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+        
+        this.ctx.globalAlpha = 1.0 // Reset alpha
+        
+        // Draw cash out text above player
+        this.ctx.fillStyle = '#22c55e'
+        this.ctx.font = 'bold 12px Arial'
+        this.ctx.textAlign = 'center'
+        this.ctx.fillText(`CASHING OUT ${Math.floor(this.gameStates.cashOutProgress)}%`, player.x, player.y - player.radius - 35)
+      }
+      
       // Draw player name
       this.ctx.fillStyle = '#ffffff'
       this.ctx.font = 'bold 14px Arial'
