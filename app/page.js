@@ -1153,17 +1153,67 @@ export default function TurfLootTactical() {
         return
       }
       
-      // Use proper Solana wallet access per documentation
-      let solanaWallet = solanaWallets[0] // Get first Solana wallet
+      // SOLANA-ONLY wallet selection and creation (NO EVM)
+      console.log('🔍 Searching for Solana wallets only...')
+      console.log('📊 Wallet inventory:', {
+        allWalletsCount: allWallets.length,
+        solanaWalletsCount: solanaWallets.length,
+        solanaReady: solanaReady
+      })
       
+      // Filter for ONLY Solana wallets by chainType
+      let solanaWallet = null
+      
+      // Method 1: Try to find existing Solana wallet from useSolanaWallets hook
+      if (solanaWallets.length > 0) {
+        solanaWallet = solanaWallets.find(wallet => 
+          wallet.chainType === 'solana' && 
+          wallet.address && 
+          !wallet.address.startsWith('0x')
+        )
+        if (solanaWallet) {
+          console.log('✅ Found existing Solana wallet:', solanaWallet.address)
+        }
+      }
+      
+      // Method 2: Double-check in all wallets for Solana chainType (safety check)
+      if (!solanaWallet && allWallets.length > 0) {
+        console.log('🔍 Backup search: Checking all wallets for chainType === solana...')
+        const backupSolanaWallet = allWallets.find(wallet => 
+          wallet.chainType === 'solana' && 
+          wallet.address && 
+          !wallet.address.startsWith('0x')
+        )
+        if (backupSolanaWallet) {
+          console.log('✅ Found Solana wallet in all wallets:', backupSolanaWallet.address)
+          solanaWallet = backupSolanaWallet
+        }
+      }
+      
+      // Method 3: Create new Solana wallet if none found
       if (!solanaWallet) {
-        console.log('🔑 No Solana wallet found, creating one using Solana-specific createWallet...')
+        console.log('🔑 No Solana wallet found, creating SOLANA-ONLY wallet...')
         
         try {
-          // Use the createWallet method from useSolanaWallets hook
           console.log('⚡ Creating Solana wallet using useSolanaWallets.createWallet()...')
           solanaWallet = await createSolanaWallet()
-          console.log('✅ Solana wallet created successfully:', solanaWallet.address)
+          
+          // Verify the created wallet is actually Solana
+          if (solanaWallet) {
+            console.log('✅ Solana wallet created successfully!')
+            console.log('🔍 New wallet details:', {
+              address: solanaWallet.address,
+              chainType: solanaWallet.chainType,
+              walletClientType: solanaWallet.walletClientType
+            })
+            
+            // Double-check it's not an EVM wallet
+            if (solanaWallet.address?.startsWith('0x')) {
+              console.error('❌ CRITICAL: Created wallet is EVM format despite Solana-only config!')
+              alert('❌ Configuration Error: EVM wallet created instead of Solana.\n\nThis indicates a deeper Privy configuration issue.\n\nPlease contact support.')
+              return
+            }
+          }
         } catch (createError) {
           console.error('❌ Solana wallet creation failed:', createError)
           alert('❌ Failed to create Solana wallet.\n\nThis might be due to configuration issues.\n\nPlease try:\n1. Refresh the page\n2. Sign out and sign back in\n3. Contact support if the issue persists')
@@ -1171,9 +1221,10 @@ export default function TurfLootTactical() {
         }
       }
       
+      // Final validation: Ensure we have a valid Solana wallet
       if (!solanaWallet) {
-        console.error('❌ No Solana wallet available after creation attempts')
-        alert('❌ No Solana wallet found. Please refresh the page and sign in again to create a Solana wallet.')
+        console.error('❌ No Solana wallet available after all attempts')
+        alert('❌ Unable to access Solana wallet.\n\nPlease refresh the page and try again.')
         return
       }
       
