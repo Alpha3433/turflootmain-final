@@ -1877,12 +1877,16 @@ const AgarIOGame = () => {
     const canvas = canvasRef.current
     // Set canvas size properly
     const setCanvasSize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      if (typeof window !== 'undefined') {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+      }
     }
     
     setCanvasSize()
-    window.addEventListener('resize', setCanvasSize)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', setCanvasSize)
+    }
 
     // Get selected skin from localStorage
     let selectedSkin = { id: 'default', name: 'Default Warrior', color: '#4A90E2' } // Default skin
