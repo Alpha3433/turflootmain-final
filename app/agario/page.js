@@ -1736,29 +1736,14 @@ const AgarIOGame = () => {
         this.ctx.globalAlpha = 1.0 // Reset alpha
       }
       
-      // Draw cash out progress ring - show on main player when cashing out
+      // Draw cash out progress ring - show ONLY on the actual main player when cashing out
       if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0) {
-        // Debug logging
-        console.log('🎯 Cash out ring condition met:', {
-          isCashingOut: this.gameStates.isCashingOut,
-          cashOutProgress: this.gameStates.cashOutProgress,
-          playerName: player.name,
-          isPlayerObject: player === this.player
-        })
-        
         // Only show on the main player (the one controlled by the user)
-        const isMainPlayer = player.id === this.player.id || player === this.player || player.name === 'You'
-        
-        console.log('🎯 Main player check:', {
-          isMainPlayer,
-          playerId: player.id,
-          mainPlayerId: this.player.id,
-          playerName: player.name,
-          objectMatch: player === this.player
-        })
+        // Use strict comparison - main player should be the exact object reference or have name 'You'
+        const isMainPlayer = (player === this.player) || (player.name === 'You' && player !== this.enemies.find(e => e.name === 'You'))
         
         if (isMainPlayer) {
-          console.log('🎯 Drawing cash out ring on main player!')
+          console.log('🎯 Drawing cash out ring ONLY on the actual main player:', player.name)
           
           const ringRadius = player.radius + 20  // Large radius for visibility
           const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
