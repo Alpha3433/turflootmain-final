@@ -1717,62 +1717,66 @@ const AgarIOGame = () => {
         this.ctx.globalAlpha = 1.0 // Reset alpha
       }
       
-      // Draw cash out progress ring - visible to ALL players when the main player is cashing out
-      const isMainPlayer = player === this.player
-      if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0 && isMainPlayer) {
-        const ringRadius = player.radius + 20  // Increased from +16 to +20 for much better visibility
-        const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
+      // Draw cash out progress ring - show on main player when cashing out
+      if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0) {
+        // Only show on the main player (the one controlled by the user)
+        const isMainPlayer = player.id === this.player.id || player === this.player || player.name === 'You'
         
-        // Draw a very prominent background ring (full circle)
-        this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
-        this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.4)' // More visible background
-        this.ctx.lineWidth = 10  // Much thicker
-        this.ctx.stroke()
-        
-        // Draw the main progress arc - very thick and bright
-        this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
-        this.ctx.strokeStyle = '#00ff00' // Bright neon green for maximum visibility
-        this.ctx.lineWidth = 10  // Much thicker
-        this.ctx.lineCap = 'round'
-        this.ctx.stroke()
-        
-        // Add a very prominent outer glow effect
-        this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius + 4, -Math.PI / 2, -Math.PI / 2 + progressAngle)
-        this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.8)' // Bright green glow
-        this.ctx.lineWidth = 6
-        this.ctx.lineCap = 'round'
-        this.ctx.stroke()
-        
-        // Add pulsing effect for cash out ring
-        const time = Date.now() / 1000
-        const pulseIntensity = Math.sin(time * 6) * 0.4 + 0.9 // More intense pulsing
-        this.ctx.globalAlpha = pulseIntensity
-        
-        // Draw inner glow for cash out (very bright)
-        this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, ringRadius - 4, -Math.PI / 2, -Math.PI / 2 + progressAngle)
-        this.ctx.strokeStyle = '#66ff66' // Very bright green inner glow
-        this.ctx.lineWidth = 6  // Thick inner glow
-        this.ctx.lineCap = 'round'
-        this.ctx.stroke()
-        
-        this.ctx.globalAlpha = 1.0 // Reset alpha
-        
-        // Draw cash out text above player (more prominent with background)
-        this.ctx.fillStyle = '#00ff00'
-        this.ctx.font = 'bold 16px Arial'  // Even larger font
-        this.ctx.textAlign = 'center'
-        
-        // Draw black outline for text readability
-        this.ctx.strokeStyle = '#000000'
-        this.ctx.lineWidth = 4
-        this.ctx.strokeText(`CASHING OUT ${Math.floor(this.gameStates.cashOutProgress)}%`, player.x, player.y - player.radius - 50)
-        
-        // Draw the main text
-        this.ctx.fillText(`CASHING OUT ${Math.floor(this.gameStates.cashOutProgress)}%`, player.x, player.y - player.radius - 50)
+        if (isMainPlayer) {
+          const ringRadius = player.radius + 20  // Large radius for visibility
+          const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
+          
+          // Draw a very prominent background ring (full circle)
+          this.ctx.beginPath()
+          this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
+          this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.4)' // More visible background
+          this.ctx.lineWidth = 10  // Much thicker
+          this.ctx.stroke()
+          
+          // Draw the main progress arc - very thick and bright
+          this.ctx.beginPath()
+          this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+          this.ctx.strokeStyle = '#00ff00' // Bright neon green for maximum visibility
+          this.ctx.lineWidth = 10  // Much thicker
+          this.ctx.lineCap = 'round'
+          this.ctx.stroke()
+          
+          // Add a very prominent outer glow effect
+          this.ctx.beginPath()
+          this.ctx.arc(player.x, player.y, ringRadius + 4, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+          this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.8)' // Bright green glow
+          this.ctx.lineWidth = 6
+          this.ctx.lineCap = 'round'
+          this.ctx.stroke()
+          
+          // Add pulsing effect for cash out ring
+          const time = Date.now() / 1000
+          const pulseIntensity = Math.sin(time * 6) * 0.4 + 0.9 // More intense pulsing
+          this.ctx.globalAlpha = pulseIntensity
+          
+          // Draw inner glow for cash out (very bright)
+          this.ctx.beginPath()
+          this.ctx.arc(player.x, player.y, ringRadius - 4, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+          this.ctx.strokeStyle = '#66ff66' // Very bright green inner glow
+          this.ctx.lineWidth = 6  // Thick inner glow
+          this.ctx.lineCap = 'round'
+          this.ctx.stroke()
+          
+          this.ctx.globalAlpha = 1.0 // Reset alpha
+          
+          // Draw cash out text above player (more prominent with background)
+          this.ctx.fillStyle = '#00ff00'
+          this.ctx.font = 'bold 16px Arial'  // Even larger font
+          this.ctx.textAlign = 'center'
+          
+          // Draw black outline for text readability
+          this.ctx.strokeStyle = '#000000'
+          this.ctx.lineWidth = 4
+          this.ctx.strokeText(`CASHING OUT ${Math.floor(this.gameStates.cashOutProgress)}%`, player.x, player.y - player.radius - 50)
+          
+          // Draw the main text
+          this.ctx.fillText(`CASHING OUT ${Math.floor(this.gameStates.cashOutProgress)}%`, player.x, player.y - player.radius - 50)
+        }
       }
       
       // Draw player name
