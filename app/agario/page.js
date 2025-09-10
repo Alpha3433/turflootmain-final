@@ -110,6 +110,7 @@ const AgarIOGame = () => {
   useEffect(() => {
     if (gameStarted && activeMissions.length === 0) {
       // Check if this is a cash game (only show missions for paid rooms)
+      if (typeof window === 'undefined') return
       const urlParams = new URLSearchParams(window.location.search)
       const fee = urlParams.get('fee')
       const mode = urlParams.get('mode')
