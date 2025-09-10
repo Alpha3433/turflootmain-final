@@ -187,7 +187,7 @@ const AgarIOGame = () => {
       // Player pieces for splitting (Agar.io style)
       this.playerPieces = []
       this.splitCooldown = 0 // Prevent spam splitting
-      this.recombineTime = 15 // Seconds before pieces can recombine (reduced from 30 to 15)
+      this.recombineTime = 5 // Seconds before pieces can recombine (reduced for better gameplay)
       
       this.coins = []
       this.enemies = []
