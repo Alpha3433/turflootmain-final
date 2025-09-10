@@ -1415,7 +1415,7 @@ const AgarIOGame = () => {
               continue // Skip collision if enemy has spawn protection
             }
             
-            if (piece.mass > enemy.mass * 1.2) {
+            if (piece.mass > enemy.mass * 1.25) { // Increased threshold for fairer piece vs enemy gameplay
               // Player piece eats enemy
               piece.mass += enemy.mass * 0.8
               piece.radius = Math.sqrt(piece.mass) * 3
@@ -1436,7 +1436,7 @@ const AgarIOGame = () => {
               
               console.log(`🔥 Player piece eliminated enemy! Piece mass: ${Math.floor(piece.mass)}`)
               
-            } else if (enemy.mass > piece.mass * 1.2) {
+            } else if (enemy.mass > piece.mass * 1.35) { // Increased threshold from 1.2 to 1.35 for fairer piece elimination
               // Enemy eats player piece
               enemy.mass += piece.mass * 0.8
               enemy.radius = Math.sqrt(enemy.mass) * 3
