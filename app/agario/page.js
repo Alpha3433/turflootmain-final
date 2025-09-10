@@ -2127,7 +2127,7 @@ const AgarIOGame = () => {
 
   // Mission timer and survival tracking
   useEffect(() => {
-    if (!gameStarted || gameOver) return
+    if (!gameStarted || gameOver || cashOutComplete) return
 
     const timer = setInterval(() => {
       setMissionTime(prev => {
@@ -2148,7 +2148,7 @@ const AgarIOGame = () => {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [gameStarted, gameOver])
+  }, [gameStarted, gameOver, cashOutComplete])
 
   const handleSplit = (e) => {
     if (gameRef.current) {
