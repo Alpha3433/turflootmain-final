@@ -200,20 +200,28 @@ export default function PrivyAuthProvider({ children }) {
     mfa: {
       noPromptOnMfaRequired: false,
     },
-    // Add Solana wallet configuration for CNR-2 format compatibility
+    // Explicit wallet configuration to support CNR-2 format
+    wallets: {
+      coinbaseWallet: {
+        connectionOptions: 'smartWalletOnly',
+      },
+    },
+    // Solana-specific configuration
     solanaClusters: [
       {
         name: 'mainnet-beta',
         rpcUrl: 'https://api.mainnet-beta.solana.com',
       },
     ],
-    // Configure funding with Coinbase Onramp
+    // Funding configuration for Coinbase Onramp CNR-2 compatibility
     fundingMethodConfig: {
       moonpay: {
         useSandbox: false,
       },
       coinbaseOnramp: {
         useSandbox: false,
+        // Explicit support for CNR-2 format
+        supportedNetworks: ['solana'],
       },
     },
   }
