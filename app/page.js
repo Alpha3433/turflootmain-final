@@ -1167,36 +1167,51 @@ export default function TurfLootTactical() {
       console.log('🔍 User ID:', privy.user.id)
       console.log('🔍 Has embedded wallet:', !!privy.user.wallet)
       
-      // Ensure user has a Solana wallet (not EVM)
+      // Ensure user has a Solana wallet - prioritize Solana over EVM
       const userWallets = privy.user.linkedAccounts?.filter(account => account.type === 'wallet') || []
-      const solanaWallet = userWallets.find(wallet => wallet.chainType === 'solana') || privy.user.wallet
+      let solanaWallet = userWallets.find(wallet => wallet.chainType === 'solana')
+      
+      console.log('🔍 Available wallets:', userWallets.map(w => ({ 
+        address: w.address, 
+        chainType: w.chainType,
+        walletClientType: w.walletClientType 
+      })))
       
       if (!solanaWallet) {
-        console.log('🔑 No Solana wallet found, creating Solana wallet...')
+        console.log('🔑 No Solana wallet found in linked accounts, checking default wallet...')
         
-        try {
-          // Try to create a Solana-specific wallet
-          await privy.createWallet()
+        // Check if the default wallet is Solana
+        if (privy.user.wallet && !privy.user.wallet.address?.startsWith('0x')) {
+          solanaWallet = privy.user.wallet
+          console.log('✅ Default wallet appears to be Solana format')
+        } else {
+          console.log('🔑 No Solana wallet found, creating Solana wallet...')
           
-          // Wait for wallet creation
-          await new Promise(resolve => setTimeout(resolve, 2000))
-          
-          // Refresh user data to get the new wallet
-          const updatedUser = privy.user
-          const newSolanaWallet = updatedUser.linkedAccounts?.find(account => 
-            account.type === 'wallet' && account.chainType === 'solana'
-          ) || updatedUser.wallet
-          
-          if (!newSolanaWallet) {
-            throw new Error('Solana wallet creation failed - only EVM wallet may have been created')
+          try {
+            // Try to create a Solana-specific wallet
+            await privy.createWallet()
+            
+            // Wait for wallet creation
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            
+            // Refresh user data to get the new wallet
+            const updatedUser = privy.user
+            const updatedWallets = updatedUser.linkedAccounts?.filter(account => account.type === 'wallet') || []
+            solanaWallet = updatedWallets.find(account => account.chainType === 'solana')
+            
+            if (!solanaWallet) {
+              throw new Error('Solana wallet creation failed - only EVM wallet may have been created')
+            }
+            
+            console.log('✅ Solana wallet created:', solanaWallet.address)
+          } catch (error) {
+            console.error('❌ Solana wallet creation failed:', error)
+            alert('❌ Failed to create Solana wallet. This may be due to Privy console configuration.\n\nPlease check that Solana is enabled as the primary chain in your Privy dashboard.')
+            return
           }
-          
-          console.log('✅ Solana wallet created:', newSolanaWallet.address)
-        } catch (error) {
-          console.error('❌ Solana wallet creation failed:', error)
-          alert('❌ Failed to create Solana wallet. This may be due to Privy console configuration.\n\nPlease check that Solana is enabled as the primary chain in your Privy dashboard.')
-          return
         }
+      } else {
+        console.log('✅ Found existing Solana wallet:', solanaWallet.address)
       }
       
       // Validate Solana wallet with enhanced checks
