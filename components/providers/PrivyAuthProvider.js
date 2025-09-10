@@ -1,6 +1,7 @@
 'use client'
 
-import { PrivyProvider, usePrivy, useFundWallet } from '@privy-io/react-auth'
+import { PrivyProvider, usePrivy } from '@privy-io/react-auth'
+import { useFundWallet } from '@privy-io/react-auth/solana'
 import { Component, useState, useEffect } from 'react'
 
 // Simple success handler
