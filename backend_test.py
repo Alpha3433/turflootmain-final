@@ -27,7 +27,7 @@ from datetime import datetime
 class SolanaDepositCNR2BackendTester:
     def __init__(self):
         # Get base URL from environment or use default
-        self.base_url = "https://solana-battle.preview.emergentagent.com/api"
+        self.base_url = "https://turfloot-cashout.preview.emergentagent.com/api"
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0

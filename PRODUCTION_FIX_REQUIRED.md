@@ -14,7 +14,7 @@
 
 ### TECHNICAL DETAILS:
 - **Internal API Status**: ✅ Working (`curl localhost:3000/api/ping` → 200 OK)
-- **External API Status**: ❌ Failing (`https://solana-battle.preview.emergentagent.com/api/ping` → 502 Bad Gateway)
+- **External API Status**: ❌ Failing (`https://turfloot-cashout.preview.emergentagent.com/api/ping` → 502 Bad Gateway)
 - **Next.js Service**: Running on `0.0.0.0:3000` (confirmed healthy)
 - **Proxy Service**: `34.118.225.58:80` (PREVIEW_PROXY_SERVICE)
 - **Ingress Controller**: Not properly routing `/api/*` paths
@@ -76,15 +76,15 @@ kubectl logs [pod-name] | grep "ready on"
 Once fixed, these should work:
 ```bash
 # Should return 200 OK with JSON response:
-curl https://solana-battle.preview.emergentagent.com/api/ping
+curl https://turfloot-cashout.preview.emergentagent.com/api/ping
 
 # Should allow name saving:
-curl -X POST https://solana-battle.preview.emergentagent.com/api/names/update \
+curl -X POST https://turfloot-cashout.preview.emergentagent.com/api/names/update \
   -H "Content-Type: application/json" \
   -d '{"userId":"test","customName":"TestUser"}'
 
 # Should allow friend requests:  
-curl -X POST https://solana-battle.preview.emergentagent.com/api/friends/send-request \
+curl -X POST https://turfloot-cashout.preview.emergentagent.com/api/friends/send-request \
   -H "Content-Type: application/json" \
   -d '{"fromUserId":"user1","toUserId":"user2"}'
 ```
