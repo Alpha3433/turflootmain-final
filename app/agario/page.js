@@ -139,19 +139,6 @@ const AgarIOGame = () => {
       return () => clearInterval(interval)
     }
   }, [activeMissions.length])
-
-  // Update game engine's gameStates when cash out state changes
-  useEffect(() => {
-    if (gameRef.current && gameRef.current.updateGameStates) {
-      console.log('🔄 Updating game states:', { isCashingOut, cashOutProgress, cashOutComplete, gameOver })
-      gameRef.current.updateGameStates({
-        isCashingOut,
-        cashOutProgress,
-        cashOutComplete,
-        gameOver
-      })
-    }
-  }, [isCashingOut, cashOutProgress, cashOutComplete, gameOver])
   
   // Cash out state
   const [cashOutProgress, setCashOutProgress] = useState(0)
