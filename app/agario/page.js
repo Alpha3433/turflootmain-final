@@ -2016,8 +2016,30 @@ const AgarIOGame = () => {
     return () => clearInterval(timer)
   }, [gameStarted, gameOver])
 
-  const handleSplit = () => {
+  const handleSplit = (e) => {
     if (gameRef.current) {
+      // Update mouse position before splitting to ensure accurate direction
+      if (e && e.clientX !== undefined && e.clientY !== undefined) {
+        const canvas = canvasRef.current
+        if (canvas) {
+          const rect = canvas.getBoundingClientRect()
+          
+          // Update the game's mouse position with current cursor location
+          gameRef.current.mouse.x = e.clientX - rect.left
+          gameRef.current.mouse.y = e.clientY - rect.top
+          
+          // Convert to world coordinates
+          gameRef.current.mouse.worldX = gameRef.current.mouse.x + gameRef.current.camera.x
+          gameRef.current.mouse.worldY = gameRef.current.mouse.y + gameRef.current.camera.y
+          
+          // Update player target to match mouse position
+          gameRef.current.player.targetX = gameRef.current.mouse.worldX
+          gameRef.current.player.targetY = gameRef.current.mouse.worldY
+          
+          console.log(`🎯 Updated mouse position for split: (${gameRef.current.mouse.worldX.toFixed(0)}, ${gameRef.current.mouse.worldY.toFixed(0)})`)
+        }
+      }
+      
       gameRef.current.split()
     }
   }
