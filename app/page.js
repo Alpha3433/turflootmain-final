@@ -1154,9 +1154,25 @@ export default function TurfLootTactical() {
       }
       
       // Use proper Solana wallet access per documentation
-      const solanaWallet = solanaWallets[0] // Get first Solana wallet
+      let solanaWallet = solanaWallets[0] // Get first Solana wallet
+      
       if (!solanaWallet) {
-        console.error('❌ No Solana wallet available')
+        console.log('🔑 No Solana wallet found, creating one using Solana-specific createWallet...')
+        
+        try {
+          // Use the createWallet method from useSolanaWallets hook
+          console.log('⚡ Creating Solana wallet using useSolanaWallets.createWallet()...')
+          solanaWallet = await createSolanaWallet()
+          console.log('✅ Solana wallet created successfully:', solanaWallet.address)
+        } catch (createError) {
+          console.error('❌ Solana wallet creation failed:', createError)
+          alert('❌ Failed to create Solana wallet.\n\nThis might be due to configuration issues.\n\nPlease try:\n1. Refresh the page\n2. Sign out and sign back in\n3. Contact support if the issue persists')
+          return
+        }
+      }
+      
+      if (!solanaWallet) {
+        console.error('❌ No Solana wallet available after creation attempts')
         alert('❌ No Solana wallet found. Please refresh the page and sign in again to create a Solana wallet.')
         return
       }
