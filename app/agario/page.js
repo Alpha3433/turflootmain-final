@@ -2259,6 +2259,7 @@ const AgarIOGame = () => {
         
         {/* Anti-Cheat Status Indicator - Only show for cash games */}
         {(() => {
+          if (typeof window === 'undefined') return null
           const urlParams = new URLSearchParams(window.location.search)
           const fee = urlParams.get('fee')
           const isCashGame = fee && parseFloat(fee) > 0
