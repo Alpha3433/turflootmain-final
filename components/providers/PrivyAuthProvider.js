@@ -21,10 +21,20 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
 
   useEffect(() => {
     setIsClient(true)
+    // Debug the configuration being passed
+    console.log('🔍 Privy Config Loading:', {
+      hasEmbeddedWallets: !!config.embeddedWallets,
+      hasSolanaEmbedded: !!config.embeddedWallets?.solana,
+      hasExternalWallets: !!config.externalWallets,
+      hasSolanaExternal: !!config.externalWallets?.solana,
+      hasSolanaClusters: !!config.solanaClusters,
+      clustersCount: config.solanaClusters?.length || 0
+    })
+    
     // Small delay to ensure proper hydration
-    const timer = setTimeout(() => setIsReady(true), 100)
+    const timer = setTimeout(() => setIsReady(true), 500) // Increased delay
     return () => clearTimeout(timer)
-  }, [])
+  }, [config])
 
   // Show loading state during hydration to prevent mismatch
   if (!isClient || !isReady) {
@@ -36,6 +46,7 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
   }
 
   // Render with Privy provider on client-side after hydration
+  console.log('🚀 Initializing Privy with Solana-only config')
   return (
     <PrivyProvider
       appId={appId}
