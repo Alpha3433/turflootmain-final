@@ -269,6 +269,7 @@ const AgarIOGame = () => {
     getRealPlayerCount() {
       // In a real implementation, this would fetch actual player count from server
       // For now, simulate varying player counts based on fee tier
+      if (typeof window === 'undefined') return 8
       const urlParams = new URLSearchParams(window.location.search)
       const fee = parseFloat(urlParams.get('fee') || 0)
       
