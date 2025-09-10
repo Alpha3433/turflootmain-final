@@ -1167,10 +1167,10 @@ export default function TurfLootTactical() {
       console.log('🔍 User ID:', privy.user.id)
       console.log('🔍 Has embedded wallet:', !!privy.user.wallet)
       
-      // Use existing wallet with cross-chain bridging support
-      console.log('🔍 Checking user wallet for cross-chain funding...')
+      // Use existing wallet with cross-chain bridging support or create Solana wallet if needed
+      console.log('🔍 Checking user wallet for funding...')
       
-      const wallet = privy.user.wallet
+      let wallet = privy.user.wallet
       if (!wallet) {
         console.error('❌ No embedded wallet available')
         alert('❌ No wallet found. Please disconnect and reconnect your account to create a wallet.')
@@ -1183,10 +1183,36 @@ export default function TurfLootTactical() {
         return
       }
       
-      // Check wallet type and inform user about cross-chain support
+      // Check if we have an EVM wallet but need Solana functionality
       const isEVMAddress = wallet.address.startsWith('0x') && wallet.address.length === 42
       if (isEVMAddress) {
-        console.log('✅ EVM wallet detected - using cross-chain bridging for Solana funding')
+        console.log('⚠️ EVM wallet detected - attempting to create Solana wallet for direct funding')
+        
+        try {
+          // Try to create a Solana wallet specifically
+          console.log('🔑 Creating Solana wallet...')
+          await privy.createWallet()
+          
+          // Wait for wallet creation
+          await new Promise(resolve => setTimeout(resolve, 3000))
+          
+          // Check if we now have additional wallets
+          const userAccounts = privy.user.linkedAccounts || []
+          const solanaWallet = userAccounts.find(account => 
+            account.type === 'wallet' && 
+            account.address && 
+            !account.address.startsWith('0x')
+          )
+          
+          if (solanaWallet) {
+            wallet = solanaWallet
+            console.log('✅ Solana wallet created successfully:', wallet.address)
+          } else {
+            console.log('⚠️ Solana wallet creation unclear - proceeding with EVM + cross-chain')
+          }
+        } catch (createError) {
+          console.log('⚠️ Solana wallet creation failed, using EVM with cross-chain:', createError.message)
+        }
       } else {
         console.log('✅ Solana wallet detected - direct funding')
       }
@@ -1196,7 +1222,7 @@ export default function TurfLootTactical() {
         address: wallet.address, 
         walletClientType: wallet.walletClientType,
         connectorType: wallet.connectorType,
-        chainType: isEVMAddress ? 'EVM (Cross-chain enabled)' : 'Solana'
+        chainType: wallet.address.startsWith('0x') ? 'EVM (Cross-chain enabled)' : 'Solana'
       })
       
       // Call Privy's fundWallet - simplified approach for cross-chain support
