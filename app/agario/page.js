@@ -206,7 +206,12 @@ const AgarIOGame = () => {
       this.gameStartTime = null // Track when game starts
       this.timeSurvivedSeconds = 0
       
-      // Anti-cheat system
+      // Add method to update game states in real-time
+    updateGameStates(newStates) {
+      if (this.gameStates) {
+        Object.assign(this.gameStates, newStates)
+      }
+    }
       this.antiCheat = {
         enabled: this.isCashGame, // Only active for cash games
         violations: 0,
