@@ -2019,6 +2019,20 @@ const AgarIOGame = () => {
     }
   }, [isCashingOut, cashOutComplete])
 
+  // Real-time survival timer - updates every second during gameplay
+  useEffect(() => {
+    if (!gameStarted || gameOver) return
+
+    const survivalTimer = setInterval(() => {
+      if (gameRef.current && gameRef.current.gameStartTime) {
+        const currentTime = Math.floor((Date.now() - gameRef.current.gameStartTime) / 1000)
+        setTimeSurvived(currentTime)
+      }
+    }, 1000)
+
+    return () => clearInterval(survivalTimer)
+  }, [gameStarted, gameOver])
+
   // Mission timer and survival tracking
   useEffect(() => {
     if (!gameStarted || gameOver) return
