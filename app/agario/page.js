@@ -2031,9 +2031,11 @@ const AgarIOGame = () => {
         const survivalSeconds = 60 - newTime
         updateMissionProgress('survival_time', survivalSeconds)
         
+        // DO NOT end the game when timer reaches 0 - let player continue playing
         if (newTime <= 0) {
-          setGameOver(true)
-          return 0
+          console.log(`⏰ Mission timer completed! Player survived 60+ seconds and can continue playing`)
+          // Reset timer to continue tracking longer survival times
+          return 60 // Reset to 60 to track additional survival increments
         }
         return newTime
       })
