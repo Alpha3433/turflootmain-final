@@ -8,17 +8,6 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - Using stable main imports
-  const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
-  const { wallets: allWallets } = useWallets()
-  
-  // For now, filter Solana wallets from all wallets instead of using separate hook
-  const solanaWallets = allWallets.filter(wallet => 
-    wallet.chainType === 'solana' || 
-    (wallet.address && !wallet.address.startsWith('0x'))
-  )
-  const solanaReady = ready
-  
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('PLAYER')
