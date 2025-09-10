@@ -1280,6 +1280,9 @@ const AgarIOGame = () => {
           }
         }
       })
+      
+      // Player pieces collision detection
+      this.checkPlayerPiecesCollisions()
     }
 
     updateCamera() {
