@@ -1038,20 +1038,25 @@ const AgarIOGame = () => {
           piece.y = centerY + Math.sin(angle) * (maxRadius - piece.radius)
         }
         
-        // Check for recombination after shorter cooldown (5 seconds for better gameplay)
-        if (currentTime - piece.splitTime > 5000) { // 5 seconds instead of 15 for easier testing
+        // Check for recombination after shorter cooldown (3 seconds for very responsive gameplay)
+        if (currentTime - piece.splitTime > 3000) { // 3 seconds for immediate merging
           piece.recombineReady = true
         }
         
-        // Auto-recombine if pieces are close and ready (very generous distance)
+        // Debug: Log piece status every few seconds
+        if (currentTime % 2000 < 50) { // Every 2 seconds approximately
+          console.log(`🔍 Piece ${i}: Ready=${piece.recombineReady}, Age=${((currentTime - piece.splitTime) / 1000).toFixed(1)}s, Distance to main=${Math.sqrt(Math.pow(piece.x - this.player.x, 2) + Math.pow(piece.y - this.player.y, 2)).toFixed(0)}`)
+        }
+        
+        // Auto-recombine if pieces are close and ready (VERY generous distance)
         if (piece.recombineReady) {
           const distanceToMain = Math.sqrt(
             Math.pow(piece.x - this.player.x, 2) + 
             Math.pow(piece.y - this.player.y, 2)
           )
           
-          // More generous collision detection - pieces merge when they're close
-          if (distanceToMain < (piece.radius + this.player.radius) * 1.3) {
+          // Very generous collision detection - pieces merge when reasonably close
+          if (distanceToMain < (piece.radius + this.player.radius) * 1.5) {
             // Merge mass back to main player
             this.player.mass += piece.mass
             this.player.radius = Math.sqrt(this.player.mass) * 3
@@ -1059,12 +1064,12 @@ const AgarIOGame = () => {
             // Remove piece from array
             this.playerPieces.splice(i, 1)
             
-            console.log(`🔄 Player piece recombined with main! Distance: ${distanceToMain.toFixed(0)}, Combined mass: ${Math.floor(this.player.mass)}`)
+            console.log(`🔄 Player piece recombined with main! Distance: ${distanceToMain.toFixed(0)}, Combined mass: ${Math.floor(this.player.mass)}, Remaining pieces: ${this.playerPieces.length}`)
             continue // Skip to next piece since this one was removed
           }
         }
         
-        // Check recombination between pieces (very lenient conditions)
+        // Check recombination between pieces (VERY lenient conditions)
         for (let j = i + 1; j < this.playerPieces.length; j++) {
           const otherPiece = this.playerPieces[j]
           if (piece.recombineReady && otherPiece.recombineReady) {
@@ -1074,18 +1079,18 @@ const AgarIOGame = () => {
             )
             
             // Very generous collision detection for piece-to-piece merging
-            if (pieceToPieceDistance < (piece.radius + otherPiece.radius) * 1.3) {
+            if (pieceToPieceDistance < (piece.radius + otherPiece.radius) * 1.5) {
               // Always merge into the larger piece (create one bigger circle)
               if (piece.mass >= otherPiece.mass) {
                 piece.mass += otherPiece.mass
                 piece.radius = Math.sqrt(piece.mass) * 3
                 this.playerPieces.splice(j, 1)
-                console.log(`🔄 Player pieces merged! Distance: ${pieceToPieceDistance.toFixed(0)}, New mass: ${Math.floor(piece.mass)}`)
+                console.log(`🔄 Player pieces merged! Distance: ${pieceToPieceDistance.toFixed(0)}, New mass: ${Math.floor(piece.mass)}, Remaining pieces: ${this.playerPieces.length}`)
               } else {
                 otherPiece.mass += piece.mass
                 otherPiece.radius = Math.sqrt(otherPiece.mass) * 3
                 this.playerPieces.splice(i, 1)
-                console.log(`🔄 Player pieces merged! Distance: ${pieceToPieceDistance.toFixed(0)}, New mass: ${Math.floor(otherPiece.mass)}`)
+                console.log(`🔄 Player pieces merged! Distance: ${pieceToPieceDistance.toFixed(0)}, New mass: ${Math.floor(otherPiece.mass)}, Remaining pieces: ${this.playerPieces.length}`)
                 break
               }
             }
