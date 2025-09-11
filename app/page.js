@@ -20,6 +20,8 @@ export default function TurfLootTactical() {
   const [leaderboard, setLeaderboard] = useState([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
+  const [customUsername, setCustomUsername] = useState('')
+  
   // Sync Privy authentication state with local state
   useEffect(() => {
     if (ready) {
