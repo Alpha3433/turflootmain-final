@@ -14,43 +14,61 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   
   // Client-only Solana wallet functionality
-  const [fundWallet, setFundWallet] = useState(null)
+  const [solanaFundWallet, setSolanaFundWallet] = useState(null)
   
+  // Initialize Solana hooks only on client side after authentication
   useEffect(() => {
-    // Only initialize Solana hooks on client side to avoid SSR issues
-    if (typeof window !== 'undefined' && authenticated) {
-      const initSolanaWallets = async () => {
-        try {
-          console.log('🔧 Loading Solana wallet functionality on client side...')
-          const { useSolanaWallets } = await import('@privy-io/react-auth/solana')
-          console.log('✅ Solana wallets module loaded successfully')
-          
-          // Create a temporary component to access the hook
-          // This is a workaround for the SSR issue
-          setFundWallet(() => async () => {
-            try {
-              console.log('💰 Attempting to access fundWallet functionality...')
-              // Try to access the global Privy object if available
-              if (window.privy && window.privy.fundWallet) {
-                await window.privy.fundWallet()
-                return
+    if (typeof window !== 'undefined' && authenticated && ready) {
+      try {
+        // Import the Solana hooks dynamically to avoid SSR issues
+        import('@privy-io/react-auth/solana').then(({ useSolanaWallets }) => {
+          console.log('🔧 Solana wallets module loaded, setting up funding capability')
+          // We can't use the hook here directly, so we'll create a workaround
+          setSolanaFundWallet(() => {
+            // Return a function that will try to access the global Privy instance
+            return async () => {
+              try {
+                console.log('💰 Attempting to access Privy funding functionality...')
+                
+                // First try: Access via window.privy
+                if (window.privy && typeof window.privy.fundWallet === 'function') {
+                  console.log('✅ Found window.privy.fundWallet, calling it...')
+                  await window.privy.fundWallet()
+                  return
+                }
+                
+                // Second try: Look for any Privy instances
+                const privyInstances = Object.keys(window).filter(key => key.toLowerCase().includes('privy'))
+                console.log('🔍 Available Privy-related objects:', privyInstances)
+                
+                if (privyInstances.length > 0) {
+                  for (const key of privyInstances) {
+                    if (window[key] && window[key].fundWallet) {
+                      console.log(`✅ Found fundWallet in ${key}`)
+                      await window[key].fundWallet()
+                      return
+                    }
+                  }
+                }
+                
+                // If we can't find the global instance, show helpful message
+                console.log('⚠️ Privy fundWallet not accessible via global objects')
+                alert('Funding functionality is initializing. Please try again in a moment or refresh the page if the issue persists.')
+                
+              } catch (error) {
+                console.error('❌ Error in Solana funding:', error)
+                throw error
               }
-              
-              // Fallback: alert user about the functionality
-              alert('Funding functionality is being loaded. Please try again in a moment.')
-            } catch (error) {
-              console.error('❌ Fund wallet error:', error)
-              alert(`Funding error: ${error.message || 'Please try again'}`)
             }
           })
-        } catch (error) {
-          console.warn('⚠️ Could not load Solana wallets:', error)
-        }
+        }).catch(error => {
+          console.warn('⚠️ Could not load Solana wallets module:', error)
+        })
+      } catch (error) {
+        console.warn('⚠️ Error setting up Solana functionality:', error)
       }
-      
-      initSolanaWallets()
     }
-  }, [authenticated])
+  }, [authenticated, ready])
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
