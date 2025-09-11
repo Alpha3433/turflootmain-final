@@ -1,251 +1,142 @@
 'use client'
 
-import { PrivyProvider, usePrivy, useFundWallet } from '@privy-io/react-auth'
+import { PrivyProvider } from '@privy-io/react-auth'
 import { Component, useState, useEffect } from 'react'
 
-// Simple success handler
-const handleSuccess = (user) => {
-  console.log('✅ Privy authentication successful for user:', user.id)
-}
-
-// Simple error handler
-const handleError = (error) => {
-  console.log('⚠️ Privy authentication error:', error)
-  // Don't throw errors, just log them
-}
-
-// Client-side wrapper to prevent SSR issues with Privy Lit Elements
-function ClientOnlyPrivyProvider({ children, appId, config }) {
-  const [isClient, setIsClient] = useState(false)
-  const [isReady, setIsReady] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-    // Debug the configuration being passed
-    console.log('🔍 Privy Config Loading:', {
-      hasEmbeddedWallets: !!config.embeddedWallets,
-      hasSolanaEmbedded: !!config.embeddedWallets?.solana,
-      hasExternalWallets: !!config.externalWallets,
-      hasSolanaExternal: !!config.externalWallets?.solana,
-      hasSolanaClusters: !!config.solanaClusters,
-      clustersCount: config.solanaClusters?.length || 0
-    })
-    
-    // Small delay to ensure proper hydration
-    const timer = setTimeout(() => setIsReady(true), 500) // Increased delay
-    return () => clearTimeout(timer)
-  }, [config])
-
-  // Show loading state during hydration to prevent mismatch
-  if (!isClient || !isReady) {
-    return (
-      <div style={{ visibility: 'hidden' }}>
-        {children}
-      </div>
-    )
-  }
-
-  // Render with Privy provider on client-side after hydration
-  console.log('🚀 Initializing Privy with Solana-only config')
-  return (
-    <PrivyProvider
-      appId={appId}
-      config={config}
-      onSuccess={handleSuccess}
-      onError={handleError}
-    >
-      <PrivyBridge>
-        {children}
-      </PrivyBridge>
-    </PrivyProvider>
-  )
-}
-
-// Bridge component to expose Privy functions globally
-function PrivyBridge({ children }) {
-  const privy = usePrivy()
-  const { fundWallet } = useFundWallet()
-  
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Expose Privy functions globally for the main page to access
-      window.__TURFLOOT_PRIVY__ = {
-        login: async () => {
-          console.log('🔗 Bridge login called - executing Privy login')
-          try {
-            if (typeof privy.login === 'function') {
-              return await privy.login()
-            } else {
-              console.error('❌ Privy login is not a function:', typeof privy.login)
-              throw new Error('Privy login function not available')
-            }
-          } catch (error) {
-            console.error('❌ Bridge login error:', error)
-            throw error
-          }
-        },
-        logout: async () => {
-          console.log('🔗 Bridge logout called - executing Privy logout')
-          try {
-            if (typeof privy.logout === 'function') {
-              const result = await privy.logout()
-              console.log('✅ Privy logout completed')
-              return result
-            } else {
-              console.error('❌ Privy logout is not a function:', typeof privy.logout)
-              throw new Error('Privy logout function not available')
-            }
-          } catch (error) {
-            console.error('❌ Bridge logout error:', error)
-            throw error
-          }
-        },
-        fundWallet: async (wallet, options) => {
-          console.log('💰 Bridge fundWallet called - executing Privy Solana fund wallet')
-          try {
-            if (typeof fundWallet === 'function') {
-              // Call fundWallet specifically for Solana deposits
-              console.log('🔗 Calling Privy fundWallet for Solana deposits...')
-              return await fundWallet(wallet, options)
-            } else {
-              console.error('❌ Privy fundWallet is not a function:', typeof fundWallet)
-              throw new Error('Privy Solana fundWallet function not available')
-            }
-          } catch (error) {
-            console.error('❌ Bridge Solana fundWallet error:', error)
-            throw error
-          }
-        },
-        ready: privy.ready,
-        authenticated: privy.authenticated,
-        user: privy.user,
-        // Add raw privy object for debugging
-        _rawPrivy: privy,
-        _rawFundWallet: fundWallet,
-        // Force refresh auth state
-        refreshAuth: () => {
-          console.log('🔄 Forcing authentication state refresh')
-          window.__TURFLOOT_PRIVY__.ready = privy.ready
-          window.__TURFLOOT_PRIVY__.authenticated = privy.authenticated
-          window.__TURFLOOT_PRIVY__.user = privy.user
-        }
-      }
-      
-      console.log('🔗 Privy bridge established - functions exposed globally')
-      console.log('🔍 Privy state:', {
-        ready: privy.ready,
-        authenticated: privy.authenticated,
-        hasLogin: typeof privy.login === 'function',
-        hasLogout: typeof privy.logout === 'function',
-        hasFundWallet: typeof fundWallet === 'function'
-      })
-    }
-  }, [privy, fundWallet])
-  
-  return children
-}
-
-// Error boundary to catch and suppress Privy authentication errors
+// Error boundary for Privy-related errors
 class PrivyErrorBoundary extends Component {
   constructor(props) {
     super(props)
-    this.state = { hasError: false, error: null }
+    this.state = { hasError: false }
   }
 
   static getDerivedStateFromError(error) {
-    // Check if it's a Privy-related fetch error
-    if (error.message && error.message.includes('Failed to fetch')) {
-      console.warn('🔇 Suppressed non-critical Privy authentication error:', error.message)
-      return { hasError: false } // Don't show error UI for fetch errors
-    }
-    return { hasError: true, error }
+    return { hasError: true }
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log Privy errors but don't break the UI
-    if (error.message && error.message.includes('Failed to fetch')) {
-      console.warn('🔇 Privy fetch error caught and suppressed')
-      return
-    }
-    console.error('🚨 Critical error in PrivyAuthProvider:', error, errorInfo)
+    console.error('🚨 Privy Error Boundary:', error, errorInfo)
   }
 
   render() {
     if (this.state.hasError) {
-      // Don't show error UI, just log and continue
-      console.warn('⚠️ Privy error caught by boundary:', this.state.error?.message)
-      return this.props.children // Continue rendering instead of showing error
+      return (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h2>Wallet Service Error</h2>
+          <p>Please refresh the page to reconnect your wallet.</p>
+          <button onClick={() => window.location.reload()}>Refresh Page</button>
+        </div>
+      )
     }
 
     return this.props.children
   }
 }
 
+// Client-side wrapper for Privy to prevent SSR issues
+function ClientOnlyPrivyProvider({ children, appId, config }) {
+  const [isClient, setIsClient] = useState(false)
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    console.log('🔧 Privy Solana-Only Configuration Loading...')
+    console.log('📋 App ID:', appId ? `${appId.substring(0, 10)}...` : 'MISSING')
+    console.log('📋 Solana RPC:', process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com')
+    console.log('📋 Config:', JSON.stringify({
+      embeddedWallets: config.embeddedWallets,
+      externalWallets: config.externalWallets,
+      solanaClusters: config.solanaClusters
+    }, null, 2))
+    
+    // Delay to ensure proper hydration
+    const timer = setTimeout(() => setIsReady(true), 1000)
+    return () => clearTimeout(timer)
+  }, [config, appId])
+
+  // Hide content during SSR and hydration
+  if (!isClient || !isReady) {
+    return (
+      <div style={{ visibility: 'hidden', height: '100vh' }}>
+        {children}
+      </div>
+    )
+  }
+
+  console.log('🚀 Initializing Privy with Solana-Only Configuration')
+  return (
+    <PrivyProvider appId={appId} config={config}>
+      {children}
+    </PrivyProvider>
+  )
+}
+
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   
-  console.log('🔍 Privy Provider - App ID:', appId ? `${appId.substring(0, 10)}...` : 'MISSING')
-  console.log('🔧 Privy Provider - Enhanced Debug Configuration:')
-  console.log('📋 Full Config Object:', JSON.stringify({
-    embeddedWallets: {
-      ethereum: { createOnLogin: 'off' },
-      solana: { createOnLogin: 'users-without-wallets' }
-    },
-    externalWallets: {
-      solana: { wallets: ['phantom', 'solflare', 'backpack'] }
-    },
-    smartWallets: { enabled: false }
-  }, null, 2))
-  
+  // Validate required environment variables
   if (!appId) {
-    console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is not configured!')
-    return <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-4">🔑 Authentication Setup Required</h1>
-        <p className="text-gray-400">Privy App ID is not configured.</p>
-      </div>
-    </div>
+    console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is required')
+    return <div>Error: Privy App ID not configured</div>
   }
 
+  // SOLANA-ONLY Privy Configuration - COMPLETELY rebuilt from scratch
   const config = {
+    // UI Appearance
     appearance: {
       theme: 'dark',
       accentColor: '#14F195', // TurfLoot green
       logo: undefined,
       showWalletLoginFirst: false,
     },
+    
+    // Authentication methods
     loginMethods: ['google', 'email', 'wallet'],
-    // OFFICIAL PRIVY DOCUMENTATION FORMAT - Explicit disable of ALL automatic wallet creation
+    
+    // 🎯 CRITICAL: Embedded Wallets - SOLANA ONLY
     embeddedWallets: {
-      // ❌ CRITICAL: Explicitly disable ALL Ethereum wallet creation
+      // ❌ EXPLICITLY DISABLE all Ethereum/EVM embedded wallets
       ethereum: {
-        createOnLogin: 'off'  // This should prevent ALL EVM wallets
+        createOnLogin: 'off'
       },
-      // ✅ ENABLE ONLY Solana wallet creation
-      solana: { 
-        createOnLogin: 'users-without-wallets' 
+      // ✅ ENABLE ONLY Solana embedded wallets for new users
+      solana: {
+        createOnLogin: 'users-without-wallets'
       }
     },
-    // Remove external wallets temporarily to isolate the issue
-    // externalWallets: {
-    //   solana: { 
-    //     wallets: ['phantom', 'solflare', 'backpack'] 
-    //   }
-    // },
-    // SOLANA-ONLY clusters configuration
+    
+    // 🎯 CRITICAL: External Wallets - SOLANA ONLY  
+    externalWallets: {
+      // ✅ ONLY Solana external wallet connectors
+      solana: {
+        wallets: ['phantom', 'solflare', 'backpack']
+      }
+      // ❌ NO ethereum section = no MetaMask, WalletConnect, etc.
+    },
+    
+    // 🎯 CRITICAL: Solana Network Configuration
     solanaClusters: [
-      { 
-        name: 'mainnet-beta', 
-        rpcUrl: 'https://api.mainnet-beta.solana.com'
+      {
+        name: 'mainnet-beta',
+        rpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
       }
     ],
+    
+    // Security & MFA
     mfa: {
       noPromptOnMfaRequired: false,
     },
-    // Explicitly disable ALL smart wallet features
+    
+    // 🎯 CRITICAL: Explicitly disable Smart Wallets (they're EVM-based)
     smartWallets: {
       enabled: false
     },
+    
+    // 🎯 CRITICAL: No default chain configuration (prevents EVM defaults)
+    defaultChain: undefined,
+    
+    // Additional safety: no funding configuration that might default to EVM
+    fundingMethodConfig: undefined
   }
 
   return (
