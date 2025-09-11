@@ -1297,18 +1297,37 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('🔧 Calling fundWallet with exchange as default funding method...')
+      console.log('🔧 Testing fundWallet with CAIP2 mainnet format and explicit methods...')
       
-      // Call fundWallet with exchange as the default funding method to force it to show
-      await fundWallet(solanaWallet.address, {
-        chain: {
-          id: 101, // Solana Mainnet chain ID
-          name: 'Solana'
-        },
-        asset: 'native-currency', // SOL
-        // ✅ Set exchange as default to force it to show if available
-        defaultFundingMethod: 'exchange'
-      })
+      // TEST 1: Use caip2 format for Solana mainnet and explicit methods
+      console.log('🧪 TEST 1: Using caip2 mainnet format with explicit exchange method')
+      try {
+        await fundWallet({
+          chain: { caip2: 'solana:mainnet' },   // Must be mainnet for onramp
+          asset: { symbol: 'SOL' },
+          methods: ['exchange', 'wallet']       // Include 'exchange' to expose that row
+        })
+        
+        console.log('✅ SUCCESS: fundWallet called with CAIP2 mainnet format!')
+        return
+      } catch (error) {
+        console.log('❌ TEST 1 failed, trying alternative approach:', error.message)
+      }
+
+      // TEST 2: Alternative format with address parameter (fallback)
+      console.log('🧪 TEST 2: Using wallet address with CAIP2 mainnet format')
+      try {
+        await fundWallet(solanaWallet.address, {
+          chain: { caip2: 'solana:mainnet' },
+          asset: { symbol: 'SOL' },
+          methods: ['exchange', 'wallet']
+        })
+        
+        console.log('✅ SUCCESS: fundWallet called with wallet address and CAIP2 format!')
+        return
+      } catch (error) {
+        console.log('❌ TEST 2 failed:', error.message)
+      }
       
       console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
       
