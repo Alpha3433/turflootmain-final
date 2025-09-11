@@ -1297,16 +1297,17 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('🔧 Calling fundWallet with proper Solana configuration...')
+      console.log('🔧 Calling fundWallet with all funding methods enabled...')
       
-      // Call fundWallet with proper Solana configuration for v2.24.0
+      // Call fundWallet with proper Solana configuration - ENABLE ALL FUNDING METHODS
       await fundWallet(solanaWallet.address, {
         chain: {
           id: 101, // Solana Mainnet chain ID
           name: 'Solana'
         },
-        asset: 'native-currency', // SOL
-        defaultFundingMethod: 'card' // Prefer card funding via Coinbase/Moonpay
+        asset: 'native-currency' // SOL
+        // ✅ REMOVED defaultFundingMethod to show ALL available funding methods
+        // This will show: "Transfer from exchange", "Receive funds", etc.
       })
       
       console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
