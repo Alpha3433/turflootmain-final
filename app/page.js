@@ -3706,13 +3706,16 @@ export default function TurfLootTactical() {
 
   const handleLogout = async () => {
     try {
-      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
-        console.log('🔐 Attempting Privy logout...')
-        await window.__TURFLOOT_PRIVY__.logout()
+      console.log('🔐 Attempting Privy logout with proper hooks...')
+      if (typeof logout === 'function') {
+        await logout()
+        console.log('✅ Privy logout completed')
+        // Clear local state
         setIsAuthenticated(false)
         setUser(null)
+        setUserName('PLAYER')
       } else {
-        console.error('❌ Privy not available')
+        console.error('❌ Privy logout hook not available')
       }
     } catch (error) {
       console.error('❌ Logout error:', error)
