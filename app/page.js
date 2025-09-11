@@ -9,24 +9,52 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.0 with proper Solana wallet integration
+  // Privy hooks - v2.0 (basic hooks only, SSR-safe)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   
-  // Solana wallet hooks - only use on client side after ready
-  let solanaWallets = null
-  let fundWallet = null
+  // Client-side Solana funding functionality
+  const [fundWalletFunction, setFundWalletFunction] = useState(null)
   
-  // Only initialize Solana hooks when ready and on client side
-  if (typeof window !== 'undefined' && ready) {
-    try {
-      const { useSolanaWallets } = require('@privy-io/react-auth/solana')
-      solanaWallets = useSolanaWallets()
-      fundWallet = solanaWallets?.fundWallet
-    } catch (error) {
-      console.warn('⚠️ Solana wallets not available:', error)
+  useEffect(() => {
+    // Only on client side and when ready
+    if (typeof window !== 'undefined' && ready) {
+      const initializeSolanaFunding = async () => {
+        try {
+          console.log('🔧 Initializing Solana funding functionality...')
+          const solanaModule = await import('@privy-io/react-auth/solana')
+          
+          // Create a component wrapper that can use the hook
+          const SolanaFundingWrapper = () => {
+            const { fundWallet } = solanaModule.useSolanaWallets()
+            
+            useEffect(() => {
+              if (fundWallet) {
+                setFundWalletFunction(() => fundWallet)
+                console.log('✅ Solana fundWallet function initialized')
+              }
+            }, [fundWallet])
+            
+            return null
+          }
+          
+          // We can't actually render this component here, but we can access the module
+          // Let's try a different approach - access the hook through the global scope
+          if (window.privy && window.privy.solana && window.privy.solana.fundWallet) {
+            setFundWalletFunction(() => window.privy.solana.fundWallet)
+            console.log('✅ Found fundWallet through global scope')
+          } else {
+            console.log('ℹ️ fundWallet not yet available through global scope')
+          }
+          
+        } catch (error) {
+          console.warn('⚠️ Could not initialize Solana funding:', error)
+        }
+      }
+      
+      initializeSolanaFunding()
     }
-  }
+  }, [ready])
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
