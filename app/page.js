@@ -14,7 +14,96 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // Debug wallet state with fundWallet from usePrivy (test approach)
+  // Real-time Solana balance checking function
+  const checkSolanaBalance = async (walletAddress) => {
+    if (!walletAddress || typeof window === 'undefined') return 0
+    
+    try {
+      setIsLoadingBalance(true)
+      console.log('🔍 Checking Solana balance for:', walletAddress)
+      
+      // Use Solana RPC to check balance
+      const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
+      
+      const response = await fetch(rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getBalance',
+          params: [walletAddress]
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.result && data.result.value !== undefined) {
+        // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
+        const balanceInSOL = data.result.value / 1000000000
+        console.log('✅ Solana balance retrieved:', balanceInSOL, 'SOL')
+        setSolanaBalance(balanceInSOL)
+        return balanceInSOL
+      } else {
+        console.log('⚠️ No balance data received')
+        return 0
+      }
+    } catch (error) {
+      console.error('❌ Error checking Solana balance:', error)
+      return 0
+    } finally {
+      setIsLoadingBalance(false)
+    }
+  }
+
+  // Start balance monitoring when user is authenticated and has Solana wallet
+  useEffect(() => {
+    let solanaWalletAddress = null
+    
+    if (authenticated && privyUser) {
+      // Find Solana wallet address from multiple sources
+      if (wallets && wallets.length > 0) {
+        const solanaWallet = wallets.find(w => w.chainType === 'solana')
+        if (solanaWallet) {
+          solanaWalletAddress = solanaWallet.address
+        }
+      }
+      
+      if (!solanaWalletAddress && privyUser.wallet?.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') {
+        solanaWalletAddress = privyUser.wallet.address
+      }
+      
+      if (!solanaWalletAddress && privyUser.linkedAccounts) {
+        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc => 
+          acc.type === 'wallet' && 
+          (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+        )
+        if (linkedSolanaWallet) {
+          solanaWalletAddress = linkedSolanaWallet.address
+        }
+      }
+      
+      if (solanaWalletAddress) {
+        console.log('🎯 Starting balance monitoring for:', solanaWalletAddress)
+        
+        // Initial balance check
+        checkSolanaBalance(solanaWalletAddress)
+        
+        // Set up periodic balance checking every 10 seconds
+        balanceCheckInterval.current = setInterval(() => {
+          checkSolanaBalance(solanaWalletAddress)
+        }, 10000)
+      }
+    }
+    
+    // Cleanup on unmount or when user changes
+    return () => {
+      if (balanceCheckInterval.current) {
+        clearInterval(balanceCheckInterval.current)
+        balanceCheckInterval.current = null
+      }
+    }
+  }, [authenticated, privyUser, wallets])
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
       console.log('🔧 Privy v2.24.0 - Debug Info (fundWallet from usePrivy):', {
