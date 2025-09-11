@@ -9,10 +9,41 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.0 with correct Solana hooks
+  // Privy hooks - v2.0 with correct Solana hooks (SSR-safe)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
-  const { fundWallet } = useSolanaWallets()  // ← CORRECT v2.0 import path!
+  
+  // SSR-safe Solana wallets hook - only call on client side
+  const [solanaHooksReady, setSolanaHooksReady] = useState(false)
+  const [fundWallet, setFundWallet] = useState(null)
+  
+  useEffect(() => {
+    // Only initialize Solana hooks on client side
+    if (typeof window !== 'undefined') {
+      try {
+        // Dynamic import to avoid SSR issues
+        import('@privy-io/react-auth/solana').then((solanaModule) => {
+          // Use the hook in a component that runs only on client
+          setSolanaHooksReady(true)
+        })
+      } catch (error) {
+        console.warn('⚠️ Solana hooks not available:', error)
+      }
+    }
+  }, [])
+  
+  // Client-only Solana wallet component
+  const SolanaWalletsProvider = ({ children }) => {
+    const solanaHooks = useSolanaWallets() // Only called in client component
+    
+    useEffect(() => {
+      if (solanaHooks?.fundWallet) {
+        setFundWallet(() => solanaHooks.fundWallet)
+      }
+    }, [solanaHooks])
+    
+    return children
+  }
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
