@@ -1128,102 +1128,103 @@ export default function TurfLootTactical() {
     console.log('💰 DEPOSIT button clicked - Solana-only implementation')
     
     try {
-      // Check authentication using proper Privy hooks
-      if (!authenticated || !privyUser) {
+      // Check authentication using Privy bridge (fallback to working method)
+      if (!isAuthenticated || !user) {
         console.log('🔐 User not authenticated, opening Privy login...')
-        await login()
+        const privy = window.__TURFLOOT_PRIVY__
+        if (privy && privy.login) {
+          await privy.login()
+        }
         return
       }
       
-      console.log('✅ Privy authenticated, proceeding with Solana deposit...')
-      console.log('🔍 User ID:', privyUser.id)
-      console.log('🔍 Solana wallets ready:', solanaReady)
-      console.log('🔍 Available Solana wallets:', solanaWallets.length)
-      
-      // Wait for Solana wallets to be ready
-      if (!solanaReady) {
-        console.log('⏳ Waiting for Solana wallets to load...')
-        alert('⏳ Loading wallet information, please wait a moment and try again.')
+      // Get fresh Privy state after authentication
+      const privy = window.__TURFLOOT_PRIVY__
+      if (!privy || !privy.authenticated || !privy.user) {
+        console.error('❌ Privy state invalid after authentication')
+        alert('❌ Authentication failed. Please try again.')
         return
       }
       
-      // SOLANA-ONLY wallet selection and creation (NO EVM)
-      console.log('🔍 Searching for Solana wallets only...')
+      console.log('✅ Privy authenticated, proceeding with SOLANA-PRIORITY deposit...')
+      console.log('🔍 User ID:', privy.user.id)
+      
+      // SOLANA-FIRST WALLET PRIORITY SYSTEM
+      console.log('🔍 Implementing Solana-first wallet priority...')
+      
+      let selectedWallet = null
+      const userWallets = privy.user.linkedAccounts?.filter(account => account.type === 'wallet') || []
+      
       console.log('📊 Wallet inventory:', {
-        allWalletsCount: allWallets.length,
-        solanaWalletsCount: solanaWallets.length,
-        solanaReady: solanaReady
+        totalWallets: userWallets.length,
+        primaryWallet: privy.user.wallet ? 'exists' : 'none',
+        walletDetails: userWallets.map(w => ({
+          address: w.address?.substring(0, 10) + '...',
+          chainType: w.chainType,
+          walletClientType: w.walletClientType
+        }))
       })
       
-      // Filter for ONLY Solana wallets by chainType
-      let solanaWallet = null
+      // PRIORITY 1: Look for explicit Solana chainType wallets
+      const explicitSolanaWallets = userWallets.filter(wallet => 
+        wallet.chainType === 'solana' && 
+        wallet.address && 
+        !wallet.address.startsWith('0x')
+      )
       
-      // Method 1: Try to find existing Solana wallet from useSolanaWallets hook
-      if (solanaWallets.length > 0) {
-        solanaWallet = solanaWallets.find(wallet => 
-          wallet.chainType === 'solana' && 
+      if (explicitSolanaWallets.length > 0) {
+        selectedWallet = explicitSolanaWallets[0]
+        console.log('✅ PRIORITY 1: Found explicit Solana wallet:', selectedWallet.address)
+      }
+      
+      // PRIORITY 2: Look for wallets with Solana address format (base58)
+      if (!selectedWallet) {
+        const base58Wallets = userWallets.filter(wallet => 
           wallet.address && 
-          !wallet.address.startsWith('0x')
+          !wallet.address.startsWith('0x') && 
+          wallet.address.length > 32 // Solana addresses are typically 32-44 chars
         )
-        if (solanaWallet) {
-          console.log('✅ Found existing Solana wallet:', solanaWallet.address)
+        
+        if (base58Wallets.length > 0) {
+          selectedWallet = base58Wallets[0]
+          console.log('✅ PRIORITY 2: Found base58 format wallet (likely Solana):', selectedWallet.address)
         }
       }
       
-      // Method 2: Double-check in all wallets for Solana chainType (safety check)
-      if (!solanaWallet && allWallets.length > 0) {
-        console.log('🔍 Backup search: Checking all wallets for chainType === solana...')
-        const backupSolanaWallet = allWallets.find(wallet => 
-          wallet.chainType === 'solana' && 
-          wallet.address && 
-          !wallet.address.startsWith('0x')
-        )
-        if (backupSolanaWallet) {
-          console.log('✅ Found Solana wallet in all wallets:', backupSolanaWallet.address)
-          solanaWallet = backupSolanaWallet
+      // PRIORITY 3: Check primary wallet if it's Solana format
+      if (!selectedWallet && privy.user.wallet) {
+        const primaryWallet = privy.user.wallet
+        if (primaryWallet.address && !primaryWallet.address.startsWith('0x')) {
+          selectedWallet = primaryWallet
+          console.log('✅ PRIORITY 3: Primary wallet is Solana format:', selectedWallet.address)
+        } else {
+          console.log('⚠️ Primary wallet is EVM format, skipping:', primaryWallet.address)
         }
       }
       
-      // Method 3: Create new Solana wallet if none found
-      if (!solanaWallet) {
-        console.log('🔑 No Solana wallet found, creating SOLANA-ONLY wallet...')
+      // LAST RESORT: Create new Solana wallet if none found
+      if (!selectedWallet) {
+        console.log('🔑 No Solana wallet found, creating new Solana wallet...')
         
         try {
-          console.log('⚡ Creating Solana wallet using standard createWallet()...')
-          // Use the standard createWallet from usePrivy or fallback to Privy bridge
-          if (window.__TURFLOOT_PRIVY__ && window.__TURFLOOT_PRIVY__.createWallet) {
-            solanaWallet = await window.__TURFLOOT_PRIVY__.createWallet()
-          } else {
-            throw new Error('Wallet creation not available')
-          }
-          
-          // Verify the created wallet is actually Solana
-          if (solanaWallet) {
-            console.log('✅ Wallet created successfully!')
-            console.log('🔍 New wallet details:', {
-              address: solanaWallet.address,
-              chainType: solanaWallet.chainType,
-              walletClientType: solanaWallet.walletClientType
-            })
-            
-            // Double-check it's not an EVM wallet
-            if (solanaWallet.address?.startsWith('0x')) {
-              console.error('❌ CRITICAL: Created wallet is EVM format despite Solana-only config!')
-              alert('❌ Configuration Error: EVM wallet created instead of Solana.\n\nThis indicates a deeper Privy configuration issue.\n\nPlease contact support.')
-              return
+          if (privy.createWallet) {
+            const newWallet = await privy.createWallet()
+            if (newWallet && !newWallet.address?.startsWith('0x')) {
+              selectedWallet = newWallet
+              console.log('✅ Created new Solana wallet:', selectedWallet.address)
+            } else {
+              console.log('⚠️ Created wallet is EVM format, will use as fallback')
             }
           }
         } catch (createError) {
-          console.error('❌ Solana wallet creation failed:', createError)
-          alert('❌ Failed to create Solana wallet.\n\nThis might be due to configuration issues.\n\nPlease try:\n1. Refresh the page\n2. Sign out and sign back in\n3. Contact support if the issue persists')
-          return
+          console.error('❌ Wallet creation failed:', createError)
         }
       }
       
-      // Final validation: Ensure we have a valid Solana wallet
-      if (!solanaWallet) {
-        console.error('❌ No Solana wallet available after all attempts')
-        alert('❌ Unable to access Solana wallet.\n\nPlease refresh the page and try again.')
+      // Final validation
+      if (!selectedWallet) {
+        console.error('❌ No suitable wallet found after all attempts')
+        alert('❌ Unable to find or create a Solana wallet.\n\nPlease refresh the page and try again.')
         return
       }
       
