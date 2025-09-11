@@ -1145,194 +1145,91 @@ export default function TurfLootTactical() {
     }
   }
 
-  // COMPLETELY REWRITTEN Wallet operations with clean Privy integration
+  // PRIVY v2.24.0 - DEPOSIT SOL FUNCTION with proper hooks
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT button clicked - Solana-only implementation')
+    console.log('💰 DEPOSIT SOL clicked - Using Privy v2.24.0 hooks')
     
     try {
-      // Check authentication using Privy bridge (fallback to working method)
-      if (!isAuthenticated || !user) {
+      // Step 1: Check authentication using proper Privy hooks
+      if (!ready) {
+        alert('⏳ Wallet service is loading. Please wait a moment and try again.')
+        return
+      }
+      
+      if (!authenticated || !privyUser) {
         console.log('🔐 User not authenticated, opening Privy login...')
-        const privy = window.__TURFLOOT_PRIVY__
-        if (privy && privy.login) {
-          await privy.login()
-        }
+        await login()
         return
       }
       
-      // Get fresh Privy state after authentication
-      const privy = window.__TURFLOOT_PRIVY__
-      if (!privy || !privy.authenticated || !privy.user) {
-        console.error('❌ Privy state invalid after authentication')
-        alert('❌ Authentication failed. Please try again.')
-        return
-      }
+      console.log('✅ User authenticated:', privyUser.id)
       
-      console.log('✅ Privy authenticated, proceeding with SOLANA-PRIORITY deposit...')
-      console.log('🔍 User ID:', privy.user.id)
+      // Step 2: Find Solana wallet using proper hook
+      const solanaWallets = wallets.filter(w => 
+        (w.chainType === 'solana') || 
+        (w.address && !w.address.startsWith('0x'))
+      )
       
-      // SOLANA-FIRST WALLET PRIORITY SYSTEM
-      console.log('🔍 Implementing Solana-first wallet priority...')
-      
-      let selectedWallet = null
-      const userWallets = privy.user.linkedAccounts?.filter(account => account.type === 'wallet') || []
-      
-      console.log('📊 Wallet inventory:', {
-        totalWallets: userWallets.length,
-        primaryWallet: privy.user.wallet ? 'exists' : 'none',
-        walletDetails: userWallets.map(w => ({
+      console.log('🔍 Available wallets:', {
+        total: wallets.length,
+        solana: solanaWallets.length,
+        walletDetails: solanaWallets.map(w => ({
           address: w.address?.substring(0, 10) + '...',
           chainType: w.chainType,
           walletClientType: w.walletClientType
         }))
       })
       
-      // PRIORITY 1: Look for explicit Solana chainType wallets
-      const explicitSolanaWallets = userWallets.filter(wallet => 
-        wallet.chainType === 'solana' && 
-        wallet.address && 
-        !wallet.address.startsWith('0x')
-      )
-      
-      if (explicitSolanaWallets.length > 0) {
-        selectedWallet = explicitSolanaWallets[0]
-        console.log('✅ PRIORITY 1: Found explicit Solana wallet:', selectedWallet.address)
-      }
-      
-      // PRIORITY 2: Look for wallets with Solana address format (base58)
-      if (!selectedWallet) {
-        const base58Wallets = userWallets.filter(wallet => 
-          wallet.address && 
-          !wallet.address.startsWith('0x') && 
-          wallet.address.length > 32 // Solana addresses are typically 32-44 chars
-        )
-        
-        if (base58Wallets.length > 0) {
-          selectedWallet = base58Wallets[0]
-          console.log('✅ PRIORITY 2: Found base58 format wallet (likely Solana):', selectedWallet.address)
-        }
-      }
-      
-      // PRIORITY 3: Check primary wallet if it's Solana format
-      if (!selectedWallet && privy.user.wallet) {
-        const primaryWallet = privy.user.wallet
-        if (primaryWallet.address && !primaryWallet.address.startsWith('0x')) {
-          selectedWallet = primaryWallet
-          console.log('✅ PRIORITY 3: Primary wallet is Solana format:', selectedWallet.address)
-        } else {
-          console.log('⚠️ Primary wallet is EVM format, skipping:', primaryWallet.address)
-        }
-      }
-      
-      // LAST RESORT: Create new Solana wallet if none found
-      if (!selectedWallet) {
-        console.log('🔑 No Solana wallet found, creating new Solana wallet...')
-        
-        try {
-          if (privy.createWallet) {
-            const newWallet = await privy.createWallet()
-            if (newWallet && !newWallet.address?.startsWith('0x')) {
-              selectedWallet = newWallet
-              console.log('✅ Created new Solana wallet:', selectedWallet.address)
-            } else {
-              console.log('⚠️ Created wallet is EVM format, will use as fallback')
-            }
-          }
-        } catch (createError) {
-          console.error('❌ Wallet creation failed:', createError)
-        }
-      }
-      
-      // Final validation
-      if (!selectedWallet) {
-        console.error('❌ No suitable wallet found after all attempts')
-        alert('❌ Unable to find or create a Solana wallet.\n\nPlease refresh the page and try again.')
+      if (solanaWallets.length === 0) {
+        console.log('🔑 No Solana wallet found, creating one...')
+        alert('⚠️ No Solana wallet detected.\n\nPlease refresh the page to create a Solana wallet, then try again.')
         return
       }
       
-      // STRICT Solana address validation (NO EVM allowed)
-      if (!solanaWallet.address) {
-        console.error('❌ Solana wallet exists but has no address')
-        alert('❌ Solana wallet address not available. Please refresh and try again.')
-        return
-      }
-      
-      // CRITICAL: Verify it's actually a Solana address format (NOT EVM)
-      const isEVMAddress = solanaWallet.address.startsWith('0x') && solanaWallet.address.length === 42
-      if (isEVMAddress) {
-        console.error('❌ CRITICAL ERROR: EVM wallet detected despite Solana-only configuration!')
-        console.error('❌ Wallet details:', {
-          address: solanaWallet.address,
-          chainType: solanaWallet.chainType,
-          walletClientType: solanaWallet.walletClientType
-        })
-        alert('❌ CRITICAL CONFIGURATION ERROR!\n\nAn EVM wallet was detected despite Solana-only settings.\n\nThis indicates a serious configuration issue.\n\nPlease contact support immediately with this error message.')
-        return
-      }
-      
-      // STRICT: Verify chainType is explicitly 'solana'
-      if (solanaWallet.chainType && solanaWallet.chainType !== 'solana') {
-        console.error('❌ CRITICAL ERROR: Wallet chainType is not Solana:', solanaWallet.chainType)
-        alert('❌ CRITICAL CONFIGURATION ERROR!\n\nWallet chainType is not Solana.\n\nPlease contact support immediately.')
-        return
-      }
-      
-      console.log('✅ SOLANA WALLET VERIFIED:', {
+      const solanaWallet = solanaWallets[0]
+      console.log('✅ Using Solana wallet:', {
         address: solanaWallet.address,
-        chainType: solanaWallet.chainType || 'solana',
-        walletClientType: solanaWallet.walletClientType,
-        connectorType: solanaWallet.connectorType,
-        addressFormat: 'Solana (base58)',
-        isEVM: false
+        chainType: solanaWallet.chainType,
+        walletClientType: solanaWallet.walletClientType
       })
       
-      // Call Privy's fundWallet - using proper hooks instead of bridge
+      // Step 3: Open Privy funding modal using v2.24.0 SDK
       console.log('💰 Opening Privy funding interface...')
       
-      try {
-        // Use the login/logout functions from usePrivy hook
-        console.log('🔗 Calling Privy fundWallet with Solana wallet...')
+      // Import fundWallet dynamically for v2.24.0
+      const { useFundWallet } = await import('@privy-io/react-auth')
+      
+      // Check if fundWallet is available in the current context
+      if (typeof window !== 'undefined' && window.privy && window.privy.fundWallet) {
+        console.log('🔗 Using Privy v2.24.0 fundWallet...')
+        await window.privy.fundWallet()
+        console.log('✅ Privy funding interface opened!')
+      } else {
+        // Fallback: Try to call fundWallet directly from Privy context
+        console.log('🔗 Searching for fundWallet in Privy context...')
         
-        // Check if fundWallet is available from the proper hooks
-        if (window.__TURFLOOT_PRIVY__ && typeof window.__TURFLOOT_PRIVY__.fundWallet === 'function') {
-          await window.__TURFLOOT_PRIVY__.fundWallet()
-          console.log('✅ Privy funding interface opened successfully!')
+        // Check for Privy in global context
+        const privyInstance = window.privy || window.Privy || window.__PRIVY__
+        if (privyInstance && privyInstance.fundWallet) {
+          await privyInstance.fundWallet()
+          console.log('✅ Privy funding opened via global context!')
         } else {
-          throw new Error('Privy fundWallet function not available')
-        }
-      } catch (fundingError) {
-        console.error('❌ Funding interface error:', fundingError)
-        
-        // More specific error handling
-        if (fundingError.message?.includes('invalid address')) {
-          alert('❌ Wallet address validation failed. Please:\n\n1. Disconnect your wallet\n2. Refresh the page\n3. Reconnect and try again')
-        } else {
-          throw fundingError // Re-throw for main error handler
+          throw new Error('Privy fundWallet not available in current context')
         }
       }
       
     } catch (error) {
-      console.error('❌ Solana deposit error:', error)
-      console.error('❌ Error details:', {
-        message: error.message,
-        code: error.code,
-        argument: error.argument,
-        value: error.value
-      })
+      console.error('❌ Deposit error:', error)
       
-      // Handle specific errors with better messaging
-      if (error.message?.includes('invalid address') || error.code === 'INVALID_ARGUMENT') {
-        console.error('❌ Address validation error - wallet state may be invalid')
-        alert('❌ Wallet address validation failed!\n\nThis usually happens when:\n• Wallet is not fully initialized\n• Connection is unstable\n\nSolution:\n1. Refresh the page\n2. Sign out and sign back in\n3. Try the deposit again')
-      } else if (error.message?.includes('CNR-2 format') || error.message?.includes('Chain ID not compatible') || error.message?.includes('Chain configuration')) {
-        console.error('❌ Chain configuration error')
-        alert('❌ Funding interface error\n\nThis might be due to:\n• Cross-chain bridging configuration\n• Wallet connectivity issues\n• Privy service temporarily unavailable\n\nPlease try:\n1. Refresh the page and try again\n2. Sign out and sign back in\n3. Wait a few minutes for services to sync\n\nIf the issue persists, contact support.')
-      } else if (error.message?.includes('User rejected')) {
-        console.log('ℹ️ User cancelled the Solana deposit operation')
-      } else if (error.message?.includes('not available')) {
-        alert('❌ Solana deposit functionality not available. Please refresh the page and try again.')
+      if (error.message?.includes('User rejected')) {
+        console.log('ℹ️ User cancelled the funding process')
+        return
+      }
+      
+      if (error.message?.includes('fundWallet')) {
+        alert('❌ Funding service unavailable\n\nThis might be due to:\n• Service temporarily down\n• Network connectivity issues\n• Configuration problems\n\nPlease try again in a moment.')
       } else {
-        alert(`❌ Solana deposit failed: ${error.message}\n\nPlease try:\n1. Refreshing the page\n2. Signing out and back in\n3. Contacting support if the issue persists`)
+        alert('❌ Deposit failed\n\nPlease try:\n1. Refreshing the page\n2. Signing out and back in\n3. Checking your internet connection\n\nIf the issue persists, contact support.')
       }
     }
   }
