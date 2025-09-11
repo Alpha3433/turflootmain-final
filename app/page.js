@@ -8,10 +8,9 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.24.0 with correct useFundWallet hook
-  const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
+  // Privy hooks - v2.24.0 using fundWallet from usePrivy (as per test suggestion)
+  const { ready, authenticated, user: privyUser, login, logout, fundWallet } = usePrivy()
   const { wallets } = useWallets()
-  const { fundWallet } = useFundWallet()
   
   // Debug wallet state with proper useFundWallet hook in v2.24.0
   useEffect(() => {
