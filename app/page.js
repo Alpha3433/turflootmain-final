@@ -1148,7 +1148,7 @@ export default function TurfLootTactical() {
 
   // DIRECT PRIVY FUNDING - No checks, straight to popup like DamnBruh
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - Direct Privy funding')
+    console.log('💰 DEPOSIT SOL clicked - Using useFundWallet hook')
     
     // Simple check: is user logged in?
     if (!authenticated) {
@@ -1156,22 +1156,19 @@ export default function TurfLootTactical() {
       return
     }
     
-    // Direct call to Privy funding - no wallet checks
-    console.log('🎯 Opening Privy funding modal...')
+    // Use the proper fundWallet from useFundWallet hook (Privy v2.24.0)
+    console.log('🎯 Calling fundWallet from useFundWallet hook...')
     
     try {
-      // Try to access Privy's fundWallet function
-      if (window.privy?.fundWallet) {
-        await window.privy.fundWallet()
-      } else if (window.Privy?.fundWallet) {
-        await window.Privy.fundWallet()
-      } else {
-        console.log('⚠️ Privy fundWallet not found in window')
-        alert('Opening funding interface... If popup doesn\'t appear, please check popup blockers.')
-      }
+      await fundWallet()
+      console.log('✅ Privy funding modal opened successfully!')
     } catch (error) {
-      console.error('❌ Funding error:', error)
-      alert('Unable to open funding popup. Please try refreshing the page and signing in again.')
+      console.error('❌ FundWallet error:', error)
+      if (error.message?.includes('User rejected')) {
+        console.log('ℹ️ User cancelled funding')
+        return
+      }
+      alert('Unable to open funding popup. Please try refreshing the page.')
     }
   }
 
