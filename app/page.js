@@ -94,6 +94,30 @@ export default function TurfLootTactical() {
     }
   }
 
+  // Initialize wallet balance based on authentication state
+  useEffect(() => {
+    if (ready && typeof window !== 'undefined') {
+      console.log('🚀 TurfLoot initialized with authentication state:', { 
+        ready, 
+        authenticated, 
+        hasPrivyUser: !!privyUser 
+      })
+      
+      // If user is not authenticated, immediately set default balance
+      if (!authenticated) {
+        console.log('👛 No authentication - setting default balance immediately')
+        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+        return
+      }
+      
+      // If user is authenticated, trigger balance fetch
+      if (authenticated && privyUser) {
+        console.log('✅ User authenticated - triggering balance fetch')
+        fetchWalletBalance()
+      }
+    }
+  }, [ready, authenticated, privyUser])
+
   // Start balance monitoring when user is authenticated and has Solana wallet
   useEffect(() => {
     let solanaWalletAddress = null
