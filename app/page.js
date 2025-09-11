@@ -13,19 +13,52 @@ export default function TurfLootTactical() {
   const { ready, authenticated, user: privyUser, login, logout, fundWallet } = usePrivy()
   const { wallets } = useWallets()
   
-  // Based on changelog: useFundWallet should be available directly from usePrivy in v2.24.0
+  // Debug wallet state in v2.24.0
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
-      console.log('🔧 Privy v2.24.0 - Debug available hooks:', {
+      console.log('🔧 Privy v2.24.0 - Comprehensive Debug Info:', {
         ready,
         authenticated,
         hasFundWallet: typeof fundWallet === 'function',
-        fundWalletType: typeof fundWallet,
-        user: !!privyUser,
-        privyHookMethods: Object.keys({ ready, authenticated, user: privyUser, login, logout, fundWallet })
+        walletsCount: wallets?.length || 0,
+        walletsArray: wallets,
+        privyUser: privyUser ? {
+          id: privyUser.id,
+          wallets: privyUser.linkedAccounts?.filter(account => account.type === 'wallet'),
+          hasEmbeddedWallet: !!privyUser.wallet,
+          embeddedWalletAddress: privyUser.wallet?.address,
+          embeddedWalletChainType: privyUser.wallet?.chainType || privyUser.wallet?.walletClientType,
+          linkedAccountsCount: privyUser.linkedAccounts?.length || 0,
+          allLinkedAccounts: privyUser.linkedAccounts?.map(acc => ({
+            type: acc.type,
+            address: acc.address,
+            chainType: acc.chainType,
+            walletClientType: acc.walletClientType
+          }))
+        } : null
       })
+      
+      // Log the specific Solana wallet we're looking for
+      console.log('🎯 Looking for Solana wallet: F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+      
+      // Check if wallet exists in linked accounts
+      if (privyUser?.linkedAccounts) {
+        const solanaAccounts = privyUser.linkedAccounts.filter(acc => 
+          acc.type === 'wallet' && (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+        )
+        console.log('🔍 Solana accounts found in linkedAccounts:', solanaAccounts)
+      }
+      
+      // Check if wallet exists in user.wallet (embedded)
+      if (privyUser?.wallet) {
+        console.log('💳 Embedded wallet info:', {
+          address: privyUser.wallet.address,
+          chainType: privyUser.wallet.chainType || 'ethereum', // default
+          walletClientType: privyUser.wallet.walletClientType
+        })
+      }
     }
-  }, [ready, authenticated, fundWallet, privyUser])
+  }, [ready, authenticated, fundWallet, privyUser, wallets])
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
