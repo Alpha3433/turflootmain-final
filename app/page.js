@@ -1147,55 +1147,50 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - Clean and simple approach
+  // PRIVY v2.24.0 SOLANA DEPOSIT - Following checklist ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - clean approach without Solana module conflicts')
+    console.log('💰 DEPOSIT SOL clicked - using correct useFundWallet from Solana package')
     
     try {
-      // Step 1: Ensure user is authenticated
+      // Checklist #4: Ensure user is authenticated first
       if (!authenticated) {
         console.log('⚠️ User not authenticated, triggering login first')
         await login()
         return
       }
 
-      console.log('✅ User authenticated, attempting to access fundWallet')
+      console.log('✅ User authenticated, proceeding with Solana funding')
       
-      // Step 2: Try direct window.privy.fundWallet access
-      if (typeof window !== 'undefined' && window.privy?.fundWallet) {
-        console.log('💰 Calling window.privy.fundWallet directly')
-        await window.privy.fundWallet()
-        console.log('✅ Privy funding modal opened successfully!')
+      // Checklist #3: Verify Solana wallet exists BEFORE calling fundWallet
+      if (!wallets || wallets.length === 0) {
+        console.log('❌ No wallets found')
+        alert('No wallet found. Please complete authentication first.')
         return
       }
       
-      // Step 3: Debug what's available and guide user
-      console.log('🔍 Debugging Privy availability:')
-      console.log('- ready:', ready)
-      console.log('- authenticated:', authenticated)
-      console.log('- fundWalletReady:', fundWalletReady)
-      console.log('- window.privy exists:', typeof window !== 'undefined' && !!window.privy)
-      
-      if (typeof window !== 'undefined' && window.privy) {
-        const privyMethods = Object.keys(window.privy).filter(key => typeof window.privy[key] === 'function')
-        console.log('- Available Privy methods:', privyMethods)
+      const solanaWallet = wallets.find(w => w.chainType === 'solana')
+      if (!solanaWallet) {
+        console.log('❌ No Solana wallet found')
+        console.log('Available wallets:', wallets.map(w => ({ chainType: w.chainType, address: w.address })))
+        alert('No Solana wallet found. Please ensure Solana wallet is created during login.')
+        return
       }
       
-      // Step 4: Helpful user message
-      if (wallets && wallets.length > 0) {
-        const solanaWallet = wallets.find(w => w.chainType === 'solana')
-        if (solanaWallet) {
-          console.log('✅ Found Solana wallet:', solanaWallet.address)
-          alert(`Great! Your Solana wallet is connected: ${solanaWallet.address.slice(0, 8)}...\n\nTo deposit SOL, you can:\n1. Use external wallets like Phantom or Solflare\n2. Transfer from exchanges\n3. The funding modal will appear shortly\n\nTry clicking DEPOSIT SOL again in a moment.`)
-          return
-        }
+      console.log('✅ Solana wallet verified:', solanaWallet.address)
+      
+      // Checklist #1: Use the correct useFundWallet hook from @privy-io/react-auth/solana
+      if (!fundWallet) {
+        console.log('❌ fundWallet function not available from useFundWallet hook')
+        alert('Funding function not initialized. Please refresh the page and try again.')
+        return
       }
       
-      // Final message
-      alert('Solana wallet is initializing...\n\nPlease wait a moment and try again.\nIf this persists, try refreshing the page.')
+      console.log('💰 Calling fundWallet from useFundWallet hook...')
+      await fundWallet()  // ✅ Using correct Solana fundWallet
+      console.log('✅ Privy Solana funding modal should now be displayed!')
       
     } catch (error) {
-      console.error('❌ Deposit error:', error)
+      console.error('❌ Solana funding error:', error)
       alert(`Deposit error: ${error.message || 'Please try again'}`)
     }
   }
