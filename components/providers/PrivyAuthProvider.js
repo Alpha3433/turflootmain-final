@@ -36,7 +36,6 @@ class PrivyErrorBoundary extends Component {
 // Client-side wrapper for Privy to prevent SSR issues
 function ClientOnlyPrivyProvider({ children, appId, config }) {
   const [isClient, setIsClient] = useState(false)
-  const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
@@ -48,19 +47,11 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
       externalWallets: config.externalWallets,
       solanaClusters: config.solanaClusters
     }, null, 2))
-    
-    // Delay to ensure proper hydration
-    const timer = setTimeout(() => setIsReady(true), 1000)
-    return () => clearTimeout(timer)
   }, [config, appId])
 
-  // Hide content during SSR and hydration
-  if (!isClient || !isReady) {
-    return (
-      <div style={{ visibility: 'hidden', height: '100vh' }}>
-        {children}
-      </div>
-    )
+  // Simple hydration check - no delays
+  if (!isClient) {
+    return null // Don't render anything on server
   }
 
   console.log('🚀 Initializing Privy with Solana-Only Configuration')
