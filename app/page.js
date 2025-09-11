@@ -1147,11 +1147,30 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - Dynamic import approach to avoid SSR ✅
+  // PRIVY v2.24.0 SOLANA DEPOSIT - Enhanced debugging for wallet detection
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using safe approach for Privy Solana integration')
+    console.log('💰 DEPOSIT SOL clicked - debugging wallet detection')
     
     try {
+      // Enhanced debugging - check authentication and wallet state
+      console.log('🔍 DEBUG - Authentication status:', authenticated)
+      console.log('🔍 DEBUG - Ready status:', ready)
+      console.log('🔍 DEBUG - User object:', privyUser)
+      console.log('🔍 DEBUG - Wallets array:', wallets)
+      console.log('🔍 DEBUG - Wallets length:', wallets?.length || 'undefined')
+      
+      if (wallets && wallets.length > 0) {
+        console.log('🔍 DEBUG - Wallet details:')
+        wallets.forEach((wallet, index) => {
+          console.log(`  Wallet ${index}:`, {
+            address: wallet.address,
+            chainType: wallet.chainType,
+            walletClientType: wallet.walletClientType,
+            connectorType: wallet.connectorType
+          })
+        })
+      }
+
       // Checklist #4: Ensure user is authenticated first
       if (!authenticated) {
         console.log('⚠️ User not authenticated, triggering login first')
@@ -1159,31 +1178,46 @@ export default function TurfLootTactical() {
         return
       }
 
-      console.log('✅ User authenticated, proceeding with Solana funding')
+      console.log('✅ User authenticated, proceeding with enhanced wallet detection')
       
-      // Checklist #3: Verify Solana wallet exists BEFORE calling fundWallet
-      if (!wallets || wallets.length === 0) {
-        console.log('❌ No wallets found')
-        alert('No wallet found. Please complete authentication first.')
+      // Enhanced Checklist #3: More detailed wallet verification
+      if (!wallets) {
+        console.log('❌ Wallets array is null/undefined')
+        alert('Wallet system not initialized. Please refresh the page and try again.')
         return
       }
       
+      if (wallets.length === 0) {
+        console.log('❌ Wallets array is empty')
+        console.log('🔧 This suggests Privy is not creating embedded Solana wallets on login')
+        console.log('📋 Current Privy user info:', {
+          id: privyUser?.id,
+          email: privyUser?.email,
+          wallets: privyUser?.linkedAccounts?.length || 0
+        })
+        alert(`Debugging Info:\n✅ User: ${privyUser?.email || 'Unknown'}\n❌ No wallets created during login\n\n🔧 Possible causes:\n1. Privy dashboard funding not enabled\n2. Embedded wallet creation disabled\n3. Need to refresh page\n\nPlease check Privy dashboard settings.`)
+        return
+      }
+      
+      console.log(`📱 Found ${wallets.length} wallet(s), checking for Solana wallet...`)
       const solanaWallet = wallets.find(w => w.chainType === 'solana')
       if (!solanaWallet) {
-        console.log('❌ No Solana wallet found')
-        console.log('Available wallets:', wallets.map(w => ({ chainType: w.chainType, address: w.address })))
-        alert('No Solana wallet found. Please ensure Solana wallet is created during login.')
+        console.log('❌ No Solana wallet found in available wallets')
+        console.log('Available wallet types:', wallets.map(w => `${w.chainType} (${w.walletClientType})`))
+        alert(`Debugging Info:\n✅ User authenticated: ${privyUser?.email}\n✅ Found ${wallets.length} wallet(s)\n❌ No Solana wallet found\n\nAvailable: ${wallets.map(w => w.chainType).join(', ')}\n\n🔧 Check Privy dashboard:\n- Enable Solana embedded wallets\n- Set createOnLogin: 'users-without-wallets'`)
         return
       }
       
-      console.log('✅ Solana wallet verified:', solanaWallet.address)
+      console.log('✅ Solana wallet verified:', {
+        address: solanaWallet.address,
+        type: solanaWallet.walletClientType,
+        chainType: solanaWallet.chainType
+      })
       
-      // Checklist #1: Try to access fundWallet through Privy context or window object
-      // This avoids the SSR issues while still accessing the function
+      // Checklist #1: Try to access fundWallet through various methods
       if (typeof window !== 'undefined' && window.privy) {
         console.log('🔍 Looking for fundWallet in Privy context...')
         
-        // Check various possible locations for the fundWallet function
         const possiblePaths = [
           'fundWallet',
           'funding.fundWallet', 
@@ -1206,13 +1240,13 @@ export default function TurfLootTactical() {
         }
       }
       
-      // Fallback: Show helpful message based on checklist
-      console.log('ℹ️ Direct fundWallet access not available')
-      alert(`Checklist completed:\n✅ User authenticated\n✅ Solana wallet found: ${solanaWallet.address.slice(0, 8)}...\n\n⚠️ Please check:\n2️⃣ Funding enabled in Privy dashboard\n6️⃣ Try refreshing page for clean SDK state\n\nIf issue persists, the Privy funding modal should appear in the wallet interface.`)
+      // Enhanced fallback with more specific guidance
+      console.log('ℹ️ fundWallet function not accessible through window.privy')
+      alert(`🔧 Advanced Debugging Complete:\n\n✅ User: ${privyUser?.email}\n✅ Authenticated: ${authenticated}\n✅ Solana wallet: ${solanaWallet.address.slice(0, 8)}...\n❌ fundWallet function not accessible\n\n🎯 Next steps:\n1. Check Privy dashboard funding settings\n2. Verify Solana funding methods enabled\n3. Try refreshing page for clean state\n\nThe wallet exists but funding interface isn't available.`)
       
     } catch (error) {
-      console.error('❌ Solana funding error:', error)
-      alert(`Deposit error: ${error.message || 'Please try refreshing the page and try again'}`)
+      console.error('❌ Enhanced debugging error:', error)
+      alert(`Debug error: ${error.message || 'Please check console for details'}`)
     }
   }
 
