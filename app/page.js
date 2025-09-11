@@ -9,10 +9,10 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.24.0 with correct Solana hook
+  // Privy hooks - v2.24.0 with CORRECT useFundWallet hook
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
-  // useFundWallet will be dynamically imported when needed to avoid SSR issues
+  const { fundWallet } = useFundWallet()  // ✅ CORRECT implementation!
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
