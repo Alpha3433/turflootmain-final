@@ -1176,9 +1176,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - Direct fundWallet approach
+  // PRIVY v2.24.0 SOLANA DEPOSIT - Clean and simple approach
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - attempting direct Privy fundWallet call')
+    console.log('💰 DEPOSIT SOL clicked - clean approach without Solana module conflicts')
     
     try {
       // Step 1: Ensure user is authenticated
@@ -1188,66 +1188,44 @@ export default function TurfLootTactical() {
         return
       }
 
-      console.log('✅ User authenticated, attempting to call fundWallet')
+      console.log('✅ User authenticated, attempting to access fundWallet')
       
-      // Step 2: Try using the solanaWallets state if available
-      if (solanaWallets?.fundWallet) {
-        console.log('💰 Using solanaWallets.fundWallet from state')
-        await solanaWallets.fundWallet()
-        console.log('✅ fundWallet called successfully!')
-        return
-      }
-      
-      // Step 3: Try direct window.privy.fundWallet
+      // Step 2: Try direct window.privy.fundWallet access
       if (typeof window !== 'undefined' && window.privy?.fundWallet) {
-        console.log('💰 Using window.privy.fundWallet directly')
+        console.log('💰 Calling window.privy.fundWallet directly')
         await window.privy.fundWallet()
-        console.log('✅ window.privy.fundWallet called successfully!')
+        console.log('✅ Privy funding modal opened successfully!')
         return
       }
       
-      // Step 4: Debug what's available on window.privy
+      // Step 3: Debug what's available and guide user
+      console.log('🔍 Debugging Privy availability:')
+      console.log('- ready:', ready)
+      console.log('- authenticated:', authenticated)
+      console.log('- fundWalletReady:', fundWalletReady)
+      console.log('- window.privy exists:', typeof window !== 'undefined' && !!window.privy)
+      
       if (typeof window !== 'undefined' && window.privy) {
-        console.log('🔍 Available methods on window.privy:', Object.keys(window.privy))
-        console.log('🔍 window.privy object:', window.privy)
-        
-        // Check for common variations
-        const variants = [
-          'fundWallet',
-          'fundSolanaWallet', 
-          'addFunds',
-          'deposit',
-          'funding'
-        ]
-        
-        for (const variant of variants) {
-          if (window.privy[variant] && typeof window.privy[variant] === 'function') {
-            console.log(`✅ Found ${variant} on window.privy, attempting to call...`)
-            try {
-              await window.privy[variant]()
-              console.log(`✅ ${variant} called successfully!`)
-              return
-            } catch (callError) {
-              console.log(`❌ Error calling ${variant}:`, callError.message)
-            }
-          }
+        const privyMethods = Object.keys(window.privy).filter(key => typeof window.privy[key] === 'function')
+        console.log('- Available Privy methods:', privyMethods)
+      }
+      
+      // Step 4: Helpful user message
+      if (wallets && wallets.length > 0) {
+        const solanaWallet = wallets.find(w => w.chainType === 'solana')
+        if (solanaWallet) {
+          console.log('✅ Found Solana wallet:', solanaWallet.address)
+          alert(`Great! Your Solana wallet is connected: ${solanaWallet.address.slice(0, 8)}...\n\nTo deposit SOL, you can:\n1. Use external wallets like Phantom or Solflare\n2. Transfer from exchanges\n3. The funding modal will appear shortly\n\nTry clicking DEPOSIT SOL again in a moment.`)
+          return
         }
       }
       
-      // Step 5: Show detailed debug info
-      console.log('❌ fundWallet not found. Debug info:')
-      console.log('- authenticated:', authenticated)
-      console.log('- ready:', ready)
-      console.log('- wallets count:', wallets?.length || 0)
-      console.log('- solanaWallets state:', !!solanaWallets)
-      console.log('- window.privy exists:', typeof window !== 'undefined' && !!window.privy)
-      
-      // Give user helpful feedback
-      alert('Funding system is still initializing. Please wait a few seconds and try again, or refresh the page if the issue persists.')
+      // Final message
+      alert('Solana wallet is initializing...\n\nPlease wait a moment and try again.\nIf this persists, try refreshing the page.')
       
     } catch (error) {
-      console.error('❌ Deposit flow error:', error)
-      alert(`Deposit error: ${error.message || 'Please try refreshing the page and try again'}`)
+      console.error('❌ Deposit error:', error)
+      alert(`Deposit error: ${error.message || 'Please try again'}`)
     }
   }
 
