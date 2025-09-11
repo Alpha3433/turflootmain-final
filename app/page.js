@@ -8,10 +8,9 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - proper integration with useFundWallet
+  // Privy hooks - simplified without useFundWallet
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
-  const { fundWallet } = useFundWallet()  // ← This is the key for Privy v2.24.0!
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
