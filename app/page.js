@@ -1297,11 +1297,18 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('🔧 Calling fundWallet with minimal configuration to show all methods...')
+      console.log('🔧 Calling fundWallet with explicit exchange funding enabled...')
       
-      // Call fundWallet with minimal configuration to allow all dashboard-configured methods
-      await fundWallet(solanaWallet.address)
-      // ✅ No configuration object - let Privy determine available methods from dashboard
+      // Call fundWallet with explicit configuration to enable exchange transfers
+      await fundWallet(solanaWallet.address, {
+        chain: {
+          id: 101, // Solana Mainnet chain ID
+          name: 'Solana'
+        },
+        asset: 'native-currency', // SOL
+        // ✅ Explicitly specify available funding methods
+        availableFundingMethods: ['card', 'exchange', 'wallet']
+      })
       
       console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
       
