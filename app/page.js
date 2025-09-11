@@ -12,14 +12,14 @@ export default function TurfLootTactical() {
   const { ready, authenticated, user: privyUser, login, logout, fundWallet } = usePrivy()
   const { wallets } = useWallets()
   
-  // Debug wallet state with proper useFundWallet hook in v2.24.0
+  // Debug wallet state with fundWallet from usePrivy (test approach)
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
-      console.log('🔧 Privy v2.24.0 - Comprehensive Debug Info (useFundWallet hook):', {
+      console.log('🔧 Privy v2.24.0 - Debug Info (fundWallet from usePrivy):', {
         ready,
         authenticated,
         hasFundWallet: typeof fundWallet === 'function',
-        fundWalletSource: 'useFundWallet hook',
+        fundWalletSource: 'usePrivy hook (test approach)',
         walletsCount: wallets?.length || 0,
         walletsArray: wallets,
         privyUser: privyUser ? {
