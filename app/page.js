@@ -1297,36 +1297,61 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('🔧 Testing fundWallet with CAIP2 mainnet format and explicit methods...')
+      console.log('🔧 Testing multiple fundWallet approaches for exchange transfers...')
       
-      // TEST 1: Use caip2 format for Solana mainnet and explicit methods
-      console.log('🧪 TEST 1: Using caip2 mainnet format with explicit exchange method')
+      // Check if fundWallet is available from useFundWallet hook
+      if (!fundWallet || typeof fundWallet !== 'function') {
+        console.error('❌ fundWallet not available from useFundWallet hook')
+        alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
+        return
+      }
+      
+      console.log('✅ fundWallet is available, trying CAIP2 mainnet format first...')
+      
+      // APPROACH 1: Try CAIP2 format with explicit methods (for exchange transfers)
       try {
-        await fundWallet({
+        console.log('🧪 APPROACH 1: Using CAIP2 mainnet format with explicit methods')
+        await fundWallet(solanaWallet.address, {
           chain: { caip2: 'solana:mainnet' },   // Must be mainnet for onramp
           asset: { symbol: 'SOL' },
           methods: ['exchange', 'wallet']       // Include 'exchange' to expose that row
         })
         
-        console.log('✅ SUCCESS: fundWallet called with CAIP2 mainnet format!')
+        console.log('✅ SUCCESS: fundWallet with CAIP2 format worked!')
         return
       } catch (error) {
-        console.log('❌ TEST 1 failed, trying alternative approach:', error.message)
+        console.log('❌ APPROACH 1 (CAIP2) failed:', error.message)
+        console.log('🔄 Trying fallback approach...')
       }
 
-      // TEST 2: Alternative format with address parameter (fallback)
-      console.log('🧪 TEST 2: Using wallet address with CAIP2 mainnet format')
+      // APPROACH 2: Fallback to chain ID format (working approach)
       try {
+        console.log('🧪 APPROACH 2: Using chain ID format (fallback)')
         await fundWallet(solanaWallet.address, {
-          chain: { caip2: 'solana:mainnet' },
-          asset: { symbol: 'SOL' },
-          methods: ['exchange', 'wallet']
+          chain: {
+            id: 101, // Solana Mainnet chain ID
+            name: 'Solana'
+          },
+          asset: 'native-currency' // SOL
+          // No explicit methods to let Privy determine from dashboard
         })
         
-        console.log('✅ SUCCESS: fundWallet called with wallet address and CAIP2 format!')
+        console.log('✅ SUCCESS: fundWallet with chain ID format worked!')
         return
       } catch (error) {
-        console.log('❌ TEST 2 failed:', error.message)
+        console.log('❌ APPROACH 2 (chain ID) failed:', error.message)
+      }
+
+      // APPROACH 3: Minimal configuration
+      try {
+        console.log('🧪 APPROACH 3: Minimal configuration')
+        await fundWallet(solanaWallet.address)
+        
+        console.log('✅ SUCCESS: fundWallet with minimal config worked!')
+        return
+      } catch (error) {
+        console.log('❌ APPROACH 3 (minimal) failed:', error.message)
+        throw error // Re-throw to trigger error handling
       }
       
       console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
