@@ -14,7 +14,7 @@ import sys
 from typing import Dict, List, Any, Optional
 
 # Configuration
-BASE_URL = "https://solana-privy-fix.preview.emergentagent.com"
+BASE_URL = "https://solana-deposit.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class SkinAvatarTester:

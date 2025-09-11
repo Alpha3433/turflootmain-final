@@ -9,7 +9,7 @@ import json
 import time
 
 # Configuration
-BASE_URL = "https://solana-privy-fix.preview.emergentagent.com"
+BASE_URL = "https://solana-deposit.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
 # Real user IDs from server logs

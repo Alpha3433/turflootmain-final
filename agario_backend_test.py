@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "https://solana-privy-fix.preview.emergentagent.com"
+BASE_URL = "https://solana-deposit.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class AgarIOBackendTester:
