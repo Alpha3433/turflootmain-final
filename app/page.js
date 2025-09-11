@@ -1166,67 +1166,8 @@ export default function TurfLootTactical() {
       setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
     }
   }
-              } else {
-                console.log('⚠️ API balance fetch failed, using default values')
-              }
-            } catch (apiError) {
-              console.log('⚠️ API call failed:', apiError.message)
-            }
-          }
-          
-          // Update balance state
-          setWalletBalance({
-            usd: usdBalance,
-            sol: solBalance,
-            loading: false
-          })
-          
-          console.log('✅ Wallet balance updated:', { usd: usdBalance, sol: solBalance })
-          
-        } catch (error) {
-          console.error('❌ Error fetching wallet balance:', error)
-          setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-        }
-      } else {
-        console.log('⚠️ Wallet address not available')
-        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-      }
-      
-    } catch (error) {
-      console.error('❌ Wallet balance fetch error:', error)
-      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-    }
-  }
 
-  // Auto-fetch balance when Privy authentication changes
-  useEffect(() => {
-    const checkAndFetchBalance = () => {
-      if (window.__TURFLOOT_PRIVY__) {
-        const privy = window.__TURFLOOT_PRIVY__
-        if (privy.ready && privy.authenticated && privy.user) {
-          fetchWalletBalance()
-        } else {
-          setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-        }
-      } else {
-        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-      }
-    }
-
-    // Initial check
-    checkAndFetchBalance()
-    
-    // Set up interval to refresh balance every 30 seconds when authenticated
-    const balanceInterval = setInterval(() => {
-      if (window.__TURFLOOT_PRIVY__?.authenticated) {
-        fetchWalletBalance()
-      }
-    }, 30000)
-
-    return () => clearInterval(balanceInterval)
-  }, [])
-
-  // Manual refresh function for the refresh button
+  // Handle balance refresh
   const handleBalanceRefresh = () => {
     console.log('🔄 Manual balance refresh triggered')
     fetchWalletBalance()
