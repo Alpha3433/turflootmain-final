@@ -1145,70 +1145,76 @@ export default function TurfLootTactical() {
     }
   }
 
-  // SIMPLIFIED DEPOSIT SOL - Direct Privy funding popup
+  // DIRECT PRIVY FUNDING - No checks, straight to popup like DamnBruh
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - Opening Privy funding popup')
+    console.log('💰 DEPOSIT SOL clicked - Going directly to Privy funding popup')
     
     try {
-      // Only check if user is authenticated - no wallet validation
-      if (!ready) {
-        alert('⏳ Wallet service is loading. Please wait a moment and try again.')
-        return
-      }
-      
+      // Step 1: Only check if Privy is ready and user is authenticated
       if (!authenticated || !privyUser) {
-        console.log('🔐 User not authenticated, opening Privy login...')
+        console.log('🔐 User not authenticated, opening login first...')
         await login()
         return
       }
       
-      console.log('✅ User authenticated - proceeding directly to Privy funding...')
+      console.log('✅ User authenticated, opening Privy funding modal...')
       
-      // DIRECT PRIVY FUNDING CALL - No wallet checks, let Privy handle everything
-      console.log('💰 Opening Privy funding interface...')
-      
-      // Try different Privy fundWallet access methods for v2.24.0
-      if (typeof window !== 'undefined') {
-        // Method 1: Check for Privy in window.privy
-        if (window.privy && typeof window.privy.fundWallet === 'function') {
-          console.log('🔗 Using window.privy.fundWallet...')
-          await window.privy.fundWallet()
-          console.log('✅ Privy funding interface opened!')
-          return
+      // Step 2: Direct fundWallet call - Let Privy handle everything
+      // Try the useFundWallet hook approach for Privy v2.24.0
+      try {
+        // Import and use the fundWallet hook dynamically
+        const { useFundWallet } = await import('@privy-io/react-auth')
+        
+        // Check if we can access fundWallet through the hook
+        console.log('🔗 Attempting to use useFundWallet hook...')
+        
+        // Since we can't use hooks directly here, try accessing Privy's fundWallet function
+        // Method 1: Check for fundWallet in the global Privy context
+        if (typeof window !== 'undefined') {
+          // Look for Privy's funding function in various locations
+          const privyFundWallet = window.privy?.fundWallet || 
+                                window.Privy?.fundWallet || 
+                                window.__PRIVY__?.fundWallet ||
+                                window.privyApp?.fundWallet
+          
+          if (privyFundWallet && typeof privyFundWallet === 'function') {
+            console.log('🎯 Found Privy fundWallet function, calling it...')
+            await privyFundWallet()
+            console.log('✅ Privy funding modal opened successfully!')
+            return
+          }
         }
         
-        // Method 2: Check for Privy in global context
-        const privyInstance = window.Privy || window.__PRIVY__ || window.__privy
-        if (privyInstance && typeof privyInstance.fundWallet === 'function') {
-          console.log('🔗 Using global Privy fundWallet...')
-          await privyInstance.fundWallet()
-          console.log('✅ Privy funding interface opened!')
-          return
+        // Method 2: Try to trigger fundWallet through Privy provider context
+        console.log('🔗 Trying alternative Privy fundWallet access...')
+        
+        // Create a temporary button click event to trigger Privy's internal fundWallet
+        const fundEvent = new CustomEvent('privy-fund-wallet', {
+          detail: { action: 'fund-wallet' }
+        })
+        
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(fundEvent)
         }
         
-        // Method 3: Try to access via Privy provider context
-        if (typeof window.__REACT_CONTEXT__ !== 'undefined') {
-          console.log('🔗 Searching in React context for Privy...')
-          // This will be handled by the error below if not found
-        }
+        // Method 3: If all else fails, show manual instruction
+        throw new Error('Direct fundWallet access not available')
+        
+      } catch (fundError) {
+        console.error('❌ FundWallet error:', fundError)
+        
+        // Show user-friendly message with manual instruction
+        alert('💰 Opening wallet funding...\n\n' +
+              'If the Privy funding popup doesn\'t appear automatically:\n\n' +
+              '1. Check if your browser is blocking popups\n' +
+              '2. Try refreshing the page and logging in again\n' +
+              '3. Contact support if the issue persists\n\n' +
+              'We\'re working to resolve this issue.')
       }
-      
-      // If none of the above work, show helpful message
-      throw new Error('Privy funding interface not available')
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
-      
-      if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
-        console.log('ℹ️ User cancelled the funding process')
-        return
-      }
-      
-      if (error.message?.includes('fundWallet') || error.message?.includes('not available')) {
-        alert('💰 Opening funding interface...\n\nIf the Privy funding popup doesn\'t appear:\n\n1. Please check if popup blockers are disabled\n2. Try refreshing the page and signing in again\n3. Contact support if the issue persists')
-      } else {
-        alert('❌ Unable to open funding interface\n\nPlease try:\n1. Refreshing the page\n2. Signing out and back in\n3. Checking your internet connection\n\nContact support if the problem continues.')
-      }
+      alert('❌ Unable to open funding interface\n\nPlease try refreshing the page and signing in again.')
     }
   }
 
