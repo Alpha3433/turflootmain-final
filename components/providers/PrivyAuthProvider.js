@@ -146,15 +146,6 @@ export default function PrivyAuthProvider({ children }) {
     defaultChain: {
       id: 101,
       name: 'Solana'
-    },
-    
-    // 🎯 FUNDING CONFIGURATION: Enable all funding methods including exchange transfers
-    fundingMethodConfig: {
-      enabled: true,
-      availableMethods: ['card', 'exchange', 'wallet', 'manual'],
-      coinbaseOnramp: {
-        enabled: true
-      }
     }
   }
 
