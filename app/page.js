@@ -3690,14 +3690,17 @@ export default function TurfLootTactical() {
 
   const handleLogin = async () => {
     try {
-      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
-        console.log('🔐 Attempting Privy login...')
-        await window.__TURFLOOT_PRIVY__.login()
+      console.log('🔐 Attempting Privy login with proper hooks...')
+      if (typeof login === 'function') {
+        await login()
+        console.log('✅ Privy login completed')
       } else {
-        console.error('❌ Privy not available')
+        console.error('❌ Privy login hook not available')
+        alert('Authentication service not ready. Please refresh the page and try again.')
       }
     } catch (error) {
       console.error('❌ Login error:', error)
+      alert('Login failed. Please try again.')
     }
   }
 
