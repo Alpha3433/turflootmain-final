@@ -1147,18 +1147,11 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - Fixed timing issue with wallet detection
+  // PRIVY v2.24.0 SOLANA DEPOSIT - FINAL CORRECT IMPLEMENTATION ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using retry mechanism for wallet detection')
+    console.log('💰 DEPOSIT SOL clicked - using CORRECT useFundWallet hook!')
     
     try {
-      // Enhanced debugging - check authentication and wallet state
-      console.log('🔍 DEBUG - Authentication status:', authenticated)
-      console.log('🔍 DEBUG - Ready status:', ready)
-      console.log('🔍 DEBUG - User object:', privyUser)
-      console.log('🔍 DEBUG - Wallets array:', wallets)
-      console.log('🔍 DEBUG - Wallets length:', wallets?.length || 'undefined')
-
       // Checklist #4: Ensure user is authenticated first
       if (!authenticated) {
         console.log('⚠️ User not authenticated, triggering login first')
@@ -1166,102 +1159,43 @@ export default function TurfLootTactical() {
         return
       }
 
-      console.log('✅ User authenticated, using retry mechanism for wallet detection')
+      console.log('✅ User authenticated, checking wallet and fundWallet function')
       
-      // NEW APPROACH: Retry mechanism for wallet detection
-      const maxRetries = 5
-      const retryDelay = 1000 // 1 second
-      
-      for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        console.log(`🔄 Wallet detection attempt ${attempt}/${maxRetries}`)
-        
-        // Check wallets hook
-        const currentWallets = wallets || []
-        console.log(`📱 Current wallets count: ${currentWallets.length}`)
-        
-        if (currentWallets.length > 0) {
-          const solanaWallet = currentWallets.find(w => w.chainType === 'solana')
-          if (solanaWallet) {
-            console.log('✅ Solana wallet found via useWallets hook!')
-            console.log('🔍 Wallet details:', {
-              address: solanaWallet.address,
-              chainType: solanaWallet.chainType,
-              walletClientType: solanaWallet.walletClientType
-            })
-            
-            // Try to access fundWallet
-            await attemptFunding(solanaWallet)
-            return
-          }
-        }
-        
-        // Alternative: Check user.linkedAccounts for wallet
-        if (privyUser?.linkedAccounts) {
-          console.log(`🔍 Checking user.linkedAccounts: ${privyUser.linkedAccounts.length} accounts`)
-          const solanaAccount = privyUser.linkedAccounts.find(acc => 
-            acc.type === 'wallet' && acc.chainType === 'solana'
-          )
-          
-          if (solanaAccount) {
-            console.log('✅ Solana wallet found via user.linkedAccounts!')
-            console.log('🔍 Account details:', {
-              address: solanaAccount.address,
-              chainType: solanaAccount.chainType,
-              walletClientType: solanaAccount.walletClientType
-            })
-            
-            // Try to access fundWallet
-            await attemptFunding(solanaAccount)
-            return
-          }
-        }
-        
-        if (attempt < maxRetries) {
-          console.log(`⏳ No wallet found, waiting ${retryDelay}ms before retry...`)
-          await new Promise(resolve => setTimeout(resolve, retryDelay))
-        }
+      // Checklist #3: Verify Solana wallet exists
+      if (!wallets || wallets.length === 0) {
+        console.log('⚠️ No wallets available yet, retrying in 2 seconds...')
+        setTimeout(() => {
+          console.log('🔄 Retrying handleDeposit...')
+          handleDeposit()
+        }, 2000)
+        return
       }
       
-      // If we get here, no wallet was found after all retries
-      console.log('❌ No Solana wallet found after all retry attempts')
-      alert(`🔧 Wallet Detection Results:\n\n✅ User authenticated: ${privyUser?.email}\n❌ No Solana wallet found after ${maxRetries} attempts\n\n🔧 Solutions:\n1. Check Privy dashboard: Enable embedded Solana wallets\n2. Set createOnLogin: 'users-without-wallets'\n3. Try refreshing the page\n4. Contact support if issue persists\n\nThe wallet system is working but may need configuration.`)
+      const solanaWallet = wallets.find(w => w.chainType === 'solana')
+      if (!solanaWallet) {
+        console.log('❌ No Solana wallet found')
+        console.log('Available wallets:', wallets.map(w => ({ chainType: w.chainType, address: w.address })))
+        alert('No Solana wallet found. Please ensure embedded Solana wallet creation is enabled in Privy dashboard.')
+        return
+      }
+      
+      console.log('✅ Solana wallet verified:', solanaWallet.address)
+      
+      // Checklist #1: Use the CORRECT fundWallet from useFundWallet hook
+      if (!fundWallet) {
+        console.log('❌ fundWallet function not available from useFundWallet hook')
+        alert('Funding function not initialized. Please refresh the page and try again.')
+        return
+      }
+      
+      console.log('💰 Calling fundWallet() from useFundWallet hook...')
+      await fundWallet()
+      console.log('✅ SUCCESS! Privy Solana funding modal should now be displayed!')
       
     } catch (error) {
-      console.error('❌ Enhanced wallet detection error:', error)
-      alert(`Debug error: ${error.message || 'Please check console for details'}`)
+      console.error('❌ Solana funding error:', error)
+      alert(`Funding error: ${error.message || 'Please check console for details'}`)
     }
-  }
-  
-  // Helper function to attempt funding
-  const attemptFunding = async (wallet) => {
-    console.log('💰 Attempting to access Privy funding...')
-    
-    if (typeof window !== 'undefined' && window.privy) {
-      const possiblePaths = [
-        'fundWallet',
-        'funding.fundWallet', 
-        'solana.fundWallet',
-        'embedded.fundWallet'
-      ]
-      
-      for (const path of possiblePaths) {
-        try {
-          const fundWalletFn = path.split('.').reduce((obj, key) => obj?.[key], window.privy)
-          if (typeof fundWalletFn === 'function') {
-            console.log(`✅ Found fundWallet at window.privy.${path}`)
-            await fundWalletFn()
-            console.log('✅ Privy Solana funding modal opened!')
-            return
-          }
-        } catch (error) {
-          console.log(`❌ Error with window.privy.${path}:`, error.message)
-        }
-      }
-    }
-    
-    // If fundWallet not found, show success message with guidance
-    console.log('ℹ️ Wallet found but fundWallet function not accessible')
-    alert(`🎉 Progress!\n\n✅ Solana wallet detected: ${wallet.address.slice(0, 8)}...\n❌ fundWallet function not accessible\n\n🔧 Next step: Check Privy dashboard funding settings\nEnable Solana funding methods to access the deposit modal.`)
   }
 
   const handleWithdraw = async () => {
