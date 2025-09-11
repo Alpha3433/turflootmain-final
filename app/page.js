@@ -1089,65 +1089,72 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
-  // State for wallet balance
+  // State for wallet balance - UPDATED to use real-time Solana balance
   const [walletBalance, setWalletBalance] = useState({
     usd: '0.00',
     sol: '0.0000',
     loading: true
   })
 
-  // Fetch wallet balance from Privy
+  // Updated fetchWalletBalance to use real Solana blockchain data
   const fetchWalletBalance = async () => {
     try {
-      if (!window.__TURFLOOT_PRIVY__ || !window.__TURFLOOT_PRIVY__.authenticated) {
+      if (!authenticated || !privyUser) {
         console.log('👛 User not authenticated, showing default balance')
         setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
         return
       }
 
-      const privy = window.__TURFLOOT_PRIVY__
-      const user = privy.user
-
-      if (!user || !user.wallet) {
-        console.log('👛 No wallet found, showing default balance')
-        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-        return
-      }
-
-      console.log('💰 Fetching wallet balance for:', user.wallet.address)
+      console.log('💰 Fetching real-time wallet balance...')
       setWalletBalance(prev => ({ ...prev, loading: true }))
 
-      // Get embedded wallet from Privy
-      const wallet = user.wallet
+      // Find Solana wallet address from multiple sources
+      let solanaWalletAddress = null
       
-      if (wallet && wallet.address) {
-        try {
-          // For embedded wallets, we can use Privy's built-in balance methods if available
-          // Or make API calls to get balance from blockchain
-          
-          // Try to get balance from the wallet object itself if available
-          let solBalance = '0.0000'
-          let usdBalance = '0.00'
-          
-          // Check if Privy provides balance information directly
-          if (wallet.balance !== undefined) {
-            solBalance = parseFloat(wallet.balance).toFixed(4)
-          } else {
-            // Fallback: Make API call to get balance
-            try {
-              const response = await fetch('/api/wallet/balance', {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${user.privyAccessToken || 'privy-user'}`
-                }
-              })
-              
-              if (response.ok) {
-                const balanceData = await response.json()
-                solBalance = parseFloat(balanceData.sol_balance || 0).toFixed(4)
-                usdBalance = parseFloat(balanceData.balance || 0).toFixed(2)
-                console.log('✅ Fetched balance from API:', { sol: solBalance, usd: usdBalance })
+      if (wallets && wallets.length > 0) {
+        const solanaWallet = wallets.find(w => w.chainType === 'solana')
+        if (solanaWallet) {
+          solanaWalletAddress = solanaWallet.address
+        }
+      }
+      
+      if (!solanaWalletAddress && privyUser.wallet?.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') {
+        solanaWalletAddress = privyUser.wallet.address
+      }
+      
+      if (!solanaWalletAddress && privyUser.linkedAccounts) {
+        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc => 
+          acc.type === 'wallet' && 
+          (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+        )
+        if (linkedSolanaWallet) {
+          solanaWalletAddress = linkedSolanaWallet.address
+        }
+      }
+
+      if (solanaWalletAddress) {
+        // Use the real-time balance checking function
+        const realSolBalance = await checkSolanaBalance(solanaWalletAddress)
+        
+        // Estimate USD value (you could integrate with a price API later)
+        const estimatedUsdValue = (realSolBalance * 150).toFixed(2) // Rough SOL price estimate
+        
+        console.log('✅ Updated wallet balance:', { sol: realSolBalance, usd: estimatedUsdValue })
+        
+        setWalletBalance({
+          sol: realSolBalance.toFixed(4),
+          usd: estimatedUsdValue,
+          loading: false
+        })
+      } else {
+        console.log('👛 No Solana wallet found, showing default balance')
+        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+      }
+    } catch (error) {
+      console.error('❌ Error fetching wallet balance:', error)
+      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+    }
+  }
               } else {
                 console.log('⚠️ API balance fetch failed, using default values')
               }
