@@ -1137,62 +1137,78 @@ export default function TurfLootTactical() {
     loading: true
   })
 
-  // Updated fetchWalletBalance to use real Solana blockchain data
+  // Updated fetchWalletBalance with better authentication handling
   const fetchWalletBalance = async () => {
     try {
+      console.log('💰 fetchWalletBalance called. Auth status:', { 
+        authenticated, 
+        hasPrivyUser: !!privyUser,
+        walletsCount: wallets?.length || 0
+      })
+
       if (!authenticated || !privyUser) {
         console.log('👛 User not authenticated, showing default balance')
         setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
         return
       }
 
-      console.log('💰 Fetching real-time wallet balance...')
+      console.log('💰 User authenticated, fetching real-time wallet balance...')
       setWalletBalance(prev => ({ ...prev, loading: true }))
 
-      // Find Solana wallet address from multiple sources
+      // Find Solana wallet address from multiple sources with detailed logging
       let solanaWalletAddress = null
       
+      console.log('🔍 Checking wallet sources...')
+      
+      // Method 1: Check useWallets hook
       if (wallets && wallets.length > 0) {
+        console.log('Method 1 - useWallets found:', wallets.length, 'wallets')
         const solanaWallet = wallets.find(w => w.chainType === 'solana')
         if (solanaWallet) {
           solanaWalletAddress = solanaWallet.address
+          console.log('✅ Found Solana wallet via useWallets:', solanaWalletAddress)
         }
       }
       
+      // Method 2: Check embedded wallet
       if (!solanaWalletAddress && privyUser.wallet?.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') {
         solanaWalletAddress = privyUser.wallet.address
+        console.log('✅ Found Solana wallet via embedded wallet:', solanaWalletAddress)
       }
       
+      // Method 3: Check linked accounts
       if (!solanaWalletAddress && privyUser.linkedAccounts) {
+        console.log('Method 3 - linkedAccounts found:', privyUser.linkedAccounts.length, 'accounts')
         const linkedSolanaWallet = privyUser.linkedAccounts.find(acc => 
           acc.type === 'wallet' && 
           (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
         )
         if (linkedSolanaWallet) {
           solanaWalletAddress = linkedSolanaWallet.address
+          console.log('✅ Found Solana wallet via linkedAccounts:', solanaWalletAddress)
         }
       }
 
       if (solanaWalletAddress) {
-        // Use the real-time balance checking function
+        // Use the improved balance checking function
+        console.log('🚀 Starting real-time balance check for:', solanaWalletAddress)
         const realSolBalance = await checkSolanaBalance(solanaWalletAddress)
         
-        // Estimate USD value (you could integrate with a price API later)
-        const estimatedUsdValue = (realSolBalance * 150).toFixed(2) // Rough SOL price estimate
-        
-        console.log('✅ Updated wallet balance:', { sol: realSolBalance, usd: estimatedUsdValue })
-        
-        setWalletBalance({
-          sol: realSolBalance.toFixed(4),
-          usd: estimatedUsdValue,
-          loading: false
-        })
+        console.log('✅ Balance check completed:', realSolBalance, 'SOL')
       } else {
-        console.log('👛 No Solana wallet found, showing default balance')
+        console.log('❌ No Solana wallet found in any source')
+        console.log('Available sources:', {
+          walletsCount: wallets?.length || 0,
+          hasEmbeddedWallet: !!privyUser.wallet,
+          embeddedWalletAddress: privyUser.wallet?.address,
+          linkedAccountsCount: privyUser.linkedAccounts?.length || 0
+        })
+        
+        // Set default balance when no wallet found
         setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
       }
     } catch (error) {
-      console.error('❌ Error fetching wallet balance:', error)
+      console.error('❌ Error in fetchWalletBalance:', error)
       setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
     }
   }
