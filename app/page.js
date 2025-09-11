@@ -14,7 +14,7 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // Real-time Solana balance checking function
+  // Real-time Solana balance checking function with automatic wallet display update
   const checkSolanaBalance = async (walletAddress) => {
     if (!walletAddress || typeof window === 'undefined') return 0
     
@@ -42,7 +42,18 @@ export default function TurfLootTactical() {
         // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
         const balanceInSOL = data.result.value / 1000000000
         console.log('✅ Solana balance retrieved:', balanceInSOL, 'SOL')
+        
+        // Update the local balance state
         setSolanaBalance(balanceInSOL)
+        
+        // Also update the wallet display balance automatically
+        const estimatedUsdValue = (balanceInSOL * 150).toFixed(2) // Rough SOL price estimate
+        setWalletBalance({
+          sol: balanceInSOL.toFixed(4),
+          usd: estimatedUsdValue,
+          loading: false
+        })
+        
         return balanceInSOL
       } else {
         console.log('⚠️ No balance data received')
