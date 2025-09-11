@@ -1160,9 +1160,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - CORRECTED IMPLEMENTATION ✅
+  // PRIVY v2.24.0 SOLANA DEPOSIT - FIXED IMPLEMENTATION ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using fundWallet from usePrivy hook!')
+    console.log('💰 DEPOSIT SOL clicked - using fundWallet from usePrivy v2.24.0!')
     
     try {
       // Ensure user is authenticated first
@@ -1173,6 +1173,11 @@ export default function TurfLootTactical() {
       }
 
       console.log('✅ User authenticated, checking wallet availability')
+      console.log('🔍 Available wallets:', wallets?.map(w => ({ 
+        chainType: w.chainType, 
+        address: w.address?.slice(0, 8) + '...',
+        connectorType: w.connectorType 
+      })))
       
       // Verify wallets are available
       if (!wallets || wallets.length === 0) {
@@ -1184,47 +1189,54 @@ export default function TurfLootTactical() {
         return
       }
       
-      // Find Solana wallet
+      // Find Solana wallet (including both embedded and external)
       const solanaWallet = wallets.find(w => w.chainType === 'solana')
       if (!solanaWallet) {
         console.log('❌ No Solana wallet found')
-        console.log('Available wallets:', wallets.map(w => ({ chainType: w.chainType, address: w.address })))
-        alert('No Solana wallet found. Please ensure embedded Solana wallet creation is enabled in Privy dashboard.')
+        console.log('Available wallet types:', wallets.map(w => w.chainType))
+        alert('No Solana wallet found. Please connect a Solana wallet first.')
         return
       }
       
-      console.log('✅ Solana wallet verified:', solanaWallet.address)
+      console.log('✅ Solana wallet found:', {
+        address: solanaWallet.address,
+        connectorType: solanaWallet.connectorType,
+        chainType: solanaWallet.chainType
+      })
       
       // Check if fundWallet is available from usePrivy hook
       if (!fundWallet || typeof fundWallet !== 'function') {
         console.error('❌ fundWallet not available from usePrivy hook')
-        alert('Funding functionality not available. Please check Privy configuration.')
+        console.log('Available usePrivy methods:', Object.keys({ ready, authenticated, user: privyUser, login, logout, fundWallet }))
+        alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
         return
       }
       
       console.log('🔧 Calling fundWallet with Solana wallet address...')
       
-      // Call fundWallet with the Solana wallet address and configuration
-      await fundWallet(solanaWallet.address, {
-        chain: {
-          id: 101, // Solana Mainnet
-          name: 'Solana'
-        },
-        asset: 'native-currency', // SOL
-        defaultFundingMethod: 'card' // Prefer card funding
-      })
+      // Call fundWallet with just the wallet address (v2.24.0 style)
+      // Let Privy handle the chain detection automatically
+      await fundWallet(solanaWallet.address)
       
-      console.log('✅ SUCCESS! Privy funding modal opened successfully!')
+      console.log('✅ SUCCESS! Privy funding modal should now be visible!')
       
     } catch (error) {
-      console.error('❌ Solana funding error:', error)
-      // Provide user-friendly error message
-      if (error.message.includes('funding not available')) {
-        alert('Funding is not enabled for your account. Please contact support.')
-      } else if (error.message.includes('chain not supported')) {
-        alert('Solana funding is not supported. Please check your Privy dashboard configuration.')
+      console.error('❌ Solana funding error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      
+      // Provide user-friendly error messages based on common issues
+      if (error.message?.includes('not enabled') || error.message?.includes('not available')) {
+        alert('Wallet funding is not enabled for your account. Please contact support or check your Privy dashboard settings.')
+      } else if (error.message?.includes('unsupported') || error.message?.includes('chain')) {
+        alert('Solana funding may not be supported. Please check your Privy dashboard configuration.')
+      } else if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
+        console.log('ℹ️ User cancelled the funding process')
+        // Don't show alert for user cancellation
       } else {
-        alert(`Funding error: ${error.message || 'Please check console for details'}`)
+        alert(`Unable to open funding modal: ${error.message || 'Please check browser console for details'}`)
       }
     }
   }
