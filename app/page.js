@@ -9,18 +9,20 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.24.0 with potential funding in main provider
+  // Privy hooks - v2.24.0 with correct hooks based on changelog analysis
   const { ready, authenticated, user: privyUser, login, logout, fundWallet } = usePrivy()
   const { wallets } = useWallets()
   
-  // Log available methods in usePrivy to debug v2.24.0 changes
+  // Based on changelog: useFundWallet should be available directly from usePrivy in v2.24.0
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
-      console.log('🔧 Privy v2.24.0 - Available usePrivy methods:', {
+      console.log('🔧 Privy v2.24.0 - Debug available hooks:', {
         ready,
         authenticated,
-        fundWallet: typeof fundWallet,
-        user: !!privyUser
+        hasFundWallet: typeof fundWallet === 'function',
+        fundWalletType: typeof fundWallet,
+        user: !!privyUser,
+        privyHookMethods: Object.keys({ ready, authenticated, user: privyUser, login, logout, fundWallet })
       })
     }
   }, [ready, authenticated, fundWallet, privyUser])
