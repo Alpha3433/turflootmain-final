@@ -1193,9 +1193,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - ENHANCED WALLET DETECTION ✅
+  // PRIVY v2.24.0 SOLANA DEPOSIT - PROPER useFundWallet HOOK IMPLEMENTATION ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using enhanced wallet detection for v2.24.0!')
+    console.log('💰 DEPOSIT SOL clicked - using proper useFundWallet hook v2.24.0!')
     
     try {
       // Ensure user is authenticated first
@@ -1289,26 +1289,33 @@ export default function TurfLootTactical() {
         chainType: solanaWallet.chainType
       })
       
-      // Check if fundWallet is available from usePrivy hook
+      // Check if fundWallet is available from useFundWallet hook
       if (!fundWallet || typeof fundWallet !== 'function') {
-        console.error('❌ fundWallet not available from usePrivy hook')
-        console.log('Available usePrivy methods:', Object.keys({ ready, authenticated, user: privyUser, login, logout, fundWallet }))
+        console.error('❌ fundWallet not available from useFundWallet hook')
         alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
         return
       }
       
-      console.log('🔧 Calling fundWallet with Solana wallet address...')
+      console.log('🔧 Calling fundWallet with proper Solana configuration...')
       
-      // Call fundWallet with the Solana wallet address (v2.24.0 style)
-      await fundWallet(solanaWallet.address)
+      // Call fundWallet with proper Solana configuration for v2.24.0
+      await fundWallet(solanaWallet.address, {
+        chain: {
+          id: 101, // Solana Mainnet chain ID
+          name: 'Solana'
+        },
+        asset: 'native-currency', // SOL
+        defaultFundingMethod: 'card' // Prefer card funding via Coinbase/Moonpay
+      })
       
-      console.log('✅ SUCCESS! Privy funding modal should now be visible!')
+      console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
       
     } catch (error) {
       console.error('❌ Solana funding error details:', {
         message: error.message,
         stack: error.stack,
-        name: error.name
+        name: error.name,
+        fundWalletAvailable: typeof fundWallet === 'function'
       })
       
       // Provide user-friendly error messages based on common issues
