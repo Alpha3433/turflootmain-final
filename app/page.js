@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useFundWallet } from '@privy-io/react-auth/solana'
+// Dynamic import for Solana to avoid SSR issues - will be imported on client side only
 import ServerBrowserModal from '@/components/ServerBrowserModal'
 
 export default function TurfLootTactical() {
