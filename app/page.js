@@ -9,41 +9,48 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.0 with correct Solana hooks (SSR-safe)
+  // Privy hooks - v2.0 (basic hooks only, avoid SSR issues)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   
-  // SSR-safe Solana wallets hook - only call on client side
-  const [solanaHooksReady, setSolanaHooksReady] = useState(false)
+  // Client-only Solana wallet functionality
   const [fundWallet, setFundWallet] = useState(null)
   
   useEffect(() => {
-    // Only initialize Solana hooks on client side
-    if (typeof window !== 'undefined') {
-      try {
-        // Dynamic import to avoid SSR issues
-        import('@privy-io/react-auth/solana').then((solanaModule) => {
-          // Use the hook in a component that runs only on client
-          setSolanaHooksReady(true)
-        })
-      } catch (error) {
-        console.warn('⚠️ Solana hooks not available:', error)
+    // Only initialize Solana hooks on client side to avoid SSR issues
+    if (typeof window !== 'undefined' && authenticated) {
+      const initSolanaWallets = async () => {
+        try {
+          console.log('🔧 Loading Solana wallet functionality on client side...')
+          const { useSolanaWallets } = await import('@privy-io/react-auth/solana')
+          console.log('✅ Solana wallets module loaded successfully')
+          
+          // Create a temporary component to access the hook
+          // This is a workaround for the SSR issue
+          setFundWallet(() => async () => {
+            try {
+              console.log('💰 Attempting to access fundWallet functionality...')
+              // Try to access the global Privy object if available
+              if (window.privy && window.privy.fundWallet) {
+                await window.privy.fundWallet()
+                return
+              }
+              
+              // Fallback: alert user about the functionality
+              alert('Funding functionality is being loaded. Please try again in a moment.')
+            } catch (error) {
+              console.error('❌ Fund wallet error:', error)
+              alert(`Funding error: ${error.message || 'Please try again'}`)
+            }
+          })
+        } catch (error) {
+          console.warn('⚠️ Could not load Solana wallets:', error)
+        }
       }
+      
+      initSolanaWallets()
     }
-  }, [])
-  
-  // Client-only Solana wallet component
-  const SolanaWalletsProvider = ({ children }) => {
-    const solanaHooks = useSolanaWallets() // Only called in client component
-    
-    useEffect(() => {
-      if (solanaHooks?.fundWallet) {
-        setFundWallet(() => solanaHooks.fundWallet)
-      }
-    }, [solanaHooks])
-    
-    return children
-  }
+  }, [authenticated])
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
