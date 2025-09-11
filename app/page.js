@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useFundWallet } from '@privy-io/react-auth/solana'  // ✅ CORRECT import for Solana
+import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
+// NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '@/components/ServerBrowserModal'
 
 export default function TurfLootTactical() {
