@@ -1298,48 +1298,66 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('🔧 Using CORRECT Solana fundWallet implementation per documentation...')
+      console.log('🔧 Using HYBRID approach: Working useFundWallet with Solana cluster format...')
       
       // Check if fundWallet is available from useFundWallet hook
       if (!fundWallet || typeof fundWallet !== 'function') {
-        console.error('❌ fundWallet not available from Solana-specific useFundWallet hook')
+        console.error('❌ fundWallet not available from useFundWallet hook')
         alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
         return
       }
       
-      console.log('✅ Solana fundWallet is available, using official documentation approach...')
+      console.log('✅ fundWallet is available, trying Solana cluster format with exchange method...')
       
-      // OFFICIAL SOLANA APPROACH: Use cluster format with explicit exchange method
+      // APPROACH 1: Use Solana cluster format with exchange method (per documentation)
       try {
-        console.log('🧪 OFFICIAL APPROACH: Using Solana cluster format with exchange method')
+        console.log('🧪 APPROACH 1: Solana cluster format with exchange method')
         await fundWallet(solanaWallet.address, {
-          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format
-          amount: '0.1',                        // ✅ Default funding amount in SOL
+          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
+          amount: '0.1',                        // ✅ SOL amount
           defaultFundingMethod: 'exchange',     // ✅ Force exchange transfer to show
           card: {
             preferredProvider: 'coinbase'       // ✅ Coinbase for exchange
           }
         })
         
-        console.log('✅ SUCCESS: Solana fundWallet with official configuration worked!')
+        console.log('✅ SUCCESS: Solana cluster format with exchange method worked!')
         return
       } catch (error) {
-        console.log('❌ OFFICIAL APPROACH failed:', error.message)
-        console.log('🔄 Trying fallback without explicit method...')
+        console.log('❌ APPROACH 1 (Solana cluster + exchange) failed:', error.message)
+        console.log('🔄 Trying simplified Solana approach...')
       }
 
-      // FALLBACK: Simplified Solana approach
+      // APPROACH 2: Simplified Solana cluster format
       try {
-        console.log('🧪 FALLBACK: Simplified Solana approach')
+        console.log('🧪 APPROACH 2: Simplified Solana cluster format')
         await fundWallet(solanaWallet.address, {
-          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format
+          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
           amount: '0.1'                         // ✅ SOL amount
         })
         
-        console.log('✅ SUCCESS: Simplified Solana fundWallet worked!')
+        console.log('✅ SUCCESS: Simplified Solana cluster format worked!')
         return
       } catch (error) {
-        console.log('❌ FALLBACK failed:', error.message)
+        console.log('❌ APPROACH 2 (Solana cluster) failed:', error.message)
+        console.log('🔄 Trying working chain ID approach...')
+      }
+
+      // APPROACH 3: Working chain ID format (reliable fallback)
+      try {
+        console.log('🧪 APPROACH 3: Working chain ID format (reliable fallback)')
+        await fundWallet(solanaWallet.address, {
+          chain: {
+            id: 101, // Solana Mainnet chain ID
+            name: 'Solana'
+          },
+          asset: 'native-currency' // SOL
+        })
+        
+        console.log('✅ SUCCESS: Working chain ID format succeeded!')
+        return
+      } catch (error) {
+        console.log('❌ APPROACH 3 (chain ID) failed:', error.message)
         throw error // Re-throw to trigger error handling
       }
       
