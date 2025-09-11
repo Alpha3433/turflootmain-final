@@ -185,11 +185,17 @@ export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   
   console.log('🔍 Privy Provider - App ID:', appId ? `${appId.substring(0, 10)}...` : 'MISSING')
-  console.log('🔧 Privy Provider - Configuration:', {
-    solanaEmbeddedWallets: 'users-without-wallets',
-    solanaExternalWallets: ['phantom', 'solflare', 'backpack'],
-    solanaClusters: 'mainnet-beta'
-  })
+  console.log('🔧 Privy Provider - Enhanced Debug Configuration:')
+  console.log('📋 Full Config Object:', JSON.stringify({
+    embeddedWallets: {
+      ethereum: { createOnLogin: 'off' },
+      solana: { createOnLogin: 'users-without-wallets' }
+    },
+    externalWallets: {
+      solana: { wallets: ['phantom', 'solflare', 'backpack'] }
+    },
+    smartWallets: { enabled: false }
+  }, null, 2))
   
   if (!appId) {
     console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is not configured!')
