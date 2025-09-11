@@ -1147,71 +1147,25 @@ export default function TurfLootTactical() {
     }
   }
 
-  // DIRECT PRIVY FUNDING - No checks, straight to popup like DamnBruh
-  // PRIVY v2.24.0 - DEPOSIT FUNCTION (using direct import approach)
+  // PRIVY v2.24.0 SOLANA DEPOSIT - Using useSolanaWallets hook
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - Trying direct import approach')
+    console.log('💰 DEPOSIT SOL clicked - using useSolanaWallets fundWallet')
     
     try {
-      // Method 1: Dynamic import of fundWallet function directly
-      console.log('🎯 Attempting dynamic import of fundWallet...')
-      const { fundWallet } = await import('@privy-io/react-auth')
-      
-      if (typeof fundWallet === 'function') {
-        console.log('✅ Found fundWallet function via dynamic import')
-        await fundWallet()
-        console.log('✅ Privy funding modal opened!')
+      // Ensure user is authenticated first
+      if (!authenticated) {
+        console.log('⚠️ User not authenticated, triggering login first')
+        await login()
         return
       }
-      
-      // Method 2: Try importing from different paths
-      console.log('🎯 Trying alternative import paths...')
-      try {
-        const { useFundWallet: fundWalletHook } = await import('@privy-io/react-auth/dist/hooks')
-        console.log('✅ Found useFundWallet from hooks path')
-      } catch (hookError) {
-        console.log('⚠️ Hooks path not found:', hookError.message)
-      }
-      
-      // Method 3: Try accessing through Privy provider programmatically
-      console.log('🎯 Searching for Privy provider in React tree...')
-      
-      // Look for Privy provider in the DOM
-      const privyProviders = document.querySelectorAll('[data-testid*="privy"], [class*="privy"], [id*="privy"]')
-      console.log(`🔍 Found ${privyProviders.length} potential Privy elements`)
-      
-      for (let element of privyProviders) {
-        console.log('🔍 Checking element:', element.tagName, element.className)
-        if (element._reactInternalFiber || element._reactInternals) {
-          console.log('📱 Found React element with Privy context')
-        }
-      }
-      
-      // Method 4: Manual trigger approach - create the UI ourselves
-      console.log('🎯 Creating manual funding trigger...')
-      
-      // Check if we can trigger via button simulation
-      const existingFundButtons = document.querySelectorAll('button[data-testid*="fund"], button:contains("fund"), button:contains("deposit")')
-      console.log(`🔍 Found ${existingFundButtons.length} potential fund buttons in DOM`)
-      
-      if (existingFundButtons.length > 0) {
-        console.log('🎯 Found potential funding button, clicking it...')
-        existingFundButtons[0].click()
-        return
-      }
-      
-      // If nothing worked, show detailed debug info
-      console.log('❌ All methods failed - showing debug info')
-      console.log('🔍 Window.privy:', typeof window.privy)
-      console.log('🔍 Available on window:', Object.keys(window).filter(k => k.toLowerCase().includes('privy')))
-      
-      alert('🔧 Debug: Privy funding not accessible\n\n' + 
-            'Console shows detailed debugging info.\n\n' +
-            'This may require different integration approach.')
+
+      console.log('✅ User authenticated, calling fundWallet from useSolanaWallets')
+      await fundWallet()
+      console.log('✅ Privy Solana funding modal opened successfully!')
       
     } catch (error) {
-      console.error('❌ Complete funding failure:', error)
-      alert('Technical issue accessing funding. Please check console for details.')
+      console.error('❌ Solana funding error:', error)
+      alert(`Funding error: ${error.message || 'Unknown error occurred'}`)
     }
   }
 
