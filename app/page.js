@@ -13,28 +13,6 @@ export default function TurfLootTactical() {
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   
-  // Client-side Solana wallet hook - conditionally rendered
-  const [shouldUseSolanaHooks, setShouldUseSolanaHooks] = useState(false)
-  
-  useEffect(() => {
-    // Only enable Solana hooks on client side
-    if (typeof window !== 'undefined') {
-      setShouldUseSolanaHooks(true)
-    }
-  }, [])
-  
-  // Conditionally use Solana hooks only on client side
-  let fundWallet = null
-  if (shouldUseSolanaHooks) {
-    try {
-      // This will only run on client side, avoiding SSR issues
-      const { fundWallet: solanaFundWallet } = require('@privy-io/react-auth/solana').useSolanaWallets()
-      fundWallet = solanaFundWallet
-    } catch (error) {
-      console.warn('⚠️ Could not load Solana hooks:', error)
-    }
-  }
-  
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('PLAYER')
