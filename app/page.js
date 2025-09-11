@@ -1203,9 +1203,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - Using useSolanaWallets hook
+  // PRIVY v2.24.0 SOLANA DEPOSIT - Using client-side Solana wallet functionality
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using useSolanaWallets fundWallet')
+    console.log('💰 DEPOSIT SOL clicked - using client-side Solana wallet integration')
     
     try {
       // Ensure user is authenticated first
@@ -1215,9 +1215,17 @@ export default function TurfLootTactical() {
         return
       }
 
-      console.log('✅ User authenticated, calling fundWallet from useSolanaWallets')
-      await fundWallet()
-      console.log('✅ Privy Solana funding modal opened successfully!')
+      console.log('✅ User authenticated, attempting Solana funding...')
+      
+      // Use the client-side Solana funding function if available
+      if (solanaFundWallet) {
+        console.log('💰 Calling client-side Solana funding function')
+        await solanaFundWallet()
+        console.log('✅ Privy Solana funding modal opened successfully!')
+      } else {
+        console.log('⚠️ Solana funding function not yet initialized')
+        alert('Funding functionality is initializing. Please wait a moment and try again.')
+      }
       
     } catch (error) {
       console.error('❌ Solana funding error:', error)
