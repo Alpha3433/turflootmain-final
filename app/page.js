@@ -9,39 +9,10 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.24.0 (simplified approach)
+  // Privy hooks - v2.24.0 with correct Solana hook
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
-  
-  // Simple state for tracking fundWallet availability
-  const [fundWalletReady, setFundWalletReady] = useState(false)
-  
-  useEffect(() => {
-    // Check if fundWallet becomes available
-    if (typeof window !== 'undefined' && ready && authenticated) {
-      const checkFundWallet = () => {
-        if (window.privy && typeof window.privy.fundWallet === 'function') {
-          setFundWalletReady(true)
-          console.log('✅ fundWallet is available on window.privy')
-          return true
-        }
-        return false
-      }
-      
-      // Check immediately
-      if (!checkFundWallet()) {
-        // Check periodically
-        const interval = setInterval(() => {
-          if (checkFundWallet()) {
-            clearInterval(interval)
-          }
-        }, 1000)
-        
-        // Clear after 10 seconds
-        setTimeout(() => clearInterval(interval), 10000)
-      }
-    }
-  }, [ready, authenticated])
+  const { fundWallet } = useFundWallet()  // ✅ CORRECT Solana import!
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
