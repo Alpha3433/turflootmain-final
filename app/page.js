@@ -8,6 +8,10 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
+  // Privy hooks - proper integration without bridge
+  const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
+  const { wallets } = useWallets()
+  
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('PLAYER')
