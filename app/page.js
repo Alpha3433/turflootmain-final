@@ -1298,70 +1298,48 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('🔧 Testing multiple fundWallet approaches for exchange transfers...')
+      console.log('🔧 Using CORRECT Solana fundWallet implementation per documentation...')
       
       // Check if fundWallet is available from useFundWallet hook
       if (!fundWallet || typeof fundWallet !== 'function') {
-        console.error('❌ fundWallet not available from useFundWallet hook')
+        console.error('❌ fundWallet not available from Solana-specific useFundWallet hook')
         alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
         return
       }
       
-      console.log('✅ fundWallet is available, trying CAIP2 mainnet format first...')
+      console.log('✅ Solana fundWallet is available, using official documentation approach...')
       
-      // APPROACH 1: Try CAIP2 format with explicit methods (for exchange transfers)
+      // OFFICIAL SOLANA APPROACH: Use cluster format with explicit exchange method
       try {
-        console.log('🧪 APPROACH 1: Using CAIP2 mainnet format with explicit methods')
+        console.log('🧪 OFFICIAL APPROACH: Using Solana cluster format with exchange method')
         await fundWallet(solanaWallet.address, {
-          chain: { caip2: 'solana:mainnet' },   // Must be mainnet for onramp
-          asset: { symbol: 'SOL' },
-          methods: ['exchange', 'wallet']       // Include 'exchange' to expose that row
-        })
-        
-        console.log('✅ SUCCESS: fundWallet with CAIP2 format worked!')
-        return
-      } catch (error) {
-        console.log('❌ APPROACH 1 (CAIP2) failed:', error.message)
-        console.log('🔄 Trying fallback approach...')
-      }
-
-      // APPROACH 2: Fallback to chain ID format (working approach)
-      try {
-        console.log('🧪 APPROACH 2: Using chain ID format (fallback)')
-        await fundWallet(solanaWallet.address, {
-          chain: {
-            id: 101, // Solana Mainnet chain ID
-            name: 'Solana'
-          },
-          asset: 'native-currency' // SOL
-          // No explicit methods to let Privy determine from dashboard
-        })
-        
-        console.log('✅ SUCCESS: fundWallet with chain ID format worked!')
-        return
-      } catch (error) {
-        console.log('❌ APPROACH 2 (chain ID) failed:', error.message)
-      }
-
-      // APPROACH 3: Chain ID format with proper chain specification
-      try {
-        console.log('🧪 APPROACH 3: Chain ID format with proper chain specification')
-        await fundWallet(solanaWallet.address, {
-          chain: {
-            id: 101, // Solana Mainnet chain ID
-            name: 'Solana'
-          },
-          asset: 'native-currency', // SOL
-          uiConfig: {
-            receiveFundsTitle: 'Add SOL to your wallet',
-            receiveFundsSubtitle: 'Fund your Solana wallet to start playing'
+          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format
+          amount: '0.1',                        // ✅ Default funding amount in SOL
+          defaultFundingMethod: 'exchange',     // ✅ Force exchange transfer to show
+          card: {
+            preferredProvider: 'coinbase'       // ✅ Coinbase for exchange
           }
         })
         
-        console.log('✅ SUCCESS: fundWallet with chain ID format and UI config worked!')
+        console.log('✅ SUCCESS: Solana fundWallet with official configuration worked!')
         return
       } catch (error) {
-        console.log('❌ APPROACH 3 (chain ID with UI) failed:', error.message)
+        console.log('❌ OFFICIAL APPROACH failed:', error.message)
+        console.log('🔄 Trying fallback without explicit method...')
+      }
+
+      // FALLBACK: Simplified Solana approach
+      try {
+        console.log('🧪 FALLBACK: Simplified Solana approach')
+        await fundWallet(solanaWallet.address, {
+          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format
+          amount: '0.1'                         // ✅ SOL amount
+        })
+        
+        console.log('✅ SUCCESS: Simplified Solana fundWallet worked!')
+        return
+      } catch (error) {
+        console.log('❌ FALLBACK failed:', error.message)
         throw error // Re-throw to trigger error handling
       }
       
