@@ -1342,15 +1342,25 @@ export default function TurfLootTactical() {
         console.log('❌ APPROACH 2 (chain ID) failed:', error.message)
       }
 
-      // APPROACH 3: Minimal configuration
+      // APPROACH 3: Chain ID format with proper chain specification
       try {
-        console.log('🧪 APPROACH 3: Minimal configuration')
-        await fundWallet(solanaWallet.address)
+        console.log('🧪 APPROACH 3: Chain ID format with proper chain specification')
+        await fundWallet(solanaWallet.address, {
+          chain: {
+            id: 101, // Solana Mainnet chain ID
+            name: 'Solana'
+          },
+          asset: 'native-currency', // SOL
+          uiConfig: {
+            receiveFundsTitle: 'Add SOL to your wallet',
+            receiveFundsSubtitle: 'Fund your Solana wallet to start playing'
+          }
+        })
         
-        console.log('✅ SUCCESS: fundWallet with minimal config worked!')
+        console.log('✅ SUCCESS: fundWallet with chain ID format and UI config worked!')
         return
       } catch (error) {
-        console.log('❌ APPROACH 3 (minimal) failed:', error.message)
+        console.log('❌ APPROACH 3 (chain ID with UI) failed:', error.message)
         throw error // Re-throw to trigger error handling
       }
       
