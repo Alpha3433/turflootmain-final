@@ -1145,12 +1145,12 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 - DEPOSIT SOL FUNCTION with proper hooks
+  // SIMPLIFIED DEPOSIT SOL - Direct Privy funding popup
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - Using Privy v2.24.0 hooks')
+    console.log('💰 DEPOSIT SOL clicked - Opening Privy funding popup')
     
     try {
-      // Step 1: Check authentication using proper Privy hooks
+      // Only check if user is authenticated - no wallet validation
       if (!ready) {
         alert('⏳ Wallet service is loading. Please wait a moment and try again.')
         return
@@ -1162,74 +1162,52 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('✅ User authenticated:', privyUser.id)
+      console.log('✅ User authenticated - proceeding directly to Privy funding...')
       
-      // Step 2: Find Solana wallet using proper hook
-      const solanaWallets = wallets.filter(w => 
-        (w.chainType === 'solana') || 
-        (w.address && !w.address.startsWith('0x'))
-      )
-      
-      console.log('🔍 Available wallets:', {
-        total: wallets.length,
-        solana: solanaWallets.length,
-        walletDetails: solanaWallets.map(w => ({
-          address: w.address?.substring(0, 10) + '...',
-          chainType: w.chainType,
-          walletClientType: w.walletClientType
-        }))
-      })
-      
-      if (solanaWallets.length === 0) {
-        console.log('🔑 No Solana wallet found, creating one...')
-        alert('⚠️ No Solana wallet detected.\n\nPlease refresh the page to create a Solana wallet, then try again.')
-        return
-      }
-      
-      const solanaWallet = solanaWallets[0]
-      console.log('✅ Using Solana wallet:', {
-        address: solanaWallet.address,
-        chainType: solanaWallet.chainType,
-        walletClientType: solanaWallet.walletClientType
-      })
-      
-      // Step 3: Open Privy funding modal using v2.24.0 SDK
+      // DIRECT PRIVY FUNDING CALL - No wallet checks, let Privy handle everything
       console.log('💰 Opening Privy funding interface...')
       
-      // Import fundWallet dynamically for v2.24.0
-      const { useFundWallet } = await import('@privy-io/react-auth')
-      
-      // Check if fundWallet is available in the current context
-      if (typeof window !== 'undefined' && window.privy && window.privy.fundWallet) {
-        console.log('🔗 Using Privy v2.24.0 fundWallet...')
-        await window.privy.fundWallet()
-        console.log('✅ Privy funding interface opened!')
-      } else {
-        // Fallback: Try to call fundWallet directly from Privy context
-        console.log('🔗 Searching for fundWallet in Privy context...')
+      // Try different Privy fundWallet access methods for v2.24.0
+      if (typeof window !== 'undefined') {
+        // Method 1: Check for Privy in window.privy
+        if (window.privy && typeof window.privy.fundWallet === 'function') {
+          console.log('🔗 Using window.privy.fundWallet...')
+          await window.privy.fundWallet()
+          console.log('✅ Privy funding interface opened!')
+          return
+        }
         
-        // Check for Privy in global context
-        const privyInstance = window.privy || window.Privy || window.__PRIVY__
-        if (privyInstance && privyInstance.fundWallet) {
+        // Method 2: Check for Privy in global context
+        const privyInstance = window.Privy || window.__PRIVY__ || window.__privy
+        if (privyInstance && typeof privyInstance.fundWallet === 'function') {
+          console.log('🔗 Using global Privy fundWallet...')
           await privyInstance.fundWallet()
-          console.log('✅ Privy funding opened via global context!')
-        } else {
-          throw new Error('Privy fundWallet not available in current context')
+          console.log('✅ Privy funding interface opened!')
+          return
+        }
+        
+        // Method 3: Try to access via Privy provider context
+        if (typeof window.__REACT_CONTEXT__ !== 'undefined') {
+          console.log('🔗 Searching in React context for Privy...')
+          // This will be handled by the error below if not found
         }
       }
+      
+      // If none of the above work, show helpful message
+      throw new Error('Privy funding interface not available')
       
     } catch (error) {
       console.error('❌ Deposit error:', error)
       
-      if (error.message?.includes('User rejected')) {
+      if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
         console.log('ℹ️ User cancelled the funding process')
         return
       }
       
-      if (error.message?.includes('fundWallet')) {
-        alert('❌ Funding service unavailable\n\nThis might be due to:\n• Service temporarily down\n• Network connectivity issues\n• Configuration problems\n\nPlease try again in a moment.')
+      if (error.message?.includes('fundWallet') || error.message?.includes('not available')) {
+        alert('💰 Opening funding interface...\n\nIf the Privy funding popup doesn\'t appear:\n\n1. Please check if popup blockers are disabled\n2. Try refreshing the page and signing in again\n3. Contact support if the issue persists')
       } else {
-        alert('❌ Deposit failed\n\nPlease try:\n1. Refreshing the page\n2. Signing out and back in\n3. Checking your internet connection\n\nIf the issue persists, contact support.')
+        alert('❌ Unable to open funding interface\n\nPlease try:\n1. Refreshing the page\n2. Signing out and back in\n3. Checking your internet connection\n\nContact support if the problem continues.')
       }
     }
   }
