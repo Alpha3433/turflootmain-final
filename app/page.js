@@ -9,59 +9,39 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.0 (basic hooks only, SSR-safe)
+  // Privy hooks - v2.24.0 (simplified approach)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   
-  // Import the Solana wallet hook properly at the top level
-  // This will only run on client-side due to 'use client' directive
-  const [solanaWallets, setSolanaWallets] = useState(null)
+  // Simple state for tracking fundWallet availability
+  const [fundWalletReady, setFundWalletReady] = useState(false)
   
   useEffect(() => {
-    // Only initialize on client side when ready
-    if (typeof window !== 'undefined' && ready) {
-      const initSolana = async () => {
-        try {
-          console.log('🔧 Initializing Solana wallets...')
-          // Import the hook dynamically
-          const { useSolanaWallets } = await import('@privy-io/react-auth/solana')
-          
-          // Since we can't use the hook directly here, we'll need a different approach
-          // Let's check if the Privy instance has the funding function
-          if (window.privy) {
-            console.log('🔍 Checking window.privy for available methods...')
-            console.log('Available privy methods:', Object.keys(window.privy))
-            
-            // Set up a function to check for fundWallet periodically
-            const checkForFundWallet = () => {
-              if (window.privy.fundWallet && typeof window.privy.fundWallet === 'function') {
-                console.log('✅ Found window.privy.fundWallet!')
-                setSolanaWallets({ fundWallet: window.privy.fundWallet })
-                return true
-              }
-              return false
-            }
-            
-            // Check immediately
-            if (!checkForFundWallet()) {
-              // Check every 500ms for up to 10 seconds
-              let attempts = 0
-              const interval = setInterval(() => {
-                attempts++
-                if (checkForFundWallet() || attempts > 20) {
-                  clearInterval(interval)
-                }
-              }, 500)
-            }
-          }
-        } catch (error) {
-          console.warn('⚠️ Could not initialize Solana wallets:', error)
+    // Check if fundWallet becomes available
+    if (typeof window !== 'undefined' && ready && authenticated) {
+      const checkFundWallet = () => {
+        if (window.privy && typeof window.privy.fundWallet === 'function') {
+          setFundWalletReady(true)
+          console.log('✅ fundWallet is available on window.privy')
+          return true
         }
+        return false
       }
       
-      initSolana()
+      // Check immediately
+      if (!checkFundWallet()) {
+        // Check periodically
+        const interval = setInterval(() => {
+          if (checkFundWallet()) {
+            clearInterval(interval)
+          }
+        }, 1000)
+        
+        // Clear after 10 seconds
+        setTimeout(() => clearInterval(interval), 10000)
+      }
     }
-  }, [ready])
+  }, [ready, authenticated])
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
