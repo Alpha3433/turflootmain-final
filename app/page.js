@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
-// v2.24.0 may have funding in main provider, not Solana-specific module
+import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
 import ServerBrowserModal from '@/components/ServerBrowserModal'
 
 export default function TurfLootTactical() {
