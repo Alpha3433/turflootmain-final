@@ -20,7 +20,23 @@ export default function TurfLootTactical() {
   const [leaderboard, setLeaderboard] = useState([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
-  const [customUsername, setCustomUsername] = useState('')
+  // Sync Privy authentication state with local state
+  useEffect(() => {
+    if (ready) {
+      console.log('🔍 Privy state updated:', { authenticated, user: privyUser?.id })
+      setIsAuthenticated(authenticated)
+      setUser(privyUser)
+      
+      // Update username from Privy user data
+      if (privyUser) {
+        const privyUsername = privyUser.email?.address || 
+                             privyUser.phone?.number || 
+                             privyUser.wallet?.address?.slice(0, 8) || 
+                             'PLAYER'
+        setUserName(privyUsername.toUpperCase())
+      }
+    }
+  }, [ready, authenticated, privyUser])
 
   // Username persistence functions
   const saveUsernameToPrivy = async (username) => {
