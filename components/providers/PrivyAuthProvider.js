@@ -105,13 +105,12 @@ export default function PrivyAuthProvider({ children }) {
       // ❌ NO ethereum section = no MetaMask, WalletConnect, etc.
     },
     
-    // 🎯 CRITICAL: supportedChains for v2.24.0 fundWallet compatibility (CAIP2 format support)
+    // 🎯 CRITICAL: supportedChains for v2.24.0 fundWallet compatibility
     supportedChains: [
       {
         id: 101, // Solana Mainnet chain ID
         name: 'Solana',
         network: 'mainnet-beta',
-        caip2: 'solana:mainnet', // ✅ ADD CAIP2 identifier for exchange transfers
         nativeCurrency: {
           name: 'Solana',
           symbol: 'SOL',
