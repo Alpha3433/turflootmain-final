@@ -209,13 +209,16 @@ export default function PrivyAuthProvider({ children }) {
       showWalletLoginFirst: false,
     },
     loginMethods: ['google', 'email', 'wallet'],
-    // SOLANA-ONLY embedded wallets configuration (NO EVM)
+    // EXPLICIT WALLET CONFIGURATION: Solana ONLY, EVM DISABLED
     embeddedWallets: {
-      createOnLogin: 'users-without-wallets',
+      // ❌ EXPLICITLY DISABLE EVM wallet creation
+      ethereum: {
+        createOnLogin: 'off'  // This prevents EVM wallet creation!
+      },
+      // ✅ ENABLE ONLY Solana wallet creation
       solana: { 
         createOnLogin: 'users-without-wallets' 
       }
-      // ❌ Explicitly NO EVM configuration to prevent EVM wallet creation
     },
     // SOLANA-ONLY external wallets support (NO EVM)
     externalWallets: {
@@ -238,8 +241,6 @@ export default function PrivyAuthProvider({ children }) {
     smartWallets: {
       enabled: false
     },
-    // Remove problematic supportedChains configuration
-    // Let Privy use default behavior with Solana-only settings above
   }
 
   return (
