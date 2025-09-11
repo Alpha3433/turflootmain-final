@@ -71,7 +71,7 @@ export default function PrivyAuthProvider({ children }) {
     return <div>Error: Privy App ID not configured</div>
   }
 
-  // SOLANA-ONLY Privy Configuration - COMPLETELY rebuilt from scratch
+  // SOLANA-ONLY Privy Configuration - UPDATED for v2.24.0 fundWallet compatibility
   const config = {
     // UI Appearance
     appearance: {
@@ -105,7 +105,26 @@ export default function PrivyAuthProvider({ children }) {
       // ❌ NO ethereum section = no MetaMask, WalletConnect, etc.
     },
     
-    // 🎯 CRITICAL: Solana Network Configuration
+    // 🎯 CRITICAL: supportedChains for v2.24.0 fundWallet compatibility
+    supportedChains: [
+      {
+        id: 101, // Solana Mainnet chain ID
+        name: 'Solana',
+        network: 'mainnet-beta',
+        nativeCurrency: {
+          name: 'Solana',
+          symbol: 'SOL',
+          decimals: 9,
+        },
+        rpcUrls: {
+          default: {
+            http: [process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com']
+          }
+        }
+      }
+    ],
+    
+    // 🎯 CRITICAL: Solana Network Configuration (keeping for backward compatibility)
     solanaClusters: [
       {
         name: 'mainnet-beta',
@@ -123,11 +142,11 @@ export default function PrivyAuthProvider({ children }) {
       enabled: false
     },
     
-    // 🎯 CRITICAL: No default chain configuration (prevents EVM defaults)
-    defaultChain: undefined,
-    
-    // Additional safety: no funding configuration that might default to EVM
-    fundingMethodConfig: undefined
+    // 🎯 CRITICAL: Default chain should be Solana
+    defaultChain: {
+      id: 101,
+      name: 'Solana'
+    }
   }
 
   return (
