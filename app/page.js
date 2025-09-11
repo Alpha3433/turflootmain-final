@@ -9,37 +9,21 @@ import ServerBrowserModal from '@/components/ServerBrowserModal'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - v2.24.0 with dynamic loading and proper instance setup
-  const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
+  // Privy hooks - v2.24.0 with potential funding in main provider
+  const { ready, authenticated, user: privyUser, login, logout, fundWallet } = usePrivy()
   const { wallets } = useWallets()
   
-  // Set up Privy instance with fundWallet function on client side
+  // Log available methods in usePrivy to debug v2.24.0 changes
   useEffect(() => {
-    if (typeof window !== 'undefined' && ready && authenticated) {
-      const setupPrivyInstance = async () => {
-        try {
-          console.log('🔧 Setting up Privy Solana funding instance...')
-          const { useFundWallet } = await import('@privy-io/react-auth/solana')
-          
-          // Create a wrapper that can access the hook's functionality
-          // We'll store this in a way that handleDeposit can access it
-          if (!window.__TURFLOOT_PRIVY__) {
-            window.__TURFLOOT_PRIVY__ = {}
-          }
-          
-          // Mark that the module is loaded and ready
-          window.__TURFLOOT_PRIVY__.solanaModuleReady = true
-          window.__TURFLOOT_PRIVY__.useFundWallet = useFundWallet
-          
-          console.log('✅ Privy Solana module loaded and ready')
-        } catch (error) {
-          console.error('❌ Failed to load Privy Solana module:', error)
-        }
-      }
-      
-      setupPrivyInstance()
+    if (ready && typeof window !== 'undefined') {
+      console.log('🔧 Privy v2.24.0 - Available usePrivy methods:', {
+        ready,
+        authenticated,
+        fundWallet: typeof fundWallet,
+        user: !!privyUser
+      })
     }
-  }, [ready, authenticated])
+  }, [ready, authenticated, fundWallet, privyUser])
   
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
