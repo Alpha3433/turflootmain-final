@@ -1196,9 +1196,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - Using proper fundWallet function
+  // PRIVY v2.24.0 SOLANA DEPOSIT - Direct fundWallet approach
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using proper Privy Solana integration')
+    console.log('💰 DEPOSIT SOL clicked - attempting direct Privy fundWallet call')
     
     try {
       // Step 1: Ensure user is authenticated
@@ -1208,69 +1208,62 @@ export default function TurfLootTactical() {
         return
       }
 
-      console.log('✅ User authenticated, attempting to trigger Privy funding modal')
+      console.log('✅ User authenticated, attempting to call fundWallet')
       
-      // Step 2: Try to use the fundWallet function if available
-      if (fundWalletFunction && typeof fundWalletFunction === 'function') {
-        console.log('💰 Calling Privy fundWallet function')
-        await fundWalletFunction()
-        console.log('✅ Privy funding modal should now be displayed!')
+      // Step 2: Try using the solanaWallets state if available
+      if (solanaWallets?.fundWallet) {
+        console.log('💰 Using solanaWallets.fundWallet from state')
+        await solanaWallets.fundWallet()
+        console.log('✅ fundWallet called successfully!')
         return
       }
       
-      // Step 3: Fallback - try to access through different methods
-      console.log('🔍 Searching for alternative ways to access fundWallet...')
-      
-      // Method A: Check if fundWallet is available through wallets
-      if (wallets && wallets.length > 0) {
-        console.log(`📱 Found ${wallets.length} wallet(s), checking for Solana wallet...`)
-        const solanaWallet = wallets.find(w => w.walletClientType === 'privy' && w.chainType === 'solana')
-        if (solanaWallet) {
-          console.log('✅ Found Privy Solana wallet:', solanaWallet.address)
-        }
+      // Step 3: Try direct window.privy.fundWallet
+      if (typeof window !== 'undefined' && window.privy?.fundWallet) {
+        console.log('💰 Using window.privy.fundWallet directly')
+        await window.privy.fundWallet()
+        console.log('✅ window.privy.fundWallet called successfully!')
+        return
       }
       
-      // Method B: Try accessing through window.privy
+      // Step 4: Debug what's available on window.privy
       if (typeof window !== 'undefined' && window.privy) {
-        console.log('🔍 Checking window.privy for funding functionality...')
+        console.log('🔍 Available methods on window.privy:', Object.keys(window.privy))
+        console.log('🔍 window.privy object:', window.privy)
         
-        // Look for various possible locations of fundWallet
-        const possiblePaths = [
-          'window.privy.fundWallet',
-          'window.privy.solana.fundWallet',
-          'window.privy.embedded.fundWallet',
-          'window.privy.wallets.fundWallet'
+        // Check for common variations
+        const variants = [
+          'fundWallet',
+          'fundSolanaWallet', 
+          'addFunds',
+          'deposit',
+          'funding'
         ]
         
-        for (const path of possiblePaths) {
-          try {
-            const func = path.split('.').reduce((obj, key) => obj?.[key], window)
-            if (typeof func === 'function') {
-              console.log(`✅ Found fundWallet at ${path}`)
-              await func()
+        for (const variant of variants) {
+          if (window.privy[variant] && typeof window.privy[variant] === 'function') {
+            console.log(`✅ Found ${variant} on window.privy, attempting to call...`)
+            try {
+              await window.privy[variant]()
+              console.log(`✅ ${variant} called successfully!`)
               return
+            } catch (callError) {
+              console.log(`❌ Error calling ${variant}:`, callError.message)
             }
-          } catch (error) {
-            console.log(`❌ ${path} not available:`, error.message)
           }
         }
       }
       
-      // Method C: Try using dynamic import approach
-      console.log('🔧 Attempting dynamic import approach...')
-      try {
-        const { useSolanaWallets } = await import('@privy-io/react-auth/solana')
-        console.log('✅ Successfully imported useSolanaWallets')
-        // The hook can't be called here, but we can show a helpful message
-        alert('Almost there! The Privy funding system is ready. Please refresh the page and try again, or contact support if the issue persists.')
-        return
-      } catch (importError) {
-        console.log('❌ Dynamic import failed:', importError.message)
-      }
+      // Step 5: Show detailed debug info
+      console.log('❌ fundWallet not found. Debug info:')
+      console.log('- authenticated:', authenticated)
+      console.log('- ready:', ready)
+      console.log('- wallets count:', wallets?.length || 0)
+      console.log('- solanaWallets state:', !!solanaWallets)
+      console.log('- window.privy exists:', typeof window !== 'undefined' && !!window.privy)
       
-      // Final fallback
-      console.log('ℹ️ fundWallet not yet available, showing guidance to user')
-      alert('To deposit SOL:\n\n1. You are successfully logged in ✅\n2. The funding system is initializing...\n3. Please try refreshing the page\n4. If this persists, the funding options should appear in your wallet interface\n\nPrivy will handle Solana deposits automatically once ready.')
+      // Give user helpful feedback
+      alert('Funding system is still initializing. Please wait a few seconds and try again, or refresh the page if the issue persists.')
       
     } catch (error) {
       console.error('❌ Deposit flow error:', error)
