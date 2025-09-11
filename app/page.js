@@ -14,16 +14,22 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // Real-time Solana balance checking function with automatic wallet display update
+  // Real-time Solana balance checking function with improved error handling
   const checkSolanaBalance = async (walletAddress) => {
-    if (!walletAddress || typeof window === 'undefined') return 0
+    if (!walletAddress || typeof window === 'undefined') {
+      console.log('⚠️ No wallet address provided for balance check')
+      return 0
+    }
     
     try {
       setIsLoadingBalance(true)
       console.log('🔍 Checking Solana balance for:', walletAddress)
       
-      // Use Solana RPC to check balance
+      // Use Solana RPC to check balance with timeout
       const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
       
       const response = await fetch(rpcUrl, {
         method: 'POST',
@@ -33,8 +39,15 @@ export default function TurfLootTactical() {
           id: 1,
           method: 'getBalance',
           params: [walletAddress]
-        })
+        }),
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
+      
+      if (!response.ok) {
+        throw new Error(`RPC request failed: ${response.status}`)
+      }
       
       const data = await response.json()
       
@@ -55,12 +68,26 @@ export default function TurfLootTactical() {
         })
         
         return balanceInSOL
+      } else if (data.error) {
+        throw new Error(`RPC error: ${data.error.message}`)
       } else {
         console.log('⚠️ No balance data received')
         return 0
       }
     } catch (error) {
-      console.error('❌ Error checking Solana balance:', error)
+      if (error.name === 'AbortError') {
+        console.error('❌ Solana balance check timeout')
+      } else {
+        console.error('❌ Error checking Solana balance:', error)
+      }
+      
+      // Set fallback balance to prevent perpetual loading
+      setWalletBalance({
+        sol: '0.0000',
+        usd: '0.00',
+        loading: false
+      })
+      
       return 0
     } finally {
       setIsLoadingBalance(false)
