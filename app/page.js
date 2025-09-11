@@ -1160,21 +1160,21 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - PROPER IMPLEMENTATION ✅
+  // PRIVY v2.24.0 SOLANA DEPOSIT - CORRECTED IMPLEMENTATION ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using proper client-side Solana integration!')
+    console.log('💰 DEPOSIT SOL clicked - using fundWallet from usePrivy hook!')
     
     try {
-      // Checklist #4: Ensure user is authenticated first
+      // Ensure user is authenticated first
       if (!authenticated) {
         console.log('⚠️ User not authenticated, triggering login first')
         await login()
         return
       }
 
-      console.log('✅ User authenticated, checking wallet and Solana module')
+      console.log('✅ User authenticated, checking wallet availability')
       
-      // Checklist #3: Verify Solana wallet exists
+      // Verify wallets are available
       if (!wallets || wallets.length === 0) {
         console.log('⚠️ No wallets available yet, retrying in 2 seconds...')
         setTimeout(() => {
@@ -1184,6 +1184,7 @@ export default function TurfLootTactical() {
         return
       }
       
+      // Find Solana wallet
       const solanaWallet = wallets.find(w => w.chainType === 'solana')
       if (!solanaWallet) {
         console.log('❌ No Solana wallet found')
@@ -1194,54 +1195,37 @@ export default function TurfLootTactical() {
       
       console.log('✅ Solana wallet verified:', solanaWallet.address)
       
-      // Checklist #1: Dynamically create a component that can use the hook
-      console.log('🔧 Creating dynamic Solana funding component...')
-      
-      // Create a temporary element to render our dynamic component
-      const tempDiv = document.createElement('div')
-      tempDiv.style.display = 'none'
-      document.body.appendChild(tempDiv)
-      
-      try {
-        // Dynamic import and execution
-        const { useFundWallet } = await import('@privy-io/react-auth/solana')
-        console.log('✅ useFundWallet module loaded')
-        
-        // Since we can't use React hooks outside of a component,
-        // let's trigger a different approach - use the provider context
-        if (typeof window !== 'undefined' && window.privy && window.privy.user) {
-          // Try to access funding through the provider
-          console.log('🔍 Attempting to access funding through Privy provider context...')
-          
-          // Look for funding methods on the Privy instance
-          const privyInstance = window.privy
-          console.log('Available Privy methods:', Object.keys(privyInstance))
-          
-          // Check if funding is available
-          if (privyInstance.fundWallet && typeof privyInstance.fundWallet === 'function') {
-            console.log('💰 Found fundWallet on Privy instance!')
-            await privyInstance.fundWallet()
-            console.log('✅ SUCCESS! Privy funding modal opened!')
-          } else {
-            console.log('⚠️ fundWallet not available on Privy instance')
-            // Show informative message
-            alert(`✅ Ready to fund!\n\nSolana wallet: ${solanaWallet.address.slice(0, 8)}...\n\n🔧 To complete setup:\n1. Check Privy dashboard funding settings\n2. Enable Solana funding methods\n3. The funding modal should appear once enabled\n\nContact support if issues persist.`)
-          }
-        } else {
-          console.log('⚠️ Privy instance not fully loaded')
-          alert('Privy not fully initialized. Please wait a moment and try again.')
-        }
-      } catch (importError) {
-        console.error('❌ Error importing useFundWallet:', importError)
-        alert(`Import error: ${importError.message}`)
-      } finally {
-        // Cleanup
-        document.body.removeChild(tempDiv)
+      // Check if fundWallet is available from usePrivy hook
+      if (!fundWallet || typeof fundWallet !== 'function') {
+        console.error('❌ fundWallet not available from usePrivy hook')
+        alert('Funding functionality not available. Please check Privy configuration.')
+        return
       }
+      
+      console.log('🔧 Calling fundWallet with Solana wallet address...')
+      
+      // Call fundWallet with the Solana wallet address and configuration
+      await fundWallet(solanaWallet.address, {
+        chain: {
+          id: 101, // Solana Mainnet
+          name: 'Solana'
+        },
+        asset: 'native-currency', // SOL
+        defaultFundingMethod: 'card' // Prefer card funding
+      })
+      
+      console.log('✅ SUCCESS! Privy funding modal opened successfully!')
       
     } catch (error) {
       console.error('❌ Solana funding error:', error)
-      alert(`Funding error: ${error.message || 'Please check console for details'}`)
+      // Provide user-friendly error message
+      if (error.message.includes('funding not available')) {
+        alert('Funding is not enabled for your account. Please contact support.')
+      } else if (error.message.includes('chain not supported')) {
+        alert('Solana funding is not supported. Please check your Privy dashboard configuration.')
+      } else {
+        alert(`Funding error: ${error.message || 'Please check console for details'}`)
+      }
     }
   }
 
