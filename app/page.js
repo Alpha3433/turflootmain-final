@@ -1297,17 +1297,17 @@ export default function TurfLootTactical() {
         return
       }
       
-      console.log('🔧 Calling fundWallet with explicit exchange funding enabled...')
+      console.log('🔧 Calling fundWallet with exchange as default funding method...')
       
-      // Call fundWallet with explicit configuration to enable exchange transfers
+      // Call fundWallet with exchange as the default funding method to force it to show
       await fundWallet(solanaWallet.address, {
         chain: {
           id: 101, // Solana Mainnet chain ID
           name: 'Solana'
         },
         asset: 'native-currency', // SOL
-        // ✅ Explicitly specify available funding methods
-        availableFundingMethods: ['card', 'exchange', 'wallet']
+        // ✅ Set exchange as default to force it to show if available
+        defaultFundingMethod: 'exchange'
       })
       
       console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
