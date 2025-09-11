@@ -1147,74 +1147,30 @@ export default function TurfLootTactical() {
 
   // DIRECT PRIVY FUNDING - No checks, straight to popup like DamnBruh
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - Going directly to Privy funding popup')
+    console.log('💰 DEPOSIT SOL clicked - Direct Privy funding')
+    
+    // Simple check: is user logged in?
+    if (!authenticated) {
+      await login()
+      return
+    }
+    
+    // Direct call to Privy funding - no wallet checks
+    console.log('🎯 Opening Privy funding modal...')
     
     try {
-      // Step 1: Only check if Privy is ready and user is authenticated
-      if (!authenticated || !privyUser) {
-        console.log('🔐 User not authenticated, opening login first...')
-        await login()
-        return
+      // Try to access Privy's fundWallet function
+      if (window.privy?.fundWallet) {
+        await window.privy.fundWallet()
+      } else if (window.Privy?.fundWallet) {
+        await window.Privy.fundWallet()
+      } else {
+        console.log('⚠️ Privy fundWallet not found in window')
+        alert('Opening funding interface... If popup doesn\'t appear, please check popup blockers.')
       }
-      
-      console.log('✅ User authenticated, opening Privy funding modal...')
-      
-      // Step 2: Direct fundWallet call - Let Privy handle everything
-      // Try the useFundWallet hook approach for Privy v2.24.0
-      try {
-        // Import and use the fundWallet hook dynamically
-        const { useFundWallet } = await import('@privy-io/react-auth')
-        
-        // Check if we can access fundWallet through the hook
-        console.log('🔗 Attempting to use useFundWallet hook...')
-        
-        // Since we can't use hooks directly here, try accessing Privy's fundWallet function
-        // Method 1: Check for fundWallet in the global Privy context
-        if (typeof window !== 'undefined') {
-          // Look for Privy's funding function in various locations
-          const privyFundWallet = window.privy?.fundWallet || 
-                                window.Privy?.fundWallet || 
-                                window.__PRIVY__?.fundWallet ||
-                                window.privyApp?.fundWallet
-          
-          if (privyFundWallet && typeof privyFundWallet === 'function') {
-            console.log('🎯 Found Privy fundWallet function, calling it...')
-            await privyFundWallet()
-            console.log('✅ Privy funding modal opened successfully!')
-            return
-          }
-        }
-        
-        // Method 2: Try to trigger fundWallet through Privy provider context
-        console.log('🔗 Trying alternative Privy fundWallet access...')
-        
-        // Create a temporary button click event to trigger Privy's internal fundWallet
-        const fundEvent = new CustomEvent('privy-fund-wallet', {
-          detail: { action: 'fund-wallet' }
-        })
-        
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(fundEvent)
-        }
-        
-        // Method 3: If all else fails, show manual instruction
-        throw new Error('Direct fundWallet access not available')
-        
-      } catch (fundError) {
-        console.error('❌ FundWallet error:', fundError)
-        
-        // Show user-friendly message with manual instruction
-        alert('💰 Opening wallet funding...\n\n' +
-              'If the Privy funding popup doesn\'t appear automatically:\n\n' +
-              '1. Check if your browser is blocking popups\n' +
-              '2. Try refreshing the page and logging in again\n' +
-              '3. Contact support if the issue persists\n\n' +
-              'We\'re working to resolve this issue.')
-      }
-      
     } catch (error) {
-      console.error('❌ Deposit error:', error)
-      alert('❌ Unable to open funding interface\n\nPlease try refreshing the page and signing in again.')
+      console.error('❌ Funding error:', error)
+      alert('Unable to open funding popup. Please try refreshing the page and signing in again.')
     }
   }
 
