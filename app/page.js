@@ -1146,25 +1146,66 @@ export default function TurfLootTactical() {
   }
 
   // DIRECT PRIVY FUNDING - No checks, straight to popup like DamnBruh
-  // PRIVY v2.24.0 - DEPOSIT FUNCTION (recreated from scratch)
+  // PRIVY v2.24.0 - DEPOSIT FUNCTION (new approach using provider context)  
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - Opening Privy funding modal')
+    console.log('💰 DEPOSIT SOL clicked - Trying provider context approach')
     
     try {
-      // Direct call to Privy's fundWallet - should open "Add funds to your TurfLoot wallet"
-      await fundWallet()
-      console.log('✅ Privy funding modal opened successfully!')
-    } catch (error) {
-      console.error('❌ Privy fundWallet error:', error)
-      
-      // Simple error handling
-      if (error.message?.includes('User rejected') || error.message?.includes('cancelled')) {
-        console.log('ℹ️ User cancelled funding')
+      // Method 1: Try to get the Privy provider context directly
+      const privyElement = document.querySelector('[data-privy-provider]')
+      if (privyElement && privyElement._privyInstance) {
+        console.log('🎯 Found Privy provider instance, calling fundWallet...')
+        await privyElement._privyInstance.fundWallet()
+        console.log('✅ Privy funding modal opened via provider!')
         return
       }
       
-      // Show user-friendly message for any other errors
-      alert('Unable to open funding modal. Please refresh the page and try again.')
+      // Method 2: Try React context approach
+      const { useContext } = await import('react')
+      console.log('🎯 Attempting React context approach...')
+      
+      // Method 3: Try imperative call using Privy's internal API
+      if (typeof window !== 'undefined' && window.privy) {
+        console.log('🎯 Found window.privy, trying fundWallet call...')
+        if (typeof window.privy.fundWallet === 'function') {
+          await window.privy.fundWallet()
+          console.log('✅ Funding modal opened!')
+          return
+        }
+      }
+      
+      // Method 4: Try manual modal creation if all else fails
+      console.log('🎯 Creating manual funding request...')
+      
+      // Dispatch a custom event that Privy might listen to
+      const fundingEvent = new CustomEvent('privy:fundWallet', {
+        detail: { 
+          action: 'open-funding-modal',
+          app: 'TurfLoot'
+        }
+      })
+      
+      window.dispatchEvent(fundingEvent)
+      
+      // Give it a moment to see if the event worked
+      setTimeout(() => {
+        const modals = document.querySelectorAll('[role="dialog"], iframe, .modal')
+        if (modals.length === 0) {
+          console.log('⚠️ No funding modal appeared after event dispatch')
+        }
+      }, 1000)
+      
+    } catch (error) {
+      console.error('❌ All funding approaches failed:', error)
+      
+      // More helpful error message
+      alert('🔧 Funding modal issue detected.\n\n' + 
+            'This appears to be a technical configuration issue.\n\n' +
+            'Please try:\n' +
+            '1. Refreshing the page\n' +
+            '2. Signing out and back in\n' +
+            '3. Contact support if the issue continues\n\n' +
+            'We\'re working to resolve this.')
     }
   }
 
