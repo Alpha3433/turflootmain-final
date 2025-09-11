@@ -1193,9 +1193,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - FIXED IMPLEMENTATION ✅
+  // PRIVY v2.24.0 SOLANA DEPOSIT - ENHANCED WALLET DETECTION ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using fundWallet from usePrivy v2.24.0!')
+    console.log('💰 DEPOSIT SOL clicked - using enhanced wallet detection for v2.24.0!')
     
     try {
       // Ensure user is authenticated first
@@ -1205,33 +1205,85 @@ export default function TurfLootTactical() {
         return
       }
 
-      console.log('✅ User authenticated, checking wallet availability')
-      console.log('🔍 Available wallets:', wallets?.map(w => ({ 
-        chainType: w.chainType, 
-        address: w.address?.slice(0, 8) + '...',
-        connectorType: w.connectorType 
-      })))
+      console.log('✅ User authenticated, performing comprehensive wallet detection...')
       
-      // Verify wallets are available
-      if (!wallets || wallets.length === 0) {
-        console.log('⚠️ No wallets available yet, retrying in 2 seconds...')
-        setTimeout(() => {
-          console.log('🔄 Retrying handleDeposit...')
-          handleDeposit()
-        }, 2000)
-        return
+      // Enhanced wallet detection: Check multiple sources
+      let solanaWallet = null
+      let walletSource = null
+      
+      // Method 1: Check useWallets() hook (primary method)
+      if (wallets && wallets.length > 0) {
+        console.log('🔍 Checking wallets from useWallets():', wallets.map(w => ({ 
+          chainType: w.chainType, 
+          address: w.address?.slice(0, 8) + '...',
+          connectorType: w.connectorType 
+        })))
+        
+        solanaWallet = wallets.find(w => w.chainType === 'solana')
+        if (solanaWallet) {
+          walletSource = 'useWallets'
+        }
       }
       
-      // Find Solana wallet (including both embedded and external)
-      const solanaWallet = wallets.find(w => w.chainType === 'solana')
+      // Method 2: Check embedded wallet in privyUser.wallet
+      if (!solanaWallet && privyUser?.wallet) {
+        console.log('🔍 Checking embedded wallet from privyUser.wallet:', {
+          address: privyUser.wallet.address,
+          chainType: privyUser.wallet.chainType || 'ethereum',
+          walletClientType: privyUser.wallet.walletClientType
+        })
+        
+        // Check if embedded wallet is the Solana wallet we're looking for
+        if (privyUser.wallet.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG' ||
+            privyUser.wallet.chainType === 'solana') {
+          solanaWallet = {
+            address: privyUser.wallet.address,
+            chainType: 'solana',
+            connectorType: 'embedded'
+          }
+          walletSource = 'privyUser.wallet'
+        }
+      }
+      
+      // Method 3: Check linkedAccounts for Solana wallets
+      if (!solanaWallet && privyUser?.linkedAccounts) {
+        console.log('🔍 Checking linkedAccounts for Solana wallets:', privyUser.linkedAccounts.map(acc => ({
+          type: acc.type,
+          address: acc.address?.slice(0, 8) + '...',
+          chainType: acc.chainType
+        })))
+        
+        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc => 
+          acc.type === 'wallet' && 
+          (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+        )
+        
+        if (linkedSolanaWallet) {
+          solanaWallet = {
+            address: linkedSolanaWallet.address,
+            chainType: 'solana',
+            connectorType: 'linked'
+          }
+          walletSource = 'linkedAccounts'
+        }
+      }
+      
+      // If still no Solana wallet found, show detailed error
       if (!solanaWallet) {
-        console.log('❌ No Solana wallet found')
-        console.log('Available wallet types:', wallets.map(w => w.chainType))
-        alert('No Solana wallet found. Please connect a Solana wallet first.')
+        console.log('❌ No Solana wallet found in any source')
+        console.log('Available sources checked:', {
+          useWalletsCount: wallets?.length || 0,
+          hasEmbeddedWallet: !!privyUser?.wallet,
+          embeddedWalletAddress: privyUser?.wallet?.address,
+          linkedAccountsCount: privyUser?.linkedAccounts?.length || 0,
+          linkedWallets: privyUser?.linkedAccounts?.filter(acc => acc.type === 'wallet').length || 0
+        })
+        
+        alert('No Solana wallet found. Please ensure you have a Solana wallet connected or create an embedded wallet.')
         return
       }
       
-      console.log('✅ Solana wallet found:', {
+      console.log('✅ Solana wallet found via:', walletSource, {
         address: solanaWallet.address,
         connectorType: solanaWallet.connectorType,
         chainType: solanaWallet.chainType
@@ -1247,8 +1299,7 @@ export default function TurfLootTactical() {
       
       console.log('🔧 Calling fundWallet with Solana wallet address...')
       
-      // Call fundWallet with just the wallet address (v2.24.0 style)
-      // Let Privy handle the chain detection automatically
+      // Call fundWallet with the Solana wallet address (v2.24.0 style)
       await fundWallet(solanaWallet.address)
       
       console.log('✅ SUCCESS! Privy funding modal should now be visible!')
