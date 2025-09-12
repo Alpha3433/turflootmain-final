@@ -10213,7 +10213,7 @@ export default function TurfLootTactical() {
         </div>
       )}
 
-      {/* Loading Local Practice Modal */}
+      {/* Loading Local Bots Modal */}
       {isLoadingLocalPractice && (
         <div 
           style={{
