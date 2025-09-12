@@ -8805,71 +8805,6 @@ export default function TurfLootTactical() {
 
         {/* Mobile Panels Grid */}
         <div style={mobileGridStyle}>
-          {/* Command Panel - Enhanced Leaderboard */}
-          <div style={tacticalPanelStyle}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ 
-                ...iconStyle, 
-                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)', 
-                color: '#1a202c',
-                boxShadow: '0 0 15px rgba(246, 173, 85, 0.6)',
-                border: '1px solid #f6ad55'
-              }}>🎯</div>
-              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LEADERBOARD</h3>
-              <div style={{ marginLeft: 'auto' }}>
-                <div style={{
-                  padding: '2px 4px',
-                  background: 'rgba(104, 211, 145, 0.2)',
-                  color: '#68d391',
-                  fontSize: '8px',
-                  borderRadius: '2px',
-                  border: '1px solid #68d391',
-                  fontWeight: '600',
-                  fontFamily: '"Rajdhani", sans-serif',
-                  textTransform: 'uppercase'
-                }}>
-                  LIVE
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ marginBottom: '12px', fontSize: '11px' }}>
-              {leaderboard.slice(0, 3).map((player, index) => (
-                <div key={player.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: index < 2 ? '1px solid rgba(104, 211, 145, 0.2)' : 'none' }}>
-                  <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
-                    {String(index + 1).padStart(2, '0')}. {player.name}
-                  </span>
-                  <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>
-                    ${player.cashout.toLocaleString()}
-                  </span>
-                </div>
-              ))}
-              {leaderboard.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '12px 0', color: '#68d391', fontSize: '10px', fontFamily: '"Rajdhani", sans-serif' }}>
-                  LOADING LEADERBOARD...
-                </div>
-              )}
-            </div>
-            
-            <button 
-              onClick={() => createDesktopLeaderboardPopup()}
-              style={{
-                width: '100%',
-                padding: '8px',
-                background: 'rgba(26, 32, 44, 0.8)',
-                border: '1px solid #68d391',
-                borderRadius: '3px',
-                color: '#68d391',
-                fontSize: '10px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                fontFamily: '"Rajdhani", sans-serif',
-                textTransform: 'uppercase'
-              }}>
-              VIEW LEADERBOARD
-            </button>
-          </div>
-
           {/* Arsenal Panel - Enhanced with Desktop Features */}
           <div style={ambrerPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
@@ -8964,6 +8899,177 @@ export default function TurfLootTactical() {
                 WITHDRAW
               </button>
             </div>
+          </div>
+
+          {/* Loadout Panel */}
+          <div style={ambrerPanelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <div style={{ 
+                ...iconStyle, 
+                background: 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)', 
+                color: '#ffffff',
+                boxShadow: '0 0 15px rgba(139, 92, 246, 0.6)',
+                border: '1px solid #8b5cf6'
+              }}>🎨</div>
+              <h3 style={{ color: '#8b5cf6', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>CUSTOMIZE</h3>
+            </div>
+            
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
+                border: '1px solid #fc8181',
+                borderRadius: '3px',
+                margin: '0 auto 8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                boxShadow: '0 0 20px rgba(252, 129, 129, 0.4)'
+              }}>
+                <div style={{
+                  width: '5px',
+                  height: '5px',
+                  backgroundColor: '#68d391',
+                  borderRadius: '50%',
+                  position: 'absolute',
+                  top: '12px',
+                  left: '12px',
+                  boxShadow: '0 0 5px #68d391'
+                }} />
+                <div style={{
+                  width: '5px',
+                  height: '5px',
+                  backgroundColor: '#68d391',
+                  borderRadius: '50%',
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  boxShadow: '0 0 5px #68d391'
+                }} />
+              </div>
+            </div>
+            
+            <button 
+              onClick={async () => {
+                console.log('VIEW STORE button clicked!')
+                const authenticated = await requireAuthentication('VIEW STORE')
+                if (authenticated) {
+                  console.log('🛒 User authenticated, opening view store...')
+                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'shop')
+                } else {
+                  console.log('❌ Authentication failed, blocking access to VIEW STORE')
+                }
+              }}
+              style={{
+              width: '100%',
+              padding: '8px',
+              background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+              color: '#1a202c',
+              fontWeight: '700',
+              borderRadius: '3px',
+              border: '1px solid #f6ad55',
+              cursor: 'pointer',
+              marginBottom: '6px',
+              fontSize: '9px',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
+            }}>
+              🛒 VIEW STORE
+            </button>
+            
+            <button 
+              onClick={async () => {
+                console.log('CHANGE SKIN button clicked!')
+                const authenticated = await requireAuthentication('CHANGE SKIN')
+                if (authenticated) {
+                  console.log('🎨 User authenticated, opening change skin...')
+                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'owned')
+                } else {
+                  console.log('❌ Authentication failed, blocking access to CHANGE SKIN')
+                }
+              }}
+              style={{
+              width: '100%',
+              padding: '6px',
+              background: 'rgba(26, 32, 44, 0.8)',
+              border: '1px solid #f6ad55',
+              borderRadius: '3px',
+              color: '#f6ad55',
+              fontSize: '9px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
+            }}>
+              🎨 CHANGE SKIN
+            </button>
+          </div>
+
+          {/* Command Panel - Enhanced Leaderboard */}
+          <div style={tacticalPanelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <div style={{ 
+                ...iconStyle, 
+                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)', 
+                color: '#1a202c',
+                boxShadow: '0 0 15px rgba(246, 173, 85, 0.6)',
+                border: '1px solid #f6ad55'
+              }}>🎯</div>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LEADERBOARD</h3>
+              <div style={{ marginLeft: 'auto' }}>
+                <div style={{
+                  padding: '2px 4px',
+                  background: 'rgba(104, 211, 145, 0.2)',
+                  color: '#68d391',
+                  fontSize: '8px',
+                  borderRadius: '2px',
+                  border: '1px solid #68d391',
+                  fontWeight: '600',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}>
+                  LIVE
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ marginBottom: '12px', fontSize: '11px' }}>
+              {leaderboard.slice(0, 3).map((player, index) => (
+                <div key={player.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: index < 2 ? '1px solid rgba(104, 211, 145, 0.2)' : 'none' }}>
+                  <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
+                    {String(index + 1).padStart(2, '0')}. {player.name}
+                  </span>
+                  <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>
+                    ${player.cashout.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+              {leaderboard.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '12px 0', color: '#68d391', fontSize: '10px', fontFamily: '"Rajdhani", sans-serif' }}>
+                  LOADING LEADERBOARD...
+                </div>
+              )}
+            </div>
+            
+            <button 
+              onClick={() => createDesktopLeaderboardPopup()}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(26, 32, 44, 0.8)',
+                border: '1px solid #68d391',
+                borderRadius: '3px',
+                color: '#68d391',
+                fontSize: '10px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
+              }}>
+              VIEW LEADERBOARD
+            </button>
           </div>
 
           {/* Squad Panel - Dynamic Party Display */}
@@ -9422,112 +9528,6 @@ export default function TurfLootTactical() {
                 textTransform: 'uppercase'
               }}>
               🎯 CREATE PARTY
-            </button>
-          </div>
-
-          {/* Loadout Panel */}
-          <div style={ambrerPanelStyle}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ 
-                ...iconStyle, 
-                background: 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)', 
-                color: '#ffffff',
-                boxShadow: '0 0 15px rgba(139, 92, 246, 0.6)',
-                border: '1px solid #8b5cf6'
-              }}>🎨</div>
-              <h3 style={{ color: '#8b5cf6', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>CUSTOMIZE</h3>
-            </div>
-            
-            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
-                border: '1px solid #fc8181',
-                borderRadius: '3px',
-                margin: '0 auto 8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                boxShadow: '0 0 20px rgba(252, 129, 129, 0.4)'
-              }}>
-                <div style={{
-                  width: '5px',
-                  height: '5px',
-                  backgroundColor: '#68d391',
-                  borderRadius: '50%',
-                  position: 'absolute',
-                  top: '12px',
-                  left: '12px',
-                  boxShadow: '0 0 5px #68d391'
-                }} />
-                <div style={{
-                  width: '5px',
-                  height: '5px',
-                  backgroundColor: '#68d391',
-                  borderRadius: '50%',
-                  position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  boxShadow: '0 0 5px #68d391'
-                }} />
-              </div>
-            </div>
-            
-            <button 
-              onClick={async () => {
-                console.log('VIEW STORE button clicked!')
-                const authenticated = await requireAuthentication('VIEW STORE')
-                if (authenticated) {
-                  console.log('🛒 User authenticated, opening view store...')
-                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'shop')
-                } else {
-                  console.log('❌ Authentication failed, blocking access to VIEW STORE')
-                }
-              }}
-              style={{
-              width: '100%',
-              padding: '8px',
-              background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
-              color: '#1a202c',
-              fontWeight: '700',
-              borderRadius: '3px',
-              border: '1px solid #f6ad55',
-              cursor: 'pointer',
-              marginBottom: '6px',
-              fontSize: '9px',
-              fontFamily: '"Rajdhani", sans-serif',
-              textTransform: 'uppercase'
-            }}>
-              🛒 VIEW STORE
-            </button>
-            
-            <button 
-              onClick={async () => {
-                console.log('CHANGE SKIN button clicked!')
-                const authenticated = await requireAuthentication('CHANGE SKIN')
-                if (authenticated) {
-                  console.log('🎨 User authenticated, opening change skin...')
-                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'owned')
-                } else {
-                  console.log('❌ Authentication failed, blocking access to CHANGE SKIN')
-                }
-              }}
-              style={{
-              width: '100%',
-              padding: '6px',
-              background: 'rgba(26, 32, 44, 0.8)',
-              border: '1px solid #f6ad55',
-              borderRadius: '3px',
-              color: '#f6ad55',
-              fontSize: '9px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Rajdhani", sans-serif',
-              textTransform: 'uppercase'
-            }}>
-              🎨 CHANGE SKIN
             </button>
           </div>
         </div>
