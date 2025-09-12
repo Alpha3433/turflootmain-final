@@ -14,7 +14,7 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // Real-time Solana balance checking function with improved error handling
+  // Real-time Solana balance checking function with improved RPC handling
   const checkSolanaBalance = async (walletAddress) => {
     if (!walletAddress || typeof window === 'undefined') {
       console.log('⚠️ No wallet address provided for balance check')
@@ -25,60 +25,97 @@ export default function TurfLootTactical() {
       setIsLoadingBalance(true)
       console.log('🔍 Checking Solana balance for:', walletAddress)
       
-      // Use Solana RPC to check balance with timeout
-      const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
+      // Try multiple RPC endpoints to avoid 403 errors
+      const rpcEndpoints = [
+        'https://api.mainnet-beta.solana.com',
+        'https://solana-api.projectserum.com',
+        'https://rpc.ankr.com/solana',
+        'https://solana-mainnet.rpc.extrnode.com'
+      ]
       
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 second timeout
+      let lastError = null
       
-      const response = await fetch(rpcUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getBalance',
-          params: [walletAddress]
-        }),
-        signal: controller.signal
-      })
-      
-      clearTimeout(timeoutId)
-      
-      if (!response.ok) {
-        throw new Error(`RPC request failed: ${response.status}`)
+      for (const rpcUrl of rpcEndpoints) {
+        try {
+          console.log(`🔄 Trying RPC endpoint: ${rpcUrl}`)
+          
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 8000)
+          
+          const response = await fetch(rpcUrl, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'User-Agent': 'TurfLoot/1.0'
+            },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: Math.floor(Math.random() * 1000000), // Random ID to avoid caching issues
+              method: 'getBalance',
+              params: [walletAddress]
+            }),
+            signal: controller.signal
+          })
+          
+          clearTimeout(timeoutId)
+          
+          if (!response.ok) {
+            console.log(`❌ RPC endpoint ${rpcUrl} failed with status: ${response.status}`)
+            lastError = new Error(`RPC request failed: ${response.status}`)
+            continue
+          }
+          
+          const data = await response.json()
+          
+          if (data.result && data.result.value !== undefined) {
+            // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
+            const balanceInSOL = data.result.value / 1000000000
+            console.log(`✅ Solana balance retrieved from ${rpcUrl}:`, balanceInSOL, 'SOL')
+            
+            // Update the local balance state
+            setSolanaBalance(balanceInSOL)
+            
+            // Also update the wallet display balance automatically
+            const estimatedUsdValue = (balanceInSOL * 150).toFixed(2) // Rough SOL price estimate
+            setWalletBalance({
+              sol: balanceInSOL.toFixed(4),
+              usd: estimatedUsdValue,
+              loading: false
+            })
+            
+            return balanceInSOL
+          } else if (data.error) {
+            console.log(`❌ RPC error from ${rpcUrl}:`, data.error.message)
+            lastError = new Error(`RPC error: ${data.error.message}`)
+            continue
+          } else {
+            console.log(`⚠️ No balance data received from ${rpcUrl}`)
+            continue
+          }
+        } catch (endpointError) {
+          if (endpointError.name === 'AbortError') {
+            console.log(`⏰ Timeout for RPC endpoint: ${rpcUrl}`)
+          } else {
+            console.log(`❌ Error with RPC endpoint ${rpcUrl}:`, endpointError.message)
+          }
+          lastError = endpointError
+          continue
+        }
       }
       
-      const data = await response.json()
-      
-      if (data.result && data.result.value !== undefined) {
-        // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
-        const balanceInSOL = data.result.value / 1000000000
-        console.log('✅ Solana balance retrieved:', balanceInSOL, 'SOL')
-        
-        // Update the local balance state
-        setSolanaBalance(balanceInSOL)
-        
-        // Also update the wallet display balance automatically
-        const estimatedUsdValue = (balanceInSOL * 150).toFixed(2) // Rough SOL price estimate
-        setWalletBalance({
-          sol: balanceInSOL.toFixed(4),
-          usd: estimatedUsdValue,
-          loading: false
-        })
-        
-        return balanceInSOL
-      } else if (data.error) {
-        throw new Error(`RPC error: ${data.error.message}`)
-      } else {
-        console.log('⚠️ No balance data received')
-        return 0
+      // If all endpoints failed, throw the last error
+      if (lastError) {
+        throw lastError
       }
+      
+      return 0
+      
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.error('❌ Solana balance check timeout')
+        console.error('❌ All Solana balance checks timed out')
       } else {
-        console.error('❌ Error checking Solana balance:', error)
+        console.error('❌ Error checking Solana balance:', error.message)
       }
       
       // Set fallback balance to prevent perpetual loading
