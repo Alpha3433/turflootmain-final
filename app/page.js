@@ -5296,12 +5296,12 @@ export default function TurfLootTactical() {
               }}
               onClick={(e) => {
                 if (currentParty && currentParty.members && currentParty.members.length > 1) {
-                  console.log('🔒 LOCAL PRACTICE blocked - user is in a duo')
+                  console.log('🔒 LOCAL BOTS blocked - user is in a duo')
                   e.preventDefault()
                   return
                 }
                 
-                console.log('🤖 LOCAL PRACTICE button clicked!')
+                console.log('🤖 LOCAL BOTS button clicked!')
                 setIsLoadingLocalPractice(true)
                 
                 // Show loading for a brief moment then navigate
@@ -5309,7 +5309,7 @@ export default function TurfLootTactical() {
                   // Create completely local room with bots - no Hathora charges
                   const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
                   const gameUrl = `/agario?roomId=${localRoomId}&mode=local&fee=0&region=local&multiplayer=offline&server=local&bots=true`
-                  console.log('🎮 Starting local practice with bots:', gameUrl)
+                  console.log('🎮 Starting local bots game:', gameUrl)
                   window.location.href = gameUrl
                 }, 500)
               }}
@@ -5317,8 +5317,8 @@ export default function TurfLootTactical() {
                 if (currentParty && currentParty.members && currentParty.members.length > 1) {
                   // Show tooltip for disabled state
                   const tooltip = document.createElement('div')
-                  tooltip.id = 'local-practice-tooltip'
-                  tooltip.textContent = 'Local Practice is only available for solo players. Leave your party to play offline with bots.'
+                  tooltip.id = 'local-bots-tooltip'
+                  tooltip.textContent = 'Local Bots is only available for solo players. Leave your party to play offline with bots.'
                   tooltip.style.cssText = `
                     position: absolute;
                     background: rgba(0, 0, 0, 0.9);
@@ -5348,7 +5348,7 @@ export default function TurfLootTactical() {
               }}
               onMouseOut={(e) => {
                 // Remove tooltip
-                const tooltip = document.getElementById('local-practice-tooltip')
+                const tooltip = document.getElementById('local-bots-tooltip')
                 if (tooltip) {
                   tooltip.remove()
                 }
@@ -5361,7 +5361,7 @@ export default function TurfLootTactical() {
               }}
               disabled={currentParty && currentParty.members && currentParty.members.length > 1}
             >
-              {(currentParty && currentParty.members && currentParty.members.length > 1) ? '🔒 LOCAL PRACTICE' : 'LOCAL PRACTICE'}
+              {(currentParty && currentParty.members && currentParty.members.length > 1) ? '🔒 LOCAL BOTS' : 'LOCAL BOTS'}
             </button>
             <button 
               style={secondaryButtonStyle}
