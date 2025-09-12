@@ -2842,29 +2842,29 @@ const AgarIOGame = () => {
         {/* Action Buttons - Mobile Optimized Circular Design */}
         <div style={{
           position: 'fixed',
-          bottom: isMobile ? '20px' : '40px',
-          right: isMobile ? '15px' : 'auto',
+          bottom: isMobile ? '30px' : '40px',
+          right: isMobile ? '20px' : 'auto',
           transform: isMobile ? 'none' : 'translateX(-50%)',
           left: isMobile ? 'auto' : '50%',
           zIndex: 1000,
           display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
-          gap: isMobile ? '15px' : '12px',
+          gap: isMobile ? '20px' : '12px',
           alignItems: 'center'
         }}>
-          {/* Cash Out Button - Circular for mobile, rectangular for desktop */}
+          {/* Cash Out Button - Larger circular for mobile, rectangular for desktop */}
           <div 
             style={{
               backgroundColor: 'rgba(255, 165, 0, 0.95)',
               border: '3px solid #ff8c00',
               borderRadius: isMobile ? '50%' : '8px',
               color: '#000000',
-              fontSize: isMobile ? '14px' : '16px',
+              fontSize: isMobile ? '12px' : '16px',
               fontWeight: '700',
               cursor: 'pointer',
               padding: isMobile ? '0' : '12px 24px',
-              width: isMobile ? '65px' : 'auto',
-              height: isMobile ? '65px' : 'auto',
+              width: isMobile ? '75px' : 'auto',
+              height: isMobile ? '75px' : 'auto',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -2873,26 +2873,39 @@ const AgarIOGame = () => {
               pointerEvents: 'auto',
               textAlign: 'center',
               fontFamily: '"Rajdhani", sans-serif',
-              boxShadow: isMobile ? '0 4px 20px rgba(255, 165, 0, 0.6)' : '0 4px 12px rgba(255, 165, 0, 0.4)',
-              minWidth: isMobile ? '65px' : '200px',
+              boxShadow: isMobile ? '0 4px 25px rgba(255, 165, 0, 0.7)' : '0 4px 12px rgba(255, 165, 0, 0.4)',
+              minWidth: isMobile ? '75px' : '200px',
               position: 'relative',
               overflow: 'hidden',
-              flexDirection: isMobile ? 'column' : 'row'
+              flexDirection: isMobile ? 'column' : 'row',
+              touchAction: 'manipulation'
             }}
             onMouseOver={(e) => {
               if (!isCashingOut) {
                 e.target.style.backgroundColor = 'rgba(255, 200, 50, 0.98)'
-                e.target.style.transform = isMobile ? 'scale(1.05)' : 'translateY(-2px)'
-                e.target.style.boxShadow = isMobile ? '0 6px 25px rgba(255, 165, 0, 0.8)' : '0 6px 20px rgba(255, 165, 0, 0.5)'
+                e.target.style.transform = isMobile ? 'scale(1.08)' : 'translateY(-2px)'
+                e.target.style.boxShadow = isMobile ? '0 6px 30px rgba(255, 165, 0, 0.9)' : '0 6px 20px rgba(255, 165, 0, 0.5)'
               }
             }}
             onMouseOut={(e) => {
               if (!isCashingOut) {
                 e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
                 e.target.style.transform = 'scale(1)'
-                e.target.style.boxShadow = isMobile ? '0 4px 20px rgba(255, 165, 0, 0.6)' : '0 4px 12px rgba(255, 165, 0, 0.4)'
+                e.target.style.boxShadow = isMobile ? '0 4px 25px rgba(255, 165, 0, 0.7)' : '0 4px 12px rgba(255, 165, 0, 0.4)'
               }
             }}
+            onTouchStart={(e) => {
+              if (!isMobile) return
+              handleCashOut()
+              e.target.style.transform = 'scale(0.95)'
+              e.target.style.backgroundColor = 'rgba(255, 140, 0, 1)'
+            }}
+            onTouchEnd={(e) => {
+              if (!isMobile) return
+              e.target.style.transform = 'scale(1)'
+              e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
+            }}
+            onMouseDown={isMobile ? undefined : handleCashOut}
           >
             {/* Progress fill overlay */}
             {isCashingOut && (
@@ -2915,13 +2928,14 @@ const AgarIOGame = () => {
                 // Mobile: Show icon and short text
                 isCashingOut ? (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ fontSize: '18px' }}>🔥</div>
-                    <div style={{ fontSize: '10px', fontWeight: '600' }}>{Math.floor(cashOutProgress)}%</div>
+                    <div style={{ fontSize: '20px' }}>🔥</div>
+                    <div style={{ fontSize: '11px', fontWeight: '600' }}>{Math.floor(cashOutProgress)}%</div>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div style={{ fontSize: '18px' }}>💰</div>
-                    <div style={{ fontSize: '9px', fontWeight: '600' }}>CASH</div>
+                    <div style={{ fontSize: '20px' }}>💰</div>
+                    <div style={{ fontSize: '10px', fontWeight: '600' }}>CASH</div>
+                    <div style={{ fontSize: '9px', fontWeight: '500' }}>${score}</div>
                   </div>
                 )
               ) : (
@@ -2933,7 +2947,7 @@ const AgarIOGame = () => {
             </span>
           </div>
 
-          {/* Split Button - Circular for mobile, rectangular for desktop */}
+          {/* Split Button - Larger circular for mobile, rectangular for desktop */}
           <div 
             onClick={(e) => handleSplit(e)}
             style={{
@@ -2941,12 +2955,12 @@ const AgarIOGame = () => {
               border: '3px solid #0064ff',
               borderRadius: isMobile ? '50%' : '8px',
               color: '#ffffff',
-              fontSize: isMobile ? '14px' : '16px',
+              fontSize: isMobile ? '12px' : '16px',
               fontWeight: '700',
               cursor: 'pointer',
               padding: isMobile ? '0' : '12px 24px',
-              width: isMobile ? '65px' : 'auto',
-              height: isMobile ? '65px' : 'auto',
+              width: isMobile ? '75px' : 'auto',
+              height: isMobile ? '75px' : 'auto',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -2954,25 +2968,36 @@ const AgarIOGame = () => {
               transition: 'all 150ms',
               pointerEvents: 'auto',
               fontFamily: '"Rajdhani", sans-serif',
-              boxShadow: isMobile ? '0 4px 20px rgba(0, 100, 255, 0.6)' : '0 4px 12px rgba(0, 100, 255, 0.3)',
-              flexDirection: isMobile ? 'column' : 'row'
+              boxShadow: isMobile ? '0 4px 25px rgba(0, 100, 255, 0.7)' : '0 4px 12px rgba(0, 100, 255, 0.3)',
+              flexDirection: isMobile ? 'column' : 'row',
+              touchAction: 'manipulation'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = 'rgba(50, 120, 255, 0.95)'
-              e.target.style.transform = isMobile ? 'scale(1.05)' : 'translateY(-2px)'
-              e.target.style.boxShadow = isMobile ? '0 6px 25px rgba(0, 100, 255, 0.8)' : '0 6px 20px rgba(0, 100, 255, 0.4)'
+              e.target.style.transform = isMobile ? 'scale(1.08)' : 'translateY(-2px)'
+              e.target.style.boxShadow = isMobile ? '0 6px 30px rgba(0, 100, 255, 0.9)' : '0 6px 20px rgba(0, 100, 255, 0.4)'
             }}
             onMouseOut={(e) => {
               e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
               e.target.style.transform = 'scale(1)'
-              e.target.style.boxShadow = isMobile ? '0 4px 20px rgba(0, 100, 255, 0.6)' : '0 4px 12px rgba(0, 100, 255, 0.3)'
+              e.target.style.boxShadow = isMobile ? '0 4px 25px rgba(0, 100, 255, 0.7)' : '0 4px 12px rgba(0, 100, 255, 0.3)'
+            }}
+            onTouchStart={(e) => {
+              if (!isMobile) return
+              e.target.style.transform = 'scale(0.95)'
+              e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
+            }}
+            onTouchEnd={(e) => {
+              if (!isMobile) return
+              e.target.style.transform = 'scale(1)'
+              e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
             }}
           >
             {isMobile ? (
               // Mobile: Show icon and short text
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ fontSize: '18px' }}>⚡</div>
-                <div style={{ fontSize: '9px', fontWeight: '600' }}>SPLIT</div>
+                <div style={{ fontSize: '20px' }}>⚡</div>
+                <div style={{ fontSize: '10px', fontWeight: '600' }}>SPLIT</div>
               </div>
             ) : (
               // Desktop: Show full text
