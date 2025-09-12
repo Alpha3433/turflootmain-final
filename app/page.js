@@ -4033,17 +4033,44 @@ export default function TurfLootTactical() {
 
   const handleLogin = async () => {
     try {
-      console.log('🔐 Attempting Privy login with proper hooks...')
-      if (typeof login === 'function') {
-        await login()
-        console.log('✅ Privy login completed')
-      } else {
-        console.error('❌ Privy login hook not available')
-        alert('Authentication service not ready. Please refresh the page and try again.')
+      console.log('🔐 LOGIN BUTTON CLICKED - Attempting Privy login...')
+      console.log('🔍 Privy state check:', {
+        ready,
+        authenticated,
+        loginFunctionAvailable: typeof login === 'function',
+        privyUserExists: !!privyUser
+      })
+      
+      if (!ready) {
+        console.log('⚠️ Privy not ready yet, please wait...')
+        alert('Authentication service is loading. Please wait a moment and try again.')
+        return
       }
+      
+      if (typeof login !== 'function') {
+        console.error('❌ Privy login function not available')
+        console.log('🔧 Debugging Privy hooks:', { ready, authenticated, login, logout })
+        alert('Authentication service not ready. Please refresh the page and try again.')
+        return
+      }
+      
+      console.log('🚀 Calling Privy login function...')
+      await login()
+      console.log('✅ Privy login call completed successfully!')
+      
     } catch (error) {
-      console.error('❌ Login error:', error)
-      alert('Login failed. Please try again.')
+      console.error('❌ Login error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+      
+      if (error.message?.includes('User rejected')) {
+        console.log('ℹ️ User cancelled the login process')
+        // Don't show alert for user cancellation
+      } else {
+        alert(`Login failed: ${error.message || 'Please try again or refresh the page.'}`)
+      }
     }
   }
 
