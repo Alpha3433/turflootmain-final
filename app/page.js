@@ -1379,8 +1379,15 @@ export default function TurfLootTactical() {
   const updateBalanceManually = (amount) => {
     if (currentWalletAddress) {
       const storageKey = `solana_balance_${currentWalletAddress}`
+      const previousBalance = parseFloat(localStorage.getItem(storageKey)) || 0
+      
       localStorage.setItem(storageKey, amount.toString())
       console.log(`💾 Manual balance update: ${amount} SOL for ${currentWalletAddress}`)
+      
+      // If this is an increase, trigger deposit detection
+      if (amount > previousBalance) {
+        console.log(`🧪 Simulating deposit of ${(amount - previousBalance).toFixed(4)} SOL`)
+      }
       
       // Trigger immediate balance refresh
       fetchWalletBalance()
@@ -1391,7 +1398,14 @@ export default function TurfLootTactical() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.updateSolBalance = updateBalanceManually
-      console.log('🧪 Testing function available: window.updateSolBalance(0.5) // Updates balance to 0.5 SOL')
+      console.log('🧪 Testing functions available:')
+      console.log('  - window.updateSolBalance(0.5) // Updates balance to 0.5 SOL')
+      console.log('  - 💡 Try increasing balance to simulate deposit and fee processing!')
+      
+      // Show fee configuration
+      const feePercentage = process.env.NEXT_PUBLIC_DEPOSIT_FEE_PERCENTAGE || 10
+      const siteWallet = process.env.NEXT_PUBLIC_SITE_FEE_WALLET
+      console.log(`💰 Fee Configuration: ${feePercentage}% → ${siteWallet}`)
     }
   }, [currentWalletAddress])
 
