@@ -1221,6 +1221,26 @@ export default function TurfLootTactical() {
     }
   }
 
+  // Manual balance update feature (for testing without RPC provider)
+  const updateBalanceManually = (amount) => {
+    if (currentWalletAddress) {
+      const storageKey = `solana_balance_${currentWalletAddress}`
+      localStorage.setItem(storageKey, amount.toString())
+      console.log(`💾 Manual balance update: ${amount} SOL for ${currentWalletAddress}`)
+      
+      // Trigger immediate balance refresh
+      fetchWalletBalance()
+    }
+  }
+
+  // Expose to window for testing (remove in production)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.updateSolBalance = updateBalanceManually
+      console.log('🧪 Testing function available: window.updateSolBalance(0.5) // Updates balance to 0.5 SOL')
+    }
+  }, [currentWalletAddress])
+
   // Handle balance refresh
   const handleBalanceRefresh = () => {
     console.log('🔄 Manual balance refresh triggered')
