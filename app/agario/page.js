@@ -882,6 +882,7 @@ const AgarIOGame = () => {
     }
 
     bindEvents() {
+      // Desktop mouse controls
       this.canvas.addEventListener('mousemove', (e) => {
         const rect = this.canvas.getBoundingClientRect()
         this.mouse.x = e.clientX - rect.left
@@ -891,11 +892,14 @@ const AgarIOGame = () => {
         this.mouse.worldX = this.mouse.x + this.camera.x
         this.mouse.worldY = this.mouse.y + this.camera.y
         
-        // Direct target update like Agar.io
-        this.player.targetX = this.mouse.worldX
-        this.player.targetY = this.mouse.worldY
+        // Direct target update like Agar.io (only for desktop)
+        if (!window.isMobileDevice) {
+          this.player.targetX = this.mouse.worldX
+          this.player.targetY = this.mouse.worldY
+        }
       })
 
+      // Mobile touch controls (fallback for non-joystick areas)
       this.canvas.addEventListener('touchmove', (e) => {
         e.preventDefault()
         const rect = this.canvas.getBoundingClientRect()
@@ -906,8 +910,11 @@ const AgarIOGame = () => {
         this.mouse.worldX = this.mouse.x + this.camera.x
         this.mouse.worldY = this.mouse.y + this.camera.y
         
-        this.player.targetX = this.mouse.worldX
-        this.player.targetY = this.mouse.worldY
+        // Only use touch movement if not using joystick
+        if (!window.isUsingJoystick) {
+          this.player.targetX = this.mouse.worldX
+          this.player.targetY = this.mouse.worldY
+        }
       }, { passive: false })
     }
 
