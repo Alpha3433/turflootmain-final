@@ -4406,8 +4406,8 @@ export default function TurfLootTactical() {
   }
 
   const mobileGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
+    display: 'flex',
+    flexDirection: 'column',
     gap: '16px',
     width: '100%'
   }
