@@ -8139,6 +8139,84 @@ export default function TurfLootTactical() {
   return (
     <div style={containerStyle}>
       
+      {/* Insufficient Funds Notification Banner - Mobile */}
+      {insufficientFundsNotification && (
+        <div style={{
+          position: 'fixed',
+          top: '60px',
+          left: '10px',
+          right: '10px',
+          zIndex: 9999,
+          background: 'linear-gradient(45deg, rgba(252, 129, 129, 0.95) 0%, rgba(245, 101, 101, 0.95) 100%)',
+          border: '2px solid #fc8181',
+          borderRadius: '12px',
+          padding: '12px 16px',
+          boxShadow: '0 8px 32px rgba(252, 129, 129, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          animation: 'slideInFromTop 0.5s ease-out',
+          fontFamily: '"Rajdhani", sans-serif'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            color: 'white',
+            fontSize: '13px',
+            fontWeight: '600'
+          }}>
+            <div style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              flexShrink: 0
+            }}>
+              💰
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '14px', fontWeight: '700', marginBottom: '2px' }}>
+                Insufficient Funds
+              </div>
+              <div style={{ fontSize: '12px', opacity: 0.9, lineHeight: '1.3' }}>
+                Need ${insufficientFundsNotification.requiredAmount} • You have ${insufficientFundsNotification.currentBalance}
+                <br />
+                <span style={{ fontWeight: '700', color: '#fef5e7' }}>Deposit more SOL to play!</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setInsufficientFundsNotification(null)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.2)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '22px',
+                height: '22px',
+                color: 'white',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.3)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Tactical Background (Simplified) */}
       <div style={{
         position: 'fixed',
