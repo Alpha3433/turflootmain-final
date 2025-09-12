@@ -227,11 +227,6 @@ export default function TurfLootTactical() {
   }, [ready, authenticated, fundWallet, privyUser, wallets])
   
   // Real-time Solana balance tracking
-  const [solanaBalance, setSolanaBalance] = useState(0)
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false)
-  const balanceCheckInterval = useRef(null)
-  
-  // Game stake selection state
   const [selectedStake, setSelectedStake] = useState('$1')
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('PLAYER')
