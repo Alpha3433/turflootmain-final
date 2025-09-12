@@ -2981,6 +2981,85 @@ const AgarIOGame = () => {
           </div>
         </div>
 
+        {/* Virtual Joystick - Mobile Only */}
+        {isMobile && (
+          <div 
+            ref={joystickRef}
+            style={{
+              position: 'fixed',
+              bottom: '30px',
+              left: '30px',
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: '3px solid rgba(255, 255, 255, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              touchAction: 'none',
+              userSelect: 'none',
+              boxShadow: '0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)'
+            }}
+            onTouchStart={handleJoystickStart}
+            onTouchMove={handleJoystickMove}
+            onTouchEnd={handleJoystickEnd}
+            onMouseDown={handleJoystickStart}
+            onMouseMove={handleJoystickMove}
+            onMouseUp={handleJoystickEnd}
+          >
+            {/* Joystick Knob */}
+            <div
+              ref={joystickKnobRef}
+              style={{
+                width: '35px',
+                height: '35px',
+                borderRadius: '50%',
+                backgroundColor: joystickActive ? 'rgba(0, 150, 255, 0.9)' : 'rgba(255, 255, 255, 0.8)',
+                border: `2px solid ${joystickActive ? '#0096ff' : 'rgba(255, 255, 255, 0.9)'}`,
+                transform: `translate(${joystickPosition.x}px, ${joystickPosition.y}px)`,
+                transition: joystickActive ? 'none' : 'all 0.2s ease-out',
+                boxShadow: joystickActive 
+                  ? '0 0 15px rgba(0, 150, 255, 0.6), 0 2px 8px rgba(0, 0, 0, 0.3)' 
+                  : '0 2px 8px rgba(0, 0, 0, 0.2)',
+                cursor: 'grab',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '14px'
+              }}
+            >
+              {/* Joystick inner indicator */}
+              <div style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                backgroundColor: joystickActive ? '#ffffff' : 'rgba(0, 0, 0, 0.3)',
+                transition: 'background-color 0.2s ease'
+              }} />
+            </div>
+            
+            {/* Joystick instruction text */}
+            <div style={{
+              position: 'absolute',
+              bottom: '-25px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '10px',
+              color: 'rgba(255, 255, 255, 0.7)',
+              fontWeight: '600',
+              fontFamily: '"Rajdhani", sans-serif',
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
+            }}>
+              MOVE
+            </div>
+          </div>
+        )}
+
         {/* Circular Minimap - Top Right (larger and faster updates) */}
         <div style={{
           position: 'fixed',
