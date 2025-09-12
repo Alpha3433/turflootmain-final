@@ -14,7 +14,7 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // STEP 2: Fetch the on-chain balance
+  // STEP 2: Fetch the on-chain balance (with fallback for no RPC provider)
   const checkSolanaBalance = async (walletAddress) => {
     if (!walletAddress) {
       console.log('⚠️ No wallet address provided for balance check')
@@ -23,59 +23,64 @@ export default function TurfLootTactical() {
     
     console.log('🔍 Checking Solana balance for:', walletAddress)
     
-    // Multiple RPC endpoints for reliability
+    // OPTION 1: Try RPC providers (will fail without proper provider)
     const rpcEndpoints = [
-      'https://api.mainnet-beta.solana.com',
-      'https://rpc.ankr.com/solana', 
-      'https://solana-api.projectserum.com',
-      'https://solana-mainnet.rpc.extrnode.com'
+      process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY',
+      process.env.NEXT_PUBLIC_QUICKNODE_RPC || 'https://api.mainnet-beta.solana.com'
     ]
     
-    for (const rpcUrl of rpcEndpoints) {
-      try {
-        console.log(`🔄 Trying RPC: ${rpcUrl}`)
-        
-        const response = await fetch(rpcUrl, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 1,
-            method: 'getBalance', 
-            params: [walletAddress]
-          }),
-          signal: AbortSignal.timeout(8000) // 8 second timeout
-        })
-        
-        if (!response.ok) {
-          console.log(`❌ ${rpcUrl} failed: ${response.status}`)
+    // Try RPC first (if available)
+    if (process.env.NEXT_PUBLIC_HELIUS_RPC || process.env.NEXT_PUBLIC_QUICKNODE_RPC) {
+      for (const rpcUrl of rpcEndpoints) {
+        try {
+          console.log(`🔄 Trying RPC: ${rpcUrl}`)
+          
+          const response = await fetch(rpcUrl, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'getBalance', 
+              params: [walletAddress]
+            }),
+            signal: AbortSignal.timeout(5000)
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            if (data.result?.value !== undefined) {
+              const solBalance = data.result.value / 1000000000
+              console.log(`✅ Real balance from ${rpcUrl}:`, solBalance, 'SOL')
+              return solBalance
+            }
+          }
+        } catch (error) {
+          console.log(`❌ RPC ${rpcUrl} failed:`, error.message)
           continue
         }
-        
-        const data = await response.json()
-        
-        if (data.result?.value !== undefined) {
-          // Convert lamports to SOL
-          const solBalance = data.result.value / 1000000000
-          console.log(`✅ Balance from ${rpcUrl}:`, solBalance, 'SOL')
-          return solBalance
-        }
-        
-        if (data.error) {
-          console.log(`❌ RPC error from ${rpcUrl}:`, data.error.message)
-          continue
-        }
-        
-      } catch (error) {
-        console.log(`❌ Error with ${rpcUrl}:`, error.message)
-        continue
       }
     }
     
-    console.log('❌ All RPC endpoints failed')
+    // OPTION 2: Fallback system (for development/testing without RPC provider)
+    console.log('📡 No RPC provider available - using fallback balance system')
+    console.log('💡 To get real-time balances, add NEXT_PUBLIC_HELIUS_RPC to your .env file')
+    
+    // Check localStorage for any manual balance updates
+    const storageKey = `solana_balance_${walletAddress}`
+    const storedBalance = localStorage.getItem(storageKey)
+    
+    if (storedBalance) {
+      const balance = parseFloat(storedBalance)
+      console.log('💾 Using stored balance:', balance, 'SOL')
+      return balance
+    }
+    
+    // Default fallback balance
+    console.log('🔢 Using default balance: 0 SOL')
     return 0
   }
 
