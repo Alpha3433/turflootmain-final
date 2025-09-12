@@ -4417,6 +4417,84 @@ export default function TurfLootTactical() {
     return (
       <div style={containerStyle}>
         
+        {/* Insufficient Funds Notification Banner - Non-Intrusive */}
+        {insufficientFundsNotification && (
+          <div style={{
+            position: 'fixed',
+            top: '80px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            background: 'linear-gradient(45deg, rgba(252, 129, 129, 0.95) 0%, rgba(245, 101, 101, 0.95) 100%)',
+            border: '2px solid #fc8181',
+            borderRadius: '12px',
+            padding: '12px 20px',
+            maxWidth: '500px',
+            minWidth: '320px',
+            boxShadow: '0 8px 32px rgba(252, 129, 129, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            animation: 'slideInFromTop 0.5s ease-out',
+            fontFamily: '"Rajdhani", sans-serif'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: '600',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px'
+              }}>
+                💰
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '16px', fontWeight: '700', marginBottom: '2px' }}>
+                  Insufficient Funds
+                </div>
+                <div style={{ fontSize: '13px', opacity: 0.9 }}>
+                  Need ${insufficientFundsNotification.requiredAmount} • You have ${insufficientFundsNotification.currentBalance} • 
+                  <span style={{ fontWeight: '700', color: '#fef5e7' }}> Deposit more SOL to play!</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setInsufficientFundsNotification(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  color: 'white',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.3)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Enhanced Tactical Animated Background */}
         <div style={{
           position: 'absolute',
