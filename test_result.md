@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "CRITICAL CNR-2 FORMAT ERROR RESOLUTION: Fixed the 'Solana deposit failed: Chain ID not compatible with CNR-2 format' error that was preventing users from depositing SOL through the Privy wallet integration. Updated Privy configuration to include explicit Solana wallet connectors with CNR-2 format support, configured Coinbase Onramp with supportedNetworks: ['solana'], added proper solanaClusters configuration, and enhanced error handling in the deposit function to provide better user feedback for CNR-2 specific errors. This fix ensures the Solana-only deposit functionality works correctly with Coinbase Onramp's CNR-2 format requirements."
+user_problem_statement: "Mobile layout redesign: Change the current 2x2 grid layout of the LEADERBOARD, WALLET, PARTY, and CUSTOMIZE sections on mobile to a cleaner vertical stacked layout in the order: WALLET, CUSTOMIZE, LEADERBOARD, PARTY. The desktop version should remain unchanged."
 
 # Test plan for this run
 
