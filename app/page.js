@@ -124,6 +124,7 @@ export default function TurfLootTactical() {
     // Update previous balance for next comparison
     setPreviousBalance(newBalance)
   }
+  // STEP 2: Fetch the on-chain balance (with deposit detection and fee processing)
   const checkSolanaBalance = async (walletAddress) => {
     if (!walletAddress) {
       console.log('⚠️ No wallet address provided for balance check')
@@ -132,53 +133,92 @@ export default function TurfLootTactical() {
     
     console.log('🔍 Checking Solana balance for:', walletAddress)
     
-    // OPTION 1: Try RPC providers (will fail without proper provider)
-    const rpcEndpoints = [
-      process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY',
-      process.env.NEXT_PUBLIC_QUICKNODE_RPC || 'https://api.mainnet-beta.solana.com'
-    ]
+    // OPTION 1: Try Helius RPC provider first
+    const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC
     
-    // Try RPC first (if available)
-    if (process.env.NEXT_PUBLIC_HELIUS_RPC || process.env.NEXT_PUBLIC_QUICKNODE_RPC) {
-      for (const rpcUrl of rpcEndpoints) {
-        try {
-          console.log(`🔄 Trying RPC: ${rpcUrl}`)
-          
-          const response = await fetch(rpcUrl, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              id: 1,
-              method: 'getBalance', 
-              params: [walletAddress]
-            }),
-            signal: AbortSignal.timeout(5000)
-          })
-          
-          if (response.ok) {
-            const data = await response.json()
-            if (data.result?.value !== undefined) {
-              const solBalance = data.result.value / 1000000000
-              console.log(`✅ Real balance from ${rpcUrl}:`, solBalance, 'SOL')
-              return solBalance
-            }
+    if (heliusRpc) {
+      try {
+        console.log('🚀 Using Helius RPC for real-time balance')
+        
+        const response = await fetch(heliusRpc, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBalance', 
+            params: [walletAddress]
+          }),
+          signal: AbortSignal.timeout(5000)
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.result?.value !== undefined) {
+            const solBalance = data.result.value / 1000000000
+            console.log(`✅ Real balance from Helius:`, solBalance, 'SOL')
+            
+            // DEPOSIT DETECTION: Check for balance increases
+            await detectDepositAndProcessFee(solBalance, walletAddress)
+            
+            return solBalance
           }
-        } catch (error) {
-          console.log(`❌ RPC ${rpcUrl} failed:`, error.message)
-          continue
+        } else {
+          console.log('❌ Helius RPC failed:', response.status)
         }
+      } catch (error) {
+        console.log('❌ Helius RPC error:', error.message)
       }
     }
     
-    // OPTION 2: Fallback system (for development/testing without RPC provider)
-    console.log('📡 No RPC provider available - using fallback balance system')
-    console.log('💡 To get real-time balances, add NEXT_PUBLIC_HELIUS_RPC to your .env file')
+    // OPTION 2: Fallback to other RPC providers
+    const fallbackEndpoints = [
+      'https://api.mainnet-beta.solana.com',
+      'https://rpc.ankr.com/solana'
+    ]
     
-    // Check localStorage for any manual balance updates
+    for (const rpcUrl of fallbackEndpoints) {
+      try {
+        console.log(`🔄 Trying fallback RPC: ${rpcUrl}`)
+        
+        const response = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBalance', 
+            params: [walletAddress]
+          }),
+          signal: AbortSignal.timeout(5000)
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.result?.value !== undefined) {
+            const solBalance = data.result.value / 1000000000
+            console.log(`✅ Balance from ${rpcUrl}:`, solBalance, 'SOL')
+            
+            // DEPOSIT DETECTION: Check for balance increases
+            await detectDepositAndProcessFee(solBalance, walletAddress)
+            
+            return solBalance
+          }
+        }
+      } catch (error) {
+        console.log(`❌ Error with ${rpcUrl}:`, error.message)
+        continue
+      }
+    }
+    
+    // OPTION 3: Development fallback
+    console.log('📡 All RPC providers failed - using development fallback')
     const storageKey = `solana_balance_${walletAddress}`
     const storedBalance = localStorage.getItem(storageKey)
     
@@ -188,7 +228,6 @@ export default function TurfLootTactical() {
       return balance
     }
     
-    // Default fallback balance
     console.log('🔢 Using default balance: 0 SOL')
     return 0
   }
