@@ -6046,51 +6046,9 @@ export default function TurfLootTactical() {
             transition: 'all 0.3s ease',
             boxShadow: '0 0 15px rgba(246, 173, 85, 0.3)',
             fontFamily: '"Rajdhani", sans-serif',
-            textTransform: 'uppercase',
-            marginBottom: '12px'
-          }}>
-            JOIN PARTY
-          </button>
-          
-          <button 
-            onClick={async () => {
-              console.log('CREATE PARTY button clicked!')
-              const authenticated = await requireAuthentication('CREATE PARTY')
-              if (authenticated) {
-                console.log('🎯 User authenticated, opening create party modal immediately...')
-                
-                // Open modal immediately for better UX
-                createDesktopCreatePartyPopup()
-                
-                // Load friends asynchronously in background (non-blocking)
-                if (friendsList.length === 0 && !loadingFriends) {
-                  console.log('🔄 Loading friends list in background...')
-                  loadFriendsList().catch(error => {
-                    console.error('❌ Background friends loading failed:', error)
-                  })
-                }
-                
-                console.log('✅ Modal opened immediately - friends will load in background')
-              } else {
-                console.log('❌ Authentication failed, blocking access to CREATE PARTY')
-              }
-            }}
-            style={{
-            width: '100%',
-            padding: '12px',
-            background: 'rgba(26, 32, 44, 0.8)',
-            border: '2px solid #68d391',
-            borderRadius: '4px',
-            color: '#68d391',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
-            fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            CREATE PARTY
+            JOIN PARTY
           </button>
         </div>
 
