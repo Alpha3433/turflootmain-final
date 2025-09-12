@@ -8722,7 +8722,7 @@ export default function TurfLootTactical() {
                   return
                 }
                 
-                console.log('🤖 MOBILE LOCAL PRACTICE button clicked!')
+                console.log('🤖 MOBILE LOCAL BOTS button clicked!')
                 setIsLoadingLocalPractice(true)
                 
                 // Show loading for a brief moment then navigate
