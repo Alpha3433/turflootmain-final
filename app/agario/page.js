@@ -66,6 +66,99 @@ const AgarIOGame = () => {
     }
   }, [])
 
+  // Virtual joystick handlers for mobile
+  const handleJoystickStart = (e) => {
+    e.preventDefault()
+    if (!isMobile) return
+    
+    setJoystickActive(true)
+    window.isUsingJoystick = true
+    
+    const rect = joystickRef.current?.getBoundingClientRect()
+    if (!rect) return
+    
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    const touch = e.touches ? e.touches[0] : e
+    const deltaX = touch.clientX - centerX
+    const deltaY = touch.clientY - centerY
+    
+    // Limit joystick knob to circle boundary
+    const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), 35)
+    const angle = Math.atan2(deltaY, deltaX)
+    
+    const knobX = Math.cos(angle) * distance
+    const knobY = Math.sin(angle) * distance
+    
+    setJoystickPosition({ x: knobX, y: knobY })
+    
+    // Update player movement based on joystick
+    if (gameRef.current?.game) {
+      const strength = distance / 35 // Normalize to 0-1
+      const moveSpeed = 300 * strength // Adjust movement speed
+      
+      const game = gameRef.current.game
+      const targetX = game.player.x + Math.cos(angle) * moveSpeed
+      const targetY = game.player.y + Math.sin(angle) * moveSpeed
+      
+      game.player.targetX = targetX
+      game.player.targetY = targetY
+    }
+  }
+  
+  const handleJoystickMove = (e) => {
+    e.preventDefault()
+    if (!isMobile || !joystickActive) return
+    
+    const rect = joystickRef.current?.getBoundingClientRect()
+    if (!rect) return
+    
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    
+    const touch = e.touches ? e.touches[0] : e
+    const deltaX = touch.clientX - centerX
+    const deltaY = touch.clientY - centerY
+    
+    // Limit joystick knob to circle boundary
+    const distance = Math.min(Math.sqrt(deltaX * deltaX + deltaY * deltaY), 35)
+    const angle = Math.atan2(deltaY, deltaX)
+    
+    const knobX = Math.cos(angle) * distance
+    const knobY = Math.sin(angle) * distance
+    
+    setJoystickPosition({ x: knobX, y: knobY })
+    
+    // Update player movement based on joystick
+    if (gameRef.current?.game) {
+      const strength = distance / 35 // Normalize to 0-1
+      const moveSpeed = 300 * strength // Adjust movement speed
+      
+      const game = gameRef.current.game
+      const targetX = game.player.x + Math.cos(angle) * moveSpeed
+      const targetY = game.player.y + Math.sin(angle) * moveSpeed
+      
+      game.player.targetX = targetX
+      game.player.targetY = targetY
+    }
+  }
+  
+  const handleJoystickEnd = (e) => {
+    e.preventDefault()
+    if (!isMobile) return
+    
+    setJoystickActive(false)
+    setJoystickPosition({ x: 0, y: 0 })
+    window.isUsingJoystick = false
+  }
+  
+  // Global variables for game state
+  useEffect(() => {
+    window.isMobileDevice = isMobile
+    window.isUsingJoystick = false
+  }, [isMobile])
+
   // Mission progress tracking
   const updateMissionProgress = (type, value) => {
     setActiveMissions(prev => prev.map(mission => {
