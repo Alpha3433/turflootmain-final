@@ -7251,21 +7251,26 @@ export default function TurfLootTactical() {
                       console.log('🎯 CREATE PARTY button clicked from Friends modal!')
                       const authenticated = await requireAuthentication('CREATE PARTY')
                       if (authenticated) {
-                        console.log('🎯 User authenticated, opening create party popup...')
+                        console.log('🎯 User authenticated, opening create party popup immediately...')
                         
-                        // Ensure friends list is loaded before opening modal
-                        if (friendsList.length === 0) {
-                          console.log('🔄 Loading friends list before opening party modal...')
-                          await loadFriendsList()
+                        // Close friends modal first
+                        const existingModal = document.querySelector('.friends-modal')
+                        if (existingModal) {
+                          existingModal.remove()
                         }
                         
-                        console.log('🔍 Friends data before modal:', {
-                          totalFriends: friendsList.length,
-                          acceptedFriends: friendsList.filter(f => f.status === 'accepted').length,
-                          friendsData: friendsList
-                        })
-                        
+                        // Open party modal immediately for better UX
                         createDesktopCreatePartyPopup()
+                        
+                        // Load friends asynchronously in background if needed
+                        if (friendsList.length === 0 && !loadingFriends) {
+                          console.log('🔄 Loading friends list in background...')
+                          loadFriendsList().catch(error => {
+                            console.error('❌ Background friends loading failed:', error)
+                          })
+                        }
+                        
+                        console.log('✅ Party modal opened immediately - friends loading in background')
                       } else {
                         console.log('❌ Authentication failed, blocking access to CREATE PARTY')
                       }
