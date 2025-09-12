@@ -1191,12 +1191,20 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
-  // State for wallet balance - UPDATED with proper initial state
+  // REAL-TIME SOLANA BALANCE SYSTEM - CLEAN REBUILD
+  
+  // State for wallet balance display
   const [walletBalance, setWalletBalance] = useState({
     usd: '0.00',
-    sol: '0.0000',
-    loading: false  // Start with false, only show loading when actually checking balance
+    sol: '0.0000', 
+    loading: false
   })
+  
+  // Balance check interval reference
+  const balanceInterval = useRef(null)
+  
+  // Current wallet address being monitored
+  const [currentWalletAddress, setCurrentWalletAddress] = useState(null)
 
   // Updated fetchWalletBalance with better authentication handling
   const fetchWalletBalance = async () => {
