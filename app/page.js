@@ -6074,7 +6074,7 @@ export default function TurfLootTactical() {
               } else {
                 console.log('❌ Authentication failed, blocking access to CREATE PARTY')
               }
-            }}}
+            }}
             style={{
             width: '100%',
             padding: '12px',
