@@ -8717,7 +8717,7 @@ export default function TurfLootTactical() {
               }}
               onClick={(e) => {
                 if (currentParty && currentParty.members && currentParty.members.length > 1) {
-                  console.log('🔒 MOBILE LOCAL PRACTICE blocked - user is in a duo')
+                  console.log('🔒 MOBILE LOCAL BOTS blocked - user is in a duo')
                   e.preventDefault()
                   return
                 }
