@@ -14,121 +14,109 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // Real-time Solana balance checking function with improved RPC handling
+  // STEP 2: Fetch the on-chain balance
   const checkSolanaBalance = async (walletAddress) => {
-    if (!walletAddress || typeof window === 'undefined') {
+    if (!walletAddress) {
       console.log('⚠️ No wallet address provided for balance check')
       return 0
     }
     
-    try {
-      setIsLoadingBalance(true)
-      console.log('🔍 Checking Solana balance for:', walletAddress)
-      
-      // Try multiple RPC endpoints to avoid 403 errors
-      const rpcEndpoints = [
-        'https://api.mainnet-beta.solana.com',
-        'https://solana-api.projectserum.com',
-        'https://rpc.ankr.com/solana',
-        'https://solana-mainnet.rpc.extrnode.com'
-      ]
-      
-      let lastError = null
-      
-      for (const rpcUrl of rpcEndpoints) {
-        try {
-          console.log(`🔄 Trying RPC endpoint: ${rpcUrl}`)
-          
-          const controller = new AbortController()
-          const timeoutId = setTimeout(() => controller.abort(), 8000)
-          
-          const response = await fetch(rpcUrl, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'User-Agent': 'TurfLoot/1.0'
-            },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              id: Math.floor(Math.random() * 1000000), // Random ID to avoid caching issues
-              method: 'getBalance',
-              params: [walletAddress]
-            }),
-            signal: controller.signal
-          })
-          
-          clearTimeout(timeoutId)
-          
-          if (!response.ok) {
-            console.log(`❌ RPC endpoint ${rpcUrl} failed with status: ${response.status}`)
-            lastError = new Error(`RPC request failed: ${response.status}`)
-            continue
-          }
-          
-          const data = await response.json()
-          
-          if (data.result && data.result.value !== undefined) {
-            // Convert lamports to SOL (1 SOL = 1,000,000,000 lamports)
-            const balanceInSOL = data.result.value / 1000000000
-            console.log(`✅ Solana balance retrieved from ${rpcUrl}:`, balanceInSOL, 'SOL')
-            
-            // Update the local balance state
-            setSolanaBalance(balanceInSOL)
-            
-            // Also update the wallet display balance automatically
-            const estimatedUsdValue = (balanceInSOL * 150).toFixed(2) // Rough SOL price estimate
-            setWalletBalance({
-              sol: balanceInSOL.toFixed(4),
-              usd: estimatedUsdValue,
-              loading: false
-            })
-            
-            return balanceInSOL
-          } else if (data.error) {
-            console.log(`❌ RPC error from ${rpcUrl}:`, data.error.message)
-            lastError = new Error(`RPC error: ${data.error.message}`)
-            continue
-          } else {
-            console.log(`⚠️ No balance data received from ${rpcUrl}`)
-            continue
-          }
-        } catch (endpointError) {
-          if (endpointError.name === 'AbortError') {
-            console.log(`⏰ Timeout for RPC endpoint: ${rpcUrl}`)
-          } else {
-            console.log(`❌ Error with RPC endpoint ${rpcUrl}:`, endpointError.message)
-          }
-          lastError = endpointError
+    console.log('🔍 Checking Solana balance for:', walletAddress)
+    
+    // Multiple RPC endpoints for reliability
+    const rpcEndpoints = [
+      'https://api.mainnet-beta.solana.com',
+      'https://rpc.ankr.com/solana', 
+      'https://solana-api.projectserum.com',
+      'https://solana-mainnet.rpc.extrnode.com'
+    ]
+    
+    for (const rpcUrl of rpcEndpoints) {
+      try {
+        console.log(`🔄 Trying RPC: ${rpcUrl}`)
+        
+        const response = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBalance', 
+            params: [walletAddress]
+          }),
+          signal: AbortSignal.timeout(8000) // 8 second timeout
+        })
+        
+        if (!response.ok) {
+          console.log(`❌ ${rpcUrl} failed: ${response.status}`)
           continue
         }
+        
+        const data = await response.json()
+        
+        if (data.result?.value !== undefined) {
+          // Convert lamports to SOL
+          const solBalance = data.result.value / 1000000000
+          console.log(`✅ Balance from ${rpcUrl}:`, solBalance, 'SOL')
+          return solBalance
+        }
+        
+        if (data.error) {
+          console.log(`❌ RPC error from ${rpcUrl}:`, data.error.message)
+          continue
+        }
+        
+      } catch (error) {
+        console.log(`❌ Error with ${rpcUrl}:`, error.message)
+        continue
       }
-      
-      // If all endpoints failed, throw the last error
-      if (lastError) {
-        throw lastError
-      }
-      
-      return 0
-      
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.error('❌ All Solana balance checks timed out')
-      } else {
-        console.error('❌ Error checking Solana balance:', error.message)
-      }
-      
-      // Set fallback balance to prevent perpetual loading
-      setWalletBalance({
-        sol: '0.0000',
-        usd: '0.00',
-        loading: false
-      })
-      
-      return 0
-    } finally {
-      setIsLoadingBalance(false)
     }
+    
+    console.log('❌ All RPC endpoints failed')
+    return 0
+  }
+
+  // STEP 1: Watch authentication and find wallet address  
+  const findWalletAddress = () => {
+    if (!authenticated || !privyUser) {
+      console.log('👛 User not authenticated')
+      return null
+    }
+    
+    console.log('🔍 Looking for Solana wallet address...')
+    
+    // Method 1: Check useWallets hook
+    if (wallets?.length > 0) {
+      const solanaWallet = wallets.find(w => w.chainType === 'solana')
+      if (solanaWallet?.address) {
+        console.log('✅ Found via useWallets:', solanaWallet.address)
+        return solanaWallet.address
+      }
+    }
+    
+    // Method 2: Check embedded wallet
+    if (privyUser.wallet?.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') {
+      console.log('✅ Found via embedded wallet:', privyUser.wallet.address)
+      return privyUser.wallet.address
+    }
+    
+    // Method 3: Check linked accounts
+    if (privyUser.linkedAccounts?.length > 0) {
+      const solanaAccount = privyUser.linkedAccounts.find(acc => 
+        acc.type === 'wallet' && 
+        (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+      )
+      if (solanaAccount?.address) {
+        console.log('✅ Found via linkedAccounts:', solanaAccount.address)
+        return solanaAccount.address
+      }
+    }
+    
+    console.log('❌ No Solana wallet found')
+    return null
   }
 
   // Initialize wallet balance based on authentication state
