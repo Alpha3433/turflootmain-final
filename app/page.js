@@ -3988,40 +3988,52 @@ export default function TurfLootTactical() {
     console.log('🎯 Desktop create party popup created with direct DOM manipulation')
   }
 
-  // Authentication check function
+  // Authentication check function - FIXED to use Privy hooks
   const requireAuthentication = async (actionName) => {
     if (typeof window === 'undefined') return false
     
-    // Check if Privy is available
-    if (!window.__TURFLOOT_PRIVY__) {
-      console.log('⚠️ Privy not available for:', actionName)
+    console.log(`🔐 Authentication check for: ${actionName}`)
+    console.log('🔍 Privy state:', {
+      ready,
+      authenticated,
+      hasUser: !!privyUser,
+      userDisplay: privyUser?.id || 'No user'
+    })
+    
+    // Check if Privy is ready
+    if (!ready) {
+      console.log('⚠️ Privy not ready yet for:', actionName)
       alert('Authentication service is loading. Please wait a moment and try again.')
       return false
     }
 
-    const privy = window.__TURFLOOT_PRIVY__
-    
-    // Check if user is already authenticated
-    if (privy.authenticated && privy.user) {
-      console.log('✅ User already authenticated for:', actionName)
+    // Check if user is authenticated via Privy hooks
+    if (authenticated && privyUser) {
+      console.log('✅ User authenticated via Privy hooks for:', actionName)
+      console.log('👤 User details:', {
+        id: privyUser.id,
+        walletAddress: privyUser.wallet?.address || 'No wallet',
+        linkedAccounts: privyUser.linkedAccounts?.length || 0
+      })
+      
+      // Update legacy state variables for compatibility
       setIsAuthenticated(true)
-      setUser(privy.user)
+      setUser(privyUser)
       return true
     }
 
-    // Force login popup
+    // User is not authenticated
+    console.log('❌ User not authenticated for:', actionName)
+    console.log('🔐 Triggering login process...')
+    
     try {
-      console.log('🔐 Forcing login for:', actionName)
-      await privy.login()
-      
-      // Double check authentication after login
-      if (privy.authenticated && privy.user) {
-        console.log('✅ Login successful for:', actionName)
-        setIsAuthenticated(true)
-        setUser(privy.user)
+      if (typeof login === 'function') {
+        await login()
+        console.log('✅ Login process completed for:', actionName)
         return true
       } else {
-        console.log('❌ Login failed - user not authenticated after login attempt')
+        console.error('❌ Login function not available')
+        alert('Authentication service not ready. Please refresh the page and try again.')
         return false
       }
     } catch (error) {
