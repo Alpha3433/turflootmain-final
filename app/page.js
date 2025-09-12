@@ -14,7 +14,116 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // STEP 2: Fetch the on-chain balance (with fallback for no RPC provider)
+  // DEPOSIT FEE PROCESSING SYSTEM
+  const processFeeTransaction = async (depositAmount, userWalletAddress) => {
+    if (isProcessingFee) {
+      console.log('⚠️ Fee processing already in progress')
+      return false
+    }
+    
+    setIsProcessingFee(true)
+    
+    try {
+      const feePercentage = parseFloat(process.env.NEXT_PUBLIC_DEPOSIT_FEE_PERCENTAGE) || 10
+      const feeAmount = depositAmount * (feePercentage / 100)
+      const siteWallet = process.env.NEXT_PUBLIC_SITE_FEE_WALLET
+      
+      console.log(`💰 Processing ${feePercentage}% deposit fee:`, {
+        depositAmount: depositAmount.toFixed(4),
+        feeAmount: feeAmount.toFixed(4),
+        siteWallet,
+        userWallet: userWalletAddress
+      })
+      
+      // Check if we have enough balance for the fee (user needs to have deposited)
+      if (depositAmount < feeAmount) {
+        console.log('⚠️ Deposit amount too small for fee processing')
+        return false
+      }
+      
+      // Get the user's wallet from Privy to send the transaction
+      if (!privyUser || !authenticated) {
+        console.log('❌ User not authenticated for fee processing')
+        return false
+      }
+      
+      // Show user notification about fee processing
+      console.log(`🏦 Collecting ${feePercentage}% deposit fee (${feeAmount.toFixed(4)} SOL) for site operations`)
+      
+      // For now, let's create the transaction data that would be sent
+      const feeTransactionData = {
+        from: userWalletAddress,
+        to: siteWallet,
+        amount: feeAmount,
+        depositAmount: depositAmount,
+        feePercentage: feePercentage,
+        timestamp: new Date().toISOString(),
+        status: 'pending'
+      }
+      
+      console.log('📄 Fee transaction prepared:', feeTransactionData)
+      
+      // Store fee transaction record in localStorage for now
+      const feeKey = `fee_transaction_${Date.now()}`
+      localStorage.setItem(feeKey, JSON.stringify(feeTransactionData))
+      
+      // In production, this is where you would:
+      // 1. Use Privy's sendTransaction method to send SOL to site wallet
+      // 2. Wait for transaction confirmation
+      // 3. Update user's balance to reflect the fee deduction
+      // 4. Store the transaction record in your database
+      
+      console.log('✅ Fee processing completed (simulated)')
+      
+      // Update the user's displayed balance to reflect the fee
+      const netBalance = depositAmount - feeAmount
+      const usdBalance = (netBalance * 150).toFixed(2) // Rough conversion
+      
+      setWalletBalance({
+        sol: netBalance.toFixed(4),
+        usd: usdBalance,
+        loading: false
+      })
+      
+      // Show success message to user
+      const feeMessage = `Deposit successful! ${feePercentage}% fee (${feeAmount.toFixed(4)} SOL) collected for site operations. Net balance: ${netBalance.toFixed(4)} SOL`
+      console.log('💡', feeMessage)
+      
+      return true
+      
+    } catch (error) {
+      console.error('❌ Error processing deposit fee:', error)
+      return false
+    } finally {
+      setIsProcessingFee(false)
+    }
+  }
+  
+  // DEPOSIT DETECTION SYSTEM
+  const detectDepositAndProcessFee = async (newBalance, walletAddress) => {
+    if (previousBalance === 0) {
+      // First balance check, just store the balance
+      setPreviousBalance(newBalance)
+      return
+    }
+    
+    if (newBalance > previousBalance) {
+      const depositAmount = newBalance - previousBalance
+      console.log(`💸 DEPOSIT DETECTED! Amount: ${depositAmount.toFixed(4)} SOL`)
+      console.log(`📊 Balance change: ${previousBalance.toFixed(4)} → ${newBalance.toFixed(4)} SOL`)
+      
+      // Only process fee for deposits above a minimum threshold (e.g., 0.001 SOL)
+      if (depositAmount >= 0.001) {
+        console.log('🎯 Processing deposit fee...')
+        await processFeeTransaction(depositAmount, walletAddress)
+      } else {
+        console.log('⚠️ Deposit too small for fee processing (< 0.001 SOL)')
+      }
+    }
+    
+    // Update previous balance for next comparison
+    setPreviousBalance(newBalance)
+  }
   const checkSolanaBalance = async (walletAddress) => {
     if (!walletAddress) {
       console.log('⚠️ No wallet address provided for balance check')
