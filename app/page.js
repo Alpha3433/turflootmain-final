@@ -8774,32 +8774,6 @@ export default function TurfLootTactical() {
             >
               {isLoadingLocalPractice ? '⏳ LOADING...' : ((currentParty && currentParty.members && currentParty.members.length > 1) ? '🔒 LOCAL PRACTICE' : '🤖 LOCAL PRACTICE')}
             </button>
-            <button 
-              style={{
-                ...secondaryButtonStyle,
-                fontSize: '10px',
-                padding: '8px 12px'
-              }}
-              onClick={async () => {
-                console.log('🎯 Mobile CREATE PARTY button clicked!')
-                const authenticated = await requireAuthentication('CREATE PARTY')
-                if (authenticated) {
-                  console.log('🎯 User authenticated, opening create party...')
-                  
-                  // Ensure friends list is loaded before opening modal
-                  if (friendsList.length === 0) {
-                    console.log('🔄 Loading friends list before opening party modal...')
-                    await loadFriendsList()
-                  }
-                  
-                  createDesktopCreatePartyPopup()
-                } else {
-                  console.log('❌ Authentication failed, blocking access to CREATE PARTY')
-                }
-              }}
-            >
-              🎯 CREATE PARTY
-            </button>
           </div>
         </div>
 
