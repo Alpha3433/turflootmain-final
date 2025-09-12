@@ -1315,7 +1315,7 @@ export default function TurfLootTactical() {
     console.log('🏆 Desktop leaderboard popup created with direct DOM manipulation')
   }
 
-  // REAL-TIME SOLANA BALANCE SYSTEM WITH 10% DEPOSIT FEE
+  // REAL-TIME SOLANA BALANCE SYSTEM WITH 10% DEPOSIT FEE + PAID ROOMS
   
   // State for wallet balance display
   const [walletBalance, setWalletBalance] = useState({
@@ -1335,6 +1335,9 @@ export default function TurfLootTactical() {
   
   // Fee processing state
   const [isProcessingFee, setIsProcessingFee] = useState(false)
+  
+  // Paid rooms system state
+  const [insufficientFundsNotification, setInsufficientFundsNotification] = useState(null)
 
   // STEP 4: Expose balance to the page
   const fetchWalletBalance = async () => {
