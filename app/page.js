@@ -119,78 +119,66 @@ export default function TurfLootTactical() {
     return null
   }
 
-  // Initialize wallet balance based on authentication state
+  // STEP 3: Refresh periodically - Main authentication watcher
   useEffect(() => {
-    if (ready && typeof window !== 'undefined') {
-      console.log('🚀 TurfLoot initialized with authentication state:', { 
-        ready, 
-        authenticated, 
-        hasPrivyUser: !!privyUser 
-      })
-      
-      // If user is not authenticated, immediately set default balance
-      if (!authenticated) {
-        console.log('👛 No authentication - setting default balance immediately')
-        setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-        return
-      }
-      
-      // If user is authenticated, trigger balance fetch
-      if (authenticated && privyUser) {
-        console.log('✅ User authenticated - triggering balance fetch')
-        fetchWalletBalance()
-      }
-    }
-  }, [ready, authenticated, privyUser])
-
-  // Start balance monitoring when user is authenticated and has Solana wallet
-  useEffect(() => {
-    let solanaWalletAddress = null
+    console.log('🔄 Authentication state changed:', { 
+      ready, 
+      authenticated, 
+      hasUser: !!privyUser 
+    })
     
-    if (authenticated && privyUser) {
-      // Find Solana wallet address from multiple sources
-      if (wallets && wallets.length > 0) {
-        const solanaWallet = wallets.find(w => w.chainType === 'solana')
-        if (solanaWallet) {
-          solanaWalletAddress = solanaWallet.address
-        }
-      }
-      
-      if (!solanaWalletAddress && privyUser.wallet?.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') {
-        solanaWalletAddress = privyUser.wallet.address
-      }
-      
-      if (!solanaWalletAddress && privyUser.linkedAccounts) {
-        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc => 
-          acc.type === 'wallet' && 
-          (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
-        )
-        if (linkedSolanaWallet) {
-          solanaWalletAddress = linkedSolanaWallet.address
-        }
-      }
-      
-      if (solanaWalletAddress) {
-        console.log('🎯 Starting balance monitoring for:', solanaWalletAddress)
-        
-        // Initial balance check
-        checkSolanaBalance(solanaWalletAddress)
-        
-        // Set up periodic balance checking every 10 seconds
-        balanceCheckInterval.current = setInterval(() => {
-          checkSolanaBalance(solanaWalletAddress)
-        }, 10000)
-      }
+    // Clear any existing interval
+    if (balanceInterval.current) {
+      clearInterval(balanceInterval.current)
+      balanceInterval.current = null
+      console.log('🧹 Cleared existing balance interval')
     }
     
-    // Cleanup on unmount or when user changes
+    if (!ready) {
+      console.log('⏳ Privy not ready yet')
+      return
+    }
+    
+    if (!authenticated || !privyUser) {
+      console.log('👛 User not authenticated - setting default balance')
+      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+      setCurrentWalletAddress(null)
+      return
+    }
+    
+    // Find wallet address
+    const walletAddress = findWalletAddress()
+    
+    if (!walletAddress) {
+      console.log('❌ No Solana wallet found')
+      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+      setCurrentWalletAddress(null)
+      return
+    }
+    
+    console.log('✅ Starting balance monitoring for:', walletAddress)
+    setCurrentWalletAddress(walletAddress)
+    
+    // Initial balance check
+    fetchWalletBalance()
+    
+    // Set up periodic balance checking every 10 seconds
+    balanceInterval.current = setInterval(() => {
+      console.log('⏰ Periodic balance check triggered')
+      fetchWalletBalance()
+    }, 10000)
+    
+    console.log('🔄 Balance monitoring started (10s interval)')
+    
+    // Cleanup function
     return () => {
-      if (balanceCheckInterval.current) {
-        clearInterval(balanceCheckInterval.current)
-        balanceCheckInterval.current = null
+      if (balanceInterval.current) {
+        clearInterval(balanceInterval.current)
+        balanceInterval.current = null
+        console.log('🧹 Cleaned up balance interval on unmount')
       }
     }
-  }, [authenticated, privyUser, wallets])
+  }, [ready, authenticated, privyUser, wallets])
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
       console.log('🔧 Privy v2.24.0 - Debug Info (fundWallet from usePrivy):', {
