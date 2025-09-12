@@ -6290,6 +6290,17 @@ export default function TurfLootTactical() {
             }
           }
           
+          @keyframes slideInFromTop {
+            0% { 
+              transform: translateX(-50%) translateY(-100%);
+              opacity: 0;
+            }
+            100% { 
+              transform: translateX(-50%) translateY(0);
+              opacity: 1;
+            }
+          }
+          
           @keyframes scanLineVertical {
             0% { 
               transform: translateY(-100vh);
