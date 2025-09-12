@@ -8697,7 +8697,7 @@ export default function TurfLootTactical() {
                   // Show tooltip for disabled state on mobile
                   const tooltip = document.createElement('div')
                   tooltip.id = 'mobile-local-practice-tooltip'
-                  tooltip.textContent = 'Local Bots is only available for solo players. Leave your party to play offline with bots.'
+                  tooltip.textContent = 'Local Practice is only available for solo players. Leave your party to play offline with bots.'
                   tooltip.style.cssText = `
                     position: absolute;
                     background: rgba(0, 0, 0, 0.9);
