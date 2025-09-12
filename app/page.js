@@ -14,7 +14,48 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // DEPOSIT FEE PROCESSING SYSTEM
+  // PAID ROOMS SYSTEM - Balance checking and validation
+  
+  const parseStakeAmount = (stakeString) => {
+    // Convert stake string to USD number (e.g., "$1" -> 1, "$5" -> 5, "$20" -> 20)
+    return parseFloat(stakeString.replace('$', '')) || 0
+  }
+  
+  const checkSufficientFunds = (requiredAmount) => {
+    const currentBalance = parseFloat(walletBalance.usd) || 0
+    console.log(`💰 Balance check: Required $${requiredAmount}, Available $${currentBalance}`)
+    return currentBalance >= requiredAmount
+  }
+  
+  const showInsufficientFundsNotification = (requiredAmount, currentBalance) => {
+    const notification = {
+      requiredAmount,
+      currentBalance,
+      timestamp: Date.now()
+    }
+    
+    console.log(`🚫 Insufficient funds: Need $${requiredAmount}, Have $${currentBalance}`)
+    setInsufficientFundsNotification(notification)
+    
+    // Auto-hide notification after 8 seconds
+    setTimeout(() => {
+      setInsufficientFundsNotification(null)
+    }, 8000)
+  }
+  
+  const validatePaidRoom = (actionName = 'join paid room') => {
+    // Get currently selected stake amount
+    const requiredAmount = parseStakeAmount(selectedStake)
+    const currentBalance = parseFloat(walletBalance.usd) || 0
+    
+    if (!checkSufficientFunds(requiredAmount)) {
+      showInsufficientFundsNotification(requiredAmount, currentBalance)
+      return false
+    }
+    
+    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance} >= $${requiredAmount}`)
+    return true
+  }
   const processFeeTransaction = async (depositAmount, userWalletAddress) => {
     if (isProcessingFee) {
       console.log('⚠️ Fee processing already in progress')
