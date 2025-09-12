@@ -8199,8 +8199,8 @@ export default function TurfLootTactical() {
               👤
             </div>
             
-            {/* Login/Logout Button - Mobile */}
-            {isAuthenticated ? (
+            {/* Login/Logout Button - Mobile FIXED */}
+            {authenticated ? (
               <button
                 onClick={handleLogout}
                 style={{
