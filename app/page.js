@@ -8675,12 +8675,12 @@ export default function TurfLootTactical() {
               }}
               onClick={(e) => {
                 if (currentParty && currentParty.members && currentParty.members.length > 1) {
-                  console.log('🔒 MOBILE LOCAL BOTS blocked - user is in a duo')
+                  console.log('🔒 MOBILE LOCAL PRACTICE blocked - user is in a duo')
                   e.preventDefault()
                   return
                 }
                 
-                console.log('🤖 MOBILE LOCAL BOTS button clicked!')
+                console.log('🤖 MOBILE LOCAL PRACTICE button clicked!')
                 setIsLoadingLocalPractice(true)
                 
                 // Show loading for a brief moment then navigate
@@ -8688,7 +8688,7 @@ export default function TurfLootTactical() {
                   // Create completely local room with bots - no Hathora charges
                   const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
                   const gameUrl = `/agario?roomId=${localRoomId}&mode=local&fee=0&region=local&multiplayer=offline&server=local&bots=true`
-                  console.log('🎮 Starting mobile local bots game:', gameUrl)
+                  console.log('🎮 Starting mobile local practice with bots:', gameUrl)
                   window.location.href = gameUrl
                 }, 500)
               }}
