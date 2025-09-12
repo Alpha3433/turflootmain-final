@@ -5136,14 +5136,33 @@ export default function TurfLootTactical() {
             ))}
           </div>
 
-          {/* Main Deploy Button */}
+          {/* Main Deploy Button - UPDATED with Paid Rooms Validation */}
           <button 
             onClick={async () => {
               console.log('▶ PLAY NOW button clicked!')
+              console.log(`💰 Selected stake: ${selectedStake}`)
+              
               const authenticated = await requireAuthentication('PLAY NOW')
               if (authenticated) {
-                console.log('🎮 User authenticated, redirecting to game...')
-                router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
+                console.log('🎮 User authenticated, checking funds for paid room...')
+                
+                // Check if user has sufficient funds for selected stake
+                const stakeAmount = parseStakeAmount(selectedStake)
+                
+                if (stakeAmount === 0) {
+                  // Free play mode
+                  console.log('🎮 Free play mode - no balance check needed')
+                  router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
+                } else {
+                  // Paid room - validate balance
+                  if (validatePaidRoom(`PLAY NOW with ${selectedStake} stake`)) {
+                    console.log(`✅ Sufficient funds confirmed for ${selectedStake} stake`)
+                    router.push(`/agario?roomId=global-paid-${stakeAmount}&mode=competitive&fee=${stakeAmount}`)
+                  } else {
+                    console.log(`❌ Insufficient funds for ${selectedStake} stake`)
+                    // Notification is already shown by validatePaidRoom function
+                  }
+                }
               } else {
                 console.log('❌ Authentication failed, blocking access to PLAY NOW')
               }
