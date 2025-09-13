@@ -8878,13 +8878,6 @@ export default function TurfLootTactical() {
           {/* Loadout Panel */}
           <div style={ambrerPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ 
-                ...iconStyle, 
-                background: 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)', 
-                color: '#ffffff',
-                boxShadow: '0 0 15px rgba(139, 92, 246, 0.6)',
-                border: '1px solid #8b5cf6'
-              }}>🎨</div>
               <h3 style={{ color: '#8b5cf6', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>CUSTOMIZE</h3>
             </div>
             
