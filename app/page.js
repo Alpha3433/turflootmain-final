@@ -8339,7 +8339,10 @@ export default function TurfLootTactical() {
               textShadow: '0 0 8px rgba(104, 211, 145, 0.6)',
               fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
-            }}>PLAYER: {userName.toUpperCase()}</span>
+            }}>PLAYER: {isAuthenticated ? 
+              (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
+              (customUsername || userName).toUpperCase()
+            }</span>
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
