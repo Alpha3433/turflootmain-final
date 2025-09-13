@@ -8778,355 +8778,427 @@ export default function TurfLootTactical() {
         </div>
 
         {/* Mobile Panels Grid */}
-        <div style={{
-          display: 'flex',
-          gap: '16px',
-          width: '100%',
-          alignItems: 'flex-start'
-        }}>
-          {/* Left Column - CUSTOMIZE, LEADERBOARD, PARTY */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-            flex: '1',
-            minWidth: '0'
-          }}>
-            {/* Loadout Panel */}
-            <div style={ambrerPanelStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <h3 style={{ color: '#8b5cf6', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>CUSTOMIZE</h3>
+        <div style={mobileGridStyle}>
+          {/* Arsenal Panel - Enhanced with Desktop Features */}
+          <div style={ambrerPanelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>WALLET</h3>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+                <button 
+                  onClick={handleCopyAddress}
+                  style={{ 
+                    fontSize: '8px', 
+                    color: '#f6ad55', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textDecoration: 'none',
+                    padding: '0'
+                  }}
+                >
+                  📋
+                </button>
+                <button 
+                  onClick={handleBalanceRefresh}
+                  style={{ 
+                    fontSize: '8px', 
+                    color: '#f6ad55', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textDecoration: 'none',
+                    padding: '0'
+                  }}
+                >
+                  ↻
+                </button>
               </div>
-              
-              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
-                  border: '1px solid #fc8181',
-                  borderRadius: '3px',
-                  margin: '0 auto 8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  boxShadow: '0 0 20px rgba(252, 129, 129, 0.4)'
-                }}>
-                  <div style={{
-                    width: '5px',
-                    height: '5px',
-                    backgroundColor: '#68d391',
-                    borderRadius: '50%',
-                    position: 'absolute',
-                    top: '12px',
-                    left: '12px',
-                    boxShadow: '0 0 5px #68d391'
-                  }} />
-                  <div style={{
-                    width: '5px',
-                    height: '5px',
-                    backgroundColor: '#68d391',
-                    borderRadius: '50%',
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    boxShadow: '0 0 5px #68d391'
-                  }} />
-                </div>
+            </div>
+            
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <div style={{ 
+                fontSize: '20px', 
+                fontWeight: '800', 
+                background: 'linear-gradient(45deg, #f6ad55 0%, #fc8181 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: '2px',
+                fontFamily: '"Rajdhani", sans-serif'
+              }}>
+                {walletBalance.loading ? 'Loading...' : `$${walletBalance.usd}`}
               </div>
-              
+              <div style={{ color: '#f6ad55', fontSize: '9px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
+                {walletBalance.loading ? 'Loading...' : `${walletBalance.sol} SOL`}
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '6px' }}>
               <button 
-                onClick={async () => {
-                  console.log('VIEW STORE button clicked!')
-                  const authenticated = await requireAuthentication('VIEW STORE')
-                  if (authenticated) {
-                    console.log('🛒 User authenticated, opening view store...')
-                    createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'shop')
-                  } else {
-                    console.log('❌ Authentication failed, blocking access to VIEW STORE')
-                  }
-                }}
+                onClick={handleDeposit}
                 style={{
-                width: '100%',
+                flex: 1,
                 padding: '8px',
-                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
-                color: '#1a202c',
-                fontWeight: '700',
+                background: 'rgba(104, 211, 145, 0.2)',
+                border: '1px solid #68d391',
                 borderRadius: '3px',
-                border: '1px solid #f6ad55',
+                color: '#68d391',
+                fontWeight: '600',
                 cursor: 'pointer',
-                marginBottom: '6px',
                 fontSize: '9px',
                 fontFamily: '"Rajdhani", sans-serif',
                 textTransform: 'uppercase'
               }}>
-                🛒 VIEW STORE
+                DEPOSIT SOL
               </button>
-              
               <button 
-                onClick={async () => {
-                  console.log('CHANGE SKIN button clicked!')
-                  const authenticated = await requireAuthentication('CHANGE SKIN')
-                  if (authenticated) {
-                    console.log('🎨 User authenticated, opening change skin...')
-                    createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'owned')
-                  } else {
-                    console.log('❌ Authentication failed, blocking access to CHANGE SKIN')
-                  }
-                }}
+                onClick={handleWithdraw}
                 style={{
-                width: '100%',
-                padding: '6px',
-                background: 'rgba(26, 32, 44, 0.8)',
-                border: '1px solid #f6ad55',
+                flex: 1,
+                padding: '8px',
+                background: 'rgba(252, 129, 129, 0.2)',
+                border: '1px solid #fc8181',
                 borderRadius: '3px',
-                color: '#f6ad55',
+                color: '#fc8181',
+                fontWeight: '600',
+                cursor: 'pointer',
                 fontSize: '9px',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
+              }}>
+                WITHDRAW
+              </button>
+            </div>
+          </div>
+
+          {/* Loadout Panel */}
+          <div style={ambrerPanelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <h3 style={{ color: '#8b5cf6', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>CUSTOMIZE</h3>
+            </div>
+            
+            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
+                border: '1px solid #fc8181',
+                borderRadius: '3px',
+                margin: '0 auto 8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                boxShadow: '0 0 20px rgba(252, 129, 129, 0.4)'
+              }}>
+                <div style={{
+                  width: '5px',
+                  height: '5px',
+                  backgroundColor: '#68d391',
+                  borderRadius: '50%',
+                  position: 'absolute',
+                  top: '12px',
+                  left: '12px',
+                  boxShadow: '0 0 5px #68d391'
+                }} />
+                <div style={{
+                  width: '5px',
+                  height: '5px',
+                  backgroundColor: '#68d391',
+                  borderRadius: '50%',
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  boxShadow: '0 0 5px #68d391'
+                }} />
+              </div>
+            </div>
+            
+            <button 
+              onClick={async () => {
+                console.log('VIEW STORE button clicked!')
+                const authenticated = await requireAuthentication('VIEW STORE')
+                if (authenticated) {
+                  console.log('🛒 User authenticated, opening view store...')
+                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'shop')
+                } else {
+                  console.log('❌ Authentication failed, blocking access to VIEW STORE')
+                }
+              }}
+              style={{
+              width: '100%',
+              padding: '8px',
+              background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+              color: '#1a202c',
+              fontWeight: '700',
+              borderRadius: '3px',
+              border: '1px solid #f6ad55',
+              cursor: 'pointer',
+              marginBottom: '6px',
+              fontSize: '9px',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
+            }}>
+              🛒 VIEW STORE
+            </button>
+            
+            <button 
+              onClick={async () => {
+                console.log('CHANGE SKIN button clicked!')
+                const authenticated = await requireAuthentication('CHANGE SKIN')
+                if (authenticated) {
+                  console.log('🎨 User authenticated, opening change skin...')
+                  createSkinStorePopup(currency, setCurrency, selectedSkin, setSelectedSkin, 'owned')
+                } else {
+                  console.log('❌ Authentication failed, blocking access to CHANGE SKIN')
+                }
+              }}
+              style={{
+              width: '100%',
+              padding: '6px',
+              background: 'rgba(26, 32, 44, 0.8)',
+              border: '1px solid #f6ad55',
+              borderRadius: '3px',
+              color: '#f6ad55',
+              fontSize: '9px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase'
+            }}>
+              🎨 CHANGE SKIN
+            </button>
+          </div>
+
+          {/* Command Panel - Enhanced Leaderboard */}
+          <div style={tacticalPanelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LEADERBOARD</h3>
+              <div style={{ marginLeft: 'auto' }}>
+                <div style={{
+                  padding: '2px 4px',
+                  background: 'rgba(104, 211, 145, 0.2)',
+                  color: '#68d391',
+                  fontSize: '8px',
+                  borderRadius: '2px',
+                  border: '1px solid #68d391',
+                  fontWeight: '600',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase'
+                }}>
+                  LIVE
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ marginBottom: '12px', fontSize: '11px' }}>
+              {leaderboard.slice(0, 3).map((player, index) => (
+                <div key={player.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: index < 2 ? '1px solid rgba(104, 211, 145, 0.2)' : 'none' }}>
+                  <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
+                    {String(index + 1).padStart(2, '0')}. {player.name}
+                  </span>
+                  <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>
+                    ${player.cashout.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+              {leaderboard.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '12px 0', color: '#68d391', fontSize: '10px', fontFamily: '"Rajdhani", sans-serif' }}>
+                  LOADING LEADERBOARD...
+                </div>
+              )}
+            </div>
+            
+            <button 
+              onClick={() => createDesktopLeaderboardPopup()}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(26, 32, 44, 0.8)',
+                border: '1px solid #68d391',
+                borderRadius: '3px',
+                color: '#68d391',
+                fontSize: '10px',
                 fontWeight: '600',
                 cursor: 'pointer',
                 fontFamily: '"Rajdhani", sans-serif',
                 textTransform: 'uppercase'
               }}>
-                🎨 CHANGE SKIN
-              </button>
-            </div>
+              VIEW LEADERBOARD
+            </button>
+          </div>
 
-            {/* Command Panel - Enhanced Leaderboard */}
-            <div style={tacticalPanelStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LEADERBOARD</h3>
-                <div style={{ marginLeft: 'auto' }}>
-                  <div style={{
-                    padding: '2px 4px',
-                    background: 'rgba(104, 211, 145, 0.2)',
-                    color: '#68d391',
-                    fontSize: '8px',
-                    borderRadius: '2px',
-                    border: '1px solid #68d391',
-                    fontWeight: '600',
+          {/* Squad Panel - Dynamic Party Display */}
+          <div style={tacticalPanelStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>
+                PARTY
+              </h3>
+              <div style={{ marginLeft: 'auto' }}>
+                <button 
+                  onClick={async () => {
+                    console.log('🔄 Mobile PARTY REFRESH button clicked - refreshing lobby data...')
+                    
+                    try {
+                      // Show loading state
+                      setLoadingParty(true)
+                      
+                      console.log('🔄 Mobile Step 1: Refreshing current party data...')
+                      await loadCurrentParty()
+                      
+                      console.log('🔄 Mobile Step 2: Refreshing friends list with updated skin data...')
+                      await loadFriendsList()
+                      
+                      console.log('🔄 Mobile Step 3: Refreshing friend requests and party invites...')
+                      await loadFriendRequests()
+                      
+                      console.log('🔄 Mobile Step 4: Refreshing available users list...')
+                      await loadAvailableUsers()
+                      
+                      // Force re-register user to update skin data
+                      if (isAuthenticated && user) {
+                        console.log('🔄 Mobile Step 5: Updating user skin data...')
+                        await registerPrivyUser()
+                      }
+                      
+                      console.log('✅ Mobile PARTY REFRESH completed successfully!')
+                      
+                      // Brief success indicator for mobile
+                      const refreshButton = document.querySelector('[data-mobile-refresh-text]')
+                      if (refreshButton) {
+                        refreshButton.textContent = '✅'
+                        setTimeout(() => {
+                          refreshButton.textContent = '↻'
+                        }, 1500)
+                      }
+                      
+                    } catch (error) {
+                      console.error('❌ Mobile PARTY REFRESH failed:', error)
+                      
+                      // Show error feedback for mobile
+                      const refreshButton = document.querySelector('[data-mobile-refresh-text]')
+                      if (refreshButton) {
+                        refreshButton.textContent = '❌'
+                        setTimeout(() => {
+                          refreshButton.textContent = '↻'
+                        }, 1500)
+                      }
+                    } finally {
+                      setLoadingParty(false)
+                    }
+                  }}
+                  style={{ 
+                    fontSize: '9px', 
+                    color: '#f6ad55', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
                     fontFamily: '"Rajdhani", sans-serif',
-                    textTransform: 'uppercase'
-                  }}>
-                    LIVE
-                  </div>
-                </div>
-              </div>
-              
-              <div style={{ marginBottom: '12px', fontSize: '11px' }}>
-                {leaderboard.slice(0, 3).map((player, index) => (
-                  <div key={player.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: index < 2 ? '1px solid rgba(104, 211, 145, 0.2)' : 'none' }}>
-                    <span style={{ color: '#e2e8f0', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
-                      {String(index + 1).padStart(2, '0')}. {player.name}
-                    </span>
-                    <span style={{ color: '#f6ad55', fontWeight: '700', fontFamily: '"Rajdhani", sans-serif' }}>
-                      ${player.cashout.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-                {leaderboard.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '12px 0', color: '#68d391', fontSize: '10px', fontFamily: '"Rajdhani", sans-serif' }}>
-                    LOADING LEADERBOARD...
-                  </div>
-                )}
-              </div>
-              
-              <button 
-                onClick={() => createDesktopLeaderboardPopup()}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  background: 'rgba(26, 32, 44, 0.8)',
-                  border: '1px solid #68d391',
-                  borderRadius: '3px',
-                  color: '#68d391',
-                  fontSize: '10px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontFamily: '"Rajdhani", sans-serif',
-                  textTransform: 'uppercase'
-                }}>
-                VIEW LEADERBOARD
-              </button>
-            </div>
-
-            {/* Squad Panel - Dynamic Party Display */}
-            <div style={tacticalPanelStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>
-                  PARTY
-                </h3>
-                <div style={{ marginLeft: 'auto' }}>
+                    padding: '1px 3px',
+                    borderRadius: '2px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(246, 173, 85, 0.1)'
+                    e.target.style.boxShadow = '0 0 3px rgba(246, 173, 85, 0.3)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'none'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                >
+                  <span data-mobile-refresh-text>↻</span>
+                </button>
+                
+                {/* Mobile Leave Party Button - Only show when in a party */}
+                {currentParty && (
                   <button 
                     onClick={async () => {
-                      console.log('🔄 Mobile PARTY REFRESH button clicked - refreshing lobby data...')
+                      console.log('🚪 Mobile LEAVE PARTY button clicked!')
                       
                       try {
-                        // Show loading state
-                        setLoadingParty(true)
-                        
-                        console.log('🔄 Mobile Step 1: Refreshing current party data...')
-                        await loadCurrentParty()
-                        
-                        console.log('🔄 Mobile Step 2: Refreshing friends list with updated skin data...')
-                        await loadFriendsList()
-                        
-                        console.log('🔄 Mobile Step 3: Refreshing friend requests and party invites...')
-                        await loadFriendRequests()
-                        
-                        console.log('🔄 Mobile Step 4: Refreshing available users list...')
-                        await loadAvailableUsers()
-                        
-                        // Force re-register user to update skin data
-                        if (isAuthenticated && user) {
-                          console.log('🔄 Mobile Step 5: Updating user skin data...')
-                          await registerPrivyUser()
+                        if (!isAuthenticated || !user) {
+                          console.log('❌ User not authenticated for leaving party')
+                          return
                         }
                         
-                        console.log('✅ Mobile PARTY REFRESH completed successfully!')
+                        const userIdentifier = user.wallet?.address || user.email || user.id
+                        console.log('🚪 Mobile leaving party for user:', userIdentifier)
                         
-                        // Brief success indicator for mobile
-                        const refreshButton = document.querySelector('[data-mobile-refresh-text]')
-                        if (refreshButton) {
-                          refreshButton.textContent = '✅'
-                          setTimeout(() => {
-                            refreshButton.textContent = '↻'
-                          }, 1500)
+                        // Show loading feedback
+                        const leaveButton = document.querySelector('[data-mobile-leave-text]')
+                        if (leaveButton) {
+                          leaveButton.textContent = '⏳'
                         }
                         
-                      } catch (error) {
-                        console.error('❌ Mobile PARTY REFRESH failed:', error)
-                        
-                        // Show error feedback for mobile
-                        const refreshButton = document.querySelector('[data-mobile-refresh-text]')
-                        if (refreshButton) {
-                          refreshButton.textContent = '❌'
-                          setTimeout(() => {
-                            refreshButton.textContent = '↻'
-                          }, 1500)
-                        }
-                      } finally {
-                        setLoadingParty(false)
-                      }
-                    }}
-                    style={{ 
-                      fontSize: '9px', 
-                      color: '#f6ad55', 
-                      background: 'none', 
-                      border: 'none', 
-                      cursor: 'pointer', 
-                      fontWeight: '600', 
-                      fontFamily: '"Rajdhani", sans-serif',
-                      padding: '1px 3px',
-                      borderRadius: '2px',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = 'rgba(246, 173, 85, 0.1)'
-                      e.target.style.boxShadow = '0 0 3px rgba(246, 173, 85, 0.3)'
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.background = 'none'
-                      e.target.style.boxShadow = 'none'
-                    }}
-                  >
-                    <span data-mobile-refresh-text>↻</span>
-                  </button>
-                  
-                  {/* Mobile Leave Party Button - Only show when in a party */}
-                  {currentParty && (
-                    <button 
-                      onClick={async () => {
-                        console.log('🚪 Mobile LEAVE PARTY button clicked!')
-                        
-                        try {
-                          if (!isAuthenticated || !user) {
-                            console.log('❌ User not authenticated for leaving party')
-                            return
-                          }
-                          
-                          const userIdentifier = user.wallet?.address || user.email || user.id
-                          console.log('🚪 Mobile leaving party for user:', userIdentifier)
-                          
-                          // Show loading feedback
-                          const leaveButton = document.querySelector('[data-mobile-leave-text]')
-                          if (leaveButton) {
-                            leaveButton.textContent = '⏳'
-                          }
-                          
-                          // API call to leave party
-                          const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party`, {
-                            method: 'DELETE',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              userIdentifier: userIdentifier,
-                              partyId: currentParty.id
-                            })
+                        // API call to leave party
+                        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party`, {
+                          method: 'DELETE',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            userIdentifier: userIdentifier,
+                            partyId: currentParty.id
                           })
+                        })
+                        
+                        const result = await response.json()
+                        
+                        if (response.ok) {
+                          console.log('✅ Mobile successfully left party:', result)
                           
-                          const result = await response.json()
-                          
-                          if (response.ok) {
-                            console.log('✅ Mobile successfully left party:', result)
+                          // Check if the party was disbanded (owner left or party became empty)
+                          if (result.partyDisbanded) {
+                            console.log('🗑️ Mobile party was disbanded:', {
+                              isOwner: result.isOwner,
+                              message: result.message
+                            })
                             
-                            // Check if the party was disbanded (owner left or party became empty)
-                            if (result.partyDisbanded) {
-                              console.log('🗑️ Mobile party was disbanded:', {
-                                isOwner: result.isOwner,
-                                message: result.message
-                              })
-                              
-                              // Show appropriate message based on whether user was owner
-                              if (result.isOwner) {
-                                // Show success feedback for party owner
-                                if (leaveButton) {
-                                  leaveButton.textContent = '✅'
-                                  setTimeout(() => {
-                                    leaveButton.textContent = '✕'
-                                  }, 1500)
-                                }
-                                alert(`👑 ${result.message}\n\nAs the party owner, your party has been completely removed.`)
-                              } else {
-                                // Show success feedback for member leaving empty party
-                                if (leaveButton) {
-                                  leaveButton.textContent = '✅'
-                                  setTimeout(() => {
-                                    leaveButton.textContent = '✕'
-                                  }, 1500)
-                                }
-                                alert(`🏁 ${result.message}`)
-                              }
-                            } else {
-                              // Regular member left, party still exists
+                            // Show appropriate message based on whether user was owner
+                            if (result.isOwner) {
+                              // Show success feedback for party owner
                               if (leaveButton) {
                                 leaveButton.textContent = '✅'
                                 setTimeout(() => {
                                   leaveButton.textContent = '✕'
                                 }, 1500)
                               }
-                              alert(`👋 ${result.message}`)
+                              alert(`👑 ${result.message}\n\nAs the party owner, your party has been completely removed.`)
+                            } else {
+                              // Show success feedback for member leaving empty party
+                              if (leaveButton) {
+                                leaveButton.textContent = '✅'
+                                setTimeout(() => {
+                                  leaveButton.textContent = '✕'
+                                }, 1500)
+                              }
+                              alert(`🏁 ${result.message}`)
                             }
-                            
-                            // Clear current party state regardless of disbandment
-                            setCurrentParty(null)
-                            
-                            // Refresh party data to show updated state
-                            await loadCurrentParty()
-                            
                           } else {
-                            console.error('❌ Mobile failed to leave party:', response.status)
+                            // Regular member left, party still exists
                             if (leaveButton) {
-                              leaveButton.textContent = '❌'
+                              leaveButton.textContent = '✅'
                               setTimeout(() => {
                                 leaveButton.textContent = '✕'
                               }, 1500)
                             }
+                            alert(`👋 ${result.message}`)
                           }
                           
-                        } catch (error) {
-                          console.error('❌ Mobile error leaving party:', error)
-                          const leaveButton = document.querySelector('[data-mobile-leave-text]')
+                          // Clear current party state regardless of disbandment
+                          setCurrentParty(null)
+                          
+                          // Refresh party data to show updated state
+                          await loadCurrentParty()
+                          
+                        } else {
+                          console.error('❌ Mobile failed to leave party:', response.status)
                           if (leaveButton) {
                             leaveButton.textContent = '❌'
                             setTimeout(() => {
@@ -9134,336 +9206,241 @@ export default function TurfLootTactical() {
                             }, 1500)
                           }
                         }
-                      }}
-                      style={{ 
-                        fontSize: '9px', 
-                        color: '#fc8181', 
-                        background: 'none', 
-                        border: 'none', 
-                        cursor: 'pointer', 
-                        fontWeight: '600', 
-                        fontFamily: '"Rajdhani", sans-serif',
-                        padding: '1px 3px',
-                        borderRadius: '2px',
-                        transition: 'all 0.2s ease',
-                        marginLeft: '4px'
-                      }}
-                      onMouseOver={(e) => {
-                        e.target.style.background = 'rgba(252, 129, 129, 0.1)'
-                        e.target.style.boxShadow = '0 0 3px rgba(252, 129, 129, 0.3)'
-                      }}
-                      onMouseOut={(e) => {
-                        e.target.style.background = 'none'
-                        e.target.style.boxShadow = 'none'
-                      }}
-                    >
-                      <span data-mobile-leave-text>✕</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-              
-              {currentParty ? (
-                // Show current party members - mobile version
-                <div style={{ padding: '12px 0' }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '4px',
-                    marginBottom: '8px'
-                  }}>
-                    <div style={{
-                      color: '#68d391',
-                      fontSize: '11px',
-                      fontWeight: '700',
+                        
+                      } catch (error) {
+                        console.error('❌ Mobile error leaving party:', error)
+                        const leaveButton = document.querySelector('[data-mobile-leave-text]')
+                        if (leaveButton) {
+                          leaveButton.textContent = '❌'
+                          setTimeout(() => {
+                            leaveButton.textContent = '✕'
+                          }, 1500)
+                        }
+                      }
+                    }}
+                    style={{ 
+                      fontSize: '9px', 
+                      color: '#fc8181', 
+                      background: 'none', 
+                      border: 'none', 
+                      cursor: 'pointer', 
+                      fontWeight: '600', 
                       fontFamily: '"Rajdhani", sans-serif',
-                      textAlign: 'center'
-                    }}>
-                      {currentParty.name}
-                    </div>
-                    <div style={{
-                      padding: '1px 4px',
-                      background: 'rgba(104, 211, 145, 0.2)',
-                      border: '1px solid #68d391',
+                      padding: '1px 3px',
                       borderRadius: '2px',
-                      fontSize: '8px',
-                      color: '#68d391',
-                      textTransform: 'uppercase',
-                      fontFamily: '"Rajdhani", sans-serif'
-                    }}>
-                      {currentParty.privacy}
-                    </div>
-                  </div>
-                  
+                      transition: 'all 0.2s ease',
+                      marginLeft: '4px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(252, 129, 129, 0.1)'
+                      e.target.style.boxShadow = '0 0 3px rgba(252, 129, 129, 0.3)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'none'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  >
+                    <span data-mobile-leave-text>✕</span>
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {currentParty ? (
+              // Show current party members - mobile version
+              <div style={{ padding: '12px 0' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  marginBottom: '8px'
+                }}>
                   <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '4px',
-                    marginBottom: '6px'
+                    color: '#68d391',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textAlign: 'center'
                   }}>
-                    {currentParty.members?.slice(0, 3).map((member, index) => {
-                      // Use current user's selected skin for their own avatar, otherwise use member's equipped skin
-                      const isCurrentUser = isAuthenticated && user && (
-                        member.userIdentifier === (user.wallet?.address || user.email || user.id)
-                      )
-                      const skinToUse = isCurrentUser ? selectedSkin : (member.equippedSkin || {
-                        type: 'circle',
-                        color: '#3b82f6',
-                        pattern: 'solid'
-                      })
-                      
-                      return (
-                        <div key={member.userIdentifier} style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          gap: '3px'
-                        }}>
-                          {/* Mobile member avatar circle */}
-                          <div style={getSkinAvatarStyle(skinToUse, 24, member.isOnline)}>
-                            {/* Mobile skin inner content */}
-                            <div style={{ 
-                              width: '60%', 
-                              height: '60%', 
-                              borderRadius: '50%', 
-                              background: 'rgba(255, 255, 255, 0.2)' 
-                            }} />
-                            
-                            {/* Mobile online status dot */}
-                            {member.isOnline && (
-                              <div style={{
-                                position: 'absolute',
-                                top: '-1px',
-                                right: '-1px',
-                                width: '6px',
-                                height: '6px',
-                                background: '#22c55e',
-                                borderRadius: '50%',
-                                border: '1px solid rgba(26, 32, 44, 1)',
-                                boxShadow: '0 0 3px rgba(34, 197, 94, 0.6)'
-                              }} />
-                            )}
-                          </div>
-                          
-                          {/* Mobile username directly below the circle */}
-                          <div style={{
-                            color: member.isOnline ? '#e2e8f0' : '#9ca3af',
-                            fontSize: '8px',
-                            fontWeight: '500',
-                            textAlign: 'center',
-                            fontFamily: '"Rajdhani", sans-serif',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.3px',
-                            maxWidth: '32px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            {member.username || 'USER'}
-                          </div>
-                        </div>
-                      )
-                    })}
-                    {currentParty.members?.length > 3 && (
-                      <div style={{
-                        width: '24px',
-                        height: '24px',
-                        background: 'rgba(104, 211, 145, 0.2)',
-                        border: '1px solid #68d391',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '8px',
-                        color: '#68d391',
-                        fontWeight: 'bold',
-                        fontFamily: '"Rajdhani", sans-serif'
-                      }}>
-                        +{currentParty.members.length - 3}
-                      </div>
-                    )}
+                    {currentParty.name}
                   </div>
-                  
                   <div style={{
-                    textAlign: 'center',
-                    color: '#a0aec0',
-                    fontSize: '9px',
+                    padding: '1px 4px',
+                    background: 'rgba(104, 211, 145, 0.2)',
+                    border: '1px solid #68d391',
+                    borderRadius: '2px',
+                    fontSize: '8px',
+                    color: '#68d391',
+                    textTransform: 'uppercase',
                     fontFamily: '"Rajdhani", sans-serif'
                   }}>
-                    {currentParty.members?.length} member{currentParty.members?.length !== 1 ? 's' : ''}
+                    {currentParty.privacy}
                   </div>
                 </div>
-              ) : loadingParty ? (
-                // Loading state - mobile
-                <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    background: 'rgba(26, 32, 44, 0.8)',
-                    border: '1px solid #68d391',
-                    borderRadius: '3px',
-                    margin: '0 auto 8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '14px',
-                    boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
-                    animation: 'pulse 2s infinite'
-                  }}>
-                    🔄
-                  </div>
-                  <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>LOADING...</div>
-                </div>
-              ) : (
-                // No party state - mobile
-                <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    background: 'rgba(26, 32, 44, 0.8)',
-                    border: '1px solid #68d391',
-                    borderRadius: '3px',
-                    margin: '0 auto 8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '14px',
-                    boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)'
-                  }}>
-                    👤
-                  </div>
-                  <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>NO PARTY</div>
-                </div>
-              )}
-              
-              <button 
-                onClick={() => {
-                  console.log('👥 Mobile Friends button clicked!')
-                  setIsFriendsModalOpen(true)
-                }}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  background: 'rgba(26, 32, 44, 0.8)',
-                  border: '1px solid #f6ad55',
-                  borderRadius: '3px',
-                  color: '#f6ad55',
-                  fontSize: '10px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontFamily: '"Rajdhani", sans-serif',
-                  textTransform: 'uppercase'
+                
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  marginBottom: '6px'
                 }}>
-                👥 SOCIAL
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column - WALLET */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px',
-            flex: '1',
-            minWidth: '0'
-          }}>
-            {/* Arsenal Panel - Enhanced with Desktop Features */}
-            <div style={ambrerPanelStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                <h3 style={{ color: '#f6ad55', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>WALLET</h3>
-                <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-                  <button 
-                    onClick={handleCopyAddress}
-                    style={{ 
-                      fontSize: '8px', 
-                      color: '#f6ad55', 
-                      background: 'none', 
-                      border: 'none', 
-                      cursor: 'pointer', 
-                      fontWeight: '600', 
-                      fontFamily: '"Rajdhani", sans-serif',
-                      textDecoration: 'none',
-                      padding: '0'
-                    }}
-                  >
-                    📋
-                  </button>
-                  <button 
-                    onClick={handleBalanceRefresh}
-                    style={{ 
-                      fontSize: '8px', 
-                      color: '#f6ad55', 
-                      background: 'none', 
-                      border: 'none', 
-                      cursor: 'pointer', 
-                      fontWeight: '600', 
-                      fontFamily: '"Rajdhani", sans-serif',
-                      textDecoration: 'none',
-                      padding: '0'
-                    }}
-                  >
-                    ↻
-                  </button>
+                  {currentParty.members?.slice(0, 3).map((member, index) => {
+                    // Use current user's selected skin for their own avatar, otherwise use member's equipped skin
+                    const isCurrentUser = isAuthenticated && user && (
+                      member.userIdentifier === (user.wallet?.address || user.email || user.id)
+                    )
+                    const skinToUse = isCurrentUser ? selectedSkin : (member.equippedSkin || {
+                      type: 'circle',
+                      color: '#3b82f6',
+                      pattern: 'solid'
+                    })
+                    
+                    return (
+                      <div key={member.userIdentifier} style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '3px'
+                      }}>
+                        {/* Mobile member avatar circle */}
+                        <div style={getSkinAvatarStyle(skinToUse, 24, member.isOnline)}>
+                          {/* Mobile skin inner content */}
+                          <div style={{ 
+                            width: '60%', 
+                            height: '60%', 
+                            borderRadius: '50%', 
+                            background: 'rgba(255, 255, 255, 0.2)' 
+                          }} />
+                          
+                          {/* Mobile online status dot */}
+                          {member.isOnline && (
+                            <div style={{
+                              position: 'absolute',
+                              top: '-1px',
+                              right: '-1px',
+                              width: '6px',
+                              height: '6px',
+                              background: '#22c55e',
+                              borderRadius: '50%',
+                              border: '1px solid rgba(26, 32, 44, 1)',
+                              boxShadow: '0 0 3px rgba(34, 197, 94, 0.6)'
+                            }} />
+                          )}
+                        </div>
+                        
+                        {/* Mobile username directly below the circle */}
+                        <div style={{
+                          color: member.isOnline ? '#e2e8f0' : '#9ca3af',
+                          fontSize: '8px',
+                          fontWeight: '500',
+                          textAlign: 'center',
+                          fontFamily: '"Rajdhani", sans-serif',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.3px',
+                          maxWidth: '32px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {member.username || 'USER'}
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {currentParty.members?.length > 3 && (
+                    <div style={{
+                      width: '24px',
+                      height: '24px',
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '1px solid #68d391',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '8px',
+                      color: '#68d391',
+                      fontWeight: 'bold',
+                      fontFamily: '"Rajdhani", sans-serif'
+                    }}>
+                      +{currentParty.members.length - 3}
+                    </div>
+                  )}
                 </div>
-              </div>
-              
-              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                <div style={{ 
-                  fontSize: '20px', 
-                  fontWeight: '800', 
-                  background: 'linear-gradient(45deg, #f6ad55 0%, #fc8181 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  marginBottom: '2px',
+                
+                <div style={{
+                  textAlign: 'center',
+                  color: '#a0aec0',
+                  fontSize: '9px',
                   fontFamily: '"Rajdhani", sans-serif'
                 }}>
-                  {walletBalance.loading ? 'Loading...' : `$${walletBalance.usd}`}
-                </div>
-                <div style={{ color: '#f6ad55', fontSize: '9px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>
-                  {walletBalance.loading ? 'Loading...' : `${walletBalance.sol} SOL`}
+                  {currentParty.members?.length} member{currentParty.members?.length !== 1 ? 's' : ''}
                 </div>
               </div>
-              
-              <div style={{ display: 'flex', gap: '6px' }}>
-                <button 
-                  onClick={handleDeposit}
-                  style={{
-                  flex: 1,
-                  padding: '8px',
-                  background: 'rgba(104, 211, 145, 0.2)',
+            ) : loadingParty ? (
+              // Loading state - mobile
+              <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  background: 'rgba(26, 32, 44, 0.8)',
                   border: '1px solid #68d391',
                   borderRadius: '3px',
-                  color: '#68d391',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '9px',
-                  fontFamily: '"Rajdhani", sans-serif',
-                  textTransform: 'uppercase'
+                  margin: '0 auto 8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
+                  animation: 'pulse 2s infinite'
                 }}>
-                  DEPOSIT SOL
-                </button>
-                <button 
-                  onClick={handleWithdraw}
-                  style={{
-                  flex: 1,
-                  padding: '8px',
-                  background: 'rgba(252, 129, 129, 0.2)',
-                  border: '1px solid #fc8181',
-                  borderRadius: '3px',
-                  color: '#fc8181',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontSize: '9px',
-                  fontFamily: '"Rajdhani", sans-serif',
-                  textTransform: 'uppercase'
-                }}>
-                  WITHDRAW
-                </button>
+                  🔄
+                </div>
+                <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>LOADING...</div>
               </div>
-            </div>
+            ) : (
+              // No party state - mobile
+              <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  background: 'rgba(26, 32, 44, 0.8)',
+                  border: '1px solid #68d391',
+                  borderRadius: '3px',
+                  margin: '0 auto 8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)'
+                }}>
+                  👤
+                </div>
+                <div style={{ color: '#e2e8f0', fontSize: '10px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif' }}>NO PARTY</div>
+              </div>
+            )}
+            
+            <button 
+              onClick={() => {
+                console.log('👥 Mobile Friends button clicked!')
+                setIsFriendsModalOpen(true)
+              }}
+              style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(26, 32, 44, 0.8)',
+                border: '1px solid #f6ad55',
+                borderRadius: '3px',
+                color: '#f6ad55',
+                fontSize: '10px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
+              }}>
+              👥 SOCIAL
+            </button>
           </div>
         </div>
 
