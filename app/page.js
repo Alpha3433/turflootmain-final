@@ -8282,31 +8282,10 @@ export default function TurfLootTactical() {
       )}
 
       {/* Mobile Tactical Background (Simplified) */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: 1,
-        overflow: 'hidden'
-      }}>
+      <div style={mobileBackgroundStyles.backgroundContainer}>
         
         {/* Mobile Grid */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '120%',
-          height: '120%',
-          opacity: 0.3,
-          backgroundImage: `
-            linear-gradient(rgba(104, 211, 145, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(104, 211, 145, 0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px',
-          animation: 'tacticalGrid 35s linear infinite'
-        }} />
+        <div style={mobileBackgroundStyles.mobileGrid} />
 
         {/* Mobile Radar (Smaller) */}
         <div style={{
