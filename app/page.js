@@ -8883,38 +8883,37 @@ export default function TurfLootTactical() {
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{
-                width: '40px',
-                height: '40px',
-                background: 'linear-gradient(135deg, rgba(252, 129, 129, 0.3) 0%, rgba(229, 62, 62, 0.5) 100%)',
-                border: '1px solid #fc8181',
-                borderRadius: '3px',
+                width: '60px',
+                height: '60px',
+                background: '#3b82f6',
+                borderRadius: '50%',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                boxShadow: '0 0 20px rgba(252, 129, 129, 0.4)'
+                border: '2px solid #60a5fa',
+                boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
               }}>
+                {/* Avatar eyes */}
                 <div style={{
-                  width: '5px',
-                  height: '5px',
-                  backgroundColor: '#68d391',
-                  borderRadius: '50%',
-                  position: 'absolute',
-                  top: '12px',
-                  left: '12px',
-                  boxShadow: '0 0 5px #68d391'
-                }} />
-                <div style={{
-                  width: '5px',
-                  height: '5px',
-                  backgroundColor: '#68d391',
-                  borderRadius: '50%',
-                  position: 'absolute',
-                  top: '12px',
-                  right: '12px',
-                  boxShadow: '0 0 5px #68d391'
-                }} />
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'center'
+                }}>
+                  <div style={{
+                    width: '6px',
+                    height: '6px',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '50%'
+                  }} />
+                  <div style={{
+                    width: '6px',  
+                    height: '6px',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '50%'
+                  }} />
+                </div>
               </div>
             </div>
             
