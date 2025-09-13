@@ -8883,19 +8883,57 @@ export default function TurfLootTactical() {
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{
-                width: '60px',
+                width: '80px',
                 height: '60px',
-                background: '#3b82f6',
-                borderRadius: '50%',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative',
-                border: '3px solid #60a5fa',
-                boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(59, 130, 246, 0.2)'
+                position: 'relative'
               }}>
-                {/* Simple game-style character - solid color like in-game */}
+                {/* Green selection oval */}
+                <div style={{
+                  width: '75px',
+                  height: '55px',
+                  border: '3px solid #22c55e',
+                  borderRadius: '50%',
+                  position: 'absolute',
+                  background: 'transparent'
+                }} />
+                
+                {/* Blue character circle */}
+                <div style={{
+                  width: '45px',
+                  height: '45px',
+                  background: '#3b82f6',
+                  borderRadius: '50%',
+                  border: '2px solid #ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  zIndex: 1
+                }}>
+                  {/* Black dot eyes */}
+                  <div style={{
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{
+                      width: '4px',
+                      height: '4px',
+                      backgroundColor: '#000000',
+                      borderRadius: '50%'
+                    }} />
+                    <div style={{
+                      width: '4px',  
+                      height: '4px',
+                      backgroundColor: '#000000',
+                      borderRadius: '50%'
+                    }} />
+                  </div>
+                </div>
               </div>
             </div>
             
