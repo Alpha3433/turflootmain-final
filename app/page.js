@@ -8935,13 +8935,17 @@ export default function TurfLootTactical() {
                       width: '4px',
                       height: '4px',
                       backgroundColor: '#000000',
-                      borderRadius: '50%'
+                      borderRadius: '50%',
+                      transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
+                      transition: 'transform 0.1s ease-out'
                     }} />
                     <div style={{
                       width: '4px',  
                       height: '4px',
                       backgroundColor: '#000000',
-                      borderRadius: '50%'
+                      borderRadius: '50%',
+                      transform: `translate(${eyePosition.x}px, ${eyePosition.y}px)`,
+                      transition: 'transform 0.1s ease-out'
                     }} />
                   </div>
                 </div>
