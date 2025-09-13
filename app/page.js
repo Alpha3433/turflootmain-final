@@ -8883,7 +8883,7 @@ export default function TurfLootTactical() {
             
             <div style={{ textAlign: 'center', marginBottom: '12px' }}>
               <div style={{
-                width: '80px',
+                width: '60px',
                 height: '60px',
                 margin: '0 auto 8px',
                 display: 'flex',
@@ -8891,16 +8891,6 @@ export default function TurfLootTactical() {
                 justifyContent: 'center',
                 position: 'relative'
               }}>
-                {/* Green selection oval */}
-                <div style={{
-                  width: '75px',
-                  height: '55px',
-                  border: '3px solid #22c55e',
-                  borderRadius: '50%',
-                  position: 'absolute',
-                  background: 'transparent'
-                }} />
-                
                 {/* Blue character circle */}
                 <div style={{
                   width: '45px',
@@ -8911,8 +8901,7 @@ export default function TurfLootTactical() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  position: 'relative',
-                  zIndex: 1
+                  position: 'relative'
                 }}>
                   {/* Black dot eyes */}
                   <div style={{
