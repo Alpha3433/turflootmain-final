@@ -1078,6 +1078,33 @@ export default function TurfLootTactical() {
 
   const eyePositions = getEyePositions()
 
+  // Memoized background styles to prevent resets on state changes
+  const mobileBackgroundStyles = useMemo(() => ({
+    backgroundContainer: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      zIndex: 1,
+      overflow: 'hidden'
+    },
+    mobileGrid: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '120%',
+      height: '120%',
+      opacity: 0.3,
+      backgroundImage: `
+        linear-gradient(rgba(104, 211, 145, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(104, 211, 145, 0.3) 1px, transparent 1px)
+      `,
+      backgroundSize: '40px 40px',
+      animation: 'tacticalGrid 35s linear infinite'
+    }
+  }), []) // Empty dependency array - these styles never change
+
   // Stable random values for background animations (client-side only)
   const [floatingElements, setFloatingElements] = useState([])
   const [codeElements, setCodeElements] = useState([])
