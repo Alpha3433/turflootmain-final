@@ -2134,6 +2134,24 @@ const AgarIOGame = () => {
   // Cash out handling
   const cashOutIntervalRef = useRef(null)
   
+  // Handle cash out button press (for mobile and desktop buttons)
+  const handleCashOut = () => {
+    if (!isCashingOut && !cashOutComplete && gameStarted) {
+      console.log('Starting cash out process via button') // Debug log
+      setIsCashingOut(true)
+      setCashOutProgress(0)
+    } else if (isCashingOut) {
+      console.log('Canceling cash out via button') // Debug log
+      // Cancel cash out if already in progress
+      setIsCashingOut(false)
+      setCashOutProgress(0)
+      if (cashOutIntervalRef.current) {
+        clearInterval(cashOutIntervalRef.current)
+        cashOutIntervalRef.current = null
+      }
+    }
+  }
+  
   // Cash out key event handlers (separated from the interval logic)
   useEffect(() => {
     const handleKeyDown = (e) => {
