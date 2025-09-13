@@ -8688,25 +8688,6 @@ export default function TurfLootTactical() {
             <button 
               style={{
                 ...secondaryButtonStyle,
-                fontSize: '10px',
-                padding: '8px 12px'
-              }}
-              onClick={async () => {
-                console.log('HOW TO PLAY button clicked!')
-                const authenticated = await requireAuthentication('HOW TO PLAY')
-                if (authenticated) {
-                  console.log('📖 User authenticated, showing how to play...')
-                  alert('HOW TO PLAY: Move with mouse, collect coins to grow, hold E to cash out!')
-                } else {
-                  console.log('❌ Authentication failed, blocking access to HOW TO PLAY')
-                }
-              }}
-            >
-              HOW TO PLAY
-            </button>
-            <button 
-              style={{
-                ...secondaryButtonStyle,
                 background: (currentParty && currentParty.members && currentParty.members.length > 1) ? 'rgba(107, 114, 128, 0.3)' : 'rgba(59, 130, 246, 0.1)',
                 border: (currentParty && currentParty.members && currentParty.members.length > 1) ? '1px solid #6b7280' : '1px solid #3b82f6',
                 color: (currentParty && currentParty.members && currentParty.members.length > 1) ? '#9ca3af' : '#3b82f6',
@@ -8773,6 +8754,25 @@ export default function TurfLootTactical() {
               disabled={currentParty && currentParty.members && currentParty.members.length > 1}
             >
               {isLoadingLocalPractice ? '⏳ LOADING...' : ((currentParty && currentParty.members && currentParty.members.length > 1) ? '🔒 LOCAL PRACTICE' : 'LOCAL PRACTICE')}
+            </button>
+            <button 
+              style={{
+                ...secondaryButtonStyle,
+                fontSize: '10px',
+                padding: '8px 12px'
+              }}
+              onClick={async () => {
+                console.log('HOW TO PLAY button clicked!')
+                const authenticated = await requireAuthentication('HOW TO PLAY')
+                if (authenticated) {
+                  console.log('📖 User authenticated, showing how to play...')
+                  alert('HOW TO PLAY: Move with mouse, collect coins to grow, hold E to cash out!')
+                } else {
+                  console.log('❌ Authentication failed, blocking access to HOW TO PLAY')
+                }
+              }}
+            >
+              HOW TO PLAY
             </button>
           </div>
         </div>
