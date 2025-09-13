@@ -1020,6 +1020,27 @@ export default function TurfLootTactical() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
+  // Eye tracking scroll effect for mobile CUSTOMIZE panel
+  useEffect(() => {
+    if (!isMobile) return
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const windowHeight = window.innerHeight
+      const scrollProgress = Math.min(scrollY / (windowHeight * 0.5), 1)
+      
+      // Calculate eye movement based on scroll position
+      const maxEyeMovement = 2 // Maximum pixels the eyes can move
+      const eyeX = Math.sin(scrollProgress * Math.PI * 2) * maxEyeMovement
+      const eyeY = (scrollProgress - 0.5) * maxEyeMovement * 2
+      
+      setEyePosition({ x: eyeX, y: Math.max(-maxEyeMovement, Math.min(maxEyeMovement, eyeY)) })
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isMobile])
+
   // Calculate eye positions based on mouse position
   const getEyePositions = () => {
     if (typeof window === 'undefined' || !circleRef.current) {
