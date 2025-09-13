@@ -8977,13 +8977,6 @@ export default function TurfLootTactical() {
           {/* Command Panel - Enhanced Leaderboard */}
           <div style={tacticalPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ 
-                ...iconStyle, 
-                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)', 
-                color: '#1a202c',
-                boxShadow: '0 0 15px rgba(246, 173, 85, 0.6)',
-                border: '1px solid #f6ad55'
-              }}>🎯</div>
               <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>LEADERBOARD</h3>
               <div style={{ marginLeft: 'auto' }}>
                 <div style={{
