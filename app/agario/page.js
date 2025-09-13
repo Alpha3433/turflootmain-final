@@ -47,6 +47,9 @@ const AgarIOGame = () => {
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
   
+  // Eye tracking state for mobile character
+  const [eyePosition, setEyePosition] = useState({ x: 0, y: 0 })
+  
   useEffect(() => {
     const checkMobile = () => {
       if (typeof window !== 'undefined') {
@@ -65,6 +68,29 @@ const AgarIOGame = () => {
       }
     }
   }, [])
+
+  // Eye tracking scroll effect for mobile
+  useEffect(() => {
+    if (!isMobile) return
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const windowHeight = window.innerHeight
+      const scrollProgress = Math.min(scrollY / (windowHeight * 0.5), 1)
+      
+      // Calculate eye movement based on scroll position
+      const maxEyeMovement = 2 // Maximum pixels the eyes can move
+      const eyeX = Math.sin(scrollProgress * Math.PI * 2) * maxEyeMovement
+      const eyeY = (scrollProgress - 0.5) * maxEyeMovement * 2
+      
+      setEyePosition({ x: eyeX, y: Math.max(-maxEyeMovement, Math.min(maxEyeMovement, eyeY)) })
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      return () => window.removeEventListener('scroll', handleScroll)
+    }
+  }, [isMobile])
 
   // Virtual joystick handlers for mobile
   const handleJoystickStart = (e) => {
