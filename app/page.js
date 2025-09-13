@@ -425,6 +425,7 @@ export default function TurfLootTactical() {
   const [liveStats, setLiveStats] = useState({ players: 0, winnings: 0 })
   const [userName, setUserName] = useState('PLAYER')
   const [isMobile, setIsMobile] = useState(false)
+  const [eyePosition, setEyePosition] = useState({ x: 0, y: 0 })
   const [activeFriends, setActiveFriends] = useState(0)
   const [leaderboard, setLeaderboard] = useState([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
