@@ -9035,13 +9035,6 @@ export default function TurfLootTactical() {
           {/* Squad Panel - Dynamic Party Display */}
           <div style={tacticalPanelStyle}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <div style={{ 
-                ...iconStyle, 
-                background: currentParty ? 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)' : 'linear-gradient(45deg, #fc8181 0%, #e53e3e 100%)', 
-                color: '#ffffff',
-                boxShadow: currentParty ? '0 0 15px rgba(104, 211, 145, 0.6)' : '0 0 15px rgba(252, 129, 129, 0.6)',
-                border: currentParty ? '1px solid #68d391' : '1px solid #fc8181'
-              }}>👥</div>
               <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>
                 PARTY
               </h3>
