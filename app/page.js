@@ -8885,37 +8885,17 @@ export default function TurfLootTactical() {
               <div style={{
                 width: '60px',
                 height: '60px',
-                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                background: '#3b82f6',
                 borderRadius: '50%',
                 margin: '0 auto 8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                border: '2px solid #60a5fa',
-                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.1)'
+                border: '3px solid #60a5fa',
+                boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(59, 130, 246, 0.2)'
               }}>
-                {/* Avatar eyes */}
-                <div style={{
-                  display: 'flex',
-                  gap: '10px',
-                  alignItems: 'center'
-                }}>
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '50%',
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
-                  }} />
-                  <div style={{
-                    width: '8px',  
-                    height: '8px',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '50%',
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
-                  }} />
-                </div>
+                {/* Simple game-style character - solid color like in-game */}
               </div>
             </div>
             
