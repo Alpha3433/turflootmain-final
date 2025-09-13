@@ -8885,7 +8885,7 @@ export default function TurfLootTactical() {
               <div style={{
                 width: '60px',
                 height: '60px',
-                background: '#3b82f6',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                 borderRadius: '50%',
                 margin: '0 auto 8px',
                 display: 'flex',
@@ -8893,25 +8893,27 @@ export default function TurfLootTactical() {
                 justifyContent: 'center',
                 position: 'relative',
                 border: '2px solid #60a5fa',
-                boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.1)'
               }}>
                 {/* Avatar eyes */}
                 <div style={{
                   display: 'flex',
-                  gap: '8px',
+                  gap: '10px',
                   alignItems: 'center'
                 }}>
                   <div style={{
-                    width: '6px',
-                    height: '6px',
+                    width: '8px',
+                    height: '8px',
                     backgroundColor: '#ffffff',
-                    borderRadius: '50%'
+                    borderRadius: '50%',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                   }} />
                   <div style={{
-                    width: '6px',  
-                    height: '6px',
+                    width: '8px',  
+                    height: '8px',
                     backgroundColor: '#ffffff',
-                    borderRadius: '50%'
+                    borderRadius: '50%',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
                   }} />
                 </div>
               </div>
@@ -8942,7 +8944,7 @@ export default function TurfLootTactical() {
               fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
             }}>
-              🛒 VIEW STORE
+              VIEW STORE
             </button>
             
             <button 
@@ -8969,7 +8971,7 @@ export default function TurfLootTactical() {
               fontFamily: '"Rajdhani", sans-serif',
               textTransform: 'uppercase'
             }}>
-              🎨 CHANGE SKIN
+              CHANGE SKIN
             </button>
           </div>
 
