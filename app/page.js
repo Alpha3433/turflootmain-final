@@ -1239,14 +1239,21 @@ export default function TurfLootTactical() {
       // Check user agent for mobile devices
       const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       
-      // Check viewport dimensions - either dimension under 768 OR both under 1024 for small tablets
-      const isSmallViewport = Math.min(window.innerWidth, window.innerHeight) <= 768 || 
-                              (window.innerWidth <= 1024 && window.innerHeight <= 768)
+      // Check viewport dimensions - mobile if smallest dimension <= 768 (handles landscape)
+      const isSmallViewport = Math.min(window.innerWidth, window.innerHeight) <= 768
+      
+      // Check for mobile-like aspect ratios in landscape (very wide but short screens)
+      const isMobileLandscape = window.innerHeight <= 500 && window.innerWidth > window.innerHeight * 1.5
       
       // Device is mobile if:
       // 1. Has touch AND mobile user agent (primary check)
-      // 2. OR has touch AND small viewport (fallback for touch devices)
-      const mobile = (isTouchDevice && isMobileUA) || (isTouchDevice && isSmallViewport)
+      // 2. OR has touch AND small viewport (fallback for touch devices)  
+      // 3. OR has small viewport regardless of touch (for automation/testing)
+      // 4. OR is mobile landscape aspect ratio
+      const mobile = (isTouchDevice && isMobileUA) || 
+                     (isTouchDevice && isSmallViewport) || 
+                     isSmallViewport || 
+                     isMobileLandscape
       
       console.log('📱 Mobile Detection:', {
         isTouchDevice,
