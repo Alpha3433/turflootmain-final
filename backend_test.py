@@ -438,24 +438,21 @@ class TurfLootAgarioBackendTester:
             return False
 
     def run_all_tests(self):
-        """Run all backend tests for Privy Solana deposit integration"""
-        print("🚀 STARTING COMPREHENSIVE BACKEND TESTING FOR PRIVY SOLANA DEPOSIT INTEGRATION")
+        """Run all backend tests for TurfLoot Agario Game after Mobile Stats Panel UI changes"""
+        print("🚀 STARTING COMPREHENSIVE BACKEND TESTING FOR TURFLOOT AGARIO GAME")
         print("=" * 80)
-        print("Testing Focus: Backend API Health after SSR fixes and Solana dependency installation")
-        print("Key Dependencies: @solana/kit and @solana/spl-token")
+        print("Testing Focus: Backend API Health after Mobile Stats Panel Sub-Labels Implementation")
+        print("UI Changes: Added sub-labels (K/D, Streak, Time, Net Worth, Mass) to mobile stats panel")
         print("=" * 80)
         print()
         
         # Run all tests
         tests = [
             self.test_api_health_check,
-            self.test_solana_wallet_balance_guest,
-            self.test_solana_wallet_balance_jwt_auth,
-            self.test_solana_wallet_balance_privy_token,
-            self.test_api_performance_after_solana_deps,
-            self.test_error_handling_solana_operations,
-            self.test_solana_deposit_backend_support,
-            self.test_authentication_state_persistence
+            self.test_game_session_apis,
+            self.test_user_balance_stats_apis,
+            self.test_server_browser_integration,
+            self.test_backend_regression_testing
         ]
         
         passed_tests = 0
