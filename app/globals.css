@@ -50,6 +50,34 @@
     overflow-x: hidden;
   }
   
+  /* Mobile game optimization */
+  @media (max-width: 768px) {
+    html, body {
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      position: relative;
+      width: 100vw;
+    }
+    
+    body.mobile-game-active {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      background: #000000 !important;
+      touch-action: none !important;
+      overscroll-behavior: none !important;
+    }
+  }
+  
   /* Ensure full viewport coverage on mobile */
   #__next {
     min-height: 100vh;
