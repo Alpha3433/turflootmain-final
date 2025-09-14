@@ -10727,7 +10727,7 @@ export default function TurfLootTactical() {
                         setWithdrawalAmount(halfAmount);
                       }}
                       style={{
-                        backgroundColor: '#3b82f6',
+                        backgroundColor: '#10b981',
                         border: 'none',
                         borderRadius: '4px',
                         color: '#ffffff',
@@ -10735,13 +10735,14 @@ export default function TurfLootTactical() {
                         fontWeight: '600',
                         padding: '4px 12px',
                         cursor: 'pointer',
-                        transition: 'all 150ms'
+                        transition: 'all 150ms',
+                        fontFamily: '"Rajdhani", sans-serif'
                       }}
                       onMouseOver={(e) => {
-                        e.target.style.backgroundColor = '#2563eb'
+                        e.target.style.backgroundColor = '#059669'
                       }}
                       onMouseOut={(e) => {
-                        e.target.style.backgroundColor = '#3b82f6'
+                        e.target.style.backgroundColor = '#10b981'
                       }}
                     >
                       ½
@@ -10760,7 +10761,8 @@ export default function TurfLootTactical() {
                         fontWeight: '600',
                         padding: '4px 12px',
                         cursor: 'pointer',
-                        transition: 'all 150ms'
+                        transition: 'all 150ms',
+                        fontFamily: '"Rajdhani", sans-serif'
                       }}
                       onMouseOver={(e) => {
                         e.target.style.backgroundColor = '#d97706'
