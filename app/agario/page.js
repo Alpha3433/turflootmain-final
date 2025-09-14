@@ -2778,7 +2778,7 @@ const AgarIOGame = () => {
           {/* Players in game counter */}
           <div style={{ 
             color: '#00ffff', 
-            fontSize: '10px', 
+            fontSize: isMobile ? '8px' : '10px', 
             fontWeight: '600',
             textAlign: 'center',
             paddingTop: '6px',
