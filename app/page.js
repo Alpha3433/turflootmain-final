@@ -9680,6 +9680,15 @@ export default function TurfLootTactical() {
             opacity: 1;
           }
         }
+        
+        @keyframes rotatePhone {
+          0% { 
+            transform: rotate(0deg);
+          }
+          100% { 
+            transform: rotate(15deg);
+          }
+        }
       `}</style>
 
       {/* Server Browser Modal - Keep the existing one */}
