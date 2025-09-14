@@ -5442,14 +5442,14 @@ export default function TurfLootTactical() {
                             }}
                             onMouseOver={(e) => {
                               if (selectedServer !== server.code) {
-                                e.target.style.backgroundColor = 'rgba(246, 173, 85, 0.05)'
-                                e.target.style.color = '#f6ad55'
+                                e.currentTarget.style.backgroundColor = 'rgba(246, 173, 85, 0.05)'
+                                e.currentTarget.style.color = '#f6ad55'
                               }
                             }}
                             onMouseOut={(e) => {
                               if (selectedServer !== server.code) {
-                                e.target.style.backgroundColor = 'transparent'
-                                e.target.style.color = '#ffffff'
+                                e.currentTarget.style.backgroundColor = 'transparent'
+                                e.currentTarget.style.color = '#ffffff'
                               }
                             }}
                           >
