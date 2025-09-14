@@ -2637,7 +2637,7 @@ const AgarIOGame = () => {
                   opacity: isMobile && !leaderboardExpanded && index >= 3 ? 0 : 1,
                   transform: isMobile && !leaderboardExpanded && index >= 3 ? 'translateY(-10px)' : 'translateY(0)'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '4px' : '3px') : '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '3px' : '2px') : '6px' }}>
                     <span style={{ 
                       color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
                       fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
