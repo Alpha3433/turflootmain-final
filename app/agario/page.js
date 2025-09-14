@@ -159,6 +159,15 @@ const AgarIOGame = () => {
     // Always update visual position of joystick knob
     setJoystickPosition({ x: knobX, y: knobY })
     
+    // Debug what's actually in gameRef
+    console.log('🔍 Debug gameRef:', {
+      gameRefExists: !!gameRef.current,
+      gameRefType: typeof gameRef.current,
+      hasGameProperty: gameRef.current?.hasOwnProperty('game'),
+      gameProperty: gameRef.current?.game,
+      gameRefKeys: gameRef.current ? Object.keys(gameRef.current) : 'none'
+    })
+    
     // Only update player movement if game is ready
     if (gameRef.current?.game) {
       const strength = distance / 35 // Normalize to 0-1
@@ -220,6 +229,15 @@ const AgarIOGame = () => {
     
     // Always update visual position of joystick knob
     setJoystickPosition({ x: knobX, y: knobY })
+    
+    // Debug what's actually in gameRef
+    console.log('🔍 Debug gameRef:', {
+      gameRefExists: !!gameRef.current,
+      gameRefType: typeof gameRef.current,
+      hasGameProperty: gameRef.current?.hasOwnProperty('game'),
+      gameProperty: gameRef.current?.game,
+      gameRefKeys: gameRef.current ? Object.keys(gameRef.current) : 'none'
+    })
     
     // Only update player movement if game is ready
     if (gameRef.current?.game) {
