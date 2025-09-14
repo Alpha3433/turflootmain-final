@@ -3684,12 +3684,13 @@ const AgarIOGame = () => {
             ? 'none' 
             : '2px solid #333',
           borderRadius: isMobile ? '6px' : '4px',
-          padding: isMobile ? (statsExpanded ? '4px 6px' : '2px 4px') : '12px 16px',
-          fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '13px',
+          padding: isMobile ? (statsExpanded ? '4px 6px' : '2px 4px') : '16px 20px',
+          fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '12px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: isMobile ? (statsExpanded ? '100px' : '75px') : '140px',
+          minWidth: isMobile ? (statsExpanded ? '100px' : '75px') : '200px',
+          maxWidth: isMobile ? 'none' : '250px',
           transition: 'all 0.2s ease'
         }}>
           {/* Header */}
