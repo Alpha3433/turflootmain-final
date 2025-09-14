@@ -3305,7 +3305,7 @@ export default function TurfLootTactical() {
           const gameMode = server.mode || 'practice'
           const gameUrl = `/agario?roomId=${roomId}&mode=${gameMode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=hathora&server=${server.id}&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&realroom=true`
           console.log('🎮 Redirecting to REAL Hathora room:', gameUrl)
-          window.location.href = gameUrl
+          checkOrientationAndEnterGame(gameUrl)
           
         } catch (error) {
           console.error('❌ REAL Hathora room creation failed:', error)
