@@ -1773,7 +1773,15 @@ export default function TurfLootTactical() {
 
   const handleWithdraw = async () => {
     try {
-      console.log('💸 WITHDRAW button clicked - requiring authentication')
+      console.log('💸 WITHDRAW button clicked')
+      
+      // For mobile, skip authentication popups and show a simple message
+      if (isMobile) {
+        console.log('📱 Mobile withdraw clicked - showing simple notification')
+        // Just log the action for mobile, no popup
+        console.log('💸 Mobile withdraw functionality - feature coming soon')
+        return
+      }
       
       const authenticated = await requireAuthentication('WITHDRAW')
       if (!authenticated) {
