@@ -39,7 +39,7 @@ class TurfLootAgarioBackendTester:
         print()
 
     def test_api_health_check(self):
-        """Test 1: Core API Health Check after Solana dependency installation"""
+        """Test 1: Core API Health Check - Verify core API endpoints are accessible"""
         print("🔍 Testing API Health Check...")
         
         try:
@@ -50,10 +50,11 @@ class TurfLootAgarioBackendTester:
             if response.status_code == 200:
                 data = response.json()
                 server_name = data.get('server', 'unknown')
+                features = data.get('features', [])
                 self.log_result(
                     "API Health Check", 
                     True, 
-                    f"API accessible with {server_name} server, confirming backend infrastructure is operational after Solana dependency installation",
+                    f"Core API endpoints accessible and responding correctly (Service: {server_name}, Features: {'/'.join(features)})",
                     response_time
                 )
                 return True
