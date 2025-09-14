@@ -50,12 +50,22 @@
     overflow-x: hidden;
   }
   
-  /* Mobile game optimization */
-  @media (max-width: 768px) {
+  /* Mobile game optimization - includes touch devices in landscape */
+  @media (max-width: 768px), (max-height: 768px) and (pointer: coarse) {
     html, body {
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
+      position: relative;
+      width: 100vw;
+    }
+  }
+  
+  /* Force mobile layout for touch devices regardless of screen size */
+  @media (pointer: coarse) and (hover: none) {
+    html, body {
+      height: 100vh;
+      height: 100dvh;
       position: relative;
       width: 100vw;
     }
