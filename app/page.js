@@ -10627,11 +10627,11 @@ export default function TurfLootTactical() {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{
-                    color: '#10b981',
+                    color: parseFloat(walletBalance.usd || 0) > 0 ? '#10b981' : '#ef4444',
                     fontSize: isMobile ? '16px' : '18px',
                     fontWeight: '700',
                     fontFamily: '"Rajdhani", sans-serif',
-                    textShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+                    textShadow: parseFloat(walletBalance.usd || 0) > 0 ? '0 0 8px rgba(16, 185, 129, 0.4)' : '0 0 8px rgba(239, 68, 68, 0.4)'
                   }}>
                     ${parseFloat(walletBalance.usd || 0).toFixed(2)}
                   </div>
