@@ -213,7 +213,48 @@ export default function TurfLootTactical() {
       console.log('❌ Public RPC error:', error.message)
     }
     
-    // OPTION 2: Fallback to other RPC providers
+    // OPTION 2: Try Helius RPC as backup (if configured)
+    const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC
+    
+    if (heliusRpc) {
+      try {
+        console.log('🔄 Trying Helius RPC as backup')
+        
+        const response = await fetch(heliusRpc, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBalance', 
+            params: [walletAddress]
+          }),
+          signal: AbortSignal.timeout(5000)
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.result?.value !== undefined) {
+            const solBalance = data.result.value / 1000000000
+            console.log(`✅ Balance from Helius backup:`, solBalance, 'SOL')
+            
+            // DEPOSIT DETECTION: Check for balance increases
+            await detectDepositAndProcessFee(solBalance, walletAddress)
+            
+            return solBalance
+          }
+        } else {
+          console.log('❌ Helius backup failed:', response.status)
+        }
+      } catch (error) {
+        console.log('❌ Helius backup error:', error.message)
+      }
+    }
+    
+    // OPTION 3: Fallback to other RPC providers
     const fallbackEndpoints = [
       'https://api.mainnet-beta.solana.com',
       'https://rpc.ankr.com/solana'
