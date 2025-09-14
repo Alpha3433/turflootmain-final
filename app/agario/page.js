@@ -2230,8 +2230,10 @@ const AgarIOGame = () => {
 
     const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
     gameRef.current = game
+    console.log('🎮 Game initialized and assigned to gameRef')
     
     game.start()
+    console.log('🎮 Game started - Joystick should now be functional')
 
     // Game loop
     const gameLoop = () => {
