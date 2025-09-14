@@ -439,6 +439,17 @@ export default function TurfLootTactical() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [customUsername, setCustomUsername] = useState('')
+  const [serverSelectorOpen, setServerSelectorOpen] = useState(false)
+  const [selectedServer, setSelectedServer] = useState('US-W')
+  
+  // Server options for the selector
+  const serverOptions = [
+    { code: 'US-W', name: 'US West', ping: 12, players: 24 },
+    { code: 'US-E', name: 'US East', ping: 28, players: 31 },
+    { code: 'EU', name: 'Europe', ping: 45, players: 18 },
+    { code: 'ASIA', name: 'Asia Pacific', ping: 67, players: 12 },
+    { code: 'SA', name: 'South America', ping: 52, players: 8 }
+  ]
   
   // Sync Privy authentication state with local state
   useEffect(() => {
