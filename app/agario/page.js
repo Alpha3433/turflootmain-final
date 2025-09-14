@@ -2642,7 +2642,7 @@ const AgarIOGame = () => {
                       color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
                       fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
                       fontWeight: '700',
-                      minWidth: isMobile ? (leaderboardExpanded ? '12px' : '10px') : '14px'
+                      minWidth: isMobile ? (leaderboardExpanded ? '10px' : '8px') : '14px'
                     }}>
                       #{index + 1}
                     </span>
