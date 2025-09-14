@@ -3381,16 +3381,16 @@ const AgarIOGame = () => {
                 key={`virus-${i}`}
                 style={{
                   position: 'absolute',
-                  width: '8px',
-                  height: '8px',
+                  width: isMobile ? '4px' : '8px',
+                  height: isMobile ? '4px' : '8px',
                   backgroundColor: '#00ff41',
                   borderRadius: '50%',
-                  left: `${(virus.x / 4000) * 210 + 5}px`,
-                  top: `${(virus.y / 4000) * 210 + 5}px`,
+                  left: `${(virus.x / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
+                  top: `${(virus.y / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
                   transform: 'translate(-50%, -50%)',
                   opacity: '1',
-                  border: '1px solid #00aa00',
-                  boxShadow: '0 0 6px rgba(0, 255, 65, 0.8)',
+                  border: isMobile ? '0.5px solid #00aa00' : '1px solid #00aa00',
+                  boxShadow: isMobile ? '0 0 3px rgba(0, 255, 65, 0.8)' : '0 0 6px rgba(0, 255, 65, 0.8)',
                   zIndex: 6
                 }}
               />
