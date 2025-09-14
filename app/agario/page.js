@@ -2631,7 +2631,10 @@ const AgarIOGame = () => {
                   backgroundColor: player.isPlayer ? 'rgba(0, 255, 255, 0.1)' : 'transparent',
                   borderRadius: isMobile ? '6px' : '4px',
                   border: player.isPlayer ? '1px solid rgba(0, 255, 255, 0.3)' : 'none',
-                  minHeight: isMobile ? (leaderboardExpanded ? 'auto' : '16px') : 'auto'
+                  minHeight: isMobile ? (leaderboardExpanded ? 'auto' : '16px') : 'auto',
+                  transition: 'all 0.2s ease',
+                  opacity: isMobile && !leaderboardExpanded && index >= 3 ? 0 : 1,
+                  transform: isMobile && !leaderboardExpanded && index >= 3 ? 'translateY(-10px)' : 'translateY(0)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '4px' : '3px') : '6px' }}>
                     <span style={{ 
