@@ -2554,16 +2554,17 @@ const AgarIOGame = () => {
         <div 
           style={{ 
             position: 'fixed', 
-            top: '10px', 
-            left: '10px', 
+            top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 5px)' : '10px', 
+            left: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 5px)' : '10px', 
             zIndex: 1000,
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            border: '2px solid rgba(0, 255, 255, 0.3)',
-            borderRadius: isMobile ? '12px' : '6px',
-            padding: isMobile ? '12px' : '10px',
-            minWidth: isMobile ? '140px' : '160px',
-            maxWidth: isMobile ? '160px' : '180px',
-            fontFamily: '"Rajdhani", sans-serif'
+            border: isMobile ? '1px solid rgba(0, 255, 255, 0.3)' : '2px solid rgba(0, 255, 255, 0.3)',
+            borderRadius: isMobile ? '8px' : '6px',
+            padding: isMobile ? (leaderboardExpanded ? '6px' : '4px') : '10px',
+            minWidth: isMobile ? (leaderboardExpanded ? '110px' : '90px') : '160px',
+            maxWidth: isMobile ? (leaderboardExpanded ? '120px' : '100px') : '180px',
+            fontFamily: '"Rajdhani", sans-serif',
+            transition: 'all 0.3s ease'
           }}
         >
           {/* Header */}
