@@ -4355,6 +4355,366 @@ const AgarIOGame = () => {
             </div>
           </div>
         )}
+      
+      {/* Report Player Modal */}
+      {reportModalVisible && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999999,
+          backdropFilter: 'blur(10px)',
+          pointerEvents: 'auto'
+        }}>
+          <div style={{
+            backgroundColor: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
+            border: '3px solid #ff4444',
+            borderRadius: isMobile ? '12px' : '16px',
+            maxWidth: isMobile ? '340px' : '500px',
+            width: '90%',
+            padding: '0',
+            color: 'white',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 68, 68, 0.3)',
+            fontFamily: '"Rajdhani", sans-serif',
+            position: 'relative'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setReportModalVisible(false)
+                setReportType('')
+                setReportReason('')
+                setReportTarget('')
+              }}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                color: '#ffffff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                zIndex: 1,
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                e.target.style.transform = 'scale(1.1)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                e.target.style.transform = 'scale(1)'
+              }}
+            >
+              ×
+            </button>
+
+            {/* Header */}
+            <div style={{
+              padding: isMobile ? '20px' : '24px',
+              borderBottom: '2px solid rgba(255, 68, 68, 0.3)',
+              background: 'linear-gradient(45deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 68, 68, 0.05) 100%)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: isMobile ? '50px' : '70px',
+                height: isMobile ? '50px' : '70px',
+                background: 'linear-gradient(45deg, #ff4444 0%, #cc3333 100%)',
+                borderRadius: isMobile ? '10px' : '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMobile ? '24px' : '32px',
+                margin: isMobile ? '0 auto 12px' : '0 auto 16px',
+                boxShadow: '0 0 20px rgba(255, 68, 68, 0.4)'
+              }}>
+                🚨
+              </div>
+              <h2 style={{
+                color: '#ff4444',
+                fontSize: isMobile ? '20px' : '28px',
+                fontWeight: '700',
+                margin: isMobile ? '0 0 6px' : '0 0 8px',
+                textTransform: 'uppercase',
+                textShadow: '0 0 15px rgba(255, 68, 68, 0.6)',
+                letterSpacing: isMobile ? '0.5px' : '1px'
+              }}>
+                Report Player
+              </h2>
+              <p style={{
+                color: '#e2e8f0',
+                fontSize: isMobile ? '12px' : '16px',
+                margin: '0',
+                opacity: '0.9'
+              }}>
+                Help us maintain fair play
+              </p>
+            </div>
+
+            {/* Body Content */}
+            <div style={{ padding: isMobile ? '16px' : '24px' }}>
+              {/* Report Target */}
+              <div style={{
+                backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                border: '1px solid rgba(255, 68, 68, 0.3)',
+                borderRadius: '8px',
+                padding: isMobile ? '8px' : '12px',
+                marginBottom: isMobile ? '16px' : '20px',
+                textAlign: 'center'
+              }}>
+                <div style={{ 
+                  color: '#ff4444', 
+                  fontSize: isMobile ? '11px' : '14px', 
+                  fontWeight: '600',
+                  marginBottom: isMobile ? '4px' : '6px',
+                  textTransform: 'uppercase'
+                }}>
+                  Reporting Player
+                </div>
+                <div style={{ 
+                  color: '#ffffff', 
+                  fontSize: isMobile ? '16px' : '20px', 
+                  fontWeight: '700'
+                }}>
+                  {reportTarget || 'Unknown Player'}
+                </div>
+              </div>
+
+              {/* Report Type Selection */}
+              <div style={{
+                marginBottom: isMobile ? '16px' : '20px'
+              }}>
+                <div style={{ 
+                  color: '#e2e8f0', 
+                  fontSize: isMobile ? '12px' : '14px', 
+                  fontWeight: '600',
+                  marginBottom: isMobile ? '8px' : '12px',
+                  textTransform: 'uppercase'
+                }}>
+                  Select Report Reason
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {[
+                    { value: 'cheating', label: '🎯 Cheating/Hacking' },
+                    { value: 'teaming', label: '🤝 Teaming/Collaboration' },
+                    { value: 'griefing', label: '😡 Griefing/Trolling' },
+                    { value: 'harassment', label: '💬 Harassment/Abuse' },
+                    { value: 'botting', label: '🤖 Botting/Automation' },
+                    { value: 'other', label: '❓ Other Violation' }
+                  ].map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => setReportType(option.value)}
+                      style={{
+                        backgroundColor: reportType === option.value ? 'rgba(255, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                        border: reportType === option.value ? '2px solid #ff4444' : '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: isMobile ? '11px' : '13px',
+                        fontWeight: '500',
+                        padding: isMobile ? '8px 12px' : '10px 16px',
+                        cursor: 'pointer',
+                        transition: 'all 150ms',
+                        fontFamily: '"Rajdhani", sans-serif',
+                        textAlign: 'left'
+                      }}
+                      onMouseOver={(e) => {
+                        if (reportType !== option.value) {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+                        }
+                      }}
+                      onMouseOut={(e) => {
+                        if (reportType !== option.value) {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Reason Text Box */}
+              <div style={{
+                marginBottom: isMobile ? '16px' : '20px'
+              }}>
+                <div style={{ 
+                  color: '#e2e8f0', 
+                  fontSize: isMobile ? '12px' : '14px', 
+                  fontWeight: '600',
+                  marginBottom: isMobile ? '8px' : '12px',
+                  textTransform: 'uppercase'
+                }}>
+                  Additional Details (Optional)
+                </div>
+                <textarea
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  placeholder="Describe what happened... (Optional)"
+                  style={{
+                    width: '100%',
+                    height: isMobile ? '80px' : '100px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '6px',
+                    color: '#ffffff',
+                    fontSize: isMobile ? '11px' : '13px',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    padding: '12px',
+                    resize: 'none',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#ff4444'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+                  }}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: isMobile ? '8px' : '12px',
+                flexDirection: 'column'
+              }}>
+                {/* Submit Report Button */}
+                <button
+                  onClick={async () => {
+                    if (!reportType) {
+                      alert('Please select a report reason.')
+                      return
+                    }
+                    
+                    try {
+                      // Create report data
+                      const reportData = {
+                        reportType,
+                        reportReason: reportReason.trim(),
+                        reportTarget,
+                        timestamp: new Date().toISOString(),
+                        reporterId: privyUser?.id || 'anonymous',
+                        gameSession: 'agario-session'
+                      }
+                      
+                      console.log('📝 Submitting report:', reportData)
+                      
+                      // Send report to backend (we'll create this API endpoint)
+                      const response = await fetch('/api/reports', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(reportData)
+                      })
+                      
+                      if (response.ok) {
+                        alert('Report submitted successfully. Thank you for helping maintain fair play!')
+                        setReportModalVisible(false)
+                        setReportType('')
+                        setReportReason('')
+                        setReportTarget('')
+                      } else {
+                        throw new Error('Failed to submit report')
+                      }
+                    } catch (error) {
+                      console.error('❌ Report submission error:', error)
+                      alert('Failed to submit report. Please try again.')
+                    }
+                  }}
+                  disabled={!reportType}
+                  style={{
+                    backgroundColor: reportType ? '#ff4444' : '#666666',
+                    border: reportType ? '2px solid #cc3333' : '2px solid #444444',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: isMobile ? '12px' : '16px',
+                    fontWeight: '700',
+                    padding: isMobile ? '10px' : '12px 24px',
+                    cursor: reportType ? 'pointer' : 'not-allowed',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    opacity: reportType ? 1 : 0.5
+                  }}
+                  onMouseOver={(e) => {
+                    if (reportType) {
+                      e.target.style.backgroundColor = '#cc3333'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (reportType) {
+                      e.target.style.backgroundColor = '#ff4444'
+                      e.target.style.transform = 'translateY(0)'
+                    }
+                  }}
+                >
+                  📝 Submit Report
+                </button>
+                
+                {/* Cancel Button */}
+                <button
+                  onClick={() => {
+                    setReportModalVisible(false)
+                    setReportType('')
+                    setReportReason('')
+                    setReportTarget('')
+                  }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '2px solid #a0aec0',
+                    borderRadius: '8px',
+                    color: '#a0aec0',
+                    fontSize: isMobile ? '11px' : '14px',
+                    fontWeight: '600',
+                    padding: isMobile ? '8px' : '10px 20px',
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#a0aec0'
+                    e.target.style.color = '#1a202c'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = 'transparent'
+                    e.target.style.color = '#a0aec0'
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       </div>
 
 
