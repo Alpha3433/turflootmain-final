@@ -4600,6 +4600,9 @@ const AgarIOGame = () => {
                     console.log('🔍 Submit Report button clicked!')
                     console.log('📊 Report state:', { reportType, reportReason, reportTarget })
                     
+                    // Simple test first
+                    alert('Button clicked! Report type: ' + reportType)
+                    
                     if (!reportType) {
                       console.log('❌ No report type selected')
                       alert('Please select a report reason.')
