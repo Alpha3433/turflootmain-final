@@ -3100,14 +3100,17 @@ const AgarIOGame = () => {
         {/* Action Buttons - Mobile Optimized Circular Design */}
         <div style={{
           position: 'fixed',
-          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 30px)' : '40px',
-          right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 20px)' : 'auto',
-          transform: isMobile ? 'none' : 'translateX(-50%)',
+          // Mobile: Right side middle for horizontal thumb access
+          // Desktop: Bottom center as before
+          bottom: isMobile ? 'auto' : '40px',
+          top: isMobile ? '50%' : 'auto',
+          right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 15px)' : 'auto',
+          transform: isMobile ? 'translateY(-50%)' : 'translateX(-50%)',
           left: isMobile ? 'auto' : '50%',
           zIndex: 1000,
           display: 'flex',
           flexDirection: isMobile ? 'column' : 'row',
-          gap: isMobile ? '20px' : '12px',
+          gap: isMobile ? '15px' : '12px',
           alignItems: 'center'
         }}>
           {/* Cash Out Button - Larger circular for mobile, rectangular for desktop */}
