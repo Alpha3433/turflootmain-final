@@ -3676,14 +3676,30 @@ const AgarIOGame = () => {
                 borderRadius: '6px',
                 border: '1px solid rgba(34, 197, 94, 0.3)'
               }}>
-                <span style={{ 
-                  color: '#22c55e',
-                  textShadow: '0 0 6px rgba(34, 197, 94, 0.8)'
-                }}>💰 ${score}</span>
-                <span style={{ 
-                  color: '#e5e7eb',
-                  textShadow: '0 0 4px rgba(229, 231, 235, 0.8)'
-                }}>{Math.floor(mass)}m</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span style={{ 
+                    color: '#22c55e',
+                    textShadow: '0 0 6px rgba(34, 197, 94, 0.8)'
+                  }}>💰 ${score}</span>
+                  <span style={{ 
+                    fontSize: '6px', 
+                    color: '#9ca3af', 
+                    opacity: '0.7',
+                    fontWeight: '500'
+                  }}>Net Worth</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span style={{ 
+                    color: '#e5e7eb',
+                    textShadow: '0 0 4px rgba(229, 231, 235, 0.8)'
+                  }}>{Math.floor(mass)}m</span>
+                  <span style={{ 
+                    fontSize: '6px', 
+                    color: '#9ca3af', 
+                    opacity: '0.7',
+                    fontWeight: '500'
+                  }}>Mass</span>
+                </div>
               </div>
               {/* Line 2: K/D • Streak • Time */}
               <div style={{ 
@@ -3697,9 +3713,33 @@ const AgarIOGame = () => {
                 borderRadius: '6px',
                 border: '1px solid rgba(107, 114, 128, 0.2)'
               }}>
-                <span style={{ color: '#fbbf24' }}>{eliminations}/0</span>
-                <span style={{ color: '#f87171' }}>{eliminations}🔥</span>
-                <span style={{ color: '#60a5fa' }}>{Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span style={{ color: '#fbbf24' }}>{eliminations}/0</span>
+                  <span style={{ 
+                    fontSize: '5px', 
+                    color: '#9ca3af', 
+                    opacity: '0.7',
+                    fontWeight: '500'
+                  }}>K/D</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span style={{ color: '#f87171' }}>{eliminations}🔥</span>
+                  <span style={{ 
+                    fontSize: '5px', 
+                    color: '#9ca3af', 
+                    opacity: '0.7',
+                    fontWeight: '500'
+                  }}>Streak</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span style={{ color: '#60a5fa' }}>{Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}</span>
+                  <span style={{ 
+                    fontSize: '5px', 
+                    color: '#9ca3af', 
+                    opacity: '0.7',
+                    fontWeight: '500'
+                  }}>Time</span>
+                </div>
               </div>
             </div>
           )}
