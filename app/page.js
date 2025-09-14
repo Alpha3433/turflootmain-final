@@ -10796,7 +10796,8 @@ export default function TurfLootTactical() {
                   color: '#e5e7eb', 
                   fontSize: isMobile ? '14px' : '16px', 
                   fontWeight: '600',
-                  marginBottom: '8px'
+                  marginBottom: '8px',
+                  fontFamily: '"Rajdhani", sans-serif'
                 }}>
                   Destination Wallet Address
                 </div>
@@ -10806,7 +10807,7 @@ export default function TurfLootTactical() {
                   style={{
                     width: '100%',
                     backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                    border: '1px solid rgba(55, 65, 81, 0.8)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
                     borderRadius: '8px',
                     color: '#ffffff',
                     fontSize: isMobile ? '14px' : '16px',
