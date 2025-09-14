@@ -2155,12 +2155,15 @@ const AgarIOGame = () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('resize', setCanvasSize)
       }
-      // Reset body styles when component unmounts
+      // Remove mobile game class and reset body styles when component unmounts
+      document.body.classList.remove('mobile-game-active')
       document.body.style.margin = ''
       document.body.style.padding = ''
       document.body.style.overflow = ''
+      document.body.style.background = ''
       document.documentElement.style.margin = ''
       document.documentElement.style.padding = ''
+      document.documentElement.style.background = ''
     }
   }, [])
 
