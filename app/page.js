@@ -9743,6 +9743,12 @@ export default function TurfLootTactical() {
             transform: rotate(15deg);
           }
         }
+        
+        /* Smaller placeholder text for wallet address input */
+        .wallet-address-input::placeholder {
+          font-size: var(--placeholder-font-size, 14px) !important;
+          color: rgba(156, 163, 175, 0.7) !important;
+        }
       `}</style>
 
       {/* Server Browser Modal - Keep the existing one */}
