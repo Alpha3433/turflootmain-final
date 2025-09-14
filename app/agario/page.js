@@ -4511,8 +4511,6 @@ const AgarIOGame = () => {
                   {[
                     { value: 'cheating', label: '🎯 Cheating/Hacking' },
                     { value: 'teaming', label: '🤝 Teaming/Collaboration' },
-                    { value: 'griefing', label: '😡 Griefing/Trolling' },
-                    { value: 'harassment', label: '💬 Harassment/Abuse' },
                     { value: 'botting', label: '🤖 Botting/Automation' },
                     { value: 'other', label: '❓ Other Violation' }
                   ].map(option => (
