@@ -10662,7 +10662,8 @@ export default function TurfLootTactical() {
                     <div style={{ 
                       color: '#ef4444', 
                       fontSize: isMobile ? '12px' : '14px', 
-                      fontWeight: '600'
+                      fontWeight: '600',
+                      fontFamily: '"Rajdhani", sans-serif'
                     }}>
                       Insufficient balance for cashout. Minimum $0.20 + $0.01 required.
                     </div>
