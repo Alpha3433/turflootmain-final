@@ -1046,16 +1046,44 @@ export default function TurfLootTactical() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isMobile])
 
+  // Improved orientation detection function
+  const detectLandscapeMode = () => {
+    // Multiple methods to detect landscape mode for better reliability
+    const screenOrientation = screen.orientation?.angle || window.orientation || 0
+    const dimensionCheck = window.innerWidth > window.innerHeight
+    const aspectRatio = window.innerWidth / window.innerHeight
+    
+    // Consider landscape if:
+    // 1. Screen orientation is 90 or 270 degrees (landscape)
+    // 2. Width is significantly greater than height (aspect ratio > 1.2)
+    const isLandscapeByOrientation = Math.abs(screenOrientation) === 90
+    const isLandscapeByDimensions = dimensionCheck && aspectRatio > 1.2
+    
+    const isLandscape = isLandscapeByOrientation || isLandscapeByDimensions
+    
+    console.log('🔍 Orientation Detection:', {
+      screenOrientation,
+      dimensionCheck,
+      aspectRatio: aspectRatio.toFixed(2),
+      isLandscapeByOrientation,
+      isLandscapeByDimensions,
+      finalResult: isLandscape
+    })
+    
+    return isLandscape
+  }
+
   // Orientation detection and game entry for mobile
   const checkOrientationAndEnterGame = (gameUrl) => {
     if (!isMobile) {
       // Desktop: Navigate immediately
+      console.log('🖥️ Desktop detected - navigating directly to game')
       window.location.href = gameUrl
       return
     }
 
-    // Mobile: Check orientation
-    const isLandscape = window.innerWidth > window.innerHeight
+    // Mobile: Check orientation with improved detection
+    const isLandscape = detectLandscapeMode()
     
     if (isLandscape) {
       // Already in landscape: Show loading then navigate
@@ -1066,6 +1094,7 @@ export default function TurfLootTactical() {
       
       // Show loading for a brief moment then navigate
       setTimeout(() => {
+        console.log('🎮 Navigating to game:', gameUrl)
         window.location.href = gameUrl
       }, 1000)
     } else {
