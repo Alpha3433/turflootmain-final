@@ -10815,8 +10815,10 @@ export default function TurfLootTactical() {
                     padding: isMobile ? '12px 16px' : '16px 20px',
                     outline: 'none',
                     boxSizing: 'border-box',
-                    fontFamily: 'monospace'
+                    fontFamily: 'monospace',
+                    '--placeholder-font-size': isMobile ? '12px' : '14px'
                   }}
+                  className="wallet-address-input"
                   onFocus={(e) => {
                     e.target.style.borderColor = '#10b981'
                     e.target.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)'
