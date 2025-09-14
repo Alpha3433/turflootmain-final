@@ -482,13 +482,15 @@ export default function TurfLootTactical() {
       } else {
         console.warn('Failed to fetch server data, using fallback')
         // Fallback to default servers
-        setServerOptions([
+        const fallbackServers = [
           { code: 'US-W', name: 'US West', ping: 12, players: 24, status: 'online' },
           { code: 'US-E', name: 'US East', ping: 28, players: 31, status: 'online' },
           { code: 'EU', name: 'Europe', ping: 45, players: 18, status: 'online' },
           { code: 'ASIA', name: 'Asia Pacific', ping: 67, players: 12, status: 'online' },
           { code: 'SA', name: 'South America', ping: 52, players: 8, status: 'online' }
-        ])
+        ]
+        setServerOptions(fallbackServers)
+        setSelectedServer(fallbackServers[0].code)
       }
     } catch (error) {
       console.error('Error fetching server data:', error)
