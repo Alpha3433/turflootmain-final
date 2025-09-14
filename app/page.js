@@ -10517,6 +10517,287 @@ export default function TurfLootTactical() {
 
       {/* Loading Local Practice Modal - REMOVED: Integrated into orientation modal */}
       
+      {/* Withdrawal Modal */}
+      {withdrawalModalVisible && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999999,
+          backdropFilter: 'blur(10px)',
+          pointerEvents: 'auto'
+        }}>
+          <div style={{
+            backgroundColor: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
+            border: '3px solid #68d391',
+            borderRadius: isMobile ? '12px' : '16px',
+            maxWidth: isMobile ? '340px' : '500px',
+            width: '90%',
+            padding: '0',
+            color: 'white',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.3)',
+            fontFamily: '"Rajdhani", sans-serif',
+            position: 'relative'
+          }}>
+            {/* Close Button */}
+            <button
+              onClick={() => setWithdrawalModalVisible(false)}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                color: '#ffffff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                zIndex: 1,
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                e.target.style.transform = 'scale(1.1)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.1)'
+                e.target.style.transform = 'scale(1)'
+              }}
+            >
+              ×
+            </button>
+
+            {/* Header */}
+            <div style={{
+              padding: isMobile ? '20px' : '24px',
+              borderBottom: '2px solid rgba(104, 211, 145, 0.3)',
+              background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                width: isMobile ? '50px' : '70px',
+                height: isMobile ? '50px' : '70px',
+                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
+                borderRadius: isMobile ? '10px' : '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: isMobile ? '24px' : '32px',
+                margin: isMobile ? '0 auto 12px' : '0 auto 16px',
+                boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)'
+              }}>
+                💸
+              </div>
+              <h2 style={{
+                color: '#68d391',
+                fontSize: isMobile ? '20px' : '28px',
+                fontWeight: '700',
+                margin: isMobile ? '0 0 6px' : '0 0 8px',
+                textTransform: 'uppercase',
+                textShadow: '0 0 15px rgba(104, 211, 145, 0.6)',
+                letterSpacing: isMobile ? '0.5px' : '1px'
+              }}>
+                Withdraw Funds
+              </h2>
+              <p style={{
+                color: '#e2e8f0',
+                fontSize: isMobile ? '12px' : '16px',
+                margin: '0',
+                opacity: '0.9'
+              }}>
+                Transfer your SOL to another wallet
+              </p>
+            </div>
+
+            {/* Body Content */}
+            <div style={{ padding: isMobile ? '16px' : '24px' }}>
+              {/* Current Balance Display */}
+              <div style={{
+                backgroundColor: 'rgba(104, 211, 145, 0.1)',
+                border: '1px solid rgba(104, 211, 145, 0.3)',
+                borderRadius: '8px',
+                padding: isMobile ? '12px' : '16px',
+                marginBottom: isMobile ? '16px' : '24px',
+                textAlign: 'center'
+              }}>
+                <div style={{ 
+                  color: '#68d391', 
+                  fontSize: isMobile ? '11px' : '14px', 
+                  fontWeight: '600',
+                  marginBottom: isMobile ? '6px' : '8px',
+                  textTransform: 'uppercase'
+                }}>
+                  Your Current Balance
+                </div>
+                <div style={{ 
+                  color: '#ffffff', 
+                  fontSize: isMobile ? '18px' : '24px', 
+                  fontWeight: '700',
+                  marginBottom: isMobile ? '2px' : '4px'
+                }}>
+                  ${balance.toFixed(2)}
+                </div>
+                <div style={{ 
+                  color: '#a0aec0', 
+                  fontSize: isMobile ? '9px' : '12px',
+                  fontWeight: '400'
+                }}>
+                  {(balance * 0.048).toFixed(6)} SOL
+                </div>
+              </div>
+
+              {/* Wallet Address Display */}
+              <div style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                padding: isMobile ? '12px' : '16px',
+                borderRadius: '8px',
+                marginBottom: isMobile ? '16px' : '20px',
+                border: '1px solid rgba(255, 255, 255, 0.1)'
+              }}>
+                <div style={{ 
+                  color: '#a0aec0', 
+                  fontSize: isMobile ? '10px' : '12px', 
+                  marginBottom: isMobile ? '6px' : '8px',
+                  textTransform: 'uppercase',
+                  fontWeight: '600'
+                }}>
+                  Your Wallet Address
+                </div>
+                <div style={{ 
+                  color: '#ffffff', 
+                  fontSize: isMobile ? '11px' : '14px', 
+                  fontWeight: '500',
+                  wordBreak: 'break-all',
+                  fontFamily: 'monospace',
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  padding: isMobile ? '6px' : '8px',
+                  borderRadius: '4px'
+                }}>
+                  {privyUser?.wallet?.address || 'No wallet connected'}
+                </div>
+              </div>
+
+              {/* Withdrawal Instructions */}
+              <div style={{
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: '8px',
+                padding: isMobile ? '12px' : '16px',
+                marginBottom: isMobile ? '16px' : '20px'
+              }}>
+                <div style={{ 
+                  color: '#60a5fa', 
+                  fontSize: isMobile ? '11px' : '14px', 
+                  fontWeight: '600',
+                  marginBottom: isMobile ? '8px' : '12px',
+                  textTransform: 'uppercase'
+                }}>
+                  How to Withdraw
+                </div>
+                <div style={{ 
+                  color: '#e2e8f0', 
+                  fontSize: isMobile ? '10px' : '13px', 
+                  lineHeight: '1.5'
+                }}>
+                  1. Copy your wallet address above<br/>
+                  2. Use any Solana wallet app to send funds to another address<br/>
+                  3. Always verify the recipient address before sending<br/>
+                  4. Transaction fees will apply
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: isMobile ? '8px' : '12px',
+                flexDirection: 'column'
+              }}>
+                {/* Copy Address Button */}
+                <button
+                  onClick={() => {
+                    if (privyUser?.wallet?.address) {
+                      navigator.clipboard.writeText(privyUser.wallet.address)
+                      alert('Wallet address copied to clipboard!')
+                    }
+                  }}
+                  style={{
+                    backgroundColor: '#68d391',
+                    border: '2px solid #48bb78',
+                    borderRadius: '8px',
+                    color: '#1a202c',
+                    fontSize: isMobile ? '12px' : '16px',
+                    fontWeight: '700',
+                    padding: isMobile ? '10px' : '12px 24px',
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#48bb78'
+                    e.target.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = '#68d391'
+                    e.target.style.transform = 'translateY(0)'
+                  }}
+                >
+                  📋 Copy Wallet Address
+                </button>
+                
+                {/* Close Button */}
+                <button
+                  onClick={() => setWithdrawalModalVisible(false)}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '2px solid #a0aec0',
+                    borderRadius: '8px',
+                    color: '#a0aec0',
+                    fontSize: isMobile ? '11px' : '14px',
+                    fontWeight: '600',
+                    padding: isMobile ? '8px' : '10px 20px',
+                    cursor: 'pointer',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#a0aec0'
+                    e.target.style.color = '#1a202c'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = 'transparent'
+                    e.target.style.color = '#a0aec0'
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Debug Info */}
       {isServerBrowserOpen && (
         <div style={{
