@@ -46,6 +46,33 @@ const AgarIOGame = () => {
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
   const [gameReady, setGameReady] = useState(false)
   const [leaderboardExpanded, setLeaderboardExpanded] = useState(false)
+  const leaderboardTimerRef = useRef(null)
+
+  // Auto-collapse leaderboard after 5 seconds of no interaction
+  useEffect(() => {
+    if (leaderboardExpanded && isMobile) {
+      leaderboardTimerRef.current = setTimeout(() => {
+        setLeaderboardExpanded(false)
+      }, 5000)
+    }
+    
+    return () => {
+      if (leaderboardTimerRef.current) {
+        clearTimeout(leaderboardTimerRef.current)
+      }
+    }
+  }, [leaderboardExpanded, isMobile])
+
+  const handleLeaderboardToggle = () => {
+    if (!isMobile) return // Only for mobile
+    
+    setLeaderboardExpanded(!leaderboardExpanded)
+    
+    // Clear existing timer when manually toggling
+    if (leaderboardTimerRef.current) {
+      clearTimeout(leaderboardTimerRef.current)
+    }
+  }
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
   
