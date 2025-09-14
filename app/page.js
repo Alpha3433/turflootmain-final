@@ -9881,43 +9881,6 @@ export default function TurfLootTactical() {
                 </span>
               </div>
               
-              {/* Debug: Skip Orientation Check Button */}
-              <button
-                onClick={() => {
-                  console.log('🔄 Skip orientation check - forcing landscape mode')
-                  setOrientationModalLoading(true)
-                  setTimeout(() => {
-                    console.log('🎮 Navigating to game (orientation skipped):', pendingGameUrl)
-                    if (pendingGameUrl) {
-                      window.location.href = pendingGameUrl
-                    }
-                  }, 1000)
-                }}
-                style={{
-                  padding: '12px 24px',
-                  background: 'rgba(20, 241, 149, 0.2)',
-                  border: '2px solid #14f195',
-                  borderRadius: '6px',
-                  color: '#14f195',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  fontFamily: '"Rajdhani", sans-serif',
-                  textTransform: 'uppercase',
-                  transition: 'all 0.3s ease',
-                  marginBottom: '15px'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.background = 'rgba(20, 241, 149, 0.3)'
-                  e.target.style.transform = 'scale(1.05)'
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.background = 'rgba(20, 241, 149, 0.2)'
-                  e.target.style.transform = 'scale(1)'
-                }}
-              >
-                Continue Anyway
-              </button>
               
               {/* Cancel Button */}
               <button
