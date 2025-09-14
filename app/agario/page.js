@@ -198,12 +198,6 @@ const AgarIOGame = () => {
     e.preventDefault()
     if (!isMobile || !joystickActive) return
     
-    // Don't process movement if game isn't ready
-    if (!gameRef.current?.game) {
-      console.log('⏳ Game not ready during joystick move - ignoring')
-      return
-    }
-    
     const rect = joystickRef.current?.getBoundingClientRect()
     if (!rect) return
     
@@ -221,14 +215,22 @@ const AgarIOGame = () => {
     const knobX = Math.cos(angle) * distance
     const knobY = Math.sin(angle) * distance
     
+    // Always update visual position of joystick knob
     setJoystickPosition({ x: knobX, y: knobY })
     
-    // Update player movement based on joystick
+    // Only update player movement if game is ready
     if (gameRef.current?.game) {
       const strength = distance / 35 // Normalize to 0-1
       const moveSpeed = 500 * strength // Increased movement speed for better responsiveness
       
       const game = gameRef.current.game
+      
+      // Ensure player object exists
+      if (!game.player) {
+        console.log('❌ Game player object not found!')
+        return
+      }
+      
       const targetX = game.player.x + Math.cos(angle) * moveSpeed
       const targetY = game.player.y + Math.sin(angle) * moveSpeed
       
@@ -237,8 +239,9 @@ const AgarIOGame = () => {
         strength: strength.toFixed(2),
         angle: (angle * 180 / Math.PI).toFixed(1) + '°',
         moveSpeed: moveSpeed.toFixed(1),
-        playerPos: { x: game.player.x.toFixed(1), y: game.player.y.toFixed(1) },
-        targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) }
+        playerPos: { x: game.player.x?.toFixed(1), y: game.player.y?.toFixed(1) },
+        targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) },
+        beforeUpdate: { targetX: game.player.targetX?.toFixed(1), targetY: game.player.targetY?.toFixed(1) }
       })
       
       game.player.targetX = targetX
@@ -246,6 +249,10 @@ const AgarIOGame = () => {
       
       // Set flag to indicate joystick is controlling movement
       window.isUsingJoystick = true
+      
+      console.log('🕹️ After Update:', { targetX: game.player.targetX?.toFixed(1), targetY: game.player.targetY?.toFixed(1) })
+    } else {
+      console.log('⏳ Game not ready - joystick visual works but no player movement yet')
     }
   }
   
