@@ -108,10 +108,10 @@ user_problem_statement: "Complete the landscape orientation requirement for mobi
 
 test_plan:
   current_focus:
-    - "Complete Mobile Orientation Modal Implementation"
-    - "Update All Game Entry Points to Use Orientation Check"
-    - "Test Mobile LOCAL PRACTICE Orientation Check"
-    - "Test Paid Rooms Orientation Check"
+    - "Mobile Stats Panel Sub-Labels Implementation"
+    - "Test Mobile Stats Panel UI Changes"
+    - "Verify Sub-Labels Display on Mobile Only"
+    - "Validate Stats Panel Minimalist Design"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
