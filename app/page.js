@@ -426,6 +426,10 @@ export default function TurfLootTactical() {
   const [userName, setUserName] = useState('PLAYER')
   const [isMobile, setIsMobile] = useState(false)
   const [eyePosition, setEyePosition] = useState({ x: 0, y: 0 })
+  
+  // Orientation state for mobile
+  const [showOrientationModal, setShowOrientationModal] = useState(false)
+  const [pendingGameUrl, setPendingGameUrl] = useState(null)
   const [activeFriends, setActiveFriends] = useState(0)
   const [leaderboard, setLeaderboard] = useState([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
