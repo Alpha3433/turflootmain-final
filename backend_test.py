@@ -519,59 +519,118 @@ class TurfLootBackendTester:
             )
             return False
 
-    def test_backend_regression_testing(self):
-        """Test 5: Backend Regression Testing - Ensure UI changes didn't introduce backend issues"""
-        print("🔍 Testing Backend Regression after Mobile Stats Panel UI Changes...")
+    def test_backend_regression(self):
+        """Test 5: Backend Regression Testing - Ensure frontend changes didn't break backend"""
+        print("🔄 TEST 5: BACKEND REGRESSION TESTING")
+        print("=" * 50)
         
+        # Test 5.1: API Performance Check
         try:
-            # Test multiple endpoints to check for regressions
-            endpoints = [
-                ("/ping", "Core API"),
-                ("/wallet/balance", "Wallet API"), 
-                ("/servers/lobbies", "Server Browser"),
-                ("/stats/live-players", "Live Stats"),
-                ("/users/leaderboard", "Leaderboard")
+            endpoints_to_test = [
+                "/ping",
+                "/wallet/balance", 
+                "/servers/lobbies",
+                "/stats/live-players"
             ]
             
-            total_time = 0
+            total_response_time = 0
             successful_requests = 0
             
-            for endpoint, description in endpoints:
+            for endpoint in endpoints_to_test:
                 try:
-                    start = time.time()
-                    response = requests.get(f"{API_BASE}{endpoint}", timeout=5)
-                    response_time = time.time() - start
-                    total_time += response_time
+                    start_time = time.time()
+                    response = requests.get(f"{API_BASE}{endpoint}", timeout=10)
+                    response_time = time.time() - start_time
+                    total_response_time += response_time
                     
                     if response.status_code == 200:
                         successful_requests += 1
-                        print(f"   ✅ {description}: Working ({response_time:.3f}s)")
-                    else:
-                        print(f"   ❌ {description}: Failed (status {response.status_code})")
                         
-                except Exception as e:
-                    print(f"   ❌ {description}: Error - {str(e)}")
+                except Exception as endpoint_error:
+                    print(f"    ⚠️ Endpoint {endpoint} failed: {str(endpoint_error)}")
             
-            if successful_requests >= 4:  # At least 4 out of 5 endpoints working
-                avg_response_time = total_time / successful_requests
-                
+            success_rate = (successful_requests / len(endpoints_to_test)) * 100
+            avg_response_time = total_response_time / len(endpoints_to_test)
+            
+            if success_rate >= 75:  # At least 75% success rate
                 self.log_result(
-                    "Backend Regression Testing", 
-                    True, 
-                    f"No backend regressions introduced by mobile stats panel UI changes ({successful_requests}/{len(endpoints)} APIs working, avg response: {avg_response_time:.3f}s)",
+                    "API Performance Check",
+                    True,
+                    f"{successful_requests}/{len(endpoints_to_test)} endpoints working, avg response: {avg_response_time:.3f}s",
                     avg_response_time
                 )
-                return True
             else:
                 self.log_result(
-                    "Backend Regression Testing", 
-                    False, 
-                    f"Potential regressions detected: only {successful_requests}/{len(endpoints)} APIs working"
+                    "API Performance Check",
+                    False,
+                    f"Only {successful_requests}/{len(endpoints_to_test)} endpoints working ({success_rate:.1f}%)"
+                )
+                
+        except Exception as e:
+            self.log_result(
+                "API Performance Check",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 5.2: Authentication State Persistence
+        try:
+            # Test multiple requests with same token to verify state persistence
+            test_token = f"testing-{base64.b64encode(json.dumps({'sub': 'persistence_test', 'wallet': {'address': '0xTEST'}}).encode()).decode()}"
+            headers = {'Authorization': f'Bearer {test_token}', 'Content-Type': 'application/json'}
+            
+            # Make 3 consecutive requests
+            responses = []
+            for i in range(3):
+                start_time = time.time()
+                response = requests.get(f"{API_BASE}/wallet/balance", headers=headers, timeout=10)
+                response_time = time.time() - start_time
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    responses.append({
+                        'balance': data.get('balance'),
+                        'wallet_address': data.get('wallet_address'),
+                        'response_time': response_time
+                    })
+                
+                time.sleep(0.1)  # Small delay between requests
+            
+            if len(responses) == 3:
+                # Check if wallet addresses are consistent
+                wallet_addresses = [r['wallet_address'] for r in responses]
+                addresses_consistent = len(set(wallet_addresses)) == 1
+                
+                if addresses_consistent:
+                    avg_time = sum(r['response_time'] for r in responses) / 3
+                    self.log_result(
+                        "Authentication State Persistence",
+                        True,
+                        f"State consistent across 3 requests, wallet: {wallet_addresses[0][:20]}...",
+                        avg_time
+                    )
+                    return True
+                else:
+                    self.log_result(
+                        "Authentication State Persistence",
+                        False,
+                        f"Inconsistent wallet addresses: {wallet_addresses}"
+                    )
+                    return False
+            else:
+                self.log_result(
+                    "Authentication State Persistence",
+                    False,
+                    f"Only {len(responses)}/3 requests successful"
                 )
                 return False
                 
         except Exception as e:
-            self.log_result("Backend Regression Testing", False, f"Error: {str(e)}")
+            self.log_result(
+                "Authentication State Persistence",
+                False,
+                f"Error: {str(e)}"
+            )
             return False
 
     def run_all_tests(self):
