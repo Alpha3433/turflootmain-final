@@ -725,6 +725,6 @@ class TurfLootBackendTester:
         print("=" * 80)
 
 if __name__ == "__main__":
-    tester = TurfLootAgarioBackendTester()
+    tester = TurfLootBackendTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
