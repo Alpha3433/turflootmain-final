@@ -10583,10 +10583,17 @@ export default function TurfLootTactical() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: '18px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.2)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'rgba(255, 255, 255, 0.1)'
                 }}
               >
-                🏠
+                ✕
               </button>
             </div>
 
