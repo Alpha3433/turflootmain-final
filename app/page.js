@@ -5399,7 +5399,7 @@ export default function TurfLootTactical() {
                     justifyContent: 'center',
                     color: '#1a202c',
                     fontWeight: '800',
-                    fontSize: '10px',
+                    fontSize: '12px',
                     boxShadow: '0 0 30px rgba(246, 173, 85, 0.6)',
                     border: '2px solid #f6ad55',
                     fontFamily: '"Rajdhani", sans-serif',
