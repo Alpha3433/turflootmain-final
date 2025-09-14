@@ -2627,20 +2627,20 @@ const AgarIOGame = () => {
                   border: player.isPlayer ? '1px solid rgba(0, 255, 255, 0.3)' : 'none',
                   minHeight: isMobile ? (leaderboardExpanded ? 'auto' : '16px') : 'auto'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '4px' : '3px') : '6px' }}>
                     <span style={{ 
                       color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
-                      fontSize: isMobile ? '10px' : '12px', 
+                      fontSize: isMobile ? (leaderboardExpanded ? '10px' : '9px') : '12px', 
                       fontWeight: '700',
-                      minWidth: isMobile ? '12px' : '14px'
+                      minWidth: isMobile ? (leaderboardExpanded ? '12px' : '10px') : '14px'
                     }}>
                       #{index + 1}
                     </span>
                     <span style={{ 
                       color: player.isPlayer ? '#00ffff' : '#ffffff', 
-                      fontSize: isMobile ? '10px' : '12px', 
+                      fontSize: isMobile ? (leaderboardExpanded ? '10px' : '9px') : '12px', 
                       fontWeight: '600',
-                      maxWidth: isMobile ? '50px' : '60px',
+                      maxWidth: isMobile ? (leaderboardExpanded ? '50px' : '40px') : '60px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
@@ -2650,7 +2650,7 @@ const AgarIOGame = () => {
                   </div>
                   <span style={{ 
                     color: '#00ff88', 
-                    fontSize: isMobile ? '10px' : '12px', 
+                    fontSize: isMobile ? (leaderboardExpanded ? '10px' : '9px') : '12px', 
                     fontWeight: '700'
                   }}>
                     ${player.score}
