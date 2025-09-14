@@ -3439,6 +3439,7 @@ const AgarIOGame = () => {
               <span>⚡ Split (Space)</span>
             )}
           </div>
+          </div>
         )}
 
         {/* Virtual Joystick - Mobile Only (Available in ALL orientations) */}
