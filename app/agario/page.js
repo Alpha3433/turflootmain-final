@@ -3723,7 +3723,7 @@ const AgarIOGame = () => {
                   }}>K/D</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span style={{ color: '#f87171' }}>{eliminations}🔥</span>
+                  <span style={{ color: '#f87171' }}>{eliminations}</span>
                   <span style={{ 
                     fontSize: '5px', 
                     color: '#9ca3af', 
