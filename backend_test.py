@@ -634,21 +634,19 @@ class TurfLootBackendTester:
             return False
 
     def run_all_tests(self):
-        """Run all backend tests for TurfLoot Agario Game after Mobile Stats Panel UI changes"""
-        print("🚀 STARTING COMPREHENSIVE BACKEND TESTING FOR TURFLOOT AGARIO GAME")
-        print("=" * 80)
-        print("Testing Focus: Backend API Health after Mobile Stats Panel Sub-Labels Implementation")
-        print("UI Changes: Added sub-labels (K/D, Streak, Time, Net Worth, Mass) to mobile stats panel")
+        """Run all backend tests"""
+        print("🚀 TURFLOOT BACKEND TESTING SUITE")
+        print("Testing backend functionality after withdrawal modal & authentication fixes")
         print("=" * 80)
         print()
         
-        # Run all tests
+        # Run all test categories
         tests = [
             self.test_api_health_check,
-            self.test_game_session_apis,
+            self.test_authentication_systems,
+            self.test_wallet_balance_apis,
             self.test_user_balance_stats_apis,
-            self.test_server_browser_integration,
-            self.test_backend_regression_testing
+            self.test_backend_regression
         ]
         
         passed_tests = 0
@@ -661,71 +659,70 @@ class TurfLootBackendTester:
             except Exception as e:
                 print(f"❌ Test {test_func.__name__} crashed: {str(e)}")
         
-        # Calculate results
-        success_rate = (passed_tests / total_tests) * 100
+        # Generate final report
+        self.generate_final_report(passed_tests, total_tests)
+        
+        return passed_tests >= (total_tests * 0.8)  # 80% success rate
+
+    def generate_final_report(self, passed_tests, total_tests):
+        """Generate comprehensive test report"""
         total_time = time.time() - self.start_time
+        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
         
         print("=" * 80)
-        print("🏁 TURFLOOT AGARIO GAME BACKEND TESTING COMPLETED")
+        print("🏁 FINAL TEST REPORT")
         print("=" * 80)
-        print(f"📊 RESULTS: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}% success rate)")
-        print(f"⏱️  Total testing time: {total_time:.2f}s")
+        print(f"📊 OVERALL RESULTS:")
+        print(f"   Total Tests: {total_tests}")
+        print(f"   ✅ Passed: {passed_tests}")
+        print(f"   ❌ Failed: {total_tests - passed_tests}")
+        print(f"   📈 Success Rate: {success_rate:.1f}%")
+        print(f"   ⏱️  Total Time: {total_time:.2f}s")
         print()
         
-        # Detailed results
-        print("📋 DETAILED TEST RESULTS:")
-        print("-" * 40)
+        print("📋 DETAILED RESULTS:")
         for result in self.results:
-            status = "✅" if result['success'] else "❌"
-            print(f"{status} {result['test']}")
+            status = "✅ PASSED" if result['success'] else "❌ FAILED"
+            print(f"   {status} - {result['test']}")
             if result['details']:
-                print(f"   {result['details']}")
-            print(f"   Response Time: {result['response_time']}")
-            print()
+                print(f"      └─ {result['details']}")
+        print()
         
-        # Summary based on review request requirements
-        print("🎯 REVIEW REQUEST REQUIREMENTS VERIFICATION:")
-        print("-" * 50)
-        
-        requirements_met = 0
-        total_requirements = 5
-        
-        # 1. API Health Check
-        api_health = any(r['test'] == 'API Health Check' and r['success'] for r in self.results)
-        print(f"{'✅' if api_health else '❌'} API Health Check: {'OPERATIONAL' if api_health else 'FAILED'}")
-        if api_health: requirements_met += 1
-        
-        # 2. Game Session APIs
-        game_sessions = any('Game Session APIs' in r['test'] and r['success'] for r in self.results)
-        print(f"{'✅' if game_sessions else '❌'} Game Session APIs: {'WORKING' if game_sessions else 'FAILED'}")
-        if game_sessions: requirements_met += 1
-        
-        # 3. User Balance & Stats APIs
-        balance_stats = any('User Balance & Stats APIs' in r['test'] and r['success'] for r in self.results)
-        print(f"{'✅' if balance_stats else '❌'} User Balance & Stats APIs: {'WORKING' if balance_stats else 'FAILED'}")
-        if balance_stats: requirements_met += 1
-        
-        # 4. Server Browser Integration
-        server_browser = any('Server Browser Integration' in r['test'] and r['success'] for r in self.results)
-        print(f"{'✅' if server_browser else '❌'} Server Browser Integration: {'WORKING' if server_browser else 'FAILED'}")
-        if server_browser: requirements_met += 1
-        
-        # 5. Backend Regression Testing
-        regression_test = any('Backend Regression Testing' in r['test'] and r['success'] for r in self.results)
-        print(f"{'✅' if regression_test else '❌'} Backend Regression Testing: {'PASSED' if regression_test else 'FAILED'}")
-        if regression_test: requirements_met += 1
+        # Critical findings summary
+        print("🎯 CRITICAL FINDINGS:")
+        if success_rate >= 90:
+            print("   ✅ EXCELLENT: Backend is fully operational after withdrawal modal & auth fixes")
+        elif success_rate >= 75:
+            print("   ⚠️  GOOD: Backend is mostly operational with minor issues")
+        elif success_rate >= 50:
+            print("   ⚠️  MODERATE: Backend has some issues that need attention")
+        else:
+            print("   ❌ CRITICAL: Backend has significant issues requiring immediate attention")
         
         print()
-        print(f"🏆 OVERALL ASSESSMENT: {requirements_met}/{total_requirements} key requirements met")
+        print("🔍 SPECIFIC REVIEW REQUEST VERIFICATION:")
         
-        if success_rate >= 80:
-            print("🎉 CONCLUSION: Backend is STABLE - Mobile stats panel UI changes did not introduce regressions")
-        elif success_rate >= 60:
-            print("⚠️  CONCLUSION: Backend has MINOR ISSUES but core agario game functionality is working")
-        else:
-            print("🚨 CONCLUSION: Backend has CRITICAL ISSUES that need immediate attention")
+        # Check specific requirements from review request
+        api_health_passed = any("API" in r['test'] and r['success'] for r in self.results)
+        auth_systems_passed = any("Authentication" in r['test'] and r['success'] for r in self.results)
+        wallet_apis_passed = any("Wallet" in r['test'] and r['success'] for r in self.results)
+        helius_integration_passed = any("Helius" in r['test'] and r['success'] for r in self.results)
+        regression_passed = any("Regression" in r['test'] or "Performance" in r['test'] and r['success'] for r in self.results)
         
-        return success_rate >= 80
+        requirements = [
+            ("✅ API Health Check", api_health_passed),
+            ("✅ Authentication Systems (Privy integration)", auth_systems_passed), 
+            ("✅ Wallet Balance APIs (Helius RPC with new API key)", wallet_apis_passed),
+            ("✅ Helius Integration Verification", helius_integration_passed),
+            ("✅ Backend Regression Testing", regression_passed)
+        ]
+        
+        for req_name, req_passed in requirements:
+            status = "OPERATIONAL" if req_passed else "NEEDS ATTENTION"
+            print(f"   {req_name}: {status}")
+        
+        print()
+        print("=" * 80)
 
 if __name__ == "__main__":
     tester = TurfLootAgarioBackendTester()
