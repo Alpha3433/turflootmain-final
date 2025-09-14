@@ -2660,7 +2660,7 @@ const AgarIOGame = () => {
                   </div>
                   <span style={{ 
                     color: '#00ff88', 
-                    fontSize: isMobile ? (leaderboardExpanded ? '10px' : '9px') : '12px', 
+                    fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
                     fontWeight: '700'
                   }}>
                     ${player.score}
