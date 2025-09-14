@@ -4713,10 +4713,10 @@ const AgarIOGame = () => {
                     e.target.style.backgroundColor = '#a0aec0'
                     e.target.style.color = '#1a202c'
                   }}
-                  onMouseOut={(e) => {
+                  onMouseOut={((e) => {
                     e.target.style.backgroundColor = 'transparent'
                     e.target.style.color = '#a0aec0'
-                  }}
+                  })}
                 >
                   Cancel
                 </button>
