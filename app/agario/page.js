@@ -2572,15 +2572,15 @@ const AgarIOGame = () => {
             onClick={handleLeaderboardToggle}
             style={{ 
               color: '#00ffff', 
-              fontSize: isMobile ? '13px' : '14px', 
+              fontSize: isMobile ? (leaderboardExpanded ? '11px' : '10px') : '14px', 
               fontWeight: '700', 
-              marginBottom: isMobile ? '8px' : '10px',
+              marginBottom: isMobile ? (leaderboardExpanded ? '6px' : '3px') : '10px',
               textAlign: 'center',
-              letterSpacing: '0.5px',
+              letterSpacing: '0.2px',
               cursor: isMobile ? 'pointer' : 'default',
               userSelect: 'none',
-              transition: 'color 0.2s ease',
-              padding: isMobile ? '4px' : '0'
+              transition: 'all 0.2s ease',
+              padding: isMobile ? '2px' : '0'
             }}
             onMouseDown={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
             onMouseUp={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
