@@ -3179,17 +3179,21 @@ const AgarIOGame = () => {
               width: '80px',
               height: '80px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
-              border: '3px solid rgba(255, 255, 255, 0.4)',
-              animation: !joystickActive ? 'joystickPulse 3s ease-in-out infinite' : 'none',
+              backgroundColor: gameRef.current?.game ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+              border: gameRef.current?.game ? '3px solid rgba(255, 255, 255, 0.4)' : '3px solid rgba(255, 255, 255, 0.15)',
+              animation: (!joystickActive && gameRef.current?.game) ? 'joystickPulse 3s ease-in-out infinite' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               zIndex: 1000,
               touchAction: 'none',
               userSelect: 'none',
-              boxShadow: '0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)'
+              opacity: gameRef.current?.game ? 1 : 0.3,
+              boxShadow: gameRef.current?.game 
+                ? '0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1)'
+                : '0 0 10px rgba(255, 255, 255, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease'
             }}
             onTouchStart={handleJoystickStart}
             onTouchMove={handleJoystickMove}
