@@ -4353,8 +4353,8 @@ const AgarIOGame = () => {
             </div>
           </div>
         )}
-      
-      {/* Report Player Modal - Temporarily Removed */}
+
+        {/* Report Player Modal - Temporarily Removed */}
     </div>
   )
 }
