@@ -4533,11 +4533,11 @@ const AgarIOGame = () => {
                           e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
                         }
                       }}
-                      onMouseOut={((e) => {
+                      onMouseOut={(e) => {
                         if (reportType !== option.value) {
                           e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
                         }
-                      })}
+                      }}
                     >
                       {option.label}
                     </button>
