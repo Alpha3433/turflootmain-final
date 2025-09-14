@@ -10654,7 +10654,7 @@ export default function TurfLootTactical() {
                   fontSize: isMobile ? '9px' : '12px',
                   fontWeight: '400'
                 }}>
-                  {(balance * 0.048).toFixed(6)} SOL
+                  {parseFloat(walletBalance.sol || 0).toFixed(6)} SOL
                 </div>
               </div>
 
