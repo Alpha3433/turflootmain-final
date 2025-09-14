@@ -31,9 +31,7 @@
     --input: #2A2A2A;
     --ring: var(--turfloot-green);
   }
-}
-
-@layer base {
+  
   * {
     border-color: #404040;
   }
