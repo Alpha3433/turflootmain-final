@@ -4668,12 +4668,12 @@ const AgarIOGame = () => {
                     gap: '8px',
                     opacity: reportType ? 1 : 0.5
                   }}
-                  onMouseOver={(e) => {
+                  onMouseOver={((e) => {
                     if (reportType) {
                       e.target.style.backgroundColor = '#cc3333'
                       e.target.style.transform = 'translateY(-2px)'
                     }
-                  }}
+                  })}
                   onMouseOut={((e) => {
                     if (reportType) {
                       e.target.style.backgroundColor = '#ff4444'
