@@ -2234,6 +2234,7 @@ const AgarIOGame = () => {
     console.log('🎮 Game initialized and assigned to gameRef')
     
     game.start()
+    setGameReady(true)
     console.log('🎮 Game started - Joystick should now be functional')
 
     // Game loop
