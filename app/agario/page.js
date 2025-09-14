@@ -45,6 +45,7 @@ const AgarIOGame = () => {
   const [joystickActive, setJoystickActive] = useState(false)
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
   const [gameReady, setGameReady] = useState(false)
+  const [leaderboardExpanded, setLeaderboardExpanded] = useState(false)
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
   
