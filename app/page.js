@@ -5501,7 +5501,7 @@ export default function TurfLootTactical() {
                               )}
                               {server.status === 'online' && (
                                 <span style={{ 
-                                  fontSize: '10px', 
+                                  fontSize: '12px', 
                                   color: '#10b981',
                                   fontWeight: '400'
                                 }}>
