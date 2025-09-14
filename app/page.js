@@ -5292,22 +5292,119 @@ export default function TurfLootTactical() {
           {/* Player Name Input */}
           <div style={{ marginBottom: '32px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', marginBottom: '24px' }}>
-              <div style={{
-                width: '56px',
-                height: '56px',
-                background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#1a202c',
-                fontWeight: '800',
-                fontSize: '24px',
-                boxShadow: '0 0 30px rgba(246, 173, 85, 0.6)',
-                border: '2px solid #f6ad55',
-                fontFamily: '"Rajdhani", sans-serif'
-              }}>
-                0
+              <div style={{ position: 'relative' }}>
+                <div 
+                  onClick={() => setServerSelectorOpen(!serverSelectorOpen)}
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    background: 'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#1a202c',
+                    fontWeight: '800',
+                    fontSize: '12px',
+                    boxShadow: '0 0 30px rgba(246, 173, 85, 0.6)',
+                    border: '2px solid #f6ad55',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'center',
+                    lineHeight: '1.2'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)'
+                    e.currentTarget.style.boxShadow = '0 0 40px rgba(246, 173, 85, 0.8)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)'
+                    e.currentTarget.style.boxShadow = '0 0 30px rgba(246, 173, 85, 0.6)'
+                  }}
+                >
+                  {selectedServer}
+                </div>
+                
+                {/* Server Dropdown */}
+                {serverSelectorOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '64px',
+                    left: '0',
+                    width: '200px',
+                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                    border: '2px solid #f6ad55',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.8)',
+                    zIndex: 1000,
+                    backdropFilter: 'blur(10px)'
+                  }}>
+                    <div style={{
+                      padding: '8px 0',
+                      fontFamily: '"Rajdhani", sans-serif'
+                    }}>
+                      {serverOptions.map((server) => (
+                        <div
+                          key={server.code}
+                          onClick={() => {
+                            setSelectedServer(server.code)
+                            setServerSelectorOpen(false)
+                            console.log(`🌐 Selected server: ${server.name} (${server.code})`)
+                          }}
+                          style={{
+                            padding: '12px 16px',
+                            color: selectedServer === server.code ? '#f6ad55' : '#ffffff',
+                            backgroundColor: selectedServer === server.code ? 'rgba(246, 173, 85, 0.1)' : 'transparent',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            transition: 'all 0.2s ease',
+                            borderLeft: selectedServer === server.code ? '3px solid #f6ad55' : '3px solid transparent'
+                          }}
+                          onMouseOver={(e) => {
+                            if (selectedServer !== server.code) {
+                              e.target.style.backgroundColor = 'rgba(246, 173, 85, 0.05)'
+                              e.target.style.color = '#f6ad55'
+                            }
+                          }}
+                          onMouseOut={(e) => {
+                            if (selectedServer !== server.code) {
+                              e.target.style.backgroundColor = 'transparent'
+                              e.target.style.color = '#ffffff'
+                            }
+                          }}
+                        >
+                          <div style={{ fontWeight: '700', marginBottom: '2px' }}>
+                            {server.name}
+                          </div>
+                          <div style={{ 
+                            fontSize: '11px', 
+                            color: '#a0aec0',
+                            fontWeight: '400'
+                          }}>
+                            {server.ping}ms • {server.players} players
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Click outside to close */}
+                {serverSelectorOpen && (
+                  <div 
+                    onClick={() => setServerSelectorOpen(false)}
+                    style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      width: '100vw',
+                      height: '100vh',
+                      zIndex: 999
+                    }}
+                  />
+                )}
               </div>
               <input 
                 type="text" 
