@@ -3063,7 +3063,7 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Virtual Joystick - Mobile Only */}
+        {/* Virtual Joystick - Mobile Only (Available in ALL orientations) */}
         {isMobile && (
           <div 
             ref={joystickRef}
