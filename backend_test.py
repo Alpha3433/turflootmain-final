@@ -532,6 +532,6 @@ class TurfLootAgarioBackendTester:
         return success_rate >= 80
 
 if __name__ == "__main__":
-    tester = SolanaDepositBackendTester()
+    tester = TurfLootAgarioBackendTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
