@@ -9797,7 +9797,7 @@ export default function TurfLootTactical() {
                 display: 'flex',
                 justifyContent: 'center',
                 gap: '8px',
-                marginBottom: '20px'
+                marginBottom: '30px'
               }}>
                 <div style={{
                   width: '8px',
@@ -9821,6 +9821,40 @@ export default function TurfLootTactical() {
                   animation: 'loadingDot 1.4s ease-in-out infinite 0.32s'
                 }} />
               </div>
+              
+              {/* Force Continue Button for loading state */}
+              <button
+                onClick={() => {
+                  console.log('🚀 Force continue button clicked - navigating to game')
+                  if (pendingGameUrl) {
+                    window.location.href = pendingGameUrl
+                  }
+                }}
+                style={{
+                  padding: '12px 24px',
+                  background: 'rgba(20, 241, 149, 0.2)',
+                  border: '2px solid #14f195',
+                  borderRadius: '6px',
+                  color: '#14f195',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase',
+                  transition: 'all 0.3s ease',
+                  marginBottom: '15px'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(20, 241, 149, 0.3)'
+                  e.target.style.transform = 'scale(1.05)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'rgba(20, 241, 149, 0.2)'
+                  e.target.style.transform = 'scale(1)'
+                }}
+              >
+                Continue to Game
+              </button>
             </>
           ) : (
             // Orientation Request State
