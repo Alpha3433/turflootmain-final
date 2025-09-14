@@ -28,7 +28,7 @@ from datetime import datetime
 BASE_URL = "https://mobilegame-ux.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-class TurfLootAgarioBackendTester:
+class TurfLootBackendTester:
     def __init__(self):
         self.results = []
         self.start_time = time.time()
