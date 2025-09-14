@@ -2567,15 +2567,29 @@ const AgarIOGame = () => {
           }}
         >
           {/* Header */}
-          <div style={{ 
-            color: '#00ffff', 
-            fontSize: isMobile ? '13px' : '14px', 
-            fontWeight: '700', 
-            marginBottom: isMobile ? '8px' : '10px',
-            textAlign: 'center',
-            letterSpacing: '0.5px'
-          }}>
-            {isMobile ? '🏆 Top 5' : '💰 Live Leaderboard'}
+          <div 
+            onClick={handleLeaderboardToggle}
+            style={{ 
+              color: '#00ffff', 
+              fontSize: isMobile ? '13px' : '14px', 
+              fontWeight: '700', 
+              marginBottom: isMobile ? '8px' : '10px',
+              textAlign: 'center',
+              letterSpacing: '0.5px',
+              cursor: isMobile ? 'pointer' : 'default',
+              userSelect: 'none',
+              transition: 'color 0.2s ease',
+              padding: isMobile ? '4px' : '0'
+            }}
+            onMouseDown={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
+            onMouseUp={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
+            onTouchStart={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
+            onTouchEnd={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
+          >
+            {isMobile 
+              ? (leaderboardExpanded ? '🏆 Top 5 (tap to hide)' : '🏆 Top 3 (tap to expand)')
+              : '💰 Live Leaderboard'
+            }
           </div>
           
           {/* Player Rankings - Dynamic Leaderboard */}
