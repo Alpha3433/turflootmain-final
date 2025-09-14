@@ -138,12 +138,6 @@ const AgarIOGame = () => {
     
     console.log('🕹️ Joystick Started - Mobile:', isMobile, 'Game Available:', !!gameRef.current?.game)
     
-    // Don't activate joystick if game isn't ready yet
-    if (!gameRef.current?.game) {
-      console.log('⏳ Game not ready yet - ignoring joystick input')
-      return
-    }
-    
     setJoystickActive(true)
     const rect = joystickRef.current?.getBoundingClientRect()
     if (!rect) return
