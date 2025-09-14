@@ -8453,7 +8453,7 @@ export default function TurfLootTactical() {
       </div>
 
       {/* Mobile Content Container */}
-      <div style={mobileContainerStyle}>
+      <div className="mobile-container" style={mobileContainerStyle}>
         
         {/* Mobile Header */}
         <div style={headerStyle}>
