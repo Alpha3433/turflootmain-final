@@ -2640,7 +2640,7 @@ const AgarIOGame = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '4px' : '3px') : '6px' }}>
                     <span style={{ 
                       color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
-                      fontSize: isMobile ? (leaderboardExpanded ? '10px' : '9px') : '12px', 
+                      fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
                       fontWeight: '700',
                       minWidth: isMobile ? (leaderboardExpanded ? '12px' : '10px') : '14px'
                     }}>
@@ -2648,7 +2648,7 @@ const AgarIOGame = () => {
                     </span>
                     <span style={{ 
                       color: player.isPlayer ? '#00ffff' : '#ffffff', 
-                      fontSize: isMobile ? (leaderboardExpanded ? '10px' : '9px') : '12px', 
+                      fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
                       fontWeight: '600',
                       maxWidth: isMobile ? (leaderboardExpanded ? '50px' : '40px') : '60px',
                       overflow: 'hidden',
