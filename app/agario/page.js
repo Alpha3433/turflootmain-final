@@ -2706,14 +2706,33 @@ const AgarIOGame = () => {
                   transform: isMobile && !leaderboardExpanded && index >= 3 ? 'translateY(-10px)' : 'translateY(0)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '3px' : '2px') : '6px' }}>
-                    <span style={{ 
-                      color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
-                      fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
-                      fontWeight: '700',
-                      minWidth: isMobile ? (leaderboardExpanded ? '10px' : '8px') : '14px'
-                    }}>
-                      #{index + 1}
-                    </span>
+                    {isMobile ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <span style={{ 
+                          color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
+                          fontSize: leaderboardExpanded ? '9px' : '8px', 
+                          fontWeight: '700',
+                          minWidth: leaderboardExpanded ? '10px' : '8px'
+                        }}>
+                          #{index + 1}
+                        </span>
+                        <span style={{ 
+                          fontSize: '5px', 
+                          color: '#9ca3af', 
+                          opacity: '0.7',
+                          fontWeight: '500'
+                        }}>Rank</span>
+                      </div>
+                    ) : (
+                      <span style={{ 
+                        color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
+                        fontSize: '12px', 
+                        fontWeight: '700',
+                        minWidth: '14px'
+                      }}>
+                        #{index + 1}
+                      </span>
+                    )}
                     <span style={{ 
                       color: player.isPlayer ? '#00ffff' : '#ffffff', 
                       fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
@@ -2726,13 +2745,31 @@ const AgarIOGame = () => {
                       {player.name}
                     </span>
                   </div>
-                  <span style={{ 
-                    color: '#00ff88', 
-                    fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
-                    fontWeight: '700'
-                  }}>
-                    ${player.score}
-                  </span>
+                  {isMobile ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <span style={{ 
+                        color: '#00ff88', 
+                        fontSize: leaderboardExpanded ? '9px' : '8px', 
+                        fontWeight: '700'
+                      }}>
+                        ${player.score}
+                      </span>
+                      <span style={{ 
+                        fontSize: '5px', 
+                        color: '#9ca3af', 
+                        opacity: '0.7',
+                        fontWeight: '500'
+                      }}>Score</span>
+                    </div>
+                  ) : (
+                    <span style={{ 
+                      color: '#00ff88', 
+                      fontSize: '12px', 
+                      fontWeight: '700'
+                    }}>
+                      ${player.score}
+                    </span>
+                  )}
                 </div>
               ));
             })()}
