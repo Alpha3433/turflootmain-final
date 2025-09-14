@@ -3069,8 +3069,8 @@ const AgarIOGame = () => {
             ref={joystickRef}
             style={{
               position: 'fixed',
-              bottom: '30px',
-              left: '30px',
+              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 30px)',
+              left: 'calc(env(safe-area-inset-left, 0px) + 30px)',
               width: '80px',
               height: '80px',
               borderRadius: '50%',
