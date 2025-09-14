@@ -3277,14 +3277,14 @@ const AgarIOGame = () => {
         }}>
           {/* Minimap Container */}
           <div style={{
-            width: '220px',
-            height: '220px',
+            width: isMobile ? '110px' : '220px',
+            height: isMobile ? '110px' : '220px',
             borderRadius: '50%',
             backgroundColor: '#000000',
-            border: '4px solid #00ff00',
+            border: isMobile ? '2px solid #00ff00' : '4px solid #00ff00',
             position: 'relative',
             overflow: 'hidden',
-            boxShadow: '0 0 30px rgba(0, 255, 0, 0.6)'
+            boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
             {/* Green spiky border effect */}
             <div style={{
