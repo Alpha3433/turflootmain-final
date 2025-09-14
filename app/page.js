@@ -10836,7 +10836,10 @@ export default function TurfLootTactical() {
               }}>
                 {/* Cancel Button */}
                 <button
-                  onClick={() => setWithdrawalModalVisible(false)}
+                  onClick={() => {
+                    setWithdrawalModalVisible(false)
+                    setWithdrawalAmount('')
+                  }}
                   style={{
                     flex: '1',
                     backgroundColor: 'rgba(55, 65, 81, 0.8)',
@@ -10863,13 +10866,21 @@ export default function TurfLootTactical() {
                 {/* Cash Out Button */}
                 <button
                   onClick={() => {
+                    if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) {
+                      alert('Please enter a valid amount to cash out.')
+                      return
+                    }
+                    if (parseFloat(withdrawalAmount) > parseFloat(walletBalance.usd || 0)) {
+                      alert('Amount exceeds available balance.')
+                      return
+                    }
                     // TODO: Implement actual cash out functionality
-                    alert('Cash out functionality will be implemented here!')
+                    alert(`Cash out of $${withdrawalAmount} will be implemented here!`)
                   }}
                   disabled={parseFloat(walletBalance.usd || 0) < 0.21}
                   style={{
                     flex: '1',
-                    backgroundColor: parseFloat(walletBalance.usd || 0) >= 0.21 ? '#f59e0b' : 'rgba(107, 114, 128, 0.5)',
+                    backgroundColor: parseFloat(walletBalance.usd || 0) >= 0.21 ? '#10b981' : 'rgba(107, 114, 128, 0.5)',
                     border: 'none',
                     borderRadius: '8px',
                     color: '#ffffff',
@@ -10879,17 +10890,18 @@ export default function TurfLootTactical() {
                     cursor: parseFloat(walletBalance.usd || 0) >= 0.21 ? 'pointer' : 'not-allowed',
                     transition: 'all 150ms',
                     fontFamily: '"Rajdhani", sans-serif',
-                    opacity: parseFloat(walletBalance.usd || 0) >= 0.21 ? 1 : 0.6
+                    opacity: parseFloat(walletBalance.usd || 0) >= 0.21 ? 1 : 0.6,
+                    textShadow: parseFloat(walletBalance.usd || 0) >= 0.21 ? '0 0 8px rgba(16, 185, 129, 0.3)' : 'none'
                   }}
                   onMouseOver={(e) => {
                     if (parseFloat(walletBalance.usd || 0) >= 0.21) {
-                      e.target.style.backgroundColor = '#d97706'
+                      e.target.style.backgroundColor = '#059669'
                       e.target.style.transform = 'translateY(-1px)'
                     }
                   }}
                   onMouseOut={(e) => {
                     if (parseFloat(walletBalance.usd || 0) >= 0.21) {
-                      e.target.style.backgroundColor = '#f59e0b'
+                      e.target.style.backgroundColor = '#10b981'
                       e.target.style.transform = 'translateY(0)'
                     }
                   }}
