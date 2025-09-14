@@ -108,10 +108,10 @@ user_problem_statement: "Complete the landscape orientation requirement for mobi
 
 test_plan:
   current_focus:
-    - "Test Solana-Only Deposit Function"
-    - "Verify DEPOSIT SOL Button Functionality"
-    - "Test Solana Wallet Creation and Authentication" 
-    - "Verify No EVM/Multi-Chain Conflicts"
+    - "Complete Mobile Orientation Modal Implementation"
+    - "Update All Game Entry Points to Use Orientation Check"
+    - "Test Mobile LOCAL PRACTICE Orientation Check"
+    - "Test Paid Rooms Orientation Check"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
