@@ -4039,7 +4039,7 @@ const AgarIOGame = () => {
                       e.target.style.color = '#a0aec0'
                     }}
                   >
-                    HOME
+                    BACK TO MAIN MENU
                   </button>
                 </div>
               </div>
