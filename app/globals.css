@@ -1426,6 +1426,33 @@
   background: #000;
 }
 
+/* Mobile canvas override - absolute priority */
+@media (max-width: 768px) {
+  #turfloot-canvas {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #000000 !important;
+    display: block !important;
+    z-index: 1 !important;
+    box-sizing: border-box !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 100vw !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+  }
+}
+
 /* Mobile drawer animation */
 .drawer-enter {
   transform: translateY(100%);
