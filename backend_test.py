@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Privy Solana Deposit Integration
-Testing Focus: Backend API Health after SSR fixes and Solana dependency installation
+Comprehensive Backend Testing for TurfLoot Agario Game
+Testing Focus: Backend API Health after Mobile Stats Panel Sub-Labels Implementation
 """
 
 import requests
@@ -14,7 +14,7 @@ from datetime import datetime
 BASE_URL = "https://mobilegame-ux.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-class SolanaDepositBackendTester:
+class TurfLootAgarioBackendTester:
     def __init__(self):
         self.results = []
         self.start_time = time.time()
