@@ -10805,32 +10805,79 @@ export default function TurfLootTactical() {
                 }}>
                   Destination Wallet Address
                 </div>
-                <input
-                  type="text"
-                  placeholder="Enter Solana wallet address..."
-                  style={{
-                    width: '100%',
-                    backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
-                    borderRadius: '8px',
-                    color: '#ffffff',
-                    fontSize: isMobile ? '14px' : '16px',
-                    padding: isMobile ? '12px 16px' : '16px 20px',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    fontFamily: 'monospace',
-                    '--placeholder-font-size': isMobile ? '12px' : '14px'
-                  }}
-                  className="wallet-address-input"
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#10b981'
-                    e.target.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)'
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
-                    e.target.style.boxShadow = 'none'
-                  }}
-                />
+                <div style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <input
+                    type="text"
+                    placeholder="Enter Solana wallet address..."
+                    value={destinationAddress || ''}
+                    onChange={(e) => setDestinationAddress(e.target.value)}
+                    style={{
+                      width: '100%',
+                      backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      fontSize: isMobile ? '14px' : '16px',
+                      padding: isMobile ? '12px 70px 12px 16px' : '16px 80px 16px 20px',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      fontFamily: 'monospace',
+                      '--placeholder-font-size': isMobile ? '12px' : '14px'
+                    }}
+                    className="wallet-address-input"
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#10b981'
+                      e.target.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  />
+                  <button
+                    onClick={async () => {
+                      try {
+                        const text = await navigator.clipboard.readText();
+                        if (text) {
+                          setDestinationAddress(text);
+                          console.log('✅ Pasted wallet address from clipboard');
+                        }
+                      } catch (err) {
+                        console.log('❌ Failed to read clipboard:', err);
+                        // Fallback: show a message to the user
+                        alert('Unable to paste from clipboard. Please manually enter your wallet address.');
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: '8px',
+                      backgroundColor: '#10b981',
+                      border: 'none',
+                      borderRadius: '4px',
+                      color: '#ffffff',
+                      fontSize: isMobile ? '10px' : '12px',
+                      fontWeight: '600',
+                      padding: isMobile ? '6px 8px' : '8px 12px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#059669'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#10b981'
+                    }}
+                  >
+                    PASTE
+                  </button>
+                </div>
               </div>
 
               {/* Action Buttons */}
