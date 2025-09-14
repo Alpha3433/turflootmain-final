@@ -10808,7 +10808,7 @@ export default function TurfLootTactical() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 999999999,
+          zIndex: 9999999999,
           backdropFilter: 'blur(10px)',
           pointerEvents: 'auto'
         }}>
