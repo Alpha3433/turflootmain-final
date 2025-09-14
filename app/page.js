@@ -1231,35 +1231,26 @@ export default function TurfLootTactical() {
   }, []) // Only run once after mount
 
   useEffect(() => {
-    // Enhanced mobile detection - prioritizes touch devices
+    // Simplified mobile detection - works in all environments
     const checkMobile = () => {
-      // Check for touch device (mobile/tablet)
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      // Screen dimensions - mobile if height <= 768 (works for both orientations)
+      const isSmallScreen = window.innerHeight <= 768 || Math.min(window.innerWidth, window.innerHeight) <= 768
       
-      // Check user agent for mobile devices
+      // Mobile landscape detection (wide but short screens)
+      const isMobileLandscape = window.innerHeight <= 500 && window.innerWidth >= 600
+      
+      // Touch and user agent detection (for real devices)
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       
-      // Check viewport dimensions - mobile if smallest dimension <= 768 (handles landscape)
-      const isSmallViewport = Math.min(window.innerWidth, window.innerHeight) <= 768
+      // Device is mobile if ANY of these conditions are true:
+      const mobile = isSmallScreen || isMobileLandscape || (isTouchDevice && isMobileUA)
       
-      // Check for mobile-like aspect ratios in landscape (very wide but short screens)
-      const isMobileLandscape = window.innerHeight <= 500 && window.innerWidth > window.innerHeight * 1.5
-      
-      // Device is mobile if:
-      // 1. Has touch AND mobile user agent (primary check)
-      // 2. OR has touch AND small viewport (fallback for touch devices)  
-      // 3. OR has small viewport regardless of touch (for automation/testing)
-      // 4. OR is mobile landscape aspect ratio
-      const mobile = (isTouchDevice && isMobileUA) || 
-                     (isTouchDevice && isSmallViewport) || 
-                     isSmallViewport || 
-                     isMobileLandscape
-      
-      console.log('📱 Mobile Detection:', {
+      console.log('📱 Mobile Detection (Simplified):', {
+        isSmallScreen,
+        isMobileLandscape,
         isTouchDevice,
         isMobileUA,
-        isSmallViewport,
-        isMobileLandscape,
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
         minDimension: Math.min(window.innerWidth, window.innerHeight),
