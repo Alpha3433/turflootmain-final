@@ -3323,15 +3323,15 @@ const AgarIOGame = () => {
             {/* Player dot on minimap - using state data */}
             <div style={{
               position: 'absolute',
-              width: '12px',
-              height: '12px',
+              width: isMobile ? '6px' : '12px',
+              height: isMobile ? '6px' : '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${(minimapData.playerX / 4000) * 210 + 5}px`,
-              top: `${(minimapData.playerY / 4000) * 210 + 5}px`,
+              left: `${(minimapData.playerX / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
+              top: `${(minimapData.playerY / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
               transform: 'translate(-50%, -50%)',
-              border: '3px solid #ffffff',
-              boxShadow: '0 0 12px rgba(96, 165, 250, 1)',
+              border: isMobile ? '1px solid #ffffff' : '3px solid #ffffff',
+              boxShadow: isMobile ? '0 0 6px rgba(96, 165, 250, 1)' : '0 0 12px rgba(96, 165, 250, 1)',
               zIndex: 10
             }} />
             
