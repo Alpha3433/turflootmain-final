@@ -453,14 +453,35 @@ export default function TurfLootTactical() {
         const data = await response.json()
         console.log('📡 Fetched server data:', data)
         
-        // Transform the server data into our selector format
-        const transformedServers = data.servers?.map(server => ({
-          code: server.regionId?.toUpperCase().replace(/[^A-Z0-9]/g, '-') || 'UNKNOWN',
-          name: server.region || 'Unknown Region',
-          ping: server.ping || 0,
-          players: server.players || 0,
-          status: server.status || 'online'
-        })) || []
+        // Transform the server data into our selector format with grouped regions
+        const transformedServers = data.servers?.map(server => {
+          // Map specific regions to broader geographic groups
+          const getRegionGroup = (regionId) => {
+            const region = regionId?.toLowerCase() || ''
+            
+            if (region.includes('washington') || region.includes('seattle') || region.includes('chicago') || region.includes('us-')) {
+              return { code: 'US', name: 'United States' }
+            } else if (region.includes('london') || region.includes('frankfurt') || region.includes('eu-') || region.includes('europe')) {
+              return { code: 'EU', name: 'Europe' }
+            } else if (region.includes('sydney') || region.includes('australia') || region.includes('oceania')) {
+              return { code: 'OCE', name: 'Oceania' }
+            } else if (region.includes('singapore') || region.includes('tokyo') || region.includes('mumbai') || region.includes('asia')) {
+              return { code: 'SEA', name: 'Asia Pacific' }
+            } else {
+              return { code: 'GLOBAL', name: 'Global' }
+            }
+          }
+          
+          const regionGroup = getRegionGroup(server.regionId)
+          
+          return {
+            code: regionGroup.code,
+            name: regionGroup.name,
+            ping: server.ping || 0,
+            players: server.players || 0,
+            status: server.status || 'online'
+          }
+        }) || []
         
         // Add some additional mock regions if needed
         const defaultServers = [
