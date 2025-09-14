@@ -3224,7 +3224,7 @@ export default function TurfLootTactical() {
               // Redirect to game with the newly created room
               const gameUrl = '/agario?roomId=' + finalRoomId + '&mode=practice&fee=0&region=' + finalRegion + '&multiplayer=hathora&server=global&hathoraApp=app-d0e53e41-4d8f-4f33-91f7-87ab78b3fddb&ondemand=true'
               console.log('🎮 Redirecting to newly created multiplayer room:', gameUrl)
-              window.location.href = gameUrl
+              checkOrientationAndEnterGame(gameUrl)
             }, 1000) // Brief delay to show completion
             
           } else {
