@@ -10535,14 +10535,14 @@ export default function TurfLootTactical() {
           pointerEvents: 'auto'
         }}>
           <div style={{
-            backgroundColor: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
-            border: '3px solid #68d391',
+            backgroundColor: 'rgba(17, 24, 39, 0.98)',
+            border: '2px solid #10b981',
             borderRadius: isMobile ? '12px' : '16px',
             maxWidth: isMobile ? '340px' : '500px',
             width: '90%',
             padding: '0',
             color: 'white',
-            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(104, 211, 145, 0.3)',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(16, 185, 129, 0.4)',
             fontFamily: '"Rajdhani", sans-serif',
             position: 'relative'
           }}>
