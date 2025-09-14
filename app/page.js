@@ -472,7 +472,13 @@ export default function TurfLootTactical() {
         ]
         
         // Use real data if available, otherwise fall back to defaults
-        setServerOptions(transformedServers.length > 0 ? transformedServers : defaultServers)
+        const finalServerOptions = transformedServers.length > 0 ? transformedServers : defaultServers
+        setServerOptions(finalServerOptions)
+        
+        // Update selected server to the first available server from real data
+        if (finalServerOptions.length > 0) {
+          setSelectedServer(finalServerOptions[0].code)
+        }
       } else {
         console.warn('Failed to fetch server data, using fallback')
         // Fallback to default servers
