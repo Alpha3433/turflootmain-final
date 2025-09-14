@@ -3543,15 +3543,27 @@ const AgarIOGame = () => {
           transition: 'all 0.3s ease'
         }}>
           {/* Header */}
-          <div style={{ 
-            color: '#22d3ee', 
-            fontSize: '14px', 
-            fontWeight: '700', 
-            marginBottom: '8px',
-            borderBottom: '1px solid #333',
-            paddingBottom: '6px'
-          }}>
-            You
+          <div 
+            onClick={handleStatsToggle}
+            style={{ 
+              color: '#22d3ee', 
+              fontSize: isMobile ? (statsExpanded ? '11px' : '10px') : '14px', 
+              fontWeight: '700', 
+              marginBottom: isMobile ? (statsExpanded ? '6px' : '3px') : '8px',
+              borderBottom: isMobile ? (statsExpanded ? '1px solid #333' : 'none') : '1px solid #333',
+              paddingBottom: isMobile ? (statsExpanded ? '4px' : '1px') : '6px',
+              cursor: isMobile ? 'pointer' : 'default',
+              userSelect: 'none',
+              transition: 'all 0.2s ease',
+              padding: isMobile ? '2px' : '0'
+            }}
+            onTouchStart={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
+            onTouchEnd={isMobile ? (e) => { e.target.style.color = '#22d3ee' } : undefined}
+          >
+            {isMobile 
+              ? (statsExpanded ? 'You' : 'Stats')
+              : 'You'
+            }
           </div>
           
           {/* Stats */}
