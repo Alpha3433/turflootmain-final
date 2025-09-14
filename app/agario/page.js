@@ -3669,28 +3669,43 @@ const AgarIOGame = () => {
             </div>
           ) : (
             /* Compact 2-Line Stats - Mobile only */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
               {/* Line 1: Net Worth • Mass */}
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between',
-                fontSize: '9px',
-                fontWeight: '700'
+                alignItems: 'center',
+                fontSize: '10px',
+                fontWeight: '700',
+                padding: '2px 4px',
+                background: 'rgba(34, 197, 94, 0.15)',
+                borderRadius: '6px',
+                border: '1px solid rgba(34, 197, 94, 0.3)'
               }}>
-                <span style={{ color: '#22c55e' }}>${score}</span>
-                <span style={{ color: '#ffffff' }}>{Math.floor(mass)}m</span>
+                <span style={{ 
+                  color: '#22c55e',
+                  textShadow: '0 0 6px rgba(34, 197, 94, 0.8)'
+                }}>💰 ${score}</span>
+                <span style={{ 
+                  color: '#e5e7eb',
+                  textShadow: '0 0 4px rgba(229, 231, 235, 0.8)'
+                }}>{Math.floor(mass)}m</span>
               </div>
               {/* Line 2: K/D • Streak • Time */}
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between',
-                fontSize: '8px',
-                color: '#9ca3af',
-                fontWeight: '600'
+                alignItems: 'center',
+                fontSize: '9px',
+                fontWeight: '600',
+                padding: '2px 4px',
+                background: 'rgba(107, 114, 128, 0.15)',
+                borderRadius: '6px',
+                border: '1px solid rgba(107, 114, 128, 0.2)'
               }}>
-                <span>{eliminations}/0</span>
-                <span>{eliminations}🔥</span>
-                <span>{Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}</span>
+                <span style={{ color: '#fbbf24' }}>{eliminations}/0</span>
+                <span style={{ color: '#f87171' }}>{eliminations}🔥</span>
+                <span style={{ color: '#60a5fa' }}>{Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}</span>
               </div>
             </div>
           )}
