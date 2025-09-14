@@ -10545,40 +10545,6 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             position: 'relative'
           }}>
-            {/* Close Button */}
-            <button
-              onClick={() => setWithdrawalModalVisible(false)}
-              style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
-                color: '#ffffff',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                zIndex: 1,
-                transition: 'all 0.2s ease'
-              }}
-              onMouseOver={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.2)'
-                e.target.style.transform = 'scale(1.1)'
-              }}
-              onMouseOut={(e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.1)'
-                e.target.style.transform = 'scale(1)'
-              }}
-            >
-              ×
-            </button>
-
             {/* Header */}
             <div style={{
               padding: isMobile ? '16px' : '20px',
