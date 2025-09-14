@@ -3585,16 +3585,27 @@ const AgarIOGame = () => {
           right: isMobile ? 'auto' : '10px',
           transform: isMobile ? 'translateX(-50%)' : 'none',
           zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          border: isMobile ? '1px solid #333' : '2px solid #333',
-          borderRadius: isMobile ? '6px' : '4px',
-          padding: isMobile ? (statsExpanded ? '6px 8px' : '4px 6px') : '12px 16px',
+          // Enhanced mobile styling
+          background: isMobile 
+            ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 50%, rgba(15, 23, 42, 0.95) 100%)'
+            : 'rgba(0, 0, 0, 0.85)',
+          border: isMobile 
+            ? '1px solid rgba(59, 130, 246, 0.4)' 
+            : '2px solid #333',
+          borderRadius: isMobile ? '12px' : '4px',
+          padding: isMobile ? (statsExpanded ? '8px 12px' : '6px 10px') : '12px 16px',
           fontSize: isMobile ? (statsExpanded ? '10px' : '9px') : '13px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: isMobile ? (statsExpanded ? '110px' : '85px') : '140px',
-          transition: 'all 0.3s ease'
+          minWidth: isMobile ? (statsExpanded ? '140px' : '110px') : '140px',
+          transition: 'all 0.3s ease',
+          // Mobile-specific enhancements
+          boxShadow: isMobile 
+            ? '0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+            : 'none',
+          backdropFilter: isMobile ? 'blur(12px)' : 'none',
+          WebkitBackdropFilter: isMobile ? 'blur(12px)' : 'none'
         }}>
           {/* Header */}
           <div 
