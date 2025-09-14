@@ -10566,10 +10566,7 @@ export default function TurfLootTactical() {
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <span style={{ 
-                  fontSize: isMobile ? '16px' : '18px',
-                  color: '#10b981'
-                }}>↗</span>
+
                 <h2 style={{
                   color: '#10b981',
                   fontSize: isMobile ? '18px' : '22px',
