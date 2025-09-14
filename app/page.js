@@ -10684,7 +10684,7 @@ export default function TurfLootTactical() {
                   style={{
                     width: '100%',
                     backgroundColor: 'rgba(17, 24, 39, 0.8)',
-                    border: '1px solid rgba(55, 65, 81, 0.8)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
                     borderRadius: '8px',
                     color: '#ffffff',
                     fontSize: isMobile ? '16px' : '18px',
@@ -10692,7 +10692,8 @@ export default function TurfLootTactical() {
                     padding: isMobile ? '12px 16px' : '16px 20px',
                     outline: 'none',
                     textAlign: 'right',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    fontFamily: '"Rajdhani", sans-serif'
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = '#3b82f6'
