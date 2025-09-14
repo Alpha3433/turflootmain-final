@@ -3109,8 +3109,8 @@ const AgarIOGame = () => {
           left: isMobile ? 'auto' : '50%',
           zIndex: 1000,
           display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          gap: isMobile ? '15px' : '12px',
+          flexDirection: 'row',
+          gap: isMobile ? '12px' : '12px',
           alignItems: 'center'
         }}>
           {/* Cash Out Button - Larger circular for mobile, rectangular for desktop */}
