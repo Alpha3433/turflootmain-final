@@ -4648,7 +4648,7 @@ const AgarIOGame = () => {
                       console.error('❌ Report submission error:', error)
                       alert(`Failed to submit report: ${error.message}. Please try again.`)
                     }
-                  }}
+                  })}
                   disabled={false}
                   style={{
                     backgroundColor: reportType ? '#ff4444' : '#666666',
