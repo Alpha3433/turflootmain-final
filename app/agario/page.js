@@ -2070,12 +2070,19 @@ const AgarIOGame = () => {
   }
 
   useEffect(() => {
+    // Apply mobile game class for full screen optimization
+    if (isMobile) {
+      document.body.classList.add('mobile-game-active')
+    }
+    
     // Remove default body margins/padding that might cause white borders
     document.body.style.margin = '0'
     document.body.style.padding = '0'
     document.body.style.overflow = 'hidden'
+    document.body.style.background = '#000000'
     document.documentElement.style.margin = '0'
     document.documentElement.style.padding = '0'
+    document.documentElement.style.background = '#000000'
     
     if (!canvasRef.current) return
 
