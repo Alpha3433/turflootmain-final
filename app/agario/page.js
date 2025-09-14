@@ -2588,7 +2588,7 @@ const AgarIOGame = () => {
             onTouchEnd={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
           >
             {isMobile 
-              ? (leaderboardExpanded ? '🏆 Top 5 (tap to hide)' : '🏆 Top 3 (tap to expand)')
+              ? (leaderboardExpanded ? '🏆 Top 5' : '🏆 Top 3')
               : '💰 Live Leaderboard'
             }
           </div>
