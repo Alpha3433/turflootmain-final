@@ -99,7 +99,7 @@ class MobileOrientationBackendTester:
                     # Test session leave endpoint
                     leave_data = {
                         "roomId": "mobile-orientation-test-room",
-                        "userIdentifier": "mobile-test-user"
+                        "playerId": "mobile-test-user"
                     }
                     
                     leave_response = requests.post(f"{API_BASE}/game-sessions/leave", 
