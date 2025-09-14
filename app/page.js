@@ -10549,23 +10549,28 @@ export default function TurfLootTactical() {
             {/* Header */}
             <div style={{
               padding: isMobile ? '16px' : '20px',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              borderBottom: '1px solid rgba(16, 185, 129, 0.2)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%)'
             }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <span style={{ fontSize: isMobile ? '16px' : '18px' }}>↗</span>
+                <span style={{ 
+                  fontSize: isMobile ? '16px' : '18px',
+                  color: '#10b981'
+                }}>↗</span>
                 <h2 style={{
-                  color: '#fbbf24',
+                  color: '#10b981',
                   fontSize: isMobile ? '18px' : '22px',
                   fontWeight: '700',
                   margin: '0',
-                  fontFamily: '"Rajdhani", sans-serif'
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
                 }}>
                   Cash Out
                 </h2>
