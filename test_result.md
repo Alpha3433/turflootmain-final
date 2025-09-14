@@ -57,8 +57,8 @@
 ##   test_priority: "high_first"  # or "sequential" or "stuck_first"
 ##
 ## agent_communication:
-##     -agent: "main"  # or "testing" or "user"
-##     -message: "Communication message between agents"
+##     -agent: "main"
+##     -message: "STARTING MOBILE ORIENTATION MODAL COMPLETION: The landscape orientation modal UI is already fully implemented (lines 9705-9808) with proper styling, instructions, visual indicators, and cancel functionality. However, not all game entry points are using the checkOrientationAndEnterGame function. Current status: Desktop LOCAL PRACTICE ✅ uses checkOrientationAndEnterGame (line 5423), Mobile LOCAL PRACTICE ❌ uses window.location.href directly (line 8807), Paid room entry points ❌ use window.location.href directly (lines 3227, 3251, 3308, 3324). Need to update all game entry points to use the orientation check function for consistent mobile landscape enforcement."
 
 # Protocol Guidelines for Main agent
 #
