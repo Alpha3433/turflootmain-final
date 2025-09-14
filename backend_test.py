@@ -53,36 +53,63 @@ class TurfLootBackendTester:
         print()
 
     def test_api_health_check(self):
-        """Test 1: Core API Health Check - Verify core API endpoints are accessible"""
-        print("🔍 Testing API Health Check...")
+        """Test 1: API Health Check - Verify core API endpoints are accessible"""
+        print("🔍 TEST 1: API HEALTH CHECK")
+        print("=" * 50)
         
         try:
-            start = time.time()
-            response = requests.get(f"{API_BASE}/ping", timeout=10)
-            response_time = time.time() - start
+            # Test root API endpoint
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}", timeout=10)
+            response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                server_name = data.get('server', 'unknown')
+                service_name = data.get('service', 'Unknown')
                 features = data.get('features', [])
+                
                 self.log_result(
-                    "API Health Check", 
-                    True, 
-                    f"Core API endpoints accessible and responding correctly (Service: {server_name}, Features: {'/'.join(features)})",
+                    "Root API Endpoint Accessibility",
+                    True,
+                    f"Service: {service_name}, Features: {features}",
                     response_time
                 )
-                return True
+                
+                # Test ping endpoint
+                start_time = time.time()
+                ping_response = requests.get(f"{API_BASE}/ping", timeout=10)
+                ping_time = time.time() - start_time
+                
+                if ping_response.status_code == 200:
+                    ping_data = ping_response.json()
+                    self.log_result(
+                        "Ping Endpoint Functionality",
+                        True,
+                        f"Status: {ping_data.get('status')}, Server: {ping_data.get('server')}",
+                        ping_time
+                    )
+                    return True
+                else:
+                    self.log_result(
+                        "Ping Endpoint Functionality",
+                        False,
+                        f"HTTP {ping_response.status_code}: {ping_response.text[:100]}"
+                    )
+                    return False
             else:
                 self.log_result(
-                    "API Health Check", 
-                    False, 
-                    f"API returned status {response.status_code}",
-                    response_time
+                    "Root API Endpoint Accessibility",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_result("API Health Check", False, f"Connection error: {str(e)}")
+            self.log_result(
+                "API Health Check",
+                False,
+                f"Connection error: {str(e)}"
+            )
             return False
 
     def test_game_session_apis(self):
