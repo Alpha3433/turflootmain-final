@@ -156,9 +156,10 @@ const AgarIOGame = () => {
     const knobX = Math.cos(angle) * distance
     const knobY = Math.sin(angle) * distance
     
+    // Always update visual position of joystick knob
     setJoystickPosition({ x: knobX, y: knobY })
     
-    // Update player movement based on joystick
+    // Only update player movement if game is ready
     if (gameRef.current?.game) {
       const strength = distance / 35 // Normalize to 0-1
       const moveSpeed = 500 * strength // Increased movement speed for better responsiveness
@@ -191,6 +192,8 @@ const AgarIOGame = () => {
       window.isUsingJoystick = true
       
       console.log('🕹️ After Update:', { targetX: game.player.targetX?.toFixed(1), targetY: game.player.targetY?.toFixed(1) })
+    } else {
+      console.log('⏳ Game not ready - joystick visual works but no player movement yet')
     }
   }
   
