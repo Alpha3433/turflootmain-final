@@ -8837,7 +8837,7 @@ export default function TurfLootTactical() {
               }}
               disabled={currentParty && currentParty.members && currentParty.members.length > 1}
             >
-              {isLoadingLocalPractice ? '⏳ LOADING...' : ((currentParty && currentParty.members && currentParty.members.length > 1) ? '🔒 LOCAL PRACTICE' : 'LOCAL PRACTICE')}
+              {(currentParty && currentParty.members && currentParty.members.length > 1) ? '🔒 LOCAL PRACTICE' : 'LOCAL PRACTICE'}
             </button>
             <button 
               style={{
