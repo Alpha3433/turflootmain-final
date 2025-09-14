@@ -10581,44 +10581,47 @@ export default function TurfLootTactical() {
 
             {/* Header */}
             <div style={{
-              padding: isMobile ? '20px' : '24px',
-              borderBottom: '2px solid rgba(104, 211, 145, 0.3)',
-              background: 'linear-gradient(45deg, rgba(104, 211, 145, 0.1) 0%, rgba(104, 211, 145, 0.05) 100%)',
-              textAlign: 'center'
+              padding: isMobile ? '16px' : '20px',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
             }}>
               <div style={{
-                width: isMobile ? '50px' : '70px',
-                height: isMobile ? '50px' : '70px',
-                background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
-                borderRadius: isMobile ? '10px' : '12px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: isMobile ? '24px' : '32px',
-                margin: isMobile ? '0 auto 12px' : '0 auto 16px',
-                boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)'
+                gap: '8px'
               }}>
-                💸
+                <span style={{ fontSize: isMobile ? '16px' : '18px' }}>↗</span>
+                <h2 style={{
+                  color: '#fbbf24',
+                  fontSize: isMobile ? '18px' : '22px',
+                  fontWeight: '700',
+                  margin: '0',
+                  fontFamily: '"Rajdhani", sans-serif'
+                }}>
+                  Cash Out
+                </h2>
               </div>
-              <h2 style={{
-                color: '#68d391',
-                fontSize: isMobile ? '20px' : '28px',
-                fontWeight: '700',
-                margin: isMobile ? '0 0 6px' : '0 0 8px',
-                textTransform: 'uppercase',
-                textShadow: '0 0 15px rgba(104, 211, 145, 0.6)',
-                letterSpacing: isMobile ? '0.5px' : '1px'
-              }}>
-                Withdraw Funds
-              </h2>
-              <p style={{
-                color: '#e2e8f0',
-                fontSize: isMobile ? '12px' : '16px',
-                margin: '0',
-                opacity: '0.9'
-              }}>
-                Transfer your SOL to another wallet
-              </p>
+              <button
+                onClick={() => setWithdrawalModalVisible(false)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '18px',
+                  fontWeight: 'bold'
+                }}
+              >
+                🏠
+              </button>
             </div>
 
             {/* Body Content */}
