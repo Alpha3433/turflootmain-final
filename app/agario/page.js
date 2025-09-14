@@ -4648,7 +4648,7 @@ const AgarIOGame = () => {
                       alert(`Failed to submit report: ${error.message}. Please try again.`)
                     }
                   }}
-                  disabled={!reportType}
+                  disabled={false}
                   style={{
                     backgroundColor: reportType ? '#ff4444' : '#666666',
                     border: reportType ? '2px solid #cc3333' : '2px solid #444444',
