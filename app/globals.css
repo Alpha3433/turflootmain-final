@@ -1023,18 +1023,20 @@
   }
 }
 
-/* Mobile joystick styles - UNIFIED */
+/* Mobile joystick styles - UNIFIED - Works in ALL orientations */
 .mobile-joystick {
   position: fixed !important;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 20px) !important;
-  left: 20px !important;
+  left: calc(env(safe-area-inset-left, 0px) + 20px) !important;
   width: 80px !important;
   height: 80px !important;
-  z-index: 999 !important;
+  z-index: 1000 !important;
   pointer-events: auto !important;
   touch-action: none !important;
   user-select: none !important;
   transition: opacity 0.3s ease;
+  display: block !important;
+  visibility: visible !important;
 }
 
 .mobile-joystick.faded {
