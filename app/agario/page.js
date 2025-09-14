@@ -160,14 +160,26 @@ const AgarIOGame = () => {
     // Update player movement based on joystick
     if (gameRef.current?.game) {
       const strength = distance / 35 // Normalize to 0-1
-      const moveSpeed = 300 * strength // Adjust movement speed
+      const moveSpeed = 500 * strength // Increased movement speed for better responsiveness
       
       const game = gameRef.current.game
       const targetX = game.player.x + Math.cos(angle) * moveSpeed
       const targetY = game.player.y + Math.sin(angle) * moveSpeed
       
+      // Debug logging for movement
+      console.log('🕹️ Joystick Movement:', {
+        strength: strength.toFixed(2),
+        angle: (angle * 180 / Math.PI).toFixed(1) + '°',
+        moveSpeed: moveSpeed.toFixed(1),
+        playerPos: { x: game.player.x.toFixed(1), y: game.player.y.toFixed(1) },
+        targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) }
+      })
+      
       game.player.targetX = targetX
       game.player.targetY = targetY
+      
+      // Set flag to indicate joystick is controlling movement
+      window.isUsingJoystick = true
     }
   }
   
@@ -197,14 +209,26 @@ const AgarIOGame = () => {
     // Update player movement based on joystick
     if (gameRef.current?.game) {
       const strength = distance / 35 // Normalize to 0-1
-      const moveSpeed = 300 * strength // Adjust movement speed
+      const moveSpeed = 500 * strength // Increased movement speed for better responsiveness
       
       const game = gameRef.current.game
       const targetX = game.player.x + Math.cos(angle) * moveSpeed
       const targetY = game.player.y + Math.sin(angle) * moveSpeed
       
+      // Debug logging for movement
+      console.log('🕹️ Joystick Movement:', {
+        strength: strength.toFixed(2),
+        angle: (angle * 180 / Math.PI).toFixed(1) + '°',
+        moveSpeed: moveSpeed.toFixed(1),
+        playerPos: { x: game.player.x.toFixed(1), y: game.player.y.toFixed(1) },
+        targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) }
+      })
+      
       game.player.targetX = targetX
       game.player.targetY = targetY
+      
+      // Set flag to indicate joystick is controlling movement
+      window.isUsingJoystick = true
     }
   }
   
