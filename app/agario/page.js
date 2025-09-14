@@ -4674,12 +4674,12 @@ const AgarIOGame = () => {
                       e.target.style.transform = 'translateY(-2px)'
                     }
                   }}
-                  onMouseOut={(e) => {
+                  onMouseOut={((e) => {
                     if (reportType) {
                       e.target.style.backgroundColor = '#ff4444'
                       e.target.style.transform = 'translateY(0)'
                     }
-                  }}
+                  })}
                 >
                   Submit Report
                 </button>
