@@ -203,6 +203,12 @@ const AgarIOGame = () => {
     e.preventDefault()
     if (!isMobile || !joystickActive) return
     
+    // Don't process movement if game isn't ready
+    if (!gameRef.current?.game) {
+      console.log('⏳ Game not ready during joystick move - ignoring')
+      return
+    }
+    
     const rect = joystickRef.current?.getBoundingClientRect()
     if (!rect) return
     
