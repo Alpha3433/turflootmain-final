@@ -3138,6 +3138,11 @@ const AgarIOGame = () => {
               minWidth: isMobile ? '75px' : '200px',
               position: 'relative',
               overflow: 'hidden',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation',
               flexDirection: isMobile ? 'column' : 'row',
               touchAction: 'manipulation'
             }}
