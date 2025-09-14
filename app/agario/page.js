@@ -3341,15 +3341,15 @@ const AgarIOGame = () => {
                 key={i}
                 style={{
                   position: 'absolute',
-                  width: '6px',
-                  height: '6px',
+                  width: isMobile ? '3px' : '6px',
+                  height: isMobile ? '3px' : '6px',
                   backgroundColor: '#ff6b6b',
                   borderRadius: '50%',
-                  left: `${(enemy.x / 4000) * 210 + 5}px`,
-                  top: `${(enemy.y / 4000) * 210 + 5}px`,
+                  left: `${(enemy.x / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
+                  top: `${(enemy.y / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
                   transform: 'translate(-50%, -50%)',
                   opacity: '0.9',
-                  border: '1px solid #ffffff',
+                  border: isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff',
                   zIndex: 8
                 }}
               />
