@@ -356,13 +356,13 @@ export default function TurfLootTactical() {
     // Initial balance check
     fetchWalletBalance()
     
-    // Set up periodic balance checking every 10 seconds
+    // Set up periodic balance checking every 60 seconds (optimized for Helius API usage)
     balanceInterval.current = setInterval(() => {
-      console.log('⏰ Periodic balance check triggered')
+      console.log('⏰ Periodic balance check triggered (60s interval)')
       fetchWalletBalance()
-    }, 10000)
+    }, 60000) // Changed from 10000ms (10s) to 60000ms (60s)
     
-    console.log('🔄 Balance monitoring started (10s interval)')
+    console.log('🔄 Balance monitoring started (60s interval - Helius API optimized)')
     
     // Cleanup function
     return () => {
