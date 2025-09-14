@@ -10625,100 +10625,180 @@ export default function TurfLootTactical() {
             </div>
 
             {/* Body Content */}
-            <div style={{ padding: isMobile ? '16px' : '24px' }}>
-              {/* Current Balance Display */}
+            <div style={{ padding: isMobile ? '16px' : '20px' }}>
+              {/* Available Balance Section */}
               <div style={{
-                backgroundColor: 'rgba(104, 211, 145, 0.1)',
-                border: '1px solid rgba(104, 211, 145, 0.3)',
-                borderRadius: '8px',
-                padding: isMobile ? '12px' : '16px',
-                marginBottom: isMobile ? '16px' : '24px',
-                textAlign: 'center'
-              }}>
-                <div style={{ 
-                  color: '#68d391', 
-                  fontSize: isMobile ? '11px' : '14px', 
-                  fontWeight: '600',
-                  marginBottom: isMobile ? '6px' : '8px',
-                  textTransform: 'uppercase'
-                }}>
-                  Your Current Balance
-                </div>
-                <div style={{ 
-                  color: '#ffffff', 
-                  fontSize: isMobile ? '18px' : '24px', 
-                  fontWeight: '700',
-                  marginBottom: isMobile ? '2px' : '4px'
-                }}>
-                  ${parseFloat(walletBalance.usd || 0).toFixed(2)}
-                </div>
-                <div style={{ 
-                  color: '#a0aec0', 
-                  fontSize: isMobile ? '9px' : '12px',
-                  fontWeight: '400'
-                }}>
-                  {parseFloat(walletBalance.sol || 0).toFixed(6)} SOL
-                </div>
-              </div>
-
-              {/* Wallet Address Display */}
-              <div style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                padding: isMobile ? '12px' : '16px',
-                borderRadius: '8px',
-                marginBottom: isMobile ? '16px' : '20px',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <div style={{ 
-                  color: '#a0aec0', 
-                  fontSize: isMobile ? '10px' : '12px', 
-                  marginBottom: isMobile ? '6px' : '8px',
-                  textTransform: 'uppercase',
-                  fontWeight: '600'
-                }}>
-                  Your Wallet Address
-                </div>
-                <div style={{ 
-                  color: '#ffffff', 
-                  fontSize: isMobile ? '11px' : '14px', 
-                  fontWeight: '500',
-                  wordBreak: 'break-all',
-                  fontFamily: 'monospace',
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                  padding: isMobile ? '6px' : '8px',
-                  borderRadius: '4px'
-                }}>
-                  {privyUser?.wallet?.address || 'No wallet connected'}
-                </div>
-              </div>
-
-              {/* Withdrawal Instructions */}
-              <div style={{
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-                borderRadius: '8px',
-                padding: isMobile ? '12px' : '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 marginBottom: isMobile ? '16px' : '20px'
               }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{ color: '#10b981', fontSize: '16px' }}>💰</span>
+                  <span style={{ 
+                    color: '#e5e7eb', 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    fontWeight: '600'
+                  }}>
+                    Available Balance
+                  </span>
+                  <span style={{ color: '#6b7280', fontSize: '14px' }}>🔄</span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{
+                    color: '#dc2626',
+                    fontSize: isMobile ? '16px' : '18px',
+                    fontWeight: '700'
+                  }}>
+                    ${parseFloat(walletBalance.usd || 0).toFixed(2)}
+                  </div>
+                  <div style={{
+                    color: '#9ca3af',
+                    fontSize: isMobile ? '11px' : '12px'
+                  }}>
+                    {parseFloat(walletBalance.sol || 0).toFixed(6)} SOL
+                  </div>
+                </div>
+              </div>
+
+              {/* Insufficient Balance Warning */}
+              {parseFloat(walletBalance.usd || 0) < 0.21 && (
+                <div style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '8px',
+                  padding: isMobile ? '12px' : '16px',
+                  marginBottom: isMobile ? '16px' : '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{ color: '#ef4444', fontSize: '16px' }}>⚠</span>
+                  <div>
+                    <div style={{ 
+                      color: '#ef4444', 
+                      fontSize: isMobile ? '12px' : '14px', 
+                      fontWeight: '600'
+                    }}>
+                      Insufficient balance for cashout. Minimum $0.20 + $0.01 required.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Amount Input */}
+              <div style={{ marginBottom: isMobile ? '16px' : '20px' }}>
+                <input
+                  type="number"
+                  placeholder="0.00"
+                  style={{
+                    width: '100%',
+                    backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                    border: '1px solid rgba(55, 65, 81, 0.8)',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: isMobile ? '16px' : '18px',
+                    fontWeight: '600',
+                    padding: isMobile ? '12px 16px' : '16px 20px',
+                    outline: 'none',
+                    textAlign: 'right',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(55, 65, 81, 0.8)'
+                  }}
+                />
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: '8px'
+                }}>
+                  <span style={{
+                    color: '#9ca3af',
+                    fontSize: isMobile ? '12px' : '14px'
+                  }}>
+                    USD
+                  </span>
+                  <div style={{
+                    display: 'flex',
+                    gap: '8px'
+                  }}>
+                    <button style={{
+                      backgroundColor: '#3b82f6',
+                      border: 'none',
+                      borderRadius: '4px',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      padding: '4px 12px',
+                      cursor: 'pointer'
+                    }}>
+                      ½
+                    </button>
+                    <button style={{
+                      backgroundColor: '#f59e0b',
+                      border: 'none',
+                      borderRadius: '4px',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      padding: '4px 12px',
+                      cursor: 'pointer'
+                    }}>
+                      MAX
+                    </button>
+                  </div>
+                </div>
+                <div style={{
+                  color: '#6b7280',
+                  fontSize: isMobile ? '12px' : '14px',
+                  textAlign: 'center',
+                  marginTop: '8px'
+                }}>
+                  0% of available balance
+                </div>
+              </div>
+
+              {/* Destination Address */}
+              <div style={{ marginBottom: isMobile ? '20px' : '24px' }}>
                 <div style={{ 
-                  color: '#60a5fa', 
-                  fontSize: isMobile ? '11px' : '14px', 
+                  color: '#e5e7eb', 
+                  fontSize: isMobile ? '14px' : '16px', 
                   fontWeight: '600',
-                  marginBottom: isMobile ? '8px' : '12px',
-                  textTransform: 'uppercase'
+                  marginBottom: '8px'
                 }}>
-                  How to Withdraw
+                  Destination Wallet Address
                 </div>
-                <div style={{ 
-                  color: '#e2e8f0', 
-                  fontSize: isMobile ? '10px' : '13px', 
-                  lineHeight: '1.5'
-                }}>
-                  1. Copy your wallet address above<br/>
-                  2. Use any Solana wallet app to send funds to another address<br/>
-                  3. Always verify the recipient address before sending<br/>
-                  4. Transaction fees will apply
-                </div>
+                <input
+                  type="text"
+                  placeholder="Enter Solana wallet address..."
+                  style={{
+                    width: '100%',
+                    backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                    border: '1px solid rgba(55, 65, 81, 0.8)',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: isMobile ? '14px' : '16px',
+                    padding: isMobile ? '12px 16px' : '16px 20px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    fontFamily: 'monospace'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#3b82f6'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(55, 65, 81, 0.8)'
+                  }}
+                />
               </div>
 
               {/* Action Buttons */}
