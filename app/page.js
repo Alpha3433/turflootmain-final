@@ -10667,6 +10667,11 @@ export default function TurfLootTactical() {
                 <input
                   type="number"
                   placeholder="0.00"
+                  value={withdrawalAmount}
+                  onChange={(e) => setWithdrawalAmount(e.target.value)}
+                  step="0.01"
+                  min="0"
+                  max={parseFloat(walletBalance.usd || 0)}
                   style={{
                     width: '100%',
                     backgroundColor: 'rgba(17, 24, 39, 0.8)',
@@ -10703,28 +10708,55 @@ export default function TurfLootTactical() {
                     display: 'flex',
                     gap: '8px'
                   }}>
-                    <button style={{
-                      backgroundColor: '#3b82f6',
-                      border: 'none',
-                      borderRadius: '4px',
-                      color: '#ffffff',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      padding: '4px 12px',
-                      cursor: 'pointer'
-                    }}>
+                    <button 
+                      onClick={() => {
+                        const maxBalance = parseFloat(walletBalance.usd || 0);
+                        const halfAmount = (maxBalance / 2).toFixed(2);
+                        setWithdrawalAmount(halfAmount);
+                      }}
+                      style={{
+                        backgroundColor: '#3b82f6',
+                        border: 'none',
+                        borderRadius: '4px',
+                        color: '#ffffff',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        padding: '4px 12px',
+                        cursor: 'pointer',
+                        transition: 'all 150ms'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.backgroundColor = '#2563eb'
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.backgroundColor = '#3b82f6'
+                      }}
+                    >
                       ½
                     </button>
-                    <button style={{
-                      backgroundColor: '#f59e0b',
-                      border: 'none',
-                      borderRadius: '4px',
-                      color: '#ffffff',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      padding: '4px 12px',
-                      cursor: 'pointer'
-                    }}>
+                    <button 
+                      onClick={() => {
+                        const maxBalance = parseFloat(walletBalance.usd || 0);
+                        setWithdrawalAmount(maxBalance.toFixed(2));
+                      }}
+                      style={{
+                        backgroundColor: '#f59e0b',
+                        border: 'none',
+                        borderRadius: '4px',
+                        color: '#ffffff',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        padding: '4px 12px',
+                        cursor: 'pointer',
+                        transition: 'all 150ms'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.backgroundColor = '#d97706'
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.backgroundColor = '#f59e0b'
+                      }}
+                    >
                       MAX
                     </button>
                   </div>
@@ -10735,7 +10767,12 @@ export default function TurfLootTactical() {
                   textAlign: 'center',
                   marginTop: '8px'
                 }}>
-                  0% of available balance
+                  {(() => {
+                    const maxBalance = parseFloat(walletBalance.usd || 0);
+                    const currentAmount = parseFloat(withdrawalAmount || 0);
+                    const percentage = maxBalance > 0 ? ((currentAmount / maxBalance) * 100).toFixed(0) : 0;
+                    return `${percentage}% of available balance`;
+                  })()}
                 </div>
               </div>
 
