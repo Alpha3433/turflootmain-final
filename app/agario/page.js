@@ -4286,6 +4286,40 @@ const AgarIOGame = () => {
                   >
                     PLAY AGAIN
                   </button>
+                  {/* Report Button */}
+                  <button
+                    onClick={() => {
+                      setReportTarget('Unknown Player') // We'll set this to the actual player who eliminated them
+                      setReportModalVisible(true)
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                      border: '2px solid #ff4444',
+                      borderRadius: '8px',
+                      color: '#ff4444',
+                      fontSize: isMobile ? '11px' : '14px',
+                      fontWeight: '600',
+                      padding: isMobile ? '6px 12px' : '8px 16px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 68, 68, 0.2)'
+                      e.target.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 68, 68, 0.1)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    🚨 REPORT PLAYER
+                  </button>
                   <button
                     onClick={() => window.location.href = '/'}
                     style={{
