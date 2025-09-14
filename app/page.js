@@ -2000,7 +2000,9 @@ export default function TurfLootTactical() {
 
   const handleWithdraw = async () => {
     try {
-      console.log('💸 WITHDRAW button clicked')
+      console.log('💸 WITHDRAW button clicked - Desktop/Mobile')
+      console.log('🔍 Current authentication state:', { authenticated, privyUser: !!privyUser })
+      console.log('🔍 withdrawalModalVisible current state:', withdrawalModalVisible)
       
       // Check authentication using Privy hooks directly
       if (!authenticated || !privyUser) {
@@ -2018,7 +2020,9 @@ export default function TurfLootTactical() {
       console.log('👤 User wallet:', privyUser.wallet?.address || 'No wallet')
       
       // Open withdrawal modal
+      console.log('🎯 Setting withdrawalModalVisible to true...')
       setWithdrawalModalVisible(true)
+      console.log('✅ withdrawalModalVisible should now be true')
       
     } catch (error) {
       console.error('❌ Withdraw error:', error)
