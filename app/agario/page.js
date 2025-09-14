@@ -4093,7 +4093,7 @@ const AgarIOGame = () => {
                   margin: '0',
                   opacity: '0.8'
                 }}>
-                  Your operative has been eliminated!
+                  Game Over!
                 </p>
               </div>
 
