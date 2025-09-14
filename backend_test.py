@@ -378,50 +378,145 @@ class TurfLootBackendTester:
             )
             return False
 
-    def test_server_browser_integration(self):
-        """Test 4: Server Browser Integration - Test server browser functionality for game loading"""
-        print("🔍 Testing Server Browser Integration...")
+    def test_user_balance_stats_apis(self):
+        """Test 4: User Balance & Stats APIs - Confirm balance retrieval functionality"""
+        print("📊 TEST 4: USER BALANCE & STATS APIs")
+        print("=" * 50)
         
+        # Test 4.1: Server Browser API
         try:
-            start = time.time()
+            start_time = time.time()
             response = requests.get(f"{API_BASE}/servers/lobbies", timeout=10)
-            response_time = time.time() - start
+            response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
+                expected_fields = ['servers', 'totalPlayers', 'hathoraEnabled']
+                has_all_fields = all(field in data for field in expected_fields)
                 
-                # Check for server browser fields
-                has_servers = 'servers' in data
-                servers = data.get('servers', [])
-                total_players = data.get('totalPlayers', 0)
-                hathora_enabled = data.get('hathoraEnabled', False)
-                
-                if has_servers and isinstance(servers, list):
+                if has_all_fields:
+                    server_count = len(data.get('servers', []))
+                    hathora_enabled = data.get('hathoraEnabled', False)
                     self.log_result(
-                        "Server Browser Integration", 
-                        True, 
-                        f"Server browser functionality for game loading works correctly ({len(servers)} servers, {total_players} players, Hathora: {hathora_enabled})",
+                        "Server Browser API",
+                        True,
+                        f"{server_count} servers available, Hathora: {hathora_enabled}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Server Browser API",
+                        False,
+                        f"Missing expected fields: {data}"
+                    )
+            else:
+                self.log_result(
+                    "Server Browser API",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "Server Browser API",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 4.2: Live Statistics APIs
+        try:
+            # Test live players endpoint
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/stats/live-players", timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'count' in data and 'timestamp' in data:
+                    player_count = data.get('count', 0)
+                    self.log_result(
+                        "Live Players Statistics API",
+                        True,
+                        f"Live players: {player_count}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Live Players Statistics API",
+                        False,
+                        f"Unexpected response structure: {data}"
+                    )
+
+            # Test global winnings endpoint
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/stats/global-winnings", timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'total' in data and 'formatted' in data:
+                    winnings = data.get('formatted', '$0')
+                    self.log_result(
+                        "Global Winnings Statistics API",
+                        True,
+                        f"Global winnings: {winnings}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Global Winnings Statistics API",
+                        False,
+                        f"Unexpected response structure: {data}"
+                    )
+            else:
+                self.log_result(
+                    "Global Winnings Statistics API",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "Live Statistics APIs",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 4.3: Leaderboard API
+        try:
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/users/leaderboard", timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'users' in data:
+                    user_count = len(data.get('users', []))
+                    self.log_result(
+                        "Leaderboard API",
+                        True,
+                        f"Leaderboard returned {user_count} users",
                         response_time
                     )
                     return True
                 else:
                     self.log_result(
-                        "Server Browser Integration", 
-                        False, 
-                        f"Invalid server browser response: servers={type(servers)}, count={len(servers) if isinstance(servers, list) else 'N/A'}"
+                        "Leaderboard API",
+                        False,
+                        f"Missing 'users' field: {data}"
                     )
                     return False
             else:
                 self.log_result(
-                    "Server Browser Integration", 
-                    False, 
-                    f"API returned status {response.status_code}",
-                    response_time
+                    "Leaderboard API",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
                 )
                 return False
-                
         except Exception as e:
-            self.log_result("Server Browser Integration", False, f"Error: {str(e)}")
+            self.log_result(
+                "Leaderboard API",
+                False,
+                f"Error: {str(e)}"
+            )
             return False
 
     def test_backend_regression_testing(self):
