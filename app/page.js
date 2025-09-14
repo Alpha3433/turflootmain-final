@@ -10810,8 +10810,7 @@ export default function TurfLootTactical() {
           justifyContent: 'center',
           zIndex: 9999999999,
           backdropFilter: 'blur(10px)',
-          pointerEvents: 'auto',
-          border: '5px solid red' // DEBUG: Make modal container visible
+          pointerEvents: 'auto'
         }}>
           <div style={{
             backgroundColor: 'rgba(17, 24, 39, 0.98)',
