@@ -441,15 +441,70 @@ export default function TurfLootTactical() {
   const [customUsername, setCustomUsername] = useState('')
   const [serverSelectorOpen, setServerSelectorOpen] = useState(false)
   const [selectedServer, setSelectedServer] = useState('US-W')
+  const [serverOptions, setServerOptions] = useState([])
+  const [serverDataLoading, setServerDataLoading] = useState(false)
   
-  // Server options for the selector
-  const serverOptions = [
-    { code: 'US-W', name: 'US West', ping: 12, players: 24 },
-    { code: 'US-E', name: 'US East', ping: 28, players: 31 },
-    { code: 'EU', name: 'Europe', ping: 45, players: 18 },
-    { code: 'ASIA', name: 'Asia Pacific', ping: 67, players: 12 },
-    { code: 'SA', name: 'South America', ping: 52, players: 8 }
-  ]
+  // Fetch real-time server data
+  const fetchServerData = async () => {
+    setServerDataLoading(true)
+    try {
+      const response = await fetch('/api/servers/lobbies')
+      if (response.ok) {
+        const data = await response.json()
+        console.log('📡 Fetched server data:', data)
+        
+        // Transform the server data into our selector format
+        const transformedServers = data.servers?.map(server => ({
+          code: server.regionId?.toUpperCase().replace(/[^A-Z0-9]/g, '-') || 'UNKNOWN',
+          name: server.region || 'Unknown Region',
+          ping: server.ping || 0,
+          players: server.players || 0,
+          status: server.status || 'online'
+        })) || []
+        
+        // Add some additional mock regions if needed
+        const defaultServers = [
+          { code: 'US-W', name: 'US West', ping: 12, players: 24, status: 'online' },
+          { code: 'US-E', name: 'US East', ping: 28, players: 31, status: 'online' },
+          { code: 'EU', name: 'Europe', ping: 45, players: 18, status: 'online' },
+          { code: 'ASIA', name: 'Asia Pacific', ping: 67, players: 12, status: 'online' },
+          { code: 'SA', name: 'South America', ping: 52, players: 8, status: 'online' }
+        ]
+        
+        // Use real data if available, otherwise fall back to defaults
+        setServerOptions(transformedServers.length > 0 ? transformedServers : defaultServers)
+      } else {
+        console.warn('Failed to fetch server data, using fallback')
+        // Fallback to default servers
+        setServerOptions([
+          { code: 'US-W', name: 'US West', ping: 12, players: 24, status: 'online' },
+          { code: 'US-E', name: 'US East', ping: 28, players: 31, status: 'online' },
+          { code: 'EU', name: 'Europe', ping: 45, players: 18, status: 'online' },
+          { code: 'ASIA', name: 'Asia Pacific', ping: 67, players: 12, status: 'online' },
+          { code: 'SA', name: 'South America', ping: 52, players: 8, status: 'online' }
+        ])
+      }
+    } catch (error) {
+      console.error('Error fetching server data:', error)
+      // Fallback to default servers on error
+      setServerOptions([
+        { code: 'US-W', name: 'US West', ping: 12, players: 24, status: 'online' },
+        { code: 'US-E', name: 'US East', ping: 28, players: 31, status: 'online' },
+        { code: 'EU', name: 'Europe', ping: 45, players: 18, status: 'online' },
+        { code: 'ASIA', name: 'Asia Pacific', ping: 67, players: 12, status: 'online' },
+        { code: 'SA', name: 'South America', ping: 52, players: 8, status: 'online' }
+      ])
+    } finally {
+      setServerDataLoading(false)
+    }
+  }
+  
+  // Fetch server data on component mount and refresh every 30 seconds
+  useEffect(() => {
+    fetchServerData()
+    const interval = setInterval(fetchServerData, 30000) // Refresh every 30 seconds
+    return () => clearInterval(interval)
+  }, [])
   
   // Sync Privy authentication state with local state
   useEffect(() => {
