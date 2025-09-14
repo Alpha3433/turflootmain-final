@@ -3265,13 +3265,20 @@ const AgarIOGame = () => {
           </div>
         )}
 
-        {/* Action Buttons - Mobile Only (Desktop uses keyboard controls) */}
-        {isMobile && (
+        {/* Action Buttons - Mobile and Desktop */}
+        {gameStarted && !gameOver && (
           <div style={{
             position: 'fixed',
             // Mobile: Right side aligned with analog stick
-            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 30px)',
-            right: 'calc(env(safe-area-inset-right, 0px) + 15px)',
+            // Desktop: Bottom center
+            bottom: isMobile 
+              ? 'calc(env(safe-area-inset-bottom, 0px) + 30px)'
+              : '20px',
+            right: isMobile 
+              ? 'calc(env(safe-area-inset-right, 0px) + 15px)'
+              : 'auto',
+            left: isMobile ? 'auto' : '50%',
+            transform: isMobile ? 'none' : 'translateX(-50%)',
             zIndex: 1000,
             display: 'flex',
             flexDirection: 'row',
