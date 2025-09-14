@@ -1259,9 +1259,11 @@ export default function TurfLootTactical() {
         isTouchDevice,
         isMobileUA,
         isSmallViewport,
+        isMobileLandscape,
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
         minDimension: Math.min(window.innerWidth, window.innerHeight),
+        aspectRatio: (window.innerWidth / window.innerHeight).toFixed(2),
         result: mobile
       })
       
