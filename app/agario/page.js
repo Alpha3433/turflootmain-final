@@ -3532,7 +3532,9 @@ const AgarIOGame = () => {
         <div style={{
           position: 'fixed',
           bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 10px)' : '10px',
-          right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 5px)' : '10px',
+          left: isMobile ? '50%' : '10px',
+          right: isMobile ? 'auto' : '10px',
+          transform: isMobile ? 'translateX(-50%)' : 'none',
           zIndex: 1000,
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
           border: isMobile ? '1px solid #333' : '2px solid #333',
