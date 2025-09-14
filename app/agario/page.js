@@ -454,6 +454,13 @@ const AgarIOGame = () => {
     viruses: []
   })
 
+  // Modal states
+  const [withdrawalModalVisible, setWithdrawalModalVisible] = useState(false)
+  const [reportModalVisible, setReportModalVisible] = useState(false)
+  const [reportType, setReportType] = useState('')
+  const [reportReason, setReportReason] = useState('')
+  const [reportTarget, setReportTarget] = useState('')
+
   // Game Engine Class
   class GameEngine {
     constructor(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates) {
