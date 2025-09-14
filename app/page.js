@@ -3321,7 +3321,7 @@ export default function TurfLootTactical() {
           // Fallback to direct connection
           const gameUrl = `/agario?roomId=${server.id}&mode=${server.mode}&fee=${server.stake || 0}&region=${server.region || 'unknown'}&multiplayer=direct`
           console.log('🎮 Fallback to direct game:', gameUrl)
-          window.location.href = gameUrl
+          checkOrientationAndEnterGame(gameUrl)
         }
       }, 2000) // Reduced delay
     }
