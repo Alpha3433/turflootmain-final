@@ -9719,92 +9719,168 @@ export default function TurfLootTactical() {
           padding: '20px',
           boxSizing: 'border-box'
         }}>
-          {/* Rotate Phone Icon */}
-          <div style={{
-            fontSize: '80px',
-            marginBottom: '30px',
-            animation: 'rotatePhone 2s ease-in-out infinite alternate'
-          }}>
-            📱➡️📲
-          </div>
-          
-          {/* Instructions */}
-          <h2 style={{
-            color: '#ffffff',
-            fontSize: '24px',
-            fontWeight: '700',
-            textAlign: 'center',
-            marginBottom: '20px',
-            fontFamily: '"Rajdhani", sans-serif',
-            textTransform: 'uppercase'
-          }}>
-            Rotate Your Device
-          </h2>
-          
-          <p style={{
-            color: '#e2e8f0',
-            fontSize: '16px',
-            textAlign: 'center',
-            lineHeight: '1.5',
-            marginBottom: '30px',
-            fontFamily: '"Rajdhani", sans-serif',
-            maxWidth: '300px'
-          }}>
-            For the best gaming experience, please rotate your device to landscape mode.
-          </p>
-          
-          {/* Visual Indicator */}
-          <div style={{
-            width: '120px',
-            height: '60px',
-            border: '3px solid #68d391',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '20px',
-            background: 'rgba(104, 211, 145, 0.1)'
-          }}>
-            <span style={{
-              color: '#68d391',
-              fontSize: '14px',
-              fontWeight: '600',
-              fontFamily: '"Rajdhani", sans-serif'
-            }}>
-              LANDSCAPE
-            </span>
-          </div>
-          
-          {/* Cancel Button */}
-          <button
-            onClick={() => {
-              setShowOrientationModal(false)
-              setPendingGameUrl(null)
-            }}
-            style={{
-              padding: '12px 24px',
-              background: 'rgba(252, 129, 129, 0.2)',
-              border: '2px solid #fc8181',
-              borderRadius: '6px',
-              color: '#fc8181',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontFamily: '"Rajdhani", sans-serif',
-              textTransform: 'uppercase',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.background = 'rgba(252, 129, 129, 0.3)'
-              e.target.style.transform = 'scale(1.05)'
-            }}
-            onMouseOut={(e) => {
-              e.target.style.background = 'rgba(252, 129, 129, 0.2)'
-              e.target.style.transform = 'scale(1)'
-            }}
-          >
-            Cancel
-          </button>
+          {orientationModalLoading ? (
+            // Loading State
+            <>
+              {/* Loading Spinner */}
+              <div style={{
+                width: '60px',
+                height: '60px',
+                border: '4px solid rgba(59, 130, 246, 0.3)',
+                borderTop: '4px solid #3b82f6',
+                borderRadius: '50%',
+                marginBottom: '30px',
+                animation: 'spin 1s linear infinite'
+              }} />
+              
+              {/* Loading Text */}
+              <h2 style={{
+                color: '#3b82f6',
+                fontSize: '24px',
+                fontWeight: '700',
+                textAlign: 'center',
+                marginBottom: '12px',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase',
+                textShadow: '0 0 10px rgba(59, 130, 246, 0.6)'
+              }}>
+                Loading Practice
+              </h2>
+              
+              <p style={{
+                color: '#a0aec0',
+                fontSize: '16px',
+                textAlign: 'center',
+                marginBottom: '30px',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                Initializing Local World...
+              </p>
+              
+              {/* Loading Dots */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '8px',
+                marginBottom: '20px'
+              }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  background: '#3b82f6',
+                  borderRadius: '50%',
+                  animation: 'loadingDot 1.4s ease-in-out infinite'
+                }} />
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  background: 'rgba(59, 130, 246, 0.6)',
+                  borderRadius: '50%',
+                  animation: 'loadingDot 1.4s ease-in-out infinite 0.16s'
+                }} />
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  background: 'rgba(59, 130, 246, 0.3)',
+                  borderRadius: '50%',
+                  animation: 'loadingDot 1.4s ease-in-out infinite 0.32s'
+                }} />
+              </div>
+            </>
+          ) : (
+            // Orientation Request State
+            <>
+              {/* Rotate Phone Icon */}
+              <div style={{
+                fontSize: '80px',
+                marginBottom: '30px',
+                animation: 'rotatePhone 2s ease-in-out infinite alternate'
+              }}>
+                📱➡️📲
+              </div>
+              
+              {/* Instructions */}
+              <h2 style={{
+                color: '#ffffff',
+                fontSize: '24px',
+                fontWeight: '700',
+                textAlign: 'center',
+                marginBottom: '20px',
+                fontFamily: '"Rajdhani", sans-serif',
+                textTransform: 'uppercase'
+              }}>
+                Rotate Your Device
+              </h2>
+              
+              <p style={{
+                color: '#e2e8f0',
+                fontSize: '16px',
+                textAlign: 'center',
+                lineHeight: '1.5',
+                marginBottom: '30px',
+                fontFamily: '"Rajdhani", sans-serif',
+                maxWidth: '300px'
+              }}>
+                For the best gaming experience, please rotate your device to landscape mode.
+              </p>
+              
+              {/* Visual Indicator */}
+              <div style={{
+                width: '120px',
+                height: '60px',
+                border: '3px solid #68d391',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '20px',
+                background: 'rgba(104, 211, 145, 0.1)'
+              }}>
+                <span style={{
+                  color: '#68d391',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  fontFamily: '"Rajdhani", sans-serif'
+                }}>
+                  LANDSCAPE
+                </span>
+              </div>
+              
+              {/* Cancel Button */}
+              <button
+                onClick={() => {
+                  setShowOrientationModal(false)
+                  setPendingGameUrl(null)
+                  setOrientationModalLoading(false)
+                }}
+                style={{
+                  padding: '12px 24px',
+                  background: 'rgba(252, 129, 129, 0.2)',
+                  border: '2px solid #fc8181',
+                  borderRadius: '6px',
+                  color: '#fc8181',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  fontFamily: '"Rajdhani", sans-serif',
+                  textTransform: 'uppercase',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+                  e.target.style.transform = 'scale(1.05)'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                  e.target.style.transform = 'scale(1)'
+                }}
+              >
+                Cancel
+              </button>
+            </>
+          )}
         </div>
       )}
 
