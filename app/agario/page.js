@@ -4596,8 +4596,12 @@ const AgarIOGame = () => {
               }}>
                 {/* Submit Report Button */}
                 <button
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    console.log('🔍 Submit Report button clicked!')
+                    console.log('📊 Report state:', { reportType, reportReason, reportTarget })
+                    
                     if (!reportType) {
+                      console.log('❌ No report type selected')
                       alert('Please select a report reason.')
                       return
                     }
@@ -4615,7 +4619,7 @@ const AgarIOGame = () => {
                       
                       console.log('📝 Submitting report:', reportData)
                       
-                      // Send report to backend (we'll create this API endpoint)
+                      // Send report to backend
                       const response = await fetch('/api/reports', {
                         method: 'POST',
                         headers: {
@@ -4624,18 +4628,24 @@ const AgarIOGame = () => {
                         body: JSON.stringify(reportData)
                       })
                       
+                      console.log('📡 API Response:', response.status, response.statusText)
+                      
                       if (response.ok) {
+                        const result = await response.json()
+                        console.log('✅ Report submitted successfully:', result)
                         alert('Report submitted successfully. Thank you for helping maintain fair play!')
                         setReportModalVisible(false)
                         setReportType('')
                         setReportReason('')
                         setReportTarget('')
                       } else {
-                        throw new Error('Failed to submit report')
+                        const errorData = await response.text()
+                        console.error('❌ API Error:', response.status, errorData)
+                        throw new Error(`API Error: ${response.status} - ${errorData}`)
                       }
                     } catch (error) {
                       console.error('❌ Report submission error:', error)
-                      alert('Failed to submit report. Please try again.')
+                      alert(`Failed to submit report: ${error.message}. Please try again.`)
                     }
                   }}
                   disabled={!reportType}
