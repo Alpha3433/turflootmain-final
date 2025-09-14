@@ -1048,9 +1048,9 @@ export default function TurfLootTactical() {
           }
         } else {
           // New authenticated user - give them starter coins
-          console.log('🎁 New authenticated user - granting starter coins')
-          setCurrency(2500)
-          localStorage.setItem(userCurrencyKey, '2500')
+          console.log('🎁 New authenticated user - granting starter coins (100)')
+          setCurrency(100)
+          localStorage.setItem(userCurrencyKey, '100')
         }
       } else {
         // Non-authenticated user - use guest currency (0 to encourage authentication)
