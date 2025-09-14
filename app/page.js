@@ -8792,16 +8792,12 @@ export default function TurfLootTactical() {
                 }
                 
                 console.log('🤖 MOBILE LOCAL PRACTICE button clicked!')
-                setIsLoadingLocalPractice(true)
                 
-                // Show loading for a brief moment then navigate
-                setTimeout(() => {
-                  // Create completely local room with bots - no Hathora charges
-                  const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
-                  const gameUrl = `/agario?roomId=${localRoomId}&mode=local&fee=0&region=local&multiplayer=offline&server=local&bots=true`
-                  console.log('🎮 Starting mobile local practice with bots:', gameUrl)
-                  checkOrientationAndEnterGame(gameUrl)
-                }, 500)
+                // Create completely local room with bots - no Hathora charges
+                const localRoomId = 'local-bots-' + Math.random().toString(36).substring(2, 10)
+                const gameUrl = `/agario?roomId=${localRoomId}&mode=local&fee=0&region=local&multiplayer=offline&server=local&bots=true`
+                console.log('🎮 Starting mobile local practice with bots:', gameUrl)
+                checkOrientationAndEnterGame(gameUrl)
               }}
               onMouseOver={(e) => {
                 if (currentParty && currentParty.members && currentParty.members.length > 1) {
