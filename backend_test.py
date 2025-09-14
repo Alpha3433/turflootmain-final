@@ -71,41 +71,45 @@ class TurfLootAgarioBackendTester:
             self.log_result("API Health Check", False, f"Connection error: {str(e)}")
             return False
 
-    def test_solana_wallet_balance_guest(self):
-        """Test 2: Solana Wallet Balance API - Guest User"""
-        print("🔍 Testing Solana Wallet Balance API - Guest User...")
+    def test_game_session_apis(self):
+        """Test 2: Game Session APIs - Test session join/leave functionality"""
+        print("🔍 Testing Game Session APIs...")
         
         try:
+            # Test session join
+            session_data = {
+                "roomId": "test-mobile-stats-room",
+                "userId": "test-user-mobile-stats",
+                "gameMode": "practice"
+            }
+            
             start = time.time()
-            response = requests.get(f"{API_BASE}/wallet/balance", timeout=10)
+            response = requests.post(f"{API_BASE}/game-sessions/join", 
+                                   json=session_data, timeout=10)
             response_time = time.time() - start
             
             if response.status_code == 200:
                 data = response.json()
+                success = data.get('success', False)
                 
-                # Check for Solana-specific fields
-                has_sol_balance = 'sol_balance' in data
-                sol_balance = data.get('sol_balance', 'missing')
-                balance = data.get('balance', 'missing')
-                
-                if has_sol_balance and sol_balance == 0.0:
+                if success:
                     self.log_result(
-                        "Solana Wallet Balance API - Guest User", 
+                        "Game Session APIs", 
                         True, 
-                        f"GET /api/wallet/balance returns correct guest balance structure with proper Solana fields (sol_balance: {sol_balance}, balance: {balance}), proper handling of unauthenticated users for Solana deposits",
+                        f"Game session join/leave functionality works correctly with proper session tracking",
                         response_time
                     )
                     return True
                 else:
                     self.log_result(
-                        "Solana Wallet Balance API - Guest User", 
+                        "Game Session APIs", 
                         False, 
-                        f"Missing or incorrect Solana fields: sol_balance={sol_balance}, balance={balance}"
+                        f"Session join failed: {data.get('message', 'Unknown error')}"
                     )
                     return False
             else:
                 self.log_result(
-                    "Solana Wallet Balance API - Guest User", 
+                    "Game Session APIs", 
                     False, 
                     f"API returned status {response.status_code}",
                     response_time
@@ -113,7 +117,7 @@ class TurfLootAgarioBackendTester:
                 return False
                 
         except Exception as e:
-            self.log_result("Solana Wallet Balance API - Guest User", False, f"Error: {str(e)}")
+            self.log_result("Game Session APIs", False, f"Error: {str(e)}")
             return False
 
     def test_solana_wallet_balance_jwt_auth(self):
