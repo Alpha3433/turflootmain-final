@@ -5525,7 +5525,7 @@ export default function TurfLootTactical() {
                             e.target.style.backgroundColor = 'transparent'
                           }}
                         >
-                          {serverDataLoading ? '⟳ Refreshing...' : '🔄 Refresh Servers'}
+                          {serverDataLoading ? '⟳ Refreshing...' : 'Refresh Servers'}
                         </button>
                       </div>
                     </div>
