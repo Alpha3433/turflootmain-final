@@ -1043,8 +1043,8 @@ export default function TurfLootTactical() {
           } catch (error) {
             console.log('Error loading user currency:', error)
             // Set default coins for new authenticated users
-            setCurrency(2500) // Higher starting amount for authenticated users
-            localStorage.setItem(userCurrencyKey, '2500')
+            setCurrency(100) // Starting amount for new authenticated users
+            localStorage.setItem(userCurrencyKey, '100')
           }
         } else {
           // New authenticated user - give them starter coins
