@@ -3611,16 +3611,21 @@ const AgarIOGame = () => {
           <div 
             onClick={handleStatsToggle}
             style={{ 
-              color: '#22d3ee', 
-              fontSize: isMobile ? (statsExpanded ? '11px' : '10px') : '14px', 
+              color: isMobile ? '#60a5fa' : '#22d3ee', 
+              fontSize: isMobile ? (statsExpanded ? '12px' : '11px') : '14px', 
               fontWeight: '700', 
-              marginBottom: isMobile ? (statsExpanded ? '6px' : '3px') : '8px',
-              borderBottom: isMobile ? (statsExpanded ? '1px solid #333' : 'none') : '1px solid #333',
-              paddingBottom: isMobile ? (statsExpanded ? '4px' : '1px') : '6px',
+              marginBottom: isMobile ? (statsExpanded ? '8px' : '4px') : '8px',
+              borderBottom: isMobile 
+                ? (statsExpanded ? '1px solid rgba(96, 165, 250, 0.3)' : 'none') 
+                : '1px solid #333',
+              paddingBottom: isMobile ? (statsExpanded ? '6px' : '2px') : '6px',
               cursor: isMobile ? 'pointer' : 'default',
               userSelect: 'none',
               transition: 'all 0.2s ease',
-              padding: isMobile ? '2px' : '0'
+              padding: isMobile ? '3px 0' : '0',
+              textAlign: 'center',
+              textShadow: isMobile ? '0 0 8px rgba(96, 165, 250, 0.6)' : 'none',
+              letterSpacing: isMobile ? '0.5px' : 'normal'
             }}
             onTouchStart={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
             onTouchEnd={isMobile ? (e) => { e.target.style.color = '#22d3ee' } : undefined}
