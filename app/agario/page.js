@@ -4670,7 +4670,7 @@ const AgarIOGame = () => {
                     }
                   }}
                 >
-                  📝 Submit Report
+                  Submit Report
                 </button>
                 
                 {/* Cancel Button */}
