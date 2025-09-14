@@ -10696,10 +10696,12 @@ export default function TurfLootTactical() {
                     fontFamily: '"Rajdhani", sans-serif'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6'
+                    e.target.style.borderColor = '#10b981'
+                    e.target.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)'
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(55, 65, 81, 0.8)'
+                    e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+                    e.target.style.boxShadow = 'none'
                   }}
                 />
                 <div style={{
@@ -10812,10 +10814,12 @@ export default function TurfLootTactical() {
                     fontFamily: 'monospace'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#3b82f6'
+                    e.target.style.borderColor = '#10b981'
+                    e.target.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)'
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(55, 65, 81, 0.8)'
+                    e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+                    e.target.style.boxShadow = 'none'
                   }}
                 />
               </div>
