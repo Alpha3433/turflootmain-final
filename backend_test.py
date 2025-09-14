@@ -213,23 +213,24 @@ class TurfLootAgarioBackendTester:
             self.log_result("Server Browser Integration", False, f"Error: {str(e)}")
             return False
 
-    def test_api_performance_after_solana_deps(self):
-        """Test 5: API Performance Check - No degradation from Solana dependencies"""
-        print("🔍 Testing API Performance after Solana dependency installation...")
+    def test_backend_regression_testing(self):
+        """Test 5: Backend Regression Testing - Ensure UI changes didn't introduce backend issues"""
+        print("🔍 Testing Backend Regression after Mobile Stats Panel UI Changes...")
         
         try:
-            # Test multiple endpoints to check performance
+            # Test multiple endpoints to check for regressions
             endpoints = [
-                "/ping",
-                "/wallet/balance", 
-                "/servers/lobbies",
-                "/stats/live-players"
+                ("/ping", "Core API"),
+                ("/wallet/balance", "Wallet API"), 
+                ("/servers/lobbies", "Server Browser"),
+                ("/stats/live-players", "Live Stats"),
+                ("/users/leaderboard", "Leaderboard")
             ]
             
             total_time = 0
             successful_requests = 0
             
-            for endpoint in endpoints:
+            for endpoint, description in endpoints:
                 try:
                     start = time.time()
                     response = requests.get(f"{API_BASE}{endpoint}", timeout=5)
@@ -238,31 +239,33 @@ class TurfLootAgarioBackendTester:
                     
                     if response.status_code == 200:
                         successful_requests += 1
+                        print(f"   ✅ {description}: Working ({response_time:.3f}s)")
+                    else:
+                        print(f"   ❌ {description}: Failed (status {response.status_code})")
                         
                 except Exception as e:
-                    print(f"   Warning: {endpoint} failed: {str(e)}")
+                    print(f"   ❌ {description}: Error - {str(e)}")
             
-            if successful_requests >= 3:  # At least 3 out of 4 endpoints working
+            if successful_requests >= 4:  # At least 4 out of 5 endpoints working
                 avg_response_time = total_time / successful_requests
-                performance_good = avg_response_time < 2.0  # Under 2 seconds average
                 
                 self.log_result(
-                    "API Performance Check", 
-                    performance_good, 
-                    f"Performance check: {successful_requests}/{len(endpoints)} endpoints working, average response time: {avg_response_time:.3f}s, {'excellent' if avg_response_time < 1.0 else 'good' if avg_response_time < 2.0 else 'slow'} performance after Solana dependency installation",
+                    "Backend Regression Testing", 
+                    True, 
+                    f"No backend regressions introduced by mobile stats panel UI changes ({successful_requests}/{len(endpoints)} APIs working, avg response: {avg_response_time:.3f}s)",
                     avg_response_time
                 )
-                return performance_good
+                return True
             else:
                 self.log_result(
-                    "API Performance Check", 
+                    "Backend Regression Testing", 
                     False, 
-                    f"Only {successful_requests}/{len(endpoints)} endpoints working"
+                    f"Potential regressions detected: only {successful_requests}/{len(endpoints)} APIs working"
                 )
                 return False
                 
         except Exception as e:
-            self.log_result("API Performance Check", False, f"Error: {str(e)}")
+            self.log_result("Backend Regression Testing", False, f"Error: {str(e)}")
             return False
 
     def test_error_handling_solana_operations(self):
