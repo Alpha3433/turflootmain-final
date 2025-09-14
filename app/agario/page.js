@@ -1092,7 +1092,16 @@ const AgarIOGame = () => {
           radius: 40 + Math.random() * 20,
           color: '#00FF41',
           spikes: 12,
-          mass: 100
+          mass: 100,
+          // Animation properties
+          rotationSpeed: 0.5 + Math.random() * 1.5, // Rotation speed (degrees per frame)
+          currentRotation: Math.random() * 360, // Starting rotation
+          pulseSpeed: 0.02 + Math.random() * 0.03, // Pulsing speed
+          pulsePhase: Math.random() * Math.PI * 2, // Starting pulse phase
+          spikeWaveSpeed: 0.05 + Math.random() * 0.05, // Individual spike animation
+          spikeWavePhase: Math.random() * Math.PI * 2, // Spike wave phase
+          glowIntensity: 0.5 + Math.random() * 0.5, // Glow effect intensity
+          colorShift: Math.random() * 30 // Color variation for uniqueness
         })
       }
       
