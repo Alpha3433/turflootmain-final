@@ -167,55 +167,42 @@ class TurfLootAgarioBackendTester:
             self.log_result("User Balance & Stats APIs", False, f"Error: {str(e)}")
             return False
 
-    def test_solana_wallet_balance_privy_token(self):
-        """Test 4: Solana Wallet Balance API - Privy Token Authentication"""
-        print("🔍 Testing Solana Wallet Balance API - Privy Token Authentication...")
+    def test_server_browser_integration(self):
+        """Test 4: Server Browser Integration - Test server browser functionality for game loading"""
+        print("🔍 Testing Server Browser Integration...")
         
         try:
-            # Create a test Privy token for Solana authentication
-            test_payload = {
-                "wallet_address": "0x2ec1DDCCd0387603cd68a564CDf0129576b1a25d",
-                "user_id": "privy-solana-test-user",
-                "email": "solana@privy.test"
-            }
-            import base64
-            encoded_payload = base64.b64encode(json.dumps(test_payload).encode()).decode()
-            
-            headers = {
-                'Authorization': f'Bearer testing-{encoded_payload}'
-            }
-            
             start = time.time()
-            response = requests.get(f"{API_BASE}/wallet/balance", headers=headers, timeout=10)
+            response = requests.get(f"{API_BASE}/servers/lobbies", timeout=10)
             response_time = time.time() - start
             
             if response.status_code == 200:
                 data = response.json()
                 
-                # Check for Solana-specific fields and Privy authentication
-                has_sol_balance = 'sol_balance' in data
-                sol_balance = data.get('sol_balance', 'missing')
-                balance = data.get('balance', 'missing')
-                wallet_address = data.get('wallet_address', 'missing')
+                # Check for server browser fields
+                has_servers = 'servers' in data
+                servers = data.get('servers', [])
+                total_players = data.get('totalPlayers', 0)
+                hathora_enabled = data.get('hathoraEnabled', False)
                 
-                if has_sol_balance and balance > 0:
+                if has_servers and isinstance(servers, list):
                     self.log_result(
-                        "Solana Wallet Balance API - Privy Token", 
+                        "Server Browser Integration", 
                         True, 
-                        f"Privy test token authentication working correctly for Solana deposits, realistic Solana testing balance generated (${balance}, SOL: {sol_balance}), proper Solana wallet address handling with Privy integration",
+                        f"Server browser functionality for game loading works correctly ({len(servers)} servers, {total_players} players, Hathora: {hathora_enabled})",
                         response_time
                     )
                     return True
                 else:
                     self.log_result(
-                        "Solana Wallet Balance API - Privy Token", 
+                        "Server Browser Integration", 
                         False, 
-                        f"Privy authentication failed or missing Solana fields: sol_balance={sol_balance}, balance={balance}"
+                        f"Invalid server browser response: servers={type(servers)}, count={len(servers) if isinstance(servers, list) else 'N/A'}"
                     )
                     return False
             else:
                 self.log_result(
-                    "Solana Wallet Balance API - Privy Token", 
+                    "Server Browser Integration", 
                     False, 
                     f"API returned status {response.status_code}",
                     response_time
@@ -223,7 +210,7 @@ class TurfLootAgarioBackendTester:
                 return False
                 
         except Exception as e:
-            self.log_result("Solana Wallet Balance API - Privy Token", False, f"Error: {str(e)}")
+            self.log_result("Server Browser Integration", False, f"Error: {str(e)}")
             return False
 
     def test_api_performance_after_solana_deps(self):
