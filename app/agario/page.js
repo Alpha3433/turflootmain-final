@@ -135,9 +135,9 @@ const AgarIOGame = () => {
     e.preventDefault()
     if (!isMobile) return
     
-    setJoystickActive(true)
-    window.isUsingJoystick = true
+    console.log('🕹️ Joystick Started - Mobile:', isMobile, 'Game Available:', !!gameRef.current?.game)
     
+    setJoystickActive(true)
     const rect = joystickRef.current?.getBoundingClientRect()
     if (!rect) return
     
@@ -163,16 +163,24 @@ const AgarIOGame = () => {
       const moveSpeed = 500 * strength // Increased movement speed for better responsiveness
       
       const game = gameRef.current.game
+      
+      // Ensure player object exists
+      if (!game.player) {
+        console.log('❌ Game player object not found!')
+        return
+      }
+      
       const targetX = game.player.x + Math.cos(angle) * moveSpeed
       const targetY = game.player.y + Math.sin(angle) * moveSpeed
       
       // Debug logging for movement
-      console.log('🕹️ Joystick Movement:', {
+      console.log('🕹️ Joystick START Movement:', {
         strength: strength.toFixed(2),
         angle: (angle * 180 / Math.PI).toFixed(1) + '°',
         moveSpeed: moveSpeed.toFixed(1),
-        playerPos: { x: game.player.x.toFixed(1), y: game.player.y.toFixed(1) },
-        targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) }
+        playerPos: { x: game.player.x?.toFixed(1), y: game.player.y?.toFixed(1) },
+        targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) },
+        beforeUpdate: { targetX: game.player.targetX?.toFixed(1), targetY: game.player.targetY?.toFixed(1) }
       })
       
       game.player.targetX = targetX
@@ -180,6 +188,8 @@ const AgarIOGame = () => {
       
       // Set flag to indicate joystick is controlling movement
       window.isUsingJoystick = true
+      
+      console.log('🕹️ After Update:', { targetX: game.player.targetX?.toFixed(1), targetY: game.player.targetY?.toFixed(1) })
     }
   }
   
