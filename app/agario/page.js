@@ -4728,7 +4728,7 @@ const AgarIOGame = () => {
       
       {/* Debug Info - Hidden in production */}
       {process.env.NODE_ENV === 'development' && (
-        <div style={({
+        <div style={{
           position: 'fixed',
           bottom: '10px',
           left: '10px',
@@ -4739,7 +4739,7 @@ const AgarIOGame = () => {
           borderRadius: '3px',
           zIndex: 9999,
           fontFamily: 'monospace'
-        })}>
+        }}>
           Mobile: {(isMobile.toString())} | Authenticated: {(authenticated.toString())} | Server: {((typeof window !== 'undefined') ? window.location.search : 'N/A')}
         </div>
       )}
