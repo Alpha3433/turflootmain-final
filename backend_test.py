@@ -25,7 +25,7 @@ import base64
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://mobilegame-ux.preview.emergentagent.com"
+BASE_URL = "https://agar-military-1.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class TurfLootBackendTester:
@@ -258,7 +258,7 @@ class TurfLootBackendTester:
         # Test 3.1: Helius RPC Connectivity Test
         try:
             # Test the Helius RPC endpoint directly to verify the new API key
-            helius_url = "https://mainnet.helius-rpc.com/?api-key=dccb9763-d453-4940-bd43-dfd987f278b1"
+            helius_url = "https://mainnet.helius-rpc.com/?api-key=agar-military-1"
             
             # Test with a simple getHealth request
             rpc_payload = {

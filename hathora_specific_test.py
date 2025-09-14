@@ -19,7 +19,7 @@ import json
 import time
 import re
 
-BASE_URL = "https://mobilegame-ux.preview.emergentagent.com"
+BASE_URL = "https://agar-military-1.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def log_test(message, level="INFO"):
