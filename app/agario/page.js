@@ -4318,7 +4318,7 @@ const AgarIOGame = () => {
                       e.target.style.transform = 'translateY(0)'
                     }}
                   >
-                    🚨 REPORT PLAYER
+                    REPORT PLAYER
                   </button>
                   <button
                     onClick={() => window.location.href = '/'}
