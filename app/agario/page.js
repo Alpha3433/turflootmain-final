@@ -3114,6 +3114,7 @@ const AgarIOGame = () => {
               borderRadius: '50%',
               backgroundColor: 'rgba(255, 255, 255, 0.15)',
               border: '3px solid rgba(255, 255, 255, 0.4)',
+              animation: !joystickActive ? 'joystickPulse 3s ease-in-out infinite' : 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
