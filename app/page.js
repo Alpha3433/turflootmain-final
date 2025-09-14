@@ -1906,42 +1906,23 @@ export default function TurfLootTactical() {
     try {
       console.log('💸 WITHDRAW button clicked')
       
-      // For mobile, skip authentication popups and show a simple message
-      if (isMobile) {
-        console.log('📱 Mobile withdraw clicked - showing simple notification')
-        // Just log the action for mobile, no popup
-        console.log('💸 Mobile withdraw functionality - feature coming soon')
-        return
+      // Check authentication using Privy hooks directly
+      if (!authenticated || !privyUser) {
+        console.log('❌ User not authenticated, triggering login')
+        if (typeof login === 'function') {
+          await login()
+          return
+        } else {
+          alert('Please log in first to access withdrawal functionality.')
+          return
+        }
       }
       
-      const authenticated = await requireAuthentication('WITHDRAW')
-      if (!authenticated) {
-        console.log('❌ Authentication failed, blocking access to WITHDRAW')
-        return
-      }
+      console.log('✅ User authenticated via Privy, opening withdrawal modal')
+      console.log('👤 User wallet:', privyUser.wallet?.address || 'No wallet')
       
-      console.log('💸 User authenticated, proceeding with withdraw...')
-
-      // Check if Privy is available
-      if (!window.__TURFLOOT_PRIVY__) {
-        console.log('⚠️ Privy not available, showing info message')
-        alert('Wallet functionality requires authentication. Please click the LOGIN button first.')
-        return
-      }
-
-      const privy = window.__TURFLOOT_PRIVY__
-
-      // Check if user has a valid wallet address
-      if (!privy.user?.wallet?.address) {
-        console.log('👛 No wallet address found, prompting wallet setup')
-        alert('No wallet found. Please ensure you are logged in and have a wallet connected. Try logging out and back in if the issue persists.')
-        return
-      }
-
-      console.log('✅ Wallet address confirmed for withdrawal:', privy.user.wallet.address)
-
-      // Show withdrawal instructions
-      alert(`To withdraw funds:\n\n1. Use your wallet to send funds to another address\n2. Your wallet address: ${privy.user.wallet.address}\n3. You can access your wallet through the Privy interface\n\nNote: Always verify recipient addresses before sending funds.`)
+      // Open withdrawal modal
+      setWithdrawalModalVisible(true)
       
     } catch (error) {
       console.error('❌ Withdraw error:', error)
@@ -1949,8 +1930,10 @@ export default function TurfLootTactical() {
       // More specific error handling
       if (error.message?.includes('invalid address')) {
         alert('Wallet address error. Please try logging out and back in to refresh your wallet connection.')
+      } else if (error.message?.includes('network')) {
+        alert('Network error. Please check your connection and try again.')
       } else {
-        alert('An error occurred while accessing withdrawal functionality. Please try again or contact support.')
+        alert(`Withdrawal error: ${error.message || 'Unknown error occurred'}. Please try again or contact support.`)
       }
     }
   }
