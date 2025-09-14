@@ -4575,7 +4575,9 @@ const AgarIOGame = () => {
                     fontFamily: '"Rajdhani", sans-serif',
                     padding: '12px',
                     resize: 'none',
-                    outline: 'none'
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    maxWidth: '100%'
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = '#ff4444'
