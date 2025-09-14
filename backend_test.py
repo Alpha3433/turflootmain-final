@@ -1,13 +1,27 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for TurfLoot Agario Game
-Testing Focus: Backend API Health after Mobile Stats Panel Sub-Labels Implementation
+TurfLoot Backend Testing Suite - Withdrawal Modal & Authentication Fixes
+Testing backend functionality after implementing withdrawal modal and authentication fixes.
+
+TESTING FOCUS:
+1. API Health Check - Verify core API endpoints are accessible
+2. Authentication Systems - Test Privy authentication integration 
+3. Wallet Balance APIs - Verify Helius RPC integration with new API key
+4. User Balance & Stats APIs - Confirm balance retrieval functionality
+5. Backend Regression Testing - Ensure frontend changes didn't break backend
+
+RECENT CHANGES BEING TESTED:
+- Authentication Fix: Updated handleWithdraw function to use Privy hooks directly
+- Withdrawal Modal: Created new responsive withdrawal modal
+- Helius Integration: Updated with valid API key (dccb9763-d453-4940-bd43-dfd987f278b1)
+- UI Improvements: Fixed mobile modal sizing, font optimizations
 """
 
 import requests
 import json
 import time
 import sys
+import base64
 from datetime import datetime
 
 # Configuration
