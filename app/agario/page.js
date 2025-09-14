@@ -4049,8 +4049,8 @@ const AgarIOGame = () => {
             <div style={{
               backgroundColor: '#1a202c',
               border: '3px solid #ff4444',
-              borderRadius: '12px',
-              maxWidth: '500px',
+              borderRadius: isMobile ? '8px' : '12px',
+              maxWidth: isMobile ? '300px' : '500px',
               width: '90%',
               padding: '0',
               color: 'white',
@@ -4059,29 +4059,29 @@ const AgarIOGame = () => {
             }}>
               {/* Header */}
               <div style={{
-                padding: '24px',
+                padding: isMobile ? '12px' : '24px',
                 borderBottom: '2px solid #ff4444',
                 background: 'linear-gradient(45deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 68, 68, 0.05) 100%)',
                 textAlign: 'center'
               }}>
                 <div style={{
-                  width: '60px',
-                  height: '60px',
+                  width: isMobile ? '40px' : '60px',
+                  height: isMobile ? '40px' : '60px',
                   background: 'linear-gradient(45deg, #ff4444 0%, #cc3333 100%)',
-                  borderRadius: '12px',
+                  borderRadius: isMobile ? '8px' : '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '30px',
-                  margin: '0 auto 16px'
+                  fontSize: isMobile ? '20px' : '30px',
+                  margin: isMobile ? '0 auto 8px' : '0 auto 16px'
                 }}>
                   💀
                 </div>
                 <h2 style={{
                   color: '#ff4444',
-                  fontSize: '32px',
+                  fontSize: isMobile ? '20px' : '32px',
                   fontWeight: '700',
-                  margin: '0 0 8px',
+                  margin: isMobile ? '0 0 4px' : '0 0 8px',
                   textTransform: 'uppercase',
                   textShadow: '0 0 10px rgba(255, 68, 68, 0.6)'
                 }}>
@@ -4089,7 +4089,7 @@ const AgarIOGame = () => {
                 </h2>
                 <p style={{
                   color: '#e2e8f0',
-                  fontSize: '16px',
+                  fontSize: isMobile ? '12px' : '16px',
                   margin: '0',
                   opacity: '0.8'
                 }}>
@@ -4098,41 +4098,55 @@ const AgarIOGame = () => {
               </div>
 
               {/* Stats */}
-              <div style={{ padding: '24px' }}>
+              <div style={{ padding: isMobile ? '12px' : '24px' }}>
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
-                  gap: '16px',
-                  marginBottom: '24px'
+                  gap: isMobile ? '8px' : '16px',
+                  marginBottom: isMobile ? '12px' : '24px'
                 }}>
                   <div style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    padding: '16px',
+                    padding: isMobile ? '8px' : '16px',
                     borderRadius: '8px',
                     textAlign: 'center'
                   }}>
-                    <div style={{ color: '#68d391', fontSize: '24px', fontWeight: '700' }}>
+                    <div style={{ 
+                      color: '#68d391', 
+                      fontSize: isMobile ? '16px' : '24px', 
+                      fontWeight: '700' 
+                    }}>
                       ${score}
                     </div>
-                    <div style={{ color: '#a0aec0', fontSize: '14px' }}>Final Score</div>
+                    <div style={{ 
+                      color: '#a0aec0', 
+                      fontSize: isMobile ? '10px' : '14px' 
+                    }}>Final Score</div>
                   </div>
                   <div style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    padding: '16px',
+                    padding: isMobile ? '8px' : '16px',
                     borderRadius: '8px',
                     textAlign: 'center'
                   }}>
-                    <div style={{ color: '#60a5fa', fontSize: '24px', fontWeight: '700' }}>
+                    <div style={{ 
+                      color: '#60a5fa', 
+                      fontSize: isMobile ? '16px' : '24px', 
+                      fontWeight: '700' 
+                    }}>
                       {mass} KG
                     </div>
-                    <div style={{ color: '#a0aec0', fontSize: '14px' }}>Final Mass</div>
+                    <div style={{ 
+                      color: '#a0aec0', 
+                      fontSize: isMobile ? '10px' : '14px' 
+                    }}>Final Mass</div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
                 <div style={{
                   display: 'flex',
-                  gap: '12px',
+                  gap: isMobile ? '8px' : '12px',
                   flexDirection: 'column'
                 }}>
                   <button
@@ -4142,9 +4156,9 @@ const AgarIOGame = () => {
                       border: '2px solid #48bb78',
                       borderRadius: '8px',
                       color: '#1a202c',
-                      fontSize: '18px',
+                      fontSize: isMobile ? '14px' : '18px',
                       fontWeight: '700',
-                      padding: '12px 24px',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
                       cursor: 'pointer',
                       transition: 'all 150ms',
                       fontFamily: '"Rajdhani", sans-serif',
@@ -4172,9 +4186,9 @@ const AgarIOGame = () => {
                       border: '2px solid #a0aec0',
                       borderRadius: '8px',
                       color: '#a0aec0',
-                      fontSize: '16px',
+                      fontSize: isMobile ? '12px' : '16px',
                       fontWeight: '600',
-                      padding: '12px 24px',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
                       cursor: 'pointer',
                       transition: 'all 150ms',
                       fontFamily: '"Rajdhani", sans-serif',
