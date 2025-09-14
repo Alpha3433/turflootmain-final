@@ -3765,8 +3765,8 @@ const AgarIOGame = () => {
             <div style={{
               backgroundColor: '#1a202c',
               border: '3px solid #ffd700',
-              borderRadius: '12px',
-              maxWidth: '500px',
+              borderRadius: isMobile ? '8px' : '12px',
+              maxWidth: isMobile ? '300px' : '500px',
               width: '90%',
               padding: '0',
               color: 'white',
@@ -3775,39 +3775,39 @@ const AgarIOGame = () => {
             }}>
               {/* Header */}
               <div style={{
-                padding: '24px',
+                padding: isMobile ? '12px' : '24px',
                 borderBottom: '2px solid #ffd700',
                 background: 'linear-gradient(45deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%)',
                 textAlign: 'center'
               }}>
                 <div style={{
-                  width: '70px',
-                  height: '70px',
+                  width: isMobile ? '40px' : '70px',
+                  height: isMobile ? '40px' : '70px',
                   background: 'linear-gradient(45deg, #ffd700 0%, #ffb000 100%)',
-                  borderRadius: '12px',
+                  borderRadius: isMobile ? '8px' : '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '36px',
-                  margin: '0 auto 16px',
+                  fontSize: isMobile ? '20px' : '36px',
+                  margin: isMobile ? '0 auto 8px' : '0 auto 16px',
                   boxShadow: '0 0 20px rgba(255, 215, 0, 0.6)'
                 }}>
                   🏆
                 </div>
                 <h2 style={{
                   color: '#ffd700',
-                  fontSize: '28px',
+                  fontSize: isMobile ? '18px' : '28px',
                   fontWeight: '700',
-                  margin: '0 0 8px',
+                  margin: isMobile ? '0 0 4px' : '0 0 8px',
                   textTransform: 'uppercase',
                   textShadow: '0 0 15px rgba(255, 215, 0, 0.8)',
-                  letterSpacing: '1px'
+                  letterSpacing: isMobile ? '0.5px' : '1px'
                 }}>
                   Cashout Successful!
                 </h2>
                 <p style={{
                   color: '#e2e8f0',
-                  fontSize: '16px',
+                  fontSize: isMobile ? '11px' : '16px',
                   margin: '0',
                   opacity: '0.9'
                 }}>
@@ -3816,7 +3816,7 @@ const AgarIOGame = () => {
               </div>
 
               {/* Body Content */}
-              <div style={{ padding: '24px' }}>
+              <div style={{ padding: isMobile ? '12px' : '24px' }}>
                 {/* Amount Received Section - Only for paid rooms */}
                 {(() => {
                   if (typeof window === 'undefined') return null
@@ -3831,30 +3831,30 @@ const AgarIOGame = () => {
                       backgroundColor: 'rgba(255, 215, 0, 0.1)',
                       border: '1px solid rgba(255, 215, 0, 0.3)',
                       borderRadius: '8px',
-                      padding: '16px',
-                      marginBottom: '24px',
+                      padding: isMobile ? '8px' : '16px',
+                      marginBottom: isMobile ? '12px' : '24px',
                       textAlign: 'center'
                     }}>
                       <div style={{ 
                         color: '#ffd700', 
-                        fontSize: '14px', 
+                        fontSize: isMobile ? '10px' : '14px', 
                         fontWeight: '600',
-                        marginBottom: '8px',
+                        marginBottom: isMobile ? '4px' : '8px',
                         textTransform: 'uppercase'
                       }}>
                         AMOUNT RECEIVED
                       </div>
                       <div style={{ 
                         color: '#ffffff', 
-                        fontSize: '24px', 
+                        fontSize: isMobile ? '16px' : '24px', 
                         fontWeight: '700',
-                        marginBottom: '4px'
+                        marginBottom: isMobile ? '2px' : '4px'
                       }}>
                         ${(score * 0.54).toFixed(2)}
                       </div>
                       <div style={{ 
                         color: '#a0aec0', 
-                        fontSize: '12px',
+                        fontSize: isMobile ? '8px' : '12px',
                         fontWeight: '400'
                       }}>
                         {(score * 0.026).toFixed(6)} SOL
@@ -3867,25 +3867,33 @@ const AgarIOGame = () => {
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
-                  gap: '16px',
-                  marginBottom: '24px'
+                  gap: isMobile ? '8px' : '16px',
+                  marginBottom: isMobile ? '12px' : '24px'
                 }}>
                   {/* Time Survived */}
                   <div style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    padding: '16px',
+                    padding: isMobile ? '8px' : '16px',
                     borderRadius: '8px',
                     textAlign: 'center',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: isMobile ? '4px' : '8px'
                   }}>
-                    <div style={{ fontSize: '24px' }}>⏱️</div>
-                    <div style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700' }}>
+                    <div style={{ fontSize: isMobile ? '16px' : '24px' }}>⏱️</div>
+                    <div style={{ 
+                      color: '#ffffff', 
+                      fontSize: isMobile ? '12px' : '18px', 
+                      fontWeight: '700' 
+                    }}>
                       {Math.floor(timeSurvived / 60)}m {timeSurvived % 60}s
                     </div>
-                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>
+                    <div style={{ 
+                      color: '#a0aec0', 
+                      fontSize: isMobile ? '8px' : '12px', 
+                      textTransform: 'uppercase' 
+                    }}>
                       Time Survived
                     </div>
                   </div>
@@ -3893,19 +3901,27 @@ const AgarIOGame = () => {
                   {/* Eliminations */}
                   <div style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    padding: '16px',
+                    padding: isMobile ? '8px' : '16px',
                     borderRadius: '8px',
                     textAlign: 'center',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '8px'
+                    gap: isMobile ? '4px' : '8px'
                   }}>
-                    <div style={{ fontSize: '24px' }}>⚔️</div>
-                    <div style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700' }}>
+                    <div style={{ fontSize: isMobile ? '16px' : '24px' }}>⚔️</div>
+                    <div style={{ 
+                      color: '#ffffff', 
+                      fontSize: isMobile ? '12px' : '18px', 
+                      fontWeight: '700' 
+                    }}>
                       {eliminations}
                     </div>
-                    <div style={{ color: '#a0aec0', fontSize: '12px', textTransform: 'uppercase' }}>
+                    <div style={{ 
+                      color: '#a0aec0', 
+                      fontSize: isMobile ? '8px' : '12px', 
+                      textTransform: 'uppercase' 
+                    }}>
                       Eliminations
                     </div>
                   </div>
@@ -3923,23 +3939,23 @@ const AgarIOGame = () => {
                   return (
                     <div style={{
                       backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                      padding: '16px',
+                      padding: isMobile ? '8px' : '16px',
                       borderRadius: '8px',
                       textAlign: 'center',
-                      marginBottom: '24px',
+                      marginBottom: isMobile ? '12px' : '24px',
                       border: '1px solid rgba(255, 255, 255, 0.1)'
                     }}>
                       <div style={{ 
                         color: '#a0aec0', 
-                        fontSize: '12px', 
-                        marginBottom: '8px',
+                        fontSize: isMobile ? '8px' : '12px', 
+                        marginBottom: isMobile ? '4px' : '8px',
                         textTransform: 'uppercase'
                       }}>
                         Current Balance
                       </div>
                       <div style={{ 
                         color: '#ffffff', 
-                        fontSize: '18px', 
+                        fontSize: isMobile ? '12px' : '18px', 
                         fontWeight: '700'
                       }}>
                         ${(14.69 + (score * 0.54)).toFixed(2)} / {(0.070710 + (score * 0.026)).toFixed(6)} SOL
@@ -3951,7 +3967,7 @@ const AgarIOGame = () => {
                 {/* Action Buttons */}
                 <div style={{
                   display: 'flex',
-                  gap: '12px',
+                  gap: isMobile ? '8px' : '12px',
                   flexDirection: 'column'
                 }}>
                   {/* Join Another Game Button */}
@@ -3970,9 +3986,9 @@ const AgarIOGame = () => {
                       border: '2px solid #ffb000',
                       borderRadius: '8px',
                       color: '#1a202c',
-                      fontSize: '16px',
+                      fontSize: isMobile ? '14px' : '16px',
                       fontWeight: '700',
-                      padding: '12px 24px',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
                       cursor: 'pointer',
                       transition: 'all 150ms',
                       fontFamily: '"Rajdhani", sans-serif',
@@ -4002,9 +4018,9 @@ const AgarIOGame = () => {
                       border: '2px solid #a0aec0',
                       borderRadius: '8px',
                       color: '#a0aec0',
-                      fontSize: '16px',
+                      fontSize: isMobile ? '12px' : '16px',
                       fontWeight: '600',
-                      padding: '12px 24px',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
                       cursor: 'pointer',
                       transition: 'all 150ms',
                       fontFamily: '"Rajdhani", sans-serif',
