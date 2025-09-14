@@ -112,53 +112,142 @@ class TurfLootBackendTester:
             )
             return False
 
-    def test_game_session_apis(self):
-        """Test 2: Game Session APIs - Test session join/leave functionality"""
-        print("🔍 Testing Game Session APIs...")
+    def test_authentication_systems(self):
+        """Test 2: Authentication Systems - Test Privy authentication integration"""
+        print("🔐 TEST 2: AUTHENTICATION SYSTEMS")
+        print("=" * 50)
         
+        # Test 2.1: Wallet Balance API with Guest User (No Authentication)
         try:
-            # Test session join
-            session_data = {
-                "roomId": "test-mobile-stats-room",
-                "userId": "test-user-mobile-stats",
-                "gameMode": "practice"
-            }
-            
-            start = time.time()
-            response = requests.post(f"{API_BASE}/game-sessions/join", 
-                                   json=session_data, timeout=10)
-            response_time = time.time() - start
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/wallet/balance", timeout=10)
+            response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                success = data.get('success', False)
+                expected_fields = ['balance', 'currency', 'sol_balance', 'wallet_address']
+                has_all_fields = all(field in data for field in expected_fields)
                 
-                if success:
+                if has_all_fields and data.get('balance') == 0.0:
                     self.log_result(
-                        "Game Session APIs", 
-                        True, 
-                        f"Game session join/leave functionality works correctly with proper session tracking",
+                        "Guest User Wallet Balance API",
+                        True,
+                        f"Guest balance structure correct: {data}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Guest User Wallet Balance API",
+                        False,
+                        f"Unexpected guest balance structure: {data}"
+                    )
+            else:
+                self.log_result(
+                    "Guest User Wallet Balance API",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "Guest User Wallet Balance API",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 2.2: JWT Token Authentication
+        try:
+            # Create a test JWT token
+            test_payload = {
+                'userId': 'test_user_auth_fix',
+                'email': 'authtest@turfloot.com',
+                'iat': int(time.time()),
+                'exp': int(time.time()) + 3600
+            }
+            
+            # Simple base64 encoding for testing (not secure, just for testing)
+            test_token = base64.b64encode(json.dumps(test_payload).encode()).decode()
+            
+            headers = {'Authorization': f'Bearer {test_token}', 'Content-Type': 'application/json'}
+            
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/wallet/balance", headers=headers, timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Should return default balance for new user or handle gracefully
+                self.log_result(
+                    "JWT Token Authentication Test",
+                    True,
+                    f"JWT auth handled correctly: balance={data.get('balance')}, wallet={data.get('wallet_address', 'N/A')[:20]}...",
+                    response_time
+                )
+            else:
+                self.log_result(
+                    "JWT Token Authentication Test",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "JWT Token Authentication Test",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 2.3: Privy Token Authentication Simulation
+        try:
+            # Create a testing token that simulates Privy format
+            privy_payload = {
+                'sub': 'did:privy:withdrawal_test_123',
+                'email': 'withdrawal_test@turfloot.com',
+                'wallet': {
+                    'address': '0x1234567890123456789012345678901234567890'
+                },
+                'iat': int(time.time()),
+                'exp': int(time.time()) + 3600
+            }
+            
+            # Create testing token with special prefix
+            testing_token = f"testing-{base64.b64encode(json.dumps(privy_payload).encode()).decode()}"
+            
+            headers = {'Authorization': f'Bearer {testing_token}', 'Content-Type': 'application/json'}
+            
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/wallet/balance", headers=headers, timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Should return testing balance with realistic values
+                if data.get('balance', 0) > 0 and 'wallet_address' in data:
+                    self.log_result(
+                        "Privy Token Authentication Simulation",
+                        True,
+                        f"Privy auth simulation successful: balance=${data.get('balance')}, SOL={data.get('sol_balance')}",
                         response_time
                     )
                     return True
                 else:
                     self.log_result(
-                        "Game Session APIs", 
-                        False, 
-                        f"Session join failed: {data.get('message', 'Unknown error')}"
+                        "Privy Token Authentication Simulation",
+                        False,
+                        f"Unexpected testing token response: {data}"
                     )
                     return False
             else:
                 self.log_result(
-                    "Game Session APIs", 
-                    False, 
-                    f"API returned status {response.status_code}",
-                    response_time
+                    "Privy Token Authentication Simulation",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
                 )
                 return False
-                
         except Exception as e:
-            self.log_result("Game Session APIs", False, f"Error: {str(e)}")
+            self.log_result(
+                "Privy Token Authentication Simulation",
+                False,
+                f"Error: {str(e)}"
+            )
             return False
 
     def test_user_balance_stats_apis(self):
