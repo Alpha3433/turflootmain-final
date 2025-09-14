@@ -174,43 +174,45 @@ export default function TurfLootTactical() {
     
     console.log('🔍 Checking Solana balance for:', walletAddress)
     
-    // OPTION 1: Try public Solana RPC first (most reliable)
-    const publicRpc = 'https://api.mainnet-beta.solana.com'
+    // OPTION 1: Try Helius RPC provider first (now with working API key)
+    const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC
     
-    try {
-      console.log('🚀 Using public Solana RPC for real-time balance')
-      
-      const response = await fetch(publicRpc, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getBalance', 
-          params: [walletAddress]
-        }),
-        signal: AbortSignal.timeout(5000)
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        if (data.result?.value !== undefined) {
-          const solBalance = data.result.value / 1000000000
-          console.log(`✅ Real balance from public RPC:`, solBalance, 'SOL')
-          
-          // DEPOSIT DETECTION: Check for balance increases
-          await detectDepositAndProcessFee(solBalance, walletAddress)
-          
-          return solBalance
+    if (heliusRpc) {
+      try {
+        console.log('🚀 Using Helius RPC for real-time balance')
+        
+        const response = await fetch(heliusRpc, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getBalance', 
+            params: [walletAddress]
+          }),
+          signal: AbortSignal.timeout(5000)
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.result?.value !== undefined) {
+            const solBalance = data.result.value / 1000000000
+            console.log(`✅ Real balance from Helius:`, solBalance, 'SOL')
+            
+            // DEPOSIT DETECTION: Check for balance increases
+            await detectDepositAndProcessFee(solBalance, walletAddress)
+            
+            return solBalance
+          }
+        } else {
+          console.log('❌ Helius RPC failed:', response.status)
         }
-      } else {
-        console.log('❌ Public RPC failed:', response.status)
+      } catch (error) {
+        console.log('❌ Helius RPC error:', error.message)
       }
-    } catch (error) {
-      console.log('❌ Public RPC error:', error.message)
     }
     
     // OPTION 2: Try Helius RPC as backup (if configured)
