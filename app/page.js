@@ -1231,9 +1231,30 @@ export default function TurfLootTactical() {
   }, []) // Only run once after mount
 
   useEffect(() => {
-    // Check if mobile
+    // Enhanced mobile detection - considers device type AND orientation
     const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
+      // Check for touch device (mobile/tablet)
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      
+      // Check viewport dimensions (allowing for landscape orientation)
+      const isSmallScreen = window.innerWidth <= 768 || window.innerHeight <= 768
+      
+      // Check user agent for mobile devices
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      
+      // Device is mobile if it has touch AND (small screen OR mobile user agent)
+      const mobile = isTouchDevice && (isSmallScreen || isMobileUA)
+      
+      console.log('📱 Mobile Detection:', {
+        isTouchDevice,
+        isSmallScreen,
+        isMobileUA,
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
+        result: mobile
+      })
+      
+      setIsMobile(mobile)
     }
     
     checkMobile()
