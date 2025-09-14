@@ -2614,8 +2614,9 @@ const AgarIOGame = () => {
               // Sort by score in descending order
               leaderboardData.sort((a, b) => b.score - a.score);
               
-              // Take top 5 players
-              return leaderboardData.slice(0, 5).map((player, index) => (
+              // Take top 3 (compact) or top 5 (expanded) players for mobile, always 5 for desktop
+              const maxPlayers = isMobile ? (leaderboardExpanded ? 5 : 3) : 5
+              return leaderboardData.slice(0, maxPlayers).map((player, index) => (
                 <div key={player.name} style={{ 
                   display: 'flex', 
                   justifyContent: 'space-between', 
