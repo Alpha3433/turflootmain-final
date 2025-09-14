@@ -5484,7 +5484,8 @@ export default function TurfLootTactical() {
                             <div style={{ 
                               fontSize: '11px', 
                               color: '#a0aec0',
-                              fontWeight: '400'
+                              fontWeight: '400',
+                              textAlign: 'left'
                             }}>
                               {server.ping}ms • {server.players} players
                             </div>
