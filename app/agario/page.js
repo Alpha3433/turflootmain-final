@@ -2621,10 +2621,11 @@ const AgarIOGame = () => {
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
-                  padding: isMobile ? '3px 6px' : '4px 8px',
+                  padding: isMobile ? (leaderboardExpanded ? '3px 6px' : '2px 4px') : '4px 8px',
                   backgroundColor: player.isPlayer ? 'rgba(0, 255, 255, 0.1)' : 'transparent',
                   borderRadius: isMobile ? '6px' : '4px',
-                  border: player.isPlayer ? '1px solid rgba(0, 255, 255, 0.3)' : 'none'
+                  border: player.isPlayer ? '1px solid rgba(0, 255, 255, 0.3)' : 'none',
+                  minHeight: isMobile ? (leaderboardExpanded ? 'auto' : '16px') : 'auto'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '6px' }}>
                     <span style={{ 
