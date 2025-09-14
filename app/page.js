@@ -1231,31 +1231,41 @@ export default function TurfLootTactical() {
   }, []) // Only run once after mount
 
   useEffect(() => {
-    // Simplified mobile detection - works in all environments
+    // Aggressive mobile detection - prioritizes screen size
     const checkMobile = () => {
-      // Screen dimensions - mobile if height <= 768 (works for both orientations)
-      const isSmallScreen = window.innerHeight <= 768 || Math.min(window.innerWidth, window.innerHeight) <= 768
+      // Screen dimensions - mobile if height <= 768 OR smallest dimension <= 768
+      const heightCheck = window.innerHeight <= 768
+      const smallestCheck = Math.min(window.innerWidth, window.innerHeight) <= 768
+      const isSmallScreen = heightCheck || smallestCheck
       
-      // Mobile landscape detection (wide but short screens)
-      const isMobileLandscape = window.innerHeight <= 500 && window.innerWidth >= 600
+      // Mobile landscape detection (wide but short screens - like phones in landscape)
+      const aspectRatio = window.innerWidth / window.innerHeight
+      const isMobileLandscape = window.innerHeight <= 500 && aspectRatio >= 1.5
       
       // Touch and user agent detection (for real devices)
       const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       
-      // Device is mobile if ANY of these conditions are true:
-      const mobile = isSmallScreen || isMobileLandscape || (isTouchDevice && isMobileUA)
+      // ALWAYS mobile if screen is very small (for automation/testing)
+      const isVerySmallScreen = window.innerHeight <= 600 || window.innerWidth <= 600
       
-      console.log('📱 Mobile Detection (Simplified):', {
+      // Device is mobile if ANY of these conditions are true:
+      const mobile = isSmallScreen || isMobileLandscape || isVerySmallScreen || (isTouchDevice && isMobileUA)
+      
+      console.log('📱 AGGRESSIVE Mobile Detection:', {
+        heightCheck,
+        smallestCheck,
         isSmallScreen,
         isMobileLandscape,
+        isVerySmallScreen,
         isTouchDevice,
         isMobileUA,
         screenWidth: window.innerWidth,
         screenHeight: window.innerHeight,
         minDimension: Math.min(window.innerWidth, window.innerHeight),
-        aspectRatio: (window.innerWidth / window.innerHeight).toFixed(2),
-        result: mobile
+        aspectRatio: aspectRatio.toFixed(2),
+        result: mobile,
+        '*** FINAL DECISION ***': mobile ? 'MOBILE LAYOUT' : 'DESKTOP LAYOUT'
       })
       
       setIsMobile(mobile)
