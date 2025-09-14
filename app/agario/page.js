@@ -2650,7 +2650,7 @@ const AgarIOGame = () => {
                       color: player.isPlayer ? '#00ffff' : '#ffffff', 
                       fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
                       fontWeight: '600',
-                      maxWidth: isMobile ? (leaderboardExpanded ? '50px' : '40px') : '60px',
+                      maxWidth: isMobile ? (leaderboardExpanded ? '40px' : '30px') : '60px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
