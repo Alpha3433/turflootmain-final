@@ -1018,23 +1018,26 @@ const AgarIOGame = () => {
         }
       })
 
-      // Mobile touch controls (fallback for non-joystick areas)
-      this.canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault()
-        const rect = this.canvas.getBoundingClientRect()
-        const touch = e.touches[0]
-        this.mouse.x = touch.clientX - rect.left
-        this.mouse.y = touch.clientY - rect.top
-        
-        this.mouse.worldX = this.mouse.x + this.camera.x
-        this.mouse.worldY = this.mouse.y + this.camera.y
-        
-        // Only use touch movement if not using joystick
-        if (!window.isUsingJoystick) {
-          this.player.targetX = this.mouse.worldX
-          this.player.targetY = this.mouse.worldY
-        }
-      }, { passive: false })
+      // Mobile touch controls - DISABLED: Using analog stick only
+      // this.canvas.addEventListener('touchmove', (e) => {
+      //   e.preventDefault()
+      //   const rect = this.canvas.getBoundingClientRect()
+      //   const touch = e.touches[0]
+      //   this.mouse.x = touch.clientX - rect.left
+      //   this.mouse.y = touch.clientY - rect.top
+      //   
+      //   this.mouse.worldX = this.mouse.x + this.camera.x
+      //   this.mouse.worldY = this.mouse.y + this.camera.y
+      //   
+      //   // Only use touch movement if not using joystick
+      //   if (!window.isUsingJoystick) {
+      //     this.player.targetX = this.mouse.worldX
+      //     this.player.targetY = this.mouse.worldY
+      //   }
+      // }, { passive: false })
+      
+      // Mobile: Analog stick only - no touch-to-move
+      console.log('🕹️ Mobile controls: Analog stick only (touch-to-move disabled)')
     }
 
     update() {
