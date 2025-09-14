@@ -4740,7 +4740,7 @@ const AgarIOGame = () => {
           zIndex: 9999,
           fontFamily: 'monospace'
         }}>
-          Mobile: {isMobile.toString()} | Authenticated: {authenticated.toString()} | Server: {typeof window !== 'undefined' ? window.location.search : 'N/A'}
+          Mobile: {isMobile.toString()} | Authenticated: {authenticated.toString()} | Server: {(typeof window !== 'undefined') ? window.location.search : 'N/A'}
         </div>
       )}
     </div>
