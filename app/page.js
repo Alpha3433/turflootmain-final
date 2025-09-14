@@ -3248,7 +3248,7 @@ export default function TurfLootTactical() {
             const fallbackRoomId = 'local-' + Math.random().toString(36).substring(2, 15)
             const gameUrl = '/agario?roomId=' + fallbackRoomId + '&mode=practice&fee=0&region=' + (server.region || 'us-east') + '&multiplayer=fallback&server=global'
             console.log('🔄 Falling back to local room:', gameUrl)
-            window.location.href = gameUrl
+            checkOrientationAndEnterGame(gameUrl)
           }, 1000)
         }
         
