@@ -918,7 +918,7 @@ export default function TurfLootTactical() {
       setLoadingParty(false)
     }
   }
-  const [isLoadingLocalPractice, setIsLoadingLocalPractice] = useState(false)
+  // Loading state removed - integrated into orientation modal
   
   // Mouse tracking for interactive eyes
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
