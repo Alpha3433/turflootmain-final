@@ -3639,7 +3639,11 @@ const AgarIOGame = () => {
           {/* Stats - Compact or Expanded */}
           {!isMobile || statsExpanded ? (
             /* Full Stats - Desktop always, Mobile when expanded */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: isMobile ? '3px' : '4px'
+            }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#9ca3af' }}>Net Worth:</span>
                 <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
