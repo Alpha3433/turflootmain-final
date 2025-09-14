@@ -250,51 +250,132 @@ class TurfLootBackendTester:
             )
             return False
 
-    def test_user_balance_stats_apis(self):
-        """Test 3: User Balance & Stats APIs - Verify wallet balance and stats update APIs"""
-        print("🔍 Testing User Balance & Stats APIs...")
+    def test_wallet_balance_apis(self):
+        """Test 3: Wallet Balance APIs - Verify Helius RPC integration with new API key"""
+        print("💰 TEST 3: WALLET BALANCE APIs - HELIUS RPC INTEGRATION")
+        print("=" * 50)
         
+        # Test 3.1: Helius RPC Connectivity Test
         try:
-            # Test wallet balance API
-            start = time.time()
-            response = requests.get(f"{API_BASE}/wallet/balance", timeout=10)
-            response_time = time.time() - start
+            # Test the Helius RPC endpoint directly to verify the new API key
+            helius_url = "https://mainnet.helius-rpc.com/?api-key=dccb9763-d453-4940-bd43-dfd987f278b1"
+            
+            # Test with a simple getHealth request
+            rpc_payload = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "getHealth"
+            }
+            
+            start_time = time.time()
+            response = requests.post(helius_url, json=rpc_payload, timeout=10)
+            response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                
-                # Check for required fields
-                has_balance = 'balance' in data
-                has_currency = 'currency' in data
-                balance = data.get('balance', 'missing')
-                currency = data.get('currency', 'missing')
-                
-                if has_balance and has_currency:
+                if 'result' in data and data['result'] == 'ok':
                     self.log_result(
-                        "User Balance & Stats APIs", 
-                        True, 
-                        f"Wallet balance and stats update APIs are operational (Balance: ${balance} {currency})",
+                        "Helius RPC Connectivity with New API Key",
+                        True,
+                        f"Helius RPC healthy: {data['result']}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Helius RPC Connectivity with New API Key",
+                        False,
+                        f"Unexpected Helius response: {data}"
+                    )
+            else:
+                self.log_result(
+                    "Helius RPC Connectivity with New API Key",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "Helius RPC Connectivity with New API Key",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 3.2: Wallet Balance API Error Handling
+        try:
+            # Test with invalid token to verify error handling
+            headers = {'Authorization': 'Bearer invalid_token_12345', 'Content-Type': 'application/json'}
+            
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/wallet/balance", headers=headers, timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Should gracefully fall back to guest balance
+                if data.get('balance') == 0.0 and data.get('wallet_address') == 'Not connected':
+                    self.log_result(
+                        "Wallet Balance API Error Handling",
+                        True,
+                        f"Invalid token handled gracefully: {data}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Wallet Balance API Error Handling",
+                        False,
+                        f"Unexpected error handling: {data}"
+                    )
+            else:
+                self.log_result(
+                    "Wallet Balance API Error Handling",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "Wallet Balance API Error Handling",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 3.3: Wallet Transactions API
+        try:
+            start_time = time.time()
+            response = requests.get(f"{API_BASE}/wallet/transactions", timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                expected_fields = ['transactions', 'total_count', 'wallet_address']
+                has_all_fields = all(field in data for field in expected_fields)
+                
+                if has_all_fields:
+                    self.log_result(
+                        "Wallet Transactions API",
+                        True,
+                        f"Transactions API working: {len(data.get('transactions', []))} transactions",
                         response_time
                     )
                     return True
                 else:
                     self.log_result(
-                        "User Balance & Stats APIs", 
-                        False, 
-                        f"Missing required fields: balance={balance}, currency={currency}"
+                        "Wallet Transactions API",
+                        False,
+                        f"Missing expected fields: {data}"
                     )
                     return False
             else:
                 self.log_result(
-                    "User Balance & Stats APIs", 
-                    False, 
-                    f"API returned status {response.status_code}",
-                    response_time
+                    "Wallet Transactions API",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
                 )
                 return False
-                
         except Exception as e:
-            self.log_result("User Balance & Stats APIs", False, f"Error: {str(e)}")
+            self.log_result(
+                "Wallet Transactions API",
+                False,
+                f"Error: {str(e)}"
+            )
             return False
 
     def test_server_browser_integration(self):
