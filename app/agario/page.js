@@ -2495,22 +2495,38 @@ const AgarIOGame = () => {
         if (joystickPosition.x !== 0 || joystickPosition.y !== 0) {
           // Calculate joystick direction
           const joystickAngle = Math.atan2(joystickPosition.y, joystickPosition.x)
-          const splitDistance = 200 // Distance to propel split cell
+          const splitDistance = 300 // Distance to propel split cell
           
-          // Set target position based on joystick direction
-          const targetX = gameRef.current.player.x + Math.cos(joystickAngle) * splitDistance
-          const targetY = gameRef.current.player.y + Math.sin(joystickAngle) * splitDistance
+          // Set world coordinates based on joystick direction
+          const worldTargetX = gameRef.current.player.x + Math.cos(joystickAngle) * splitDistance
+          const worldTargetY = gameRef.current.player.y + Math.sin(joystickAngle) * splitDistance
           
-          // Update player target for split direction
-          gameRef.current.player.targetX = targetX
-          gameRef.current.player.targetY = targetY
+          // Update both player target AND mouse world coordinates for split
+          gameRef.current.player.targetX = worldTargetX
+          gameRef.current.player.targetY = worldTargetY
           
-          console.log(`🕹️ Mobile split in joystick direction: angle=${(joystickAngle * 180 / Math.PI).toFixed(1)}°, target=(${targetX.toFixed(0)}, ${targetY.toFixed(0)})`)
+          // CRITICAL: Set mouse world coordinates (this is what split() actually uses)
+          gameRef.current.mouse.worldX = worldTargetX
+          gameRef.current.mouse.worldY = worldTargetY
+          
+          // Also update screen mouse coordinates for consistency
+          const screenX = worldTargetX - gameRef.current.camera.x
+          const screenY = worldTargetY - gameRef.current.camera.y
+          gameRef.current.mouse.x = screenX
+          gameRef.current.mouse.y = screenY
+          
+          console.log(`🕹️ Mobile split: joystick=(${joystickPosition.x.toFixed(1)}, ${joystickPosition.y.toFixed(1)}), angle=${(joystickAngle * 180 / Math.PI).toFixed(1)}°, world=(${worldTargetX.toFixed(0)}, ${worldTargetY.toFixed(0)})`)
         } else {
           // If joystick is centered, split in current movement direction
-          gameRef.current.player.targetX = gameRef.current.player.targetX || gameRef.current.player.x
-          gameRef.current.player.targetY = gameRef.current.player.targetY || gameRef.current.player.y
-          console.log('🕹️ Mobile split with centered joystick - using current direction')
+          const currentTargetX = gameRef.current.player.targetX || gameRef.current.player.x + 100
+          const currentTargetY = gameRef.current.player.targetY || gameRef.current.player.y
+          
+          gameRef.current.mouse.worldX = currentTargetX
+          gameRef.current.mouse.worldY = currentTargetY
+          gameRef.current.player.targetX = currentTargetX
+          gameRef.current.player.targetY = currentTargetY
+          
+          console.log('🕹️ Mobile split with centered joystick - using current movement direction')
         }
       } else {
         // Desktop: Use mouse position as before
