@@ -1058,14 +1058,22 @@ export default function TurfLootTactical() {
     const isLandscape = window.innerWidth > window.innerHeight
     
     if (isLandscape) {
-      // Already in landscape: Navigate immediately
-      console.log('📱 Mobile device already in landscape - entering game')
-      window.location.href = gameUrl
+      // Already in landscape: Show loading then navigate
+      console.log('📱 Mobile device already in landscape - showing loading and entering game')
+      setPendingGameUrl(gameUrl)
+      setShowOrientationModal(true)
+      setOrientationModalLoading(true)
+      
+      // Show loading for a brief moment then navigate
+      setTimeout(() => {
+        window.location.href = gameUrl
+      }, 1000)
     } else {
-      // Portrait mode: Show orientation modal
+      // Portrait mode: Show orientation modal without loading
       console.log('📱 Mobile device in portrait - requesting landscape rotation')
       setPendingGameUrl(gameUrl)
       setShowOrientationModal(true)
+      setOrientationModalLoading(false)
     }
   }
 
