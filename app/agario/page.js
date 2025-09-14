@@ -3566,35 +3566,64 @@ const AgarIOGame = () => {
             }
           </div>
           
-          {/* Stats */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Net Worth:</span>
-              <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
+          {/* Stats - Compact or Expanded */}
+          {!isMobile || statsExpanded ? (
+            /* Full Stats - Desktop always, Mobile when expanded */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Net Worth:</span>
+                <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Total Mass:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{Math.floor(mass)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>K/D:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations}/0</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Streak:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations} 🔥</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Coins Collected:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{score}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Time Alive:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>
+                  {Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Total Mass:</span>
-              <span style={{ color: '#ffffff', fontWeight: '700' }}>{Math.floor(mass)}</span>
+          ) : (
+            /* Compact 2-Line Stats - Mobile only */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+              {/* Line 1: Net Worth • Mass */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                fontSize: '9px',
+                fontWeight: '700'
+              }}>
+                <span style={{ color: '#22c55e' }}>${score}</span>
+                <span style={{ color: '#ffffff' }}>{Math.floor(mass)}m</span>
+              </div>
+              {/* Line 2: K/D • Streak • Time */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                fontSize: '8px',
+                color: '#9ca3af',
+                fontWeight: '600'
+              }}>
+                <span>{eliminations}/0</span>
+                <span>{eliminations}🔥</span>
+                <span>{Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}</span>
+              </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>K/D:</span>
-              <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations}/0</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Streak:</span>
-              <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations} 🔥</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Coins Collected:</span>
-              <span style={{ color: '#ffffff', fontWeight: '700' }}>{score}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#9ca3af' }}>Time Alive:</span>
-              <span style={{ color: '#ffffff', fontWeight: '700' }}>
-                {Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}
-              </span>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Cash Out Success Popup */}
