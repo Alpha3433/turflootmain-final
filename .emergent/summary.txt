@@ -1,69 +1,70 @@
 <analysis>
-The AI engineer's work involved an iterative process of debugging and feature implementation for the TurfLoot application. Initially, the focus was on rectifying a critical Privy Solana deposit issue, which led to numerous refactorings of the  function in  and  due to deprecated Privy hooks and incorrect configuration. This phase included battling SSR issues, dependency conflicts, and accurately configuring Solana mainnet details.
+The AI engineer's trajectory details a focused, iterative development process on the TurfLoot application, primarily targeting mobile user experience enhancements and critical bug fixes. The work began by redesigning the mobile landing page from a 2x2 grid to a vertical stack, reordering key panels (Wallet, Customize, Leaderboard, Party). A significant in-game improvement was the recreation of a virtual joystick for mobile, coupled with optimized action buttons, addressing a gap in mobile game controls.
 
-Subsequently, the engineer implemented real-time Solana balance monitoring using Helius RPC, including robust error handling and a multi-endpoint failover system. A 10% deposit fee mechanism was added, automatically transferring fees to a designated site wallet. Critical bug fixes followed, addressing a non-functional Privy login button (due to an invalid app ID) and game buttons showing authentication popups (fixed by using proper Privy hooks). Finally, a paid rooms feature with insufficient funds notification was developed, and a significant performance bottleneck in the CREATE PARTY modal (caused by a slow  API call and MongoDB  errors) was resolved by implementing asynchronous loading. The trajectory concluded with the user requesting a mobile layout redesign.
+Subsequent efforts refined the UI further, including removing emojis, standardizing the mobile Customize panel's character design to match desktop, and adding an engaging scroll-based eye-tracking effect. Bug fixes involved implementing the missing  function and resolving a mobile background reset during username input via . Mobile UI consistency was ensured by re-adding the Create Party button and aligning party button texts with desktop. An authentication popup on the mobile Withdraw button was also suppressed. The trajectory concludes with the implementation of a landscape orientation enforcement for mobile game entry, currently in the phase of adding the modal UI.
 </analysis>
 
 <product_requirements>
-The TurfLoot application is an Agar.io-style multiplayer game with a military theme, leveraging Hathora for game servers and Privy for wallet and authentication. The core objective is to enhance the existing MVP through UI/UX improvements, bug fixes, and robust social features.
+The TurfLoot application is an Agar.io-style multiplayer game with a military theme, leveraging Hathora for game servers and Privy for wallet and authentication. The core objective is to enhance the existing MVP through UI/UX improvements, bug fixes, and robust social features, with a strong focus on mobile experience.
 
 **Currently Implemented Features:**
-*   **UI/UX**: Refined navigation, scrollable User Profile Modal.
-*   **Social System**: Persistent friends system (requests, acceptance), comprehensive party system (public/private creation, friend invitations, invite management, real-time notification badges).
-*   **Mobile Parity**: Full mobile support across social, wallet, leaderboard, and game controls.
-*   **Game Mechanics**: Authentic Agar.io splitting, directional ejection, and merging.
-*   **Bug Fixes**: Resolved random eliminations and premature game over popups.
-*   **In-Game Metrics**: Real-time Time Alive metric that stops on cash-out.
-*   **Cash-Out Visualization**: A subtle, non-intrusive visual cash-out progress ring in-game.
+*   **UI/UX**: Mobile layout redesigned to a vertical stack for WALLET, CUSTOMIZE, LEADERBOARD, and PARTY sections. Mobile character customization preview updated to a blue circular avatar with black eyes (no green ring), featuring a scroll-based eye-tracking effect. In-game mobile buttons (CASH OUT, SPLIT) optimized for touch.
+*   **Social System**: Persistent friends/party system with mobile  panel now including  and  buttons, aligning text with desktop.
+*   **Mobile Parity**: Full mobile support including wallet, leaderboard, and game controls, with a recreated virtual joystick for in-game movement.
+*   **Game Mechanics**: Authentic Agar.io splitting, directional ejection, merging, real-time Time Alive, cash-out visualization.
+*   **Bug Fixes**: Solana-only deposit via Privy fixed (using  v2.24.0, Helius RPC, 10% fee). Privy login and game button authentication issues resolved.  modal delay fixed (asynchronous friends list loading). Missing  function implemented. Mobile background reset on username input fixed using . Mobile WITHDRAW button authentication popup removed.
+*   **User Interaction**: Player name on the mobile navigation bar now updates dynamically based on user input.
 
-**Immediate Problem Addressed & Solutions Implemented:**
-The Solana-only deposit functionality via Privy was broken, specifically the DEPOSIT SOL button failed to trigger the Privy funding modal. This has been fixed to use Privy v2.24.0's  hook with correct Solana Mainnet () configuration and fallbacks.
-Real-time Solana balance monitoring using Helius RPC was implemented, displaying current SOL and USD values. A 10% deposit fee, sent to a site-owned SOL wallet, is now automatically applied. Authentication issues with the green LOGIN button (due to an invalid Privy App ID) and game buttons displaying authentication popups for logged-in users (due to legacy bridge usage) have been resolved. A paid rooms system checks user wallet balance against game stakes and displays an insufficient funds banner. The 20-second delay in opening the CREATE PARTY modal was fixed by making friends list loading asynchronous.
+**Current Task:** Implementing a non-intrusive solution to force mobile players into landscape mode when entering any in-game experience, preventing access in portrait mode.
 </product_requirements>
 
 <key_technical_concepts>
-- Next.js 14 (App Router, Server/Client Components, API routes, SSR)
-- React Hooks (, , , custom hooks)
-- Privy ( v2.24.0, , ,  for Solana, Solana configuration)
-- Solana (, Helius RPC)
-- Tailwind CSS & shadcn/ui
-- Hathora (game servers)
-- MongoDB (database)
+-   Next.js 14 (App Router, Server/Client Components)
+-   React Hooks (, , , )
+-   Privy (, Solana integration)
+-   Solana (, Helius RPC)
+-   Tailwind CSS & shadcn/ui
+-   Hathora (game servers)
+-   MongoDB (database)
+-    detection
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a Next.js full-stack architecture, structured with , , and  directories.
-
-
 
 -   ****:
-    -   **Importance**: Central client-side component for UI, authentication, state, and wallet interactions. It contains the core game logic,  function, and real-time balance display.
-    -   **Changes Made**: This file underwent extensive modifications.  was refactored numerous times to correctly use  from  with Solana-specific  configuration and multi-tier fallbacks. Real-time Solana balance monitoring was implemented, including  with Helius RPC integration, error handling, and  to update  state. A 10% deposit fee calculation and processing logic were added. Authentication checks for  and game buttons were updated to use Privy's  state and hooks, replacing legacy  logic. Insufficient funds notification banner logic and rendering were added.  calls were made asynchronous to improve CREATE PARTY modal opening speed. Several syntax errors and state management issues ( definition,  state) were fixed here.
+    -   **Importance**: The central client-side component managing UI, authentication, state, and wallet interactions for the application's landing page.
+    -   **Changes Made**:
+        -   Mobile layout transformed from 2x2 grid to a vertical flex container, with panels reordered to WALLET, CUSTOMIZE, LEADERBOARD, PARTY.
+        -    button removed from mobile's main button row and PARTY panel. Mobile  and  buttons swapped.  emoji removed from mobile  button.
+        -   Mobile  panel character preview updated to a blue circular avatar with white border and black dot eyes, matching desktop. Implemented scroll-based eye-tracking using  state and . Emojis removed from  and  button texts.
+        -   Mobile  panel's  button text changed to , and  to , aligning with desktop.  button was re-added to the mobile PARTY panel.
+        -   Mobile navigation bar's player name display logic updated to dynamically reflect the user's .
+        -   Background stability on mobile improved by memoizing  using  to prevent animation resets when typing in the username field.
+        -    function modified to bypass authentication popups for mobile users.
+        -   Integrated  function for game entry points and introduced  state for landscape enforcement.
 -   ****:
-    -   **Importance**: Provides the Privy authentication context and global configurations for wallet and authentication.
-    -   **Changes Made**: Heavily modified to configure Solana wallet connectors, enforcing Solana-only wallet creation ().  was updated to include Solana Mainnet with  and , and later  for specific API calls, though the final Solana funding uses  parameter directly. Invalid  was added and then removed. The  was updated here via  changes.
+    -   **Importance**: Handles the in-game experience, including rendering, movement, and player actions.
+    -   **Changes Made**:
+        -   Implemented a mobile-only virtual joystick system with , ,  functions, providing touch-responsive, 360-degree movement control with visual feedback and boundary limits.
+        -   Optimized in-game  and  buttons for mobile touch, increasing size, improving positioning, and enhancing feedback.
+        -   The missing  function was defined to manage the cash-out process for the dedicated button, mirroring the 'E' key functionality.
 -   ****:
-    -   **Importance**: Stores environment variables for API keys and configurations.
-    -   **Changes Made**: Updated  multiple times to a valid ID.  was added for Solana RPC.  and  were added for the deposit fee system.
--   ****:
-    -   **Importance**: Manages project dependencies.
-    -   **Changes Made**:  was updated to . Solana-related packages were managed for compatibility.
+    -   **Importance**: Provides the Privy authentication context.
+    -   **Changes Made**: Configured Solana wallet connectors, , and  (as per initial analysis). No new changes in this trajectory segment.
 </code_architecture>
 
 <pending_tasks>
-- Mobile Customization Screen Redesign
-- Modernizing Social Popup
-- Production Infrastructure Stability: Address persistent 502/404/ERR_ABORTED errors on preview deployment for  calls. (Note: The MongoDB  error found during CREATE PARTY modal fix might be related to this, but it was not fully addressed as a pending task here).
-- Implement  button functionality in the Wallet Snapshot.
-- Mobile layout redesign to vertical stacking for LEADERBOARD, WALLET, PARTY, CUSTOMIZE sections.
+-   Mobile Customization Screen Redesign (remaining design aspects, if any, beyond character preview)
+-   Modernizing Social Popup
+-   Production Infrastructure Stability: Address persistent 502/404/ERR_ABORTED errors for  calls.
+-   Implement core  button functionality in Wallet Snapshot (popup removed, but actual withdrawal logic is pending).
+-   Complete implementation of the landscape orientation requirement for mobile game entry by adding the modal UI.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was tasked with redesigning the mobile layout of the TurfLoot application. The user explicitly requested to change the current 2x2 grid layout of the LEADERBOARD, WALLET, PARTY, and CUSTOMIZE sections on mobile to a cleaner vertical stacked layout, similar to a reference application (damnbruh), while ensuring the desktop version remains unchanged.
-
-The AI engineer acknowledged the request, confirmed understanding by comparing the existing TurfLoot mobile layout (4 boxes in a 2x2 grid) with the desired vertical stacked layout. The immediate next action was to locate the relevant code sections responsible for rendering these four UI components on mobile to begin implementing the vertical stacking. This involved initiating a search within the codebase for the mobile layout code that controls these specific sections. The engineer had not yet made any code changes for this task and was in the initial exploration phase.
+Immediately before this summary request, the AI engineer was working on enforcing a landscape orientation requirement for mobile players before they can enter any in-game experience. The user explicitly requested that mobile users should be prevented from accessing the game if their device is in portrait mode, requiring them to rotate it to landscape. The AI engineer has already implemented the core logic: an  check,  function to verify the device's current orientation, and the  state to control the visibility of an informational modal. The  button on the main page (), which serves as a game entry point, has been updated to use this  function. The current phase of work is focused on adding the actual UI component for this  to the  file.
 </current_work>
 
 <optional_next_step>
-Locate the mobile layout code for the LEADERBOARD, WALLET, PARTY, and CUSTOMIZE sections to implement vertical stacking.
+Add the UI component for the landscape orientation modal to .
 </optional_next_step>
