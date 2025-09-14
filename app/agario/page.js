@@ -2899,8 +2899,8 @@ const AgarIOGame = () => {
         {/* Action Buttons - Mobile Optimized Circular Design */}
         <div style={{
           position: 'fixed',
-          bottom: isMobile ? '30px' : '40px',
-          right: isMobile ? '20px' : 'auto',
+          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 30px)' : '40px',
+          right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 20px)' : 'auto',
           transform: isMobile ? 'none' : 'translateX(-50%)',
           left: isMobile ? 'auto' : '50%',
           zIndex: 1000,
