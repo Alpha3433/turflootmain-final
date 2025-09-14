@@ -432,6 +432,7 @@ export default function TurfLootTactical() {
   const [pendingGameUrl, setPendingGameUrl] = useState(null)
   const [orientationModalLoading, setOrientationModalLoading] = useState(false)
   const [withdrawalModalVisible, setWithdrawalModalVisible] = useState(false)
+  const [withdrawalAmount, setWithdrawalAmount] = useState('')
   const [activeFriends, setActiveFriends] = useState(0)
   const [leaderboard, setLeaderboard] = useState([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
