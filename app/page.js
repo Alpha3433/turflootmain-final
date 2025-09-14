@@ -10804,76 +10804,70 @@ export default function TurfLootTactical() {
               {/* Action Buttons */}
               <div style={{
                 display: 'flex',
-                gap: isMobile ? '8px' : '12px',
-                flexDirection: 'column'
+                gap: isMobile ? '12px' : '16px',
+                flexDirection: 'row'
               }}>
-                {/* Copy Address Button */}
-                <button
-                  onClick={() => {
-                    if (privyUser?.wallet?.address) {
-                      navigator.clipboard.writeText(privyUser.wallet.address)
-                      alert('Wallet address copied to clipboard!')
-                    }
-                  }}
-                  style={{
-                    backgroundColor: '#68d391',
-                    border: '2px solid #48bb78',
-                    borderRadius: '8px',
-                    color: '#1a202c',
-                    fontSize: isMobile ? '12px' : '16px',
-                    fontWeight: '700',
-                    padding: isMobile ? '10px' : '12px 24px',
-                    cursor: 'pointer',
-                    transition: 'all 150ms',
-                    fontFamily: '"Rajdhani", sans-serif',
-                    textTransform: 'uppercase',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px'
-                  }}
-                  onMouseOver={(e) => {
-                    e.target.style.backgroundColor = '#48bb78'
-                    e.target.style.transform = 'translateY(-2px)'
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.backgroundColor = '#68d391'
-                    e.target.style.transform = 'translateY(0)'
-                  }}
-                >
-                  📋 Copy Wallet Address
-                </button>
-                
-                {/* Close Button */}
+                {/* Cancel Button */}
                 <button
                   onClick={() => setWithdrawalModalVisible(false)}
                   style={{
-                    backgroundColor: 'transparent',
-                    border: '2px solid #a0aec0',
+                    flex: '1',
+                    backgroundColor: 'rgba(55, 65, 81, 0.8)',
+                    border: '1px solid rgba(75, 85, 99, 0.8)',
                     borderRadius: '8px',
-                    color: '#a0aec0',
-                    fontSize: isMobile ? '11px' : '14px',
+                    color: '#e5e7eb',
+                    fontSize: isMobile ? '14px' : '16px',
                     fontWeight: '600',
-                    padding: isMobile ? '8px' : '10px 20px',
+                    padding: isMobile ? '12px' : '16px',
                     cursor: 'pointer',
                     transition: 'all 150ms',
-                    fontFamily: '"Rajdhani", sans-serif',
-                    textTransform: 'uppercase',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px'
+                    fontFamily: '"Rajdhani", sans-serif'
                   }}
                   onMouseOver={(e) => {
-                    e.target.style.backgroundColor = '#a0aec0'
-                    e.target.style.color = '#1a202c'
+                    e.target.style.backgroundColor = 'rgba(75, 85, 99, 0.8)'
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.backgroundColor = 'transparent'
-                    e.target.style.color = '#a0aec0'
+                    e.target.style.backgroundColor = 'rgba(55, 65, 81, 0.8)'
                   }}
                 >
-                  Close
+                  Cancel
+                </button>
+                
+                {/* Cash Out Button */}
+                <button
+                  onClick={() => {
+                    // TODO: Implement actual cash out functionality
+                    alert('Cash out functionality will be implemented here!')
+                  }}
+                  disabled={parseFloat(walletBalance.usd || 0) < 0.21}
+                  style={{
+                    flex: '1',
+                    backgroundColor: parseFloat(walletBalance.usd || 0) >= 0.21 ? '#f59e0b' : 'rgba(107, 114, 128, 0.5)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: isMobile ? '14px' : '16px',
+                    fontWeight: '700',
+                    padding: isMobile ? '12px' : '16px',
+                    cursor: parseFloat(walletBalance.usd || 0) >= 0.21 ? 'pointer' : 'not-allowed',
+                    transition: 'all 150ms',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    opacity: parseFloat(walletBalance.usd || 0) >= 0.21 ? 1 : 0.6
+                  }}
+                  onMouseOver={(e) => {
+                    if (parseFloat(walletBalance.usd || 0) >= 0.21) {
+                      e.target.style.backgroundColor = '#d97706'
+                      e.target.style.transform = 'translateY(-1px)'
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (parseFloat(walletBalance.usd || 0) >= 0.21) {
+                      e.target.style.backgroundColor = '#f59e0b'
+                      e.target.style.transform = 'translateY(0)'
+                    }
+                  }}
+                >
+                  Cash Out
                 </button>
               </div>
             </div>
