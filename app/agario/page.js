@@ -2593,7 +2593,13 @@ const AgarIOGame = () => {
           </div>
           
           {/* Player Rankings - Dynamic Leaderboard */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '3px' : '4px', marginBottom: isMobile ? '8px' : '10px' }}>
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: isMobile ? (leaderboardExpanded ? '3px' : '1px') : '4px', 
+            marginBottom: isMobile ? '8px' : '10px',
+            transition: 'all 0.3s ease'
+          }}>
             {(() => {
               if (!gameRef.current) return null;
               
