@@ -1168,6 +1168,16 @@
     padding: 0 !important;
     border: none !important;
   }
+  
+  /* iOS Safari viewport fix */
+  @supports (-webkit-touch-callout: none) {
+    .game-container,
+    #turfloot-canvas,
+    #gameRoot {
+      height: -webkit-fill-available !important;
+      min-height: -webkit-fill-available !important;
+    }
+  }
 }
 
 .game-canvas {
