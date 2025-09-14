@@ -3680,7 +3680,7 @@ const AgarIOGame = () => {
                   <span style={{ 
                     color: '#22c55e',
                     textShadow: '0 0 6px rgba(34, 197, 94, 0.8)'
-                  }}>💰 ${score}</span>
+                  }}>${score}</span>
                   <span style={{ 
                     fontSize: '6px', 
                     color: '#9ca3af', 
