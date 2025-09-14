@@ -3531,7 +3531,7 @@ const AgarIOGame = () => {
         {/* Player Info Panel - Bottom Right (larger with landing page font) */}
         <div style={{
           position: 'fixed',
-          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 110px)' : '10px',
+          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 10px)' : '10px',
           right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 5px)' : '10px',
           zIndex: 1000,
           backgroundColor: 'rgba(0, 0, 0, 0.85)',
