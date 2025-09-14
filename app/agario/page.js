@@ -3526,46 +3526,11 @@ const AgarIOGame = () => {
               />
             ))}
             
-            {/* Coin dots on minimap - using state data */}
-            {minimapData.coins.map((coin, i) => (
-              <div
-                key={`coin-${i}`}
-                style={{
-                  position: 'absolute',
-                  width: isMobile ? '2px' : '4px',
-                  height: isMobile ? '2px' : '4px',
-                  backgroundColor: '#ffd700',
-                  borderRadius: '50%',
-                  left: `${(coin.x / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  top: `${(coin.y / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  transform: 'translate(-50%, -50%)',
-                  opacity: '1',
-                  boxShadow: isMobile ? '0 0 2px rgba(255, 215, 0, 0.8)' : '0 0 4px rgba(255, 215, 0, 0.8)',
-                  zIndex: 7
-                }}
-              />
-            ))}
+            {/* Coin dots on minimap - REMOVED for cleaner minimap view */}
+            {/* {minimapData.coins.map((coin, i) => (...))} */}
             
-            {/* Virus dots on minimap - using state data */}
-            {minimapData.viruses.map((virus, i) => (
-              <div
-                key={`virus-${i}`}
-                style={{
-                  position: 'absolute',
-                  width: isMobile ? '4px' : '8px',
-                  height: isMobile ? '4px' : '8px',
-                  backgroundColor: '#00ff41',
-                  borderRadius: '50%',
-                  left: `${(virus.x / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  top: `${(virus.y / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  transform: 'translate(-50%, -50%)',
-                  opacity: '1',
-                  border: isMobile ? '0.5px solid #00aa00' : '1px solid #00aa00',
-                  boxShadow: isMobile ? '0 0 3px rgba(0, 255, 65, 0.8)' : '0 0 6px rgba(0, 255, 65, 0.8)',
-                  zIndex: 6
-                }}
-              />
-            ))}
+            {/* Virus dots on minimap - REMOVED for cleaner minimap view */}
+            {/* {minimapData.viruses.map((virus, i) => (...))} */}
             
             {/* Border spikes effect overlay */}
             <div style={{
