@@ -5410,49 +5410,124 @@ export default function TurfLootTactical() {
                       padding: '8px 0',
                       fontFamily: '"Rajdhani", sans-serif'
                     }}>
-                      {serverOptions.map((server) => (
-                        <div
-                          key={server.code}
-                          onClick={() => {
-                            setSelectedServer(server.code)
-                            setServerSelectorOpen(false)
-                            console.log(`🌐 Selected server: ${server.name} (${server.code})`)
+                      {serverDataLoading ? (
+                        <div style={{
+                          padding: '16px',
+                          textAlign: 'center',
+                          color: '#a0aec0',
+                          fontSize: '14px'
+                        }}>
+                          <div style={{ fontSize: '18px', marginBottom: '8px' }}>⏳</div>
+                          Refreshing servers...
+                        </div>
+                      ) : (
+                        serverOptions.map((server) => (
+                          <div
+                            key={server.code}
+                            onClick={() => {
+                              setSelectedServer(server.code)
+                              setServerSelectorOpen(false)
+                              console.log(`🌐 Selected server: ${server.name} (${server.code}) - ${server.players} players, ${server.ping}ms`)
+                            }}
+                            style={{
+                              padding: '12px 16px',
+                              color: selectedServer === server.code ? '#f6ad55' : '#ffffff',
+                              backgroundColor: selectedServer === server.code ? 'rgba(246, 173, 85, 0.1)' : 'transparent',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              fontWeight: '600',
+                              transition: 'all 0.2s ease',
+                              borderLeft: selectedServer === server.code ? '3px solid #f6ad55' : '3px solid transparent',
+                              opacity: server.status === 'offline' ? 0.5 : 1
+                            }}
+                            onMouseOver={(e) => {
+                              if (selectedServer !== server.code) {
+                                e.target.style.backgroundColor = 'rgba(246, 173, 85, 0.05)'
+                                e.target.style.color = '#f6ad55'
+                              }
+                            }}
+                            onMouseOut={(e) => {
+                              if (selectedServer !== server.code) {
+                                e.target.style.backgroundColor = 'transparent'
+                                e.target.style.color = '#ffffff'
+                              }
+                            }}
+                          >
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              marginBottom: '2px' 
+                            }}>
+                              <span style={{ fontWeight: '700' }}>
+                                {server.name}
+                              </span>
+                              {server.status === 'offline' && (
+                                <span style={{ 
+                                  fontSize: '10px', 
+                                  color: '#ef4444',
+                                  fontWeight: '400'
+                                }}>
+                                  OFFLINE
+                                </span>
+                              )}
+                              {server.status === 'online' && (
+                                <span style={{ 
+                                  fontSize: '10px', 
+                                  color: '#10b981',
+                                  fontWeight: '400'
+                                }}>
+                                  ONLINE
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ 
+                              fontSize: '11px', 
+                              color: '#a0aec0',
+                              fontWeight: '400'
+                            }}>
+                              {server.ping}ms • {server.players} players
+                            </div>
+                          </div>
+                        ))
+                      )}
+                      
+                      {/* Refresh button */}
+                      <div style={{
+                        borderTop: '1px solid rgba(246, 173, 85, 0.2)',
+                        margin: '8px 0 0 0'
+                      }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            fetchServerData()
                           }}
+                          disabled={serverDataLoading}
                           style={{
-                            padding: '12px 16px',
-                            color: selectedServer === server.code ? '#f6ad55' : '#ffffff',
-                            backgroundColor: selectedServer === server.code ? 'rgba(246, 173, 85, 0.1)' : 'transparent',
-                            cursor: 'pointer',
-                            fontSize: '14px',
+                            width: '100%',
+                            padding: '8px 16px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: serverDataLoading ? '#6b7280' : '#f6ad55',
+                            fontSize: '12px',
                             fontWeight: '600',
-                            transition: 'all 0.2s ease',
-                            borderLeft: selectedServer === server.code ? '3px solid #f6ad55' : '3px solid transparent'
+                            cursor: serverDataLoading ? 'not-allowed' : 'pointer',
+                            fontFamily: '"Rajdhani", sans-serif',
+                            textTransform: 'uppercase',
+                            transition: 'all 0.2s ease'
                           }}
                           onMouseOver={(e) => {
-                            if (selectedServer !== server.code) {
-                              e.target.style.backgroundColor = 'rgba(246, 173, 85, 0.05)'
-                              e.target.style.color = '#f6ad55'
+                            if (!serverDataLoading) {
+                              e.target.style.backgroundColor = 'rgba(246, 173, 85, 0.1)'
                             }
                           }}
                           onMouseOut={(e) => {
-                            if (selectedServer !== server.code) {
-                              e.target.style.backgroundColor = 'transparent'
-                              e.target.style.color = '#ffffff'
-                            }
+                            e.target.style.backgroundColor = 'transparent'
                           }}
                         >
-                          <div style={{ fontWeight: '700', marginBottom: '2px' }}>
-                            {server.name}
-                          </div>
-                          <div style={{ 
-                            fontSize: '11px', 
-                            color: '#a0aec0',
-                            fontWeight: '400'
-                          }}>
-                            {server.ping}ms • {server.players} players
-                          </div>
-                        </div>
-                      ))}
+                          {serverDataLoading ? '⟳ Refreshing...' : '🔄 Refresh Servers'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
