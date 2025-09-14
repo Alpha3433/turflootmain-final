@@ -3277,8 +3277,8 @@ const AgarIOGame = () => {
         }}>
           {/* Minimap Container */}
           <div style={{
-            width: isMobile ? '110px' : '220px',
-            height: isMobile ? '110px' : '220px',
+            width: isMobile ? '121px' : '220px',
+            height: isMobile ? '121px' : '220px',
             borderRadius: '50%',
             backgroundColor: '#000000',
             border: isMobile ? '2px solid #00ff00' : '4px solid #00ff00',
