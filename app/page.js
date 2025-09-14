@@ -10779,7 +10779,8 @@ export default function TurfLootTactical() {
                   color: '#6b7280',
                   fontSize: isMobile ? '12px' : '14px',
                   textAlign: 'center',
-                  marginTop: '8px'
+                  marginTop: '8px',
+                  fontFamily: '"Rajdhani", sans-serif'
                 }}>
                   {(() => {
                     const maxBalance = parseFloat(walletBalance.usd || 0);
