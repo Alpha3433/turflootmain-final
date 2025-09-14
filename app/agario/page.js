@@ -1183,6 +1183,16 @@ const AgarIOGame = () => {
       const dy = this.player.targetY - this.player.y
       const distance = Math.sqrt(dx * dx + dy * dy)
       
+      // Debug player movement (only log occasionally to avoid spam)
+      if (window.isUsingJoystick && Math.random() < 0.01) { // 1% chance to log
+        console.log('🎮 Player Movement Update:', {
+          playerPos: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
+          targetPos: { x: this.player.targetX.toFixed(1), y: this.player.targetY.toFixed(1) },
+          distance: distance.toFixed(1),
+          usingJoystick: window.isUsingJoystick
+        })
+      }
+      
       // Dynamic speed based on mass - larger players move slower
       // Use a much smaller threshold to prevent stopping when mouse is still
       if (distance > 0.1) {
