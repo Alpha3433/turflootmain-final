@@ -440,7 +440,7 @@ export default function TurfLootTactical() {
   const [user, setUser] = useState(null)
   const [customUsername, setCustomUsername] = useState('')
   const [serverSelectorOpen, setServerSelectorOpen] = useState(false)
-  const [selectedServer, setSelectedServer] = useState('US-W')
+  const [selectedServer, setSelectedServer] = useState('') // Start empty, will be set by API
   const [serverOptions, setServerOptions] = useState([])
   const [serverDataLoading, setServerDataLoading] = useState(false)
   
