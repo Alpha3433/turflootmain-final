@@ -10,13 +10,6 @@ export const metadata = {
   title: 'TurfLoot – Real-time blockchain skill gaming',
   description: 'Compete in skill-based territory battles. Earn real SOL rewards. 100% skill, 0% luck.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: 'cover'
-  },
   openGraph: {
     title: 'TurfLoot – Real-time blockchain skill gaming',
     description: 'Compete in skill-based territory battles. Earn real SOL rewards.',
@@ -35,6 +28,14 @@ export const metadata = {
     statusBarStyle: 'black-translucent',
     title: 'TurfLoot',
   }
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover'
 }
 
 export default function RootLayout({ children }) {
