@@ -3727,11 +3727,11 @@ const AgarIOGame = () => {
               gap: isMobile ? '3px' : '4px'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Net Worth:</span>
+                <span style={{ color: '#9ca3af' }}>Worth:</span>
                 <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Total Mass:</span>
+                <span style={{ color: '#9ca3af' }}>Mass:</span>
                 <span style={{ color: '#ffffff', fontWeight: '700' }}>{Math.floor(mass)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -3743,11 +3743,11 @@ const AgarIOGame = () => {
                 <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations} 🔥</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Coins Collected:</span>
+                <span style={{ color: '#9ca3af' }}>Coins:</span>
                 <span style={{ color: '#ffffff', fontWeight: '700' }}>{score}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#9ca3af' }}>Time Alive:</span>
+                <span style={{ color: '#9ca3af' }}>Time:</span>
                 <span style={{ color: '#ffffff', fontWeight: '700' }}>
                   {Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}
                 </span>
