@@ -47,6 +47,8 @@ const AgarIOGame = () => {
   const [gameReady, setGameReady] = useState(false)
   const [leaderboardExpanded, setLeaderboardExpanded] = useState(false)
   const leaderboardTimerRef = useRef(null)
+  const [statsExpanded, setStatsExpanded] = useState(false)
+  const statsTimerRef = useRef(null)
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
