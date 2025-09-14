@@ -1085,12 +1085,12 @@ export default function TurfLootTactical() {
       const isLandscape = window.innerWidth > window.innerHeight
       
       if (isLandscape && pendingGameUrl) {
-        console.log('📱 Device rotated to landscape - entering game')
-        setShowOrientationModal(false)
-        // Small delay to ensure smooth transition
+        console.log('📱 Device rotated to landscape - showing loading and entering game')
+        setOrientationModalLoading(true)
+        // Show loading then navigate
         setTimeout(() => {
           window.location.href = pendingGameUrl
-        }, 500)
+        }, 1000)
       }
     }
 
