@@ -3528,18 +3528,19 @@ const AgarIOGame = () => {
         {/* Player Info Panel - Bottom Right (larger with landing page font) */}
         <div style={{
           position: 'fixed',
-          bottom: '10px',
-          right: '10px',
+          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 110px)' : '10px',
+          right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 5px)' : '10px',
           zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          border: '2px solid #333',
-          borderRadius: '4px',
-          padding: '12px 16px',
-          fontSize: '13px',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          border: isMobile ? '1px solid #333' : '2px solid #333',
+          borderRadius: isMobile ? '6px' : '4px',
+          padding: isMobile ? (statsExpanded ? '6px 8px' : '4px 6px') : '12px 16px',
+          fontSize: isMobile ? (statsExpanded ? '10px' : '9px') : '13px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: '140px'
+          minWidth: isMobile ? (statsExpanded ? '110px' : '85px') : '140px',
+          transition: 'all 0.3s ease'
         }}>
           {/* Header */}
           <div style={{ 
