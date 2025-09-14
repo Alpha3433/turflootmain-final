@@ -10647,7 +10647,7 @@ export default function TurfLootTactical() {
                   fontWeight: '700',
                   marginBottom: isMobile ? '2px' : '4px'
                 }}>
-                  ${balance.toFixed(2)}
+                  ${parseFloat(walletBalance.usd || 0).toFixed(2)}
                 </div>
                 <div style={{ 
                   color: '#a0aec0', 
