@@ -1045,6 +1045,55 @@ export default function TurfLootTactical() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isMobile])
 
+  // Orientation detection and game entry for mobile
+  const checkOrientationAndEnterGame = (gameUrl) => {
+    if (!isMobile) {
+      // Desktop: Navigate immediately
+      window.location.href = gameUrl
+      return
+    }
+
+    // Mobile: Check orientation
+    const isLandscape = window.innerWidth > window.innerHeight
+    
+    if (isLandscape) {
+      // Already in landscape: Navigate immediately
+      console.log('📱 Mobile device already in landscape - entering game')
+      window.location.href = gameUrl
+    } else {
+      // Portrait mode: Show orientation modal
+      console.log('📱 Mobile device in portrait - requesting landscape rotation')
+      setPendingGameUrl(gameUrl)
+      setShowOrientationModal(true)
+    }
+  }
+
+  // Listen for orientation changes when modal is open
+  useEffect(() => {
+    if (!showOrientationModal || !isMobile) return
+
+    const handleOrientationChange = () => {
+      const isLandscape = window.innerWidth > window.innerHeight
+      
+      if (isLandscape && pendingGameUrl) {
+        console.log('📱 Device rotated to landscape - entering game')
+        setShowOrientationModal(false)
+        // Small delay to ensure smooth transition
+        setTimeout(() => {
+          window.location.href = pendingGameUrl
+        }, 500)
+      }
+    }
+
+    window.addEventListener('resize', handleOrientationChange)
+    window.addEventListener('orientationchange', handleOrientationChange)
+    
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange)
+      window.removeEventListener('orientationchange', handleOrientationChange)
+    }
+  }, [showOrientationModal, pendingGameUrl, isMobile])
+
   // Calculate eye positions based on mouse position
   const getEyePositions = () => {
     if (typeof window === 'undefined' || !circleRef.current) {
