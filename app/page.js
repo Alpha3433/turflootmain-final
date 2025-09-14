@@ -9692,6 +9692,112 @@ export default function TurfLootTactical() {
         onJoinLobby={handleJoinLobby}
       />
 
+      {/* Mobile Orientation Modal */}
+      {showOrientationModal && isMobile && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.95)',
+          zIndex: 10000,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+          boxSizing: 'border-box'
+        }}>
+          {/* Rotate Phone Icon */}
+          <div style={{
+            fontSize: '80px',
+            marginBottom: '30px',
+            animation: 'rotatePhone 2s ease-in-out infinite alternate'
+          }}>
+            📱➡️📲
+          </div>
+          
+          {/* Instructions */}
+          <h2 style={{
+            color: '#ffffff',
+            fontSize: '24px',
+            fontWeight: '700',
+            textAlign: 'center',
+            marginBottom: '20px',
+            fontFamily: '"Rajdhani", sans-serif',
+            textTransform: 'uppercase'
+          }}>
+            Rotate Your Device
+          </h2>
+          
+          <p style={{
+            color: '#e2e8f0',
+            fontSize: '16px',
+            textAlign: 'center',
+            lineHeight: '1.5',
+            marginBottom: '30px',
+            fontFamily: '"Rajdhani", sans-serif',
+            maxWidth: '300px'
+          }}>
+            For the best gaming experience, please rotate your device to landscape mode.
+          </p>
+          
+          {/* Visual Indicator */}
+          <div style={{
+            width: '120px',
+            height: '60px',
+            border: '3px solid #68d391',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '20px',
+            background: 'rgba(104, 211, 145, 0.1)'
+          }}>
+            <span style={{
+              color: '#68d391',
+              fontSize: '14px',
+              fontWeight: '600',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              LANDSCAPE
+            </span>
+          </div>
+          
+          {/* Cancel Button */}
+          <button
+            onClick={() => {
+              setShowOrientationModal(false)
+              setPendingGameUrl(null)
+            }}
+            style={{
+              padding: '12px 24px',
+              background: 'rgba(252, 129, 129, 0.2)',
+              border: '2px solid #fc8181',
+              borderRadius: '6px',
+              color: '#fc8181',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.background = 'rgba(252, 129, 129, 0.3)'
+              e.target.style.transform = 'scale(1.05)'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+              e.target.style.transform = 'scale(1)'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
       {/* User Profile Modal */}
       {isProfileModalOpen && (
         <div 
