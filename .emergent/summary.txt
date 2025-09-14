@@ -1,56 +1,64 @@
 <analysis>
-The AI engineer's trajectory details a focused, iterative development process on the TurfLoot application, primarily targeting mobile user experience enhancements and critical bug fixes. The work began by redesigning the mobile landing page from a 2x2 grid to a vertical stack, reordering key panels (Wallet, Customize, Leaderboard, Party). A significant in-game improvement was the recreation of a virtual joystick for mobile, coupled with optimized action buttons, addressing a gap in mobile game controls.
-
-Subsequent efforts refined the UI further, including removing emojis, standardizing the mobile Customize panel's character design to match desktop, and adding an engaging scroll-based eye-tracking effect. Bug fixes involved implementing the missing  function and resolving a mobile background reset during username input via . Mobile UI consistency was ensured by re-adding the Create Party button and aligning party button texts with desktop. An authentication popup on the mobile Withdraw button was also suppressed. The trajectory concludes with the implementation of a landscape orientation enforcement for mobile game entry, currently in the phase of adding the modal UI.
+The AI engineer's trajectory focused heavily on mobile UI/UX and in-game experience for the TurfLoot application, iteratively responding to user feedback. Key accomplishments include implementing a mobile landscape orientation enforcement with a custom modal, then integrating loading states and refining the detection logic. The engineer then optimized the in-game canvas for full-screen display and ensured the virtual analog stick was fully functional across orientations, disabling touch-to-move. Extensive work was done to fix the mobile landing page's landscape layout by refining mobile detection. In-game UI elements like the minimap, leaderboard, and stats panel were re-designed for compactness and user-friendliness on mobile, including expandable views and notch-safe positioning. Further fixes addressed a button text selection bug and refined the mobile split mechanic to utilize joystick direction. The latest task involves simplifying the redesigned stats panel for improved minimalism.
 </analysis>
 
 <product_requirements>
-The TurfLoot application is an Agar.io-style multiplayer game with a military theme, leveraging Hathora for game servers and Privy for wallet and authentication. The core objective is to enhance the existing MVP through UI/UX improvements, bug fixes, and robust social features, with a strong focus on mobile experience.
+The TurfLoot application is an Agar.io-style multiplayer game with a military theme, using Hathora for game servers and Privy for wallet/authentication. The goal is to enhance the MVP with UI/UX improvements, bug fixes, and social features, prioritizing the mobile experience.
 
-**Currently Implemented Features:**
-*   **UI/UX**: Mobile layout redesigned to a vertical stack for WALLET, CUSTOMIZE, LEADERBOARD, and PARTY sections. Mobile character customization preview updated to a blue circular avatar with black eyes (no green ring), featuring a scroll-based eye-tracking effect. In-game mobile buttons (CASH OUT, SPLIT) optimized for touch.
-*   **Social System**: Persistent friends/party system with mobile  panel now including  and  buttons, aligning text with desktop.
-*   **Mobile Parity**: Full mobile support including wallet, leaderboard, and game controls, with a recreated virtual joystick for in-game movement.
-*   **Game Mechanics**: Authentic Agar.io splitting, directional ejection, merging, real-time Time Alive, cash-out visualization.
-*   **Bug Fixes**: Solana-only deposit via Privy fixed (using  v2.24.0, Helius RPC, 10% fee). Privy login and game button authentication issues resolved.  modal delay fixed (asynchronous friends list loading). Missing  function implemented. Mobile background reset on username input fixed using . Mobile WITHDRAW button authentication popup removed.
-*   **User Interaction**: Player name on the mobile navigation bar now updates dynamically based on user input.
+**Implemented features include:**
+*   **UI/UX**: Mobile layout redesigned (vertical stack: WALLET, CUSTOMIZE, LEADERBOARD, PARTY). Character customization updated with blue circular avatar and scroll-based eye-tracking. In-game mobile buttons (CASH OUT, SPLIT) optimized.
+*   **Social System**: Persistent friends/party system, mobile PARTY panel aligned with desktop.
+*   **Mobile Parity**: Full mobile support, including a virtual in-game joystick.
+*   **Game Mechanics**: Agar.io splitting, ejection, merging, real-time Time Alive, cash-out.
+*   **Bug Fixes**: Solana deposit fixes, Privy login issues,  modal delay fixed,  implemented, mobile background reset fixed, mobile WITHDRAW button authentication popup removed.
+*   **User Interaction**: Dynamic player name on mobile navigation bar.
 
-**Current Task:** Implementing a non-intrusive solution to force mobile players into landscape mode when entering any in-game experience, preventing access in portrait mode.
+**Problem/Current Development:** The ongoing task involves continuously refining the mobile in-game experience to be intuitive and non-intrusive. Specifically, the stats panel needs to be redesigned for a more simplistic, space-saving display in its bottom-center mobile position.
 </product_requirements>
 
 <key_technical_concepts>
--   Next.js 14 (App Router, Server/Client Components)
+-   Next.js 14 (App Router, Client Components)
 -   React Hooks (, , , )
--   Privy (, Solana integration)
--   Solana (, Helius RPC)
--   Tailwind CSS & shadcn/ui
--   Hathora (game servers)
--   MongoDB (database)
--    detection
+-   Tailwind CSS & custom CSS animations ()
+-    detection logic (user agent, screen dimensions, touch capability)
+-   Viewport metadata (, )
+-   CSS  for safe-area-insets (notch/bezel handling)
+-   , ,  for mobile touch control.
 </key_technical_concepts>
 
 <code_architecture>
 
 -   ****:
-    -   **Importance**: The central client-side component managing UI, authentication, state, and wallet interactions for the application's landing page.
+    -   **Importance**: The main client-side landing page, handling UI, authentication, and pre-game interactions.
     -   **Changes Made**:
-        -   Mobile layout transformed from 2x2 grid to a vertical flex container, with panels reordered to WALLET, CUSTOMIZE, LEADERBOARD, PARTY.
-        -    button removed from mobile's main button row and PARTY panel. Mobile  and  buttons swapped.  emoji removed from mobile  button.
-        -   Mobile  panel character preview updated to a blue circular avatar with white border and black dot eyes, matching desktop. Implemented scroll-based eye-tracking using  state and . Emojis removed from  and  button texts.
-        -   Mobile  panel's  button text changed to , and  to , aligning with desktop.  button was re-added to the mobile PARTY panel.
-        -   Mobile navigation bar's player name display logic updated to dynamically reflect the user's .
-        -   Background stability on mobile improved by memoizing  using  to prevent animation resets when typing in the username field.
-        -    function modified to bypass authentication popups for mobile users.
-        -   Integrated  function for game entry points and introduced  state for landscape enforcement.
+        -   Implemented mobile landscape orientation enforcement, including  checks,  function, and  state for an informational modal.
+        -   Removed  state and associated loading modal, integrating loading feedback directly into the orientation modal.
+        -   Refined mobile detection logic for both portrait and landscape, moving from  to more robust checks ( user agent,  for landscape).
+        -   Ensured all game entry points (e.g., LOCAL PRACTICE) trigger the orientation check.
+        -   Fixed mobile layout in landscape to maintain vertical stacking using CSS media queries.
 -   ****:
-    -   **Importance**: Handles the in-game experience, including rendering, movement, and player actions.
+    -   **Importance**: Handles the core in-game experience, including rendering, movement, and player actions.
     -   **Changes Made**:
-        -   Implemented a mobile-only virtual joystick system with , ,  functions, providing touch-responsive, 360-degree movement control with visual feedback and boundary limits.
-        -   Optimized in-game  and  buttons for mobile touch, increasing size, improving positioning, and enhancing feedback.
-        -   The missing  function was defined to manage the cash-out process for the dedicated button, mirroring the 'E' key functionality.
+        -   Enhanced  detection for in-game context to ensure joystick and other mobile-specific features activate correctly in landscape.
+        -   Ensured the virtual joystick is visible and functional in all mobile orientations, disabling canvas-based touch-to-move.
+        -   Implemented various fixes for analog stick movement, including addressing timing issues where the joystick was used before the game fully initialized and correcting the  reference.
+        -   Optimized in-game UI elements for mobile: minimap (scaled down then up), leaderboard (compact Top 3 with expand/auto-collapse, notch-safe positioning), and stats panel (2-line summary with expand/auto-collapse, repositioned to bottom-center).
+        -   Repositioned CASH OUT and SPLIT buttons for right-thumb accessibility in landscape, aligning them horizontally with the analog stick.
+        -   Fixed a mobile bug where holding CASH OUT/SPLIT buttons would highlight emojis by applying  and .
+        -   Updated the mobile split mechanic to propel smaller cells in the direction of the joystick, fixing an issue where it was defaulting to mouse world coordinates.
+        -   Performed an initial visual redesign of the stats panel for a modern, polished look.
 -   ****:
-    -   **Importance**: Provides the Privy authentication context.
-    -   **Changes Made**: Configured Solana wallet connectors, , and  (as per initial analysis). No new changes in this trajectory segment.
+    -   **Importance**: Defines the root layout and metadata for the Next.js application.
+    -   **Changes Made**: Added mobile-specific viewport metadata (, ) and iOS Safari  CSS for full-screen game canvas.
+-   ****:
+    -   **Importance**: Global CSS styles for the application.
+    -   **Changes Made**:
+        -   Added  for loading spinner and dots animations.
+        -   Implemented comprehensive CSS rules for full-screen game canvas (, , ) for mobile, including viewport units and .
+        -   Added  class styles for body when in-game, preventing scrolling (, ).
+        -   Added CSS media queries to force the mobile landing page layout for touch devices in landscape.
+        -   Corrected multiple CSS syntax errors (extra braces, misplaced blocks) introduced during earlier edits.
+        -   Added CSS animations for joystick pulse effect.
 </code_architecture>
 
 <pending_tasks>
@@ -58,13 +66,16 @@ The TurfLoot application is an Agar.io-style multiplayer game with a military th
 -   Modernizing Social Popup
 -   Production Infrastructure Stability: Address persistent 502/404/ERR_ABORTED errors for  calls.
 -   Implement core  button functionality in Wallet Snapshot (popup removed, but actual withdrawal logic is pending).
--   Complete implementation of the landscape orientation requirement for mobile game entry by adding the modal UI.
+-   Continue with the redesign of the in-game mobile stats section, making it more simplistic and taking up less space.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was working on enforcing a landscape orientation requirement for mobile players before they can enter any in-game experience. The user explicitly requested that mobile users should be prevented from accessing the game if their device is in portrait mode, requiring them to rotate it to landscape. The AI engineer has already implemented the core logic: an  check,  function to verify the device's current orientation, and the  state to control the visibility of an informational modal. The  button on the main page (), which serves as a game entry point, has been updated to use this  function. The current phase of work is focused on adding the actual UI component for this  to the  file.
+Immediately before this summary request, the AI engineer was working on redesigning the in-game mobile stats panel. Following a previous user request to make the stats panel more visually appealing and polished in its bottom-center position (which resulted in a Modern Design Elements implementation with gradients, shadows, glass effects, etc.), the user provided feedback that this design was too elaborate and takes up too much visual space.
+
+Therefore, the current work is to revert to a more minimalistic and compact design for the mobile stats panel. The AI engineer has just initiated this task by making an edit to simplify the overall container styling, and the next immediate step is to simplify the header styling as part of this new minimalist approach.
 </current_work>
 
 <optional_next_step>
-Add the UI component for the landscape orientation modal to .
+Simplify the header styling of the mobile in-game stats panel to align with the new minimalist design goal.
 </optional_next_step>
+

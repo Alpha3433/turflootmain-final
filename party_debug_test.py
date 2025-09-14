@@ -10,7 +10,7 @@ import time
 from urllib.parse import quote, unquote
 
 # Configuration
-BASE_URL = "https://mobile-gaming-ui.preview.emergentagent.com"
+BASE_URL = "https://mobilegame-ux.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
 # Real user IDs from server logs
