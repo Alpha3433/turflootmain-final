@@ -75,6 +75,32 @@ const AgarIOGame = () => {
       clearTimeout(leaderboardTimerRef.current)
     }
   }
+
+  // Auto-collapse stats panel after 5 seconds of no interaction
+  useEffect(() => {
+    if (statsExpanded && isMobile) {
+      statsTimerRef.current = setTimeout(() => {
+        setStatsExpanded(false)
+      }, 5000)
+    }
+    
+    return () => {
+      if (statsTimerRef.current) {
+        clearTimeout(statsTimerRef.current)
+      }
+    }
+  }, [statsExpanded, isMobile])
+
+  const handleStatsToggle = () => {
+    if (!isMobile) return // Only for mobile
+    
+    setStatsExpanded(!statsExpanded)
+    
+    // Clear existing timer when manually toggling
+    if (statsTimerRef.current) {
+      clearTimeout(statsTimerRef.current)
+    }
+  }
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
   
