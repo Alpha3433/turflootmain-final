@@ -81,8 +81,8 @@ class MobileOrientationBackendTester:
             # Test session join endpoint
             join_data = {
                 "roomId": "mobile-orientation-test-room",
-                "gameMode": "practice",
-                "userIdentifier": "mobile-test-user"
+                "playerId": "mobile-test-user",
+                "playerName": "MobileTestUser"
             }
             
             start = time.time()
