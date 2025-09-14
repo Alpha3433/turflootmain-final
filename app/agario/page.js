@@ -246,8 +246,19 @@ const AgarIOGame = () => {
     e.preventDefault()
     if (!isMobile) return
     
+    console.log('🕹️ Joystick Ended - Stopping Movement')
+    
     setJoystickActive(false)
     setJoystickPosition({ x: 0, y: 0 })
+    
+    // Stop player movement by setting target to current position
+    if (gameRef.current?.game?.player) {
+      const game = gameRef.current.game
+      game.player.targetX = game.player.x
+      game.player.targetY = game.player.y
+      console.log('🕹️ Player movement stopped at:', { x: game.player.x?.toFixed(1), y: game.player.y?.toFixed(1) })
+    }
+    
     window.isUsingJoystick = false
   }
   
