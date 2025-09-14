@@ -4594,7 +4594,7 @@ const AgarIOGame = () => {
               }}>
                 {/* Submit Report Button */}
                 <button
-                  onClick={(async (e) => {
+                  onClick={async (e) => {
                     console.log('🔍 Submit Report button clicked!')
                     console.log('📊 Report state:', { reportType, reportReason, reportTarget })
                     
