@@ -3361,15 +3361,15 @@ const AgarIOGame = () => {
                 key={`coin-${i}`}
                 style={{
                   position: 'absolute',
-                  width: '4px',
-                  height: '4px',
+                  width: isMobile ? '2px' : '4px',
+                  height: isMobile ? '2px' : '4px',
                   backgroundColor: '#ffd700',
                   borderRadius: '50%',
-                  left: `${(coin.x / 4000) * 210 + 5}px`,
-                  top: `${(coin.y / 4000) * 210 + 5}px`,
+                  left: `${(coin.x / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
+                  top: `${(coin.y / 4000) * (isMobile ? 105 : 210) + (isMobile ? 2.5 : 5)}px`,
                   transform: 'translate(-50%, -50%)',
                   opacity: '1',
-                  boxShadow: '0 0 4px rgba(255, 215, 0, 0.8)',
+                  boxShadow: isMobile ? '0 0 2px rgba(255, 215, 0, 0.8)' : '0 0 4px rgba(255, 215, 0, 0.8)',
                   zIndex: 7
                 }}
               />
