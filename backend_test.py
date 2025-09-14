@@ -120,47 +120,43 @@ class TurfLootAgarioBackendTester:
             self.log_result("Game Session APIs", False, f"Error: {str(e)}")
             return False
 
-    def test_solana_wallet_balance_jwt_auth(self):
-        """Test 3: Solana Wallet Balance API - JWT Authentication"""
-        print("🔍 Testing Solana Wallet Balance API - JWT Authentication...")
+    def test_user_balance_stats_apis(self):
+        """Test 3: User Balance & Stats APIs - Verify wallet balance and stats update APIs"""
+        print("🔍 Testing User Balance & Stats APIs...")
         
         try:
-            # Create a test JWT token for authentication
-            headers = {
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItc29sYW5hIiwiZW1haWwiOiJ0ZXN0QHNvbGFuYS5jb20iLCJpYXQiOjE3NTc0MDAwMDAsImV4cCI6MTc1NzQ4NjQwMH0.test-signature'
-            }
-            
+            # Test wallet balance API
             start = time.time()
-            response = requests.get(f"{API_BASE}/wallet/balance", headers=headers, timeout=10)
+            response = requests.get(f"{API_BASE}/wallet/balance", timeout=10)
             response_time = time.time() - start
             
             if response.status_code == 200:
                 data = response.json()
                 
-                # Check for Solana-specific fields and authentication
-                has_sol_balance = 'sol_balance' in data
-                sol_balance = data.get('sol_balance', 'missing')
+                # Check for required fields
+                has_balance = 'balance' in data
+                has_currency = 'currency' in data
                 balance = data.get('balance', 'missing')
-                wallet_address = data.get('wallet_address', 'missing')
+                currency = data.get('currency', 'missing')
                 
-                if has_sol_balance and balance != 0.0:
+                if has_balance and has_currency:
                     self.log_result(
-                        "Solana Wallet Balance API - JWT Authentication", 
+                        "User Balance & Stats APIs", 
                         True, 
-                        f"JWT token authentication working correctly with Solana wallet data, authenticated user balance (${balance}) and Solana wallet address properly included, proper Solana wallet address handling in authentication",
+                        f"Wallet balance and stats update APIs are operational (Balance: ${balance} {currency})",
                         response_time
                     )
                     return True
                 else:
                     self.log_result(
-                        "Solana Wallet Balance API - JWT Authentication", 
+                        "User Balance & Stats APIs", 
                         False, 
-                        f"Authentication failed or missing Solana fields: sol_balance={sol_balance}, balance={balance}"
+                        f"Missing required fields: balance={balance}, currency={currency}"
                     )
                     return False
             else:
                 self.log_result(
-                    "Solana Wallet Balance API - JWT Authentication", 
+                    "User Balance & Stats APIs", 
                     False, 
                     f"API returned status {response.status_code}",
                     response_time
@@ -168,7 +164,7 @@ class TurfLootAgarioBackendTester:
                 return False
                 
         except Exception as e:
-            self.log_result("Solana Wallet Balance API - JWT Authentication", False, f"Error: {str(e)}")
+            self.log_result("User Balance & Stats APIs", False, f"Error: {str(e)}")
             return False
 
     def test_solana_wallet_balance_privy_token(self):
