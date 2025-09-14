@@ -10611,7 +10611,6 @@ export default function TurfLootTactical() {
                   alignItems: 'center',
                   gap: '8px'
                 }}>
-                  <span style={{ color: '#10b981', fontSize: '16px' }}>💰</span>
                   <span style={{ 
                     color: '#e5e7eb', 
                     fontSize: isMobile ? '14px' : '16px', 
@@ -10619,7 +10618,6 @@ export default function TurfLootTactical() {
                   }}>
                     Available Balance
                   </span>
-                  <span style={{ color: '#6b7280', fontSize: '14px' }}>🔄</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{
