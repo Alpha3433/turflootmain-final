@@ -9466,7 +9466,7 @@ export default function TurfLootTactical() {
             
             <button 
               onClick={() => {
-                console.log('👥 Mobile Friends button clicked!')
+                console.log('👥 Mobile JOIN PARTY button clicked!')
                 setIsFriendsModalOpen(true)
               }}
               style={{
@@ -9483,7 +9483,7 @@ export default function TurfLootTactical() {
                 textTransform: 'uppercase',
                 marginBottom: '6px'
               }}>
-              👥 SOCIAL
+              JOIN PARTY
             </button>
             
             <button
@@ -9523,7 +9523,7 @@ export default function TurfLootTactical() {
                 fontFamily: '"Rajdhani", sans-serif',
                 textTransform: 'uppercase'
               }}>
-              🎯 CREATE PARTY
+              CREATE PARTY
             </button>
           </div>
         </div>
