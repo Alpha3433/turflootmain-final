@@ -3236,7 +3236,11 @@ const AgarIOGame = () => {
               fontFamily: '"Rajdhani", sans-serif',
               boxShadow: isMobile ? '0 4px 25px rgba(0, 100, 255, 0.7)' : '0 4px 12px rgba(0, 100, 255, 0.3)',
               flexDirection: isMobile ? 'column' : 'row',
-              touchAction: 'manipulation'
+              touchAction: 'manipulation',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
+              WebkitTapHighlightColor: 'transparent'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = 'rgba(50, 120, 255, 0.95)'
