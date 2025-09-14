@@ -234,17 +234,11 @@ const AgarIOGame = () => {
     })
     
     // Only update player movement if game is ready
-    if (gameRef.current?.game) {
+    if (gameRef.current && gameRef.current.player) {
       const strength = distance / 35 // Normalize to 0-1
       const moveSpeed = 500 * strength // Increased movement speed for better responsiveness
       
-      const game = gameRef.current.game
-      
-      // Ensure player object exists
-      if (!game.player) {
-        console.log('❌ Game player object not found!')
-        return
-      }
+      const game = gameRef.current  // gameRef.current IS the game object
       
       const targetX = game.player.x + Math.cos(angle) * moveSpeed
       const targetY = game.player.y + Math.sin(angle) * moveSpeed
