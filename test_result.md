@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Mobile layout redesign: Change the current 2x2 grid layout of the LEADERBOARD, WALLET, PARTY, and CUSTOMIZE sections on mobile to a cleaner vertical stacked layout in the order: WALLET, CUSTOMIZE, LEADERBOARD, PARTY. The desktop version should remain unchanged."
+user_problem_statement: "Complete the landscape orientation requirement for mobile game entry by ensuring all game entry points (LOCAL PRACTICE and paid rooms) use the orientation check system. The mobile orientation modal UI is already implemented, but not all entry points are utilizing the checkOrientationAndEnterGame function."
 
 # Test plan for this run
 
