@@ -7261,7 +7261,7 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
-        {/* Cash Out Notifications - Bottom Right */}
+        {/* Cash Out Notifications - Bottom Right - Tactical HUD Style */}
         <div style={{
           position: 'absolute',
           bottom: '20px',
@@ -7269,60 +7269,134 @@ export default function TurfLootTactical() {
           zIndex: 30,
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
+          gap: '12px',
           alignItems: 'flex-end'
         }}>
           {cashOutNotifications.map((notification, index) => (
             <div
               key={notification.id}
               style={{
-                backgroundColor: 'rgba(16, 185, 129, 0.95)',
-                border: '1px solid #10b981',
-                borderRadius: '8px',
-                padding: '12px 16px',
+                position: 'relative',
+                backgroundColor: 'rgba(26, 32, 44, 0.95)',
+                border: '2px solid #10b981',
+                borderRadius: '4px',
+                padding: '16px 20px',
                 color: 'white',
                 fontSize: '14px',
                 fontWeight: '600',
-                boxShadow: '0 4px 20px rgba(16, 185, 129, 0.3)',
-                backdropFilter: 'blur(10px)',
-                minWidth: '280px',
+                boxShadow: '0 0 25px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(15px)',
+                minWidth: '320px',
                 fontFamily: '"Rajdhani", sans-serif',
                 animation: `slideInRight 0.5s ease-out ${index * 0.1}s both`,
-                opacity: 1 - (index * 0.1) // Fade older notifications
+                opacity: 1 - (index * 0.15), // Fade older notifications
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
               }}
             >
+              {/* Status Indicator */}
+              <div style={{
+                position: 'absolute',
+                top: '6px',
+                right: '6px',
+                width: '8px',
+                height: '8px',
+                background: '#10b981',
+                borderRadius: '50%',
+                boxShadow: '0 0 10px #10b981',
+                animation: 'statusBlink 2s ease-in-out infinite'
+              }} />
+              
+              {/* Header with Player and Amount */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '4px'
+                marginBottom: '8px',
+                borderBottom: '1px solid rgba(16, 185, 129, 0.3)',
+                paddingBottom: '8px'
               }}>
-                <span style={{ 
-                  fontSize: '16px',
+                <div style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}>
-                  💰 <strong>{notification.player}</strong>
-                </span>
+                  <div style={{
+                    width: '6px',
+                    height: '6px',
+                    background: '#10b981',
+                    transform: 'rotate(45deg)'
+                  }} />
+                  <span style={{ 
+                    fontSize: '13px',
+                    fontWeight: '800',
+                    color: '#10b981'
+                  }}>
+                    CASH OUT
+                  </span>
+                </div>
                 <span style={{ 
-                  fontSize: '18px', 
+                  fontSize: '16px', 
                   fontWeight: '700',
-                  color: '#ecfdf5'
+                  color: '#ffd700',
+                  textShadow: '0 0 10px rgba(255, 215, 0, 0.5)'
                 }}>
                   ${notification.amount}
                 </span>
               </div>
+              
+              {/* Player Info */}
               <div style={{
-                fontSize: '12px',
-                color: 'rgba(255, 255, 255, 0.8)',
                 display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                fontSize: '12px'
               }}>
-                <span>{notification.country}</span>
-                <span>cashed out</span>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <div style={{
+                    width: '4px',
+                    height: '4px',
+                    background: '#68d391',
+                    borderRadius: '50%'
+                  }} />
+                  <span style={{ 
+                    fontWeight: '700',
+                    color: 'white'
+                  }}>
+                    {notification.player}
+                  </span>
+                </div>
+                <span style={{ 
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: '11px'
+                }}>
+                  {notification.country}
+                </span>
               </div>
+              
+              {/* Corner Accents */}
+              <div style={{
+                position: 'absolute',
+                top: '-1px',
+                left: '-1px',
+                width: '12px',
+                height: '12px',
+                borderTop: '2px solid #10b981',
+                borderLeft: '2px solid #10b981'
+              }} />
+              <div style={{
+                position: 'absolute',
+                bottom: '-1px',
+                right: '-1px',
+                width: '12px',
+                height: '12px',
+                borderBottom: '2px solid #10b981',
+                borderRight: '2px solid #10b981'
+              }} />
             </div>
           ))}
         </div>
