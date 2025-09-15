@@ -179,47 +179,186 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           </button>
         </div>
 
-        {/* Content */}
-        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-          <h3 style={{ fontSize: '20px', marginBottom: '16px', color: '#10b981' }}>
-            🎉 Server Browser is Working!
-          </h3>
-          <p style={{ color: '#9ca3af', marginBottom: '24px' }}>
-            This modal successfully opens when you click the SERVER BROWSER button.
-          </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+        {/* Stats Bar */}
+        <div style={{
+          display: 'flex',
+          gap: '16px',
+          marginBottom: '20px',
+          padding: '12px',
+          backgroundColor: '#2d3748',
+          borderRadius: '8px',
+          fontSize: '14px'
+        }}>
+          <div>
+            <strong style={{ color: '#10b981' }}>{totalStats.totalPlayers}</strong>
+            <span style={{ color: '#9ca3af', marginLeft: '4px' }}>Players Online</span>
+          </div>
+          <div>
+            <strong style={{ color: '#3b82f6' }}>{totalStats.totalActiveServers}</strong>
+            <span style={{ color: '#9ca3af', marginLeft: '4px' }}>Active Servers</span>
+          </div>
+          <div style={{ marginLeft: 'auto' }}>
             <button
-              onClick={onClose}
+              onClick={() => fetchServers(true)}
+              disabled={refreshing}
               style={{
-                backgroundColor: '#3b82f6',
+                backgroundColor: refreshing ? '#4a5568' : '#10b981',
                 color: 'white',
                 border: 'none',
-                borderRadius: '8px',
-                padding: '12px 24px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
+                borderRadius: '6px',
+                padding: '6px 12px',
+                fontSize: '12px',
+                cursor: refreshing ? 'not-allowed' : 'pointer'
               }}
             >
-              Close Modal
-            </button>
-            <button
-              onClick={() => {
-                // Demo join functionality
-                onJoinLobby({ id: 'demo-server', name: 'Demo Server', region: 'US-East' })
-              }}
-              style={{
-                backgroundColor: '#10b981',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px 24px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
-              Join Demo Server
+              {refreshing ? '🔄 Refreshing...' : '🔄 Refresh'}
             </button>
           </div>
+        </div>
+
+        {/* Filter Tabs */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+          {['All', 'Free', 'Paid'].map(type => (
+            <button
+              key={type}
+              onClick={() => setSelectedGameType(type === 'All' ? 'All' : type === 'Free' ? 'Global Multiplayer' : 'Cash Game')}
+              style={{
+                backgroundColor: selectedGameType === (type === 'All' ? 'All' : type === 'Free' ? 'Global Multiplayer' : 'Cash Game') ? '#10b981' : '#374151',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '8px 16px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                fontWeight: selectedGameType === (type === 'All' ? 'All' : type === 'Free' ? 'Global Multiplayer' : 'Cash Game') ? 'bold' : 'normal'
+              }}
+            >
+              {type} Servers
+            </button>
+          ))}
+        </div>
+
+        {/* Server List */}
+        <div style={{ 
+          maxHeight: '300px', 
+          overflowY: 'auto',
+          border: '1px solid #374151',
+          borderRadius: '8px',
+          backgroundColor: '#2d3748'
+        }}>
+          {isLoading ? (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '40px',
+              color: '#9ca3af'
+            }}>
+              <div style={{ marginBottom: '8px' }}>Loading...</div>
+              <div style={{ fontSize: '12px' }}>🔄 Loading...</div>
+            </div>
+          ) : filteredServers.length === 0 ? (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '40px',
+              color: '#ef4444'
+            }}>
+              <div style={{ fontSize: '20px', marginBottom: '8px' }}>⚠️</div>
+              <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Failed to Load Servers</div>
+              <div style={{ fontSize: '12px', marginBottom: '16px' }}>Unable to fetch server list. Please try refreshing</div>
+              <button
+                onClick={() => fetchServers(true)}
+                style={{
+                  backgroundColor: '#ef4444',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '8px 16px',
+                  cursor: 'pointer'
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            filteredServers.map(server => (
+              <div
+                key={server.id}
+                style={{
+                  padding: '12px 16px',
+                  borderBottom: '1px solid #374151',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: server.status === 'full' ? '#4a1e1e' : 'transparent'
+                }}
+              >
+                <div style={{ flex: 1 }}>
+                  <div style={{ 
+                    fontWeight: 'bold', 
+                    marginBottom: '4px',
+                    color: server.status === 'full' ? '#9ca3af' : 'white'
+                  }}>
+                    {server.name}
+                  </div>
+                  <div style={{ 
+                    fontSize: '12px', 
+                    color: '#9ca3af',
+                    display: 'flex',
+                    gap: '12px'
+                  }}>
+                    <span>{server.ping}ms</span>
+                    <span>{server.currentPlayers}/{server.maxPlayers} players</span>
+                    <span>{server.region}</span>
+                    {server.entryFee > 0 && (
+                      <span style={{ color: getStakeColor(server.entryFee) }}>
+                        ${server.entryFee}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleJoinServer(server)}
+                  disabled={server.status === 'full'}
+                  style={{
+                    backgroundColor: server.status === 'full' ? '#4a5568' : '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '8px 16px',
+                    cursor: server.status === 'full' ? 'not-allowed' : 'pointer',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {server.status === 'full' ? 'FULL' : 'JOIN'}
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          marginTop: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: '12px',
+          color: '#9ca3af'
+        }}>
+          <span>Auto-refresh every 3 seconds</span>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: '#374151',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '8px 16px',
+              cursor: 'pointer'
+            }}
+          >
+            CLOSE
+          </button>
         </div>
       </div>
     </div>
