@@ -5419,10 +5419,20 @@ export default function TurfLootTactical() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em'
             }}>
-              PLAYER: {isAuthenticated ? 
-                (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
-                (customUsername || userName).toUpperCase()
-              }
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>
+                  PLAYER: {isAuthenticated ? 
+                    (customUsername || user?.email?.address?.split('@')[0] || user?.wallet?.address?.slice(0, 8) || 'USER').toUpperCase() : 
+                    (customUsername || userName).toUpperCase()
+                  }
+                </span>
+                {isAuthenticated && privyUser && (
+                  <TierBadge 
+                    userIdentifier={privyUser.wallet?.address || privyUser.id} 
+                    size="small" 
+                  />
+                )}
+              </div>
             </span>
           </div>
           
