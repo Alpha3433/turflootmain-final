@@ -18,6 +18,9 @@ export default function TurfLootTactical() {
   const [loyaltyData, setLoyaltyData] = useState(null)
   const [tierUpgradeNotification, setTierUpgradeNotification] = useState(null)
   
+  // CASH OUT NOTIFICATIONS STATE
+  const [cashOutNotifications, setCashOutNotifications] = useState([])
+  
   // Loyalty code moved to after state declarations to fix initialization error
   
   // PAID ROOMS SYSTEM - Balance checking and validation with dynamic server fees
