@@ -10,10 +10,8 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
-  const [selectedRegion, setSelectedRegion] = useState('All')
-  const [selectedGameType, setSelectedGameType] = useState('All')
-  const [regions, setRegions] = useState([])
-  const [gameTypes, setGameTypes] = useState([])
+  const [selectedStakeFilter, setSelectedStakeFilter] = useState('All')
+  const [showEmptyServers, setShowEmptyServers] = useState(false)
   
   // Safely get user from Privy with error handling
   let user = null
@@ -23,6 +21,29 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   } catch (error) {
     console.warn('Privy hook not available in ServerBrowserModal:', error)
     user = null
+  }
+
+  // Stake level categorization
+  const getStakeCategory = (stake) => {
+    if (stake === 0) return 'Practice'
+    if (stake <= 0.02) return 'Micro Stakes'
+    if (stake <= 0.10) return 'Low Stakes'
+    return 'High Stakes'
+  }
+
+  // Region flag mapping
+  const getRegionFlag = (region) => {
+    const flagMap = {
+      'US East': '🇺🇸',
+      'US-East-1': '🇺🇸', 
+      'US West': '🇺🇸',
+      'Europe (Frankfurt)': '🇩🇪',
+      'Europe (London)': '🇬🇧',
+      'Oceania': '🇦🇺',
+      'OCE (Sydney)': '🇦🇺',
+      'Asia': '🇸🇬'
+    }
+    return flagMap[region] || '🌍'
   }
 
   // Fetch server data
