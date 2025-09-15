@@ -6110,10 +6110,10 @@ export default function TurfLootTactical() {
                   alignItems: 'center'
                 }}>
                   <span>
-                    {loyaltyData.progress?.progress?.gamesProgress?.current || 25}/
+                    {loyaltyData.userStats?.gamesPlayed || 0}/
                     {loyaltyData.progress?.progress?.gamesProgress?.required || 50} games • 
-                    ${loyaltyData.progress?.progress?.wageredProgress?.current?.toFixed(2) || '45.50'}/
-                    ${loyaltyData.progress?.progress?.wageredProgress?.required || '100'} wagered
+                    ${(loyaltyData.userStats?.totalWagered || 0).toFixed(2)}/
+                    ${loyaltyData.progress?.progress?.wageredProgress?.required || 100} wagered
                   </span>
                   <span style={{ fontSize: '10px', opacity: 0.8 }}>
                     → {loyaltyData.progress?.nextTier === 'SILVER' ? '🥈 9%' : '🥇 8%'} fees
