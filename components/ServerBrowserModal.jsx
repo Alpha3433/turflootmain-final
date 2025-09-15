@@ -256,24 +256,27 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           </div>
         </div>
 
-        {/* Filter Tabs */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-          {['All', 'Free', 'Paid'].map(type => (
+        {/* Stake Filter Pills */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+          {['All', 'Practice', 'Micro Stakes', 'Low Stakes', 'High Stakes'].map(stake => (
             <button
-              key={type}
-              onClick={() => setSelectedGameType(type === 'All' ? 'All' : type === 'Free' ? 'Global Multiplayer' : 'Cash Game')}
+              key={stake}
+              onClick={() => setSelectedStakeFilter(stake)}
               style={{
-                backgroundColor: selectedGameType === (type === 'All' ? 'All' : type === 'Free' ? 'Global Multiplayer' : 'Cash Game') ? '#10b981' : '#374151',
+                backgroundColor: selectedStakeFilter === stake ? '#10b981' : '#374151',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '8px 16px',
-                fontSize: '14px',
+                padding: '6px 12px',
+                fontSize: '12px',
                 cursor: 'pointer',
-                fontWeight: selectedGameType === (type === 'All' ? 'All' : type === 'Free' ? 'Global Multiplayer' : 'Cash Game') ? 'bold' : 'normal'
+                fontWeight: selectedStakeFilter === stake ? 'bold' : 'normal'
               }}
             >
-              {type} Servers
+              {stake === 'Practice' ? 'Practice' : 
+               stake === 'Micro Stakes' ? 'Micro ($0.01-$0.02)' :
+               stake === 'Low Stakes' ? 'Low ($0.05-$0.10)' :
+               stake === 'High Stakes' ? 'High ($0.25+)' : 'All Servers'}
             </button>
           ))}
         </div>
