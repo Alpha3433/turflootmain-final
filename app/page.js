@@ -6033,31 +6033,27 @@ export default function TurfLootTactical() {
           </div>
 
           {/* Loyalty Progress Bar - Above PLAY NOW button */}
-          {isAuthenticated && privyUser && (
-            <div style={{ 
-              marginBottom: '16px',
-              border: '2px solid #10b981', // Debug border to make it visible
-              borderRadius: '8px',
-              padding: '4px'
-            }}>
-              <LoyaltyProgressBar 
-                userIdentifier={privyUser.wallet?.address || privyUser.id}
-                variant="compact"
-              />
-            </div>
-          )}
+          <div style={{ 
+            marginBottom: '16px',
+            border: '2px solid #10b981', // Debug border to make it visible
+            borderRadius: '8px',
+            padding: '4px'
+          }}>
+            <LoyaltyProgressBar 
+              userIdentifier="demo-user"
+              variant="compact"
+            />
+          </div>
           
           {/* Debug info for progress bar */}
-          {isAuthenticated && privyUser && (
-            <div style={{
-              marginBottom: '8px',
-              fontSize: '10px',
-              color: '#10b981',
-              textAlign: 'center'
-            }}>
-              Progress Bar: Auth={isAuthenticated?.toString()}, User={!!privyUser}
-            </div>
-          )}
+          <div style={{
+            marginBottom: '8px',
+            fontSize: '10px',
+            color: '#10b981',
+            textAlign: 'center'
+          }}>
+            Progress Bar: Visible (Demo Mode), Auth={isAuthenticated?.toString()}
+          </div>
           
           {/* Main Deploy Button - UPDATED with Paid Rooms Validation */}
           <button 
