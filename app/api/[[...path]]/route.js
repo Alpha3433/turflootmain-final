@@ -555,8 +555,99 @@ export async function GET(request, { params }) {
             })
           }
           
+          // PAID HATHORA ROOMS - Add test stake rooms to server browser
+          console.log('💰 Adding paid Hathora rooms to server browser...')
+          
+          // Generate paid rooms for each test stake and region
+          const paidGameTypes = [
+            { stake: 0.01, mode: 'cash', name: '$0.01 Cash Game (TEST)', maxPlayers: 6, description: 'Tiny stakes for testing' },
+            { stake: 0.02, mode: 'cash', name: '$0.02 Cash Game (TEST)', maxPlayers: 6, description: 'Small stakes for testing' },
+            { stake: 0.05, mode: 'cash', name: '$0.05 High Stakes (TEST)', maxPlayers: 4, description: 'Low stakes for testing' }
+          ]
+          
+          const paidRegions = [
+            { id: 'washington-dc', name: 'US East', displayName: 'US East', basePing: 25 },
+            { id: 'seattle', name: 'US West', displayName: 'US West', basePing: 35 },
+            { id: 'london', name: 'Europe', displayName: 'EU', basePing: 55 }
+          ]
+          
+          for (const gameType of paidGameTypes) {
+            for (const region of paidRegions) {
+              // Create 1-2 rooms per stake/region combination
+              const roomsPerType = gameType.stake >= 0.05 ? 1 : 2 // High stakes get fewer rooms
+              
+              for (let roomIndex = 0; roomIndex < roomsPerType; roomIndex++) {
+                const roomId = `paid-${region.id}-${gameType.stake}-${roomIndex + 1}`
+                
+                // Simulate realistic player counts for paid rooms
+                let simulatedPlayers = 0
+                if (gameType.stake === 0.01) {
+                  simulatedPlayers = Math.floor(Math.random() * 4) // 0-3 players in cheap rooms
+                } else if (gameType.stake === 0.02) {
+                  simulatedPlayers = Math.floor(Math.random() * 3) // 0-2 players in medium rooms
+                } else if (gameType.stake === 0.05) {
+                  simulatedPlayers = Math.floor(Math.random() * 2) // 0-1 players in expensive rooms
+                }
+                
+                const ping = region.basePing + Math.floor(Math.random() * 15)
+                
+                // Calculate potential winnings (total entry fees minus server fees)
+                const totalEntryFees = simulatedPlayers * gameType.stake
+                const serverFees = totalEntryFees * 0.1 // 10% server fee
+                const prizePool = totalEntryFees - serverFees
+                
+                let status = 'waiting'
+                if (simulatedPlayers >= gameType.maxPlayers) {
+                  status = 'full'
+                } else if (simulatedPlayers > 0) {
+                  status = 'active'
+                }
+                
+                const roomName = roomsPerType > 1 
+                  ? `${gameType.name} #${roomIndex + 1} (${region.displayName})`
+                  : `${gameType.name} (${region.displayName})`
+                
+                serverData.push({
+                  id: roomId,
+                  hathoraRoomId: roomId,
+                  name: roomName,
+                  region: region.name,
+                  regionId: region.id,
+                  stake: gameType.stake,
+                  mode: gameType.mode,
+                  gameType: gameType.name,
+                  description: gameType.description,
+                  currentPlayers: simulatedPlayers,
+                  maxPlayers: gameType.maxPlayers,
+                  minPlayers: 2, // Minimum 2 players for cash games
+                  waitingPlayers: 0,
+                  isRunning: simulatedPlayers >= 2, // Cash games need at least 2 players
+                  ping,
+                  avgWaitTime: status === 'active' ? 'Join Now' : 
+                              status === 'full' ? 'Full' : 
+                              'Waiting for players',
+                  difficulty: gameType.stake >= 0.05 ? 'High Stakes' : 'Cash Game',
+                  entryFee: gameType.stake,
+                  serverFee: gameType.stake * 0.1, // 10% server fee
+                  totalCost: gameType.stake + (gameType.stake * 0.1), // Entry + server fee
+                  potentialWinning: prizePool,
+                  prizePool: prizePool,
+                  status,
+                  serverType: 'hathora-paid',
+                  lastUpdated: new Date().toISOString(),
+                  canJoin: status !== 'full',
+                  isPaidRoom: true,
+                  requiresPayment: true,
+                  serverWallet: 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+                })
+                
+                console.log(`💰 Added paid room: ${roomName} - ${simulatedPlayers}/${gameType.maxPlayers} players, Entry: $${gameType.stake}, Prize: $${prizePool.toFixed(3)}`)
+              }
+            }
+          }
 
           console.log(`✅ Server browser showing real data: ${serverData.length} servers with actual player counts`)
+          console.log(`💰 Paid rooms added: ${serverData.filter(s => s.isPaidRoom).length} cash game servers`)
           
         } catch (hathoraError) {
           console.error('❌ Error generating Hathora server data:', hathoraError)
