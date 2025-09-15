@@ -685,15 +685,15 @@ export async function GET(request, { params }) {
           serverData = []
         }
 
-        // Calculate aggregated statistics (using sorted data)
-        const totalPlayers = sortedServerData.reduce((sum, server) => sum + (server.currentPlayers || 0), 0)
-        const totalActiveServers = sortedServerData.filter(server => server.status === 'active').length
-        const practiceServers = sortedServerData.filter(server => server.mode === 'practice').length
-        const cashServers = sortedServerData.filter(server => server.mode === 'cash').length
+        // Calculate aggregated statistics (using server data)
+        const totalPlayers = serverData.reduce((sum, server) => sum + (server.currentPlayers || 0), 0)
+        const totalActiveServers = serverData.filter(server => server.status === 'active').length
+        const practiceServers = serverData.filter(server => server.mode === 'practice').length
+        const cashServers = serverData.filter(server => server.mode === 'cash').length
 
-        // Group regions and game types for UI filters (using sorted data)
-        const availableRegions = [...new Set(sortedServerData.map(s => s.region))]
-        const availableGameTypes = [...new Set(sortedServerData.map(s => s.gameType))]
+        // Group regions and game types for UI filters (using server data)
+        const availableRegions = [...new Set(serverData.map(s => s.region))]
+        const availableGameTypes = [...new Set(serverData.map(s => s.gameType))]
 
         console.log(`📊 Server Browser Stats: ${totalPlayers} players, ${totalActiveServers} active servers, ${practiceServers} practice + ${cashServers} cash games`)
         console.log(`🌍 Available regions: ${availableRegions.join(', ')}`)
