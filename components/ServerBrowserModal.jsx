@@ -295,7 +295,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               <div style={{ marginBottom: '8px' }}>Loading...</div>
               <div style={{ fontSize: '12px' }}>🔄 Loading...</div>
             </div>
-          ) : filteredServers.length === 0 ? (
+          ) : stakeFilteredServers.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
               padding: '40px',
