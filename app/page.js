@@ -21,7 +21,7 @@ export default function TurfLootTactical() {
     return parseFloat(stakeString.replace('$', '')) || 0
   }
   
-  // SMART MATCHMAKING SYSTEM
+  // SMART MATCHMAKING SYSTEM with HATHORA INTEGRATION
   const findOrCreateRoom = async (region, stakeAmount, mode = 'competitive') => {
     try {
       console.log(`🎯 Smart Matchmaking: Finding room for ${region} region, $${stakeAmount} stake`)
@@ -85,24 +85,91 @@ export default function TurfLootTactical() {
       // Step 6: Create new Hathora room if no matching servers exist
       console.log('🆕 No matching servers found, creating new Hathora room...')
       
-      const newRoomId = `${region.toLowerCase()}-${stakeAmount}-${Date.now()}`
-      console.log(`🆕 Creating new room: ${newRoomId}`)
-      
-      // For now, we'll create a placeholder room entry
-      // In a full implementation, this would call Hathora's room creation API
-      return {
-        roomId: newRoomId,
-        serverData: {
-          id: newRoomId,
+      try {
+        // Import and initialize Hathora client
+        const { default: HathoraClientModule } = await import('/lib/hathoraClient.js')
+        const hathoraClient = new HathoraClientModule()
+        
+        const initialized = await hathoraClient.initialize()
+        if (!initialized) {
+          console.log('⚠️ Hathora not available, creating fallback room ID')
+          const fallbackRoomId = `${region.toLowerCase()}-${stakeAmount}-${Date.now()}`
+          return {
+            roomId: fallbackRoomId,
+            serverData: {
+              id: fallbackRoomId,
+              name: `${region} $${stakeAmount} Cash Game`,
+              region: region,
+              stake: stakeAmount,
+              mode: mode,
+              currentPlayers: 0,
+              maxPlayers: stakeAmount >= 0.05 ? 4 : 6,
+              ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65,
+              isHathora: false
+            },
+            action: 'created_fallback'
+          }
+        }
+        
+        console.log('🌍 Creating new Hathora room for paid game...')
+        
+        // Create Hathora room with paid game configuration
+        const hathoraRoomId = await hathoraClient.createOrJoinRoom(
+          user?.id || 'anonymous',
+          'cash-game' // Custom game mode for paid rooms
+        )
+        
+        console.log(`🆕 Created Hathora room: ${hathoraRoomId}`)
+        
+        // Get connection info for the new room
+        const connectionInfo = await hathoraClient.client.getConnectionInfo(hathoraRoomId)
+        
+        const serverData = {
+          id: hathoraRoomId,
+          hathoraRoomId: hathoraRoomId,
           name: `${region} $${stakeAmount} Cash Game`,
-          region: `${region}-1`,
+          region: connectionInfo.region || region,
           stake: stakeAmount,
           mode: mode,
           currentPlayers: 0,
           maxPlayers: stakeAmount >= 0.05 ? 4 : 6, // High stakes = fewer players
-          ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65
-        },
-        action: 'created_new'
+          ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65,
+          host: connectionInfo.host,
+          port: connectionInfo.port,
+          isHathora: true,
+          hathoraProcess: true
+        }
+        
+        console.log('✅ Hathora room created successfully:', serverData)
+        
+        return {
+          roomId: hathoraRoomId,
+          serverData: serverData,
+          action: 'created_hathora'
+        }
+        
+      } catch (hathoraError) {
+        console.error('❌ Failed to create Hathora room:', hathoraError)
+        
+        // Fallback to simple room ID if Hathora fails
+        const fallbackRoomId = `${region.toLowerCase()}-${stakeAmount}-${Date.now()}`
+        console.log(`🔄 Creating fallback room: ${fallbackRoomId}`)
+        
+        return {
+          roomId: fallbackRoomId,
+          serverData: {
+            id: fallbackRoomId,
+            name: `${region} $${stakeAmount} Cash Game (Fallback)`,
+            region: region,
+            stake: stakeAmount,
+            mode: mode,
+            currentPlayers: 0,
+            maxPlayers: stakeAmount >= 0.05 ? 4 : 6,
+            ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65,
+            isHathora: false
+          },
+          action: 'created_fallback'
+        }
       }
       
     } catch (error) {
