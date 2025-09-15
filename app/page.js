@@ -883,9 +883,15 @@ export default function TurfLootTactical() {
     }
   }, [isAuthenticated, privyUser])
   
-  // Update loyalty stats after a game
+  // Update loyalty stats after a PAID game only (not practice games)
   const updateLoyaltyStats = async (gameData) => {
     if (!isAuthenticated || !privyUser) return
+    
+    // Only track paid games for loyalty progression
+    if (!gameData.isPaidGame || gameData.stake <= 0) {
+      console.log('🎯 Skipping loyalty update - practice game or no stake')
+      return
+    }
     
     try {
       const userIdentifier = privyUser.wallet?.address || privyUser.id
@@ -896,15 +902,19 @@ export default function TurfLootTactical() {
         },
         body: JSON.stringify({
           userIdentifier,
-          gameData
+          gameData: {
+            ...gameData,
+            gameType: 'paid',
+            stake: gameData.stake || 0
+          }
         })
       })
       
       if (response.ok) {
         const result = await response.json()
-        console.log('🎯 Loyalty stats updated:', result)
+        console.log('💰 Paid game loyalty stats updated:', result)
         
-        // Update local loyalty data
+        // Update local loyalty data with new stats
         setLoyaltyData(prev => ({
           ...prev,
           userStats: result.userStats,
@@ -919,8 +929,23 @@ export default function TurfLootTactical() {
         }
       }
     } catch (error) {
-      console.error('Error updating loyalty stats:', error)
+      console.error('Error updating paid game loyalty stats:', error)
     }
+  }
+  
+  // Demo function to simulate completing a paid game (for testing)
+  const simulatePaidGameCompletion = async (stakeAmount = 5) => {
+    if (!isAuthenticated || !privyUser) return
+    
+    console.log(`🎮 Simulating paid game completion with $${stakeAmount} stake`)
+    
+    await updateLoyaltyStats({
+      isPaidGame: true,
+      stake: stakeAmount,
+      gameResult: 'completed',
+      duration: Math.floor(Math.random() * 300) + 60, // 1-5 minutes
+      timestamp: Date.now()
+    })
   }
 
   // Cash Out Notifications System
