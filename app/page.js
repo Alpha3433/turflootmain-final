@@ -280,15 +280,27 @@ export default function TurfLootTactical() {
   
   const validatePaidRoom = (actionName = 'join paid room') => {
     // Get currently selected stake amount
-    const requiredAmount = parseStakeAmount(selectedStake)
+    const entryFee = parseStakeAmount(selectedStake)
+    const costs = calculateTotalCost(entryFee)
     const currentBalance = parseFloat(walletBalance.usd) || 0
     
-    if (!checkSufficientFunds(requiredAmount)) {
-      showInsufficientFundsNotification(requiredAmount, currentBalance)
+    console.log(`💰 Validating paid room access for ${actionName}:`)
+    console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
+    console.log(`   Server Fee (10%): $${costs.serverFee.toFixed(3)}`)
+    console.log(`   Total Required: $${costs.totalCost.toFixed(3)}`)
+    console.log(`   Current Balance: $${currentBalance.toFixed(3)}`)
+    
+    if (currentBalance < costs.totalCost) {
+      console.log(`❌ Insufficient funds: Need $${costs.totalCost.toFixed(3)}, have $${currentBalance.toFixed(3)}`)
+      
+      // Enhanced notification showing fee breakdown
+      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room:\n• Entry Fee: $${costs.entryFee.toFixed(3)}\n• Server Fee (10%): +$${costs.serverFee.toFixed(3)}\n• Total Cost: $${costs.totalCost.toFixed(3)}\n\nYour Balance: $${currentBalance.toFixed(3)}\nShortfall: $${(costs.totalCost - currentBalance).toFixed(3)}\n\nPlease deposit more funds to play.`
+      
+      alert(message)
       return false
     }
     
-    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance} >= $${requiredAmount}`)
+    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance.toFixed(3)} >= $${costs.totalCost.toFixed(3)}`)
     return true
   }
   const processFeeTransaction = async (depositAmount, userWalletAddress) => {
