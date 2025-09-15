@@ -5949,21 +5949,42 @@ export default function TurfLootTactical() {
                         console.log(`🎮 Server: ${serverData.name}`)
                         console.log(`👥 Players: ${serverData.currentPlayers}/${serverData.maxPlayers}`)
                         
+                        // DEDUCT ENTRY FEE + 10% SERVER FEE BEFORE JOINING
+                        console.log(`💰 Deducting entry fee + server fee before joining room...`)
+                        
+                        const userWalletAddress = privyUser?.wallet?.address || 'unknown'
+                        const feeResult = await deductRoomFees(stakeAmount, userWalletAddress)
+                        
+                        if (!feeResult.success) {
+                          console.error(`❌ Fee deduction failed: ${feeResult.error}`)
+                          alert(`Failed to join room: ${feeResult.error}\n\nPlease try again or contact support.`)
+                          return
+                        }
+                        
+                        console.log(`✅ Fees deducted successfully!`)
+                        console.log(`💰 Entry Fee: $${feeResult.costs.entryFee.toFixed(3)}`)
+                        console.log(`🏦 Server Fee: $${feeResult.costs.serverFee.toFixed(3)} → ${SERVER_WALLET_ADDRESS}`)
+                        console.log(`💳 Total Deducted: $${feeResult.costs.totalCost.toFixed(3)}`)
+                        console.log(`💵 New Balance: $${feeResult.newBalance.toFixed(3)}`)
+                        
                         // Show matchmaking result to user
                         let message = ''
                         if (action === 'joined_existing') {
-                          message = `🎯 Joining active ${serverData.name} with ${serverData.currentPlayers} players!`
+                          message = `🎯 Joining active ${serverData.name} with ${serverData.currentPlayers} players!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
                         } else if (action === 'joined_empty') {
-                          message = `🎮 Joining ${serverData.name} - waiting for players...`
-                        } else if (action === 'created_new') {
-                          message = `🆕 Created new ${serverData.name} - you're the first player!`
+                          message = `🎮 Joining ${serverData.name} - waiting for players...\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
+                        } else if (action === 'created_hathora') {
+                          message = `🆕 Created new ${serverData.name} - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
+                        } else if (action === 'created_fallback') {
+                          message = `🔄 Created new ${serverData.name} - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
                         }
                         
-                        // Brief notification (optional)
+                        // Brief notification showing payment confirmation
                         console.log(`🎯 ${message}`)
+                        alert(`💰 Payment Confirmed!\n\n${message}`)
                         
                         // Navigate to game with the matched/created room
-                        router.push(`/agario?roomId=${roomId}&mode=competitive&fee=${stakeAmount}&region=${selectedServer}`)
+                        router.push(`/agario?roomId=${roomId}&mode=competitive&fee=${stakeAmount}&region=${selectedServer}&paid=true`)
                         
                       } else {
                         console.log('❌ Smart matchmaking failed - falling back to simple room creation')
