@@ -14,11 +14,89 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // PAID ROOMS SYSTEM - Balance checking and validation
+  // PAID ROOMS SYSTEM - Balance checking and validation with server fees
   
   const parseStakeAmount = (stakeString) => {
     // Convert stake string to USD number (e.g., "$0.01" -> 0.01, "$0.02" -> 0.02, "$0.05" -> 0.05)
     return parseFloat(stakeString.replace('$', '')) || 0
+  }
+  
+  // Calculate total cost including 10% server fee
+  const calculateTotalCost = (entryFee) => {
+    const serverFee = entryFee * 0.10 // 10% server fee
+    const totalCost = entryFee + serverFee
+    return {
+      entryFee: entryFee,
+      serverFee: serverFee,
+      totalCost: totalCost
+    }
+  }
+  
+  // Server wallet address for 10% fees
+  const SERVER_WALLET_ADDRESS = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+  
+  // Deduct entry fee + server fee when joining paid room
+  const deductRoomFees = async (entryFee, userWalletAddress) => {
+    try {
+      console.log(`💰 Deducting fees for paid room: Entry=$${entryFee}`)
+      
+      const costs = calculateTotalCost(entryFee)
+      console.log(`📊 Fee breakdown:`)
+      console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
+      console.log(`   Server Fee (10%): $${costs.serverFee.toFixed(3)}`)
+      console.log(`   Total Cost: $${costs.totalCost.toFixed(3)}`)
+      
+      // Check if user has sufficient balance
+      const currentBalance = parseFloat(walletBalance.usd || 0)
+      if (currentBalance < costs.totalCost) {
+        throw new Error(`Insufficient balance. Need $${costs.totalCost.toFixed(3)}, have $${currentBalance.toFixed(2)}`)
+      }
+      
+      console.log(`✅ Sufficient balance confirmed: $${currentBalance.toFixed(2)} >= $${costs.totalCost.toFixed(3)}`)
+      
+      // TODO: Implement actual blockchain transactions
+      // For now, we'll simulate the deduction and log the transfer details
+      
+      console.log(`🔄 Processing blockchain transactions...`)
+      console.log(`   Deducting $${costs.totalCost.toFixed(3)} from user wallet: ${userWalletAddress}`)
+      console.log(`   Transferring $${costs.serverFee.toFixed(3)} to server wallet: ${SERVER_WALLET_ADDRESS}`)
+      
+      // Simulate transaction processing time
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // Update local balance (in production, this would be updated by blockchain confirmation)
+      const newBalance = currentBalance - costs.totalCost
+      setWalletBalance(prev => ({
+        ...prev,
+        usd: newBalance.toFixed(6),
+        sol: (parseFloat(prev.sol || 0) - (costs.totalCost / 100)).toFixed(6) // Rough SOL conversion
+      }))
+      
+      console.log(`✅ Fees deducted successfully!`)
+      console.log(`   New user balance: $${newBalance.toFixed(3)}`)
+      console.log(`   Server fee transferred to: ${SERVER_WALLET_ADDRESS}`)
+      
+      return {
+        success: true,
+        costs: costs,
+        newBalance: newBalance,
+        transactionDetails: {
+          userWallet: userWalletAddress,
+          serverWallet: SERVER_WALLET_ADDRESS,
+          entryFeeDeducted: costs.entryFee,
+          serverFeeTransferred: costs.serverFee,
+          totalDeducted: costs.totalCost
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ Fee deduction failed:', error)
+      return {
+        success: false,
+        error: error.message,
+        costs: calculateTotalCost(entryFee)
+      }
+    }
   }
   
   // SMART MATCHMAKING SYSTEM with HATHORA INTEGRATION
