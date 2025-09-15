@@ -1040,6 +1040,13 @@ const AgarIOGame = () => {
 
     generateEnemies() {
       this.enemies = []
+      
+      // Skip bot generation for paid/cash games - only real human players
+      if (this.isCashGame) {
+        console.log('💰 Skipping bot generation for cash game - humans only!')
+        return
+      }
+      
       const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
