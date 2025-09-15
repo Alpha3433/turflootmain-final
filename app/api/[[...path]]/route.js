@@ -580,14 +580,37 @@ export async function GET(request, { params }) {
               for (let roomIndex = 0; roomIndex < roomsPerType; roomIndex++) {
                 const roomId = `paid-${region.id}-${gameType.stake}-${roomIndex + 1}`
                 
-                // Simulate realistic player counts for paid rooms
+                // Generate dynamic player counts based on time and room characteristics
+                const timeBasedSeed = Math.floor(Date.now() / 30000) // Changes every 30 seconds
+                const roomSeed = roomId.split('').reduce((a, b) => a + b.charCodeAt(0), 0)
+                const combinedSeed = (timeBasedSeed + roomSeed) % 1000
+                
+                // Use seeded random for more realistic dynamic behavior
+                const seedRandom = (seed) => {
+                  const x = Math.sin(seed) * 10000
+                  return x - Math.floor(x)
+                }
+                
                 let simulatedPlayers = 0
+                const rand1 = seedRandom(combinedSeed)
+                const rand2 = seedRandom(combinedSeed + 1)
+                
                 if (gameType.stake === 0.01) {
-                  simulatedPlayers = Math.floor(Math.random() * 4) // 0-3 players in cheap rooms
+                  // Cheap rooms: higher activity, 0-5 players
+                  simulatedPlayers = Math.floor(rand1 * 6)
                 } else if (gameType.stake === 0.02) {
-                  simulatedPlayers = Math.floor(Math.random() * 3) // 0-2 players in medium rooms
+                  // Medium rooms: moderate activity, 0-4 players  
+                  simulatedPlayers = Math.floor(rand1 * 5)
                 } else if (gameType.stake === 0.05) {
-                  simulatedPlayers = Math.floor(Math.random() * 2) // 0-1 players in expensive rooms
+                  // High stakes: lower activity, 0-3 players
+                  simulatedPlayers = Math.floor(rand1 * 4)
+                }
+                
+                // Add some realistic variation - some rooms are more popular
+                if (rand2 > 0.7) {
+                  simulatedPlayers = Math.min(simulatedPlayers + 1, gameType.maxPlayers)
+                } else if (rand2 < 0.3) {
+                  simulatedPlayers = Math.max(simulatedPlayers - 1, 0)
                 }
                 
                 const ping = region.basePing + Math.floor(Math.random() * 15)
