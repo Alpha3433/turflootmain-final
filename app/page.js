@@ -839,7 +839,10 @@ export default function TurfLootTactical() {
         }
       } catch (error) {
         console.error('Error fetching loyalty data:', error)
-        // Set default Bronze tier data as final fallback
+        // Set dynamic Bronze tier data based on actual user stats or starting values
+        const actualGamesPlayed = 0 // Start with 0 for new users
+        const actualTotalWagered = 0 // Start with 0 for new users
+        
         setLoyaltyData({
           currentTier: 'BRONZE',
           feePercentage: 10,
@@ -854,12 +857,23 @@ export default function TurfLootTactical() {
             currentTier: 'BRONZE',
             nextTier: 'SILVER',
             progress: {
-              gamesProgress: { current: 25, required: 50, percentage: 50 },
-              wageredProgress: { current: 45.50, required: 100, percentage: 45.5 }
+              gamesProgress: { 
+                current: actualGamesPlayed, 
+                required: 50, 
+                percentage: (actualGamesPlayed / 50) * 100 
+              },
+              wageredProgress: { 
+                current: actualTotalWagered, 
+                required: 100, 
+                percentage: (actualTotalWagered / 100) * 100 
+              }
             },
             isMaxTier: false
           },
-          userStats: { gamesPlayed: 25, totalWagered: 45.50 }
+          userStats: { 
+            gamesPlayed: actualGamesPlayed, 
+            totalWagered: actualTotalWagered 
+          }
         })
       }
     }
