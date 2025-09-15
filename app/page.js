@@ -822,19 +822,23 @@ export default function TurfLootTactical() {
           const data = await response.json()
           setLoyaltyData(data)
         } else {
-          // Fallback to demo data when MongoDB is unavailable
-          console.log('🔄 Using demo loyalty data (MongoDB unavailable)')
+          // For authenticated users, show real starting values (not mock data)
+          console.log('🔄 Database unavailable - showing actual account starting state')
+          
+          // Use real account starting values (0 games, $0 wagered for new accounts)
+          const realUserStats = { gamesPlayed: 0, totalWagered: 0 }
+          
           const mockResponse = await fetch('/api/loyalty/demo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               action: 'calculate_tier',
-              userStats: { gamesPlayed: 25, totalWagered: 45.50 }
+              userStats: realUserStats
             })
           })
           if (mockResponse.ok) {
-            const mockData = await mockResponse.json()
-            setLoyaltyData(mockData)
+            const realData = await mockResponse.json()
+            setLoyaltyData(realData)
           }
         }
       } catch (error) {
