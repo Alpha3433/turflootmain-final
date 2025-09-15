@@ -11637,6 +11637,28 @@ export default function TurfLootTactical() {
           </div>
         </div>
       )}
+
+      {/* TEST BUTTON - TEMPORARY */}
+      <button 
+        style={{
+          position: 'fixed',
+          top: '100px',
+          right: '20px',
+          backgroundColor: '#10b981',
+          border: 'none',
+          borderRadius: '8px',
+          color: '#ffffff',
+          fontSize: '14px',
+          fontWeight: '600',
+          padding: '12px 20px',
+          cursor: 'pointer',
+          zIndex: 10000,
+          fontFamily: '"Rajdhani", sans-serif'
+        }}
+        onClick={() => setDesktopWithdrawalModalVisible(true)}
+      >
+        TEST DESKTOP MODAL
+      </button>
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
