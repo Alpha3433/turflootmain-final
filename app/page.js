@@ -5760,23 +5760,67 @@ export default function TurfLootTactical() {
             onClick={async () => {
               console.log('▶ PLAY NOW button clicked!')
               console.log(`💰 Selected stake: ${selectedStake}`)
+              console.log(`🌍 Selected server: ${selectedServer}`)
               
               const authenticated = await requireAuthentication('PLAY NOW')
               if (authenticated) {
-                console.log('🎮 User authenticated, checking funds for paid room...')
+                console.log('🎮 User authenticated, starting smart matchmaking...')
                 
                 // Check if user has sufficient funds for selected stake
                 const stakeAmount = parseStakeAmount(selectedStake)
                 
                 if (stakeAmount === 0) {
-                  // Free play mode
-                  console.log('🎮 Free play mode - no balance check needed')
+                  // Free play mode - use existing global practice room
+                  console.log('🎮 Free play mode - joining global practice room')
                   router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
                 } else {
-                  // Paid room - validate balance
+                  // Paid room - validate balance and use smart matchmaking
                   if (validatePaidRoom(`PLAY NOW with ${selectedStake} stake`)) {
                     console.log(`✅ Sufficient funds confirmed for ${selectedStake} stake`)
-                    router.push(`/agario?roomId=global-paid-${stakeAmount}&mode=competitive&fee=${stakeAmount}`)
+                    console.log(`🎯 Starting smart matchmaking for ${selectedServer} region...`)
+                    
+                    try {
+                      // Use smart matchmaking to find or create room
+                      const matchResult = await findOrCreateRoom(selectedServer, stakeAmount, 'competitive')
+                      
+                      if (matchResult) {
+                        const { roomId, serverData, action } = matchResult
+                        
+                        console.log(`🎯 Matchmaking successful!`)
+                        console.log(`📍 Action: ${action}`)
+                        console.log(`🏠 Room ID: ${roomId}`)
+                        console.log(`🎮 Server: ${serverData.name}`)
+                        console.log(`👥 Players: ${serverData.currentPlayers}/${serverData.maxPlayers}`)
+                        
+                        // Show matchmaking result to user
+                        let message = ''
+                        if (action === 'joined_existing') {
+                          message = `🎯 Joining active ${serverData.name} with ${serverData.currentPlayers} players!`
+                        } else if (action === 'joined_empty') {
+                          message = `🎮 Joining ${serverData.name} - waiting for players...`
+                        } else if (action === 'created_new') {
+                          message = `🆕 Created new ${serverData.name} - you're the first player!`
+                        }
+                        
+                        // Brief notification (optional)
+                        console.log(`🎯 ${message}`)
+                        
+                        // Navigate to game with the matched/created room
+                        router.push(`/agario?roomId=${roomId}&mode=competitive&fee=${stakeAmount}&region=${selectedServer}`)
+                        
+                      } else {
+                        console.log('❌ Smart matchmaking failed - falling back to simple room creation')
+                        // Fallback to simple room creation
+                        router.push(`/agario?roomId=paid-${selectedServer.toLowerCase()}-${stakeAmount}&mode=competitive&fee=${stakeAmount}`)
+                      }
+                      
+                    } catch (matchmakingError) {
+                      console.error('❌ Smart matchmaking error:', matchmakingError)
+                      // Fallback to simple room creation
+                      console.log('🔄 Falling back to simple room creation...')
+                      router.push(`/agario?roomId=paid-${selectedServer.toLowerCase()}-${stakeAmount}&mode=competitive&fee=${stakeAmount}`)
+                    }
+                    
                   } else {
                     console.log(`❌ Insufficient funds for ${selectedStake} stake`)
                     // Notification is already shown by validatePaidRoom function
