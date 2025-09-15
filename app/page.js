@@ -5955,6 +5955,16 @@ export default function TurfLootTactical() {
             ))}
           </div>
 
+          {/* Loyalty Progress Bar - Above PLAY NOW button */}
+          {isAuthenticated && privyUser && (
+            <div style={{ marginBottom: '16px' }}>
+              <LoyaltyProgressBar 
+                userIdentifier={privyUser.wallet?.address || privyUser.id}
+                variant="compact"
+              />
+            </div>
+          )}
+          
           {/* Main Deploy Button - UPDATED with Paid Rooms Validation */}
           <button 
             onClick={async () => {
