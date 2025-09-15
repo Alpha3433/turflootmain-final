@@ -6036,7 +6036,129 @@ export default function TurfLootTactical() {
           </div>
 
           {/* Loyalty Progress Bar - Above PLAY NOW button */}
-          {/* Progress bar removed - real loyalty system will populate this dynamically */}
+          {isAuthenticated && loyaltyData && (
+            <div style={{ 
+              marginBottom: '16px',
+              border: '1px solid #374151',
+              borderRadius: '8px',
+              padding: '12px',
+              backgroundColor: '#1f2937',
+              color: 'white'
+            }}>
+              {!loyaltyData.progress?.isMaxTier ? (
+                <div>
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '8px'
+                  }}>
+                    <span style={{ fontSize: '14px', fontWeight: 'bold' }}>
+                      Progress to {loyaltyData.progress?.nextTier || 'SILVER'}
+                    </span>
+                    <span style={{ 
+                      fontSize: '12px', 
+                      color: loyaltyData.tierInfo?.color || '#10b981'
+                    }}>
+                      {loyaltyData.tierInfo?.icon} → {loyaltyData.progress?.nextTier === 'SILVER' ? '🥈' : '🥇'}
+                    </span>
+                  </div>
+                  
+                  {/* Games Progress */}
+                  <div style={{ marginBottom: '6px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      fontSize: '12px',
+                      color: '#9ca3af',
+                      marginBottom: '2px'
+                    }}>
+                      <span>Games Played</span>
+                      <span>
+                        {loyaltyData.progress?.progress?.gamesProgress?.current || 0}/
+                        {loyaltyData.progress?.progress?.gamesProgress?.required || 50}
+                      </span>
+                    </div>
+                    <div style={{ 
+                      width: '100%', 
+                      height: '6px', 
+                      backgroundColor: '#374151', 
+                      borderRadius: '3px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{ 
+                        width: `${loyaltyData.progress?.progress?.gamesProgress?.percentage || 0}%`,
+                        height: '100%',
+                        backgroundColor: '#3b82f6',
+                        transition: 'width 0.3s ease'
+                      }}></div>
+                    </div>
+                  </div>
+                  
+                  {/* Wagered Progress */}
+                  <div>
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      fontSize: '12px',
+                      color: '#9ca3af',
+                      marginBottom: '2px'
+                    }}>
+                      <span>Total Wagered</span>
+                      <span>
+                        ${loyaltyData.progress?.progress?.wageredProgress?.current?.toFixed(2) || '0.00'}/
+                        ${loyaltyData.progress?.progress?.wageredProgress?.required || '100.00'}
+                      </span>
+                    </div>
+                    <div style={{ 
+                      width: '100%', 
+                      height: '6px', 
+                      backgroundColor: '#374151', 
+                      borderRadius: '3px',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{ 
+                        width: `${loyaltyData.progress?.progress?.wageredProgress?.percentage || 0}%`,
+                        height: '100%',
+                        backgroundColor: '#10b981',
+                        transition: 'width 0.3s ease'
+                      }}></div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center' }}>
+                  <span style={{ 
+                    fontSize: '16px', 
+                    fontWeight: 'bold',
+                    color: '#ffd700'
+                  }}>
+                    🏆 {loyaltyData.tierInfo?.name} Tier - Maximum Rank!
+                  </span>
+                  <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
+                    Enjoying the lowest fees ({loyaltyData.feePercentage}%)
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Fallback progress bar for unauthenticated users */}
+          {!isAuthenticated && (
+            <div style={{ 
+              marginBottom: '16px',
+              border: '1px solid #374151',
+              borderRadius: '8px',
+              padding: '12px',
+              backgroundColor: '#1f2937',
+              color: '#9ca3af',
+              textAlign: 'center'
+            }}>
+              <span style={{ fontSize: '14px' }}>
+                🏆 Login to track your loyalty progress and reduce fees!
+              </span>
+            </div>
+          )}
           
           {/* Main Deploy Button - UPDATED with Paid Rooms Validation */}
           <button 
