@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '@/components/ServerBrowserModal'
+import TierBadge from '@/components/loyalty/TierBadge'
+import LoyaltyProgressBar from '@/components/loyalty/LoyaltyProgressBar'
+import TierUpgradeNotification from '@/components/loyalty/TierUpgradeNotification'
 
 export default function TurfLootTactical() {
   const router = useRouter()
