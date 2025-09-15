@@ -7329,7 +7329,7 @@ export default function TurfLootTactical() {
                     transform: 'rotate(45deg)'
                   }} />
                   <span style={{ 
-                    fontSize: '13px',
+                    fontSize: '11px',
                     fontWeight: '800',
                     color: '#10b981'
                   }}>
@@ -7337,7 +7337,7 @@ export default function TurfLootTactical() {
                   </span>
                 </div>
                 <span style={{ 
-                  fontSize: '16px', 
+                  fontSize: '14px', 
                   fontWeight: '700',
                   color: '#ffd700',
                   textShadow: '0 0 10px rgba(255, 215, 0, 0.5)'
