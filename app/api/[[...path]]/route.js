@@ -695,7 +695,7 @@ export async function GET(request, { params }) {
           practiceServers,
           cashServers,
           regions: availableRegions,
-          gameTypes: availableGameTypes.map(name => ({ name, servers: serverData.filter(s => s.gameType === name).length })),
+          gameTypes: availableGameTypes.map(name => ({ name, servers: sortedServerData.filter(s => s.gameType === name).length })),
           hathoraEnabled: true,
           lastUpdated: new Date().toISOString(),
           timestamp: new Date().toISOString()
