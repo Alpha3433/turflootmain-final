@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/mongodb'
-import loyaltySystem from '@/lib/loyaltySystem'
+import { connectToDatabase } from '../../../lib/mongodb.js'
+import loyaltySystem from '../../../lib/loyaltySystem.js'
 
 // GET /api/loyalty - Get user's loyalty stats and tier info
 export async function GET(request) {
