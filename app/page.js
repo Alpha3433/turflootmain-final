@@ -6033,14 +6033,14 @@ export default function TurfLootTactical() {
           {/* Loyalty Progress Bar - Above PLAY NOW button */}
           <div style={{ 
             marginBottom: '16px',
-            border: '2px solid #10b981', // Debug border to make it visible
+            border: '2px solid #10b981',
             borderRadius: '8px',
-            padding: '4px'
+            padding: '8px',
+            backgroundColor: '#1a202c',
+            textAlign: 'center',
+            color: '#10b981'
           }}>
-            <LoyaltyProgressBar 
-              userIdentifier="demo-user"
-              variant="compact"
-            />
+            🏆 Loyalty Progress: Bronze → Silver (25/50 games, $45.50/$100)
           </div>
           
           {/* Debug info for progress bar */}
@@ -6050,7 +6050,7 @@ export default function TurfLootTactical() {
             color: '#10b981',
             textAlign: 'center'
           }}>
-            Progress Bar: Visible (Demo Mode), Auth={isAuthenticated?.toString()}
+            Demo Mode: Loyalty System Active
           </div>
           
           {/* Main Deploy Button - UPDATED with Paid Rooms Validation */}
