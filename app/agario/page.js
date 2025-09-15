@@ -865,7 +865,7 @@ const AgarIOGame = () => {
         const timeDiff = (newest.timestamp - oldest.timestamp) / 1000 // seconds
         const massGain = newest.mass - oldest.mass
         
-        if (massGain > 100 && timeDiff < 5) { // Gained 100+ mass in under 5 seconds
+        if (massGain > 300 && timeDiff < 3) { // Increased from 100 to 300 mass, reduced time from 5s to 3s - more lenient
           this.recordViolation('IMPOSSIBLE_MASS_GAIN', `Gained ${massGain} mass in ${timeDiff}s`)
         }
       }
