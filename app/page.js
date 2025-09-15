@@ -12082,6 +12082,12 @@ export default function TurfLootTactical() {
         </div>
       )}
       
+      {/* Tier Upgrade Notifications */}
+      <TierUpgradeNotification 
+        notification={tierUpgradeNotification}
+        onClose={() => setTierUpgradeNotification(null)}
+      />
+      
       {/* Debug Info */}
       {isServerBrowserOpen && (
         <div style={{
