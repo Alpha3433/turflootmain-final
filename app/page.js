@@ -6033,12 +6033,29 @@ export default function TurfLootTactical() {
           </div>
 
           {/* Loyalty Progress Bar - Above PLAY NOW button */}
-          {isAuthenticated && privyUser && (
-            <div style={{ marginBottom: '16px' }}>
+          {authenticated && privyUser && (
+            <div style={{ 
+              marginBottom: '16px',
+              border: '2px solid #10b981', // Debug border to make it visible
+              borderRadius: '8px',
+              padding: '4px'
+            }}>
               <LoyaltyProgressBar 
                 userIdentifier={privyUser.wallet?.address || privyUser.id}
                 variant="compact"
               />
+            </div>
+          )}
+          
+          {/* Debug info for progress bar */}
+          {authenticated && privyUser && (
+            <div style={{
+              marginBottom: '8px',
+              fontSize: '10px',
+              color: '#10b981',
+              textAlign: 'center'
+            }}>
+              Progress Bar Debug: Auth={authenticated?.toString()}, User={!!privyUser}
             </div>
           )}
           
