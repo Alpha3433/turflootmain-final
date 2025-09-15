@@ -17,16 +17,43 @@ export default function TurfLootTactical() {
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
   
-  // PAID ROOMS SYSTEM - Balance checking and validation with server fees
+  // LOYALTY SYSTEM STATE
+  const [loyaltyData, setLoyaltyData] = useState(null)
+  const [tierUpgradeNotification, setTierUpgradeNotification] = useState(null)
+  
+  // Fetch loyalty data
+  useEffect(() => {
+    const fetchLoyaltyData = async () => {
+      if (!authenticated || !privyUser) return
+      
+      try {
+        const userIdentifier = privyUser.wallet?.address || privyUser.id
+        const response = await fetch(`/api/loyalty?userIdentifier=${userIdentifier}`)
+        if (response.ok) {
+          const data = await response.json()
+          setLoyaltyData(data)
+        }
+      } catch (error) {
+        console.error('Error fetching loyalty data:', error)
+      }
+    }
+    
+    if (authenticated && privyUser) {
+      fetchLoyaltyData()
+    }
+  }, [authenticated, privyUser])
+  
+  // PAID ROOMS SYSTEM - Balance checking and validation with dynamic server fees
   
   const parseStakeAmount = (stakeString) => {
     // Convert stake string to USD number (e.g., "$0.01" -> 0.01, "$0.02" -> 0.02, "$0.05" -> 0.05)
     return parseFloat(stakeString.replace('$', '')) || 0
   }
   
-  // Calculate total cost including 10% server fee
+  // Calculate total cost including dynamic server fee based on loyalty tier
   const calculateTotalCost = (entryFee) => {
-    const serverFee = entryFee * 0.10 // 10% server fee
+    const feePercentage = loyaltyData?.feePercentage || 10 // Default to 10% if no data
+    const serverFee = entryFee * (feePercentage / 100) // Dynamic server fee
     const totalCost = entryFee + serverFee
     return {
       entryFee: entryFee,
