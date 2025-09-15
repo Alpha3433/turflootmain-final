@@ -586,7 +586,8 @@ export async function GET(request, { params }) {
           const paidRegions = [
             { id: 'washington-dc', name: 'US East', displayName: 'US East', basePing: 25 },
             { id: 'seattle', name: 'US West', displayName: 'US West', basePing: 35 },
-            { id: 'london', name: 'Europe', displayName: 'EU', basePing: 55 },
+            { id: 'frankfurt', name: 'Europe (Frankfurt)', displayName: 'Europe (Frankfurt)', basePing: 45 },
+            { id: 'london', name: 'Europe (London)', displayName: 'Europe (London)', basePing: 55 },
             { id: 'sydney', name: 'Oceania', displayName: 'OCE (Sydney)', basePing: 180 }
           ]
           
