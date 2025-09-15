@@ -120,12 +120,31 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     })
   }
 
-  // Filter servers based on selected region and game type
-  const filteredServers = servers.filter(server => {
-    const regionMatch = selectedRegion === 'All' || server.region === selectedRegion
-    const gameTypeMatch = selectedGameType === 'All' || server.name.includes(selectedGameType.split(' ')[0])
-    return regionMatch && gameTypeMatch
-  })
+  // Group and filter servers
+  const processedServers = servers.map(server => ({
+    ...server,
+    stakeCategory: getStakeCategory(server.entryFee || 0),
+    regionFlag: getRegionFlag(server.region),
+    isActive: server.currentPlayers > 0,
+    isEmpty: server.currentPlayers === 0
+  }))
+
+  // Filter by stake if selected
+  const stakeFilteredServers = selectedStakeFilter === 'All' 
+    ? processedServers 
+    : processedServers.filter(server => server.stakeCategory === selectedStakeFilter)
+
+  // Separate active and empty servers
+  const activeServers = stakeFilteredServers.filter(server => server.isActive)
+  const emptyServers = stakeFilteredServers.filter(server => server.isEmpty)
+
+  // Group servers by stake category
+  const groupedByStake = processedServers.reduce((acc, server) => {
+    const category = server.stakeCategory
+    if (!acc[category]) acc[category] = []
+    acc[category].push(server)
+    return acc
+  }, {})
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
