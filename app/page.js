@@ -5503,10 +5503,16 @@ export default function TurfLootTactical() {
                     (customUsername || userName).toUpperCase()
                   }
                 </span>
-                <TierBadge 
-                  userIdentifier="demo-user" 
-                  size="small" 
-                />
+                <span style={{
+                  backgroundColor: '#CD7F32',
+                  color: 'white',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  marginLeft: '8px'
+                }}>
+                  🥉 Bronze
+                </span>
               </div>
             </span>
           </div>
@@ -9271,10 +9277,16 @@ export default function TurfLootTactical() {
                     (customUsername || userName).toUpperCase()
                   }
                 </span>
-                <TierBadge 
-                  userIdentifier="demo-user" 
-                  size="small" 
-                />
+                <span style={{
+                  backgroundColor: '#CD7F32',
+                  color: 'white',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  marginLeft: '8px'
+                }}>
+                  🥉 Bronze
+                </span>
               </div>
             </span>
           </div>
