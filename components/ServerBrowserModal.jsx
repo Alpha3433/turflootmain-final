@@ -319,7 +319,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               </button>
             </div>
           ) : (
-            filteredServers.map(server => (
+            stakeFilteredServers.map(server => (
               <div
                 key={server.id}
                 style={{
