@@ -513,13 +513,31 @@ export async function GET(request, { params }) {
           
           if (globalGameType && primaryRegion) {
             const roomId = 'global-practice-bots'
-            const realPlayerCount = roomPlayerCounts.get(roomId) || 0
+            let realPlayerCount = roomPlayerCounts.get(roomId) || 0
+            
+            // Add dynamic simulation for practice room if no real players
+            if (realPlayerCount === 0) {
+              const timeBasedSeed = Math.floor(Date.now() / 45000) // Changes every 45 seconds
+              const seedRandom = (seed) => {
+                const x = Math.sin(seed) * 10000
+                return x - Math.floor(x)
+              }
+              
+              // Practice rooms should have higher activity (5-25 players typical)
+              const rand = seedRandom(timeBasedSeed)
+              realPlayerCount = Math.floor(rand * 21) + 5 // 5-25 players
+              
+              // Occasionally have very high activity
+              if (seedRandom(timeBasedSeed + 1) > 0.8) {
+                realPlayerCount = Math.min(realPlayerCount + 10, globalGameType.maxPlayers - 5)
+              }
+            }
             
             // Calculate ping for primary region
             const basePing = 25 // US East base ping
             const ping = basePing + Math.floor(Math.random() * 10) // Small variation
             
-            // Server status based on real player activity
+            // Server status based on player activity
             let status = 'waiting'
             if (realPlayerCount >= globalGameType.maxPlayers) {
               status = 'full'
