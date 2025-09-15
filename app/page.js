@@ -43,6 +43,46 @@ export default function TurfLootTactical() {
     }
   }, [authenticated, privyUser])
   
+  // Update loyalty stats after a game
+  const updateLoyaltyStats = async (gameData) => {
+    if (!authenticated || !privyUser) return
+    
+    try {
+      const userIdentifier = privyUser.wallet?.address || privyUser.id
+      const response = await fetch('/api/loyalty', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userIdentifier,
+          gameData
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('🎯 Loyalty stats updated:', result)
+        
+        // Update local loyalty data
+        setLoyaltyData(prev => ({
+          ...prev,
+          userStats: result.userStats,
+          currentTier: result.newTier,
+          feePercentage: result.feePercentage,
+          progress: result.progress
+        }))
+        
+        // Show tier upgrade notification if applicable
+        if (result.tierUpgrade.isUpgrade) {
+          setTierUpgradeNotification(result)
+        }
+      }
+    } catch (error) {
+      console.error('Error updating loyalty stats:', error)
+    }
+  }
+  
   // PAID ROOMS SYSTEM - Balance checking and validation with dynamic server fees
   
   const parseStakeAmount = (stakeString) => {
