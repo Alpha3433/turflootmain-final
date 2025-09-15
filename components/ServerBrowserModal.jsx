@@ -7,6 +7,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   
   const [servers, setServers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [selectedStakeFilter, setSelectedStakeFilter] = useState('All')
   const [showEmptyServers, setShowEmptyServers] = useState(false)
   const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
