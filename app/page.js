@@ -2019,10 +2019,16 @@ export default function TurfLootTactical() {
       console.log('✅ User authenticated via Privy, opening withdrawal modal')
       console.log('👤 User wallet:', privyUser.wallet?.address || 'No wallet')
       
-      // Open withdrawal modal
-      console.log('🎯 Setting withdrawalModalVisible to true...')
-      setWithdrawalModalVisible(true)
-      console.log('✅ withdrawalModalVisible should now be true')
+      // Open different modals for desktop vs mobile
+      if (window.innerWidth >= 768) {
+        // Desktop: Open new desktop modal
+        console.log('🖥️ Opening desktop withdrawal modal')
+        setDesktopWithdrawalModalVisible(true)
+      } else {
+        // Mobile: Use existing modal
+        console.log('📱 Opening mobile withdrawal modal')
+        setWithdrawalModalVisible(true)
+      }
       
     } catch (error) {
       console.error('❌ Withdraw error:', error)
