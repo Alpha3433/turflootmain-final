@@ -12177,11 +12177,22 @@ export default function TurfLootTactical() {
         </div>
       )}
       
-      {/* Tier Upgrade Notifications */}
-      <TierUpgradeNotification 
-        notification={tierUpgradeNotification}
-        onClose={() => setTierUpgradeNotification(null)}
-      />
+      {/* Tier Upgrade Notifications - Simplified for demo */}
+      {tierUpgradeNotification && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#FFD700',
+          color: '#1a202c',
+          padding: '16px',
+          borderRadius: '8px',
+          fontWeight: 'bold',
+          zIndex: 1000
+        }}>
+          🎉 Tier Upgrade! {tierUpgradeNotification.newTier}
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
