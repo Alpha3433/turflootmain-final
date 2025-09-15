@@ -909,6 +909,60 @@ export default function TurfLootTactical() {
     }
   }
 
+  // Cash Out Notifications System
+  useEffect(() => {
+    const countries = [
+      '🇺🇸 USA', '🇨🇦 Canada', '🇬🇧 UK', '🇩🇪 Germany', '🇫🇷 France', 
+      '🇮🇹 Italy', '🇪🇸 Spain', '🇦🇺 Australia', '🇯🇵 Japan', '🇰🇷 Korea',
+      '🇧🇷 Brazil', '🇲🇽 Mexico', '🇳🇱 Netherlands', '🇸🇪 Sweden', '🇳🇴 Norway',
+      '🇩🇰 Denmark', '🇫🇮 Finland', '🇨🇭 Switzerland', '🇦🇹 Austria', '🇧🇪 Belgium'
+    ]
+    
+    const cashOutAmounts = [1, 5, 10, 20, 25, 50, 75, 100, 150, 200]
+    const playerNames = [
+      'CryptoKing', 'SniperElite', 'NinjaWarrior', 'DiamondHands', 'MoonRocket',
+      'GameMaster', 'PixelHunter', 'StealthMode', 'TechNinja', 'CyberWolf',
+      'QuantumGamer', 'NeonBlade', 'VortexPlayer', 'PhantomStrike', 'CosmicRider'
+    ]
+    
+    const generateNotification = () => {
+      const randomCountry = countries[Math.floor(Math.random() * countries.length)]
+      const randomAmount = cashOutAmounts[Math.floor(Math.random() * cashOutAmounts.length)]
+      const randomPlayer = playerNames[Math.floor(Math.random() * playerNames.length)]
+      
+      const notification = {
+        id: Date.now() + Math.random(),
+        player: randomPlayer,
+        country: randomCountry,
+        amount: randomAmount,
+        timestamp: Date.now()
+      }
+      
+      setCashOutNotifications(prev => {
+        const newNotifications = [notification, ...prev.slice(0, 4)] // Keep max 5 notifications
+        return newNotifications
+      })
+      
+      // Auto-remove notification after 8 seconds
+      setTimeout(() => {
+        setCashOutNotifications(prev => 
+          prev.filter(n => n.id !== notification.id)
+        )
+      }, 8000)
+    }
+    
+    // Generate initial notification
+    generateNotification()
+    
+    // Generate new notifications every 3-7 seconds
+    const interval = setInterval(() => {
+      const randomDelay = 3000 + Math.random() * 4000 // 3-7 seconds
+      setTimeout(generateNotification, Math.random() * 1000) // Small random offset
+    }, 5000)
+    
+    return () => clearInterval(interval)
+  }, [])
+
   // Username persistence functions
   const saveUsernameToPrivy = async (username) => {
     if (!username.trim()) return false
