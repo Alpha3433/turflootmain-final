@@ -281,9 +281,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           ))}
         </div>
 
-        {/* Server List */}
+        {/* Server List - Redesigned */}
         <div style={{ 
-          maxHeight: '300px', 
+          maxHeight: '400px', 
           overflowY: 'auto',
           border: '1px solid #374151',
           borderRadius: '8px',
@@ -298,15 +298,15 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               <div style={{ marginBottom: '8px' }}>Loading...</div>
               <div style={{ fontSize: '12px' }}>🔄 Loading...</div>
             </div>
-          ) : stakeFilteredServers.length === 0 ? (
+          ) : activeServers.length === 0 && emptyServers.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
               padding: '40px',
               color: '#ef4444'
             }}>
               <div style={{ fontSize: '20px', marginBottom: '8px' }}>⚠️</div>
-              <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>Failed to Load Servers</div>
-              <div style={{ fontSize: '12px', marginBottom: '16px' }}>Unable to fetch server list. Please try refreshing</div>
+              <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>No Servers Found</div>
+              <div style={{ fontSize: '12px', marginBottom: '16px' }}>Try adjusting your filters or refresh</div>
               <button
                 onClick={() => fetchServers(true)}
                 style={{
@@ -318,64 +318,148 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                   cursor: 'pointer'
                 }}
               >
-                Retry
+                Refresh
               </button>
             </div>
           ) : (
-            stakeFilteredServers.map(server => (
-              <div
-                key={server.id}
-                style={{
-                  padding: '12px 16px',
-                  borderBottom: '1px solid #374151',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  backgroundColor: server.status === 'full' ? '#4a1e1e' : 'transparent'
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    fontWeight: 'bold', 
-                    marginBottom: '4px',
-                    color: server.status === 'full' ? '#9ca3af' : 'white'
-                  }}>
-                    {server.name}
-                  </div>
-                  <div style={{ 
-                    fontSize: '12px', 
-                    color: '#9ca3af',
-                    display: 'flex',
-                    gap: '12px'
-                  }}>
-                    <span>{server.ping}ms</span>
-                    <span>{server.currentPlayers}/{server.maxPlayers} players</span>
-                    <span>{server.region}</span>
-                    {server.entryFee > 0 && (
-                      <span style={{ color: getStakeColor(server.entryFee) }}>
-                        ${server.entryFee}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleJoinServer(server)}
-                  disabled={server.status === 'full'}
-                  style={{
-                    backgroundColor: server.status === 'full' ? '#4a5568' : '#10b981',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
+            <>
+              {/* Active Servers First */}
+              {activeServers.length > 0 && (
+                <div>
+                  <div style={{
                     padding: '8px 16px',
-                    cursor: server.status === 'full' ? 'not-allowed' : 'pointer',
+                    backgroundColor: '#374151',
                     fontSize: '12px',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  {server.status === 'full' ? 'FULL' : 'JOIN'}
-                </button>
-              </div>
-            ))
+                    fontWeight: 'bold',
+                    color: '#10b981',
+                    borderBottom: '1px solid #4a5568'
+                  }}>
+                    🟢 ACTIVE SERVERS ({activeServers.length})
+                  </div>
+                  {activeServers.map(server => (
+                    <div
+                      key={server.id}
+                      style={{
+                        padding: '10px 16px',
+                        borderBottom: '1px solid #374151',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: server.status === 'full' ? '#4a1e1e' : 'transparent'
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        {/* Condensed One-Line Format */}
+                        <div style={{ 
+                          fontSize: '14px',
+                          color: server.status === 'full' ? '#9ca3af' : 'white',
+                          fontWeight: '500'
+                        }}>
+                          {server.entryFee > 0 
+                            ? `$${server.entryFee.toFixed(2)} Cash Game — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
+                            : `Practice — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
+                          }
+                        </div>
+                        <div style={{ 
+                          fontSize: '11px', 
+                          color: '#9ca3af',
+                          marginTop: '2px'
+                        }}>
+                          {server.ping}ms ping
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleJoinServer(server)}
+                        disabled={server.status === 'full'}
+                        style={{
+                          backgroundColor: server.status === 'full' ? '#4a5568' : '#10b981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '6px 12px',
+                          cursor: server.status === 'full' ? 'not-allowed' : 'pointer',
+                          fontSize: '11px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {server.status === 'full' ? 'FULL' : 'JOIN'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Empty Servers Collapsible */}
+              {emptyServers.length > 0 && (
+                <div>
+                  <button
+                    onClick={() => setShowEmptyServers(!showEmptyServers)}
+                    style={{
+                      width: '100%',
+                      padding: '8px 16px',
+                      backgroundColor: '#374151',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      color: '#9ca3af',
+                      border: 'none',
+                      borderBottom: '1px solid #4a5568',
+                      cursor: 'pointer',
+                      textAlign: 'left'
+                    }}
+                  >
+                    {showEmptyServers ? '🔽' : '▶️'} EMPTY LOBBIES ({emptyServers.length})
+                  </button>
+                  {showEmptyServers && emptyServers.map(server => (
+                    <div
+                      key={server.id}
+                      style={{
+                        padding: '10px 16px',
+                        borderBottom: '1px solid #374151',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: 'rgba(107, 114, 128, 0.1)'
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ 
+                          fontSize: '14px',
+                          color: '#9ca3af',
+                          fontWeight: '500'
+                        }}>
+                          {server.entryFee > 0 
+                            ? `$${server.entryFee.toFixed(2)} Cash Game — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
+                            : `Practice — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
+                          }
+                        </div>
+                        <div style={{ 
+                          fontSize: '11px', 
+                          color: '#6b7280',
+                          marginTop: '2px'
+                        }}>
+                          {server.ping}ms ping
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleJoinServer(server)}
+                        style={{
+                          backgroundColor: '#10b981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          padding: '6px 12px',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        JOIN
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
 
