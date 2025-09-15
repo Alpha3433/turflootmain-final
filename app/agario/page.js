@@ -675,7 +675,7 @@ const AgarIOGame = () => {
       let consoleCallCount = 0
       console.log = (...args) => {
         consoleCallCount++
-        if (consoleCallCount > 100) { // Excessive console usage
+        if (consoleCallCount > 500) { // Increased from 100 to 500 - more lenient for console usage
           this.recordViolation('EXCESSIVE_CONSOLE_USAGE', 'High console.log usage detected')
         }
         return originalConsoleLog.apply(console, args)
