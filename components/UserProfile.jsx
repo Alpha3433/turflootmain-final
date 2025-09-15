@@ -933,6 +933,24 @@ const UserProfile = ({ isOpen, onClose, user, initialTab = 'leaderboard' }) => {
             <div className="pb-4">
               {renderContent()}
             </div>
+            
+            {/* Privacy Policy and Terms & Conditions Buttons - Mobile */}
+            <div className="flex flex-col space-y-3 mt-6 pt-4 border-t border-gray-700/50">
+              <button
+                onClick={() => window.open('https://drive.google.com/file/d/1dE-KZMxTAWtxVP-_Sff_SWqJh-1L_lq0/view?usp=sharing', '_blank')}
+                className="w-full py-3 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-600/50 hover:border-gray-500/50 rounded-lg text-gray-300 hover:text-white text-sm font-medium transition-all flex items-center justify-center space-x-2"
+              >
+                <span>📋</span>
+                <span>Privacy Policy</span>
+              </button>
+              <button
+                onClick={() => window.open('https://drive.google.com/file/d/1l8n6nR2YzwywFQkPaephYUIJAbFghXt-/view?usp=sharing', '_blank')}
+                className="w-full py-3 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-600/50 hover:border-gray-500/50 rounded-lg text-gray-300 hover:text-white text-sm font-medium transition-all flex items-center justify-center space-x-2"
+              >
+                <span>📜</span>
+                <span>Terms & Conditions</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
