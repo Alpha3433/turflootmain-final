@@ -18,9 +18,34 @@ const TierBadge = ({ userIdentifier, size = 'small' }) => {
         if (response.ok) {
           const data = await response.json()
           setTierData(data)
+        } else {
+          // Fallback to demo data when MongoDB is unavailable
+          const mockResponse = await fetch('/api/loyalty/demo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'calculate_tier',
+              userStats: { gamesPlayed: 25, totalWagered: 45.50 }
+            })
+          })
+          if (mockResponse.ok) {
+            const mockData = await mockResponse.json()
+            setTierData(mockData)
+          }
         }
       } catch (error) {
         console.error('Error fetching tier data:', error)
+        // Default Bronze tier fallback
+        setTierData({
+          currentTier: 'BRONZE',
+          feePercentage: 10,
+          tierInfo: {
+            name: 'Bronze',
+            feePercentage: 10,
+            color: '#CD7F32',
+            icon: '🥉'
+          }
+        })
       }
       setLoading(false)
     }
