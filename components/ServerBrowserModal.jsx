@@ -131,7 +131,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
             textTransform: 'uppercase',
             letterSpacing: '1px'
           }}>
-            🎮 SERVER BROWSER
+            🎮 NEW REDESIGNED SERVER BROWSER v4.0
           </h2>
           <button
             onClick={onClose}
