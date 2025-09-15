@@ -75,10 +75,10 @@ export default function TurfLootTactical() {
       }
     }
     
-    if (authenticated && privyUser) {
+    if (isAuthenticated && privyUser) {
       fetchLoyaltyData()
     }
-  }, [authenticated, privyUser])
+  }, [isAuthenticated, privyUser])
   
   // Update loyalty stats after a game
   const updateLoyaltyStats = async (gameData) => {
