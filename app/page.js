@@ -6196,7 +6196,7 @@ export default function TurfLootTactical() {
           </button>
 
           {/* Secondary Buttons */}
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginLeft: '-40px' }}>
             <button 
               style={secondaryButtonStyle}
               onClick={async () => {
