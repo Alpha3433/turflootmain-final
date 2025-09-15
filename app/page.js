@@ -11244,6 +11244,399 @@ export default function TurfLootTactical() {
           </div>
         </div>
       )}
+
+      {/* Desktop Withdrawal Modal */}
+      {desktopWithdrawalModalVisible && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000000000,
+          backdropFilter: 'blur(8px)'
+        }}>
+          <div style={{
+            backgroundColor: '#1a1a1a',
+            border: '2px solid #10b981',
+            borderRadius: '12px',
+            width: '480px',
+            padding: '0',
+            fontFamily: '"Rajdhani", sans-serif',
+            position: 'relative'
+          }}>
+            {/* Header */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '20px 24px',
+              borderBottom: '1px solid rgba(16, 185, 129, 0.2)'
+            }}>
+              <h2 style={{
+                color: '#10b981',
+                fontSize: '24px',
+                fontWeight: '700',
+                margin: '0',
+                textShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
+              }}>
+                Cash Out
+              </h2>
+              <button
+                onClick={() => setDesktopWithdrawalModalVisible(false)}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  color: '#9ca3af',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = 'rgba(156, 163, 175, 0.1)'
+                  e.target.style.color = '#ffffff'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = 'transparent'
+                  e.target.style.color = '#9ca3af'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '24px' }}>
+              {/* Available Balance */}
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{
+                  color: parseFloat(walletBalance.usd || 0) > 0 ? '#10b981' : '#ef4444',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  marginBottom: '8px'
+                }}>
+                  Available Balance
+                </div>
+                <div style={{
+                  color: '#ffffff',
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  marginBottom: '4px'
+                }}>
+                  ${parseFloat(walletBalance.usd || 0).toFixed(2)}
+                </div>
+                <div style={{
+                  color: '#9ca3af',
+                  fontSize: '14px'
+                }}>
+                  {parseFloat(walletBalance.sol || 0).toFixed(6)} SOL
+                </div>
+              </div>
+
+              {/* Amount Input */}
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  borderRadius: '8px',
+                  padding: '0'
+                }}>
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    value={withdrawalAmount}
+                    onChange={(e) => setWithdrawalAmount(e.target.value)}
+                    style={{
+                      flex: '1',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: '#ffffff',
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      padding: '16px 20px',
+                      outline: 'none',
+                      fontFamily: '"Rajdhani", sans-serif'
+                    }}
+                  />
+                  <div style={{
+                    color: '#9ca3af',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    padding: '0 20px'
+                  }}>
+                    USD
+                  </div>
+                </div>
+                
+                {/* Quick Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  marginTop: '12px'
+                }}>
+                  <button
+                    onClick={() => {
+                      const halfAmount = (parseFloat(walletBalance.usd || 0) / 2).toFixed(2)
+                      setWithdrawalAmount(halfAmount)
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      borderRadius: '6px',
+                      color: '#10b981',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      padding: '8px 16px',
+                      cursor: 'pointer',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = 'rgba(16, 185, 129, 0.2)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'rgba(16, 185, 129, 0.1)'
+                    }}
+                  >
+                    ½
+                  </button>
+                  <button
+                    onClick={() => {
+                      setWithdrawalAmount((parseFloat(walletBalance.usd || 0)).toFixed(2))
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      borderRadius: '6px',
+                      color: '#10b981',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      padding: '8px 16px',
+                      cursor: 'pointer',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = 'rgba(16, 185, 129, 0.2)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'rgba(16, 185, 129, 0.1)'
+                    }}
+                  >
+                    MAX
+                  </button>
+                </div>
+
+                {/* Percentage Display */}
+                <div style={{
+                  color: '#9ca3af',
+                  fontSize: '12px',
+                  marginTop: '8px'
+                }}>
+                  {withdrawalAmount && parseFloat(walletBalance.usd || 0) > 0 
+                    ? `${((parseFloat(withdrawalAmount) / parseFloat(walletBalance.usd || 0)) * 100).toFixed(0)}% of available balance`
+                    : '0% of available balance'
+                  }
+                </div>
+              </div>
+
+              {/* Destination Address */}
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  marginBottom: '8px'
+                }}>
+                  Destination Wallet Address
+                </div>
+                <div style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <input
+                    type="text"
+                    placeholder="Enter Solana wallet address..."
+                    value={destinationAddress || ''}
+                    onChange={(e) => setDestinationAddress(e.target.value)}
+                    style={{
+                      width: '100%',
+                      backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      padding: '12px 80px 12px 16px',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      fontFamily: 'monospace'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#10b981'
+                      e.target.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)'
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+                      e.target.style.boxShadow = 'none'
+                    }}
+                  />
+                  <button
+                    onClick={async () => {
+                      try {
+                        const text = await navigator.clipboard.readText();
+                        if (text) {
+                          setDestinationAddress(text);
+                          console.log('✅ Pasted wallet address from clipboard');
+                        }
+                      } catch (err) {
+                        console.log('❌ Failed to read clipboard:', err);
+                        alert('Unable to paste from clipboard. Please manually enter your wallet address.');
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: '8px',
+                      backgroundColor: '#10b981',
+                      border: 'none',
+                      borderRadius: '4px',
+                      color: '#ffffff',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#059669'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#10b981'
+                    }}
+                  >
+                    PASTE
+                  </button>
+                </div>
+              </div>
+
+              {/* Insufficient Balance Warning */}
+              {parseFloat(walletBalance.usd || 0) < 0.21 && (
+                <div style={{
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  marginBottom: '24px'
+                }}>
+                  <div style={{
+                    color: '#ef4444',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}>
+                    Insufficient balance for withdrawal. Minimum $0.21 required.
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: '12px'
+              }}>
+                <button
+                  onClick={() => setDesktopWithdrawalModalVisible(false)}
+                  style={{
+                    flex: '1',
+                    backgroundColor: 'rgba(107, 114, 128, 0.2)',
+                    border: '1px solid rgba(107, 114, 128, 0.3)',
+                    borderRadius: '8px',
+                    color: '#9ca3af',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    padding: '16px',
+                    cursor: 'pointer',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = 'rgba(107, 114, 128, 0.3)'
+                    e.target.style.color = '#ffffff'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = 'rgba(107, 114, 128, 0.2)'
+                    e.target.style.color = '#9ca3af'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) {
+                      alert('Please enter a valid amount to cash out.')
+                      return
+                    }
+                    if (parseFloat(withdrawalAmount) > parseFloat(walletBalance.usd || 0)) {
+                      alert('Amount exceeds available balance.')
+                      return
+                    }
+                    if (!destinationAddress || destinationAddress.trim() === '') {
+                      alert('Please enter a destination wallet address.')
+                      return
+                    }
+                    // TODO: Implement actual cash out functionality
+                    alert(`Cash out of $${withdrawalAmount} to ${destinationAddress} will be implemented here!`)
+                    setDesktopWithdrawalModalVisible(false)
+                  }}
+                  disabled={parseFloat(walletBalance.usd || 0) < 0.21}
+                  style={{
+                    flex: '1',
+                    backgroundColor: parseFloat(walletBalance.usd || 0) >= 0.21 ? '#10b981' : 'rgba(107, 114, 128, 0.3)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    padding: '16px',
+                    cursor: parseFloat(walletBalance.usd || 0) >= 0.21 ? 'pointer' : 'not-allowed',
+                    fontFamily: '"Rajdhani", sans-serif',
+                    opacity: parseFloat(walletBalance.usd || 0) >= 0.21 ? '1' : '0.6',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    if (parseFloat(walletBalance.usd || 0) >= 0.21) {
+                      e.target.style.backgroundColor = '#059669'
+                      e.target.style.transform = 'translateY(-1px)'
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (parseFloat(walletBalance.usd || 0) >= 0.21) {
+                      e.target.style.backgroundColor = '#10b981'
+                      e.target.style.transform = 'translateY(0)'
+                    }
+                  }}
+                >
+                  Cash Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Debug Info */}
       {isServerBrowserOpen && (
