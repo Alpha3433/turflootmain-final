@@ -5642,7 +5642,7 @@ export default function TurfLootTactical() {
 
           {/* Stakes */}
           <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', justifyContent: 'center' }}>
-            {['$1', '$5', '$20'].map((stake) => (
+            {['$0.01', '$0.02', '$0.05'].map((stake) => (
               <button
                 key={stake}
                 onClick={() => setSelectedStake(stake)}
