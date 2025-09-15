@@ -5503,12 +5503,10 @@ export default function TurfLootTactical() {
                     (customUsername || userName).toUpperCase()
                   }
                 </span>
-                {isAuthenticated && privyUser && (
-                  <TierBadge 
-                    userIdentifier={privyUser.wallet?.address || privyUser.id} 
-                    size="small" 
-                  />
-                )}
+                <TierBadge 
+                  userIdentifier="demo-user" 
+                  size="small" 
+                />
               </div>
             </span>
           </div>
@@ -9273,12 +9271,10 @@ export default function TurfLootTactical() {
                     (customUsername || userName).toUpperCase()
                   }
                 </span>
-                {isAuthenticated && privyUser && (
-                  <TierBadge 
-                    userIdentifier={privyUser.wallet?.address || privyUser.id} 
-                    size="small" 
-                  />
-                )}
+                <TierBadge 
+                  userIdentifier="demo-user" 
+                  size="small" 
+                />
               </div>
             </span>
           </div>
