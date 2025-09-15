@@ -7461,6 +7461,73 @@ export default function TurfLootTactical() {
                   justifyContent: 'center',
                   flexWrap: 'wrap'
                 }}>
+                  {/* Privacy Policy and Terms & Conditions Buttons */}
+                  <button
+                    onClick={() => window.open('https://drive.google.com/file/d/1dE-KZMxTAWtxVP-_Sff_SWqJh-1L_lq0/view?usp=sharing', '_blank')}
+                    style={{
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '2px solid #68d391',
+                      borderRadius: '8px',
+                      color: '#68d391',
+                      padding: '12px 20px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      minWidth: '140px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    <span>📋</span>
+                    <span>Privacy Policy</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => window.open('https://drive.google.com/file/d/1l8n6nR2YzwywFQkPaephYUIJAbFghXt-/view?usp=sharing', '_blank')}
+                    style={{
+                      background: 'rgba(104, 211, 145, 0.2)',
+                      border: '2px solid #68d391',
+                      borderRadius: '8px',
+                      color: '#68d391',
+                      padding: '12px 20px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      minWidth: '140px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.3)'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(104, 211, 145, 0.2)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    <span>📜</span>
+                    <span>Terms & Conditions</span>
+                  </button>
+                  
                   {isAuthenticated ? (
                     <button
                       onClick={() => {
