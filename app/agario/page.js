@@ -696,8 +696,8 @@ const AgarIOGame = () => {
           const oldMass = _mass
           _mass = value
           
-          // Validate mass changes
-          if (value > oldMass * 2) { // Suspicious mass jump
+          // Validate mass changes - more lenient thresholds
+          if (value > oldMass * 4) { // Increased from 2x to 4x - allow larger mass jumps
             self.recordViolation('SUSPICIOUS_MASS_CHANGE', `Mass jumped from ${oldMass} to ${value}`)
           }
           if (value < 0) { // Invalid mass
