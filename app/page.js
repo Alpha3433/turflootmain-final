@@ -17,8 +17,98 @@ export default function TurfLootTactical() {
   // PAID ROOMS SYSTEM - Balance checking and validation
   
   const parseStakeAmount = (stakeString) => {
-    // Convert stake string to USD number (e.g., "$1" -> 1, "$5" -> 5, "$20" -> 20)
+    // Convert stake string to USD number (e.g., "$0.01" -> 0.01, "$0.02" -> 0.02, "$0.05" -> 0.05)
     return parseFloat(stakeString.replace('$', '')) || 0
+  }
+  
+  // SMART MATCHMAKING SYSTEM
+  const findOrCreateRoom = async (region, stakeAmount, mode = 'competitive') => {
+    try {
+      console.log(`🎯 Smart Matchmaking: Finding room for ${region} region, $${stakeAmount} stake`)
+      
+      // Step 1: Get available servers from the API
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/servers/lobbies`)
+      const serverData = await response.json()
+      
+      if (!serverData.servers || serverData.servers.length === 0) {
+        console.log('❌ No servers available from API')
+        return null
+      }
+      
+      // Step 2: Filter servers by region and stake
+      const matchingServers = serverData.servers.filter(server => {
+        const serverRegion = server.regionId || server.region || ''
+        const regionMatches = serverRegion.toLowerCase().includes(region.toLowerCase()) || 
+                             (region === 'US' && (serverRegion.includes('washington') || serverRegion.includes('us'))) ||
+                             (region === 'EU' && serverRegion.includes('eu')) ||
+                             (region === 'OCE' && serverRegion.includes('oceania')) ||
+                             (region === 'SEA' && serverRegion.includes('asia'))
+        
+        const stakeMatches = Math.abs(server.stake - stakeAmount) < 0.001 // Handle floating point precision
+        
+        console.log(`🔍 Server ${server.name}: Region=${serverRegion}, Stake=${server.stake}, RegionMatch=${regionMatches}, StakeMatch=${stakeMatches}`)
+        
+        return regionMatches && stakeMatches
+      })
+      
+      console.log(`🎯 Found ${matchingServers.length} matching servers for ${region}/$${stakeAmount}`)
+      
+      // Step 3: Prioritize servers with active players
+      const serversWithPlayers = matchingServers.filter(server => server.currentPlayers > 0)
+      const emptyServers = matchingServers.filter(server => server.currentPlayers === 0)
+      
+      console.log(`👥 Servers with players: ${serversWithPlayers.length}, Empty servers: ${emptyServers.length}`)
+      
+      // Step 4: Join existing game with players (highest priority)
+      if (serversWithPlayers.length > 0) {
+        // Sort by player count (join fuller games first for better experience)
+        const bestServer = serversWithPlayers.sort((a, b) => b.currentPlayers - a.currentPlayers)[0]
+        console.log(`✅ Joining existing game: ${bestServer.name} with ${bestServer.currentPlayers} players`)
+        return {
+          roomId: bestServer.id || bestServer.hathoraRoomId,
+          serverData: bestServer,
+          action: 'joined_existing'
+        }
+      }
+      
+      // Step 5: Join empty server if available
+      if (emptyServers.length > 0) {
+        const emptyServer = emptyServers[0]
+        console.log(`✅ Joining empty server: ${emptyServer.name}`)
+        return {
+          roomId: emptyServer.id || emptyServer.hathoraRoomId,
+          serverData: emptyServer,
+          action: 'joined_empty'
+        }
+      }
+      
+      // Step 6: Create new Hathora room if no matching servers exist
+      console.log('🆕 No matching servers found, creating new Hathora room...')
+      
+      const newRoomId = `${region.toLowerCase()}-${stakeAmount}-${Date.now()}`
+      console.log(`🆕 Creating new room: ${newRoomId}`)
+      
+      // For now, we'll create a placeholder room entry
+      // In a full implementation, this would call Hathora's room creation API
+      return {
+        roomId: newRoomId,
+        serverData: {
+          id: newRoomId,
+          name: `${region} $${stakeAmount} Cash Game`,
+          region: `${region}-1`,
+          stake: stakeAmount,
+          mode: mode,
+          currentPlayers: 0,
+          maxPlayers: stakeAmount >= 0.05 ? 4 : 6, // High stakes = fewer players
+          ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65
+        },
+        action: 'created_new'
+      }
+      
+    } catch (error) {
+      console.error('❌ Smart Matchmaking error:', error)
+      return null
+    }
   }
   
   const checkSufficientFunds = (requiredAmount) => {
