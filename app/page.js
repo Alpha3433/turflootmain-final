@@ -6033,7 +6033,7 @@ export default function TurfLootTactical() {
           </div>
 
           {/* Loyalty Progress Bar - Above PLAY NOW button */}
-          {authenticated && privyUser && (
+          {isAuthenticated && privyUser && (
             <div style={{ 
               marginBottom: '16px',
               border: '2px solid #10b981', // Debug border to make it visible
@@ -6048,14 +6048,14 @@ export default function TurfLootTactical() {
           )}
           
           {/* Debug info for progress bar */}
-          {authenticated && privyUser && (
+          {isAuthenticated && privyUser && (
             <div style={{
               marginBottom: '8px',
               fontSize: '10px',
               color: '#10b981',
               textAlign: 'center'
             }}>
-              Progress Bar Debug: Auth={authenticated?.toString()}, User={!!privyUser}
+              Progress Bar: Auth={isAuthenticated?.toString()}, User={!!privyUser}
             </div>
           )}
           
