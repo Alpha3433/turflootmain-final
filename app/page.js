@@ -843,9 +843,9 @@ export default function TurfLootTactical() {
         }
       } catch (error) {
         console.error('Error fetching loyalty data:', error)
-        // Set dynamic Bronze tier data based on actual user stats or starting values
-        const actualGamesPlayed = 0 // Start with 0 for new users
-        const actualTotalWagered = 0 // Start with 0 for new users
+        // Set realistic starting values for authenticated user account
+        const actualGamesPlayed = 0 // Real account starting point
+        const actualTotalWagered = 0 // Real account starting point
         
         setLoyaltyData({
           currentTier: 'BRONZE',
