@@ -7562,6 +7562,17 @@ export default function TurfLootTactical() {
               boxShadow: 0 0 15px currentColor;
             }
           }
+          
+          @keyframes slideInRight {
+            0% {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            100% {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
         `}</style>
 
         {/* Server Browser Modal */}
