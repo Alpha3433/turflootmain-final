@@ -807,6 +807,105 @@ export default function TurfLootTactical() {
     }
   }, [ready, authenticated, privyUser])
 
+  // Fetch loyalty data with fallback (moved here to fix initialization error)
+  useEffect(() => {
+    const fetchLoyaltyData = async () => {
+      if (!isAuthenticated || !privyUser) return
+      
+      try {
+        const userIdentifier = privyUser.wallet?.address || privyUser.id
+        const response = await fetch(`/api/loyalty?userIdentifier=${userIdentifier}`)
+        if (response.ok) {
+          const data = await response.json()
+          setLoyaltyData(data)
+        } else {
+          // Fallback to demo data when MongoDB is unavailable
+          console.log('🔄 Using demo loyalty data (MongoDB unavailable)')
+          const mockResponse = await fetch('/api/loyalty/demo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'calculate_tier',
+              userStats: { gamesPlayed: 25, totalWagered: 45.50 }
+            })
+          })
+          if (mockResponse.ok) {
+            const mockData = await mockResponse.json()
+            setLoyaltyData(mockData)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching loyalty data:', error)
+        // Set default Bronze tier data as final fallback
+        setLoyaltyData({
+          currentTier: 'BRONZE',
+          feePercentage: 10,
+          tierInfo: {
+            name: 'Bronze',
+            feePercentage: 10,
+            color: '#CD7F32',
+            icon: '🥉',
+            benefits: ['Standard gameplay', '10% server fee']
+          },
+          progress: {
+            currentTier: 'BRONZE',
+            nextTier: 'SILVER',
+            progress: {
+              gamesProgress: { current: 25, required: 50, percentage: 50 },
+              wageredProgress: { current: 45.50, required: 100, percentage: 45.5 }
+            },
+            isMaxTier: false
+          },
+          userStats: { gamesPlayed: 25, totalWagered: 45.50 }
+        })
+      }
+    }
+    
+    if (isAuthenticated && privyUser) {
+      fetchLoyaltyData()
+    }
+  }, [isAuthenticated, privyUser])
+  
+  // Update loyalty stats after a game
+  const updateLoyaltyStats = async (gameData) => {
+    if (!isAuthenticated || !privyUser) return
+    
+    try {
+      const userIdentifier = privyUser.wallet?.address || privyUser.id
+      const response = await fetch('/api/loyalty', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userIdentifier,
+          gameData
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('🎯 Loyalty stats updated:', result)
+        
+        // Update local loyalty data
+        setLoyaltyData(prev => ({
+          ...prev,
+          userStats: result.userStats,
+          currentTier: result.newTier,
+          feePercentage: result.feePercentage,
+          progress: result.progress
+        }))
+        
+        // Show tier upgrade notification if applicable
+        if (result.tierUpgrade.isUpgrade) {
+          setTierUpgradeNotification(result)
+        }
+      }
+    } catch (error) {
+      console.error('Error updating loyalty stats:', error)
+    }
+  }
+
   // Username persistence functions
   const saveUsernameToPrivy = async (username) => {
     if (!username.trim()) return false
