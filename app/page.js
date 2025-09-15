@@ -5602,7 +5602,7 @@ export default function TurfLootTactical() {
                   e.target.style.boxShadow = '0 0 20px rgba(104, 211, 145, 0.4)'
                 }}
               >
-                🔐 LOGIN
+                LOGIN
               </button>
             )}
           </div>
@@ -7900,7 +7900,7 @@ export default function TurfLootTactical() {
                         e.target.style.transform = 'translateY(0)'
                       }}
                     >
-                      🔐 LOGIN
+                      LOGIN
                     </button>
                   )}
                 </div>
@@ -9337,7 +9337,7 @@ export default function TurfLootTactical() {
                   e.target.style.boxShadow = '0 0 10px rgba(104, 211, 145, 0.3)'
                 }}
               >
-                🔐 LOGIN
+                LOGIN
               </button>
             )}
           </div>
