@@ -485,12 +485,12 @@ export async function GET(request, { params }) {
             { id: 'sydney', name: 'Oceania-1', displayName: 'Oceania' }
           ]
           
-          // Game types available on Hathora (without mock counts)
+          // Game types available on Hathora (TEST VALUES - Small entry fees for testing)
           const gameTypes = [
             { stake: 0, mode: 'practice', name: 'Global Multiplayer', maxPlayers: 50, description: 'Free worldwide multiplayer' },
-            { stake: 1, mode: 'cash', name: '$1 Cash Game', maxPlayers: 6, description: 'Low stakes competitive' },
-            { stake: 5, mode: 'cash', name: '$5 Cash Game', maxPlayers: 6, description: 'Medium stakes competitive' },
-            { stake: 20, mode: 'cash', name: '$20 High Stakes', maxPlayers: 4, description: 'High stakes competitive' }
+            { stake: 0.01, mode: 'cash', name: '$0.01 Cash Game (TEST)', maxPlayers: 6, description: 'Tiny stakes for testing' },
+            { stake: 0.02, mode: 'cash', name: '$0.02 Cash Game (TEST)', maxPlayers: 6, description: 'Small stakes for testing' },
+            { stake: 0.05, mode: 'cash', name: '$0.05 High Stakes (TEST)', maxPlayers: 4, description: 'Low stakes for testing' }
           ]
 
           // Create room tracking map for real player counts
