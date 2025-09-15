@@ -3675,11 +3675,11 @@ const AgarIOGame = () => {
           </div>
         </div>
 
-        {/* Player Info Panel - Bottom Right (larger with landing page font) */}
+        {/* Player Info Panel - Bottom Right (compact) */}
         <div style={{
           position: 'fixed',
           bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 8px)' : '10px',
-          left: isMobile ? '50%' : '10px',
+          left: isMobile ? '50%' : 'auto',
           right: isMobile ? 'auto' : '10px',
           transform: isMobile ? 'translateX(-50%)' : 'none',
           zIndex: 1000,
@@ -3691,13 +3691,13 @@ const AgarIOGame = () => {
             ? 'none' 
             : '2px solid #333',
           borderRadius: isMobile ? '6px' : '4px',
-          padding: isMobile ? (statsExpanded ? '4px 6px' : '2px 4px') : '16px 20px',
-          fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '12px',
+          padding: isMobile ? (statsExpanded ? '4px 6px' : '2px 4px') : '12px 14px',
+          fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '11px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: isMobile ? (statsExpanded ? '100px' : '75px') : '200px',
-          maxWidth: isMobile ? 'none' : '250px',
+          minWidth: isMobile ? (statsExpanded ? '100px' : '75px') : '160px',
+          maxWidth: isMobile ? 'none' : '180px',
           transition: 'all 0.2s ease'
         }}>
           {/* Header */}
