@@ -7261,6 +7261,72 @@ export default function TurfLootTactical() {
           </button>
         </div>
 
+        {/* Cash Out Notifications - Bottom Right */}
+        <div style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 30,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          alignItems: 'flex-end'
+        }}>
+          {cashOutNotifications.map((notification, index) => (
+            <div
+              key={notification.id}
+              style={{
+                backgroundColor: 'rgba(16, 185, 129, 0.95)',
+                border: '1px solid #10b981',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: '600',
+                boxShadow: '0 4px 20px rgba(16, 185, 129, 0.3)',
+                backdropFilter: 'blur(10px)',
+                minWidth: '280px',
+                fontFamily: '"Rajdhani", sans-serif',
+                animation: `slideInRight 0.5s ease-out ${index * 0.1}s both`,
+                opacity: 1 - (index * 0.1) // Fade older notifications
+              }}
+            >
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '4px'
+              }}>
+                <span style={{ 
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  💰 <strong>{notification.player}</strong>
+                </span>
+                <span style={{ 
+                  fontSize: '18px', 
+                  fontWeight: '700',
+                  color: '#ecfdf5'
+                }}>
+                  ${notification.amount}
+                </span>
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: 'rgba(255, 255, 255, 0.8)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <span>{notification.country}</span>
+                <span>cashed out</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Enhanced CSS Animations */}
         <style jsx global>{`
           @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
