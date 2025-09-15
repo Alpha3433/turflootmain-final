@@ -3698,18 +3698,21 @@ export default function TurfLootTactical() {
           console.log('🎯 Hathora client initialized, creating room process...')
           
           // Create actual Hathora room process
-          const roomConfig = {
-            gameMode: server.mode || 'practice',
-            maxPlayers: 50,
-            roomName: `${server.name} - Room`,
-            region: server.region || 'Seattle'
+          console.log('🚀 Creating Hathora room for server:', server)
+          
+          let roomId
+          if (server.mode === 'cash' && server.stake > 0) {
+            // For paid servers, use createPaidRoom
+            console.log(`💰 Creating paid Hathora room with $${server.stake} stake`)
+            const paidRoomResult = await hathoraClient.createPaidRoom(server.stake, null, server.region)
+            roomId = paidRoomResult.roomId
+            console.log('✅ Created paid Hathora room:', roomId)
+          } else {
+            // For practice servers, use createOrJoinRoom
+            console.log('🌍 Creating practice Hathora room')
+            roomId = await hathoraClient.createOrJoinRoom(null, 'practice', 0)
+            console.log('✅ Created practice Hathora room:', roomId)
           }
-          
-          console.log('🚀 Creating Hathora room with config:', roomConfig)
-          
-          // Use the client to create an actual room
-          const roomId = await hathoraClient.client.createRoom(roomConfig, server.region || 'Seattle')
-          console.log('✅ Created Hathora room process:', roomId)
           
           // Remove loading popup
           if (loadingPopup && loadingPopup.cleanup) {
