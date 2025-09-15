@@ -650,34 +650,6 @@ export async function GET(request, { params }) {
           console.log(`✅ Server browser showing real data: ${serverData.length} servers with actual player counts`)
           console.log(`💰 Paid rooms added: ${serverData.filter(s => s.isPaidRoom).length} cash game servers`)
           
-          // LATENCY-BASED SORTING
-          console.log('🔄 Sorting servers by latency for optimal user experience...')
-          
-          // Calculate user's estimated location and sort by ping
-          // For now, we'll simulate this by sorting by ping values
-          // In production, this could use IP geolocation or user preference
-          
-          const sortedServerData = serverData.sort((a, b) => {
-            // Primary sort: by ping (latency)
-            if (a.ping !== b.ping) {
-              return a.ping - b.ping
-            }
-            
-            // Secondary sort: by player count (more players = better)
-            if (a.currentPlayers !== b.currentPlayers) {
-              return b.currentPlayers - a.currentPlayers
-            }
-            
-            // Tertiary sort: by status (active > waiting > full)
-            const statusPriority = { 'active': 0, 'waiting': 1, 'full': 2 }
-            return statusPriority[a.status] - statusPriority[b.status]
-          })
-          
-          console.log('📊 Server sorting completed:')
-          sortedServerData.slice(0, 5).forEach((server, index) => {
-            console.log(`   ${index + 1}. ${server.name} - ${server.ping}ms, ${server.currentPlayers}/${server.maxPlayers} players, ${server.status}`)
-          })
-          
           
         } catch (hathoraError) {
           console.error('❌ Error generating Hathora server data:', hathoraError)
