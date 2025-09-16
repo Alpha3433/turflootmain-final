@@ -581,85 +581,123 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                 </div>
               )}
 
-              {/* NEW: Empty Servers Collapsible */}
-              {emptyServers.length > 0 && (
-                <div>
-                  <button
-                    onClick={() => setShowEmptyServers(!showEmptyServers)}
-                    style={{
-                      width: '100%',
+              {/* NEW: Create New Room Options (Collapsed Empty Servers) */}
+              {(() => {
+                // Group empty servers by region and stake for collapsed display
+                const groupedEmptyServers = {}
+                
+                emptyServers.forEach(server => {
+                  const key = `${server.regionId}-${server.entryFee}`
+                  if (!groupedEmptyServers[key]) {
+                    groupedEmptyServers[key] = {
+                      regionId: server.regionId,
+                      region: server.region,
+                      regionFlag: server.regionFlag,
+                      entryFee: server.entryFee,
+                      maxPlayers: server.maxPlayers,
+                      stake: server.stake,
+                      ping: server.ping,
+                      hathoraRegion: server.hathoraRegion,
+                      servers: []
+                    }
+                  }
+                  groupedEmptyServers[key].servers.push(server)
+                })
+
+                const groupedEntries = Object.values(groupedEmptyServers)
+                
+                return groupedEntries.length > 0 && (
+                  <div>
+                    <div style={{
                       padding: '8px 16px',
                       backgroundColor: '#374151',
                       fontSize: '12px',
                       fontWeight: 'bold',
-                      color: '#9ca3af',
-                      border: 'none',
-                      borderBottom: '1px solid #4a5568',
-                      cursor: 'pointer',
-                      textAlign: 'left'
-                    }}
-                  >
-                    {showEmptyServers ? '🔽' : '▶️'} EMPTY LOBBIES ({emptyServers.length})
-                  </button>
-                  {showEmptyServers && emptyServers.map(server => (
-                    <div
-                      key={server.id}
-                      style={{
-                        padding: '10px 16px',
-                        borderBottom: '1px solid #374151',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        backgroundColor: 'rgba(107, 114, 128, 0.1)',
-                        border: 'none' // Remove any practice server highlighting
-                      }}
-                    >
-                      <div style={{ flex: 1 }}>
-                        <div style={{ 
-                          fontSize: '14px',
-                          color: '#9ca3af',
-                          fontWeight: '500'
-                        }}>
-                          {server.entryFee > 0 
-                            ? `$${server.entryFee.toFixed(2)} Cash Game — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
-                            : `Practice — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
-                          }
-                        </div>
-                        <div style={{ 
-                          fontSize: '11px', 
-                          color: '#6b7280',
-                          marginTop: '2px'
-                        }}>
-                          <span style={{ color: getPingColor(server.ping) }}>
-                            {server.ping !== null ? `${server.ping}ms` : (pingingRegions ? '...' : 'N/A')}
-                          </span>
-                          {server.ping !== null && (
-                            <span style={{ color: getPingColor(server.ping), marginLeft: '4px' }}>
-                              ({getPingStatus(server.ping)})
-                            </span>
-                          )}
-                          <span style={{ color: '#6b7280' }}> ping</span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleJoinServer(server)}
+                      color: '#6b7280',
+                      borderBottom: '1px solid #4a5568'
+                    }}>
+                      🆕 CREATE NEW ROOM ({groupedEntries.length} combinations available)
+                    </div>
+                    {groupedEntries
+                      .sort((a, b) => {
+                        // Sort by ping (lowest first), then by stake (lowest first)
+                        if (a.ping !== null && b.ping !== null) {
+                          if (a.ping !== b.ping) return a.ping - b.ping
+                        }
+                        return a.entryFee - b.entryFee
+                      })
+                      .map((group, index) => (
+                      <div
+                        key={`${group.regionId}-${group.entryFee}`}
                         style={{
-                          backgroundColor: '#10b981',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          padding: '6px 12px',
-                          cursor: 'pointer',
-                          fontSize: '11px',
-                          fontWeight: 'bold'
+                          padding: '12px 16px',
+                          borderBottom: index < groupedEntries.length - 1 ? '1px solid #374151' : 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                          borderLeft: '3px solid #10b981'
                         }}
                       >
-                        JOIN
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <div style={{ flex: 1 }}>
+                          <div style={{ 
+                            fontSize: '14px',
+                            color: '#10b981',
+                            fontWeight: '600',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <span>+</span>
+                            <span>Create New Room</span>
+                            <span style={{ color: 'white' }}>
+                              (${group.entryFee.toFixed(2)} – {group.regionFlag} {group.region})
+                            </span>
+                          </div>
+                          <div style={{ 
+                            fontSize: '11px', 
+                            color: '#9ca3af',
+                            marginTop: '4px'
+                          }}>
+                            <span style={{ color: getPingColor(group.ping) }}>
+                              {group.ping !== null ? `${group.ping}ms` : (pingingRegions ? '...' : 'N/A')}
+                            </span>
+                            {group.ping !== null && (
+                              <span style={{ color: getPingColor(group.ping), marginLeft: '4px' }}>
+                                ({getPingStatus(group.ping)})
+                              </span>
+                            )}
+                            <span style={{ color: '#9ca3af' }}> ping</span>
+                            <span style={{ color: '#6b7280', marginLeft: '12px' }}>
+                              Spin up fresh server • Max {group.maxPlayers} players
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            // Use the first server in the group as template for creation
+                            const templateServer = group.servers[0]
+                            handleJoinServer(templateServer)
+                          }}
+                          style={{
+                            backgroundColor: '#10b981',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                          }}
+                        >
+                          CREATE
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
             </>
           )}
         </div>
