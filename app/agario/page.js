@@ -565,7 +565,10 @@ const AgarIOGame = () => {
       this.initAntiCheat()
       
       console.log(`🎯 Game initialized - Cash game: ${this.isCashGame}, Player count: ${this.realPlayerCount}, Zone radius: ${this.currentPlayableRadius}`)
-      console.log(`🛡️ Anti-cheat system: ${this.antiCheat.enabled ? 'ENABLED' : 'DISABLED'}`)
+      console.log(`🛡️ Anti-cheat system: ${this.antiCheat.enabled ? 'ENABLED' : '🚫 DISABLED FOR TESTING'}`)
+      if (!this.antiCheat.enabled) {
+        console.log('🧪 ANTI-CHEAT TEMPORARILY DISABLED - All players can play without restrictions')
+      }
     }
 
     detectCashGame() {
