@@ -611,14 +611,14 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                   </div>
                   {activeRooms.map(room => (
                     <div
-                      key={server.id}
+                      key={room.id}
                       style={{
                         padding: '10px 16px',
                         borderBottom: '1px solid #374151',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        backgroundColor: server.status === 'full' ? '#4a1e1e' : 'transparent',
+                        backgroundColor: room.currentPlayers >= room.maxPlayers ? '#4a1e1e' : 'transparent',
                         border: 'none' // Remove any practice server highlighting
                       }}
                     >
@@ -626,12 +626,12 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                         {/* NEW: Condensed One-Line Format */}
                         <div style={{ 
                           fontSize: '14px',
-                          color: server.status === 'full' ? '#9ca3af' : 'white',
+                          color: room.currentPlayers >= room.maxPlayers ? '#9ca3af' : 'white',
                           fontWeight: '500'
                         }}>
-                          {server.entryFee > 0 
-                            ? `$${server.entryFee.toFixed(2)} Cash Game — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
-                            : `Practice — ${server.regionFlag} ${server.region} | ${server.currentPlayers}/${server.maxPlayers} Players`
+                          {room.entryFee > 0 
+                            ? `$${room.entryFee.toFixed(2)} Cash Game — ${room.regionFlag} ${room.region} | ${room.currentPlayers}/${room.maxPlayers} Players`
+                            : `Practice — ${room.regionFlag} ${room.region} | ${room.currentPlayers}/${room.maxPlayers} Players`
                           }
                         </div>
                         <div style={{ 
@@ -639,32 +639,32 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           color: '#9ca3af',
                           marginTop: '2px'
                         }}>
-                          <span style={{ color: getPingColor(server.ping) }}>
-                            {server.ping !== null ? `${server.ping}ms` : (pingingRegions ? '...' : 'N/A')}
+                          <span style={{ color: getPingColor(room.ping) }}>
+                            {room.ping !== null ? `${room.ping}ms` : (pingingRegions ? '...' : 'N/A')}
                           </span>
-                          {server.ping !== null && (
-                            <span style={{ color: getPingColor(server.ping), marginLeft: '4px' }}>
-                              ({getPingStatus(server.ping)})
+                          {room.ping !== null && (
+                            <span style={{ color: getPingColor(room.ping), marginLeft: '4px' }}>
+                              ({getPingStatus(room.ping)})
                             </span>
                           )}
                           <span style={{ color: '#9ca3af' }}> ping</span>
                         </div>
                       </div>
                       <button
-                        onClick={() => handleJoinServer(server)}
-                        disabled={server.status === 'full'}
+                        onClick={() => handleJoinServer(room)}
+                        disabled={room.currentPlayers >= room.maxPlayers}
                         style={{
-                          backgroundColor: server.status === 'full' ? '#4a5568' : '#10b981',
+                          backgroundColor: room.currentPlayers >= room.maxPlayers ? '#4a5568' : '#10b981',
                           color: 'white',
                           border: 'none',
                           borderRadius: '4px',
                           padding: '6px 12px',
-                          cursor: server.status === 'full' ? 'not-allowed' : 'pointer',
+                          cursor: room.currentPlayers >= room.maxPlayers ? 'not-allowed' : 'pointer',
                           fontSize: '11px',
                           fontWeight: 'bold'
                         }}
                       >
-                        {server.status === 'full' ? 'FULL' : 'JOIN'}
+                        {room.currentPlayers >= room.maxPlayers ? 'FULL' : 'JOIN'}
                       </button>
                     </div>
                   ))}
