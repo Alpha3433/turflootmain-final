@@ -14,12 +14,24 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [pingingRegions, setPingingRegions] = useState(false)
 
-  // Client-side ping measurement function
+  // Client-side ping measurement function with caching
   const measureClientPing = async (endpoint) => {
+    // Check cache first (60 second cache)
+    const cacheKey = `ping_${endpoint}`
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) {
+      const { ping, timestamp } = JSON.parse(cached)
+      const age = Date.now() - timestamp
+      if (age < 60000) { // 60 seconds cache
+        console.log(`📦 Using cached ping for ${endpoint}: ${ping}ms (${Math.round(age/1000)}s old)`)
+        return ping
+      }
+    }
+
     try {
       const startTime = performance.now()
       
-      // Try to ping the Hathora API endpoint with CORS-friendly request
+      // Try to ping the regional endpoint with CORS-friendly request
       const response = await fetch(`https://${endpoint}/health`, {
         method: 'GET',
         mode: 'cors',
@@ -30,7 +42,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       const endTime = performance.now()
       const clientPing = Math.round(endTime - startTime)
       
-      console.log(`📡 Client ping to ${endpoint}: ${clientPing}ms`)
+      // Cache the result
+      localStorage.setItem(cacheKey, JSON.stringify({
+        ping: clientPing,
+        timestamp: Date.now()
+      }))
+      
+      console.log(`📡 Client ping to ${endpoint}: ${clientPing}ms (cached for 60s)`)
       return Math.min(clientPing, 999) // Cap at 999ms for display
     } catch (error) {
       console.warn(`⚠️ Client ping to ${endpoint} failed:`, error.message)
@@ -45,17 +63,40 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
         })
         const endTime = performance.now()
         const fallbackPing = Math.round(endTime - startTime)
-        console.log(`📡 Fallback ping to ${endpoint}: ${fallbackPing}ms`)
+        
+        // Cache fallback result too
+        localStorage.setItem(cacheKey, JSON.stringify({
+          ping: fallbackPing,
+          timestamp: Date.now()
+        }))
+        
+        console.log(`📡 Fallback ping to ${endpoint}: ${fallbackPing}ms (cached for 60s)`)
         return Math.min(fallbackPing, 999)
       } catch (fallbackError) {
         console.warn(`⚠️ Fallback ping also failed for ${endpoint}`)
-        // Return estimated ping based on region
+        // Return estimated ping based on region without caching (since it's not real)
         return endpoint.includes('sydney') ? 180 : 
                endpoint.includes('frankfurt') ? 45 :
                endpoint.includes('london') ? 55 :
                endpoint.includes('seattle') ? 35 : 25
       }
     }
+  }
+
+  // Get ping color based on latency (Green <60ms, Yellow 60-130ms, Red >130ms)
+  const getPingColor = (ping) => {
+    if (ping === null) return '#9ca3af' // Gray for N/A
+    if (ping < 60) return '#10b981' // Green for excellent
+    if (ping <= 130) return '#f59e0b' // Yellow for good
+    return '#ef4444' // Red for poor
+  }
+
+  // Get ping status text
+  const getPingStatus = (ping) => {
+    if (ping === null) return 'N/A'
+    if (ping < 60) return 'Excellent'
+    if (ping <= 130) return 'Good'
+    return 'Poor'
   }
 
   // Measure client-side pings for all servers
