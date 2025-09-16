@@ -238,7 +238,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
         overflowY: 'auto',
         position: 'relative'
       }}>
-        {/* Header */}
+        {/* Header with ping status */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -247,17 +247,31 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           borderBottom: '1px solid #10b981',
           paddingBottom: '16px'
         }}>
-          <h2 style={{
-            color: '#10b981',
-            fontSize: '24px',
-            fontWeight: 'bold',
-            margin: 0,
-            fontFamily: '"Rajdhani", sans-serif',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}>
-            SERVER BROWSER
-          </h2>
+          <div>
+            <h2 style={{
+              color: '#10b981',
+              fontSize: '24px',
+              fontWeight: 'bold',
+              margin: 0,
+              fontFamily: '"Rajdhani", sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              SERVER BROWSER
+              {pingingRegions && (
+                <span style={{ 
+                  fontSize: '12px', 
+                  color: '#10b981',
+                  fontWeight: 'normal'
+                }}>
+                  📡 Measuring your ping...
+                </span>
+              )}
+            </h2>
+          </div>
           <button
             onClick={onClose}
             style={{
