@@ -91,6 +91,13 @@ const AgarIOGame = () => {
     }
   }, [statsExpanded, isMobile])
 
+  // Multiplayer WebSocket state
+  const [isMultiplayer, setIsMultiplayer] = useState(false)
+  const [connectedPlayers, setConnectedPlayers] = useState(0)
+  const [wsConnection, setWsConnection] = useState(null)
+  const wsRef = useRef(null)
+  const playersRef = useRef(new Map()) // Store other players data
+
   const handleStatsToggle = () => {
     if (!isMobile) return // Only for mobile
     
