@@ -396,17 +396,24 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     instantJoinAvailable: emptyRooms.length
   }
 
-  const handleJoinServer = (server) => {
+  const handleJoinServer = (room) => {
+    console.log('🏠 Joining Hathora room:', room)
+    
     const serverData = {
-      id: server.id,
-      region: server.region,
-      regionId: server.regionId, // Pass the specific region ID (e.g., 'london', 'frankfurt')
-      name: server.name,
-      entryFee: server.entryFee,
-      gameType: server.gameType,
-      mode: server.mode
+      id: room.id,
+      region: room.region,
+      regionId: room.regionId, // Pass the specific region ID (e.g., 'london', 'frankfurt')
+      name: room.name,
+      entryFee: room.entryFee,
+      gameType: room.gameType || 'cash-game',
+      mode: room.type === 'instant-join' ? 'hathora-multiplayer' : 'join-existing',
+      maxPlayers: room.maxPlayers,
+      currentPlayers: room.currentPlayers,
+      isActive: room.isActive,
+      canSpectate: room.canSpectate
     }
     
+    console.log('🎮 Processed room data for join:', serverData)
     onJoinLobby(serverData)
   }
 
