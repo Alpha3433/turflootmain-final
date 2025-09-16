@@ -523,12 +523,12 @@ const AgarIOGame = () => {
       this.antiCheat = {
         enabled: this.isCashGame, // Only active for cash games
         violations: 0,
-        maxViolations: 8, // Increased from 3 to 8 strikes - more lenient
+        maxViolations: 20, // Significantly increased from 8 to 20 - very lenient
         banned: false,
         
-        // Movement validation
+        // Movement validation - much more lenient
         lastPosition: { x: this.player.x, y: this.player.y, timestamp: Date.now() },
-        maxSpeed: 12, // Increased from 6 to 12 - allow faster movement
+        maxSpeed: 25, // Significantly increased from 12 to 25 - allow very fast movement
         speedViolations: 0,
         
         // Input monitoring
@@ -536,18 +536,18 @@ const AgarIOGame = () => {
         clickPattern: [],
         keyPresses: [],
         lastInputTime: Date.now(),
-        humanLikeThreshold: 0.4, // Lowered from 0.7 to 0.4 - more lenient
+        humanLikeThreshold: 0.2, // Lowered from 0.4 to 0.2 - much more lenient
         
-        // Behavioral analysis
+        // Behavioral analysis - more lenient
         massGainRate: [],
         eliminationPattern: [],
         survivalTime: Date.now(),
         suspiciousActions: 0,
         
-        // Network monitoring
+        // Network monitoring - more lenient
         actionQueue: [],
         lastActionTime: Date.now(),
-        actionRateLimit: 120, // Increased from 60 to 120 actions per second
+        actionRateLimit: 200, // Increased from 120 to 200 actions per second - much more lenient
         
         // Memory protection
         gameStateHash: '',
