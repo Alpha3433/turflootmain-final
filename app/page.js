@@ -5823,24 +5823,21 @@ export default function TurfLootTactical() {
                         
                         // Show Hathora room creation result to user
                         const message = `🆕 Created new Hathora room - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
-                        } else if (action === 'created_fallback') {
-                          message = `🔄 Created new ${serverData.name} - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
-                        }
                         
                         // Brief notification showing payment confirmation
                         console.log(`🎯 ${message}`)
                         alert(`💰 Payment Confirmed!\n\n${message}`)
                         
-                        // Navigate to game with the matched/created room
+                        // Navigate to game with the Hathora room
                         router.push(`/agario?roomId=${roomId}&mode=competitive&fee=${stakeAmount}&region=${selectedServer}&paid=true`)
                         
                       } else {
-                        console.error('❌ Smart matchmaking failed - Hathora rooms required for multiplayer games')
+                        console.error('❌ Hathora room creation failed')
                         alert('Failed to create multiplayer room. Please try again.')
                       }
                       
-                    } catch (matchmakingError) {
-                      console.error('❌ Smart matchmaking error:', matchmakingError)
+                    } catch (hathoraError) {
+                      console.error('❌ Hathora room creation error:', hathoraError)
                       alert('Failed to create multiplayer room. Please try again.')
                     }
                     
