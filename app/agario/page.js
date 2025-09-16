@@ -839,11 +839,11 @@ const AgarIOGame = () => {
           return
         }
         
-        // Try to create connection
+        // Try to create connection using the actual Hathora room ID
         let connection
         try {
-          connection = hathoraClient.client.newConnection(roomId)
-          console.log('🔗 Successfully called newConnection, result:', connection)
+          connection = hathoraClient.client.newConnection(actualRoomId)
+          console.log('🔗 Successfully called newConnection for room:', actualRoomId, 'result:', connection)
         } catch (error) {
           console.error('❌ Error calling newConnection:', error)
           setWsConnection('error')
