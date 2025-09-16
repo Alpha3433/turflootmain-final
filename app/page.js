@@ -5796,11 +5796,12 @@ export default function TurfLootTactical() {
                         const { roomId } = matchResult
                         const action = 'created_hathora_direct'
                         
-                        console.log(`🎯 Matchmaking successful!`)
+                        console.log(`🎯 Hathora room created successfully!`)
                         console.log(`📍 Action: ${action}`)
                         console.log(`🏠 Room ID: ${roomId}`)
                         console.log(`🎮 Server: ${serverData.name}`)
-                        console.log(`👥 Players: ${serverData.currentPlayers}/${serverData.maxPlayers}`)
+                        console.log(`🌍 Region: ${matchResult.region}`)
+                        console.log(`💰 Entry Fee: $${matchResult.entryFee}`)
                         
                         // DEDUCT ENTRY FEE + 10% SERVER FEE BEFORE JOINING
                         console.log(`💰 Deducting entry fee + server fee before joining room...`)
@@ -5820,14 +5821,8 @@ export default function TurfLootTactical() {
                         console.log(`💳 Total Deducted: $${feeResult.costs.totalCost.toFixed(3)}`)
                         console.log(`💵 New Balance: $${feeResult.newBalance.toFixed(3)}`)
                         
-                        // Show matchmaking result to user
-                        let message = ''
-                        if (action === 'joined_existing') {
-                          message = `🎯 Joining active ${serverData.name} with ${serverData.currentPlayers} players!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
-                        } else if (action === 'joined_empty') {
-                          message = `🎮 Joining ${serverData.name} - waiting for players...\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
-                        } else if (action === 'created_hathora') {
-                          message = `🆕 Created new ${serverData.name} - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
+                        // Show Hathora room creation result to user
+                        const message = `🆕 Created new Hathora room - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
                         } else if (action === 'created_fallback') {
                           message = `🔄 Created new ${serverData.name} - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
                         }
