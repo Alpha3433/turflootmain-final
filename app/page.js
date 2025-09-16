@@ -12573,8 +12573,21 @@ export default function TurfLootTactical() {
               borderTop: '4px solid #10b981',
               borderRadius: '50%',
               margin: '0 auto',
-              animation: 'spin 1s linear infinite'
+              animationName: 'spin',
+              animationDuration: '1s',
+              animationTimingFunction: 'linear',
+              animationIterationCount: 'infinite'
             }}></div>
+            
+            {/* Add CSS animation */}
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `
+            }} />
           </div>
         </div>
       )}
