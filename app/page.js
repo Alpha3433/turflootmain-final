@@ -3555,18 +3555,7 @@ export default function TurfLootTactical() {
   }
 
   const createDesktopJoinPartyPopup = () => {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      background: rgba(13, 17, 23, 0.95) !important;
-      backdrop-filter: blur(10px) !important;
-      z-index: 9999 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    `
+    // Only create popup on desktop
 
     // Create the modal
     const modal = document.createElement('div')
