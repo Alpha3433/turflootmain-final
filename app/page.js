@@ -747,7 +747,7 @@ export default function TurfLootTactical() {
   const fetchServerData = async () => {
     setServerDataLoading(true)
     try {
-      const response = await fetch('/api/servers/lobbies')
+      const response = await fetch('/api/servers')
       if (response.ok) {
         const data = await response.json()
         console.log('📡 Fetched server data:', data)
