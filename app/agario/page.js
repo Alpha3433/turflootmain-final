@@ -852,34 +852,42 @@ const AgarIOGame = () => {
         // Try to create connection using the actual Hathora room ID
         let connection
         try {
-          connection = hathoraClient.client.newConnection(actualRoomId)
-          console.log('🔗 Successfully called newConnection for room:', actualRoomId, 'result:', connection)
+          const connectionPromise = hathoraClient.client.newConnection(actualRoomId)
+          console.log('🔗 newConnection returned:', typeof connectionPromise)
+          
+          // Check if it's a Promise (new SDK behavior)
+          if (connectionPromise && typeof connectionPromise.then === 'function') {
+            console.log('📡 newConnection returned a Promise, awaiting...')
+            connection = await connectionPromise
+            console.log('🔗 Connection resolved from Promise:', connection)
+          } else {
+            console.log('🔗 newConnection returned direct object')
+            connection = connectionPromise
+          }
+          
         } catch (error) {
           console.error('❌ Error calling newConnection:', error)
           setWsConnection('error')
           return
         }
         
-        // DEBUG: Check what newConnection actually returns
-        console.log('🔍 DEBUG: connection object:', connection)
-        console.log('🔍 DEBUG: connection type:', typeof connection)
+        // DEBUG: Check what we actually got
+        console.log('🔍 Final connection object:', connection)
+        console.log('🔍 Connection type:', typeof connection)
         
-        if (connection && typeof connection === 'object') {
-          console.log('🔍 DEBUG: connection methods:', Object.getOwnPropertyNames(connection))
-          console.log('🔍 DEBUG: connection prototype:', Object.getPrototypeOf(connection))
-          console.log('🔍 DEBUG: onClose available?', typeof connection.onClose)
-          console.log('🔍 DEBUG: onMessageJson available?', typeof connection.onMessageJson)
-          console.log('🔍 DEBUG: connect available?', typeof connection.connect)
-          console.log('🔍 DEBUG: writeJson available?', typeof connection.writeJson)
-        } else {
-          console.error('❌ newConnection did not return a valid object:', connection)
+        if (!connection || typeof connection !== 'object') {
+          console.error('❌ Invalid connection object received:', connection)
           setWsConnection('error')
           return
         }
         
-        // Check if connection has the expected methods before using them
+        // Check available methods
+        const methods = Object.getOwnPropertyNames(connection)
+        console.log('🔍 Available connection methods:', methods)
+        
+        // Check if connection has the expected methods
         if (typeof connection.onClose !== 'function') {
-          console.error('❌ connection.onClose is not a function - available methods:', Object.getOwnPropertyNames(connection))
+          console.error('❌ connection.onClose is not a function - available methods:', methods)
           setWsConnection('error')
           return
         }
