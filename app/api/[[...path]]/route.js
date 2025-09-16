@@ -1336,6 +1336,7 @@ export async function GET(request, { params }) {
 
     // Default route for unknown paths
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders })
+    
   } catch (error) {
     console.error('GET handler error:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500, headers: corsHeaders })
