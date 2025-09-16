@@ -599,43 +599,30 @@ export async function GET(request, { params }) {
               for (let roomIndex = 0; roomIndex < roomsPerType; roomIndex++) {
                 const roomId = `paid-${region.id}-${gameType.stake}-${roomIndex + 1}`
                 
-                // Generate dynamic player counts based on time and room characteristics
-                const timeBasedSeed = Math.floor(Date.now() / 30000) // Changes every 30 seconds
-                const roomSeed = roomId.split('').reduce((a, b) => a + b.charCodeAt(0), 0)
-                const combinedSeed = (timeBasedSeed + roomSeed) % 1000
-                
-                // Use seeded random for more realistic dynamic behavior
-                const seedRandom = (seed) => {
-                  const x = Math.sin(seed) * 10000
-                  return x - Math.floor(x)
-                }
-                
-                let simulatedPlayers = 0
-                const rand1 = seedRandom(combinedSeed)
-                const rand2 = seedRandom(combinedSeed + 1)
-                
-                if (gameType.stake === 0.01) {
-                  // Cheap rooms: higher activity, 0-5 players
-                  simulatedPlayers = Math.floor(rand1 * 6)
-                } else if (gameType.stake === 0.02) {
-                  // Medium rooms: moderate activity, 0-4 players  
-                  simulatedPlayers = Math.floor(rand1 * 5)
-                } else if (gameType.stake === 0.05) {
-                  // High stakes: lower activity, 0-3 players
-                  simulatedPlayers = Math.floor(rand1 * 4)
-                }
-                
-                // Add some realistic variation - some rooms are more popular
-                if (rand2 > 0.7) {
-                  simulatedPlayers = Math.min(simulatedPlayers + 1, gameType.maxPlayers)
-                } else if (rand2 < 0.3) {
-                  simulatedPlayers = Math.max(simulatedPlayers - 1, 0)
+                // Get REAL player count from active game sessions in database
+                let realPlayers = 0
+                try {
+                  const db = await getDb()
+                  const gameSessions = db.collection('game_sessions')
+                  
+                  // Count active players in this specific room
+                  const activeSessionsCount = await gameSessions.countDocuments({
+                    roomId: roomId,
+                    status: 'active',
+                    lastActivity: { $gte: new Date(Date.now() - 5 * 60 * 1000) } // Active within last 5 minutes
+                  })
+                  
+                  realPlayers = activeSessionsCount
+                  console.log(`📊 Room ${roomId}: ${realPlayers} real players`)
+                } catch (error) {
+                  console.error('❌ Error fetching real player count:', error)
+                  realPlayers = 0 // Default to 0 if database error
                 }
                 
                 const ping = region.basePing + Math.floor(Math.random() * 15)
                 
-                // Calculate potential winnings (total entry fees minus server fees)
-                const totalEntryFees = simulatedPlayers * gameType.stake
+                // Calculate potential winnings based on REAL player count
+                const totalEntryFees = realPlayers * gameType.stake
                 const serverFees = totalEntryFees * 0.1 // 10% server fee
                 const prizePool = totalEntryFees - serverFees
                 
