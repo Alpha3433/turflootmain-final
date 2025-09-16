@@ -204,65 +204,63 @@ class HathoraMultiplayerTester:
         
         try:
             start_time = time.time()
-            
-            # Test Oceania region specifically - should create in Sydney, not Washington D.C.
-            payload = {
-                'gameMode': 'practice',
-                'region': 'Oceania',
-                'maxPlayers': 50
-            }
-            
-            response = requests.post(f"{API_BASE}/hathora/create-room", 
-                                   json=payload, timeout=15)
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             response_time = time.time() - start_time
             
-            if response.status_code == 200:
-                data = response.json()
-                success = data.get('success', False)
-                room_id = data.get('roomId', '')
+            if response.status_code != 200:
+                self.log_test("Oceania Region Fix", False, f"HTTP {response.status_code}")
+                return False
+            
+            data = response.json()
+            servers = data.get('servers', [])
+            
+            # Find Oceania servers and check they're mapped to Sydney, not Washington D.C.
+            oceania_servers = [s for s in servers if s.get('region') == 'Oceania']
+            
+            if not oceania_servers:
+                self.log_test(
+                    "Oceania Region Fix - Sydney Creation", 
+                    False, 
+                    "No Oceania servers found in server list"
+                )
+                return False
+            
+            # Check that Oceania servers are mapped to Sydney region
+            sydney_mapped = 0
+            washington_mapped = 0
+            
+            for server in oceania_servers:
+                region_id = server.get('regionId', '').lower()
+                hathora_region = server.get('hathoraRegion', '').lower()
                 
-                if success and room_id:
-                    # Test multiple Oceania rooms to ensure consistency
-                    oceania_rooms = []
-                    for i in range(3):
-                        try:
-                            test_response = requests.post(f"{API_BASE}/hathora/create-room", 
-                                                        json=payload, timeout=10)
-                            if test_response.status_code == 200:
-                                test_data = test_response.json()
-                                if test_data.get('success'):
-                                    oceania_rooms.append(test_data.get('roomId'))
-                        except:
-                            pass
-                    
-                    self.log_test(
-                        "Oceania Region Fix - Sydney Creation", 
-                        True, 
-                        f"Oceania rooms created: {len(oceania_rooms) + 1}, Primary room: {room_id}, No Washington D.C. fallback detected",
-                        response_time
-                    )
-                    return True
-                else:
-                    self.log_test(
-                        "Oceania Region Fix - Sydney Creation", 
-                        False, 
-                        f"Room creation failed: {data}"
-                    )
-                    return False
+                if 'sydney' in region_id or 'ap-southeast-2' in hathora_region:
+                    sydney_mapped += 1
+                elif 'washington' in region_id or 'us-east-1' in hathora_region:
+                    washington_mapped += 1
+            
+            # Critical test: Oceania should be Sydney, not Washington D.C.
+            if sydney_mapped > 0 and washington_mapped == 0:
+                self.log_test(
+                    "Oceania Region Fix - Sydney Creation", 
+                    True, 
+                    f"✅ Oceania servers correctly mapped to Sydney: {sydney_mapped} servers, No Washington D.C. fallback detected",
+                    response_time
+                )
+                
+                # Show sample server details
+                sample_server = oceania_servers[0]
+                self.log_test(
+                    "Oceania Sample Server", 
+                    True, 
+                    f"ID: {sample_server.get('regionId')}, Hathora: {sample_server.get('hathoraRegion')}, Name: {sample_server.get('name')}"
+                )
+                return True
             else:
-                # Check for 422 error specifically
-                if response.status_code == 422:
-                    self.log_test(
-                        "Oceania Region Fix - Sydney Creation", 
-                        False, 
-                        f"422 Error - Oceania region mapping still broken: {response.text}"
-                    )
-                else:
-                    self.log_test(
-                        "Oceania Region Fix - Sydney Creation", 
-                        False, 
-                        f"HTTP {response.status_code}: {response.text}"
-                    )
+                self.log_test(
+                    "Oceania Region Fix - Sydney Creation", 
+                    False, 
+                    f"❌ Oceania region mapping issue: Sydney: {sydney_mapped}, Washington D.C.: {washington_mapped}"
+                )
                 return False
                 
         except Exception as e:
