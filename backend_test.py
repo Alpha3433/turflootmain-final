@@ -355,7 +355,7 @@ class WebSocketConnectionTester:
         try:
             # Test multiple endpoints that support WebSocket functionality
             endpoints_to_test = [
-                ("/servers/lobbies", "Server browser for WebSocket room discovery"),
+                ("/servers", "Server browser for WebSocket room discovery"),
                 ("/game-sessions", "Session management for WebSocket connections"),
             ]
             
@@ -364,9 +364,20 @@ class WebSocketConnectionTester:
             for endpoint, description in endpoints_to_test:
                 try:
                     if endpoint == "/game-sessions":
-                        # POST request for session endpoint
+                        # POST request for session endpoint with valid data
                         response = requests.post(f"{API_BASE}{endpoint}", 
-                                               json={"action": "test"},
+                                               json={
+                                                   "action": "join",
+                                                   "session": {
+                                                       "roomId": "test-websocket-infra",
+                                                       "entryFee": 0,
+                                                       "mode": "practice",
+                                                       "region": "US-East-1",
+                                                       "joinedAt": "2025-01-09T12:00:00Z",
+                                                       "lastActivity": "2025-01-09T12:00:00Z",
+                                                       "status": "active"
+                                                   }
+                                               },
                                                timeout=10)
                     else:
                         # GET request for other endpoints
@@ -378,7 +389,7 @@ class WebSocketConnectionTester:
                 except Exception:
                     pass  # Endpoint not working
             
-            if working_endpoints >= len(endpoints_to_test) - 1:  # Allow 1 endpoint to fail
+            if working_endpoints >= len(endpoints_to_test):  # Both endpoints should work
                 self.log_test("WebSocket Infrastructure Readiness", True, 
                             f"Backend infrastructure ready: {working_endpoints}/{len(endpoints_to_test)} endpoints working")
                 return True
