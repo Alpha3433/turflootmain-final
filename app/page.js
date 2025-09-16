@@ -1990,6 +1990,8 @@ export default function TurfLootTactical() {
       
       console.log('🎉 Hathora multiplayer initialization complete!')
       console.log('📊 Room details:', hathoraResult)
+      console.log('🔍 DEBUG: hathoraResult.roomId type:', typeof hathoraResult.roomId)
+      console.log('🔍 DEBUG: hathoraResult.roomId value:', hathoraResult.roomId)
       
       // Final success status
       updateStatus('✅ Connected to multiplayer server!')
@@ -1997,9 +1999,14 @@ export default function TurfLootTactical() {
       updateProgress(100)
       updateTimer('🚀 Loading multiplayer game...')
       
+      // Ensure roomId is a string and not null/undefined
+      const roomIdStr = String(hathoraResult.roomId)
+      console.log('🔍 DEBUG: roomIdStr after String():', roomIdStr)
+      console.log('🔍 DEBUG: roomIdStr type:', typeof roomIdStr)
+      
       // Build navigation URL with all Hathora parameters
       const queryParams = new URLSearchParams({
-        roomId: hathoraResult.roomId,
+        roomId: roomIdStr,
         mode: 'hathora-multiplayer',
         multiplayer: 'hathora',
         server: 'hathora',
@@ -2007,11 +2014,12 @@ export default function TurfLootTactical() {
         fee: hathoraResult.entryFee.toString(),
         name: serverData.name || 'Hathora Multiplayer',
         paid: hathoraResult.entryFee > 0 ? 'true' : 'false',
-        hathoraRoom: hathoraResult.roomId, // ✅ FIXED: Use actual room ID instead of 'true'
+        hathoraRoom: roomIdStr, // ✅ FIXED: Use actual room ID instead of 'true'
         realHathoraRoom: 'true',
         maxPlayers: hathoraResult.maxPlayers.toString()
       })
       
+      console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
       console.log('🚀 Navigating to Hathora multiplayer game:', `/agario?${queryParams.toString()}`)
       
       // Ensure minimum display time for user confidence
