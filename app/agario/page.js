@@ -797,9 +797,20 @@ const AgarIOGame = () => {
         const multiplayer = urlParams.get('multiplayer')
         const server = urlParams.get('server')
 
+        console.log('🔍 DEBUG: Raw URL search params:', window.location.search)
+        console.log('🔍 DEBUG: All URL parameters:', Object.fromEntries(urlParams))
+        console.log('🔍 DEBUG: roomId value:', roomId, '(type:', typeof roomId, ')')
+        console.log('🔍 DEBUG: hathoraRoom value:', hathoraRoom, '(type:', typeof hathoraRoom, ')')
+        console.log('🔍 DEBUG: realHathoraRoom value:', realHathoraRoom, '(type:', typeof realHathoraRoom, ')')
+
         // Only connect to Hathora WebSocket for multiplayer rooms
         if (!roomId || mode === 'local' || mode === 'practice' || server !== 'hathora') {
           console.log('🚫 Not a Hathora multiplayer room - skipping WebSocket connection')
+          console.log('🔍 DEBUG: Skip reasons:')
+          console.log('  - !roomId:', !roomId)
+          console.log('  - mode === "local":', mode === 'local')
+          console.log('  - mode === "practice":', mode === 'practice')
+          console.log('  - server !== "hathora":', server !== 'hathora')
           return
         }
 
@@ -812,6 +823,15 @@ const AgarIOGame = () => {
           actualRoomId,
           isRealHathoraRoom: realHathoraRoom
         })
+        console.log('🔍 DEBUG: actualRoomId value:', actualRoomId, '(type:', typeof actualRoomId, ')')
+        
+        // Validate the room ID format
+        if (actualRoomId === 'true' || actualRoomId === 'false' || actualRoomId === 'undefined' || actualRoomId === 'null') {
+          console.error('❌ CRITICAL: actualRoomId is invalid:', actualRoomId)
+          console.error('🔍 This is the source of the WebSocket connection failure!')
+          setWsConnection('error')
+          return
+        }
         setIsMultiplayer(true)
         setConnectedPlayers(1) // At least the current player
 
