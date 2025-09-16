@@ -2084,15 +2084,6 @@ export default function TurfLootTactical() {
       
       alert('Failed to create Hathora room. Please try again.')
     }
-      console.error('❌ Error message:', error.message)
-      console.error('❌ Error stack:', error.stack)
-      console.error('❌ Server data:', serverData)
-      console.error('❌ Full error object:', error)
-      
-      // More specific error messages
-      if (error.message.includes('balance') || error.message.includes('funds')) {
-        alert(`Insufficient funds: ${error.message}`)
-      } else if (error.message.includes('Hathora') || error.message.includes('room')) {
         alert(`Server connection failed: ${error.message}`)
       } else if (error.message.includes('network') || error.message.includes('fetch')) {
         alert(`Network error: Please check your connection and try again.`)
