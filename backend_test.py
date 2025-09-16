@@ -13,10 +13,19 @@ from typing import Dict, List, Any
 
 class ServerBrowserTester:
     def __init__(self):
+        # Get base URL from environment
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://mp-game-enhance.preview.emergentagent.com')
+        self.api_base = f"{self.base_url}/api"
+        
+        # Test results tracking
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
-        self.failed_tests = 0
+        
+        print(f"🎮 REDESIGNED SERVER BROWSER TESTING SUITE")
+        print(f"📡 Backend URL: {self.api_base}")
+        print(f"🎯 Focus: Collapsed Empty Servers Design")
+        print("=" * 80)
         
     def log_test(self, test_name, passed, details="", error_msg=""):
         """Log test result"""
