@@ -585,19 +585,13 @@ const AgarIOGame = () => {
         console.log('🔗 Creating Hathora connection for room:', roomId)
         const connection = hathoraClient.client.newConnection(roomId)
         
-        // Set up connection event handlers
-        connection.onClose((error) => {
+        // Set up connection event handlers with correct method names
+        connection.onClose(() => {
           console.log('🔌 Hathora connection closed')
-          if (error) {
-            console.error('❌ Connection closed with error:', error)
-            setWsConnection('error')
-          } else {
-            console.log('✅ Connection closed cleanly')
-            setWsConnection('disconnected')
-          }
+          setWsConnection('disconnected')
           
-          // Attempt to reconnect if game is still active and error occurred
-          if (gameStarted && error) {
+          // Attempt to reconnect if game is still active
+          if (gameStarted) {
             console.log('🔄 Attempting to reconnect in 3 seconds...')
             setTimeout(() => {
               if (gameStarted) {
@@ -607,33 +601,45 @@ const AgarIOGame = () => {
           }
         })
 
-        connection.onMessageJson((json) => {
-          console.log('📨 Received Hathora message:', json)
+        connection.onError((error) => {
+          console.error('❌ Hathora connection error:', error)
+          setWsConnection('error')
+        })
+
+        connection.onMessage((message) => {
+          console.log('📨 Received Hathora message:', message)
           
-          switch (json.type) {
-            case 'player_joined':
-              console.log('👤 Player joined:', json.playerId)
-              setConnectedPlayers(prev => prev + 1)
-              break
-              
-            case 'player_left':
-              console.log('👋 Player left:', json.playerId)
-              setConnectedPlayers(prev => Math.max(1, prev - 1))
-              break
-              
-            case 'game_state':
-              // Handle real-time game state updates
-              console.log('🎮 Game state update received')
-              if (json.players) {
-                playersRef.current.clear()
-                json.players.forEach(player => {
-                  playersRef.current.set(player.id, player)
-                })
-              }
-              break
-              
-            default:
-              console.log('📦 Unknown message type:', json.type)
+          try {
+            // Handle both JSON and string messages
+            const data = typeof message === 'string' ? JSON.parse(message) : message
+            
+            switch (data.type) {
+              case 'player_joined':
+                console.log('👤 Player joined:', data.playerId)
+                setConnectedPlayers(prev => prev + 1)
+                break
+                
+              case 'player_left':
+                console.log('👋 Player left:', data.playerId)
+                setConnectedPlayers(prev => Math.max(1, prev - 1))
+                break
+                
+              case 'game_state':
+                // Handle real-time game state updates
+                console.log('🎮 Game state update received')
+                if (data.players) {
+                  playersRef.current.clear()
+                  data.players.forEach(player => {
+                    playersRef.current.set(player.id, player)
+                  })
+                }
+                break
+                
+              default:
+                console.log('📦 Unknown message type:', data.type)
+            }
+          } catch (parseError) {
+            console.error('❌ Error parsing Hathora message:', parseError)
           }
         })
 
@@ -658,7 +664,7 @@ const AgarIOGame = () => {
           }
         }
         
-        connection.writeJson(joinMessage)
+        connection.send(JSON.stringify(joinMessage))
         console.log('📤 Sent player join event')
 
       } catch (error) {
