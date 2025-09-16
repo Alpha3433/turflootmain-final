@@ -173,7 +173,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
             textTransform: 'uppercase',
             letterSpacing: '1px'
           }}>
-            🎮 SERVER BROWSER
+            SERVER BROWSER
           </h2>
           <button
             onClick={onClose}
