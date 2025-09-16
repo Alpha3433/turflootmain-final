@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Hathora Multiplayer Fixes
-Testing the critical Hathora multiplayer fixes that were just implemented:
+Backend Testing Suite for Hathora WebSocket Connection Fixes
+Testing the updated WebSocket connection format and authentication fixes
 
-1. Region Mapping Fix Testing - Test canonical region codes (SEATTLE, SYDNEY, FRANKFURT, etc.)
-2. WebSocket URL Construction Fix Testing - Test proper authentication and room path format
-3. Oceania Region Fix Testing - Test Sydney region creation instead of Washington D.C.
-4. Multiplayer Connection Testing - Test complete flow of joining Hathora multiplayer room
+Review Request Testing:
+1. Direct Connection Format Testing - WebSocket URLs use wss://host:port?token=${authToken}&roomId=${roomId}
+2. WebSocket URL Construction Verification - No /ws path in URL construction  
+3. Authentication Parameter Testing - Tokens and room IDs as query parameters
+4. Connection Success Testing - Resolving Error 1006 WebSocket connection failures
 
 Files modified:
-- /app/lib/hathoraClient.js - Fixed region mapping and WebSocket URL construction
-- /app/app/agario/page.js - Fixed WebSocket URL construction with authentication
+- /app/app/agario/page.js - Updated WebSocket URL construction for direct connection
+- /app/lib/hathoraClient.js - Updated both WebSocket connection methods to use direct connection
 """
 
 import requests
 import json
 import time
 import os
-from datetime import datetime
+import sys
+from urllib.parse import urlparse, parse_qs
 
-# Configuration
+# Test configuration
 BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://netbattle-fix.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
-class HathoraMultiplayerTester:
+class WebSocketConnectionTester:
     def __init__(self):
         self.test_results = []
         self.total_tests = 0
