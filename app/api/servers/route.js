@@ -145,6 +145,7 @@ export async function GET(request) {
             isRunning: realPlayers >= 2,
             ping: ping, // Will be measured by client
             pingEndpoint: region.pingEndpoint, // Endpoint for client-side ping measurement
+            hathoraRegion: region.hathoraRegion, // Hathora region for WebSocket ping attempts
             avgWaitTime: status === 'active' ? 'Join Now' : 
                         status === 'full' ? 'Full' : 
                         'Waiting for players',
