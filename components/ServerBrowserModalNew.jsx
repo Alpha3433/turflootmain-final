@@ -555,17 +555,17 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           borderRadius: '8px',
           backgroundColor: '#2d3748'
         }}>
-          {isLoading ? (
+          {roomsLoading ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
-              🔄 Loading servers...
+              🔍 Discovering Hathora rooms...
             </div>
-          ) : errorMessage ? (
+          ) : error ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#ef4444' }}>
               <div style={{ fontSize: '24px', marginBottom: '16px' }}>⚠️</div>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Failed to Load Servers</div>
-              <div style={{ fontSize: '12px', color: '#9ca3af' }}>{errorMessage}</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Failed to Discover Rooms</div>
+              <div style={{ fontSize: '12px', color: '#9ca3af' }}>{error}</div>
               <button
-                onClick={() => fetchServers(true)}
+                onClick={() => fetchRealHathoraRooms()}
                 style={{
                   marginTop: '16px',
                   backgroundColor: '#10b981',
@@ -580,9 +580,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                 🔄 Retry
               </button>
             </div>
-          ) : servers.length === 0 ? (
+          ) : realHathoraRooms.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
-              📭 No servers available
+              🏠 No Hathora rooms available
             </div>
           ) : (
             <>
