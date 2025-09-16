@@ -19,8 +19,8 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     setErrorMessage('') // Clear previous errors
     
     try {
-      console.log('🌐 Fetching servers from /api/servers/lobbies...')
-      const response = await fetch('/api/servers/lobbies', {
+      console.log('🌐 Fetching servers from /api/servers...')
+      const response = await fetch('/api/servers', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
