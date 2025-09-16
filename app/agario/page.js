@@ -2179,7 +2179,11 @@ const AgarIOGame = () => {
       
       // Create gradient for depth effect
       const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, virus.radius + 20)
-      gradient.addColorStop(0, `hsl(120, 100%, ${50 + virus.colorShift}%)`)
+      
+      // Safeguard: Ensure colorShift is a valid number
+      const safeColorShift = isNaN(virus.colorShift) ? 0 : virus.colorShift
+      
+      gradient.addColorStop(0, `hsl(120, 100%, ${50 + safeColorShift}%)`)
       gradient.addColorStop(0.6, '#00FF41')
       gradient.addColorStop(1, '#00AA00')
       
