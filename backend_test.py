@@ -25,30 +25,30 @@ class BackendTester:
         self.total_tests = 0
         self.passed_tests = 0
         self.failed_tests = 0
-
-    def log_test(self, test_name, success, details="", error_msg=""):
-        """Log test results"""
+        
+    def log_test(self, test_name, passed, details="", error_msg=""):
+        """Log test result"""
         self.total_tests += 1
-        if success:
+        if passed:
             self.passed_tests += 1
             status = "✅ PASSED"
         else:
+            self.failed_tests += 1
             status = "❌ FAILED"
-        
+            
         result = {
             'test': test_name,
-            'success': success,
+            'status': status,
             'details': details,
             'error': error_msg,
             'timestamp': datetime.now().isoformat()
         }
         self.test_results.append(result)
-        
         print(f"{status}: {test_name}")
         if details:
-            print(f"   📋 Details: {details}")
+            print(f"   Details: {details}")
         if error_msg:
-            print(f"   ❌ Error: {error_msg}")
+            print(f"   Error: {error_msg}")
         print()
 
     def test_api_health_check(self):
