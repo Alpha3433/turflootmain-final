@@ -2007,7 +2007,8 @@ export default function TurfLootTactical() {
         fee: hathoraResult.entryFee.toString(),
         name: serverData.name || 'Hathora Multiplayer',
         paid: hathoraResult.entryFee > 0 ? 'true' : 'false',
-        hathoraRoom: 'true',
+        hathoraRoom: hathoraResult.roomId, // ✅ FIXED: Use actual room ID instead of 'true'
+        realHathoraRoom: 'true',
         maxPlayers: hathoraResult.maxPlayers.toString()
       })
       
