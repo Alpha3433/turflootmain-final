@@ -3062,7 +3062,7 @@ const AgarIOGame = () => {
                 height: '8px',
                 borderRadius: '50%',
                 backgroundColor: wsConnection === 'connected' ? '#00ff00' : wsConnection === 'connecting' ? '#ffff00' : '#ff0000',
-                animation: wsConnection === 'connecting' ? 'pulse 1s infinite' : 'none'
+                animation: wsConnection === 'connecting' ? 'pulse 1s infinite alternate' : 'none'
               }}></span>
               <span>
                 {wsConnection === 'connected' && `🌐 MULTIPLAYER (${connectedPlayers} players)`}
