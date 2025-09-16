@@ -591,6 +591,8 @@ export async function GET(request, { params }) {
             { id: 'sydney', name: 'Oceania', displayName: 'OCE (Sydney)', basePing: 180 }
           ]
           
+          console.log(`🎯 Creating servers for ${paidGameTypes.length} game types across ${paidRegions.length} regions`)
+          
           for (const gameType of paidGameTypes) {
             for (const region of paidRegions) {
               // Create 1-2 rooms per stake/region combination
