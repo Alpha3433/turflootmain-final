@@ -632,7 +632,137 @@ class TurfLootBackendTester:
             )
             return False
 
-    def run_all_tests(self):
+    def test_server_browser_modal_specific_apis(self):
+        """Test 6: Server Browser Modal Specific APIs - Test APIs specifically used by the modal"""
+        print("🎮 TEST 6: SERVER BROWSER MODAL SPECIFIC APIS")
+        print("=" * 50)
+        
+        # Test 6.1: Game Session Join API (called when joining server from modal)
+        try:
+            session_data = {
+                'roomId': 'server-browser-test-room-123',
+                'playerId': 'test-player-server-browser',
+                'playerName': 'ServerBrowserTestPlayer'
+            }
+            
+            start_time = time.time()
+            response = requests.post(f"{API_BASE}/game-sessions/join", json=session_data, timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success', False):
+                    self.log_result(
+                        "Game Session Join API",
+                        True,
+                        f"Session join successful: {data.get('message', 'No message')}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Game Session Join API",
+                        False,
+                        f"Session join failed: {data.get('message', 'Unknown error')}"
+                    )
+            else:
+                self.log_result(
+                    "Game Session Join API",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "Game Session Join API",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 6.2: Game Session Leave API (called when leaving server)
+        try:
+            leave_data = {
+                'roomId': 'server-browser-test-room-123',
+                'playerId': 'test-player-server-browser'
+            }
+            
+            start_time = time.time()
+            response = requests.post(f"{API_BASE}/game-sessions/leave", json=leave_data, timeout=10)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success', False):
+                    self.log_result(
+                        "Game Session Leave API",
+                        True,
+                        f"Session leave successful: {data.get('message', 'No message')}",
+                        response_time
+                    )
+                else:
+                    self.log_result(
+                        "Game Session Leave API",
+                        False,
+                        f"Session leave failed: {data.get('message', 'Unknown error')}"
+                    )
+            else:
+                self.log_result(
+                    "Game Session Leave API",
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:100]}"
+                )
+        except Exception as e:
+            self.log_result(
+                "Game Session Leave API",
+                False,
+                f"Error: {str(e)}"
+            )
+
+        # Test 6.3: Hathora Room Creation API (used for creating new rooms from server browser)
+        try:
+            hathora_data = {
+                'gameMode': 'practice',
+                'region': 'US-East-1',
+                'maxPlayers': 50
+            }
+            
+            start_time = time.time()
+            response = requests.post(f"{API_BASE}/hathora/create-room", json=hathora_data, timeout=15)
+            response_time = time.time() - start_time
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success', False) and data.get('roomId'):
+                    self.log_result(
+                        "Hathora Room Creation API",
+                        True,
+                        f"Room creation successful: Room ID = {data.get('roomId')}",
+                        response_time
+                    )
+                    return True
+                else:
+                    self.log_result(
+                        "Hathora Room Creation API",
+                        False,
+                        f"Room creation failed: {data.get('message', 'Unknown error')}"
+                    )
+                    return False
+            else:
+                # Hathora might not be available in test environment
+                error_text = response.text[:200]
+                is_config_issue = 'initialize' in error_text.lower() or 'hathora' in error_text.lower()
+                
+                self.log_result(
+                    "Hathora Room Creation API",
+                    False,
+                    f"HTTP {response.status_code}: {error_text} ({'Config issue' if is_config_issue else 'System error'})"
+                )
+                return False
+        except Exception as e:
+            self.log_result(
+                "Hathora Room Creation API",
+                False,
+                f"Error: {str(e)}"
+            )
+            return False
         """Run all backend tests"""
         print("🚀 TURFLOOT BACKEND TESTING SUITE")
         print("Testing backend functionality after withdrawal modal & authentication fixes")
