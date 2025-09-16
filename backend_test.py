@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Hathora SDK Fixes
-Testing Agent: Verifying Hathora client initialization, region mapping, and room creation fixes
+Backend Testing Suite for Server Browser and Wallet API Fixes
+Testing the recent fixes for:
+1. Server Browser API Fix (/api/servers)
+2. Wallet API Endpoints (/api/wallet/balance, /api/wallet/transactions)
+3. API Endpoint Consistency (no 404 errors)
+4. Helius Integration (wallet balance with updated API key)
+5. Server Browser Data Structure (Sydney/Oceania regions)
 """
 
 import requests
@@ -10,7 +15,11 @@ import time
 import os
 from datetime import datetime
 
-class HathoraSDKTester:
+# Get base URL from environment
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://mp-game-enhance.preview.emergentagent.com')
+API_BASE = f"{BASE_URL}/api"
+
+class BackendTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://mp-game-enhance.preview.emergentagent.com')
