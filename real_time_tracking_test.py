@@ -22,7 +22,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://turfloot-dev.preview.emergentagent.com"
+BASE_URL = "https://military-agario.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Test configuration
