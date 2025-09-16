@@ -21,17 +21,10 @@ API_BASE = f"{BASE_URL}/api"
 
 class BackendTester:
     def __init__(self):
-        # Get base URL from environment
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://mp-game-enhance.preview.emergentagent.com')
-        self.api_base = f"{self.base_url}/api"
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
-        
-        print(f"🧪 HATHORA SDK FIXES COMPREHENSIVE TESTING")
-        print(f"🌐 Base URL: {self.base_url}")
-        print(f"🔗 API Base: {self.api_base}")
-        print("=" * 80)
+        self.failed_tests = 0
 
     def log_test(self, test_name, success, details="", error_msg=""):
         """Log test results"""
