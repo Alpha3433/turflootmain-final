@@ -14,6 +14,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [pingingRegions, setPingingRegions] = useState(false)
 
+  // Add debugging mount effect
+  useEffect(() => {
+    console.log('🔧 ServerBrowserModalNew component mounted!')
+    console.log('🔧 handleJoinServer function:', typeof handleJoinServer)
+    console.log('🔧 onJoinLobby prop:', typeof onJoinLobby)
+  }, [])
+
   // Client-side ping measurement function with realistic latency estimation
   const measureClientPing = async (endpoint, hathoraRegion = null) => {
     // Check cache first (60 second cache)
