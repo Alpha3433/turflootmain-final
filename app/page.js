@@ -174,34 +174,8 @@ export default function TurfLootTactical() {
       
       const initialized = await hathoraClient.initialize()
       if (!initialized) {
-        console.log('⚠️ Hathora not available, using fallback')
-        // If there are existing servers, join the best one as fallback
-        if (serversWithPlayers.length > 0) {
-          const bestServer = serversWithPlayers.sort((a, b) => b.currentPlayers - a.currentPlayers)[0]
-          console.log(`✅ Fallback: Joining existing game: ${bestServer.name}`)
-          return {
-            roomId: bestServer.id || bestServer.hathoraRoomId,
-            serverData: bestServer,
-            action: 'joined_existing_fallback'
-          }
-        }
-        
-        const fallbackRoomId = `${region.toLowerCase()}-${stakeAmount}-${Date.now()}`
-        return {
-          roomId: fallbackRoomId,
-          serverData: {
-            id: fallbackRoomId,
-            name: `${region} $${stakeAmount} Cash Game`,
-            region: region,
-            stake: stakeAmount,
-            mode: mode,
-            currentPlayers: 0,
-            maxPlayers: stakeAmount >= 0.05 ? 4 : 6,
-            ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65,
-            isHathora: false
-          },
-          action: 'created_fallback'
-        }
+        console.error('❌ Hathora initialization failed - Server browser requires Hathora')
+        throw new Error('Hathora is required for server browser multiplayer games. Please try again.')
       }
       
       console.log('🌍 Creating new Hathora room for server browser join...')
