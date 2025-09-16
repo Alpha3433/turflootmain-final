@@ -399,7 +399,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           color: '#9ca3af',
                           marginTop: '2px'
                         }}>
-                          {server.ping}ms ping
+                          {server.ping !== null ? `${server.ping}ms ping` : (pingingRegions ? '... ping' : 'N/A ping')}
                         </div>
                       </div>
                       <button
