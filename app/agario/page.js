@@ -179,31 +179,156 @@ const AgarIOGame = () => {
     
   }, [])
   
-  const initializeAuthoritativeGame = (roomId, mode, urlParams) => {
+  const initializeAuthoritativeGame = async (roomId, mode, urlParams) => {
     console.log('🚀 Initializing 100% authoritative Hathora game...')
     
     const fee = parseFloat(urlParams.get('fee')) || 0
     const region = urlParams.get('region') || 'unknown'
     const maxPlayers = parseInt(urlParams.get('maxPlayers')) || 8
     const gameName = urlParams.get('name') || 'Hathora Multiplayer'
+    const regionId = urlParams.get('regionId') || 'us-east-1'
     
     console.log('📊 Authoritative game configuration:', {
       roomId,
       fee,
       region,
+      regionId,
       maxPlayers,
       gameName,
       isAuthoritative: true,
       serverSide: 'Hathora Cloud'
     })
     
-    // Track player session in real-time
-    trackPlayerSession(roomId, fee, mode, region)
+    // 🔥 CRITICAL FIX: Create actual Hathora room process
+    console.log('🏠 Creating actual Hathora room process...')
+    
+    try {
+      // Import and initialize Hathora client for room creation
+      const { default: hathoraClient } = await import('/lib/hathoraClient.js')
+      
+      const isInitialized = await hathoraClient.initialize()
+      if (!isInitialized) {
+        throw new Error('Failed to initialize Hathora client for room creation')
+      }
+      
+      console.log('✅ Hathora client initialized for room creation')
+      
+      // Determine game mode based on entry fee
+      const gameMode = fee > 0 ? 'cash-game' : 'practice'
+      
+      // Create actual Hathora room process
+      console.log(`🚀 Creating ${gameMode} room with $${fee} entry fee...`)
+      const actualRoomId = await hathoraClient.createOrJoinRoom(null, gameMode, fee)
+      
+      if (!actualRoomId) {
+        throw new Error('Failed to create Hathora room - no room ID returned')
+      }
+      
+      console.log(`✅ REAL HATHORA ROOM CREATED: ${actualRoomId}`)
+      console.log(`💰 Room type: ${gameMode}, Entry fee: $${fee}`)
+      console.log(`🌐 Region: ${region} (${regionId})`)
+      
+      // Update URL parameters with the real Hathora room ID
+      const currentUrl = new URL(window.location.href)
+      currentUrl.searchParams.set('hathoraRoom', actualRoomId)
+      currentUrl.searchParams.set('realHathoraRoom', 'true')
+      
+      // Update browser history without triggering a reload
+      window.history.replaceState({}, '', currentUrl.toString())
+      
+      console.log('🔄 Updated URL with real Hathora room ID')
+      
+      // Track the real Hathora room session
+      trackRealHathoraSession(actualRoomId, fee, mode, region, gameMode)
+      
+    } catch (error) {
+      console.error('❌ Failed to create Hathora room process:', error)
+      console.log('🔄 Falling back to session tracking only...')
+      
+      // Fallback to old session tracking if Hathora creation fails
+      trackPlayerSession(roomId, fee, mode, region)
+    }
     
     // Set up authoritative game state (server owns truth)
     console.log('🎮 Setting up client-side prediction with server reconciliation')
     console.log('⚡ Authoritative server will handle all game logic')
     console.log('📡 Client will send inputs, receive state updates')
+  }
+
+  // New function to track real Hathora room sessions
+  const trackRealHathoraSession = async (realRoomId, fee, mode, region, gameMode) => {
+    try {
+      console.log('📊 Tracking real Hathora room session:', {
+        realRoomId,
+        fee,
+        mode,
+        region,
+        gameMode
+      })
+      
+      const sessionData = {
+        action: 'join',
+        roomId: realRoomId,
+        fee: fee,
+        mode: gameMode,
+        region: region,
+        isRealHathoraRoom: true,
+        hathoraRoomProcess: true,
+        timestamp: new Date().toISOString()
+      }
+      
+      const response = await fetch('/api/game-sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sessionData)
+      })
+      
+      if (response.ok) {
+        console.log('✅ Real Hathora room session tracked successfully')
+      } else {
+        console.warn('⚠️ Failed to track real Hathora room session:', response.status)
+      }
+      
+    } catch (error) {
+      console.error('❌ Error tracking real Hathora room session:', error)
+    }
+  }
+
+  // Define trackPlayerSession function (was being called but not defined)
+  const trackPlayerSession = async (roomId, fee, mode, region) => {
+    try {
+      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region })
+      
+      const sessionData = {
+        action: 'join',
+        roomId: roomId,
+        fee: fee || 0,
+        mode: mode || 'unknown',
+        region: region || 'unknown',
+        isRealHathoraRoom: false,
+        fallbackSession: true,
+        timestamp: new Date().toISOString()
+      }
+      
+      const response = await fetch('/api/game-sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sessionData)
+      })
+      
+      if (response.ok) {
+        console.log('✅ Fallback session tracked successfully')
+      } else {
+        console.warn('⚠️ Failed to track fallback session:', response.status)
+      }
+      
+    } catch (error) {
+      console.error('❌ Error tracking fallback session:', error)
+    }
   }
 
   const handleStatsToggle = () => {
