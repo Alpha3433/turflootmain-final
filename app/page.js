@@ -114,8 +114,8 @@ export default function TurfLootTactical() {
     try {
       console.log(`🎯 Smart Matchmaking: Finding room for ${region} region, $${stakeAmount} stake`)
       
-      // Step 1: Get available servers from the API
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/servers/lobbies`)
+      // Step 1: Get available servers from the correct API endpoint
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/servers`)
       const serverData = await response.json()
       
       if (!serverData.servers || serverData.servers.length === 0) {
