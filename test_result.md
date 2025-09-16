@@ -108,10 +108,7 @@ user_problem_statement: "Priority 1 - Critical Hathora SDK Fix: Fix the persiste
 
 test_plan:
   current_focus:
-    - "Hathora SDK Fix - Region Mapping and Room Creation"
-    - "Remove problematic getConnectionInfo calls"
-    - "Fix createPublicLobby region parameter syntax"
-    - "Verify Oceania server creation in Sydney region"
+    - "Hathora WebSocket Connection Fixes Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
