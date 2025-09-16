@@ -87,7 +87,7 @@ class HathoraMultiplayerTester:
         print("🔍 Testing Hathora Environment Configuration...")
         try:
             start_time = time.time()
-            response = requests.get(f"{API_BASE}/servers/lobbies", timeout=10)
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
@@ -96,7 +96,7 @@ class HathoraMultiplayerTester:
                 servers = data.get('servers', [])
                 
                 # Look for Hathora servers
-                hathora_servers = [s for s in servers if s.get('serverType') == 'hathora']
+                hathora_servers = [s for s in servers if 'hathora' in s.get('serverType', '')]
                 
                 if hathora_enabled and len(hathora_servers) > 0:
                     self.log_test(
