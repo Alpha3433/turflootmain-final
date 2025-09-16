@@ -891,7 +891,7 @@ const AgarIOGame = () => {
         if (angleDiff < 0.1) circularScore++ // Very small angle changes
       }
       
-      if (circularScore > 25) { // Increased from 15 to 25 - allow more precise movements
+      if (circularScore > 40) { // Increased from 25 to 40 - allow much more precise movements
         this.recordViolation('AUTOMATED_MOVEMENT', `Robotic movement pattern detected: ${circularScore}/18`)
         this.antiCheat.botLikeScore += 10
       }
