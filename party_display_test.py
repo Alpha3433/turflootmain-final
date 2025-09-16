@@ -17,7 +17,7 @@ import os
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "https://military-agario.preview.emergentagent.com"
+BASE_URL = "https://mp-game-enhance.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class PartyDisplayTester:
