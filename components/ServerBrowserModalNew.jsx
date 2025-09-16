@@ -470,7 +470,15 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           color: '#9ca3af',
                           marginTop: '2px'
                         }}>
-                          {server.ping !== null ? `${server.ping}ms ping` : (pingingRegions ? '... ping' : 'N/A ping')}
+                          <span style={{ color: getPingColor(server.ping) }}>
+                            {server.ping !== null ? `${server.ping}ms` : (pingingRegions ? '...' : 'N/A')}
+                          </span>
+                          {server.ping !== null && (
+                            <span style={{ color: getPingColor(server.ping), marginLeft: '4px' }}>
+                              ({getPingStatus(server.ping)})
+                            </span>
+                          )}
+                          <span style={{ color: '#9ca3af' }}> ping</span>
                         </div>
                       </div>
                       <button
