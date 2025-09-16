@@ -245,6 +245,31 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
             <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
               🔄 Loading servers...
             </div>
+          ) : errorMessage ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#ef4444' }}>
+              <div style={{ fontSize: '24px', marginBottom: '16px' }}>⚠️</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Failed to Load Servers</div>
+              <div style={{ fontSize: '12px', color: '#9ca3af' }}>{errorMessage}</div>
+              <button
+                onClick={() => fetchServers(true)}
+                style={{
+                  marginTop: '16px',
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '8px 16px',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                🔄 Retry
+              </button>
+            </div>
+          ) : servers.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
+              📭 No servers available
+            </div>
           ) : (
             <>
               {/* NEW: Active Servers First */}
