@@ -2161,13 +2161,28 @@ export default function TurfLootTactical() {
     } catch (error) {
       console.error('❌ DETAILED ERROR joining server from browser:', error)
       
-      // Remove loading modal
-      try {
-        const modal = document.getElementById('hathora-loading-modal')
-        if (modal) document.body.removeChild(modal)
-      } catch (e) {}
+      // Show error status
+      updateStatus('❌ Connection error occurred')
+      updateSubStatus('🔄 Please check your internet connection')
+      updateProgress(100)
+      updateTimer('⏱️ Error: ' + error.message.substring(0, 30) + '...')
       
-      alert('Failed to create Hathora room. Please try again.')
+      // Ensure minimum display time for errors
+      const elapsedTime = Date.now() - loadingStartTime
+      const remainingTime = Math.max(2000, minimumDisplayTime - elapsedTime)
+      
+      setTimeout(() => {
+        // Remove loading modal
+        try {
+          if (document.body.contains(loadingModal)) {
+            document.body.removeChild(loadingModal)
+          }
+        } catch (e) {
+          console.log('Modal already removed')
+        }
+        
+        alert('Failed to create Hathora room. Please try again.')
+      }, remainingTime)
     }
   }
 
