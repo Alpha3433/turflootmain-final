@@ -26,31 +26,26 @@ class ServerBrowserTester:
         print(f"📡 Backend URL: {self.api_base}")
         print(f"🎯 Focus: Collapsed Empty Servers Design")
         print("=" * 80)
-        
-    def log_test(self, test_name, passed, details="", error_msg=""):
-        """Log test result"""
+
+    def log_test(self, test_name: str, passed: bool, details: str = ""):
+        """Log test results"""
         self.total_tests += 1
         if passed:
             self.passed_tests += 1
             status = "✅ PASSED"
         else:
-            self.failed_tests += 1
             status = "❌ FAILED"
-            
-        result = {
-            'test': test_name,
-            'status': status,
-            'details': details,
-            'error': error_msg,
-            'timestamp': datetime.now().isoformat()
-        }
-        self.test_results.append(result)
-        print(f"{status}: {test_name}")
+        
+        result = f"{status}: {test_name}"
         if details:
-            print(f"   Details: {details}")
-        if error_msg:
-            print(f"   Error: {error_msg}")
-        print()
+            result += f" - {details}"
+        
+        print(result)
+        self.test_results.append({
+            'test': test_name,
+            'passed': passed,
+            'details': details
+        })
 
     def test_api_health_check(self):
         """Test basic API connectivity"""
