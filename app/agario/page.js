@@ -306,15 +306,20 @@ const AgarIOGame = () => {
     try {
       console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region })
       
+      // Format data according to API requirements (session object with required fields)
       const sessionData = {
         action: 'join',
-        roomId: roomId,
-        fee: fee || 0,
-        mode: mode || 'unknown',
-        region: region || 'unknown',
-        isRealHathoraRoom: false,
-        fallbackSession: true,
-        timestamp: new Date().toISOString()
+        session: {
+          roomId: roomId,
+          joinedAt: new Date().toISOString(),
+          lastActivity: new Date().toISOString(),
+          userId: 'fallback_' + Math.random().toString(36).substr(2, 9),
+          entryFee: fee || 0,
+          mode: mode || 'unknown',
+          region: region || 'unknown',
+          isRealHathoraRoom: false,
+          fallbackSession: true
+        }
       }
       
       const response = await fetch('/api/game-sessions', {
