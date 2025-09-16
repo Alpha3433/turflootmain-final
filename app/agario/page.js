@@ -849,37 +849,54 @@ const AgarIOGame = () => {
           return
         }
         
-        // Get connection info first, then create WebSocket connection
-        console.log('🔍 Getting connection info for room:', actualRoomId)
+        // Use Hathora SDK's newConnection method properly
+        console.log('🔗 Creating Hathora connection using SDK...')
         
-        let connectionInfo
+        let connection
         try {
-          // Get connection info for the room
-          connectionInfo = await hathoraClient.client.getConnectionInfo(actualRoomId)
-          console.log('📡 Connection info received:', connectionInfo)
-        } catch (connectionInfoError) {
-          console.warn('⚠️ getConnectionInfo failed, trying alternative approach:', connectionInfoError.message)
+          // Create connection using Hathora SDK - this should return a WebSocket-like object
+          connection = await hathoraClient.client.newConnection(actualRoomId)
+          console.log('✅ Hathora connection created:', typeof connection)
           
-          // Fallback: try to connect directly using room ID
-          connectionInfo = {
-            host: `${actualRoomId}.hathora.dev`,
-            port: 443,
-            transportType: 'wss'
+          if (!connection) {
+            throw new Error('newConnection returned null/undefined')
           }
-          console.log('🔄 Using fallback connection info:', connectionInfo)
+          
+        } catch (connectionError) {
+          console.error('❌ Hathora SDK connection failed:', connectionError)
+          
+          // Fallback: Try direct WebSocket connection to Hathora
+          console.log('🔄 Attempting direct WebSocket fallback...')
+          
+          try {
+            // Get connection info for direct WebSocket connection
+            const connectionInfo = await hathoraClient.client.getConnectionInfo(actualRoomId)
+            console.log('📡 Got connection info for direct connection:', connectionInfo)
+            
+            if (connectionInfo && connectionInfo.host && connectionInfo.port) {
+              const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
+              console.log('🔗 Direct WebSocket URL:', wsUrl)
+              
+              connection = new WebSocket(wsUrl)
+              console.log('✅ Created direct WebSocket connection')
+            } else {
+              throw new Error('No valid connection info for direct WebSocket')
+            }
+            
+          } catch (fallbackError) {
+            console.error('❌ Direct WebSocket fallback also failed:', fallbackError)
+            setWsConnection('error')
+            return
+          }
         }
         
-        if (!connectionInfo || !connectionInfo.host) {
-          console.error('❌ No valid connection info available')
-          setWsConnection('error')
-          return
-        }
+        // Check if connection is a native WebSocket or Hathora connection object
+        const isNativeWebSocket = connection instanceof WebSocket
+        console.log('🔍 Connection type:', isNativeWebSocket ? 'Native WebSocket' : 'Hathora Connection')
         
-        // Create WebSocket connection to Hathora server
-        const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}?token=${token}&roomId=${actualRoomId}`
-        console.log('🔗 Connecting to WebSocket:', wsUrl)
-        
-        const ws = new WebSocket(wsUrl)
+        if (isNativeWebSocket) {
+          // Handle native WebSocket
+          const ws = connection
         
         // Set up WebSocket event handlers
         ws.onopen = () => {
