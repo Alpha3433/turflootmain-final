@@ -65,7 +65,7 @@ class BackendTester:
             self.log_test("API Health Check", False, "", str(e))
             return False
 
-    def test_hathora_environment_variables(self):
+    def test_server_browser_api(self):
         """Test 2: Verify Hathora environment variables are properly configured"""
         try:
             # Test by checking if servers endpoint returns Hathora configuration
