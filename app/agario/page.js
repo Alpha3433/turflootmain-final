@@ -944,6 +944,13 @@ const AgarIOGame = () => {
     }
     
     recordViolation(type, description) {
+      // Grace period: Don't record violations in the first 10 seconds of gameplay
+      const gameTime = (Date.now() - this.antiCheat.gameStartTime) / 1000
+      if (gameTime < 10) {
+        console.log(`🛡️ GRACE PERIOD: Ignoring violation "${type}" in first 10 seconds (${gameTime.toFixed(1)}s elapsed)`)
+        return
+      }
+      
       this.antiCheat.violations++
       this.antiCheat.suspiciousActions++
       
