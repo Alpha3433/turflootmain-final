@@ -101,7 +101,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 1000
+      zIndex: 10000
     }}>
       <div style={{
         backgroundColor: '#1a202c',
