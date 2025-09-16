@@ -590,12 +590,12 @@ const AgarIOGame = () => {
                 // Construct WebSocket URL with proper path and token
                 const baseUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
                 if (authToken) {
-                  // Try different WebSocket path formats that Hathora might expect
-                  wsUrl = `${baseUrl}/ws?token=${authToken}&roomId=${roomId}`
-                  console.log('🎯 Using Hathora WebSocket with query parameters format')
+                  // Try direct connection to the host and port (no path)
+                  wsUrl = `${baseUrl}?token=${authToken}&roomId=${roomId}`
+                  console.log('🎯 Using Hathora WebSocket with direct connection and query parameters')
                 } else {
-                  wsUrl = `${baseUrl}/ws`
-                  console.log('🎯 Using basic Hathora URL without authentication')
+                  wsUrl = baseUrl  // Direct connection without path
+                  console.log('🎯 Using direct Hathora connection without authentication')
                 }
                 console.log('🔗 Final WebSocket URL:', wsUrl)
               }
