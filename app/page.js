@@ -6304,7 +6304,7 @@ export default function TurfLootTactical() {
                 const authenticated = await requireAuthentication('SERVER BROWSER')
                 if (authenticated) {
                   console.log('🌐 User authenticated, opening server browser...')
-                  createDesktopServerBrowserPopup()
+                  setIsServerBrowserOpen(true)
                 } else {
                   console.log('❌ Authentication failed, blocking access to SERVER BROWSER')
                 }
