@@ -3042,6 +3042,37 @@ const AgarIOGame = () => {
             }
           </div>
           
+          {/* Multiplayer Status Indicator */}
+          {isMultiplayer && (
+            <div style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              color: wsConnection === 'connected' ? '#00ff00' : wsConnection === 'connecting' ? '#ffff00' : '#ff0000',
+              padding: isMobile ? '4px 8px' : '6px 12px',
+              borderRadius: '8px',
+              fontSize: isMobile ? '10px' : '12px',
+              fontWeight: 'bold',
+              marginBottom: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              border: `1px solid ${wsConnection === 'connected' ? '#00ff00' : wsConnection === 'connecting' ? '#ffff00' : '#ff0000'}`
+            }}>
+              <span style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: wsConnection === 'connected' ? '#00ff00' : wsConnection === 'connecting' ? '#ffff00' : '#ff0000',
+                animation: wsConnection === 'connecting' ? 'pulse 1s infinite' : 'none'
+              }}></span>
+              <span>
+                {wsConnection === 'connected' && `🌐 MULTIPLAYER (${connectedPlayers} players)`}
+                {wsConnection === 'connecting' && '🔄 CONNECTING...'}
+                {wsConnection === 'error' && '❌ CONNECTION ERROR'}
+                {wsConnection === 'disconnected' && '🔌 DISCONNECTED'}
+              </span>
+            </div>
+          )}
+
           {/* Player Rankings - Dynamic Leaderboard */}
           <div style={{ 
             display: 'flex', 
