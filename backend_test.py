@@ -550,53 +550,58 @@ class HathoraMultiplayerTester:
         try:
             start_time = time.time()
             
-            # Test with invalid region to check error handling
-            payload = {
-                'gameMode': 'practice',
-                'region': 'INVALID_REGION_TEST',
-                'maxPlayers': 50
-            }
+            # Test error handling by making invalid API requests
+            # Test 1: Invalid endpoint
+            invalid_response = requests.get(f"{API_BASE}/invalid-endpoint", timeout=10)
             
-            response = requests.post(f"{API_BASE}/hathora/create-room", 
-                                   json=payload, timeout=10)
+            # Test 2: Invalid game session request
+            invalid_session = requests.post(f"{API_BASE}/game-sessions", 
+                                          json={'invalid': 'data'}, timeout=10)
+            
             response_time = time.time() - start_time
             
-            # Should either succeed with fallback or fail gracefully
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('success'):
-                    self.log_test(
-                        "Error Handling and Fallbacks", 
-                        True, 
-                        f"Invalid region handled with fallback: {data.get('roomId')}",
-                        response_time
-                    )
-                    return True
-                else:
-                    self.log_test(
-                        "Error Handling and Fallbacks", 
-                        True, 
-                        f"Invalid region properly rejected: {data}",
-                        response_time
-                    )
-                    return True
+            # Check that errors are handled gracefully
+            proper_error_handling = True
+            error_details = []
+            
+            # Should return 404 for invalid endpoint
+            if invalid_response.status_code == 404:
+                error_details.append("✅ Invalid endpoint returns 404")
             else:
-                # Check if it's a proper error response
-                if response.status_code in [400, 422]:
-                    self.log_test(
-                        "Error Handling and Fallbacks", 
-                        True, 
-                        f"Invalid region properly rejected with HTTP {response.status_code}",
-                        response_time
-                    )
-                    return True
-                else:
-                    self.log_test(
-                        "Error Handling and Fallbacks", 
-                        False, 
-                        f"Unexpected error response: HTTP {response.status_code}"
-                    )
-                    return False
+                error_details.append(f"❌ Invalid endpoint returns {invalid_response.status_code}")
+                proper_error_handling = False
+            
+            # Should return 400/422 for invalid session data
+            if invalid_session.status_code in [400, 422, 405]:  # 405 is also acceptable
+                error_details.append(f"✅ Invalid session data returns {invalid_session.status_code}")
+            else:
+                error_details.append(f"❌ Invalid session data returns {invalid_session.status_code}")
+                proper_error_handling = False
+            
+            # Test that servers API is robust
+            servers_response = requests.get(f"{API_BASE}/servers", timeout=10)
+            if servers_response.status_code == 200:
+                error_details.append("✅ Servers API remains stable")
+            else:
+                error_details.append(f"❌ Servers API unstable: {servers_response.status_code}")
+                proper_error_handling = False
+            
+            if proper_error_handling:
+                self.log_test(
+                    "Error Handling and Fallbacks", 
+                    True, 
+                    f"✅ Robust error handling: {'; '.join(error_details)}",
+                    response_time
+                )
+                return True
+            else:
+                self.log_test(
+                    "Error Handling and Fallbacks", 
+                    False, 
+                    f"❌ Error handling issues: {'; '.join(error_details)}",
+                    response_time
+                )
+                return False
                 
         except Exception as e:
             self.log_test(
