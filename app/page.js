@@ -3555,7 +3555,6 @@ export default function TurfLootTactical() {
   }
 
   const createDesktopJoinPartyPopup = () => {
-    popup.style.cssText = `
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
