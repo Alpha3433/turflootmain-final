@@ -368,7 +368,8 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        backgroundColor: 'rgba(107, 114, 128, 0.1)'
+                        backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                        border: 'none' // Remove any practice server highlighting
                       }}
                     >
                       <div style={{ flex: 1 }}>
