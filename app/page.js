@@ -126,11 +126,27 @@ export default function TurfLootTactical() {
       // Step 2: Filter servers by region and stake
       const matchingServers = serverData.servers.filter(server => {
         const serverRegion = server.regionId || server.region || ''
-        const regionMatches = serverRegion.toLowerCase().includes(region.toLowerCase()) || 
-                             (region === 'US' && (serverRegion.includes('washington') || serverRegion.includes('us'))) ||
-                             (region === 'EU' && serverRegion.includes('eu')) ||
-                             (region === 'OCE' && serverRegion.includes('oceania')) ||
-                             (region === 'SEA' && serverRegion.includes('asia'))
+        const serverRegionLower = serverRegion.toLowerCase()
+        const regionLower = region.toLowerCase()
+        
+        // Enhanced region matching to handle all regionId formats
+        const regionMatches = 
+          serverRegionLower === regionLower || // Exact match
+          serverRegionLower.includes(regionLower) || // Partial match
+          regionLower.includes(serverRegionLower) || // Reverse partial match
+          // Legacy shortcuts
+          (region === 'US' && (serverRegionLower.includes('washington') || serverRegionLower.includes('seattle') || serverRegionLower.includes('los-angeles'))) ||
+          (region === 'EU' && (serverRegionLower.includes('london') || serverRegionLower.includes('frankfurt'))) ||
+          (region === 'OCE' && (serverRegionLower.includes('sydney') || serverRegionLower.includes('oceania'))) ||
+          (region === 'SEA' && (serverRegionLower.includes('singapore') || serverRegionLower.includes('asia'))) ||
+          // Direct regionId matching  
+          (regionLower === 'sydney' && serverRegionLower === 'sydney') ||
+          (regionLower === 'washington-dc' && serverRegionLower === 'washington-dc') ||
+          (regionLower === 'london' && serverRegionLower === 'london') ||
+          (regionLower === 'frankfurt' && serverRegionLower === 'frankfurt') ||
+          (regionLower === 'singapore' && serverRegionLower === 'singapore') ||
+          (regionLower === 'seattle' && serverRegionLower === 'seattle') ||
+          (regionLower === 'los-angeles' && serverRegionLower === 'los-angeles')
         
         const stakeMatches = Math.abs(server.stake - stakeAmount) < 0.001 // Handle floating point precision
         
