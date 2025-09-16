@@ -98,6 +98,114 @@ const AgarIOGame = () => {
   const wsRef = useRef(null)
   const playersRef = useRef(new Map()) // Store other players data
 
+  // ========================================
+  // HATHORA-FIRST MULTIPLAYER INITIALIZATION
+  // No local fallbacks - 100% authoritative server
+  // ========================================
+  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const roomId = urlParams.get('roomId')
+    const mode = urlParams.get('mode')
+    const multiplayer = urlParams.get('multiplayer')
+    const server = urlParams.get('server')
+    const hathoraRoom = urlParams.get('hathoraRoom')
+    
+    console.log('🎮 HATHORA-FIRST: Game initialization - URL parameters:', {
+      roomId,
+      mode,
+      multiplayer,
+      server,
+      hathoraRoom,
+      url: window.location.href
+    })
+    
+    // CRITICAL: Block all non-Hathora games except practice
+    if (mode === 'practice' && roomId === 'global-practice-bots') {
+      console.log('✅ PRACTICE MODE: Allowing local practice with bots')
+      setIsMultiplayer(false)
+      setGameStarted(true)
+      return
+    }
+    
+    // Block any non-Hathora multiplayer attempts
+    if (!roomId || server !== 'hathora' || !hathoraRoom || mode === 'local') {
+      console.log('❌ BLOCKED: Non-Hathora multiplayer game blocked')
+      console.log('🔄 Redirecting to server browser for proper multiplayer...')
+      
+      // Show modal explaining the redirect
+      const modal = document.createElement('div')
+      modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9); display: flex; align-items: center;
+        justify-content: center; z-index: 10000; color: white;
+        font-family: 'Rajdhani', sans-serif;
+      `
+      modal.innerHTML = `
+        <div style="background: #1a202c; padding: 40px; border-radius: 12px; text-align: center; border: 2px solid #68d391;">
+          <div style="font-size: 48px; margin-bottom: 20px;">🚀</div>
+          <h2 style="color: #68d391; margin-bottom: 15px;">Multiplayer Games Require Hathora</h2>
+          <p style="margin-bottom: 20px; color: #e2e8f0;">All multiplayer games now run on authoritative servers.</p>
+          <p style="color: #a0aec0;">Redirecting to server browser...</p>
+        </div>
+      `
+      document.body.appendChild(modal)
+      
+      setTimeout(() => {
+        window.location.href = '/?openServerBrowser=true'
+      }, 3000)
+      return
+    }
+    
+    // Validate Hathora room ID
+    if (!roomId || roomId.length < 8) {
+      console.error('❌ Invalid Hathora room ID:', roomId)
+      alert('Invalid multiplayer room. Redirecting to server browser.')
+      window.location.href = '/?openServerBrowser=true'
+      return
+    }
+    
+    console.log('✅ HATHORA MULTIPLAYER: Valid authoritative room detected')
+    console.log('🏠 Room ID:', roomId)
+    console.log('🌐 Multiplayer mode:', multiplayer)
+    console.log('🖥️ Server type:', server)
+    
+    // Set game to authoritative multiplayer mode
+    setIsMultiplayer(true)
+    setGameStarted(true)
+    
+    // Initialize authoritative multiplayer game
+    initializeAuthoritativeGame(roomId, mode, urlParams)
+    
+  }, [])
+  
+  const initializeAuthoritativeGame = (roomId, mode, urlParams) => {
+    console.log('🚀 Initializing 100% authoritative Hathora game...')
+    
+    const fee = parseFloat(urlParams.get('fee')) || 0
+    const region = urlParams.get('region') || 'unknown'
+    const maxPlayers = parseInt(urlParams.get('maxPlayers')) || 8
+    const gameName = urlParams.get('name') || 'Hathora Multiplayer'
+    
+    console.log('📊 Authoritative game configuration:', {
+      roomId,
+      fee,
+      region,
+      maxPlayers,
+      gameName,
+      isAuthoritative: true,
+      serverSide: 'Hathora Cloud'
+    })
+    
+    // Track player session in real-time
+    trackPlayerSession(roomId, fee, mode, region)
+    
+    // Set up authoritative game state (server owns truth)
+    console.log('🎮 Setting up client-side prediction with server reconciliation')
+    console.log('⚡ Authoritative server will handle all game logic')
+    console.log('📡 Client will send inputs, receive state updates')
+  }
+
   const handleStatsToggle = () => {
     if (!isMobile) return // Only for mobile
     
