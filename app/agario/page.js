@@ -952,8 +952,8 @@ const AgarIOGame = () => {
       // Log violation for server reporting
       this.reportViolation(type, description)
       
-      // More lenient banning - require more violations at high mass
-      const banThreshold = this.player.mass > 500 ? 12 : this.antiCheat.maxViolations // Higher threshold for players above 500 mass
+      // Much more lenient banning - require many more violations 
+      const banThreshold = this.player.mass > 200 ? 25 : this.antiCheat.maxViolations // Even higher threshold for players above 200 mass
       
       if (this.antiCheat.violations >= banThreshold) {
         console.log(`🔒 PLAYER BAN TRIGGERED: ${this.antiCheat.violations}/${banThreshold} violations (Mass: ${this.player.mass.toFixed(1)})`)
