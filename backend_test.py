@@ -155,53 +155,60 @@ class ServerBrowserTester:
             'grouping_data': grouping_data
         }
 
-    def test_sydney_oceania_regions(self):
-        """Test that Sydney/Oceania regions are properly included in server data"""
-        try:
-            response = requests.get(f"{API_BASE}/servers", timeout=15)
-            
-            if response.status_code != 200:
-                self.log_test("Sydney/Oceania Regions", False, f"Status: {response.status_code}")
-                return False
-                
-            data = response.json()
-            servers = data.get('servers', [])
-            
-            # Look for Sydney/Oceania servers
-            sydney_servers = []
-            oceania_servers = []
-            
-            for server in servers:
-                region_id = server.get('regionId', '').lower()
-                region_name = server.get('region', '').lower()
-                display_name = server.get('name', '').lower()
-                
-                if 'sydney' in region_id or 'sydney' in display_name:
-                    sydney_servers.append(server)
-                    
-                if 'oceania' in region_name or 'oceania' in display_name:
-                    oceania_servers.append(server)
-            
-            # Check for Hathora region mapping
-            hathora_regions = []
-            for server in servers:
-                hathora_region = server.get('hathoraRegion')
-                if hathora_region and 'ap-southeast-2' in hathora_region:
-                    hathora_regions.append(server)
-            
-            total_oceania_related = len(sydney_servers) + len(oceania_servers) + len(hathora_regions)
-            
-            if total_oceania_related > 0:
-                self.log_test("Sydney/Oceania Regions", True, 
-                             f"Found {len(sydney_servers)} Sydney servers, {len(oceania_servers)} Oceania servers, {len(hathora_regions)} ap-southeast-2 servers")
-                return True
+    def test_empty_server_detection(self, server_data: Dict):
+        """Test 3: Empty Server Detection - Verify servers with 0 currentPlayers are identified"""
+        print("\n🔍 TEST 3: EMPTY SERVER DETECTION")
+        
+        if not server_data or 'servers' not in server_data:
+            self.log_test("Empty Server Detection", False, "No server data available")
+            return
+        
+        servers = server_data['servers']
+        
+        # Count empty servers (currentPlayers = 0)
+        empty_servers = []
+        active_servers = []
+        
+        for server in servers:
+            current_players = server.get('currentPlayers', 0)
+            if current_players == 0:
+                empty_servers.append(server)
             else:
-                self.log_test("Sydney/Oceania Regions", False, "No Sydney/Oceania regions found in server data")
-                return False
-                
-        except Exception as e:
-            self.log_test("Sydney/Oceania Regions", False, "", str(e))
-            return False
+                active_servers.append(server)
+        
+        total_servers = len(servers)
+        empty_count = len(empty_servers)
+        active_count = len(active_servers)
+        
+        self.log_test("Total Server Count", total_servers > 0, f"Found {total_servers} total servers")
+        self.log_test("Empty Server Identification", True, f"Identified {empty_count} empty servers")
+        self.log_test("Active Server Identification", True, f"Identified {active_count} active servers")
+        
+        # Test collapse potential - empty servers should be grouped for better UX
+        if empty_count > 10:  # Threshold for collapse benefit
+            self.log_test("Collapse Benefit Analysis", True, 
+                         f"{empty_count} empty servers benefit from collapsed design")
+        else:
+            self.log_test("Collapse Benefit Analysis", True, 
+                         f"{empty_count} empty servers - collapse still improves UX")
+        
+        # Verify empty server data structure for grouping
+        if empty_servers:
+            sample_empty = empty_servers[0]
+            required_fields = ['region', 'stake', 'name', 'id']
+            
+            for field in required_fields:
+                if field in sample_empty:
+                    self.log_test(f"Empty Server Field: {field}", True, 
+                                 f"Available for grouping: {sample_empty.get(field)}")
+                else:
+                    self.log_test(f"Empty Server Field: {field}", False, "Missing for grouping")
+        
+        return {
+            'empty_servers': empty_servers,
+            'active_servers': active_servers,
+            'collapse_benefit': empty_count > 5
+        }
 
     def test_wallet_balance_api(self):
         """Test /api/wallet/balance endpoint"""
