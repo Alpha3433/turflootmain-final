@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend Testing Suite - Withdrawal Modal & Authentication Fixes
-Testing backend functionality after implementing withdrawal modal and authentication fixes.
+Backend Testing Suite for Server Browser Modal Fixes
+Testing backend functionality after server browser modal changes to ensure no regressions.
 
 TESTING FOCUS:
 1. API Health Check - Verify core API endpoints are accessible
-2. Authentication Systems - Test Privy authentication integration 
-3. Wallet Balance APIs - Verify Helius RPC integration with new API key
-4. User Balance & Stats APIs - Confirm balance retrieval functionality
-5. Backend Regression Testing - Ensure frontend changes didn't break backend
+2. Server Browser API - Test /api/servers/lobbies endpoint that provides data to the modal
+3. Authentication System - Verify authentication APIs work correctly after modal fixes
+4. Game Session Management - Test game session join/leave APIs called from server browser
+5. General Application Health - Ensure no regressions from modal fixes
 
 RECENT CHANGES BEING TESTED:
-- Authentication Fix: Updated handleWithdraw function to use Privy hooks directly
-- Withdrawal Modal: Created new responsive withdrawal modal
-- Helius Integration: Updated with valid API key (dccb9763-d453-4940-bd43-dfd987f278b1)
-- UI Improvements: Fixed mobile modal sizing, font optimizations
+- Modified /app/app/page.js to replace createDesktopServerBrowserPopup() calls with setIsServerBrowserOpen(true)
+- Updated /app/components/ServerBrowserModalNew.jsx z-index from 1000 to 99999
+- These changes should not affect backend functionality but need verification
 """
 
 import requests
