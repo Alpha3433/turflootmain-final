@@ -2030,36 +2030,47 @@ export default function TurfLootTactical() {
         }
       }
       
-      console.log('📋 Match result:', matchResult)
+      console.log('📋 Final match result:', matchResult)
       
-      if (matchResult) {
+      if (matchResult && matchResult.serverData && matchResult.serverData.isHathora) {
         const { roomId, serverData: hathoraServerData, action } = matchResult
         
-        console.log(`🎉 Server Browser: Hathora room ready!`)
+        console.log(`🎉 SUCCESS: Real Hathora room created!`)
         console.log(`📍 Action: ${action}`)
         console.log(`🏠 Room ID: ${roomId}`)
         console.log(`🎮 Server: ${hathoraServerData.name}`)
         console.log(`👥 Players: ${hathoraServerData.currentPlayers}/${hathoraServerData.maxPlayers}`)
+        console.log(`✅ Hathora Process: ${hathoraServerData.hathoraProcess}`)
         
         // Navigate to actual multiplayer game with Hathora room
         const queryParams = new URLSearchParams({
           roomId: roomId, // Real Hathora room ID
-          mode: serverData.entryFee > 0 ? 'cash' : 'practice',
+          mode: 'hathora-multiplayer', // Explicit Hathora multiplayer mode
           fee: serverData.entryFee || 0,
-          region: serverData.region,
-          name: serverData.name,
+          region: hathoraServerData.region || serverData.region,
+          name: hathoraServerData.name,
           multiplayer: 'hathora', // Ensure multiplayer mode
-          server: 'hathora' // Use Hathora backend
+          server: 'hathora', // Use Hathora backend
+          paid: serverData.entryFee > 0 ? 'true' : 'false',
+          hathoraRoom: 'true' // Explicit flag for Hathora room
         })
         
         console.log(`🚀 Navigating to Hathora multiplayer game: /agario?${queryParams.toString()}`)
+        
+        // Remove loading modal
+        document.body.removeChild(loadingModal)
+        
         router.push(`/agario?${queryParams.toString()}`)
         setIsServerBrowserOpen(false) // Close the modal after joining
         
       } else {
-        console.error('❌ findOrCreateRoom returned null/undefined')
-        console.error('❌ Match result was:', matchResult)
-        alert('No available rooms found. The server might be full or unavailable.')
+        console.error('❌ FAILED: Could not create Hathora room after all attempts')
+        console.error('❌ Final match result was:', matchResult)
+        
+        // Remove loading modal
+        document.body.removeChild(loadingModal)
+        
+        alert('Failed to create Hathora multiplayer room. Please try again. Server browser requires real multiplayer servers.')
       }
       
     } catch (error) {
