@@ -16,15 +16,32 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const fetchServers = async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true)
     try {
+      console.log('🌐 Fetching servers from /api/servers/lobbies...')
       const response = await fetch('/api/servers/lobbies')
+      console.log('📡 Server response status:', response.status)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+      
       const data = await response.json()
+      console.log('✅ Server data received:', {
+        servers: data.servers?.length || 0,
+        totalPlayers: data.totalPlayers || 0,
+        totalActiveServers: data.totalActiveServers || 0
+      })
+      
       setServers(data.servers || [])
       setTotalStats({
         totalPlayers: data.totalPlayers || 0,
         totalActiveServers: data.totalActiveServers || 0
       })
     } catch (error) {
-      console.error('Error fetching servers:', error)
+      console.error('❌ Error fetching servers:', error)
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack
+      })
       setServers([])
     }
     setIsLoading(false)
