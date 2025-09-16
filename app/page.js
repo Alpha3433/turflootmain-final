@@ -12525,115 +12525,57 @@ export default function TurfLootTactical() {
         Loading State: {localPracticeLoading.toString()}
       </div>
 
-      {/* Local Practice Loading Popup - Desktop Only */}
+      {/* Local Practice Loading Popup - Desktop Only - SIMPLIFIED */}
       {localPracticeLoading && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 10000,
-          fontFamily: '"Rajdhani", sans-serif'
-        }}>
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 999999, // Even higher z-index
+            fontFamily: '"Rajdhani", sans-serif'
+          }}
+        >
           <div style={{
-            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+            backgroundColor: '#111827',
             border: '2px solid #10b981',
             borderRadius: '16px',
             padding: '48px',
             textAlign: 'center',
             maxWidth: '400px',
-            width: '90%',
-            backdropFilter: 'blur(10px)'
+            width: '90%'
           }}>
-            {/* Animated Loading Spinner */}
             <div style={{
-              width: '80px',
-              height: '80px',
-              border: '4px solid rgba(16, 185, 129, 0.2)',
-              borderTop: '4px solid #10b981',
-              borderRadius: '50%',
-              margin: '0 auto 24px auto',
-              animation: 'spin 1s linear infinite'
-            }}></div>
-            
-            {/* Loading Text */}
-            <h2 style={{
               color: '#10b981',
               fontSize: '28px',
               fontWeight: 'bold',
-              margin: '0 0 12px 0',
-              textTransform: 'uppercase',
-              letterSpacing: '2px'
+              marginBottom: '16px'
             }}>
               🤖 LOCAL PRACTICE
-            </h2>
-            
-            <p style={{
+            </div>
+            <div style={{
               color: '#e2e8f0',
               fontSize: '16px',
-              margin: '0 0 20px 0',
-              lineHeight: '1.5'
+              marginBottom: '20px'
             }}>
-              Initializing offline bot training session...
-            </p>
-            
-            {/* Loading Bar */}
-            <div style={{
-              width: '100%',
-              height: '6px',
-              backgroundColor: 'rgba(16, 185, 129, 0.2)',
-              borderRadius: '3px',
-              overflow: 'hidden',
-              margin: '0 auto'
-            }}>
-              <div style={{
-                width: '40%',
-                height: '100%',
-                backgroundColor: '#10b981',
-                borderRadius: '3px',
-                animation: 'loading-bar 1.5s ease-in-out infinite'
-              }}></div>
+              Loading offline bot training...
             </div>
-            
-            {/* Tips */}
             <div style={{
-              marginTop: '24px',
-              padding: '16px',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              borderRadius: '8px',
-              border: '1px solid rgba(16, 185, 129, 0.3)'
-            }}>
-              <p style={{
-                color: '#10b981',
-                fontSize: '12px',
-                margin: '0',
-                fontWeight: '600'
-              }}>
-                💡 TIP: Practice against AI bots to improve your skills before joining cash games!
-              </p>
-            </div>
+              width: '50px',
+              height: '50px',
+              border: '4px solid rgba(16, 185, 129, 0.2)',
+              borderTop: '4px solid #10b981',
+              borderRadius: '50%',
+              margin: '0 auto',
+              animation: 'spin 1s linear infinite'
+            }}></div>
           </div>
-          
-          {/* CSS Animations - Using regular style tag */}
-          <style dangerouslySetInnerHTML={{
-            __html: `
-              @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-              }
-              
-              @keyframes loading-bar {
-                0% { transform: translateX(-100%); }
-                50% { transform: translateX(0%); }
-                100% { transform: translateX(100%); }
-              }
-            `
-          }} />
         </div>
       )}
     </div>
