@@ -637,8 +637,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                         </div>
                         <button
                           onClick={() => {
+                            console.log('🚨 CREATE button clicked - onClick handler executed!')
                             // Use the first server in the group as template for creation
                             const templateServer = group.servers[0]
+                            console.log('🚨 Template server:', templateServer)
                             handleJoinServer(templateServer)
                           }}
                           style={{
