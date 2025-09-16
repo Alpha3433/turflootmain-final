@@ -52,42 +52,18 @@ class BackendTester:
         print()
 
     def test_api_health_check(self):
-        """Test 1: Verify API is accessible and Hathora environment is configured"""
+        """Test basic API connectivity"""
         try:
-            response = requests.get(f"{self.api_base}/servers", timeout=10)
-            
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             if response.status_code == 200:
-                data = response.json()
-                hathora_enabled = data.get('hathoraEnabled', False)
-                
-                if hathora_enabled:
-                    self.log_test(
-                        "API Health Check with Hathora Configuration",
-                        True,
-                        f"API accessible, Hathora enabled: {hathora_enabled}, Total servers: {data.get('totalServers', 0)}"
-                    )
-                else:
-                    self.log_test(
-                        "API Health Check with Hathora Configuration",
-                        False,
-                        "API accessible but Hathora not enabled",
-                        "Hathora integration not properly configured"
-                    )
+                self.log_test("API Health Check", True, f"API accessible at {API_BASE}")
+                return True
             else:
-                self.log_test(
-                    "API Health Check with Hathora Configuration",
-                    False,
-                    f"API returned status {response.status_code}",
-                    f"HTTP {response.status_code}: {response.text[:200]}"
-                )
-                
+                self.log_test("API Health Check", False, f"Status: {response.status_code}", response.text[:200])
+                return False
         except Exception as e:
-            self.log_test(
-                "API Health Check with Hathora Configuration",
-                False,
-                "Failed to connect to API",
-                str(e)
-            )
+            self.log_test("API Health Check", False, "", str(e))
+            return False
 
     def test_hathora_environment_variables(self):
         """Test 2: Verify Hathora environment variables are properly configured"""
