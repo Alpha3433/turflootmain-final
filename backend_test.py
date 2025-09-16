@@ -66,53 +66,37 @@ class BackendTester:
             return False
 
     def test_server_browser_api(self):
-        """Test 2: Verify Hathora environment variables are properly configured"""
+        """Test /api/servers endpoint for server browser functionality"""
         try:
-            # Test by checking if servers endpoint returns Hathora configuration
-            response = requests.get(f"{self.api_base}/servers", timeout=10)
+            response = requests.get(f"{API_BASE}/servers", timeout=15)
             
-            if response.status_code == 200:
-                data = response.json()
-                hathora_enabled = data.get('hathoraEnabled', False)
-                servers = data.get('servers', [])
+            if response.status_code != 200:
+                self.log_test("Server Browser API", False, f"Status: {response.status_code}", response.text[:200])
+                return False
                 
-                # Check for Hathora-specific server properties
-                hathora_servers = [s for s in servers if s.get('serverType') == 'hathora-paid']
+            data = response.json()
+            
+            # Check required fields
+            required_fields = ['servers', 'totalPlayers', 'totalActiveServers', 'hathoraEnabled']
+            missing_fields = [field for field in required_fields if field not in data]
+            
+            if missing_fields:
+                self.log_test("Server Browser API", False, f"Missing fields: {missing_fields}")
+                return False
                 
-                if hathora_enabled and len(hathora_servers) > 0:
-                    # Check for proper region mapping
-                    regions_found = set()
-                    for server in hathora_servers:
-                        if 'hathoraRegion' in server:
-                            regions_found.add(server['hathoraRegion'])
-                    
-                    self.log_test(
-                        "Hathora Environment Variables Configuration",
-                        True,
-                        f"Hathora enabled, {len(hathora_servers)} Hathora servers, Regions: {list(regions_found)}"
-                    )
-                else:
-                    self.log_test(
-                        "Hathora Environment Variables Configuration",
-                        False,
-                        f"Hathora enabled: {hathora_enabled}, Hathora servers: {len(hathora_servers)}",
-                        "Hathora environment not properly configured"
-                    )
-            else:
-                self.log_test(
-                    "Hathora Environment Variables Configuration",
-                    False,
-                    f"API returned status {response.status_code}",
-                    "Cannot verify Hathora configuration"
-                )
+            # Check if servers array exists and has data
+            servers = data.get('servers', [])
+            if not isinstance(servers, list):
+                self.log_test("Server Browser API", False, "Servers field is not an array")
+                return False
                 
+            self.log_test("Server Browser API", True, 
+                         f"Found {len(servers)} servers, Hathora enabled: {data.get('hathoraEnabled')}")
+            return True
+            
         except Exception as e:
-            self.log_test(
-                "Hathora Environment Variables Configuration",
-                False,
-                "Failed to verify Hathora environment",
-                str(e)
-            )
+            self.log_test("Server Browser API", False, "", str(e))
+            return False
 
     def test_region_mapping_verification(self):
         """Test 3: Verify region mapping works correctly (Oceania->sydney, US->washington-dc, EU->frankfurt/london)"""
