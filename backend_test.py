@@ -1,33 +1,16 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Server Browser Modal Fixes
-Testing backend functionality after server browser modal changes to ensure no regressions.
-
-TESTING FOCUS:
-1. API Health Check - Verify core API endpoints are accessible
-2. Server Browser API - Test /api/servers/lobbies endpoint that provides data to the modal
-3. Authentication System - Verify authentication APIs work correctly after modal fixes
-4. Game Session Management - Test game session join/leave APIs called from server browser
-5. General Application Health - Ensure no regressions from modal fixes
-
-RECENT CHANGES BEING TESTED:
-- Modified /app/app/page.js to replace createDesktopServerBrowserPopup() calls with setIsServerBrowserOpen(true)
-- Updated /app/components/ServerBrowserModalNew.jsx z-index from 1000 to 99999
-- These changes should not affect backend functionality but need verification
+Comprehensive Backend Testing for Hathora SDK Fixes
+Testing Agent: Verifying Hathora client initialization, region mapping, and room creation fixes
 """
 
 import requests
 import json
 import time
-import sys
-import base64
+import os
 from datetime import datetime
 
-# Configuration
-BASE_URL = "https://mp-game-enhance.preview.emergentagent.com"
-API_BASE = f"{BASE_URL}/api"
-
-class TurfLootBackendTester:
+class HathoraSDKTester:
     def __init__(self):
         self.results = []
         self.start_time = time.time()
