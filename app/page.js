@@ -5781,11 +5781,20 @@ export default function TurfLootTactical() {
                     console.log(`🎯 Starting smart matchmaking for ${selectedServer} region...`)
                     
                     try {
-                      // Use smart matchmaking to find or create room
-                      const matchResult = await findOrCreateRoom(selectedServer, stakeAmount, 'competitive')
+                      // HATHORA-FIRST: Create room directly using initializeHathoraGame
+                      const serverData = {
+                        regionId: selectedServer,
+                        region: selectedServer,
+                        entryFee: stakeAmount,
+                        name: `${selectedServer} $${stakeAmount} Cash Game`,
+                        stake: stakeAmount
+                      }
+                      
+                      const matchResult = await initializeHathoraGame(serverData)
                       
                       if (matchResult) {
-                        const { roomId, serverData, action } = matchResult
+                        const { roomId } = matchResult
+                        const action = 'created_hathora_direct'
                         
                         console.log(`🎯 Matchmaking successful!`)
                         console.log(`📍 Action: ${action}`)
