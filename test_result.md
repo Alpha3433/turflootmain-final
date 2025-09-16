@@ -108,10 +108,10 @@ user_problem_statement: "PHASE 1: Critical Issue Resolution - Server Browser Mod
 
 test_plan:
   current_focus:
-    - "Mobile Stats Panel Sub-Labels Implementation"
-    - "Test Mobile Stats Panel UI Changes"
-    - "Verify Sub-Labels Display on Mobile Only"
-    - "Validate Stats Panel Minimalist Design"
+    - "Server Browser Modal Investigation and Fix"
+    - "Replace DOM-created popup with React modal"
+    - "Fix z-index layering over Privy authentication modal"
+    - "Test redesigned server browser functionality"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
