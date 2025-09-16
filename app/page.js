@@ -3546,8 +3546,13 @@ export default function TurfLootTactical() {
     console.log('🛒 Skin store popup created with direct DOM manipulation')
   }
 
-  // Desktop server browser popup
+  // DEPRECATED: Old DOM-based server browser - DISABLED to prevent conflicts
   const createDesktopServerBrowserPopup = () => {
+    console.log('🚫 Old DOM server browser disabled - using React modal instead')
+    // This function has been replaced by the React ServerBrowserModal
+    // to prevent region mapping conflicts and improve user experience
+    return
+  }
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
 
