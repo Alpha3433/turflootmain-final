@@ -444,6 +444,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
 
   if (!isOpen) return null
 
+  console.log('🔧 ServerBrowserModalNew RENDERING with processedRooms:', processedRooms.length)
+  console.log('🔧 ServerBrowserModalNew emptyRooms:', emptyRooms.length)
+
   return (
     <div style={{
       position: 'fixed',
