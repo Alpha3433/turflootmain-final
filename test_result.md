@@ -2571,7 +2571,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Friend Request System MongoDB Index Compatibility Fix"
+    - "Hathora WebSocket Connection Fix Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
