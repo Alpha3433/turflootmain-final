@@ -1965,7 +1965,7 @@ export default function TurfLootTactical() {
       console.log('⏳ Calling findOrCreateRoom...')
       
       const matchResult = await findOrCreateRoom(
-        serverData.region, 
+        serverData.regionId || serverData.region, // Use regionId first, fallback to region
         serverData.entryFee, 
         serverData.mode || 'competitive'
       )
