@@ -99,12 +99,44 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     return 'Poor'
   }
 
+  // Clean up old cache entries to prevent localStorage bloat
+  const cleanupCache = () => {
+    const keys = Object.keys(localStorage)
+    const pingKeys = keys.filter(key => key.startsWith('ping_'))
+    let cleaned = 0
+    
+    pingKeys.forEach(key => {
+      try {
+        const cached = localStorage.getItem(key)
+        if (cached) {
+          const { timestamp } = JSON.parse(cached)
+          const age = Date.now() - timestamp
+          if (age > 300000) { // Remove entries older than 5 minutes
+            localStorage.removeItem(key)
+            cleaned++
+          }
+        }
+      } catch (error) {
+        // Remove corrupted cache entries
+        localStorage.removeItem(key)
+        cleaned++
+      }
+    })
+    
+    if (cleaned > 0) {
+      console.log(`🧹 Cleaned up ${cleaned} old ping cache entries`)
+    }
+  }
+
   // Measure client-side pings for all servers
   const measureServerPings = async (serverList) => {
     if (!serverList || serverList.length === 0) return serverList
     
     setPingingRegions(true)
     console.log('📡 Measuring client-side pings to game servers...')
+    
+    // Clean up old cache entries first
+    cleanupCache()
     
     // Get unique ping endpoints
     const uniqueEndpoints = [...new Set(serverList.map(s => s.pingEndpoint))].filter(Boolean)
