@@ -174,327 +174,198 @@ class WalletTester:
         except Exception as e:
             self.log_result("Guest Wallet Balance API", False, f"Exception: {str(e)}")
 
-    def test_real_room_process_verification(self):
-        """Test 3: Real Room Process Verification - Verify actual Hathora room processes are created"""
-        print("🔍 TEST 3: REAL ROOM PROCESS VERIFICATION")
+    def test_wallet_balance_with_jwt(self):
+        """Test wallet balance API with JWT authentication"""
+        print("\n🔐 Testing Wallet Balance API - JWT Authentication...")
         
-        # Test game session API to verify room tracking
         try:
-            start_time = time.time()
-            
-            # Test joining a session (simulates room creation)
-            session_data = {
-                "action": "join",
-                "roomId": "test-hathora-room-" + str(int(time.time())),
-                "fee": 0.01,
-                "mode": "cash-game",
-                "region": "us-east-1",
-                "isRealHathoraRoom": True,
-                "hathoraRoomProcess": True
+            # Create a test JWT token
+            test_payload = {
+                "userId": "test-user-123",
+                "email": "test@example.com",
+                "jwt_wallet_address": SAMPLE_WALLETS[0],
+                "iat": int(time.time()),
+                "exp": int(time.time()) + 3600
             }
             
-            response = requests.post(
-                f"{self.api_base}/game-sessions",
-                json=session_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            response_time = time.time() - start_time
+            # Use testing token format
+            test_token = "testing-" + base64.b64encode(json.dumps(test_payload).encode()).decode()
+            
+            headers = {"Authorization": f"Bearer {test_token}"}
+            response = requests.get(f"{self.api_base}/wallet/balance", headers=headers, timeout=10)
             
             if response.status_code == 200:
-                result = response.json()
-                success = result.get('success', False)
+                data = response.json()
                 
-                if success:
-                    details = f"Real Hathora room session tracked successfully: {session_data['roomId']}"
-                    self.log_test("Real Room Process Verification", True, details, response_time)
-                    return True
+                # Check if we got realistic testing balance
+                if data.get('balance', 0) > 0 and data.get('sol_balance', 0) > 0:
+                    self.log_result("JWT Wallet Balance", True, 
+                                  f"Balance: ${data.get('balance')}, SOL: {data.get('sol_balance')}, Address: {data.get('wallet_address')}")
                 else:
-                    error_msg = result.get('error', 'Unknown error')
-                    self.log_test("Real Room Process Verification", False, f"Session tracking failed: {error_msg}", response_time)
-                    return False
+                    self.log_result("JWT Wallet Balance", False, 
+                                  f"Expected positive balances, got: ${data.get('balance')}, {data.get('sol_balance')} SOL")
             else:
-                self.log_test("Real Room Process Verification", False, f"Session API failed: HTTP {response.status_code}", response_time)
-                return False
+                self.log_result("JWT Wallet Balance API", False, f"HTTP {response.status_code}")
                 
         except Exception as e:
-            self.log_test("Real Room Process Verification", False, f"Error verifying room processes: {str(e)}")
-            return False
-
-    def test_game_session_integration(self):
-        """Test 4: Game Session Integration - Test session tracking and management"""
-        print("🔍 TEST 4: GAME SESSION INTEGRATION")
+            self.log_result("JWT Wallet Balance API", False, f"Exception: {str(e)}")
+    
+    def test_wallet_balance_with_privy_token(self):
+        """Test wallet balance API with Privy token simulation"""
+        print("\n🔑 Testing Wallet Balance API - Privy Token...")
         
         try:
-            # Test session join
-            start_time = time.time()
-            join_data = {
-                "action": "join",
-                "roomId": "integration-test-room",
-                "fee": 0.05,
-                "mode": "cash-game",
-                "region": "us-west-1"
+            # Create a mock Privy token structure
+            privy_payload = {
+                "sub": "privy-user-456",
+                "email": "privy@example.com",
+                "wallet": {
+                    "address": SAMPLE_WALLETS[0]
+                },
+                "iat": int(time.time()),
+                "exp": int(time.time()) + 3600
             }
             
-            response = requests.post(
-                f"{self.api_base}/game-sessions",
-                json=join_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            join_time = time.time() - start_time
+            # Use testing token format for Privy simulation
+            test_token = "testing-" + base64.b64encode(json.dumps(privy_payload).encode()).decode()
             
-            if response.status_code != 200:
-                self.log_test("Game Session Integration - Join", False, f"Join failed: HTTP {response.status_code}", join_time)
-                return False
-            
-            # Test session leave
-            start_time = time.time()
-            leave_data = {
-                "action": "leave",
-                "roomId": "integration-test-room"
-            }
-            
-            response = requests.post(
-                f"{self.api_base}/game-sessions",
-                json=leave_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            leave_time = time.time() - start_time
+            headers = {"Authorization": f"Bearer {test_token}"}
+            response = requests.get(f"{self.api_base}/wallet/balance", headers=headers, timeout=10)
             
             if response.status_code == 200:
-                details = f"Session join/leave cycle completed successfully (Join: {join_time:.3f}s, Leave: {leave_time:.3f}s)"
-                self.log_test("Game Session Integration", True, details, join_time + leave_time)
-                return True
-            else:
-                self.log_test("Game Session Integration - Leave", False, f"Leave failed: HTTP {response.status_code}", leave_time)
-                return False
+                data = response.json()
                 
-        except Exception as e:
-            self.log_test("Game Session Integration", False, f"Error testing session integration: {str(e)}")
-            return False
-
-    def test_navigation_flow_backend_support(self):
-        """Test 5: Navigation Flow Backend Support - Test APIs supporting server browser → game navigation"""
-        print("🔍 TEST 5: NAVIGATION FLOW BACKEND SUPPORT")
-        
-        try:
-            # Test 1: Server browser API
-            start_time = time.time()
-            response = requests.get(f"{self.api_base}/servers", timeout=10)
-            server_time = time.time() - start_time
-            
-            if response.status_code != 200:
-                self.log_test("Navigation Flow - Server Browser", False, f"Server browser API failed: HTTP {response.status_code}", server_time)
-                return False
-            
-            servers_data = response.json()
-            servers = servers_data.get('servers', [])
-            
-            # Test 2: Wallet balance API (needed for paid room validation)
-            start_time = time.time()
-            response = requests.get(f"{self.api_base}/wallet/balance", timeout=10)
-            wallet_time = time.time() - start_time
-            
-            if response.status_code != 200:
-                self.log_test("Navigation Flow - Wallet Balance", False, f"Wallet balance API failed: HTTP {response.status_code}", wallet_time)
-                return False
-            
-            wallet_data = response.json()
-            
-            # Test 3: Game session creation (simulates room joining from server browser)
-            start_time = time.time()
-            session_data = {
-                "action": "join",
-                "roomId": "navigation-test-room",
-                "fee": 0.01,
-                "mode": "cash-game",
-                "region": "us-east-1"
-            }
-            
-            response = requests.post(
-                f"{self.api_base}/game-sessions",
-                json=session_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            session_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                total_time = server_time + wallet_time + session_time
-                details = f"Complete navigation flow supported: {len(servers)} servers available, wallet balance API working, session creation successful (Total: {total_time:.3f}s)"
-                self.log_test("Navigation Flow Backend Support", True, details, total_time)
-                return True
-            else:
-                self.log_test("Navigation Flow - Session Creation", False, f"Session creation failed: HTTP {response.status_code}", session_time)
-                return False
-                
-        except Exception as e:
-            self.log_test("Navigation Flow Backend Support", False, f"Error testing navigation flow: {str(e)}")
-            return False
-
-    def test_websocket_authentication_support(self):
-        """Test 6: WebSocket Authentication Support - Test backend support for WebSocket connections"""
-        print("🔍 TEST 6: WEBSOCKET AUTHENTICATION SUPPORT")
-        
-        try:
-            # Test session API with WebSocket-related parameters
-            start_time = time.time()
-            websocket_session_data = {
-                "action": "join",
-                "roomId": "websocket-test-room",
-                "fee": 0.02,
-                "mode": "cash-game",
-                "region": "us-east-1",
-                "websocketConnection": True,
-                "authToken": "test-auth-token-" + str(int(time.time()))
-            }
-            
-            response = requests.post(
-                f"{self.api_base}/game-sessions",
-                json=websocket_session_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            response_time = time.time() - start_time
-            
-            if response.status_code == 200:
-                result = response.json()
-                success = result.get('success', False)
-                
-                if success:
-                    details = f"WebSocket session parameters accepted, backend supports WebSocket authentication flow"
-                    self.log_test("WebSocket Authentication Support", True, details, response_time)
-                    return True
+                # Check if we got realistic testing balance
+                if data.get('balance', 0) > 0 and data.get('sol_balance', 0) > 0:
+                    self.log_result("Privy Token Wallet Balance", True, 
+                                  f"Balance: ${data.get('balance')}, SOL: {data.get('sol_balance')}, Address: {data.get('wallet_address')}")
                 else:
-                    error_msg = result.get('error', 'Unknown error')
-                    self.log_test("WebSocket Authentication Support", False, f"WebSocket session failed: {error_msg}", response_time)
-                    return False
+                    self.log_result("Privy Token Wallet Balance", False, 
+                                  f"Expected positive balances, got: ${data.get('balance')}, {data.get('sol_balance')} SOL")
             else:
-                # Even if it returns an error, check if it's a validation error (which means the endpoint exists)
-                if response.status_code == 400:
-                    details = f"WebSocket authentication endpoint exists (HTTP 400 validation error expected)"
-                    self.log_test("WebSocket Authentication Support", True, details, response_time)
-                    return True
-                else:
-                    self.log_test("WebSocket Authentication Support", False, f"WebSocket API failed: HTTP {response.status_code}", response_time)
-                    return False
+                self.log_result("Privy Token Wallet Balance API", False, f"HTTP {response.status_code}")
                 
         except Exception as e:
-            self.log_test("WebSocket Authentication Support", False, f"Error testing WebSocket support: {str(e)}")
-            return False
-
-    def test_balance_validation_support(self):
-        """Test 7: Balance Validation Support - Test paid room validation APIs"""
-        print("🔍 TEST 7: BALANCE VALIDATION SUPPORT")
+            self.log_result("Privy Token Wallet Balance API", False, f"Exception: {str(e)}")
+    
+    def test_sample_wallet_balances(self):
+        """Test wallet balance retrieval for sample Solana addresses"""
+        print("\n🎯 Testing Sample Solana Wallet Balances...")
         
-        try:
-            # Test wallet balance API with different authentication scenarios
-            test_scenarios = [
-                ("Guest User", {}),
-                ("JWT Token", {"Authorization": "Bearer test-jwt-token"}),
-                ("Privy Token", {"Authorization": "Bearer privy-test-token"})
-            ]
-            
-            total_time = 0
-            successful_scenarios = 0
-            
-            for scenario_name, headers in test_scenarios:
-                start_time = time.time()
-                response = requests.get(
-                    f"{self.api_base}/wallet/balance",
-                    headers=headers,
-                    timeout=10
-                )
-                scenario_time = time.time() - start_time
-                total_time += scenario_time
+        for i, wallet_address in enumerate(SAMPLE_WALLETS[:3]):  # Test first 3 wallets
+            try:
+                # Test direct Helius API call for this wallet
+                payload = {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "getBalance",
+                    "params": [wallet_address]
+                }
+                
+                response = requests.post(HELIUS_RPC_URL, json=payload, timeout=10)
                 
                 if response.status_code == 200:
                     data = response.json()
-                    balance = data.get('usd', 0)
-                    successful_scenarios += 1
-                    print(f"    ✅ {scenario_name}: Balance ${balance} (HTTP 200)")
-                elif response.status_code in [401, 403]:
-                    # Expected for invalid tokens
-                    successful_scenarios += 1
-                    print(f"    ✅ {scenario_name}: Authentication handled correctly (HTTP {response.status_code})")
+                    if 'result' in data and 'value' in data['result']:
+                        lamports = data['result']['value']
+                        sol_balance = lamports / 1e9
+                        self.log_result(f"Sample Wallet {i+1} Balance", True, 
+                                      f"Address: {wallet_address[:8]}...{wallet_address[-8:]} - {sol_balance:.4f} SOL")
+                    else:
+                        self.log_result(f"Sample Wallet {i+1} Balance", False, 
+                                      f"Invalid response structure: {data}")
                 else:
-                    print(f"    ❌ {scenario_name}: Unexpected response (HTTP {response.status_code})")
-            
-            if successful_scenarios >= 2:  # At least 2 scenarios should work
-                details = f"Balance validation working for {successful_scenarios}/3 scenarios, supports paid room validation"
-                self.log_test("Balance Validation Support", True, details, total_time)
-                return True
-            else:
-                details = f"Only {successful_scenarios}/3 scenarios working, insufficient for paid room validation"
-                self.log_test("Balance Validation Support", False, details, total_time)
-                return False
-                
-        except Exception as e:
-            self.log_test("Balance Validation Support", False, f"Error testing balance validation: {str(e)}")
-            return False
-
-    def test_general_application_health(self):
-        """Test 8: General Application Health - Ensure no regressions from Hathora changes"""
-        print("🔍 TEST 8: GENERAL APPLICATION HEALTH")
+                    self.log_result(f"Sample Wallet {i+1} Balance", False, 
+                                  f"HTTP {response.status_code}")
+                    
+            except Exception as e:
+                self.log_result(f"Sample Wallet {i+1} Balance", False, f"Exception: {str(e)}")
+    
+    def test_wallet_transactions_api(self):
+        """Test wallet transactions API"""
+        print("\n📊 Testing Wallet Transactions API...")
         
         try:
-            # Test multiple endpoints to ensure overall health
-            endpoints_to_test = [
-                ("/", "Root API"),
-                ("/servers", "Server Browser"),
-                ("/wallet/balance", "Wallet Balance"),
-                ("/game-sessions", "Game Sessions")
-            ]
+            response = requests.get(f"{self.api_base}/wallet/transactions", timeout=10)
             
-            total_time = 0
-            successful_endpoints = 0
-            endpoint_results = []
-            
-            for endpoint, name in endpoints_to_test:
-                start_time = time.time()
-                try:
-                    if endpoint == "/game-sessions":
-                        # POST request for game sessions
-                        response = requests.post(
-                            f"{self.api_base}{endpoint}",
-                            json={"action": "health_check"},
-                            headers={'Content-Type': 'application/json'},
-                            timeout=10
-                        )
-                    else:
-                        # GET request for others
-                        response = requests.get(f"{self.api_base}{endpoint}", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check required fields
+                required_fields = ['transactions', 'total_count', 'wallet_address', 'timestamp']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_result("Transactions API Structure", True, 
+                                  f"Count: {data.get('total_count')}, Address: {data.get('wallet_address')}")
+                else:
+                    self.log_result("Transactions API Structure", False, 
+                                  f"Missing fields: {missing_fields}")
                     
-                    endpoint_time = time.time() - start_time
-                    total_time += endpoint_time
-                    
-                    if response.status_code in [200, 400]:  # 400 is acceptable for some endpoints
-                        successful_endpoints += 1
-                        endpoint_results.append(f"{name}: OK ({endpoint_time:.3f}s)")
-                    else:
-                        endpoint_results.append(f"{name}: HTTP {response.status_code} ({endpoint_time:.3f}s)")
-                        
-                except Exception as e:
-                    endpoint_time = time.time() - start_time
-                    total_time += endpoint_time
-                    endpoint_results.append(f"{name}: Error - {str(e)}")
-            
-            success_rate = (successful_endpoints / len(endpoints_to_test)) * 100
-            
-            if success_rate >= 75:  # At least 75% of endpoints should be healthy
-                details = f"Application health: {success_rate:.1f}% ({successful_endpoints}/{len(endpoints_to_test)} endpoints), avg response: {total_time/len(endpoints_to_test):.3f}s"
-                self.log_test("General Application Health", True, details, total_time)
-                return True
+                # Check if transactions is a list
+                if isinstance(data.get('transactions'), list):
+                    self.log_result("Transactions Array Type", True, "Transactions field is proper array")
+                else:
+                    self.log_result("Transactions Array Type", False, 
+                                  f"Transactions field type: {type(data.get('transactions'))}")
             else:
-                details = f"Poor application health: {success_rate:.1f}% ({successful_endpoints}/{len(endpoints_to_test)} endpoints)"
-                self.log_test("General Application Health", False, details, total_time)
-                return False
+                self.log_result("Wallet Transactions API", False, f"HTTP {response.status_code}")
                 
         except Exception as e:
-            self.log_test("General Application Health", False, f"Error testing application health: {str(e)}")
-            return False
+            self.log_result("Wallet Transactions API", False, f"Exception: {str(e)}")
+    
+    def test_json_response_format(self):
+        """Test that APIs return proper JSON responses"""
+        print("\n📋 Testing JSON Response Format...")
+        
+        endpoints = [
+            "/wallet/balance",
+            "/wallet/transactions"
+        ]
+        
+        for endpoint in endpoints:
+            try:
+                response = requests.get(f"{self.api_base}{endpoint}", timeout=10)
+                
+                # Check Content-Type header
+                content_type = response.headers.get('content-type', '')
+                if 'application/json' in content_type:
+                    self.log_result(f"JSON Content-Type {endpoint}", True, f"Content-Type: {content_type}")
+                else:
+                    self.log_result(f"JSON Content-Type {endpoint}", False, f"Content-Type: {content_type}")
+                
+                # Try to parse JSON
+                try:
+                    data = response.json()
+                    self.log_result(f"JSON Parse {endpoint}", True, "Valid JSON response")
+                except json.JSONDecodeError:
+                    self.log_result(f"JSON Parse {endpoint}", False, "Invalid JSON response")
+                    
+            except Exception as e:
+                self.log_result(f"JSON Format {endpoint}", False, f"Exception: {str(e)}")
+    
+    def test_authentication_error_handling(self):
+        """Test error handling for invalid authentication"""
+        print("\n🛡️ Testing Authentication Error Handling...")
+        
+        try:
+            # Test with invalid token
+            headers = {"Authorization": "Bearer invalid-token-12345"}
+            response = requests.get(f"{self.api_base}/wallet/balance", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Should return guest balance for invalid token
+                if data.get('balance') == 0.0 and data.get('wallet_address') == 'Not connected':
+                    self.log_result("Invalid Token Handling", True, "Correctly returns guest balance for invalid token")
+                else:
+                    self.log_result("Invalid Token Handling", False, 
+                                  f"Unexpected response for invalid token: {data}")
+            else:
+                self.log_result("Invalid Token Handling", False, f"HTTP {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Authentication Error Handling", False, f"Exception: {str(e)}")
 
     def run_all_tests(self):
         """Run all Hathora integration tests"""
