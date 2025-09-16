@@ -903,7 +903,7 @@ const AgarIOGame = () => {
       }
       
       const avgReactionTime = reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length
-      if (avgReactionTime < 5) { // Reduced from 10ms to 5ms - allow faster reactions
+      if (avgReactionTime < 2) { // Reduced from 5ms to 2ms - allow much faster reactions
         this.recordViolation('INHUMAN_REACTION_TIME', `Average reaction time: ${avgReactionTime}ms`)
         this.antiCheat.botLikeScore += 15
       }
