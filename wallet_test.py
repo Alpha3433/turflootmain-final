@@ -1,7 +1,21 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for TurfLoot Wallet Endpoints with Privy Authentication
-Focus: Testing wallet balance and transactions endpoints that were recently fixed
+Wallet Functionality Backend Testing Suite with Updated Helius API Key
+Testing wallet balance and transactions endpoints with the new Helius API key: dccb9763-d453-4940-bd43-dfd987f278b1
+
+Review Request Testing:
+1. Test /api/wallet/balance endpoint with the new Helius API key
+2. Test /api/wallet/transactions endpoint 
+3. Verify Helius RPC connectivity with the new API key
+4. Test with sample Solana wallet addresses to ensure proper balance retrieval
+5. Check that the wallet APIs return proper JSON responses
+6. Verify no authentication errors with Helius
+
+Expected behavior:
+- Wallet balance API should return SOL balance successfully
+- Transactions API should fetch transaction history
+- No 401/403 errors from Helius RPC
+- Proper error handling for invalid wallet addresses
 """
 
 import requests
@@ -16,8 +30,17 @@ from datetime import datetime, timedelta
 BASE_URL = "https://turf-fixer.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
-# Use localhost for testing as external URL has ingress issues
-TEST_URL = LOCAL_URL
+# Use external URL for testing as per review request
+TEST_URL = BASE_URL
+HELIUS_API_KEY = "dccb9763-d453-4940-bd43-dfd987f278b1"
+HELIUS_RPC_URL = f"https://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}"
+
+# Sample Solana wallet addresses for testing
+SAMPLE_WALLETS = [
+    "F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG",  # Default testing wallet
+    "GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa",  # Site fee wallet from .env
+    "11111111111111111111111111111112",  # System program (should have 0 balance)
+]
 
 class WalletEndpointTester:
     def __init__(self):
