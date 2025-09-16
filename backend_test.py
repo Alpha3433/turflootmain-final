@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Server Browser Functionality
-Testing the /api/servers endpoint and related server browser features
+Backend Testing for ServerBrowserModalNew Component Fix Verification
+Testing all backend APIs that support the fixed server browser component
 
-Review Request Testing:
-1. Test GET /api/servers endpoint returns 35 servers
-2. Verify server data structure includes required fields: id, name, entryFee, region, regionId, currentPlayers, maxPlayers
-3. Check that servers have entryFee > 0 (cash games)
-4. Verify ping endpoints are accessible for regions
-5. Test server filtering logic works correctly
-6. Ensure all regions are represented: US East, US West, Europe, Asia, Oceania
+PRIORITY FOCUS: Critical Fix Testing
+Recent fixes to ServerBrowserModalNew.jsx:
+1. ✅ Added missing useState declarations (pingingRegions, selectedStakeFilter, etc.)
+2. ✅ Fixed variable name inconsistency (server → room)  
+3. ✅ Corrected emptyServers reference to emptyRooms
 
-Expected behavior:
-- API should return JSON with servers array containing 35 servers
-- Each server should have entryFee values like 0.01, 0.02, 0.05
-- Servers should be grouped by regions and stakes
-- All servers should have currentPlayers: 0 initially (no active sessions)
+TESTING REQUIREMENTS:
+Core Focus (Priority 1):
+1. API Health Check - Verify backend infrastructure is operational
+2. Server Browser API - Test /api/servers endpoint that provides data to component
+3. Hathora Integration - Verify Hathora room creation/management still works
+4. Real-time Server Data - Test server discovery and room listing APIs
+
+Secondary Focus (Priority 2):
+5. Game Session Management - Test join/leave functionality for rooms
+6. Ping Infrastructure - Verify ping endpoint accessibility
+7. General Application Health - Ensure no regressions from fixes
 """
 
 import requests
