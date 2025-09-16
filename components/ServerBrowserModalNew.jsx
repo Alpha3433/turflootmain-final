@@ -764,15 +764,25 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           </div>
                         </div>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
                             console.log('🎯 CREATE button clicked! Group:', group)
                             console.log('🎯 Template server:', group.servers[0])
+                            
+                            // Prevent any event bubbling
+                            e.preventDefault()
+                            e.stopPropagation()
                             
                             // Use the first server in the group as template for creation
                             const templateServer = group.servers[0]
                             
                             console.log('🎯 Calling handleJoinServer with:', templateServer)
-                            handleJoinServer(templateServer)
+                            
+                            // Force call handleJoinServer regardless of Privy state
+                            try {
+                              handleJoinServer(templateServer)
+                            } catch (error) {
+                              console.error('❌ Error in handleJoinServer:', error)
+                            }
                           }}
                           style={{
                             backgroundColor: '#10b981',
