@@ -407,7 +407,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   }
 
   const handleJoinServer = (room) => {
-    console.log('🏠 Joining Hathora room:', room)
+    console.log('🏠 HANDLEJOINSERVER CALLED! Joining Hathora room:', room)
     
     const serverData = {
       id: room.id,
@@ -423,8 +423,16 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       canSpectate: room.canSpectate
     }
     
-    console.log('🎮 Processed room data for join:', serverData)
-    onJoinLobby(serverData)
+    console.log('🎮 HANDLEJOINSERVER: Processed room data for join:', serverData)
+    console.log('🎮 HANDLEJOINSERVER: onJoinLobby type:', typeof onJoinLobby)
+    console.log('🎮 HANDLEJOINSERVER: About to call onJoinLobby...')
+    
+    try {
+      onJoinLobby(serverData)
+      console.log('🎮 HANDLEJOINSERVER: onJoinLobby called successfully!')
+    } catch (error) {
+      console.error('❌ HANDLEJOINSERVER: Error calling onJoinLobby:', error)
+    }
   }
 
   // Add debugging mount effect
