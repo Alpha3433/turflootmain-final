@@ -236,7 +236,7 @@ export default function TurfLootTactical() {
             connectionInfo = {
               host: 'hathora.dev',
               port: 443,
-              region: hathoraRegion,
+              region: actualRegion, // Use the actual region from Hathora
               roomId: hathoraRoomId
             }
           }
