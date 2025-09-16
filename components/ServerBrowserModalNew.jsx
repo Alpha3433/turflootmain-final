@@ -9,7 +9,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [selectedStakeFilter, setSelectedStakeFilter] = useState('All')
-  const [showEmptyServers, setShowEmptyServers] = useState(false)
+  // Removed showEmptyServers state - no longer needed with collapsed design
   const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
   const [errorMessage, setErrorMessage] = useState('')
   const [pingingRegions, setPingingRegions] = useState(false)
