@@ -207,11 +207,11 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           fontSize: '14px'
         }}>
           <div>
-            <strong style={{ color: '#10b981' }}>{totalStats.totalPlayers}</strong>
+            <strong style={{ color: '#10b981' }}>{dynamicStats.totalPlayers}</strong>
             <span style={{ color: '#9ca3af', marginLeft: '4px' }}>Players Online</span>
           </div>
           <div>
-            <strong style={{ color: '#3b82f6' }}>{totalStats.totalActiveServers}</strong>
+            <strong style={{ color: '#3b82f6' }}>{dynamicStats.totalActiveServers}</strong>
             <span style={{ color: '#9ca3af', marginLeft: '4px' }}>Active Servers</span>
           </div>
         </div>
