@@ -197,7 +197,11 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     
     // Measure pings concurrently
     const pingPromises = uniqueEndpoints.map(async (endpoint) => {
-      const ping = await measureClientPing(endpoint)
+      // Find the server that uses this endpoint to get the hathoraRegion
+      const serverWithEndpoint = serverList.find(s => s.pingEndpoint === endpoint)
+      const hathoraRegion = serverWithEndpoint?.hathoraRegion || null
+      
+      const ping = await measureClientPing(endpoint, hathoraRegion)
       return { endpoint, ping }
     })
     
