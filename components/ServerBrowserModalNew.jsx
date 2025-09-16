@@ -13,6 +13,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [realHathoraRooms, setRealHathoraRooms] = useState([])
   const [roomsLoading, setRoomsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [pingCache, setPingCache] = useState(new Map())
   
   const fetchRealHathoraRooms = async () => {
     setRoomsLoading(true)
