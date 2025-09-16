@@ -26,32 +26,35 @@ import requests
 import json
 import time
 import sys
-from typing import Dict, List, Any
+from datetime import datetime
 
 # Configuration
 BASE_URL = "https://hathora-overhaul.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
-class ServerBrowserTester:
+class BackendTester:
     def __init__(self):
         self.test_results = []
-        self.total_tests = 0
-        self.passed_tests = 0
+        self.start_time = time.time()
         
-    def log_test(self, test_name: str, passed: bool, details: str = ""):
-        """Log test results"""
-        self.total_tests += 1
-        if passed:
-            self.passed_tests += 1
-            status = "✅ PASSED"
-        else:
-            status = "❌ FAILED"
-            
-        result = f"{status}: {test_name}"
+    def log_test(self, test_name, success, details="", error=""):
+        """Log test result"""
+        result = {
+            "test": test_name,
+            "success": success,
+            "details": details,
+            "error": error,
+            "timestamp": datetime.now().isoformat()
+        }
+        self.test_results.append(result)
+        
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} {test_name}")
         if details:
-            result += f" - {details}"
-            
-        print(result)
+            print(f"    Details: {details}")
+        if error:
+            print(f"    Error: {error}")
+        print()
         self.test_results.append({
             'test': test_name,
             'passed': passed,
