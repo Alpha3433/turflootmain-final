@@ -14,7 +14,7 @@ from typing import Dict, List, Any
 class ServerBrowserTester:
     def __init__(self):
         # Get base URL from environment
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://mp-game-enhance.preview.emergentagent.com')
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://netbattle-fix.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         
         # Test results tracking
