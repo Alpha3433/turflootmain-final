@@ -615,8 +615,8 @@ export async function GET(request, { params }) {
                   realPlayers = activeSessionsCount
                   console.log(`📊 Room ${roomId}: ${realPlayers} real players`)
                 } catch (error) {
-                  console.error('❌ Error fetching real player count:', error)
-                  realPlayers = 0 // Default to 0 if database error
+                  console.error('❌ Error fetching real player count for', roomId, ':', error.message)
+                  realPlayers = 0 // Default to 0 if database error - room is still joinable
                 }
                 
                 const ping = region.basePing + Math.floor(Math.random() * 15)
