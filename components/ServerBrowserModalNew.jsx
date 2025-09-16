@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 
 const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
-  console.log('🎮 REDESIGNED ServerBrowserModal v4.0 FORCE UPDATE loaded:', isOpen)
+  // Removed console.log to prevent render loop spam
   
   const [servers, setServers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
