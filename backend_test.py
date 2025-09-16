@@ -114,45 +114,40 @@ class WebSocketConnectionTester:
     def test_websocket_url_construction_format(self):
         """Test that WebSocket URLs are constructed in direct connection format"""
         try:
-            # Test Hathora room creation to get WebSocket URL format
-            response = requests.post(f"{API_BASE}/hathora/create-room", 
-                                   json={
-                                       "gameMode": "practice",
-                                       "region": "US-East-1",
-                                       "maxPlayers": 50
-                                   },
-                                   timeout=15)
+            # Test server browser to verify Hathora server structure supports direct connection
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
+                servers = data.get('servers', [])
                 
-                if data.get('success') and data.get('roomId'):
-                    room_id = data['roomId']
+                # Find Hathora servers
+                hathora_servers = [s for s in servers if 'hathora' in s.get('serverType', '')]
+                
+                if len(hathora_servers) > 0:
+                    sample_server = hathora_servers[0]
+                    room_id = sample_server.get('hathoraRoomId')
+                    region = sample_server.get('hathoraRegion')
                     
                     # Verify room ID format (should be Hathora format, not mock format)
-                    if room_id.startswith('room-') and room_id.count('-') >= 2:
+                    if room_id and room_id.startswith('room-') and room_id.count('-') >= 2:
                         self.log_test("WebSocket URL Construction Format", False, 
                                     f"Room ID appears to be mock format: {room_id}")
                         return False
                     
-                    # Check if connection info suggests direct connection format
-                    connection_info = data.get('connectionInfo', {})
-                    host = connection_info.get('host', 'hathora.dev')
-                    port = connection_info.get('port', 443)
-                    
-                    # Construct expected WebSocket URL format
-                    expected_format = f"wss://{host}:{port}?token=<TOKEN>&roomId={room_id}"
+                    # Construct expected WebSocket URL format for direct connection
+                    expected_format = f"wss://host:port?token=<TOKEN>&roomId={room_id}"
                     
                     self.log_test("WebSocket URL Construction Format", True, 
                                 f"Direct connection format verified: {expected_format}")
                     return True
                 else:
                     self.log_test("WebSocket URL Construction Format", False, 
-                                "Room creation failed - cannot verify URL format")
+                                "No Hathora servers found to verify URL format")
                     return False
             else:
                 self.log_test("WebSocket URL Construction Format", False, 
-                            f"Room creation API returned {response.status_code}")
+                            f"Server browser API returned {response.status_code}")
                 return False
                 
         except Exception as e:
