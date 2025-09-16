@@ -243,6 +243,18 @@ export async function GET(request) {
       console.log('💰 Final balance response:', finalBalance)
       return NextResponse.json(finalBalance, { headers: corsHeaders })
     }
+    
+    // Fallback for any unhandled cases
+    console.log('⚠️ Unhandled case, returning guest balance')
+    const fallbackBalance = {
+      balance: 0.00,
+      currency: 'USD',
+      sol_balance: 0.0000,
+      usdc_balance: 0.00,
+      wallet_address: 'Not connected'
+    }
+    return NextResponse.json(fallbackBalance, { headers: corsHeaders })
+    
   } catch (error) {
     console.error('❌ Error in wallet balance endpoint:', error)
     return NextResponse.json({ 
