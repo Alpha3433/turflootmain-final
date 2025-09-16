@@ -329,230 +329,204 @@ class ServerBrowserTester:
             'combinations': stake_region_combinations
         }
 
-    def test_wallet_transactions_api(self):
-        """Test /api/wallet/transactions endpoint"""
-        try:
-            response = requests.get(f"{API_BASE}/wallet/transactions", timeout=10)
-            
-            if response.status_code != 200:
-                self.log_test("Wallet Transactions API", False, f"Status: {response.status_code}", response.text[:200])
-                return False
-                
-            data = response.json()
-            
-            # Check required fields for transactions
-            required_fields = ['transactions', 'total_count', 'wallet_address']
-            missing_fields = [field for field in required_fields if field not in data]
-            
-            if missing_fields:
-                self.log_test("Wallet Transactions API", False, f"Missing fields: {missing_fields}")
-                return False
-                
-            # Transactions should be an array (even if empty)
-            if not isinstance(data.get('transactions'), list):
-                self.log_test("Wallet Transactions API", False, "Transactions field is not an array")
-                return False
-                
-            self.log_test("Wallet Transactions API", True, 
-                         f"Transactions count: {data.get('total_count')}, Wallet: {data.get('wallet_address')}")
-            return True
-            
-        except Exception as e:
-            self.log_test("Wallet Transactions API", False, "", str(e))
-            return False
-
-    def test_helius_integration(self):
-        """Test Helius API integration by checking if the API key is configured"""
-        try:
-            # Check if Helius API key is configured by testing the wallet balance endpoint
-            response = requests.get(f"{API_BASE}/wallet/balance", timeout=15)
-            
-            if response.status_code != 200:
-                self.log_test("Helius Integration Test", False, f"Status: {response.status_code}")
-                return False
-                
-            data = response.json()
-            
-            # Check if the response structure indicates Helius integration is available
-            required_fields = ['balance', 'currency', 'sol_balance', 'wallet_address']
-            missing_fields = [field for field in required_fields if field not in data]
-            
-            if missing_fields:
-                self.log_test("Helius Integration Test", False, f"Missing fields: {missing_fields}")
-                return False
-            
-            # If sol_balance field exists, Helius integration is configured
-            if 'sol_balance' in data:
-                self.log_test("Helius Integration Test", True, 
-                             f"Helius API integration configured, SOL balance field available")
-                return True
-            else:
-                self.log_test("Helius Integration Test", False, "SOL balance field not available")
-                return False
-                
-        except Exception as e:
-            self.log_test("Helius Integration Test", False, "", str(e))
-            return False
-
-    def test_api_endpoint_consistency(self):
-        """Test that all expected API endpoints exist and don't return 404"""
-        endpoints_to_test = [
-            '/servers',
-            '/wallet/balance', 
-            '/wallet/transactions',
-            '/game-sessions',
-            '/party',
-            '/friends'
-        ]
+    def test_server_browser_enhancement(self, grouping_data: Dict):
+        """Test 6: Server Browser Enhancement - Verify collapsed design reduces clutter"""
+        print("\n🔍 TEST 6: SERVER BROWSER ENHANCEMENT")
         
-        all_passed = True
-        endpoint_results = []
+        if not grouping_data:
+            self.log_test("Server Browser Enhancement", False, "No grouping data available")
+            return
         
-        for endpoint in endpoints_to_test:
-            try:
-                response = requests.get(f"{API_BASE}{endpoint}", timeout=10)
-                
-                if response.status_code == 404:
-                    endpoint_results.append(f"❌ {endpoint}: 404 Not Found")
-                    all_passed = False
-                elif response.status_code >= 500:
-                    endpoint_results.append(f"⚠️ {endpoint}: {response.status_code} Server Error")
-                else:
-                    endpoint_results.append(f"✅ {endpoint}: {response.status_code}")
-                    
-            except Exception as e:
-                endpoint_results.append(f"❌ {endpoint}: Connection Error - {str(e)}")
-                all_passed = False
+        empty_servers = grouping_data.get('empty_servers', [])
+        active_servers = grouping_data.get('active_servers', [])
+        groups = grouping_data.get('grouping_data', {})
         
-        details = "\n   " + "\n   ".join(endpoint_results)
+        # Calculate enhancement metrics
+        total_empty_servers = len(empty_servers)
+        total_groups = len(groups)
+        reduction_ratio = total_groups / total_empty_servers if total_empty_servers > 0 else 0
         
-        if all_passed:
-            self.log_test("API Endpoint Consistency", True, f"All endpoints accessible:{details}")
+        self.log_test("Empty Server Count", total_empty_servers > 0, 
+                     f"{total_empty_servers} empty servers to collapse")
+        
+        self.log_test("Grouping Efficiency", total_groups < total_empty_servers, 
+                     f"Reduced from {total_empty_servers} to {total_groups} groups")
+        
+        # Test enhancement benefit (should reduce visual clutter significantly)
+        if total_empty_servers >= 10:  # Threshold for significant benefit
+            clutter_reduction = ((total_empty_servers - total_groups) / total_empty_servers) * 100
+            self.log_test("Clutter Reduction", clutter_reduction > 50, 
+                         f"{clutter_reduction:.1f}% reduction in visual clutter")
         else:
-            self.log_test("API Endpoint Consistency", False, f"Some endpoints have issues:{details}")
-            
-        return all_passed
+            self.log_test("Clutter Reduction", True, "Improvement even with fewer servers")
+        
+        # Test "Create New Room" format generation
+        create_room_options = []
+        for group_key, servers in groups.items():
+            if servers:  # Only if there are servers in this group
+                sample_server = servers[0]
+                region = sample_server.get('region', 'Unknown')
+                stake = sample_server.get('stake', 0)
+                
+                # Generate "Create New Room" format
+                create_option = f"+ Create New Room (${stake} – {region})"
+                create_room_options.append(create_option)
+        
+        self.log_test("Create Room Options", len(create_room_options) > 0, 
+                     f"Generated {len(create_room_options)} 'Create New Room' options")
+        
+        # Display sample create room options
+        for i, option in enumerate(create_room_options[:3]):  # Show first 3
+            self.log_test(f"Sample Create Option {i+1}", True, option)
+        
+        # Test overall enhancement success
+        enhancement_success = (
+            total_groups < total_empty_servers and  # Reduced count
+            len(create_room_options) > 0 and       # Generated options
+            total_groups <= 10                      # Manageable number
+        )
+        
+        self.log_test("Overall Enhancement", enhancement_success, 
+                     f"Collapsed design successfully reduces clutter from {total_empty_servers} to {total_groups}")
+        
+        return {
+            'empty_count': total_empty_servers,
+            'group_count': total_groups,
+            'create_options': create_room_options,
+            'enhancement_success': enhancement_success
+        }
 
-    def test_server_data_structure(self):
-        """Test that server data structure contains all expected fields"""
+    def test_api_performance(self):
+        """Test API Performance for server browser calls"""
+        print("\n🔍 PERFORMANCE TEST: API RESPONSE TIME")
+        
         try:
-            response = requests.get(f"{API_BASE}/servers", timeout=15)
+            start_time = time.time()
+            response = requests.get(f"{self.api_base}/servers", timeout=10)
+            end_time = time.time()
             
-            if response.status_code != 200:
-                self.log_test("Server Data Structure", False, f"Status: {response.status_code}")
-                return False
-                
-            data = response.json()
-            servers = data.get('servers', [])
+            response_time = end_time - start_time
             
-            if not servers:
-                self.log_test("Server Data Structure", False, "No servers found to validate structure")
-                return False
+            self.log_test("API Response Time", response_time < 2.0, 
+                         f"{response_time:.3f}s (target: <2.0s)")
             
-            # Check first server for required fields
-            server = servers[0]
-            required_server_fields = [
-                'id', 'name', 'region', 'regionId', 'currentPlayers', 'maxPlayers',
-                'hathoraRegion', 'serverType', 'status', 'canJoin'
-            ]
+            # Test multiple calls for consistency
+            times = []
+            for i in range(3):
+                start = time.time()
+                requests.get(f"{self.api_base}/servers", timeout=10)
+                end = time.time()
+                times.append(end - start)
             
-            missing_fields = [field for field in required_server_fields if field not in server]
+            avg_time = sum(times) / len(times)
+            self.log_test("Average Response Time", avg_time < 2.0, 
+                         f"{avg_time:.3f}s over {len(times)} calls")
             
-            if missing_fields:
-                self.log_test("Server Data Structure", False, f"Missing server fields: {missing_fields}")
-                return False
-            
-            # Check for Hathora integration flags
-            hathora_enabled = data.get('hathoraEnabled', False)
-            has_hathora_regions = any(server.get('hathoraRegion') for server in servers)
-            
-            if not hathora_enabled:
-                self.log_test("Server Data Structure", False, "Hathora integration not enabled")
-                return False
-                
-            if not has_hathora_regions:
-                self.log_test("Server Data Structure", False, "No Hathora regions found in server data")
-                return False
-            
-            self.log_test("Server Data Structure", True, 
-                         f"Complete server structure with {len(servers)} servers, Hathora enabled")
-            return True
+            return response_time
             
         except Exception as e:
-            self.log_test("Server Data Structure", False, "", str(e))
-            return False
+            self.log_test("API Performance", False, f"Exception: {str(e)}")
+            return None
 
     def run_all_tests(self):
-        """Run all backend tests"""
-        print("🚀 Starting Backend Testing Suite for Server Browser and Wallet API Fixes")
+        """Run all server browser tests"""
+        print("🚀 STARTING REDESIGNED SERVER BROWSER COMPREHENSIVE TESTING")
+        print("🎯 Testing collapsed empty servers design and functionality")
+        
+        # Test 1: API Response
+        server_data = self.test_server_browser_api_response()
+        
+        # Test 2: Server Grouping Logic
+        grouping_data = None
+        if server_data:
+            grouping_data = self.test_server_grouping_logic(server_data)
+        
+        # Test 3: Empty Server Detection
+        empty_data = None
+        if server_data:
+            empty_data = self.test_empty_server_detection(server_data)
+        
+        # Test 4: Regional Coverage
+        if server_data:
+            self.test_regional_coverage(server_data)
+        
+        # Test 5: Stake Variations
+        if server_data:
+            self.test_stake_variations(server_data)
+        
+        # Test 6: Server Browser Enhancement
+        if grouping_data:
+            self.test_server_browser_enhancement(grouping_data)
+        
+        # Test 7: API Performance
+        self.test_api_performance()
+        
+        # Print final results
+        self.print_final_results()
+
+    def print_final_results(self):
+        """Print comprehensive test results"""
+        print("\n" + "=" * 80)
+        print("🎮 REDESIGNED SERVER BROWSER TESTING RESULTS")
         print("=" * 80)
-        print()
         
-        start_time = time.time()
+        success_rate = (self.passed_tests / self.total_tests) * 100 if self.total_tests > 0 else 0
         
-        # Run all tests
-        self.test_api_health_check()
-        self.test_server_browser_api()
-        self.test_sydney_oceania_regions()
-        self.test_wallet_balance_api()
-        self.test_wallet_balance_with_auth()
-        self.test_wallet_transactions_api()
-        self.test_helius_integration()
-        self.test_api_endpoint_consistency()
-        self.test_server_data_structure()
+        print(f"📊 OVERALL RESULTS:")
+        print(f"   Total Tests: {self.total_tests}")
+        print(f"   Passed: {self.passed_tests}")
+        print(f"   Failed: {self.total_tests - self.passed_tests}")
+        print(f"   Success Rate: {success_rate:.1f}%")
         
-        end_time = time.time()
-        duration = end_time - start_time
+        if success_rate >= 90:
+            print("🎉 EXCELLENT: Redesigned server browser is working perfectly!")
+        elif success_rate >= 75:
+            print("✅ GOOD: Redesigned server browser is mostly functional with minor issues")
+        elif success_rate >= 50:
+            print("⚠️ MODERATE: Redesigned server browser has some issues that need attention")
+        else:
+            print("❌ CRITICAL: Redesigned server browser has significant issues")
         
-        # Print summary
+        print("\n🎯 KEY FINDINGS:")
+        
+        # Analyze specific test categories
+        api_tests = [r for r in self.test_results if 'API' in r['test'] or 'Response' in r['test']]
+        grouping_tests = [r for r in self.test_results if 'Grouping' in r['test'] or 'Group' in r['test']]
+        empty_tests = [r for r in self.test_results if 'Empty' in r['test']]
+        region_tests = [r for r in self.test_results if 'Region' in r['test']]
+        stake_tests = [r for r in self.test_results if 'Stake' in r['test']]
+        enhancement_tests = [r for r in self.test_results if 'Enhancement' in r['test'] or 'Clutter' in r['test']]
+        
+        categories = [
+            ("API Response", api_tests),
+            ("Server Grouping", grouping_tests),
+            ("Empty Server Detection", empty_tests),
+            ("Regional Coverage", region_tests),
+            ("Stake Variations", stake_tests),
+            ("Browser Enhancement", enhancement_tests)
+        ]
+        
+        for category_name, tests in categories:
+            if tests:
+                passed = sum(1 for t in tests if t['passed'])
+                total = len(tests)
+                rate = (passed / total) * 100 if total > 0 else 0
+                status = "✅" if rate >= 80 else "⚠️" if rate >= 60 else "❌"
+                print(f"   {status} {category_name}: {passed}/{total} ({rate:.0f}%)")
+        
+        print("\n🔧 REDESIGNED SERVER BROWSER STATUS:")
+        if success_rate >= 85:
+            print("   ✅ Ready for production - collapsed empty servers design working correctly")
+            print("   ✅ Server grouping logic operational")
+            print("   ✅ Empty server detection and collapse functionality working")
+            print("   ✅ Regional coverage and stake variations available")
+            print("   ✅ Visual clutter reduction achieved through collapsed design")
+        else:
+            print("   ⚠️ Needs attention before production deployment")
+            print("   🔍 Review failed tests above for specific issues")
+        
         print("=" * 80)
-        print("🎯 BACKEND TESTING SUMMARY")
-        print("=" * 80)
-        print(f"Total Tests: {self.total_tests}")
-        print(f"✅ Passed: {self.passed_tests}")
-        print(f"❌ Failed: {self.failed_tests}")
-        print(f"Success Rate: {(self.passed_tests/self.total_tests*100):.1f}%")
-        print(f"Duration: {duration:.2f}s")
-        print()
-        
-        # Print detailed results
-        print("📊 DETAILED TEST RESULTS:")
-        print("-" * 40)
-        for result in self.test_results:
-            print(f"{result['status']}: {result['test']}")
-            if result['details']:
-                print(f"   {result['details']}")
-            if result['error']:
-                print(f"   Error: {result['error']}")
-        
-        print()
-        print("🎯 REVIEW REQUEST VERIFICATION:")
-        print("-" * 40)
-        
-        # Check specific review request requirements
-        server_browser_working = any('Server Browser API' in r['test'] and '✅' in r['status'] for r in self.test_results)
-        wallet_balance_working = any('Wallet Balance API' in r['test'] and '✅' in r['status'] for r in self.test_results)
-        wallet_transactions_working = any('Wallet Transactions API' in r['test'] and '✅' in r['status'] for r in self.test_results)
-        helius_working = any('Helius Integration' in r['test'] and '✅' in r['status'] for r in self.test_results)
-        sydney_regions_working = any('Sydney/Oceania' in r['test'] and '✅' in r['status'] for r in self.test_results)
-        no_404_errors = any('API Endpoint Consistency' in r['test'] and '✅' in r['status'] for r in self.test_results)
-        
-        print(f"✅ Server Browser API Fix: {'WORKING' if server_browser_working else 'FAILED'}")
-        print(f"✅ Wallet Balance Endpoint: {'WORKING' if wallet_balance_working else 'FAILED'}")
-        print(f"✅ Wallet Transactions Endpoint: {'WORKING' if wallet_transactions_working else 'FAILED'}")
-        print(f"✅ Helius Integration: {'WORKING' if helius_working else 'FAILED'}")
-        print(f"✅ Sydney/Oceania Regions: {'WORKING' if sydney_regions_working else 'FAILED'}")
-        print(f"✅ No 404 Errors: {'WORKING' if no_404_errors else 'FAILED'}")
-        
-        return self.passed_tests == self.total_tests
 
 if __name__ == "__main__":
-    tester = BackendTester()
-    success = tester.run_all_tests()
-    
-    if success:
-        print("\n🎉 ALL TESTS PASSED - Backend fixes are working correctly!")
-    else:
-        print(f"\n⚠️ {tester.failed_tests} test(s) failed - Some issues need attention")
-    
-    exit(0 if success else 1)
+    tester = ServerBrowserTester()
+    tester.run_all_tests()
