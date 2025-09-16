@@ -98,14 +98,16 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     return flagMap[region] || '🌍'
   }
 
-  // Process servers
-  const processedServers = servers.map(server => ({
-    ...server,
-    stakeCategory: getStakeCategory(server.entryFee || 0),
-    regionFlag: getRegionFlag(server.region),
-    isActive: server.currentPlayers > 0,
-    isEmpty: server.currentPlayers === 0
-  }))
+  // Process servers - exclude practice servers (entryFee === 0)
+  const processedServers = servers
+    .filter(server => server.entryFee > 0) // Only show cash games, remove practice servers
+    .map(server => ({
+      ...server,
+      stakeCategory: getStakeCategory(server.entryFee || 0),
+      regionFlag: getRegionFlag(server.region),
+      isActive: server.currentPlayers > 0,
+      isEmpty: server.currentPlayers === 0
+    }))
 
   // Filter by stake
   const filteredServers = selectedStakeFilter === 'All' 
