@@ -1939,18 +1939,64 @@ export default function TurfLootTactical() {
     router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
   }
 
-  const handleJoinLobby = (serverData) => {
-    console.log('Joining lobby:', serverData)
-    // Navigate to the agario game with server data
-    const queryParams = new URLSearchParams({
-      roomId: serverData.id || 'lobby-' + Date.now(),
-      mode: serverData.mode || 'practice',
-      fee: serverData.entryFee || 0,
-      region: serverData.region || 'US-East',
-      name: serverData.name || 'Unknown Server'
-    })
-    router.push(`/agario?${queryParams.toString()}`)
-    setIsServerBrowserOpen(false) // Close the modal after joining
+  const handleJoinLobby = async (serverData) => {
+    console.log('🌐 Server Browser: Joining server via Hathora:', serverData)
+    
+    try {
+      // For cash games, validate balance first
+      if (serverData.entryFee > 0) {
+        const balanceCheck = validatePaidRoom(`Server Browser: ${serverData.name} ($${serverData.entryFee})`)
+        if (!balanceCheck) {
+          console.log('❌ Insufficient funds for server:', serverData.name)
+          return
+        }
+        console.log('✅ Balance validated for server browser entry')
+      }
+      
+      // Use the smart matchmaking system to create/join actual Hathora room
+      console.log(`🎯 Creating Hathora room for server: ${serverData.name}`)
+      console.log(`💰 Entry fee: $${serverData.entryFee}`)
+      console.log(`🌍 Region: ${serverData.region}`)
+      
+      const matchResult = await findOrCreateRoom(
+        serverData.region, 
+        serverData.entryFee, 
+        serverData.mode || 'competitive'
+      )
+      
+      if (matchResult) {
+        const { roomId, serverData: hathoraServerData, action } = matchResult
+        
+        console.log(`🎉 Server Browser: Hathora room ready!`)
+        console.log(`📍 Action: ${action}`)
+        console.log(`🏠 Room ID: ${roomId}`)
+        console.log(`🎮 Server: ${hathoraServerData.name}`)
+        console.log(`👥 Players: ${hathoraServerData.currentPlayers}/${hathoraServerData.maxPlayers}`)
+        
+        // Navigate to actual multiplayer game with Hathora room
+        const queryParams = new URLSearchParams({
+          roomId: roomId, // Real Hathora room ID
+          mode: serverData.entryFee > 0 ? 'cash' : 'practice',
+          fee: serverData.entryFee || 0,
+          region: serverData.region,
+          name: serverData.name,
+          multiplayer: 'hathora', // Ensure multiplayer mode
+          server: 'hathora' // Use Hathora backend
+        })
+        
+        console.log(`🚀 Navigating to Hathora multiplayer game: /agario?${queryParams.toString()}`)
+        router.push(`/agario?${queryParams.toString()}`)
+        setIsServerBrowserOpen(false) // Close the modal after joining
+        
+      } else {
+        console.error('❌ Failed to create Hathora room for server browser')
+        alert('Failed to join server. Please try again.')
+      }
+      
+    } catch (error) {
+      console.error('❌ Error joining server from browser:', error)
+      alert(`Failed to join server: ${error.message}`)
+    }
   }
 
   const createDesktopLeaderboardPopup = async () => {
