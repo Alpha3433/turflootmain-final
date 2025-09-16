@@ -35,10 +35,24 @@ Secondary Focus (Priority 2):
 import requests
 import json
 import time
+import base64
 import sys
 from datetime import datetime
 
-class HathoraBackendTester:
+# Configuration
+HELIUS_API_KEY = "dccb9763-d453-4940-bd43-dfd987f278b1"
+HELIUS_RPC_URL = f"https://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}"
+
+# Sample Solana addresses for testing
+SAMPLE_WALLETS = [
+    "F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG",  # Test wallet 1
+    "GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa",  # Site fee wallet
+    "11111111111111111111111111111112",              # System program (should have balance)
+    "So11111111111111111111111111111111111111112",   # Wrapped SOL mint
+    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"   # USDC mint
+]
+
+class WalletTester:
     def __init__(self):
         # Get base URL from environment
         with open('/app/.env', 'r') as f:
