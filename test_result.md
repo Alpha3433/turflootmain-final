@@ -117,7 +117,17 @@ test_plan:
   test_priority: "high_first"
 
 backend:
-  - task: "Mobile Layout Redesign - Vertical Stacking Implementation"
+  - task: "Server Browser Modal Investigation and Fix"
+    implemented: true
+    working: true
+    file: "/app/app/page.js, /app/components/ServerBrowserModalNew.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "✅ SERVER BROWSER MODAL ISSUE RESOLVED: Successfully identified and fixed the root cause of why the redesigned server browser modal wasn't appearing. PROBLEM DISCOVERED: The application had TWO server browser systems: 1) React ServerBrowserModal component (redesigned) - never being used, 2) DOM-created popup via createDesktopServerBrowserPopup() - generating old-style HTML. ROOT CAUSE: The SERVER BROWSER button onClick handlers were calling createDesktopServerBrowserPopup() instead of setIsServerBrowserOpen(true), so the redesigned React component was never triggered. SOLUTION IMPLEMENTED: 1) Replaced createDesktopServerBrowserPopup() calls with setIsServerBrowserOpen(true) in both desktop and mobile button handlers, 2) Increased z-index from 1000 to 99999 to ensure the modal appears above Privy authentication modals, 3) Fixed authentication flow conflict where Privy login modal was overlaying the server browser modal. VERIFICATION: Screenshots confirm the redesigned modal with '🎮 NEW REDESIGNED SERVER BROWSER v4.0' header, condensed server format, stake filter pills, and modern styling is now displaying correctly. The new design features are working: one-line server format, region flags, active/empty server separation, and dynamic player counts. GOAL: Ensure users see the redesigned server browser modal instead of the old DOM-created popup when clicking SERVER BROWSER button."
     implemented: true
     working: true
     file: "/app/app/page.js"
