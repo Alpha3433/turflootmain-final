@@ -2084,13 +2084,6 @@ export default function TurfLootTactical() {
       
       alert('Failed to create Hathora room. Please try again.')
     }
-        alert(`Server connection failed: ${error.message}`)
-      } else if (error.message.includes('network') || error.message.includes('fetch')) {
-        alert(`Network error: Please check your connection and try again.`)
-      } else {
-        alert(`Failed to join server: ${error.message}`)
-      }
-    }
   }
 
   const createDesktopLeaderboardPopup = async () => {
