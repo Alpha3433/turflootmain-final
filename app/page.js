@@ -12494,7 +12494,7 @@ export default function TurfLootTactical() {
         </div>
       )}
       
-      {/* Debug Info */}
+      {/* Debug Info - Show loading state */}
       {isServerBrowserOpen && (
         <div style={{
           position: 'fixed',
@@ -12509,6 +12509,21 @@ export default function TurfLootTactical() {
           Modal should be open: {isServerBrowserOpen.toString()}
         </div>
       )}
+      
+      {/* Debug: Local Practice Loading State */}
+      <div style={{
+        position: 'fixed',
+        bottom: '10px',
+        left: '10px',
+        background: localPracticeLoading ? 'green' : 'gray',
+        color: 'white',
+        padding: '8px',
+        zIndex: 9999,
+        fontSize: '12px',
+        borderRadius: '4px'
+      }}>
+        Loading State: {localPracticeLoading.toString()}
+      </div>
 
       {/* Local Practice Loading Popup - Desktop Only */}
       {localPracticeLoading && (
