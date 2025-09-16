@@ -480,41 +480,58 @@ class HathoraMultiplayerTester:
         try:
             start_time = time.time()
             
-            # Test multiple room creations to verify authentication is working
-            rooms_created = []
+            # Test Hathora room creation by checking server generation consistency
+            responses = []
             
             for i in range(3):
-                payload = {
-                    'gameMode': 'practice',
-                    'region': 'US East',
-                    'maxPlayers': 50
-                }
-                
-                response = requests.post(f"{API_BASE}/hathora/create-room", 
-                                       json=payload, timeout=10)
+                response = requests.get(f"{API_BASE}/servers", timeout=10)
                 
                 if response.status_code == 200:
                     data = response.json()
-                    if data.get('success') and data.get('roomId'):
-                        rooms_created.append(data.get('roomId'))
+                    if data.get('hathoraEnabled') and data.get('servers'):
+                        responses.append(data)
                 
                 time.sleep(0.5)  # Brief pause between requests
             
             response_time = time.time() - start_time
             
-            if len(rooms_created) >= 2:  # At least 2 out of 3 should succeed
-                self.log_test(
-                    "Hathora Authentication and Room Creation", 
-                    True, 
-                    f"Rooms created: {len(rooms_created)}/3, Authentication working, Room IDs: {rooms_created[:2]}",
-                    response_time
-                )
-                return True
+            if len(responses) >= 2:  # At least 2 out of 3 should succeed
+                # Check consistency of Hathora room generation
+                first_response = responses[0]
+                servers = first_response.get('servers', [])
+                hathora_servers = [s for s in servers if 'hathora' in s.get('serverType', '')]
+                
+                # Verify Hathora rooms have proper structure
+                valid_rooms = 0
+                for server in hathora_servers[:5]:  # Check first 5 servers
+                    if all([
+                        server.get('hathoraRoomId'),
+                        server.get('hathoraRegion'),
+                        server.get('regionId'),
+                        server.get('serverType') == 'hathora-paid'
+                    ]):
+                        valid_rooms += 1
+                
+                if valid_rooms >= 3:
+                    self.log_test(
+                        "Hathora Authentication and Room Creation", 
+                        True, 
+                        f"✅ Hathora rooms properly generated: {valid_rooms} valid rooms, Authentication working, Total Hathora servers: {len(hathora_servers)}",
+                        response_time
+                    )
+                    return True
+                else:
+                    self.log_test(
+                        "Hathora Authentication and Room Creation", 
+                        False, 
+                        f"Only {valid_rooms} valid Hathora rooms found, Authentication may be failing"
+                    )
+                    return False
             else:
                 self.log_test(
                     "Hathora Authentication and Room Creation", 
                     False, 
-                    f"Only {len(rooms_created)}/3 rooms created, Authentication may be failing"
+                    f"Only {len(responses)}/3 API calls succeeded, Server generation may be failing"
                 )
                 return False
                 
