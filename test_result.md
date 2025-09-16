@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "PHASE 1: Critical Issue Resolution - Server Browser Modal Investigation: Investigate why the redesigned server browser modal isn't rendering and force the new design to appear on desktop. The user reported that despite extensive changes made to ServerBrowserModalNew.jsx, the old server browser design persists and the new design is not consistently rendering on the frontend."
+user_problem_statement: "Priority 1 - Critical Hathora SDK Fix: Fix the persistent Hathora client issue where region mapping fails (Oceania servers creating Washington D.C. rooms), resolve HathoraClientModule is not a constructor and getConnectionInfo not available errors, and simplify the Hathora client by removing problematic getConnectionInfo calls."
 
 # Test plan for this run
 
