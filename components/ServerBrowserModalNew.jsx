@@ -11,27 +11,47 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [selectedStakeFilter, setSelectedStakeFilter] = useState('All')
   const [showEmptyServers, setShowEmptyServers] = useState(false)
   const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
+  const [errorMessage, setErrorMessage] = useState('')
 
   // Fetch servers
   const fetchServers = async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true)
+    setErrorMessage('') // Clear previous errors
+    
     try {
       console.log('🌐 Fetching servers from /api/servers/lobbies...')
-      const response = await fetch('/api/servers/lobbies')
-      console.log('📡 Server response status:', response.status)
+      const response = await fetch('/api/servers/lobbies', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin'
+      })
+      console.log('📡 Server response status:', response.status, response.statusText)
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const errorText = await response.text()
+        console.error('❌ Server response error:', errorText)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
       }
       
       const data = await response.json()
       console.log('✅ Server data received:', {
         servers: data.servers?.length || 0,
         totalPlayers: data.totalPlayers || 0,
-        totalActiveServers: data.totalActiveServers || 0
+        totalActiveServers: data.totalActiveServers || 0,
+        sampleServer: data.servers?.[0]?.name || 'No servers'
       })
       
-      setServers(data.servers || [])
+      if (!data.servers || data.servers.length === 0) {
+        console.warn('⚠️ No servers in response')
+        setErrorMessage('No servers available')
+        setServers([])
+      } else {
+        setServers(data.servers)
+        setErrorMessage('')
+      }
+      
       setTotalStats({
         totalPlayers: data.totalPlayers || 0,
         totalActiveServers: data.totalActiveServers || 0
@@ -40,8 +60,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       console.error('❌ Error fetching servers:', error)
       console.error('❌ Error details:', {
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
+        name: error.name
       })
+      setErrorMessage(`Failed to load servers: ${error.message}`)
       setServers([])
     }
     setIsLoading(false)
