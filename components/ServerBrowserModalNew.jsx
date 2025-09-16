@@ -676,7 +676,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                 // Group empty servers by region and stake for collapsed display
                 const groupedEmptyServers = {}
                 
-                emptyServers.forEach(server => {
+                emptyRooms.forEach(server => {
                   const key = `${server.regionId}-${server.entryFee}`
                   if (!groupedEmptyServers[key]) {
                     groupedEmptyServers[key] = {
