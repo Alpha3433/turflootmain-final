@@ -310,6 +310,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     onJoinLobby(serverData)
   }
 
+  // Add debugging mount effect
+  useEffect(() => {
+    console.log('🔧 ServerBrowserModalNew component mounted!')
+    console.log('🔧 handleJoinServer function:', typeof handleJoinServer)
+    console.log('🔧 onJoinLobby prop:', typeof onJoinLobby)
+  }, [])
+
   if (!isOpen) return null
 
   return (
