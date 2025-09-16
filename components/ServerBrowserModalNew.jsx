@@ -357,15 +357,15 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     return flagMap[region] || '🌍'
   }
 
-  // Process servers - exclude practice servers (entryFee === 0) and sort by ping
-  const processedServers = servers
-    .filter(server => server.entryFee > 0) // Only show cash games, remove practice servers
-    .map(server => ({
-      ...server,
-      stakeCategory: getStakeCategory(server.entryFee || 0),
-      regionFlag: getRegionFlag(server.region),
-      isActive: server.currentPlayers > 0,
-      isEmpty: server.currentPlayers === 0
+  // Process real Hathora rooms - exclude practice servers (entryFee === 0) and sort by ping
+  const processedRooms = realHathoraRooms
+    .filter(room => room.entryFee > 0) // Only show cash games, remove practice servers
+    .map(room => ({
+      ...room,
+      stakeCategory: getStakeCategory(room.entryFee || 0),
+      regionFlag: room.flag || getRegionFlag(room.region),
+      isActive: room.currentPlayers > 0,
+      isEmpty: room.currentPlayers === 0
     }))
     .sort((a, b) => {
       // Primary sort: by ping (lowest first) - but only if both have ping data
@@ -376,7 +376,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       if (a.ping !== null && b.ping === null) return -1
       if (a.ping === null && b.ping !== null) return 1
       
-      // Secondary sort: active servers first (if no ping difference)
+      // Secondary sort: active rooms first (if no ping difference)
       if (a.currentPlayers > 0 && b.currentPlayers === 0) return -1
       if (a.currentPlayers === 0 && b.currentPlayers > 0) return 1
       
@@ -384,19 +384,16 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       return a.region.localeCompare(b.region)
     })
 
-  // Filter by stake
-  const filteredServers = selectedStakeFilter === 'All' 
-    ? processedServers 
-    : processedServers.filter(server => server.stakeCategory === selectedStakeFilter)
-
   // Separate active and empty
-  const activeServers = filteredServers.filter(server => server.isActive)
-  const emptyServers = filteredServers.filter(server => server.isEmpty)
+  const activeRooms = processedRooms.filter(room => room.isActive)
+  const emptyRooms = processedRooms.filter(room => room.isEmpty)
 
-  // Calculate dynamic stats from filtered servers (cash games only)
+  // Calculate dynamic stats from real Hathora rooms (cash games only)
   const dynamicStats = {
-    totalPlayers: filteredServers.reduce((sum, server) => sum + (server.currentPlayers || 0), 0),
-    totalActiveServers: activeServers.length
+    totalPlayers: processedRooms.reduce((sum, room) => sum + (room.currentPlayers || 0), 0),
+    totalActiveRooms: activeRooms.length,
+    totalRooms: processedRooms.length,
+    instantJoinAvailable: emptyRooms.length
   }
 
   const handleJoinServer = (server) => {
