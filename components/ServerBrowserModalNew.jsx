@@ -118,6 +118,12 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const activeServers = filteredServers.filter(server => server.isActive)
   const emptyServers = filteredServers.filter(server => server.isEmpty)
 
+  // Calculate dynamic stats from filtered servers (cash games only)
+  const dynamicStats = {
+    totalPlayers: filteredServers.reduce((sum, server) => sum + (server.currentPlayers || 0), 0),
+    totalActiveServers: activeServers.length
+  }
+
   const handleJoinServer = (server) => {
     onJoinLobby({
       id: server.id,
