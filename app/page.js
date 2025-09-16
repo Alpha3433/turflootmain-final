@@ -139,8 +139,10 @@ export default function TurfLootTactical() {
           (region === 'EU' && (serverRegionLower.includes('london') || serverRegionLower.includes('frankfurt'))) ||
           (region === 'OCE' && (serverRegionLower.includes('sydney') || serverRegionLower.includes('oceania'))) ||
           (region === 'SEA' && (serverRegionLower.includes('singapore') || serverRegionLower.includes('asia'))) ||
-          // Direct regionId matching  
+          // CRITICAL FIX: Oceania should match Sydney servers
+          (regionLower === 'oceania' && serverRegionLower === 'sydney') ||
           (regionLower === 'sydney' && serverRegionLower === 'sydney') ||
+          // Direct regionId matching  
           (regionLower === 'washington-dc' && serverRegionLower === 'washington-dc') ||
           (regionLower === 'london' && serverRegionLower === 'london') ||
           (regionLower === 'frankfurt' && serverRegionLower === 'frankfurt') ||
