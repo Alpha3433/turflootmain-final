@@ -77,30 +77,26 @@ class WalletTester:
         print(f"🎯 Focus: Wallet balance, transactions, Helius RPC connectivity")
         print("=" * 80)
 
-    def log_test(self, test_name, success, details="", response_time=0):
+    def log_result(self, test_name, passed, details=""):
         """Log test results with detailed information"""
         self.total_tests += 1
-        if success:
+        if passed:
             self.passed_tests += 1
             status = "✅ PASSED"
         else:
             status = "❌ FAILED"
-        
-        result = {
-            'test': test_name,
-            'success': success,
-            'details': details,
-            'response_time': response_time,
-            'timestamp': datetime.now().isoformat()
-        }
-        self.test_results.append(result)
-        
-        print(f"{status} | {test_name}")
+            
+        result = f"{status}: {test_name}"
         if details:
-            print(f"    📝 {details}")
-        if response_time > 0:
-            print(f"    ⏱️  Response time: {response_time:.3f}s")
-        print()
+            result += f" - {details}"
+            
+        print(result)
+        self.test_results.append({
+            'test': test_name,
+            'passed': passed,
+            'details': details,
+            'timestamp': datetime.now().isoformat()
+        })
 
     def test_api_health_check(self):
         """Test 1: API Health Check - Verify backend infrastructure is operational"""
