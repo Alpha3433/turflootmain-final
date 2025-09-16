@@ -1,25 +1,17 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Server Browser and Wallet API Fixes
-Testing the recent fixes for:
-1. Server Browser API Fix (/api/servers)
-2. Wallet API Endpoints (/api/wallet/balance, /api/wallet/transactions)
-3. API Endpoint Consistency (no 404 errors)
-4. Helius Integration (wallet balance with updated API key)
-5. Server Browser Data Structure (Sydney/Oceania regions)
+Backend Testing Suite for Redesigned Server Browser with Collapsed Empty Servers
+Testing Focus: Server Browser API Response, Server Grouping Logic, Empty Server Detection,
+Regional Coverage, Stake Variations, and Server Browser Enhancement
 """
 
 import requests
 import json
 import time
 import os
-from datetime import datetime
+from typing import Dict, List, Any
 
-# Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://mp-game-enhance.preview.emergentagent.com')
-API_BASE = f"{BASE_URL}/api"
-
-class BackendTester:
+class ServerBrowserTester:
     def __init__(self):
         self.test_results = []
         self.total_tests = 0
