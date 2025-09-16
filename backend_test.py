@@ -83,33 +83,66 @@ class BackendTester:
         except Exception as e:
             self.log_test("API Health Check", False, error=str(e))
             return False
-            
-    def test_servers_endpoint_structure(self):
-        """Test GET /api/servers endpoint returns expected structure"""
-        print("\n🔍 TESTING: Server Endpoint Structure")
+    
+    def test_server_browser_api(self):
+        """Test 2: Server Browser API - Test /api/servers endpoint"""
         try:
             response = requests.get(f"{API_BASE}/servers", timeout=10)
+            
             if response.status_code != 200:
-                self.log_test("Server Endpoint Response", False, f"Status: {response.status_code}")
-                return None
-                
+                self.log_test(
+                    "Server Browser API", 
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:200]}"
+                )
+                return False
+            
             data = response.json()
             
-            # Check required top-level fields
-            required_fields = ['servers', 'totalPlayers', 'totalActiveServers', 'totalServers', 'hathoraEnabled']
+            # Verify required fields
+            required_fields = ['servers', 'totalPlayers', 'totalActiveServers', 'hathoraEnabled']
             missing_fields = [field for field in required_fields if field not in data]
             
             if missing_fields:
-                self.log_test("Server Endpoint Structure", False, f"Missing fields: {missing_fields}")
-                return None
-            else:
-                self.log_test("Server Endpoint Structure", True, f"All required fields present")
-                
-            return data
+                self.log_test(
+                    "Server Browser API", 
+                    False,
+                    f"Missing required fields: {missing_fields}"
+                )
+                return False
+            
+            servers = data.get('servers', [])
+            if not servers:
+                self.log_test(
+                    "Server Browser API", 
+                    False,
+                    "No servers returned from API"
+                )
+                return False
+            
+            # Verify server structure
+            sample_server = servers[0]
+            required_server_fields = ['id', 'name', 'entryFee', 'region', 'regionId', 'currentPlayers', 'maxPlayers']
+            missing_server_fields = [field for field in required_server_fields if field not in sample_server]
+            
+            if missing_server_fields:
+                self.log_test(
+                    "Server Browser API", 
+                    False,
+                    f"Server missing required fields: {missing_server_fields}"
+                )
+                return False
+            
+            self.log_test(
+                "Server Browser API", 
+                True,
+                f"{len(servers)} servers with proper structure, Hathora enabled: {data.get('hathoraEnabled')}"
+            )
+            return True
             
         except Exception as e:
-            self.log_test("Server Endpoint Structure", False, f"Error: {str(e)}")
-            return None
+            self.log_test("Server Browser API", False, error=str(e))
+            return False
             
     def test_server_count(self, data: Dict):
         """Test that endpoint returns expected number of servers (around 35)"""
