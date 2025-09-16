@@ -21,11 +21,11 @@ export async function GET(request) {
     ]
     
     const paidRegions = [
-      { id: 'washington-dc', name: 'US East', displayName: 'US East', pingEndpoint: hathoraRegionEndpoints['washington-dc'] },
-      { id: 'seattle', name: 'US West', displayName: 'US West', pingEndpoint: hathoraRegionEndpoints['seattle'] },
-      { id: 'frankfurt', name: 'Europe (Frankfurt)', displayName: 'Europe (Frankfurt)', pingEndpoint: hathoraRegionEndpoints['frankfurt'] },
-      { id: 'london', name: 'Europe (London)', displayName: 'Europe (London)', pingEndpoint: hathoraRegionEndpoints['london'] },
-      { id: 'sydney', name: 'Oceania', displayName: 'OCE (Sydney)', pingEndpoint: hathoraRegionEndpoints['sydney'] }
+      { id: 'washington-dc', name: 'US East', displayName: 'US East', pingEndpoint: hathoraRegionalEndpoints['washington-dc'] },
+      { id: 'seattle', name: 'US West', displayName: 'US West', pingEndpoint: hathoraRegionalEndpoints['seattle'] },
+      { id: 'frankfurt', name: 'Europe (Frankfurt)', displayName: 'Europe (Frankfurt)', pingEndpoint: hathoraRegionalEndpoints['frankfurt'] },
+      { id: 'london', name: 'Europe (London)', displayName: 'Europe (London)', pingEndpoint: hathoraRegionalEndpoints['london'] },
+      { id: 'sydney', name: 'Oceania', displayName: 'OCE (Sydney)', pingEndpoint: hathoraRegionalEndpoints['sydney'] }
     ]
     
     const servers = []
