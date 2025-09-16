@@ -585,6 +585,23 @@ const AgarIOGame = () => {
         console.log('🔗 Creating Hathora connection for room:', roomId)
         const connection = hathoraClient.client.newConnection(roomId)
         
+        // DEBUG: Check what newConnection actually returns
+        console.log('🔍 DEBUG: connection object:', connection)
+        console.log('🔍 DEBUG: connection type:', typeof connection)
+        console.log('🔍 DEBUG: connection methods:', Object.getOwnPropertyNames(connection))
+        console.log('🔍 DEBUG: connection prototype:', Object.getPrototypeOf(connection))
+        console.log('🔍 DEBUG: onClose available?', typeof connection.onClose)
+        console.log('🔍 DEBUG: onMessageJson available?', typeof connection.onMessageJson)
+        console.log('🔍 DEBUG: connect available?', typeof connection.connect)
+        console.log('🔍 DEBUG: writeJson available?', typeof connection.writeJson)
+        
+        // Check if connection has the expected methods before using them
+        if (typeof connection.onClose !== 'function') {
+          console.error('❌ connection.onClose is not a function - connection object:', connection)
+          setWsConnection('error')
+          return
+        }
+        
         // Set up connection event handlers with correct Hathora SDK 1.3.1 method names
         connection.onClose((error) => {
           console.log('🔌 Hathora connection closed')
