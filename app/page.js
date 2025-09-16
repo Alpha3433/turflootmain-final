@@ -3553,16 +3553,8 @@ export default function TurfLootTactical() {
     // to prevent region mapping conflicts and improve user experience
     return
   }
-    // Only create popup on desktop
-    if (window.innerWidth <= 768) return
 
-    // Remove any existing server browser popup
-    const existing = document.getElementById('desktop-server-browser-popup')
-    if (existing) existing.remove()
-
-    // Create the popup container
-    const popup = document.createElement('div')
-    popup.id = 'desktop-server-browser-popup'
+  const createDesktopJoinPartyPopup = () => {
     popup.style.cssText = `
       position: fixed !important;
       top: 0 !important;
