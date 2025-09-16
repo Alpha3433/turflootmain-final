@@ -83,33 +83,32 @@ class WebSocketConnectionTester:
     def test_hathora_environment_config(self):
         """Test Hathora environment configuration for WebSocket connections"""
         try:
-            # Test server browser to check Hathora configuration
-            response = requests.get(f"{API_BASE}/servers/lobbies", timeout=10)
+            # Use the servers endpoint to check Hathora configuration
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
                 
                 # Check if Hathora is enabled
-                hathora_enabled = False
+                hathora_enabled = data.get('hathoraEnabled', False)
+                servers = data.get('servers', [])
                 hathora_servers = 0
                 
-                if 'servers' in data:
-                    for server in data['servers']:
-                        if server.get('serverType') == 'hathora' or server.get('serverType') == 'hathora-paid':
-                            hathora_enabled = True
-                            hathora_servers += 1
+                for server in servers:
+                    if server.get('serverType') == 'hathora' or server.get('serverType') == 'hathora-paid':
+                        hathora_servers += 1
                 
-                if hathora_enabled:
+                if hathora_enabled and hathora_servers > 0:
                     self.log_test("Hathora Environment Configuration", True, 
                                 f"Hathora integration enabled with {hathora_servers} servers available")
                     return True
                 else:
                     self.log_test("Hathora Environment Configuration", False, 
-                                "No Hathora servers found - WebSocket connections may not work")
+                                f"Hathora enabled: {hathora_enabled}, servers: {hathora_servers}")
                     return False
             else:
                 self.log_test("Hathora Environment Configuration", False, 
-                            f"Server browser API returned {response.status_code}")
+                            f"Servers API returned {response.status_code}")
                 return False
                 
         except Exception as e:
