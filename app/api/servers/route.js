@@ -86,11 +86,13 @@ export async function GET(request) {
     ]
     
     const paidRegions = [
-      { id: 'washington-dc', name: 'US East', displayName: 'US East', pingEndpoint: regionalPingEndpoints['washington-dc'] },
-      { id: 'seattle', name: 'US West', displayName: 'US West', pingEndpoint: regionalPingEndpoints['seattle'] },
-      { id: 'frankfurt', name: 'Europe (Frankfurt)', displayName: 'Europe (Frankfurt)', pingEndpoint: regionalPingEndpoints['frankfurt'] },
-      { id: 'london', name: 'Europe (London)', displayName: 'Europe (London)', pingEndpoint: regionalPingEndpoints['london'] },
-      { id: 'sydney', name: 'Oceania', displayName: 'OCE (Sydney)', pingEndpoint: regionalPingEndpoints['sydney'] }
+      { id: 'washington-dc', name: 'US East', displayName: 'Washington, D.C.', pingEndpoint: hathoraRegionalMapping['washington-dc'].aws, hathoraRegion: hathoraRegionalMapping['washington-dc'].hathora },
+      { id: 'seattle', name: 'US West', displayName: 'Seattle', pingEndpoint: hathoraRegionalMapping['seattle'].aws, hathoraRegion: hathoraRegionalMapping['seattle'].hathora },
+      { id: 'los-angeles', name: 'US West', displayName: 'Los Angeles', pingEndpoint: hathoraRegionalMapping['los-angeles'].aws, hathoraRegion: hathoraRegionalMapping['los-angeles'].hathora },
+      { id: 'london', name: 'Europe', displayName: 'London', pingEndpoint: hathoraRegionalMapping['london'].aws, hathoraRegion: hathoraRegionalMapping['london'].hathora },
+      { id: 'frankfurt', name: 'Europe', displayName: 'Frankfurt', pingEndpoint: hathoraRegionalMapping['frankfurt'].aws, hathoraRegion: hathoraRegionalMapping['frankfurt'].hathora },
+      { id: 'singapore', name: 'Asia', displayName: 'Singapore', pingEndpoint: hathoraRegionalMapping['singapore'].aws, hathoraRegion: hathoraRegionalMapping['singapore'].hathora },
+      { id: 'sydney', name: 'Oceania', displayName: 'Sydney', pingEndpoint: hathoraRegionalMapping['sydney'].aws, hathoraRegion: hathoraRegionalMapping['sydney'].hathora }
     ]
     
     const servers = []
