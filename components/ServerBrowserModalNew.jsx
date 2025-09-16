@@ -212,7 +212,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
 
         {/* NEW: Stake Filter Pills */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-          {['All', 'Practice', 'Micro Stakes', 'Low Stakes', 'High Stakes'].map(stake => (
+          {['All', 'Micro Stakes', 'Low Stakes', 'High Stakes'].map(stake => (
             <button
               key={stake}
               onClick={() => setSelectedStakeFilter(stake)}
@@ -227,8 +227,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                 fontWeight: selectedStakeFilter === stake ? 'bold' : 'normal'
               }}
             >
-              {stake === 'Practice' ? 'Practice' : 
-               stake === 'Micro Stakes' ? 'Micro ($0.01-$0.02)' :
+              {stake === 'Micro Stakes' ? 'Micro ($0.01-$0.02)' :
                stake === 'Low Stakes' ? 'Low ($0.05-$0.10)' :
                stake === 'High Stakes' ? 'High ($0.25+)' : 'All Servers'}
             </button>
