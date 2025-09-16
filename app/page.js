@@ -12599,19 +12599,21 @@ export default function TurfLootTactical() {
             </div>
           </div>
           
-          {/* CSS Animations */}
-          <style jsx>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-            
-            @keyframes loading-bar {
-              0% { transform: translateX(-100%); }
-              50% { transform: translateX(0%); }
-              100% { transform: translateX(100%); }
-            }
-          `}</style>
+          {/* CSS Animations - Using regular style tag */}
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+              
+              @keyframes loading-bar {
+                0% { transform: translateX(-100%); }
+                50% { transform: translateX(0%); }
+                100% { transform: translateX(100%); }
+              }
+            `
+          }} />
         </div>
       )}
     </div>
