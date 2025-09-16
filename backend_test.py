@@ -764,8 +764,8 @@ class TurfLootBackendTester:
             )
             return False
         """Run all backend tests"""
-        print("🚀 TURFLOOT BACKEND TESTING SUITE")
-        print("Testing backend functionality after withdrawal modal & authentication fixes")
+        print("🚀 SERVER BROWSER MODAL BACKEND TESTING SUITE")
+        print("Testing backend functionality after server browser modal fixes")
         print("=" * 80)
         print()
         
