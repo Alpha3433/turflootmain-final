@@ -561,10 +561,35 @@ const AgarIOGame = () => {
         console.log('🌐 Connecting to Hathora multiplayer room:', roomId)
         setIsMultiplayer(true)
 
-        // Connect to Hathora WebSocket
-        const wsUrl = `wss://hathora.dev/rooms/${roomId}`
-        console.log('🔗 Connecting to:', wsUrl)
+        // Get proper connection info from Hathora SDK
+        console.log('📡 Getting connection details for room:', roomId)
         
+        // Try to get connection info using Hathora client
+        let wsUrl = `wss://hathora.dev/rooms/${roomId}` // Default fallback
+        
+        try {
+          // Import Hathora client to get connection info
+          const { default: hathoraClient } = await import('../../lib/hathoraClient.js')
+          if (hathoraClient && hathoraClient.client) {
+            console.log('🔍 Attempting to get connection details from Hathora client...')
+            
+            // Try different methods to get connection info
+            if (typeof hathoraClient.client.getConnectionDetailsForRoomId === 'function') {
+              const connectionInfo = await hathoraClient.client.getConnectionDetailsForRoomId(roomId)
+              console.log('✅ Got connection info:', connectionInfo)
+              if (connectionInfo && connectionInfo.host && connectionInfo.port) {
+                wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
+                console.log('🎯 Using Hathora connection info URL:', wsUrl)
+              }
+            } else {
+              console.log('⚠️ getConnectionDetailsForRoomId not available, using default URL')
+            }
+          }
+        } catch (error) {
+          console.log('⚠️ Could not get Hathora connection info:', error.message)
+        }
+        
+        console.log('🔗 Connecting to:', wsUrl)
         const ws = new WebSocket(wsUrl)
         wsRef.current = ws
         
