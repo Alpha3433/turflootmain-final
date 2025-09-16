@@ -581,26 +581,57 @@ const AgarIOGame = () => {
         }
         console.log('🔑 Got Hathora auth token successfully')
 
-        // Create new connection using proper Hathora SDK method
-        console.log('🔗 Creating Hathora connection for room:', roomId)
-        const connection = hathoraClient.client.newConnection(roomId)
+        console.log('🔗 Attempting to create Hathora connection for room:', roomId)
+        
+        // DEBUG: Check what methods are available on the Hathora client
+        console.log('🔍 DEBUG: hathoraClient.client object:', hathoraClient.client)
+        console.log('🔍 DEBUG: hathoraClient.client methods:', Object.getOwnPropertyNames(hathoraClient.client))
+        console.log('🔍 DEBUG: hathoraClient.client prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(hathoraClient.client)))
+        
+        // Check if newConnection method exists
+        if (typeof hathoraClient.client.newConnection !== 'function') {
+          console.error('❌ hathoraClient.client.newConnection is not a function')
+          console.log('🔍 Available methods on hathoraClient.client:', Object.getOwnPropertyNames(hathoraClient.client))
+          setWsConnection('error')
+          return
+        }
+        
+        // Try to create connection
+        let connection
+        try {
+          connection = hathoraClient.client.newConnection(roomId)
+          console.log('🔗 Successfully called newConnection, result:', connection)
+        } catch (error) {
+          console.error('❌ Error calling newConnection:', error)
+          setWsConnection('error')
+          return
+        }
         
         // DEBUG: Check what newConnection actually returns
         console.log('🔍 DEBUG: connection object:', connection)
         console.log('🔍 DEBUG: connection type:', typeof connection)
-        console.log('🔍 DEBUG: connection methods:', Object.getOwnPropertyNames(connection))
-        console.log('🔍 DEBUG: connection prototype:', Object.getPrototypeOf(connection))
-        console.log('🔍 DEBUG: onClose available?', typeof connection.onClose)
-        console.log('🔍 DEBUG: onMessageJson available?', typeof connection.onMessageJson)
-        console.log('🔍 DEBUG: connect available?', typeof connection.connect)
-        console.log('🔍 DEBUG: writeJson available?', typeof connection.writeJson)
         
-        // Check if connection has the expected methods before using them
-        if (typeof connection.onClose !== 'function') {
-          console.error('❌ connection.onClose is not a function - connection object:', connection)
+        if (connection && typeof connection === 'object') {
+          console.log('🔍 DEBUG: connection methods:', Object.getOwnPropertyNames(connection))
+          console.log('🔍 DEBUG: connection prototype:', Object.getPrototypeOf(connection))
+          console.log('🔍 DEBUG: onClose available?', typeof connection.onClose)
+          console.log('🔍 DEBUG: onMessageJson available?', typeof connection.onMessageJson)
+          console.log('🔍 DEBUG: connect available?', typeof connection.connect)
+          console.log('🔍 DEBUG: writeJson available?', typeof connection.writeJson)
+        } else {
+          console.error('❌ newConnection did not return a valid object:', connection)
           setWsConnection('error')
           return
         }
+        
+        // Check if connection has the expected methods before using them
+        if (typeof connection.onClose !== 'function') {
+          console.error('❌ connection.onClose is not a function - available methods:', Object.getOwnPropertyNames(connection))
+          setWsConnection('error')
+          return
+        }
+        
+        console.log('✅ Connection object validated, setting up event handlers...')
         
         // Set up connection event handlers with correct Hathora SDK 1.3.1 method names
         connection.onClose((error) => {
