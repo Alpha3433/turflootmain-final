@@ -1,17 +1,29 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Redesigned Server Browser with Collapsed Empty Servers
-Testing Focus: Server Browser API Response, Server Grouping Logic, Empty Server Detection,
-Regional Coverage, Stake Variations, and Server Browser Enhancement
+Comprehensive Backend Testing for Hathora Multiplayer Fixes
+Testing the critical Hathora multiplayer fixes that were just implemented:
+
+1. Region Mapping Fix Testing - Test canonical region codes (SEATTLE, SYDNEY, FRANKFURT, etc.)
+2. WebSocket URL Construction Fix Testing - Test proper authentication and room path format
+3. Oceania Region Fix Testing - Test Sydney region creation instead of Washington D.C.
+4. Multiplayer Connection Testing - Test complete flow of joining Hathora multiplayer room
+
+Files modified:
+- /app/lib/hathoraClient.js - Fixed region mapping and WebSocket URL construction
+- /app/app/agario/page.js - Fixed WebSocket URL construction with authentication
 """
 
 import requests
 import json
 import time
 import os
-from typing import Dict, List, Any
+from datetime import datetime
 
-class ServerBrowserTester:
+# Configuration
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://netbattle-fix.preview.emergentagent.com')
+API_BASE = f"{BASE_URL}/api"
+
+class HathoraMultiplayerTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://netbattle-fix.preview.emergentagent.com')
