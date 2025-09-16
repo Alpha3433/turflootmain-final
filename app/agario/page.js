@@ -897,86 +897,189 @@ const AgarIOGame = () => {
         if (isNativeWebSocket) {
           // Handle native WebSocket
           const ws = connection
-        
-        // Set up WebSocket event handlers
-        ws.onopen = () => {
-          console.log('✅ WebSocket connected to Hathora!')
-          setWsConnection('connected')
-          setConnectedPlayers(1)
+        } else {
+          // Handle Hathora SDK connection object
+          console.log('🔗 Setting up Hathora SDK connection handlers...')
           
-          // Send initial player join message
-          const joinMessage = {
-            type: 'player_join',
-            roomId: actualRoomId,
-            playerId: 'player_' + Math.random().toString(36).substr(2, 9),
-            playerData: {
-              name: 'TurfLoot Player',
-              color: '#ff6b6b'
-            }
-          }
+          // Check available methods on the connection
+          const connectionMethods = Object.getOwnPropertyNames(connection)
+          console.log('🔍 Available methods on Hathora connection:', connectionMethods)
           
-          ws.send(JSON.stringify(joinMessage))
-          console.log('📤 Sent player join event')
-        }
-        
-        ws.onmessage = (event) => {
-          try {
-            const json = JSON.parse(event.data)
-            console.log('📨 Received Hathora message:', json)
-            
-            switch (json.type) {
-              case 'player_joined':
-                console.log('👤 Player joined:', json.playerId)
-                setConnectedPlayers(prev => prev + 1)
-                break
-                
-              case 'player_left':
-                console.log('👋 Player left:', json.playerId)
-                setConnectedPlayers(prev => Math.max(1, prev - 1))
-                break
-                
-              case 'game_state':
-                console.log('🎮 Game state update received')
-                if (json.players) {
-                  playersRef.current.clear()
-                  json.players.forEach(player => {
-                    playersRef.current.set(player.id, player)
-                  })
+          // Set up Hathora SDK connection handlers
+          if (typeof connection.onOpen === 'function') {
+            connection.onOpen(() => {
+              console.log('✅ Hathora SDK connection opened!')
+              setWsConnection('connected')
+              setConnectedPlayers(1)
+              
+              // Send join message using Hathora SDK
+              const joinMessage = {
+                type: 'player_join',
+                roomId: actualRoomId,
+                playerId: 'player_' + Math.random().toString(36).substr(2, 9),
+                playerData: {
+                  name: 'TurfLoot Player',
+                  color: '#ff6b6b'
                 }
-                break
-                
-              default:
-                console.log('📦 Unknown message type:', json.type)
-            }
-          } catch (parseError) {
-            console.error('❌ Failed to parse message:', parseError, event.data)
-          }
-        }
-        
-        ws.onclose = (event) => {
-          console.log('🔌 WebSocket connection closed:', event.code, event.reason)
-          setWsConnection('disconnected')
-          
-          // Attempt to reconnect if game is still active and it wasn't a clean close
-          if (gameStarted && event.code !== 1000) {
-            console.log('🔄 Attempting to reconnect in 3 seconds...')
-            setTimeout(() => {
-              if (gameStarted) {
-                connectToHathoraRoom()
               }
-            }, 3000)
+              
+              if (typeof connection.writeJson === 'function') {
+                connection.writeJson(joinMessage)
+                console.log('📤 Sent join message via Hathora SDK')
+              }
+            })
+          }
+          
+          if (typeof connection.onMessageJson === 'function') {
+            connection.onMessageJson((json) => {
+              console.log('📨 Received Hathora SDK message:', json)
+              
+              switch (json.type) {
+                case 'player_joined':
+                  console.log('👤 Player joined:', json.playerId)
+                  setConnectedPlayers(prev => prev + 1)
+                  break
+                  
+                case 'player_left':
+                  console.log('👋 Player left:', json.playerId)
+                  setConnectedPlayers(prev => Math.max(1, prev - 1))
+                  break
+                  
+                case 'game_state':
+                  console.log('🎮 Game state update received')
+                  if (json.players) {
+                    playersRef.current.clear()
+                    json.players.forEach(player => {
+                      playersRef.current.set(player.id, player)
+                    })
+                  }
+                  break
+                  
+                default:
+                  console.log('📦 Unknown message type:', json.type)
+              }
+            })
+          }
+          
+          if (typeof connection.onClose === 'function') {
+            connection.onClose((error) => {
+              console.log('🔌 Hathora SDK connection closed')
+              if (error) {
+                console.error('❌ Connection closed with error:', error)
+                setWsConnection('error')
+              } else {
+                console.log('✅ Connection closed cleanly')
+                setWsConnection('disconnected')
+              }
+              
+              // Attempt to reconnect if game is still active and error occurred
+              if (gameStarted && error) {
+                console.log('🔄 Attempting to reconnect in 3 seconds...')
+                setTimeout(() => {
+                  if (gameStarted) {
+                    connectToHathoraRoom()
+                  }
+                }, 3000)
+              }
+            })
+          }
+          
+          // Try to connect if there's a connect method
+          if (typeof connection.connect === 'function') {
+            try {
+              await connection.connect(token)
+              console.log('✅ Hathora SDK connection established')
+            } catch (connectError) {
+              console.error('❌ Failed to connect via Hathora SDK:', connectError)
+              setWsConnection('error')
+              return
+            }
           }
         }
         
-        ws.onerror = (error) => {
-          console.error('❌ WebSocket error:', error)
-          setWsConnection('error')
+        // Set up WebSocket event handlers for native WebSocket fallback
+        if (isNativeWebSocket) {
+          const ws = connection
+          
+          ws.onopen = () => {
+            console.log('✅ Native WebSocket connected to Hathora!')
+            setWsConnection('connected')
+            setConnectedPlayers(1)
+            
+            // Send initial player join message
+            const joinMessage = {
+              type: 'player_join',
+              roomId: actualRoomId,
+              playerId: 'player_' + Math.random().toString(36).substr(2, 9),
+              playerData: {
+                name: 'TurfLoot Player',
+                color: '#ff6b6b'
+              }
+            }
+            
+            ws.send(JSON.stringify(joinMessage))
+            console.log('📤 Sent player join event via native WebSocket')
+          }
+          
+          ws.onmessage = (event) => {
+            try {
+              const json = JSON.parse(event.data)
+              console.log('📨 Received native WebSocket message:', json)
+              
+              switch (json.type) {
+                case 'player_joined':
+                  console.log('👤 Player joined:', json.playerId)
+                  setConnectedPlayers(prev => prev + 1)
+                  break
+                  
+                case 'player_left':
+                  console.log('👋 Player left:', json.playerId)
+                  setConnectedPlayers(prev => Math.max(1, prev - 1))
+                  break
+                  
+                case 'game_state':
+                  console.log('🎮 Game state update received')
+                  if (json.players) {
+                    playersRef.current.clear()
+                    json.players.forEach(player => {
+                      playersRef.current.set(player.id, player)
+                    })
+                  }
+                  break
+                  
+                default:
+                  console.log('📦 Unknown message type:', json.type)
+              }
+            } catch (parseError) {
+              console.error('❌ Failed to parse native WebSocket message:', parseError, event.data)
+            }
+          }
+          
+          ws.onclose = (event) => {
+            console.log('🔌 Native WebSocket connection closed:', event.code, event.reason)
+            setWsConnection('disconnected')
+            
+            // Attempt to reconnect if game is still active and it wasn't a clean close
+            if (gameStarted && event.code !== 1000) {
+              console.log('🔄 Attempting to reconnect in 3 seconds...')
+              setTimeout(() => {
+                if (gameStarted) {
+                  connectToHathoraRoom()
+                }
+              }, 3000)
+            }
+          }
+          
+          ws.onerror = (error) => {
+            console.error('❌ Native WebSocket error:', error)
+            setWsConnection('error')
+          }
         }
         
-        // Store WebSocket reference
-        wsRef.current = ws
+        // Store connection reference
+        wsRef.current = connection
         
-        console.log('🔗 WebSocket connection initiated...')
+        console.log('🔗 Multiplayer connection setup completed!')
 
       } catch (error) {
         console.error('❌ Failed to connect to Hathora room:', error)
