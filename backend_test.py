@@ -304,17 +304,17 @@ class WebSocketConnectionTester:
     def test_direct_connection_format_verification(self):
         """Verify that WebSocket connections use direct connection format"""
         try:
-            # Test server browser to find Hathora servers
-            response = requests.get(f"{API_BASE}/servers/lobbies", timeout=10)
+            # Use servers endpoint to find Hathora servers
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
+                servers = data.get('servers', [])
                 hathora_servers = []
                 
-                if 'servers' in data:
-                    for server in data['servers']:
-                        if server.get('serverType') == 'hathora' or server.get('serverType') == 'hathora-paid':
-                            hathora_servers.append(server)
+                for server in servers:
+                    if server.get('serverType') == 'hathora' or server.get('serverType') == 'hathora-paid':
+                        hathora_servers.append(server)
                 
                 if len(hathora_servers) > 0:
                     # Verify server structure supports direct connection
@@ -343,7 +343,7 @@ class WebSocketConnectionTester:
                     return False
             else:
                 self.log_test("Direct Connection Format Verification", False, 
-                            f"Server browser API returned {response.status_code}")
+                            f"Servers API returned {response.status_code}")
                 return False
                 
         except Exception as e:
