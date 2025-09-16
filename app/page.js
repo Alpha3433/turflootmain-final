@@ -2097,13 +2097,38 @@ export default function TurfLootTactical() {
           hathoraRoom: 'true' // Explicit flag for Hathora room
         })
         
+        // Show success status before navigation
+        updateStatus('✅ Hathora room created successfully!')
+        updateSubStatus(`🎮 Room ID: ${roomId} • Server: ${hathoraServerData.name}`)
+        updateProgress(100)
+        updateTimer('🚀 Launching multiplayer game...')
+        
         console.log(`🚀 Navigating to Hathora multiplayer game: /agario?${queryParams.toString()}`)
         
-        // Remove loading modal
-        document.body.removeChild(loadingModal)
+        // Ensure minimum display time for user confidence
+        const elapsedTime = Date.now() - loadingStartTime
+        const remainingTime = Math.max(0, minimumDisplayTime - elapsedTime)
         
-        router.push(`/agario?${queryParams.toString()}`)
-        setIsServerBrowserOpen(false) // Close the modal after joining
+        setTimeout(async () => {
+          // Show final success message
+          updateStatus('🎉 Welcome to Hathora Multiplayer!')
+          updateTimer('🎮 Starting game...')
+          
+          // Wait a bit more for final confirmation
+          await new Promise(resolve => setTimeout(resolve, 1500))
+          
+          // Remove loading modal
+          try {
+            if (document.body.contains(loadingModal)) {
+              document.body.removeChild(loadingModal)
+            }
+          } catch (e) {
+            console.log('Modal already removed')
+          }
+          
+          router.push(`/agario?${queryParams.toString()}`)
+          setIsServerBrowserOpen(false) // Close the modal after joining
+        }, remainingTime)
         
       } else {
         console.error('❌ FAILED: Could not create Hathora room after all attempts')
