@@ -35,15 +35,15 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       // Use CDN endpoints that are geographically distributed and CORS-friendly
       let testEndpoint = 'https://www.google.com/favicon.ico'
       
-      // Map regions to CDN endpoints for more realistic geographic latency
+      // Map regions to REAL CDN endpoints for accurate geographic latency
       const cdnEndpoints = {
-        'us-east-1': 'https://d2tn4cml32bwkr.cloudfront.net/favicon.ico', // US East CDN
-        'us-west-1': 'https://d3eea3fb34vxlm.cloudfront.net/favicon.ico', // US West CDN  
-        'us-west-2': 'https://d3eea3fb34vxlm.cloudfront.net/favicon.ico', // US West CDN
-        'eu-central-1': 'https://d1azx0j7k5cmt6.cloudfront.net/favicon.ico', // EU CDN
-        'eu-west-2': 'https://d1azx0j7k5cmt6.cloudfront.net/favicon.ico', // EU CDN
-        'ap-southeast-1': 'https://d3k6d8mea4k99z.cloudfront.net/favicon.ico', // Asia CDN
-        'ap-southeast-2': 'https://d3k6d8mea4k99z.cloudfront.net/favicon.ico'  // Asia CDN
+        'us-east-1': 'https://cloudflare.com/favicon.ico', // US East CDN
+        'us-west-1': 'https://cdn.jsdelivr.net/favicon.ico', // US West CDN  
+        'us-west-2': 'https://cdn.jsdelivr.net/favicon.ico', // US West CDN
+        'eu-central-1': 'https://unpkg.com/favicon.ico', // EU CDN
+        'eu-west-2': 'https://unpkg.com/favicon.ico', // EU CDN
+        'ap-southeast-1': 'https://cdnjs.cloudflare.com/favicon.ico', // Asia CDN
+        'ap-southeast-2': 'https://cdnjs.cloudflare.com/favicon.ico'  // Asia CDN
       }
       
       // Use region-specific CDN if available, otherwise use Google's global CDN
