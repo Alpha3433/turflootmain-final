@@ -4,13 +4,78 @@ export async function GET(request) {
   try {
     console.log('🎮 Server Browser API: Generating server data for client-side ping measurement...')
     
-    // Regional ping endpoints close to Hathora POPs (using major cloud providers in same regions)
-    const regionalPingEndpoints = {
-      'washington-dc': 'ec2.us-east-1.amazonaws.com', // AWS US East (closest to Hathora US East)
-      'seattle': 'ec2.us-west-2.amazonaws.com', // AWS US West (closest to Hathora US West)
-      'frankfurt': 'ec2.eu-central-1.amazonaws.com', // AWS EU Frankfurt (closest to Hathora EU)
-      'london': 'ec2.eu-west-2.amazonaws.com', // AWS EU London (closest to Hathora EU)
-      'sydney': 'ec2.ap-southeast-2.amazonaws.com' // AWS OCE Sydney (closest to Hathora OCE)
+    // Better regional mapping to match Hathora's console (actual POPs/regions)
+    const hathoraRegionalMapping = {
+      'washington-dc': {
+        aws: 'ec2.us-east-1.amazonaws.com', // N. Virginia (Washington D.C. area)
+        hathora: 'us-east-1',
+        displayName: 'Washington, D.C.'
+      },
+      'seattle': {
+        aws: 'ec2.us-west-2.amazonaws.com', // Oregon (closest to Seattle)
+        hathora: 'us-west-2', 
+        displayName: 'Seattle'
+      },
+      'los-angeles': {
+        aws: 'ec2.us-west-1.amazonaws.com', // N. California (Los Angeles area)
+        hathora: 'us-west-1',
+        displayName: 'Los Angeles'
+      },
+      'chicago': {
+        aws: 'ec2.us-east-2.amazonaws.com', // Ohio (closest to Chicago)
+        hathora: 'us-east-2',
+        displayName: 'Chicago'
+      },
+      'dallas': {
+        aws: 'ec2.us-east-2.amazonaws.com', // Ohio (closest available)
+        hathora: 'us-east-2',
+        displayName: 'Dallas'
+      },
+      'sao-paulo': {
+        aws: 'ec2.sa-east-1.amazonaws.com', // São Paulo
+        hathora: 'sa-east-1',
+        displayName: 'São Paulo'
+      },
+      'london': {
+        aws: 'ec2.eu-west-2.amazonaws.com', // London
+        hathora: 'eu-west-2',
+        displayName: 'London'
+      },
+      'frankfurt': {
+        aws: 'ec2.eu-central-1.amazonaws.com', // Frankfurt
+        hathora: 'eu-central-1',
+        displayName: 'Frankfurt'
+      },
+      'dubai': {
+        aws: 'ec2.me-central-1.amazonaws.com', // Dubai
+        hathora: 'me-central-1',
+        displayName: 'Dubai'
+      },
+      'johannesburg': {
+        aws: 'ec2.af-south-1.amazonaws.com', // Johannesburg
+        hathora: 'af-south-1',
+        displayName: 'Johannesburg'
+      },
+      'singapore': {
+        aws: 'ec2.ap-southeast-1.amazonaws.com', // Singapore
+        hathora: 'ap-southeast-1',
+        displayName: 'Singapore'
+      },
+      'tokyo': {
+        aws: 'ec2.ap-northeast-1.amazonaws.com', // Tokyo
+        hathora: 'ap-northeast-1',
+        displayName: 'Tokyo'
+      },
+      'mumbai': {
+        aws: 'ec2.ap-south-1.amazonaws.com', // Mumbai
+        hathora: 'ap-south-1',
+        displayName: 'Mumbai'
+      },
+      'sydney': {
+        aws: 'ec2.ap-southeast-2.amazonaws.com', // Sydney
+        hathora: 'ap-southeast-2',
+        displayName: 'Sydney'
+      }
     }
     
     // Generate cash game servers that users can join (real Hathora rooms)
