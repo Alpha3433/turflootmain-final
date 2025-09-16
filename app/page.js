@@ -174,9 +174,9 @@ export default function TurfLootTactical() {
       console.log('🆕 No matching servers found, creating new Hathora room...')
       
       try {
-        // Import and initialize Hathora client
-        const { default: HathoraClientModule } = await import('../lib/hathoraClient.js')
-        const hathoraClient = new HathoraClientModule()
+        // Import and use Hathora client singleton
+        const { default: hathoraClient } = await import('../lib/hathoraClient.js')
+        // No need to instantiate - it's already a singleton instance
         
         const initialized = await hathoraClient.initialize()
         if (!initialized) {
