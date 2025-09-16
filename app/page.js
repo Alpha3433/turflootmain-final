@@ -3546,6 +3546,7 @@ export default function TurfLootTactical() {
     console.log('🛒 Skin store popup created with direct DOM manipulation')
   }
 
+  // Desktop server browser popup
   const createDesktopServerBrowserPopup = () => {
     // Only create popup on desktop
     if (window.innerWidth <= 768) return
