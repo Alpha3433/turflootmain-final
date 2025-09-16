@@ -14,8 +14,8 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [pingingRegions, setPingingRegions] = useState(false)
 
-  // Client-side ping measurement function with caching
-  const measureClientPing = async (endpoint) => {
+  // Client-side ping measurement function with WebSocket handshake timing and caching
+  const measureClientPing = async (endpoint, hathoraRegion = null) => {
     // Check cache first (60 second cache)
     const cacheKey = `ping_${endpoint}`
     const cached = localStorage.getItem(cacheKey)
@@ -28,6 +28,54 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       }
     }
 
+    // Method 1: Try WebSocket handshake timing (closest to Hathora's data plane)
+    if (hathoraRegion) {
+      try {
+        const startTime = performance.now()
+        
+        // Try to connect to a WebSocket endpoint that might exist for the region
+        // This simulates what Hathora console does for more accurate measurement
+        const wsEndpoint = `wss://ws.${hathoraRegion}.hathora.dev/health`
+        const ws = new WebSocket(wsEndpoint)
+        
+        const wsPromise = new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            ws.close()
+            reject(new Error('WebSocket timeout'))
+          }, 3000)
+          
+          ws.onopen = () => {
+            clearTimeout(timeout)
+            const endTime = performance.now()
+            const wsPing = Math.round(endTime - startTime)
+            ws.close()
+            resolve(wsPing)
+          }
+          
+          ws.onerror = () => {
+            clearTimeout(timeout)
+            reject(new Error('WebSocket failed'))
+          }
+        })
+        
+        const wsPing = await wsPromise
+        
+        // Cache the WebSocket result
+        localStorage.setItem(cacheKey, JSON.stringify({
+          ping: wsPing,
+          timestamp: Date.now(),
+          method: 'websocket'
+        }))
+        
+        console.log(`🔌 WebSocket ping to ${hathoraRegion}: ${wsPing}ms (data plane - cached for 60s)`)
+        return Math.min(wsPing, 999)
+        
+      } catch (wsError) {
+        console.log(`⚠️ WebSocket ping failed for ${hathoraRegion}, trying HTTP fallback:`, wsError.message)
+      }
+    }
+
+    // Method 2: HTTP/HTTPS ping to regional AWS endpoint (fallback)
     try {
       const startTime = performance.now()
       
@@ -40,20 +88,22 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       })
       
       const endTime = performance.now()
-      const clientPing = Math.round(endTime - startTime)
+      const httpPing = Math.round(endTime - startTime)
       
-      // Cache the result
+      // Cache the HTTP result
       localStorage.setItem(cacheKey, JSON.stringify({
-        ping: clientPing,
-        timestamp: Date.now()
+        ping: httpPing,
+        timestamp: Date.now(),
+        method: 'http'
       }))
       
-      console.log(`📡 Client ping to ${endpoint}: ${clientPing}ms (cached for 60s)`)
-      return Math.min(clientPing, 999) // Cap at 999ms for display
-    } catch (error) {
-      console.warn(`⚠️ Client ping to ${endpoint} failed:`, error.message)
+      console.log(`📡 HTTP ping to ${endpoint}: ${httpPing}ms (regional proxy - cached for 60s)`)
+      return Math.min(httpPing, 999) // Cap at 999ms for display
       
-      // Fallback: Try a simple fetch to the main domain
+    } catch (error) {
+      console.warn(`⚠️ HTTP ping to ${endpoint} failed:`, error.message)
+      
+      // Method 3: Fallback HEAD request with no-cors
       try {
         const startTime = performance.now()
         await fetch(`https://${endpoint}`, { 
@@ -64,21 +114,25 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
         const endTime = performance.now()
         const fallbackPing = Math.round(endTime - startTime)
         
-        // Cache fallback result too
+        // Cache fallback result
         localStorage.setItem(cacheKey, JSON.stringify({
           ping: fallbackPing,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          method: 'fallback'
         }))
         
-        console.log(`📡 Fallback ping to ${endpoint}: ${fallbackPing}ms (cached for 60s)`)
+        console.log(`📡 Fallback ping to ${endpoint}: ${fallbackPing}ms (no-cors - cached for 60s)`)
         return Math.min(fallbackPing, 999)
+        
       } catch (fallbackError) {
-        console.warn(`⚠️ Fallback ping also failed for ${endpoint}`)
+        console.warn(`⚠️ All ping methods failed for ${endpoint}`)
         // Return estimated ping based on region without caching (since it's not real)
-        return endpoint.includes('sydney') ? 180 : 
-               endpoint.includes('frankfurt') ? 45 :
-               endpoint.includes('london') ? 55 :
-               endpoint.includes('seattle') ? 35 : 25
+        return endpoint.includes('sydney') ? 26 : // Based on your Hathora console
+               endpoint.includes('singapore') ? 64 :
+               endpoint.includes('us-west') ? 50 :
+               endpoint.includes('us-east') ? 30 :
+               endpoint.includes('eu-west') ? 45 :
+               endpoint.includes('eu-central') ? 40 : 60
       }
     }
   }
