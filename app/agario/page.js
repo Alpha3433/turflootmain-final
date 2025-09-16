@@ -4697,6 +4697,7 @@ const AgarIOGame = () => {
       </div>
     </div>
     </>
+  )
 }
 
 export default AgarIOGame
