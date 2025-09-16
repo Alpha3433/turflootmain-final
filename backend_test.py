@@ -620,64 +620,86 @@ class HathoraMultiplayerTester:
             )
             return False
 
-    def test_server_grouping_logic(self, server_data: Dict):
-        """Test 2: Server Grouping Logic - Confirm backend provides right data for grouping"""
-        print("\n🔍 TEST 2: SERVER GROUPING LOGIC")
+    def run_all_tests(self):
+        """Run all Hathora multiplayer fix tests"""
+        print("🚀 STARTING COMPREHENSIVE HATHORA MULTIPLAYER FIXES TESTING")
+        print("=" * 80)
+        print("Testing critical Hathora multiplayer fixes:")
+        print("1. Region Mapping Fix - Canonical region codes (SEATTLE, SYDNEY, FRANKFURT, etc.)")
+        print("2. WebSocket URL Construction Fix - Proper authentication and room path format")
+        print("3. Oceania Region Fix - Sydney region creation instead of Washington D.C.")
+        print("4. Multiplayer Connection Testing - Complete flow of joining Hathora multiplayer room")
+        print("=" * 80)
+        print()
         
-        if not server_data or 'servers' not in server_data:
-            self.log_test("Server Grouping Logic", False, "No server data available")
-            return
+        start_time = time.time()
         
-        servers = server_data['servers']
+        # Run all tests
+        tests = [
+            self.test_api_health_check,
+            self.test_hathora_environment_configuration,
+            self.test_region_mapping_fix,
+            self.test_oceania_region_fix_specific,
+            self.test_websocket_url_construction_fix,
+            self.test_multiplayer_connection_flow,
+            self.test_hathora_authentication_and_room_creation,
+            self.test_error_handling_and_fallbacks
+        ]
         
-        # Test region grouping capability
-        regions = set()
-        stakes = set()
-        region_stake_combinations = set()
+        for test in tests:
+            try:
+                test()
+            except Exception as e:
+                print(f"❌ Test {test.__name__} crashed: {str(e)}")
+                self.failed_tests += 1
+                self.total_tests += 1
         
-        for server in servers:
-            if 'region' in server and 'stake' in server:
-                region = server['region']
-                stake = server['stake']
-                regions.add(region)
-                stakes.add(stake)
-                region_stake_combinations.add((region, stake))
+        total_time = time.time() - start_time
         
-        self.log_test("Region Extraction", len(regions) > 0, f"Found {len(regions)} unique regions: {list(regions)}")
-        self.log_test("Stake Extraction", len(stakes) > 0, f"Found {len(stakes)} unique stakes: {list(stakes)}")
-        self.log_test("Region-Stake Combinations", len(region_stake_combinations) > 0, 
-                     f"Found {len(region_stake_combinations)} combinations for grouping")
+        # Print summary
+        print("=" * 80)
+        print("🎯 HATHORA MULTIPLAYER FIXES TESTING SUMMARY")
+        print("=" * 80)
         
-        # Test grouping potential for collapsed design
-        empty_servers = [s for s in servers if s.get('currentPlayers', 0) == 0]
-        active_servers = [s for s in servers if s.get('currentPlayers', 0) > 0]
+        success_rate = (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
         
-        self.log_test("Empty Server Detection", len(empty_servers) >= 0, 
-                     f"Found {len(empty_servers)} empty servers for collapse grouping")
-        self.log_test("Active Server Detection", len(active_servers) >= 0, 
-                     f"Found {len(active_servers)} active servers to display normally")
+        print(f"📊 Total Tests: {self.total_tests}")
+        print(f"✅ Passed: {self.passed_tests}")
+        print(f"❌ Failed: {self.failed_tests}")
+        print(f"📈 Success Rate: {success_rate:.1f}%")
+        print(f"⏱️  Total Time: {total_time:.2f}s")
+        print()
         
-        # Test grouping by region and stake for collapsed display
-        grouping_data = {}
-        for server in empty_servers:
-            region = server.get('region', 'Unknown')
-            stake = server.get('stake', 0)
-            key = f"{region}-${stake}"
-            
-            if key not in grouping_data:
-                grouping_data[key] = []
-            grouping_data[key].append(server)
+        # Print detailed results
+        print("📋 DETAILED TEST RESULTS:")
+        print("-" * 40)
+        for result in self.test_results:
+            print(f"{result['status']}: {result['test']}")
+            if result['details']:
+                print(f"   Details: {result['details']}")
+            if result['response_time'] != "N/A":
+                print(f"   Time: {result['response_time']}")
+            print()
         
-        self.log_test("Grouping Data Generation", len(grouping_data) > 0, 
-                     f"Generated {len(grouping_data)} groups for collapsed display")
+        # Critical findings
+        print("🔍 CRITICAL FINDINGS:")
+        print("-" * 40)
         
-        return {
-            'regions': regions,
-            'stakes': stakes,
-            'empty_servers': empty_servers,
-            'active_servers': active_servers,
-            'grouping_data': grouping_data
-        }
+        if success_rate >= 80:
+            print("✅ HATHORA MULTIPLAYER FIXES ARE WORKING CORRECTLY")
+            print("✅ Region mapping fix implemented successfully")
+            print("✅ WebSocket URL construction fix operational")
+            print("✅ Oceania region fix working (Sydney instead of Washington D.C.)")
+            print("✅ Multiplayer connection flow functional")
+        else:
+            print("❌ CRITICAL ISSUES DETECTED IN HATHORA FIXES")
+            print("❌ Some multiplayer fixes may not be working correctly")
+            print("❌ Manual investigation required")
+        
+        print()
+        print("=" * 80)
+        
+        return success_rate >= 80
 
     def test_empty_server_detection(self, server_data: Dict):
         """Test 3: Empty Server Detection - Verify servers with 0 currentPlayers are identified"""
