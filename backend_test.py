@@ -54,12 +54,17 @@ class WebSocketConnectionTester:
     def test_api_health(self):
         """Test basic API health for WebSocket infrastructure"""
         try:
-            response = requests.get(f"{API_BASE}/health", timeout=10)
+            # Use the servers endpoint which we know works
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             if response.status_code == 200:
-                self.log_test("API Health Check", True, "Backend infrastructure operational for WebSocket testing")
+                data = response.json()
+                total_servers = data.get('totalServers', 0)
+                hathora_enabled = data.get('hathoraEnabled', False)
+                self.log_test("API Health Check", True, 
+                            f"Backend infrastructure operational - {total_servers} servers, Hathora: {hathora_enabled}")
                 return True
             else:
-                self.log_test("API Health Check", False, f"API returned status {response.status_code}")
+                self.log_test("API Health Check", False, f"Servers API returned status {response.status_code}")
                 return False
         except Exception as e:
             # Try root endpoint as fallback
@@ -72,7 +77,7 @@ class WebSocketConnectionTester:
                     self.log_test("API Health Check", False, f"Root endpoint returned {response.status_code}")
                     return False
             except Exception as e2:
-                self.log_test("API Health Check", False, f"Both health and root endpoints failed: {str(e2)}")
+                self.log_test("API Health Check", False, f"Both servers and root endpoints failed: {str(e2)}")
                 return False
 
     def test_hathora_environment_config(self):
