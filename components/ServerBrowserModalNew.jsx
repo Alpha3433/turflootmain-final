@@ -224,56 +224,45 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     if (showRefresh) setRefreshing(true)
     setErrorMessage('') // Clear previous errors
     
-    try {
-      console.log('🌐 Fetching servers from /api/servers...')
-      const response = await fetch('/api/servers', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'same-origin'
-      })
-      console.log('📡 Server response status:', response.status, response.statusText)
-      
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('❌ Server response error:', errorText)
-        throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
-      }
-      
-      const data = await response.json()
-      console.log('✅ Server data received:', {
-        servers: data.servers?.length || 0,
-        totalPlayers: data.totalPlayers || 0,
-        totalActiveServers: data.totalActiveServers || 0,
-        sampleServer: data.servers?.[0]?.name || 'No servers'
-      })
-      
-      if (!data.servers || data.servers.length === 0) {
-        console.warn('⚠️ No servers in response')
-        setErrorMessage('No servers available')
-        setServers([])
-      } else {
-        // Measure client-side pings for all servers
-        const serversWithPings = await measureServerPings(data.servers)
-        setServers(serversWithPings)
-        setErrorMessage('')
-      }
-      
-      setTotalStats({
-        totalPlayers: data.totalPlayers || 0,
-        totalActiveServers: data.totalActiveServers || 0
-      })
-    } catch (error) {
-      console.error('❌ Error fetching servers:', error)
-      console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      })
-      setErrorMessage(`Failed to load servers: ${error.message}`)
-      setServers([])
+    console.log('🌐 Fetching servers from /api/servers...')
+    const response = await fetch('/api/servers', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin'
+    })
+    console.log('📡 Server response status:', response.status, response.statusText)
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('❌ Server response error:', errorText)
+      throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
     }
+    
+    const data = await response.json()
+    console.log('✅ Server data received:', {
+      servers: data.servers?.length || 0,
+      totalPlayers: data.totalPlayers || 0,
+      totalActiveServers: data.totalActiveServers || 0,
+      sampleServer: data.servers?.[0]?.name || 'No servers'
+    })
+    
+    if (!data.servers || data.servers.length === 0) {
+      console.warn('⚠️ No servers in response')
+      throw new Error('No servers available')
+    }
+    
+    // Measure client-side pings for all servers
+    const serversWithPings = await measureServerPings(data.servers)
+    setServers(serversWithPings)
+    setErrorMessage('')
+    
+    setTotalStats({
+      totalPlayers: data.totalPlayers || 0,
+      totalActiveServers: data.totalActiveServers || 0
+    })
+    
     setIsLoading(false)
     if (showRefresh) setRefreshing(false)
   }
