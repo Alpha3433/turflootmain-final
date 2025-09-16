@@ -821,7 +821,7 @@ class TurfLootBackendTester:
         # Critical findings summary
         print("🎯 CRITICAL FINDINGS:")
         if success_rate >= 90:
-            print("   ✅ EXCELLENT: Backend is fully operational after withdrawal modal & auth fixes")
+            print("   ✅ EXCELLENT: Backend is fully operational after server browser modal fixes")
         elif success_rate >= 75:
             print("   ⚠️  GOOD: Backend is mostly operational with minor issues")
         elif success_rate >= 50:
@@ -834,17 +834,17 @@ class TurfLootBackendTester:
         
         # Check specific requirements from review request
         api_health_passed = any("API" in r['test'] and r['success'] for r in self.results)
+        server_browser_passed = any("Server Browser" in r['test'] and r['success'] for r in self.results)
         auth_systems_passed = any("Authentication" in r['test'] and r['success'] for r in self.results)
-        wallet_apis_passed = any("Wallet" in r['test'] and r['success'] for r in self.results)
-        helius_integration_passed = any("Helius" in r['test'] and r['success'] for r in self.results)
+        game_session_passed = any("Game Session" in r['test'] and r['success'] for r in self.results)
         regression_passed = any("Regression" in r['test'] or "Performance" in r['test'] and r['success'] for r in self.results)
         
         requirements = [
             ("✅ API Health Check", api_health_passed),
-            ("✅ Authentication Systems (Privy integration)", auth_systems_passed), 
-            ("✅ Wallet Balance APIs (Helius RPC with new API key)", wallet_apis_passed),
-            ("✅ Helius Integration Verification", helius_integration_passed),
-            ("✅ Backend Regression Testing", regression_passed)
+            ("✅ Server Browser API (/api/servers/lobbies)", server_browser_passed), 
+            ("✅ Authentication System", auth_systems_passed),
+            ("✅ Game Session Management", game_session_passed),
+            ("✅ General Application Health", regression_passed)
         ]
         
         for req_name, req_passed in requirements:
