@@ -586,8 +586,8 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
             </div>
           ) : (
             <>
-              {/* NEW: Active Servers First */}
-              {activeServers.length > 0 && (
+              {/* NEW: Active Rooms First */}
+              {activeRooms.length > 0 && (
                 <div>
                   <div style={{
                     padding: '8px 16px',
@@ -597,9 +597,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                     color: '#10b981',
                     borderBottom: '1px solid #4a5568'
                   }}>
-                    🟢 ACTIVE SERVERS ({activeServers.length})
+                    🟢 ACTIVE HATHORA ROOMS ({activeRooms.length})
                   </div>
-                  {activeServers.map(server => (
+                  {activeRooms.map(room => (
                     <div
                       key={server.id}
                       style={{
