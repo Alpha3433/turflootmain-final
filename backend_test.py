@@ -32,19 +32,51 @@ from datetime import datetime
 
 class HathoraBackendTester:
     def __init__(self):
-        self.test_results = []
-        self.start_time = time.time()
+        # Get base URL from environment
+        with open('/app/.env', 'r') as f:
+            env_content = f.read()
+            for line in env_content.split('\n'):
+                if line.startswith('NEXT_PUBLIC_BASE_URL='):
+                    self.base_url = line.split('=', 1)[1].strip()
+                    break
         
-    def log_test(self, test_name, success, details="", error=""):
-        """Log test result"""
+        if not hasattr(self, 'base_url'):
+            self.base_url = "https://hathora-overhaul.preview.emergentagent.com"
+        
+        self.api_base = f"{self.base_url}/api"
+        self.test_results = []
+        self.total_tests = 0
+        self.passed_tests = 0
+        
+        print(f"🚀 PHASE 2 HATHORA INTEGRATION TESTING")
+        print(f"📍 Backend URL: {self.api_base}")
+        print(f"🎯 Focus: Real Hathora room creation, WebSocket connections, session tracking")
+        print("=" * 80)
+
+    def log_test(self, test_name, success, details="", response_time=0):
+        """Log test results with detailed information"""
+        self.total_tests += 1
+        if success:
+            self.passed_tests += 1
+            status = "✅ PASSED"
+        else:
+            status = "❌ FAILED"
+        
         result = {
-            "test": test_name,
-            "success": success,
-            "details": details,
-            "error": error,
-            "timestamp": datetime.now().isoformat()
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'response_time': response_time,
+            'timestamp': datetime.now().isoformat()
         }
         self.test_results.append(result)
+        
+        print(f"{status} | {test_name}")
+        if details:
+            print(f"    📝 {details}")
+        if response_time > 0:
+            print(f"    ⏱️  Response time: {response_time:.3f}s")
+        print()
         
         status = "✅ PASS" if success else "❌ FAIL"
         print(f"{status} {test_name}")
