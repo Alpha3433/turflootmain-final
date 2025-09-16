@@ -775,7 +775,8 @@ class TurfLootBackendTester:
             self.test_authentication_systems,
             self.test_wallet_balance_apis,
             self.test_user_balance_stats_apis,
-            self.test_backend_regression
+            self.test_backend_regression,
+            self.test_server_browser_modal_specific_apis
         ]
         
         passed_tests = 0
