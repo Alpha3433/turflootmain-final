@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Hathora WebSocket Connection Fixes
-Testing the updated WebSocket connection format and authentication fixes
+Backend Testing Suite for Server Browser Functionality
+Testing the /api/servers endpoint and related server browser features
 
 Review Request Testing:
-1. Direct Connection Format Testing - WebSocket URLs use wss://host:port?token=${authToken}&roomId=${roomId}
-2. WebSocket URL Construction Verification - No /ws path in URL construction  
-3. Authentication Parameter Testing - Tokens and room IDs as query parameters
-4. Connection Success Testing - Resolving Error 1006 WebSocket connection failures
+1. Test GET /api/servers endpoint returns 35 servers
+2. Verify server data structure includes required fields: id, name, entryFee, region, regionId, currentPlayers, maxPlayers
+3. Check that servers have entryFee > 0 (cash games)
+4. Verify ping endpoints are accessible for regions
+5. Test server filtering logic works correctly
+6. Ensure all regions are represented: US East, US West, Europe, Asia, Oceania
 
-Files modified:
-- /app/app/agario/page.js - Updated WebSocket URL construction for direct connection
-- /app/lib/hathoraClient.js - Updated both WebSocket connection methods to use direct connection
+Expected behavior:
+- API should return JSON with servers array containing 35 servers
+- Each server should have entryFee values like 0.01, 0.02, 0.05
+- Servers should be grouped by regions and stakes
+- All servers should have currentPlayers: 0 initially (no active sessions)
 """
 
 import requests
