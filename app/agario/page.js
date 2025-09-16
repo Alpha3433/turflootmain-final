@@ -561,11 +561,12 @@ const AgarIOGame = () => {
         console.log('🌐 Connecting to Hathora multiplayer room:', roomId)
         setIsMultiplayer(true)
 
-        // Get proper connection info from Hathora SDK
+        // Get proper connection info from Hathora SDK with authentication
         console.log('📡 Getting connection details for room:', roomId)
         
-        // Try to get connection info using Hathora client
-        let wsUrl = `wss://hathora.dev/rooms/${roomId}` // Default fallback
+        // Default fallback with proper format
+        let wsUrl = `wss://hathora.dev/ws`
+        let authToken = null
         
         try {
           // Import Hathora client to get connection info
@@ -573,16 +574,41 @@ const AgarIOGame = () => {
           if (hathoraClient && hathoraClient.client) {
             console.log('🔍 Attempting to get connection details from Hathora client...')
             
-            // Try different methods to get connection info
+            // First get authentication token
+            try {
+              authToken = await hathoraClient.client.loginAnonymous()
+              console.log('🔑 Got auth token:', authToken ? 'SUCCESS' : 'FAILED')
+            } catch (authError) {
+              console.warn('⚠️ Failed to get auth token:', authError.message)
+            }
+            
+            // Try to get connection details for the room
             if (typeof hathoraClient.client.getConnectionDetailsForRoomId === 'function') {
               const connectionInfo = await hathoraClient.client.getConnectionDetailsForRoomId(roomId)
               console.log('✅ Got connection info:', connectionInfo)
               if (connectionInfo && connectionInfo.host && connectionInfo.port) {
-                wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
-                console.log('🎯 Using Hathora connection info URL:', wsUrl)
+                // Construct WebSocket URL with proper path and token
+                const baseUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
+                if (authToken) {
+                  wsUrl = `${baseUrl}/${roomId}?token=${authToken}`
+                  console.log('🎯 Using authenticated Hathora URL with room path')
+                } else {
+                  wsUrl = `${baseUrl}/ws`
+                  console.log('🎯 Using basic Hathora URL without authentication')
+                }
+                console.log('🔗 Final WebSocket URL:', wsUrl)
               }
             } else {
-              console.log('⚠️ getConnectionDetailsForRoomId not available, using default URL')
+              console.log('⚠️ getConnectionDetailsForRoomId not available')
+              // Fallback: Try to construct URL using app ID and room ID with token
+              const appId = hathoraClient.appId
+              if (appId && authToken) {
+                wsUrl = `wss://${appId}.hathora.dev/connect?roomId=${roomId}&token=${authToken}`
+                console.log('🎯 Using fallback authenticated URL format')
+              } else if (appId) {
+                wsUrl = `wss://${appId}.hathora.dev/ws`
+                console.log('🎯 Using fallback basic URL format')
+              }
             }
           }
         } catch (error) {
