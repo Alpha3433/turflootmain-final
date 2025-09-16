@@ -781,6 +781,8 @@ const AgarIOGame = () => {
         
         const urlParams = new URLSearchParams(window.location.search)
         const roomId = urlParams.get('roomId')
+        const hathoraRoom = urlParams.get('hathoraRoom') // Real Hathora room ID
+        const realHathoraRoom = urlParams.get('realHathoraRoom') === 'true'
         const mode = urlParams.get('mode')
         const multiplayer = urlParams.get('multiplayer')
         const server = urlParams.get('server')
@@ -791,7 +793,15 @@ const AgarIOGame = () => {
           return
         }
 
-        console.log('🌐 Connecting to Hathora multiplayer room:', roomId)
+        // Use the real Hathora room ID if available, otherwise fall back to roomId
+        const actualRoomId = hathoraRoom || roomId
+        
+        console.log('🌐 Connecting to Hathora multiplayer room:', {
+          originalRoomId: roomId,
+          hathoraRoomId: hathoraRoom,
+          actualRoomId,
+          isRealHathoraRoom: realHathoraRoom
+        })
         setIsMultiplayer(true)
         setConnectedPlayers(1) // At least the current player
 
