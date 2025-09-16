@@ -461,6 +461,8 @@ export async function GET(request, { params }) {
         // Get real server data with actual player tracking
         let serverData = []
         
+        let mongoError = null
+        
         try {
           // Connect to MongoDB to get real active game sessions
           const db = await getDb()
@@ -473,8 +475,9 @@ export async function GET(request, { params }) {
           
           console.log(`📊 Found ${activeGameSessions.length} active game sessions`)
           
-        } catch (mongoError) {
-          console.error('❌ MongoDB connection failed, continuing with server generation:', mongoError.message)
+        } catch (error) {
+          mongoError = error
+          console.error('❌ MongoDB connection failed, continuing with server generation:', error.message)
           // Continue with server generation even if MongoDB is down
         }
         
