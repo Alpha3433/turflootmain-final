@@ -293,9 +293,6 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   }
 
   const handleJoinServer = (server) => {
-    console.log('🎯 ServerBrowserModalNew: handleJoinServer called with:', server)
-    console.log('🎯 onJoinLobby prop:', onJoinLobby ? 'EXISTS' : 'MISSING')
-    
     const serverData = {
       id: server.id,
       region: server.region,
@@ -306,7 +303,6 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       mode: server.mode
     }
     
-    console.log('🎯 Calling onJoinLobby with serverData:', serverData)
     onJoinLobby(serverData)
   }
 
