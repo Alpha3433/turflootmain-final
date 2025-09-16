@@ -941,7 +941,7 @@ const AgarIOGame = () => {
         // Send player join event using writeJson method
         const joinMessage = {
           type: 'player_join',
-          roomId: roomId,
+          roomId: actualRoomId,
           playerId: 'player_' + Math.random().toString(36).substr(2, 9),
           playerData: {
             name: 'TurfLoot Player',
