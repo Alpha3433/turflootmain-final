@@ -2189,7 +2189,11 @@ const AgarIOGame = () => {
       
       // Draw outer glow effect
       this.ctx.shadowColor = '#00FF41'
-      this.ctx.shadowBlur = 15 * virus.glowIntensity * glowPulse
+      
+      // Safeguard: Ensure glowIntensity is a valid number
+      const safeGlowIntensity = isNaN(virus.glowIntensity) ? 0.5 : virus.glowIntensity
+      
+      this.ctx.shadowBlur = 15 * safeGlowIntensity * glowPulse
       this.ctx.shadowOffsetX = 0
       this.ctx.shadowOffsetY = 0
       
