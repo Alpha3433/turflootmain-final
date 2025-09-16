@@ -538,35 +538,56 @@ export default function TurfLootTactical() {
     }
     
     console.log('🔍 Looking for Solana wallet address...')
+    console.log('🧪 Privy user object:', JSON.stringify(privyUser, null, 2))
     
     // Method 1: Check useWallets hook
     if (wallets?.length > 0) {
+      console.log('🔍 Checking useWallets hook:', wallets)
       const solanaWallet = wallets.find(w => w.chainType === 'solana')
       if (solanaWallet?.address) {
-        console.log('✅ Found via useWallets:', solanaWallet.address)
+        console.log('✅ Found Solana wallet via useWallets:', solanaWallet.address)
         return solanaWallet.address
       }
     }
     
-    // Method 2: Check embedded wallet
-    if (privyUser.wallet?.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') {
+    // Method 2: Check embedded wallet (remove hardcoded address)
+    if (privyUser.wallet?.address) {
       console.log('✅ Found via embedded wallet:', privyUser.wallet.address)
       return privyUser.wallet.address
     }
     
-    // Method 3: Check linked accounts
+    // Method 3: Check linked accounts for any Solana wallet
     if (privyUser.linkedAccounts?.length > 0) {
+      console.log('🔍 Checking linkedAccounts:', privyUser.linkedAccounts)
       const solanaAccount = privyUser.linkedAccounts.find(acc => 
-        acc.type === 'wallet' && 
-        (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+        acc.type === 'wallet' && acc.chainType === 'solana'
       )
       if (solanaAccount?.address) {
-        console.log('✅ Found via linkedAccounts:', solanaAccount.address)
+        console.log('✅ Found Solana wallet via linkedAccounts:', solanaAccount.address)
         return solanaAccount.address
       }
     }
     
+    // Method 4: Check for any wallet with valid Solana address format
+    const allWallets = [
+      ...(privyUser.linkedAccounts || []),
+      ...(wallets || []),
+      privyUser.wallet
+    ].filter(Boolean)
+    
+    for (const wallet of allWallets) {
+      if (wallet?.address && wallet.address.length >= 32) {
+        console.log('✅ Found potential Solana wallet:', wallet.address)
+        return wallet.address
+      }
+    }
+    
     console.log('❌ No Solana wallet found')
+    console.log('🧪 Available wallets:', {
+      useWallets: wallets,
+      privyWallet: privyUser.wallet,
+      linkedAccounts: privyUser.linkedAccounts
+    })
     return null
   }
 
