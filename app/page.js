@@ -1923,10 +1923,76 @@ export default function TurfLootTactical() {
     router.push(`/agario?roomId=global-practice-bots&mode=practice&fee=0`)
   }
 
-  const handleJoinLobby = async (serverData) => {
-    console.log('🌐 Server Browser: Joining server via Hathora:', serverData)
+  // ========================================
+  // HATHORA-FIRST MULTIPLAYER ARCHITECTURE
+  // ========================================
+  
+  const initializeHathoraGame = async (serverData) => {
+    console.log('🚀 Initializing 100% Hathora multiplayer game...')
+    console.log('📊 Server details:', serverData)
     
-    // Show enhanced loading modal with progress tracking
+    // Validate required server data
+    if (!serverData.regionId && !serverData.region) {
+      throw new Error('Server region is required for Hathora room creation')
+    }
+    
+    if (!serverData.entryFee && serverData.entryFee !== 0) {
+      throw new Error('Entry fee must be specified for multiplayer rooms')
+    }
+    
+    // Import Hathora client
+    const { default: hathoraClient } = await import('/lib/hathoraClient.js')
+    
+    const isInitialized = await hathoraClient.initialize()
+    if (!isInitialized) {
+      throw new Error('Failed to initialize Hathora client')
+    }
+    
+    console.log('✅ Hathora client initialized successfully')
+    
+    // Create or join Hathora room with proper configuration
+    const roomConfig = {
+      region: serverData.regionId || serverData.region,
+      entryFee: serverData.entryFee,
+      maxPlayers: 8,
+      gameMode: 'multiplayer',
+      roomName: serverData.name || `TurfLoot Room`,
+      isPublic: true
+    }
+    
+    console.log('🏠 Creating Hathora room with config:', roomConfig)
+    
+    // Use the enhanced createPaidRoom method for all multiplayer games
+    const result = await hathoraClient.createPaidRoom(
+      roomConfig.entryFee,
+      null, // userId - will use anonymous auth
+      roomConfig.region
+    )
+    
+    if (!result || !result.roomId) {
+      throw new Error('Failed to create Hathora room - no room ID returned')
+    }
+    
+    console.log('🎉 Hathora room created successfully!')
+    console.log('🏠 Room ID:', result.roomId)
+    console.log('🌍 Region:', result.region || roomConfig.region)
+    console.log('💰 Entry Fee:', roomConfig.entryFee)
+    
+    return {
+      roomId: result.roomId,
+      region: result.region || roomConfig.region,
+      entryFee: roomConfig.entryFee,
+      maxPlayers: roomConfig.maxPlayers,
+      gameMode: 'hathora-multiplayer',
+      isHathoraRoom: true,
+      connectionInfo: result.connectionInfo || { host: 'hathora.dev', port: 443 }
+    }
+  }
+
+  const handleJoinLobby = async (serverData) => {
+    console.log('🌐 HATHORA-FIRST: Joining multiplayer server:', serverData)
+    
+    // Show enhanced loading modal with detailed progress
     const loadingModal = document.createElement('div')
     loadingModal.id = 'hathora-loading-modal'
     loadingModal.style.cssText = `
@@ -1935,53 +2001,54 @@ export default function TurfLootTactical() {
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.95);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10000;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(15px);
     `
     
     loadingModal.innerHTML = `
       <div style="
         background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        padding: 40px;
-        border-radius: 16px;
+        padding: 50px;
+        border-radius: 20px;
         text-align: center;
-        border: 2px solid #68d391;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        min-width: 400px;
+        border: 3px solid #68d391;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        min-width: 450px;
+        max-width: 500px;
       ">
-        <div style="font-size: 48px; margin-bottom: 20px;">🚀</div>
-        <div style="color: #68d391; font-size: 24px; font-weight: bold; margin-bottom: 10px;">
-          CREATING HATHORA ROOM
+        <div style="font-size: 64px; margin-bottom: 25px;">🚀</div>
+        <div style="color: #68d391; font-size: 28px; font-weight: bold; margin-bottom: 15px;">
+          JOINING HATHORA MULTIPLAYER
         </div>
-        <div id="loading-status" style="color: #e2e8f0; font-size: 16px; margin-bottom: 10px;">
-          💰 Setting up multiplayer server in ${serverData.region}...
+        <div id="loading-status" style="color: #e2e8f0; font-size: 18px; margin-bottom: 15px;">
+          🌐 Connecting to authoritative game server...
         </div>
-        <div id="loading-substatus" style="color: #a0aec0; font-size: 14px; margin-bottom: 20px;">
-          🎯 Entry Fee: $${serverData.entryFee} • Max Players: 8 • Server: ${serverData.name}
+        <div id="loading-substatus" style="color: #a0aec0; font-size: 16px; margin-bottom: 25px;">
+          💰 ${serverData.name} • Entry: $${serverData.entryFee} • Region: ${serverData.region}
         </div>
         <div style="
-          width: 300px;
-          height: 6px;
+          width: 350px;
+          height: 8px;
           background: rgba(104, 211, 145, 0.2);
-          border-radius: 3px;
+          border-radius: 4px;
           overflow: hidden;
-          margin: 0 auto 15px;
+          margin: 0 auto 20px;
         ">
           <div id="progress-bar" style="
-            width: 20%;
+            width: 25%;
             height: 100%;
             background: linear-gradient(90deg, #68d391, #38b2ac);
-            animation: loading-bar 2s ease-in-out infinite;
-            border-radius: 3px;
-            transition: width 0.5s ease;
+            animation: loading-bar 2.5s ease-in-out infinite;
+            border-radius: 4px;
+            transition: width 0.8s ease;
           "></div>
         </div>
-        <div id="loading-timer" style="color: #718096; font-size: 12px;">
-          ⏱️ Connecting to Hathora servers...
+        <div id="loading-timer" style="color: #718096; font-size: 14px;">
+          🎮 Preparing authoritative multiplayer experience...
         </div>
       </div>
     `
@@ -2011,176 +2078,89 @@ export default function TurfLootTactical() {
     
     // Track timing for minimum display duration
     const loadingStartTime = Date.now()
-    const minimumDisplayTime = 5000 // 5 seconds minimum for user confidence
+    const minimumDisplayTime = 4000 // 4 seconds minimum for confidence
     
     // Progressive status updates
-    setTimeout(() => updateStatus('🔐 Authenticating with Hathora...'), 500)
-    setTimeout(() => updateProgress(40), 1000)
-    setTimeout(() => updateStatus('🌍 Finding optimal server region...'), 1500)
-    setTimeout(() => updateProgress(60), 2000)
-    setTimeout(() => updateTimer('⏱️ Almost ready...'), 2500)
+    setTimeout(() => {
+      updateStatus('🔐 Authenticating with Hathora cloud...')
+      updateProgress(40)
+    }, 800)
     
+    setTimeout(() => {
+      updateStatus('🌍 Allocating dedicated game server...')
+      updateProgress(65)
+      updateTimer('🎯 Creating authoritative game instance...')
+    }, 1600)
+    
+    setTimeout(() => {
+      updateStatus('⚡ Establishing real-time connection...')
+      updateProgress(85)
+      updateTimer('🚀 Almost ready for multiplayer...')
+    }, 2400)
+
     try {
-      // For cash games, validate balance first
+      // Validate balance for paid games
       if (serverData.entryFee > 0) {
-        console.log(`💰 Validating balance for $${serverData.entryFee} entry fee...`)
-        const balanceCheck = validatePaidRoom(`Server Browser: ${serverData.name} ($${serverData.entryFee})`)
-        if (!balanceCheck) {
-          console.log('❌ Insufficient funds for server:', serverData.name)
-          document.body.removeChild(loadingModal)
-          alert(`Insufficient funds! You need $${serverData.entryFee} to join this server.`)
-          return
+        console.log('💰 Validating balance for multiplayer entry...')
+        const balanceValid = validatePaidRoom(`Hathora Multiplayer: ${serverData.name}`)
+        
+        if (!balanceValid) {
+          throw new Error(`Insufficient balance for $${serverData.entryFee} entry fee`)
         }
-        console.log('✅ Balance validated for server browser entry')
+        
+        updateSubStatus(`✅ Balance validated • Entry: $${serverData.entryFee} • Sufficient funds`)
+        console.log('✅ Balance validated for Hathora multiplayer entry')
       }
       
-      // Use the smart matchmaking system to create/join actual Hathora room
-      console.log(`🎯 Creating Hathora room for server: ${serverData.name}`)
-      console.log(`💰 Entry fee: $${serverData.entryFee}`)
-      console.log(`🌍 Region: ${serverData.region}`)
-      console.log(`📊 Server ID: ${serverData.id}`)
+      // Initialize 100% Hathora multiplayer game
+      updateStatus('🎮 Initializing multiplayer game server...')
+      updateProgress(95)
+      updateTimer('🌐 Connecting to game instance...')
       
-      // Keep loading and retry until we get a real Hathora room
-      let matchResult = null
-      let attempts = 0
-      const maxAttempts = 5
+      const hathoraResult = await initializeHathoraGame(serverData)
       
-      while (!matchResult && attempts < maxAttempts) {
-        attempts++
-        console.log(`⏳ Attempt ${attempts}/${maxAttempts}: Calling findOrCreateRoom...`)
-        
-        // Update status during attempts
-        updateStatus(`🔄 Creating room... (attempt ${attempts}/${maxAttempts})`)
-        updateProgress(20 + (attempts * 15)) // Progressive loading
-        updateTimer(`⏱️ Attempt ${attempts} of ${maxAttempts}...`)
-        
-        try {
-          matchResult = await findOrCreateRoom(
-            serverData.regionId || serverData.region, // Use regionId first, fallback to region
-            serverData.entryFee, 
-            serverData.mode || 'competitive'
-          )
-          
-          // Verify it's actually a Hathora room
-          if (matchResult && matchResult.serverData && !matchResult.serverData.isHathora) {
-            console.log('❌ Got local room instead of Hathora room, retrying...')
-            updateSubStatus('🔄 Ensuring Hathora multiplayer room...')
-            matchResult = null
-          }
-          
-        } catch (createError) {
-          console.error(`❌ Attempt ${attempts} failed:`, createError)
-          updateStatus(`⚠️ Attempt ${attempts} failed, retrying...`)
-          updateSubStatus(`🔄 Error: ${createError.message.substring(0, 40)}...`)
-          if (attempts < maxAttempts) {
-            console.log(`🔄 Retrying in 2 seconds...`)
-            updateTimer(`⏱️ Retrying in 2 seconds...`)
-            await new Promise(resolve => setTimeout(resolve, 2000))
-          }
-        }
+      if (!hathoraResult || !hathoraResult.roomId) {
+        throw new Error('Failed to initialize Hathora multiplayer game')
       }
       
-      console.log('📋 Final match result:', matchResult)
+      console.log('🎉 Hathora multiplayer initialization complete!')
+      console.log('📊 Room details:', hathoraResult)
       
-      if (matchResult && matchResult.serverData && matchResult.serverData.isHathora) {
-        const { roomId, serverData: hathoraServerData, action } = matchResult
-        
-        console.log(`🎉 SUCCESS: Real Hathora room created!`)
-        console.log(`📍 Action: ${action}`)
-        console.log(`🏠 Room ID: ${roomId}`)
-        console.log(`🎮 Server: ${hathoraServerData.name}`)
-        console.log(`👥 Players: ${hathoraServerData.currentPlayers}/${hathoraServerData.maxPlayers}`)
-        console.log(`✅ Hathora Process: ${hathoraServerData.hathoraProcess}`)
-        
-        // Navigate to actual multiplayer game with Hathora room
-        const queryParams = new URLSearchParams({
-          roomId: roomId, // Real Hathora room ID
-          mode: 'hathora-multiplayer', // Explicit Hathora multiplayer mode
-          fee: serverData.entryFee || 0,
-          region: hathoraServerData.region || serverData.region,
-          name: hathoraServerData.name,
-          multiplayer: 'hathora', // Ensure multiplayer mode
-          server: 'hathora', // Use Hathora backend
-          paid: serverData.entryFee > 0 ? 'true' : 'false',
-          hathoraRoom: 'true' // Explicit flag for Hathora room
-        })
-        
-        // Show success status before navigation
-        updateStatus('✅ Hathora room created successfully!')
-        updateSubStatus(`🎮 Room ID: ${roomId} • Server: ${hathoraServerData.name}`)
-        updateProgress(100)
-        updateTimer('🚀 Launching multiplayer game...')
-        
-        console.log(`🚀 Navigating to Hathora multiplayer game: /agario?${queryParams.toString()}`)
-        
-        // Ensure minimum display time for user confidence
-        const elapsedTime = Date.now() - loadingStartTime
-        const remainingTime = Math.max(0, minimumDisplayTime - elapsedTime)
-        
-        setTimeout(async () => {
-          // Show final success message
-          updateStatus('🎉 Welcome to Hathora Multiplayer!')
-          updateTimer('🎮 Starting game...')
-          
-          // Wait a bit more for final confirmation
-          await new Promise(resolve => setTimeout(resolve, 1500))
-          
-          // Remove loading modal
-          try {
-            if (document.body.contains(loadingModal)) {
-              document.body.removeChild(loadingModal)
-            }
-          } catch (e) {
-            console.log('Modal already removed')
-          }
-          
-          router.push(`/agario?${queryParams.toString()}`)
-          setIsServerBrowserOpen(false) // Close the modal after joining
-        }, remainingTime)
-        
-      } else {
-        console.error('❌ FAILED: Could not create Hathora room after all attempts')
-        console.error('❌ Final match result was:', matchResult)
-        
-        // Show failure status
-        updateStatus('❌ Failed to create Hathora room')
-        updateSubStatus('🔄 Please try again or contact support')
-        updateProgress(100)
-        updateTimer('⏱️ Room creation failed')
-        
-        // Ensure minimum display time even for errors
-        const elapsedTime = Date.now() - loadingStartTime
-        const remainingTime = Math.max(2000, minimumDisplayTime - elapsedTime) // At least 2 seconds for error
-        
-        setTimeout(() => {
-          // Remove loading modal
-          try {
-            if (document.body.contains(loadingModal)) {
-              document.body.removeChild(loadingModal)
-            }
-          } catch (e) {
-            console.log('Modal already removed')
-          }
-          
-          alert('Failed to create Hathora multiplayer room. Please try again. Server browser requires real multiplayer servers.')
-        }, remainingTime)
-      }
-      
-    } catch (error) {
-      console.error('❌ DETAILED ERROR joining server from browser:', error)
-      
-      // Show error status
-      updateStatus('❌ Connection error occurred')
-      updateSubStatus('🔄 Please check your internet connection')
+      // Final success status
+      updateStatus('✅ Connected to multiplayer server!')
+      updateSubStatus(`🎮 Room: ${hathoraResult.roomId} • Players: 0/${hathoraResult.maxPlayers}`)
       updateProgress(100)
-      updateTimer('⏱️ Error: ' + error.message.substring(0, 30) + '...')
+      updateTimer('🚀 Loading multiplayer game...')
       
-      // Ensure minimum display time for errors
+      // Build navigation URL with all Hathora parameters
+      const queryParams = new URLSearchParams({
+        roomId: hathoraResult.roomId,
+        mode: 'hathora-multiplayer',
+        multiplayer: 'hathora',
+        server: 'hathora',
+        region: hathoraResult.region,
+        fee: hathoraResult.entryFee.toString(),
+        name: serverData.name || 'Hathora Multiplayer',
+        paid: hathoraResult.entryFee > 0 ? 'true' : 'false',
+        hathoraRoom: 'true',
+        maxPlayers: hathoraResult.maxPlayers.toString()
+      })
+      
+      console.log('🚀 Navigating to Hathora multiplayer game:', `/agario?${queryParams.toString()}`)
+      
+      // Ensure minimum display time for user confidence
       const elapsedTime = Date.now() - loadingStartTime
-      const remainingTime = Math.max(2000, minimumDisplayTime - elapsedTime)
+      const remainingTime = Math.max(0, minimumDisplayTime - elapsedTime)
       
-      setTimeout(() => {
-        // Remove loading modal
+      setTimeout(async () => {
+        // Final confirmation
+        updateStatus('🎉 Welcome to Hathora Multiplayer!')
+        updateTimer('🎮 Starting authoritative game server...')
+        
+        // Wait for final confirmation
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        
+        // Remove loading modal and navigate
         try {
           if (document.body.contains(loadingModal)) {
             document.body.removeChild(loadingModal)
@@ -2189,7 +2169,35 @@ export default function TurfLootTactical() {
           console.log('Modal already removed')
         }
         
-        alert('Failed to create Hathora room. Please try again.')
+        // Navigate to 100% Hathora multiplayer game
+        router.push(`/agario?${queryParams.toString()}`)
+        setIsServerBrowserOpen(false)
+        
+      }, remainingTime)
+      
+    } catch (error) {
+      console.error('❌ FAILED: Hathora multiplayer initialization failed:', error)
+      
+      // Show error status
+      updateStatus('❌ Connection failed')
+      updateSubStatus('🔄 Please try again or select another server')
+      updateProgress(100)
+      updateTimer(`⚠️ Error: ${error.message.substring(0, 40)}...`)
+      
+      // Ensure minimum display time for errors
+      const elapsedTime = Date.now() - loadingStartTime
+      const remainingTime = Math.max(3000, minimumDisplayTime - elapsedTime)
+      
+      setTimeout(() => {
+        try {
+          if (document.body.contains(loadingModal)) {
+            document.body.removeChild(loadingModal)
+          }
+        } catch (e) {
+          console.log('Modal already removed')
+        }
+        
+        alert(`Failed to join Hathora multiplayer server: ${error.message}`)
       }, remainingTime)
     }
   }
