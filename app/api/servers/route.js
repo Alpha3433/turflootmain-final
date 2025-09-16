@@ -2,41 +2,15 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request) {
   try {
-    console.log('🎮 Server Browser API: Generating real server data with actual pings...')
+    console.log('🎮 Server Browser API: Generating server data for client-side ping measurement...')
     
-    // Real Hathora server endpoints for ping measurement
-    const realHathoraEndpoints = {
-      'washington-dc': 'hathora.com', // US East
-      'seattle': 'hathora.com', // US West  
-      'frankfurt': 'hathora.com', // EU
-      'london': 'hathora.com', // EU
-      'sydney': 'hathora.com' // OCE
-    }
-    
-    // Function to measure real ping to Hathora servers
-    const measureRealPing = async (endpoint) => {
-      try {
-        const startTime = Date.now()
-        
-        // Make a quick HEAD request to measure latency
-        const response = await fetch(`https://${endpoint}`, {
-          method: 'HEAD',
-          signal: AbortSignal.timeout(5000) // 5 second timeout
-        })
-        
-        const endTime = Date.now()
-        const realPing = endTime - startTime
-        
-        console.log(`📡 Real ping to ${endpoint}: ${realPing}ms`)
-        return Math.min(realPing, 999) // Cap at 999ms for display
-      } catch (error) {
-        console.warn(`⚠️ Could not ping ${endpoint}, using fallback:`, error.message)
-        // Fallback to realistic estimates if ping fails
-        return endpoint.includes('sydney') ? 180 : 
-               endpoint.includes('frankfurt') ? 45 :
-               endpoint.includes('london') ? 55 :
-               endpoint.includes('seattle') ? 35 : 25
-      }
+    // Hathora region endpoints that clients can ping directly  
+    const hathoraRegionEndpoints = {
+      'washington-dc': 'api.hathora.dev', // US East - Hathora's actual API endpoint
+      'seattle': 'api.hathora.dev', // US West
+      'frankfurt': 'api.hathora.dev', // EU Frankfurt
+      'london': 'api.hathora.dev', // EU London  
+      'sydney': 'api.hathora.dev' // OCE Sydney
     }
     
     // Generate cash game servers that users can join (real Hathora rooms)
@@ -47,25 +21,19 @@ export async function GET(request) {
     ]
     
     const paidRegions = [
-      { id: 'washington-dc', name: 'US East', displayName: 'US East', endpoint: realHathoraEndpoints['washington-dc'] },
-      { id: 'seattle', name: 'US West', displayName: 'US West', endpoint: realHathoraEndpoints['seattle'] },
-      { id: 'frankfurt', name: 'Europe (Frankfurt)', displayName: 'Europe (Frankfurt)', endpoint: realHathoraEndpoints['frankfurt'] },
-      { id: 'london', name: 'Europe (London)', displayName: 'Europe (London)', endpoint: realHathoraEndpoints['london'] },
-      { id: 'sydney', name: 'Oceania', displayName: 'OCE (Sydney)', endpoint: realHathoraEndpoints['sydney'] }
+      { id: 'washington-dc', name: 'US East', displayName: 'US East', pingEndpoint: hathoraRegionEndpoints['washington-dc'] },
+      { id: 'seattle', name: 'US West', displayName: 'US West', pingEndpoint: hathoraRegionEndpoints['seattle'] },
+      { id: 'frankfurt', name: 'Europe (Frankfurt)', displayName: 'Europe (Frankfurt)', pingEndpoint: hathoraRegionEndpoints['frankfurt'] },
+      { id: 'london', name: 'Europe (London)', displayName: 'Europe (London)', pingEndpoint: hathoraRegionEndpoints['london'] },
+      { id: 'sydney', name: 'Oceania', displayName: 'OCE (Sydney)', pingEndpoint: hathoraRegionEndpoints['sydney'] }
     ]
     
     const servers = []
     
-    // Measure real pings to all regions concurrently for better performance
-    console.log('📡 Measuring real pings to Hathora servers...')
-    const pingPromises = paidRegions.map(region => 
-      measureRealPing(region.endpoint).then(ping => ({ ...region, realPing: ping }))
-    )
-    const regionsWithRealPings = await Promise.all(pingPromises)
-    
-    // Generate servers for each stake/region combination
+    // Generate servers without server-side ping measurement
+    // Client will measure real user latency to game servers
     for (const gameType of paidGameTypes) {
-      for (const region of regionsWithRealPings) {
+      for (const region of paidRegions) {
         const roomsPerType = gameType.stake >= 0.05 ? 1 : 2 // High stakes get fewer rooms
         
         for (let roomIndex = 0; roomIndex < roomsPerType; roomIndex++) {
@@ -74,8 +42,8 @@ export async function GET(request) {
           // Real player count (0 for now, will be populated when users join)
           const realPlayers = 0
           
-          // Use REAL measured ping to actual Hathora servers
-          const realPing = region.realPing
+          // No server-side ping - client will measure real user latency
+          const ping = null // Will be measured client-side
           
           // Calculate potential winnings based on real player count
           const totalEntryFees = realPlayers * gameType.stake
@@ -108,7 +76,8 @@ export async function GET(request) {
             minPlayers: 2,
             waitingPlayers: 0,
             isRunning: realPlayers >= 2,
-            ping: realPing, // REAL PING TO ACTUAL HATHORA SERVERS
+            ping: ping, // Will be measured by client
+            pingEndpoint: region.pingEndpoint, // Endpoint for client-side ping measurement
             avgWaitTime: status === 'active' ? 'Join Now' : 
                         status === 'full' ? 'Full' : 
                         'Waiting for players',
