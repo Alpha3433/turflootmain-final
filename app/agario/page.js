@@ -849,64 +849,99 @@ const AgarIOGame = () => {
           return
         }
         
-        // Try to create connection using the actual Hathora room ID
-        let connection
+        // Get connection info first, then create WebSocket connection
+        console.log('🔍 Getting connection info for room:', actualRoomId)
+        
+        let connectionInfo
         try {
-          const connectionPromise = hathoraClient.client.newConnection(actualRoomId)
-          console.log('🔗 newConnection returned:', typeof connectionPromise)
+          // Get connection info for the room
+          connectionInfo = await hathoraClient.client.getConnectionInfo(actualRoomId)
+          console.log('📡 Connection info received:', connectionInfo)
+        } catch (connectionInfoError) {
+          console.warn('⚠️ getConnectionInfo failed, trying alternative approach:', connectionInfoError.message)
           
-          // Check if it's a Promise (new SDK behavior)
-          if (connectionPromise && typeof connectionPromise.then === 'function') {
-            console.log('📡 newConnection returned a Promise, awaiting...')
-            connection = await connectionPromise
-            console.log('🔗 Connection resolved from Promise:', connection)
-          } else {
-            console.log('🔗 newConnection returned direct object')
-            connection = connectionPromise
+          // Fallback: try to connect directly using room ID
+          connectionInfo = {
+            host: `${actualRoomId}.hathora.dev`,
+            port: 443,
+            transportType: 'wss'
+          }
+          console.log('🔄 Using fallback connection info:', connectionInfo)
+        }
+        
+        if (!connectionInfo || !connectionInfo.host) {
+          console.error('❌ No valid connection info available')
+          setWsConnection('error')
+          return
+        }
+        
+        // Create WebSocket connection to Hathora server
+        const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}?token=${token}&roomId=${actualRoomId}`
+        console.log('🔗 Connecting to WebSocket:', wsUrl)
+        
+        const ws = new WebSocket(wsUrl)
+        
+        // Set up WebSocket event handlers
+        ws.onopen = () => {
+          console.log('✅ WebSocket connected to Hathora!')
+          setWsConnection('connected')
+          setConnectedPlayers(1)
+          
+          // Send initial player join message
+          const joinMessage = {
+            type: 'player_join',
+            roomId: actualRoomId,
+            playerId: 'player_' + Math.random().toString(36).substr(2, 9),
+            playerData: {
+              name: 'TurfLoot Player',
+              color: '#ff6b6b'
+            }
           }
           
-        } catch (error) {
-          console.error('❌ Error calling newConnection:', error)
-          setWsConnection('error')
-          return
+          ws.send(JSON.stringify(joinMessage))
+          console.log('📤 Sent player join event')
         }
         
-        // DEBUG: Check what we actually got
-        console.log('🔍 Final connection object:', connection)
-        console.log('🔍 Connection type:', typeof connection)
-        
-        if (!connection || typeof connection !== 'object') {
-          console.error('❌ Invalid connection object received:', connection)
-          setWsConnection('error')
-          return
-        }
-        
-        // Check available methods
-        const methods = Object.getOwnPropertyNames(connection)
-        console.log('🔍 Available connection methods:', methods)
-        
-        // Check if connection has the expected methods
-        if (typeof connection.onClose !== 'function') {
-          console.error('❌ connection.onClose is not a function - available methods:', methods)
-          setWsConnection('error')
-          return
-        }
-        
-        console.log('✅ Connection object validated, setting up event handlers...')
-        
-        // Set up connection event handlers with correct Hathora SDK 1.3.1 method names
-        connection.onClose((error) => {
-          console.log('🔌 Hathora connection closed')
-          if (error) {
-            console.error('❌ Connection closed with error:', error)
-            setWsConnection('error')
-          } else {
-            console.log('✅ Connection closed cleanly')
-            setWsConnection('disconnected')
+        ws.onmessage = (event) => {
+          try {
+            const json = JSON.parse(event.data)
+            console.log('📨 Received Hathora message:', json)
+            
+            switch (json.type) {
+              case 'player_joined':
+                console.log('👤 Player joined:', json.playerId)
+                setConnectedPlayers(prev => prev + 1)
+                break
+                
+              case 'player_left':
+                console.log('👋 Player left:', json.playerId)
+                setConnectedPlayers(prev => Math.max(1, prev - 1))
+                break
+                
+              case 'game_state':
+                console.log('🎮 Game state update received')
+                if (json.players) {
+                  playersRef.current.clear()
+                  json.players.forEach(player => {
+                    playersRef.current.set(player.id, player)
+                  })
+                }
+                break
+                
+              default:
+                console.log('📦 Unknown message type:', json.type)
+            }
+          } catch (parseError) {
+            console.error('❌ Failed to parse message:', parseError, event.data)
           }
+        }
+        
+        ws.onclose = (event) => {
+          console.log('🔌 WebSocket connection closed:', event.code, event.reason)
+          setWsConnection('disconnected')
           
-          // Attempt to reconnect if game is still active and error occurred
-          if (gameStarted && error) {
+          // Attempt to reconnect if game is still active and it wasn't a clean close
+          if (gameStarted && event.code !== 1000) {
             console.log('🔄 Attempting to reconnect in 3 seconds...')
             setTimeout(() => {
               if (gameStarted) {
@@ -914,61 +949,17 @@ const AgarIOGame = () => {
               }
             }, 3000)
           }
-        })
-
-        connection.onMessageJson((json) => {
-          console.log('📨 Received Hathora message:', json)
-          
-          switch (json.type) {
-            case 'player_joined':
-              console.log('👤 Player joined:', json.playerId)
-              setConnectedPlayers(prev => prev + 1)
-              break
-              
-            case 'player_left':
-              console.log('👋 Player left:', json.playerId)
-              setConnectedPlayers(prev => Math.max(1, prev - 1))
-              break
-              
-            case 'game_state':
-              // Handle real-time game state updates
-              console.log('🎮 Game state update received')
-              if (json.players) {
-                playersRef.current.clear()
-                json.players.forEach(player => {
-                  playersRef.current.set(player.id, player)
-                })
-              }
-              break
-              
-            default:
-              console.log('📦 Unknown message type:', json.type)
-          }
-        })
-
-        // Connect to the room
-        console.log('🚀 Connecting to Hathora room...')
-        await connection.connect(token)
-        
-        console.log('✅ Connected to Hathora room successfully!')
-        setWsConnection('connected')
-        
-        // Store connection reference
-        wsRef.current = connection
-        
-        // Send player join event using writeJson method
-        const joinMessage = {
-          type: 'player_join',
-          roomId: actualRoomId,
-          playerId: 'player_' + Math.random().toString(36).substr(2, 9),
-          playerData: {
-            name: 'TurfLoot Player',
-            color: '#ff6b6b'
-          }
         }
         
-        connection.writeJson(joinMessage)
-        console.log('📤 Sent player join event')
+        ws.onerror = (error) => {
+          console.error('❌ WebSocket error:', error)
+          setWsConnection('error')
+        }
+        
+        // Store WebSocket reference
+        wsRef.current = ws
+        
+        console.log('🔗 WebSocket connection initiated...')
 
       } catch (error) {
         console.error('❌ Failed to connect to Hathora room:', error)
