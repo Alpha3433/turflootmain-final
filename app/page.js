@@ -300,10 +300,19 @@ export default function TurfLootTactical() {
         console.log(`🆕 Created Hathora room result:`, hathoraRoomResult)
         
         // Extract room ID from the result object
-        const hathoraRoomId = hathoraRoomResult.roomId || hathoraRoomResult
+        let hathoraRoomId
+        if (typeof hathoraRoomResult === 'string') {
+          hathoraRoomId = hathoraRoomResult
+        } else if (hathoraRoomResult && hathoraRoomResult.roomId) {
+          hathoraRoomId = hathoraRoomResult.roomId
+        } else {
+          console.error('❌ Invalid Hathora room result:', hathoraRoomResult)
+          throw new Error('Failed to extract room ID from Hathora result')
+        }
+        
         const actualRegion = hathoraRoomResult.region || hathoraRegion
         
-        console.log(`🆕 Created Hathora room: ${hathoraRoomId}`)
+        console.log(`🆕 Created Hathora room ID: ${hathoraRoomId} (type: ${typeof hathoraRoomId})`)
         
         // Simplified connection info without getConnectionInfo
         const connectionInfo = {
