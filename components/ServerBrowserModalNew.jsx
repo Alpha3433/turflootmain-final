@@ -296,6 +296,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     onJoinLobby({
       id: server.id,
       region: server.region,
+      regionId: server.regionId, // Pass the specific region ID (e.g., 'london', 'frankfurt')
       name: server.name,
       entryFee: server.entryFee,
       gameType: server.gameType,
