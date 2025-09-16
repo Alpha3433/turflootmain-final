@@ -210,33 +210,63 @@ class ServerBrowserTester:
             'collapse_benefit': empty_count > 5
         }
 
-    def test_wallet_balance_api(self):
-        """Test /api/wallet/balance endpoint"""
-        try:
-            # Test without authentication (guest user)
-            response = requests.get(f"{API_BASE}/wallet/balance", timeout=10)
+    def test_regional_coverage(self, server_data: Dict):
+        """Test 4: Regional Coverage - Test all regions are represented"""
+        print("\n🔍 TEST 4: REGIONAL COVERAGE")
+        
+        if not server_data or 'servers' not in server_data:
+            self.log_test("Regional Coverage", False, "No server data available")
+            return
+        
+        servers = server_data['servers']
+        
+        # Expected regions based on review request
+        expected_regions = ['US East', 'US West', 'Europe', 'Asia', 'Oceania']
+        
+        # Extract actual regions from server data
+        actual_regions = set()
+        region_server_count = {}
+        
+        for server in servers:
+            region = server.get('region', 'Unknown')
+            actual_regions.add(region)
             
-            if response.status_code != 200:
-                self.log_test("Wallet Balance API - Guest", False, f"Status: {response.status_code}", response.text[:200])
-                return False
-                
-            data = response.json()
+            if region not in region_server_count:
+                region_server_count[region] = 0
+            region_server_count[region] += 1
+        
+        self.log_test("Region Extraction", len(actual_regions) > 0, 
+                     f"Found regions: {list(actual_regions)}")
+        
+        # Test coverage of major regions
+        major_regions_covered = 0
+        for expected in expected_regions:
+            found = False
+            for actual in actual_regions:
+                if expected.lower() in actual.lower() or any(keyword in actual.lower() 
+                    for keyword in expected.lower().split()):
+                    found = True
+                    break
             
-            # Check required fields for wallet balance
-            required_fields = ['balance', 'currency', 'sol_balance', 'wallet_address']
-            missing_fields = [field for field in required_fields if field not in data]
-            
-            if missing_fields:
-                self.log_test("Wallet Balance API - Guest", False, f"Missing fields: {missing_fields}")
-                return False
-                
-            self.log_test("Wallet Balance API - Guest", True, 
-                         f"Balance: ${data.get('balance')}, SOL: {data.get('sol_balance')}")
-            return True
-            
-        except Exception as e:
-            self.log_test("Wallet Balance API - Guest", False, "", str(e))
-            return False
+            if found:
+                major_regions_covered += 1
+                self.log_test(f"Region Coverage: {expected}", True, "Region represented")
+            else:
+                self.log_test(f"Region Coverage: {expected}", False, "Region not found")
+        
+        coverage_percentage = (major_regions_covered / len(expected_regions)) * 100
+        self.log_test("Overall Regional Coverage", coverage_percentage >= 60, 
+                     f"{coverage_percentage:.1f}% of expected regions covered")
+        
+        # Test region distribution for collapsed design
+        for region, count in region_server_count.items():
+            self.log_test(f"Region Server Count: {region}", count > 0, f"{count} servers")
+        
+        return {
+            'actual_regions': actual_regions,
+            'region_server_count': region_server_count,
+            'coverage_percentage': coverage_percentage
+        }
 
     def test_wallet_balance_with_auth(self):
         """Test wallet balance API with authentication token"""
