@@ -1628,8 +1628,9 @@ export default function TurfLootTactical() {
   // Orientation detection and game entry for mobile
   const checkOrientationAndEnterGame = (gameUrl) => {
     if (!isMobile) {
-      // Desktop: Navigate immediately
+      // Desktop: Navigate immediately and dismiss loading popup
       console.log('🖥️ Desktop detected - navigating directly to game')
+      setLocalPracticeLoading(false) // Dismiss loading popup before navigation
       window.location.href = gameUrl
       return
     }
