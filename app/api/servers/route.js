@@ -106,8 +106,32 @@ export async function GET(request) {
         for (let roomIndex = 0; roomIndex < roomsPerType; roomIndex++) {
           const roomId = `paid-${region.id}-${gameType.stake}-${roomIndex + 1}`
           
-          // Real player count (0 for now, will be populated when users join)
-          const realPlayers = 0
+          // Query REAL player count from actual Hathora rooms
+          let realPlayers = 0
+          try {
+            // Import Hathora client to query actual room status
+            const { default: hathoraClient } = await import('../../lib/hathoraClient.js')
+            
+            // Initialize if not already done
+            await hathoraClient.initialize()
+            
+            // Query actual room for player count
+            const roomInfo = await hathoraClient.getRoomInfo(roomId)
+            if (roomInfo && roomInfo.allocations) {
+              // Count active connections/players in this room
+              realPlayers = roomInfo.allocations.filter(allocation => 
+                allocation.status === 'active' || allocation.status === 'running'
+              ).length
+              
+              console.log(`📊 Room ${roomId}: ${realPlayers} real players from Hathora`)
+            } else {
+              console.log(`📭 Room ${roomId}: No active Hathora room found`)
+              realPlayers = 0
+            }
+          } catch (error) {
+            console.warn(`⚠️ Could not query Hathora room ${roomId}:`, error.message)
+            realPlayers = 0 // Fallback to 0 if Hathora query fails
+          }
           
           // No server-side ping - client will measure real user latency
           const ping = null // Will be measured client-side
