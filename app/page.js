@@ -6359,8 +6359,19 @@ export default function TurfLootTactical() {
                 // Add delay to show loading popup, then navigate
                 setTimeout(() => {
                   console.log('⏰ Timeout reached - starting game navigation')
-                  checkOrientationAndEnterGame(gameUrl)
-                }, 1000) // Increased delay to 1 second
+                  // Don't immediately navigate - give time for the loading popup to show
+                  if (window.innerWidth >= 768) {
+                    // Desktop: show loading for 2 seconds, then navigate
+                    setTimeout(() => {
+                      console.log('🎮 Loading complete - navigating to game')
+                      setLocalPracticeLoading(false) // Dismiss loading popup before navigation
+                      window.location.href = gameUrl
+                    }, 2000)
+                  } else {
+                    // Mobile: use normal flow
+                    checkOrientationAndEnterGame(gameUrl)
+                  }
+                }, 200) // Reduced initial delay
               }}
               onMouseOver={(e) => {
                 if (currentParty && currentParty.members && currentParty.members.length > 1) {
