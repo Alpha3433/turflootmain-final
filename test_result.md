@@ -108,7 +108,7 @@ user_problem_statement: "Priority 1 - Critical Hathora SDK Fix: Fix the persiste
 
 test_plan:
   current_focus:
-    - "Server Browser Functionality Testing"
+    - "Wallet Functionality with Updated Helius API Key"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
