@@ -108,10 +108,10 @@ user_problem_statement: "Priority 1 - Critical Hathora SDK Fix: Fix the persiste
 
 test_plan:
   current_focus:
-    - "Server Browser Modal Investigation and Fix"
-    - "Replace DOM-created popup with React modal"
-    - "Fix z-index layering over Privy authentication modal"
-    - "Test redesigned server browser functionality"
+    - "Hathora SDK Fix - Region Mapping and Room Creation"
+    - "Remove problematic getConnectionInfo calls"
+    - "Fix createPublicLobby region parameter syntax"
+    - "Verify Oceania server creation in Sydney region"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
