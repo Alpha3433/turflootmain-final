@@ -268,37 +268,66 @@ class ServerBrowserTester:
             'coverage_percentage': coverage_percentage
         }
 
-    def test_wallet_balance_with_auth(self):
-        """Test wallet balance API with authentication token"""
-        try:
-            # Test with a simple testing token
-            headers = {
-                'Authorization': 'Bearer testing-simple-test-user'
-            }
+    def test_stake_variations(self, server_data: Dict):
+        """Test 5: Stake Variations - Confirm different stake levels are available"""
+        print("\n🔍 TEST 5: STAKE VARIATIONS")
+        
+        if not server_data or 'servers' not in server_data:
+            self.log_test("Stake Variations", False, "No server data available")
+            return
+        
+        servers = server_data['servers']
+        
+        # Expected stake levels based on review request
+        expected_stakes = [0.01, 0.02, 0.05]
+        
+        # Extract actual stakes from server data
+        actual_stakes = set()
+        stake_server_count = {}
+        stake_region_combinations = set()
+        
+        for server in servers:
+            stake = server.get('stake', 0)
+            region = server.get('region', 'Unknown')
             
-            response = requests.get(f"{API_BASE}/wallet/balance", headers=headers, timeout=10)
+            actual_stakes.add(stake)
             
-            if response.status_code != 200:
-                self.log_test("Wallet Balance API - Authenticated", False, f"Status: {response.status_code}", response.text[:200])
-                return False
-                
-            data = response.json()
+            if stake not in stake_server_count:
+                stake_server_count[stake] = 0
+            stake_server_count[stake] += 1
             
-            # For testing tokens, the API should return a valid response structure
-            required_fields = ['balance', 'currency', 'sol_balance', 'wallet_address']
-            missing_fields = [field for field in required_fields if field not in data]
-            
-            if missing_fields:
-                self.log_test("Wallet Balance API - Authenticated", False, f"Missing fields: {missing_fields}")
-                return False
-                
-            self.log_test("Wallet Balance API - Authenticated", True, 
-                         f"Auth Balance: ${data.get('balance')}, SOL: {data.get('sol_balance')}, Wallet: {data.get('wallet_address')}")
-            return True
-                
-        except Exception as e:
-            self.log_test("Wallet Balance API - Authenticated", False, "", str(e))
-            return False
+            stake_region_combinations.add((stake, region))
+        
+        self.log_test("Stake Extraction", len(actual_stakes) > 0, 
+                     f"Found stakes: {sorted(list(actual_stakes))}")
+        
+        # Test coverage of expected stake levels
+        stakes_covered = 0
+        for expected_stake in expected_stakes:
+            if expected_stake in actual_stakes:
+                stakes_covered += 1
+                self.log_test(f"Stake Level: ${expected_stake}", True, "Available")
+            else:
+                self.log_test(f"Stake Level: ${expected_stake}", False, "Not found")
+        
+        stake_coverage = (stakes_covered / len(expected_stakes)) * 100
+        self.log_test("Stake Coverage", stake_coverage >= 66, 
+                     f"{stake_coverage:.1f}% of expected stakes available")
+        
+        # Test stake distribution across regions
+        self.log_test("Stake-Region Combinations", len(stake_region_combinations) > 0, 
+                     f"Found {len(stake_region_combinations)} stake-region combinations")
+        
+        # Test stake distribution for collapsed design
+        for stake, count in stake_server_count.items():
+            self.log_test(f"Stake Server Count: ${stake}", count > 0, f"{count} servers")
+        
+        return {
+            'actual_stakes': actual_stakes,
+            'stake_server_count': stake_server_count,
+            'stake_coverage': stake_coverage,
+            'combinations': stake_region_combinations
+        }
 
     def test_wallet_transactions_api(self):
         """Test /api/wallet/transactions endpoint"""
