@@ -1926,6 +1926,59 @@ export default function TurfLootTactical() {
   const handleJoinLobby = async (serverData) => {
     console.log('🌐 Server Browser: Joining server via Hathora:', serverData)
     
+    // Show loading modal immediately
+    const loadingModal = document.createElement('div')
+    loadingModal.id = 'hathora-loading-modal'
+    loadingModal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      backdrop-filter: blur(10px);
+    `
+    
+    loadingModal.innerHTML = `
+      <div style="
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        padding: 40px;
+        border-radius: 16px;
+        text-align: center;
+        border: 2px solid #68d391;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      ">
+        <div style="font-size: 48px; margin-bottom: 20px;">🌐</div>
+        <div style="color: #68d391; font-size: 24px; font-weight: bold; margin-bottom: 10px;">
+          CREATING HATHORA ROOM
+        </div>
+        <div style="color: #e2e8f0; font-size: 16px; margin-bottom: 20px;">
+          Setting up multiplayer server in ${serverData.region}...
+        </div>
+        <div style="
+          width: 200px;
+          height: 4px;
+          background: rgba(104, 211, 145, 0.2);
+          border-radius: 2px;
+          overflow: hidden;
+          margin: 0 auto;
+        ">
+          <div style="
+            width: 100%;
+            height: 100%;
+            background: #68d391;
+            animation: loading-bar 2s ease-in-out infinite;
+          "></div>
+        </div>
+      </div>
+    `
+    
+    document.body.appendChild(loadingModal)
+    
     try {
       // For cash games, validate balance first
       if (serverData.entryFee > 0) {
@@ -1933,6 +1986,7 @@ export default function TurfLootTactical() {
         const balanceCheck = validatePaidRoom(`Server Browser: ${serverData.name} ($${serverData.entryFee})`)
         if (!balanceCheck) {
           console.log('❌ Insufficient funds for server:', serverData.name)
+          document.body.removeChild(loadingModal)
           alert(`Insufficient funds! You need $${serverData.entryFee} to join this server.`)
           return
         }
@@ -1945,14 +1999,36 @@ export default function TurfLootTactical() {
       console.log(`🌍 Region: ${serverData.region}`)
       console.log(`📊 Server ID: ${serverData.id}`)
       
-      // Show loading state
-      console.log('⏳ Calling findOrCreateRoom...')
+      // Keep loading and retry until we get a real Hathora room
+      let matchResult = null
+      let attempts = 0
+      const maxAttempts = 5
       
-      const matchResult = await findOrCreateRoom(
-        serverData.regionId || serverData.region, // Use regionId first, fallback to region
-        serverData.entryFee, 
-        serverData.mode || 'competitive'
-      )
+      while (!matchResult && attempts < maxAttempts) {
+        attempts++
+        console.log(`⏳ Attempt ${attempts}/${maxAttempts}: Calling findOrCreateRoom...`)
+        
+        try {
+          matchResult = await findOrCreateRoom(
+            serverData.regionId || serverData.region, // Use regionId first, fallback to region
+            serverData.entryFee, 
+            serverData.mode || 'competitive'
+          )
+          
+          // Verify it's actually a Hathora room
+          if (matchResult && matchResult.serverData && !matchResult.serverData.isHathora) {
+            console.log('❌ Got local room instead of Hathora room, retrying...')
+            matchResult = null
+          }
+          
+        } catch (createError) {
+          console.error(`❌ Attempt ${attempts} failed:`, createError)
+          if (attempts < maxAttempts) {
+            console.log(`🔄 Retrying in 2 seconds...`)
+            await new Promise(resolve => setTimeout(resolve, 2000))
+          }
+        }
+      }
       
       console.log('📋 Match result:', matchResult)
       
