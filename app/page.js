@@ -200,11 +200,19 @@ export default function TurfLootTactical() {
         }
         
         console.log('🌍 Creating new Hathora room for paid game...')
+        console.log(`🗺️ Target region: ${region}`)
         
-        // Create Hathora room with paid game configuration
-        const hathoraRoomId = await hathoraClient.createOrJoinRoom(
+        // Map region to Hathora region format
+        const hathoraRegion = hathoraClient.mapServerRegionToHathora ? 
+          hathoraClient.mapServerRegionToHathora(region) : region
+        
+        console.log(`🎯 Mapped to Hathora region: ${hathoraRegion}`)
+        
+        // Create Hathora room with paid game configuration and specific region
+        const hathoraRoomId = await hathoraClient.createPaidRoom(
+          stakeAmount,
           user?.id || 'anonymous',
-          'cash-game' // Custom game mode for paid rooms
+          hathoraRegion // Pass the mapped region
         )
         
         console.log(`🆕 Created Hathora room: ${hathoraRoomId}`)
