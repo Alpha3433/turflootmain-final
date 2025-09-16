@@ -1927,7 +1927,7 @@ export default function TurfLootTactical() {
     console.log('🌐 Server Browser: Joining server via Hathora:', serverData)
     console.log('🔍 handleJoinLobby called with serverData:', JSON.stringify(serverData, null, 2))
     
-    // Show loading modal immediately
+    // Show enhanced loading modal with progress tracking
     const loadingModal = document.createElement('div')
     loadingModal.id = 'hathora-loading-modal'
     loadingModal.style.cssText = `
@@ -1952,33 +1952,74 @@ export default function TurfLootTactical() {
         text-align: center;
         border: 2px solid #68d391;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        min-width: 400px;
       ">
-        <div style="font-size: 48px; margin-bottom: 20px;">🌐</div>
+        <div style="font-size: 48px; margin-bottom: 20px;">🚀</div>
         <div style="color: #68d391; font-size: 24px; font-weight: bold; margin-bottom: 10px;">
           CREATING HATHORA ROOM
         </div>
-        <div style="color: #e2e8f0; font-size: 16px; margin-bottom: 20px;">
-          Setting up multiplayer server in ${serverData.region}...
+        <div id="loading-status" style="color: #e2e8f0; font-size: 16px; margin-bottom: 10px;">
+          💰 Setting up multiplayer server in ${serverData.region}...
+        </div>
+        <div id="loading-substatus" style="color: #a0aec0; font-size: 14px; margin-bottom: 20px;">
+          🎯 Entry Fee: $${serverData.entryFee} • Max Players: 8 • Server: ${serverData.name}
         </div>
         <div style="
-          width: 200px;
-          height: 4px;
+          width: 300px;
+          height: 6px;
           background: rgba(104, 211, 145, 0.2);
-          border-radius: 2px;
+          border-radius: 3px;
           overflow: hidden;
-          margin: 0 auto;
+          margin: 0 auto 15px;
         ">
-          <div style="
-            width: 100%;
+          <div id="progress-bar" style="
+            width: 20%;
             height: 100%;
-            background: #68d391;
+            background: linear-gradient(90deg, #68d391, #38b2ac);
             animation: loading-bar 2s ease-in-out infinite;
+            border-radius: 3px;
+            transition: width 0.5s ease;
           "></div>
+        </div>
+        <div id="loading-timer" style="color: #718096; font-size: 12px;">
+          ⏱️ Connecting to Hathora servers...
         </div>
       </div>
     `
     
     document.body.appendChild(loadingModal)
+    
+    // Progress tracking functions
+    const updateStatus = (message) => {
+      const statusEl = document.getElementById('loading-status')
+      if (statusEl) statusEl.textContent = message
+    }
+    
+    const updateSubStatus = (message) => {
+      const subStatusEl = document.getElementById('loading-substatus')
+      if (subStatusEl) subStatusEl.textContent = message
+    }
+    
+    const updateProgress = (percentage) => {
+      const progressBar = document.getElementById('progress-bar')
+      if (progressBar) progressBar.style.width = `${percentage}%`
+    }
+    
+    const updateTimer = (message) => {
+      const timerEl = document.getElementById('loading-timer')
+      if (timerEl) timerEl.textContent = message
+    }
+    
+    // Track timing for minimum display duration
+    const loadingStartTime = Date.now()
+    const minimumDisplayTime = 5000 // 5 seconds minimum for user confidence
+    
+    // Progressive status updates
+    setTimeout(() => updateStatus('🔐 Authenticating with Hathora...'), 500)
+    setTimeout(() => updateProgress(40), 1000)
+    setTimeout(() => updateStatus('🌍 Finding optimal server region...'), 1500)
+    setTimeout(() => updateProgress(60), 2000)
+    setTimeout(() => updateTimer('⏱️ Almost ready...'), 2500)
     
     try {
       // For cash games, validate balance first
