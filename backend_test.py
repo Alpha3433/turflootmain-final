@@ -141,50 +141,38 @@ class WalletTester:
         except Exception as e:
             self.log_result("Helius RPC Connectivity", False, f"Exception: {str(e)}")
 
-    def test_hathora_room_creation_api(self):
-        """Test 2: Hathora Room Creation API - Test createPaidRoom and createOrJoinRoom methods"""
-        print("🔍 TEST 2: HATHORA ROOM CREATION API")
+    def test_wallet_balance_guest(self):
+        """Test wallet balance API for guest users"""
+        print("\n💰 Testing Wallet Balance API - Guest User...")
         
-        # Test server browser API to get available servers
         try:
-            start_time = time.time()
-            response = requests.get(f"{self.api_base}/servers", timeout=10)
-            response_time = time.time() - start_time
+            response = requests.get(f"{self.api_base}/wallet/balance", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                servers = data.get('servers', [])
-                hathora_enabled = data.get('hathoraEnabled', False)
                 
-                if not hathora_enabled:
-                    self.log_test("Hathora Integration Check", False, "Hathora not enabled in server configuration")
-                    return False
+                # Check required fields
+                required_fields = ['balance', 'currency', 'sol_balance', 'wallet_address']
+                missing_fields = [field for field in required_fields if field not in data]
                 
-                if len(servers) == 0:
-                    self.log_test("Hathora Room Creation API", False, "No servers available for room creation testing")
-                    return False
-                
-                # Find a Hathora server for testing
-                hathora_servers = [s for s in servers if s.get('serverType') == 'hathora-paid']
-                
-                if len(hathora_servers) == 0:
-                    self.log_test("Hathora Room Creation API", False, "No Hathora servers found in server list")
-                    return False
-                
-                # Test with a sample Hathora server
-                test_server = hathora_servers[0]
-                server_details = f"Found {len(hathora_servers)} Hathora servers, testing with: {test_server.get('name', 'Unknown')} (Entry: ${test_server.get('entryFee', 0)}, Region: {test_server.get('region', 'Unknown')})"
-                
-                self.log_test("Hathora Room Creation API", True, server_details, response_time)
-                return True
-                
+                if not missing_fields:
+                    self.log_result("Guest Wallet Balance Structure", True, 
+                                  f"Balance: ${data.get('balance')}, SOL: {data.get('sol_balance')}")
+                else:
+                    self.log_result("Guest Wallet Balance Structure", False, 
+                                  f"Missing fields: {missing_fields}")
+                    
+                # Verify guest balance is 0
+                if data.get('balance') == 0.0 and data.get('sol_balance') == 0.0:
+                    self.log_result("Guest Balance Values", True, "Correct zero balances for guest")
+                else:
+                    self.log_result("Guest Balance Values", False, 
+                                  f"Expected zero balances, got: ${data.get('balance')}, {data.get('sol_balance')} SOL")
             else:
-                self.log_test("Hathora Room Creation API", False, f"Server API failed: HTTP {response.status_code}", response_time)
-                return False
+                self.log_result("Guest Wallet Balance API", False, f"HTTP {response.status_code}")
                 
         except Exception as e:
-            self.log_test("Hathora Room Creation API", False, f"Error testing room creation: {str(e)}")
-            return False
+            self.log_result("Guest Wallet Balance API", False, f"Exception: {str(e)}")
 
     def test_real_room_process_verification(self):
         """Test 3: Real Room Process Verification - Verify actual Hathora room processes are created"""
