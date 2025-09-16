@@ -2979,7 +2979,17 @@ const AgarIOGame = () => {
   }
 
   return (
-    <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
+    <>
+      {/* CSS for multiplayer status animation */}
+      <style jsx>{`
+        @keyframes pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.5; }
+          100% { opacity: 1; }
+        }
+      `}</style>
+      
+      <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
       {/* Game Canvas - Full Screen */}
       <canvas
         ref={canvasRef}
