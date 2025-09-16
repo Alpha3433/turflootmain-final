@@ -147,27 +147,100 @@ export default function TurfLootTactical() {
       
       console.log(`👥 Servers with players: ${serversWithPlayers.length}, Empty servers: ${emptyServers.length}`)
       
-      // Step 4: Join existing game with players (highest priority)
-      if (serversWithPlayers.length > 0) {
-        // Sort by player count (join fuller games first for better experience)
-        const bestServer = serversWithPlayers.sort((a, b) => b.currentPlayers - a.currentPlayers)[0]
-        console.log(`✅ Joining existing game: ${bestServer.name} with ${bestServer.currentPlayers} players`)
+      // Step 4: Always create new Hathora room processes for server browser joins
+      // The server browser shows "virtual" servers, but we need to create real Hathora rooms
+      console.log('🆕 Server browser join detected - creating new Hathora room process...')
+      
+      // Import and use Hathora client singleton
+      const { default: hathoraClient } = await import('../lib/hathoraClient.js')
+      
+      const initialized = await hathoraClient.initialize()
+      if (!initialized) {
+        console.log('⚠️ Hathora not available, using fallback')
+        // If there are existing servers, join the best one as fallback
+        if (serversWithPlayers.length > 0) {
+          const bestServer = serversWithPlayers.sort((a, b) => b.currentPlayers - a.currentPlayers)[0]
+          console.log(`✅ Fallback: Joining existing game: ${bestServer.name}`)
+          return {
+            roomId: bestServer.id || bestServer.hathoraRoomId,
+            serverData: bestServer,
+            action: 'joined_existing_fallback'
+          }
+        }
+        
+        const fallbackRoomId = `${region.toLowerCase()}-${stakeAmount}-${Date.now()}`
         return {
-          roomId: bestServer.id || bestServer.hathoraRoomId,
-          serverData: bestServer,
-          action: 'joined_existing'
+          roomId: fallbackRoomId,
+          serverData: {
+            id: fallbackRoomId,
+            name: `${region} $${stakeAmount} Cash Game`,
+            region: region,
+            stake: stakeAmount,
+            mode: mode,
+            currentPlayers: 0,
+            maxPlayers: stakeAmount >= 0.05 ? 4 : 6,
+            ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65,
+            isHathora: false
+          },
+          action: 'created_fallback'
         }
       }
       
-      // Step 5: Join empty server if available
-      if (emptyServers.length > 0) {
-        const emptyServer = emptyServers[0]
-        console.log(`✅ Joining empty server: ${emptyServer.name}`)
-        return {
-          roomId: emptyServer.id || emptyServer.hathoraRoomId,
-          serverData: emptyServer,
-          action: 'joined_empty'
-        }
+      console.log('🌍 Creating new Hathora room for server browser join...')
+      console.log(`🗺️ Target region: ${region}`)
+      
+      // Map region to Hathora region format
+      const hathoraRegion = hathoraClient.mapServerRegionToHathora ? 
+        hathoraClient.mapServerRegionToHathora(region) : region
+      
+      console.log(`🎯 Mapped to Hathora region: ${hathoraRegion}`)
+      
+      // Create Hathora room with paid game configuration and specific region
+      const hathoraRoomResult = await hathoraClient.createPaidRoom(
+        stakeAmount,
+        user?.id || 'anonymous',
+        hathoraRegion // Pass the mapped region
+      )
+      
+      console.log(`🆕 Created Hathora room result:`, hathoraRoomResult)
+      
+      // Extract room ID from the result object
+      const hathoraRoomId = hathoraRoomResult.roomId || hathoraRoomResult
+      const actualRegion = hathoraRoomResult.region || hathoraRegion
+      
+      console.log(`🆕 Created Hathora room: ${hathoraRoomId}`)
+      
+      // Simplified connection info without getConnectionInfo
+      const connectionInfo = {
+        host: 'hathora.dev',
+        port: 443,
+        region: actualRegion, // Use the actual region from Hathora
+        roomId: hathoraRoomId
+      }
+      console.log('📡 Hathora connection info (simplified):', connectionInfo)
+      
+      const serverData = {
+        id: hathoraRoomId,
+        hathoraRoomId: hathoraRoomId,
+        name: `${region} $${stakeAmount} Cash Game`,
+        region: connectionInfo.region || region,
+        stake: stakeAmount,
+        mode: mode,
+        currentPlayers: 0,
+        maxPlayers: stakeAmount >= 0.05 ? 4 : 6, // High stakes = fewer players
+        ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65,
+        host: connectionInfo.host,
+        port: connectionInfo.port,
+        isHathora: true,
+        hathoraProcess: true
+      }
+      
+      console.log('✅ Hathora room created successfully for server browser join:', serverData)
+      
+      return {
+        roomId: hathoraRoomId,
+        serverData: serverData,
+        action: 'created_hathora_from_browser'
       }
       
       // Step 6: Create new Hathora room if no matching servers exist
