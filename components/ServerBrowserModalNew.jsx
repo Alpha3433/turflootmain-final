@@ -175,7 +175,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     return flagMap[region] || '🌍'
   }
 
-  // Process servers - exclude practice servers (entryFee === 0)
+  // Process servers - exclude practice servers (entryFee === 0) and sort by ping
   const processedServers = servers
     .filter(server => server.entryFee > 0) // Only show cash games, remove practice servers
     .map(server => ({
@@ -185,6 +185,22 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       isActive: server.currentPlayers > 0,
       isEmpty: server.currentPlayers === 0
     }))
+    .sort((a, b) => {
+      // Primary sort: by ping (lowest first) - but only if both have ping data
+      if (a.ping !== null && b.ping !== null) {
+        return a.ping - b.ping
+      }
+      // If one has ping and other doesn't, prioritize the one with ping data
+      if (a.ping !== null && b.ping === null) return -1
+      if (a.ping === null && b.ping !== null) return 1
+      
+      // Secondary sort: active servers first (if no ping difference)
+      if (a.currentPlayers > 0 && b.currentPlayers === 0) return -1
+      if (a.currentPlayers === 0 && b.currentPlayers > 0) return 1
+      
+      // Tertiary sort: by region name for consistency
+      return a.region.localeCompare(b.region)
+    })
 
   // Filter by stake
   const filteredServers = selectedStakeFilter === 'All' 
