@@ -4,13 +4,13 @@ export async function GET(request) {
   try {
     console.log('🎮 Server Browser API: Generating server data for client-side ping measurement...')
     
-    // Hathora region endpoints that clients can ping directly  
-    const hathoraRegionEndpoints = {
-      'washington-dc': 'api.hathora.dev', // US East - Hathora's actual API endpoint
-      'seattle': 'api.hathora.dev', // US West
-      'frankfurt': 'api.hathora.dev', // EU Frankfurt
-      'london': 'api.hathora.dev', // EU London  
-      'sydney': 'api.hathora.dev' // OCE Sydney
+    // Hathora regional game server endpoints (actual data plane, not control plane)
+    const hathoraRegionalEndpoints = {
+      'washington-dc': 'us-east-1.hathora.dev', // US East game servers
+      'seattle': 'us-west-1.hathora.dev', // US West game servers
+      'frankfurt': 'eu-central-1.hathora.dev', // EU Frankfurt game servers  
+      'london': 'eu-west-1.hathora.dev', // EU London game servers
+      'sydney': 'ap-southeast-2.hathora.dev' // OCE Sydney game servers
     }
     
     // Generate cash game servers that users can join (real Hathora rooms)
