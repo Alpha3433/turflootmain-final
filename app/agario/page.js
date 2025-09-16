@@ -544,8 +544,8 @@ const AgarIOGame = () => {
 
     const connectToHathoraRoom = async () => {
       try {
-        if (typeof window === 'undefined') return
-
+        console.log('🌐 Initializing Hathora room connection...')
+        
         const urlParams = new URLSearchParams(window.location.search)
         const roomId = urlParams.get('roomId')
         const mode = urlParams.get('mode')
@@ -560,75 +560,113 @@ const AgarIOGame = () => {
 
         console.log('🌐 Connecting to Hathora multiplayer room:', roomId)
         setIsMultiplayer(true)
+        setConnectedPlayers(1) // At least the current player
 
-        // Get proper connection info from Hathora SDK with authentication
-        console.log('📡 Getting connection details for room:', roomId)
+        // Import and initialize Hathora client
+        const { default: hathoraClient } = await import('/lib/hathoraClient.js')
         
-        // Default fallback with proper format
-        let wsUrl = `wss://hathora.dev/ws`
+        const isInitialized = await hathoraClient.initialize()
+        if (!isInitialized) {
+          console.error('❌ Failed to initialize Hathora client')
+          setWsConnection('error')
+          return
+        }
+
+        let wsUrl = null
         let authToken = null
         
         try {
-          // Import Hathora client to get connection info
-          const { default: hathoraClient } = await import('../../lib/hathoraClient.js')
-          if (hathoraClient && hathoraClient.client) {
-            console.log('🔍 Attempting to get connection details from Hathora client...')
+          // Get authentication token first
+          console.log('🔐 Attempting to get Hathora authentication token...')
+          const token = await hathoraClient.client.loginAnonymous()
+          authToken = token
+          console.log('🔑 Got Hathora auth token:', authToken ? 'SUCCESS' : 'FAILED')
+        } catch (error) {
+          console.log('⚠️ Could not get Hathora auth token:', error.message)
+        }
+
+        try {
+          // Try multiple approaches to get connection info
+          console.log('🔍 Attempting to get connection details for room:', roomId)
+          
+          if (hathoraClient.client.getConnectionInfoV2) {
+            console.log('🔄 Trying getConnectionInfoV2...')
+            const connectionInfo = await hathoraClient.client.getConnectionInfoV2(roomId)
+            console.log('✅ Got connection info V2:', connectionInfo)
             
-            // First get authentication token
-            try {
-              authToken = await hathoraClient.client.loginAnonymous()
-              console.log('🔑 Got auth token:', authToken ? 'SUCCESS' : 'FAILED')
-            } catch (authError) {
-              console.warn('⚠️ Failed to get auth token:', authError.message)
+            if (connectionInfo && connectionInfo.host && connectionInfo.port) {
+              const baseUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
+              wsUrl = authToken ? `${baseUrl}?token=${authToken}&roomId=${roomId}` : baseUrl
+              console.log('🎯 Using V2 connection info')
             }
+          } else if (hathoraClient.client.getConnectionInfo) {
+            console.log('🔄 Trying getConnectionInfo...')
+            const connectionInfo = await hathoraClient.client.getConnectionInfo(roomId)
+            console.log('✅ Got connection info:', connectionInfo)
             
-            // Try to get connection details for the room
-            if (typeof hathoraClient.client.getConnectionDetailsForRoomId === 'function') {
-              const connectionInfo = await hathoraClient.client.getConnectionDetailsForRoomId(roomId)
-              console.log('✅ Got connection info:', connectionInfo)
-              if (connectionInfo && connectionInfo.host && connectionInfo.port) {
-                // Construct WebSocket URL with proper path and token
-                const baseUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
-                if (authToken) {
-                  // Try direct connection to the host and port (no path)
-                  wsUrl = `${baseUrl}?token=${authToken}&roomId=${roomId}`
-                  console.log('🎯 Using Hathora WebSocket with direct connection and query parameters')
-                } else {
-                  wsUrl = baseUrl  // Direct connection without path
-                  console.log('🎯 Using direct Hathora connection without authentication')
-                }
-                console.log('🔗 Final WebSocket URL:', wsUrl)
-              }
-            } else {
-              console.log('⚠️ getConnectionDetailsForRoomId not available')
-              // Fallback: Try to construct URL using app ID and room ID with token
-              const appId = hathoraClient.appId
-              if (appId && authToken) {
-                wsUrl = `wss://${appId}.hathora.dev/connect?roomId=${roomId}&token=${authToken}`
-                console.log('🎯 Using fallback authenticated URL format')
-              } else if (appId) {
-                wsUrl = `wss://${appId}.hathora.dev/ws`
-                console.log('🎯 Using fallback basic URL format')
-              }
+            if (connectionInfo && connectionInfo.host && connectionInfo.port) {
+              const baseUrl = `wss://${connectionInfo.host}:${connectionInfo.port}`
+              wsUrl = authToken ? `${baseUrl}?token=${authToken}&roomId=${roomId}` : baseUrl
+              console.log('🎯 Using standard connection info')
             }
           }
+          
+          // If still no URL, try fallback approaches
+          if (!wsUrl) {
+            console.log('⚠️ No connection info available, trying fallback methods...')
+            const appId = hathoraClient.appId
+            
+            // Fallback 1: Standard Hathora coordinator URL
+            if (appId && roomId) {
+              wsUrl = authToken 
+                ? `wss://coordinator.hathora.dev/ws?appId=${appId}&roomId=${roomId}&token=${authToken}`
+                : `wss://coordinator.hathora.dev/ws?appId=${appId}&roomId=${roomId}`
+              console.log('🔗 Using coordinator fallback URL')
+            }
+            
+            // Fallback 2: Direct room connection attempt
+            if (!wsUrl && roomId) {
+              wsUrl = authToken 
+                ? `wss://${roomId}.hathora.dev?token=${authToken}`
+                : `wss://${roomId}.hathora.dev`
+              console.log('🔗 Using direct room fallback URL')
+            }
+          }
+          
         } catch (error) {
           console.log('⚠️ Could not get Hathora connection info:', error.message)
+          
+          // Final fallback attempt
+          const appId = hathoraClient.appId
+          if (appId && roomId) {
+            wsUrl = authToken 
+              ? `wss://coordinator.hathora.dev/ws?appId=${appId}&roomId=${roomId}&token=${authToken}`
+              : `wss://coordinator.hathora.dev/ws?appId=${appId}&roomId=${roomId}`
+            console.log('🔗 Using emergency fallback URL')
+          }
         }
         
-        console.log('🔗 Connecting to:', wsUrl)
+        if (!wsUrl) {
+          console.error('❌ Could not determine WebSocket URL for Hathora room')
+          setWsConnection('error')
+          return
+        }
+        
+        console.log('🔗 Final WebSocket URL:', wsUrl)
+        console.log('🚀 Attempting connection...')
+        
         const ws = new WebSocket(wsUrl)
         wsRef.current = ws
         
         ws.onopen = () => {
-          console.log('✅ Connected to Hathora room WebSocket')
+          console.log('✅ Connected to Hathora room WebSocket successfully!')
           setWsConnection('connected')
           
           // Send player join event
           const joinMessage = {
             type: 'player_join',
-            playerId: `player_${Date.now()}`,
-            timestamp: Date.now(),
+            roomId: roomId,
+            playerId: 'player_' + Math.random().toString(36).substr(2, 9),
             playerData: {
               name: 'TurfLoot Player',
               color: '#ff6b6b'
@@ -652,25 +690,18 @@ const AgarIOGame = () => {
                 
               case 'player_left':
                 console.log('👋 Player left:', data.playerId)
-                setConnectedPlayers(prev => Math.max(0, prev - 1))
+                setConnectedPlayers(prev => Math.max(1, prev - 1))
                 break
                 
-              case 'player_position':
-                // Update other players positions
-                if (playersRef.current && data.playerId !== wsRef.current?.playerId) {
-                  playersRef.current.set(data.playerId, {
-                    x: data.x,
-                    y: data.y,
-                    mass: data.mass,
-                    color: data.color,
-                    lastUpdate: Date.now()
+              case 'game_state':
+                // Handle real-time game state updates
+                console.log('🎮 Game state update received')
+                if (data.players) {
+                  playersRef.current.clear()
+                  data.players.forEach(player => {
+                    playersRef.current.set(player.id, player)
                   })
                 }
-                break
-                
-              case 'room_state':
-                console.log('🏠 Room state update:', data)
-                setConnectedPlayers(data.playerCount || 0)
                 break
                 
               default:
@@ -682,16 +713,22 @@ const AgarIOGame = () => {
         }
 
         ws.onerror = (error) => {
-          console.error('❌ WebSocket error:', error)
+          console.error('❌ WebSocket connection error:', error)
+          console.log('🔍 Error details - URL was:', wsUrl)
+          console.log('🔍 Room ID:', roomId)
+          console.log('🔍 Auth token present:', !!authToken)
           setWsConnection('error')
         }
 
         ws.onclose = (event) => {
-          console.log('🔌 WebSocket connection closed:', event.code, event.reason)
+          console.log('🔌 WebSocket connection closed')
+          console.log('📊 Close code:', event.code)
+          console.log('📝 Close reason:', event.reason)
+          console.log('🧹 Was clean close:', event.wasClean)
           setWsConnection('disconnected')
           
-          // Attempt to reconnect after 3 seconds if game is still active
-          if (gameStarted && event.code !== 1000) {
+          // Attempt to reconnect after 3 seconds if game is still active and wasn't a clean close
+          if (gameStarted && event.code !== 1000 && !event.wasClean) {
             console.log('🔄 Attempting to reconnect in 3 seconds...')
             setTimeout(() => {
               if (gameStarted) {
@@ -701,10 +738,9 @@ const AgarIOGame = () => {
           }
         }
 
-        setWsConnection('connecting')
-
       } catch (error) {
-        console.error('❌ Error connecting to Hathora room:', error)
+        console.error('❌ Failed to connect to Hathora room:', error)
+        console.log('🔍 Error details:', error.message)
         setWsConnection('error')
       }
     }
