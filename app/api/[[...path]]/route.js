@@ -627,9 +627,9 @@ export async function GET(request, { params }) {
                 const prizePool = totalEntryFees - serverFees
                 
                 let status = 'waiting'
-                if (simulatedPlayers >= gameType.maxPlayers) {
+                if (realPlayers >= gameType.maxPlayers) {
                   status = 'full'
-                } else if (simulatedPlayers > 0) {
+                } else if (realPlayers > 0) {
                   status = 'active'
                 }
                 
@@ -647,11 +647,11 @@ export async function GET(request, { params }) {
                   mode: gameType.mode,
                   gameType: gameType.name,
                   description: gameType.description,
-                  currentPlayers: simulatedPlayers,
+                  currentPlayers: realPlayers, // REAL PLAYER COUNT FROM DATABASE
                   maxPlayers: gameType.maxPlayers,
                   minPlayers: 2, // Minimum 2 players for cash games
                   waitingPlayers: 0,
-                  isRunning: simulatedPlayers >= 2, // Cash games need at least 2 players
+                  isRunning: realPlayers >= 2, // Cash games need at least 2 players
                   ping,
                   avgWaitTime: status === 'active' ? 'Join Now' : 
                               status === 'full' ? 'Full' : 
