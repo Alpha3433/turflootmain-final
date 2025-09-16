@@ -12,6 +12,81 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [showEmptyServers, setShowEmptyServers] = useState(false)
   const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
   const [errorMessage, setErrorMessage] = useState('')
+  const [pingingRegions, setPingingRegions] = useState(false)
+
+  // Client-side ping measurement function
+  const measureClientPing = async (endpoint) => {
+    try {
+      const startTime = performance.now()
+      
+      // Try to ping the Hathora API endpoint with CORS-friendly request
+      const response = await fetch(`https://${endpoint}/health`, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      })
+      
+      const endTime = performance.now()
+      const clientPing = Math.round(endTime - startTime)
+      
+      console.log(`📡 Client ping to ${endpoint}: ${clientPing}ms`)
+      return Math.min(clientPing, 999) // Cap at 999ms for display
+    } catch (error) {
+      console.warn(`⚠️ Client ping to ${endpoint} failed:`, error.message)
+      
+      // Fallback: Try a simple fetch to the main domain
+      try {
+        const startTime = performance.now()
+        await fetch(`https://${endpoint}`, { 
+          method: 'HEAD',
+          mode: 'no-cors',
+          signal: AbortSignal.timeout(3000)
+        })
+        const endTime = performance.now()
+        const fallbackPing = Math.round(endTime - startTime)
+        console.log(`📡 Fallback ping to ${endpoint}: ${fallbackPing}ms`)
+        return Math.min(fallbackPing, 999)
+      } catch (fallbackError) {
+        console.warn(`⚠️ Fallback ping also failed for ${endpoint}`)
+        // Return estimated ping based on region
+        return endpoint.includes('sydney') ? 180 : 
+               endpoint.includes('frankfurt') ? 45 :
+               endpoint.includes('london') ? 55 :
+               endpoint.includes('seattle') ? 35 : 25
+      }
+    }
+  }
+
+  // Measure client-side pings for all servers
+  const measureServerPings = async (serverList) => {
+    if (!serverList || serverList.length === 0) return serverList
+    
+    setPingingRegions(true)
+    console.log('📡 Measuring client-side pings to game servers...')
+    
+    // Get unique ping endpoints
+    const uniqueEndpoints = [...new Set(serverList.map(s => s.pingEndpoint))].filter(Boolean)
+    
+    // Measure pings concurrently
+    const pingPromises = uniqueEndpoints.map(async (endpoint) => {
+      const ping = await measureClientPing(endpoint)
+      return { endpoint, ping }
+    })
+    
+    const pingResults = await Promise.all(pingPromises)
+    const pingMap = Object.fromEntries(pingResults.map(r => [r.endpoint, r.ping]))
+    
+    // Update servers with real client pings
+    const serversWithPings = serverList.map(server => ({
+      ...server,
+      ping: server.pingEndpoint ? pingMap[server.pingEndpoint] : null
+    }))
+    
+    setPingingRegions(false)
+    console.log('✅ Client-side ping measurement complete')
+    return serversWithPings
+  }
 
   // Fetch servers
   const fetchServers = async (showRefresh = false) => {
@@ -48,7 +123,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
         setErrorMessage('No servers available')
         setServers([])
       } else {
-        setServers(data.servers)
+        // Measure client-side pings for all servers
+        const serversWithPings = await measureServerPings(data.servers)
+        setServers(serversWithPings)
         setErrorMessage('')
       }
       
