@@ -98,32 +98,48 @@ class WalletTester:
             'timestamp': datetime.now().isoformat()
         })
 
-    def test_api_health_check(self):
-        """Test 1: API Health Check - Verify backend infrastructure is operational"""
-        print("🔍 TEST 1: API HEALTH CHECK")
+    def test_helius_rpc_connectivity(self):
+        """Test direct Helius RPC connectivity with new API key"""
+        print("\n🔗 Testing Helius RPC Connectivity...")
+        
         try:
-            start_time = time.time()
-            response = requests.get(f"{self.api_base}", timeout=10)
-            response_time = time.time() - start_time
+            # Test basic RPC health check
+            payload = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "getHealth"
+            }
+            
+            response = requests.post(HELIUS_RPC_URL, json=payload, timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                service_name = data.get('service', 'unknown')
-                features = data.get('features', [])
-                
-                # Check if multiplayer and Hathora features are enabled
-                has_multiplayer = 'multiplayer' in features
-                
-                details = f"Service: {service_name}, Features: {features}, Multiplayer: {has_multiplayer}"
-                self.log_test("API Health Check", True, details, response_time)
-                return True
+                if data.get('result') == 'ok':
+                    self.log_result("Helius RPC Health Check", True, f"Status: {data.get('result')}")
+                else:
+                    self.log_result("Helius RPC Health Check", False, f"Unexpected result: {data}")
             else:
-                self.log_test("API Health Check", False, f"HTTP {response.status_code}: {response.text}", response_time)
-                return False
+                self.log_result("Helius RPC Health Check", False, f"HTTP {response.status_code}")
+                
+            # Test slot retrieval
+            slot_payload = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "getSlot"
+            }
+            
+            slot_response = requests.post(HELIUS_RPC_URL, json=slot_payload, timeout=10)
+            if slot_response.status_code == 200:
+                slot_data = slot_response.json()
+                if 'result' in slot_data and isinstance(slot_data['result'], int):
+                    self.log_result("Helius Slot Retrieval", True, f"Current slot: {slot_data['result']}")
+                else:
+                    self.log_result("Helius Slot Retrieval", False, f"Invalid slot data: {slot_data}")
+            else:
+                self.log_result("Helius Slot Retrieval", False, f"HTTP {slot_response.status_code}")
                 
         except Exception as e:
-            self.log_test("API Health Check", False, f"Connection error: {str(e)}")
-            return False
+            self.log_result("Helius RPC Connectivity", False, f"Exception: {str(e)}")
 
     def test_hathora_room_creation_api(self):
         """Test 2: Hathora Room Creation API - Test createPaidRoom and createOrJoinRoom methods"""
