@@ -5770,16 +5770,13 @@ export default function TurfLootTactical() {
                         router.push(`/agario?roomId=${roomId}&mode=competitive&fee=${stakeAmount}&region=${selectedServer}&paid=true`)
                         
                       } else {
-                        console.log('❌ Smart matchmaking failed - falling back to simple room creation')
-                        // Fallback to simple room creation
-                        router.push(`/agario?roomId=paid-${selectedServer.toLowerCase()}-${stakeAmount}&mode=competitive&fee=${stakeAmount}`)
+                        console.error('❌ Smart matchmaking failed - Hathora rooms required for multiplayer games')
+                        alert('Failed to create multiplayer room. Please try again.')
                       }
                       
                     } catch (matchmakingError) {
                       console.error('❌ Smart matchmaking error:', matchmakingError)
-                      // Fallback to simple room creation
-                      console.log('🔄 Falling back to simple room creation...')
-                      router.push(`/agario?roomId=paid-${selectedServer.toLowerCase()}-${stakeAmount}&mode=competitive&fee=${stakeAmount}`)
+                      alert('Failed to create multiplayer room. Please try again.')
                     }
                     
                   } else {
