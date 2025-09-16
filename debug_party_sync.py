@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Test configuration
-BASE_URL = "https://hathora-overhaul.preview.emergentagent.com"
+BASE_URL = "https://multiplayer-fix-1.preview.emergentagent.com"
 TEST_USER_ID = "did:privy:cmeksdeoe00gzl10bsienvnbk"
 TEST_USER_USERNAME = "anth"
 

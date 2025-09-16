@@ -15,9 +15,9 @@ This test suite verifies:
 PRIORITY FOCUS: Wallet Functionality Testing with New Helius API Key
 Updated API Key: dccb9763-d453-4940-bd43-dfd987f278b1
 Updated Environment Variables:
-- HELIUS_API_KEY=dccb9763-d453-4940-bd43-dfd987f278b1
-- NEXT_PUBLIC_HELIUS_RPC=https://mainnet.helius-rpc.com/?api-key=dccb9763-d453-4940-bd43-dfd987f278b1
-- HELIUS_WEBSOCKET_URL=wss://atlas-mainnet.helius-rpc.com/?api-key=dccb9763-d453-4940-bd43-dfd987f278b1
+- HELIUS_API_KEY=multiplayer-fix-1
+- NEXT_PUBLIC_HELIUS_RPC=https://mainnet.helius-rpc.com/?api-key=multiplayer-fix-1
+- HELIUS_WEBSOCKET_URL=wss://atlas-mainnet.helius-rpc.com/?api-key=multiplayer-fix-1
 
 TESTING REQUIREMENTS:
 Core Focus (Priority 1):
@@ -63,7 +63,7 @@ class WalletTester:
                     break
         
         if not hasattr(self, 'base_url'):
-            self.base_url = "https://hathora-overhaul.preview.emergentagent.com"
+            self.base_url = "https://multiplayer-fix-1.preview.emergentagent.com"
         
         self.api_base = f"{self.base_url}/api"
         self.test_results = []

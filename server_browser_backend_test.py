@@ -25,7 +25,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://hathora-overhaul.preview.emergentagent.com"
+BASE_URL = "https://multiplayer-fix-1.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 # Test user data for realistic testing
