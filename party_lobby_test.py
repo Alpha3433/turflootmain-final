@@ -20,7 +20,7 @@ import sys
 from datetime import datetime
 
 # Test Configuration
-BASE_URL = "https://turf-fixer.preview.emergentagent.com"
+BASE_URL = "https://hathora-overhaul.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Use localhost for testing as per environment configuration

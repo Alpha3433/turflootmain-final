@@ -25,7 +25,7 @@ import sys
 from typing import Dict, List, Any
 
 # Configuration
-BASE_URL = "https://turf-fixer.preview.emergentagent.com"
+BASE_URL = "https://hathora-overhaul.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class ServerBrowserTester:

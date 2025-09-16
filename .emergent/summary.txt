@@ -1,28 +1,24 @@
 <analysis>
-The previous AI engineer focused on critical bug fixes and implementing multiplayer features for the TurfLoot application. Initial efforts involved overhauling the server browser for real-time ping and region mapping, resolving API integration and MongoDB connectivity issues, and refactoring Hathora client integration. Key problems included a persistent Hathora SDK connection issue, a broken wallet functionality due to an API route issue, region mapping discrepancies, WebSocket connection failures, and an infinite UI re-render loop.
-
-The engineer systematically addressed these by:
-1. Correcting Hathora region codes and WebSocket URL formats (including authentication tokens) in  and .
-2. Updating the Helius API key in .
-3. Fixing a duplicate  component in  to resolve the infinite render loop.
-4. Implementing a robust CDN-based ping measurement system in  to replace faulty WebSocket pings.
-5. Refining server region passing in  to use specific  for Hathora.
-6. Crucially, eliminating all local game fallbacks from  for server browser joins, ensuring 100% Hathora room creation with loading states and clear error messages, while preserving the Local Practice mode.
+The AI engineer's work primarily focused on transforming the TurfLoot application into a robust, Hathora-first multiplayer game. Initial efforts involved systematic debugging and refactoring of the server browser, API integrations, MongoDB connectivity, and Hathora client. Critical fixes included eliminating local game fallbacks, implementing CDN-based ping, restoring wallet functionality via Helius API, and correcting Hathora WebSocket connection logic. Despite intermittent claims of everything working, a persistent WebSocket connection error and UI indicator remained. This led the user to request a full multiplayer overhaul based on authoritative server logic. The AI engineer initiated this overhaul by refactoring core game initialization and the server browser to directly integrate with Hathora rooms, but immediately hit a  error, halting progress on the new architecture.
 </analysis>
 
 <product_requirements>
-The TurfLoot application is an Agar.io-style multiplayer game with a military theme, leveraging Hathora for game servers and Privy for authentication. The core objective is to enhance MVP functionality through UI/UX improvements, bug fixes, and social features, supporting both mobile and desktop.
+The TurfLoot application is an Agar.io-style military-themed multiplayer game, leveraging Hathora for game servers and Privy for authentication, targeting both mobile and desktop. The goal is to enhance MVP functionality through UI/UX improvements, bug fixes, and social features.
 
-**Key features and fixes implemented so far:**
-*   **Redesigned Server Browser**: A functional modal with condensed information, stake filters, region flags, dynamic player counts, real client-side ping (with caching, color-coding, auto-sorting), and Hathora room creation/joining. Empty servers collapse into Create New Room. Now uses CDN-based ping.
-*   **Dynamic Player Counts**: Real Privy user sessions in Hathora rooms are tracked.
-*   **Desktop Loading Popup**: Implemented for LOCAL PRACTICE button.
-*   **Wallet Functionality**: Fixed with Helius API key integration, improved wallet detection, and display of real SOL balances post-login. Dedicated wallet balance and transactions API routes were created.
-*   **Anti-cheat System**: Debugged, made lenient, and temporarily disabled for testing.
-*   **In-game Fixes**: Fixed Canvas Gradient  error when interacting with viruses.
-*   **Database Connectivity**: Resolved MongoDB connection issues.
-*   **Hathora Integration**: Refactored for robust room creation, correct region mapping (, ), authenticated WebSocket connection (), and removal of all local server fallbacks for server browser joins. Includes loading modals and retry logic.
-*   **Multiplayer Core**: WebSocket connection logic integrated into the game client for real-time multiplayer, including UI indicators for connection status and player count.
+**Implemented features & fixes:**
+*   **Redesigned Server Browser:** Functional modal with condensed information, stake filters, region flags, dynamic player counts, CDN-based client-side ping (cached, color-coded, auto-sorting), and Hathora room creation/joining (empty servers collapse into Create New Room).
+*   **Wallet Functionality:** Fixed via Helius API key integration, improved wallet detection, and real SOL balance display.
+*   **Hathora Integration:** Refactored for robust room creation, correct region mapping, authenticated WebSocket connection, and removal of all local server fallbacks. Includes loading modals and retry logic.
+*   **Enhanced Loading Popup:** Displays for 5+ seconds with progressive status updates, real-time progress bar, detailed server info, and success confirmation.
+
+**Current Overhaul Requirements:**
+*   **Authoritative Hathora Rooms:** All game logic server-side.
+*   **Server Browser-First:** Direct load into online matches; no local mode. List active rooms, pre-warmed rooms, then create new room options. Display stake, region, players, ping, join/spectate.
+*   **Room Lifecycle:** On-demand creation, 8-minute keep-alive, pre-warm 1 room per popular region/tier during peak hours.
+*   **Networking:** WebSocket transport (Hathora), 20 Hz tick rate.
+*   **Spectator & Party Support:** Spectate option if ≥1 player. Party system for group joins.
+*   **Backend Monitoring:** Hathora Console metrics.
+*   **Exclusion:** Server-side bot management for auto-fill is *not* required; practice bots remain unchanged.
 </product_requirements>
 
 <key_technical_concepts>
@@ -39,29 +35,27 @@ The TurfLoot application is an Agar.io-style multiplayer game with a military th
 
 <code_architecture>
 
--   ****: Main landing page, UI, authentication.
-    -   **Changes**:  updated for Hathora room creation,  fix,  extraction,  calls. Removed duplicate . Significantly modified  to remove all local server fallbacks, implement loading states, retry logic, and enhance error messages for Hathora-only room creation.
--   ****: Core in-game experience, canvas.
-    -   **Changes**: Relaxed/disabled anti-cheat. Added  checks. Integrated  for player session tracking. **Implemented Hathora WebSocket client connection logic with correct authenticated URL (room ID and token) and removed  path from URL.**
--   ****: Catch-all API route.
-    -   **Changes**: Renamed to  to resolve build errors.
--   ****: Dedicated API for server list.
-    -   **Changes**: Generates 35 cash game servers across regions, uses  for player counts, AWS EC2 for pings.
--   ****: API for real-time player sessions.
-    -   **Changes**: Handles  requests for recording, updating, removing active player sessions.
--   ** (New)**: Fetches wallet balance.
-    -   **Changes**: Created to restore wallet functionality, integrates with Helius API.
--   ** (New)**: Fetches wallet transactions.
-    -   **Changes**: Created to restore wallet functionality, integrates with Helius API.
--   ****: Hathora client integration.
-    -   **Changes**: Removed problematic  calls. Updated  and  to correctly pass region parameters.  refined to use canonical region identifiers (e.g., ). Fixed  variable redeclaration. Updated WebSocket URL construction to ensure correct path and authentication.
+-   ****: Main landing page, UI, authentication, and server browser modal.
+    -   **Importance**: Orchestrates user entry into the game.
+    -   **Changes**:  refactored for Hathora-only room creation, removing local game fallbacks. Enhanced loading modal with progress updates and extended display time was implemented.  was updated for the new Hathora-first approach.
+-   ****: Core in-game experience, canvas, and WebSocket connection.
+    -   **Importance**: Handles the game client logic and real-time multiplayer communication.
+    -   **Changes**: Hathora WebSocket client connection logic was implemented and repeatedly refined to use correct SDK methods (, , , , ). A new  was added for Hathora-first game initialization.
+-   ****: API for dynamic server list.
+    -   **Importance**: Supplies server data (regions, stakes, player counts) to the frontend.
+    -   **Changes**: Generates 35 cash game servers with specific  values and uses  for player counts.
+-   ** & **: APIs for wallet data.
+    -   **Importance**: Facilitates Solana wallet integration.
+    -   **Changes**: Created/updated to integrate with Helius API for balance and transaction fetching.
+-   ****: Hathora SDK wrapper.
+    -   **Importance**: Manages Hathora room creation and region mapping.
+    -   **Changes**:  and  were updated for correct region passing.  was refined for canonical region identifiers. Debugging logs for region mapping were added.
 -   ****: Redesigned server browser UI.
-    -   **Changes**: Renamed title, removed practice server filters. Implemented client-side ping (CDN-based, cached, color-coded, auto-sorting). Redesigned to collapse empty servers into + Create New Room entries. Removed  state. Updated to pass  for Hathora room creation instead of generic . Replaced faulty WebSocket ping with CDN-based geographic latency measurement.
+    -   **Importance**: The primary interface for users to select and join multiplayer rooms.
+    -   **Changes**: Implemented CDN-based ping measurements. Display logic was updated to group servers by  and . State variables were updated to  and , and  was adapted for this new room structure.
 -   ****: Environment variables.
-    -   **Changes**: Updated , , .
--   ****: Global CSS styles.
-    -   **Changes**: Added  and  for UI animations.
--   ** (New)**: Documented Hathora server management strategy.
+    -   **Importance**: Stores critical configuration keys.
+    -   **Changes**: , , and  were updated with the provided API key.
 </code_architecture>
 
 <pending_tasks>
@@ -70,25 +64,20 @@ The TurfLoot application is an Agar.io-style multiplayer game with a military th
 - Production Infrastructure Stability: Address persistent 502/404/ERR_ABORTED errors for  calls.
 - Implement core  button functionality in Wallet Snapshot (beyond UI).
 - Re-integrate and ensure functionality of the complex player report modal.
-- Dynamically change the Available Balance text color in the Cash Out modal to green for positive balances and red for zero balances.
+- Dynamically change the Available Balance text color in the Cash Out modal.
 - Make the Enter Solana wallet address placeholder text smaller.
-- Investigate why clicking JOIN on server browser entries still doesn't log actual server joins, or if the join buttons are not fully clickable/visible.
+- Address Content Security Policy (CSP) violations related to .
+- Resolve Privy bridge not yet available messages.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was addressing the user's report that multiplayer games selected on the server browser are still putting me in local games, and an observation in the console logs indicating repeated  requests to  failing with , suggesting issues with the CDN-based ping measurement implemented earlier.
+The AI engineer is currently engaged in a complete overhaul of the TurfLoot application's multiplayer experience to ensure 100% Hathora integration and a server browser-first approach, eliminating all local game fallbacks. This work began by refactoring the core game initialization in  and  to be entirely Hathora-dependent and authoritative.
 
-The AI engineer's previous extensive work involved:
-1.  **Ensuring 100% Hathora Multiplayer Rooms**: Removing all local fallback logic from the  and  functions in , and also from mobile UI sections. This was intended to force the creation of real Hathora rooms and prevent accidental local game creation, except for the explicit LOCAL PRACTICE button.
-2.  **Implementing Loading State**: A CREATING HATHORA ROOM loading modal with regional targeting and an animated progress bar was added to  (with  in ) to improve user feedback during room creation.
-3.  **Enhancing Error Handling**: Clear error messages were implemented for cases where Hathora room creation fails.
-4.  **Parameter Validation**: Ensured correct , , and  parameters are passed to the  page and correctly interpreted to prevent local fallbacks.
-5.  **Fixing Syntax Errors**: Several duplicate/unreachable code segments (e.g., duplicate error handling after  statements) were removed from  to resolve build errors.
+Simultaneously, the  component is being updated to directly display and interact with real Hathora rooms instead of simulated server data. This involves replacing old state variables (like  with ), updating the data fetching logic to query for actual Hathora rooms, and adjusting the UI rendering to categorize and display  and . The  function in the modal was also modified to align with the new Hathora room structure.
 
-Despite these fixes, the user's latest console logs show repeated ⏳ Privy bridge not yet available, waiting... messages and numerous  for CDN ping endpoints, indicating the ping system is still problematic. More critically, the user explicitly states that clicking server browser options still leads to local games. The AI engineer noted that while the server browser loads and shows simulated pings, no logs showing actual server joins, suggesting a potential frontend issue where server entries might not be clickable or the  function isn't being triggered as expected.
+The immediate blocker and the last identified issue is a **critical JavaScript error**:  within . This error occurred after recent refactoring efforts to update the server browser, causing the component to crash and preventing any further progress on the multiplayer overhaul. Before this, there were also persistent  errors and Privy bridge not yet available messages, which while noted, are secondary to the current blocking error.
 </current_work>
 
 <optional_next_step>
-Investigate and resolve why server entries in the  are not triggering the  function on click.
+Resolve the  error in .
 </optional_next_step>
-
