@@ -56,18 +56,32 @@ class BackendTester:
             print(f"    Error: {error}")
         
     def test_api_health_check(self):
-        """Test basic API connectivity"""
-        print("\n🔍 TESTING: API Health Check")
+        """Test 1: API Health Check - Verify backend infrastructure"""
         try:
+            # Test basic API accessibility
             response = requests.get(f"{API_BASE}/servers", timeout=10)
+            
             if response.status_code == 200:
-                self.log_test("API Health Check", True, f"Status: {response.status_code}")
+                data = response.json()
+                server_count = len(data.get('servers', []))
+                hathora_enabled = data.get('hathoraEnabled', False)
+                
+                self.log_test(
+                    "API Health Check", 
+                    True,
+                    f"API accessible, {server_count} servers available, Hathora enabled: {hathora_enabled}"
+                )
                 return True
             else:
-                self.log_test("API Health Check", False, f"Status: {response.status_code}")
+                self.log_test(
+                    "API Health Check", 
+                    False,
+                    f"HTTP {response.status_code}: {response.text[:200]}"
+                )
                 return False
+                
         except Exception as e:
-            self.log_test("API Health Check", False, f"Error: {str(e)}")
+            self.log_test("API Health Check", False, error=str(e))
             return False
             
     def test_servers_endpoint_structure(self):
