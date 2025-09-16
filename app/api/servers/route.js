@@ -106,31 +106,31 @@ export async function GET(request) {
         for (let roomIndex = 0; roomIndex < roomsPerType; roomIndex++) {
           const roomId = `paid-${region.id}-${gameType.stake}-${roomIndex + 1}`
           
-          // Query REAL player count from actual Hathora rooms
+          // Query REAL player count from active game sessions in database
           let realPlayers = 0
           try {
-            // Import Hathora client to query actual room status
-            const { default: hathoraClient } = await import('../../lib/hathoraClient.js')
+            // Connect to MongoDB to get real active game sessions
+            const { MongoClient } = await import('mongodb')
+            const client = new MongoClient(process.env.MONGO_URL)
             
-            // Initialize if not already done
-            await hathoraClient.initialize()
+            await client.connect()
+            const db = client.db('turfloot')
+            const gameSessions = db.collection('game_sessions')
             
-            // Query actual room for player count
-            const roomInfo = await hathoraClient.getRoomInfo(roomId)
-            if (roomInfo && roomInfo.allocations) {
-              // Count active connections/players in this room
-              realPlayers = roomInfo.allocations.filter(allocation => 
-                allocation.status === 'active' || allocation.status === 'running'
-              ).length
-              
-              console.log(`📊 Room ${roomId}: ${realPlayers} real players from Hathora`)
-            } else {
-              console.log(`📭 Room ${roomId}: No active Hathora room found`)
-              realPlayers = 0
-            }
+            // Count active players in this specific room (active within last 2 minutes)
+            const activeSessionsCount = await gameSessions.countDocuments({
+              roomId: roomId,
+              status: 'active',
+              lastActivity: { $gte: new Date(Date.now() - 2 * 60 * 1000) } // Active within last 2 minutes
+            })
+            
+            realPlayers = activeSessionsCount
+            console.log(`📊 Room ${roomId}: ${realPlayers} real players from database`)
+            
+            await client.close()
           } catch (error) {
-            console.warn(`⚠️ Could not query Hathora room ${roomId}:`, error.message)
-            realPlayers = 0 // Fallback to 0 if Hathora query fails
+            console.warn(`⚠️ Could not query database for room ${roomId}:`, error.message)
+            realPlayers = 0 // Fallback to 0 if database query fails
           }
           
           // No server-side ping - client will measure real user latency
