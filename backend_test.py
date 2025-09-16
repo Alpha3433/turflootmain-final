@@ -59,21 +59,18 @@ class HathoraMultiplayerTester:
         print("🔍 Testing API Health Check...")
         try:
             start_time = time.time()
-            response = requests.get(f"{API_BASE}/ping", timeout=10)
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             response_time = time.time() - start_time
             
             if response.status_code == 200:
                 data = response.json()
-                server_info = data.get('server', 'Unknown')
-                features = data.get('features', [])
-                
-                # Check if multiplayer features are enabled
-                multiplayer_enabled = 'multiplayer' in features
+                hathora_enabled = data.get('hathoraEnabled', False)
+                total_servers = data.get('totalServers', 0)
                 
                 self.log_test(
                     "API Health Check", 
                     True, 
-                    f"Server: {server_info}, Multiplayer: {'Enabled' if multiplayer_enabled else 'Disabled'}, Features: {len(features)}",
+                    f"Servers API working, Hathora enabled: {hathora_enabled}, Total servers: {total_servers}",
                     response_time
                 )
                 return True
