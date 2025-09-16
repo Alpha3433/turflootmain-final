@@ -47,19 +47,54 @@ class ServerBrowserTester:
             'details': details
         })
 
-    def test_api_health_check(self):
-        """Test basic API connectivity"""
+    def test_server_browser_api_response(self):
+        """Test 1: Server Browser API Response - Verify /api/servers returns expected data structure"""
+        print("\n🔍 TEST 1: SERVER BROWSER API RESPONSE")
+        
         try:
-            response = requests.get(f"{API_BASE}/servers", timeout=10)
-            if response.status_code == 200:
-                self.log_test("API Health Check", True, f"API accessible at {API_BASE}")
-                return True
+            response = requests.get(f"{self.api_base}/servers", timeout=10)
+            
+            if response.status_code != 200:
+                self.log_test("API Response Status", False, f"Expected 200, got {response.status_code}")
+                return
+            
+            self.log_test("API Response Status", True, f"Status code: {response.status_code}")
+            
+            # Parse JSON response
+            data = response.json()
+            
+            # Check required fields for redesigned server browser
+            required_fields = ['servers', 'totalPlayers', 'totalActiveServers', 'totalServers', 'regions', 'gameTypes', 'hathoraEnabled']
+            
+            for field in required_fields:
+                if field in data:
+                    self.log_test(f"Required Field: {field}", True, f"Present with value: {type(data[field])}")
+                else:
+                    self.log_test(f"Required Field: {field}", False, "Missing from response")
+            
+            # Verify servers array structure
+            if 'servers' in data and isinstance(data['servers'], list):
+                if len(data['servers']) > 0:
+                    server = data['servers'][0]
+                    server_fields = ['id', 'name', 'region', 'stake', 'currentPlayers', 'maxPlayers', 'status', 'serverType']
+                    
+                    for field in server_fields:
+                        if field in server:
+                            self.log_test(f"Server Field: {field}", True, f"Value: {server.get(field)}")
+                        else:
+                            self.log_test(f"Server Field: {field}", False, "Missing from server object")
+                    
+                    self.log_test("Server Data Structure", True, f"Found {len(data['servers'])} servers")
+                else:
+                    self.log_test("Server Data Structure", False, "No servers in response")
             else:
-                self.log_test("API Health Check", False, f"Status: {response.status_code}", response.text[:200])
-                return False
+                self.log_test("Server Data Structure", False, "Servers field missing or not array")
+            
+            return data
+            
         except Exception as e:
-            self.log_test("API Health Check", False, "", str(e))
-            return False
+            self.log_test("Server Browser API Response", False, f"Exception: {str(e)}")
+            return None
 
     def test_server_browser_api(self):
         """Test /api/servers endpoint for server browser functionality"""
