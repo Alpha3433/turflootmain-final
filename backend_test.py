@@ -54,14 +54,8 @@ class BackendTester:
             print(f"    Details: {details}")
         if error:
             print(f"    Error: {error}")
-        print()
-        self.test_results.append({
-            'test': test_name,
-            'passed': passed,
-            'details': details
-        })
         
-    def test_api_health(self):
+    def test_api_health_check(self):
         """Test basic API connectivity"""
         print("\n🔍 TESTING: API Health Check")
         try:
