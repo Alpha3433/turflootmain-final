@@ -1945,9 +1945,11 @@ export default function TurfLootTactical() {
     try {
       // For cash games, validate balance first
       if (serverData.entryFee > 0) {
+        console.log(`💰 Validating balance for $${serverData.entryFee} entry fee...`)
         const balanceCheck = validatePaidRoom(`Server Browser: ${serverData.name} ($${serverData.entryFee})`)
         if (!balanceCheck) {
           console.log('❌ Insufficient funds for server:', serverData.name)
+          alert(`Insufficient funds! You need $${serverData.entryFee} to join this server.`)
           return
         }
         console.log('✅ Balance validated for server browser entry')
@@ -1957,12 +1959,18 @@ export default function TurfLootTactical() {
       console.log(`🎯 Creating Hathora room for server: ${serverData.name}`)
       console.log(`💰 Entry fee: $${serverData.entryFee}`)
       console.log(`🌍 Region: ${serverData.region}`)
+      console.log(`📊 Server ID: ${serverData.id}`)
+      
+      // Show loading state
+      console.log('⏳ Calling findOrCreateRoom...')
       
       const matchResult = await findOrCreateRoom(
         serverData.region, 
         serverData.entryFee, 
         serverData.mode || 'competitive'
       )
+      
+      console.log('📋 Match result:', matchResult)
       
       if (matchResult) {
         const { roomId, serverData: hathoraServerData, action } = matchResult
@@ -1989,13 +1997,28 @@ export default function TurfLootTactical() {
         setIsServerBrowserOpen(false) // Close the modal after joining
         
       } else {
-        console.error('❌ Failed to create Hathora room for server browser')
-        alert('Failed to join server. Please try again.')
+        console.error('❌ findOrCreateRoom returned null/undefined')
+        console.error('❌ Match result was:', matchResult)
+        alert('No available rooms found. The server might be full or unavailable.')
       }
       
     } catch (error) {
-      console.error('❌ Error joining server from browser:', error)
-      alert(`Failed to join server: ${error.message}`)
+      console.error('❌ DETAILED ERROR joining server from browser:')
+      console.error('❌ Error message:', error.message)
+      console.error('❌ Error stack:', error.stack)
+      console.error('❌ Server data:', serverData)
+      console.error('❌ Full error object:', error)
+      
+      // More specific error messages
+      if (error.message.includes('balance') || error.message.includes('funds')) {
+        alert(`Insufficient funds: ${error.message}`)
+      } else if (error.message.includes('Hathora') || error.message.includes('room')) {
+        alert(`Server connection failed: ${error.message}`)
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        alert(`Network error: Please check your connection and try again.`)
+      } else {
+        alert(`Failed to join server: ${error.message}`)
+      }
     }
   }
 
