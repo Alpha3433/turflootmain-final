@@ -106,13 +106,31 @@ export async function GET(request) {
         for (let roomIndex = 0; roomIndex < roomsPerType; roomIndex++) {
           const roomId = `paid-${region.id}-${gameType.stake}-${roomIndex + 1}`
           
-          // TODO: Query real player count - for now using mock data with dynamic updates
+          // Query REAL player count from active game sessions in database
           let realPlayers = 0
-          
-          // Simulate some servers having players for testing
-          // This should be replaced with actual Hathora/database queries
-          if (Math.random() < 0.3) { // 30% chance a server has players
-            realPlayers = Math.floor(Math.random() * 3) + 1 // 1-3 players
+          try {
+            // Connect to MongoDB to get real active game sessions
+            const { MongoClient } = await import('mongodb')
+            const client = new MongoClient(process.env.MONGO_URL)
+            
+            await client.connect()
+            const db = client.db('turfloot')
+            const gameSessions = db.collection('game_sessions')
+            
+            // Count active players in this specific room (active within last 2 minutes)
+            const activeSessionsCount = await gameSessions.countDocuments({
+              roomId: roomId,
+              status: 'active',
+              lastActivity: { $gte: new Date(Date.now() - 2 * 60 * 1000) } // Active within last 2 minutes
+            })
+            
+            realPlayers = activeSessionsCount
+            console.log(`📊 Room ${roomId}: ${realPlayers} real players from database`)
+            
+            await client.close()
+          } catch (error) {
+            console.warn(`⚠️ Could not query database for room ${roomId}:`, error.message)
+            realPlayers = 0 // Fallback to 0 if database query fails
           }
           
           // No server-side ping - client will measure real user latency
