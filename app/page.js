@@ -243,35 +243,6 @@ export default function TurfLootTactical() {
         serverData: newServerData,
         action: 'created_hathora_from_browser'
       }
-      
-      // Step 6: Create new Hathora room if no matching servers exist
-      console.log('🆕 No matching servers found, creating new Hathora room...')
-      
-      try {
-        // Import and use Hathora client singleton
-        const { default: hathoraClient } = await import('../lib/hathoraClient.js')
-        // No need to instantiate - it's already a singleton instance
-        
-        const initialized = await hathoraClient.initialize()
-        if (!initialized) {
-          console.log('⚠️ Hathora not available, creating fallback room ID')
-          const fallbackRoomId = `${region.toLowerCase()}-${stakeAmount}-${Date.now()}`
-          return {
-            roomId: fallbackRoomId,
-            serverData: {
-              id: fallbackRoomId,
-              name: `${region} $${stakeAmount} Cash Game`,
-              region: region,
-              stake: stakeAmount,
-              mode: mode,
-              currentPlayers: 0,
-              maxPlayers: stakeAmount >= 0.05 ? 4 : 6,
-              ping: region === 'US' ? 25 : region === 'EU' ? 45 : 65,
-              isHathora: false
-            },
-            action: 'created_fallback'
-          }
-        }
         
         console.log('🌍 Creating new Hathora room for paid game...')
         console.log(`🗺️ Target region: ${region}`)
