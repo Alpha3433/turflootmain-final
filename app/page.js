@@ -219,7 +219,7 @@ export default function TurfLootTactical() {
       }
       console.log('📡 Hathora connection info (simplified):', connectionInfo)
       
-      const serverData = {
+      const newServerData = {
         id: hathoraRoomId,
         hathoraRoomId: hathoraRoomId,
         name: `${region} $${stakeAmount} Cash Game`,
@@ -235,11 +235,11 @@ export default function TurfLootTactical() {
         hathoraProcess: true
       }
       
-      console.log('✅ Hathora room created successfully for server browser join:', serverData)
+      console.log('✅ Hathora room created successfully for server browser join:', newServerData)
       
       return {
         roomId: hathoraRoomId,
-        serverData: serverData,
+        serverData: newServerData,
         action: 'created_hathora_from_browser'
       }
       
