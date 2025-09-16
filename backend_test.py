@@ -22,7 +22,7 @@ import sys
 from urllib.parse import urlparse, parse_qs
 
 # Test configuration
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://netbattle-fix.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turf-fixer.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class WebSocketConnectionTester:

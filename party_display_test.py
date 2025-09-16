@@ -17,7 +17,7 @@ import os
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "https://netbattle-fix.preview.emergentagent.com"
+BASE_URL = "https://turf-fixer.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class PartyDisplayTester:
