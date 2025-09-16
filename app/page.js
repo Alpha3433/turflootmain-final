@@ -1707,75 +1707,22 @@ export default function TurfLootTactical() {
     // Leaderboard will be populated when users actually cash out
     // For now, it remains empty to show "LOADING LEADERBOARD..." state
     
-    // Check for Privy authentication state with improved logic
-    const checkPrivyAuth = () => {
-      if (typeof window !== 'undefined' && window.__TURFLOOT_PRIVY__) {
-        const privyState = window.__TURFLOOT_PRIVY__
-        
-        // Debug logging to track authentication state changes
-        console.log('🔍 Privy Auth Check:', {
-          ready: privyState.ready,
-          authenticated: privyState.authenticated,
-          hasUser: !!privyState.user,
-          userEmail: privyState.user?.email?.address,
-          userWallet: privyState.user?.wallet?.address?.slice(0, 8) + '...',
-          userId: privyState.user?.id,
-          userKeys: privyState.user ? Object.keys(privyState.user) : []
-        })
-        
-        // Only update state if Privy is ready to avoid false negatives
-        if (privyState.ready !== undefined) {
-          const newAuthState = privyState.authenticated || false
-          const newUser = privyState.user || null
-          
-          // Only update if state actually changed to reduce unnecessary re-renders
-          setIsAuthenticated(prevAuth => {
-            if (prevAuth !== newAuthState) {
-              console.log('🔄 Authentication state changed:', prevAuth, '->', newAuthState)
-              return newAuthState
-            }
-            return prevAuth
-          })
-          
-          setUser(prevUser => {
-            // Check if user object has meaningful changes
-            const prevUserStr = JSON.stringify(prevUser)
-            const newUserStr = JSON.stringify(newUser)
-            if (prevUserStr !== newUserStr) {
-              console.log('👤 User state changed:', {
-                prev: prevUser ? { id: prevUser.id, wallet: prevUser.wallet?.address } : null,
-                new: newUser ? { id: newUser.id, wallet: newUser.wallet?.address } : null
-              })
-              return newUser
-            }
-            return prevUser
-          })
-        }
-      } else {
-        console.log('⏳ Privy bridge not yet available, waiting...')
-      }
-    }
+    // ✅ FIXED: Use standard Privy hooks instead of custom bridge
+    console.log('🔍 Initializing Privy authentication state monitoring...')
+    console.log('🔍 Privy state from hooks:', {
+      ready: ready,
+      authenticated: authenticated,
+      hasUser: !!user,
+      userEmail: user?.email?.address,
+      userWallet: user?.wallet?.address?.slice(0, 8) + '...',
+      userId: user?.id
+    })
     
-    // Initial auth check
-    checkPrivyAuth()
+    // Update authentication state directly from Privy hooks
+    setIsAuthenticated(authenticated || false)
+    setUser(user || null)
     
-    // More frequent initial checks to catch Privy user loading, then less frequent maintenance checks
-    let checkCount = 0
-    const authCheckInterval = setInterval(() => {
-      checkPrivyAuth()
-      checkCount++
-      
-      // After 50 checks (10 seconds at 200ms), reduce frequency to every 3 seconds
-      if (checkCount >= 50) {
-        clearInterval(authCheckInterval)
-        const maintCheckInterval = setInterval(checkPrivyAuth, 3000)
-        
-        // Clean up maintenance interval on unmount
-        return () => {
-          clearInterval(maintCheckInterval)
-        }
-      }
-    }, 200)
+    console.log('✅ Privy authentication state initialized successfully')
     
     return () => {
       window.removeEventListener('resize', checkMobile)
