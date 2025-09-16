@@ -416,6 +416,122 @@ const AgarIOGame = () => {
     }
   }, [gameStarted])
 
+  // REAL PLAYER SESSION TRACKING - Track when real Privy users join/leave games
+  useEffect(() => {
+    if (!gameStarted) return
+    
+    const trackPlayerSession = async () => {
+      try {
+        if (typeof window === 'undefined') return
+        
+        const urlParams = new URLSearchParams(window.location.search)
+        const roomId = urlParams.get('roomId')
+        const fee = urlParams.get('fee')
+        const mode = urlParams.get('mode')
+        const region = urlParams.get('region')
+        
+        if (!roomId) {
+          console.log('🚫 No roomId found - not tracking session')
+          return
+        }
+        
+        // Only track multiplayer Hathora rooms (not local practice)
+        const isMultiplayerRoom = mode !== 'local' && mode !== 'practice'
+        
+        if (!isMultiplayerRoom) {
+          console.log('🚫 Local/practice game - not tracking session')
+          return
+        }
+        
+        console.log('🎯 Tracking real player session:', {
+          roomId,
+          fee: fee || 0,
+          mode,
+          region
+        })
+        
+        // Record player joining the room
+        const sessionData = {
+          roomId,
+          entryFee: parseFloat(fee) || 0,
+          mode,
+          region,
+          joinedAt: new Date().toISOString(),
+          lastActivity: new Date().toISOString(),
+          status: 'active'
+        }
+        
+        // Send to backend API to record session
+        const response = await fetch('/api/game-sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: 'join',
+            session: sessionData
+          })
+        })
+        
+        if (response.ok) {
+          console.log('✅ Player session recorded successfully')
+        } else {
+          console.warn('⚠️ Failed to record player session:', response.status)
+        }
+        
+      } catch (error) {
+        console.error('❌ Error tracking player session:', error)
+      }
+    }
+    
+    // Track session when game starts
+    trackPlayerSession()
+    
+    // Update session activity every 30 seconds
+    const activityInterval = setInterval(() => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const roomId = urlParams.get('roomId')
+      const mode = urlParams.get('mode')
+      
+      if (roomId && mode !== 'local' && mode !== 'practice') {
+        fetch('/api/game-sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: 'update',
+            roomId,
+            lastActivity: new Date().toISOString()
+          })
+        }).catch(err => console.warn('⚠️ Failed to update session activity:', err))
+      }
+    }, 30000) // Every 30 seconds
+    
+    // Cleanup: Record player leaving when component unmounts
+    return () => {
+      clearInterval(activityInterval)
+      
+      const urlParams = new URLSearchParams(window.location.search)
+      const roomId = urlParams.get('roomId')
+      const mode = urlParams.get('mode')
+      
+      if (roomId && mode !== 'local' && mode !== 'practice') {
+        // Send leave event (don't await since component is unmounting)
+        fetch('/api/game-sessions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: 'leave',
+            roomId
+          })
+        }).catch(err => console.warn('⚠️ Failed to record session leave:', err))
+      }
+    }
+  }, [gameStarted])
+
   // Cycle through missions every 4 seconds
   useEffect(() => {
     if (activeMissions.length > 0) {
