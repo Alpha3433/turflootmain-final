@@ -763,7 +763,8 @@ class TurfLootBackendTester:
                 f"Error: {str(e)}"
             )
             return False
-        """Run all backend tests"""
+
+    def run_all_tests(self):
         print("🚀 SERVER BROWSER MODAL BACKEND TESTING SUITE")
         print("Testing backend functionality after server browser modal fixes")
         print("=" * 80)
