@@ -938,7 +938,7 @@ const AgarIOGame = () => {
         if (area < 5) linearityScore++ // Points are very close to a straight line
       }
       
-      if (linearityScore > 10) { // Increased from 6 to 10 - allow more linear movements
+      if (linearityScore > 20) { // Increased from 10 to 20 - allow much more linear movements
         this.recordViolation('LINEAR_MOVEMENT_PATTERN', `Bot-like linear movement: ${linearityScore}/8`)
       }
     }
