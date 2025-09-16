@@ -1925,7 +1925,6 @@ export default function TurfLootTactical() {
 
   const handleJoinLobby = async (serverData) => {
     console.log('🌐 Server Browser: Joining server via Hathora:', serverData)
-    console.log('🔍 handleJoinLobby called with serverData:', JSON.stringify(serverData, null, 2))
     
     // Show enhanced loading modal with progress tracking
     const loadingModal = document.createElement('div')
