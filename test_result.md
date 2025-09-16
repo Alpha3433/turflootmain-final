@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Complete the landscape orientation requirement for mobile game entry by ensuring all game entry points (LOCAL PRACTICE and paid rooms) use the orientation check system. The mobile orientation modal UI is already implemented, but not all entry points are utilizing the checkOrientationAndEnterGame function."
+user_problem_statement: "PHASE 1: Critical Issue Resolution - Server Browser Modal Investigation: Investigate why the redesigned server browser modal isn't rendering and force the new design to appear on desktop. The user reported that despite extensive changes made to ServerBrowserModalNew.jsx, the old server browser design persists and the new design is not consistently rendering on the frontend."
 
 # Test plan for this run
 
