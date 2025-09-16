@@ -538,6 +538,136 @@ const AgarIOGame = () => {
       }
     }
   }, [gameStarted])
+  // WebSocket connection for multiplayer Hathora rooms
+  useEffect(() => {
+    if (!gameStarted) return
+
+    const connectToHathoraRoom = async () => {
+      try {
+        if (typeof window === 'undefined') return
+
+        const urlParams = new URLSearchParams(window.location.search)
+        const roomId = urlParams.get('roomId')
+        const mode = urlParams.get('mode')
+        const multiplayer = urlParams.get('multiplayer')
+        const server = urlParams.get('server')
+
+        // Only connect to Hathora WebSocket for multiplayer rooms
+        if (!roomId || mode === 'local' || mode === 'practice' || server !== 'hathora') {
+          console.log('🚫 Not a Hathora multiplayer room - skipping WebSocket connection')
+          return
+        }
+
+        console.log('🌐 Connecting to Hathora multiplayer room:', roomId)
+        setIsMultiplayer(true)
+
+        // Connect to Hathora WebSocket
+        const wsUrl = `wss://hathora.dev/rooms/${roomId}`
+        console.log('🔗 Connecting to:', wsUrl)
+        
+        const ws = new WebSocket(wsUrl)
+        wsRef.current = ws
+        
+        ws.onopen = () => {
+          console.log('✅ Connected to Hathora room WebSocket')
+          setWsConnection('connected')
+          
+          // Send player join event
+          const joinMessage = {
+            type: 'player_join',
+            playerId: `player_${Date.now()}`,
+            timestamp: Date.now(),
+            playerData: {
+              name: 'TurfLoot Player',
+              color: '#ff6b6b'
+            }
+          }
+          
+          ws.send(JSON.stringify(joinMessage))
+          console.log('📤 Sent player join event')
+        }
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data)
+            console.log('📨 Received WebSocket data:', data)
+            
+            switch (data.type) {
+              case 'player_joined':
+                console.log('👤 Player joined:', data.playerId)
+                setConnectedPlayers(prev => prev + 1)
+                break
+                
+              case 'player_left':
+                console.log('👋 Player left:', data.playerId)
+                setConnectedPlayers(prev => Math.max(0, prev - 1))
+                break
+                
+              case 'player_position':
+                // Update other players positions
+                if (playersRef.current && data.playerId !== wsRef.current?.playerId) {
+                  playersRef.current.set(data.playerId, {
+                    x: data.x,
+                    y: data.y,
+                    mass: data.mass,
+                    color: data.color,
+                    lastUpdate: Date.now()
+                  })
+                }
+                break
+                
+              case 'room_state':
+                console.log('🏠 Room state update:', data)
+                setConnectedPlayers(data.playerCount || 0)
+                break
+                
+              default:
+                console.log('📦 Unknown message type:', data.type)
+            }
+          } catch (error) {
+            console.error('❌ Error parsing WebSocket message:', error)
+          }
+        }
+
+        ws.onerror = (error) => {
+          console.error('❌ WebSocket error:', error)
+          setWsConnection('error')
+        }
+
+        ws.onclose = (event) => {
+          console.log('🔌 WebSocket connection closed:', event.code, event.reason)
+          setWsConnection('disconnected')
+          
+          // Attempt to reconnect after 3 seconds if game is still active
+          if (gameStarted && event.code !== 1000) {
+            console.log('🔄 Attempting to reconnect in 3 seconds...')
+            setTimeout(() => {
+              if (gameStarted) {
+                connectToHathoraRoom()
+              }
+            }, 3000)
+          }
+        }
+
+        setWsConnection('connecting')
+
+      } catch (error) {
+        console.error('❌ Error connecting to Hathora room:', error)
+        setWsConnection('error')
+      }
+    }
+
+    connectToHathoraRoom()
+
+    // Cleanup on unmount
+    return () => {
+      if (wsRef.current) {
+        console.log('🧹 Cleaning up WebSocket connection')
+        wsRef.current.close(1000, 'Component unmounting')
+        wsRef.current = null
+      }
+    }
+  }, [gameStarted])
 
   // Cycle through missions every 4 seconds
   useEffect(() => {
