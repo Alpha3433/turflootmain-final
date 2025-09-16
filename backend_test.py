@@ -543,21 +543,7 @@ class HathoraBackendTester:
 if __name__ == "__main__":
     tester = HathoraBackendTester()
     success = tester.run_all_tests()
-    sys.exit(0 if success else 1) 
-                    True,
-                    f"API accessible, {server_count} servers available, Hathora enabled: {hathora_enabled}"
-                )
-                return True
-            else:
-                self.log_test(
-                    "API Health Check", 
-                    False,
-                    f"HTTP {response.status_code}: {response.text[:200]}"
-                )
-                return False
-                
-        except Exception as e:
-            self.log_test("API Health Check", False, error=str(e))
+    sys.exit(0 if success else 1)
             return False
     
     def test_server_browser_api(self):
