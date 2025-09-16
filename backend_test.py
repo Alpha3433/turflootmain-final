@@ -69,10 +69,12 @@ class WalletTester:
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
+        self.start_time = time.time()
         
-        print(f"🚀 PHASE 2 HATHORA INTEGRATION TESTING")
+        print(f"🚀 WALLET FUNCTIONALITY TESTING WITH UPDATED HELIUS API KEY")
         print(f"📍 Backend URL: {self.api_base}")
-        print(f"🎯 Focus: Real Hathora room creation, WebSocket connections, session tracking")
+        print(f"🔑 Helius API Key: {HELIUS_API_KEY}")
+        print(f"🎯 Focus: Wallet balance, transactions, Helius RPC connectivity")
         print("=" * 80)
 
     def log_test(self, test_name, success, details="", response_time=0):
