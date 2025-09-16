@@ -317,12 +317,24 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     if (showRefresh) setRefreshing(false)
   }
 
+  // Initialize real Hathora room discovery when modal opens
   useEffect(() => {
     if (isOpen) {
-      fetchServers()
-      const interval = setInterval(fetchServers, 5000)
-      return () => clearInterval(interval)
+      console.log('🏠 Real Hathora Server Browser opened - discovering rooms...')
+      fetchRealHathoraRooms()
     }
+  }, [isOpen])
+
+  // Refresh rooms every 30 seconds while modal is open
+  useEffect(() => {
+    if (!isOpen) return
+
+    const refreshInterval = setInterval(() => {
+      console.log('🔄 Refreshing Hathora rooms...')
+      fetchRealHathoraRooms()
+    }, 30000) // 30 seconds
+
+    return () => clearInterval(refreshInterval)
   }, [isOpen])
 
   // Helper functions
