@@ -30,25 +30,29 @@ class HathoraMultiplayerTester:
         self.passed_tests = 0
         self.failed_tests = 0
 
-    def log_test(self, test_name: str, passed: bool, details: str = ""):
-        """Log test results"""
+    def log_test(self, test_name, passed, details="", response_time=None):
+        """Log test result"""
         self.total_tests += 1
         if passed:
             self.passed_tests += 1
             status = "✅ PASSED"
         else:
+            self.failed_tests += 1
             status = "❌ FAILED"
-        
-        result = f"{status}: {test_name}"
-        if details:
-            result += f" - {details}"
-        
-        print(result)
-        self.test_results.append({
+            
+        result = {
             'test': test_name,
-            'passed': passed,
-            'details': details
-        })
+            'status': status,
+            'details': details,
+            'response_time': f"{response_time:.3f}s" if response_time else "N/A"
+        }
+        self.test_results.append(result)
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        if response_time:
+            print(f"   Response Time: {response_time:.3f}s")
+        print()
 
     def test_server_browser_api_response(self):
         """Test 1: Server Browser API Response - Verify /api/servers returns expected data structure"""
