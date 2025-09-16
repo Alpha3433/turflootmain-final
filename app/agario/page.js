@@ -2163,6 +2163,18 @@ const AgarIOGame = () => {
     }
 
     drawVirus(virus) {
+      // Comprehensive NaN protection for virus properties
+      virus.currentRotation = isNaN(virus.currentRotation) ? 0 : virus.currentRotation
+      virus.rotationSpeed = isNaN(virus.rotationSpeed) ? 0.5 : virus.rotationSpeed
+      virus.pulsePhase = isNaN(virus.pulsePhase) ? 0 : virus.pulsePhase
+      virus.pulseSpeed = isNaN(virus.pulseSpeed) ? 0.02 : virus.pulseSpeed
+      virus.spikeWavePhase = isNaN(virus.spikeWavePhase) ? 0 : virus.spikeWavePhase
+      virus.spikeWaveSpeed = isNaN(virus.spikeWaveSpeed) ? 0.05 : virus.spikeWaveSpeed
+      virus.colorShift = isNaN(virus.colorShift) ? 0 : virus.colorShift
+      virus.glowIntensity = isNaN(virus.glowIntensity) ? 0.5 : virus.glowIntensity
+      virus.radius = isNaN(virus.radius) ? 30 : virus.radius
+      virus.spikes = isNaN(virus.spikes) ? 12 : virus.spikes
+      
       // Update animation properties
       virus.currentRotation += virus.rotationSpeed
       virus.pulsePhase += virus.pulseSpeed
