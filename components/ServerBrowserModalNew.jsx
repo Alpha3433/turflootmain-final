@@ -293,7 +293,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   }
 
   const handleJoinServer = (server) => {
-    onJoinLobby({
+    console.log('🎯 ServerBrowserModalNew: handleJoinServer called with:', server)
+    console.log('🎯 onJoinLobby prop:', onJoinLobby ? 'EXISTS' : 'MISSING')
+    
+    const serverData = {
       id: server.id,
       region: server.region,
       regionId: server.regionId, // Pass the specific region ID (e.g., 'london', 'frankfurt')
@@ -301,7 +304,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       entryFee: server.entryFee,
       gameType: server.gameType,
       mode: server.mode
-    })
+    }
+    
+    console.log('🎯 Calling onJoinLobby with serverData:', serverData)
+    onJoinLobby(serverData)
   }
 
   if (!isOpen) return null
