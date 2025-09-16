@@ -223,33 +223,14 @@ export default function TurfLootTactical() {
         
         console.log(`🆕 Created Hathora room: ${hathoraRoomId}`)
         
-        // Get connection info using the hathoraClient wrapper methods
-        let connectionInfo = null
-        try {
-          // Try to get connection info through the client
-          if (hathoraClient.client && hathoraClient.client.getConnectionInfo) {
-            connectionInfo = await hathoraClient.client.getConnectionInfo(hathoraRoomId)
-            console.log('📡 Hathora connection info:', connectionInfo)
-          } else {
-            console.warn('⚠️ getConnectionInfo not available, using fallback')
-            // Create fallback connection info
-            connectionInfo = {
-              host: 'hathora.dev',
-              port: 443,
-              region: actualRegion, // Use the actual region from Hathora
-              roomId: hathoraRoomId
-            }
-          }
-        } catch (connError) {
-          console.warn('⚠️ Failed to get connection info, using fallback:', connError.message)
-          // Create fallback connection info
-          connectionInfo = {
-            host: 'hathora.dev', 
-            port: 443,
-            region: actualRegion, // Use the actual region from Hathora
-            roomId: hathoraRoomId
-          }
+        // Simplified connection info without getConnectionInfo
+        const connectionInfo = {
+          host: 'hathora.dev',
+          port: 443,
+          region: actualRegion, // Use the actual region from Hathora
+          roomId: hathoraRoomId
         }
+        console.log('📡 Hathora connection info (simplified):', connectionInfo)
         
         const serverData = {
           id: hathoraRoomId,
