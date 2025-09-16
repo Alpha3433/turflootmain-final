@@ -2134,10 +2134,28 @@ export default function TurfLootTactical() {
         console.error('❌ FAILED: Could not create Hathora room after all attempts')
         console.error('❌ Final match result was:', matchResult)
         
-        // Remove loading modal
-        document.body.removeChild(loadingModal)
+        // Show failure status
+        updateStatus('❌ Failed to create Hathora room')
+        updateSubStatus('🔄 Please try again or contact support')
+        updateProgress(100)
+        updateTimer('⏱️ Room creation failed')
         
-        alert('Failed to create Hathora multiplayer room. Please try again. Server browser requires real multiplayer servers.')
+        // Ensure minimum display time even for errors
+        const elapsedTime = Date.now() - loadingStartTime
+        const remainingTime = Math.max(2000, minimumDisplayTime - elapsedTime) // At least 2 seconds for error
+        
+        setTimeout(() => {
+          // Remove loading modal
+          try {
+            if (document.body.contains(loadingModal)) {
+              document.body.removeChild(loadingModal)
+            }
+          } catch (e) {
+            console.log('Modal already removed')
+          }
+          
+          alert('Failed to create Hathora multiplayer room. Please try again. Server browser requires real multiplayer servers.')
+        }, remainingTime)
       }
       
     } catch (error) {
