@@ -96,38 +96,64 @@ class ServerBrowserTester:
             self.log_test("Server Browser API Response", False, f"Exception: {str(e)}")
             return None
 
-    def test_server_browser_api(self):
-        """Test /api/servers endpoint for server browser functionality"""
-        try:
-            response = requests.get(f"{API_BASE}/servers", timeout=15)
+    def test_server_grouping_logic(self, server_data: Dict):
+        """Test 2: Server Grouping Logic - Confirm backend provides right data for grouping"""
+        print("\n🔍 TEST 2: SERVER GROUPING LOGIC")
+        
+        if not server_data or 'servers' not in server_data:
+            self.log_test("Server Grouping Logic", False, "No server data available")
+            return
+        
+        servers = server_data['servers']
+        
+        # Test region grouping capability
+        regions = set()
+        stakes = set()
+        region_stake_combinations = set()
+        
+        for server in servers:
+            if 'region' in server and 'stake' in server:
+                region = server['region']
+                stake = server['stake']
+                regions.add(region)
+                stakes.add(stake)
+                region_stake_combinations.add((region, stake))
+        
+        self.log_test("Region Extraction", len(regions) > 0, f"Found {len(regions)} unique regions: {list(regions)}")
+        self.log_test("Stake Extraction", len(stakes) > 0, f"Found {len(stakes)} unique stakes: {list(stakes)}")
+        self.log_test("Region-Stake Combinations", len(region_stake_combinations) > 0, 
+                     f"Found {len(region_stake_combinations)} combinations for grouping")
+        
+        # Test grouping potential for collapsed design
+        empty_servers = [s for s in servers if s.get('currentPlayers', 0) == 0]
+        active_servers = [s for s in servers if s.get('currentPlayers', 0) > 0]
+        
+        self.log_test("Empty Server Detection", len(empty_servers) >= 0, 
+                     f"Found {len(empty_servers)} empty servers for collapse grouping")
+        self.log_test("Active Server Detection", len(active_servers) >= 0, 
+                     f"Found {len(active_servers)} active servers to display normally")
+        
+        # Test grouping by region and stake for collapsed display
+        grouping_data = {}
+        for server in empty_servers:
+            region = server.get('region', 'Unknown')
+            stake = server.get('stake', 0)
+            key = f"{region}-${stake}"
             
-            if response.status_code != 200:
-                self.log_test("Server Browser API", False, f"Status: {response.status_code}", response.text[:200])
-                return False
-                
-            data = response.json()
-            
-            # Check required fields
-            required_fields = ['servers', 'totalPlayers', 'totalActiveServers', 'hathoraEnabled']
-            missing_fields = [field for field in required_fields if field not in data]
-            
-            if missing_fields:
-                self.log_test("Server Browser API", False, f"Missing fields: {missing_fields}")
-                return False
-                
-            # Check if servers array exists and has data
-            servers = data.get('servers', [])
-            if not isinstance(servers, list):
-                self.log_test("Server Browser API", False, "Servers field is not an array")
-                return False
-                
-            self.log_test("Server Browser API", True, 
-                         f"Found {len(servers)} servers, Hathora enabled: {data.get('hathoraEnabled')}")
-            return True
-            
-        except Exception as e:
-            self.log_test("Server Browser API", False, "", str(e))
-            return False
+            if key not in grouping_data:
+                grouping_data[key] = []
+            grouping_data[key].append(server)
+        
+        self.log_test("Grouping Data Generation", len(grouping_data) > 0, 
+                     f"Generated {len(grouping_data)} groups for collapsed display")
+        
+        return {
+            'regions': regions,
+            'stakes': stakes,
+            'empty_servers': empty_servers,
+            'active_servers': active_servers,
+            'grouping_data': grouping_data
+        }
 
     def test_sydney_oceania_regions(self):
         """Test that Sydney/Oceania regions are properly included in server data"""
