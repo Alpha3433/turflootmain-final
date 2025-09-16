@@ -2074,7 +2074,16 @@ export default function TurfLootTactical() {
       }
       
     } catch (error) {
-      console.error('❌ DETAILED ERROR joining server from browser:')
+      console.error('❌ DETAILED ERROR joining server from browser:', error)
+      
+      // Remove loading modal
+      try {
+        const modal = document.getElementById('hathora-loading-modal')
+        if (modal) document.body.removeChild(modal)
+      } catch (e) {}
+      
+      alert('Failed to create Hathora room. Please try again.')
+    }
       console.error('❌ Error message:', error.message)
       console.error('❌ Error stack:', error.stack)
       console.error('❌ Server data:', serverData)
