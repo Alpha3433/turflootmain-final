@@ -15,6 +15,15 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [error, setError] = useState(null)
   const [pingCache, setPingCache] = useState(new Map())
   
+  // Additional state variables that were missing
+  const [pingingRegions, setPingingRegions] = useState(false)
+  const [selectedStakeFilter, setSelectedStakeFilter] = useState('All')
+  const [servers, setServers] = useState([])
+  const [errorMessage, setErrorMessage] = useState('')
+  const [refreshing, setRefreshing] = useState(false)
+  const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
+  const [isLoading, setIsLoading] = useState(false)
+  
   const fetchRealHathoraRooms = async () => {
     setRoomsLoading(true)
     setError(null)
