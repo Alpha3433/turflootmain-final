@@ -2050,6 +2050,11 @@ export default function TurfLootTactical() {
         attempts++
         console.log(`⏳ Attempt ${attempts}/${maxAttempts}: Calling findOrCreateRoom...`)
         
+        // Update status during attempts
+        updateStatus(`🔄 Creating room... (attempt ${attempts}/${maxAttempts})`)
+        updateProgress(20 + (attempts * 15)) // Progressive loading
+        updateTimer(`⏱️ Attempt ${attempts} of ${maxAttempts}...`)
+        
         try {
           matchResult = await findOrCreateRoom(
             serverData.regionId || serverData.region, // Use regionId first, fallback to region
@@ -2060,13 +2065,17 @@ export default function TurfLootTactical() {
           // Verify it's actually a Hathora room
           if (matchResult && matchResult.serverData && !matchResult.serverData.isHathora) {
             console.log('❌ Got local room instead of Hathora room, retrying...')
+            updateSubStatus('🔄 Ensuring Hathora multiplayer room...')
             matchResult = null
           }
           
         } catch (createError) {
           console.error(`❌ Attempt ${attempts} failed:`, createError)
+          updateStatus(`⚠️ Attempt ${attempts} failed, retrying...`)
+          updateSubStatus(`🔄 Error: ${createError.message.substring(0, 40)}...`)
           if (attempts < maxAttempts) {
             console.log(`🔄 Retrying in 2 seconds...`)
+            updateTimer(`⏱️ Retrying in 2 seconds...`)
             await new Promise(resolve => setTimeout(resolve, 2000))
           }
         }
