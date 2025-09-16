@@ -473,7 +473,15 @@ export async function GET(request, { params }) {
           
           console.log(`📊 Found ${activeGameSessions.length} active game sessions`)
           
-          // Get available Hathora regions
+        } catch (mongoError) {
+          console.error('❌ MongoDB connection failed, continuing with server generation:', mongoError.message)
+          // Continue with server generation even if MongoDB is down
+        }
+        
+        // ALWAYS GENERATE SERVERS - even if MongoDB is down
+        console.log('🎮 Generating server list (MongoDB status: ' + (mongoError ? 'OFFLINE' : 'ONLINE') + ')')
+        
+        // Get available Hathora regions
           const hathoraRegions = [
             { id: 'washingtondc', name: 'US-East-1', displayName: 'US East' },
             { id: 'seattle', name: 'US-West-1', displayName: 'US West' },
