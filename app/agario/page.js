@@ -4686,7 +4686,6 @@ const AgarIOGame = () => {
         {/* Report Player Modal - Temporarily Removed */}
       </div>
     </div>
-    </>
   )
 }
 
