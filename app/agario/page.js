@@ -680,10 +680,10 @@ const AgarIOGame = () => {
     return () => {
       if (wsRef.current) {
         console.log('🧹 Cleaning up Hathora connection')
-        if (typeof wsRef.current.disconnect === 'function') {
-          wsRef.current.disconnect()
-        } else if (typeof wsRef.current.close === 'function') {
+        if (typeof wsRef.current.close === 'function') {
           wsRef.current.close()
+        } else if (typeof wsRef.current.disconnect === 'function') {
+          wsRef.current.disconnect()
         }
         wsRef.current = null
       }
