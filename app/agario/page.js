@@ -266,15 +266,20 @@ const AgarIOGame = () => {
         gameMode
       })
       
+      // Format data according to API requirements (session object with required fields)
       const sessionData = {
         action: 'join',
-        roomId: realRoomId,
-        fee: fee,
-        mode: gameMode,
-        region: region,
-        isRealHathoraRoom: true,
-        hathoraRoomProcess: true,
-        timestamp: new Date().toISOString()
+        session: {
+          roomId: realRoomId,
+          joinedAt: new Date().toISOString(),
+          lastActivity: new Date().toISOString(),
+          userId: 'anonymous_' + Math.random().toString(36).substr(2, 9),
+          entryFee: fee || 0,
+          mode: gameMode || mode,
+          region: region || 'unknown',
+          isRealHathoraRoom: true,
+          hathoraRoomProcess: true
+        }
       }
       
       const response = await fetch('/api/game-sessions', {
