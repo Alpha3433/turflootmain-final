@@ -521,7 +521,7 @@ const AgarIOGame = () => {
       }
       
       this.antiCheat = {
-        enabled: this.isCashGame, // Only active for cash games
+        enabled: false, // TEMPORARILY DISABLED FOR TESTING - was: this.isCashGame
         violations: 0,
         maxViolations: 20, // Significantly increased from 8 to 20 - very lenient
         banned: false,
