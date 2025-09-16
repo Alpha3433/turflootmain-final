@@ -1,27 +1,35 @@
 #!/usr/bin/env python3
 """
-TurfLoot Backend Testing Suite - Phase 2 Hathora Integration Testing
-Testing Agent: Comprehensive backend API testing for Hathora multiplayer overhaul
-Focus: Real Hathora room creation, WebSocket connections, session tracking, navigation flow
+Comprehensive Backend Testing for Wallet Functionality with Updated Helius API Key
+Testing Priority: Critical Wallet Fix Verification
 
-PRIORITY FOCUS: Phase 2 Hathora Integration Testing
-Critical changes implemented:
-1. ✅ Real Hathora Room Creation: Modified initializeAuthoritativeGame() to create actual Hathora room processes
-2. ✅ Enhanced WebSocket Connection: Updated WebSocket connection logic with real Hathora room IDs
-3. ✅ Session Tracking: Added trackRealHathoraSession() function for actual Hathora room processes
-4. ✅ Navigation Flow: Fixed complete user flow from server browser → room creation → game page
+This test suite verifies:
+1. Wallet Balance API with new Helius API key
+2. Wallet Transactions API functionality  
+3. Helius RPC connectivity verification
+4. Sample Solana wallet testing
+5. Authentication integration testing
+6. Error handling verification
+7. JSON response format validation
+
+PRIORITY FOCUS: Wallet Functionality Testing with New Helius API Key
+Updated API Key: dccb9763-d453-4940-bd43-dfd987f278b1
+Updated Environment Variables:
+- HELIUS_API_KEY=dccb9763-d453-4940-bd43-dfd987f278b1
+- NEXT_PUBLIC_HELIUS_RPC=https://mainnet.helius-rpc.com/?api-key=dccb9763-d453-4940-bd43-dfd987f278b1
+- HELIUS_WEBSOCKET_URL=wss://atlas-mainnet.helius-rpc.com/?api-key=dccb9763-d453-4940-bd43-dfd987f278b1
 
 TESTING REQUIREMENTS:
 Core Focus (Priority 1):
-1. Hathora Room Creation API - Test createPaidRoom() and createOrJoinRoom() methods
-2. Real Room Process Verification - Verify actual Hathora room processes are being created
-3. Game Session Integration - Test trackRealHathoraSession() vs old session tracking
-4. Navigation Flow Backend Support - Test APIs supporting server browser → game page flow
+1. Wallet Balance API - Test /api/wallet/balance with new Helius API key
+2. Wallet Transactions API - Test /api/wallet/transactions with new Helius API key  
+3. Helius RPC Connectivity - Verify direct connection to Helius with new API key
+4. Sample Wallet Testing - Test with known Solana addresses
 
 Secondary Focus (Priority 2):
-5. WebSocket Authentication - Verify Hathora authentication tokens and connection parameters
-6. Balance Validation - Test paid room validation for cash games
-7. General Application Health - Ensure no regressions from the changes
+5. Authentication Integration - Test wallet APIs with different auth scenarios
+6. Error Handling - Verify proper error handling for invalid requests
+7. JSON Response Format - Ensure APIs return proper JSON structure
 """
 
 import requests
