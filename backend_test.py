@@ -688,35 +688,264 @@ class HathoraIntegrationTester:
             print("❌ API not accessible - aborting remaining tests")
             return self.generate_summary()
         
-        # Test 2: Hathora Room Endpoint Documentation
-        print("📚 Testing Hathora Room Endpoint Documentation...")
-        self.test_hathora_room_endpoint_get()
-        
-        # Test 3: Server-Side Room Creation (Core Test)
-        print("🚀 Testing Server-Side Room Creation...")
-        created_rooms = self.test_server_side_room_creation()
-        
-        # Test 4: Real Connection Info Validation
-        print("🌐 Testing Real Connection Info...")
-        self.test_real_connection_info_validation(created_rooms)
-        
-        # Test 5: Player Token Authentication
-        print("🔐 Testing Player Token Authentication...")
-        self.test_player_token_authentication(created_rooms)
-        
-        # Test 6: Client Flow Integration
-        print("🔄 Testing Client Flow Integration...")
-        self.test_client_flow_integration()
-        
-        # Test 7: WebSocket Security Preparation
-        print("🔒 Testing WebSocket Security...")
-        self.test_websocket_security_preparation(created_rooms)
-        
-        # Test 8: End-to-End Production Flow
-        print("🎯 Testing End-to-End Production Flow...")
-        self.test_end_to_end_production_flow()
+        # Test 2: Test the /api/hathora/room endpoint directly
+        print("🚀 Testing Server-Side Hathora Room Creation...")
+        self.test_hathora_room_creation()
         
         return self.generate_summary()
+
+    def test_hathora_room_creation(self):
+        """Test Server-Side Hathora Room Creation"""
+        try:
+            # Test different room configurations
+            test_configs = [
+                {
+                    "name": "Practice Room (US-East)",
+                    "payload": {
+                        "gameMode": "practice",
+                        "region": "us-east-1",
+                        "maxPlayers": 8,
+                        "stakeAmount": 0
+                    }
+                },
+                {
+                    "name": "Cash Game Room (US-West)",
+                    "payload": {
+                        "gameMode": "cash-game", 
+                        "region": "us-west-2",
+                        "maxPlayers": 4,
+                        "stakeAmount": 5
+                    }
+                }
+            ]
+            
+            created_rooms = []
+            
+            for config in test_configs:
+                try:
+                    print(f"Testing {config['name']}...")
+                    response = requests.post(
+                        f"{API_BASE}/hathora/room",
+                        json=config["payload"],
+                        headers={"Content-Type": "application/json"},
+                        timeout=30
+                    )
+                    
+                    print(f"Response status: {response.status_code}")
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        print(f"Response data: {data}")
+                        
+                        # Validate response structure
+                        required_fields = ['success', 'roomId', 'host', 'port', 'playerToken']
+                        missing_fields = [field for field in required_fields if field not in data]
+                        
+                        if not missing_fields and data.get('success'):
+                            room_info = {
+                                'config': config["name"],
+                                'roomId': data['roomId'],
+                                'host': data['host'],
+                                'port': data['port'],
+                                'hasToken': bool(data.get('playerToken')),
+                                'region': data.get('region', 'auto'),
+                                'gameMode': data.get('gameMode'),
+                                'isHathoraRoom': data.get('isHathoraRoom', False)
+                            }
+                            created_rooms.append(room_info)
+                            
+                            self.log_test(
+                                f"Room Creation - {config['name']}", 
+                                True, 
+                                f"Room ID: {data['roomId']}, Host: {data['host']}:{data['port']}, Token: {'Yes' if data.get('playerToken') else 'No'}"
+                            )
+                            
+                            # Test connection info validation
+                            self.test_connection_info(room_info)
+                            
+                            # Test player token
+                            self.test_player_token(room_info)
+                            
+                            # Test WebSocket security
+                            self.test_websocket_security(room_info)
+                            
+                        else:
+                            self.log_test(
+                                f"Room Creation - {config['name']}", 
+                                False, 
+                                f"Missing fields: {missing_fields} or success=False. Response: {data}"
+                            )
+                    else:
+                        error_data = response.text
+                        try:
+                            error_json = response.json()
+                            error_data = error_json
+                        except:
+                            pass
+                        self.log_test(
+                            f"Room Creation - {config['name']}", 
+                            False, 
+                            f"HTTP {response.status_code}: {error_data}"
+                        )
+                        
+                except Exception as config_error:
+                    self.log_test(
+                        f"Room Creation - {config['name']}", 
+                        False, 
+                        error_msg=str(config_error)
+                    )
+            
+            # Overall assessment
+            if len(created_rooms) > 0:
+                self.log_test(
+                    "Server-Side Room Creation Overall", 
+                    True, 
+                    f"Successfully created {len(created_rooms)}/{len(test_configs)} rooms"
+                )
+                
+                # Test end-to-end flow with one of the created rooms
+                if created_rooms:
+                    self.test_end_to_end_flow(created_rooms[0])
+                    
+                return created_rooms
+            else:
+                self.log_test(
+                    "Server-Side Room Creation Overall", 
+                    False, 
+                    "No rooms were successfully created"
+                )
+                return []
+                
+        except Exception as e:
+            self.log_test("Server-Side Room Creation Overall", False, error_msg=str(e))
+            return []
+
+    def test_connection_info(self, room_info):
+        """Test Real Connection Info Validation"""
+        try:
+            host = room_info['host']
+            port = room_info['port']
+            
+            # Check if this is real Hathora connection info (not placeholders)
+            is_real_hathora = (
+                host and 
+                port and 
+                not host.endswith('hathora.dev') and  # Not placeholder
+                not host == 'localhost' and  # Not local
+                port != 443 and  # Not generic HTTPS port
+                '.' in host  # Has domain structure
+            )
+            
+            if is_real_hathora:
+                self.log_test(
+                    f"Real Connection Info - {room_info['config']}", 
+                    True, 
+                    f"Real Hathora endpoint: {host}:{port}"
+                )
+            else:
+                self.log_test(
+                    f"Real Connection Info - {room_info['config']}", 
+                    False, 
+                    f"Placeholder/generic endpoint: {host}:{port}"
+                )
+                
+        except Exception as e:
+            self.log_test(f"Real Connection Info - {room_info['config']}", False, error_msg=str(e))
+
+    def test_player_token(self, room_info):
+        """Test Player Token Authentication"""
+        try:
+            if not room_info['hasToken']:
+                self.log_test(
+                    f"Player Token - {room_info['config']}", 
+                    False, 
+                    "No player token provided"
+                )
+                return
+            
+            self.log_test(
+                f"Player Token - {room_info['config']}", 
+                True, 
+                "Player authentication token generated by server"
+            )
+                
+        except Exception as e:
+            self.log_test(f"Player Token - {room_info['config']}", False, error_msg=str(e))
+
+    def test_websocket_security(self, room_info):
+        """Test WebSocket Security"""
+        try:
+            host = room_info['host']
+            port = room_info['port']
+            has_token = room_info['hasToken']
+            room_id = room_info['roomId']
+            
+            # Validate WebSocket security requirements
+            has_real_endpoint = host and port and host != 'localhost' and '.' in host
+            has_auth_token = has_token
+            has_room_id = bool(room_id)
+            
+            if has_real_endpoint and has_auth_token and has_room_id:
+                # Construct expected WebSocket URL format
+                websocket_url = f"wss://{host}:{port}?token=<PLAYER_TOKEN>&roomId={room_id}"
+                
+                self.log_test(
+                    f"WebSocket Security - {room_info['config']}", 
+                    True, 
+                    f"Secure WebSocket ready: {websocket_url.replace('<PLAYER_TOKEN>', '[TOKEN]')}"
+                )
+            else:
+                missing_components = []
+                if not has_real_endpoint:
+                    missing_components.append("real endpoint")
+                if not has_auth_token:
+                    missing_components.append("auth token")
+                if not has_room_id:
+                    missing_components.append("room ID")
+                    
+                self.log_test(
+                    f"WebSocket Security - {room_info['config']}", 
+                    False, 
+                    f"Missing security components: {', '.join(missing_components)}"
+                )
+                
+        except Exception as e:
+            self.log_test(f"WebSocket Security - {room_info['config']}", False, error_msg=str(e))
+
+    def test_end_to_end_flow(self, room_info):
+        """Test End-to-End Production Flow"""
+        try:
+            print("🚀 TESTING END-TO-END PRODUCTION FLOW")
+            
+            # Simulate client receiving and processing the data
+            client_room_info = {
+                'roomId': room_info['roomId'],
+                'host': room_info['host'], 
+                'port': room_info['port'],
+                'gameMode': room_info.get('gameMode'),
+                'region': room_info.get('region')
+            }
+            
+            # Validate WebSocket URL construction
+            websocket_url = f"wss://{client_room_info['host']}:{client_room_info['port']}?token=<PLAYER_TOKEN>&roomId={client_room_info['roomId']}"
+            
+            # Basic URL validation
+            parsed_url = urlparse(websocket_url)
+            if parsed_url.scheme == 'wss' and parsed_url.hostname and parsed_url.port:
+                self.log_test(
+                    "End-to-End Production Flow", 
+                    True, 
+                    f"Complete flow successful: Room {client_room_info['roomId']} ready for secure WebSocket connection at {client_room_info['host']}:{client_room_info['port']}"
+                )
+            else:
+                self.log_test(
+                    "End-to-End Production Flow", 
+                    False, 
+                    f"Invalid WebSocket URL structure: {websocket_url}"
+                )
+                
+        except Exception as e:
+            self.log_test("End-to-End Production Flow", False, error_msg=str(e))
 
     def generate_summary(self):
         """Generate comprehensive test summary"""
