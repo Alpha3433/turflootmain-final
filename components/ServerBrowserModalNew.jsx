@@ -32,7 +32,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       console.log('🔍 Fetching real Hathora rooms from discovery API...')
       
       // Import Hathora client to discover active rooms
-      const { default: hathoraClient } = await import('/lib/hathoraClient.js')
+      const { default: hathoraClient } = await import('@/lib/hathoraClient')
       
       const isInitialized = await hathoraClient.initialize()
       if (!isInitialized) {
