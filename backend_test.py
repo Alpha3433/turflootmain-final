@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-CRITICAL HATHORA INTEGRATION FIXES VERIFICATION - Backend Testing
-Testing Objectives:
-1. Correct API Usage: Verify createLobby + getConnectionInfo instead of createPublicLobby/createRoom
-2. Return Value Fixes: Confirm room methods return just room ID strings (not objects)
-3. Module Resolution: Test that @/lib/hathoraClient imports work correctly
-4. Connection Info Propagation: Verify real host/port details are retrieved and used
-5. End-to-End Flow: Test complete flow from room creation to WebSocket connection
+COMPREHENSIVE SERVER-SIDE HATHORA INTEGRATION VERIFICATION
+Testing all requirements from the review request for production-ready Hathora integration
+
+TESTING OBJECTIVES:
+1. Server-Side API Route: Test the new /api/hathora/room endpoint for secure room creation
+2. Real Connection Info: Verify that the server API returns actual host/port details from Hathora
+3. Real Player Tokens: Test that genuine player authentication tokens are generated and returned
+4. Client Flow Integration: Verify that client components consume server API responses correctly
+5. WebSocket Security: Test that WebSocket connections use real tokens and endpoints
+6. End-to-End Production Flow: Complete test from room creation to WebSocket connection
 """
 
 import requests
