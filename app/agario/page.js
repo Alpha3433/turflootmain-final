@@ -815,7 +815,7 @@ const AgarIOGame = () => {
         }
 
         // Use the real Hathora room ID if available, otherwise fall back to roomId
-        const actualRoomId = hathoraRoom || roomId
+        const actualRoomId = String(hathoraRoom || roomId).trim()
         
         console.log('🌐 Connecting to Hathora multiplayer room:', {
           originalRoomId: roomId,
@@ -825,8 +825,8 @@ const AgarIOGame = () => {
         })
         console.log('🔍 DEBUG: actualRoomId value:', actualRoomId, '(type:', typeof actualRoomId, ')')
         
-        // Validate the room ID format
-        if (actualRoomId === 'true' || actualRoomId === 'false' || actualRoomId === 'undefined' || actualRoomId === 'null') {
+        // Validate the room ID format - ensure it's not an object string
+        if (actualRoomId === 'true' || actualRoomId === 'false' || actualRoomId === 'undefined' || actualRoomId === 'null' || actualRoomId.includes('[object') || actualRoomId.length === 0) {
           console.error('❌ CRITICAL: actualRoomId is invalid:', actualRoomId)
           console.error('🔍 This is the source of the WebSocket connection failure!')
           setWsConnection('error')
