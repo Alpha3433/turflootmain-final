@@ -88,6 +88,7 @@ export async function POST(request) {
     console.log(`🔍 Debug - getting connection info for roomId: "${roomId}", type: ${typeof roomId}`)
     
     const connectionInfo = await hathora.roomsV2.getConnectionInfo({
+      appId: appId,
       roomId: roomId,
       playerToken: playerToken
     })
