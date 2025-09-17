@@ -7,7 +7,7 @@ import requests
 import json
 import time
 
-BASE_URL = "https://multiplayer-fix-1.preview.emergentagent.com"
+BASE_URL = "https://turfloot-server.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def check_database_content():

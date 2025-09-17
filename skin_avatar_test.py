@@ -14,7 +14,7 @@ import sys
 from typing import Dict, List, Any, Optional
 
 # Configuration
-BASE_URL = "https://multiplayer-fix-1.preview.emergentagent.com"
+BASE_URL = "https://turfloot-server.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class SkinAvatarTester:

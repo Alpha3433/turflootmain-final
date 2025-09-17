@@ -1,79 +1,58 @@
 <analysis>
-The AI engineer's trajectory centered on migrating the TurfLoot game to a Hathora-first multiplayer architecture. Key early efforts involved resolving a  error in the  component and integrating Helius API for wallet functionality. Significant refactoring was undertaken in  and  to ensure Hathora room creation and WebSocket connections. Despite successfully creating Hathora rooms and navigating to the game page, a persistent issue with WebSocket connections emerged. The root cause identified in the latest messages is that the  URL parameter is incorrectly passed as the string 'true' instead of the actual room ID, leading to invalid WebSocket URLs and connection failures.
+The AI engineer's trajectory centered on migrating the TurfLoot game to a Hathora-first multiplayer architecture. Initial efforts resolved a  error and integrated Helius API. The first major hurdle was a  connection failure due to  parameter being 'true' and later a mixed content error ( vs ) plus a 422 Hathora API error, all resolved by direct  WebSocket implementation and updated region codes.
+
+Subsequently, the user requested critical refactoring: switching to / APIs, returning plain room IDs, and fixing module resolution. These were implemented, leading to the discovery that the *wrong Hathora SDK* was being used. This was corrected. The final architectural shift involved moving all Hathora SDK operations to a *server-side API route* () for security. This resulted in a Zod validation error (), which the AI engineer temporarily bypassed by implementing a *mock room creation API*. The immediate task concludes with a working mock room system, but the real Hathora SDK integration issue remains to be fixed.
 </analysis>
 
 <product_requirements>
-The TurfLoot application is an Agar.io-style military-themed multiplayer game built with Hathora for game servers and Privy for authentication, targeting both mobile and desktop. The core objective is to transition the MVP into a fully authoritative Hathora-based multiplayer experience.
-
-**Implemented features & fixes:**
-*   **Redesigned Server Browser:** Features a functional modal with condensed information, stake filters, region flags, dynamic player counts, CDN-based client-side ping (cached, color-coded, auto-sorting), and Hathora room creation/joining.
-*   **Wallet Functionality:** Successfully fixed through Helius API key integration, enabling real SOL balance display.
-*   **Hathora Integration:** Refactored for robust room creation, correct region mapping, authenticated WebSocket connection, and removal of local server fallbacks. Includes loading modals and retry logic.
-*   **Enhanced Loading Popup:** Displays for 5+ seconds with progressive status updates.
-
-**Current Overhaul Requirements (Authoritative Hathora Rooms):**
-*   All game logic must be server-side.
-*   **Server Browser-First:** Direct load into online matches; list active, pre-warmed rooms, then create new.
-*   **Room Lifecycle:** On-demand creation, 8-minute keep-alive, pre-warm 1 room/region/tier during peak.
-*   **Networking:** WebSocket transport (Hathora), 20 Hz tick rate.
-*   **Support:** Spectator & Party support. Backend Monitoring via Hathora Console.
-*   **Exclusion:** Server-side bot management for auto-fill not required.
+The TurfLoot application is an Agar.io-style military-themed multiplayer game built with Hathora for game servers and Privy for authentication, targeting both mobile and desktop. The core objective is to transition the MVP into a fully authoritative Hathora-based multiplayer experience. Implemented features include a redesigned Server Browser with dynamic player counts and CDN-based ping, fixed Wallet Functionality via Helius API, and robust Hathora Integration for room creation, region mapping, and authenticated WebSocket connections, removing local server fallbacks. Current overhaul requires all game logic to be server-side, a Server Browser-First approach (listing active, pre-warmed rooms, then creating new), defined Room Lifecycle (on-demand creation, 8-minute keep-alive), WebSocket transport at 20 Hz tick rate, and Spectator & Party support with Hathora Console monitoring. Server-side bot management for auto-fill is not required.
 </product_requirements>
 
 <key_technical_concepts>
 - Next.js 14 (App Router, Client/Server Components, API Routes)
 - React Hooks (, , )
 - Tailwind CSS & Shadcn/ui
-- Hathora (real-time multiplayer game server hosting, SDK 1.3.1)
-- Privy (wallet/authentication, session management)
+- Hathora ( for game servers)
+- Privy (wallet/authentication)
 - Helius RPC (Solana blockchain interaction)
 - MongoDB (database)
-- WebSocket (for client-side ping and multiplayer connection)
-- CloudFront CDN (for client-side ping measurement)
+- WebSocket (multiplayer connection)
+- Zod (validation schema)
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: Main landing page, handles UI, authentication, and orchestrates user entry into the game via the server browser modal.
-    -   **Changes**: Refactored  and  for Hathora-only room creation, removing local game fallbacks. Enhanced loading modal.  updated. Logic for calling  was introduced. Session tracking format for  was corrected. Some Privy-related authentication checks were reverted to address a 500 error, and URL navigation parameters were refined.
--   ****: Manages the core in-game experience, canvas, and WebSocket connections for real-time multiplayer.
-    -   **Changes**: Hathora WebSocket client connection logic was implemented and repeatedly refined to use correct SDK methods (, , , , ). A  was added for Hathora-first game initialization. Updates were made to use  for WebSocket connections and join messages. WebSocket promise handling was fixed. Validation was added to prevent redundant room creation.
--   ****: Backend API for dynamic server list.
-    -   **Changes**: Generates 35 cash game servers with specific  values and uses  for player counts.
--   ** & **: Backend APIs for wallet data.
-    -   **Changes**: Created/updated to integrate with Helius API for balance and transaction fetching.
--   ****: Hathora SDK wrapper, managing room creation and region mapping.
-    -   **Changes**:  and  were updated for correct region passing.  was refined. Debugging logs were added. Validation was introduced to handle  returning .
--   ****: The primary UI for users to select and join multiplayer rooms.
-    -   **Changes**: The  error was fixed by adding  for . Variable name inconsistencies (e.g.,  instead of ,  instead of ) were corrected. CDN-based ping measurements were implemented, and UI display logic was updated.  was adapted for new room structure. Debugging messages were added to track button clicks, and an attempt was made to make buttons work independently of Privy auth state.
--   ****: Environment variables for critical configurations.
-    -   **Changes**: , , and  were updated with a new API key.
+- : Main landing page, orchestrates user entry into game.
+  - **Changes**: Refactored  to call the new server API endpoint (). Updated navigation to pass , , , , and  as URL parameters from the server API response.
+- : Manages in-game experience and WebSocket connections.
+  - **Changes**: Refactored WebSocket connection logic to directly use , , and  extracted from URL parameters. Removed old SDK-based connection logic and hardcoded  fallbacks. Added logic to gracefully handle  by not attempting WebSocket connections.
+- : **NEW** Server-side API endpoint for Hathora room creation and connection info.
+  - **Changes**: Implements a *temporary mock room creation logic* that returns a fixed , , , , and . This bypasses a Zod validation error currently encountered with the actual  calls.
+- : Hathora SDK wrapper, now acts as a client-side API facade.
+  - **Changes**: Removed direct Hathora SDK instantiation. All room creation and connection info requests (, ) now make  calls to the new server API route () instead of directly interacting with the SDK. Module import path updated to .
+- : General API route.
+  - **Changes**: Updated logic to correctly handle Hathora client methods returning plain room ID strings instead of objects with  properties.
+- : Environment variables.
+  - **Changes**: , ,  were updated.
 </code_architecture>
 
 <pending_tasks>
-- Mobile Customization Screen Redesign (remaining design aspects).
+- Fix the *real* Hathora SDK integration in  to correctly use  and  parameters, replacing the current mock implementation.
+- Resolve the  error.
+- Mobile Customization Screen Redesign.
 - Modernizing Social Popup.
-- Production Infrastructure Stability: Address persistent 502/404/ERR_ABORTED errors for  calls.
+- Production Infrastructure Stability for  calls.
 - Implement core  button functionality in Wallet Snapshot.
-- Re-integrate and ensure functionality of the complex player report modal.
-- Dynamically change the Available Balance text color in the Cash Out modal.
-- Make the Enter Solana wallet address placeholder text smaller.
-- Address Content Security Policy (CSP) violations related to .
-- Resolve Privy bridge not yet available messages.
-- Hathora console metrics (Connection count, Egress bandwidth) not updating.
 </pending_tasks>
 
 <current_work>
-The AI engineer is currently in the advanced stages of a complete overhaul of the TurfLoot application's multiplayer experience, transitioning it to a 100% Hathora-first and server browser-first model. This involved extensive refactoring of  and  for game initialization and Hathora room creation, alongside updates to  for direct interaction with Hathora rooms.
+The AI engineer is currently addressing a critical issue where the server-side API route for Hathora room creation () was failing due to Zod validation errors within the  when attempting to call . To unblock the development and allow other functionalities to be tested, a **temporary mock room creation system** has been implemented.
 
-Significant progress has been made:
-1.  The initial  error in  was resolved, and the server browser UI functions correctly.
-2.  Wallet functionality was restored by updating the Helius API key in  and verified to successfully validate funds for multiplayer entry.
-3.  Hathora rooms are being successfully created, and the application navigates to the  game page with the correct .
+This mock implementation in  now returns a predefined successful response including a mock  (e.g., ),  (), , and , along with an  flag.
 
-However, the immediate blocker is that **WebSocket connections to these newly created Hathora rooms are failing.** The core issue, identified in the latest logs, is that the  URL parameter, intended to carry the actual room ID, is incorrectly being set to the string literal  during navigation. This results in an invalid WebSocket URL format (e.g., ), preventing the client from establishing a connection to the authoritative Hathora server. Consequently, Hathora console metrics for connection count and egress bandwidth remain at zero, despite active rooms.
+The client-side  now calls this mock server API.  has been updated to pass the mock room details and  flag as URL parameters during navigation. Consequently,  has been refactored to consume these URL parameters and, specifically for mock rooms, to gracefully skip attempting a real WebSocket connection to . This ensures the application flow proceeds without encountering the SDK validation error.
 </current_work>
 
 <optional_next_step>
-Fix the  URL parameter in the navigation logic to correctly pass the actual .
+Fix the real Hathora SDK integration in .
 </optional_next_step>
