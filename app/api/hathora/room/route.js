@@ -78,23 +78,39 @@ export async function POST(request) {
     })
 
     console.log('🔍 Debug - roomResponse structure:', JSON.stringify(roomResponse, null, 2))
+    console.log('🔍 Debug - roomResponse keys:', Object.keys(roomResponse))
+    console.log('🔍 Debug - roomResponse.roomId:', roomResponse.roomId)
+    console.log('🔍 Debug - typeof roomResponse.roomId:', typeof roomResponse.roomId)
     
-    // The roomResponse itself contains the roomId, appId, and playerToken
-    // Extract just the roomId string from the response object
-    const actualRoomId = roomResponse.roomId  // This is the string ID within the response
-    if (!actualRoomId) {
-      throw new Error('Failed to get room ID from room creation')
+    // The roomResponse should be: { appId, roomId, playerToken }
+    // We want just the roomId string value
+    let actualRoomId;
+    
+    if (typeof roomResponse.roomId === 'string') {
+      actualRoomId = roomResponse.roomId;
+    } else if (roomResponse.roomId && typeof roomResponse.roomId === 'object' && roomResponse.roomId.roomId) {
+      // Handle case where roomId is nested
+      actualRoomId = roomResponse.roomId.roomId;
+    } else {
+      // Fallback - maybe the whole response IS the roomId object
+      actualRoomId = roomResponse.roomId || roomResponse.id;
     }
+    
+    if (!actualRoomId || typeof actualRoomId !== 'string') {
+      console.error('❌ Failed to extract string roomId from response:', roomResponse);
+      throw new Error('Failed to get room ID string from room creation response');
+    }
+    
     console.log(`✅ Room created successfully with ID: ${actualRoomId}`)
-    console.log(`🔍 Debug - extracted roomId: "${actualRoomId}", type: ${typeof actualRoomId}`)
+    console.log(`🔍 Debug - final extracted roomId: "${actualRoomId}", type: ${typeof actualRoomId}`)
 
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
-    console.log(`🔍 Debug - calling getConnectionInfo with roomId string: "${actualRoomId}"`)
+    console.log(`🔍 Debug - calling getConnectionInfo with roomId: "${actualRoomId}", appId: "${appId}"`)
     
     const connectionInfo = await hathora.roomsV2.getConnectionInfo({
       appId: appId,
-      roomId: actualRoomId,  // Pass just the string, not the object
+      roomId: actualRoomId,  // This should now be a string
       playerToken: playerToken
     })
 
