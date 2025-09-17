@@ -2043,6 +2043,12 @@ export default function TurfLootTactical() {
         console.warn('⚠️ No player token available for WebSocket authentication')
       }
       
+      // Add mock room flag if present
+      if (hathoraResult.isMockRoom) {
+        queryParams.set('isMockRoom', 'true')
+        console.log('🎭 Adding mock room flag for testing')
+      }
+      
       console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
       console.log('🚀 Navigating to Hathora multiplayer game:', `/agario?${queryParams.toString()}`)
       
