@@ -36,27 +36,25 @@ export async function POST(request) {
 
     console.log(`🚀 Creating Hathora room server-side: ${gameMode} mode, region: ${region}`)
 
-    // Initialize RoomV2Api with developer token (server-side only)
-    const roomClient = new RoomV2Api()
-    const playerAuthClient = new PlayerAuthApi()
+    // Initialize HathoraCloud SDK
+    const hathoraClient = new HathoraCloud({
+      appId: appId,
+      security: {
+        hathoraDevToken: developerToken
+      }
+    })
 
     // Step 1: Create the room
-    console.log('📡 Creating room with RoomV2Api...')
+    console.log('📡 Creating room with HathoraCloud SDK...')
     let roomResponse
     
     try {
       const createRoomConfig = region ? { region } : {}
       
-      roomResponse = await roomClient.createRoom(
+      roomResponse = await hathoraClient.roomV2.createRoom(
         appId,
         createRoomConfig,
-        undefined, // Let Hathora generate room ID
-        {
-          headers: {
-            'Authorization': `Bearer ${developerToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
+        undefined // Let Hathora generate room ID
       )
       
       if (!roomResponse || !roomResponse.roomId) {
@@ -82,7 +80,7 @@ export async function POST(request) {
     let connectionInfo
     
     try {
-      connectionInfo = await roomClient.getConnectionInfo(appId, roomResponse.roomId)
+      connectionInfo = await hathoraClient.roomV2.getConnectionInfo(appId, roomResponse.roomId)
       
       if (!connectionInfo || !connectionInfo.host || !connectionInfo.port) {
         throw new Error('Invalid connection info from Hathora')
@@ -107,7 +105,7 @@ export async function POST(request) {
     let playerToken
     
     try {
-      const authResponse = await playerAuthClient.loginAnonymous(appId)
+      const authResponse = await hathoraClient.playerAuthV1.loginAnonymous(appId)
       
       if (!authResponse || !authResponse.token) {
         throw new Error('Invalid auth response from Hathora')
