@@ -78,14 +78,16 @@ export async function POST(request, { params }) {
         console.log('✅ Hathora client initialized successfully')
         
         // Create actual Hathora room process
+        let roomResult
         let roomId
         if (stakeAmount > 0) {
           // Create paid room
-          const result = await hathoraClient.createPaidRoom(stakeAmount, null, region)
-          roomId = result.roomId
+          roomResult = await hathoraClient.createPaidRoom(stakeAmount, null, region)
+          roomId = roomResult.roomId
         } else {
           // Create practice room
-          roomId = await hathoraClient.createOrJoinRoom(null, gameMode)
+          roomResult = await hathoraClient.createOrJoinRoom(null, gameMode)
+          roomId = roomResult.roomId || roomResult // Handle both object and string returns
         }
         
         if (!roomId) {
@@ -102,6 +104,7 @@ export async function POST(request, { params }) {
           maxPlayers: maxPlayers,
           stakeAmount: stakeAmount,
           isHathoraRoom: true,
+          connectionInfo: roomResult.connectionInfo || null, // Include connection info if available
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
         
