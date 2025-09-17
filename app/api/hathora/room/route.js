@@ -77,11 +77,13 @@ export async function POST(request) {
       region: hathoraRegion
     })
 
+    console.log('🔍 Debug - roomResponse structure:', JSON.stringify(roomResponse, null, 2))
     const roomId = roomResponse.roomId
     if (!roomId) {
       throw new Error('Failed to get room ID from room creation')
     }
     console.log(`✅ Room created successfully with ID: ${roomId}`)
+    console.log(`🔍 Debug - extracted roomId: "${roomId}", type: ${typeof roomId}`)
 
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
