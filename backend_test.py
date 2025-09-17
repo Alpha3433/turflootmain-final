@@ -45,7 +45,7 @@ class HathoraIntegrationTester:
             'status': status,
             'details': details,
             'error': error_msg,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': time.time()
         }
         self.test_results.append(result)
         print(f"{status}: {test_name}")
