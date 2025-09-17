@@ -36,9 +36,10 @@ export async function POST(request) {
 
     console.log(`🚀 Creating Hathora room server-side: ${gameMode} mode, region: ${region}`)
 
-    // Initialize Hathora SDK clients
-    const roomClient = new RoomV2Api()
-    const authClient = new AuthV1Api()
+    // Initialize Hathora SDK client with authentication
+    const hathora = new HathoraCloud({
+      hathoraDevToken: developerToken,
+    })
 
     // Map our regions to Hathora regions
     const regionMap = {
@@ -59,42 +60,47 @@ export async function POST(request) {
 
     // Step 1: Create anonymous player authentication
     console.log('🔐 Creating anonymous player authentication...')
-    const authResponse = await authClient.loginAnonymous({
-      appId
-    })
+    const authResponse = await hathora.authV1.loginAnonymous()
     
-    const playerToken = authResponse.token
+    const playerToken = authResponse.data?.token
+    if (!playerToken) {
+      throw new Error('Failed to get player token from anonymous login')
+    }
     console.log('✅ Player token created successfully')
 
-    // Step 2: Create the room using RoomV2Api
+    // Step 2: Create the room using roomsV2
     console.log(`🏠 Creating room in region: ${hathoraRegion}`)
-    const roomResponse = await roomClient.createRoom(
+    const roomResponse = await hathora.roomsV2.createRoom({
       appId,
-      { region: hathoraRegion },
-      undefined, // Let Hathora generate the room ID
-      {
-        headers: {
-          Authorization: `Bearer ${developerToken}`,
-          'Content-Type': 'application/json',
-        },
+      createRoomRequest: {
+        region: hathoraRegion
       }
-    )
+    })
 
-    const roomId = roomResponse.roomId
+    const roomId = roomResponse.data?.roomId
+    if (!roomId) {
+      throw new Error('Failed to get room ID from room creation')
+    }
     console.log(`✅ Room created successfully with ID: ${roomId}`)
 
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
-    const connectionInfo = await roomClient.getConnectionInfo(
+    
+    // Create a new client instance with the player token for connection info
+    const hathoraPlayer = new HathoraCloud({
+      appId: appId,
+    })
+    
+    const connectionInfo = await hathoraPlayer.roomsV2.getConnectionInfo({
       appId,
       roomId,
-      {
-        headers: {
-          Authorization: `Bearer ${playerToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+      playerToken
+    })
+
+    const connectionData = connectionInfo.data
+    if (!connectionData?.host || !connectionData?.port) {
+      throw new Error('Failed to get connection info from Hathora')
+    }
 
     console.log('✅ Connection info retrieved successfully')
 
@@ -102,8 +108,8 @@ export async function POST(request) {
     const roomInfo = {
       success: true,
       roomId: roomId,
-      host: connectionInfo.host,
-      port: connectionInfo.port,
+      host: connectionData.host,
+      port: connectionData.port,
       region: region || hathoraRegion,
       gameMode,
       maxPlayers,
