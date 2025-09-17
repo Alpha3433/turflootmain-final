@@ -115,12 +115,19 @@ export async function POST(request) {
     console.log('🔍 Debug - connectionInfo response:', JSON.stringify(connectionInfo, null, 2))
     console.log('🔍 Debug - connectionInfo keys:', Object.keys(connectionInfo || {}))
 
-    const connectionData = connectionInfo
+    // Extract host and port from the exposedPort object
+    const exposedPort = connectionInfo?.exposedPort
+    const connectionData = {
+      host: exposedPort?.host,
+      port: exposedPort?.port
+    }
+    
     if (!connectionData?.host || !connectionData?.port) {
       console.error('❌ Missing host or port in connection info:', {
         host: connectionData?.host,
         port: connectionData?.port,
-        fullResponse: connectionData
+        exposedPort: exposedPort,
+        fullResponse: connectionInfo
       })
       throw new Error('Failed to get connection info from Hathora')
     }
