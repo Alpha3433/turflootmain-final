@@ -36,24 +36,23 @@ export async function POST(request) {
 
     console.log(`🚀 Creating Hathora room server-side: ${gameMode} mode, region: ${region}`)
 
-    // Initialize HathoraCloud SDK
+    // Initialize HathoraCloud SDK with proper configuration
     const hathoraClient = new HathoraCloud({
-      appId: appId,
       security: {
         hathoraDevToken: developerToken
       }
     })
 
-    // Step 1: Create the room
+    // Step 1: Create the room using roomsV2 API
     console.log('📡 Creating room with HathoraCloud SDK...')
     let roomResponse
     
     try {
-      const createRoomConfig = region ? { region } : {}
+      const createRoomOptions = region ? { region } : {}
       
       roomResponse = await hathoraClient.roomsV2.createRoom(
         appId,
-        createRoomConfig,
+        createRoomOptions,
         undefined // Let Hathora generate room ID
       )
       
