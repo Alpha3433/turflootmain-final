@@ -857,14 +857,39 @@ const AgarIOGame = () => {
         console.log('🔗 Attempting to create Hathora connection for room:', roomId)
         
         // Get connection info and create secure WebSocket directly
+        // Extract connection info from URL parameters if provided
+        const hathoraHost = urlParams.get('hathoraHost')
+        const hathoraPort = urlParams.get('hathoraPort')
+        
+        console.log('🔍 DEBUG: hathoraHost from URL:', hathoraHost)
+        console.log('🔍 DEBUG: hathoraPort from URL:', hathoraPort)
+
         console.log('🔗 Getting connection info for secure WebSocket...')
         
         let connection
+        let connectionInfo = null
+        
+        // Try to use provided host/port from URL parameters first
+        if (hathoraHost && hathoraPort) {
+          console.log(`🌐 Using provided connection info: ${hathoraHost}:${hathoraPort}`)
+          connectionInfo = {
+            host: hathoraHost,
+            port: parseInt(hathoraPort, 10)
+          }
+        } else {
+          console.log('📡 No host/port in URL parameters, fetching from Hathora API...')
+          try {
+            // Fallback: Get connection info from Hathora API
+            connectionInfo = await hathoraClient.client.getRoomInfo(actualRoomId)
+            console.log('📡 Got connection info from API:', connectionInfo)
+          } catch (apiError) {
+            console.error('❌ Failed to get connection info from API:', apiError)
+            setWsConnection('error')
+            return
+          }
+        }
+        
         try {
-          // Get connection info from Hathora for the room
-          const connectionInfo = await hathoraClient.client.getConnectionInfo(actualRoomId)
-          console.log('📡 Got connection info:', connectionInfo)
-          
           if (connectionInfo && connectionInfo.host && connectionInfo.port) {
             // Force HTTPS/WSS connection for production
             const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/${actualRoomId}?token=${token}`
