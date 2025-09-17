@@ -1847,7 +1847,7 @@ export default function TurfLootTactical() {
     let connectionInfo = null
     try {
       console.log('📡 Getting connection info for room:', roomId)
-      connectionInfo = await hathoraClient.client.getConnectionInfo(roomId)
+      connectionInfo = await hathoraClient.getConnectionInfo(roomId)
       console.log('📊 Connection info:', connectionInfo)
     } catch (connectionError) {
       console.warn('⚠️ Failed to get connection info:', connectionError.message)
