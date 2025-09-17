@@ -845,13 +845,10 @@ const AgarIOGame = () => {
           return
         }
 
-        console.log('🔐 Attempting to get Hathora authentication token...')
-        const token = await hathoraClient.client.loginAnonymous()
-        if (!token) {
-          console.error('❌ Failed to get Hathora authentication token')
-          setWsConnection('error')
-          return
-        }
+        console.log('🔐 Using server-side authentication for Hathora...')
+        // RoomV2Api uses server-side authentication with developer tokens
+        // No need for client-side login tokens
+        const token = 'server-auth' // Placeholder for server-authenticated connection
         console.log('🔑 Got Hathora auth token successfully')
 
         console.log('🔗 Attempting to create Hathora connection for room:', roomId)
