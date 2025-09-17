@@ -38,6 +38,7 @@ export async function POST(request) {
 
     // Initialize Hathora SDK client with authentication
     const hathora = new HathoraCloud({
+      appId: appId,
       hathoraDevToken: developerToken,
     })
 
@@ -62,7 +63,7 @@ export async function POST(request) {
     console.log('🔐 Creating anonymous player authentication...')
     const authResponse = await hathora.authV1.loginAnonymous()
     
-    const playerToken = authResponse.data?.token
+    const playerToken = authResponse.token
     if (!playerToken) {
       throw new Error('Failed to get player token from anonymous login')
     }
@@ -71,13 +72,12 @@ export async function POST(request) {
     // Step 2: Create the room using roomsV2
     console.log(`🏠 Creating room in region: ${hathoraRegion}`)
     const roomResponse = await hathora.roomsV2.createRoom({
-      appId,
       createRoomRequest: {
         region: hathoraRegion
       }
     })
 
-    const roomId = roomResponse.data?.roomId
+    const roomId = roomResponse.roomId
     if (!roomId) {
       throw new Error('Failed to get room ID from room creation')
     }
@@ -86,18 +86,12 @@ export async function POST(request) {
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
     
-    // Create a new client instance with the player token for connection info
-    const hathoraPlayer = new HathoraCloud({
-      appId: appId,
-    })
-    
-    const connectionInfo = await hathoraPlayer.roomsV2.getConnectionInfo({
-      appId,
+    const connectionInfo = await hathora.roomsV2.getConnectionInfo({
       roomId,
       playerToken
     })
 
-    const connectionData = connectionInfo.data
+    const connectionData = connectionInfo
     if (!connectionData?.host || !connectionData?.port) {
       throw new Error('Failed to get connection info from Hathora')
     }
