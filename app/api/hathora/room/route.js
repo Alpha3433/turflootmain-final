@@ -112,8 +112,16 @@ export async function POST(request) {
     // getConnectionInfo only needs the roomId as a direct parameter, not an object
     const connectionInfo = await hathora.roomsV2.getConnectionInfo(actualRoomId)
 
+    console.log('🔍 Debug - connectionInfo response:', JSON.stringify(connectionInfo, null, 2))
+    console.log('🔍 Debug - connectionInfo keys:', Object.keys(connectionInfo || {}))
+
     const connectionData = connectionInfo
     if (!connectionData?.host || !connectionData?.port) {
+      console.error('❌ Missing host or port in connection info:', {
+        host: connectionData?.host,
+        port: connectionData?.port,
+        fullResponse: connectionData
+      })
       throw new Error('Failed to get connection info from Hathora')
     }
 
