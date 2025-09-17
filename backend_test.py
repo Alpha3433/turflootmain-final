@@ -56,37 +56,39 @@ class HathoraIntegrationTester:
         print()
 
     def test_api_health_check(self):
-        """Test 1: API Health Check - Verify backend is operational"""
+        """Test 1: Basic API Health Check"""
         try:
             response = requests.get(f"{API_BASE}", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                service_name = data.get('service', 'unknown')
                 features = data.get('features', [])
+                service = data.get('service', '')
                 
-                self.log_test(
-                    "API Health Check",
-                    True,
-                    f"Service: {service_name}, Features: {features}"
-                )
-                return True
+                if 'multiplayer' in features and service:
+                    self.log_test(
+                        "API Health Check", 
+                        True, 
+                        f"API accessible, service: {service}, features: {features}"
+                    )
+                    return True
+                else:
+                    self.log_test(
+                        "API Health Check", 
+                        False, 
+                        f"Missing multiplayer features or service info: {data}"
+                    )
+                    return False
             else:
                 self.log_test(
-                    "API Health Check",
-                    False,
-                    f"HTTP {response.status_code}",
-                    response.text
+                    "API Health Check", 
+                    False, 
+                    f"HTTP {response.status_code}: {response.text}"
                 )
                 return False
                 
         except Exception as e:
-            self.log_test(
-                "API Health Check",
-                False,
-                "Connection failed",
-                str(e)
-            )
+            self.log_test("API Health Check", False, error_msg=str(e))
             return False
 
     def test_hathora_room_creation_api_methods(self):
