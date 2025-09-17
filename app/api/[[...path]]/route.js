@@ -101,7 +101,6 @@ export async function POST(request, { params }) {
           maxPlayers: maxPlayers,
           stakeAmount: stakeAmount,
           isHathoraRoom: true,
-          connectionInfo: roomResult.connectionInfo || null, // Include connection info if available
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
         
