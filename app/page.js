@@ -1828,29 +1828,39 @@ export default function TurfLootTactical() {
     console.log('🏠 Creating Hathora room with config:', roomConfig)
     
     // Use the enhanced createPaidRoom method for all multiplayer games
-    const result = await hathoraClient.createPaidRoom(
+    const roomId = await hathoraClient.createPaidRoom(
       roomConfig.entryFee,
       null, // userId - will use anonymous auth
       roomConfig.region
     )
     
-    if (!result || !result.roomId) {
-      throw new Error('Failed to create Hathora room - no room ID returned')
+    if (!roomId || typeof roomId !== 'string') {
+      throw new Error('Failed to create Hathora room - invalid room ID returned')
     }
     
     console.log('🎉 Hathora room created successfully!')
-    console.log('🏠 Room ID:', result.roomId)
-    console.log('🌍 Region:', result.region || roomConfig.region)
+    console.log('🏠 Room ID:', roomId)
+    console.log('🌍 Region:', roomConfig.region)
     console.log('💰 Entry Fee:', roomConfig.entryFee)
     
+    // Get connection info separately if needed
+    let connectionInfo = null
+    try {
+      console.log('📡 Getting connection info for room:', roomId)
+      connectionInfo = await hathoraClient.client.getConnectionInfo(roomId)
+      console.log('📊 Connection info:', connectionInfo)
+    } catch (connectionError) {
+      console.warn('⚠️ Failed to get connection info:', connectionError.message)
+    }
+    
     return {
-      roomId: result.roomId,
-      region: result.region || roomConfig.region,
+      roomId: roomId,
+      region: roomConfig.region,
       entryFee: roomConfig.entryFee,
       maxPlayers: roomConfig.maxPlayers,
       gameMode: 'hathora-multiplayer',
       isHathoraRoom: true,
-      connectionInfo: result.connectionInfo || null // Use real connection info or null
+      connectionInfo: connectionInfo || null // Use real connection info or null
     }
   }
 
