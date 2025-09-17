@@ -79,8 +79,9 @@ export async function POST(request) {
 
     console.log('🔍 Debug - roomResponse structure:', JSON.stringify(roomResponse, null, 2))
     
-    // Extract the roomId string from the response
-    const actualRoomId = roomResponse.roomId  // This should be the string
+    // The roomResponse itself contains the roomId, appId, and playerToken
+    // Extract just the roomId string from the response object
+    const actualRoomId = roomResponse.roomId  // This is the string ID within the response
     if (!actualRoomId) {
       throw new Error('Failed to get room ID from room creation')
     }
@@ -89,11 +90,11 @@ export async function POST(request) {
 
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
-    console.log(`🔍 Debug - getting connection info for roomId: "${actualRoomId}", appId: "${appId}"`)
+    console.log(`🔍 Debug - calling getConnectionInfo with roomId string: "${actualRoomId}"`)
     
     const connectionInfo = await hathora.roomsV2.getConnectionInfo({
       appId: appId,
-      roomId: actualRoomId,
+      roomId: actualRoomId,  // Pass just the string, not the object
       playerToken: playerToken
     })
 
