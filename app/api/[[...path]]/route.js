@@ -78,20 +78,17 @@ export async function POST(request, { params }) {
         console.log('✅ Hathora client initialized successfully')
         
         // Create actual Hathora room process
-        let roomResult
         let roomId
         if (stakeAmount > 0) {
-          // Create paid room
-          roomResult = await hathoraClient.createPaidRoom(stakeAmount, null, region)
-          roomId = roomResult.roomId
+          // Create paid room - now returns just room ID string
+          roomId = await hathoraClient.createPaidRoom(stakeAmount, null, region)
         } else {
-          // Create practice room
-          roomResult = await hathoraClient.createOrJoinRoom(null, gameMode)
-          roomId = roomResult.roomId || roomResult // Handle both object and string returns
+          // Create practice room - now returns just room ID string
+          roomId = await hathoraClient.createOrJoinRoom(null, gameMode)
         }
         
-        if (!roomId) {
-          throw new Error('Failed to create Hathora room - no room ID returned')
+        if (!roomId || typeof roomId !== 'string') {
+          throw new Error('Failed to create Hathora room - invalid room ID returned')
         }
         
         console.log(`✅ Created Hathora room: ${roomId}`)
