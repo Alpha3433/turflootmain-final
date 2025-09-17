@@ -1,0 +1,23 @@
+{
+  "name": "turfloot-hathora-server",
+  "version": "1.0.0",
+  "description": "TurfLoot multiplayer game server for Hathora Cloud",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "deploy": "hathora deploy"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": ["multiplayer", "game", "websocket", "hathora"],
+  "author": "TurfLoot",
+  "license": "MIT"
+}
