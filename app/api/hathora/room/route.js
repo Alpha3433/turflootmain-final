@@ -58,6 +58,7 @@ export async function POST(request) {
 
     const hathoraRegion = regionMap[region] || 'Seattle'
     console.log(`🌍 Mapping region ${region} to Hathora region: ${hathoraRegion}`)
+    console.log(`🔍 Debug - original region: "${region}", mapped region: "${hathoraRegion}", type: ${typeof hathoraRegion}`)
 
     // Step 1: Create anonymous player authentication
     console.log('🔐 Creating anonymous player authentication...')
@@ -71,6 +72,7 @@ export async function POST(request) {
 
     // Step 2: Create the room using roomsV2
     console.log(`🏠 Creating room in region: ${hathoraRegion}`)
+    console.log(`🔍 Debug - about to call createRoom with region: "${hathoraRegion}"`)
     const roomResponse = await hathora.roomsV2.createRoom({
       createRoomParams: {
         region: hathoraRegion
