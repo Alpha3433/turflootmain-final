@@ -886,7 +886,19 @@ const AgarIOGame = () => {
           }
           
           // Create secure WebSocket connection with real player token
-          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/${actualRoomId}?token=${hathoraToken}`
+          // Ensure roomId is definitely a string, not an object
+          const cleanRoomId = typeof actualRoomId === 'string' ? actualRoomId : 
+                             (actualRoomId && actualRoomId.roomId) ? actualRoomId.roomId :
+                             String(actualRoomId)
+          
+          console.log('🔍 DEBUG: cleanRoomId extraction:', {
+            originalActualRoomId: actualRoomId,
+            typeOfActualRoomId: typeof actualRoomId,
+            cleanRoomId: cleanRoomId,
+            typeOfCleanRoomId: typeof cleanRoomId
+          })
+          
+          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/${cleanRoomId}?token=${hathoraToken}`
           console.log('🔗 Secure WebSocket URL with real token:', wsUrl.replace(hathoraToken, 'HIDDEN_TOKEN'))
           
           try {
