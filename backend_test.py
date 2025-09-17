@@ -20,7 +20,7 @@ import sys
 from urllib.parse import urlparse, parse_qs
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-server.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turf-websocket.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 print("🚀 COMPREHENSIVE WEBSOCKET ENDPOINT TESTING")
