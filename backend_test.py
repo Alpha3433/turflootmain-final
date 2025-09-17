@@ -673,4 +673,4 @@ class HathoraIntegrationTester:
 
 if __name__ == "__main__":
     tester = HathoraIntegrationTester()
-    tester.run_all_tests()
+    tester.run_comprehensive_test()
