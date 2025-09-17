@@ -877,7 +877,7 @@ const AgarIOGame = () => {
           console.log('📡 No host/port in URL parameters, fetching from Hathora API...')
           try {
             // Fallback: Get connection info from Hathora API
-            connectionInfo = await hathoraClient.client.getRoomInfo(actualRoomId)
+            connectionInfo = await hathoraClient.getConnectionInfo(actualRoomId)
             console.log('📡 Got connection info from API:', connectionInfo)
           } catch (apiError) {
             console.error('❌ Failed to get connection info from API:', apiError)
