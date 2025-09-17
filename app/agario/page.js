@@ -975,40 +975,40 @@ const AgarIOGame = () => {
         } catch (connectionError) {
           console.error('❌ Failed to create secure WebSocket connection:', connectionError)
           
-          // Try fallback connection without path
-          try {
-            console.log('🔄 Attempting fallback connection...')
-            const connectionInfo = await hathoraClient.client.getConnectionInfo(actualRoomId)
-            
-            if (connectionInfo && connectionInfo.host && connectionInfo.port) {
-              const fallbackUrl = `wss://${connectionInfo.host}:${connectionInfo.port}?token=${token}&roomId=${actualRoomId}`
-              console.log('🔗 Fallback WebSocket URL:', fallbackUrl)
+          // If we used provided host/port and it failed, try alternative connection format
+          if (hathoraHost && hathoraPort) {
+            try {
+              console.log('🔄 Attempting alternative connection format with provided host/port...')
+              const alternativeUrl = `wss://${hathoraHost}:${hathoraPort}?token=${token}&roomId=${actualRoomId}`
+              console.log('🔗 Alternative WebSocket URL:', alternativeUrl)
               
-              connection = new WebSocket(fallbackUrl)
+              connection = new WebSocket(alternativeUrl)
               wsRef.current = connection
               
-              // Set up basic event handlers for fallback
+              // Set up basic event handlers for alternative connection
               connection.onopen = () => {
-                console.log('✅ Fallback WebSocket connection opened')
+                console.log('✅ Alternative WebSocket connection opened')
                 setWsConnection('connected')
               }
               
               connection.onerror = (error) => {
-                console.error('❌ Fallback WebSocket error:', error)
+                console.error('❌ Alternative WebSocket error:', error)
                 setWsConnection('error')
               }
               
               connection.onclose = () => {
-                console.log('🔒 Fallback WebSocket connection closed')
+                console.log('🔒 Alternative WebSocket connection closed')
                 setWsConnection('disconnected')
               }
               
-            } else {
-              throw new Error('No connection info available for fallback')
+            } catch (alternativeError) {
+              console.error('❌ Alternative WebSocket connection also failed:', alternativeError)
+              setWsConnection('error')
+              return
             }
-            
-          } catch (fallbackError) {
-            console.error('❌ All WebSocket connection attempts failed:', fallbackError)
+          } else {
+            // No provided host/port and API fetch failed - cannot establish connection
+            console.error('❌ No connection information available - cannot establish WebSocket connection')
             setWsConnection('error')
             return
           }
