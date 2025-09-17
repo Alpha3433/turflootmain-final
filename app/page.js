@@ -1806,7 +1806,7 @@ export default function TurfLootTactical() {
     }
     
     // Import Hathora client
-    const { default: hathoraClient } = await import('/lib/hathoraClient.js')
+    const { default: hathoraClient } = await import('@/lib/hathoraClient')
     
     const isInitialized = await hathoraClient.initialize()
     if (!isInitialized) {
