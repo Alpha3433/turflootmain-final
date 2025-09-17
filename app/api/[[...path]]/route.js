@@ -65,42 +65,45 @@ export async function POST(request, { params }) {
         
         console.log(`🚀 Creating Hathora room with gameMode: ${gameMode}, region: ${region}, stakeAmount: ${stakeAmount}`)
         
-        // Import and initialize Hathora client
-        const hathoraClientModule = await import('@/lib/hathoraClient')
-        const hathoraClient = hathoraClientModule.default
+        // Call the working /api/hathora/room endpoint directly to avoid circular dependency
+        const roomResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/hathora/room`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            gameMode,
+            region,
+            maxPlayers,
+            stakeAmount
+          })
+        })
         
-        // Initialize the client
-        const initialized = await hathoraClient.initialize()
-        if (!initialized) {
-          throw new Error('Failed to initialize Hathora client')
+        if (!roomResponse.ok) {
+          const errorData = await roomResponse.json()
+          throw new Error(`Hathora room creation failed: ${errorData.error || roomResponse.statusText}`)
         }
         
-        console.log('✅ Hathora client initialized successfully')
+        const roomData = await roomResponse.json()
         
-        // Create actual Hathora room process
-        let roomId
-        if (stakeAmount > 0) {
-          // Create paid room - now returns just room ID string
-          roomId = await hathoraClient.createPaidRoom(stakeAmount, null, region)
-        } else {
-          // Create practice room - now returns just room ID string
-          roomId = await hathoraClient.createOrJoinRoom(null, gameMode)
+        if (!roomData.success) {
+          throw new Error(`Hathora room creation failed: ${roomData.error}`)
         }
         
-        if (!roomId || typeof roomId !== 'string') {
-          throw new Error('Failed to create Hathora room - invalid room ID returned')
-        }
-        
-        console.log(`✅ Created Hathora room: ${roomId}`)
+        console.log(`✅ Created Hathora room: ${roomData.roomId}`)
         
         return NextResponse.json({
           success: true,
-          roomId: roomId,
-          gameMode: gameMode,
-          region: region || 'default',
-          maxPlayers: maxPlayers,
-          stakeAmount: stakeAmount,
+          roomId: roomData.roomId,
+          gameMode: roomData.gameMode,
+          region: roomData.region,
+          maxPlayers: roomData.maxPlayers,
+          stakeAmount: roomData.stakeAmount,
+          host: roomData.host,
+          port: roomData.port,
+          playerToken: roomData.playerToken,
           isHathoraRoom: true,
+          isMockRoom: false,
           timestamp: new Date().toISOString()
         }, { headers: corsHeaders })
         
