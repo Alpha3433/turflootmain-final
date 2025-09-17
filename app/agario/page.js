@@ -845,10 +845,9 @@ const AgarIOGame = () => {
           return
         }
 
-        console.log('🔐 Using server-side authentication for Hathora...')
-        // RoomV2Api uses server-side authentication with developer tokens
-        // No need for client-side login tokens
-        const token = 'server-auth' // Placeholder for server-authenticated connection
+        console.log('🔐 Using real player token from server API for WebSocket authentication')
+        // Real player token is extracted from URL parameters (hathoraToken)
+        // No need for client-side authentication - server API handles this securely
         console.log('🔑 Got Hathora auth token successfully')
 
         console.log('🔗 Attempting to create Hathora connection for room:', roomId)
