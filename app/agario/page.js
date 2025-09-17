@@ -854,49 +854,38 @@ const AgarIOGame = () => {
         console.log('🔗 Attempting to create Hathora connection for room:', roomId)
         
         // Get connection info and create secure WebSocket directly
-        // Extract connection info from URL parameters if provided
+        // Extract connection info from URL parameters (from server API)
         const hathoraHost = urlParams.get('hathoraHost')
         const hathoraPort = urlParams.get('hathoraPort')
+        const hathoraToken = urlParams.get('hathoraToken') // Real player token
         
         console.log('🔍 DEBUG: hathoraHost from URL:', hathoraHost)
         console.log('🔍 DEBUG: hathoraPort from URL:', hathoraPort)
+        console.log('🔍 DEBUG: hathoraToken from URL:', hathoraToken ? 'present' : 'missing')
 
-        console.log('🔗 Getting connection info for secure WebSocket...')
+        console.log('🔗 Using connection info from server API...')
         
         let connection
         let connectionInfo = null
         
-        // Try to use provided host/port from URL parameters first
-        if (hathoraHost && hathoraPort) {
-          console.log(`🌐 Using provided connection info: ${hathoraHost}:${hathoraPort}`)
+        // Use provided host/port from server API (secure, no client-side SDK calls)
+        if (hathoraHost && hathoraPort && hathoraToken) {
+          console.log(`🌐 Using server-provided connection info: ${hathoraHost}:${hathoraPort}`)
           connectionInfo = {
             host: hathoraHost,
             port: parseInt(hathoraPort, 10)
           }
-        } else {
-          console.log('📡 No host/port in URL parameters, fetching from Hathora API...')
+          
+          // Create secure WebSocket connection with real player token
+          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/${actualRoomId}?token=${hathoraToken}`
+          console.log('🔗 Secure WebSocket URL with real token:', wsUrl.replace(hathoraToken, 'HIDDEN_TOKEN'))
+          
           try {
-            // Fallback: Get connection info from Hathora API
-            connectionInfo = await hathoraClient.getConnectionInfo(actualRoomId)
-            console.log('📡 Got connection info from API:', connectionInfo)
-          } catch (apiError) {
-            console.error('❌ Failed to get connection info from API:', apiError)
-            setWsConnection('error')
-            return
-          }
-        }
-        
-        try {
-          if (connectionInfo && connectionInfo.host && connectionInfo.port) {
-            // Force HTTPS/WSS connection for production
-            const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/${actualRoomId}?token=${token}`
-            console.log('🔗 Secure WebSocket URL:', wsUrl)
-            
-            // Create secure WebSocket connection manually
             connection = new WebSocket(wsUrl)
-            console.log('✅ Created secure WebSocket connection')
+            console.log('✅ Created secure WebSocket connection with real player token')
             
-            // Set up connection event handlers
+            // Store connection reference
+            wsRef.current = connection
             connection.onopen = () => {
               console.log('✅ WebSocket connection opened successfully')
               setWsConnection('connected')
