@@ -43,13 +43,20 @@ export async function POST(request) {
       }
     })
 
-    // Step 1: Create the room using roomsV2 API
+    // Step 1: Create the room using roomsV2 API  
     console.log('📡 Creating room with HathoraCloud SDK...')
     let roomResponse
     
     try {
-      // Use simplified parameters - most Hathora APIs expect minimal config
-      roomResponse = await hathoraClient.roomsV2.createRoom(appId)
+      // Use correct parameter structure based on the error logs
+      // The SDK expects: createRoom(createRoomParams, appId, roomId)
+      const createRoomParams = region ? { region } : {}
+      
+      roomResponse = await hathoraClient.roomsV2.createRoom(
+        createRoomParams, // First parameter: room config
+        appId,            // Second parameter: app ID
+        undefined         // Third parameter: room ID (let Hathora generate)
+      )
       
       if (!roomResponse || !roomResponse.roomId) {
         throw new Error('Invalid room response from Hathora')
