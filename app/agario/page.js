@@ -932,21 +932,21 @@ const AgarIOGame = () => {
             
             // Store connection reference
             wsRef.current = connection
-            // Set up WebSocket event handlers for real Hathora connection
+            
+            // Send authentication message after connection opens
             connection.onopen = () => {
-              console.log('✅ WebSocket connection opened successfully with real Hathora server')
-              setWsConnection('connected')
-              
-              // Send join message with real player token
-              const joinMessage = {
-                type: 'player_join',
-                playerId: hathoraToken,
-                roomId: actualRoomId,
-                timestamp: Date.now()
+              console.log('🔓 WebSocket opened, sending authentication...')
+              // Send authentication message with both token and roomId
+              const authMessage = {
+                type: 'auth',
+                token: hathoraToken,
+                roomId: cleanRoomId
               }
-              connection.send(JSON.stringify(joinMessage))
-              console.log('📤 Sent join message with real player token')
+              connection.send(JSON.stringify(authMessage))
+              console.log('🔐 Authentication sent to Hathora server')
             }
+            
+            // Set up WebSocket event handlers for real Hathora connection
             
             connection.onmessage = (event) => {
               try {
