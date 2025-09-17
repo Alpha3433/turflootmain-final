@@ -106,22 +106,11 @@ export async function POST(request) {
 
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
-    console.log(`🔍 Debug - calling getConnectionInfo with roomId: "${actualRoomId}", appId: "${appId}"`)
-    console.log(`🔍 Debug - parameters about to be passed:`, {
-      appId: appId,
-      roomId: actualRoomId,
-      playerToken: playerToken ? 'present' : 'missing'
-    })
+    console.log(`🔍 Debug - calling getConnectionInfo with just roomId: "${actualRoomId}"`)
     
-    const connectionParams = {
-      appId: appId,
-      roomId: actualRoomId,
-      playerToken: playerToken
-    }
-    
-    console.log(`🔍 Debug - connectionParams object:`, JSON.stringify(connectionParams, null, 2))
-    
-    const connectionInfo = await hathora.roomsV2.getConnectionInfo(connectionParams)
+    // According to Hathora SDK docs, when appId is set globally during initialization,
+    // getConnectionInfo only needs the roomId as a direct parameter, not an object
+    const connectionInfo = await hathora.roomsV2.getConnectionInfo(actualRoomId)
 
     const connectionData = connectionInfo
     if (!connectionData?.host || !connectionData?.port) {
