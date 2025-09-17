@@ -51,7 +51,7 @@ export async function POST(request) {
     try {
       const createRoomConfig = region ? { region } : {}
       
-      roomResponse = await hathoraClient.roomV2.createRoom(
+      roomResponse = await hathoraClient.roomsV2.createRoom(
         appId,
         createRoomConfig,
         undefined // Let Hathora generate room ID
