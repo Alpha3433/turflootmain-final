@@ -886,25 +886,26 @@ const AgarIOGame = () => {
             
             // Store connection reference
             wsRef.current = connection
+            // Set up WebSocket event handlers for real Hathora connection
             connection.onopen = () => {
-              console.log('✅ WebSocket connection opened successfully')
+              console.log('✅ WebSocket connection opened successfully with real Hathora server')
               setWsConnection('connected')
               
-              // Send join message
+              // Send join message with real player token
               const joinMessage = {
                 type: 'player_join',
-                playerId: token,
+                playerId: hathoraToken,
                 roomId: actualRoomId,
                 timestamp: Date.now()
               }
               connection.send(JSON.stringify(joinMessage))
-              console.log('📤 Sent join message:', joinMessage)
+              console.log('📤 Sent join message with real player token')
             }
             
             connection.onmessage = (event) => {
               try {
                 const message = JSON.parse(event.data)
-                console.log('📥 Received message:', message)
+                console.log('📥 Received message from Hathora server:', message)
                 
                 // Handle different message types
                 switch (message.type) {
@@ -951,53 +952,19 @@ const AgarIOGame = () => {
               }
             }
             
-            // Store connection reference
-            wsRef.current = connection
-            
-          } else {
-            throw new Error('No valid connection info received from Hathora')
-          }
-          
-        } catch (connectionError) {
-          console.error('❌ Failed to create secure WebSocket connection:', connectionError)
-          
-          // If we used provided host/port and it failed, try alternative connection format
-          if (hathoraHost && hathoraPort) {
-            try {
-              console.log('🔄 Attempting alternative connection format with provided host/port...')
-              const alternativeUrl = `wss://${hathoraHost}:${hathoraPort}?token=${token}&roomId=${actualRoomId}`
-              console.log('🔗 Alternative WebSocket URL:', alternativeUrl)
-              
-              connection = new WebSocket(alternativeUrl)
-              wsRef.current = connection
-              
-              // Set up basic event handlers for alternative connection
-              connection.onopen = () => {
-                console.log('✅ Alternative WebSocket connection opened')
-                setWsConnection('connected')
-              }
-              
-              connection.onerror = (error) => {
-                console.error('❌ Alternative WebSocket error:', error)
-                setWsConnection('error')
-              }
-              
-              connection.onclose = () => {
-                console.log('🔒 Alternative WebSocket connection closed')
-                setWsConnection('disconnected')
-              }
-              
-            } catch (alternativeError) {
-              console.error('❌ Alternative WebSocket connection also failed:', alternativeError)
-              setWsConnection('error')
-              return
-            }
-          } else {
-            // No provided host/port and API fetch failed - cannot establish connection
-            console.error('❌ No connection information available - cannot establish WebSocket connection')
+          } catch (connectionError) {
+            console.error('❌ Failed to create secure WebSocket connection:', connectionError)
             setWsConnection('error')
             return
           }
+          
+        } else {
+          console.error('❌ Missing required connection parameters from server API')
+          console.error('  - hathoraHost:', hathoraHost)
+          console.error('  - hathoraPort:', hathoraPort) 
+          console.error('  - hathoraToken:', hathoraToken ? 'present' : 'missing')
+          setWsConnection('error')
+          return
         }
         
         console.log('🔗 Multiplayer connection setup completed!')
