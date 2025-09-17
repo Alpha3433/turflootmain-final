@@ -1,6 +1,6 @@
 // Server-side Hathora room creation API
 import { NextResponse } from 'next/server'
-import { RoomV2Api, AuthV1Api } from '@hathora/cloud-sdk-typescript'
+import { HathoraCloud } from '@hathora/cloud-sdk-typescript'
 
 // CORS headers for client requests
 const corsHeaders = {
