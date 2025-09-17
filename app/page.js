@@ -1793,7 +1793,7 @@ export default function TurfLootTactical() {
   // ========================================
   
   const initializeHathoraGame = async (serverData) => {
-    console.log('🚀 Initializing 100% Hathora multiplayer game...')
+    console.log('🚀 Initializing Hathora multiplayer game via server API...')
     console.log('📊 Server details:', serverData)
     
     // Validate required server data
@@ -1805,7 +1805,7 @@ export default function TurfLootTactical() {
       throw new Error('Entry fee must be specified for multiplayer rooms')
     }
     
-    // Import Hathora client
+    // Import and initialize Hathora client (no SDK, just API wrapper)
     const { default: hathoraClient } = await import('@/lib/hathoraClient')
     
     const isInitialized = await hathoraClient.initialize()
@@ -1815,52 +1815,51 @@ export default function TurfLootTactical() {
     
     console.log('✅ Hathora client initialized successfully')
     
-    // Create or join Hathora room with proper configuration
+    // Create room configuration
     const roomConfig = {
+      gameMode: serverData.entryFee > 0 ? 'cash-game' : 'practice',
       region: serverData.regionId || serverData.region,
       entryFee: serverData.entryFee,
-      maxPlayers: 8,
-      gameMode: 'multiplayer',
-      roomName: serverData.name || `TurfLoot Room`,
-      isPublic: true
+      maxPlayers: serverData.entryFee >= 0.05 ? 4 : (serverData.entryFee > 0 ? 6 : 50),
+      roomName: serverData.name || `TurfLoot Room`
     }
     
-    console.log('🏠 Creating Hathora room with config:', roomConfig)
+    console.log('🏠 Creating Hathora room via server API with config:', roomConfig)
     
-    // Use the enhanced createPaidRoom method for all multiplayer games
-    const roomId = await hathoraClient.createPaidRoom(
-      roomConfig.entryFee,
-      null, // userId - will use anonymous auth
-      roomConfig.region
+    // Create room via server API (secure, no SDK secrets in browser)
+    const roomInfo = await hathoraClient.createRoomServerSide(
+      roomConfig.gameMode,
+      roomConfig.region,
+      roomConfig.maxPlayers,
+      roomConfig.entryFee
     )
     
-    if (!roomId || typeof roomId !== 'string') {
-      throw new Error('Failed to create Hathora room - invalid room ID returned')
+    if (!roomInfo || !roomInfo.success || !roomInfo.roomId) {
+      throw new Error('Failed to create Hathora room via server API')
     }
     
-    console.log('🎉 Hathora room created successfully!')
-    console.log('🏠 Room ID:', roomId)
-    console.log('🌍 Region:', roomConfig.region)
-    console.log('💰 Entry Fee:', roomConfig.entryFee)
-    
-    // Get connection info separately if needed
-    let connectionInfo = null
-    try {
-      console.log('📡 Getting connection info for room:', roomId)
-      connectionInfo = await hathoraClient.getConnectionInfo(roomId)
-      console.log('📊 Connection info:', connectionInfo)
-    } catch (connectionError) {
-      console.warn('⚠️ Failed to get connection info:', connectionError.message)
-    }
+    console.log('🎉 Hathora room created successfully via server API!')
+    console.log('🏠 Room ID:', roomInfo.roomId)
+    console.log('🌐 Host:', roomInfo.host)
+    console.log('🌐 Port:', roomInfo.port)
+    console.log('🔐 Has Player Token:', !!roomInfo.playerToken)
+    console.log('🌍 Region:', roomInfo.region)
+    console.log('💰 Entry Fee:', roomInfo.stakeAmount)
     
     return {
-      roomId: roomId,
-      region: roomConfig.region,
-      entryFee: roomConfig.entryFee,
-      maxPlayers: roomConfig.maxPlayers,
+      roomId: roomInfo.roomId,
+      host: roomInfo.host,
+      port: roomInfo.port,
+      region: roomInfo.region,
+      entryFee: roomInfo.stakeAmount || roomConfig.entryFee,
+      maxPlayers: roomInfo.maxPlayers || roomConfig.maxPlayers,
       gameMode: 'hathora-multiplayer',
       isHathoraRoom: true,
-      connectionInfo: connectionInfo || null // Use real connection info or null
+      playerToken: roomInfo.playerToken, // Real player token for WebSocket auth
+      connectionInfo: {
+        host: roomInfo.host,
+        port: roomInfo.port
+      }
     }
   }
 
