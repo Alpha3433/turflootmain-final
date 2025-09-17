@@ -1,6 +1,6 @@
 // Server-side Hathora room creation API
 import { NextResponse } from 'next/server'
-import { HathoraCloud } from '@hathora/cloud-sdk-typescript'
+import { RoomV2Api, AuthV1Api } from '@hathora/cloud-sdk-typescript'
 
 // CORS headers for client requests
 const corsHeaders = {
@@ -36,60 +36,111 @@ export async function POST(request) {
 
     console.log(`🚀 Creating Hathora room server-side: ${gameMode} mode, region: ${region}`)
 
-    // TEMPORARY: Mock room creation for immediate testing
-    // TODO: Fix real Hathora SDK integration once parameter structure is resolved
-    console.log('⚠️ Using mock room creation for testing - real SDK integration needs parameter fixes')
-    
-    // Generate a realistic room ID format
-    const mockRoomId = `${gameMode}-${region || 'auto'}-${Date.now().toString(36)}${Math.random().toString(36).substr(2, 5)}`
-    
-    // Mock connection info (replace with real Hathora endpoints later)
-    const mockConnectionInfo = {
-      host: 'localhost', // Will be replaced with real Hathora host
-      port: 3001,        // Will be replaced with real Hathora port
-      roomId: mockRoomId
-    }
-    
-    // Mock player token (replace with real Hathora token later)
-    const mockPlayerToken = `mock_token_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`
-    
-    console.log(`✅ Mock room created: ${mockRoomId}`)
-    console.log(`✅ Mock connection: ${mockConnectionInfo.host}:${mockConnectionInfo.port}`)
-    console.log(`✅ Mock token generated`)
+    // Initialize Hathora SDK clients
+    const roomClient = new RoomV2Api()
+    const authClient = new AuthV1Api()
 
-    // Return mock room information to client (same format as real implementation)
+    // Map our regions to Hathora regions
+    const regionMap = {
+      'US-East-1': 'Washington_DC',
+      'US-West-1': 'Seattle', 
+      'US-West-2': 'Seattle',
+      'Europe': 'London',
+      'EU-West-1': 'London',
+      'EU-Central-1': 'Frankfurt',
+      'Asia': 'Singapore',
+      'Oceania': 'Sydney',
+      'AP-Southeast-1': 'Singapore',
+      'AP-Southeast-2': 'Sydney'
+    }
+
+    const hathoraRegion = regionMap[region] || 'Seattle'
+    console.log(`🌍 Mapping region ${region} to Hathora region: ${hathoraRegion}`)
+
+    // Step 1: Create anonymous player authentication
+    console.log('🔐 Creating anonymous player authentication...')
+    const authResponse = await authClient.loginAnonymous({
+      appId
+    })
+    
+    const playerToken = authResponse.token
+    console.log('✅ Player token created successfully')
+
+    // Step 2: Create the room using RoomV2Api
+    console.log(`🏠 Creating room in region: ${hathoraRegion}`)
+    const roomResponse = await roomClient.createRoom(
+      appId,
+      { region: hathoraRegion },
+      undefined, // Let Hathora generate the room ID
+      {
+        headers: {
+          Authorization: `Bearer ${developerToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    const roomId = roomResponse.roomId
+    console.log(`✅ Room created successfully with ID: ${roomId}`)
+
+    // Step 3: Get connection info for the room
+    console.log('🔗 Getting connection info for room...')
+    const connectionInfo = await roomClient.getConnectionInfo(
+      appId,
+      roomId,
+      {
+        headers: {
+          Authorization: `Bearer ${playerToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    console.log('✅ Connection info retrieved successfully')
+
+    // Return real room information to client
     const roomInfo = {
       success: true,
-      roomId: mockRoomId,
-      host: mockConnectionInfo.host,
-      port: mockConnectionInfo.port,
-      region: region || 'auto',
+      roomId: roomId,
+      host: connectionInfo.host,
+      port: connectionInfo.port,
+      region: region || hathoraRegion,
       gameMode,
       maxPlayers,
       stakeAmount,
-      playerToken: mockPlayerToken,
+      playerToken: playerToken,
       isHathoraRoom: true,
-      isMockRoom: true, // Flag to indicate this is mock data
+      isMockRoom: false, // This is real Hathora data
       timestamp: new Date().toISOString()
     }
 
-    console.log(`🎉 Mock room info prepared for client:`, {
+    console.log(`🎉 Real Hathora room info prepared for client:`, {
       roomId: roomInfo.roomId,
       host: roomInfo.host,
       port: roomInfo.port,
       hasToken: !!roomInfo.playerToken,
-      isMock: true
+      isMock: false
     })
 
     return NextResponse.json(roomInfo, { headers: corsHeaders })
 
   } catch (error) {
     console.error('❌ Server-side room creation failed:', error)
+    
+    // Enhanced error logging for debugging
+    if (error.response) {
+      console.error('❌ Hathora API error response:', error.response.status, error.response.data)
+    }
+    if (error.request) {
+      console.error('❌ Hathora API request failed:', error.request)
+    }
+    
     return NextResponse.json(
       { 
         success: false, 
-        error: 'Internal server error',
-        details: error.message
+        error: 'Failed to create Hathora room',
+        details: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       },
       { status: 500, headers: corsHeaders }
     )
