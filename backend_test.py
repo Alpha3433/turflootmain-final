@@ -15,9 +15,9 @@ TESTING OBJECTIVES:
 import requests
 import json
 import time
+import re
 import os
-import sys
-from datetime import datetime
+from urllib.parse import urlparse
 
 # Configuration
 BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://multiplayer-fix-1.preview.emergentagent.com')
