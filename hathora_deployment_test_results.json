@@ -1,0 +1,57 @@
+{
+  "timestamp": "2025-09-17T18:43:04.634065",
+  "base_url": "https://turf-websocket.preview.emergentagent.com",
+  "tests_passed": 7,
+  "tests_failed": 0,
+  "test_results": [
+    {
+      "test": "API Health Check",
+      "passed": true,
+      "details": "API accessible with 35 servers, Hathora enabled: True",
+      "error": "",
+      "timestamp": "2025-09-17T18:43:05.760031"
+    },
+    {
+      "test": "Hathora Room Creation with Real Deployment",
+      "passed": true,
+      "details": "Successfully created 5 rooms: ['psaj7a5z1iia', '1pmfcnao7qq9e', '16xpimr0jgh2u', '52ifuujef0w7', '2zhsrd1yvmryu']",
+      "error": "",
+      "timestamp": "2025-09-17T18:43:33.725644"
+    },
+    {
+      "test": "Connection Info Verification",
+      "passed": true,
+      "details": "Valid connection info for 3 rooms: [{'roomId': 'psaj7a5z1iia', 'host': 'spghgd.edge.hathora.dev', 'port': 13856, 'region': 'US-East-1'}, {'roomId': '1pmfcnao7qq9e', 'host': 'mpl7ff.edge.hathora.dev', 'port': 26180, 'region': 'US-West-2'}, {'roomId': '16xpimr0jgh2u', 'host': '3vl1nm.edge.hathora.dev', 'port': 51597, 'region': 'Europe'}]",
+      "error": "",
+      "timestamp": "2025-09-17T18:43:33.725919"
+    },
+    {
+      "test": "WebSocket URL Construction",
+      "passed": true,
+      "details": "Valid WebSocket URLs for 3 rooms with correct /ws endpoint format",
+      "error": "",
+      "timestamp": "2025-09-17T18:43:33.725986"
+    },
+    {
+      "test": "Authentication Token Flow",
+      "passed": true,
+      "details": "Authentication tokens provided for 3 rooms",
+      "error": "",
+      "timestamp": "2025-09-17T18:43:33.725997"
+    },
+    {
+      "test": "Server Browser Integration",
+      "passed": true,
+      "details": "Server browser shows 35 valid Hathora servers out of 35 total",
+      "error": "",
+      "timestamp": "2025-09-17T18:43:34.030659"
+    },
+    {
+      "test": "Multi-Region Deployment Verification",
+      "passed": true,
+      "details": "Successfully deployed to 5 regions: ['US-East-1', 'US-West-2', 'Europe', 'Asia', 'Oceania']",
+      "error": "",
+      "timestamp": "2025-09-17T18:43:35.144319"
+    }
+  ]
+}
