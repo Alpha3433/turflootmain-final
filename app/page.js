@@ -2014,8 +2014,6 @@ export default function TurfLootTactical() {
       console.log('🔍 DEBUG: roomIdStr type:', typeof roomIdStr)
       
       // Build navigation URL with all Hathora parameters including real connection info
-      const connectionInfo = hathoraResult.connectionInfo
-      
       const queryParams = new URLSearchParams({
         roomId: roomIdStr,
         mode: 'hathora-multiplayer',
@@ -2025,18 +2023,24 @@ export default function TurfLootTactical() {
         fee: hathoraResult.entryFee.toString(),
         name: serverData.name || 'Hathora Multiplayer',
         paid: hathoraResult.entryFee > 0 ? 'true' : 'false',
-        hathoraRoom: roomIdStr, // ✅ FIXED: Use actual room ID instead of 'true'
+        hathoraRoom: roomIdStr, // Real room ID
         realHathoraRoom: 'true',
         maxPlayers: hathoraResult.maxPlayers.toString()
       })
       
-      // Add real connection info if available
-      if (connectionInfo && connectionInfo.host && connectionInfo.port) {
-        queryParams.set('hathoraHost', connectionInfo.host)
-        queryParams.set('hathoraPort', connectionInfo.port.toString())
-        console.log(`🌐 Adding real connection info: ${connectionInfo.host}:${connectionInfo.port}`)
+      // Add real connection info from server API
+      if (hathoraResult.host && hathoraResult.port) {
+        queryParams.set('hathoraHost', hathoraResult.host)
+        queryParams.set('hathoraPort', hathoraResult.port.toString())
+        console.log(`🌐 Adding real connection info: ${hathoraResult.host}:${hathoraResult.port}`)
+      }
+      
+      // Add real player token for WebSocket authentication
+      if (hathoraResult.playerToken) {
+        queryParams.set('hathoraToken', hathoraResult.playerToken)
+        console.log('🔐 Adding real player authentication token')
       } else {
-        console.log('⚠️ No real connection info available, game page will need to fetch it')
+        console.warn('⚠️ No player token available for WebSocket authentication')
       }
       
       console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
