@@ -66,7 +66,7 @@ export async function POST(request, { params }) {
         console.log(`🚀 Creating Hathora room with gameMode: ${gameMode}, region: ${region}, stakeAmount: ${stakeAmount}`)
         
         // Import and initialize Hathora client
-        const hathoraClientModule = await import('../../../lib/hathoraClient.js')
+        const hathoraClientModule = await import('@/lib/hathoraClient')
         const hathoraClient = hathoraClientModule.default
         
         // Initialize the client
