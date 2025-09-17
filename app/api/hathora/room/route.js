@@ -48,13 +48,8 @@ export async function POST(request) {
     let roomResponse
     
     try {
-      const createRoomOptions = region ? { region } : {}
-      
-      roomResponse = await hathoraClient.roomsV2.createRoom(
-        appId,
-        createRoomOptions,
-        undefined // Let Hathora generate room ID
-      )
+      // Use simplified parameters - most Hathora APIs expect minimal config
+      roomResponse = await hathoraClient.roomsV2.createRoom(appId)
       
       if (!roomResponse || !roomResponse.roomId) {
         throw new Error('Invalid room response from Hathora')
@@ -64,11 +59,19 @@ export async function POST(request) {
       
     } catch (roomError) {
       console.error('❌ Room creation failed:', roomError)
+      console.error('Error details:', roomError.message)
+      console.error('Error stack:', roomError.stack)
+      
       return NextResponse.json(
         { 
           success: false, 
           error: 'Failed to create Hathora room',
-          details: roomError.message
+          details: roomError.message,
+          debugInfo: {
+            appId: appId ? 'present' : 'missing',
+            region: region || 'not specified',
+            errorType: roomError.constructor.name
+          }
         },
         { status: 500, headers: corsHeaders }
       )
