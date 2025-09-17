@@ -921,33 +921,33 @@ const AgarIOGame = () => {
             typeOfCleanRoomId: typeof cleanRoomId
           })
           
-          // According to Hathora docs: wss://<host>:<port>/ws 
-          // Authentication token should be sent as a message after connection, not as query parameter
-          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws`
+          // According to Hathora docs: wss://<host>:<port>/ws?token=<jwt-token>
+          // Authentication token should be sent as a query parameter
+          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws?token=${hathoraToken}`
           console.log('🔗 Secure WebSocket URL:', wsUrl)
           
           try {
-            connection = new WebSocket(wsUrl)
             console.log('✅ Created secure WebSocket connection with real player token')
+            const connection = new WebSocket(wsUrl)
             
             // Store connection reference
             wsRef.current = connection
             
-            // Send authentication message after connection opens
+            // Send room join message after connection opens
             connection.onopen = () => {
-              console.log('🔓 WebSocket opened, sending authentication...')
-              // Send authentication message with both token and roomId
-              const authMessage = {
-                type: 'auth',
-                token: hathoraToken,
-                roomId: cleanRoomId
-              }
-              connection.send(JSON.stringify(authMessage))
-              console.log('🔐 Authentication sent to Hathora server')
-              
-              // Set connection status to connected after authentication is sent
+              console.log('🔓 WebSocket connection opened successfully!')
               setWsConnection('connected')
               console.log('✅ WebSocket connection opened successfully with real Hathora server')
+              
+              // Send join message to notify server which room to join
+              const joinMessage = {
+                type: 'join_room',
+                roomId: cleanRoomId,
+                playerId: `player_${Date.now()}`,
+                timestamp: Date.now()
+              }
+              connection.send(JSON.stringify(joinMessage))
+              console.log('📤 Sent room join message:', joinMessage)
             }
             
             // Set up WebSocket event handlers for real Hathora connection
