@@ -98,9 +98,37 @@ export async function POST(request) {
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
     
-    // According to Hathora SDK docs, when appId is set globally during initialization,
-    // getConnectionInfo only needs the roomId as a direct parameter, not an object
-    const connectionInfo = await hathora.roomsV2.getConnectionInfo(actualRoomId)
+    // Sometimes there's a slight delay before connection info is available
+    // Add retry logic with exponential backoff
+    let connectionInfo = null
+    let retries = 0
+    const maxRetries = 3
+    
+    while (!connectionInfo && retries < maxRetries) {
+      try {
+        if (retries > 0) {
+          const delay = Math.pow(2, retries) * 1000 // 2s, 4s, 8s
+          console.log(`⏳ Waiting ${delay}ms before retry ${retries}...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+        }
+        
+        console.log(`🔍 Attempting to get connection info (attempt ${retries + 1}/${maxRetries})...`)
+        connectionInfo = await hathora.roomsV2.getConnectionInfo(actualRoomId)
+        
+        if (connectionInfo && connectionInfo.exposedPort) {
+          console.log('✅ Connection info retrieved successfully')
+          break
+        } else {
+          console.warn(`⚠️ Connection info incomplete on attempt ${retries + 1}:`, connectionInfo)
+          connectionInfo = null
+        }
+      } catch (error) {
+        console.error(`❌ Connection info attempt ${retries + 1} failed:`, error.message)
+        connectionInfo = null
+      }
+      
+      retries++
+    }
 
     // Extract host and port from the exposedPort object
     const exposedPort = connectionInfo?.exposedPort
@@ -110,12 +138,13 @@ export async function POST(request) {
     }
     
     if (!connectionData?.host || !connectionData?.port) {
-      console.error('❌ Missing host or port in connection info:', {
+      console.error('❌ Failed to get connection info after all retries:', {
         host: connectionData?.host,
         port: connectionData?.port,
-        exposedPort: exposedPort
+        exposedPort: exposedPort,
+        finalConnectionInfo: connectionInfo
       })
-      throw new Error('Failed to get connection info from Hathora')
+      throw new Error('Failed to get connection info from Hathora after multiple attempts')
     }
 
     console.log('✅ Connection info retrieved successfully')
