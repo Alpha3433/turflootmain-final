@@ -2004,7 +2004,9 @@ export default function TurfLootTactical() {
       console.log('🔍 DEBUG: roomIdStr after String():', roomIdStr)
       console.log('🔍 DEBUG: roomIdStr type:', typeof roomIdStr)
       
-      // Build navigation URL with all Hathora parameters
+      // Build navigation URL with all Hathora parameters including real connection info
+      const connectionInfo = hathoraResult.connectionInfo
+      
       const queryParams = new URLSearchParams({
         roomId: roomIdStr,
         mode: 'hathora-multiplayer',
@@ -2018,6 +2020,15 @@ export default function TurfLootTactical() {
         realHathoraRoom: 'true',
         maxPlayers: hathoraResult.maxPlayers.toString()
       })
+      
+      // Add real connection info if available
+      if (connectionInfo && connectionInfo.host && connectionInfo.port) {
+        queryParams.set('hathoraHost', connectionInfo.host)
+        queryParams.set('hathoraPort', connectionInfo.port.toString())
+        console.log(`🌐 Adding real connection info: ${connectionInfo.host}:${connectionInfo.port}`)
+      } else {
+        console.log('⚠️ No real connection info available, game page will need to fetch it')
+      }
       
       console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
       console.log('🚀 Navigating to Hathora multiplayer game:', `/agario?${queryParams.toString()}`)
