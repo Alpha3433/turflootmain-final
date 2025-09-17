@@ -58,7 +58,6 @@ export async function POST(request) {
 
     const hathoraRegion = regionMap[region] || 'Seattle'
     console.log(`🌍 Mapping region ${region} to Hathora region: ${hathoraRegion}`)
-    console.log(`🔍 Debug - original region: "${region}", mapped region: "${hathoraRegion}", type: ${typeof hathoraRegion}`)
 
     // Step 1: Create anonymous player authentication
     console.log('🔐 Creating anonymous player authentication...')
@@ -72,18 +71,11 @@ export async function POST(request) {
 
     // Step 2: Create the room using roomsV2
     console.log(`🏠 Creating room in region: ${hathoraRegion}`)
-    console.log(`🔍 Debug - about to call createRoom with region: "${hathoraRegion}"`)
     const roomResponse = await hathora.roomsV2.createRoom({
       region: hathoraRegion
     })
 
-    console.log('🔍 Debug - roomResponse structure:', JSON.stringify(roomResponse, null, 2))
-    console.log('🔍 Debug - roomResponse keys:', Object.keys(roomResponse))
-    console.log('🔍 Debug - roomResponse.roomId:', roomResponse.roomId)
-    console.log('🔍 Debug - typeof roomResponse.roomId:', typeof roomResponse.roomId)
-    
-    // The roomResponse should be: { appId, roomId, playerToken }
-    // We want just the roomId string value
+    // Extract the roomId string from the response
     let actualRoomId;
     
     if (typeof roomResponse.roomId === 'string') {
@@ -102,18 +94,13 @@ export async function POST(request) {
     }
     
     console.log(`✅ Room created successfully with ID: ${actualRoomId}`)
-    console.log(`🔍 Debug - final extracted roomId: "${actualRoomId}", type: ${typeof actualRoomId}`)
 
     // Step 3: Get connection info for the room
     console.log('🔗 Getting connection info for room...')
-    console.log(`🔍 Debug - calling getConnectionInfo with just roomId: "${actualRoomId}"`)
     
     // According to Hathora SDK docs, when appId is set globally during initialization,
     // getConnectionInfo only needs the roomId as a direct parameter, not an object
     const connectionInfo = await hathora.roomsV2.getConnectionInfo(actualRoomId)
-
-    console.log('🔍 Debug - connectionInfo response:', JSON.stringify(connectionInfo, null, 2))
-    console.log('🔍 Debug - connectionInfo keys:', Object.keys(connectionInfo || {}))
 
     // Extract host and port from the exposedPort object
     const exposedPort = connectionInfo?.exposedPort
@@ -126,8 +113,7 @@ export async function POST(request) {
       console.error('❌ Missing host or port in connection info:', {
         host: connectionData?.host,
         port: connectionData?.port,
-        exposedPort: exposedPort,
-        fullResponse: connectionInfo
+        exposedPort: exposedPort
       })
       throw new Error('Failed to get connection info from Hathora')
     }
