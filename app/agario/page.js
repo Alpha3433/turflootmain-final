@@ -129,9 +129,23 @@ const AgarIOGame = () => {
     }
     
     // Block any non-Hathora multiplayer attempts
-    if (!roomId || server !== 'hathora' || !hathoraRoom || mode === 'local') {
+    console.log('🔍 REDIRECT DEBUG: Checking conditions...')
+    console.log('  - roomId:', roomId, 'exists:', !!roomId)
+    console.log('  - server:', server, 'isHathora:', server === 'hathora')
+    console.log('  - hathoraRoom:', hathoraRoom, 'exists:', !!hathoraRoom)
+    console.log('  - mode:', mode, 'isNotLocal:', mode !== 'local')
+    
+    const shouldRedirect = !roomId || server !== 'hathora' || !hathoraRoom || mode === 'local'
+    console.log('🔍 REDIRECT DECISION: shouldRedirect =', shouldRedirect)
+    
+    if (shouldRedirect) {
       console.log('❌ BLOCKED: Non-Hathora multiplayer game blocked')
       console.log('🔄 Redirecting to server browser for proper multiplayer...')
+      console.log('🔍 REDIRECT REASONS:')
+      console.log('  - Missing roomId:', !roomId)
+      console.log('  - Wrong server:', server !== 'hathora')
+      console.log('  - Missing hathoraRoom:', !hathoraRoom)
+      console.log('  - Local mode:', mode === 'local')
       
       // Show modal explaining the redirect
       const modal = document.createElement('div')
