@@ -922,9 +922,9 @@ const AgarIOGame = () => {
           })
           
           // According to Hathora docs: wss://<host>:<port>/ws 
-          // Authentication token can be sent via query parameter or message
-          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws?token=${hathoraToken}&roomId=${cleanRoomId}`
-          console.log('🔗 Secure WebSocket URL with real token:', wsUrl.replace(hathoraToken, 'HIDDEN_TOKEN'))
+          // Authentication token should be sent as a message after connection, not as query parameter
+          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws`
+          console.log('🔗 Secure WebSocket URL:', wsUrl)
           
           try {
             connection = new WebSocket(wsUrl)
