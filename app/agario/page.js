@@ -803,6 +803,13 @@ const AgarIOGame = () => {
         console.log('🔍 DEBUG: hathoraRoom value:', hathoraRoom, '(type:', typeof hathoraRoom, ')')
         console.log('🔍 DEBUG: realHathoraRoom value:', realHathoraRoom, '(type:', typeof realHathoraRoom, ')')
 
+        // Debug: Log the exact values being used for fallback logic
+        console.log('🔍 DEBUG: hathoraRoom || roomId evaluation:')
+        console.log('  - hathoraRoom:', hathoraRoom)
+        console.log('  - roomId:', roomId)
+        console.log('  - hathoraRoom || roomId:', hathoraRoom || roomId)
+        console.log('  - typeof (hathoraRoom || roomId):', typeof (hathoraRoom || roomId))
+
         // Only connect to Hathora WebSocket for multiplayer rooms
         if (!roomId || mode === 'local' || mode === 'practice' || server !== 'hathora') {
           console.log('🚫 Not a Hathora multiplayer room - skipping WebSocket connection')
