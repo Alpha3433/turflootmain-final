@@ -232,17 +232,19 @@ const AgarIOGame = () => {
       
       // Create actual Hathora room process
       console.log(`🚀 Creating ${gameMode} room with $${fee} entry fee...`)
-      const actualRoomId = await hathoraClient.createOrJoinRoom(null, gameMode, fee)
+      const roomResponse = await hathoraClient.createOrJoinRoom(null, gameMode, fee)
       
-      if (!actualRoomId) {
+      if (!roomResponse || !roomResponse.roomId) {
         throw new Error('Failed to create Hathora room - no room ID returned')
       }
       
+      // Extract the actual room ID string from the response
+      const actualRoomId = roomResponse.roomId
       console.log(`✅ REAL HATHORA ROOM CREATED: ${actualRoomId}`)
       console.log(`💰 Room type: ${gameMode}, Entry fee: $${fee}`)
       console.log(`🌐 Region: ${region} (${regionId})`)
       
-      // Update URL parameters with the real Hathora room ID
+      // Update URL parameters with the real Hathora room ID string
       const currentUrl = new URL(window.location.href)
       currentUrl.searchParams.set('hathoraRoom', actualRoomId)
       currentUrl.searchParams.set('realHathoraRoom', 'true')
