@@ -944,6 +944,10 @@ const AgarIOGame = () => {
               }
               connection.send(JSON.stringify(authMessage))
               console.log('🔐 Authentication sent to Hathora server')
+              
+              // Set connection status to connected after authentication is sent
+              setWsConnection('connected')
+              console.log('✅ WebSocket connection opened successfully with real Hathora server')
             }
             
             // Set up WebSocket event handlers for real Hathora connection
