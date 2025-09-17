@@ -80,7 +80,7 @@ export async function POST(request) {
     let connectionInfo
     
     try {
-      connectionInfo = await hathoraClient.roomV2.getConnectionInfo(appId, roomResponse.roomId)
+      connectionInfo = await hathoraClient.roomsV2.getConnectionInfo(appId, roomResponse.roomId)
       
       if (!connectionInfo || !connectionInfo.host || !connectionInfo.port) {
         throw new Error('Invalid connection info from Hathora')
