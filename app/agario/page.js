@@ -857,15 +857,25 @@ const AgarIOGame = () => {
         const hathoraHost = urlParams.get('hathoraHost')
         const hathoraPort = urlParams.get('hathoraPort')
         const hathoraToken = urlParams.get('hathoraToken') // Real player token
+        const isMockRoom = urlParams.get('isMockRoom') === 'true' // Check if this is a mock room
         
         console.log('🔍 DEBUG: hathoraHost from URL:', hathoraHost)
         console.log('🔍 DEBUG: hathoraPort from URL:', hathoraPort)
         console.log('🔍 DEBUG: hathoraToken from URL:', hathoraToken ? 'present' : 'missing')
+        console.log('🔍 DEBUG: isMockRoom from URL:', isMockRoom)
 
         console.log('🔗 Using connection info from server API...')
         
         let connection
         let connectionInfo = null
+        
+        // Handle mock rooms differently than real Hathora rooms
+        if (isMockRoom) {
+          console.log('⚠️ This is a mock room - skipping WebSocket connection for now')
+          console.log('🎮 Mock room mode: Game will run in local/offline mode')
+          setWsConnection('mock')
+          return
+        }
         
         // Use provided host/port from server API (secure, no client-side SDK calls)
         if (hathoraHost && hathoraPort && hathoraToken) {
