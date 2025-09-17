@@ -72,7 +72,7 @@ export async function POST(request) {
     // Step 2: Create the room using roomsV2
     console.log(`🏠 Creating room in region: ${hathoraRegion}`)
     const roomResponse = await hathora.roomsV2.createRoom({
-      createRoomRequest: {
+      createRoomParams: {
         region: hathoraRegion
       }
     })
