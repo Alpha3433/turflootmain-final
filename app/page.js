@@ -1850,7 +1850,7 @@ export default function TurfLootTactical() {
       maxPlayers: roomConfig.maxPlayers,
       gameMode: 'hathora-multiplayer',
       isHathoraRoom: true,
-      connectionInfo: result.connectionInfo || { host: 'hathora.dev', port: 443 }
+      connectionInfo: result.connectionInfo || null // Use real connection info or null
     }
   }
 
