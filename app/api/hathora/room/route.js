@@ -107,7 +107,7 @@ export async function POST(request) {
     // Return real room information to client
     const roomInfo = {
       success: true,
-      roomId: roomId,
+      roomId: actualRoomId,
       host: connectionData.host,
       port: connectionData.port,
       region: region || hathoraRegion,
