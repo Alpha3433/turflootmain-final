@@ -990,15 +990,16 @@ const AgarIOGame = () => {
               console.log('🔒 WebSocket connection closed:', event.code, event.reason)
               setWsConnection('disconnected')
               
-              // Auto-reconnect after 3 seconds if not intentionally closed
-              if (event.code !== 1000) {
-                console.log('🔄 Attempting to reconnect in 3 seconds...')
+              // Only auto-reconnect for unexpected disconnections, not user-initiated ones
+              // Also add exponential backoff to prevent spam
+              if (event.code !== 1000 && event.code !== 1001) {
+                console.log('🔄 Connection lost unexpectedly, will attempt reconnect in 10 seconds...')
                 setTimeout(() => {
                   if (wsRef.current?.readyState === WebSocket.CLOSED) {
                     console.log('🔄 Attempting WebSocket reconnection...')
                     connectToHathoraRoom()
                   }
-                }, 3000)
+                }, 10000) // Increased from 3 to 10 seconds to reduce spam
               }
             }
             
