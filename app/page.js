@@ -1796,70 +1796,90 @@ export default function TurfLootTactical() {
     console.log('🚀 Initializing Hathora multiplayer game via server API...')
     console.log('📊 Server details:', serverData)
     
-    // Validate required server data
-    if (!serverData.regionId && !serverData.region) {
-      throw new Error('Server region is required for Hathora room creation')
-    }
-    
-    if (!serverData.entryFee && serverData.entryFee !== 0) {
-      throw new Error('Entry fee must be specified for multiplayer rooms')
-    }
-    
-    // Import and initialize Hathora client (no SDK, just API wrapper)
-    const { default: hathoraClient } = await import('@/lib/hathoraClient')
-    
-    const isInitialized = await hathoraClient.initialize()
-    if (!isInitialized) {
-      throw new Error('Failed to initialize Hathora client')
-    }
-    
-    console.log('✅ Hathora client initialized successfully')
-    
-    // Create room configuration
-    const roomConfig = {
-      gameMode: serverData.entryFee > 0 ? 'cash-game' : 'practice',
-      region: serverData.regionId || serverData.region,
-      entryFee: serverData.entryFee,
-      maxPlayers: serverData.entryFee >= 0.05 ? 4 : (serverData.entryFee > 0 ? 6 : 50),
-      roomName: serverData.name || `TurfLoot Room`
-    }
-    
-    console.log('🏠 Creating Hathora room via server API with config:', roomConfig)
-    
-    // Create room via server API (secure, no SDK secrets in browser)
-    const roomInfo = await hathoraClient.createRoomServerSide(
-      roomConfig.gameMode,
-      roomConfig.region,
-      roomConfig.maxPlayers,
-      roomConfig.entryFee
-    )
-    
-    if (!roomInfo || !roomInfo.success || !roomInfo.roomId) {
-      throw new Error('Failed to create Hathora room via server API')
-    }
-    
-    console.log('🎉 Hathora room created successfully via server API!')
-    console.log('🏠 Room ID:', roomInfo.roomId)
-    console.log('🌐 Host:', roomInfo.host)
-    console.log('🌐 Port:', roomInfo.port)
-    console.log('🔐 Has Player Token:', !!roomInfo.playerToken)
-    console.log('🌍 Region:', roomInfo.region)
-    console.log('💰 Entry Fee:', roomInfo.stakeAmount)
-    
-    return {
-      roomId: roomInfo.roomId,
-      host: roomInfo.host,
-      port: roomInfo.port,
-      region: roomInfo.region,
-      entryFee: roomInfo.stakeAmount || roomConfig.entryFee,
-      maxPlayers: roomInfo.maxPlayers || roomConfig.maxPlayers,
-      gameMode: 'hathora-multiplayer',
-      isHathoraRoom: true,
-      playerToken: roomInfo.playerToken, // Real player token for WebSocket auth
-      connectionInfo: {
-        host: roomInfo.host,
-        port: roomInfo.port
+    try {
+      // Validate required server data
+      if (!serverData.regionId && !serverData.region) {
+        throw new Error('Server region is required for Hathora room creation')
       }
+      
+      if (!serverData.entryFee && serverData.entryFee !== 0) {
+        throw new Error('Entry fee must be specified for multiplayer rooms')
+      }
+      
+      // Import and initialize Hathora client (no SDK, just API wrapper)
+      const { default: hathoraClient } = await import('@/lib/hathoraClient')
+      
+      const isInitialized = await hathoraClient.initialize()
+      if (!isInitialized) {
+        throw new Error('Failed to initialize Hathora client')
+      }
+      
+      console.log('✅ Hathora client initialized successfully')
+      
+      // Create room configuration
+      const roomConfig = {
+        gameMode: serverData.entryFee > 0 ? 'cash-game' : 'practice',
+        region: serverData.regionId || serverData.region,
+        entryFee: serverData.entryFee,
+        maxPlayers: serverData.entryFee >= 0.05 ? 4 : (serverData.entryFee > 0 ? 6 : 50),
+        roomName: serverData.name || `TurfLoot Room`
+      }
+      
+      console.log('🏠 Creating Hathora room via server API with config:', roomConfig)
+      
+      // Create room via server API (secure, no SDK secrets in browser)
+      const roomInfo = await hathoraClient.createRoomServerSide(
+        roomConfig.gameMode,
+        roomConfig.region,
+        roomConfig.maxPlayers,
+        roomConfig.entryFee
+      )
+      
+      if (!roomInfo || !roomInfo.success || !roomInfo.roomId) {
+        console.error('❌ Invalid room response:', roomInfo)
+        throw new Error('Failed to create Hathora room via server API - invalid response')
+      }
+      
+      console.log('🎉 Hathora room created successfully via server API!')
+      console.log('🏠 Room ID:', roomInfo.roomId)
+      console.log('🌐 Host:', roomInfo.host)
+      console.log('🌐 Port:', roomInfo.port)
+      console.log('🔐 Has Player Token:', !!roomInfo.playerToken)
+      console.log('🌍 Region:', roomInfo.region)
+      console.log('💰 Entry Fee:', roomInfo.stakeAmount)
+      
+      return {
+        roomId: roomInfo.roomId,
+        host: roomInfo.host,
+        port: roomInfo.port,
+        region: roomInfo.region,
+        entryFee: roomInfo.stakeAmount || roomConfig.entryFee,
+        maxPlayers: roomInfo.maxPlayers || roomConfig.maxPlayers,
+        gameMode: 'hathora-multiplayer',
+        isHathoraRoom: true,
+        playerToken: roomInfo.playerToken, // Real player token for WebSocket auth
+        connectionInfo: {
+          host: roomInfo.host,
+          port: roomInfo.port,
+          token: roomInfo.playerToken
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ initializeHathoraGame failed:', error)
+      
+      // Enhanced error logging
+      if (error.name === 'TypeError' && error.message.includes('json')) {
+        console.error('❌ JSON parsing error detected - likely empty response or network timeout')
+        console.error('❌ Original error:', error)
+        throw new Error('Network timeout or invalid server response. Please try again.')
+      }
+      
+      if (error.message.includes('timeout')) {
+        throw new Error('Request timeout - server may be busy. Please try again.')
+      }
+      
+      throw error
     }
   }
 
