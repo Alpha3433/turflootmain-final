@@ -114,7 +114,7 @@ user_problem_statement: "Issue 1 – Match allocator still hands out ws:// lobby
 
 test_plan:
   current_focus:
-    - "Fix Lobby Allocator WebSocket URL Protocol - Mixed Content Security Error"
+    - "Fix hathoraClient WebSocket send shim - Infinite Recursion Bug"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
