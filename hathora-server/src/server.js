@@ -146,6 +146,12 @@ wss.on('connection', (ws, req) => {
           });
           break;
           
+        case 'join_room':
+          // Handle room join request from client (already handled by connection logic)
+          console.log(`🏠 Room join request from ${playerName} for room: ${data.roomId}`);
+          // No action needed - player is already added to game
+          break;
+          
         default:
           console.warn(`⚠️ Unknown message type from ${playerName}: ${data.type}`);
       }
