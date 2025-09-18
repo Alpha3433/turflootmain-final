@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Hathora WebSocket Query Parameters Fix
-Testing the fix for undefined token and roomId variables in connectToGame method
+Backend Testing Suite for WebSocket Connection Info Mismatch Fix
+Testing the critical issue where new Hathora rooms weren't updating URL parameters
+with new connection info (host/port), causing WebSocket connections to use stale data.
 """
 
 import requests
 import json
 import time
 import sys
+import os
 from urllib.parse import urlparse, parse_qs
 
-# Configuration
-BASE_URL = "https://turfloot-gameroom.preview.emergentagent.com"
+# Get base URL from environment
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-gameroom.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraWebSocketFixTester:
