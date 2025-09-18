@@ -244,10 +244,26 @@ const AgarIOGame = () => {
       console.log(`💰 Room type: ${gameMode}, Entry fee: $${fee}`)
       console.log(`🌐 Region: ${region} (${regionId})`)
       
-      // Update URL parameters with the real Hathora room ID string
+      // Update URL parameters with the real Hathora room ID string AND connection info
       const currentUrl = new URL(window.location.href)
       currentUrl.searchParams.set('hathoraRoom', actualRoomId)
       currentUrl.searchParams.set('realHathoraRoom', 'true')
+      
+      // CRITICAL FIX: Update connection info in URL parameters
+      // This ensures WebSocket reconnections use the correct host/port for the new room
+      if (roomResponse.host) {
+        currentUrl.searchParams.set('hathoraHost', roomResponse.host)
+        console.log(`🔄 Updated URL with new host: ${roomResponse.host}`)
+      }
+      if (roomResponse.port) {
+        currentUrl.searchParams.set('hathoraPort', roomResponse.port.toString())
+        console.log(`🔄 Updated URL with new port: ${roomResponse.port}`)
+      }
+      if (roomResponse.token || roomResponse.connectionToken || roomResponse.playerToken) {
+        const newToken = roomResponse.token || roomResponse.connectionToken || roomResponse.playerToken
+        currentUrl.searchParams.set('hathoraToken', newToken)
+        console.log('🔄 Updated URL with new authentication token')
+      }
       
       // Update browser history without triggering a reload
       window.history.replaceState({}, '', currentUrl.toString())
