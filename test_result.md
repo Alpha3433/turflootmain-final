@@ -327,6 +327,18 @@ backend:
         - agent: "testing"
         - comment: "✅ HATHORA WEBSOCKET ROOMID FIX VERIFICATION COMPLETED - CODE ANALYSIS CONFIRMS IMPLEMENTATION SUCCESS. CRITICAL FINDINGS: The roomId parameter fix has been SUCCESSFULLY IMPLEMENTED in the WebSocket URL construction code. CODE VERIFICATION: Examined /app/app/agario/page.js line 927 and confirmed the WebSocket URL now includes both token and roomId parameters: 'wss://${connectionInfo.host}:${connectionInfo.port}/ws?token=${encodeURIComponent(hathoraToken)}&roomId=${encodeURIComponent(cleanRoomId)}'. IMPLEMENTATION DETAILS: 1) ✅ ROOMID PARAMETER ADDED: WebSocket URLs now include roomId parameter alongside token parameter, 2) ✅ PROPER URL ENCODING: Both token and roomId values are properly URL-encoded using encodeURIComponent() to handle special characters, 3) ✅ CORRECT URL FORMAT: WebSocket URL follows the required format 'wss://host:port/ws?token={encodedToken}&roomId={encodedRoomId}', 4) ✅ HATHORA COMPATIBILITY: The fix enables Hathora to associate WebSocket connections with specific rooms, preventing handshake failures. TESTING LIMITATIONS: While comprehensive UI testing was conducted, the authentication flow prevented reaching the actual WebSocket connection establishment. However, code analysis confirms the fix is properly implemented and will resolve the Error 1006 WebSocket handshake failures mentioned in the review request. INFRASTRUCTURE VERIFICATION: Hathora integration is working correctly with 35 servers available, server browser functionality is operational, and room creation processes are functional. The WebSocket URL construction fix is ready for production use and will enable successful multiplayer connections to Hathora servers."
 
+  - task: "Define Hathora WebSocket query parameters in connectToGame"
+    implemented: false
+    working: false
+    file: "/app/lib/hathoraClient.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "main"
+        - comment: "CRITICAL: WebSocket URL construction in lib/hathoraClient.js connectToGame method references undefined variables. At line 292, both 'token' and 'roomId' variables are used in WebSocket URL construction but are never defined in scope. The 'token' variable was removed during this.client fixes but not replaced with proper token retrieval. The 'roomId' should reference roomResponse.roomId or connectionInfo.roomId. IMPACT: Condition falls through to else block creating 'wss://host:port' without query parameters, stores roomId: undefined, causing handshake failures as server requires identifiers. LOCATIONS: Line 290-292 in connectToGame method. SOLUTION: Define proper token retrieval from roomResponse and use roomResponse.roomId for roomId parameter."
+
   - task: "Wallet Functionality with Updated Helius API Key"
     implemented: true
     working: true
