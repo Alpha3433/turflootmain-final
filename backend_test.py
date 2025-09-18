@@ -428,7 +428,7 @@ class HathoraWebSocketFixTester:
                 response = requests.post(f"{API_BASE}/hathora/room", json=payload, timeout=10)
                 if response.status_code == 200:
                     data = response.json()
-                    if data.get('roomId') and (data.get('token') or data.get('connectionToken')):
+                    if data.get('roomId') and (data.get('token') or data.get('connectionToken') or data.get('playerToken')):
                         path1_rooms.append(data)
             
             # Test Path 2: Test server browser integration (simulates second code path)
