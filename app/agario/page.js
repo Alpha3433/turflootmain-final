@@ -921,9 +921,9 @@ const AgarIOGame = () => {
             typeOfCleanRoomId: typeof cleanRoomId
           })
           
-          // Hathora uses ws:// (not wss://) for WebSocket connections
+          // Hathora requires wss:// for HTTPS sites (mixed content security policy)
           // Authentication token should be sent as a query parameter
-          const wsUrl = `ws://${connectionInfo.host}:${connectionInfo.port}/ws?token=${hathoraToken}`
+          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws?token=${hathoraToken}`
           console.log('🔗 Secure WebSocket URL:', wsUrl)
           
           try {
