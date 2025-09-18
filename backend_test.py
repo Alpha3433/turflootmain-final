@@ -85,7 +85,7 @@ class HathoraWebSocketFixTester:
                     if response.status_code == 200:
                         data = response.json()
                         room_id = data.get('roomId')
-                        token = data.get('token') or data.get('connectionToken')
+                        token = data.get('token') or data.get('connectionToken') or data.get('playerToken')
                         
                         if room_id and token:
                             successful_rooms.append({
