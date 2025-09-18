@@ -492,7 +492,7 @@ class HathoraWebSocketFixTester:
                         # Verify the response has the structure needed to avoid undefined variables
                         required_for_websocket = {
                             'roomId': data.get('roomId'),
-                            'token': data.get('token') or data.get('connectionToken'),
+                            'token': data.get('token') or data.get('connectionToken') or data.get('playerToken'),
                             'success': data.get('success', False)
                         }
                         
