@@ -285,7 +285,7 @@ class HathoraWebSocketFixTester:
                         
                         # Check if the response provides fallback data or proper error handling
                         has_room_id = 'roomId' in data and data['roomId']
-                        has_token = ('token' in data and data['token']) or ('connectionToken' in data and data['connectionToken'])
+                        has_token = ('token' in data and data['token']) or ('connectionToken' in data and data['connectionToken']) or ('playerToken' in data and data['playerToken'])
                         
                         if has_room_id and has_token:
                             fallback_tests_passed += 1
