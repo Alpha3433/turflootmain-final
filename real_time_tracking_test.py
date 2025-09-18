@@ -22,7 +22,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://turf-websocket.preview.emergentagent.com"
+BASE_URL = "https://turfloot-gameroom.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Test configuration
