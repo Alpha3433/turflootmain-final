@@ -108,7 +108,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "✅ COMPLETED - Fix the real Hathora SDK integration in `/app/app/api/hathora/room/route.js` to correctly use `roomsV2.createRoom()` and `playerAuth.loginAnonymous()` parameters, replacing the current mock implementation."
+user_problem_statement: "Issue 1 – Match allocator still hands out ws:// lobby endpoints - The lobby allocator hard-codes match URLs as ws://localhost:3000/game/<roomCode>. When the site is served over HTTPS the browser refuses that insecure WebSocket URL, which matches the SecurityError you're seeing in app-index.tsx. The allocator needs to derive the proper host and switch to wss:// (or honor an environment-configured secure URL) before returning endpoints to the client."
 
 # Test plan for this run
 
