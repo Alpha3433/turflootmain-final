@@ -291,6 +291,18 @@ backend:
         - agent: "main"
         - comment: "✅ IMPLEMENTED FIX: Fixed both instances of infinite recursion in WebSocket send shim. CHANGES: 1) Line 303-309: Added `const rawSend = socket.send.bind(socket)` to capture original native send method before overriding, then changed recursive `socket.send()` call to `rawSend()`. 2) Line 409-415: Applied same fix to second WebSocket creation. Both locations now properly capture the native WebSocket send method and call it instead of the overridden method, preventing infinite recursion. This allows WebSocket messages including the initial join message to be sent successfully."
 
+  - task: "Fix hathoraClient this.client initialization - TypeError Prevention"
+    implemented: false
+    working: false
+    file: "/app/lib/hathoraClient.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "main"
+        - comment: "CRITICAL: Found uninitialized this.client property causing TypeErrors. Multiple methods in hathoraClient.js call this.client.* (loginAnonymous, createPublicLobby, getRoomInfo, listActivePublicLobbies) but the constructor never creates a Hathora SDK instance. LOCATIONS: Lines 273-274 (connectToGame method), line 393 (connectToGame method), line 502 (getRoomInfo method), line 530 (getActiveRooms method). IMPACT: When these methods are called, they throw 'TypeError: Cannot read properties of undefined' preventing anonymous login and room info retrieval. SOLUTION: Need to properly initialize this.client with a Hathora SDK instance in the constructor or initialize method."
+
   - task: "Wallet Functionality with Updated Helius API Key"
     implemented: true
     working: true
