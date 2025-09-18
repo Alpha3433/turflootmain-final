@@ -116,7 +116,7 @@ user_problem_statement: "Issue 1 – Match allocator still hands out ws:// lobby
 
 test_plan:
   current_focus:
-    - "Define Hathora WebSocket query parameters in connectToGame"
+    - "WebSocket Connection Info Mismatch Fix"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
