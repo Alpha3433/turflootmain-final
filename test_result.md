@@ -114,7 +114,7 @@ user_problem_statement: "Issue 1 – Match allocator still hands out ws:// lobby
 
 test_plan:
   current_focus:
-    - "Hathora Game Server Deployment Testing - COMPLETED"
+    - "Fix Lobby Allocator WebSocket URL Protocol - Mixed Content Security Error"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
