@@ -59,15 +59,29 @@ export async function POST(request) {
     const hathoraRegion = regionMap[region] || 'Seattle'
     console.log(`🌍 Mapping region ${region} to Hathora region: ${hathoraRegion}`)
 
-    // Step 1: Create anonymous player authentication
+    // Step 1: Create anonymous player authentication  
     console.log('🔐 Creating anonymous player authentication...')
     const authResponse = await hathora.authV1.loginAnonymous()
     
-    const playerToken = authResponse.token
-    if (!playerToken) {
+    const hathoraPlayerToken = authResponse.token
+    if (!hathoraPlayerToken) {
       throw new Error('Failed to get player token from anonymous login')
     }
-    console.log('✅ Player token created successfully')
+    console.log('✅ Hathora player token created successfully')
+    
+    // CRITICAL FIX: Generate custom JWT token that matches game server's expected format
+    // Our game server expects tokens signed with 'hathora-turfloot-secret'
+    const jwt = require('jsonwebtoken')
+    const customPlayerPayload = {
+      type: 'anonymous',
+      id: `player_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      name: `player-${Math.random().toString(36).substring(2, 9)}`,
+      iat: Math.floor(Date.now() / 1000)
+    }
+    
+    const customToken = jwt.sign(customPlayerPayload, 'hathora-turfloot-secret')
+    console.log('✅ Custom game server token generated successfully')
+    console.log(`🎭 Player ID: ${customPlayerPayload.id}, Name: ${customPlayerPayload.name}`)
 
     // Step 2: Create the room using roomsV2
     console.log(`🏠 Creating room in region: ${hathoraRegion}`)
