@@ -234,8 +234,10 @@ class HathoraWebSocketFixTester:
                     room_response_fields.append('token')
                 if 'connectionToken' in data:
                     room_response_fields.append('connectionToken')
+                if 'playerToken' in data:
+                    room_response_fields.append('playerToken')
                 
-                if 'roomId' in data and ('token' in data or 'connectionToken' in data):
+                if 'roomId' in data and ('token' in data or 'connectionToken' in data or 'playerToken' in data):
                     self.log_test(
                         "Variable Definition Verification",
                         True,
