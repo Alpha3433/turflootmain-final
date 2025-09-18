@@ -357,7 +357,7 @@ class HathoraWebSocketFixTester:
             if response.status_code == 200:
                 data = response.json()
                 room_id = data.get('roomId')
-                token = data.get('token') or data.get('connectionToken') or data.get('playerToken')
+                token = data.get('token') or data.get('connectionToken') or data.get('playerToken') or data.get('playerToken')
                 
                 if room_id and token:
                     # Test URL encoding scenarios that might cause issues
