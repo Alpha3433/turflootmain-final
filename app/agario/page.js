@@ -95,8 +95,55 @@ const AgarIOGame = () => {
   const [isMultiplayer, setIsMultiplayer] = useState(false)
   const [connectedPlayers, setConnectedPlayers] = useState(0)
   const [wsConnection, setWsConnection] = useState(null)
+  const [hathoraConnectionInfo, setHathoraConnectionInfo] = useState({
+    host: null,
+    port: null,
+    token: null
+  })
   const wsRef = useRef(null)
   const playersRef = useRef(new Map()) // Store other players data
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const initialHost = urlParams.get('hathoraHost')
+    const initialPortString = urlParams.get('hathoraPort')
+    const initialToken = urlParams.get('hathoraToken')
+
+    if (initialHost && initialPortString && initialToken) {
+      const parsedInitialPort = Number(initialPortString)
+
+      if (!Number.isNaN(parsedInitialPort)) {
+        setHathoraConnectionInfo(prev => {
+          if (
+            prev.host === initialHost &&
+            prev.port === parsedInitialPort &&
+            prev.token === initialToken
+          ) {
+            return prev
+          }
+
+          console.log('💾 Cached initial Hathora connection info from URL parameters', {
+            host: initialHost,
+            port: parsedInitialPort
+          })
+
+          return {
+            host: initialHost,
+            port: parsedInitialPort,
+            token: initialToken
+          }
+        })
+      } else {
+        console.warn('⚠️ Ignoring invalid Hathora port from URL parameters', {
+          initialPortString
+        })
+      }
+    }
+  }, [])
 
   // ========================================
   // HATHORA-FIRST MULTIPLAYER INITIALIZATION
@@ -233,11 +280,59 @@ const AgarIOGame = () => {
       // Create actual Hathora room process
       console.log(`🚀 Creating ${gameMode} room with $${fee} entry fee...`)
       const roomResponse = await hathoraClient.createOrJoinRoom(null, gameMode, fee)
-      
+
       if (!roomResponse || !roomResponse.roomId) {
         throw new Error('Failed to create Hathora room - no room ID returned')
       }
-      
+
+      const responseHostRaw = roomResponse.host ?? roomResponse.connection?.host ?? null
+      const responseHost = typeof responseHostRaw === 'string' ? responseHostRaw.trim() : null
+      const responsePortRaw = roomResponse.port ?? roomResponse.connection?.port ?? null
+      const parsedResponsePort =
+        responsePortRaw !== null && responsePortRaw !== undefined
+          ? Number(responsePortRaw)
+          : null
+      const responseToken =
+        roomResponse.token ||
+        roomResponse.connectionToken ||
+        roomResponse.playerToken ||
+        roomResponse.connection?.token ||
+        null
+
+      if (
+        responseHost &&
+        responseToken &&
+        parsedResponsePort !== null &&
+        !Number.isNaN(parsedResponsePort)
+      ) {
+        setHathoraConnectionInfo(prev => {
+          if (
+            prev.host === responseHost &&
+            prev.port === parsedResponsePort &&
+            prev.token === responseToken
+          ) {
+            return prev
+          }
+
+          console.log('💾 Stored Hathora connection details from room creation', {
+            host: responseHost,
+            port: parsedResponsePort
+          })
+
+          return {
+            host: responseHost,
+            port: parsedResponsePort,
+            token: responseToken
+          }
+        })
+      } else {
+        console.warn('⚠️ Hathora room response missing connection info', {
+          responseHost,
+          responsePortRaw,
+          hasToken: Boolean(responseToken)
+        })
+      }
+
       // Extract the actual room ID string from the response
       const actualRoomId = roomResponse.roomId
       console.log(`✅ REAL HATHORA ROOM CREATED: ${actualRoomId}`)
@@ -248,20 +343,22 @@ const AgarIOGame = () => {
       const currentUrl = new URL(window.location.href)
       currentUrl.searchParams.set('hathoraRoom', actualRoomId)
       currentUrl.searchParams.set('realHathoraRoom', 'true')
-      
+
       // CRITICAL FIX: Update connection info in URL parameters
       // This ensures WebSocket reconnections use the correct host/port for the new room
-      if (roomResponse.host) {
-        currentUrl.searchParams.set('hathoraHost', roomResponse.host)
-        console.log(`🔄 Updated URL with new host: ${roomResponse.host}`)
+      if (responseHost) {
+        currentUrl.searchParams.set('hathoraHost', responseHost)
+        console.log(`🔄 Updated URL with new host: ${responseHost}`)
       }
-      if (roomResponse.port) {
-        currentUrl.searchParams.set('hathoraPort', roomResponse.port.toString())
-        console.log(`🔄 Updated URL with new port: ${roomResponse.port}`)
+      if (
+        parsedResponsePort !== null &&
+        !Number.isNaN(parsedResponsePort)
+      ) {
+        currentUrl.searchParams.set('hathoraPort', parsedResponsePort.toString())
+        console.log(`🔄 Updated URL with new port: ${parsedResponsePort}`)
       }
-      if (roomResponse.token || roomResponse.connectionToken || roomResponse.playerToken) {
-        const newToken = roomResponse.token || roomResponse.connectionToken || roomResponse.playerToken
-        currentUrl.searchParams.set('hathoraToken', newToken)
+      if (responseToken) {
+        currentUrl.searchParams.set('hathoraToken', responseToken)
         console.log('🔄 Updated URL with new authentication token')
       }
       
@@ -696,7 +793,12 @@ const AgarIOGame = () => {
         setActiveMissions(selectedMissions)
       }
     }
-  }, [gameStarted])
+  }, [
+    gameStarted,
+    hathoraConnectionInfo.host,
+    hathoraConnectionInfo.port,
+    hathoraConnectionInfo.token
+  ])
 
   // REAL PLAYER SESSION TRACKING - Track when real Privy users join/leave games
   useEffect(() => {
@@ -893,21 +995,40 @@ const AgarIOGame = () => {
         
         // Get connection info and create secure WebSocket directly
         // Extract connection info from URL parameters (from server API)
-        const hathoraHost = urlParams.get('hathoraHost')
-        const hathoraPort = urlParams.get('hathoraPort')
-        const hathoraToken = urlParams.get('hathoraToken') // Real player token
+        const urlHostParam = urlParams.get('hathoraHost')
+        const urlPortParam = urlParams.get('hathoraPort')
+        const urlTokenParam = urlParams.get('hathoraToken') // Real player token
         const isMockRoom = urlParams.get('isMockRoom') === 'true' // Check if this is a mock room
-        
-        console.log('🔍 DEBUG: hathoraHost from URL:', hathoraHost)
-        console.log('🔍 DEBUG: hathoraPort from URL:', hathoraPort)
-        console.log('🔍 DEBUG: hathoraToken from URL:', hathoraToken ? 'present' : 'missing')
+
+        const stateHost = hathoraConnectionInfo.host
+        const statePort = hathoraConnectionInfo.port
+        const stateToken = hathoraConnectionInfo.token
+
+        const parsedStatePort =
+          typeof statePort === 'number' && !Number.isNaN(statePort)
+            ? statePort
+            : null
+        const parsedUrlPort =
+          urlPortParam !== null && urlPortParam !== undefined
+            ? Number(urlPortParam)
+            : null
+
+        const resolvedHost = stateHost || (urlHostParam ? urlHostParam.trim() : null)
+        const resolvedPort =
+          parsedStatePort !== null ? parsedStatePort : parsedUrlPort
+        const resolvedToken = stateToken || urlTokenParam
+
+        const connectionSource =
+          stateHost && parsedStatePort !== null && stateToken ? 'state' : 'url'
+
+        console.log('🔍 DEBUG: hathoraHost from state:', stateHost)
+        console.log('🔍 DEBUG: hathoraPort from state:', parsedStatePort)
+        console.log('🔍 DEBUG: hathoraToken from state:', stateToken ? 'present' : 'missing')
+        console.log('🔍 DEBUG: hathoraHost from URL:', urlHostParam)
+        console.log('🔍 DEBUG: hathoraPort from URL:', urlPortParam)
+        console.log('🔍 DEBUG: hathoraToken from URL:', urlTokenParam ? 'present' : 'missing')
         console.log('🔍 DEBUG: isMockRoom from URL:', isMockRoom)
 
-        console.log('🔗 Using connection info from server API...')
-        
-        let connection
-        let connectionInfo = null
-        
         // Handle mock rooms differently than real Hathora rooms
         if (isMockRoom) {
           console.log('⚠️ This is a mock room - skipping WebSocket connection for now')
@@ -915,122 +1036,131 @@ const AgarIOGame = () => {
           setWsConnection('mock')
           return
         }
-        
-        // Use provided host/port from server API (secure, no client-side SDK calls)
-        if (hathoraHost && hathoraPort && hathoraToken) {
-          console.log(`🌐 Using server-provided connection info: ${hathoraHost}:${hathoraPort}`)
-          connectionInfo = {
-            host: hathoraHost,
-            port: parseInt(hathoraPort, 10)
-          }
-          
-          // Create secure WebSocket connection with real player token
-          // Ensure roomId is definitely a string, not an object
-          const cleanRoomId = typeof actualRoomId === 'string' ? actualRoomId : 
-                             (actualRoomId && actualRoomId.roomId) ? actualRoomId.roomId :
-                             String(actualRoomId)
-          
-          console.log('🔍 DEBUG: cleanRoomId extraction:', {
-            originalActualRoomId: actualRoomId,
-            typeOfActualRoomId: typeof actualRoomId,
-            cleanRoomId: cleanRoomId,
-            typeOfCleanRoomId: typeof cleanRoomId
+
+        if (
+          !resolvedHost ||
+          resolvedPort === null ||
+          Number.isNaN(resolvedPort) ||
+          !resolvedToken
+        ) {
+          console.log('⏳ Waiting for valid Hathora connection info before opening WebSocket', {
+            stateHost,
+            statePort,
+            hasStateToken: Boolean(stateToken),
+            urlHostParam,
+            urlPortParam,
+            urlTokenPresent: Boolean(urlTokenParam)
           })
-          
-          // Hathora requires wss:// for HTTPS sites (mixed content security policy)
-          // Authentication token AND roomId should be sent as query parameters
-          // Both values must be URL-encoded to handle special characters
-          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws?token=${encodeURIComponent(hathoraToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
-          console.log('🔗 Secure WebSocket URL with roomId:', wsUrl)
-          
-          try {
-            console.log('✅ Created secure WebSocket connection with real player token')
-            const connection = new WebSocket(wsUrl)
-            
-            // Store connection reference
-            wsRef.current = connection
-            
-            // Send room join message after connection opens
-            connection.onopen = () => {
-              console.log('🔓 WebSocket connection opened successfully!')
-              setWsConnection('connected')
-              console.log('✅ WebSocket connection opened successfully with real Hathora server')
-              
-              // Send join message to notify server which room to join
-              const joinMessage = {
-                type: 'join_room',
-                roomId: cleanRoomId,
-                playerId: `player_${Date.now()}`,
-                timestamp: Date.now()
-              }
-              connection.send(JSON.stringify(joinMessage))
-              console.log('📤 Sent room join message:', joinMessage)
+          return
+        }
+
+        console.log(
+          `🌐 Using Hathora connection info from ${connectionSource}: ${resolvedHost}:${resolvedPort}`
+        )
+
+        const connectionInfo = {
+          host: resolvedHost,
+          port: Number(resolvedPort)
+        }
+
+        // Create secure WebSocket connection with real player token
+        // Ensure roomId is definitely a string, not an object
+        const cleanRoomId = typeof actualRoomId === 'string' ? actualRoomId :
+                           (actualRoomId && actualRoomId.roomId) ? actualRoomId.roomId :
+                           String(actualRoomId)
+
+        console.log('🔍 DEBUG: cleanRoomId extraction:', {
+          originalActualRoomId: actualRoomId,
+          typeOfActualRoomId: typeof actualRoomId,
+          cleanRoomId: cleanRoomId,
+          typeOfCleanRoomId: typeof cleanRoomId
+        })
+
+        // Hathora requires wss:// for HTTPS sites (mixed content security policy)
+        // Authentication token AND roomId should be sent as query parameters
+        // Both values must be URL-encoded to handle special characters
+        const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws?token=${encodeURIComponent(resolvedToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
+        console.log('🔗 Secure WebSocket URL with roomId:', wsUrl)
+
+        try {
+          console.log('✅ Created secure WebSocket connection with real player token')
+          const connection = new WebSocket(wsUrl)
+
+          // Store connection reference
+          wsRef.current = connection
+
+          // Send room join message after connection opens
+          connection.onopen = () => {
+            console.log('🔓 WebSocket connection opened successfully!')
+            setWsConnection('connected')
+            console.log('✅ WebSocket connection opened successfully with real Hathora server')
+
+            // Send join message to notify server which room to join
+            const joinMessage = {
+              type: 'join_room',
+              roomId: cleanRoomId,
+              playerId: `player_${Date.now()}`,
+              timestamp: Date.now()
             }
-            
-            // Set up WebSocket event handlers for real Hathora connection
-            
-            connection.onmessage = (event) => {
-              try {
-                const message = JSON.parse(event.data)
-                console.log('📥 Received message from Hathora server:', message)
-                
-                // Handle different message types
-                switch (message.type) {
-                  case 'player_join':
-                    console.log('👋 Player joined:', message.playerId)
-                    setConnectedPlayers(prev => prev + 1)
-                    break
-                  case 'player_left':
-                    console.log('👋 Player left:', message.playerId)
-                    setConnectedPlayers(prev => Math.max(0, prev - 1))
-                    break
-                  case 'room_state':
-                    console.log('🎮 Room state update:', message)
-                    if (message.playerCount !== undefined) {
-                      setConnectedPlayers(message.playerCount)
-                    }
-                    break
-                  default:
-                    console.log('📨 Unknown message type:', message.type)
-                }
-              } catch (parseError) {
-                console.error('❌ Failed to parse message:', parseError)
-              }
-            }
-            
-            connection.onerror = (error) => {
-              console.error('❌ WebSocket error:', error)
-              setWsConnection('error')
-            }
-            
-            connection.onclose = (event) => {
-              console.log('🔒 WebSocket connection closed:', event.code, event.reason)
-              setWsConnection('disconnected')
-              
-              // Only auto-reconnect for unexpected disconnections, not user-initiated ones
-              // Also add exponential backoff to prevent spam
-              if (event.code !== 1000 && event.code !== 1001) {
-                console.log('🔄 Connection lost unexpectedly, will attempt reconnect in 10 seconds...')
-                setTimeout(() => {
-                  if (wsRef.current?.readyState === WebSocket.CLOSED) {
-                    console.log('🔄 Attempting WebSocket reconnection...')
-                    connectToHathoraRoom()
-                  }
-                }, 10000) // Increased from 3 to 10 seconds to reduce spam
-              }
-            }
-            
-          } catch (connectionError) {
-            console.error('❌ Failed to create secure WebSocket connection:', connectionError)
-            setWsConnection('error')
-            return
+            connection.send(JSON.stringify(joinMessage))
+            console.log('📤 Sent room join message:', joinMessage)
           }
-          
-        } else {
-          console.error('❌ Missing required connection parameters from server API')
-          console.error('  - hathoraHost:', hathoraHost)
-          console.error('  - hathoraPort:', hathoraPort) 
-          console.error('  - hathoraToken:', hathoraToken ? 'present' : 'missing')
+
+          // Set up WebSocket event handlers for real Hathora connection
+
+          connection.onmessage = (event) => {
+            try {
+              const message = JSON.parse(event.data)
+              console.log('📥 Received message from Hathora server:', message)
+
+              // Handle different message types
+              switch (message.type) {
+                case 'player_join':
+                  console.log('👋 Player joined:', message.playerId)
+                  setConnectedPlayers(prev => prev + 1)
+                  break
+                case 'player_left':
+                  console.log('👋 Player left:', message.playerId)
+                  setConnectedPlayers(prev => Math.max(0, prev - 1))
+                  break
+                case 'room_state':
+                  console.log('🎮 Room state update:', message)
+                  if (message.playerCount !== undefined) {
+                    setConnectedPlayers(message.playerCount)
+                  }
+                  break
+                default:
+                  console.log('📨 Unknown message type:', message.type)
+              }
+            } catch (parseError) {
+              console.error('❌ Failed to parse message:', parseError)
+            }
+          }
+
+          connection.onerror = (error) => {
+            console.error('❌ WebSocket error:', error)
+            setWsConnection('error')
+          }
+
+          connection.onclose = (event) => {
+            console.log('🔒 WebSocket connection closed:', event.code, event.reason)
+            setWsConnection('disconnected')
+
+            // Only auto-reconnect for unexpected disconnections, not user-initiated ones
+            // Also add exponential backoff to prevent spam
+            if (event.code !== 1000 && event.code !== 1001) {
+              console.log('🔄 Connection lost unexpectedly, will attempt reconnect in 10 seconds...')
+              setTimeout(() => {
+                if (wsRef.current?.readyState === WebSocket.CLOSED) {
+                  console.log('🔄 Attempting WebSocket reconnection...')
+                  connectToHathoraRoom()
+                }
+              }, 10000) // Increased from 3 to 10 seconds to reduce spam
+            }
+          }
+
+        } catch (connectionError) {
+          console.error('❌ Failed to create secure WebSocket connection:', connectionError)
           setWsConnection('error')
           return
         }
@@ -1058,7 +1188,12 @@ const AgarIOGame = () => {
         wsRef.current = null
       }
     }
-  }, [gameStarted])
+  }, [
+    gameStarted,
+    hathoraConnectionInfo.host,
+    hathoraConnectionInfo.port,
+    hathoraConnectionInfo.token
+  ])
 
   // Cycle through missions every 4 seconds
   useEffect(() => {
