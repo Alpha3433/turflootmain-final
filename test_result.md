@@ -114,7 +114,7 @@ user_problem_statement: "Issue 1 – Match allocator still hands out ws:// lobby
 
 test_plan:
   current_focus:
-    - "Fix hathoraClient WebSocket send shim - Infinite Recursion Bug"
+    - "Wallet Functionality Testing with Updated Helius API Key"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
