@@ -1,5 +1,8 @@
-import { Room } from "colyseus";
-import { Schema, MapSchema, type } from "@colyseus/schema";
+import colyseusPackage from "colyseus";
+import schemaPackage from "@colyseus/schema";
+
+const { Room } = colyseusPackage;
+const { Schema, MapSchema, type } = schemaPackage;
 
 // Player state schema
 class Player extends Schema {
