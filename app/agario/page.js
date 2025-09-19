@@ -1151,6 +1151,84 @@ const AgarIOGame = () => {
       }
     }
 
+    // Update game state from Colyseus server
+    updateFromServer(serverState) {
+      if (!serverState) return
+      
+      console.log('📡 Receiving server state update:', {
+        players: serverState.players?.size || 0,
+        coins: serverState.coins?.size || 0,
+        viruses: serverState.viruses?.size || 0,
+        timestamp: serverState.timestamp
+      })
+      
+      // Store server state for rendering
+      this.serverState = {
+        players: [],
+        coins: [],
+        viruses: [],
+        timestamp: serverState.timestamp || Date.now()
+      }
+      
+      // Convert Colyseus MapSchema to arrays for easier processing
+      if (serverState.players) {
+        serverState.players.forEach((player, sessionId) => {
+          this.serverState.players.push({
+            sessionId,
+            x: player.x,
+            y: player.y,
+            radius: player.radius,
+            mass: player.mass,
+            name: player.name,
+            color: player.color,
+            score: player.score,
+            alive: player.alive,
+            isCurrentPlayer: sessionId === (wsRef.current?.sessionId)
+          })
+        })
+      }
+      
+      if (serverState.coins) {
+        serverState.coins.forEach((coin, coinId) => {
+          this.serverState.coins.push({
+            id: coinId,
+            x: coin.x,
+            y: coin.y,
+            radius: coin.radius,
+            color: coin.color,
+            value: coin.value
+          })
+        })
+      }
+      
+      if (serverState.viruses) {
+        serverState.viruses.forEach((virus, virusId) => {
+          this.serverState.viruses.push({
+            id: virusId,
+            x: virus.x,
+            y: virus.y,
+            radius: virus.radius,
+            color: virus.color
+          })
+        })
+      }
+      
+      // Update current player from server state if in multiplayer
+      const currentPlayer = this.serverState.players.find(p => p.isCurrentPlayer)
+      if (currentPlayer && isMultiplayer) {
+        // Apply server-authoritative position with client-side prediction
+        this.player.x = currentPlayer.x
+        this.player.y = currentPlayer.y
+        this.player.mass = currentPlayer.mass
+        this.player.radius = currentPlayer.radius
+        this.player.name = currentPlayer.name
+        
+        // Update UI state
+        if (typeof setMass === 'function') setMass(Math.floor(currentPlayer.mass))
+        if (typeof setScore === 'function') setScore(Math.floor(currentPlayer.score))
+      }
+    }
+
     detectCashGame() {
       // Check URL parameters to determine if this is a cash game
       if (typeof window === 'undefined') return false
