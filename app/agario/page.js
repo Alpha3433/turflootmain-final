@@ -19,6 +19,15 @@ const AgarIOGame = () => {
   const [eliminations, setEliminations] = useState(0)
   const [timeSurvived, setTimeSurvived] = useState(0)
   
+  // Multiplayer state
+  const [isMultiplayer, setIsMultiplayer] = useState(false)
+  const [connectedPlayers, setConnectedPlayers] = useState(0)
+  const [wsConnection, setWsConnection] = useState('disconnected')
+  const wsRef = useRef(null)
+  const inputSequenceRef = useRef(0)
+  const lastInputRef = useRef({ dx: 0, dy: 0 })
+  const serverStateRef = useRef(null)
+  
   // Missions system
   const [currency, setCurrency] = useState(0) // Coins earned from missions
   const [completedMissions, setCompletedMissions] = useState([])
