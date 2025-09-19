@@ -931,8 +931,8 @@ const AgarIOGame = () => {
         // Direct connection to the running Hathora process
         const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}`
         console.log('🔗 Seattle server WebSocket URL:', wsUrl)
-          
-          try {
+        
+        try {
             console.log('✅ Created secure WebSocket connection with real player token')
             const connection = new WebSocket(wsUrl)
             
