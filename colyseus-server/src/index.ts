@@ -19,17 +19,14 @@ const gameServer = new Server({
 });
 
 // Define the arena room with 20 TPS (50ms intervals)
-gameServer.define("arena", ArenaRoom, {
-  maxClients: 50,
-  patchRate: 50, // Send patches every 50ms (20 TPS)
-});
+gameServer.define("arena", ArenaRoom);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    rooms: Object.keys(gameServer.rooms).length
+    version: '1.0.0'
   });
 });
 
