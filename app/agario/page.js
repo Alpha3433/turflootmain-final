@@ -2600,21 +2600,37 @@ const AgarIOGame = () => {
       // Draw world boundary (red ring)
       this.drawWorldBoundary()
       
-      // Draw coins
-      this.coins.forEach(coin => this.drawCoin(coin))
-      
-      // Draw viruses
-      this.viruses.forEach(virus => this.drawVirus(virus))
-      
-      // Draw enemies
-      this.enemies.forEach(enemy => this.drawPlayer(enemy))
-      
-      // Draw player and all player pieces only if game is running and no modals are showing
-      if (this.running && !this.gameStates.cashOutComplete && !this.gameStates.gameOver) {
-        this.drawPlayer(this.player)
+      // In multiplayer mode, render server state; otherwise render local state
+      if (this.serverState && window.isMultiplayer) {
+        // Draw server coins
+        this.serverState.coins.forEach(coin => this.drawCoin(coin))
         
-        // Draw all player pieces
-        this.playerPieces.forEach(piece => this.drawPlayer(piece))
+        // Draw server viruses
+        this.serverState.viruses.forEach(virus => this.drawVirus(virus))
+        
+        // Draw all server players (including other players)
+        this.serverState.players.forEach(player => {
+          if (player.alive) {
+            this.drawPlayer(player)
+          }
+        })
+      } else {
+        // Draw local coins
+        this.coins.forEach(coin => this.drawCoin(coin))
+        
+        // Draw local viruses
+        this.viruses.forEach(virus => this.drawVirus(virus))
+        
+        // Draw local enemies
+        this.enemies.forEach(enemy => this.drawPlayer(enemy))
+        
+        // Draw player and all player pieces only if game is running and no modals are showing
+        if (this.running && !this.gameStates.cashOutComplete && !this.gameStates.gameOver) {
+          this.drawPlayer(this.player)
+          
+          // Draw all player pieces
+          this.playerPieces.forEach(piece => this.drawPlayer(piece))
+        }
       }
       
       this.ctx.restore()
