@@ -1797,11 +1797,11 @@ export default function TurfLootTactical() {
     console.log('📊 Server details:', serverData)
     
     try {
-      // Fixed Seattle server configuration
+      // Fixed Seattle server configuration (updated connection details)
       const seattleServerInfo = {
         host: 'mpl7ff.edge.hathora.dev',
-        port: 50283,
-        processId: 'cb88bc37-ecec-4688-8966-4d3d438a3242',
+        port: 55939, // Updated port
+        processId: '4fed52b7-91e5-4901-a064-ff51b8e72521', // Updated ProcessId
         appId: 'app-ad240461-f9c1-4c9b-9846-8b9cbcaa1298',
         roomId: 'seattle-main-server',
         region: 'seattle'
