@@ -988,7 +988,8 @@ const AgarIOGame = () => {
               const joinMessage = {
                 type: 'join_room',
                 roomId: cleanRoomId,
-                playerId: `player_${Date.now()}`,
+                playerId: playerInfo?.id || `player_${Date.now()}`,
+                playerName: playerInfo?.name || `player-${Math.random().toString(36).substring(2, 9)}`,
                 timestamp: Date.now()
               }
               connection.send(JSON.stringify(joinMessage))
