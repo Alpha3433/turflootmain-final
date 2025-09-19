@@ -1012,22 +1012,12 @@ const AgarIOGame = () => {
           } catch (connectionError) {
             console.error('❌ Failed to create secure WebSocket connection:', connectionError)
             setWsConnection('error')
-            return
           }
-          
-        } else {
-          console.error('❌ Missing required connection parameters from server API')
-          console.error('  - hathoraHost:', hathoraHost)
-          console.error('  - hathoraPort:', hathoraPort) 
-          console.error('  - hathoraToken:', hathoraToken ? 'present' : 'missing')
-          setWsConnection('error')
-          return
-        }
         
-        console.log('🔗 Multiplayer connection setup completed!')
+        console.log('🔗 Seattle server connection setup completed!')
 
       } catch (error) {
-        console.error('❌ Failed to connect to Hathora room:', error)
+        console.error('❌ Failed to connect to Seattle server:', error)
         console.log('🔍 Error details:', error.message)
         setWsConnection('error')
       }
