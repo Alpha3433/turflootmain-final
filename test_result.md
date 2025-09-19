@@ -116,7 +116,7 @@ user_problem_statement: "Issue 1 – Match allocator still hands out ws:// lobby
 
 test_plan:
   current_focus:
-    - "Updated Seattle Server Implementation Testing"
+    - "Navigation Fix Testing for Seattle Server Implementation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
