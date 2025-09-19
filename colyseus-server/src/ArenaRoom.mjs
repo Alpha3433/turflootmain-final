@@ -1,5 +1,5 @@
 import colyseusPackage from "colyseus";
-import schemaPackage from "@colyseus/schema";
+import * as schemaPackage from "@colyseus/schema";
 
 const { Room } = colyseusPackage;
 const { Schema, MapSchema, type } = schemaPackage;
