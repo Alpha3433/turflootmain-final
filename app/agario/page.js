@@ -922,8 +922,7 @@ const AgarIOGame = () => {
           port: 55939 // Updated port
         }
         
-        // Define the room ID for Seattle server connection
-        const actualRoomId = hathoraRoom || roomId || 'seattle-main-server'
+        // Use the existing actualRoomId variable that was already defined above
         const cleanRoomId = typeof actualRoomId === 'string' ? actualRoomId : 
                            (actualRoomId && actualRoomId.roomId) ? actualRoomId.roomId :
                            String(actualRoomId)
