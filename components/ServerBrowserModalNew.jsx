@@ -35,49 +35,30 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       // Server browser API handles all room information
       console.log('✅ Using server-side room discovery for Colyseus')
       
-      console.log('✅ Hathora client initialized for room discovery')
+      console.log('✅ Colyseus room discovery ready')
       
-      // Get active rooms from Hathora
-      // Note: This might require a custom discovery endpoint or Hathora's room listing API
-      const activeRooms = await discoverActiveHathoraRooms(hathoraClient)
+      // For Colyseus, we don't need client-side room discovery
+      // The server API already provides all available rooms
+      console.log('🏠 Colyseus rooms will be loaded from server API')
       
-      console.log('🏠 Discovered active Hathora rooms:', activeRooms.length)
-      
-      // Create instant-join room options for popular regions
-      const instantJoinOptions = createInstantJoinOptions()
-      
-      // Combine active rooms with instant join options
-      const combinedRooms = [
-        ...activeRooms,
-        ...instantJoinOptions
-      ]
-      
-      setRealHathoraRooms(combinedRooms)
+      // No need for separate real room discovery with Colyseus
+      // The main API call already handles everything
+      setRealHathoraRooms([])
       
     } catch (error) {
-      console.error('❌ Failed to fetch real Hathora rooms:', error)
+      console.error('❌ Failed to initialize Colyseus room discovery:', error)
       setError(error.message)
       
-      // Fallback to instant join options only
-      const fallbackOptions = createInstantJoinOptions()
-      setRealHathoraRooms(fallbackOptions)
+      // Set empty array on error
+      setRealHathoraRooms([])
       
     } finally {
       setRoomsLoading(false)
     }
   }
   
-  const discoverActiveHathoraRooms = async (hathoraClient) => {
-    // This function would integrate with Hathora's room discovery API
-    // For now, we'll return an empty array since Hathora might not expose public room listing
-    console.log('🔍 Checking for active Hathora rooms...')
-    
-    // In a real implementation, this would call Hathora's API to get active rooms
-    // const activeRooms = await hathoraClient.listActiveRooms() // Hypothetical API
-    
-    // Since Hathora might not have public room listing, we'll start with empty array
-    return []
-  }
+  // Colyseus doesn't need separate room discovery
+  // All room information comes from the server API
   
   const createInstantJoinOptions = () => {
     const regions = [
