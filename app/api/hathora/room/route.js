@@ -173,7 +173,9 @@ export async function POST(request) {
       gameMode,
       maxPlayers,
       stakeAmount,
-      playerToken: playerToken,
+      playerToken: customToken, // Use our custom token that the game server can validate
+      connectionToken: customToken, // Alias for compatibility
+      token: customToken, // Another alias for compatibility
       isHathoraRoom: true,
       isMockRoom: false, // This is real Hathora data
       timestamp: new Date().toISOString()
