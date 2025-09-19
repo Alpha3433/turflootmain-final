@@ -1960,64 +1960,36 @@ export default function TurfLootTactical() {
       
       const colyseusResult = await initializeColyseusGame(serverData)
       
-      if (!hathoraResult || !hathoraResult.roomId) {
-        throw new Error('Failed to initialize Hathora multiplayer game')
+      if (!colyseusResult || !colyseusResult.roomId) {
+        throw new Error('Failed to initialize Colyseus multiplayer game')
       }
       
-      console.log('🎉 Hathora multiplayer initialization complete!')
-      console.log('📊 Room details:', hathoraResult)
-      console.log('🔍 DEBUG: hathoraResult.roomId type:', typeof hathoraResult.roomId)
-      console.log('🔍 DEBUG: hathoraResult.roomId value:', hathoraResult.roomId)
+      console.log('🎉 Colyseus multiplayer initialization complete!')
+      console.log('📊 Room details:', colyseusResult)
       
       // Final success status
       updateStatus('✅ Connected to multiplayer server!')
-      updateSubStatus(`🎮 Room: ${hathoraResult.roomId} • Players: 0/${hathoraResult.maxPlayers}`)
+      updateSubStatus(`🎮 Arena: ${colyseusResult.roomType} • Players: 0/${colyseusResult.maxPlayers}`)
       updateProgress(100)
       updateTimer('🚀 Loading multiplayer game...')
       
-      // Ensure roomId is a string and not null/undefined
-      const roomIdStr = String(hathoraResult.roomId)
-      console.log('🔍 DEBUG: roomIdStr after String():', roomIdStr)
-      console.log('🔍 DEBUG: roomIdStr type:', typeof roomIdStr)
-      
-      // Build navigation URL with all Hathora parameters including real connection info
+      // Build navigation URL with Colyseus parameters
       const queryParams = new URLSearchParams({
-        roomId: roomIdStr,
-        mode: 'hathora-multiplayer',
-        multiplayer: 'hathora',
-        server: 'hathora',
-        region: hathoraResult.region,
-        fee: hathoraResult.entryFee.toString(),
-        name: serverData.name || 'Hathora Multiplayer',
-        paid: hathoraResult.entryFee > 0 ? 'true' : 'false',
-        hathoraRoom: roomIdStr, // Real room ID
-        realHathoraRoom: 'true',
-        maxPlayers: hathoraResult.maxPlayers.toString()
+        roomId: colyseusResult.roomId,
+        mode: 'colyseus-multiplayer',
+        multiplayer: 'colyseus',
+        server: 'colyseus',
+        region: colyseusResult.region,
+        fee: colyseusResult.entryFee.toString(),
+        name: serverData.name || 'Colyseus Arena',
+        paid: colyseusResult.entryFee > 0 ? 'true' : 'false',
+        roomType: colyseusResult.roomType,
+        maxPlayers: colyseusResult.maxPlayers.toString(),
+        endpoint: colyseusResult.endpoint
       })
       
-      // Add real connection info from server API
-      if (hathoraResult.host && hathoraResult.port) {
-        queryParams.set('hathoraHost', hathoraResult.host)
-        queryParams.set('hathoraPort', hathoraResult.port.toString())
-        console.log(`🌐 Adding real connection info: ${hathoraResult.host}:${hathoraResult.port}`)
-      }
-      
-      // Add real player token for WebSocket authentication
-      if (hathoraResult.playerToken) {
-        queryParams.set('hathoraToken', hathoraResult.playerToken)
-        console.log('🔐 Adding real player authentication token')
-      } else {
-        console.warn('⚠️ No player token available for WebSocket authentication')
-      }
-      
-      // Add mock room flag if present
-      if (hathoraResult.isMockRoom) {
-        queryParams.set('isMockRoom', 'true')
-        console.log('🎭 Adding mock room flag for testing')
-      }
-      
       console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
-      console.log('🚀 Navigating to Hathora multiplayer game:', `/agario?${queryParams.toString()}`)
+      console.log('🚀 Navigating to Colyseus multiplayer game:', `/agario?${queryParams.toString()}`)
       
       // Ensure minimum display time for user confidence
       const elapsedTime = Date.now() - loadingStartTime
