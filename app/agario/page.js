@@ -932,28 +932,42 @@ const AgarIOGame = () => {
         
         console.log('🎯 Seattle server detected - establishing WebSocket connection')
         
-        // Generate proper JWT token for Hathora server authentication
-        // The server expects tokens signed with 'hathora-turfloot-secret'
-        const playerPayload = {
-          type: 'anonymous',
-          id: `player_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-          name: `player-${Math.random().toString(36).substring(2, 9)}`,
-          iat: Math.floor(Date.now() / 1000)
+        // Generate proper JWT token via server API for secure authentication
+        console.log('🔐 Requesting authentication token from server...')
+        
+        try {
+          const tokenResponse = await fetch('/api/auth/game-token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              playerId: `player_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+              playerName: `player-${Math.random().toString(36).substring(2, 9)}`
+            })
+          })
+          
+          const tokenData = await tokenResponse.json()
+          
+          if (!tokenData.success || !tokenData.token) {
+            throw new Error('Failed to get authentication token from server')
+          }
+          
+          const playerToken = tokenData.token
+          const playerInfo = tokenData.player
+          
+          console.log('✅ Authentication token received successfully')
+          console.log('👤 Player info:', playerInfo)
+          
+          // WebSocket connection to Hathora server with /ws path and proper JWT authentication
+          const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}/ws?token=${encodeURIComponent(playerToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
+          console.log('🔗 Seattle server WebSocket URL with secure auth:', wsUrl)
+          
+        } catch (tokenError) {
+          console.error('❌ Failed to get authentication token:', tokenError)
+          setWsConnection('error')
+          return
         }
-        
-        // Create JWT token using the same secret as the server expects
-        // For client-side, we'll create a simple token structure that the server can validate
-        const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-        const payload = btoa(JSON.stringify(playerPayload))
-        // Note: In production, this should be generated server-side for security
-        const signature = 'IDkJcacPYcU9h0LIs1Tz4ntN8I90Ko0OAD_WQfCJNYE' // Placeholder signature
-        const playerToken = `${header}.${payload}.${signature}`
-        
-        // WebSocket connection to Hathora server with /ws path and authentication
-        const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}/ws?token=${encodeURIComponent(playerToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
-        console.log('🔗 Seattle server WebSocket URL with auth:', wsUrl)
-        console.log('👤 Player info:', playerPayload)
-        console.log('🔐 Using JWT token for authentication')
         
         try {
           console.log('✅ Created secure WebSocket connection with real player token')
