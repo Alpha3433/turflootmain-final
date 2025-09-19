@@ -1,229 +1,139 @@
-# 🚀 TurfLoot Production Deployment Guide
+# TurfLoot Colyseus Deployment Guide
 
-## ✅ Wallet Balance System - Production Ready
+## 🚀 Deployment Steps
 
-The wallet balance system has been **completely fixed** for both testing and production environments. Here's what was implemented:
-
-### 🔧 **Issues Fixed**
-
-1. **Authentication Token Handling**: Enhanced to support multiple token sources including Privy access tokens
-2. **Testing Environment Support**: Added realistic mock balances for development
-3. **Production Blockchain Integration**: Proper ETH and SOL balance fetching from RPC endpoints
-4. **Graceful Fallbacks**: System handles network errors and provides appropriate responses
-5. **Environment-Specific Configuration**: Different behavior for testing vs production
-
-### 🧪 **Testing Results**
+### 1. Deploy Colyseus Server to Colyseus Cloud
 
 ```bash
-# Test Results from ./test-wallet-balance.js
-✅ Unauthenticated Request: $0.00 (Guest balance)
-✅ Testing Token Request: $130.87 with realistic SOL/ETH balances
-✅ Invalid Token Request: $0.00 (Proper error handling)
-✅ Server Status: API v2.0 running correctly
-```
+# Navigate to colyseus server
+cd colyseus-server
 
-## 🛠️ **Deployment Steps**
-
-### **1. Environment Configuration**
-
-Copy the production environment template:
-```bash
-cp .env.production.template .env.production
-```
-
-Fill in the production values:
-
-#### **Required Production Variables**
-```env
-# Database (MongoDB Atlas)
-MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/turfloot_production
-
-# Domain
-NEXT_PUBLIC_BASE_URL=https://your-domain.com
-
-# Security
-JWT_SECRET=your-super-secure-jwt-secret-here
-
-# Privy (Production App)
-NEXT_PUBLIC_PRIVY_APP_ID=your-production-privy-app-id
-PRIVY_APP_SECRET=your-production-privy-app-secret
-
-# Blockchain (Mainnet with API keys)
-ETH_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/your-alchemy-key
-NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
-
-# Production Mode
-NEXT_PUBLIC_TESTING_MODE=false
-NEXT_PUBLIC_MOCK_WALLET_BALANCE=false
-```
-
-### **2. Dependencies & Build**
-
-All deployment issues have been resolved:
-```bash
 # Install dependencies
-yarn install
+npm install
 
-# Build for production
-yarn build
-
-# Start production server
-yarn start
+# Test locally first
+npm start
+# Server should start on http://localhost:2567
 ```
 
-### **3. Database Setup**
+**Upload to Colyseus Cloud:**
+1. Zip the `/colyseus-server` directory
+2. Upload to your Colyseus Cloud dashboard
+3. Set entry point: `npm start`
+4. Deploy and get your WebSocket URL: `wss://your-app.colyseus.cloud`
 
-#### **MongoDB Atlas Configuration**
-1. Create MongoDB Atlas cluster
-2. Create database user with read/write permissions
-3. Whitelist your server IP addresses
-4. Update `MONGO_URL` with connection string
+### 2. Update Frontend Environment
 
-#### **Required Collections**
-```javascript
-// Collections auto-created by the application:
-- users (user profiles and stats)
-- games (game history)
-- transactions (wallet transactions)
-- achievements (achievement progress)
-- friends (social features)
-```
+Update your production environment variables:
 
-### **4. Privy Setup**
-
-#### **Production Privy App**
-1. Create production Privy app at [privy.io](https://privy.io)
-2. Configure domain and allowed origins
-3. Set up wallet providers (Ethereum, Solana)
-4. Update environment variables with production keys
-
-### **5. Blockchain Configuration**
-
-#### **Ethereum Mainnet**
-```env
-ETH_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
-```
-- Sign up for [Alchemy](https://alchemy.com) or [Infura](https://infura.io)
-- Create Ethereum mainnet project
-- Use the provided RPC URL
-
-#### **Solana Mainnet**
-```env
-NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
-SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
-```
-- Use public RPC or [Helius](https://helius.xyz) for better performance
-
-## 🔐 **Security Checklist**
-
-### **Environment Security**
-- [ ] Strong JWT secret (32+ characters)
-- [ ] Database connection over SSL
-- [ ] API keys stored securely
-- [ ] CORS configured for production domain
-- [ ] Rate limiting enabled
-
-### **Blockchain Security**
-- [ ] Mainnet RPC endpoints configured
-- [ ] Wallet transaction validation
-- [ ] Anti-cheat system enabled
-- [ ] Server-side balance verification
-
-## 📊 **Monitoring & Testing**
-
-### **Health Checks**
 ```bash
-# Test wallet API
-curl https://your-domain.com/api/wallet/balance
+# .env.production or deployment config
+NEXT_PUBLIC_COLYSEUS_ENDPOINT=wss://your-app.colyseus.cloud
 
-# Test server status
-curl https://your-domain.com/api
+# Keep existing variables
+NEXT_PUBLIC_PRIVY_APP_ID=your-privy-app-id
+MONGO_URL=your-mongodb-connection-string
+HELIUS_API_KEY=your-helius-api-key
+# ... other existing vars
 ```
 
-### **Key Metrics to Monitor**
-- Wallet balance API response times
-- Blockchain RPC success rates
-- User authentication success rates
-- Game server connection stability
+### 3. Deploy Next.js Frontend
 
-## 🚀 **Deployment Commands**
+Deploy using your existing process (the frontend is ready):
 
-### **For Emergent Deployments**
 ```bash
-# The app is ready for deployment with these fixes:
-✅ All peer dependency conflicts resolved
-✅ Middleware manifest generated properly
-✅ Wallet balance API working perfectly
-✅ Environment configuration optimized
-✅ Build optimizations applied
-✅ Container-ready configuration
+# Build and deploy as usual
+npm run build
+npm start
 ```
 
-### **Manual Deployment**
+## 🧪 Testing the Migration
+
+### Local Testing:
 ```bash
-# 1. Install dependencies
-yarn install --frozen-lockfile
+# Terminal 1: Start Colyseus server
+cd colyseus-server && npm run dev
 
-# 2. Build application
-NODE_OPTIONS='--max-old-space-size=4096' yarn build
+# Terminal 2: Start Next.js frontend
+npm run dev
 
-# 3. Start production server
-yarn start
+# Test:
+# 1. Go to http://localhost:3000
+# 2. Click "SERVER BROWSER"
+# 3. Should see "TurfLoot Arena" 
+# 4. Click to join and test multiplayer
 ```
 
-## 🎯 **Expected Results**
+### Production Testing:
+1. Deploy Colyseus server first
+2. Update NEXT_PUBLIC_COLYSEUS_ENDPOINT 
+3. Deploy frontend
+4. Test multiplayer functionality
 
-### **Wallet Balance Display**
-- **Guest Users**: $0.00 (prompts for login)
-- **Authenticated Users**: Real blockchain balance from connected wallet
-- **Testing Environment**: Realistic mock balances for development
-- **Production**: Live ETH/SOL balances from mainnet
+## 📋 Migration Checklist
 
-### **Performance**
-- **API Response Time**: < 200ms for cached balances
-- **Blockchain Queries**: < 2s with proper RPC endpoints
-- **Error Handling**: Graceful fallbacks for network issues
-- **Scalability**: Supports 1000+ concurrent users
+### ✅ **Completed:**
+- [x] Created new Colyseus server (`/colyseus-server/`)
+- [x] Updated frontend to use Colyseus client
+- [x] Removed all Hathora dependencies
+- [x] Updated server browser API
+- [x] Preserved all game logic and Privy auth
+- [x] Updated navigation and WebSocket connections
+- [x] Removed Hathora files and directories
 
-## ✅ **Verification**
+### 🎯 **Next Steps:**
+- [ ] Deploy Colyseus server to Colyseus Cloud
+- [ ] Update production environment variables
+- [ ] Deploy updated frontend
+- [ ] Test multiplayer functionality
+- [ ] Monitor performance and player experience
 
-After deployment, verify these features work:
+## 🔧 **Technical Notes**
 
-1. **Wallet Connection**: Users can connect Privy wallets
-2. **Balance Display**: Real-time balance updates
-3. **Transactions**: Add funds and cash out functionality
-4. **Game Integration**: Entry fees and winnings
-5. **Anti-Cheat**: Server-side validation working
+### Game Logic Preserved:
+- Same player movement (x, y, vx, vy)
+- Same input system (seq-based with replay protection)
+- Same collision detection (coins, viruses, players)
+- Same authoritative server at 20 TPS
+- Same Privy authentication flow
+
+### Architecture Changes:
+- **Before:** Custom WebSocket + Hathora SDK
+- **After:** Colyseus Schema + automatic state sync
+- **Benefit:** Simpler, more reliable, better scaling
+
+### Performance:
+- 20 TPS server tick rate maintained
+- Automatic state patching (more efficient than manual JSON)
+- Better connection management
+- Built-in room scaling
 
 ## 🆘 **Troubleshooting**
 
-### **Common Issues**
+### Common Issues:
 
-**Wallet Balance Shows $0.00**
-- Check Privy authentication setup
-- Verify blockchain RPC endpoints
-- Ensure JWT_SECRET is configured
-- Check browser console for auth errors
+1. **"Cannot connect to Colyseus server"**
+   - Check `NEXT_PUBLIC_COLYSEUS_ENDPOINT` is correct
+   - Ensure Colyseus server is deployed and running
+   - Test WebSocket URL directly
 
-**502 Gateway Errors**
-- Verify MongoDB connection string
-- Check if all environment variables are set
-- Ensure server has proper resource allocation
+2. **"Players not syncing"**
+   - Check server console for errors
+   - Verify Schema definitions are correct
+   - Check network connectivity
 
-**Build Failures**
-- Use Node.js 20.x
-- Clear .next directory before building
-- Check for peer dependency conflicts
+3. **"Authentication errors"**
+   - Privy integration should work unchanged
+   - Check console for auth-related errors
+
+## 📞 **Support**
+
+If you encounter issues:
+1. Check browser console for client errors
+2. Check Colyseus Cloud logs for server errors  
+3. Verify environment variables are set correctly
+4. Test with local Colyseus server first
 
 ---
 
-## 🎉 **Success!**
-
-Your TurfLoot application is now **production-ready** with:
-- ✅ **Fixed wallet balance system**
-- ✅ **Resolved deployment issues**
-- ✅ **Enhanced anti-cheat & multiplayer**
-- ✅ **Premium character customization**
-- ✅ **Comprehensive testing & monitoring**
-
-The wallet balance issue has been **completely resolved** and the app is ready for production deployment! 🚀
+**Migration Status: READY FOR DEPLOYMENT** ✅
