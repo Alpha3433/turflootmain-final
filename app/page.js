@@ -1809,20 +1809,8 @@ export default function TurfLootTactical() {
       
       console.log('🏔️ Using Seattle server configuration:', seattleServerInfo)
       
-      // Navigate directly to the game with Seattle server info
-      const gameUrl = new URL('/agario', window.location.origin)
-      gameUrl.searchParams.set('mode', 'hathora-multiplayer')
-      gameUrl.searchParams.set('server', 'hathora')
-      gameUrl.searchParams.set('hathoraRoom', seattleServerInfo.roomId)
-      gameUrl.searchParams.set('hathoraHost', seattleServerInfo.host)
-      gameUrl.searchParams.set('hathoraPort', seattleServerInfo.port.toString())
-      gameUrl.searchParams.set('region', seattleServerInfo.region)
-      gameUrl.searchParams.set('entryFee', '0') // Free to play on main server
-      
-      console.log('🎮 Navigating to Seattle server game:', gameUrl.href)
-      
-      // Navigate to the game immediately
-      window.location.href = gameUrl.href
+      // Return server configuration for handleJoinLobby to use
+      console.log('✅ Seattle server configuration ready for navigation')
       
       return {
         roomId: seattleServerInfo.roomId,
