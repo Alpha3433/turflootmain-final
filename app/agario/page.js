@@ -922,6 +922,12 @@ const AgarIOGame = () => {
           port: 55939 // Updated port
         }
         
+        // Define the room ID for Seattle server connection
+        const actualRoomId = hathoraRoom || roomId || 'seattle-main-server'
+        const cleanRoomId = typeof actualRoomId === 'string' ? actualRoomId : 
+                           (actualRoomId && actualRoomId.roomId) ? actualRoomId.roomId :
+                           String(actualRoomId)
+        
         console.log('🏔️ Connecting to Seattle server:', seattleConnectionInfo)
         console.log('🔍 Using roomId for WebSocket:', cleanRoomId)
         
