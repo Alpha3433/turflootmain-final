@@ -4,15 +4,15 @@ export async function GET(request) {
   try {
     console.log('🎮 Single Seattle Server API: Returning the dedicated Seattle server...')
     
-    // Fixed Seattle server configuration using the provided connection info
+    // Fixed Seattle server configuration using the updated connection info
     const seattleServer = {
       id: 'seattle-main-server',
-      hathoraRoomId: 'cb88bc37-ecec-4688-8966-4d3d438a3242', // ProcessId from user
+      hathoraRoomId: '4fed52b7-91e5-4901-a064-ff51b8e72521', // Updated ProcessId from user
       appId: 'app-ad240461-f9c1-4c9b-9846-8b9cbcaa1298',
-      deploymentId: 'dep-7cc6db21-9d5e-4086-b5d8-984f1f1e2ddb',
+      deploymentId: 'dep-6a724a8d-89f4-416d-b56c-4ba6459eb6b9', // Updated DeploymentId
       buildId: 'bld-30739381-fd81-462f-97d7-377979f6918f',
       connectionHost: 'mpl7ff.edge.hathora.dev',
-      connectionPort: 50283,
+      connectionPort: 55939, // Updated Port
       name: 'TurfLoot Seattle Server',
       region: 'US West',
       regionId: 'seattle',
