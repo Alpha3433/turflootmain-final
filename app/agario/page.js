@@ -556,6 +556,14 @@ const AgarIOGame = () => {
       
       const game = gameRef.current  // gameRef.current IS the game object
       
+      // Calculate normalized direction for server input
+      const dx = Math.cos(angle) * strength
+      const dy = Math.sin(angle) * strength
+      
+      // Send input to multiplayer server
+      sendInputToServer(dx, dy)
+      
+      // For local prediction, still update local targets
       const targetX = game.player.x + Math.cos(angle) * moveSpeed
       const targetY = game.player.y + Math.sin(angle) * moveSpeed
       
@@ -563,6 +571,9 @@ const AgarIOGame = () => {
       console.log('🕹️ Joystick START Movement:', {
         strength: strength.toFixed(2),
         angle: (angle * 180 / Math.PI).toFixed(1) + '°',
+        dx: dx.toFixed(3),
+        dy: dy.toFixed(3),
+        multiplayer: isMultiplayer,
         moveSpeed: moveSpeed.toFixed(1),
         playerPos: { x: game.player.x?.toFixed(1), y: game.player.y?.toFixed(1) },
         targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) },
