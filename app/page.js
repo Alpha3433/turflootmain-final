@@ -1958,7 +1958,7 @@ export default function TurfLootTactical() {
       updateProgress(95)
       updateTimer('🌐 Connecting to game instance...')
       
-      const hathoraResult = await initializeHathoraGame(serverData)
+      const colyseusResult = await initializeColyseusGame(serverData)
       
       if (!hathoraResult || !hathoraResult.roomId) {
         throw new Error('Failed to initialize Hathora multiplayer game')
