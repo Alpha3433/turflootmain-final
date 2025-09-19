@@ -916,10 +916,10 @@ const AgarIOGame = () => {
           return
         }
         
-        // Connect to fixed Seattle server
+        // Connect to updated Seattle server
         const seattleConnectionInfo = {
           host: 'mpl7ff.edge.hathora.dev',
-          port: 50283
+          port: 55939 // Updated port
         }
         
         console.log('🏔️ Connecting to Seattle server:', seattleConnectionInfo)
