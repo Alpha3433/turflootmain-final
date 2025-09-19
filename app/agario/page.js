@@ -3019,6 +3019,9 @@ const AgarIOGame = () => {
       cashOutProgress
     }
 
+    // Make sendInputToServer available globally for Game class
+    window.sendInputToServer = sendInputToServer
+
     const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
     gameRef.current = game
     console.log('🎮 Game initialized and assigned to gameRef')
