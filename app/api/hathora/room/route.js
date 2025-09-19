@@ -72,7 +72,6 @@ export async function POST(request) {
     
     // CRITICAL FIX: Generate custom JWT token that matches game server's expected format
     // Our game server expects tokens signed with 'hathora-turfloot-secret'
-    const jwt = require('jsonwebtoken')
     const customPlayerPayload = {
       type: 'anonymous',
       id: `player_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
