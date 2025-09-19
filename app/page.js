@@ -1831,11 +1831,11 @@ export default function TurfLootTactical() {
   }
 
   const handleJoinLobby = async (serverData) => {
-    console.log('🌐 HATHORA-FIRST: Joining multiplayer server:', serverData)
+    console.log('🌐 COLYSEUS-FIRST: Joining multiplayer server:', serverData)
     
     // Show enhanced loading modal with detailed progress
     const loadingModal = document.createElement('div')
-    loadingModal.id = 'hathora-loading-modal'
+    loadingModal.id = 'colyseus-loading-modal'
     loadingModal.style.cssText = `
       position: fixed;
       top: 0;
@@ -1863,13 +1863,13 @@ export default function TurfLootTactical() {
       ">
         <div style="font-size: 64px; margin-bottom: 25px;">🚀</div>
         <div style="color: #68d391; font-size: 28px; font-weight: bold; margin-bottom: 15px;">
-          JOINING HATHORA MULTIPLAYER
+          JOINING COLYSEUS MULTIPLAYER
         </div>
         <div id="loading-status" style="color: #e2e8f0; font-size: 18px; margin-bottom: 15px;">
-          🌐 Connecting to authoritative game server...
+          🌐 Connecting to real-time game server...
         </div>
         <div id="loading-substatus" style="color: #a0aec0; font-size: 16px; margin-bottom: 25px;">
-          💰 ${serverData.name} • Entry: $${serverData.entryFee} • Region: ${serverData.region}
+          💰 ${serverData.name} • Entry: $${serverData.entryFee || 0} • Region: ${serverData.region}
         </div>
         <div style="
           width: 350px;
