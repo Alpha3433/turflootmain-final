@@ -938,9 +938,9 @@ const AgarIOGame = () => {
           
           // Store connection reference
           wsRef.current = connection
-            
-            // Send room join message after connection opens
-            connection.onopen = () => {
+          
+          // Send room join message after connection opens
+          connection.onopen = () => {
               console.log('🔓 WebSocket connection opened successfully!')
               setWsConnection('connected')
               console.log('✅ WebSocket connection opened successfully with real Hathora server')
