@@ -115,31 +115,10 @@ export class ArenaRoom extends Room<GameState> {
     console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)})`);
   }
 
-  onMessage(client: Client, message: any) {
+  handleInput(client: Client, message: any) {
     const player = this.state.players.get(client.sessionId);
     if (!player || !player.alive) return;
 
-    const { type } = message;
-
-    switch (type) {
-      case "input":
-        this.handleInput(client, player, message);
-        break;
-        
-      case "ping":
-        // Respond with pong for latency measurement
-        client.send("pong", {
-          timestamp: Date.now(),
-          clientTimestamp: message.timestamp
-        });
-        break;
-        
-      default:
-        console.warn(`⚠️ Unknown message type from ${player.name}: ${type}`);
-    }
-  }
-
-  handleInput(client: Client, player: Player, message: any) {
     const { seq, dx, dy } = message;
     
     // Validate input sequence to prevent replay attacks
