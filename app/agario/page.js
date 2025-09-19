@@ -813,90 +813,116 @@ const AgarIOGame = () => {
       }
     }
   }, [gameStarted])
-  // WebSocket connection for multiplayer Hathora rooms
+  // WebSocket connection for multiplayer Colyseus rooms
   useEffect(() => {
     if (!gameStarted) return
 
-    const connectToHathoraRoom = async () => {
+    const connectToColyseusRoom = async () => {
       try {
-        console.log('🌐 Initializing Hathora room connection...')
+        console.log('🌐 Initializing Colyseus room connection...')
         
         const urlParams = new URLSearchParams(window.location.search)
-        const roomId = urlParams.get('roomId')
-        const hathoraRoom = urlParams.get('hathoraRoom') // Real Hathora room ID
-        const realHathoraRoom = urlParams.get('realHathoraRoom') === 'true'
         const mode = urlParams.get('mode')
         const multiplayer = urlParams.get('multiplayer')
         const server = urlParams.get('server')
 
-        console.log('🔍 DEBUG: Raw URL search params:', window.location.search)
-        console.log('🔍 DEBUG: All URL parameters:', Object.fromEntries(urlParams))
-        console.log('🔍 DEBUG: roomId value:', roomId, '(type:', typeof roomId, ')')
-        console.log('🔍 DEBUG: hathoraRoom value:', hathoraRoom, '(type:', typeof hathoraRoom, ')')
-        console.log('🔍 DEBUG: realHathoraRoom value:', realHathoraRoom, '(type:', typeof realHathoraRoom, ')')
+        console.log('🔍 URL parameters:', { mode, multiplayer, server })
 
-        // Debug: Log the exact values being used for fallback logic
-        console.log('🔍 DEBUG: hathoraRoom || roomId evaluation:')
-        console.log('  - hathoraRoom:', hathoraRoom)
-        console.log('  - roomId:', roomId)
-        console.log('  - hathoraRoom || roomId:', hathoraRoom || roomId)
-        console.log('  - typeof (hathoraRoom || roomId):', typeof (hathoraRoom || roomId))
-
-        // Only connect to Hathora WebSocket for multiplayer rooms
-        if (!roomId || mode === 'local' || mode === 'practice' || server !== 'hathora') {
-          console.log('🚫 Not a Hathora multiplayer room - skipping WebSocket connection')
-          console.log('🔍 DEBUG: Skip reasons:')
-          console.log('  - !roomId:', !roomId)
-          console.log('  - mode === "local":', mode === 'local')
-          console.log('  - mode === "practice":', mode === 'practice')
-          console.log('  - server !== "hathora":', server !== 'hathora')
+        // Only connect to Colyseus for multiplayer rooms
+        if (mode === 'local' || mode === 'practice' || server !== 'colyseus') {
+          console.log('🚫 Not a Colyseus multiplayer room - skipping WebSocket connection')
           return
         }
 
-        // Use the real Hathora room ID if available, otherwise fall back to roomId
-        const actualRoomId = String(hathoraRoom || roomId).trim()
-        
-        console.log('🌐 Connecting to Hathora multiplayer room:', {
-          originalRoomId: roomId,
-          hathoraRoomId: hathoraRoom,
-          actualRoomId,
-          isRealHathoraRoom: realHathoraRoom
-        })
-        console.log('🔍 DEBUG: actualRoomId value:', actualRoomId, '(type:', typeof actualRoomId, ')')
-        
-        // Validate the room ID format - ensure it's not an object string
-        if (actualRoomId === 'true' || actualRoomId === 'false' || actualRoomId === 'undefined' || actualRoomId === 'null' || actualRoomId.includes('[object') || actualRoomId.length === 0) {
-          console.error('❌ CRITICAL: actualRoomId is invalid:', actualRoomId)
-          console.error('🔍 This is the source of the WebSocket connection failure!')
-          setWsConnection('error')
-          return
-        }
         setIsMultiplayer(true)
         setConnectedPlayers(1) // At least the current player
 
-        // Import and initialize Hathora client
-        const { default: hathoraClient } = await import('@/lib/hathoraClient')
+        // Import Colyseus client
+        const colyseusClient = await import('@/lib/colyseus')
         
-        const isInitialized = await hathoraClient.initialize()
-        if (!isInitialized) {
-          console.error('❌ Failed to initialize Hathora client')
-          setWsConnection('error')
-          return
+        // Get Privy user ID for authentication
+        let privyUserId = null
+        let playerName = null
+        
+        // Try to get Privy user info if available
+        try {
+          const { usePrivy } = await import('@privy-io/react-auth')
+          const { user } = usePrivy()
+          privyUserId = user?.id || `anonymous_${Date.now()}`
+          playerName = user?.username || user?.email?.split('@')[0] || null
+        } catch (error) {
+          console.log('⚠️ Privy not available, using anonymous user')
+          privyUserId = `anonymous_${Date.now()}`
         }
 
-        console.log('🔐 Using real player token from server API for WebSocket authentication')
-        // Real player token is extracted from URL parameters (hathoraToken)
-        // No need for client-side authentication - server API handles this securely
-        console.log('🔑 Got Hathora auth token successfully')
+        console.log('🔑 Connecting with user:', { privyUserId, playerName })
 
-        console.log('🔗 Attempting to create Hathora connection for room:', roomId)
+        // Connect to Colyseus arena
+        const room = await colyseusClient.joinArena({ privyUserId, playerName })
         
-        // Get connection info and create secure WebSocket directly
-        // Extract connection info from URL parameters (from server API)
-        const hathoraHost = urlParams.get('hathoraHost')
-        const hathoraPort = urlParams.get('hathoraPort')
-        const hathoraToken = urlParams.get('hathoraToken') // Real player token
-        const isMockRoom = urlParams.get('isMockRoom') === 'true' // Check if this is a mock room
+        setWsConnection('connected')
+        console.log('✅ Connected to Colyseus arena')
+
+        // Store room reference for sending inputs
+        wsRef.current = room
+        
+        // Set up state change listener
+        room.onStateChange((state) => {
+          // Update connected player count
+          setConnectedPlayers(state.players.size)
+          
+          // Update local game state with server data
+          if (gameRef.current && gameRef.current.updateFromServer) {
+            gameRef.current.updateFromServer(state)
+          }
+        })
+
+        // Handle player changes
+        room.state.players.onAdd((player, sessionId) => {
+          console.log(`👋 Player joined: ${player.name}`)
+          setConnectedPlayers(prev => prev + 1)
+        })
+
+        room.state.players.onRemove((player, sessionId) => {
+          console.log(`👋 Player left: ${player.name}`)
+          setConnectedPlayers(prev => Math.max(0, prev - 1))
+        })
+
+        // Handle room errors
+        room.onError((code, message) => {
+          console.error('❌ Colyseus room error:', code, message)
+          setWsConnection('error')
+        })
+
+        // Handle disconnection
+        room.onLeave((code) => {
+          console.log('👋 Left Colyseus room:', code)
+          setWsConnection('disconnected')
+        })
+
+        // Send ping every 5 seconds for latency measurement
+        const pingInterval = setInterval(() => {
+          if (room && colyseusClient.default.isConnected) {
+            colyseusClient.default.sendPing()
+          }
+        }, 5000)
+
+        // Cleanup on unmount
+        return () => {
+          clearInterval(pingInterval)
+          if (room) {
+            room.leave()
+          }
+        }
+
+      } catch (error) {
+        console.error('❌ Failed to connect to Colyseus server:', error)
+        setWsConnection('error')
+      }
+    }
+
+    connectToColyseusRoom()
+  }, [gameStarted])
         
         console.log('🔍 DEBUG: hathoraHost from URL:', hathoraHost)
         console.log('🔍 DEBUG: hathoraPort from URL:', hathoraPort)
