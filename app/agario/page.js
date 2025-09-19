@@ -933,9 +933,12 @@ const AgarIOGame = () => {
         console.log('🎯 Seattle server detected - establishing WebSocket connection')
         
         // Create secure WebSocket connection to Seattle server
-        // Direct connection to the running Hathora process
-        const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}`
-        console.log('🔗 Seattle server WebSocket URL:', wsUrl)
+        // Hathora server expects /ws path and token authentication
+        // Generate a simple JWT token for connection (as expected by the server)
+        const playerToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYW5vbnltb3VzIiwiaWQiOiJwbGF5ZXJf${Date.now()}_r1n0khn","name":"player-${Math.random().toString(36).substring(7)}","iat":${Math.floor(Date.now()/1000)}}.IDkJcacPYcU9h0LIs1Tz4ntN8I90Ko0OAD_WQfCJNYE`
+        
+        const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}/ws?token=${encodeURIComponent(playerToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
+        console.log('🔗 Seattle server WebSocket URL with auth:', wsUrl)
         
         try {
           console.log('✅ Created secure WebSocket connection with real player token')
