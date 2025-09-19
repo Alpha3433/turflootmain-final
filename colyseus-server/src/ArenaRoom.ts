@@ -65,6 +65,18 @@ export class ArenaRoom extends Room<GameState> {
     // Start game loop at 20 TPS
     this.setSimulationInterval(() => this.update(), 1000 / this.tickRate);
     
+    // Set up message handlers
+    this.onMessage("input", (client: Client, message: any) => {
+      this.handleInput(client, message);
+    });
+    
+    this.onMessage("ping", (client: Client, message: any) => {
+      client.send("pong", {
+        timestamp: Date.now(),
+        clientTimestamp: message.timestamp
+      });
+    });
+    
     console.log(`🪙 Generated ${this.maxCoins} coins`);
     console.log(`🦠 Generated ${this.maxViruses} viruses`);
     console.log(`🔄 Game loop started at ${this.tickRate} TPS`);
