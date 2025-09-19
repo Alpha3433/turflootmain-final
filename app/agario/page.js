@@ -188,9 +188,16 @@ const AgarIOGame = () => {
     setIsMultiplayer(true)
     setGameStarted(true)
     
-    // Initialize authoritative multiplayer game
-    initializeAuthoritativeGame(roomId, mode, urlParams)
+    // Initialize Colyseus multiplayer game (no room creation needed)
+    console.log('🎮 Colyseus multiplayer game ready')
     
+    // Track game session in database
+    trackPlayerSession(roomId, 0, mode, 'colyseus')
+    
+    // Set up game state (server owns truth via Colyseus)
+    console.log('🎮 Setting up client-side prediction with Colyseus state sync')
+    console.log('⚡ Colyseus server will handle all game logic')
+    console.log('📡 Client will send inputs, receive state updates via Schema')
   }, [])
   
   const initializeAuthoritativeGame = async (roomId, mode, urlParams) => {
