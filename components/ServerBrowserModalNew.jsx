@@ -29,15 +29,11 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     setError(null)
     
     try {
-      console.log('🔍 Fetching real Hathora rooms from discovery API...')
+      console.log('🔍 Fetching Colyseus rooms from server API...')
       
-      // Import Hathora client to discover active rooms
-      const { default: hathoraClient } = await import('@/lib/hathoraClient')
-      
-      const isInitialized = await hathoraClient.initialize()
-      if (!isInitialized) {
-        throw new Error('Failed to initialize Hathora client for room discovery')
-      }
+      // No need for client-side room discovery with Colyseus
+      // Server browser API handles all room information
+      console.log('✅ Using server-side room discovery for Colyseus')
       
       console.log('✅ Hathora client initialized for room discovery')
       
