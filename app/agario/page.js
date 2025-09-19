@@ -935,6 +935,8 @@ const AgarIOGame = () => {
         // Generate proper JWT token via server API for secure authentication
         console.log('🔐 Requesting authentication token from server...')
         
+        let wsUrl, playerInfo
+        
         try {
           const tokenResponse = await fetch('/api/auth/game-token', {
             method: 'POST',
@@ -954,13 +956,13 @@ const AgarIOGame = () => {
           }
           
           const playerToken = tokenData.token
-          const playerInfo = tokenData.player
+          playerInfo = tokenData.player
           
           console.log('✅ Authentication token received successfully')
           console.log('👤 Player info:', playerInfo)
           
           // WebSocket connection to Hathora server with /ws path and proper JWT authentication
-          const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}/ws?token=${encodeURIComponent(playerToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
+          wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}/ws?token=${encodeURIComponent(playerToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
           console.log('🔗 Seattle server WebSocket URL with secure auth:', wsUrl)
           
         } catch (tokenError) {
