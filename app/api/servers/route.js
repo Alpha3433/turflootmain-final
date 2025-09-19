@@ -2,45 +2,47 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request) {
   try {
-    console.log('🎮 Single Seattle Server API: Returning the dedicated Seattle server...')
+    console.log('🎮 Colyseus Server Browser API: Returning available Colyseus servers...')
     
-    // Fixed Seattle server configuration using the updated connection info
-    const seattleServer = {
-      id: 'seattle-main-server',
-      hathoraRoomId: '4fed52b7-91e5-4901-a064-ff51b8e72521', // Updated ProcessId from user
-      appId: 'app-ad240461-f9c1-4c9b-9846-8b9cbcaa1298',
-      deploymentId: 'dep-6a724a8d-89f4-416d-b56c-4ba6459eb6b9', // Updated DeploymentId
-      buildId: 'bld-30739381-fd81-462f-97d7-377979f6918f',
-      connectionHost: 'mpl7ff.edge.hathora.dev',
-      connectionPort: 55939, // Updated Port
-      name: 'TurfLoot Seattle Server',
-      region: 'US West',
-      regionId: 'seattle',
-      displayName: 'Seattle',
-      hathoraRegion: 'us-west-2',
+    // Colyseus server configuration
+    const colyseusEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'ws://localhost:2567'
+    
+    // Create a single arena server entry for the server browser
+    const arenaServer = {
+      id: 'colyseus-arena-global',
+      roomType: 'arena',
+      name: 'TurfLoot Arena',
+      region: 'Global',
+      regionId: 'global',
+      displayName: 'Global Arena',
       mode: 'multiplayer',
-      gameType: 'Main Server',
-      description: 'Official TurfLoot Multiplayer Server',
-      maxPlayers: 50, // Adjust as needed
+      gameType: 'Arena Battle',
+      description: 'Real-time multiplayer arena with up to 50 players',
+      maxPlayers: 50,
       minPlayers: 1,
-      stake: 0, // Free to play
+      currentPlayers: 0, // Will be updated dynamically
+      waitingPlayers: 0,
+      isRunning: true,
+      ping: null, // Will be measured client-side
+      avgWaitTime: 'Join Now',
+      difficulty: 'All Players',
       entryFee: 0,
       serverFee: 0,
       totalCost: 0,
-      difficulty: 'All Players',
-      serverType: 'hathora-dedicated',
-      pingEndpoint: 'ec2.us-west-2.amazonaws.com', // For client-side ping measurement
-      ping: null, // Will be measured client-side
+      potentialWinning: 0,
+      prizePool: 0,
+      stake: 0,
+      status: 'active',
+      serverType: 'colyseus',
+      endpoint: colyseusEndpoint,
       lastUpdated: new Date().toISOString(),
       timestamp: new Date().toISOString(),
-      canJoin: true,
-      isRunning: true
+      canJoin: true
     }
 
-    // Query REAL player count from active game sessions in database
+    // Try to get real player count from game sessions database
     let realPlayers = 0
     try {
-      // Connect to MongoDB to get real active game sessions
       const { MongoClient } = await import('mongodb')
       const client = new MongoClient(process.env.MONGO_URL)
       
@@ -48,34 +50,31 @@ export async function GET(request) {
       const db = client.db('turfloot')
       const gameSessions = db.collection('game_sessions')
       
-      // Count active players in the Seattle server (active within last 2 minutes)
+      // Count active players in Colyseus arena (active within last 2 minutes)
       const activeSessionsCount = await gameSessions.countDocuments({
-        roomId: seattleServer.id,
+        roomId: 'colyseus-arena-global',
         status: 'active',
-        lastActivity: { $gte: new Date(Date.now() - 2 * 60 * 1000) } // Active within last 2 minutes
+        lastActivity: { $gte: new Date(Date.now() - 2 * 60 * 1000) }
       })
       
       realPlayers = activeSessionsCount
-      console.log(`📊 Seattle Server: ${realPlayers} real players from database`)
+      console.log(`📊 Colyseus Arena: ${realPlayers} real players from database`)
       
       await client.close()
     } catch (error) {
-      console.warn(`⚠️ Could not query database for Seattle server:`, error.message)
-      realPlayers = 0 // Fallback to 0 if database query fails
+      console.warn(`⚠️ Could not query database for Colyseus arena:`, error.message)
+      realPlayers = 0
     }
 
     // Update server with real player count
-    seattleServer.currentPlayers = realPlayers
-    seattleServer.waitingPlayers = 0
-    seattleServer.status = realPlayers > 0 ? 'active' : 'waiting'
-    seattleServer.avgWaitTime = realPlayers > 0 ? 'Join Now' : 'Waiting for players'
-    seattleServer.potentialWinning = 0 // No cash prizes on main server
-    seattleServer.prizePool = 0
+    arenaServer.currentPlayers = realPlayers
+    arenaServer.status = realPlayers > 0 ? 'active' : 'waiting'
+    arenaServer.avgWaitTime = realPlayers > 0 ? 'Join Now' : 'Waiting for players'
 
     // Return single server array
-    const servers = [seattleServer]
+    const servers = [arenaServer]
     
-    console.log(`📊 Returning single Seattle server with ${realPlayers} players`)
+    console.log(`📊 Returning Colyseus arena server with ${realPlayers} players`)
     
     return NextResponse.json({
       servers: servers,
@@ -84,31 +83,26 @@ export async function GET(request) {
       totalServers: 1,
       practiceServers: 0,
       cashServers: 0,
-      regions: ['US West'],
+      regions: ['Global'],
       gameTypes: [{ 
-        name: 'Main Server', 
+        name: 'Arena Battle', 
         servers: 1 
       }],
-      hathoraEnabled: true,
-      seattleServerInfo: {
-        host: seattleServer.connectionHost,
-        port: seattleServer.connectionPort,
-        processId: seattleServer.hathoraRoomId,
-        appId: seattleServer.appId
-      },
+      colyseusEnabled: true,
+      colyseusEndpoint: colyseusEndpoint,
       lastUpdated: new Date().toISOString(),
       timestamp: new Date().toISOString()
     })
     
   } catch (error) {
-    console.error('❌ Error in Seattle server API:', error)
+    console.error('❌ Error in Colyseus server browser API:', error)
     return NextResponse.json({ 
-      error: 'Failed to fetch Seattle server',
+      error: 'Failed to fetch Colyseus servers',
       message: error.message,
       servers: [],
       totalPlayers: 0,
       totalActiveServers: 0,
-      hathoraEnabled: false
+      colyseusEnabled: false
     }, { status: 500 })
   }
 }
