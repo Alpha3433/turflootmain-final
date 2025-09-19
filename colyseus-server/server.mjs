@@ -1,9 +1,11 @@
-import { Server } from "colyseus";
-import { createServer } from "http";
+import colyseusPackage from "colyseus";
 import express from "express";
 import cors from "cors";
+import { createServer } from "http";
 import { ArenaRoom } from "./src/ArenaRoom.mjs";
 import dotenv from "dotenv";
+
+const { Server } = colyseusPackage;
 
 // Load environment variables
 dotenv.config();
