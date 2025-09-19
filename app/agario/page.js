@@ -916,32 +916,21 @@ const AgarIOGame = () => {
           return
         }
         
-        // Use provided host/port from server API (secure, no client-side SDK calls)
-        if (hathoraHost && hathoraPort && hathoraToken) {
-          console.log(`🌐 Using server-provided connection info: ${hathoraHost}:${hathoraPort}`)
-          connectionInfo = {
-            host: hathoraHost,
-            port: parseInt(hathoraPort, 10)
-          }
-          
-          // Create secure WebSocket connection with real player token
-          // Ensure roomId is definitely a string, not an object
-          const cleanRoomId = typeof actualRoomId === 'string' ? actualRoomId : 
-                             (actualRoomId && actualRoomId.roomId) ? actualRoomId.roomId :
-                             String(actualRoomId)
-          
-          console.log('🔍 DEBUG: cleanRoomId extraction:', {
-            originalActualRoomId: actualRoomId,
-            typeOfActualRoomId: typeof actualRoomId,
-            cleanRoomId: cleanRoomId,
-            typeOfCleanRoomId: typeof cleanRoomId
-          })
-          
-          // Hathora requires wss:// for HTTPS sites (mixed content security policy)
-          // Authentication token AND roomId should be sent as query parameters
-          // Both values must be URL-encoded to handle special characters
-          const wsUrl = `wss://${connectionInfo.host}:${connectionInfo.port}/ws?token=${encodeURIComponent(hathoraToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
-          console.log('🔗 Secure WebSocket URL with roomId:', wsUrl)
+        // Connect to fixed Seattle server
+        const seattleConnectionInfo = {
+          host: 'mpl7ff.edge.hathora.dev',
+          port: 50283
+        }
+        
+        console.log('🏔️ Connecting to Seattle server:', seattleConnectionInfo)
+        console.log('🔍 Using roomId for WebSocket:', cleanRoomId)
+        
+        console.log('🎯 Seattle server detected - establishing WebSocket connection')
+        
+        // Create secure WebSocket connection to Seattle server
+        // Direct connection to the running Hathora process
+        const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}`
+        console.log('🔗 Seattle server WebSocket URL:', wsUrl)
           
           try {
             console.log('✅ Created secure WebSocket connection with real player token')
