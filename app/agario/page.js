@@ -1797,6 +1797,22 @@ const AgarIOGame = () => {
         
         // Direct target update like Agar.io (only for desktop)
         if (!window.isMobileDevice) {
+          // Calculate normalized direction for server input
+          const dx = this.mouse.worldX - this.player.x
+          const dy = this.mouse.worldY - this.player.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance > 1) { // Only send if there's meaningful movement
+            const normalizedDx = dx / distance
+            const normalizedDy = dy / distance
+            
+            // Send input to multiplayer server
+            if (window.sendInputToServer) {
+              window.sendInputToServer(normalizedDx, normalizedDy)
+            }
+          }
+          
+          // For local prediction, still update local targets
           this.player.targetX = this.mouse.worldX
           this.player.targetY = this.mouse.worldY
         }
