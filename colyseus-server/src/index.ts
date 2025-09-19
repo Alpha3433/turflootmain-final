@@ -5,7 +5,7 @@ import cors from "cors";
 import { ArenaRoom } from "./ArenaRoom";
 
 const app = express();
-const port = process.env.PORT || 2567;
+const port = Number(process.env.PORT) || 2567;
 
 // Enable CORS for all routes
 app.use(cors());
@@ -16,7 +16,6 @@ const server = createServer(app);
 // Create Colyseus server
 const gameServer = new Server({
   server: server,
-  express: app,
 });
 
 // Define the arena room with 20 TPS (50ms intervals)
@@ -30,7 +29,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    rooms: gameServer.presence.channels.size
+    rooms: gameServer.stats.roomCount
   });
 });
 
