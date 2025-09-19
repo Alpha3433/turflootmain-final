@@ -29,7 +29,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    rooms: gameServer.stats.roomCount
+    rooms: Object.keys(gameServer.rooms).length
   });
 });
 
