@@ -933,11 +933,11 @@ const AgarIOGame = () => {
         console.log('🔗 Seattle server WebSocket URL:', wsUrl)
         
         try {
-            console.log('✅ Created secure WebSocket connection with real player token')
-            const connection = new WebSocket(wsUrl)
-            
-            // Store connection reference
-            wsRef.current = connection
+          console.log('✅ Created secure WebSocket connection with real player token')
+          const connection = new WebSocket(wsUrl)
+          
+          // Store connection reference
+          wsRef.current = connection
             
             // Send room join message after connection opens
             connection.onopen = () => {
