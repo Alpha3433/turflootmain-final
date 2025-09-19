@@ -3113,8 +3113,10 @@ const AgarIOGame = () => {
       cashOutProgress
     }
 
-    // Make sendInputToServer available globally for Game class
+    // Make sendInputToServer and multiplayer state available globally for Game class
     window.sendInputToServer = sendInputToServer
+    window.isMultiplayer = isMultiplayer
+    window.wsRef = wsRef
 
     const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
     gameRef.current = game
