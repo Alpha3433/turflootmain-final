@@ -1793,75 +1793,50 @@ export default function TurfLootTactical() {
   // ========================================
   
   const initializeHathoraGame = async (serverData) => {
-    console.log('🚀 Initializing Hathora multiplayer game via server API...')
+    console.log('🚀 Connecting to Seattle server...')
     console.log('📊 Server details:', serverData)
     
     try {
-      // Validate required server data
-      if (!serverData.regionId && !serverData.region) {
-        throw new Error('Server region is required for Hathora room creation')
+      // Fixed Seattle server configuration
+      const seattleServerInfo = {
+        host: 'mpl7ff.edge.hathora.dev',
+        port: 50283,
+        processId: 'cb88bc37-ecec-4688-8966-4d3d438a3242',
+        appId: 'app-ad240461-f9c1-4c9b-9846-8b9cbcaa1298',
+        roomId: 'seattle-main-server',
+        region: 'seattle'
       }
       
-      if (!serverData.entryFee && serverData.entryFee !== 0) {
-        throw new Error('Entry fee must be specified for multiplayer rooms')
-      }
+      console.log('🏔️ Using Seattle server configuration:', seattleServerInfo)
       
-      // Import and initialize Hathora client (no SDK, just API wrapper)
-      const { default: hathoraClient } = await import('@/lib/hathoraClient')
+      // Navigate directly to the game with Seattle server info
+      const gameUrl = new URL('/agario', window.location.origin)
+      gameUrl.searchParams.set('mode', 'hathora-multiplayer')
+      gameUrl.searchParams.set('server', 'hathora')
+      gameUrl.searchParams.set('hathoraRoom', seattleServerInfo.roomId)
+      gameUrl.searchParams.set('hathoraHost', seattleServerInfo.host)
+      gameUrl.searchParams.set('hathoraPort', seattleServerInfo.port.toString())
+      gameUrl.searchParams.set('region', seattleServerInfo.region)
+      gameUrl.searchParams.set('entryFee', '0') // Free to play on main server
       
-      const isInitialized = await hathoraClient.initialize()
-      if (!isInitialized) {
-        throw new Error('Failed to initialize Hathora client')
-      }
+      console.log('🎮 Navigating to Seattle server game:', gameUrl.href)
       
-      console.log('✅ Hathora client initialized successfully')
-      
-      // Create room configuration
-      const roomConfig = {
-        gameMode: serverData.entryFee > 0 ? 'cash-game' : 'practice',
-        region: serverData.regionId || serverData.region,
-        entryFee: serverData.entryFee,
-        maxPlayers: serverData.entryFee >= 0.05 ? 4 : (serverData.entryFee > 0 ? 6 : 50),
-        roomName: serverData.name || `TurfLoot Room`
-      }
-      
-      console.log('🏠 Creating Hathora room via server API with config:', roomConfig)
-      
-      // Create room via server API (secure, no SDK secrets in browser)
-      const roomInfo = await hathoraClient.createRoomServerSide(
-        roomConfig.gameMode,
-        roomConfig.region,
-        roomConfig.maxPlayers,
-        roomConfig.entryFee
-      )
-      
-      if (!roomInfo || !roomInfo.success || !roomInfo.roomId) {
-        console.error('❌ Invalid room response:', roomInfo)
-        throw new Error('Failed to create Hathora room via server API - invalid response')
-      }
-      
-      console.log('🎉 Hathora room created successfully via server API!')
-      console.log('🏠 Room ID:', roomInfo.roomId)
-      console.log('🌐 Host:', roomInfo.host)
-      console.log('🌐 Port:', roomInfo.port)
-      console.log('🔐 Has Player Token:', !!roomInfo.playerToken)
-      console.log('🌍 Region:', roomInfo.region)
-      console.log('💰 Entry Fee:', roomInfo.stakeAmount)
+      // Navigate to the game immediately
+      window.location.href = gameUrl.href
       
       return {
-        roomId: roomInfo.roomId,
-        host: roomInfo.host,
-        port: roomInfo.port,
-        region: roomInfo.region,
-        entryFee: roomInfo.stakeAmount || roomConfig.entryFee,
-        maxPlayers: roomInfo.maxPlayers || roomConfig.maxPlayers,
+        roomId: seattleServerInfo.roomId,
+        host: seattleServerInfo.host,
+        port: seattleServerInfo.port,
+        region: seattleServerInfo.region,
+        entryFee: 0,
+        maxPlayers: 50,
         gameMode: 'hathora-multiplayer',
         isHathoraRoom: true,
-        playerToken: roomInfo.playerToken, // Real player token for WebSocket auth
+        isSeattleServer: true,
         connectionInfo: {
-          host: roomInfo.host,
-          port: roomInfo.port,
-          token: roomInfo.playerToken
+          host: seattleServerInfo.host,
+          port: seattleServerInfo.port
         }
       }
       
