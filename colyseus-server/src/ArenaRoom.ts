@@ -44,8 +44,6 @@ export class GameState extends Schema {
 
 export class ArenaRoom extends Room<GameState> {
   maxClients = 50;
-  patchRate = 50; // 20 TPS
-  autoDispose = false;
   
   // Game configuration
   worldSize = 4000;
@@ -96,7 +94,7 @@ export class ArenaRoom extends Room<GameState> {
     this.state.players.set(client.sessionId, player);
     
     // Store client metadata
-    client.userData = {
+    (client as any).userData = {
       privyUserId,
       playerName,
       lastInputTime: Date.now()
@@ -105,9 +103,11 @@ export class ArenaRoom extends Room<GameState> {
     console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)})`);
   }
 
-  onMessage(client: Client, type: string, message: any) {
+  onMessage(client: Client, message: any) {
     const player = this.state.players.get(client.sessionId);
     if (!player || !player.alive) return;
+
+    const { type } = message;
 
     switch (type) {
       case "input":
