@@ -13,7 +13,7 @@ import os
 from urllib.parse import urlparse, parse_qs
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-gameroom.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfws-solver.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def test_websocket_connection_info_mismatch_fix():
