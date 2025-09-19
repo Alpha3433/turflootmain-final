@@ -932,13 +932,20 @@ const AgarIOGame = () => {
         
         console.log('🎯 Seattle server detected - establishing WebSocket connection')
         
-        // Create secure WebSocket connection to Seattle server
-        // Hathora server expects /ws path and token authentication
-        // Generate a simple JWT token for connection (as expected by the server)
-        const playerToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYW5vbnltb3VzIiwiaWQiOiJwbGF5ZXJf${Date.now()}_r1n0khn","name":"player-${Math.random().toString(36).substring(7)}","iat":${Math.floor(Date.now()/1000)}}.IDkJcacPYcU9h0LIs1Tz4ntN8I90Ko0OAD_WQfCJNYE`
+        // Generate a simple authentication token that the Hathora server expects
+        // Based on the server code, it expects JWT tokens signed with 'hathora-turfloot-secret'
+        const playerPayload = {
+          type: 'anonymous',
+          id: `player_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          name: `player-${Math.random().toString(36).substring(2, 9)}`,
+          iat: Math.floor(Date.now() / 1000)
+        }
         
-        const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}/ws?token=${encodeURIComponent(playerToken)}&roomId=${encodeURIComponent(cleanRoomId)}`
-        console.log('🔗 Seattle server WebSocket URL with auth:', wsUrl)
+        // For now, let's try connecting without a token first to see if the server is accessible
+        // The server at mpl7ff.edge.hathora.dev:55939 should be running for this to work
+        const wsUrl = `wss://${seattleConnectionInfo.host}:${seattleConnectionInfo.port}/ws?roomId=${encodeURIComponent(cleanRoomId)}`
+        console.log('🔗 Seattle server WebSocket URL:', wsUrl)
+        console.log('👤 Player info:', playerPayload)
         
         try {
           console.log('✅ Created secure WebSocket connection with real player token')
