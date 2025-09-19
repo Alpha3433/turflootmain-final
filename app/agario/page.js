@@ -485,6 +485,33 @@ const AgarIOGame = () => {
     }
   }, [isMobile])
 
+  // Multiplayer input transmission system
+  const sendInputToServer = (dx, dy) => {
+    if (!isMultiplayer || !wsRef.current || wsConnection !== 'connected') {
+      return // Skip if not in multiplayer mode or not connected
+    }
+
+    // Only send if input changed significantly to reduce network traffic
+    const threshold = 0.01
+    if (Math.abs(dx - lastInputRef.current.dx) < threshold && 
+        Math.abs(dy - lastInputRef.current.dy) < threshold) {
+      return
+    }
+
+    inputSequenceRef.current++
+    lastInputRef.current = { dx, dy }
+
+    try {
+      wsRef.current.send("input", {
+        seq: inputSequenceRef.current,
+        dx: dx,
+        dy: dy
+      })
+    } catch (error) {
+      console.error('❌ Failed to send input to server:', error)
+    }
+  }
+
   // Virtual joystick handlers for mobile
   const handleJoystickStart = (e) => {
     e.preventDefault()
