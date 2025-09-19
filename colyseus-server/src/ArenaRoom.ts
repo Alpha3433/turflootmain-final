@@ -136,7 +136,7 @@ export class ArenaRoom extends Room<GameState> {
     }
     
     player.lastSeq = seq;
-    client.userData.lastInputTime = Date.now();
+    (client as any).userData.lastInputTime = Date.now();
     
     // Apply movement (dx, dy are normalized direction vectors)
     const speed = Math.max(1, 5 * (100 / player.mass)); // Speed inversely proportional to mass
