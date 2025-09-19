@@ -1792,56 +1792,40 @@ export default function TurfLootTactical() {
   // HATHORA-FIRST MULTIPLAYER ARCHITECTURE
   // ========================================
   
-  const initializeHathoraGame = async (serverData) => {
-    console.log('🚀 Connecting to Seattle server...')
+  const initializeColyseusGame = async (serverData) => {
+    console.log('🚀 Connecting to Colyseus server...')
     console.log('📊 Server details:', serverData)
     
     try {
-      // Fixed Seattle server configuration (updated connection details)
-      const seattleServerInfo = {
-        host: 'mpl7ff.edge.hathora.dev',
-        port: 55939, // Updated port
-        processId: '4fed52b7-91e5-4901-a064-ff51b8e72521', // Updated ProcessId
-        appId: 'app-ad240461-f9c1-4c9b-9846-8b9cbcaa1298',
-        roomId: 'seattle-main-server',
-        region: 'seattle'
+      // Colyseus server configuration
+      const colyseusServerInfo = {
+        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'ws://localhost:2567',
+        roomType: 'arena',
+        region: serverData.region || 'global'
       }
       
-      console.log('🏔️ Using Seattle server configuration:', seattleServerInfo)
+      console.log('🎮 Using Colyseus server configuration:', colyseusServerInfo)
       
       // Return server configuration for handleJoinLobby to use
-      console.log('✅ Seattle server configuration ready for navigation')
+      console.log('✅ Colyseus server configuration ready for navigation')
       
       return {
-        roomId: seattleServerInfo.roomId,
-        host: seattleServerInfo.host,
-        port: seattleServerInfo.port,
-        region: seattleServerInfo.region,
-        entryFee: 0,
+        roomId: 'colyseus-arena',
+        endpoint: colyseusServerInfo.endpoint,
+        roomType: colyseusServerInfo.roomType,
+        region: colyseusServerInfo.region,
+        entryFee: serverData.entryFee || 0,
         maxPlayers: 50,
-        gameMode: 'hathora-multiplayer',
-        isHathoraRoom: true,
-        isSeattleServer: true,
+        gameMode: 'colyseus-multiplayer',
+        isColyseusRoom: true,
         connectionInfo: {
-          host: seattleServerInfo.host,
-          port: seattleServerInfo.port
+          endpoint: colyseusServerInfo.endpoint,
+          roomType: colyseusServerInfo.roomType
         }
       }
       
     } catch (error) {
-      console.error('❌ initializeHathoraGame failed:', error)
-      
-      // Enhanced error logging
-      if (error.name === 'TypeError' && error.message.includes('json')) {
-        console.error('❌ JSON parsing error detected - likely empty response or network timeout')
-        console.error('❌ Original error:', error)
-        throw new Error('Network timeout or invalid server response. Please try again.')
-      }
-      
-      if (error.message.includes('timeout')) {
-        throw new Error('Request timeout - server may be busy. Please try again.')
-      }
-      
+      console.error('❌ initializeColyseusGame failed:', error)
       throw error
     }
   }
