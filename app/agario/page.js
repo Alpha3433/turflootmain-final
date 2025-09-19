@@ -1925,8 +1925,20 @@ const AgarIOGame = () => {
       const deltaTime = (now - this.lastUpdate) / 1000
       this.lastUpdate = now
 
-      // Update player with simple Agar.io-style movement
+      // Always update player movement (for client-side prediction)
       this.updatePlayer(deltaTime)
+      
+      // Always update camera
+      this.updateCamera()
+      
+      // Skip local AI and collision detection in multiplayer mode
+      if (window.isMultiplayer && this.serverState) {
+        console.log('🌐 Multiplayer mode: Using server-authoritative state')
+        return // Server handles all game logic
+      }
+      
+      // Local single-player game logic (only when not in multiplayer)
+      console.log('🏠 Single-player mode: Running local game logic')
       
       // Update dynamic zone for cash games
       this.updateDynamicZone(deltaTime)
@@ -1934,16 +1946,13 @@ const AgarIOGame = () => {
       // Update spawn protection timers
       this.updateSpawnProtection()
       
-      // Update enemies
+      // Update enemies (AI bots)
       this.enemies.forEach(enemy => this.updateEnemy(enemy, deltaTime))
       
-      // Check collisions
+      // Check collisions (local simulation)
       this.checkCollisions()
       
-      // Update camera
-      this.updateCamera()
-      
-      // Maintain coin count
+      // Maintain coin count (local coin generation)
       while (this.coins.length < 1000) { // Increased to 1000 to match Agar.io food density
         const centerX = this.world.width / 2  // 2000
         const centerY = this.world.height / 2 // 2000
