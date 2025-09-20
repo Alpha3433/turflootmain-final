@@ -65,3 +65,7 @@ colyseus-server-minimal/node_modules/.next/cache/webpack/client-production/0.pac
 # Environment files
 *.env
 *.env.*
+-e 
+# Environment files
+*.env
+*.env.*
