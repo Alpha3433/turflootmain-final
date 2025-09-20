@@ -38,6 +38,7 @@
     "app/**/*",
     "components/**/*",
     "lib/**/*",
-    "public/**/*"
+    "public/**/*",
+    ".next/**/*"
   ]
 }
