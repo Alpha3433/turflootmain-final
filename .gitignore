@@ -56,3 +56,4 @@ yarn-error.log*
 colyseus-server/lib/
 colyseus-server/node_modules/
 colyseus-server-minimal/node_modules/.next/cache/webpack/client-production/0.pack
+.next/cache/webpack/client-production/0.pack
