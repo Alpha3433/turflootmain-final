@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
-import ServerBrowserModal from '@/components/ServerBrowserModalNew'
+import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
   const router = useRouter()
