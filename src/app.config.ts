@@ -21,5 +21,10 @@ export default config({
   beforeListen: () => {
     // Anything you want to do before server starts listening
     console.log("🚀 TurfLoot Arena Server starting...");
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 Region: ${process.env.REGION || 'default'}`);
+    console.log(`🎮 Max Players: ${process.env.MAX_PLAYERS_PER_ROOM || '50'}`);
+    console.log(`⚡ Tick Rate: ${process.env.TICK_RATE || '20'} TPS`);
+    console.log(`🗺️ World Size: ${process.env.WORLD_SIZE || '4000'}px`);
   }
 });
