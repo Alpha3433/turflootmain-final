@@ -28,8 +28,8 @@ export class MinimalRoom extends Room<MinimalState> {
     this.state.playerCount = Math.max(0, this.state.playerCount - 1);
   }
 
-  onMessage(client: Client, type: string, message: any) {
-    console.log(`📨 Received message from ${client.sessionId}:`, type, message);
+  onMessage(client: Client, message: any) {
+    console.log(`📨 Received message from ${client.sessionId}:`, message);
   }
 }
 
