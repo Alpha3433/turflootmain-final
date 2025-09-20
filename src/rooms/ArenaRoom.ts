@@ -1,4 +1,4 @@
-import { Room, Client } from "colyseus";
+import { Room, Client } from "@colyseus/core";
 import { Schema, MapSchema, type } from "@colyseus/schema";
 
 // Player state schema
