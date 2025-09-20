@@ -1,5 +1,6 @@
 import config from "@colyseus/tools";
 import { ArenaRoom } from "./rooms/ArenaRoom.js";
+import { Request, Response } from "express";
 
 export default config({
   initializeGameServer: (gameServer) => {
@@ -9,7 +10,7 @@ export default config({
 
   initializeExpress: (app) => {
     // Health check endpoint
-    app.get("/health", (req, res) => {
+    app.get("/health", (req: Request, res: Response) => {
       res.json({
         status: "healthy",
         timestamp: new Date().toISOString(),
@@ -21,7 +22,7 @@ export default config({
     });
 
     // Root endpoint
-    app.get("/", (req, res) => {
+    app.get("/", (req: Request, res: Response) => {
       res.json({
         name: "TurfLoot Arena",
         status: "running",
