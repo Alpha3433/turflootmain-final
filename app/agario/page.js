@@ -989,13 +989,6 @@ const AgarIOGame = () => {
     connectToColyseusRoom()
   }, [gameStarted])
 
-          wsRef.current.disconnect()
-        }
-        wsRef.current = null
-      }
-    }
-  }, [gameStarted])
-
   // Cycle through missions every 4 seconds
   useEffect(() => {
     if (activeMissions.length > 0) {
