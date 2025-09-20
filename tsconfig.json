@@ -35,6 +35,12 @@
   "exclude": [
     "node_modules",
     "build",
-    "loadtest"
+    "loadtest",
+    "app/**/*",
+    "components/**/*",
+    "lib/**/*",
+    "public/**/*",
+    "*.js",
+    "*.jsx"
   ]
 }
