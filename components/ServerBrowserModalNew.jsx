@@ -578,9 +578,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                 🔄 Retry
               </button>
             </div>
-          ) : realHathoraRooms.length === 0 ? (
+          ) : servers.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
-              🏠 No Hathora rooms available
+              🎮 No Colyseus servers available
             </div>
           ) : (
             <>
