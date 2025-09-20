@@ -1,0 +1,17 @@
+{
+  "name": "turfloot-arena-colyseus",
+  "version": "1.0.0",
+  "description": "TurfLoot Arena - Colyseus Cloud Server",
+  "main": "colyseus-index.js",
+  "scripts": {
+    "start": "node colyseus-index.js",
+    "dev": "node colyseus-index.js"
+  },
+  "dependencies": {
+    "colyseus": "^0.15.22",
+    "@colyseus/schema": "^2.0.35"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
