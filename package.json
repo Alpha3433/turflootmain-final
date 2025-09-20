@@ -1,28 +1,23 @@
 {
-  "name": "turfloot-arena-colyseus",
+  "name": "turfloot-minimal-colyseus",
   "version": "1.0.0",
-  "description": "TurfLoot Arena - Colyseus Cloud Server",
-  "main": "build/index.js",
+  "description": "TurfLoot Arena - Minimal Colyseus Server for Deployment Testing",
+  "main": "build/minimal.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node build/index.js",
-    "dev": "ts-node-esm src/index.ts",
-    "loadtest": "colyseus-loadtest loadtest/example.ts --room arena --numClients 2"
+    "build": "tsc src/minimal.ts --outDir build --target ES2020 --module commonjs --esModuleInterop true --skipLibCheck true --experimentalDecorators true --emitDecoratorMetadata true",
+    "start": "node build/minimal.js",
+    "dev": "ts-node-esm src/minimal.ts",
+    "test": "echo 'Minimal server - no tests needed'"
   },
   "dependencies": {
     "colyseus": "^0.15.22",
     "@colyseus/tools": "^0.15.22",
-    "@colyseus/schema": "^2.0.35",
-    "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "@colyseus/schema": "^2.0.35"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
     "ts-node": "^10.9.0",
-    "@types/node": "^20.0.0",
-    "@types/express": "^4.17.0",
-    "@types/cors": "^2.8.0",
-    "@colyseus/loadtest": "^0.15.0"
+    "@types/node": "^20.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
