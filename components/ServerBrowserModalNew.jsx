@@ -563,7 +563,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Failed to Discover Rooms</div>
               <div style={{ fontSize: '12px', color: '#9ca3af' }}>{error}</div>
               <button
-                onClick={() => fetchRealHathoraRooms()}
+                onClick={() => fetchServers(true)}
                 style={{
                   marginTop: '16px',
                   backgroundColor: '#10b981',
