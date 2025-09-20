@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "turfloot-arena",
-      script: "colyseus-index.js",
+      script: "build/index.js",
       instances: 1,
       exec_mode: "fork",
       env: {
@@ -12,7 +12,11 @@ module.exports = {
       error_file: "./logs/err.log",
       out_file: "./logs/out.log",
       log_file: "./logs/combined.log",
-      time: true
+      time: true,
+      // Restart configuration
+      restart_delay: 4000,
+      max_restarts: 5,
+      min_uptime: "10s"
     }
   ]
 };
