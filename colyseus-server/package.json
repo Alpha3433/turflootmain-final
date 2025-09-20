@@ -4,6 +4,7 @@
   "description": "TurfLoot multiplayer game server using Colyseus",
   "main": "lib/index.js",
   "scripts": {
+    "prestart": "npm run build",
     "start": "node lib/index.js",
     "build": "tsc",
     "dev": "ts-node-esm src/index.ts"
