@@ -304,21 +304,21 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     if (showRefresh) setRefreshing(false)
   }
 
-  // Initialize real Hathora room discovery when modal opens
+  // Initialize Colyseus server discovery when modal opens
   useEffect(() => {
     if (isOpen) {
-      console.log('🏠 Real Hathora Server Browser opened - discovering rooms...')
-      fetchRealHathoraRooms()
+      console.log('🎮 Colyseus Server Browser opened - fetching servers...')
+      fetchServers()
     }
   }, [isOpen])
 
-  // Refresh rooms every 30 seconds while modal is open
+  // Refresh servers every 30 seconds while modal is open
   useEffect(() => {
     if (!isOpen) return
 
     const refreshInterval = setInterval(() => {
-      console.log('🔄 Refreshing Hathora rooms...')
-      fetchRealHathoraRooms()
+      console.log('🔄 Refreshing Colyseus servers...')
+      fetchServers(true)
     }, 30000) // 30 seconds
 
     return () => clearInterval(refreshInterval)
