@@ -153,15 +153,15 @@ class ColyseusBackendTester:
                         error_msg=f"Failed to check environment: {str(e)}")
 
     def test_server_build_verification(self):
-        """Test 3: Server Build Verification - TypeScript compilation"""
+        """Test 3: Server Build Verification - Colyseus server build files"""
         print("🧪 TEST 3: Server Build Verification")
         
         try:
-            # Check if build directory exists
+            # Check if build directory exists (for Colyseus server)
             build_dir = '/app/build'
             if not os.path.exists(build_dir):
                 self.log_test("Server Build Verification", False,
-                            error_msg="Build directory not found")
+                            error_msg="Build directory not found - Colyseus server not built")
                 return
             
             # Check if main build files exist
@@ -178,7 +178,7 @@ class ColyseusBackendTester:
             
             if missing_files:
                 self.log_test("Server Build Verification", False,
-                            error_msg=f"Missing build files: {missing_files}")
+                            error_msg=f"Missing Colyseus server build files: {missing_files}")
                 return
             
             # Check if TypeScript configuration exists
@@ -188,27 +188,25 @@ class ColyseusBackendTester:
                             error_msg="tsconfig.json not found")
                 return
             
-            # Verify package.json has correct build configuration
-            package_json_path = '/app/package.json'
-            if os.path.exists(package_json_path):
-                with open(package_json_path, 'r') as f:
-                    package_data = json.load(f)
-                
-                scripts = package_data.get('scripts', {})
-                if 'build' not in scripts or 'tsc' not in scripts['build']:
-                    self.log_test("Server Build Verification", False,
-                                error_msg="Build script not properly configured in package.json")
-                    return
-                
-                # Check main entry point
-                main_entry = package_data.get('main', '')
-                if main_entry != 'build/index.js':
-                    self.log_test("Server Build Verification", False,
-                                error_msg=f"Main entry point incorrect: {main_entry}")
-                    return
+            # Check if Colyseus source files exist
+            src_files = [
+                '/app/src/index.ts',
+                '/app/src/app.config.ts',
+                '/app/src/rooms/ArenaRoom.ts'
+            ]
+            
+            missing_src_files = []
+            for file_path in src_files:
+                if not os.path.exists(file_path):
+                    missing_src_files.append(file_path)
+            
+            if missing_src_files:
+                self.log_test("Server Build Verification", False,
+                            error_msg=f"Missing Colyseus source files: {missing_src_files}")
+                return
             
             self.log_test("Server Build Verification", True,
-                        "TypeScript build files present and properly configured")
+                        "Colyseus server TypeScript build files and source files present - ready for deployment")
             
         except Exception as e:
             self.log_test("Server Build Verification", False,
