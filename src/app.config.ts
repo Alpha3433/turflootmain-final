@@ -1,25 +1,39 @@
 import config from "@colyseus/tools";
-import { ArenaRoom } from "./rooms/ArenaRoom";
+import { ArenaRoom } from "./rooms/ArenaRoom.js";
 
 export default config({
   initializeGameServer: (gameServer) => {
-    // Define your room handlers
+    // Define room types
     gameServer.define("arena", ArenaRoom);
   },
 
   initializeExpress: (app) => {
-    // Custom Express middleware and routes
-    app.get("/health", (req: any, res: any) => {
+    // Health check endpoint
+    app.get("/health", (req, res) => {
       res.json({
         status: "healthy",
         timestamp: new Date().toISOString(),
-        version: "1.0.0"
+        server: "colyseus",
+        version: "1.0.0",
+        region: process.env.REGION || "default",
+        maxPlayers: process.env.MAX_PLAYERS_PER_ROOM || "50"
+      });
+    });
+
+    // Root endpoint
+    app.get("/", (req, res) => {
+      res.json({
+        name: "TurfLoot Arena",
+        status: "running",
+        version: "1.0.0",
+        server: "colyseus",
+        region: process.env.REGION || "default",
+        rooms: ["arena"]
       });
     });
   },
 
   beforeListen: () => {
-    // Anything you want to do before server starts listening
     console.log("🚀 TurfLoot Arena Server starting...");
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 Region: ${process.env.REGION || 'default'}`);
