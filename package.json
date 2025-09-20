@@ -18,7 +18,6 @@
     "@colyseus/ws-transport": "^0.16.5",
     "@colyseus/redis-driver": "^0.16.1",
     "@colyseus/redis-presence": "^0.16.4",
-    "@colyseus/auth": "^0.16.22",
     "@colyseus/uwebsockets-transport": "^0.16.5",
     "@pm2/io": "^6.1.0",
     "ws": "^8.18.0"
