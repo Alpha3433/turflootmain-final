@@ -344,9 +344,9 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     return flagMap[region] || '🌍'
   }
 
-  // Process real Hathora rooms - exclude practice servers (entryFee === 0) and sort by ping
-  const processedRooms = realHathoraRooms
-    .filter(room => room.entryFee > 0) // Only show cash games, remove practice servers
+  // Process Colyseus servers - show all servers including practice (entryFee === 0)
+  const processedRooms = servers
+    //.filter(room => room.entryFee > 0) // Show all servers including practice
     .map(room => ({
       ...room,
       stakeCategory: getStakeCategory(room.entryFee || 0),
