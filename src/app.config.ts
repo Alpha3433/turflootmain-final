@@ -4,9 +4,7 @@ import { ArenaRoom } from "./rooms/ArenaRoom";
 export default config({
   initializeGameServer: (gameServer) => {
     // Define your room handlers
-    gameServer.define("arena", ArenaRoom, {
-      maxClients: 50,
-    });
+    gameServer.define("arena", ArenaRoom);
   },
 
   initializeExpress: (app) => {
