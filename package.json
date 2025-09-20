@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@colyseus/schema": "^3.0.60",
+    "@colyseus/tools": "^0.16.13",
     "@hathora/client-sdk": "^1.3.1",
     "@privy-io/react-auth": "^1.76.2",
     "@privy-io/wagmi": "^0.2.12",
@@ -22,6 +24,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "colyseus": "^0.16.4",
     "colyseus.js": "^0.16.19",
     "lucide-react": "^0.378.0",
     "mongodb": "^6.6.2",
