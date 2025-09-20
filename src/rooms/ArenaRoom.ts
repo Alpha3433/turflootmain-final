@@ -43,13 +43,13 @@ export class GameState extends Schema {
 }
 
 export class ArenaRoom extends Room<GameState> {
-  maxClients = 50;
+  maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
   
   // Game configuration
-  worldSize = 4000;
+  worldSize = parseInt(process.env.WORLD_SIZE || '4000');
   maxCoins = 100;
   maxViruses = 15;
-  tickRate = 20; // 20 TPS server logic
+  tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
   
   onCreate() {
     console.log("🌍 Arena room initialized");
