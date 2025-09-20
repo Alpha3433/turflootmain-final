@@ -18,7 +18,7 @@ from typing import Dict, Any, List, Optional
 
 class NavigationFixTester:
     def __init__(self):
-        self.base_url = "https://turfws-solver.preview.emergentagent.com"
+        self.base_url = "https://turfmulti.preview.emergentagent.com"
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
