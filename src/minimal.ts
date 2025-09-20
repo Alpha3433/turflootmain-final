@@ -16,6 +16,12 @@ export class MinimalRoom extends Room<MinimalState> {
   onCreate() {
     console.log("🚀 Minimal TurfLoot room created");
     this.setState(new MinimalState());
+    
+    // Set up message handlers
+    this.onMessage("ping", (client, message) => {
+      console.log(`🏓 Ping from ${client.sessionId}`);
+      client.send("pong", { timestamp: Date.now() });
+    });
   }
 
   onJoin(client: Client) {
@@ -26,10 +32,6 @@ export class MinimalRoom extends Room<MinimalState> {
   onLeave(client: Client) {
     console.log(`👋 Player left: ${client.sessionId}`);
     this.state.playerCount = Math.max(0, this.state.playerCount - 1);
-  }
-
-  onMessage(client: Client, message: any) {
-    console.log(`📨 Received message from ${client.sessionId}:`, message);
   }
 }
 
