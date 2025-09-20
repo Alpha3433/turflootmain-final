@@ -207,3 +207,7 @@ node_modules/next/next-swc-fallback/@next/swc-linux-arm64-gnu/next-swc.linux-arm
 # Environment files
 *.env
 *.env.*
+-e 
+# Environment files
+*.env
+*.env.*
