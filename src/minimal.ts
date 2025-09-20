@@ -1,6 +1,6 @@
 import { listen } from "@colyseus/tools";
 import config from "@colyseus/tools";
-import { Room, Client } from "colyseus";
+import { Room, Client } from "@colyseus/core";
 import { Schema, type } from "@colyseus/schema";
 
 // Minimal state schema
