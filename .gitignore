@@ -1,9 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# IDE and editors
-.idea/
-.vscode/
-
 # Dependencies
 node_modules/
 /node_modules
@@ -28,186 +24,35 @@ next-env.d.ts
 # Production builds
 /build
 dist/
-dist
+lib/
 
-# Environment files (comprehensive coverage)
-*token.json*
-*credentials.json*
+# Environment files
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Logs and debug files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-dump.rdb
+*.log
 
 # System files
 .DS_Store
 *.pem
 
-# Python
-__pycache__/
-*pyc*
-venv/
-.venv/
-
-# Development tools
-chainlit.md
-.chainlit
-.ipynb_checkpoints/
-.ac
+# IDE and editors
+.idea/
+.vscode/
 
 # Deployment
 .vercel
 
-# Data and databases
-agenthub/agents/youtube/db
-
-# Archive files and large assets
-**/*.zip
-**/*.tar.gz
-**/*.tar
-**/*.tgz
-*.pack
-*.deb
-*.dylib
-
-# Build caches
-.cache/
-
-# Mobile development
-android-sdk/ node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
-node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
-node_modules/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
-.next/cache/webpack/server-production/0.pack
-.next/cache/webpack/client-production/0.pack
-.next/cache/webpack/client-development/1.pack.gz
-node_modules/next/next-swc-fallback/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
-node_modules/next/next-swc-fallback/@next/swc-linux-arm64-gnu/next-swc.linux-arm64-gnu.node
-.yarn/cache/phaser-npm-3.90.0-64c22be6a3-43d405832f.zip
-.yarn/cache/@next-swc-linux-arm64-gnu-npm-14.2.4-acf896e2cf-10c0.zip
-.next/cache/webpack/server-production/1.pack
-.next/cache/webpack/server-production/2.pack
-.next/cache/webpack/server-production/3.pack
-.next/cache/webpack/client-production/1.pack
-.next/cache/webpack/client-production/5.pack
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Colyseus server builds
+colyseus-server/lib/
+colyseus-server/node_modules/
+colyseus-server-minimal/node_modules/.next/cache/webpack/client-production/0.pack
