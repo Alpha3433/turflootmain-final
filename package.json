@@ -1,12 +1,13 @@
 {
-  "name": "turfloot-nextjs",
-  "version": "0.1.0",
-  "private": true,
+  "name": "turfloot-arena-colyseus",
+  "version": "1.0.0",
+  "description": "TurfLoot Arena - Colyseus Cloud Server",
+  "main": "build/index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "ts-node-esm src/index.ts",
+    "loadtest": "colyseus-loadtest loadtest/example.ts --room arena --numClients 2"
   },
   "dependencies": {
     "@colyseus/core": "^0.16.21",
