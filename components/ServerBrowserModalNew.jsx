@@ -595,7 +595,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                     color: '#10b981',
                     borderBottom: '1px solid #4a5568'
                   }}>
-                    🟢 ACTIVE HATHORA ROOMS ({activeRooms.length})
+                    🟢 ACTIVE COLYSEUS SERVERS ({activeRooms.length})
                   </div>
                   {activeRooms.map(room => (
                     <div
