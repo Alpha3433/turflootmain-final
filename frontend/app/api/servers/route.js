@@ -15,12 +15,12 @@ export async function GET(request) {
       const db = client.db('turfloot')
       const sessionsCollection = db.collection('game_sessions')
 
-      // Get active Colyseus sessions (last activity within 2 minutes) 
-      const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
-      console.log('🕐 Looking for sessions newer than:', twoMinutesAgo.toISOString())
+      // Get active Colyseus sessions (last activity within 10 minutes) 
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
+      console.log('🕐 Looking for sessions newer than:', tenMinutesAgo.toISOString())
       
       const activeSessions = await sessionsCollection.find({
-        'lastActivity': { $gte: twoMinutesAgo },
+        'lastActivity': { $gte: tenMinutesAgo },
         'mode': { $regex: /colyseus/i }
       }).toArray()
       
