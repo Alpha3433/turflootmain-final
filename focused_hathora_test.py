@@ -9,7 +9,7 @@ import json
 import time
 import os
 
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://gameloop-migrate.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-colyseus.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def test_real_hathora_integration():
