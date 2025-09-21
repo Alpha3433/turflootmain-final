@@ -4,6 +4,9 @@
   "description": "TurfLoot - Real-time blockchain multiplayer game",
   "private": true,
   "scripts": {
+    "build": "cd server && npm ci && npm run build",
+    "start": "cd server && npm start",
+    "dev": "cd server && npm run dev",
     "dev:server": "cd server && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
     "build:server": "cd server && npm run build",
