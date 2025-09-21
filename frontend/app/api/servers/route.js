@@ -4,24 +4,10 @@ export async function GET(request) {
   try {
     console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
     
-    // Query Colyseus Cloud for available rooms
+    // Query our database for active Colyseus rooms and sessions
     let availableRooms = []
     let totalRealPlayers = 0
     
-    try {
-      // Check if there are active rooms on Colyseus Cloud
-      const colyseusResponse = await fetch(`https://au-syd-ab3eaf4e.colyseus.cloud/matchmake/arena`)
-      if (colyseusResponse.ok) {
-        const roomsData = await colyseusResponse.json()
-        availableRooms = roomsData || []
-        console.log(`📊 Found ${availableRooms.length} active Colyseus rooms`)
-      }
-    } catch (error) {
-      console.warn('⚠️ Could not fetch Colyseus rooms, showing generic arena:', error.message)
-    }
-
-    // Query database for accurate player count
-    let realPlayers = 0
     try {
       const { MongoClient } = await import('mongodb')
       const client = new MongoClient(process.env.MONGO_URL)
@@ -29,21 +15,64 @@ export async function GET(request) {
       const db = client.db('turfloot')
       const sessionsCollection = db.collection('game-sessions')
 
-      // Count active Colyseus sessions (last activity within 2 minutes)
+      // Get active Colyseus sessions (last activity within 2 minutes) 
       const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
-      const activeSessionsCount = await sessionsCollection.countDocuments({
+      const activeSessions = await sessionsCollection.find({
         'session.lastActivity': { $gte: twoMinutesAgo },
         'session.mode': { $regex: /colyseus/i }
+      }).toArray()
+      
+      totalRealPlayers = activeSessions.length
+      console.log(`📊 Database shows ${totalRealPlayers} active Colyseus players`)
+      
+      // Group sessions by room ID to create room entries
+      const roomsMap = new Map()
+      
+      activeSessions.forEach(session => {
+        const roomId = session.roomId || session.session?.roomId || 'colyseus-arena-default'
+        const region = session.session?.region || 'AU'
+        const mode = session.session?.mode || 'colyseus-multiplayer'
+        
+        if (roomsMap.has(roomId)) {
+          roomsMap.get(roomId).currentPlayers += 1
+        } else {
+          roomsMap.set(roomId, {
+            id: roomId,
+            name: `Arena Battle ${roomsMap.size > 0 ? `#${roomsMap.size + 1}` : ''}`,
+            serverType: 'colyseus',
+            roomType: 'arena',
+            region: region,
+            mode: mode,
+            currentPlayers: 1,
+            maxPlayers: 50,
+            status: 'active',
+            avgWaitTime: 'Join Now',
+            entryFee: 0,
+            prizePool: 0,
+            colyseusRoomId: roomId,
+            colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud',
+            joinable: true,
+            lastActivity: session.session?.lastActivity || new Date()
+          })
+        }
       })
       
-      realPlayers = activeSessionsCount
-      totalRealPlayers = realPlayers
-      console.log(`📊 Database shows ${realPlayers} active Colyseus players`)
+      availableRooms = Array.from(roomsMap.values())
+      
+      // Update status based on player count and capacity
+      availableRooms.forEach(room => {
+        room.avgWaitTime = room.currentPlayers < room.maxPlayers ? 'Join Now' : 'Full'
+        room.joinable = room.currentPlayers < room.maxPlayers
+        room.status = room.currentPlayers > 0 ? 'active' : 'waiting'
+      })
+      
+      console.log(`📊 Found ${availableRooms.length} active Colyseus rooms from database`)
       
       await client.close()
+      
     } catch (error) {
-      console.warn(`⚠️ Could not query database for Colyseus players:`, error.message)
-      realPlayers = 0
+      console.warn(`⚠️ Could not query database for Colyseus rooms:`, error.message)
+      totalRealPlayers = 0
     }
 
     // Create server entries for active rooms
@@ -51,28 +80,7 @@ export async function GET(request) {
     
     if (availableRooms.length > 0) {
       // Show each active room as a separate server entry
-      availableRooms.forEach((room, index) => {
-        const playersInRoom = room.clients || 0
-        const maxPlayers = room.maxClients || 50
-        
-        servers.push({
-          id: room.roomId || `colyseus-arena-${index}`,
-          name: `Arena Battle #${index + 1}`,
-          serverType: 'colyseus',
-          roomType: 'arena',
-          region: 'AU',
-          mode: 'colyseus-multiplayer',
-          currentPlayers: playersInRoom,
-          maxPlayers: maxPlayers,
-          status: playersInRoom > 0 ? 'active' : 'waiting',
-          avgWaitTime: playersInRoom < maxPlayers ? 'Join Now' : 'Full',
-          entryFee: 0,
-          prizePool: 0,
-          colyseusRoomId: room.roomId,
-          colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud',
-          joinable: playersInRoom < maxPlayers
-        })
-      })
+      servers.push(...availableRooms)
     } else {
       // Show a default arena if no active rooms (allows creating new rooms)
       servers.push({
@@ -82,9 +90,9 @@ export async function GET(request) {
         roomType: 'arena',
         region: 'AU', 
         mode: 'colyseus-multiplayer',
-        currentPlayers: realPlayers,
+        currentPlayers: 0,
         maxPlayers: 50,
-        status: realPlayers > 0 ? 'active' : 'waiting',
+        status: 'waiting',
         avgWaitTime: 'Join Now',
         entryFee: 0,
         prizePool: 0,
@@ -94,6 +102,7 @@ export async function GET(request) {
     }
     
     console.log(`📊 Returning ${servers.length} Colyseus server(s) with ${totalRealPlayers} total players`)
+    console.log(`🔍 Server details:`, servers.map(s => `${s.name} (${s.currentPlayers}/${s.maxPlayers})`))
     
     return NextResponse.json({
       servers: servers,
