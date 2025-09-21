@@ -40,16 +40,7 @@
       "static/chunks/fd9d1056-c1467956791053fe.js",
       "static/chunks/7023-68e3a26057158208.js",
       "static/chunks/main-app-b56364f70b27a961.js",
-      "static/chunks/app/agario/page-68a99be2a485fd88.js"
-    ],
-    "/blocked/page": [
-      "static/chunks/webpack-2fb9188287952bfd.js",
-      "static/chunks/fd9d1056-c1467956791053fe.js",
-      "static/chunks/7023-68e3a26057158208.js",
-      "static/chunks/main-app-b56364f70b27a961.js",
-      "static/chunks/346-4cbba2d294bed834.js",
-      "static/chunks/7138-deb15d5331dec4e6.js",
-      "static/chunks/app/blocked/page-77f14f14f8044697.js"
+      "static/chunks/app/agario/page-ba080a66308608c0.js"
     ],
     "/dashboard/page": [
       "static/chunks/webpack-2fb9188287952bfd.js",
@@ -59,6 +50,15 @@
       "static/chunks/346-4cbba2d294bed834.js",
       "static/chunks/7138-deb15d5331dec4e6.js",
       "static/chunks/app/dashboard/page-ac0fd5a2d3e18574.js"
+    ],
+    "/blocked/page": [
+      "static/chunks/webpack-2fb9188287952bfd.js",
+      "static/chunks/fd9d1056-c1467956791053fe.js",
+      "static/chunks/7023-68e3a26057158208.js",
+      "static/chunks/main-app-b56364f70b27a961.js",
+      "static/chunks/346-4cbba2d294bed834.js",
+      "static/chunks/7138-deb15d5331dec4e6.js",
+      "static/chunks/app/blocked/page-77f14f14f8044697.js"
     ],
     "/demo/page": [
       "static/chunks/webpack-2fb9188287952bfd.js",
@@ -114,13 +114,6 @@
       "static/chunks/main-app-b56364f70b27a961.js",
       "static/chunks/app/test-env/page-ce37610784c991c0.js"
     ],
-    "/test-login/page": [
-      "static/chunks/webpack-2fb9188287952bfd.js",
-      "static/chunks/fd9d1056-c1467956791053fe.js",
-      "static/chunks/7023-68e3a26057158208.js",
-      "static/chunks/main-app-b56364f70b27a961.js",
-      "static/chunks/app/test-login/page-54d11238004dc47f.js"
-    ],
     "/page": [
       "static/chunks/webpack-2fb9188287952bfd.js",
       "static/chunks/fd9d1056-c1467956791053fe.js",
@@ -129,6 +122,13 @@
       "static/chunks/2707-e6d4838f4aa178aa.js",
       "static/chunks/993-698aa469c3abeabc.js",
       "static/chunks/app/page-8130cf5639f9e977.js"
+    ],
+    "/test-login/page": [
+      "static/chunks/webpack-2fb9188287952bfd.js",
+      "static/chunks/fd9d1056-c1467956791053fe.js",
+      "static/chunks/7023-68e3a26057158208.js",
+      "static/chunks/main-app-b56364f70b27a961.js",
+      "static/chunks/app/test-login/page-54d11238004dc47f.js"
     ],
     "/test-privy-solana/page": [
       "static/chunks/webpack-2fb9188287952bfd.js",
