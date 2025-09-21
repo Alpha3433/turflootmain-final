@@ -18,8 +18,9 @@ export async function GET(request) {
       // Get active Colyseus sessions (last activity within 2 minutes) 
       const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
       const activeSessions = await sessionsCollection.find({
-        'session.lastActivity': { $gte: twoMinutesAgo },
-        'session.mode': { $regex: /colyseus/i }
+        'lastActivity': { $gte: twoMinutesAgo },
+        'mode': { $regex: /colyseus/i },
+        'status': 'active'
       }).toArray()
       
       totalRealPlayers = activeSessions.length
