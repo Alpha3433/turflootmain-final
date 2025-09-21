@@ -888,7 +888,7 @@ const AgarIOGame = () => {
           
           setWsConnection('connected')
           console.log('✅ Connected to Colyseus arena')
-          console.log(`🎮 Room ID: ${room.id}`)
+          console.log(`🎮 Room ID: ${room.roomId}`)
           console.log(`👥 Session ID: ${room.sessionId}`)
 
           // Store room reference for sending inputs
