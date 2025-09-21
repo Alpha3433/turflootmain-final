@@ -6,6 +6,7 @@ export const revalidate = 0
 
 export async function GET(request) {
   console.log('🚀 SERVERS API CALLED AT:', new Date().toISOString())
+  console.log('🔥 DEBUG: This is the /app/app/api/servers/route.js file - MAIN VERSION')
   try {
     console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
     
