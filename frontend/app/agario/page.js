@@ -865,14 +865,24 @@ const AgarIOGame = () => {
 
         console.log('🔑 Connecting with user:', { privyUserId, playerName })
 
-        // Connect to Colyseus arena
-        const room = await joinArena({ privyUserId, playerName })
-        
-        setWsConnection('connected')
-        console.log('✅ Connected to Colyseus arena')
+        // Connect to Colyseus arena with timeout and error handling
+        try {
+          console.log('🚀 Attempting Colyseus connection...')
+          
+          // Add a timeout promise to prevent hanging
+          const connectionTimeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Colyseus connection timeout')), 10000)
+          )
+          
+          const connectionPromise = joinArena({ privyUserId, playerName })
+          
+          const room = await Promise.race([connectionPromise, connectionTimeout])
+          
+          setWsConnection('connected')
+          console.log('✅ Connected to Colyseus arena')
 
-        // Store room reference for sending inputs
-        wsRef.current = room
+          // Store room reference for sending inputs
+          wsRef.current = room
         
         // Set up state change listener
         room.onStateChange((state) => {
