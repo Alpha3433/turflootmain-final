@@ -11,7 +11,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://turfloot-colyseus.preview.emergentagent.com"
+BASE_URL = "https://turfloot-mp.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class ColyseusRoomTrackingTester:

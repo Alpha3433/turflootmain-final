@@ -30,7 +30,7 @@ from datetime import datetime
 class CashoutUIRegressionTester:
     def __init__(self):
         # Get base URL from environment
-        self.base_url = "https://turfloot-colyseus.preview.emergentagent.com/api"
+        self.base_url = "https://turfloot-mp.preview.emergentagent.com/api"
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
