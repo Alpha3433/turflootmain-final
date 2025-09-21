@@ -13,7 +13,7 @@ import sys
 from urllib.parse import urlparse
 
 # Test configuration
-BASE_URL = "https://turfloot-mp.preview.emergentagent.com"
+BASE_URL = "https://turf-arena.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class WebSocketSendShimTester:
@@ -317,7 +317,7 @@ class WebSocketSendShimTester:
         
         try:
             # Test WebSocket URL construction for Hathora
-            base_url = "https://turfloot-mp.preview.emergentagent.com"
+            base_url = "https://turf-arena.preview.emergentagent.com"
             
             # Simulate the WebSocket URL construction that would happen
             # after the fix is applied

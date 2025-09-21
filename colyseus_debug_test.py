@@ -24,7 +24,7 @@ import time
 import sys
 
 # Configuration
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-mp.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turf-arena.preview.emergentagent.com')
 MONGO_URL = os.getenv('MONGO_URL', 'mongodb://localhost:27017/turfloot')
 
 def print_section(title):
