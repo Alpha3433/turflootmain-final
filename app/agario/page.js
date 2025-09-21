@@ -231,7 +231,7 @@ const AgarIOGame = () => {
       
       return {
         success: true,
-        roomId: room.id,
+        roomId: room.roomId,
         serverEndpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT,
         gameMode: fee > 0 ? 'cash-game' : 'practice',
         region: region,
