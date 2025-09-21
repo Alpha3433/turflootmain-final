@@ -37,6 +37,7 @@ export async function GET(request, { params }) {
 
     // Servers endpoint for Colyseus server browser
     if (route === 'servers') {
+      console.error('🚨 SERVERS ENDPOINT HIT: route === servers is TRUE')
       try {
         console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
         
