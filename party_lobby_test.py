@@ -20,7 +20,7 @@ import sys
 from datetime import datetime
 
 # Test Configuration
-BASE_URL = "https://turfmulti.preview.emergentagent.com"
+BASE_URL = "https://gameloop-migrate.preview.emergentagent.com"
 LOCAL_URL = "http://localhost:3000"
 
 # Use localhost for testing as per environment configuration

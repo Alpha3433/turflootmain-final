@@ -25,7 +25,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://turfmulti.preview.emergentagent.com"
+BASE_URL = "https://gameloop-migrate.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraProcessTester:
