@@ -1656,6 +1656,12 @@ const AgarIOGame = () => {
     generateEnemies() {
       this.enemies = []
       
+      // Skip bot generation for multiplayer games (Colyseus) - only real human players
+      if (isMultiplayer) {
+        console.log('🌐 Skipping bot generation for multiplayer game - real players only!')
+        return
+      }
+      
       // Skip bot generation for paid/cash games - only real human players
       if (this.isCashGame) {
         console.log('💰 Skipping bot generation for cash game - humans only!')
