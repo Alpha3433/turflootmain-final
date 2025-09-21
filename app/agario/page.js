@@ -920,8 +920,9 @@ const AgarIOGame = () => {
 
         // Send ping every 5 seconds for latency measurement
         const pingInterval = setInterval(() => {
-          if (room && colyseusClient.default.isConnected) {
-            colyseusClient.default.sendPing()
+          if (room && room.connection && room.connection.readyState === WebSocket.OPEN) {
+            // Send ping message through Colyseus room
+            room.send("ping", { timestamp: Date.now() })
           }
         }, 5000)
 
