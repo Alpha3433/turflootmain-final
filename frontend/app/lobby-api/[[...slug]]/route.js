@@ -31,7 +31,7 @@ export async function OPTIONS() {
 }
 
 // Party-integrated lobby system
-export class PartyLobbySystem {
+class PartyLobbySystem {
   // Create a game lobby that party members can join together
   static async createPartyLobby(ownerId, roomType, entryFee) {
     const db = await getDb()
