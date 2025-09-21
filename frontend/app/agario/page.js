@@ -884,40 +884,40 @@ const AgarIOGame = () => {
           // Store room reference for sending inputs
           wsRef.current = room
         
-        // Set up state change listener
-        room.onStateChange((state) => {
-          if (!state) {
-            console.log('📊 Colyseus state is null/undefined')
-            return
-          }
-          
-          // Update connected player count with null checks
-          const playerCount = state.players ? 
-            (state.players.size || Object.keys(state.players).length || 0) : 0
-          setConnectedPlayers(playerCount)
-          
-          // Update local game state with server data
-          if (gameRef.current && gameRef.current.updateFromServer) {
-            gameRef.current.updateFromServer(state)
-          }
-        })
+          // Set up state change listener
+          room.onStateChange((state) => {
+            if (!state) {
+              console.log('📊 Colyseus state is null/undefined')
+              return
+            }
+            
+            // Update connected player count with null checks
+            const playerCount = state.players ? 
+              (state.players.size || Object.keys(state.players).length || 0) : 0
+            setConnectedPlayers(playerCount)
+            
+            // Update local game state with server data
+            if (gameRef.current && gameRef.current.updateFromServer) {
+              gameRef.current.updateFromServer(state)
+            }
+          })
 
-        // Handle player changes (with null check)
-        room.onStateChange.once((state) => {
-          if (state && state.players) {
-            state.players.onAdd((player, sessionId) => {
-              console.log(`👋 Player joined: ${player.name || 'Unknown'}`)
-              setConnectedPlayers(prev => prev + 1)
-            })
+          // Handle player changes (with null check)
+          room.onStateChange.once((state) => {
+            if (state && state.players) {
+              state.players.onAdd((player, sessionId) => {
+                console.log(`👋 Player joined: ${player.name || 'Unknown'}`)
+                setConnectedPlayers(prev => prev + 1)
+              })
 
-            state.players.onRemove((player, sessionId) => {
-              console.log(`👋 Player left: ${sessionId}`)
-              setConnectedPlayers(prev => Math.max(0, prev - 1))
-            })
-          }
-        })
+              state.players.onRemove((player, sessionId) => {
+                console.log(`👋 Player left: ${sessionId}`)
+                setConnectedPlayers(prev => Math.max(0, prev - 1))
+              })
+            }
+          })
 
-        // Handle room errors
+          // Handle room errors
         room.onError((code, message) => {
           console.error('❌ Colyseus room error:', code, message)
           setWsConnection('error')
