@@ -19,15 +19,8 @@ const nextConfig = {
     COLYSEUS_ENDPOINT: process.env.COLYSEUS_ENDPOINT || 'ws://localhost:2567',
   },
   
-  // Allow WebSocket connections
-  async rewrites() {
-    return [
-      {
-        source: '/colyseus/:path*',
-        destination: `${process.env.COLYSEUS_ENDPOINT || 'ws://localhost:2567'}/:path*`,
-      },
-    ];
-  },
+  // Remove WebSocket rewrites as they can't be handled by Next.js
+  // WebSocket connections will be made directly from client-side
 };
 
 module.exports = nextConfig;
