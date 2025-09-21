@@ -30,9 +30,9 @@ export async function GET(request) {
       const roomsMap = new Map()
       
       activeSessions.forEach(session => {
-        const roomId = session.roomId || session.session?.roomId || 'colyseus-arena-default'
-        const region = session.session?.region || 'AU'
-        const mode = session.session?.mode || 'colyseus-multiplayer'
+        const roomId = session.roomId || 'colyseus-arena-default'
+        const region = session.region || 'AU'
+        const mode = session.mode || 'colyseus-multiplayer'
         
         if (roomsMap.has(roomId)) {
           roomsMap.get(roomId).currentPlayers += 1
@@ -48,12 +48,12 @@ export async function GET(request) {
             maxPlayers: 50,
             status: 'active',
             avgWaitTime: 'Join Now',
-            entryFee: 0,
+            entryFee: session.entryFee || 0,
             prizePool: 0,
             colyseusRoomId: roomId,
             colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud',
             joinable: true,
-            lastActivity: session.session?.lastActivity || new Date()
+            lastActivity: session.lastActivity || new Date()
           })
         }
       })
