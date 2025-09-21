@@ -2,96 +2,113 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request) {
   try {
-    console.log('🎮 Colyseus Server Browser API: Returning available Colyseus servers...')
+    console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
     
-    // Colyseus server configuration
-    const colyseusEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'ws://localhost:2567'
+    // Query Colyseus Cloud for available rooms
+    let availableRooms = []
+    let totalRealPlayers = 0
     
-    // Create a single arena server entry for the server browser
-    const arenaServer = {
-      id: 'colyseus-arena-global',
-      roomType: 'arena',
-      name: 'TurfLoot Arena',
-      region: 'Australia',
-      regionId: 'au-syd',
-      displayName: 'Global Arena',
-      mode: 'multiplayer',
-      gameType: 'Arena Battle',
-      description: 'Real-time multiplayer arena with up to 50 players',
-      maxPlayers: 50,
-      minPlayers: 1,
-      currentPlayers: 0, // Will be updated dynamically
-      waitingPlayers: 0,
-      isRunning: true,
-      ping: null, // Will be measured client-side
-      avgWaitTime: 'Join Now',
-      difficulty: 'All Players',
-      entryFee: 0,
-      serverFee: 0,
-      totalCost: 0,
-      potentialWinning: 0,
-      prizePool: 0,
-      stake: 0,
-      status: 'active',
-      serverType: 'colyseus',
-      endpoint: colyseusEndpoint,
-      lastUpdated: new Date().toISOString(),
-      timestamp: new Date().toISOString(),
-      canJoin: true
+    try {
+      // Check if there are active rooms on Colyseus Cloud
+      const colyseusResponse = await fetch(`https://au-syd-ab3eaf4e.colyseus.cloud/matchmake/arena`)
+      if (colyseusResponse.ok) {
+        const roomsData = await colyseusResponse.json()
+        availableRooms = roomsData || []
+        console.log(`📊 Found ${availableRooms.length} active Colyseus rooms`)
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not fetch Colyseus rooms, showing generic arena:', error.message)
     }
 
-    // Try to get real player count from game sessions database
+    // Query database for accurate player count
     let realPlayers = 0
     try {
       const { MongoClient } = await import('mongodb')
       const client = new MongoClient(process.env.MONGO_URL)
-      
       await client.connect()
       const db = client.db('turfloot')
-      const gameSessions = db.collection('game_sessions')
-      
-      // Count active players in Colyseus arena (active within last 2 minutes)
-      const activeSessionsCount = await gameSessions.countDocuments({
-        roomId: 'colyseus-arena-global',
-        status: 'active',
-        lastActivity: { $gte: new Date(Date.now() - 2 * 60 * 1000) }
+      const sessionsCollection = db.collection('game-sessions')
+
+      // Count active Colyseus sessions (last activity within 2 minutes)
+      const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
+      const activeSessionsCount = await sessionsCollection.countDocuments({
+        'session.lastActivity': { $gte: twoMinutesAgo },
+        'session.mode': { $regex: /colyseus/i }
       })
       
       realPlayers = activeSessionsCount
-      console.log(`📊 Colyseus Arena: ${realPlayers} real players from database`)
+      totalRealPlayers = realPlayers
+      console.log(`📊 Database shows ${realPlayers} active Colyseus players`)
       
       await client.close()
     } catch (error) {
-      console.warn(`⚠️ Could not query database for Colyseus arena:`, error.message)
+      console.warn(`⚠️ Could not query database for Colyseus players:`, error.message)
       realPlayers = 0
     }
 
-    // Update server with real player count
-    arenaServer.currentPlayers = realPlayers
-    arenaServer.status = realPlayers > 0 ? 'active' : 'waiting'
-    arenaServer.avgWaitTime = realPlayers > 0 ? 'Join Now' : 'Waiting for players'
-
-    // Return single server array
-    const servers = [arenaServer]
+    // Create server entries for active rooms
+    const servers = []
     
-    console.log(`📊 Returning Colyseus arena server with ${realPlayers} players`)
+    if (availableRooms.length > 0) {
+      // Show each active room as a separate server entry
+      availableRooms.forEach((room, index) => {
+        const playersInRoom = room.clients || 0
+        const maxPlayers = room.maxClients || 50
+        
+        servers.push({
+          id: room.roomId || `colyseus-arena-${index}`,
+          name: `Arena Battle #${index + 1}`,
+          serverType: 'colyseus',
+          roomType: 'arena',
+          region: 'AU',
+          mode: 'colyseus-multiplayer',
+          currentPlayers: playersInRoom,
+          maxPlayers: maxPlayers,
+          status: playersInRoom > 0 ? 'active' : 'waiting',
+          avgWaitTime: playersInRoom < maxPlayers ? 'Join Now' : 'Full',
+          entryFee: 0,
+          prizePool: 0,
+          colyseusRoomId: room.roomId,
+          colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud',
+          joinable: playersInRoom < maxPlayers
+        })
+      })
+    } else {
+      // Show a default arena if no active rooms (allows creating new rooms)
+      servers.push({
+        id: 'colyseus-arena-default',
+        name: 'Arena Battle',
+        serverType: 'colyseus',
+        roomType: 'arena',
+        region: 'AU', 
+        mode: 'colyseus-multiplayer',
+        currentPlayers: realPlayers,
+        maxPlayers: 50,
+        status: realPlayers > 0 ? 'active' : 'waiting',
+        avgWaitTime: 'Join Now',
+        entryFee: 0,
+        prizePool: 0,
+        colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud',
+        joinable: true
+      })
+    }
+    
+    console.log(`📊 Returning ${servers.length} Colyseus server(s) with ${totalRealPlayers} total players`)
     
     return NextResponse.json({
       servers: servers,
-      totalPlayers: realPlayers,
-      totalActiveServers: realPlayers > 0 ? 1 : 0,
-      totalServers: 1,
+      totalPlayers: totalRealPlayers,
+      totalActiveServers: servers.filter(s => s.status === 'active').length,
+      totalServers: servers.length,
       practiceServers: 0,
       cashServers: 0,
-      regions: ['Global'],
+      regions: ['AU'],
       gameTypes: [{ 
         name: 'Arena Battle', 
-        servers: 1 
+        servers: servers.length 
       }],
       colyseusEnabled: true,
-      colyseusEndpoint: colyseusEndpoint,
-      lastUpdated: new Date().toISOString(),
-      timestamp: new Date().toISOString()
+      colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud'
     })
     
   } catch (error) {
