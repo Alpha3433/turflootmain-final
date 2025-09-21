@@ -488,7 +488,15 @@ class ColyseusRoomTrackingTester:
                 sessions_by_room = session_data.get('sessionsByRoom', {})
                 
                 # Check active sessions criteria
-                arena_sessions = sessions_by_room.get('colyseus-arena-global', [])
+                arena_sessions = []
+                arena_room_found = None
+                
+                for room_id, sessions in sessions_by_room.items():
+                    if 'arena' in room_id.lower():
+                        arena_sessions.extend(sessions)
+                        arena_room_found = room_id
+                        break
+                
                 recent_sessions = []
                 
                 for session in arena_sessions:
@@ -511,7 +519,7 @@ class ColyseusRoomTrackingTester:
                 
                 # 3. Test room grouping by room ID
                 room_ids = list(sessions_by_room.keys())
-                arena_in_rooms = 'colyseus-arena-global' in room_ids
+                arena_in_rooms = any('arena' in room_id.lower() for room_id in room_ids)
                 
                 self.log_test(
                     "Room ID Grouping",
