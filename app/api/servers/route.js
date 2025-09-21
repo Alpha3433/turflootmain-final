@@ -53,7 +53,7 @@ export async function GET(request) {
             colyseusRoomId: roomId,
             colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud',
             joinable: true,
-            lastActivity: session.session?.lastActivity || new Date(),
+            lastActivity: session.lastActivity || new Date(),
             // Legacy fields for compatibility
             regionId: 'au-syd',
             displayName: roomsMap.size === 0 ? 'Global Arena' : `Arena #${roomsMap.size + 1}`,
