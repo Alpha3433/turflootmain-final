@@ -17,11 +17,21 @@ export async function GET(request) {
 
       // Get active Colyseus sessions (last activity within 2 minutes) 
       const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
+      console.log(`🔍 Querying for sessions active since: ${twoMinutesAgo}`)
+      
       const activeSessions = await sessionsCollection.find({
         'lastActivity': { $gte: twoMinutesAgo },
         'mode': { $regex: /colyseus/i },
         'status': 'active'
       }).toArray()
+      
+      console.log(`🔍 Query found ${activeSessions.length} active sessions:`, activeSessions.map(s => ({
+        roomId: s.roomId,
+        userId: s.userId,
+        mode: s.mode,
+        lastActivity: s.lastActivity,
+        status: s.status
+      })))
       
       totalRealPlayers = activeSessions.length
       console.log(`📊 Database shows ${totalRealPlayers} active Colyseus players`)
