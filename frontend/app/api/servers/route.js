@@ -12,11 +12,21 @@ export async function GET() {
     
     // Get active Colyseus sessions (last activity within 10 minutes) 
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
+    console.log('🔍 FRONTEND SERVERS API: Querying for active sessions since:', tenMinutesAgo)
+    
     const activeSessions = await sessionsCollection.find({
       'lastActivity': { $gte: tenMinutesAgo },
       'mode': { $regex: /colyseus/i },
-      'roomId': { $ne: 'colyseus-arena' } // Exclude default room template
+      'status': 'active'  // Added missing status filter
     }).toArray()
+    
+    console.log(`🔍 FRONTEND SERVERS API: Found ${activeSessions.length} active sessions:`, activeSessions.map(s => ({
+      roomId: s.roomId,
+      userId: s.userId,
+      mode: s.mode,
+      status: s.status,
+      lastActivity: s.lastActivity
+    })))
     
     // Group sessions by room ID to count players
     const roomsMap = new Map()
