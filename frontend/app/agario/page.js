@@ -1669,6 +1669,19 @@ const AgarIOGame = () => {
         return
       }
       
+      // Skip bot generation for server browser games (even if fee is 0)
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search)
+        const server = urlParams.get('server')
+        const multiplayer = urlParams.get('multiplayer')
+        const paid = urlParams.get('paid')
+        
+        if (server === 'colyseus' || multiplayer === 'colyseus' || paid === 'true') {
+          console.log('🌐 Skipping bot generation for server browser game - real players only!')
+          return
+        }
+      }
+      
       const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
