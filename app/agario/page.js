@@ -1668,6 +1668,20 @@ const AgarIOGame = () => {
         return
       }
       
+      // Skip bot generation for server browser games - only real human players
+      if (this.isServerBrowserGame()) {
+        console.log('🖥️ Skipping bot generation for server browser game - real players only!')
+        return
+      }
+      
+      // Skip bot generation for any game with 'colyseus' or 'hathora' server type
+      if (this.isRealMultiplayerGame()) {
+        console.log('🎮 Skipping bot generation for real multiplayer game - humans only!')
+        return
+      }
+      
+      console.log('🤖 Generating AI bots for practice/local game')
+      
       const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
