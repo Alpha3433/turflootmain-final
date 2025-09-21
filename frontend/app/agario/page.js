@@ -894,7 +894,7 @@ const AgarIOGame = () => {
             const region = urlParams.get('region') || 'AU'
             
             // Update session with room ID
-            trackPlayerSession(room.id, parseInt(fee), mode, region)
+            trackPlayerSession(room.roomId, parseInt(fee), mode, region)
           }
         
           // Set up state change listener
