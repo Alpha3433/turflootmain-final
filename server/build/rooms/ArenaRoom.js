@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -7,10 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Room } from "@colyseus/core";
-import { Schema, MapSchema, type } from "@colyseus/schema";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ArenaRoom = exports.GameState = exports.Virus = exports.Coin = exports.Player = void 0;
+const core_1 = require("@colyseus/core");
+const schema_1 = require("@colyseus/schema");
 // Player state schema
-export class Player extends Schema {
+class Player extends schema_1.Schema {
     constructor() {
         super(...arguments);
         this.name = "Player";
@@ -26,52 +29,53 @@ export class Player extends Schema {
         this.alive = true;
     }
 }
+exports.Player = Player;
 __decorate([
-    type("string"),
+    (0, schema_1.type)("string"),
     __metadata("design:type", String)
 ], Player.prototype, "name", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "x", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "y", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "vx", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "vy", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "mass", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "radius", void 0);
 __decorate([
-    type("string"),
+    (0, schema_1.type)("string"),
     __metadata("design:type", String)
 ], Player.prototype, "color", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "score", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Player.prototype, "lastSeq", void 0);
 __decorate([
-    type("boolean"),
+    (0, schema_1.type)("boolean"),
     __metadata("design:type", Boolean)
 ], Player.prototype, "alive", void 0);
 // Coin state schema
-export class Coin extends Schema {
+class Coin extends schema_1.Schema {
     constructor() {
         super(...arguments);
         this.x = 0;
@@ -81,28 +85,29 @@ export class Coin extends Schema {
         this.color = "#FFD700";
     }
 }
+exports.Coin = Coin;
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Coin.prototype, "x", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Coin.prototype, "y", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Coin.prototype, "value", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Coin.prototype, "radius", void 0);
 __decorate([
-    type("string"),
+    (0, schema_1.type)("string"),
     __metadata("design:type", String)
 ], Coin.prototype, "color", void 0);
 // Virus state schema
-export class Virus extends Schema {
+class Virus extends schema_1.Schema {
     constructor() {
         super(...arguments);
         this.x = 0;
@@ -111,54 +116,56 @@ export class Virus extends Schema {
         this.color = "#FF6B6B";
     }
 }
+exports.Virus = Virus;
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Virus.prototype, "x", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Virus.prototype, "y", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], Virus.prototype, "radius", void 0);
 __decorate([
-    type("string"),
+    (0, schema_1.type)("string"),
     __metadata("design:type", String)
 ], Virus.prototype, "color", void 0);
 // Game state schema
-export class GameState extends Schema {
+class GameState extends schema_1.Schema {
     constructor() {
         super(...arguments);
-        this.players = new MapSchema();
-        this.coins = new MapSchema();
-        this.viruses = new MapSchema();
+        this.players = new schema_1.MapSchema();
+        this.coins = new schema_1.MapSchema();
+        this.viruses = new schema_1.MapSchema();
         this.worldSize = 4000;
         this.timestamp = 0;
     }
 }
+exports.GameState = GameState;
 __decorate([
-    type({ map: Player }),
+    (0, schema_1.type)({ map: Player }),
     __metadata("design:type", Object)
 ], GameState.prototype, "players", void 0);
 __decorate([
-    type({ map: Coin }),
+    (0, schema_1.type)({ map: Coin }),
     __metadata("design:type", Object)
 ], GameState.prototype, "coins", void 0);
 __decorate([
-    type({ map: Virus }),
+    (0, schema_1.type)({ map: Virus }),
     __metadata("design:type", Object)
 ], GameState.prototype, "viruses", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], GameState.prototype, "worldSize", void 0);
 __decorate([
-    type("number"),
+    (0, schema_1.type)("number"),
     __metadata("design:type", Number)
 ], GameState.prototype, "timestamp", void 0);
-export class ArenaRoom extends Room {
+class ArenaRoom extends core_1.Room {
     constructor() {
         super(...arguments);
         this.maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
@@ -382,4 +389,5 @@ export class ArenaRoom extends Room {
         console.log('🛑 Arena room disposed');
     }
 }
+exports.ArenaRoom = ArenaRoom;
 //# sourceMappingURL=ArenaRoom.js.map

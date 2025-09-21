@@ -1,9 +1,14 @@
-import config from "@colyseus/tools";
-import { ArenaRoom } from "./rooms/ArenaRoom.js";
-export default config({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const tools_1 = __importDefault(require("@colyseus/tools"));
+const ArenaRoom_js_1 = require("./rooms/ArenaRoom.js");
+exports.default = (0, tools_1.default)({
     initializeGameServer: (gameServer) => {
         // Define room types
-        gameServer.define("arena", ArenaRoom);
+        gameServer.define("arena", ArenaRoom_js_1.ArenaRoom);
     },
     initializeExpress: (app) => {
         // Health check endpoint
