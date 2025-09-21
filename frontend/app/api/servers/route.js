@@ -19,8 +19,7 @@ export async function GET(request) {
       const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
       const activeSessions = await sessionsCollection.find({
         'lastActivity': { $gte: twoMinutesAgo },
-        'mode': { $regex: /colyseus/i },
-        'status': 'active'
+        'mode': { $regex: /colyseus/i }
       }).toArray()
       
       totalRealPlayers = activeSessions.length
