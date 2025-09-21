@@ -906,7 +906,7 @@ const AgarIOGame = () => {
         console.log('🔑 Connecting with user:', { privyUserId, playerName })
 
         // Connect to Colyseus arena
-        const room = await colyseusClient.joinArena({ privyUserId, playerName })
+        const room = await joinArena({ privyUserId, playerName })
         
         setWsConnection('connected')
         console.log('✅ Connected to Colyseus arena')
