@@ -142,24 +142,16 @@ const AgarIOGame = () => {
     // ✅ Allow all multiplayer connections (Colyseus handles everything)
     console.log('✅ PROCEEDING: Colyseus multiplayer enabled')
     
-    // Validate Hathora room ID
-    if (!roomId || roomId.length < 8) {
-      console.error('❌ Invalid Hathora room ID:', roomId)
-      alert('Invalid multiplayer room. Redirecting to server browser.')
-      window.location.href = '/?openServerBrowser=true'
-      return
-    }
-    
-    console.log('✅ HATHORA MULTIPLAYER: Valid authoritative room detected')
-    console.log('🏠 Room ID:', roomId)
+    // ✅ COLYSEUS MULTIPLAYER: Ready to connect
+    console.log('🏠 Room ID:', roomId || 'will-be-generated')
     console.log('🌐 Multiplayer mode:', multiplayer)
-    console.log('🖥️ Server type:', server)
+    console.log('🖥️ Server type:', server || 'colyseus')
     
-    // Set game to authoritative multiplayer mode
+    // Set game to multiplayer mode
     setIsMultiplayer(true)
     setGameStarted(true)
     
-    // Initialize Colyseus multiplayer game (no room creation needed)
+    // Initialize Colyseus multiplayer game
     console.log('🎮 Colyseus multiplayer game ready')
     
     // Track game session in database
