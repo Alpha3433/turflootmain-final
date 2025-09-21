@@ -276,6 +276,8 @@ const AgarIOGame = () => {
         `anonymous_${Math.random().toString(36).substr(2, 9)}`
 
       const joinedAt = new Date().toISOString()
+      const colyseusSessionId = sessionId || null
+      const userId = privyUserId || resolvedIdentifier
 
       // Format data according to API requirements (session object with required fields)
       const sessionData = {
@@ -285,9 +287,11 @@ const AgarIOGame = () => {
           realRoomId,
           joinedAt,
           lastActivity: joinedAt,
-          userId: privyUserId || resolvedIdentifier,
+          userId,
           playerIdentifier: resolvedIdentifier,
-          playerSessionId: sessionId || null,
+          playerSessionId: colyseusSessionId,
+          colyseusSessionId,
+          uniqueIdentifier: colyseusSessionId || userId,
           entryFee: fee || 0,
           mode: gameMode || mode,
           region: region || 'unknown',
@@ -324,14 +328,15 @@ const AgarIOGame = () => {
       console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region, playerIdentifier })
 
       // Format data according to API requirements (session object with required fields)
+      const resolvedUserId = playerIdentifier || 'fallback_' + Math.random().toString(36).substr(2, 9)
       const sessionData = {
         action: 'join',
         session: {
           roomId: roomId,
           joinedAt: new Date().toISOString(),
           lastActivity: new Date().toISOString(),
-          userId: playerIdentifier || 'fallback_' + Math.random().toString(36).substr(2, 9),
-          playerIdentifier: playerIdentifier || null,
+          userId: resolvedUserId,
+          playerIdentifier: playerIdentifier || resolvedUserId,
           entryFee: fee || 0,
           mode: mode || 'unknown',
           region: region || 'unknown',
@@ -790,6 +795,7 @@ const AgarIOGame = () => {
     const joinedAt = sessionInfoRef.current.joinedAt || new Date().toISOString()
     sessionInfoRef.current.joinedAt = joinedAt
 
+    const resolvedUserId = privyUserId || playerIdentifier
     const sessionPayload = {
       roomId: realRoomId,
       realRoomId,
@@ -801,8 +807,11 @@ const AgarIOGame = () => {
       lastActivity: new Date().toISOString(),
       status: 'active',
       playerSessionId: sessionId,
+      colyseusSessionId: sessionId,
       playerIdentifier,
       privyUserId,
+      userId: resolvedUserId,
+      uniqueIdentifier: sessionId || resolvedUserId,
       multiplayerMode
     }
 
@@ -849,6 +858,7 @@ const AgarIOGame = () => {
           playerSessionId: sessionId,
           playerIdentifier,
           privyUserId,
+          userId: resolvedUserId,
           lastActivity: new Date().toISOString()
         })
       }).catch(err => console.warn('⚠️ Failed to update session activity:', err))
@@ -868,6 +878,7 @@ const AgarIOGame = () => {
           playerSessionId: sessionId,
           playerIdentifier,
           privyUserId,
+          userId: resolvedUserId,
           clientReportedRoomId: queryRoomId
         })
       }).catch(err => console.warn('⚠️ Failed to record session leave:', err))
