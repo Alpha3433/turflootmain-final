@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { MongoClient } from 'mongodb'
 
-export async function GET(request) {
+export async function GET() {
   console.log('🚀 SERVERS API CALLED!')
   try {
     console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
