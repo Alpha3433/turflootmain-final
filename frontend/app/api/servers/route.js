@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 export async function GET(request) {
+  console.log('🚀 SERVERS API CALLED!')
   try {
     console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
     
@@ -12,8 +13,10 @@ export async function GET(request) {
       const { MongoClient } = await import('mongodb')
       const client = new MongoClient(process.env.MONGO_URL)
       await client.connect()
+      console.log('🔗 MongoDB connected successfully')
       const db = client.db('turfloot')
       const sessionsCollection = db.collection('game_sessions')
+      console.log('📊 Collection accessed: game_sessions')
 
       // Get active Colyseus sessions (last activity within 10 minutes) 
       const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
