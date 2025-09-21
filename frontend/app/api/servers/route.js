@@ -33,7 +33,7 @@ export async function GET() {
     
     activeSessions.forEach(session => {
       const roomId = session.roomId
-      if (roomId && roomId !== 'colyseus-arena') {
+      if (roomId) {  // Remove the exclusion filter - include all rooms
         if (roomsMap.has(roomId)) {
           roomsMap.get(roomId).currentPlayers += 1
         } else {
