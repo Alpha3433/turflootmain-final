@@ -114,6 +114,13 @@
       "static/chunks/main-app-b56364f70b27a961.js",
       "static/chunks/app/test-env/page-ce37610784c991c0.js"
     ],
+    "/test-login/page": [
+      "static/chunks/webpack-e19bdad4fa88d15f.js",
+      "static/chunks/fd9d1056-c1467956791053fe.js",
+      "static/chunks/7023-68e3a26057158208.js",
+      "static/chunks/main-app-b56364f70b27a961.js",
+      "static/chunks/app/test-login/page-54d11238004dc47f.js"
+    ],
     "/page": [
       "static/chunks/webpack-e19bdad4fa88d15f.js",
       "static/chunks/fd9d1056-c1467956791053fe.js",
@@ -122,13 +129,6 @@
       "static/chunks/2707-e6d4838f4aa178aa.js",
       "static/chunks/993-698aa469c3abeabc.js",
       "static/chunks/app/page-8130cf5639f9e977.js"
-    ],
-    "/test-login/page": [
-      "static/chunks/webpack-e19bdad4fa88d15f.js",
-      "static/chunks/fd9d1056-c1467956791053fe.js",
-      "static/chunks/7023-68e3a26057158208.js",
-      "static/chunks/main-app-b56364f70b27a961.js",
-      "static/chunks/app/test-login/page-54d11238004dc47f.js"
     ],
     "/test-privy-solana/page": [
       "static/chunks/webpack-e19bdad4fa88d15f.js",
