@@ -198,10 +198,13 @@ class ColyseusRoomTrackingTester:
             return False
         
         # Simulate Device 1 creating/joining a room
+        # Use the actual arena server ID from the server browser
+        arena_room_id = getattr(self, 'arena_server_id', 'colyseus-arena-global')
+        
         device1_session = {
             "action": "join",
             "session": {
-                "roomId": "colyseus-arena-global",
+                "roomId": arena_room_id,
                 "userId": "device1_user",
                 "mode": "colyseus-arena",
                 "region": "au-syd",
