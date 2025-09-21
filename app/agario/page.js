@@ -205,13 +205,13 @@ const AgarIOGame = () => {
   }, [])
   
   const initializeAuthoritativeGame = async (roomId, mode, urlParams) => {
-    console.log('🚀 Initializing 100% authoritative Hathora game...')
+    console.log('🚀 Initializing 100% authoritative Colyseus game...')
     
     const fee = parseFloat(urlParams.get('fee')) || 0
-    const region = urlParams.get('region') || 'unknown'
-    const maxPlayers = parseInt(urlParams.get('maxPlayers')) || 8
-    const gameName = urlParams.get('name') || 'Hathora Multiplayer'
-    const regionId = urlParams.get('regionId') || 'us-east-1'
+    const region = urlParams.get('region') || 'Australia'
+    const maxPlayers = parseInt(urlParams.get('maxPlayers')) || 50
+    const gameName = urlParams.get('name') || 'TurfLoot Arena'
+    const regionId = urlParams.get('regionId') || 'au-syd'
     
     console.log('📊 Authoritative game configuration:', {
       roomId,
@@ -221,81 +221,69 @@ const AgarIOGame = () => {
       maxPlayers,
       gameName,
       isAuthoritative: true,
-      serverSide: 'Hathora Cloud'
+      serverSide: 'Colyseus Cloud'
     })
     
-    // 🔥 CRITICAL FIX: Create actual Hathora room process
-    console.log('🏠 Creating actual Hathora room process...')
+    // 🔥 CRITICAL: Connect to Colyseus arena room
+    console.log('🏠 Connecting to Colyseus arena room...')
     
     try {
-      // Import and initialize Hathora client for room creation
-      const { default: hathoraClient } = await import('@/lib/hathoraClient')
+      // Import and initialize Colyseus client
+      const { joinArena } = await import('/lib/colyseus')
       
-      const isInitialized = await hathoraClient.initialize()
-      if (!isInitialized) {
-        throw new Error('Failed to initialize Hathora client for room creation')
+      console.log('✅ Colyseus client loaded')
+      
+      // Join Colyseus arena room
+      console.log(`🚀 Joining Colyseus arena room...`)
+      const room = await joinArena({ privyUserId: 'player-' + Date.now() })
+      
+      if (!room) {
+        throw new Error('Failed to join Colyseus arena room')
       }
       
-      console.log('✅ Hathora client initialized for room creation')
+      console.log('✅ Successfully joined Colyseus arena room:', room.id)
       
-      // Determine game mode based on entry fee
-      const gameMode = fee > 0 ? 'cash-game' : 'practice'
+      // Set up multiplayer state
+      setIsMultiplayer(true)
+      setWsConnection('connected')
+      wsRef.current = room
       
-      // Create actual Hathora room process
-      console.log(`🚀 Creating ${gameMode} room with $${fee} entry fee...`)
-      const roomResponse = await hathoraClient.createOrJoinRoom(null, gameMode, fee)
+      // Set up Colyseus room event handlers
+      room.onStateChange((state) => {
+        console.log('📡 Colyseus state update received')
+        serverStateRef.current = state
+        
+        // Update connected players count
+        if (state.players) {
+          setConnectedPlayers(Object.keys(state.players).length)
+        }
+      })
       
-      if (!roomResponse || !roomResponse.roomId) {
-        throw new Error('Failed to create Hathora room - no room ID returned')
+      room.onMessage("player-joined", (message) => {
+        console.log('👋 Player joined:', message)
+      })
+      
+      room.onLeave(() => {
+        console.log('👋 Left Colyseus room')
+        setIsMultiplayer(false)
+        setWsConnection('disconnected')
+        setConnectedPlayers(0)
+      })
+      
+      return {
+        success: true,
+        roomId: room.id,
+        serverEndpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT,
+        gameMode: fee > 0 ? 'cash-game' : 'practice',
+        region: region,
+        maxPlayers: maxPlayers
       }
-      
-      // Extract the actual room ID string from the response
-      const actualRoomId = roomResponse.roomId
-      console.log(`✅ REAL HATHORA ROOM CREATED: ${actualRoomId}`)
-      console.log(`💰 Room type: ${gameMode}, Entry fee: $${fee}`)
-      console.log(`🌐 Region: ${region} (${regionId})`)
-      
-      // Update URL parameters with the real Hathora room ID string AND connection info
-      const currentUrl = new URL(window.location.href)
-      currentUrl.searchParams.set('hathoraRoom', actualRoomId)
-      currentUrl.searchParams.set('realHathoraRoom', 'true')
-      
-      // CRITICAL FIX: Update connection info in URL parameters
-      // This ensures WebSocket reconnections use the correct host/port for the new room
-      if (roomResponse.host) {
-        currentUrl.searchParams.set('hathoraHost', roomResponse.host)
-        console.log(`🔄 Updated URL with new host: ${roomResponse.host}`)
-      }
-      if (roomResponse.port) {
-        currentUrl.searchParams.set('hathoraPort', roomResponse.port.toString())
-        console.log(`🔄 Updated URL with new port: ${roomResponse.port}`)
-      }
-      if (roomResponse.token || roomResponse.connectionToken || roomResponse.playerToken) {
-        const newToken = roomResponse.token || roomResponse.connectionToken || roomResponse.playerToken
-        currentUrl.searchParams.set('hathoraToken', newToken)
-        console.log('🔄 Updated URL with new authentication token')
-      }
-      
-      // Update browser history without triggering a reload
-      window.history.replaceState({}, '', currentUrl.toString())
-      
-      console.log('🔄 Updated URL with real Hathora room ID')
-      
-      // Track the real Hathora room session
-      trackRealHathoraSession(actualRoomId, fee, mode, region, gameMode)
       
     } catch (error) {
-      console.error('❌ Failed to create Hathora room process:', error)
-      console.log('🔄 Falling back to session tracking only...')
-      
-      // Fallback to old session tracking if Hathora creation fails
-      trackPlayerSession(roomId, fee, mode, region)
+      console.error('❌ Failed to initialize Colyseus game:', error)
+      setWsConnection('error')
+      throw error
     }
-    
-    // Set up authoritative game state (server owns truth)
-    console.log('🎮 Setting up client-side prediction with server reconciliation')
-    console.log('⚡ Authoritative server will handle all game logic')
-    console.log('📡 Client will send inputs, receive state updates')
   }
 
   // New function to track real Hathora room sessions
