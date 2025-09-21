@@ -217,11 +217,12 @@ class TurfLootBackendTester:
                 self.log_test("Wallet API", "FAIL", f"Wallet API returned status {response.status_code}")
             
             # Test with testing token
+            import base64
             test_payload = {
                 "userId": "test-user-123",
                 "wallet_address": "F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG"
             }
-            test_token = "testing-" + json.dumps(test_payload).encode().hex()
+            test_token = "testing-" + base64.b64encode(json.dumps(test_payload).encode()).decode()
             
             headers = {"Authorization": f"Bearer {test_token}"}
             response = requests.get(f"{self.base_url}/api/wallet/balance", headers=headers, timeout=10)
