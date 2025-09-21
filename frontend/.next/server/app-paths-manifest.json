@@ -13,8 +13,8 @@
   "/api/user/username/route": "app/api/user/username/route.js",
   "/api/wallet/balance/route": "app/api/wallet/balance/route.js",
   "/api/wallet/transactions/route": "app/api/wallet/transactions/route.js",
-  "/dashboard/page": "app/dashboard/page.js",
   "/blocked/page": "app/blocked/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/demo/page": "app/demo/page.js",
   "/friends-api/[[...slug]]/route": "app/friends-api/[[...slug]]/route.js",
   "/health/route": "app/health/route.js",
@@ -27,10 +27,10 @@
   "/test-backend/page": "app/test-backend/page.js",
   "/test-customization/page": "app/test-customization/page.js",
   "/test-env/page": "app/test-env/page.js",
-  "/page": "app/page.js",
   "/test-login/page": "app/test-login/page.js",
   "/test-privy-solana/page": "app/test-privy-solana/page.js",
   "/test/page": "app/test/page.js",
   "/users-api/register/route": "app/users-api/register/route.js",
-  "/debug-privy/page": "app/debug-privy/page.js"
+  "/debug-privy/page": "app/debug-privy/page.js",
+  "/page": "app/page.js"
 }
