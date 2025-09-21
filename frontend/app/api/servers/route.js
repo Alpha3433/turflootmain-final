@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { MongoClient } from 'mongodb'
 
 export async function GET(request) {
   console.log('🚀 SERVERS API CALLED!')
