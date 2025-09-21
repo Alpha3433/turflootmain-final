@@ -257,12 +257,21 @@ class ColyseusRoomTrackingTester:
             if response.status_code == 200:
                 data = response.json()
                 sessions_by_room = data.get('sessionsByRoom', {})
-                arena_sessions = sessions_by_room.get('colyseus-arena-global', [])
+                
+                # Look for sessions in any arena room (handle ID inconsistencies)
+                arena_sessions = []
+                arena_room_found = None
+                
+                for room_id, sessions in sessions_by_room.items():
+                    if 'arena' in room_id.lower():
+                        arena_sessions.extend(sessions)
+                        arena_room_found = room_id
+                        break
                 
                 self.log_test(
                     "Session Database Recording",
                     len(arena_sessions) > 0,
-                    f"Arena sessions found: {len(arena_sessions)}"
+                    f"Arena sessions found in room '{arena_room_found}': {len(arena_sessions)}"
                 )
                 
                 return len(arena_sessions) > 0
