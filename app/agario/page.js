@@ -1201,6 +1201,43 @@ const AgarIOGame = () => {
       return 8 // Default for practice
     }
 
+    isServerBrowserGame() {
+      // Check URL parameters to detect if game was launched from server browser
+      if (typeof window === 'undefined') return false
+      const urlParams = new URLSearchParams(window.location.search)
+      const mode = urlParams.get('mode')
+      const server = urlParams.get('server')
+      const gameType = urlParams.get('gameType')
+      
+      // Server browser games typically have these characteristics
+      return (
+        mode === 'hathora-multiplayer' ||
+        mode === 'colyseus-multiplayer' ||
+        mode === 'join-existing' ||
+        server === 'colyseus' ||
+        server === 'hathora' ||
+        gameType === 'cash-game' ||
+        gameType === 'Arena Battle'
+      )
+    }
+
+    isRealMultiplayerGame() {
+      // Check for any indicators of real multiplayer (not practice/local)
+      if (typeof window === 'undefined') return false
+      const urlParams = new URLSearchParams(window.location.search)
+      const mode = urlParams.get('mode')
+      const server = urlParams.get('server')
+      const roomId = urlParams.get('roomId')
+      
+      // Real multiplayer games have server type or room ID or specific modes
+      return (
+        server && server !== 'local' ||
+        roomId && roomId !== 'global-practice-bots' ||
+        mode && mode !== 'local' && mode !== 'practice' ||
+        window.location.pathname.includes('multiplayer')
+      )
+    }
+
     calculatePlayableRadius() {
       if (!this.isCashGame) {
         return 1800 // Fixed size for practice games
