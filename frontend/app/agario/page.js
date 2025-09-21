@@ -294,7 +294,13 @@ const AgarIOGame = () => {
   // Define trackPlayerSession function (was being called but not defined)
   const trackPlayerSession = async (roomId, fee, mode, region) => {
     try {
-      console.log('📊 Tracking Colyseus session:', { roomId, fee, mode, region })
+      console.log('📊 Tracking Colyseus session INPUT:', { roomId, fee, mode, region })
+      
+      // Check if roomId is valid before proceeding
+      if (!roomId || roomId === 'undefined' || roomId === 'null') {
+        console.error('❌ Invalid roomId provided to trackPlayerSession:', roomId)
+        return
+      }
       
       // Format data according to API requirements (nested session object)
       const sessionData = {
@@ -310,6 +316,8 @@ const AgarIOGame = () => {
           isRealColyseusRoom: true
         }
       }
+      
+      console.log('📤 Sending session data:', JSON.stringify(sessionData, null, 2))
       
       const response = await fetch('/api/game-sessions', {
         method: 'POST',
