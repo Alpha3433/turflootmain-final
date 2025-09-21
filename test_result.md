@@ -2915,8 +2915,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Hathora WebSocket Connection Fix Verification"
-  stuck_tasks: []
+    - "Colyseus Room Tracking System Testing"
+  stuck_tasks: 
+    - "Colyseus Room Tracking System - Multiple Critical Issues"
   test_all: false
   test_priority: "high_first"
 
