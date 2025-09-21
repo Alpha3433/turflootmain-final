@@ -133,47 +133,14 @@ const AgarIOGame = () => {
     }
     
     // Block any non-Hathora multiplayer attempts
-    console.log('🔍 REDIRECT DEBUG: Checking conditions...')
-    console.log('  - roomId:', roomId, 'exists:', !!roomId)
-    console.log('  - server:', server, 'isHathora:', server === 'hathora')
-    console.log('  - hathoraRoom:', hathoraRoom, 'exists:', !!hathoraRoom)
+    console.log('🎮 Colyseus multiplayer game starting...')
+    console.log('📊 Game parameters:')
+    console.log('  - roomId:', roomId || 'will-be-generated')
+    console.log('  - server:', server || 'colyseus')
     console.log('  - mode:', mode, 'isNotLocal:', mode !== 'local')
     
-    const shouldRedirect = !roomId || server !== 'hathora' || !hathoraRoom || mode === 'local'
-    console.log('🔍 REDIRECT DECISION: shouldRedirect =', shouldRedirect)
-    
-    if (shouldRedirect) {
-      console.log('❌ BLOCKED: Non-Hathora multiplayer game blocked')
-      console.log('🔄 Redirecting to server browser for proper multiplayer...')
-      console.log('🔍 REDIRECT REASONS:')
-      console.log('  - Missing roomId:', !roomId)
-      console.log('  - Wrong server:', server !== 'hathora')
-      console.log('  - Missing hathoraRoom:', !hathoraRoom)
-      console.log('  - Local mode:', mode === 'local')
-      
-      // Show modal explaining the redirect
-      const modal = document.createElement('div')
-      modal.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.9); display: flex; align-items: center;
-        justify-content: center; z-index: 10000; color: white;
-        font-family: 'Rajdhani', sans-serif;
-      `
-      modal.innerHTML = `
-        <div style="background: #1a202c; padding: 40px; border-radius: 12px; text-align: center; border: 2px solid #68d391;">
-          <div style="font-size: 48px; margin-bottom: 20px;">🚀</div>
-          <h2 style="color: #68d391; margin-bottom: 15px;">Multiplayer Games Require Hathora</h2>
-          <p style="margin-bottom: 20px; color: #e2e8f0;">All multiplayer games now run on authoritative servers.</p>
-          <p style="color: #a0aec0;">Redirecting to server browser...</p>
-        </div>
-      `
-      document.body.appendChild(modal)
-      
-      setTimeout(() => {
-        window.location.href = '/?openServerBrowser=true'
-      }, 3000)
-      return
-    }
+    // ✅ Allow all multiplayer connections (Colyseus handles everything)
+    console.log('✅ PROCEEDING: Colyseus multiplayer enabled')
     
     // Validate Hathora room ID
     if (!roomId || roomId.length < 8) {
