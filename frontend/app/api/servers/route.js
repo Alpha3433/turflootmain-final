@@ -82,16 +82,35 @@ export async function GET() {
       paidServers: 0,
       lastUpdated: new Date().toISOString()
     })
-    
   } catch (error) {
-    console.error('❌ Error in Colyseus server browser API:', error)
-    return NextResponse.json({ 
-      error: 'Failed to fetch Colyseus servers',
-      message: error.message,
-      servers: [],
+    console.error('❌ Servers API Error:', error)
+    
+    // Return default room as fallback
+    return NextResponse.json({
+      servers: [{
+        id: 'colyseus-arena-default',
+        name: 'Arena Battle',
+        serverType: 'colyseus',
+        roomType: 'arena',
+        region: 'AU',
+        mode: 'colyseus-multiplayer',
+        currentPlayers: 0,
+        maxPlayers: 50,
+        status: 'template',
+        avgWaitTime: 'Create New',
+        entryFee: 0,
+        prizePool: 0,
+        colyseusRoomId: 'colyseus-arena',
+        colyseusEndpoint: 'wss://au-syd-ab3eaf4e.colyseus.cloud',
+        joinable: false
+      }],
       totalPlayers: 0,
       totalActiveServers: 0,
-      colyseusEnabled: false
-    }, { status: 500 })
+      totalServers: 1,
+      practiceServers: 0,
+      paidServers: 0,
+      lastUpdated: new Date().toISOString(),
+      error: error.message
+    })
   }
 }
