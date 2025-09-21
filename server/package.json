@@ -1,0 +1,42 @@
+{
+  "name": "turfloot-colyseus-server",
+  "version": "1.0.0",
+  "description": "TurfLoot Arena - Colyseus Game Server",
+  "main": "build/index.js",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "ts-node-esm src/index.ts",
+    "loadtest": "colyseus-loadtest loadtest/example.ts --room arena --numClients 2"
+  },
+  "dependencies": {
+    "colyseus": "^0.16.4",
+    "@colyseus/core": "^0.16.21",
+    "@colyseus/tools": "^0.16.13",
+    "@colyseus/schema": "^3.0.60",
+    "@colyseus/ws-transport": "^0.16.5",
+    "@colyseus/redis-driver": "^0.16.1",
+    "@colyseus/redis-presence": "^0.16.4",
+    "@colyseus/uwebsockets-transport": "^0.16.5",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "@pm2/io": "^6.1.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^20.0.0",
+    "@types/ws": "^8.18.1",
+    "@types/express": "^4.17.0",
+    "@types/cors": "^2.8.17",
+    "@colyseus/loadtest": "^0.15.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
