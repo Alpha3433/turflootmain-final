@@ -7,8 +7,10 @@ const tools_1 = __importDefault(require("@colyseus/tools"));
 const ArenaRoom_js_1 = require("./rooms/ArenaRoom.js");
 exports.default = (0, tools_1.default)({
     initializeGameServer: (gameServer) => {
-        // Define room types
-        gameServer.define("arena", ArenaRoom_js_1.ArenaRoom);
+        // Define room types with filtering for shared arena
+        gameServer.define("arena", ArenaRoom_js_1.ArenaRoom)
+            .filterBy(['roomName'])
+            .sortBy({ createdAt: -1 });
     },
     initializeExpress: (app) => {
         // Health check endpoint
