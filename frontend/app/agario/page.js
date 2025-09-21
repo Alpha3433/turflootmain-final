@@ -952,6 +952,10 @@ const AgarIOGame = () => {
           // Allow the game to continue in local mode if Colyseus fails
           console.log('🏠 Falling back to local game mode due to Colyseus connection failure')
         }
+        
+      } catch (error) {
+        console.error('❌ Error in Colyseus room connection setup:', error)
+        setWsConnection('error')
       }
     }
 
