@@ -887,7 +887,18 @@ const AgarIOGame = () => {
           
           // Update local game state with server data
           if (gameRef.current && gameRef.current.updateFromServer) {
+            console.log('🔄 Calling updateFromServer with state:', {
+              hasPlayers: !!state.players,
+              playersCount: state.players?.size || 0,
+              hasCoins: !!state.coins,
+              hasViruses: !!state.viruses
+            })
             gameRef.current.updateFromServer(state)
+          } else {
+            console.log('❌ Game not ready or updateFromServer missing:', {
+              gameExists: !!gameRef.current,
+              hasUpdateMethod: !!(gameRef.current?.updateFromServer)
+            })
           }
         })
 
