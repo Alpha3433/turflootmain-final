@@ -11,7 +11,7 @@ import sys
 from datetime import datetime, timedelta
 
 # Test configuration
-BASE_URL = "https://turf-arena.preview.emergentagent.com"
+BASE_URL = "https://lobby-finder-1.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class ColyseusRoomIDFixTester:

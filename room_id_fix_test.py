@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BASE_URL = "https://turf-arena.preview.emergentagent.com"
+BASE_URL = "https://lobby-finder-1.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 def test_room_id_fix():
