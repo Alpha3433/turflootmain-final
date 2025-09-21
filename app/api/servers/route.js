@@ -20,9 +20,9 @@ export async function GET(request) {
       const db = client.db('turfloot')
       const sessionsCollection = db.collection('game_sessions')
 
-      // Get active Colyseus sessions (last activity within 2 minutes) 
-      const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
-      console.log(`🔍 Querying for sessions active since: ${twoMinutesAgo}`)
+      // Get active Colyseus sessions (last activity within 10 minutes) 
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
+      console.log(`🔍 Querying for sessions active since: ${tenMinutesAgo}`)
       
       const activeSessions = await sessionsCollection.find({
         'lastActivity': { $gte: twoMinutesAgo },
