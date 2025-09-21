@@ -33,6 +33,8 @@ export async function POST(request) {
         status: 'active'
       }
       
+      console.log('💾 Storing session document:', JSON.stringify(sessionDoc, null, 2))
+      
       // Upsert session (create if new, update if exists)
       await gameSessions.updateOne(
         { roomId: session.roomId, userId: sessionDoc.userId },
