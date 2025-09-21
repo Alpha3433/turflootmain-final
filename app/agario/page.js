@@ -229,7 +229,7 @@ const AgarIOGame = () => {
     
     try {
       // Import and initialize Colyseus client
-      const { joinArena } = await import('/lib/colyseus')
+      const { joinArena } = await import('@/lib/colyseus')
       
       console.log('✅ Colyseus client loaded')
       
