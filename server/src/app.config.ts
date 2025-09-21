@@ -4,8 +4,10 @@ import { Request, Response } from "express";
 
 export default config({
   initializeGameServer: (gameServer) => {
-    // Define room types
-    gameServer.define("arena", ArenaRoom);
+    // Define room types with filtering for shared arena
+    gameServer.define("arena", ArenaRoom)
+      .filterBy(['roomName'])
+      .sortBy({ createdAt: -1 });
   },
 
   initializeExpress: (app) => {
