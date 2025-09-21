@@ -289,10 +289,13 @@ class ColyseusRoomTrackingTester:
         print("=" * 60)
         
         # Add a second player to test pooling
+        # Use the same room ID as Device 1
+        arena_room_id = getattr(self, 'arena_server_id', 'colyseus-arena-global')
+        
         device2_session = {
             "action": "join",
             "session": {
-                "roomId": "colyseus-arena-global",
+                "roomId": arena_room_id,
                 "userId": "device2_user",
                 "mode": "colyseus-arena",
                 "region": "au-syd",
