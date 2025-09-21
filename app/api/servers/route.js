@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function GET(request) {
+  console.log('🚀 SERVERS API CALLED AT:', new Date().toISOString())
   try {
     console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
     
