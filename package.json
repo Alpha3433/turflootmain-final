@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "TurfLoot - Real-time blockchain multiplayer game",
   "private": true,
-  "workspaces": [
-    "server",
-    "frontend"
-  ],
   "scripts": {
     "dev:server": "cd server && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
@@ -14,7 +10,7 @@
     "build:frontend": "cd frontend && npm run build",
     "start:server": "cd server && npm start",
     "start:frontend": "cd frontend && npm start",
-    "install:all": "npm install && cd server && npm install && cd ../frontend && npm install"
+    "install:all": "cd server && npm install && cd ../frontend && npm install"
   },
   "engines": {
     "node": ">=18.0.0"
