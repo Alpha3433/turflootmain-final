@@ -894,6 +894,8 @@ const AgarIOGame = () => {
             const region = urlParams.get('region') || 'AU'
             
             // Update session with room ID
+            console.log('🔍 Room object properties:', Object.keys(room))
+            console.log('🎮 Room ID:', room.roomId, 'Room object:', room)
             trackPlayerSession(room.roomId, parseInt(fee), mode, region)
           }
         
