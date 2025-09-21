@@ -23,7 +23,11 @@ const AgarIOGame = () => {
   const [isMultiplayer, setIsMultiplayer] = useState(false)
   const [connectedPlayers, setConnectedPlayers] = useState(0)
   const [wsConnection, setWsConnection] = useState('disconnected')
+  const [sessionReady, setSessionReady] = useState(false)
   const wsRef = useRef(null)
+  const sessionInfoRef = useRef({})
+  const sessionTrackedRef = useRef(false)
+  const fallbackPlayerIdentifierRef = useRef(null)
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   const serverStateRef = useRef(null)
@@ -154,9 +158,6 @@ const AgarIOGame = () => {
     // Initialize Colyseus multiplayer game
     console.log('🎮 Colyseus multiplayer game ready')
     
-    // Track game session in database
-    trackPlayerSession(roomId, 0, mode, 'colyseus')
-    
     // Set up game state (server owns truth via Colyseus)
     console.log('🎮 Setting up client-side prediction with Colyseus state sync')
     console.log('⚡ Colyseus server will handle all game logic')
@@ -246,24 +247,47 @@ const AgarIOGame = () => {
   }
 
   // New function to track real Hathora room sessions
-  const trackRealHathoraSession = async (realRoomId, fee, mode, region, gameMode) => {
+  const trackRealHathoraSession = async (
+    realRoomId,
+    sessionId,
+    fee,
+    mode,
+    region,
+    gameMode,
+    playerIdentifier = null,
+    privyUserId = null
+  ) => {
     try {
       console.log('📊 Tracking real Hathora room session:', {
         realRoomId,
+        sessionId,
         fee,
         mode,
         region,
-        gameMode
+        gameMode,
+        playerIdentifier,
+        privyUserId
       })
-      
+
+      const resolvedIdentifier =
+        playerIdentifier ||
+        privyUserId ||
+        sessionId ||
+        `anonymous_${Math.random().toString(36).substr(2, 9)}`
+
+      const joinedAt = new Date().toISOString()
+
       // Format data according to API requirements (session object with required fields)
       const sessionData = {
         action: 'join',
         session: {
           roomId: realRoomId,
-          joinedAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
-          userId: 'anonymous_' + Math.random().toString(36).substr(2, 9),
+          realRoomId,
+          joinedAt,
+          lastActivity: joinedAt,
+          userId: privyUserId || resolvedIdentifier,
+          playerIdentifier: resolvedIdentifier,
+          playerSessionId: sessionId || null,
           entryFee: fee || 0,
           mode: gameMode || mode,
           region: region || 'unknown',
@@ -271,7 +295,7 @@ const AgarIOGame = () => {
           hathoraRoomProcess: true
         }
       }
-      
+
       const response = await fetch('/api/game-sessions', {
         method: 'POST',
         headers: {
@@ -282,20 +306,23 @@ const AgarIOGame = () => {
       
       if (response.ok) {
         console.log('✅ Real Hathora room session tracked successfully')
-      } else {
-        console.warn('⚠️ Failed to track real Hathora room session:', response.status)
+        return true
       }
-      
+
+      console.warn('⚠️ Failed to track real Hathora room session:', response.status)
+      return false
+
     } catch (error) {
       console.error('❌ Error tracking real Hathora room session:', error)
+      return false
     }
   }
 
   // Define trackPlayerSession function (was being called but not defined)
-  const trackPlayerSession = async (roomId, fee, mode, region) => {
+  const trackPlayerSession = async (roomId, fee, mode, region, playerIdentifier = null) => {
     try {
-      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region })
-      
+      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region, playerIdentifier })
+
       // Format data according to API requirements (session object with required fields)
       const sessionData = {
         action: 'join',
@@ -303,7 +330,8 @@ const AgarIOGame = () => {
           roomId: roomId,
           joinedAt: new Date().toISOString(),
           lastActivity: new Date().toISOString(),
-          userId: 'fallback_' + Math.random().toString(36).substr(2, 9),
+          userId: playerIdentifier || 'fallback_' + Math.random().toString(36).substr(2, 9),
+          playerIdentifier: playerIdentifier || null,
           entryFee: fee || 0,
           mode: mode || 'unknown',
           region: region || 'unknown',
@@ -708,49 +736,79 @@ const AgarIOGame = () => {
   // REAL PLAYER SESSION TRACKING - Track when real Privy users join/leave games
   useEffect(() => {
     if (!gameStarted) return
-    
-    const trackPlayerSession = async () => {
+
+    if (wsConnection !== 'connected') {
+      console.log('⏳ Session tracking waiting for live connection. Current state:', wsConnection)
+      return
+    }
+
+    if (!sessionReady) {
+      console.log('⏳ Session tracking waiting for session metadata to be ready')
+      return
+    }
+
+    if (typeof window === 'undefined') return
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const urlMode = urlParams.get('mode')
+    const urlRegion = urlParams.get('region')
+    const urlFee = urlParams.get('fee')
+
+    const mode = sessionInfoRef.current.mode || urlMode
+    const region = sessionInfoRef.current.region || urlRegion || 'unknown'
+    const fee = sessionInfoRef.current.fee ?? (urlFee ? parseFloat(urlFee) : 0)
+    const queryRoomId = sessionInfoRef.current.queryRoomId || urlParams.get('roomId')
+    const realRoomId = sessionInfoRef.current.realRoomId || urlParams.get('colyseusRoomId') || queryRoomId
+    const sessionId = sessionInfoRef.current.sessionId || urlParams.get('sessionId') || null
+    const privyUserId = sessionInfoRef.current.privyUserId || null
+    const multiplayerMode = sessionInfoRef.current.multiplayer || urlParams.get('multiplayer') || null
+
+    if (!realRoomId) {
+      console.log('🚫 No real room ID available - skipping session tracking')
+      return
+    }
+
+    const isMultiplayerRoom = mode !== 'local' && mode !== 'practice'
+
+    if (!isMultiplayerRoom) {
+      console.log('🚫 Local/practice game - not tracking session')
+      return
+    }
+
+    let playerIdentifier = sessionInfoRef.current.playerIdentifier || null
+    if (!playerIdentifier) {
+      if (!fallbackPlayerIdentifierRef.current) {
+        fallbackPlayerIdentifierRef.current = sessionId
+          ? `session_${sessionId}`
+          : `anonymous_${Date.now()}`
+      }
+      playerIdentifier = fallbackPlayerIdentifierRef.current
+    }
+
+    sessionInfoRef.current.playerIdentifier = playerIdentifier
+
+    const joinedAt = sessionInfoRef.current.joinedAt || new Date().toISOString()
+    sessionInfoRef.current.joinedAt = joinedAt
+
+    const sessionPayload = {
+      roomId: realRoomId,
+      realRoomId,
+      clientReportedRoomId: queryRoomId,
+      entryFee: parseFloat(fee) || 0,
+      mode,
+      region,
+      joinedAt,
+      lastActivity: new Date().toISOString(),
+      status: 'active',
+      playerSessionId: sessionId,
+      playerIdentifier,
+      privyUserId,
+      multiplayerMode
+    }
+
+    const postJoin = async () => {
       try {
-        if (typeof window === 'undefined') return
-        
-        const urlParams = new URLSearchParams(window.location.search)
-        const roomId = urlParams.get('roomId')
-        const fee = urlParams.get('fee')
-        const mode = urlParams.get('mode')
-        const region = urlParams.get('region')
-        
-        if (!roomId) {
-          console.log('🚫 No roomId found - not tracking session')
-          return
-        }
-        
-        // Only track multiplayer Hathora rooms (not local practice)
-        const isMultiplayerRoom = mode !== 'local' && mode !== 'practice'
-        
-        if (!isMultiplayerRoom) {
-          console.log('🚫 Local/practice game - not tracking session')
-          return
-        }
-        
-        console.log('🎯 Tracking real player session:', {
-          roomId,
-          fee: fee || 0,
-          mode,
-          region
-        })
-        
-        // Record player joining the room
-        const sessionData = {
-          roomId,
-          entryFee: parseFloat(fee) || 0,
-          mode,
-          region,
-          joinedAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
-          status: 'active'
-        }
-        
-        // Send to backend API to record session
+        console.log('🎯 Tracking player session:', sessionPayload)
         const response = await fetch('/api/game-sessions', {
           method: 'POST',
           headers: {
@@ -758,68 +816,63 @@ const AgarIOGame = () => {
           },
           body: JSON.stringify({
             action: 'join',
-            session: sessionData
+            session: sessionPayload
           })
         })
-        
+
         if (response.ok) {
           console.log('✅ Player session recorded successfully')
+          sessionTrackedRef.current = true
         } else {
           console.warn('⚠️ Failed to record player session:', response.status)
         }
-        
       } catch (error) {
         console.error('❌ Error tracking player session:', error)
       }
     }
-    
-    // Track session when game starts
-    trackPlayerSession()
-    
-    // Update session activity every 30 seconds
+
+    if (!sessionTrackedRef.current) {
+      postJoin()
+    } else {
+      console.log('ℹ️ Real session already recorded - skipping duplicate join payload')
+    }
+
     const activityInterval = setInterval(() => {
-      const urlParams = new URLSearchParams(window.location.search)
-      const roomId = urlParams.get('roomId')
-      const mode = urlParams.get('mode')
-      
-      if (roomId && mode !== 'local' && mode !== 'practice') {
-        fetch('/api/game-sessions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'update',
-            roomId,
-            lastActivity: new Date().toISOString()
-          })
-        }).catch(err => console.warn('⚠️ Failed to update session activity:', err))
-      }
-    }, 30000) // Every 30 seconds
-    
-    // Cleanup: Record player leaving when component unmounts
+      fetch('/api/game-sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'update',
+          roomId: realRoomId,
+          playerSessionId: sessionId,
+          playerIdentifier,
+          privyUserId,
+          lastActivity: new Date().toISOString()
+        })
+      }).catch(err => console.warn('⚠️ Failed to update session activity:', err))
+    }, 30000)
+
     return () => {
       clearInterval(activityInterval)
-      
-      const urlParams = new URLSearchParams(window.location.search)
-      const roomId = urlParams.get('roomId')
-      const mode = urlParams.get('mode')
-      
-      if (roomId && mode !== 'local' && mode !== 'practice') {
-        // Send leave event (don't await since component is unmounting)
-        fetch('/api/game-sessions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'leave',
-            roomId
-          })
-        }).catch(err => console.warn('⚠️ Failed to record session leave:', err))
-      }
+
+      fetch('/api/game-sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'leave',
+          roomId: realRoomId,
+          playerSessionId: sessionId,
+          playerIdentifier,
+          privyUserId,
+          clientReportedRoomId: queryRoomId
+        })
+      }).catch(err => console.warn('⚠️ Failed to record session leave:', err))
     }
-  }, [gameStarted])
+  }, [gameStarted, wsConnection, sessionReady])
   // WebSocket connection for multiplayer Colyseus rooms
   useEffect(() => {
     if (!gameStarted) return
@@ -832,6 +885,9 @@ const AgarIOGame = () => {
         const mode = urlParams.get('mode')
         const multiplayer = urlParams.get('multiplayer')
         const server = urlParams.get('server')
+        const fee = parseFloat(urlParams.get('fee')) || 0
+        const region = urlParams.get('region') || 'unknown'
+        const queryRoomId = urlParams.get('roomId')
 
         console.log('🔍 URL parameters:', { mode, multiplayer, server })
 
@@ -843,6 +899,8 @@ const AgarIOGame = () => {
 
         setIsMultiplayer(true)
         setConnectedPlayers(1) // At least the current player
+
+        setSessionReady(false)
 
         // Import Colyseus client
         const { joinArena } = await import('../../lib/colyseus')
@@ -866,13 +924,51 @@ const AgarIOGame = () => {
 
         // Connect to Colyseus arena
         const room = await joinArena({ privyUserId, playerName })
-        
+
         setWsConnection('connected')
         console.log('✅ Connected to Colyseus arena')
 
+        const playerIdentifier = privyUserId || room.sessionId || `anonymous_${Date.now()}`
+        const joinTimestamp = new Date().toISOString()
+
+        sessionInfoRef.current = {
+          realRoomId: room.roomId,
+          sessionId: room.sessionId,
+          privyUserId: privyUserId || null,
+          playerIdentifier,
+          playerName: playerName || null,
+          fee,
+          mode,
+          region,
+          multiplayer,
+          queryRoomId,
+          joinedAt: joinTimestamp
+        }
+        fallbackPlayerIdentifierRef.current = playerIdentifier
+
+        sessionTrackedRef.current = true
+
+        const tracked = await trackRealHathoraSession(
+          room.roomId,
+          room.sessionId,
+          fee,
+          mode,
+          region,
+          multiplayer,
+          playerIdentifier,
+          privyUserId
+        )
+
+        if (!tracked) {
+          sessionTrackedRef.current = false
+          console.warn('⚠️ Falling back to legacy session tracking after failed real session tracking')
+        }
+
+        setSessionReady(true)
+
         // Store room reference for sending inputs
         wsRef.current = room
-        
+
         // Set up state change listener
         room.onStateChange((state) => {
           if (!state) {
@@ -948,6 +1044,7 @@ const AgarIOGame = () => {
       } catch (error) {
         console.error('❌ Failed to connect to Colyseus server:', error)
         setWsConnection('error')
+        setSessionReady(false)
       }
     }
 

@@ -1809,8 +1809,28 @@ export default function TurfLootTactical() {
       // Return server configuration for handleJoinLobby to use
       console.log('✅ Colyseus server configuration ready for navigation')
       
+      const resolvedRoomId =
+        serverData.colyseusRoomId ||
+        serverData.roomId ||
+        serverData.id ||
+        'colyseus-arena'
+
+      const joinMetadata = {
+        serverId: serverData.id,
+        colyseusRoomId: serverData.colyseusRoomId || resolvedRoomId,
+        colyseusEndpoint: serverData.colyseusEndpoint || colyseusServerInfo.endpoint,
+        regionId: serverData.regionId,
+        gameType: serverData.gameType,
+        mode: serverData.mode,
+        entryFee: serverData.entryFee,
+        canSpectate: serverData.canSpectate,
+        currentPlayers: serverData.currentPlayers,
+        ...(serverData.joinMetadata || {})
+      }
+
       return {
-        roomId: 'colyseus-arena',
+        roomId: resolvedRoomId,
+        colyseusRoomId: joinMetadata.colyseusRoomId,
         endpoint: colyseusServerInfo.endpoint,
         roomType: colyseusServerInfo.roomType,
         region: colyseusServerInfo.region,
@@ -1821,7 +1841,8 @@ export default function TurfLootTactical() {
         connectionInfo: {
           endpoint: colyseusServerInfo.endpoint,
           roomType: colyseusServerInfo.roomType
-        }
+        },
+        joinMetadata
       }
       
     } catch (error) {
@@ -1987,6 +2008,26 @@ export default function TurfLootTactical() {
         maxPlayers: colyseusResult.maxPlayers.toString(),
         endpoint: colyseusResult.endpoint
       })
+
+      if (colyseusResult.colyseusRoomId) {
+        queryParams.set('colyseusRoomId', colyseusResult.colyseusRoomId)
+      }
+
+      if (colyseusResult.joinMetadata) {
+        Object.entries(colyseusResult.joinMetadata).forEach(([key, value]) => {
+          if (value === undefined || value === null) return
+          const paramKey = `join_${key}`
+          if (typeof value === 'object') {
+            try {
+              queryParams.set(paramKey, JSON.stringify(value))
+            } catch (err) {
+              console.warn('⚠️ Failed to serialize join metadata for query params:', key, err)
+            }
+          } else {
+            queryParams.set(paramKey, String(value))
+          }
+        })
+      }
       
       console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
       console.log('🚀 Navigating to Colyseus multiplayer game:', `/agario?${queryParams.toString()}`)

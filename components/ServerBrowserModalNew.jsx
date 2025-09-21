@@ -397,7 +397,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       maxPlayers: room.maxPlayers,
       currentPlayers: room.currentPlayers,
       isActive: room.isActive,
-      canSpectate: room.canSpectate
+      canSpectate: room.canSpectate,
+      colyseusRoomId: room.colyseusRoomId || room.id,
+      colyseusEndpoint: room.colyseusEndpoint || room.endpoint,
+      joinMetadata: room.joinMetadata || room.metadata || null
     }
     
     console.log('🎮 HANDLEJOINSERVER: Processed room data for join:', serverData)
