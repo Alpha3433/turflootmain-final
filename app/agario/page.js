@@ -875,8 +875,15 @@ const AgarIOGame = () => {
         
         // Set up state change listener
         room.onStateChange((state) => {
-          // Update connected player count
-          setConnectedPlayers(state.players.size)
+          if (!state) {
+            console.log('📊 Colyseus state is null/undefined')
+            return
+          }
+          
+          // Update connected player count with null checks
+          const playerCount = state.players ? 
+            (state.players.size || Object.keys(state.players).length || 0) : 0
+          setConnectedPlayers(playerCount)
           
           // Update local game state with server data
           if (gameRef.current && gameRef.current.updateFromServer) {
@@ -884,15 +891,19 @@ const AgarIOGame = () => {
           }
         })
 
-        // Handle player changes
-        room.state.players.onAdd((player, sessionId) => {
-          console.log(`👋 Player joined: ${player.name}`)
-          setConnectedPlayers(prev => prev + 1)
-        })
+        // Handle player changes (with null check)
+        room.onStateChange.once((state) => {
+          if (state && state.players) {
+            state.players.onAdd((player, sessionId) => {
+              console.log(`👋 Player joined: ${player.name || 'Unknown'}`)
+              setConnectedPlayers(prev => prev + 1)
+            })
 
-        room.state.players.onRemove((player, sessionId) => {
-          console.log(`👋 Player left: ${player.name}`)
-          setConnectedPlayers(prev => Math.max(0, prev - 1))
+            state.players.onRemove((player, sessionId) => {
+              console.log(`👋 Player left: ${sessionId}`)
+              setConnectedPlayers(prev => Math.max(0, prev - 1))
+            })
+          }
         })
 
         // Handle room errors
