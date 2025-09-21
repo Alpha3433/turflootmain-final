@@ -200,7 +200,7 @@ const AgarIOGame = () => {
         throw new Error('Failed to join Colyseus arena room')
       }
       
-      console.log('✅ Successfully joined Colyseus arena room:', room.id)
+      console.log('✅ Successfully joined Colyseus arena room:', room.roomId)
       
       // Set up multiplayer state
       setIsMultiplayer(true)
