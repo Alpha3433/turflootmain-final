@@ -294,22 +294,20 @@ const AgarIOGame = () => {
   // Define trackPlayerSession function (was being called but not defined)
   const trackPlayerSession = async (roomId, fee, mode, region) => {
     try {
-      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region })
+      console.log('📊 Tracking player session:', { roomId, fee, mode, region })
       
-      // Format data according to API requirements (session object with required fields)
+      // Store session data at root level for API compatibility
       const sessionData = {
         action: 'join',
-        session: {
-          roomId: roomId,
-          joinedAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
-          userId: 'fallback_' + Math.random().toString(36).substr(2, 9),
-          entryFee: fee || 0,
-          mode: mode || 'unknown',
-          region: region || 'unknown',
-          isRealHathoraRoom: false,
-          fallbackSession: true
-        }
+        roomId: roomId,
+        joinedAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+        userId: 'player_' + Math.random().toString(36).substr(2, 9),
+        entryFee: fee || 0,
+        mode: mode || 'colyseus-multiplayer',
+        region: region || 'AU',
+        status: 'active',
+        isRealColyseusRoom: true
       }
       
       const response = await fetch('/api/game-sessions', {
@@ -321,13 +319,13 @@ const AgarIOGame = () => {
       })
       
       if (response.ok) {
-        console.log('✅ Fallback session tracked successfully')
+        console.log('✅ Colyseus session tracked successfully')
       } else {
-        console.warn('⚠️ Failed to track fallback session:', response.status)
+        console.warn('⚠️ Failed to track Colyseus session:', response.status)
       }
       
     } catch (error) {
-      console.error('❌ Error tracking fallback session:', error)
+      console.error('❌ Error tracking Colyseus session:', error)
     }
   }
 
