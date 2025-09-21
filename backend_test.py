@@ -562,6 +562,8 @@ class ColyseusRoomTrackingTester:
         # Remove test sessions
         cleanup_actions = [
             {"action": "leave", "roomId": "colyseus-arena-global"},
+            {"action": "leave", "roomId": "colyseus-arena-default"},
+            {"action": "leave", "roomId": "colyseus-arena"},
         ]
         
         for action in cleanup_actions:
