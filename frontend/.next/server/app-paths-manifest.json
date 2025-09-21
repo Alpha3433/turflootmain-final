@@ -1,8 +1,8 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
+  "/agario/page": "app/agario/page.js",
   "/api/[[...path]]/route": "app/api/[[...path]]/route.js",
   "/api/debug-servers/route": "app/api/debug-servers/route.js",
-  "/agario/page": "app/agario/page.js",
   "/api/friends/route": "app/api/friends/route.js",
   "/api/game-sessions/route": "app/api/game-sessions/route.js",
   "/api/loyalty/demo/route": "app/api/loyalty/demo/route.js",
@@ -10,7 +10,6 @@
   "/api/names/[...slug]/route": "app/api/names/[...slug]/route.js",
   "/api/party/route": "app/api/party/route.js",
   "/api/reports/route": "app/api/reports/route.js",
-  "/api/servers/route": "app/api/servers/route.js",
   "/api/test-db/route": "app/api/test-db/route.js",
   "/api/user/username/route": "app/api/user/username/route.js",
   "/api/wallet/balance/route": "app/api/wallet/balance/route.js",
@@ -29,10 +28,10 @@
   "/test-backend/page": "app/test-backend/page.js",
   "/test-customization/page": "app/test-customization/page.js",
   "/test-env/page": "app/test-env/page.js",
-  "/page": "app/page.js",
   "/test-login/page": "app/test-login/page.js",
+  "/page": "app/page.js",
+  "/test-privy-solana/page": "app/test-privy-solana/page.js",
   "/test/page": "app/test/page.js",
   "/users-api/register/route": "app/users-api/register/route.js",
-  "/test-privy-solana/page": "app/test-privy-solana/page.js",
   "/debug-privy/page": "app/debug-privy/page.js"
 }

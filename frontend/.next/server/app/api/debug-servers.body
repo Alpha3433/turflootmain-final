@@ -1,1 +1,1 @@
-{"totalSessions":137,"activeSessions":0,"sessions":[],"twoMinutesAgo":"2025-09-21T17:00:51.740Z"}
+{"totalSessions":141,"activeSessions":1,"sessions":[{"_id":"68cf7fa0798dd0c42f953ca9","userId":"anonymous","roomId":"colyseus-arena","entryFee":0,"joinedAt":"2025-09-21T17:55:17.073Z","lastActivity":"2025-09-21T18:14:17.077Z","mode":"colyseus-multiplayer","region":"AU","status":"active","fallbackSession":true,"isRealHathoraRoom":false,"leftAt":"2025-09-21T13:19:30.425Z","isRealColyseusRoom":true}],"twoMinutesAgo":"2025-09-21T18:13:57.871Z"}
