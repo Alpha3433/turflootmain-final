@@ -918,36 +918,40 @@ const AgarIOGame = () => {
           })
 
           // Handle room errors
-        room.onError((code, message) => {
-          console.error('❌ Colyseus room error:', code, message)
+          room.onError((code, message) => {
+            console.error('❌ Colyseus room error:', code, message)
+            setWsConnection('error')
+          })
+
+          // Handle disconnection
+          room.onLeave((code) => {
+            console.log('👋 Left Colyseus room:', code)
+            setWsConnection('disconnected')
+          })
+
+          // Send ping every 5 seconds for latency measurement
+          const pingInterval = setInterval(() => {
+            if (room && room.connection && room.connection.readyState === WebSocket.OPEN) {
+              // Send ping message through Colyseus room
+              room.send("ping", { timestamp: Date.now() })
+            }
+          }, 5000)
+
+          // Cleanup on unmount
+          return () => {
+            clearInterval(pingInterval)
+            if (room) {
+              room.leave()
+            }
+          }
+
+        } catch (error) {
+          console.error('❌ Failed to connect to Colyseus server:', error)
           setWsConnection('error')
-        })
-
-        // Handle disconnection
-        room.onLeave((code) => {
-          console.log('👋 Left Colyseus room:', code)
-          setWsConnection('disconnected')
-        })
-
-        // Send ping every 5 seconds for latency measurement
-        const pingInterval = setInterval(() => {
-          if (room && room.connection && room.connection.readyState === WebSocket.OPEN) {
-            // Send ping message through Colyseus room
-            room.send("ping", { timestamp: Date.now() })
-          }
-        }, 5000)
-
-        // Cleanup on unmount
-        return () => {
-          clearInterval(pingInterval)
-          if (room) {
-            room.leave()
-          }
+          
+          // Allow the game to continue in local mode if Colyseus fails
+          console.log('🏠 Falling back to local game mode due to Colyseus connection failure')
         }
-
-      } catch (error) {
-        console.error('❌ Failed to connect to Colyseus server:', error)
-        setWsConnection('error')
       }
     }
 
