@@ -30,9 +30,9 @@ export async function GET(request) {
       const roomsMap = new Map()
       
       activeSessions.forEach(session => {
-        const roomId = session.roomId || session.session?.roomId || 'colyseus-arena-default'
-        const region = session.session?.region || 'AU'
-        const mode = session.session?.mode || 'colyseus-multiplayer'
+        const roomId = session.roomId || 'colyseus-arena-default'
+        const region = session.region || 'AU'
+        const mode = session.mode || 'colyseus-multiplayer'
         
         if (roomsMap.has(roomId)) {
           roomsMap.get(roomId).currentPlayers += 1
