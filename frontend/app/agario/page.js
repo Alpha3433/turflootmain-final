@@ -836,7 +836,8 @@ const AgarIOGame = () => {
         console.log('🔍 URL parameters:', { mode, multiplayer, server })
 
         // Only connect to Colyseus for multiplayer rooms
-        if (mode === 'local' || mode === 'practice' || server !== 'colyseus') {
+        // Default to Colyseus when server is not specified
+        if (mode === 'local' || mode === 'practice' || (server && server !== 'colyseus')) {
           console.log('🚫 Not a Colyseus multiplayer room - skipping WebSocket connection')
           return
         }
