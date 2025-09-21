@@ -28,9 +28,9 @@
   "/test-customization/page": "app/test-customization/page.js",
   "/test-env/page": "app/test-env/page.js",
   "/test-login/page": "app/test-login/page.js",
+  "/page": "app/page.js",
   "/test-privy-solana/page": "app/test-privy-solana/page.js",
   "/test/page": "app/test/page.js",
   "/users-api/register/route": "app/users-api/register/route.js",
-  "/debug-privy/page": "app/debug-privy/page.js",
-  "/page": "app/page.js"
+  "/debug-privy/page": "app/debug-privy/page.js"
 }
