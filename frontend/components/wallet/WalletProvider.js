@@ -1,0 +1,51 @@
+'use client'
+
+import { useMemo } from 'react'
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import { 
+  PhantomWalletAdapter
+} from '@solana/wallet-adapter-phantom'
+import {
+  SolflareWalletAdapter  
+} from '@solana/wallet-adapter-solflare'
+import {
+  TorusWalletAdapter
+} from '@solana/wallet-adapter-torus'
+
+// Import wallet adapter CSS
+import '@solana/wallet-adapter-react-ui/styles.css'
+
+export default function SolanaWalletProvider({ children }) {
+  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
+  const network = process.env.NEXT_PUBLIC_SOLANA_NETWORK === 'mainnet' 
+    ? WalletAdapterNetwork.Mainnet 
+    : WalletAdapterNetwork.Devnet
+  
+  // You can also provide a custom RPC endpoint
+  const endpoint = useMemo(() => 
+    process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 
+    (network === WalletAdapterNetwork.Mainnet 
+      ? 'https://api.mainnet-beta.solana.com' 
+      : 'https://api.devnet.solana.com'),
+    [network]
+  )
+  
+  // Using individual wallet adapters to avoid problematic dependencies
+  const wallets = useMemo(() => [
+    new PhantomWalletAdapter(),
+    new SolflareWalletAdapter(),
+    new TorusWalletAdapter(),
+  ], [network])
+
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          {children}
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  )
+}
