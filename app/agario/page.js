@@ -886,7 +886,7 @@ const AgarIOGame = () => {
         setConnectedPlayers(1) // At least the current player
 
         // Import Colyseus client
-        const { joinArena } = await import('@/lib/colyseus')
+        const { joinArena } = await import('../../lib/colyseus')
         
         // Get Privy user ID for authentication
         let privyUserId = null
