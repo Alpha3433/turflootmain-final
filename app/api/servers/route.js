@@ -25,7 +25,7 @@ export async function GET(request) {
       console.log(`🔍 Querying for sessions active since: ${tenMinutesAgo}`)
       
       const activeSessions = await sessionsCollection.find({
-        'lastActivity': { $gte: twoMinutesAgo },
+        'lastActivity': { $gte: tenMinutesAgo },
         'mode': { $regex: /colyseus/i },
         'status': 'active'
       }).toArray()
