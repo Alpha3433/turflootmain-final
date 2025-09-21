@@ -102,7 +102,7 @@ export default function PrivyAuthProvider({ children }) {
     externalWallets: {
       // ✅ ONLY Solana external wallet connectors
       solana: {
-        wallets: ['phantom', 'solflare', 'backpack']
+        wallets: ['phantom', 'solflare']
       }
       // ❌ NO ethereum section = no MetaMask, WalletConnect, etc.
     },
