@@ -880,9 +880,22 @@ const AgarIOGame = () => {
           
           setWsConnection('connected')
           console.log('✅ Connected to Colyseus arena')
+          console.log(`🎮 Room ID: ${room.id}`)
+          console.log(`👥 Session ID: ${room.sessionId}`)
 
           // Store room reference for sending inputs
           wsRef.current = room
+          
+          // Track this room in our session system
+          if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search)
+            const fee = urlParams.get('fee') || '0'
+            const mode = urlParams.get('mode') || 'colyseus-multiplayer'
+            const region = urlParams.get('region') || 'AU'
+            
+            // Update session with room ID
+            trackPlayerSession(room.id, parseInt(fee), mode, region)
+          }
         
           // Set up state change listener
           room.onStateChange((state) => {
