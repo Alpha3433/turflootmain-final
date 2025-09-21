@@ -13,7 +13,7 @@ export async function GET(request) {
       const client = new MongoClient(process.env.MONGO_URL)
       await client.connect()
       const db = client.db('turfloot')
-      const sessionsCollection = db.collection('game-sessions')
+      const sessionsCollection = db.collection('game_sessions')
 
       // Get active Colyseus sessions (last activity within 2 minutes) 
       const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000)
