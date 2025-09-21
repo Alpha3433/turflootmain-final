@@ -19,6 +19,8 @@ export async function GET(request, { params }) {
   const route = path?.join('/') || ''
   
   console.log('🚀 GET HANDLER CALLED - PATH:', route)
+  console.error('🔍 DEBUG: route value =', JSON.stringify(route), 'typeof =', typeof route)
+  console.error('🔍 DEBUG: route === "servers" ?', route === 'servers')
   
   try {
     // Root API endpoint
