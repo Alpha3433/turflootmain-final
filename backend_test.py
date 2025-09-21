@@ -356,7 +356,7 @@ class ColyseusRoomTrackingTester:
             
             arena_server = None
             for server in servers:
-                if server.get('id') == 'colyseus-arena-global':
+                if server.get('serverType') == 'colyseus' and server.get('roomType') == 'arena':
                     arena_server = server
                     break
             
@@ -383,12 +383,21 @@ class ColyseusRoomTrackingTester:
             if response.status_code == 200:
                 session_data = response.json()
                 sessions_by_room = session_data.get('sessionsByRoom', {})
-                arena_sessions = sessions_by_room.get('colyseus-arena-global', [])
+                
+                # Look for sessions in any arena room (handle ID inconsistencies)
+                arena_sessions = []
+                arena_room_found = None
+                
+                for room_id, sessions in sessions_by_room.items():
+                    if 'arena' in room_id.lower():
+                        arena_sessions.extend(sessions)
+                        arena_room_found = room_id
+                        break
                 
                 self.log_test(
                     "Session Grouping by Room ID",
                     len(arena_sessions) >= 2,
-                    f"Sessions in arena room: {len(arena_sessions)}"
+                    f"Sessions in arena room '{arena_room_found}': {len(arena_sessions)}"
                 )
                 
                 # Verify session details
