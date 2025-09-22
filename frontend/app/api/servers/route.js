@@ -37,16 +37,17 @@ export async function GET(request) {
         }
       }).toArray()
       
-      console.log(`🔍 Query found ${activeSessions.length} active sessions:`, activeSessions.map(s => ({
+      console.log(`🔍 Query found ${activeSessions.length} active sessions from REAL PRIVY USERS:`, activeSessions.map(s => ({
         roomId: s.roomId,
         userId: s.userId,
         mode: s.mode,
         lastActivity: s.lastActivity,
-        status: s.status
+        status: s.status,
+        isRealUser: s.userId !== 'anonymous' && !s.userId?.startsWith('anonymous')
       })))
       
       totalRealPlayers = activeSessions.length
-      console.log(`📊 Database shows ${totalRealPlayers} active Colyseus players`)
+      console.log(`📊 Database shows ${totalRealPlayers} active Colyseus players (REAL PRIVY USERS ONLY)`)
       
       // Group sessions by room ID to create room entries
       const roomsMap = new Map()
