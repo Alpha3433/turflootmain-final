@@ -187,6 +187,12 @@ const AgarIOGame = () => {
       setWsConnection('connected')
       wsRef.current = room
       
+      // CRITICAL: Set global window variable for game engine
+      if (typeof window !== 'undefined') {
+        window.isMultiplayer = true
+        console.log('✅ Set window.isMultiplayer = true')
+      }
+      
       // Set up Colyseus room event handlers
       room.onStateChange((state) => {
         console.log('📡 Colyseus state update received')
