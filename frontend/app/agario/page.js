@@ -2735,6 +2735,29 @@ const AgarIOGame = () => {
         this.ctx.fillText(`Players: ${this.realPlayerCount} | Radius: ${Math.floor(playableRadius)}`, centerX, centerY - playableRadius - 20)
       }
     }
+    
+    drawLoadingOverlay() {
+      // Fill background with dark color
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
+      
+      // Draw loading text
+      this.ctx.fillStyle = '#68d391'
+      this.ctx.font = 'bold 36px Arial'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillText('⚡ CONNECTING TO MULTIPLAYER', this.canvas.width / 2, this.canvas.height / 2 - 50)
+      
+      // Draw subtitle
+      this.ctx.fillStyle = '#e2e8f0'
+      this.ctx.font = '20px Arial'
+      this.ctx.fillText('🌐 Establishing connection to Colyseus server...', this.canvas.width / 2, this.canvas.height / 2)
+      
+      // Draw animated loading dots
+      const dots = Math.floor(Date.now() / 500) % 4
+      this.ctx.fillStyle = '#a0aec0'
+      this.ctx.font = '16px Arial'
+      this.ctx.fillText('⏳ Please wait' + '.'.repeat(dots), this.canvas.width / 2, this.canvas.height / 2 + 40)
+    }
 
     drawCoin(coin) {
       this.ctx.beginPath()
