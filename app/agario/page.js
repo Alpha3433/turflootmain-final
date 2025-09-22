@@ -59,6 +59,15 @@ const AgarIOGame = () => {
   const [statsExpanded, setStatsExpanded] = useState(false)
   const statsTimerRef = useRef(null)
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    window.isMultiplayer = isMultiplayer
+    window.getIsMultiplayer = () => window.isMultiplayer
+  }, [isMultiplayer])
+
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
     if (leaderboardExpanded && isMobile) {
