@@ -8,7 +8,7 @@ export async function GET(request) {
   console.log('🚀 DEDICATED SERVERS API CALLED AT:', new Date().toISOString())
   
   try {
-    console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
+    console.log('🎮 REAL PRIVY USERS ONLY: Colyseus Server Browser API - Fetching rooms created by authenticated users...')
     
     // Query our database for active Colyseus rooms and sessions
     let availableRooms = []
