@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Server Browser to Game Joining Flow for Colyseus Multiplayer
-=================================================================================
+Backend Testing for Online-Only Game Implementation
+==================================================
 
-This test suite focuses on the specific issue where players are getting 
-"🏠 Single-player mode: Running local game logic" instead of connecting to 
-Colyseus multiplayer when joining servers from the browser.
+Testing Agent: Comprehensive verification of single-player mode removal
+This test suite verifies that the application keeps loading until an online 
+multiplayer game is successfully created/joined, with no single-player fallback.
 
-Test Areas:
-1. Server Browser API - Verify /api/servers shows active rooms with players
-2. URL Parameter Generation - Test correct URL parameters for Colyseus
-3. Game Page Parameter Parsing - Verify parameters are received correctly
-4. Session Tracking Flow - Test complete flow from session creation to room visibility
+CRITICAL TESTS NEEDED:
+1. Server Browser API - Verify /api/servers correctly shows active Colyseus rooms
+2. Game Session Creation - Test creating sessions with mode: "colyseus-multiplayer"  
+3. URL Parameter Generation - Test proper multiplayer parameters
+4. Loading State Verification - Verify no single-player fallback
 """
 
 import requests
