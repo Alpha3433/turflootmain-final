@@ -216,6 +216,12 @@ const AgarIOGame = () => {
         setWsConnection('disconnected')
         setConnectedPlayers(0)
         
+        // CRITICAL: Reset global window variable for game engine
+        if (typeof window !== 'undefined') {
+          window.isMultiplayer = false
+          console.log('✅ Set window.isMultiplayer = false (disconnected)')
+        }
+        
         // CRITICAL: Update database session to inactive when player leaves
         updateSessionOnLeave(room.roomId)
       })
