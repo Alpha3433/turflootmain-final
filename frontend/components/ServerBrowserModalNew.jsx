@@ -384,23 +384,32 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   }
 
   const handleJoinServer = (room) => {
-    console.log('🏠 HANDLEJOINSERVER CALLED! Joining Hathora room:', room)
+    console.log('🏠 HANDLEJOINSERVER CALLED! Joining server:', room)
+    console.log('🔍 Room details:', { 
+      id: room.id, 
+      serverType: room.serverType, 
+      currentPlayers: room.currentPlayers,
+      colyseusRoomId: room.colyseusRoomId 
+    })
     
     const serverData = {
-      id: room.id,
+      id: room.colyseusRoomId || room.id, // Use Colyseus room ID if available
       region: room.region,
       regionId: room.regionId, // Pass the specific region ID (e.g., 'london', 'frankfurt')
       name: room.name,
       entryFee: room.entryFee,
-      gameType: room.gameType || 'cash-game',
-      mode: room.type === 'instant-join' ? 'hathora-multiplayer' : 'join-existing',
+      gameType: room.gameType || 'arena-battle',
+      // CRITICAL FIX: Set proper mode based on server type
+      mode: room.serverType === 'colyseus' ? 'join-existing' : 'hathora-multiplayer',
       maxPlayers: room.maxPlayers,
       currentPlayers: room.currentPlayers,
       isActive: room.isActive,
-      canSpectate: room.canSpectate
+      canSpectate: room.canSpectate,
+      serverType: room.serverType // Pass server type for identification
     }
     
     console.log('🎮 HANDLEJOINSERVER: Processed room data for join:', serverData)
+    console.log('🔍 JOIN MODE:', serverData.mode, '- Server Type:', room.serverType)
     console.log('🎮 HANDLEJOINSERVER: onJoinLobby type:', typeof onJoinLobby)
     console.log('🎮 HANDLEJOINSERVER: About to call onJoinLobby...')
     
