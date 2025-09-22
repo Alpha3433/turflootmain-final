@@ -30,7 +30,7 @@ export async function GET(request) {
       const activeSessions = await sessionsCollection.find({
         'lastActivity': { $gte: threeMinutesAgo },
         'mode': { $regex: /colyseus/i },
-        'status': 'active',
+        'status': 'active',  // Only active sessions (exclude 'left' sessions)
         'userId': { 
           $exists: true, 
           $ne: 'anonymous',
