@@ -957,8 +957,15 @@ const AgarIOGame = () => {
           console.error('❌ Failed to connect to Colyseus server:', error)
           setWsConnection('error')
           
-          // Allow the game to continue in local mode if Colyseus fails
-          console.log('🏠 Falling back to local game mode due to Colyseus connection failure')
+          // ONLINE-ONLY: Stay in loading state, retry connection
+          console.log('⏳ Connection failed - staying in loading state for retry...')
+          console.log('🔄 Will attempt to reconnect to multiplayer server...')
+          
+          // Optionally, set up a retry mechanism here
+          setTimeout(() => {
+            console.log('🔄 Retrying Colyseus connection...')
+            setWsConnection('connecting')
+          }, 3000)
         }
         
       } catch (error) {
