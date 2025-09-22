@@ -21,13 +21,14 @@ export async function GET(request) {
       const db = client.db('turfloot')
       const sessionsCollection = db.collection('game_sessions')
 
-      // Get active Colyseus sessions created by REAL PRIVY USERS ONLY (last activity within 10 minutes)
-      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
-      console.log(`🔍 Querying for sessions active since: ${tenMinutesAgo}`)
+      // Get active Colyseus sessions created by REAL PRIVY USERS ONLY (last activity within 3 minutes)
+      const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000)
+      console.log(`🔍 Querying for sessions active since: ${threeMinutesAgo}`)
       console.log(`👤 FILTERING: Only showing sessions created by real Privy users (not anonymous)`)
+      console.log(`⏰ Session expiry window: 3 minutes (sessions older than this are considered inactive)`)
       
       const activeSessions = await sessionsCollection.find({
-        'lastActivity': { $gte: tenMinutesAgo },
+        'lastActivity': { $gte: threeMinutesAgo },
         'mode': { $regex: /colyseus/i },
         'status': 'active',
         'userId': { 
