@@ -180,8 +180,10 @@ const AgarIOGame = () => {
       
       console.log('✅ Successfully joined Colyseus arena room:', room.id)
       
-      // Set up multiplayer state
+      // ONLINE-ONLY: Set up multiplayer state and start game
+      console.log('🎉 MULTIPLAYER CONNECTION ESTABLISHED - Starting game!')
       setIsMultiplayer(true)
+      setGameStarted(true)  // Game can now start
       setWsConnection('connected')
       wsRef.current = room
       
