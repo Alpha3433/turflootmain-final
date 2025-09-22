@@ -858,7 +858,7 @@ const AgarIOGame = () => {
           privyUserId = `anonymous_${Date.now()}`
         }
 
-        console.log('🔑 Connecting with user:', { privyUserId, playerName })
+        console.log('🔑 Connecting with user:', { privyUserId, playerName, targetRoomId })
 
         // Connect to Colyseus arena with timeout and error handling
         try {
