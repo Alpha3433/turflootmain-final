@@ -922,6 +922,12 @@ const AgarIOGame = () => {
           console.log('🎉 MULTIPLAYER CONNECTION ESTABLISHED - Starting game!')
           setIsMultiplayer(true)
           setGameStarted(true)  // Game can now start
+          
+          // CRITICAL: Set global window variable for game engine
+          if (typeof window !== 'undefined') {
+            window.isMultiplayer = true
+            console.log('✅ Set window.isMultiplayer = true')
+          }
 
           // Store room reference for sending inputs
           wsRef.current = room
