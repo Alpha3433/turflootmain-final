@@ -3571,6 +3571,16 @@ const AgarIOGame = () => {
             🎮 TurfLoot requires an active multiplayer connection<br/>
             The game will start once connected to the server
           </div>
+          
+          {/* DEBUG INFO */}
+          <div style={{
+            marginTop: '40px',
+            fontSize: '12px',
+            color: '#4a5568',
+            textAlign: 'center'
+          }}>
+            DEBUG: gameStarted={gameStarted.toString()}, isMultiplayer={isMultiplayer.toString()}, wsConnection={wsConnection}
+          </div>
         </div>
       )}
       
