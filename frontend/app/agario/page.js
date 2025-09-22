@@ -204,7 +204,9 @@ const AgarIOGame = () => {
       
       room.onLeave(() => {
         console.log('👋 Left Colyseus room')
+        // ONLINE-ONLY: Reset to loading state on disconnect
         setIsMultiplayer(false)
+        setGameStarted(false)
         setWsConnection('disconnected')
         setConnectedPlayers(0)
       })
