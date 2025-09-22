@@ -812,7 +812,8 @@ const AgarIOGame = () => {
   }, [gameStarted])
   // WebSocket connection for multiplayer Colyseus rooms
   useEffect(() => {
-    if (!gameStarted) return
+    // ONLINE-ONLY: Always attempt connection, don't wait for gameStarted
+    console.log('🔄 Connection useEffect triggered - attempting Colyseus connection...')
 
     const connectToColyseusRoom = async () => {
       try {
