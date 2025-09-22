@@ -870,6 +870,11 @@ const AgarIOGame = () => {
           console.log('✅ Connected to Colyseus arena')
           console.log(`🎮 Room ID: ${room.roomId}`)
           console.log(`👥 Session ID: ${room.sessionId}`)
+          
+          // ONLINE-ONLY: Connection established - start the game!
+          console.log('🎉 MULTIPLAYER CONNECTION ESTABLISHED - Starting game!')
+          setIsMultiplayer(true)
+          setGameStarted(true)  // Game can now start
 
           // Store room reference for sending inputs
           wsRef.current = room
