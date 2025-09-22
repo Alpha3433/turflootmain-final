@@ -813,6 +813,33 @@ const AgarIOGame = () => {
       }
     }
   }, [gameStarted])
+  // Function to update session status when player leaves
+  const updateSessionOnLeave = async (roomId) => {
+    try {
+      console.log(`📡 Updating session status to inactive for room: ${roomId}`)
+      const response = await fetch('/api/game-sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'leave',
+          session: {
+            roomId: roomId,
+            lastActivity: new Date().toISOString(),
+            status: 'inactive'
+          }
+        })
+      })
+      
+      if (response.ok) {
+        console.log('✅ Session marked as inactive in database')
+      } else {
+        console.warn('⚠️ Failed to update session status:', response.status)
+      }
+    } catch (error) {
+      console.error('❌ Error updating session on leave:', error)
+    }
+  }
+
   // WebSocket connection for multiplayer Colyseus rooms
   useEffect(() => {
     // ONLINE-ONLY: Always attempt connection, don't wait for gameStarted
