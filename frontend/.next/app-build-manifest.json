@@ -42,15 +42,6 @@
       "static/chunks/main-app-b56364f70b27a961.js",
       "static/chunks/app/agario/page-1f5d7c745804c532.js"
     ],
-    "/blocked/page": [
-      "static/chunks/webpack-e19bdad4fa88d15f.js",
-      "static/chunks/fd9d1056-c1467956791053fe.js",
-      "static/chunks/7023-68e3a26057158208.js",
-      "static/chunks/main-app-b56364f70b27a961.js",
-      "static/chunks/346-4cbba2d294bed834.js",
-      "static/chunks/7138-deb15d5331dec4e6.js",
-      "static/chunks/app/blocked/page-77f14f14f8044697.js"
-    ],
     "/dashboard/page": [
       "static/chunks/webpack-e19bdad4fa88d15f.js",
       "static/chunks/fd9d1056-c1467956791053fe.js",
@@ -59,6 +50,15 @@
       "static/chunks/346-4cbba2d294bed834.js",
       "static/chunks/7138-deb15d5331dec4e6.js",
       "static/chunks/app/dashboard/page-ac0fd5a2d3e18574.js"
+    ],
+    "/blocked/page": [
+      "static/chunks/webpack-e19bdad4fa88d15f.js",
+      "static/chunks/fd9d1056-c1467956791053fe.js",
+      "static/chunks/7023-68e3a26057158208.js",
+      "static/chunks/main-app-b56364f70b27a961.js",
+      "static/chunks/346-4cbba2d294bed834.js",
+      "static/chunks/7138-deb15d5331dec4e6.js",
+      "static/chunks/app/blocked/page-77f14f14f8044697.js"
     ],
     "/demo/page": [
       "static/chunks/webpack-e19bdad4fa88d15f.js",
