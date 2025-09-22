@@ -1799,10 +1799,33 @@ export default function TurfLootTactical() {
     try {
       // Colyseus server configuration
       const colyseusServerInfo = {
-        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'ws://localhost:2567',
+        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud',
         roomType: 'arena',
-        region: serverData.region || 'global'
+        region: serverData.region || 'AU'
       }
+      
+      // CRITICAL FIX: Use existing room ID for JOIN, create new room for CREATE
+      let roomId
+      let isJoiningExisting = false
+      
+      if (serverData.mode === 'join-existing' && serverData.id) {
+        // Player is joining an existing room from server browser
+        roomId = serverData.id
+        isJoiningExisting = true
+        console.log(`👥 JOINING EXISTING ROOM: ${roomId}`)
+      } else {
+        // Player is creating a new room
+        roomId = `colyseus-arena-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        isJoiningExisting = false
+        console.log(`🆕 CREATING NEW ROOM: ${roomId}`)
+      }
+      
+      console.log('🔍 Room ID Logic:', { 
+        serverDataId: serverData.id, 
+        serverDataMode: serverData.mode,
+        finalRoomId: roomId,
+        isJoiningExisting 
+      })
       
       console.log('🎮 Using Colyseus server configuration:', colyseusServerInfo)
       
@@ -1810,7 +1833,7 @@ export default function TurfLootTactical() {
       console.log('✅ Colyseus server configuration ready for navigation')
       
       return {
-        roomId: 'colyseus-arena',
+        roomId: roomId,
         endpoint: colyseusServerInfo.endpoint,
         roomType: colyseusServerInfo.roomType,
         region: colyseusServerInfo.region,
@@ -1818,6 +1841,7 @@ export default function TurfLootTactical() {
         maxPlayers: 50,
         gameMode: 'colyseus-multiplayer',
         isColyseusRoom: true,
+        isJoiningExisting: isJoiningExisting,
         connectionInfo: {
           endpoint: colyseusServerInfo.endpoint,
           roomType: colyseusServerInfo.roomType
