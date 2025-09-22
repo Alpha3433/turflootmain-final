@@ -982,6 +982,9 @@ const AgarIOGame = () => {
             // ONLINE-ONLY: Reset to loading state on disconnect
             setIsMultiplayer(false)
             setGameStarted(false)
+            
+            // CRITICAL: Update database session to inactive when player leaves
+            updateSessionOnLeave(room.roomId)
           })
 
           // Send ping every 5 seconds for latency measurement
