@@ -209,6 +209,9 @@ const AgarIOGame = () => {
         setGameStarted(false)
         setWsConnection('disconnected')
         setConnectedPlayers(0)
+        
+        // CRITICAL: Update database session to inactive when player leaves
+        updateSessionOnLeave(room.roomId)
       })
       
       return {
