@@ -5,11 +5,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function GET(request) {
-  console.log('🚀 SERVERS API CALLED AT:', new Date().toISOString())
-  console.log('🔥 DEBUG: This is the /app/app/api/servers/route.js file - MAIN VERSION')
-  
-  // Simple test to see if this route is being called
-  console.error('🚨 CRITICAL DEBUG: If you see this, the /app/app/api/servers/route.js is being executed!')
+  console.log('🚀 DEDICATED SERVERS API CALLED AT:', new Date().toISOString())
   
   try {
     console.log('🎮 Colyseus Server Browser API: Fetching available Colyseus rooms...')
