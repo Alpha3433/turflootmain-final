@@ -115,7 +115,7 @@ const AgarIOGame = () => {
     const server = urlParams.get('server')
     const hathoraRoom = urlParams.get('hathoraRoom')
     
-    console.log('🎮 HATHORA-FIRST: Game initialization - URL parameters:', {
+    console.log('🎮 ONLINE-ONLY GAME: Game initialization - URL parameters:', {
       roomId,
       mode,
       multiplayer,
@@ -124,43 +124,21 @@ const AgarIOGame = () => {
       url: window.location.href
     })
     
-    // CRITICAL: Block all non-Hathora games except practice
-    if (mode === 'practice' && roomId === 'global-practice-bots') {
-      console.log('✅ PRACTICE MODE: Allowing local practice with bots')
-      setIsMultiplayer(false)
-      setGameStarted(true)
-      return
-    }
-    
-    // Block any non-Hathora multiplayer attempts
-    console.log('🎮 Colyseus multiplayer game starting...')
+    // ONLINE-ONLY: No practice mode or local games allowed
+    console.log('⚡ ONLINE-ONLY MODE: All games must be multiplayer')
+    console.log('🌐 Colyseus multiplayer game starting...')
     console.log('📊 Game parameters:')
     console.log('  - roomId:', roomId || 'will-be-generated')
     console.log('  - server:', server || 'colyseus')
-    console.log('  - mode:', mode, 'isNotLocal:', mode !== 'local')
+    console.log('  - mode:', mode, 'isOnlineMode:', mode !== 'local')
     
-    // ✅ Allow all multiplayer connections (Colyseus handles everything)
-    console.log('✅ PROCEEDING: Colyseus multiplayer enabled')
+    // Set initial loading state - game won't start until connection established
+    setIsMultiplayer(false) // Will be set to true only after successful connection
+    setGameStarted(false)   // Will be set to true only after successful connection
     
-    // ✅ COLYSEUS MULTIPLAYER: Ready to connect
-    console.log('🏠 Room ID:', roomId || 'will-be-generated')
-    console.log('🌐 Multiplayer mode:', multiplayer)
-    console.log('🖥️ Server type:', server || 'colyseus')
+    console.log('⏳ Game in loading state - waiting for multiplayer connection...')
+    console.log('🔄 Connection establishment in progress...')
     
-    // Set game to multiplayer mode
-    setIsMultiplayer(true)
-    setGameStarted(true)
-    
-    // Initialize Colyseus multiplayer game
-    console.log('🎮 Colyseus multiplayer game ready')
-    
-    // Track game session in database
-    trackPlayerSession(roomId, 0, mode, 'colyseus')
-    
-    // Set up game state (server owns truth via Colyseus)
-    console.log('🎮 Setting up client-side prediction with Colyseus state sync')
-    console.log('⚡ Colyseus server will handle all game logic')
-    console.log('📡 Client will send inputs, receive state updates via Schema')
   }, [])
   
   const initializeAuthoritativeGame = async (roomId, mode, urlParams) => {
