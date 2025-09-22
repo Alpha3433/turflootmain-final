@@ -138,6 +138,7 @@ user_problem_statement: "Phase 1 Assessment Complete: Colyseus server builds suc
 
 test_plan:
   current_focus:
+    - "REAL PRIVY USERS ONLY Server Browser Implementation"
     - "Colyseus Room ID Property Fix - Session Tracking"
     - "Phase 1 Assessment - Colyseus Build Verification"
     - "Phase 1 Assessment - Frontend Dependency Resolution" 
