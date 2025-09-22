@@ -27,7 +27,7 @@ export async function POST(request) {
       // Create or update session record
       const sessionDoc = {
         ...session,
-        userId: 'anonymous', // TODO: Add real Privy user ID when available
+        userId: session.userId || 'anonymous', // Use provided userId or default to 'anonymous'
         joinedAt: new Date(session.joinedAt),
         lastActivity: new Date(session.lastActivity),
         status: 'active'
