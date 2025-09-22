@@ -1939,25 +1939,20 @@ const AgarIOGame = () => {
       // Always update camera
       this.updateCamera()
       
-      // Skip local AI and collision detection in multiplayer mode
+      // ONLINE-ONLY: Only proceed if multiplayer connection is established
       if (window.isMultiplayer && this.serverState) {
         console.log('🌐 Multiplayer mode: Using server-authoritative state')
         return // Server handles all game logic
       }
       
-      // Local single-player game logic (only when not in multiplayer)
-      console.log('🏠 Single-player mode: Running local game logic')
-      
-      // Update dynamic zone for cash games
-      this.updateDynamicZone(deltaTime)
-      
-      // Update spawn protection timers
-      this.updateSpawnProtection()
-      
-      // Update enemies (AI bots)
-      this.enemies.forEach(enemy => this.updateEnemy(enemy, deltaTime))
-      
-      // Check collisions (local simulation)
+      // ONLINE-ONLY: If no multiplayer connection, show loading state
+      if (!window.isMultiplayer || !this.serverState) {
+        console.log('⏳ Waiting for online multiplayer connection...')
+        
+        // Draw loading overlay
+        this.drawLoadingOverlay()
+        return // Don't run any local game logic
+      }
       this.checkCollisions()
       
       // Maintain coin count (local coin generation)
