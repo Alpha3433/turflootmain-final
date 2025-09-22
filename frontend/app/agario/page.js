@@ -929,12 +929,18 @@ const AgarIOGame = () => {
           room.onError((code, message) => {
             console.error('❌ Colyseus room error:', code, message)
             setWsConnection('error')
+            // ONLINE-ONLY: Reset to loading state on error
+            setIsMultiplayer(false)
+            setGameStarted(false)
           })
 
           // Handle disconnection
           room.onLeave((code) => {
             console.log('👋 Left Colyseus room:', code)
             setWsConnection('disconnected')
+            // ONLINE-ONLY: Reset to loading state on disconnect
+            setIsMultiplayer(false)
+            setGameStarted(false)
           })
 
           // Send ping every 5 seconds for latency measurement
