@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Online-Only Game Implementation
-==================================================
+REAL PRIVY USERS ONLY Server Browser Implementation Testing
+===========================================================
 
-Testing Agent: Comprehensive verification of single-player mode removal
-This test suite verifies that the application keeps loading until an online 
-multiplayer game is successfully created/joined, with no single-player fallback.
+Testing the filtering for server browser to only show active servers created by real Privy users,
+excluding anonymous sessions.
 
 CRITICAL TESTS NEEDED:
-1. Server Browser API - Verify /api/servers correctly shows active Colyseus rooms
-2. Game Session Creation - Test creating sessions with mode: "colyseus-multiplayer"  
-3. URL Parameter Generation - Test proper multiplayer parameters
-4. Loading State Verification - Verify no single-player fallback
+1. Database Session Verification - Check that database contains both anonymous and real Privy user sessions
+2. Server Browser API Filtering - Test /api/servers endpoint only returns sessions with real Privy user IDs
+3. Session Creation with Real Users - Test creating sessions with real Privy user IDs
+4. Filtering Logic Verification - Verify MongoDB query filters
 """
 
 import requests
