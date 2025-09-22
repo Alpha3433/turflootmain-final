@@ -823,8 +823,12 @@ const AgarIOGame = () => {
         const mode = urlParams.get('mode')
         const multiplayer = urlParams.get('multiplayer')
         const server = urlParams.get('server')
+        
+        // Get room ID from URL parameters for specific room joining
+        const targetRoomId = urlParams.get('roomId')
+        console.log('🎯 Target Room ID from URL:', targetRoomId)
 
-        console.log('🔍 URL parameters:', { mode, multiplayer, server })
+        console.log('🔍 URL parameters:', { mode, multiplayer, server, targetRoomId })
 
         // Only connect to Colyseus for multiplayer rooms
         // Default to Colyseus when server is not specified
