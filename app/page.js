@@ -1795,7 +1795,7 @@ export default function TurfLootTactical() {
   const initializeColyseusGame = async (serverData) => {
     console.log('🚀 Connecting to Colyseus server...')
     console.log('📊 Server details:', serverData)
-    
+
     try {
       // Colyseus server configuration
       const colyseusServerInfo = {
@@ -1803,21 +1803,57 @@ export default function TurfLootTactical() {
         roomType: 'arena',
         region: serverData.region || 'global'
       }
-      
+
       console.log('🎮 Using Colyseus server configuration:', colyseusServerInfo)
-      
+
+      const candidateRoomIds = [
+        serverData?.colyseusRoomId,
+        serverData?.roomId,
+        serverData?.id
+      ].filter(Boolean)
+
+      let resolvedRoomId = candidateRoomIds[0] || null
+
+      const isInstantJoinRoom =
+        (serverData?.type && serverData.type.includes('instant')) ||
+        (resolvedRoomId && resolvedRoomId.startsWith('instant-'))
+
+      if (!resolvedRoomId || isInstantJoinRoom) {
+        const regionSegment = (serverData?.regionId || serverData?.region || 'global')
+          .toString()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '')
+
+        const stakeSegment = serverData?.entryFee ? `-${String(serverData.entryFee).replace(/[^0-9]+/g, '')}` : ''
+        const uniqueSegment = Date.now().toString(36)
+
+        resolvedRoomId = `colyseus-${regionSegment || 'arena'}${stakeSegment}-${uniqueSegment}`
+      }
+
+      const resolvedMode =
+        (serverData?.mode && serverData.mode.includes('colyseus'))
+          ? serverData.mode
+          : 'colyseus-multiplayer'
+
+      const resolvedServerType = serverData?.serverType || 'colyseus'
+
       // Return server configuration for handleJoinLobby to use
       console.log('✅ Colyseus server configuration ready for navigation')
-      
+
       return {
-        roomId: 'colyseus-arena',
+        roomId: resolvedRoomId,
         endpoint: colyseusServerInfo.endpoint,
         roomType: colyseusServerInfo.roomType,
         region: colyseusServerInfo.region,
         entryFee: serverData.entryFee || 0,
-        maxPlayers: 50,
-        gameMode: 'colyseus-multiplayer',
+        maxPlayers: serverData.maxPlayers || 50,
+        mode: resolvedMode,
+        server: resolvedServerType,
+        gameMode: resolvedMode,
         isColyseusRoom: true,
+        isInstantJoinRoom,
+        sourceRoomId: candidateRoomIds[0] || null,
         connectionInfo: {
           endpoint: colyseusServerInfo.endpoint,
           roomType: colyseusServerInfo.roomType
@@ -1974,11 +2010,14 @@ export default function TurfLootTactical() {
       updateTimer('🚀 Loading multiplayer game...')
       
       // Build navigation URL with Colyseus parameters
+      const resolvedModeParam = colyseusResult.mode || colyseusResult.gameMode || 'colyseus-multiplayer'
+      const resolvedServerParam = colyseusResult.server || 'colyseus'
+
       const queryParams = new URLSearchParams({
         roomId: colyseusResult.roomId,
-        mode: 'colyseus-multiplayer',
-        multiplayer: 'colyseus',
-        server: 'colyseus',
+        mode: resolvedModeParam,
+        multiplayer: resolvedServerParam,
+        server: resolvedServerParam,
         region: colyseusResult.region,
         fee: colyseusResult.entryFee.toString(),
         name: serverData.name || 'Colyseus Arena',
@@ -1987,6 +2026,14 @@ export default function TurfLootTactical() {
         maxPlayers: colyseusResult.maxPlayers.toString(),
         endpoint: colyseusResult.endpoint
       })
+
+      if (colyseusResult.isInstantJoinRoom) {
+        queryParams.set('instantJoin', 'true')
+      }
+
+      if (colyseusResult.sourceRoomId) {
+        queryParams.set('sourceRoomId', colyseusResult.sourceRoomId)
+      }
       
       console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
       console.log('🚀 Navigating to Colyseus multiplayer game:', `/agario?${queryParams.toString()}`)
