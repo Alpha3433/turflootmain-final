@@ -869,7 +869,11 @@ const AgarIOGame = () => {
             setTimeout(() => reject(new Error('Colyseus connection timeout')), 10000)
           )
           
-          const connectionPromise = joinArena({ privyUserId, playerName })
+          const connectionPromise = joinArena({ 
+            privyUserId, 
+            playerName,
+            roomId: targetRoomId  // CRITICAL: Pass room ID for specific room joining
+          })
           
           const room = await Promise.race([connectionPromise, connectionTimeout])
           
