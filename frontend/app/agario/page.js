@@ -3457,6 +3457,57 @@ const AgarIOGame = () => {
 
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
+      {/* ONLINE-ONLY Loading Screen */}
+      {!gameStarted && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.95)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999,
+          color: 'white',
+          fontFamily: '"Rajdhani", sans-serif'
+        }}>
+          <div style={{
+            fontSize: '48px',
+            fontWeight: 'bold',
+            color: '#68d391',
+            marginBottom: '20px',
+            textAlign: 'center'
+          }}>⚡ CONNECTING TO MULTIPLAYER</div>
+          
+          <div style={{
+            fontSize: '20px',
+            color: '#e2e8f0',
+            marginBottom: '30px',
+            textAlign: 'center'
+          }}>🌐 Establishing connection to Colyseus server...</div>
+          
+          <div style={{
+            fontSize: '16px',
+            color: '#a0aec0',
+            textAlign: 'center'
+          }}>⏳ Please wait{'.'.repeat((Math.floor(Date.now() / 500) % 4))}</div>
+          
+          <div style={{
+            marginTop: '40px',
+            fontSize: '14px',
+            color: '#718096',
+            textAlign: 'center',
+            maxWidth: '400px'
+          }}>
+            🎮 TurfLoot requires an active multiplayer connection<br/>
+            The game will start once connected to the server
+          </div>
+        </div>
+      )}
+      
       {/* Game Canvas - Full Screen */}
       <canvas
         ref={canvasRef}
