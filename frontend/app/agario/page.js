@@ -984,7 +984,7 @@ const AgarIOGame = () => {
     }
 
     connectToColyseusRoom()
-  }, [gameStarted])
+  }, []) // ONLINE-ONLY: Run once on mount, don't depend on gameStarted)
 
   // Cycle through missions every 4 seconds
   useEffect(() => {
