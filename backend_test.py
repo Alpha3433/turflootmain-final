@@ -314,41 +314,47 @@ class CameraStabilityBackendTester:
                         True,
                         {
                             "sessionTracked": True,
-                            "roomId": session_data['roomId'],
-                            "sessionId": session_data['sessionId'],
-                            "playerName": session_data['playerName'],
+                            "roomId": session_data['session']['roomId'],
+                            "userId": session_data['session']['userId'],
                             "trackingMessage": session_result.get('message')
                         },
                         "Session ID Management"
                     )
                     
-                    # Test duplicate session prevention by trying to create same session
-                    duplicate_response = self.session.post(f"{self.api_base}/game-sessions", json=session_data, timeout=10)
+                    # Test session update (heartbeat)
+                    update_data = {
+                        "action": "update",
+                        "roomId": "colyseus-arena-global",
+                        "lastActivity": datetime.now().isoformat()
+                    }
                     
-                    if duplicate_response.status_code == 200:
-                        duplicate_result = duplicate_response.json()
+                    update_response = self.session.post(f"{self.api_base}/game-sessions", json=update_data, timeout=10)
+                    
+                    if update_response.status_code == 200:
+                        update_result = update_response.json()
                         self.log_test(
-                            "Duplicate Session Handling",
+                            "Session Update (Heartbeat)",
                             True,
                             {
-                                "duplicateHandled": True,
-                                "response": duplicate_result.get('message', 'Session handled properly'),
-                                "sessionId": session_data['sessionId']
+                                "updateWorking": True,
+                                "response": update_result.get('message', 'Session updated properly'),
+                                "roomId": update_data['roomId']
                             },
                             "Session ID Management"
                         )
                     else:
                         self.log_test(
-                            "Duplicate Session Handling",
+                            "Session Update (Heartbeat)",
                             False,
-                            f"HTTP {duplicate_response.status_code}: {duplicate_response.text[:200]}",
+                            f"HTTP {update_response.status_code}: {update_response.text[:200]}",
                             "Session ID Management"
                         )
                         
-                    # Test session cleanup by marking session as ended
-                    cleanup_data = session_data.copy()
-                    cleanup_data['action'] = 'leave'
-                    cleanup_data['status'] = 'ended'
+                    # Test session cleanup by leaving
+                    cleanup_data = {
+                        "action": "leave",
+                        "roomId": "colyseus-arena-global"
+                    }
                     
                     cleanup_response = self.session.post(f"{self.api_base}/game-sessions", json=cleanup_data, timeout=10)
                     
@@ -360,7 +366,7 @@ class CameraStabilityBackendTester:
                             {
                                 "sessionCleaned": True,
                                 "cleanupMessage": cleanup_result.get('message'),
-                                "sessionId": cleanup_data['sessionId']
+                                "roomId": cleanup_data['roomId']
                             },
                             "Session ID Management"
                         )
