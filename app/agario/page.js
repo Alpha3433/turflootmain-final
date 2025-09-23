@@ -3625,30 +3625,41 @@ const AgarIOGame = () => {
         
         // Update minimap data for React state (every few frames to avoid performance issues)
         if (Date.now() % 100 < 16) { // Update roughly every 100ms
-          // In multiplayer mode, show other players instead of local enemies
-          let minimapEnemies = []
-          if (window.isMultiplayer && game.serverState && game.serverState.players) {
+          // In multiplayer mode, use server state for everything
+          if (window.isMultiplayer && game.serverState) {
             // Show other live players on minimap (excluding current player)
-            minimapEnemies = game.serverState.players
-              .filter(player => player && player.alive && !player.isCurrentPlayer)
-              .map(player => ({ 
-                x: player.x, 
-                y: player.y,
-                name: player.name,
-                isPlayer: true 
-              }))
-          } else {
-            // Show local AI enemies in local mode
-            minimapEnemies = game.enemies.map(enemy => ({ x: enemy.x, y: enemy.y }))
-          }
+            const minimapPlayers = game.serverState.players
+              ? game.serverState.players
+                  .filter(player => player && player.alive && !player.isCurrentPlayer)
+                  .map(player => ({ 
+                    x: player.x, 
+                    y: player.y,
+                    name: player.name,
+                    isPlayer: true 
+                  }))
+              : []
 
-          setMinimapData({
-            playerX: game.player.x,
-            playerY: game.player.y,
-            enemies: minimapEnemies,
-            coins: game.coins.map(coin => ({ x: coin.x, y: coin.y })),
-            viruses: game.viruses.map(virus => ({ x: virus.x, y: virus.y }))
-          })
+            // Use server state for coins and viruses too
+            const minimapCoins = game.serverState.coins || []
+            const minimapViruses = game.serverState.viruses || []
+
+            setMinimapData({
+              playerX: game.player.x,
+              playerY: game.player.y,
+              enemies: minimapPlayers,
+              coins: minimapCoins.map(coin => ({ x: coin.x, y: coin.y })),
+              viruses: minimapViruses.map(virus => ({ x: virus.x, y: virus.y }))
+            })
+          } else {
+            // Show local state in practice mode
+            setMinimapData({
+              playerX: game.player.x,
+              playerY: game.player.y,
+              enemies: game.enemies.map(enemy => ({ x: enemy.x, y: enemy.y })),
+              coins: game.coins.map(coin => ({ x: coin.x, y: coin.y })),
+              viruses: game.viruses.map(virus => ({ x: virus.x, y: virus.y }))
+            })
+          }
           
           // Update other game stats
           setScore(Math.floor(game.player.mass - 20))
