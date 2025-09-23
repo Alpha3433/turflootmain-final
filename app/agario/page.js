@@ -2954,10 +2954,6 @@ const AgarIOGame = () => {
       
       // In multiplayer mode, render server state; otherwise render local state
       if (this.serverState && window.isMultiplayer) {
-        console.log('🎮 MULTIPLAYER RENDERING MODE ACTIVE')
-        console.log('👥 Server state players:', this.serverState.players ? Object.keys(this.serverState.players).length : 0)
-        console.log('🪙 Server state coins:', this.serverState.coins ? this.serverState.coins.length : 0)
-        
         // Draw server coins
         if (this.serverState.coins) {
           this.serverState.coins.forEach(coin => this.drawCoin(coin))
@@ -2970,19 +2966,13 @@ const AgarIOGame = () => {
         
         // Draw all server players (including other players)
         if (this.serverState.players) {
-          console.log('🎨 Drawing server players:', Object.keys(this.serverState.players))
           this.serverState.players.forEach((player, sessionId) => {
-            console.log(`🎨 Drawing player ${sessionId}:`, player?.name || 'Unknown', 'alive:', player?.alive)
             if (player && player.alive) {
               this.drawPlayer(player)
             }
           })
-        } else {
-          console.log('❌ No server players to draw')
         }
       } else {
-        console.log('🎮 LOCAL RENDERING MODE - serverState:', !!this.serverState, 'isMultiplayer:', window.isMultiplayer)
-        
         // Draw local coins
         this.coins.forEach(coin => this.drawCoin(coin))
         
