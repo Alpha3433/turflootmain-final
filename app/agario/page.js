@@ -3605,6 +3605,11 @@ const AgarIOGame = () => {
     }
   }, [isMultiplayer])
 
+  // Debug: Monitor multiplayer state synchronization
+  useEffect(() => {
+    console.log('🎮 Multiplayer state sync - React state:', isMultiplayer, 'Global window.isMultiplayer:', window.isMultiplayer)
+  }, [isMultiplayer])
+
   // Cash out handling
   const cashOutIntervalRef = useRef(null)
   
