@@ -1271,11 +1271,22 @@ const AgarIOGame = () => {
       const mode = urlParams.get('mode')
       const server = urlParams.get('server')
       const roomId = urlParams.get('roomId')
+      const multiplayer = urlParams.get('multiplayer')
+      const bots = urlParams.get('bots')
       
-      // Real multiplayer games have server type or room ID or specific modes
+      // If this is explicitly local practice mode, it's NOT real multiplayer
+      if (mode === 'local' && server === 'local' && multiplayer === 'offline' && bots === 'true') {
+        return false
+      }
+      
+      // If this is legacy practice mode, it's NOT real multiplayer
+      if (mode === 'practice' && roomId === 'global-practice-bots') {
+        return false
+      }
+      
+      // Real multiplayer games have server type or specific modes
       return (
         server && server !== 'local' ||
-        roomId && roomId !== 'global-practice-bots' ||
         mode && mode !== 'local' && mode !== 'practice' ||
         window.location.pathname.includes('multiplayer')
       )
