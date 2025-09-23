@@ -2038,8 +2038,18 @@ const AgarIOGame = () => {
             const normalizedDy = dy / distance
             
             // Send input to multiplayer server
+            console.log('🖱️ MOUSE INPUT DEBUG:', {
+              hasSendInputToServer: !!window.sendInputToServer,
+              windowIsMultiplayer: window.isMultiplayer,
+              normalizedDx: normalizedDx.toFixed(3),
+              normalizedDy: normalizedDy.toFixed(3),
+              distance: distance.toFixed(1)
+            })
+            
             if (window.sendInputToServer) {
               window.sendInputToServer(normalizedDx, normalizedDy)
+            } else {
+              console.log('❌ window.sendInputToServer not available!')
             }
           }
           
