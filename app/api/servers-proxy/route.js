@@ -53,30 +53,31 @@ export async function GET() {
     const serverData = {
       servers: [
         {
-          id: 'colyseus-arena-global',
+          id: activeRoomId, // Use actual room ID instead of generic one
           roomType: 'arena',
           name: 'TurfLoot Arena',
           region: 'Australia',
           regionId: 'au-syd',
           endpoint: colyseusEndpoint,
           maxPlayers: 50,
-          currentPlayers: 1, // TESTING: Simulated active player
+          currentPlayers: activePlayerCount, // Use real player count
           entryFee: 0,
           gameType: 'Arena Battle',
           serverType: 'colyseus',
-          isActive: true,
+          isActive: activePlayerCount > 0,
           canSpectate: true,
           ping: 0,
-          status: 'active', // Set to active for testing JOIN functionality
-          canJoin: true,
-          creatorName: 'Account A', // Show who created the room
-          creatorWallet: 'Demo_Wallet_123',
+          status: activePlayerCount > 0 ? 'active' : 'waiting', // Dynamic status
+          canJoin: activePlayerCount > 0 && activePlayerCount < 50,
+          creatorName: activePlayerCount > 0 ? 'Account A' : null, // Show creator only if active
+          creatorWallet: activePlayerCount > 0 ? 'Demo_Wallet_123' : null,
+          actualRoomId: activeRoomId, // Store the actual room ID for joining
           lastUpdated: new Date().toISOString(),
           timestamp: new Date().toISOString()
         }
       ],
-      totalPlayers: 1, // Update to reflect active player
-      totalActiveServers: 1,
+      totalPlayers: activePlayerCount, // Use real player count
+      totalActiveServers: activePlayerCount > 0 ? 1 : 0,
       totalServers: 1,
       practiceServers: 0,
       cashServers: 0,
