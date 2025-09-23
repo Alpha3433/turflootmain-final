@@ -2971,7 +2971,7 @@ const AgarIOGame = () => {
         
         // Draw all server players (including other players)
         if (this.serverState.players) {
-          this.serverState.players.forEach((player, sessionId) => {
+          this.serverState.players.forEach((player) => {
             if (player && player.alive) {
               this.drawPlayer(player)
             }
