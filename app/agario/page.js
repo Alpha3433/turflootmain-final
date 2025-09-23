@@ -1736,9 +1736,17 @@ const AgarIOGame = () => {
     generateEnemies() {
       this.enemies = []
       
+      // Check if this is a multiplayer game by examining the current URL parameters
+      const urlParams = new URLSearchParams(window.location.search)
+      const mode = urlParams.get('mode')
+      const multiplayer = urlParams.get('multiplayer')
+      const server = urlParams.get('server')
+      const bots = urlParams.get('bots')
+      
       // Skip bot generation for multiplayer games (Colyseus) - only real human players
-      if (isMultiplayer) {
-        console.log('🌐 Skipping bot generation for multiplayer game - real players only!')
+      if (mode !== 'local' || multiplayer !== 'offline' || server !== 'local' || bots !== 'true') {
+        console.log('🌐 Skipping bot generation - not in local practice mode')
+        console.log('🔍 Current params:', { mode, multiplayer, server, bots })
         return
       }
       
