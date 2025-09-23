@@ -158,6 +158,7 @@ const MultiplayerArena = () => {
       // World setup
       this.world = { width: 4000, height: 4000 }
       this.camera = { x: 0, y: 0 }
+      this.expectedSessionId = null // Will be set when we connect to Colyseus
       
       // Player setup  
       this.player = {
