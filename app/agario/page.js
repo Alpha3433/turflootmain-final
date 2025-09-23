@@ -3016,34 +3016,13 @@ const AgarIOGame = () => {
           this.serverState.viruses.forEach(virus => this.drawVirus(virus))
         }
         
-        // Draw all server players (other players first)
-        let currentPlayerFromServer = null
+        // Draw all server players (including current player)
         if (this.serverState.players) {
           this.serverState.players.forEach((player) => {
             if (player && player.alive) {
-              if (player.isCurrentPlayer) {
-                // Store current player for special rendering
-                currentPlayerFromServer = player
-              } else {
-                // Draw other players normally
-                this.drawPlayer(player)
-              }
+              this.drawPlayer(player)
             }
           })
-        }
-        
-        // Always ensure current player is visible - draw from server state or fallback to local
-        if (currentPlayerFromServer) {
-          // Draw current player from server state with special highlighting
-          this.drawPlayer({
-            ...currentPlayerFromServer,
-            color: currentPlayerFromServer.color || this.player.color,
-            // Add visual distinction for current player
-            isCurrentPlayer: true
-          })
-        } else if (this.player.alive) {
-          // Fallback: draw local player if server doesn't have current player yet
-          this.drawPlayer(this.player)
         }
       } else {
         // Draw local coins
