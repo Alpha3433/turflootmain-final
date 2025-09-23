@@ -38,10 +38,15 @@ const MultiplayerArena = () => {
 
   // Colyseus connection and input handling  
   const connectToColyseus = async () => {
-    // Prevent multiple connections
+    // Prevent multiple connections - cleanup any existing connection first
     if (wsRef.current) {
-      console.log('🔄 Connection already exists, skipping...')
-      return
+      console.log('🔄 Cleaning up existing connection before creating new one...')
+      try {
+        wsRef.current.leave()
+      } catch (error) {
+        console.log('⚠️ Error cleaning up existing connection:', error)
+      }
+      wsRef.current = null
     }
     
     try {
