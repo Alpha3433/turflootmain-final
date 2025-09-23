@@ -1893,10 +1893,10 @@ export default function TurfLootTactical() {
       
       console.log('🔗 Colyseus game URL parameters:', gameParams.toString())
       
-      const gameUrl = `/agario?${gameParams.toString()}`
-      console.log('🚀 Navigating to Colyseus multiplayer game:', gameUrl)
+      const gameUrl = `/arena?${gameParams.toString()}`
+      console.log('🚀 Navigating to dedicated multiplayer arena:', gameUrl)
       
-      // Navigate to Colyseus multiplayer game
+      // Navigate to dedicated multiplayer arena (pure Colyseus)
       router.push(gameUrl)
       
     } catch (error) {
