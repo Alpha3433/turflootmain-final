@@ -225,21 +225,12 @@ const AgarIOGame = () => {
       console.log('✅ Colyseus client loaded')
       
       // Join Colyseus arena room
-      console.log(`🚀 Joining Colyseus arena room...`)
+      console.log(`🚀 Joining persistent 24/7 Colyseus arena...`)
       
-      // Determine if we should join a specific room or create/join the global arena
-      let specificRoomId = null
-      if (roomId && roomId !== 'colyseus-arena-global' && roomId !== 'new-room' && !roomId.startsWith('local-')) {
-        specificRoomId = roomId
-        console.log('🎯 Attempting to join specific room:', specificRoomId)
-      } else {
-        console.log('🌍 Joining or creating global arena room')
-      }
-      
+      // Always join the persistent room - no need for specific room ID logic
       const room = await joinArena({ 
         privyUserId: 'player-' + Date.now(),
-        playerName: customUsername || 'Anonymous Player',
-        specificRoomId: specificRoomId // Pass the specific room ID if available
+        playerName: customUsername || 'Anonymous Player'
       })
       
       if (!room) {
