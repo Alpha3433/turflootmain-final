@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 const AgarIOGame = () => {
@@ -428,7 +428,7 @@ const AgarIOGame = () => {
   }, [isMobile])
 
   // Multiplayer input transmission system
-  const sendInputToServer = (dx, dy) => {
+  const sendInputToServer = useCallback((dx, dy) => {
     if (!isMultiplayer || !wsRef.current || wsConnection !== 'connected') {
       return // Skip if not in multiplayer mode or not connected
     }
@@ -452,7 +452,7 @@ const AgarIOGame = () => {
     } catch (error) {
       console.error('❌ Failed to send input to server:', error)
     }
-  }
+  }, [isMultiplayer, wsConnection])
 
   // Virtual joystick handlers for mobile
   const handleJoystickStart = (e) => {
@@ -3075,11 +3075,6 @@ const AgarIOGame = () => {
       cashOutProgress
     }
 
-    // Make sendInputToServer and multiplayer state available globally for Game class
-    window.sendInputToServer = sendInputToServer
-    window.isMultiplayer = isMultiplayer
-    window.wsRef = wsRef
-
     const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
     gameRef.current = game
     console.log('🎮 Game initialized and assigned to gameRef')
@@ -3129,6 +3124,22 @@ const AgarIOGame = () => {
       document.documentElement.style.background = ''
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    window.sendInputToServer = sendInputToServer
+    window.isMultiplayer = isMultiplayer
+    window.wsRef = wsRef
+
+    return () => {
+      window.sendInputToServer = undefined
+      window.isMultiplayer = undefined
+      window.wsRef = undefined
+    }
+  }, [sendInputToServer, isMultiplayer, wsConnection, wsRef])
 
   // Cash out handling
   const cashOutIntervalRef = useRef(null)
