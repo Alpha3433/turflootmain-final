@@ -266,46 +266,25 @@ const AgarIOGame = () => {
       
       // Set up Colyseus room event handlers
       room.onStateChange((state) => {
-        console.log('📡 *** NEW DEBUG *** Colyseus state update received')
-        console.log('👥 *** NEW DEBUG *** Players in state:', state.players ? Object.keys(state.players).length : 0)
-        console.log('🔍 *** NEW DEBUG *** State structure:', { 
-          hasPlayers: !!state.players, 
-          playersType: typeof state.players,
-          isMultiplayer: window.isMultiplayer 
-        })
-        
-        // Log actual player data (only once per state change, not in render)
-        if (state.players) {
-          console.log('*** NEW DEBUG *** About to iterate through players...')
-          Object.entries(state.players).forEach(([sessionId, player]) => {
-            console.log(`👤 *** NEW DEBUG *** Player ${sessionId}:`, {
-              name: player?.name || player?.playerName,
-              alive: player?.alive,
-              x: player?.x,
-              y: player?.y
-            })
-          })
-        } else {
-          console.log('❌ *** NEW DEBUG *** No players in state')
-        }
+        console.log('📡 *** GAME PAGE *** Colyseus state received in agario page')
+        console.log('👥 *** GAME PAGE *** Players count:', state.players ? state.players.size : 0)
         
         serverStateRef.current = state
         
         // CRITICAL: Update the game's serverState for rendering
         if (gameRef.current) {
           gameRef.current.serverState = state
-          console.log('🎮 *** NEW DEBUG *** Updated game serverState - isMultiplayer:', window.isMultiplayer)
+          console.log('🎮 *** GAME PAGE *** Updated game.serverState, isMultiplayer:', window.isMultiplayer)
+          console.log('🎮 *** GAME PAGE *** Game serverState now has', state.players ? state.players.size : 0, 'players')
         } else {
-          console.log('❌ *** NEW DEBUG *** gameRef.current is null!')
+          console.log('❌ *** GAME PAGE *** gameRef.current is null!')
         }
         
         // Update connected players count
         if (state.players) {
-          setConnectedPlayers(Object.keys(state.players).length)
+          setConnectedPlayers(state.players.size)
         }
       })
-      
-      console.log('✅ *** NEW DEBUG *** Event handlers setup complete')
       
       room.onMessage("player-joined", (message) => {
         console.log('👋 Player joined:', message)
