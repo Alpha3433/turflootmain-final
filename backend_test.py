@@ -696,8 +696,8 @@ class MultiplayerSyncBackendTester:
             self.log_test("Legacy Cleanup", "FAIL", f"Exception: {str(e)}")
 
     def run_all_tests(self):
-        """Run all backend tests for multiplayer player rendering fix"""
-        print("🚀 Starting comprehensive backend testing for multiplayer player rendering fix...")
+        """Run all backend tests for multiplayer synchronization complete fix"""
+        print("🚀 Starting comprehensive backend testing for multiplayer synchronization complete fix...")
         print()
         
         start_time = time.time()
@@ -709,6 +709,7 @@ class MultiplayerSyncBackendTester:
         self.test_multiplayer_session_management()
         self.test_backend_api_integration()
         self.test_player_authentication()
+        self.test_legacy_cleanup()
         
         end_time = time.time()
         total_time = end_time - start_time
