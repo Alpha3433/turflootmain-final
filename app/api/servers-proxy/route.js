@@ -4,8 +4,49 @@ export async function GET() {
   try {
     console.log('🔄 Servers-proxy route called - bypassing external routing issues')
     
-    // Since external routing has issues, let's create the server data directly here
-    // This mimics what the original /api/servers endpoint returns
+    // Try to get active room data from database
+    let activeRoomId = null
+    let activePlayerCount = 0
+    
+    try {
+      const { MongoClient } = await import('mongodb')
+      const client = new MongoClient(process.env.MONGO_URL)
+      await client.connect()
+      const db = client.db('turfloot')
+      const gameSessions = db.collection('game_sessions')
+      
+      // Find the most recent active Colyseus arena session
+      const activeSession = await gameSessions.findOne(
+        { 
+          status: 'active',
+          roomType: 'arena',
+          lastActivity: { $gte: new Date(Date.now() - 5 * 60 * 1000) } // Active within 5 minutes
+        },
+        { sort: { lastActivity: -1 } } // Get most recent
+      )
+      
+      if (activeSession) {
+        activeRoomId = activeSession.roomId
+        // Count all active players in this room
+        activePlayerCount = await gameSessions.countDocuments({
+          roomId: activeRoomId,
+          status: 'active',
+          lastActivity: { $gte: new Date(Date.now() - 5 * 60 * 1000) }
+        })
+        console.log(`🎮 Found active room ${activeRoomId} with ${activePlayerCount} players`)
+      }
+      
+      await client.close()
+    } catch (error) {
+      console.warn('⚠️ Could not query database for active rooms:', error.message)
+    }
+    
+    // If no real room found, use simulation for testing
+    if (!activeRoomId) {
+      activeRoomId = 'colyseus-arena-global' // Fallback for testing
+      activePlayerCount = 1 // Simulated for testing
+      console.log('🧪 TESTING: Using simulated room data')
+    }
     
     const colyseusEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
     
