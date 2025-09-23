@@ -3598,6 +3598,10 @@ const AgarIOGame = () => {
     window.isMultiplayer = isMultiplayer
     window.wsRef = wsRef
 
+    console.log('🎮 CREATING NEW GAME ENGINE - Current state:')
+    console.log('🎮 isMultiplayer:', isMultiplayer)
+    console.log('🎮 Previous gameRef.current:', !!gameRef.current)
+    
     const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
     gameRef.current = game
     console.log('🎮 Game initialized and assigned to gameRef')
