@@ -240,6 +240,13 @@ const MultiplayerArena = () => {
         // Update UI
         setMass(Math.floor(currentPlayer.mass))
         setScore(Math.floor(currentPlayer.score || 0))
+        } else {
+          console.log('⚠️ Session ID mismatch - ignoring player update for session:', 
+                     currentPlayer.sessionId, 'expected:', this.expectedSessionId)
+        }
+      } else {
+        console.log('⚠️ Current player not found in state - camera remains stationary')
+        // Do NOT use any fallback - camera should not jump to other players
       }
     }
     
