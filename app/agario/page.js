@@ -226,7 +226,21 @@ const AgarIOGame = () => {
       
       // Join Colyseus arena room
       console.log(`🚀 Joining Colyseus arena room...`)
-      const room = await joinArena({ privyUserId: 'player-' + Date.now() })
+      
+      // Determine if we should join a specific room or create/join the global arena
+      let specificRoomId = null
+      if (roomId && roomId !== 'colyseus-arena-global' && roomId !== 'new-room' && !roomId.startsWith('local-')) {
+        specificRoomId = roomId
+        console.log('🎯 Attempting to join specific room:', specificRoomId)
+      } else {
+        console.log('🌍 Joining or creating global arena room')
+      }
+      
+      const room = await joinArena({ 
+        privyUserId: 'player-' + Date.now(),
+        playerName: customUsername || 'Anonymous Player',
+        specificRoomId: specificRoomId // Pass the specific room ID if available
+      })
       
       if (!room) {
         throw new Error('Failed to join Colyseus arena room')
