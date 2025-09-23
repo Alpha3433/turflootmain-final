@@ -611,15 +611,15 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           fontSize: '14px'
         }}>
           <div>
-            <strong style={{ color: '#10b981' }}>{dynamicStats.totalPlayers}</strong>
+            <strong style={{ color: '#10b981' }}>{serverStats.totalPlayers || 0}</strong>
             <span style={{ color: '#9ca3af', marginLeft: '4px' }}>Players Online</span>
           </div>
           <div>
-            <strong style={{ color: '#3b82f6' }}>{dynamicStats.totalActiveRooms}</strong>
+            <strong style={{ color: '#3b82f6' }}>{serverStats.totalActiveServers || 0}</strong>
             <span style={{ color: '#9ca3af', marginLeft: '4px' }}>Active Rooms</span>
           </div>
           <div>
-            <strong style={{ color: '#f59e0b' }}>{dynamicStats.instantJoinAvailable}</strong>
+            <strong style={{ color: '#f59e0b' }}>{serverStats.totalActiveServers || 0}</strong>
             <span style={{ color: '#9ca3af', marginLeft: '4px' }}>Instant Join</span>
           </div>
         </div>
