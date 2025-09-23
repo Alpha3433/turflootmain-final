@@ -227,24 +227,20 @@ const AgarIOGame = () => {
       // Join Colyseus arena room
       console.log(`🚀 Joining persistent 24/7 Colyseus arena...`)
       
-      // Get real Privy user data for proper identification
-      const { usePrivy } = await import('@privy-io/react-auth')
-      let realPrivyUserId = 'anonymous-' + Date.now()
-      let realPlayerName = customUsername || 'Anonymous Player'
+      // Get Privy user data from URL parameters
+      const urlPrivyUserId = urlParams.get('privyUserId')
+      const urlPlayerName = urlParams.get('playerName')
+      const urlWalletAddress = urlParams.get('walletAddress')
       
-      // Try to get authenticated user info from Privy
-      try {
-        // Access Privy context if available
-        if (typeof window !== 'undefined' && window.privyUser) {
-          realPrivyUserId = window.privyUser.id || realPrivyUserId
-          realPlayerName = window.privyUser.email?.split('@')[0] || customUsername || 'Privy User'
-          console.log('✅ Using authenticated Privy user:', realPlayerName)
-        } else {
-          console.log('⚠️ No Privy user found, using fallback name:', realPlayerName)
-        }
-      } catch (error) {
-        console.warn('⚠️ Could not access Privy user data:', error.message)
-      }
+      // Use URL data or fallback values
+      const realPrivyUserId = urlPrivyUserId || 'anonymous-' + Date.now()
+      const realPlayerName = urlPlayerName ? decodeURIComponent(urlPlayerName) : (customUsername || 'Anonymous Player')
+      
+      console.log('👤 Using player data:', {
+        privyUserId: realPrivyUserId,
+        playerName: realPlayerName,
+        walletAddress: urlWalletAddress
+      })
       
       const room = await joinArena({ 
         privyUserId: realPrivyUserId,
