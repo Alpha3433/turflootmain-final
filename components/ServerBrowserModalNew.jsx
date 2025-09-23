@@ -681,19 +681,6 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               instantJoinAvailable: activeRooms.length
             }
 
-            // Update stats display
-            if (servers.length > 0) {
-              setServerStats({
-                totalPlayers: dynamicStats.totalPlayers,
-                totalActiveServers: dynamicStats.totalActiveRooms,
-                totalServers: filteredServers.length,
-                practiceServers: 0,
-                cashServers: filteredServers.filter(s => s.entryFee > 0).length,
-                regions: [...new Set(filteredServers.map(s => s.region))],
-                gameTypes: [...new Set(filteredServers.map(s => s.gameType))]
-              })
-            }
-
             return (
               <>
                 {roomsLoading ? (
