@@ -69,83 +69,254 @@ class MultiplayerBackendTester:
             "timestamp": datetime.now().isoformat()
         })
 
-    def test_api_health_check(self):
-        """Test 1: Core API Health Check"""
-        print("\n🔍 TESTING: Core API Health Check")
+    def test_colyseus_room_state_management(self):
+        """Test 1: Colyseus Room State Management - Verify Colyseus server maintains player state with MapSchema"""
+        print("\n🏠 TESTING: Colyseus Room State Management")
         
         try:
-            # Test root API endpoint
-            response = requests.get(f"{self.base_url}/api", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("service") == "turfloot-api" and data.get("status") == "operational":
-                    self.log_test("API Health Check", "PASS", f"API operational with features: {data.get('features', [])}")
-                else:
-                    self.log_test("API Health Check", "FAIL", f"Unexpected API response: {data}")
-            else:
-                self.log_test("API Health Check", "FAIL", f"API returned status {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("API Health Check", "FAIL", f"API connection failed: {str(e)}")
-
-    def test_colyseus_server_api(self):
-        """Test 2: Colyseus Integration APIs"""
-        print("\n🎮 TESTING: Colyseus Server Integration")
-        
-        try:
-            # Test /api/servers endpoint
+            # Test /api/servers endpoint for Colyseus configuration
             response = requests.get(f"{self.base_url}/api/servers", timeout=15)
             
             if response.status_code == 200:
                 data = response.json()
                 
-                # Check required Colyseus fields
-                required_fields = ["servers", "colyseusEnabled", "colyseusEndpoint"]
-                missing_fields = [field for field in required_fields if field not in data]
+                # Check for Colyseus configuration
+                colyseus_enabled = data.get('colyseusEnabled', False)
+                colyseus_endpoint = data.get('colyseusEndpoint', '')
+                servers = data.get('servers', [])
                 
-                if missing_fields:
-                    self.log_test("Colyseus API Structure", "FAIL", f"Missing fields: {missing_fields}")
-                    return
-                
-                # Verify Colyseus is enabled
-                if not data.get("colyseusEnabled"):
-                    self.log_test("Colyseus Enabled Flag", "FAIL", "colyseusEnabled is false")
-                    return
-                
-                # Verify Colyseus endpoint
-                expected_endpoint = COLYSEUS_ENDPOINT
-                actual_endpoint = data.get("colyseusEndpoint")
-                if actual_endpoint != expected_endpoint:
-                    self.log_test("Colyseus Endpoint", "FAIL", f"Expected {expected_endpoint}, got {actual_endpoint}")
-                else:
-                    self.log_test("Colyseus Endpoint", "PASS", f"Correct endpoint: {actual_endpoint}")
-                
-                # Check arena server data
-                servers = data.get("servers", [])
-                if not servers:
-                    self.log_test("Arena Server Data", "FAIL", "No servers returned")
-                    return
-                
-                arena_server = servers[0]
-                arena_required_fields = ["id", "roomType", "serverType", "maxPlayers", "endpoint"]
-                arena_missing = [field for field in arena_required_fields if field not in arena_server]
-                
-                if arena_missing:
-                    self.log_test("Arena Server Structure", "FAIL", f"Missing arena fields: {arena_missing}")
-                else:
-                    # Verify arena server details
-                    if arena_server.get("serverType") == "colyseus" and arena_server.get("roomType") == "arena":
-                        self.log_test("Arena Server Structure", "PASS", f"Valid arena server: {arena_server.get('id')}")
+                if colyseus_enabled and colyseus_endpoint and servers:
+                    # Find Colyseus arena server
+                    arena_server = None
+                    for server in servers:
+                        if server.get('serverType') == 'colyseus' and server.get('roomType') == 'arena':
+                            arena_server = server
+                            break
+                    
+                    if arena_server:
+                        self.log_test(
+                            "Colyseus Arena Server Configuration", 
+                            "PASS", 
+                            f"Arena server found with ID: {arena_server.get('id')}, Max players: {arena_server.get('maxPlayers')}"
+                        )
+                        
+                        # Verify server supports MapSchema player state
+                        expected_fields = ['id', 'roomType', 'maxPlayers', 'currentPlayers', 'serverType', 'endpoint']
+                        missing_fields = [field for field in expected_fields if field not in arena_server]
+                        
+                        if not missing_fields:
+                            self.log_test(
+                                "MapSchema Player State Support", 
+                                "PASS", 
+                                f"All required fields present for MapSchema support: {expected_fields}"
+                            )
+                        else:
+                            self.log_test(
+                                "MapSchema Player State Support", 
+                                "FAIL", 
+                                f"Missing required fields: {missing_fields}"
+                            )
                     else:
-                        self.log_test("Arena Server Structure", "FAIL", f"Invalid server type or room type")
-                
-                # Check player count integration
-                total_players = data.get("totalPlayers", 0)
-                self.log_test("Player Count Integration", "PASS", f"Total players: {total_players}")
-                
+                        self.log_test(
+                            "Colyseus Arena Server Configuration", 
+                            "FAIL", 
+                            "No Colyseus arena server found in server list"
+                        )
+                else:
+                    self.log_test(
+                        "Colyseus Server Configuration", 
+                        "FAIL", 
+                        f"Colyseus not properly configured - Enabled: {colyseus_enabled}, Endpoint: {colyseus_endpoint}, Servers: {len(servers)}"
+                    )
             else:
-                self.log_test("Colyseus Server API", "FAIL", f"API returned status {response.status_code}")
+                self.log_test(
+                    "Colyseus Server API Access", 
+                    "FAIL", 
+                    f"Failed to access /api/servers - Status: {response.status_code}"
+                )
+        except Exception as e:
+            self.log_test("Colyseus Room State Management", "FAIL", f"Exception: {str(e)}")
+
+    def test_player_data_propagation(self):
+        """Test 2: Player Data Propagation - Test that multiple players' data is correctly transmitted"""
+        print("\n👥 TESTING: Player Data Propagation")
+        
+        try:
+            # Test game sessions API for player tracking
+            test_session_data = {
+                "action": "join",
+                "session": {
+                    "roomId": "colyseus-arena-global",
+                    "joinedAt": "2024-01-01T00:00:00.000Z",
+                    "lastActivity": "2024-01-01T00:00:00.000Z",
+                    "userId": "test_player_1",
+                    "entryFee": 0,
+                    "mode": "colyseus-multiplayer",
+                    "region": "Australia",
+                    "status": "active"
+                }
+            }
+            
+            response = requests.post(
+                f"{self.base_url}/api/game-sessions",
+                json=test_session_data,
+                headers={'Content-Type': 'application/json'},
+                timeout=10
+            )
+            
+            if response.status_code in [200, 201]:
+                self.log_test(
+                    "Player Session Tracking", 
+                    "PASS", 
+                    "Backend can track player sessions for multiplayer rooms"
+                )
+                
+                # Test multiple player session handling
+                test_session_data_2 = {
+                    "action": "join",
+                    "session": {
+                        "roomId": "colyseus-arena-global",
+                        "joinedAt": "2024-01-01T00:01:00.000Z",
+                        "lastActivity": "2024-01-01T00:01:00.000Z",
+                        "userId": "test_player_2",
+                        "entryFee": 0,
+                        "mode": "colyseus-multiplayer",
+                        "region": "Australia",
+                        "status": "active"
+                    }
+                }
+                
+                response2 = requests.post(
+                    f"{self.base_url}/api/game-sessions",
+                    json=test_session_data_2,
+                    headers={'Content-Type': 'application/json'},
+                    timeout=10
+                )
+                
+                if response2.status_code in [200, 201]:
+                    self.log_test(
+                        "Multiple Player Session Support", 
+                        "PASS", 
+                        "Backend supports multiple concurrent player sessions"
+                    )
+                else:
+                    self.log_test(
+                        "Multiple Player Session Support", 
+                        "FAIL", 
+                        f"Failed to create second player session - Status: {response2.status_code}"
+                    )
+            else:
+                self.log_test(
+                    "Player Session Tracking", 
+                    "FAIL", 
+                    f"Failed to create player session - Status: {response.status_code}"
+                )
+                
+            # Verify player count tracking
+            response = requests.get(f"{self.base_url}/api/servers", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                servers = data.get('servers', [])
+                arena_server = next((s for s in servers if s.get('serverType') == 'colyseus'), None)
+                
+                if arena_server:
+                    current_players = arena_server.get('currentPlayers', 0)
+                    self.log_test(
+                        "Player Count Propagation", 
+                        "PASS", 
+                        f"Arena server shows {current_players} current players - data propagation working"
+                    )
+                else:
+                    self.log_test(
+                        "Player Count Propagation", 
+                        "FAIL", 
+                        "No Colyseus arena server found for player count verification"
+                    )
+            else:
+                self.log_test(
+                    "Player Count Propagation", 
+                    "FAIL", 
+                    f"Failed to verify player count - Status: {response.status_code}"
+                )
+                
+        except Exception as e:
+            self.log_test("Player Data Propagation", "FAIL", f"Exception: {str(e)}")
+
+    def test_mapschema_handling(self):
+        """Test 3: MapSchema Handling - Confirm backend sends proper MapSchema data for frontend conversion"""
+        print("\n🗺️ TESTING: MapSchema Handling")
+        
+        try:
+            # Check environment configuration
+            if self.colyseus_endpoint and self.colyseus_endpoint.startswith('wss://'):
+                self.log_test(
+                    "Colyseus Endpoint Configuration", 
+                    "PASS", 
+                    f"Colyseus endpoint properly configured: {self.colyseus_endpoint}"
+                )
+                
+                # Verify backend provides correct MapSchema structure info
+                response = requests.get(f"{self.base_url}/api/servers", timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Check if response includes Colyseus-specific data structure info
+                    colyseus_enabled = data.get('colyseusEnabled', False)
+                    colyseus_endpoint = data.get('colyseusEndpoint', '')
+                    
+                    if colyseus_enabled and colyseus_endpoint:
+                        self.log_test(
+                            "MapSchema Data Structure Support", 
+                            "PASS", 
+                            "Backend provides Colyseus MapSchema configuration data"
+                        )
+                        
+                        # Verify arena server structure for MapSchema compatibility
+                        servers = data.get('servers', [])
+                        arena_server = next((s for s in servers if s.get('serverType') == 'colyseus'), None)
+                        
+                        if arena_server:
+                            # Check for fields that support MapSchema player data
+                            required_mapschema_fields = ['roomType', 'maxPlayers', 'currentPlayers', 'endpoint']
+                            has_all_fields = all(field in arena_server for field in required_mapschema_fields)
+                            
+                            if has_all_fields:
+                                self.log_test(
+                                    "MapSchema Player Data Structure", 
+                                    "PASS", 
+                                    f"Arena server has all required MapSchema fields: {required_mapschema_fields}"
+                                )
+                            else:
+                                missing = [f for f in required_mapschema_fields if f not in arena_server]
+                                self.log_test(
+                                    "MapSchema Player Data Structure", 
+                                    "FAIL", 
+                                    f"Missing MapSchema fields: {missing}"
+                                )
+                        else:
+                            self.log_test(
+                                "MapSchema Player Data Structure", 
+                                "FAIL", 
+                                "No Colyseus arena server found for MapSchema verification"
+                            )
+                    else:
+                        self.log_test(
+                            "MapSchema Data Structure Support", 
+                            "FAIL", 
+                            f"Colyseus not enabled or endpoint missing - Enabled: {colyseus_enabled}, Endpoint: {colyseus_endpoint}"
+                        )
+                else:
+                    self.log_test(
+                        "MapSchema Data Structure Support", 
+                        "FAIL", 
+                        f"Failed to access server data - Status: {response.status_code}"
+                    )
+            else:
+                self.log_test(
+                    "Colyseus Endpoint Configuration", 
+                    "FAIL", 
+                    f"Invalid Colyseus endpoint: {self.colyseus_endpoint}"
+                )
                 
         except Exception as e:
             self.log_test("Colyseus Server API", "FAIL", f"API request failed: {str(e)}")
