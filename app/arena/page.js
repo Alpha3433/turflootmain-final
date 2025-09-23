@@ -32,8 +32,14 @@ const MultiplayerArena = () => {
   
   console.log('🎮 Arena parameters:', { roomId, playerName, privyUserId })
 
-  // Colyseus connection and input handling
+  // Colyseus connection and input handling  
   const connectToColyseus = async () => {
+    // Prevent multiple connections
+    if (wsRef.current) {
+      console.log('🔄 Connection already exists, skipping...')
+      return
+    }
+    
     try {
       console.log('🚀 Connecting to Colyseus arena...')
       setConnectionStatus('connecting')
@@ -49,6 +55,7 @@ const MultiplayerArena = () => {
       wsRef.current = room
       setConnectionStatus('connected')
       console.log('✅ Connected to arena:', room.id)
+      console.log('🎮 Stable session ID:', room.sessionId)
       
       // Handle server state updates
       room.onStateChange((state) => {
