@@ -555,11 +555,17 @@ class CameraStabilityBackendTester:
             
             # Test database connectivity through game sessions
             db_test_data = {
-                "action": "health_check",
-                "roomId": "health_check_room",
-                "playerId": "health_check_player",
-                "sessionId": f"health_{int(time.time())}",
-                "status": "testing"
+                "action": "join",
+                "session": {
+                    "roomId": "health_check_room",
+                    "joinedAt": datetime.now().isoformat(),
+                    "lastActivity": datetime.now().isoformat(),
+                    "userId": "health_check_player",
+                    "entryFee": 0,
+                    "mode": "health-check",
+                    "region": "Global",
+                    "status": "testing"
+                }
             }
             
             db_response = self.session.post(f"{self.api_base}/game-sessions", json=db_test_data, timeout=10)
