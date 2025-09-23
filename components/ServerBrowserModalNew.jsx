@@ -261,53 +261,80 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     if (showRefresh) setRefreshing(true)
     setErrorMessage('') // Clear previous errors
     
-    // Determine the correct API URL based on current host
-    const isExternal = window.location.hostname !== 'localhost'
-    const apiUrl = isExternal ? `${window.location.origin}/api/servers` : '/api/servers'
+    // Try multiple API endpoints to handle routing issues
+    const endpoints = [
+      '/api/servers', // Standard relative path
+      `${window.location.origin}/api/servers`, // Full origin path
+    ]
     
-    console.log('🌐 Fetching servers from:', apiUrl)
-    console.log('🌐 Current hostname:', window.location.hostname, 'isExternal:', isExternal)
+    let lastError = null
     
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'same-origin'
-    })
-    console.log('📡 Server response status:', response.status, response.statusText)
-    
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('❌ Server response error:', errorText)
-      throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
+    for (const apiUrl of endpoints) {
+      try {
+        console.log('🌐 Attempting to fetch servers from:', apiUrl)
+        
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'same-origin'
+        })
+        
+        console.log('📡 Server response status:', response.status, response.statusText)
+        
+        if (response.ok) {
+          const data = await response.json()
+          console.log('✅ Server data received:', {
+            servers: data.servers?.length || 0,
+            totalPlayers: data.totalPlayers || 0,
+            totalActiveServers: data.totalActiveServers || 0,
+            sampleServer: data.servers?.[0]?.name || 'No servers'
+          })
+          
+          if (!data.servers || data.servers.length === 0) {
+            console.warn('⚠️ No servers in response')
+            throw new Error('No servers available')
+          }
+          
+          // Success! Process the data
+          const serversWithPings = await measureServerPings(data.servers)
+          setServers(serversWithPings)
+          setErrorMessage('')
+          
+          setTotalStats({
+            totalPlayers: data.totalPlayers || 0,
+            totalActiveServers: data.totalActiveServers || 0
+          })
+          
+          setIsLoading(false)
+          if (showRefresh) {
+            setTimeout(() => setRefreshing(false), 500)
+          }
+          return // Success, exit the function
+          
+        } else {
+          const errorText = await response.text()
+          lastError = new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`)
+          console.error('❌ Server response error from', apiUrl, ':', errorText)
+        }
+      } catch (error) {
+        console.error('❌ Network error with', apiUrl, ':', error.message)
+        lastError = error
+      }
     }
     
-    const data = await response.json()
-    console.log('✅ Server data received:', {
-      servers: data.servers?.length || 0,
-      totalPlayers: data.totalPlayers || 0,
-      totalActiveServers: data.totalActiveServers || 0,
-      sampleServer: data.servers?.[0]?.name || 'No servers'
-    })
+    // If we get here, all endpoints failed
+    console.error('❌ All server endpoints failed, last error:', lastError?.message)
     
-    if (!data.servers || data.servers.length === 0) {
-      console.warn('⚠️ No servers in response')
-      throw new Error('No servers available')
+    // Show user-friendly error and provide fallback
+    setErrorMessage(`Unable to connect to game servers. This may be a temporary issue with the server connection. Please try refreshing the page or contact support if the problem persists.`)
+    
+    if (showRefresh) {
+      setTimeout(() => setRefreshing(false), 500)
     }
     
-    // Measure client-side pings for all servers
-    const serversWithPings = await measureServerPings(data.servers)
-    setServers(serversWithPings)
-    setErrorMessage('')
-    
-    setTotalStats({
-      totalPlayers: data.totalPlayers || 0,
-      totalActiveServers: data.totalActiveServers || 0
-    })
-    
-    setIsLoading(false)
-    if (showRefresh) setRefreshing(false)
+    throw lastError || new Error('All server endpoints failed')
   }
 
   // Initialize Colyseus server discovery when modal opens
