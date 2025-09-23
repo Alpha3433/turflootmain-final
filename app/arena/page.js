@@ -41,12 +41,14 @@ const MultiplayerArena = () => {
     }
     
     try {
-      console.log('🚀 Connecting to Colyseus arena...')
+      console.log('🚀 Creating dedicated Colyseus client for this arena...')
       setConnectionStatus('connecting')
       
-      const client = colyseusClient
+      // Create dedicated client instance for this arena
+      const client = new Client(process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud')
       
-      const room = await client.joinArena({
+      console.log('🎯 Joining arena room:', roomId)
+      const room = await client.joinOrCreate("arena", {
         roomName: roomId,
         playerName: playerName,
         privyUserId: privyUserId
@@ -54,8 +56,8 @@ const MultiplayerArena = () => {
       
       wsRef.current = room
       setConnectionStatus('connected')
-      console.log('✅ Connected to arena:', room.id)
-      console.log('🎮 Stable session ID:', room.sessionId)
+      console.log('✅ Connected to dedicated arena:', room.id)
+      console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
       
       // Handle server state updates
       room.onStateChange((state) => {
