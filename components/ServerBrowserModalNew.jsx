@@ -666,12 +666,14 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               return true
             })
 
-            // Separate active rooms (with players) from empty rooms
+            // Separate active/persistent rooms from empty rooms
             const activeRooms = filteredServers.filter(server => 
-              server.currentPlayers > 0 && server.currentPlayers < server.maxPlayers
+              // Room is active if it has players OR if it's a persistent 24/7 room
+              (server.currentPlayers > 0 && server.currentPlayers < server.maxPlayers) ||
+              server.isPersistent === true // Always show persistent rooms as joinable
             )
             const emptyRooms = filteredServers.filter(server => 
-              server.currentPlayers === 0
+              server.currentPlayers === 0 && !server.isPersistent // Only non-persistent empty rooms need creation
             )
 
             // Calculate dynamic stats for display
