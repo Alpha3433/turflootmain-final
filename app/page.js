@@ -1068,6 +1068,7 @@ export default function TurfLootTactical() {
     }
   }, [customUsername, isAuthenticated, user])
   const [isServerBrowserOpen, setIsServerBrowserOpen] = useState(false)
+  const [isCreateRoomOpen, setIsCreateRoomOpen] = useState(false)
   const [localPracticeLoading, setLocalPracticeLoading] = useState(false) // Loading state for local practice
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isFriendsModalOpen, setIsFriendsModalOpen] = useState(false)
