@@ -23,9 +23,8 @@ const MultiplayerArena = () => {
   const [timeSurvived, setTimeSurvived] = useState(0)
   const [eliminations, setEliminations] = useState(0)
   
-  // Loading and initialization state - NEW
-  const [uiLoading, setUiLoading] = useState(true)
-  const [canvasReady, setCanvasReady] = useState(false)
+  // Loading and initialization state - SIMPLIFIED
+  const [gameReady, setGameReady] = useState(false)
 
   // Mobile detection and UI states - matching agario
   const [isMobile, setIsMobile] = useState(false)
