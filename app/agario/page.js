@@ -3533,6 +3533,11 @@ const AgarIOGame = () => {
   }
 
   useEffect(() => {
+    console.log('🎮 GAME INIT USEEFFECT RUNNING - Debug info:')
+    console.log('🎮 isMultiplayer:', isMultiplayer)
+    console.log('🎮 isMobile:', isMobile) 
+    console.log('🎮 canvasRef.current:', !!canvasRef.current)
+    
     // Apply mobile game class for full screen optimization
     if (isMobile) {
       document.body.classList.add('mobile-game-active')
@@ -3547,7 +3552,12 @@ const AgarIOGame = () => {
     document.documentElement.style.padding = '0'
     document.documentElement.style.background = '#000000'
     
-    if (!canvasRef.current) return
+    if (!canvasRef.current) {
+      console.log('❌ GAME INIT BLOCKED: canvasRef.current is null')
+      return
+    }
+    
+    console.log('✅ GAME INIT PROCEEDING: Canvas available, creating game engine...')
 
     const canvas = canvasRef.current
     // Set canvas size properly
