@@ -263,6 +263,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     
     // Try multiple API endpoints to handle routing issues
     const endpoints = [
+      '/api/servers-proxy', // New proxy endpoint to bypass routing issues
       '/api/servers', // Standard relative path
       `${window.location.origin}/api/servers`, // Full origin path
     ]
