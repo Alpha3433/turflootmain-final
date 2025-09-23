@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Get base URL from environment
-BASE_URL = "https://gameloop-migrate.preview.emergentagent.com"
+BASE_URL = "https://multi-rooms-fix.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class AgarIOBackendTester:

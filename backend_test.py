@@ -18,7 +18,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://gameloop-migrate.preview.emergentagent.com"
+BASE_URL = "https://multi-rooms-fix.preview.emergentagent.com"
 COLYSEUS_ENDPOINT = "wss://au-syd-ab3eaf4e.colyseus.cloud"
 
 class TurfLootBackendTester:

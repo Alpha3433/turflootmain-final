@@ -19,7 +19,7 @@ import sys
 from urllib.parse import urlparse
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://gameloop-migrate.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://multi-rooms-fix.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 print(f"🚀 HATHORA API UPDATES VERIFICATION - Backend Testing")
