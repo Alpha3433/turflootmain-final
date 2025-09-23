@@ -38,7 +38,7 @@ const MultiplayerArena = () => {
       console.log('🚀 Connecting to Colyseus arena...')
       setConnectionStatus('connecting')
       
-      const client = new TurfLootColyseusClient()
+      const client = colyseusClient
       
       const room = await client.joinArena({
         roomName: roomId,
