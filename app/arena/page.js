@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import colyseusClient from '../../lib/colyseus.js'
+import { Client } from 'colyseus.js'
 
 const MultiplayerArena = () => {
   console.log('🎮 MULTIPLAYER ARENA - Pure Colyseus multiplayer mode')
