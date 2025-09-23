@@ -2,82 +2,41 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    console.log('🔄 Servers-proxy route called - bypassing external routing issues')
-    
-    // Try to get active room data from database
-    let activeRoomId = null
-    let activePlayerCount = 0
-    
-    try {
-      const { MongoClient } = await import('mongodb')
-      const client = new MongoClient(process.env.MONGO_URL)
-      await client.connect()
-      const db = client.db('turfloot')
-      const gameSessions = db.collection('game_sessions')
-      
-      // Find the most recent active Colyseus arena session
-      const activeSession = await gameSessions.findOne(
-        { 
-          status: 'active',
-          roomType: 'arena',
-          lastActivity: { $gte: new Date(Date.now() - 5 * 60 * 1000) } // Active within 5 minutes
-        },
-        { sort: { lastActivity: -1 } } // Get most recent
-      )
-      
-      if (activeSession) {
-        activeRoomId = activeSession.roomId
-        // Count all active players in this room
-        activePlayerCount = await gameSessions.countDocuments({
-          roomId: activeRoomId,
-          status: 'active',
-          lastActivity: { $gte: new Date(Date.now() - 5 * 60 * 1000) }
-        })
-        console.log(`🎮 Found active room ${activeRoomId} with ${activePlayerCount} players`)
-      }
-      
-      await client.close()
-    } catch (error) {
-      console.warn('⚠️ Could not query database for active rooms:', error.message)
-    }
-    
-    // If no real room found, use simulation for testing
-    if (!activeRoomId) {
-      activeRoomId = 'colyseus-arena-global' // Fallback for testing
-      activePlayerCount = 1 // Simulated for testing
-      console.log('🧪 TESTING: Using simulated room data')
-    }
+    console.log('🔄 Servers-proxy route called - returning persistent 24/7 room')
     
     const colyseusEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
     
+    // Always show the persistent 24/7 room as available
+    // This room is always open and ready for players to join
     const serverData = {
       servers: [
         {
-          id: activeRoomId, // Use actual room ID instead of generic one
+          id: 'turfloot-persistent-arena-24-7', // Fixed room ID for the persistent room
           roomType: 'arena',
-          name: 'TurfLoot Arena',
+          name: 'TurfLoot Arena 24/7',
           region: 'Australia',
           regionId: 'au-syd',
           endpoint: colyseusEndpoint,
           maxPlayers: 50,
-          currentPlayers: activePlayerCount, // Use real player count
+          currentPlayers: 0, // Will be updated dynamically by Colyseus
           entryFee: 0,
           gameType: 'Arena Battle',
           serverType: 'colyseus',
-          isActive: activePlayerCount > 0,
+          isActive: true, // Always active
           canSpectate: true,
           ping: 0,
-          status: activePlayerCount > 0 ? 'active' : 'waiting', // Dynamic status
-          canJoin: activePlayerCount > 0 && activePlayerCount < 50,
-          creatorName: activePlayerCount > 0 ? 'Account A' : null, // Show creator only if active
-          creatorWallet: activePlayerCount > 0 ? 'Demo_Wallet_123' : null,
-          actualRoomId: activeRoomId, // Store the actual room ID for joining
+          status: 'active', // Always active and ready
+          canJoin: true, // Always joinable
+          creatorName: 'TurfLoot', // Official room
+          creatorWallet: 'Official',
+          description: 'Open 24/7 multiplayer arena - join anytime!',
+          isPersistent: true, // Mark as persistent room
           lastUpdated: new Date().toISOString(),
           timestamp: new Date().toISOString()
         }
       ],
-      totalPlayers: activePlayerCount, // Use real player count
-      totalActiveServers: activePlayerCount > 0 ? 1 : 0,
+      totalPlayers: 0, // Will be updated by real connections
+      totalActiveServers: 1, // Always 1 active room
       totalServers: 1,
       practiceServers: 0,
       cashServers: 0,
