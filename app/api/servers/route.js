@@ -5,7 +5,7 @@ export async function GET(request) {
     console.log('🎮 Colyseus Server Browser API: Returning available Colyseus servers...')
     
     // Colyseus server configuration
-    const colyseusEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'ws://localhost:2567'
+    const colyseusEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
     
     // Create a single arena server entry for the server browser
     const arenaServer = {
