@@ -63,15 +63,29 @@ const MultiplayerArena = () => {
           worldSize: state.worldSize || 4000
         }
         
-        // Process players
+        // Process players with proper current player identification
         if (state.players) {
+          console.log('🎮 Current session ID:', room.sessionId)
+          let currentPlayerFound = false
+          
           state.players.forEach((player, sessionId) => {
+            const isCurrentPlayer = sessionId === room.sessionId
+            if (isCurrentPlayer) {
+              console.log('✅ Found current player:', sessionId, player.name)
+              currentPlayerFound = true
+            }
+            
             gameState.players.push({
               ...player,
               sessionId,
-              isCurrentPlayer: sessionId === room.sessionId
+              isCurrentPlayer
             })
           })
+          
+          if (!currentPlayerFound) {
+            console.log('❌ Current player not found! Available sessions:', 
+              Array.from(state.players.keys()))
+          }
         }
         
         // Process coins
