@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { TurfLootColyseusClient } from '../../lib/colyseus.js'
 
 const MultiplayerArena = () => {
   console.log('🎮 MULTIPLAYER ARENA - Pure Colyseus multiplayer mode')
