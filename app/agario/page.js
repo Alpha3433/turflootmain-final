@@ -257,8 +257,11 @@ const AgarIOGame = () => {
       
       // Set up multiplayer state
       setIsMultiplayer(true)
+      window.isMultiplayer = true // CRITICAL: Set global flag for game rendering
       setWsConnection('connected')
       wsRef.current = room
+      
+      console.log('🎮 Multiplayer mode activated - window.isMultiplayer =', window.isMultiplayer)
       
       // Set up Colyseus room event handlers
       room.onStateChange((state) => {
