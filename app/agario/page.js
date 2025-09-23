@@ -1760,42 +1760,76 @@ const AgarIOGame = () => {
         return
       }
       
-      console.log('🤖 Generating AI bots for practice/local game')
+      console.log('🤖 Generating enhanced AI bots for practice/local game')
       
-      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7']
+      const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#A29BFE', '#FD79A8', '#FDCB6E']
+      const botNames = [
+        'AI_Hunter', 'CoinSeeker', 'BlobMaster', 'QuickSilver', 'Predator',
+        'NinjaCoin', 'MegaBlob', 'SpeedDemon', 'TacticalBot', 'Dominator'
+      ]
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
       const playableRadius = this.currentPlayableRadius
       
-      for (let i = 0; i < 8; i++) {
-        const mass = 15 + Math.random() * 40
-        let x, y, distance
-        
-        // Generate enemy within the playable radius
-        do {
-          x = Math.random() * this.world.width
-          y = Math.random() * this.world.height
-          distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
-        } while (distance > playableRadius - 50) // 50px buffer from edge
-        
-        this.enemies.push({
-          x: x,
-          y: y,
-          mass: mass,
-          radius: Math.sqrt(mass) * 3,
-          color: colors[i % colors.length],
-          name: `Player ${i + 2}`,
-          speed: Math.max(0.2, 35 / Math.sqrt(mass)), // Reduced from 50 to 35 to match player speed
-          targetX: Math.random() * this.world.width,
-          targetY: Math.random() * this.world.height,
-          lastTargetChange: Date.now(),
-          spawnProtection: true,
-          spawnProtectionTime: 4000, // 4 seconds in milliseconds
-          spawnProtectionStart: Date.now() + (i * 200) // Stagger spawn times slightly
-        })
-      }
+      // Create bots with varied difficulty levels
+      const botTypes = [
+        { type: 'aggressive', count: 2, baseMass: 25, massVariation: 30 },
+        { type: 'defensive', count: 2, baseMass: 20, massVariation: 20 },
+        { type: 'balanced', count: 3, baseMass: 18, massVariation: 25 },
+        { type: 'fast', count: 1, baseMass: 15, massVariation: 10 }
+      ]
       
-      console.log(`👥 Generated ${this.enemies.length} enemies within radius ${Math.floor(playableRadius)}px`)
+      let botIndex = 0
+      botTypes.forEach(botType => {
+        for (let i = 0; i < botType.count && botIndex < 8; i++) {
+          const mass = botType.baseMass + Math.random() * botType.massVariation
+          let x, y, distance
+          
+          // Generate enemy within the playable radius
+          do {
+            x = Math.random() * this.world.width
+            y = Math.random() * this.world.height
+            distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+          } while (distance > playableRadius - 50) // 50px buffer from edge
+          
+          // Create bot with enhanced AI properties
+          const bot = {
+            x: x,
+            y: y,
+            mass: mass,
+            radius: Math.sqrt(mass) * 3,
+            color: colors[botIndex % colors.length],
+            name: botNames[botIndex % botNames.length],
+            speed: Math.max(0.2, 35 / Math.sqrt(mass)),
+            targetX: Math.random() * this.world.width,
+            targetY: Math.random() * this.world.height,
+            lastTargetChange: Date.now(),
+            spawnProtection: true,
+            spawnProtectionTime: 4000, // 4 seconds
+            spawnProtectionStart: Date.now() + (botIndex * 200), // Stagger spawn times
+            
+            // Enhanced AI properties
+            botType: botType.type,
+            behavior: 'exploring',
+            aggressiveness: botType.type === 'aggressive' ? 0.8 : 
+                           botType.type === 'defensive' ? 0.3 : 0.5,
+            coinHuntingRadius: botType.type === 'fast' ? 15 : 12,
+            fleeThreshold: botType.type === 'defensive' ? 1.1 : 1.3,
+            huntThreshold: botType.type === 'aggressive' ? 1.1 : 1.4,
+            lastBehaviorChange: Date.now(),
+            reactionTime: 200 + Math.random() * 300, // 200-500ms reaction time
+            decisionCooldown: 0
+          }
+          
+          this.enemies.push(bot)
+          botIndex++
+        }
+      })
+      
+      console.log(`👥 Generated ${this.enemies.length} enhanced AI bots:`)
+      this.enemies.forEach(bot => {
+        console.log(`  - ${bot.name} (${bot.botType}): Mass ${Math.floor(bot.mass)}, Aggressiveness ${bot.aggressiveness}`)
+      })
     }
 
     generateViruses() {
