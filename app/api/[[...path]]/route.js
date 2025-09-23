@@ -123,6 +123,26 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Create room endpoint
+    if (route === 'rooms/create') {
+      return await handleCreateRoom(request)
+    }
+    
+    // Join room endpoint
+    if (route === 'rooms/join') {
+      return await handleJoinRoom(request)
+    }
+    
+    // Update room status endpoint
+    if (route === 'rooms/status') {
+      return await handleUpdateRoomStatus(request)
+    }
+
+    // Game sessions endpoint (existing)
+    if (route === 'game-sessions') {
+      return await handleGameSessions(request)
+    }
+
     // Default route for unknown paths
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders })
     
