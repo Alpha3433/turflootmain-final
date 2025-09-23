@@ -1242,9 +1242,25 @@ const AgarIOGame = () => {
       // Update current player from server state if in multiplayer
       const currentPlayer = this.serverState.players.find(p => p.isCurrentPlayer)
       if (currentPlayer && isMultiplayer) {
-        // Apply server-authoritative position with client-side prediction
-        this.player.x = currentPlayer.x
-        this.player.y = currentPlayer.y
+        // Calculate distance to prevent flickering from rapid server updates
+        const distanceToServer = Math.sqrt(
+          Math.pow(currentPlayer.x - this.player.x, 2) + 
+          Math.pow(currentPlayer.y - this.player.y, 2)
+        )
+        
+        // Apply server-authoritative position with anti-flickering smoothing
+        if (distanceToServer > 50) {
+          // Large distance - apply server position directly (avoid desync)
+          this.player.x = currentPlayer.x
+          this.player.y = currentPlayer.y
+        } else {
+          // Small distance - apply gentle interpolation to prevent flickering
+          const lerpFactor = 0.3
+          this.player.x += (currentPlayer.x - this.player.x) * lerpFactor
+          this.player.y += (currentPlayer.y - this.player.y) * lerpFactor
+        }
+        
+        // Always update other properties directly (they don't cause visual flickering)
         this.player.mass = currentPlayer.mass
         this.player.radius = currentPlayer.radius
         this.player.name = currentPlayer.name
