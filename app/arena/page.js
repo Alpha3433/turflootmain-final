@@ -707,6 +707,9 @@ const MultiplayerArena = () => {
   useEffect(() => {
     console.log('🎮 Arena initialization - setting up game...')
     
+    // Set loading states
+    setUiLoading(true)
+    
     // Apply mobile game class for full screen optimization
     if (isMobile) {
       document.body.classList.add('mobile-game-active')
@@ -738,6 +741,7 @@ const MultiplayerArena = () => {
     
     game.start()
     setGameReady(true)
+    setCanvasReady(true)
     
     // Game loop
     const gameLoop = () => {
@@ -752,6 +756,12 @@ const MultiplayerArena = () => {
     
     // Connect to Colyseus only once
     connectToColyseus()
+    
+    // Set UI ready after a short delay to ensure everything is initialized
+    setTimeout(() => {
+      setUiLoading(false)
+      console.log('🎨 UI fully initialized and ready')
+    }, 2000)
     
     // Handle resize
     const handleResize = () => {
