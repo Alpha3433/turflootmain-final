@@ -86,7 +86,40 @@ export class ArenaRoom extends Room<GameState> {
     const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
     const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
     
-    console.log(`👋 Player joined: ${playerName} (${client.sessionId})`);
+    console.log(`👋 Player attempting to join: ${playerName} (${client.sessionId}) - privyUserId: ${privyUserId}`);
+    
+    // Check for existing players with the same privyUserId or playerName to prevent duplicates
+    let existingSessionId: string | null = null;
+    this.state.players.forEach((existingPlayer, sessionId) => {
+      // Check if there's already a player with same privyUserId (for authenticated users)
+      if (privyUserId !== `anonymous_${Date.now()}` && 
+          this.clients.find(c => (c as any).userData?.privyUserId === privyUserId)) {
+        existingSessionId = sessionId;
+        console.log(`⚠️ Found existing player with same privyUserId: ${privyUserId} (session: ${sessionId})`);
+      }
+      // Also check for same player name as fallback (for anonymous users)
+      else if (existingPlayer.name === playerName) {
+        existingSessionId = sessionId;
+        console.log(`⚠️ Found existing player with same name: ${playerName} (session: ${sessionId})`);
+      }
+    });
+    
+    // Remove duplicate player if found
+    if (existingSessionId) {
+      console.log(`🧹 Removing duplicate player (session: ${existingSessionId}) to prevent camera confusion`);
+      this.state.players.delete(existingSessionId);
+      
+      // Also try to disconnect the old client if still connected
+      const oldClient = this.clients.find(c => c.sessionId === existingSessionId);
+      if (oldClient) {
+        console.log(`🔌 Disconnecting old client session: ${existingSessionId}`);
+        try {
+          oldClient.leave(1000, 'Duplicate connection detected');
+        } catch (error) {
+          console.log('⚠️ Error disconnecting old client:', error);
+        }
+      }
+    }
     
     // Create new player
     const player = new Player();
@@ -112,7 +145,7 @@ export class ArenaRoom extends Room<GameState> {
       lastInputTime: Date.now()
     };
     
-    console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)})`);
+    console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)}) - No duplicates!`);
   }
 
   handleInput(client: Client, message: any) {
