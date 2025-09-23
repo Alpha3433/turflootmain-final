@@ -30,9 +30,10 @@ from datetime import datetime
 BASE_URL = "https://turfloot-arena-2.preview.emergentagent.com"
 COLYSEUS_ENDPOINT = "wss://au-syd-ab3eaf4e.colyseus.cloud"
 
-class TurfLootBackendTester:
+class MultiplayerBackendTester:
     def __init__(self):
         self.base_url = BASE_URL
+        self.colyseus_endpoint = COLYSEUS_ENDPOINT
         self.results = {
             "total_tests": 0,
             "passed_tests": 0,
@@ -41,6 +42,11 @@ class TurfLootBackendTester:
             "critical_issues": [],
             "minor_issues": []
         }
+        print("🎮 MULTIPLAYER PLAYER RENDERING FIX - BACKEND TESTING SUITE")
+        print("=" * 70)
+        print(f"🔗 API Base URL: {self.base_url}")
+        print(f"🎯 Colyseus Endpoint: {self.colyseus_endpoint}")
+        print()
         
     def log_test(self, test_name, status, details, is_critical=True):
         """Log test result"""
