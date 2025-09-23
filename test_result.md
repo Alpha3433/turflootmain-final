@@ -126,8 +126,7 @@ user_problem_statement: "Fix multiplayer synchronization issue where players are
 
 test_plan:
   current_focus:
-    - "Multiplayer Player Rendering Fix"
-    - "Colyseus MapSchema Frontend Integration"
+    - "Multiplayer Synchronization Complete Fix Backend Support"
   stuck_tasks:
     - "Frontend Build Issues - Missing Solana wallet adapters"
   test_all: false
