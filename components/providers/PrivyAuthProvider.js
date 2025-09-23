@@ -65,15 +65,10 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   
-  // Validate required environment variables - if not configured, use demo mode
+  // Validate required environment variables
   if (!appId) {
-    console.warn('⚠️ NEXT_PUBLIC_PRIVY_APP_ID not configured - running in demo mode')
-    // Return children directly for demo mode (no Privy wrapper)
-    return (
-      <div>
-        {children}
-      </div>
-    )
+    console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is required')
+    return <div>Error: Privy App ID not configured</div>
   }
 
   // SOLANA-ONLY Privy Configuration - UPDATED for v2.24.0 fundWallet compatibility
