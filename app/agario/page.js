@@ -3952,8 +3952,11 @@ const AgarIOGame = () => {
         targetX: gameRef.current.world.width / 2,
         targetY: gameRef.current.world.height / 2
       }
-      gameRef.current.generateCoins()
-      gameRef.current.generateEnemies()
+      // Only regenerate local world in practice mode
+      if (!window.isMultiplayer) {
+        gameRef.current.generateCoins()
+        gameRef.current.generateEnemies()
+      }
       gameRef.current.start()
     }
   }
