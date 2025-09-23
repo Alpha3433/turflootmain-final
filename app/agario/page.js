@@ -3014,13 +3014,33 @@ const AgarIOGame = () => {
           this.serverState.viruses.forEach(virus => this.drawVirus(virus))
         }
         
-        // Draw all server players (including other players)
+        // Draw all server players (including current player)
         if (this.serverState.players) {
-          this.serverState.players.forEach((player) => {
+          console.log('🎮 MULTIPLAYER RENDER DEBUG - Total players to draw:', this.serverState.players.length)
+          let currentPlayerFound = false
+          this.serverState.players.forEach((player, index) => {
             if (player && player.alive) {
+              if (player.isCurrentPlayer) {
+                console.log('🎮 DRAWING CURRENT PLAYER:', {
+                  x: player.x?.toFixed(1),
+                  y: player.y?.toFixed(1),
+                  radius: player.radius,
+                  name: player.name,
+                  sessionId: player.sessionId
+                })
+                currentPlayerFound = true
+              }
               this.drawPlayer(player)
             }
           })
+          if (!currentPlayerFound) {
+            console.log('❌ CURRENT PLAYER NOT FOUND in serverState.players!')
+            console.log('🎮 Available players:', this.serverState.players.map(p => ({ 
+              sessionId: p.sessionId, 
+              isCurrentPlayer: p.isCurrentPlayer, 
+              alive: p.alive 
+            })))
+          }
         }
       } else {
         // Draw local coins
