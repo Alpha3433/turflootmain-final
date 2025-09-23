@@ -384,20 +384,23 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   }
 
   const handleJoinServer = (room) => {
-    console.log('🏠 HANDLEJOINSERVER CALLED! Joining Hathora room:', room)
+    console.log('🏠 HANDLEJOINSERVER CALLED! Joining Colyseus room:', room)
     
     const serverData = {
       id: room.id,
       region: room.region,
-      regionId: room.regionId, // Pass the specific region ID (e.g., 'london', 'frankfurt')
+      regionId: room.regionId,
       name: room.name,
       entryFee: room.entryFee,
-      gameType: room.gameType || 'cash-game',
-      mode: room.type === 'instant-join' ? 'hathora-multiplayer' : 'join-existing',
+      gameType: room.gameType || 'Arena Battle',
+      mode: 'colyseus-multiplayer', // Force Colyseus multiplayer for all server browser games
+      server: 'colyseus', // Explicitly set server type
       maxPlayers: room.maxPlayers,
       currentPlayers: room.currentPlayers,
       isActive: room.isActive,
-      canSpectate: room.canSpectate
+      canSpectate: room.canSpectate,
+      multiplayer: 'true', // Force multiplayer flag
+      serverType: 'colyseus' // Ensure server type is set
     }
     
     console.log('🎮 HANDLEJOINSERVER: Processed room data for join:', serverData)
