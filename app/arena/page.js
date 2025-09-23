@@ -857,13 +857,14 @@ const MultiplayerArena = () => {
 
       {/* UI Elements - Only show when not loading */}
       {!uiLoading && (
-        {/* Live Leaderboard - Mobile Optimized */}
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 5px)' : '10px', 
-            left: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 5px)' : '10px', 
-            zIndex: 1000,
+        <div>
+          {/* Live Leaderboard - Mobile Optimized */}
+          <div 
+            style={{ 
+              position: 'fixed', 
+              top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 5px)' : '10px', 
+              left: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 5px)' : '10px', 
+              zIndex: 1000,
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             border: isMobile ? '1px solid rgba(0, 255, 255, 0.3)' : '2px solid rgba(0, 255, 255, 0.3)',
             borderRadius: isMobile ? '8px' : '6px',
