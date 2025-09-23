@@ -2993,6 +2993,17 @@ const AgarIOGame = () => {
       this.ctx.fillStyle = '#000000'
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
       
+      // Debug camera and player positions
+      if (Date.now() % 1000 < 16) { // Log every ~1 second
+        console.log('🎮 RENDER DEBUG:', {
+          mode: window.isMultiplayer ? 'MULTIPLAYER' : 'LOCAL',
+          playerPos: { x: this.player.x?.toFixed(1), y: this.player.y?.toFixed(1) },
+          cameraPos: { x: this.camera.x?.toFixed(1), y: this.camera.y?.toFixed(1) },
+          hasServerState: !!this.serverState,
+          serverPlayersCount: this.serverState?.players?.length || 0
+        })
+      }
+      
       this.ctx.save()
       this.ctx.translate(-this.camera.x, -this.camera.y)
       
