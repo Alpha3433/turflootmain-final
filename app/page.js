@@ -1831,217 +1831,50 @@ export default function TurfLootTactical() {
   }
 
   const handleJoinLobby = async (serverData) => {
-    console.log('🌐 COLYSEUS-FIRST: Joining multiplayer server:', serverData)
+    console.log('🎮 HANDLEFNLOBIOY - Starting Colyseus game with server data:', serverData)
     
-    // Show enhanced loading modal with detailed progress
-    const loadingModal = document.createElement('div')
-    loadingModal.id = 'colyseus-loading-modal'
-    loadingModal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      backdrop-filter: blur(15px);
-    `
-    
-    loadingModal.innerHTML = `
-      <div style="
-        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        padding: 50px;
-        border-radius: 20px;
-        text-align: center;
-        border: 3px solid #68d391;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-        min-width: 450px;
-        max-width: 500px;
-      ">
-        <div style="font-size: 64px; margin-bottom: 25px;">🚀</div>
-        <div style="color: #68d391; font-size: 28px; font-weight: bold; margin-bottom: 15px;">
-          JOINING COLYSEUS MULTIPLAYER
-        </div>
-        <div id="loading-status" style="color: #e2e8f0; font-size: 18px; margin-bottom: 15px;">
-          🌐 Connecting to real-time game server...
-        </div>
-        <div id="loading-substatus" style="color: #a0aec0; font-size: 16px; margin-bottom: 25px;">
-          💰 ${serverData.name} • Entry: $${serverData.entryFee || 0} • Region: ${serverData.region}
-        </div>
-        <div style="
-          width: 350px;
-          height: 8px;
-          background: rgba(104, 211, 145, 0.2);
-          border-radius: 4px;
-          overflow: hidden;
-          margin: 0 auto 20px;
-        ">
-          <div id="progress-bar" style="
-            width: 25%;
-            height: 100%;
-            background: linear-gradient(90deg, #68d391, #38b2ac);
-            animation: loading-bar 2.5s ease-in-out infinite;
-            border-radius: 4px;
-            transition: width 0.8s ease;
-          "></div>
-        </div>
-        <div id="loading-timer" style="color: #718096; font-size: 14px;">
-          🎮 Preparing authoritative multiplayer experience...
-        </div>
-      </div>
-    `
-    
-    document.body.appendChild(loadingModal)
-    
-    // Progress tracking functions
-    const updateStatus = (message) => {
-      const statusEl = document.getElementById('loading-status')
-      if (statusEl) statusEl.textContent = message
-    }
-    
-    const updateSubStatus = (message) => {
-      const subStatusEl = document.getElementById('loading-substatus')
-      if (subStatusEl) subStatusEl.textContent = message
-    }
-    
-    const updateProgress = (percentage) => {
-      const progressBar = document.getElementById('progress-bar')
-      if (progressBar) progressBar.style.width = `${percentage}%`
-    }
-    
-    const updateTimer = (message) => {
-      const timerEl = document.getElementById('loading-timer')
-      if (timerEl) timerEl.textContent = message
-    }
-    
-    // Track timing for minimum display duration
-    const loadingStartTime = Date.now()
-    const minimumDisplayTime = 4000 // 4 seconds minimum for confidence
-    
-    // Progressive status updates
-    setTimeout(() => {
-      updateStatus('🔐 Authenticating with Hathora cloud...')
-      updateProgress(40)
-    }, 800)
-    
-    setTimeout(() => {
-      updateStatus('🌍 Allocating dedicated game server...')
-      updateProgress(65)
-      updateTimer('🎯 Creating authoritative game instance...')
-    }, 1600)
-    
-    setTimeout(() => {
-      updateStatus('⚡ Establishing real-time connection...')
-      updateProgress(85)
-      updateTimer('🚀 Almost ready for multiplayer...')
-    }, 2400)
-
     try {
-      // Validate balance for paid games
-      if (serverData.entryFee > 0) {
-        console.log('💰 Validating balance for multiplayer entry...')
-        const balanceValid = validatePaidRoom(`Hathora Multiplayer: ${serverData.name}`)
-        
-        if (!balanceValid) {
-          throw new Error(`Insufficient balance for $${serverData.entryFee} entry fee`)
-        }
-        
-        updateSubStatus(`✅ Balance validated • Entry: $${serverData.entryFee} • Sufficient funds`)
-        console.log('✅ Balance validated for Hathora multiplayer entry')
+      // Validate server data
+      if (!serverData) {
+        throw new Error('No server data provided')
       }
       
-      // Initialize 100% Hathora multiplayer game
-      updateStatus('🎮 Initializing multiplayer game server...')
-      updateProgress(95)
-      updateTimer('🌐 Connecting to game instance...')
-      
-      const colyseusResult = await initializeColyseusGame(serverData)
-      
-      if (!colyseusResult || !colyseusResult.roomId) {
-        throw new Error('Failed to initialize Colyseus multiplayer game')
-      }
-      
-      console.log('🎉 Colyseus multiplayer initialization complete!')
-      console.log('📊 Room details:', colyseusResult)
-      
-      // Final success status
-      updateStatus('✅ Connected to multiplayer server!')
-      updateSubStatus(`🎮 Arena: ${colyseusResult.roomType} • Players: 0/${colyseusResult.maxPlayers}`)
-      updateProgress(100)
-      updateTimer('🚀 Loading multiplayer game...')
-      
-      // Build navigation URL with Colyseus parameters
-      const queryParams = new URLSearchParams({
-        roomId: colyseusResult.roomId,
-        mode: 'colyseus-multiplayer',
-        multiplayer: 'colyseus',
-        server: 'colyseus',
-        region: colyseusResult.region,
-        fee: colyseusResult.entryFee.toString(),
-        name: serverData.name || 'Colyseus Arena',
-        paid: colyseusResult.entryFee > 0 ? 'true' : 'false',
-        roomType: colyseusResult.roomType,
-        maxPlayers: colyseusResult.maxPlayers.toString(),
-        endpoint: colyseusResult.endpoint
+      console.log('📊 Server configuration for Colyseus game:', {
+        id: serverData.id,
+        name: serverData.name,
+        region: serverData.region,
+        entryFee: serverData.entryFee,
+        maxPlayers: serverData.maxPlayers,
+        serverType: serverData.serverType || 'colyseus',
+        mode: serverData.mode || 'colyseus-multiplayer'
       })
       
-      console.log('🔍 DEBUG: Query params object:', Object.fromEntries(queryParams))
-      console.log('🚀 Navigating to Colyseus multiplayer game:', `/agario?${queryParams.toString()}`)
+      // Build URL parameters for Colyseus multiplayer game
+      const gameParams = new URLSearchParams({
+        roomId: serverData.id || 'colyseus-arena-global',
+        mode: 'colyseus-multiplayer', // Force Colyseus multiplayer
+        server: 'colyseus', // Explicitly set server type
+        serverType: 'colyseus', // Additional server type identifier
+        multiplayer: 'true', // Force multiplayer flag
+        fee: serverData.entryFee || 0,
+        region: serverData.region || 'Australia',
+        regionId: serverData.regionId || 'au-syd',
+        maxPlayers: serverData.maxPlayers || 50,
+        name: encodeURIComponent(serverData.name || 'TurfLoot Arena'),
+        gameType: encodeURIComponent(serverData.gameType || 'Arena Battle')
+      })
       
-      // Ensure minimum display time for user confidence
-      const elapsedTime = Date.now() - loadingStartTime
-      const remainingTime = Math.max(0, minimumDisplayTime - elapsedTime)
+      console.log('🔗 Colyseus game URL parameters:', gameParams.toString())
       
-      setTimeout(async () => {
-        // Final confirmation
-        updateStatus('🎉 Welcome to Hathora Multiplayer!')
-        updateTimer('🎮 Starting authoritative game server...')
-        
-        // Wait for final confirmation
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        
-        // Remove loading modal and navigate
-        try {
-          if (document.body.contains(loadingModal)) {
-            document.body.removeChild(loadingModal)
-          }
-        } catch (e) {
-          console.log('Modal already removed')
-        }
-        
-        // Navigate to 100% Hathora multiplayer game
-        router.push(`/agario?${queryParams.toString()}`)
-        setIsServerBrowserOpen(false)
-        
-      }, remainingTime)
+      const gameUrl = `/agario?${gameParams.toString()}`
+      console.log('🚀 Navigating to Colyseus multiplayer game:', gameUrl)
+      
+      // Navigate to Colyseus multiplayer game
+      router.push(gameUrl)
       
     } catch (error) {
-      console.error('❌ FAILED: Hathora multiplayer initialization failed:', error)
-      
-      // Show error status
-      updateStatus('❌ Connection failed')
-      updateSubStatus('🔄 Please try again or select another server')
-      updateProgress(100)
-      updateTimer(`⚠️ Error: ${error.message.substring(0, 40)}...`)
-      
-      // Ensure minimum display time for errors
-      const elapsedTime = Date.now() - loadingStartTime
-      const remainingTime = Math.max(3000, minimumDisplayTime - elapsedTime)
-      
-      setTimeout(() => {
-        try {
-          if (document.body.contains(loadingModal)) {
-            document.body.removeChild(loadingModal)
-          }
-        } catch (e) {
-          console.log('Modal already removed')
-        }
-        
-        alert(`Failed to join Hathora multiplayer server: ${error.message}`)
-      }, remainingTime)
+      console.error('❌ Failed to start Colyseus game:', error)
+      alert(`Failed to join Colyseus game: ${error.message}`)
     }
   }
 
