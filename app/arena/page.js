@@ -784,53 +784,6 @@ const MultiplayerArena = () => {
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
-      {/* Loading Screen */}
-      {uiLoading && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: '#000000',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          fontFamily: '"Rajdhani", sans-serif'
-        }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            border: '4px solid #333',
-            borderTop: '4px solid #00ffff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginBottom: '20px'
-          }} />
-          <div style={{
-            color: '#00ffff',
-            fontSize: '24px',
-            fontWeight: '700',
-            textAlign: 'center',
-            marginBottom: '8px'
-          }}>
-            Loading Arena...
-          </div>
-          <div style={{
-            color: '#ffffff',
-            fontSize: '14px',
-            opacity: '0.7',
-            textAlign: 'center'
-          }}>
-            {connectionStatus === 'connecting' && 'Connecting to multiplayer server...'}
-            {connectionStatus === 'connected' && 'Initializing game world...'}
-            {connectionStatus === 'failed' && 'Connection failed. Retrying...'}
-          </div>
-        </div>
-      )}
-
       {/* Game Canvas - Full Screen */}
       <canvas
         ref={canvasRef}
@@ -844,15 +797,12 @@ const MultiplayerArena = () => {
           padding: 0,
           border: 'none',
           outline: 'none',
-          display: 'block',
-          opacity: canvasReady ? 1 : 0,
-          transition: 'opacity 0.5s ease'
+          display: 'block'
         }}
       />
 
-      {/* UI Elements - Only show when not loading */}
-      {!uiLoading && (
-        <div>
+      {/* UI Elements */}
+      <div>
           {/* Live Leaderboard - Mobile Optimized */}
           <div 
             style={{ 
