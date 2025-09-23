@@ -3603,7 +3603,7 @@ const AgarIOGame = () => {
       document.documentElement.style.padding = ''
       document.documentElement.style.background = ''
     }
-  }, [])
+  }, [isMultiplayer])
 
   // Cash out handling
   const cashOutIntervalRef = useRef(null)
