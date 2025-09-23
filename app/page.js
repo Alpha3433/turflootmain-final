@@ -9375,6 +9375,28 @@ export default function TurfLootTactical() {
             <button 
               style={{
                 ...secondaryButtonStyle,
+                background: 'rgba(246, 173, 85, 0.8)', // Orange color for CREATE ROOM
+                borderColor: '#f6ad55',
+                boxShadow: '0 0 15px rgba(246, 173, 85, 0.3)',
+                fontSize: '10px',
+                padding: '8px 12px'
+              }}
+              onClick={async () => {
+                console.log('CREATE ROOM button clicked!')
+                const authenticated = await requireAuthentication('CREATE ROOM')
+                if (authenticated) {
+                  console.log('🏗️ User authenticated, opening create room modal...')
+                  setIsCreateRoomOpen(true)
+                } else {
+                  console.log('❌ Authentication failed, blocking access to CREATE ROOM')
+                }
+              }}
+            >
+              🏗️ CREATE ROOM
+            </button>
+            <button 
+              style={{
+                ...secondaryButtonStyle,
                 background: (currentParty && currentParty.members && currentParty.members.length > 1) ? 'rgba(107, 114, 128, 0.3)' : 'rgba(59, 130, 246, 0.1)',
                 border: (currentParty && currentParty.members && currentParty.members.length > 1) ? '1px solid #6b7280' : '1px solid #3b82f6',
                 color: (currentParty && currentParty.members && currentParty.members.length > 1) ? '#9ca3af' : '#3b82f6',
