@@ -3025,33 +3025,34 @@ const AgarIOGame = () => {
           this.serverState.viruses.forEach(virus => this.drawVirus(virus))
         }
         
-        // Draw all server players (including current player)
+        // Draw all server players (other players first)
+        let currentPlayerFromServer = null
         if (this.serverState.players) {
-          console.log('🎮 MULTIPLAYER RENDER DEBUG - Total players to draw:', this.serverState.players.length)
-          let currentPlayerFound = false
-          this.serverState.players.forEach((player, index) => {
+          this.serverState.players.forEach((player) => {
             if (player && player.alive) {
               if (player.isCurrentPlayer) {
-                console.log('🎮 DRAWING CURRENT PLAYER:', {
-                  x: player.x?.toFixed(1),
-                  y: player.y?.toFixed(1),
-                  radius: player.radius,
-                  name: player.name,
-                  sessionId: player.sessionId
-                })
-                currentPlayerFound = true
+                // Store current player for special rendering
+                currentPlayerFromServer = player
+              } else {
+                // Draw other players normally
+                this.drawPlayer(player)
               }
-              this.drawPlayer(player)
             }
           })
-          if (!currentPlayerFound) {
-            console.log('❌ CURRENT PLAYER NOT FOUND in serverState.players!')
-            console.log('🎮 Available players:', this.serverState.players.map(p => ({ 
-              sessionId: p.sessionId, 
-              isCurrentPlayer: p.isCurrentPlayer, 
-              alive: p.alive 
-            })))
-          }
+        }
+        
+        // Always ensure current player is visible - draw from server state or fallback to local
+        if (currentPlayerFromServer) {
+          // Draw current player from server state with special highlighting
+          this.drawPlayer({
+            ...currentPlayerFromServer,
+            color: currentPlayerFromServer.color || this.player.color,
+            // Add visual distinction for current player
+            isCurrentPlayer: true
+          })
+        } else if (this.player.alive) {
+          // Fallback: draw local player if server doesn't have current player yet
+          this.drawPlayer(this.player)
         }
       } else {
         // Draw local coins
