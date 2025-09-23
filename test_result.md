@@ -126,7 +126,7 @@ user_problem_statement: "Fix camera stability issue in multiplayer arena where t
 
 test_plan:
   current_focus:
-    - "Multiplayer Synchronization Complete Fix Backend Support"
+    - "Camera Stability Fix for Multiplayer Arena"
   stuck_tasks:
     - "Frontend Build Issues - Missing Solana wallet adapters"
   test_all: false
