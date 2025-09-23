@@ -120,13 +120,13 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix camera stability issue in multiplayer arena where the camera is rapidly switching between different session IDs for the same player, causing jarring camera movements. The user reported rapid updates like 'Updating camera to follow: jaulo' with different session IDs (lGDgvPlWz and nWVr4OFlT)."
+user_problem_statement: "Test the backend systems after porting the complete UI/UX features from agario to arena: Successfully ported ALL UI/UX features from local agario mode to multiplayer arena including live leaderboard, stats panel, minimap, virtual joystick for mobile, multiplayer status indicator. Need to verify backend fully supports the enhanced arena UI with real-time updates."
 
 # Test plan for this run
 
 test_plan:
   current_focus:
-    - "Camera Stability Fix for Multiplayer Arena"
+    - "Enhanced Arena UI Backend Support Testing"
   stuck_tasks:
     - "Frontend Build Issues - Missing Solana wallet adapters"
   test_all: false
