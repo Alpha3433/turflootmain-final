@@ -760,94 +760,15 @@ class MultiplayerBackendTester:
             print("🚀 RECOMMENDATION: Backend is ready to support the multiplayer player rendering fix")
         else:
             print("🔧 RECOMMENDATION: Address failed tests before deploying multiplayer player rendering fix")
-            
-            headers = {"Authorization": f"Bearer {mock_privy_token}"}
-            response = requests.get(f"{self.base_url}/api/wallet/balance", headers=headers, timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                # Should handle Privy token gracefully even if verification fails
-                self.log_test("Privy Token Handling", "PASS", "Privy token processed without errors")
-            else:
-                self.log_test("Privy Token Handling", "FAIL", f"Privy token handling failed with status {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Privy Authentication Status", "FAIL", f"Privy auth test failed: {str(e)}")
 
-    def test_legacy_hathora_cleanup(self):
-        """Test 6: Legacy Hathora Cleanup Verification"""
-        print("\n🧹 TESTING: Legacy Hathora Cleanup Verification")
-        
-        try:
-            # Check if Hathora endpoints still exist (they should for backward compatibility)
-            hathora_endpoints = [
-                "/api/hathora/create-room"
-            ]
-            
-            hathora_still_active = []
-            
-            for endpoint in hathora_endpoints:
-                try:
-                    response = requests.post(
-                        f"{self.base_url}{endpoint}",
-                        json={"gameMode": "practice", "region": "us-east-1"},
-                        timeout=10
-                    )
-                    
-                    if response.status_code != 404:
-                        hathora_still_active.append(endpoint)
-                        
-                except:
-                    pass  # Endpoint doesn't exist or failed
-            
-            if hathora_still_active:
-                self.log_test("Hathora Endpoint Cleanup", "PASS", f"Hathora endpoints still available for compatibility: {hathora_still_active}", is_critical=False)
-            else:
-                self.log_test("Hathora Endpoint Cleanup", "PASS", "All Hathora endpoints properly cleaned up")
-            
-            # Check if Colyseus has replaced Hathora in server browser
-            response = requests.get(f"{self.base_url}/api/servers", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                servers = data.get("servers", [])
-                
-                colyseus_servers = [s for s in servers if s.get("serverType") == "colyseus"]
-                hathora_servers = [s for s in servers if s.get("serverType") == "hathora" or s.get("serverType") == "hathora-paid"]
-                
-                if colyseus_servers and not hathora_servers:
-                    self.log_test("Server Migration", "PASS", f"Successfully migrated to Colyseus: {len(colyseus_servers)} Colyseus servers, 0 Hathora servers")
-                elif colyseus_servers and hathora_servers:
-                    self.log_test("Server Migration", "PASS", f"Hybrid setup: {len(colyseus_servers)} Colyseus, {len(hathora_servers)} Hathora servers", is_critical=False)
-                else:
-                    self.log_test("Server Migration", "FAIL", f"Migration incomplete: {len(colyseus_servers)} Colyseus, {len(hathora_servers)} Hathora servers")
-            
-        except Exception as e:
-            self.log_test("Legacy Hathora Cleanup", "FAIL", f"Cleanup verification failed: {str(e)}")
+# Main execution
+def main():
+    """Main test execution"""
+    tester = MultiplayerBackendTester()
+    tester.run_all_tests()
 
-    def test_environment_variables(self):
-        """Test 7: Environment Variables Configuration"""
-        print("\n⚙️ TESTING: Environment Variables Configuration")
-        
-        try:
-            # Test Colyseus endpoint configuration through API
-            response = requests.get(f"{self.base_url}/api/servers", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                colyseus_endpoint = data.get("colyseusEndpoint")
-                
-                if colyseus_endpoint == COLYSEUS_ENDPOINT:
-                    self.log_test("Colyseus Endpoint Config", "PASS", f"Correct Colyseus endpoint: {colyseus_endpoint}")
-                else:
-                    self.log_test("Colyseus Endpoint Config", "FAIL", f"Expected {COLYSEUS_ENDPOINT}, got {colyseus_endpoint}")
-            
-            # Test MongoDB connection through database operations
-            response = requests.get(f"{self.base_url}/api/game-sessions", timeout=10)
-            
-            if response.status_code == 200:
-                self.log_test("MongoDB URL Config", "PASS", "MongoDB connection successful")
-            else:
+if __name__ == "__main__":
+    main()
                 self.log_test("MongoDB URL Config", "FAIL", f"MongoDB connection failed with status {response.status_code}")
                 
         except Exception as e:
