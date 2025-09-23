@@ -30,7 +30,11 @@ const MultiplayerArena = () => {
   const playerName = decodeURIComponent(searchParams.get('playerName') || 'Anonymous Player')
   const privyUserId = searchParams.get('privyUserId') || `anonymous_${Date.now()}`
   
-  console.log('🎮 Arena parameters:', { roomId, playerName, privyUserId })
+  console.log('🎮 Arena parameters:')
+  console.log('  - roomId:', roomId)  
+  console.log('  - playerName (decoded):', playerName)
+  console.log('  - privyUserId:', privyUserId)
+  console.log('  - raw playerName param:', searchParams.get('playerName'))
 
   // Colyseus connection and input handling  
   const connectToColyseus = async () => {
