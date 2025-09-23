@@ -49,20 +49,9 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
     }, null, 2))
   }, [config, appId])
 
-  // Simple hydration check - provide loading state instead of null
+  // Simple hydration check - no delays
   if (!isClient) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh', 
-        backgroundColor: '#1E1E1E',
-        color: '#white'
-      }}>
-        <div>Loading...</div>
-      </div>
-    )
+    return <div className="min-h-screen bg-[#1E1E1E]" /> // Empty container to prevent hydration mismatch
   }
 
   console.log('🚀 Initializing Privy with Solana-Only Configuration')
