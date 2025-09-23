@@ -2,8 +2,6 @@
 
 import { PrivyProvider } from '@privy-io/react-auth'
 import { Component, useState, useEffect } from 'react'
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
-import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare'
 
 // Error boundary for Privy-related errors
 class PrivyErrorBoundary extends Component {
