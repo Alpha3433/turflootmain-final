@@ -23,6 +23,16 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   const [refreshing, setRefreshing] = useState(false)
   const [totalStats, setTotalStats] = useState({ totalPlayers: 0, totalActiveServers: 0 })
   const [isLoading, setIsLoading] = useState(false)
+  const [serverStats, setServerStats] = useState({
+    totalPlayers: 0,
+    totalActiveServers: 0,
+    totalServers: 0,
+    practiceServers: 0,
+    cashServers: 0,
+    regions: [],
+    gameTypes: []
+  })
+  const [lastUpdated, setLastUpdated] = useState(new Date().toISOString())
   
   const fetchRealHathoraRooms = async () => {
     setRoomsLoading(true)
