@@ -2934,9 +2934,25 @@ const AgarIOGame = () => {
       const targetX = this.player.x - this.canvas.width / 2
       const targetY = this.player.y - this.canvas.height / 2
       
-      // Increased from 0.1 to 0.2 for snappier camera
-      this.camera.x += (targetX - this.camera.x) * 0.2
-      this.camera.y += (targetY - this.camera.y) * 0.2
+      // Adjust camera smoothing based on multiplayer mode to prevent flickering
+      let smoothing = 0.2
+      if (window.isMultiplayer && this.serverState) {
+        // Use gentler smoothing in multiplayer to prevent flickering from server updates
+        smoothing = 0.15
+        
+        // Add stability check - don't update camera if player position change is too drastic
+        const distanceChange = Math.sqrt(
+          Math.pow(targetX - this.camera.x, 2) + Math.pow(targetY - this.camera.y, 2)
+        )
+        
+        // If position change is too large (teleport-like), reduce smoothing even more
+        if (distanceChange > 200) {
+          smoothing = 0.08 // Very gentle for large position changes
+        }
+      }
+      
+      this.camera.x += (targetX - this.camera.x) * smoothing
+      this.camera.y += (targetY - this.camera.y) * smoothing
       
       // Keep camera within world bounds
       const boundaryExtension = 100
