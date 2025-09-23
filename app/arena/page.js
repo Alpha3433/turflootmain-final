@@ -25,9 +25,9 @@ const MultiplayerArena = () => {
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   
-  // Parse URL parameters
+  // Parse URL parameters with proper decoding
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
-  const playerName = searchParams.get('playerName') || 'Anonymous Player'
+  const playerName = decodeURIComponent(searchParams.get('playerName') || 'Anonymous Player')
   const privyUserId = searchParams.get('privyUserId') || `anonymous_${Date.now()}`
   
   console.log('🎮 Arena parameters:', { roomId, playerName, privyUserId })
