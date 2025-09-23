@@ -688,65 +688,78 @@ class MultiplayerBackendTester:
                 
         except Exception as e:
             self.log_test("Legacy Cleanup", "FAIL", f"Exception: {str(e)}")
-                        self.log_test("Guest Wallet Balance", "FAIL", f"Unexpected guest balance: {data}")
-            else:
-                self.log_test("Wallet API", "FAIL", f"Wallet API returned status {response.status_code}")
-            
-            # Test with testing token
-            import base64
-            test_payload = {
-                "userId": "test-user-123",
-                "wallet_address": "F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG"
-            }
-            test_token = "testing-" + base64.b64encode(json.dumps(test_payload).encode()).decode()
-            
-            headers = {"Authorization": f"Bearer {test_token}"}
-            response = requests.get(f"{self.base_url}/api/wallet/balance", headers=headers, timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("balance", 0) > 0 and data.get("sol_balance", 0) > 0:
-                    self.log_test("Authenticated Wallet Balance", "PASS", f"Testing balance: ${data.get('balance')}, {data.get('sol_balance')} SOL")
-                else:
-                    self.log_test("Authenticated Wallet Balance", "FAIL", f"Invalid testing balance: {data}")
-            else:
-                self.log_test("Authenticated Wallet Balance", "FAIL", f"Auth wallet API returned status {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Wallet Authentication API", "FAIL", f"Wallet API test failed: {str(e)}")
 
-    def test_privy_authentication_status(self):
-        """Test 5: Privy Authentication Status Check"""
-        print("\n🔐 TESTING: Privy Authentication Status")
+    def run_all_tests(self):
+        """Run all backend tests for multiplayer player rendering fix"""
+        print("🚀 Starting comprehensive backend testing for multiplayer player rendering fix...")
+        print()
         
-        try:
-            # Test if Privy configuration is accessible through API
-            response = requests.get(f"{self.base_url}/api", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                features = data.get("features", [])
-                if "auth" in features:
-                    self.log_test("Privy Auth Feature", "PASS", "Authentication feature enabled in API")
-                else:
-                    self.log_test("Privy Auth Feature", "FAIL", "Authentication feature not listed in API features")
-            
-            # Test Privy token handling in wallet API
-            # Create a mock Privy-style JWT token
-            import base64
-            privy_payload = {
-                "sub": "did:privy:test-user-123",
-                "email": "test@example.com",
-                "wallet": {
-                    "address": "F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG"
-                }
-            }
-            
-            # Create a simple JWT-like token (header.payload.signature)
-            header = base64.b64encode(json.dumps({"typ": "JWT", "alg": "HS256"}).encode()).decode().rstrip('=')
-            payload = base64.b64encode(json.dumps(privy_payload).encode()).decode().rstrip('=')
-            signature = "test-signature"
-            mock_privy_token = f"{header}.{payload}.{signature}"
+        start_time = time.time()
+        
+        # Run all test categories
+        self.test_colyseus_room_state_management()
+        self.test_player_data_propagation()
+        self.test_mapschema_handling()
+        self.test_multiplayer_session_management()
+        self.test_backend_api_integration()
+        self.test_player_authentication()
+        
+        end_time = time.time()
+        total_time = end_time - start_time
+        
+        # Print comprehensive summary
+        self.print_final_summary(total_time)
+
+    def print_final_summary(self, total_time):
+        """Print comprehensive test summary"""
+        print("\n" + "=" * 70)
+        print("🎯 MULTIPLAYER PLAYER RENDERING FIX - BACKEND TEST SUMMARY")
+        print("=" * 70)
+        
+        success_rate = (self.results["passed_tests"] / self.results["total_tests"] * 100) if self.results["total_tests"] > 0 else 0
+        
+        print(f"📊 OVERALL RESULTS:")
+        print(f"   Total Tests: {self.results['total_tests']}")
+        print(f"   Passed: {self.results['passed_tests']}")
+        print(f"   Failed: {self.results['failed_tests']}")
+        print(f"   Success Rate: {success_rate:.1f}%")
+        print(f"   Total Time: {total_time:.2f} seconds")
+        print()
+        
+        if self.results["failed_tests"] > 0:
+            print("❌ FAILED TESTS:")
+            for issue in self.results["critical_issues"]:
+                print(f"   • {issue}")
+            print()
+        
+        print("✅ PASSED TESTS:")
+        for result in self.results["test_results"]:
+            if result["status"] == "PASS":
+                print(f"   • {result['test']}: {result['details']}")
+        print()
+        
+        # Overall assessment
+        if success_rate >= 90:
+            print("🎉 EXCELLENT: Backend systems fully support multiplayer player rendering fix")
+        elif success_rate >= 75:
+            print("✅ GOOD: Backend systems mostly support multiplayer player rendering fix")
+        elif success_rate >= 50:
+            print("⚠️ PARTIAL: Backend systems partially support multiplayer player rendering fix")
+        else:
+            print("❌ CRITICAL: Backend systems have significant issues supporting multiplayer player rendering fix")
+        
+        print()
+        print("🔍 KEY FINDINGS:")
+        print("   • Multiplayer player rendering fix requires proper backend MapSchema support")
+        print("   • Player data propagation must work correctly for players to see each other")
+        print("   • Session management is critical for multiplayer room state")
+        print("   • Authentication integration ensures proper player identification")
+        print()
+        
+        if success_rate >= 90:
+            print("🚀 RECOMMENDATION: Backend is ready to support the multiplayer player rendering fix")
+        else:
+            print("🔧 RECOMMENDATION: Address failed tests before deploying multiplayer player rendering fix")
             
             headers = {"Authorization": f"Bearer {mock_privy_token}"}
             response = requests.get(f"{self.base_url}/api/wallet/balance", headers=headers, timeout=10)
