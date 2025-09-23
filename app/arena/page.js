@@ -198,36 +198,35 @@ const MultiplayerArena = () => {
     updateFromServer(state) {
       this.serverState = state
       
-      // Find current player with fallback logic
+      // Find ONLY the current player based on session ID - NO FALLBACK
       let currentPlayer = state.players.find(p => p.isCurrentPlayer)
       
-      // Fallback: if no current player found, use the first player (for single player debugging)
-      if (!currentPlayer && state.players.length > 0) {
-        console.log('⚠️ No current player found, using first player as fallback')
-        currentPlayer = state.players[0]
-      }
-      
       if (currentPlayer) {
-        console.log('🎮 Updating camera to follow:', currentPlayer.name, 'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
-        // Smooth position updates to prevent camera jumping
-        if (this.player.x && this.player.y) {
-          const distance = Math.sqrt(
-            Math.pow(currentPlayer.x - this.player.x, 2) + 
-            Math.pow(currentPlayer.y - this.player.y, 2)
-          )
+        // Verify this is actually our session to prevent camera jumping
+        if (currentPlayer.sessionId === this.expectedSessionId) {
+          console.log('🎮 Camera following authenticated player:', currentPlayer.name, 
+                     'session:', currentPlayer.sessionId, 
+                     'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
           
-          // If the distance is large, apply directly (avoid desync)
-          // If small, smooth interpolate to prevent jitter
-          if (distance > 100) {
-            this.player.x = currentPlayer.x
-            this.player.y = currentPlayer.y
+          // Smooth position updates to prevent camera jumping
+          if (this.player.x && this.player.y) {
+            const distance = Math.sqrt(
+              Math.pow(currentPlayer.x - this.player.x, 2) + 
+              Math.pow(currentPlayer.y - this.player.y, 2)
+            )
+            
+            // If the distance is large, apply directly (avoid desync)
+            // If small, smooth interpolate to prevent jitter
+            if (distance > 100) {
+              this.player.x = currentPlayer.x
+              this.player.y = currentPlayer.y
+            } else {
+              const lerpFactor = 0.3
+              this.player.x += (currentPlayer.x - this.player.x) * lerpFactor
+              this.player.y += (currentPlayer.y - this.player.y) * lerpFactor
+            }
           } else {
-            const lerpFactor = 0.3
-            this.player.x += (currentPlayer.x - this.player.x) * lerpFactor
-            this.player.y += (currentPlayer.y - this.player.y) * lerpFactor
-          }
-        } else {
-          // First update - apply directly
+            // First update - apply directly
           this.player.x = currentPlayer.x
           this.player.y = currentPlayer.y
         }
