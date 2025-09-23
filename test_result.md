@@ -120,11 +120,8 @@ user_problem_statement: "Fix multiplayer synchronization issue where players are
 
 test_plan:
   current_focus:
-    - "Phase 1 Assessment - Colyseus Build Verification"
-    - "Phase 1 Assessment - Frontend Dependency Resolution" 
-    - "Backend API Integration Testing"
-    - "Colyseus Server Deployment Readiness"
-    - "Privy Authentication Status Check"
+    - "Multiplayer Player Rendering Fix"
+    - "Colyseus MapSchema Frontend Integration"
   stuck_tasks:
     - "Frontend Build Issues - Missing Solana wallet adapters"
   test_all: false
