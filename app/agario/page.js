@@ -1270,7 +1270,7 @@ const AgarIOGame = () => {
       
       // Update current player from server state if in multiplayer
       const currentPlayer = this.serverState.players.find(p => p.isCurrentPlayer)
-      if (currentPlayer && window.isMultiplayer) {
+      if (currentPlayer && isMultiplayer) {
         // Apply server-authoritative position directly (maintain server authority)
         this.player.x = currentPlayer.x
         this.player.y = currentPlayer.y
