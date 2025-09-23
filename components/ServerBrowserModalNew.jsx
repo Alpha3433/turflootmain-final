@@ -261,11 +261,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     if (showRefresh) setRefreshing(true)
     setErrorMessage('') // Clear previous errors
     
-    // Use base URL for external access, fallback to relative path for local
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ''
-    const apiUrl = `${baseUrl}/api/servers`
+    // Determine the correct API URL based on current host
+    const isExternal = window.location.hostname !== 'localhost'
+    const apiUrl = isExternal ? `${window.location.origin}/api/servers` : '/api/servers'
     
     console.log('🌐 Fetching servers from:', apiUrl)
+    console.log('🌐 Current hostname:', window.location.hostname, 'isExternal:', isExternal)
+    
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
