@@ -1850,11 +1850,23 @@ export default function TurfLootTactical() {
       })
       
       // Get Privy user info for proper identification in game
+      let playerDisplayName = 'Anonymous Player'
+      
+      // Use custom username first, then try to extract from email, then fallback
+      if (customUsername) {
+        playerDisplayName = customUsername
+      } else if (user?.email && typeof user.email === 'string') {
+        try {
+          playerDisplayName = user.email.split('@')[0]
+        } catch (error) {
+          console.warn('Failed to extract username from email:', error)
+          playerDisplayName = 'Privy User'
+        }
+      }
+      
       const privyUserData = {
         privyUserId: user?.id || 'anonymous-' + Date.now(),
-        playerName: customUsername || 
-                   (user?.email && typeof user.email === 'string' ? user.email.split('@')[0] : null) ||
-                   'Anonymous Player',
+        playerName: playerDisplayName,
         walletAddress: user?.wallet?.address || null
       }
       
