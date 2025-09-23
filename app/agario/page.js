@@ -2627,11 +2627,105 @@ const AgarIOGame = () => {
           if (distance < enemy.radius + coin.radius) {
             enemy.mass += coin.value * 0.5
             enemy.radius = Math.sqrt(enemy.mass) * 3
+            enemy.speed = Math.max(0.2, 35 / Math.sqrt(enemy.mass)) // Update speed
             this.coins.splice(i, 1)
             break
           }
         }
       })
+      
+      // Enhanced AI: Enemies vs Enemies collision (bots eating each other)
+      for (let i = 0; i < this.enemies.length; i++) {
+        const enemy1 = this.enemies[i]
+        if (enemy1.spawnProtection) continue // Skip if has spawn protection
+        
+        for (let j = i + 1; j < this.enemies.length; j++) {
+          const enemy2 = this.enemies[j]
+          if (enemy2.spawnProtection) continue // Skip if has spawn protection
+          
+          const dx = enemy1.x - enemy2.x
+          const dy = enemy1.y - enemy2.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance < enemy1.radius + enemy2.radius - 3) {
+            // Determine who eats who based on mass (with threshold)
+            const massThreshold = 1.3 // Need to be 30% larger to eat
+            
+            if (enemy1.mass > enemy2.mass * massThreshold) {
+              // Enemy1 eats Enemy2
+              console.log(`🤖 ${enemy1.name} ate ${enemy2.name}! (${Math.floor(enemy1.mass)} > ${Math.floor(enemy2.mass)})`)
+              enemy1.mass += enemy2.mass * 0.7 // Gain 70% of eaten enemy's mass
+              enemy1.radius = Math.sqrt(enemy1.mass) * 3
+              enemy1.speed = Math.max(0.2, 35 / Math.sqrt(enemy1.mass))
+              
+              // Respawn the eaten enemy with new properties
+              const respawnMass = 15 + Math.random() * 30
+              enemy2.mass = respawnMass
+              enemy2.radius = Math.sqrt(respawnMass) * 3
+              enemy2.speed = Math.max(0.2, 35 / Math.sqrt(respawnMass))
+              
+              // Respawn at random location within playable area
+              const centerX = this.world.width / 2
+              const centerY = this.world.height / 2
+              const playableRadius = this.currentPlayableRadius
+              let x, y, spawnDistance
+              
+              do {
+                x = Math.random() * this.world.width
+                y = Math.random() * this.world.height
+                spawnDistance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+              } while (spawnDistance > playableRadius - 100) // Larger buffer for respawn
+              
+              enemy2.x = x
+              enemy2.y = y
+              enemy2.spawnProtection = true
+              enemy2.spawnProtectionStart = Date.now()
+              enemy2.behavior = 'exploring' // Reset behavior
+              
+            } else if (enemy2.mass > enemy1.mass * massThreshold) {
+              // Enemy2 eats Enemy1
+              console.log(`🤖 ${enemy2.name} ate ${enemy1.name}! (${Math.floor(enemy2.mass)} > ${Math.floor(enemy1.mass)})`)
+              enemy2.mass += enemy1.mass * 0.7 // Gain 70% of eaten enemy's mass
+              enemy2.radius = Math.sqrt(enemy2.mass) * 3
+              enemy2.speed = Math.max(0.2, 35 / Math.sqrt(enemy2.mass))
+              
+              // Respawn the eaten enemy with new properties
+              const respawnMass = 15 + Math.random() * 30
+              enemy1.mass = respawnMass
+              enemy1.radius = Math.sqrt(respawnMass) * 3
+              enemy1.speed = Math.max(0.2, 35 / Math.sqrt(respawnMass))
+              
+              // Respawn at random location within playable area
+              const centerX = this.world.width / 2
+              const centerY = this.world.height / 2
+              const playableRadius = this.currentPlayableRadius
+              let x, y, spawnDistance
+              
+              do {
+                x = Math.random() * this.world.width
+                y = Math.random() * this.world.height
+                spawnDistance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+              } while (spawnDistance > playableRadius - 100) // Larger buffer for respawn
+              
+              enemy1.x = x
+              enemy1.y = y
+              enemy1.spawnProtection = true
+              enemy1.spawnProtectionStart = Date.now()
+              enemy1.behavior = 'exploring' // Reset behavior
+            }
+            // If masses are too similar, they just bounce off each other (no collision)
+            else {
+              // Apply slight repulsion to prevent sticking together
+              const repulsionForce = 2
+              const repulsionAngle = Math.atan2(dy, dx)
+              enemy1.x += Math.cos(repulsionAngle) * repulsionForce
+              enemy1.y += Math.sin(repulsionAngle) * repulsionForce
+              enemy2.x -= Math.cos(repulsionAngle) * repulsionForce
+              enemy2.y -= Math.sin(repulsionAngle) * repulsionForce
+            }
+          }
+        }
+      }
       
       // Player pieces collision detection
       this.checkPlayerPiecesCollisions()
