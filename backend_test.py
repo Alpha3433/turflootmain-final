@@ -772,7 +772,7 @@ class MultiplayerSyncBackendTester:
 # Main execution
 def main():
     """Main test execution"""
-    tester = MultiplayerBackendTester()
+    tester = MultiplayerSyncBackendTester()
     tester.run_all_tests()
 
 if __name__ == "__main__":
