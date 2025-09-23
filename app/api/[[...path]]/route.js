@@ -35,6 +35,11 @@ export async function GET(request, { params }) {
       )
     }
 
+    // Servers API endpoint - get active rooms
+    if (route === 'servers' || route === 'servers-proxy') {
+      return await handleGetServers(request)
+    }
+
     // Default route for unknown paths
     return NextResponse.json({ error: 'Not found' }, { status: 404, headers: corsHeaders })
     
