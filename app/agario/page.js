@@ -2236,21 +2236,117 @@ const AgarIOGame = () => {
       const centerY = this.world.height / 2
       const playableRadius = this.currentPlayableRadius
       
-      // Update target selection to stay within playable area
-      if (now - enemy.lastTargetChange > 3000 + Math.random() * 2000) {
+      // Enhanced AI behavior - different strategies based on enemy size and situation
+      const enemyRadius = enemy.radius
+      const playerRadius = this.player.radius
+      const distanceToPlayer = Math.sqrt(
+        Math.pow(enemy.x - this.player.x, 2) + 
+        Math.pow(enemy.y - this.player.y, 2)
+      )
+      
+      let targetX = enemy.targetX
+      let targetY = enemy.targetY
+      let shouldUpdateTarget = now - enemy.lastTargetChange > 3000 + Math.random() * 2000
+      
+      // AI Strategy 1: Avoid larger enemies (including player if larger)
+      const avoidanceRadius = enemyRadius * 8 // Avoid within 8x radius
+      if (playerRadius > enemyRadius * 1.2 && distanceToPlayer < avoidanceRadius) {
+        // Player is significantly larger - flee!
+        const fleeAngle = Math.atan2(enemy.y - this.player.y, enemy.x - this.player.x)
+        const fleeDistance = enemyRadius * 10
+        targetX = enemy.x + Math.cos(fleeAngle) * fleeDistance
+        targetY = enemy.y + Math.sin(fleeAngle) * fleeDistance
+        shouldUpdateTarget = true
+        enemy.behavior = 'fleeing'
+        enemy.speed = Math.max(0.4, 45 / Math.sqrt(enemy.mass)) // Faster when fleeing
+      }
+      // AI Strategy 2: Hunt smaller enemies (including player if smaller)
+      else if (enemyRadius > playerRadius * 1.3 && distanceToPlayer < enemyRadius * 6) {
+        // Enemy is larger - hunt the player!
+        targetX = this.player.x
+        targetY = this.player.y
+        shouldUpdateTarget = true
+        enemy.behavior = 'hunting_player'
+        enemy.speed = Math.max(0.3, 40 / Math.sqrt(enemy.mass)) // Aggressive hunting speed
+      }
+      // AI Strategy 3: Hunt other smaller enemies
+      else {
+        let smallerEnemy = null
+        let closestDistance = Infinity
+        
+        this.enemies.forEach(otherEnemy => {
+          if (otherEnemy !== enemy && otherEnemy.radius < enemyRadius * 0.8) {
+            const dist = Math.sqrt(
+              Math.pow(enemy.x - otherEnemy.x, 2) + 
+              Math.pow(enemy.y - otherEnemy.y, 2)
+            )
+            if (dist < closestDistance && dist < enemyRadius * 8) {
+              closestDistance = dist
+              smallerEnemy = otherEnemy
+            }
+          }
+        })
+        
+        if (smallerEnemy) {
+          targetX = smallerEnemy.x
+          targetY = smallerEnemy.y
+          shouldUpdateTarget = true
+          enemy.behavior = 'hunting_enemy'
+          enemy.speed = Math.max(0.3, 40 / Math.sqrt(enemy.mass))
+        }
+        // AI Strategy 4: Coin hunting behavior
+        else {
+          // Look for nearby coins to hunt
+          let nearestCoin = null
+          let nearestCoinDistance = Infinity
+          const coinSearchRadius = enemyRadius * 12
+          
+          this.coins.forEach(coin => {
+            const dist = Math.sqrt(
+              Math.pow(enemy.x - coin.x, 2) + 
+              Math.pow(enemy.y - coin.y, 2)
+            )
+            if (dist < nearestCoinDistance && dist < coinSearchRadius) {
+              nearestCoinDistance = dist
+              nearestCoin = coin
+            }
+          })
+          
+          if (nearestCoin) {
+            targetX = nearestCoin.x
+            targetY = nearestCoin.y
+            shouldUpdateTarget = true
+            enemy.behavior = 'hunting_coins'
+            enemy.speed = Math.max(0.25, 38 / Math.sqrt(enemy.mass))
+          }
+          // AI Strategy 5: Random exploration (fallback)
+          else if (shouldUpdateTarget) {
+            enemy.behavior = 'exploring'
+            enemy.speed = Math.max(0.2, 35 / Math.sqrt(enemy.mass))
+          }
+        }
+      }
+      
+      // Update target if needed (random exploration or no specific target)
+      if (shouldUpdateTarget && !['fleeing', 'hunting_player', 'hunting_enemy', 'hunting_coins'].includes(enemy.behavior)) {
         // Generate new target within the circular playable area
-        let targetX, targetY, distance
+        let newTargetX, newTargetY, distance
         do {
-          targetX = Math.random() * this.world.width
-          targetY = Math.random() * this.world.height
-          distance = Math.sqrt(Math.pow(targetX - centerX, 2) + Math.pow(targetY - centerY, 2))
+          newTargetX = Math.random() * this.world.width
+          newTargetY = Math.random() * this.world.height
+          distance = Math.sqrt(Math.pow(newTargetX - centerX, 2) + Math.pow(newTargetY - centerY, 2))
         } while (distance > playableRadius - enemy.radius - 50) // 50px buffer from edge
         
-        enemy.targetX = targetX
-        enemy.targetY = targetY
+        targetX = newTargetX
+        targetY = newTargetY
         enemy.lastTargetChange = now
       }
       
+      // Update enemy target
+      enemy.targetX = targetX
+      enemy.targetY = targetY
+      
+      // Movement logic with enhanced pathfinding
       const dx = enemy.targetX - enemy.x
       const dy = enemy.targetY - enemy.y
       const distance = Math.sqrt(dx * dx + dy * dy)
@@ -2259,15 +2355,21 @@ const AgarIOGame = () => {
         const moveX = (dx / distance) * enemy.speed * 60 * deltaTime
         const moveY = (dy / distance) * enemy.speed * 60 * deltaTime
         
-        // Add movement smoothing to enemies for more fluid motion
-        const smoothingFactor = 0.7 // Slightly less smoothing than player for more varied movement
+        // Add movement smoothing with behavior-based adjustments
+        let smoothingFactor = 0.7
+        if (enemy.behavior === 'fleeing') {
+          smoothingFactor = 0.9 // More direct movement when fleeing
+        } else if (enemy.behavior === 'hunting_player' || enemy.behavior === 'hunting_enemy') {
+          smoothingFactor = 0.8 // More direct when hunting
+        }
+        
         const smoothMoveX = moveX * smoothingFactor
         const smoothMoveY = moveY * smoothingFactor
         
         enemy.x += smoothMoveX
         enemy.y += smoothMoveY
         
-        // Constrain enemies to circular playable boundary (same as player)
+        // Constrain enemies to circular playable boundary
         const distanceFromCenter = Math.sqrt(
           Math.pow(enemy.x - centerX, 2) + 
           Math.pow(enemy.y - centerY, 2)
@@ -2286,6 +2388,22 @@ const AgarIOGame = () => {
           enemy.targetX = centerX + Math.cos(angleToCenter + (Math.random() - 0.5) * Math.PI) * targetDistance
           enemy.targetY = centerY + Math.sin(angleToCenter + (Math.random() - 0.5) * Math.PI) * targetDistance
           enemy.lastTargetChange = now // Reset target timer
+          enemy.behavior = 'exploring' // Reset behavior after boundary hit
+        }
+      }
+      
+      // AI coins collection - bots can eat coins too
+      for (let i = this.coins.length - 1; i >= 0; i--) {
+        const coin = this.coins[i]
+        const coinDx = enemy.x - coin.x
+        const coinDy = enemy.y - coin.y
+        const coinDistance = Math.sqrt(coinDx * coinDx + coinDy * coinDy)
+        
+        if (coinDistance < enemy.radius + coin.radius) {
+          enemy.mass += coin.value
+          enemy.radius = Math.sqrt(enemy.mass) * 3
+          enemy.speed = Math.max(0.2, 35 / Math.sqrt(enemy.mass)) // Update speed based on new mass
+          this.coins.splice(i, 1)
         }
       }
     }
