@@ -410,17 +410,20 @@ class CameraStabilityBackendTester:
             # Test multiple session creation for same player to verify cleanup
             base_session_data = {
                 "action": "join",
-                "roomId": "colyseus-arena-global",
-                "playerId": "cleanup_test_player",
-                "playerName": "CleanupTestPlayer",
-                "status": "active"
+                "session": {
+                    "roomId": "colyseus-arena-global",
+                    "joinedAt": datetime.now().isoformat(),
+                    "lastActivity": datetime.now().isoformat(),
+                    "userId": "cleanup_test_player",
+                    "entryFee": 0,
+                    "mode": "colyseus-multiplayer",
+                    "region": "Australia",
+                    "status": "active"
+                }
             }
             
             # Create first session
-            session1_data = base_session_data.copy()
-            session1_data['sessionId'] = f"session_1_{int(time.time())}"
-            
-            response1 = self.session.post(f"{self.api_base}/game-sessions", json=session1_data, timeout=10)
+            response1 = self.session.post(f"{self.api_base}/game-sessions", json=base_session_data, timeout=10)
             
             if response1.status_code == 200:
                 result1 = response1.json()
@@ -428,7 +431,7 @@ class CameraStabilityBackendTester:
                 # Create second session for same player (should trigger cleanup of first)
                 time.sleep(1)  # Small delay to ensure different timestamps
                 session2_data = base_session_data.copy()
-                session2_data['sessionId'] = f"session_2_{int(time.time())}"
+                session2_data['session']['lastActivity'] = datetime.now().isoformat()
                 
                 response2 = self.session.post(f"{self.api_base}/game-sessions", json=session2_data, timeout=10)
                 
@@ -439,9 +442,8 @@ class CameraStabilityBackendTester:
                         "Multiple Session Prevention",
                         True,
                         {
-                            "firstSessionId": session1_data['sessionId'],
-                            "secondSessionId": session2_data['sessionId'],
-                            "playerId": base_session_data['playerId'],
+                            "userId": base_session_data['session']['userId'],
+                            "roomId": base_session_data['session']['roomId'],
                             "cleanupWorking": True,
                             "bothSessionsTracked": result1.get('success') and result2.get('success')
                         },
@@ -449,25 +451,19 @@ class CameraStabilityBackendTester:
                     )
                     
                     # Test explicit cleanup by leaving sessions
-                    leave_data1 = session1_data.copy()
-                    leave_data1['action'] = 'leave'
-                    leave_data1['status'] = 'ended'
+                    leave_data = {
+                        "action": "leave",
+                        "roomId": "colyseus-arena-global"
+                    }
                     
-                    leave_response1 = self.session.post(f"{self.api_base}/game-sessions", json=leave_data1, timeout=10)
+                    leave_response = self.session.post(f"{self.api_base}/game-sessions", json=leave_data, timeout=10)
                     
-                    leave_data2 = session2_data.copy()
-                    leave_data2['action'] = 'leave'
-                    leave_data2['status'] = 'ended'
-                    
-                    leave_response2 = self.session.post(f"{self.api_base}/game-sessions", json=leave_data2, timeout=10)
-                    
-                    if leave_response1.status_code == 200 and leave_response2.status_code == 200:
+                    if leave_response.status_code == 200:
                         self.log_test(
                             "Explicit Session Cleanup",
                             True,
                             {
-                                "session1Cleaned": leave_response1.json().get('success', True),
-                                "session2Cleaned": leave_response2.json().get('success', True),
+                                "sessionCleaned": leave_response.json().get('success', True),
                                 "cleanupComplete": True
                             },
                             "Connection Cleanup"
@@ -476,7 +472,7 @@ class CameraStabilityBackendTester:
                         self.log_test(
                             "Explicit Session Cleanup",
                             False,
-                            f"Cleanup failed - Response1: {leave_response1.status_code}, Response2: {leave_response2.status_code}",
+                            f"Cleanup failed - Response: {leave_response.status_code}",
                             "Connection Cleanup"
                         )
                         
