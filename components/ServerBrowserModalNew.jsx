@@ -656,246 +656,298 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           borderRadius: '8px',
           backgroundColor: '#2d3748'
         }}>
-          {roomsLoading ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
-              🔍 Discovering Hathora rooms...
-            </div>
-          ) : error ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#ef4444' }}>
-              <div style={{ fontSize: '24px', marginBottom: '16px' }}>⚠️</div>
-              <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Failed to Discover Rooms</div>
-              <div style={{ fontSize: '12px', color: '#9ca3af' }}>{error}</div>
-              <button
-                onClick={() => fetchServers(true)}
-                style={{
-                  marginTop: '16px',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  fontSize: '12px'
-                }}
-              >
-                🔄 Retry
-              </button>
-            </div>
-          ) : servers.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
-              🎮 No Colyseus servers available
-            </div>
-          ) : (
-            <>
-              {/* NEW: Active Rooms First */}
-              {activeRooms.length > 0 && (
-                <div>
-                  <div style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#374151',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    color: '#10b981',
-                    borderBottom: '1px solid #4a5568'
-                  }}>
-                    🟢 ACTIVE COLYSEUS SERVERS ({activeRooms.length})
+          {(() => {
+            // Filter and categorize servers
+            const filteredServers = servers.filter(server => {
+              if (selectedStakeFilter === 'All') return true
+              if (selectedStakeFilter === 'Micro Stakes') return server.entryFee >= 0.01 && server.entryFee <= 0.02
+              if (selectedStakeFilter === 'Low Stakes') return server.entryFee >= 0.05 && server.entryFee <= 0.10
+              if (selectedStakeFilter === 'High Stakes') return server.entryFee >= 0.25
+              return true
+            })
+
+            // Separate active rooms (with players) from empty rooms
+            const activeRooms = filteredServers.filter(server => 
+              server.currentPlayers > 0 && server.currentPlayers < server.maxPlayers
+            )
+            const emptyRooms = filteredServers.filter(server => 
+              server.currentPlayers === 0
+            )
+
+            // Calculate dynamic stats for display
+            const dynamicStats = {
+              totalPlayers: filteredServers.reduce((sum, server) => sum + (server.currentPlayers || 0), 0),
+              totalActiveRooms: activeRooms.length,
+              instantJoinAvailable: activeRooms.length
+            }
+
+            // Update stats display
+            if (servers.length > 0) {
+              setServerStats({
+                totalPlayers: dynamicStats.totalPlayers,
+                totalActiveServers: dynamicStats.totalActiveRooms,
+                totalServers: filteredServers.length,
+                practiceServers: 0,
+                cashServers: filteredServers.filter(s => s.entryFee > 0).length,
+                regions: [...new Set(filteredServers.map(s => s.region))],
+                gameTypes: [...new Set(filteredServers.map(s => s.gameType))]
+              })
+            }
+
+            return (
+              <>
+                {roomsLoading ? (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
+                    🔍 Discovering servers...
                   </div>
-                  {activeRooms.map(room => (
-                    <div
-                      key={room.id}
+                ) : errorMessage ? (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#ef4444' }}>
+                    <div style={{ fontSize: '24px', marginBottom: '16px' }}>⚠️</div>
+                    <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>Failed to Load Servers</div>
+                    <div style={{ fontSize: '12px', color: '#9ca3af' }}>{errorMessage}</div>
+                    <button
+                      onClick={() => fetchServers(true)}
                       style={{
-                        padding: '10px 16px',
-                        borderBottom: '1px solid #374151',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        backgroundColor: room.currentPlayers >= room.maxPlayers ? '#4a1e1e' : 'transparent',
-                        border: 'none' // Remove any practice server highlighting
+                        marginTop: '16px',
+                        backgroundColor: '#10b981',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '8px 16px',
+                        cursor: 'pointer',
+                        fontSize: '12px'
                       }}
                     >
-                      <div style={{ flex: 1 }}>
-                        {/* NEW: Condensed One-Line Format */}
-                        <div style={{ 
-                          fontSize: '14px',
-                          color: room.currentPlayers >= room.maxPlayers ? '#9ca3af' : 'white',
-                          fontWeight: '500'
+                      🔄 Retry
+                    </button>
+                  </div>
+                ) : servers.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
+                    🎮 No servers available
+                  </div>
+                ) : (
+                  <>
+                    {/* ACTIVE JOINABLE ROOMS */}
+                    {activeRooms.length > 0 && (
+                      <div>
+                        <div style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#374151',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#10b981',
+                          borderBottom: '1px solid #4a5568'
                         }}>
-                          {room.entryFee > 0 
-                            ? `$${room.entryFee.toFixed(2)} Cash Game — ${room.regionFlag} ${room.region} | ${room.currentPlayers}/${room.maxPlayers} Players`
-                            : `Practice — ${room.regionFlag} ${room.region} | ${room.currentPlayers}/${room.maxPlayers} Players`
-                          }
+                          🟢 ACTIVE ROOMS - READY TO JOIN ({activeRooms.length})
                         </div>
-                        <div style={{ 
-                          fontSize: '11px', 
-                          color: '#9ca3af',
-                          marginTop: '2px'
-                        }}>
-                          <span style={{ color: getPingColor(room.ping) }}>
-                            {room.ping !== null ? `${room.ping}ms` : (pingingRegions ? '...' : 'N/A')}
-                          </span>
-                          {room.ping !== null && (
-                            <span style={{ color: getPingColor(room.ping), marginLeft: '4px' }}>
-                              ({getPingStatus(room.ping)})
-                            </span>
-                          )}
-                          <span style={{ color: '#9ca3af' }}> ping</span>
-                        </div>
+                        {activeRooms.map(room => (
+                          <div
+                            key={room.id}
+                            style={{
+                              padding: '12px 16px',
+                              borderBottom: '1px solid #374151',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                              borderLeft: '3px solid #10b981'
+                            }}
+                          >
+                            <div style={{ flex: 1 }}>
+                              <div style={{ 
+                                fontSize: '14px',
+                                color: 'white',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}>
+                                <span>🎮</span>
+                                <span>{room.name || `${room.gameType} Room`}</span>
+                                <span style={{ 
+                                  color: '#10b981',
+                                  fontSize: '12px',
+                                  background: 'rgba(16, 185, 129, 0.2)',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px'
+                                }}>
+                                  {room.currentPlayers}/{room.maxPlayers} players
+                                </span>
+                              </div>
+                              <div style={{ 
+                                fontSize: '12px', 
+                                color: '#9ca3af',
+                                marginTop: '4px',
+                                display: 'flex',
+                                gap: '12px'
+                              }}>
+                                <span>{room.region}</span>
+                                <span>${room.entryFee.toFixed(2)} entry</span>
+                                <span style={{ color: getPingColor(room.ping) }}>
+                                  {room.ping !== null ? `${room.ping}ms` : 'N/A'}
+                                </span>
+                                {room.creatorName && (
+                                  <span>by {room.creatorName}</span>
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                console.log('🎮 Joining room:', room.id)
+                                onJoinLobby(room)
+                              }}
+                              style={{
+                                backgroundColor: '#10b981',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '8px 16px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                              }}
+                            >
+                              JOIN
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                      <button
-                        onClick={() => handleJoinServer(room)}
-                        disabled={room.currentPlayers >= room.maxPlayers}
-                        style={{
-                          backgroundColor: room.currentPlayers >= room.maxPlayers ? '#4a5568' : '#10b981',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          padding: '6px 12px',
-                          cursor: room.currentPlayers >= room.maxPlayers ? 'not-allowed' : 'pointer',
-                          fontSize: '11px',
-                          fontWeight: 'bold'
-                        }}
-                      >
-                        {room.currentPlayers >= room.maxPlayers ? 'FULL' : 'JOIN'}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    )}
 
-              {/* NEW: Create New Room Options (Collapsed Empty Servers) */}
-              {(() => {
-                // Group empty servers by region and stake for collapsed display
-                const groupedEmptyServers = {}
-                
-                emptyRooms.forEach(server => {
-                  const key = `${server.regionId}-${server.entryFee}`
-                  if (!groupedEmptyServers[key]) {
-                    groupedEmptyServers[key] = {
-                      regionId: server.regionId,
-                      region: server.region,
-                      regionFlag: server.regionFlag,
-                      entryFee: server.entryFee,
-                      maxPlayers: server.maxPlayers,
-                      stake: server.stake,
-                      ping: server.ping,
-                      hathoraRegion: server.hathoraRegion,
-                      servers: []
-                    }
-                  }
-                  groupedEmptyServers[key].servers.push(server)
-                })
-
-                const groupedEntries = Object.values(groupedEmptyServers)
-                
-                return groupedEntries.length > 0 && (
-                  <div>
-                    <div style={{
-                      padding: '8px 16px',
-                      backgroundColor: '#374151',
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#6b7280',
-                      borderBottom: '1px solid #4a5568'
-                    }}>
-                      🆕 CREATE NEW ROOM ({groupedEntries.length} combinations available)
-                    </div>
-                    {groupedEntries
-                      .sort((a, b) => {
-                        // Sort by ping (lowest first), then by stake (lowest first)
-                        if (a.ping !== null && b.ping !== null) {
-                          if (a.ping !== b.ping) return a.ping - b.ping
+                    {/* CREATE NEW ROOM OPTIONS */}
+                    {(() => {
+                      // Group empty servers by region and stake for collapsed display
+                      const groupedEmptyServers = {}
+                      
+                      emptyRooms.forEach(server => {
+                        const key = `${server.regionId || server.region}-${server.entryFee}`
+                        if (!groupedEmptyServers[key]) {
+                          groupedEmptyServers[key] = {
+                            regionId: server.regionId || server.region,
+                            region: server.region,
+                            regionFlag: server.regionFlag || '🌍',
+                            entryFee: server.entryFee,
+                            maxPlayers: server.maxPlayers,
+                            stake: server.stake,
+                            ping: server.ping,
+                            hathoraRegion: server.hathoraRegion,
+                            servers: []
+                          }
                         }
-                        return a.entryFee - b.entryFee
+                        groupedEmptyServers[key].servers.push(server)
                       })
-                      .map((group, index) => (
-                      <div
-                        key={`${group.regionId}-${group.entryFee}`}
-                        style={{
-                          padding: '12px 16px',
-                          borderBottom: index < groupedEntries.length - 1 ? '1px solid #374151' : 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                          borderLeft: '3px solid #10b981'
-                        }}
-                      >
-                        <div style={{ flex: 1 }}>
-                          <div style={{ 
-                            fontSize: '14px',
-                            color: '#10b981',
-                            fontWeight: '600',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                          }}>
-                            <span>+</span>
-                            <span>Create New Room</span>
-                            <span style={{ color: 'white' }}>
-                              (${group.entryFee.toFixed(2)} – {group.regionFlag} {group.region})
-                            </span>
-                          </div>
-                          <div style={{ 
-                            fontSize: '11px', 
-                            color: '#9ca3af',
-                            marginTop: '4px'
-                          }}>
-                            <span style={{ color: getPingColor(group.ping) }}>
-                              {group.ping !== null ? `${group.ping}ms` : (pingingRegions ? '...' : 'N/A')}
-                            </span>
-                            {group.ping !== null && (
-                              <span style={{ color: getPingColor(group.ping), marginLeft: '4px' }}>
-                                ({getPingStatus(group.ping)})
-                              </span>
-                            )}
-                            <span style={{ color: '#9ca3af' }}> ping</span>
-                            <span style={{ color: '#6b7280', marginLeft: '12px' }}>
-                              Spin up fresh server • Max {group.maxPlayers} players
-                            </span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            console.log('🎯 CREATE button clicked! Group:', group)
-                            console.log('🎯 Template server:', group.servers[0])
-                            
-                            // Prevent any event bubbling
-                            e.preventDefault()
-                            e.stopPropagation()
-                            
-                            // Use the first server in the group as template for creation
-                            const templateServer = group.servers[0]
-                            
-                            console.log('🎯 Calling handleJoinServer with:', templateServer)
-                            
-                            // Force call handleJoinServer regardless of Privy state
-                            try {
-                              handleJoinServer(templateServer)
-                            } catch (error) {
-                              console.error('❌ Error in handleJoinServer:', error)
-                            }
-                          }}
-                          style={{
-                            backgroundColor: '#10b981',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
+
+                      const groupedEntries = Object.values(groupedEmptyServers)
+                      
+                      return groupedEntries.length > 0 && (
+                        <div>
+                          <div style={{
                             padding: '8px 16px',
-                            cursor: 'pointer',
+                            backgroundColor: '#374151',
                             fontSize: '12px',
                             fontWeight: 'bold',
-                            boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
-                          }}
-                        >
-                          CREATE
-                        </button>
+                            color: '#6b7280',
+                            borderBottom: '1px solid #4a5568'
+                          }}>
+                            🆕 CREATE NEW ROOM ({groupedEntries.length} combinations available)
+                          </div>
+                          {groupedEntries
+                            .sort((a, b) => {
+                              // Sort by ping (lowest first), then by stake (lowest first)
+                              if (a.ping !== null && b.ping !== null) {
+                                if (a.ping !== b.ping) return a.ping - b.ping
+                              }
+                              return a.entryFee - b.entryFee
+                            })
+                            .map((group, index) => (
+                            <div
+                              key={`${group.regionId}-${group.entryFee}`}
+                              style={{
+                                padding: '12px 16px',
+                                borderBottom: index < groupedEntries.length - 1 ? '1px solid #374151' : 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                                borderLeft: '3px solid #10b981'
+                              }}
+                            >
+                              <div style={{ flex: 1 }}>
+                                <div style={{ 
+                                  fontSize: '14px',
+                                  color: '#10b981',
+                                  fontWeight: '600',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px'
+                                }}>
+                                  <span>+</span>
+                                  <span>Create New Room</span>
+                                  <span style={{ color: 'white' }}>
+                                    (${group.entryFee.toFixed(2)} – {group.regionFlag} {group.region})
+                                  </span>
+                                </div>
+                                <div style={{ 
+                                  fontSize: '11px', 
+                                  color: '#9ca3af',
+                                  marginTop: '4px'
+                                }}>
+                                  <span style={{ color: getPingColor(group.ping) }}>
+                                    {group.ping !== null ? `${group.ping}ms` : (pingingRegions ? '...' : 'N/A')}
+                                  </span>
+                                  {group.ping !== null && (
+                                    <span style={{ color: getPingColor(group.ping), marginLeft: '4px' }}>
+                                      ({getPingStatus(group.ping)})
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  console.log('🏗️ Creating new room in region:', group.region)
+                                  // Create a new room with the selected parameters
+                                  const newRoom = {
+                                    ...group.servers[0], // Use first server as template
+                                    id: `new-room-${Date.now()}`,
+                                    currentPlayers: 0,
+                                    isNewRoom: true
+                                  }
+                                  onJoinLobby(newRoom)
+                                }}
+                                style={{
+                                  backgroundColor: '#10b981',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  padding: '8px 16px',
+                                  cursor: 'pointer',
+                                  fontSize: '12px',
+                                  fontWeight: 'bold',
+                                  boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                                }}
+                              >
+                                CREATE
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
+
+                    {/* NO ROOMS MESSAGE */}
+                    {activeRooms.length === 0 && emptyRooms.length === 0 && (
+                      <div style={{ textAlign: 'center', padding: '40px', color: '#9ca3af' }}>
+                        <div style={{ fontSize: '24px', marginBottom: '16px' }}>🎮</div>
+                        <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>No Rooms Available</div>
+                        <div style={{ fontSize: '12px' }}>Check back later or try a different filter</div>
                       </div>
-                    ))}
-                  </div>
-                )
-              })()}
-            </>
-          )}
+                    )}
+                  </>
+                )}
+              </>
+            )
+          })()}
         </div>
 
         {/* Footer */}
