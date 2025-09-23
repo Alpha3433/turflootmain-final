@@ -394,7 +394,7 @@ const MultiplayerArena = () => {
     game.start()
     setGameReady(true)
     
-    // Connect to Colyseus
+    // Connect to Colyseus only once
     connectToColyseus()
     
     // Handle resize
@@ -405,10 +405,13 @@ const MultiplayerArena = () => {
     window.addEventListener('resize', handleResize)
     
     return () => {
+      console.log('🧹 Cleaning up arena connection...')
       game.stop()
       window.removeEventListener('resize', handleResize)
       if (wsRef.current) {
+        console.log('🔌 Disconnecting from Colyseus...')
         wsRef.current.leave()
+        wsRef.current = null
       }
     }
   }, [])
