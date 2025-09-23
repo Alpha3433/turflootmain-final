@@ -3640,6 +3640,9 @@ const AgarIOGame = () => {
   // Debug: Monitor multiplayer state synchronization
   useEffect(() => {
     console.log('🎮 Multiplayer state sync - React state:', isMultiplayer, 'Global window.isMultiplayer:', window.isMultiplayer)
+    if (isMultiplayer) {
+      console.log('🎮 ANTI-FLICKER: Multiplayer mode activated - using smoothed camera and position updates')
+    }
   }, [isMultiplayer])
 
   // Cash out handling
