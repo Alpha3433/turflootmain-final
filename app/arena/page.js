@@ -1329,9 +1329,16 @@ const MultiplayerArena = () => {
           Exit Arena
         </button>
       </div>
+      
+      )} {/* End of conditional UI rendering */}
 
       {/* CSS Animations */}
       <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
         @keyframes pulse {
           0% { opacity: 1; }
           100% { opacity: 0.5; }
