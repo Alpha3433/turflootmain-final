@@ -1266,8 +1266,6 @@ const MultiplayerArena = () => {
           Exit Arena
         </button>
       </div>
-      
-      )} {/* End of conditional UI rendering */}
 
       {/* CSS Animations */}
       <style jsx>{`
