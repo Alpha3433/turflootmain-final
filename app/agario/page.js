@@ -114,17 +114,19 @@ const AgarIOGame = () => {
     const multiplayer = urlParams.get('multiplayer')
     const server = urlParams.get('server')
     const hathoraRoom = urlParams.get('hathoraRoom')
+    const serverType = urlParams.get('serverType')
     
-    console.log('🎮 HATHORA-FIRST: Game initialization - URL parameters:', {
+    console.log('🎮 COLYSEUS-FIRST: Game initialization - URL parameters:', {
       roomId,
       mode,
       multiplayer,
       server,
       hathoraRoom,
+      serverType,
       url: window.location.href
     })
     
-    // CRITICAL: Block all non-Hathora games except practice
+    // CRITICAL: Allow practice mode with bots (accessed via Practice button)
     if (mode === 'practice' && roomId === 'global-practice-bots') {
       console.log('✅ PRACTICE MODE: Allowing local practice with bots')
       setIsMultiplayer(false)
@@ -132,35 +134,52 @@ const AgarIOGame = () => {
       return
     }
     
-    // Block any non-Hathora multiplayer attempts
-    console.log('🎮 Colyseus multiplayer game starting...')
-    console.log('📊 Game parameters:')
-    console.log('  - roomId:', roomId || 'will-be-generated')
-    console.log('  - server:', server || 'colyseus')
-    console.log('  - mode:', mode, 'isNotLocal:', mode !== 'local')
+    // CRITICAL: Force all server browser games to use Colyseus multiplayer
+    // Server browser games are identified by:
+    // - mode === 'colyseus-multiplayer' 
+    // - server === 'colyseus'
+    // - serverType === 'colyseus'
+    // - multiplayer === 'true'
+    const isServerBrowserGame = (
+      mode === 'colyseus-multiplayer' ||
+      server === 'colyseus' ||
+      serverType === 'colyseus' ||
+      multiplayer === 'true' ||
+      // Any mode that's not practice should be multiplayer
+      (mode && mode !== 'practice' && mode !== 'local')
+    )
     
-    // ✅ Allow all multiplayer connections (Colyseus handles everything)
-    console.log('✅ PROCEEDING: Colyseus multiplayer enabled')
+    if (isServerBrowserGame) {
+      console.log('🎮 SERVER BROWSER GAME DETECTED: Forcing Colyseus multiplayer')
+      console.log('📊 Game parameters:')
+      console.log('  - roomId:', roomId || 'will-be-generated')
+      console.log('  - server:', server || 'colyseus')
+      console.log('  - mode:', mode, 'isServerBrowser:', isServerBrowserGame)
+      
+      // ✅ FORCE COLYSEUS MULTIPLAYER: All server browser games go to Colyseus
+      console.log('✅ PROCEEDING: Colyseus multiplayer enabled (server browser game)')
+      
+      // Set game to multiplayer mode
+      setIsMultiplayer(true)
+      setGameStarted(true)
+      
+      // Initialize Colyseus multiplayer game
+      console.log('🎮 Colyseus multiplayer game ready (from server browser)')
+      
+      // Track game session in database
+      trackPlayerSession(roomId, 0, mode, 'colyseus')
+      
+      console.log('🎮 Setting up client-side prediction with Colyseus state sync')
+      console.log('⚡ Colyseus server will handle all game logic')
+      console.log('📡 Client will send inputs, receive state updates via Schema')
+      
+      return
+    }
     
-    // ✅ COLYSEUS MULTIPLAYER: Ready to connect
-    console.log('🏠 Room ID:', roomId || 'will-be-generated')
-    console.log('🌐 Multiplayer mode:', multiplayer)
-    console.log('🖥️ Server type:', server || 'colyseus')
-    
-    // Set game to multiplayer mode
-    setIsMultiplayer(true)
-    setGameStarted(true)
-    
-    // Initialize Colyseus multiplayer game
-    console.log('🎮 Colyseus multiplayer game ready')
-    
-    // Track game session in database
-    trackPlayerSession(roomId, 0, mode, 'colyseus')
-    
-    // Set up game state (server owns truth via Colyseus)
-    console.log('🎮 Setting up client-side prediction with Colyseus state sync')
-    console.log('⚡ Colyseus server will handle all game logic')
-    console.log('📡 Client will send inputs, receive state updates via Schema')
+    // Block any other non-practice games (fallback protection)
+    console.log('❌ BLOCKED: Non-server-browser, non-practice game attempt')
+    console.log('🎮 Redirecting to landing page - only server browser and practice modes allowed')
+    window.location.href = '/'
   }, [])
   
   const initializeAuthoritativeGame = async (roomId, mode, urlParams) => {
