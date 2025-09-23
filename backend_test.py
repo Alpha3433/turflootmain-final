@@ -289,14 +289,19 @@ class CameraStabilityBackendTester:
         print("-" * 60)
         
         try:
-            # Test game sessions API for session tracking
+            # Test game sessions API for session tracking with correct format
             session_data = {
                 "action": "join",
-                "roomId": "colyseus-arena-global",
-                "playerId": "camera_test_player",
-                "playerName": "CameraStabilityTestPlayer",
-                "sessionId": f"session_{int(time.time())}_{hash('camera_test') % 10000}",
-                "status": "active"
+                "session": {
+                    "roomId": "colyseus-arena-global",
+                    "joinedAt": datetime.now().isoformat(),
+                    "lastActivity": datetime.now().isoformat(),
+                    "userId": "camera_test_player",
+                    "entryFee": 0,
+                    "mode": "colyseus-multiplayer",
+                    "region": "Australia",
+                    "status": "active"
+                }
             }
             
             response = self.session.post(f"{self.api_base}/game-sessions", json=session_data, timeout=10)
