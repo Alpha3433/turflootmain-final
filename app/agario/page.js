@@ -4,10 +4,14 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 const AgarIOGame = () => {
+  console.log('🎮 AGARIO PAGE COMPONENT RENDERING - URL:', typeof window !== 'undefined' ? window.location.href : 'SSR')
+  
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
   const router = useRouter()
   const searchParams = useSearchParams()
+  
+  console.log('🎮 SEARCH PARAMS:', Array.from(searchParams.entries()))
   
   // Game state
   const [gameStarted, setGameStarted] = useState(false)
