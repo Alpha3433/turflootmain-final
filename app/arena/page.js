@@ -183,9 +183,17 @@ const MultiplayerArena = () => {
     updateFromServer(state) {
       this.serverState = state
       
-      // Update current player from server
-      const currentPlayer = state.players.find(p => p.isCurrentPlayer)
+      // Find current player with fallback logic
+      let currentPlayer = state.players.find(p => p.isCurrentPlayer)
+      
+      // Fallback: if no current player found, use the first player (for single player debugging)
+      if (!currentPlayer && state.players.length > 0) {
+        console.log('⚠️ No current player found, using first player as fallback')
+        currentPlayer = state.players[0]
+      }
+      
       if (currentPlayer) {
+        console.log('🎮 Updating camera to follow:', currentPlayer.name, 'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
         // Smooth position updates to prevent camera jumping
         if (this.player.x && this.player.y) {
           const distance = Math.sqrt(
