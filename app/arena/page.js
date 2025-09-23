@@ -63,6 +63,12 @@ const MultiplayerArena = () => {
       console.log('✅ Connected to dedicated arena:', room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
       
+      // Set expected session ID in game engine for camera stability
+      if (gameRef.current) {
+        gameRef.current.expectedSessionId = room.sessionId
+        console.log('🎯 Set expected session ID in game engine:', room.sessionId)
+      }
+      
       // Handle server state updates
       room.onStateChange((state) => {
         console.log('🎮 Arena state update - Players:', state.players?.size || 0)
