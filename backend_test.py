@@ -624,7 +624,7 @@ class CameraStabilityBackendTester:
         success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
         
         print("=" * 80)
-        print("🎯 CAMERA STABILITY FIX BACKEND TESTING COMPLETED")
+        print("🎯 ENHANCED ARENA UI BACKEND TESTING COMPLETED")
         print("=" * 80)
         print(f"📊 TOTAL TESTS: {total_tests}")
         print(f"✅ PASSED: {passed_tests}")
