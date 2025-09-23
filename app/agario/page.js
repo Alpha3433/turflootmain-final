@@ -497,7 +497,22 @@ const AgarIOGame = () => {
 
   // Multiplayer input transmission system
   const sendInputToServer = (dx, dy) => {
+    console.log('🎮 INPUT DEBUG - sendInputToServer called:', {
+      dx: dx?.toFixed(3),
+      dy: dy?.toFixed(3),
+      isMultiplayer,
+      wsRef: !!wsRef.current,
+      wsConnection,
+      hasRoom: !!wsRef.current
+    })
+
     if (!isMultiplayer || !wsRef.current || wsConnection !== 'connected') {
+      console.log('❌ INPUT BLOCKED:', {
+        isMultiplayer,
+        hasWsRef: !!wsRef.current,
+        wsConnection,
+        reason: !isMultiplayer ? 'not multiplayer' : !wsRef.current ? 'no wsRef' : 'not connected'
+      })
       return // Skip if not in multiplayer mode or not connected
     }
 
@@ -505,6 +520,7 @@ const AgarIOGame = () => {
     const threshold = 0.01
     if (Math.abs(dx - lastInputRef.current.dx) < threshold && 
         Math.abs(dy - lastInputRef.current.dy) < threshold) {
+      console.log('🔄 INPUT THROTTLED - no significant change')
       return
     }
 
@@ -512,6 +528,7 @@ const AgarIOGame = () => {
     lastInputRef.current = { dx, dy }
 
     try {
+      console.log('📡 SENDING INPUT to server:', { seq: inputSequenceRef.current, dx, dy })
       wsRef.current.send("input", {
         seq: inputSequenceRef.current,
         dx: dx,
