@@ -165,6 +165,14 @@ const AgarIOGame = () => {
       (mode && mode !== 'practice' && mode !== 'local')
     )
     
+    console.log('🎮 MULTIPLAYER DETECTION DEBUG:')
+    console.log('  - isServerBrowserGame:', isServerBrowserGame)
+    console.log('  - roomId:', roomId)
+    console.log('  - server:', server)
+    console.log('  - mode:', mode)
+    console.log('  - serverType:', serverType)
+    console.log('  - multiplayer:', multiplayer)
+    
     if (isServerBrowserGame) {
       console.log('🎮 SERVER BROWSER GAME DETECTED: Forcing Colyseus multiplayer')
       console.log('📊 Game parameters:')
