@@ -3048,9 +3048,52 @@ const AgarIOGame = () => {
       this.ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2)
       this.ctx.fillStyle = player.color
       this.ctx.fill()
-      this.ctx.strokeStyle = '#ffffff'
-      this.ctx.lineWidth = 3
-      this.ctx.stroke()
+      
+      // Enhanced AI bot visual indicators
+      if (player.botType) {
+        // Draw different border styles based on bot type
+        if (player.botType === 'aggressive') {
+          this.ctx.strokeStyle = '#ff4444' // Red border for aggressive bots
+          this.ctx.lineWidth = 4
+          this.ctx.setLineDash([8, 4]) // Aggressive dashed pattern
+        } else if (player.botType === 'defensive') {
+          this.ctx.strokeStyle = '#44ff44' // Green border for defensive bots
+          this.ctx.lineWidth = 5
+          this.ctx.setLineDash([]) // Solid line
+        } else if (player.botType === 'fast') {
+          this.ctx.strokeStyle = '#ffff44' // Yellow border for fast bots
+          this.ctx.lineWidth = 3
+          this.ctx.setLineDash([4, 2, 4, 2]) // Fast alternating pattern
+        } else { // balanced
+          this.ctx.strokeStyle = '#4444ff' // Blue border for balanced bots
+          this.ctx.lineWidth = 3
+          this.ctx.setLineDash([6, 3]) // Balanced dashed pattern
+        }
+        
+        // Add behavior indicator with different line styles
+        if (player.behavior === 'hunting_player') {
+          // Add extra red glow for bots hunting the player
+          this.ctx.shadowColor = '#ff0000'
+          this.ctx.shadowBlur = 8
+        } else if (player.behavior === 'fleeing') {
+          // Add yellow glow for fleeing bots
+          this.ctx.shadowColor = '#ffff00'
+          this.ctx.shadowBlur = 6
+        } else if (player.behavior === 'hunting_enemy') {
+          // Add orange glow for bots hunting other bots
+          this.ctx.shadowColor = '#ff8800'
+          this.ctx.shadowBlur = 5
+        }
+        
+        this.ctx.stroke()
+        this.ctx.shadowBlur = 0 // Reset shadow
+        this.ctx.setLineDash([]) // Reset line dash
+      } else {
+        // Default border for human players
+        this.ctx.strokeStyle = '#ffffff'
+        this.ctx.lineWidth = 3
+        this.ctx.stroke()
+      }
       
       // Draw spawn protection ring
       if (player.spawnProtection) {
@@ -3131,11 +3174,24 @@ const AgarIOGame = () => {
         }
       }
       
-      // Draw player name
+      // Draw player name with bot type indicator
       this.ctx.fillStyle = '#ffffff'
       this.ctx.font = 'bold 14px Arial'
       this.ctx.textAlign = 'center'
-      this.ctx.fillText(player.name, player.x, player.y - player.radius - 15)
+      
+      let displayName = player.name
+      if (player.botType) {
+        // Add emoji indicators for different bot types
+        const botEmojis = {
+          'aggressive': '⚔️',
+          'defensive': '🛡️',
+          'fast': '⚡',
+          'balanced': '⚖️'
+        }
+        displayName = `${botEmojis[player.botType]} ${player.name}`
+      }
+      
+      this.ctx.fillText(displayName, player.x, player.y - player.radius - 15)
       
       // Draw black eyes
       const eyeRadius = Math.max(2, player.radius * 0.12) // Made eyes smaller
@@ -3152,6 +3208,24 @@ const AgarIOGame = () => {
       this.ctx.arc(player.x + eyeOffset, player.y - eyeOffset * 0.3, eyeRadius, 0, Math.PI * 2)
       this.ctx.fillStyle = '#000000'
       this.ctx.fill()
+      
+      // Enhanced AI: Draw behavior indicator above bot name
+      if (player.botType && player.behavior && player.behavior !== 'exploring') {
+        this.ctx.fillStyle = '#ffff88'
+        this.ctx.font = '10px Arial'
+        this.ctx.textAlign = 'center'
+        
+        const behaviorText = {
+          'hunting_player': '🎯 HUNTING YOU!',
+          'fleeing': '💨 FLEEING',
+          'hunting_enemy': '🔍 HUNTING',
+          'hunting_coins': '🪙 COIN HUNT'
+        }[player.behavior] || ''
+        
+        if (behaviorText) {
+          this.ctx.fillText(behaviorText, player.x, player.y - player.radius - 35)
+        }
+      }
     }
 
     drawVirus(virus) {
