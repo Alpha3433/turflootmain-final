@@ -120,7 +120,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix multiplayer synchronization issue where players are connected to same Colyseus room but not seeing each other. Backend and Colyseus communication working correctly with MapSchema, but frontend rendering logic not properly displaying other players on the game canvas."
+user_problem_statement: "Fix camera stability issue in multiplayer arena where the camera is rapidly switching between different session IDs for the same player, causing jarring camera movements. The user reported rapid updates like 'Updating camera to follow: jaulo' with different session IDs (lGDgvPlWz and nWVr4OFlT)."
 
 # Test plan for this run
 
