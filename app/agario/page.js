@@ -262,12 +262,13 @@ const AgarIOGame = () => {
       wsRef.current = room
       
       console.log('🎮 Multiplayer mode activated - window.isMultiplayer =', window.isMultiplayer)
+      console.log('📡 Setting up Colyseus event handlers...')
       
       // Set up Colyseus room event handlers
       room.onStateChange((state) => {
-        console.log('📡 Colyseus state update received')
-        console.log('👥 Players in state:', state.players ? Object.keys(state.players).length : 0)
-        console.log('🔍 State structure:', { 
+        console.log('📡 *** NEW DEBUG *** Colyseus state update received')
+        console.log('👥 *** NEW DEBUG *** Players in state:', state.players ? Object.keys(state.players).length : 0)
+        console.log('🔍 *** NEW DEBUG *** State structure:', { 
           hasPlayers: !!state.players, 
           playersType: typeof state.players,
           isMultiplayer: window.isMultiplayer 
@@ -275,14 +276,17 @@ const AgarIOGame = () => {
         
         // Log actual player data (only once per state change, not in render)
         if (state.players) {
+          console.log('*** NEW DEBUG *** About to iterate through players...')
           Object.entries(state.players).forEach(([sessionId, player]) => {
-            console.log(`👤 Player ${sessionId}:`, {
+            console.log(`👤 *** NEW DEBUG *** Player ${sessionId}:`, {
               name: player?.name || player?.playerName,
               alive: player?.alive,
               x: player?.x,
               y: player?.y
             })
           })
+        } else {
+          console.log('❌ *** NEW DEBUG *** No players in state')
         }
         
         serverStateRef.current = state
@@ -290,7 +294,9 @@ const AgarIOGame = () => {
         // CRITICAL: Update the game's serverState for rendering
         if (gameRef.current) {
           gameRef.current.serverState = state
-          console.log('🎮 Updated game serverState - isMultiplayer:', window.isMultiplayer)
+          console.log('🎮 *** NEW DEBUG *** Updated game serverState - isMultiplayer:', window.isMultiplayer)
+        } else {
+          console.log('❌ *** NEW DEBUG *** gameRef.current is null!')
         }
         
         // Update connected players count
@@ -298,6 +304,8 @@ const AgarIOGame = () => {
           setConnectedPlayers(Object.keys(state.players).length)
         }
       })
+      
+      console.log('✅ *** NEW DEBUG *** Event handlers setup complete')
       
       room.onMessage("player-joined", (message) => {
         console.log('👋 Player joined:', message)
