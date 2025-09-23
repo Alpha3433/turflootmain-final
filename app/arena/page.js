@@ -186,11 +186,21 @@ const MultiplayerArena = () => {
     }
     
     updateCamera() {
+      // Only update camera if player position is valid
+      if (!this.player.x || !this.player.y) return
+      
       const targetX = this.player.x - this.canvas.width / 2
       const targetY = this.player.y - this.canvas.height / 2
       
-      this.camera.x += (targetX - this.camera.x) * 0.2
-      this.camera.y += (targetY - this.camera.y) * 0.2
+      // Use gentler smoothing to prevent camera jumping
+      const smoothing = 0.08
+      this.camera.x += (targetX - this.camera.x) * smoothing
+      this.camera.y += (targetY - this.camera.y) * smoothing
+      
+      // Keep camera within reasonable bounds
+      const boundaryExtension = 200
+      this.camera.x = Math.max(-boundaryExtension, Math.min(this.world.width - this.canvas.width + boundaryExtension, this.camera.x))
+      this.camera.y = Math.max(-boundaryExtension, Math.min(this.world.height - this.canvas.height + boundaryExtension, this.camera.y))
     }
     
     render() {
