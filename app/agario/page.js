@@ -1193,9 +1193,20 @@ const AgarIOGame = () => {
         humanScore: 100
       }
       
-      this.generateCoins()
-      this.generateEnemies()
-      this.generateViruses()
+      // Only generate local world in practice mode - multiplayer gets world from server
+      if (!window.isMultiplayer) {
+        console.log('🎮 LOCAL PRACTICE MODE: Generating local world (coins, enemies, viruses)')
+        this.generateCoins()
+        this.generateEnemies()
+        this.generateViruses()
+      } else {
+        console.log('🎮 MULTIPLAYER MODE: Waiting for server world state (no local generation)')
+        // Initialize empty arrays for multiplayer - server will populate these
+        this.coins = []
+        this.enemies = []
+        this.viruses = []
+      }
+      
       this.bindEvents()
       this.initAntiCheat()
       
