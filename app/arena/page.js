@@ -740,7 +740,6 @@ const MultiplayerArena = () => {
     
     game.start()
     setGameReady(true)
-    setCanvasReady(true)
     
     // Game loop
     const gameLoop = () => {
