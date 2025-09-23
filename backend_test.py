@@ -34,7 +34,7 @@ class CameraStabilityBackendTester:
         self.test_results = []
         self.session = requests.Session()
         
-        print(f"🎯 CAMERA STABILITY FIX BACKEND TESTING INITIATED")
+        print(f"🎯 ENHANCED ARENA UI BACKEND TESTING INITIATED")
         print(f"🔗 Testing Base URL: {self.base_url}")
         print(f"🔗 API Base URL: {self.api_base}")
         print("=" * 80)
