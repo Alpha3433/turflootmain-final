@@ -1849,6 +1849,15 @@ export default function TurfLootTactical() {
         mode: serverData.mode || 'colyseus-multiplayer'
       })
       
+      // Get Privy user info for proper identification in game
+      const privyUserData = {
+        privyUserId: user?.id || 'anonymous-' + Date.now(),
+        playerName: customUsername || user?.email?.split('@')[0] || 'Anonymous Player',
+        walletAddress: user?.wallet?.address || null
+      }
+      
+      console.log('👤 Passing Privy user data to game:', privyUserData)
+      
       // Build URL parameters for Colyseus multiplayer game
       const gameParams = new URLSearchParams({
         roomId: serverData.id || 'colyseus-arena-global',
@@ -1861,7 +1870,11 @@ export default function TurfLootTactical() {
         regionId: serverData.regionId || 'au-syd',
         maxPlayers: serverData.maxPlayers || 50,
         name: encodeURIComponent(serverData.name || 'TurfLoot Arena'),
-        gameType: encodeURIComponent(serverData.gameType || 'Arena Battle')
+        gameType: encodeURIComponent(serverData.gameType || 'Arena Battle'),
+        // Add Privy user data
+        privyUserId: privyUserData.privyUserId,
+        playerName: encodeURIComponent(privyUserData.playerName),
+        walletAddress: privyUserData.walletAddress || ''
       })
       
       console.log('🔗 Colyseus game URL parameters:', gameParams.toString())
