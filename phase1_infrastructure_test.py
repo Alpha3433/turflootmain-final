@@ -16,7 +16,7 @@ from datetime import datetime
 
 # Configuration - Use localhost for testing as per environment
 LOCALHOST_URL = "http://localhost:3000"
-PRODUCTION_URL = "https://browser-click-error.preview.emergentagent.com"
+PRODUCTION_URL = "https://turfloot-arena-2.preview.emergentagent.com"
 
 # Test configuration
 TEST_TIMEOUT = 10

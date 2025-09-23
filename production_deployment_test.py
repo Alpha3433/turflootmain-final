@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Configuration - Test both production and localhost
-PRODUCTION_URL = "https://browser-click-error.preview.emergentagent.com"
+PRODUCTION_URL = "https://turfloot-arena-2.preview.emergentagent.com"
 LOCALHOST_URL = "http://localhost:3000"
 
 # Test data for production deployment verification

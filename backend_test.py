@@ -18,7 +18,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://browser-click-error.preview.emergentagent.com"
+BASE_URL = "https://turfloot-arena-2.preview.emergentagent.com"
 COLYSEUS_ENDPOINT = "wss://au-syd-ab3eaf4e.colyseus.cloud"
 
 class TurfLootBackendTester:
