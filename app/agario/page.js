@@ -227,11 +227,31 @@ const AgarIOGame = () => {
       // Join Colyseus arena room
       console.log(`🚀 Joining persistent 24/7 Colyseus arena...`)
       
-      // Always join the persistent room - no need for specific room ID logic
+      // Get real Privy user data for proper identification
+      const { usePrivy } = await import('@privy-io/react-auth')
+      let realPrivyUserId = 'anonymous-' + Date.now()
+      let realPlayerName = customUsername || 'Anonymous Player'
+      
+      // Try to get authenticated user info from Privy
+      try {
+        // Access Privy context if available
+        if (typeof window !== 'undefined' && window.privyUser) {
+          realPrivyUserId = window.privyUser.id || realPrivyUserId
+          realPlayerName = window.privyUser.email?.split('@')[0] || customUsername || 'Privy User'
+          console.log('✅ Using authenticated Privy user:', realPlayerName)
+        } else {
+          console.log('⚠️ No Privy user found, using fallback name:', realPlayerName)
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not access Privy user data:', error.message)
+      }
+      
       const room = await joinArena({ 
-        privyUserId: 'player-' + Date.now(),
-        playerName: customUsername || 'Anonymous Player'
+        privyUserId: realPrivyUserId,
+        playerName: realPlayerName
       })
+      
+      console.log('🎮 Connected with player name:', realPlayerName, 'and ID:', realPrivyUserId)
       
       if (!room) {
         throw new Error('Failed to join Colyseus arena room')
