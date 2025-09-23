@@ -168,7 +168,7 @@ def test_websocket_url_scenarios():
     scenarios = [
         {
             "name": "Production HTTPS Environment",
-            "base_url": "https://turfloot-arena-2.preview.emergentagent.com",
+            "base_url": "https://agar-clone-debug.preview.emergentagent.com",
             "expected_protocol": "wss:",
             "expected_port": "443"
         },

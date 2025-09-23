@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Test Configuration
-BASE_URL = "https://turfloot-arena-2.preview.emergentagent.com"
+BASE_URL = "https://agar-clone-debug.preview.emergentagent.com"
 LOCALHOST_URL = "http://localhost:3000"
 
 # Real Privy User IDs from review request

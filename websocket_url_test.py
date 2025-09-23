@@ -17,7 +17,7 @@ def test_websocket_url_generation():
 // Test the WebSocket URL generation logic from the fix
 function testWebSocketURLGeneration() {
     // Set environment variable to match production
-    process.env.NEXT_PUBLIC_BASE_URL = 'https://turfloot-arena-2.preview.emergentagent.com';
+    process.env.NEXT_PUBLIC_BASE_URL = 'https://agar-clone-debug.preview.emergentagent.com';
     
     console.log('🧪 Testing WebSocket URL Generation Fix...');
     console.log('=' * 60);
@@ -50,7 +50,7 @@ function testWebSocketURLGeneration() {
     
     // Validation tests
     const tests = {
-        'Environment Variable Read': baseUrl === 'https://turfloot-arena-2.preview.emergentagent.com',
+        'Environment Variable Read': baseUrl === 'https://agar-clone-debug.preview.emergentagent.com',
         'HTTPS Protocol Detected': url.protocol === 'https:',
         'WSS Protocol Used': wsProtocol === 'wss:',
         'Correct Host Extracted': wsHost === 'turfloot-gameroom.preview.emergentagent.com',
@@ -82,7 +82,7 @@ function testWebSocketURLGeneration() {
     console.log('\\n🧪 Testing Different Scenarios:');
     
     const scenarios = [
-        { name: 'Production HTTPS', url: 'https://turfloot-arena-2.preview.emergentagent.com', expectedWS: 'wss:' },
+        { name: 'Production HTTPS', url: 'https://agar-clone-debug.preview.emergentagent.com', expectedWS: 'wss:' },
         { name: 'Local HTTP', url: 'http://localhost:3000', expectedWS: 'ws:' },
         { name: 'Custom HTTPS', url: 'https://custom.example.com:8443', expectedWS: 'wss:' }
     ];
