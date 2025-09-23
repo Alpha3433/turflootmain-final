@@ -17,7 +17,7 @@
     "declaration": false,
     "sourceMap": false,
     "allowJs": true,
-    "noEmit": true,
+    "noEmit": false,
     "incremental": true,
     "moduleResolution": "node",
     "isolatedModules": true,
