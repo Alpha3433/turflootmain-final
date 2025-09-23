@@ -172,8 +172,30 @@ const MultiplayerArena = () => {
       // Update current player from server
       const currentPlayer = state.players.find(p => p.isCurrentPlayer)
       if (currentPlayer) {
-        this.player.x = currentPlayer.x
-        this.player.y = currentPlayer.y
+        // Smooth position updates to prevent camera jumping
+        if (this.player.x && this.player.y) {
+          const distance = Math.sqrt(
+            Math.pow(currentPlayer.x - this.player.x, 2) + 
+            Math.pow(currentPlayer.y - this.player.y, 2)
+          )
+          
+          // If the distance is large, apply directly (avoid desync)
+          // If small, smooth interpolate to prevent jitter
+          if (distance > 100) {
+            this.player.x = currentPlayer.x
+            this.player.y = currentPlayer.y
+          } else {
+            const lerpFactor = 0.3
+            this.player.x += (currentPlayer.x - this.player.x) * lerpFactor
+            this.player.y += (currentPlayer.y - this.player.y) * lerpFactor
+          }
+        } else {
+          // First update - apply directly
+          this.player.x = currentPlayer.x
+          this.player.y = currentPlayer.y
+        }
+        
+        // Always update other properties directly
         this.player.mass = currentPlayer.mass
         this.player.radius = currentPlayer.radius
         this.player.name = currentPlayer.name
