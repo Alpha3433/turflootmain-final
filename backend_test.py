@@ -603,8 +603,8 @@ class CameraStabilityBackendTester:
         """Run all backend tests for camera stability fix"""
         start_time = time.time()
         
-        print("🎯 STARTING COMPREHENSIVE BACKEND TESTING FOR CAMERA STABILITY FIX")
-        print("🎯 FOCUS: Colyseus Connection, Arena Room Management, Session ID Management, Connection Cleanup, API Health")
+        print("🎯 STARTING COMPREHENSIVE BACKEND TESTING FOR ENHANCED ARENA UI")
+        print("🎯 FOCUS: Colyseus Connection, Server State Management, API Endpoints, Session Management, Performance")
         print("=" * 80)
         
         # Run all test categories
