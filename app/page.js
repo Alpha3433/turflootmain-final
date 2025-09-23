@@ -1852,7 +1852,9 @@ export default function TurfLootTactical() {
       // Get Privy user info for proper identification in game
       const privyUserData = {
         privyUserId: user?.id || 'anonymous-' + Date.now(),
-        playerName: customUsername || user?.email?.split('@')[0] || 'Anonymous Player',
+        playerName: customUsername || 
+                   (user?.email && typeof user.email === 'string' ? user.email.split('@')[0] : null) ||
+                   'Anonymous Player',
         walletAddress: user?.wallet?.address || null
       }
       
