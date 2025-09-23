@@ -2016,8 +2016,13 @@ const AgarIOGame = () => {
     }
 
     bindEvents() {
+      console.log('🎮 BIND EVENTS DEBUG: Setting up mouse event listeners')
+      console.log('🎮 Canvas available:', !!this.canvas)
+      console.log('🎮 Window isMultiplayer:', window.isMultiplayer)
+      
       // Desktop mouse controls
       this.canvas.addEventListener('mousemove', (e) => {
+        console.log('🖱️ RAW MOUSE EVENT:', { x: e.clientX, y: e.clientY })
         const rect = this.canvas.getBoundingClientRect()
         this.mouse.x = e.clientX - rect.left
         this.mouse.y = e.clientY - rect.top
