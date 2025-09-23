@@ -263,7 +263,14 @@ const AgarIOGame = () => {
       // Set up Colyseus room event handlers
       room.onStateChange((state) => {
         console.log('📡 Colyseus state update received')
+        console.log('👥 Players in state:', state.players ? Object.keys(state.players).length : 0)
         serverStateRef.current = state
+        
+        // CRITICAL: Update the game's serverState for rendering
+        if (gameRef.current) {
+          gameRef.current.serverState = state
+          console.log('🎮 Updated game serverState with', state.players ? Object.keys(state.players).length : 0, 'players')
+        }
         
         // Update connected players count
         if (state.players) {
