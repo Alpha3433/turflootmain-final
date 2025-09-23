@@ -115,6 +115,7 @@ const AgarIOGame = () => {
     const server = urlParams.get('server')
     const hathoraRoom = urlParams.get('hathoraRoom')
     const serverType = urlParams.get('serverType')
+    const bots = urlParams.get('bots')
     
     console.log('🎮 COLYSEUS-FIRST: Game initialization - URL parameters:', {
       roomId,
@@ -123,12 +124,23 @@ const AgarIOGame = () => {
       server,
       hathoraRoom,
       serverType,
+      bots,
       url: window.location.href
     })
     
-    // CRITICAL: Allow practice mode with bots (accessed via Practice button)
+    // CRITICAL: Allow practice modes
+    // 1. Legacy practice mode (if any existing links use this)
     if (mode === 'practice' && roomId === 'global-practice-bots') {
-      console.log('✅ PRACTICE MODE: Allowing local practice with bots')
+      console.log('✅ LEGACY PRACTICE MODE: Allowing local practice with bots')
+      setIsMultiplayer(false)
+      setGameStarted(true)
+      return
+    }
+    
+    // 2. LOCAL PRACTICE mode (from LOCAL PRACTICE button)
+    if (mode === 'local' && multiplayer === 'offline' && server === 'local' && bots === 'true') {
+      console.log('✅ LOCAL PRACTICE MODE: Allowing offline practice with bots')
+      console.log('🎮 Local practice parameters:', { roomId, mode, multiplayer, server, bots })
       setIsMultiplayer(false)
       setGameStarted(true)
       return
@@ -145,7 +157,7 @@ const AgarIOGame = () => {
       server === 'colyseus' ||
       serverType === 'colyseus' ||
       multiplayer === 'true' ||
-      // Any mode that's not practice should be multiplayer
+      // Any mode that's not practice/local should be multiplayer
       (mode && mode !== 'practice' && mode !== 'local')
     )
     
@@ -178,6 +190,7 @@ const AgarIOGame = () => {
     
     // Block any other non-practice games (fallback protection)
     console.log('❌ BLOCKED: Non-server-browser, non-practice game attempt')
+    console.log('🎮 Game parameters that were rejected:', { roomId, mode, multiplayer, server, serverType, bots })
     console.log('🎮 Redirecting to landing page - only server browser and practice modes allowed')
     window.location.href = '/'
   }, [])
