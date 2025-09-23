@@ -77,6 +77,12 @@ export async function GET(request) {
     arenaServer.currentPlayers = realPlayers
     arenaServer.status = realPlayers > 0 ? 'active' : 'waiting'
     arenaServer.avgWaitTime = realPlayers > 0 ? 'Join Now' : 'Waiting for players'
+    
+    // Add creator info for active rooms
+    if (realPlayers > 0) {
+      arenaServer.creatorName = 'Account A'
+      arenaServer.creatorWallet = 'Demo_Wallet_123'
+    }
 
     // Return single server array
     const servers = [arenaServer]
