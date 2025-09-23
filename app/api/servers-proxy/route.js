@@ -19,18 +19,22 @@ export async function GET() {
           regionId: 'au-syd',
           endpoint: colyseusEndpoint,
           maxPlayers: 50,
-          currentPlayers: 0,
+          currentPlayers: 1, // TESTING: Simulated active player
           entryFee: 0,
           gameType: 'Arena Battle',
           serverType: 'colyseus',
           isActive: true,
           canSpectate: true,
           ping: 0,
+          status: 'active', // Set to active for testing JOIN functionality
+          canJoin: true,
+          creatorName: 'Account A', // Show who created the room
+          creatorWallet: 'Demo_Wallet_123',
           lastUpdated: new Date().toISOString(),
           timestamp: new Date().toISOString()
         }
       ],
-      totalPlayers: 0,
+      totalPlayers: 1, // Update to reflect active player
       totalActiveServers: 1,
       totalServers: 1,
       practiceServers: 0,
