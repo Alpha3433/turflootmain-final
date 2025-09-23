@@ -769,15 +769,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-                self.log_test("MongoDB URL Config", "FAIL", f"MongoDB connection failed with status {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Environment Variables", "FAIL", f"Environment config test failed: {str(e)}")
-
-    def run_all_tests(self):
-        """Run all backend tests"""
-        print("🚀 Starting TurfLoot Backend API Testing Suite - Phase 2 Assessment")
-        print(f"Testing against: {self.base_url}")
         print(f"Expected Colyseus endpoint: {COLYSEUS_ENDPOINT}")
         print("=" * 80)
         
