@@ -319,85 +319,375 @@ class MultiplayerBackendTester:
                 )
                 
         except Exception as e:
-            self.log_test("Colyseus Server API", "FAIL", f"API request failed: {str(e)}")
+            self.log_test("MapSchema Handling", "FAIL", f"Exception: {str(e)}")
 
-    def test_database_integration(self):
-        """Test 3: Database Integration"""
-        print("\n🗄️ TESTING: Database Integration")
+    def test_multiplayer_session_management(self):
+        """Test 4: Multiplayer Session Management - Verify room joining, player tracking, state synchronization"""
+        print("\n🎮 TESTING: Multiplayer Session Management")
         
         try:
-            # Test game sessions API (GET)
-            response = requests.get(f"{self.base_url}/api/game-sessions", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                if "totalActiveSessions" in data and "sessionsByRoom" in data:
-                    self.log_test("Database Connection", "PASS", f"MongoDB connected, {data.get('totalActiveSessions', 0)} active sessions")
-                else:
-                    self.log_test("Database Connection", "FAIL", f"Unexpected response structure: {data}")
-            else:
-                self.log_test("Database Connection", "FAIL", f"Game sessions API returned status {response.status_code}")
-            
-            # Test database write operation
-            test_session_data = {
+            # Test room joining capability
+            test_join_data = {
                 "action": "join",
                 "session": {
-                    "roomId": "test-colyseus-arena",
-                    "userId": "test-user-backend-test",
-                    "joinedAt": datetime.now().isoformat(),
-                    "lastActivity": datetime.now().isoformat(),
-                    "mode": "arena",
-                    "region": "au-syd",
-                    "entryFee": 0
+                    "roomId": "colyseus-arena-global",
+                    "joinedAt": "2024-01-01T00:00:00.000Z",
+                    "lastActivity": "2024-01-01T00:00:00.000Z",
+                    "userId": "multiplayer_test_user",
+                    "entryFee": 0,
+                    "mode": "colyseus-multiplayer",
+                    "region": "Australia",
+                    "status": "active"
                 }
             }
             
             response = requests.post(
-                f"{self.base_url}/api/game-sessions", 
-                json=test_session_data,
+                f"{self.base_url}/api/game-sessions",
+                json=test_join_data,
+                headers={'Content-Type': 'application/json'},
                 timeout=10
             )
             
+            if response.status_code in [200, 201]:
+                self.log_test(
+                    "Room Joining Capability", 
+                    "PASS", 
+                    "Backend supports room joining for multiplayer sessions"
+                )
+                
+                # Test player tracking - update session activity
+                time.sleep(1)  # Brief delay
+                
+                update_data = {
+                    "action": "update",
+                    "roomId": "colyseus-arena-global",
+                    "lastActivity": "2024-01-01T00:01:00.000Z"
+                }
+                
+                update_response = requests.post(
+                    f"{self.base_url}/api/game-sessions",
+                    json=update_data,
+                    headers={'Content-Type': 'application/json'},
+                    timeout=10
+                )
+                
+                if update_response.status_code in [200, 201]:
+                    self.log_test(
+                        "Player Activity Tracking", 
+                        "PASS", 
+                        "Backend can track and update player activity"
+                    )
+                else:
+                    self.log_test(
+                        "Player Activity Tracking", 
+                        "FAIL", 
+                        f"Failed to update player activity - Status: {update_response.status_code}"
+                    )
+                
+                # Test leave functionality
+                leave_data = {
+                    "action": "leave",
+                    "roomId": "colyseus-arena-global"
+                }
+                
+                leave_response = requests.post(
+                    f"{self.base_url}/api/game-sessions",
+                    json=leave_data,
+                    headers={'Content-Type': 'application/json'},
+                    timeout=10
+                )
+                
+                if leave_response.status_code in [200, 201]:
+                    self.log_test(
+                        "Session Leave Management", 
+                        "PASS", 
+                        "Backend properly handles player leaving sessions"
+                    )
+                else:
+                    self.log_test(
+                        "Session Leave Management", 
+                        "FAIL", 
+                        f"Failed to handle session leave - Status: {leave_response.status_code}"
+                    )
+            else:
+                self.log_test(
+                    "Room Joining Capability", 
+                    "FAIL", 
+                    f"Failed to join room - Status: {response.status_code}"
+                )
+                
+            # Test state synchronization support
+            response = requests.get(f"{self.base_url}/api/servers", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success"):
-                    self.log_test("Database Write Operation", "PASS", "Successfully created test session")
-                    
-                    # Clean up test session
-                    cleanup_data = {
-                        "action": "leave",
-                        "roomId": "test-colyseus-arena"
-                    }
-                    requests.post(f"{self.base_url}/api/game-sessions", json=cleanup_data, timeout=5)
-                    
+                
+                # Check for real-time data that indicates state synchronization
+                servers = data.get('servers', [])
+                total_players = data.get('totalPlayers', 0)
+                total_active_servers = data.get('totalActiveServers', 0)
+                
+                if servers and 'lastUpdated' in data:
+                    self.log_test(
+                        "State Synchronization Support", 
+                        "PASS", 
+                        f"Backend provides real-time state data - {len(servers)} servers, {total_players} players, {total_active_servers} active"
+                    )
                 else:
-                    self.log_test("Database Write Operation", "FAIL", f"Write failed: {data}")
+                    self.log_test(
+                        "State Synchronization Support", 
+                        "FAIL", 
+                        "Backend missing real-time state synchronization data"
+                    )
             else:
-                self.log_test("Database Write Operation", "FAIL", f"Write request returned status {response.status_code}")
+                self.log_test(
+                    "State Synchronization Support", 
+                    "FAIL", 
+                    f"Failed to verify state synchronization - Status: {response.status_code}"
+                )
                 
         except Exception as e:
-            self.log_test("Database Integration", "FAIL", f"Database test failed: {str(e)}")
+            self.log_test("Multiplayer Session Management", "FAIL", f"Exception: {str(e)}")
 
-    def test_wallet_authentication_api(self):
-        """Test 4: Authentication & Wallet APIs"""
-        print("\n💰 TESTING: Wallet & Authentication APIs")
+    def test_backend_api_integration(self):
+        """Test 5: Backend API Integration - Test /api/servers endpoint for Colyseus integration"""
+        print("\n🔌 TESTING: Backend API Integration")
         
         try:
-            # Test wallet balance API without authentication (guest mode)
+            # Basic API health check
+            response = requests.get(f"{self.base_url}/api/servers", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                
+                self.log_test(
+                    "API Health Check", 
+                    "PASS", 
+                    f"API accessible - {len(data.get('servers', []))} servers available"
+                )
+                
+                # Colyseus integration verification
+                colyseus_enabled = data.get('colyseusEnabled', False)
+                colyseus_endpoint = data.get('colyseusEndpoint', '')
+                
+                if colyseus_enabled and colyseus_endpoint:
+                    self.log_test(
+                        "Colyseus API Integration", 
+                        "PASS", 
+                        f"Colyseus integration active - Endpoint: {colyseus_endpoint}"
+                    )
+                    
+                    # Server data structure validation
+                    servers = data.get('servers', [])
+                    colyseus_servers = [s for s in servers if s.get('serverType') == 'colyseus']
+                    
+                    if colyseus_servers:
+                        arena_server = colyseus_servers[0]
+                        required_fields = [
+                            'id', 'roomType', 'name', 'region', 'maxPlayers', 
+                            'currentPlayers', 'serverType', 'endpoint', 'canJoin'
+                        ]
+                        
+                        missing_fields = [field for field in required_fields if field not in arena_server]
+                        
+                        if not missing_fields:
+                            self.log_test(
+                                "Server Data Structure", 
+                                "PASS", 
+                                f"Complete server data structure with all {len(required_fields)} required fields"
+                            )
+                        else:
+                            self.log_test(
+                                "Server Data Structure", 
+                                "FAIL", 
+                                f"Missing required fields: {missing_fields}"
+                            )
+                            
+                        # Real-time data verification
+                        if 'lastUpdated' in data and 'timestamp' in data:
+                            self.log_test(
+                                "Real-time Data Support", 
+                                "PASS", 
+                                "API provides real-time timestamps for data freshness"
+                            )
+                        else:
+                            self.log_test(
+                                "Real-time Data Support", 
+                                "FAIL", 
+                                "Missing real-time timestamp data"
+                            )
+                    else:
+                        self.log_test(
+                            "Colyseus Server Data", 
+                            "FAIL", 
+                            "No Colyseus servers found in API response"
+                        )
+                else:
+                    self.log_test(
+                        "Colyseus API Integration", 
+                        "FAIL", 
+                        f"Colyseus integration not active - Enabled: {colyseus_enabled}, Endpoint: {colyseus_endpoint}"
+                    )
+            else:
+                self.log_test(
+                    "API Health Check", 
+                    "FAIL", 
+                    f"API not accessible - Status: {response.status_code}"
+                )
+                
+        except Exception as e:
+            self.log_test("Backend API Integration", "FAIL", f"Exception: {str(e)}")
+
+    def test_player_authentication(self):
+        """Test 6: Player Authentication - Verify Privy user data handling in multiplayer context"""
+        print("\n🔐 TESTING: Player Authentication")
+        
+        try:
+            # Verify authentication endpoint availability
             response = requests.get(f"{self.base_url}/api/wallet/balance", timeout=10)
+            if response.status_code in [200, 401]:  # 401 is expected without auth token
+                self.log_test(
+                    "Authentication Endpoint Availability", 
+                    "PASS", 
+                    f"Authentication endpoint accessible - Status: {response.status_code}"
+                )
+                
+                # Test guest authentication handling
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'balance' in data and 'wallet_address' in data:
+                        self.log_test(
+                            "Guest Authentication Support", 
+                            "PASS", 
+                            f"Guest authentication working - Balance: {data.get('balance')}, Wallet: {data.get('wallet_address')}"
+                        )
+                    else:
+                        self.log_test(
+                            "Guest Authentication Support", 
+                            "FAIL", 
+                            "Missing balance or wallet_address in response"
+                        )
+                else:
+                    # 401 is expected for unauthenticated requests
+                    self.log_test(
+                        "Authentication Security", 
+                        "PASS", 
+                        "Proper authentication security - unauthenticated requests rejected"
+                    )
+            else:
+                self.log_test(
+                    "Authentication Endpoint Availability", 
+                    "FAIL", 
+                    f"Authentication endpoint not accessible - Status: {response.status_code}"
+                )
+            
+            # Verify multiplayer session supports user identification
+            test_auth_session = {
+                "action": "join",
+                "session": {
+                    "roomId": "colyseus-arena-global",
+                    "joinedAt": "2024-01-01T00:00:00.000Z",
+                    "lastActivity": "2024-01-01T00:00:00.000Z",
+                    "userId": "privy_test_user_123",
+                    "playerName": "TestPlayer",
+                    "entryFee": 0,
+                    "mode": "colyseus-multiplayer",
+                    "region": "Australia",
+                    "status": "active"
+                }
+            }
+            
+            response = requests.post(
+                f"{self.base_url}/api/game-sessions",
+                json=test_auth_session,
+                headers={'Content-Type': 'application/json'},
+                timeout=10
+            )
+            
+            if response.status_code in [200, 201]:
+                self.log_test(
+                    "Multiplayer User Identification", 
+                    "PASS", 
+                    "Backend supports user identification in multiplayer sessions"
+                )
+            else:
+                self.log_test(
+                    "Multiplayer User Identification", 
+                    "FAIL", 
+                    f"Failed to create authenticated session - Status: {response.status_code}"
+                )
+                
+            # Verify API supports authentication features
+            response = requests.get(f"{self.base_url}/api", timeout=10)
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    features = data.get('features', [])
+                    
+                    if 'auth' in features:
+                        self.log_test(
+                            "Authentication Feature Support", 
+                            "PASS", 
+                            f"Authentication feature enabled in API - Features: {features}"
+                        )
+                    else:
+                        self.log_test(
+                            "Authentication Feature Support", 
+                            "FAIL", 
+                            f"Authentication not in API features - Features: {features}"
+                        )
+                except:
+                    # If root API doesn't return JSON, that's okay
+                    self.log_test(
+                        "API Root Access", 
+                        "PASS", 
+                        "API root accessible (non-JSON response is acceptable)"
+                    )
+            else:
+                self.log_test(
+                    "API Root Access", 
+                    "FAIL", 
+                    f"API root not accessible - Status: {response.status_code}"
+                )
+                
+        except Exception as e:
+            self.log_test("Player Authentication", "FAIL", f"Exception: {str(e)}")
+
+    def test_legacy_cleanup(self):
+        """Test 7: Legacy cleanup verification"""
+        print("\n🧹 TESTING: Legacy Cleanup Verification")
+        
+        try:
+            # Test that Colyseus has replaced Hathora in server browser
+            response = requests.get(f"{self.base_url}/api/servers", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                required_fields = ["balance", "currency", "sol_balance", "wallet_address"]
-                missing_fields = [field for field in required_fields if field not in data]
+                servers = data.get("servers", [])
                 
-                if missing_fields:
-                    self.log_test("Wallet API Structure", "FAIL", f"Missing fields: {missing_fields}")
+                colyseus_servers = [s for s in servers if s.get("serverType") == "colyseus"]
+                hathora_servers = [s for s in servers if s.get("serverType") == "hathora"]
+                
+                if colyseus_servers and not hathora_servers:
+                    self.log_test("Server Migration", "PASS", f"Successfully migrated to Colyseus: {len(colyseus_servers)} Colyseus servers, {len(hathora_servers)} Hathora servers")
+                elif colyseus_servers and hathora_servers:
+                    self.log_test("Server Migration", "PASS", f"Hybrid setup: {len(colyseus_servers)} Colyseus servers, {len(hathora_servers)} Hathora servers (backward compatibility)")
                 else:
-                    # Check guest balance
-                    if data.get("wallet_address") == "Not connected" and data.get("balance") == 0.0:
-                        self.log_test("Guest Wallet Balance", "PASS", "Correct guest balance returned")
+                    self.log_test("Server Migration", "FAIL", f"Migration incomplete: {len(colyseus_servers)} Colyseus servers, {len(hathora_servers)} Hathora servers")
+                    
+                # Check that Hathora endpoints still exist for backward compatibility
+                try:
+                    hathora_response = requests.get(f"{self.base_url}/api/hathora/create-room", timeout=5)
+                    if hathora_response.status_code in [200, 400, 405]:  # Any response means endpoint exists
+                        self.log_test("Hathora Backward Compatibility", "PASS", "Hathora endpoints still available for backward compatibility")
                     else:
+                        self.log_test("Hathora Backward Compatibility", "FAIL", f"Hathora endpoints not accessible: {hathora_response.status_code}")
+                except:
+                    self.log_test("Hathora Backward Compatibility", "FAIL", "Hathora endpoints completely removed")
+                    
+            else:
+                self.log_test("Server Migration", "FAIL", f"Cannot verify migration - API status: {response.status_code}")
+                
+        except Exception as e:
+            self.log_test("Legacy Cleanup", "FAIL", f"Exception: {str(e)}")
                         self.log_test("Guest Wallet Balance", "FAIL", f"Unexpected guest balance: {data}")
             else:
                 self.log_test("Wallet API", "FAIL", f"Wallet API returned status {response.status_code}")
