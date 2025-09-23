@@ -126,6 +126,12 @@ const MultiplayerArena = () => {
         // Update game engine if it exists
         if (gameRef.current) {
           gameRef.current.updateFromServer(gameState)
+          
+          // Ensure session ID is set (in case game was initialized before connection)
+          if (!gameRef.current.expectedSessionId) {
+            gameRef.current.expectedSessionId = room.sessionId
+            console.log('🎯 Set expected session ID in game engine (delayed):', room.sessionId)
+          }
         }
       })
       
