@@ -4897,22 +4897,26 @@ const AgarIOGame = () => {
               zIndex: 10
             }} />
             
-            {/* Enemy dots on minimap - using state data */}
+            {/* Player/Enemy dots on minimap - different colors for real players vs AI */}
             {minimapData.enemies.map((enemy, i) => (
               <div
                 key={i}
+                title={enemy.isPlayer ? `Player: ${enemy.name || 'Anonymous'}` : 'AI Enemy'}
                 style={{
                   position: 'absolute',
-                  width: isMobile ? '3px' : '6px',
-                  height: isMobile ? '3px' : '6px',
-                  backgroundColor: '#ff6b6b',
+                  width: isMobile ? '4px' : '7px',
+                  height: isMobile ? '4px' : '7px',
+                  backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b', // Green for real players, red for AI
                   borderRadius: '50%',
                   left: `${(enemy.x / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
                   top: `${(enemy.y / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
                   transform: 'translate(-50%, -50%)',
-                  opacity: '0.9',
-                  border: isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff',
-                  zIndex: 8
+                  opacity: enemy.isPlayer ? '1.0' : '0.8', // Real players more opaque
+                  border: enemy.isPlayer 
+                    ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff') 
+                    : (isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff'),
+                  boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none', // Glow for real players
+                  zIndex: enemy.isPlayer ? 10 : 8 // Real players on top
                 }}
               />
             ))}
