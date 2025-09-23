@@ -66,15 +66,12 @@ export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
   
   // Validate required environment variables
-  if (!appId || appId === 'test-app-id') {
-    console.warn('⚠️ Using mock authentication provider (no valid Privy App ID)')
-    // Return children directly without Privy authentication for testing
-    return (
-      <PrivyErrorBoundary>
-        {children}
-      </PrivyErrorBoundary>
-    )
+  if (!appId) {
+    console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is required')
+    return <div>Error: Privy App ID not configured</div>
   }
+
+  console.log('🔧 Initializing Privy with App ID:', appId.substring(0, 10) + '...')
 
   // SOLANA-ONLY Privy Configuration - UPDATED for v2.24.0 fundWallet compatibility
   const config = {
