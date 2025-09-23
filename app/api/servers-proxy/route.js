@@ -7,11 +7,11 @@ export async function GET() {
     const colyseusEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
     
     // Always show the persistent 24/7 room as available
-    // This room is always open and ready for players to join
+    // This room uses the original working room name for compatibility
     const serverData = {
       servers: [
         {
-          id: 'turfloot-persistent-arena-24-7', // Fixed room ID for the persistent room
+          id: 'global-turfloot-arena', // Use original working room identifier
           roomType: 'arena',
           name: 'TurfLoot Arena 24/7',
           region: 'Australia',
