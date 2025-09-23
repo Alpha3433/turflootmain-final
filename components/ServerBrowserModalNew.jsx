@@ -371,7 +371,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     })
     
     // Process fallback data the same way as API data
-    await measurePings(fallbackServerData.servers)
+    await measureServerPings(fallbackServerData.servers)
     setServers(fallbackServerData.servers || [])
     setServerStats({
       totalPlayers: fallbackServerData.totalPlayers || 0,
