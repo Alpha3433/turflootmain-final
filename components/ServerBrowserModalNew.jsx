@@ -728,6 +728,11 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           borderBottom: '1px solid #4a5568'
                         }}>
                           🟢 ACTIVE ROOMS - READY TO JOIN ({activeRooms.length})
+                          {activeRooms.some(room => room.isPersistent) && (
+                            <span style={{ color: '#f59e0b', marginLeft: '8px' }}>
+                              (Includes 24/7 Persistent Rooms)
+                            </span>
+                          )}
                         </div>
                         {activeRooms.map(room => (
                           <div
