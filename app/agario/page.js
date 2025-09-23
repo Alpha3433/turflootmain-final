@@ -3544,10 +3544,10 @@ const AgarIOGame = () => {
     }
   }
 
+  // Initialize game ONCE on mount - don't recreate when multiplayer changes
   useEffect(() => {
-    console.log('🎮 GAME INIT USEEFFECT RUNNING - Debug info:')
-    console.log('🎮 isMultiplayer:', isMultiplayer)
-    console.log('🎮 isMobile:', isMobile) 
+    console.log('🎮 GAME INIT USEEFFECT RUNNING - ONE TIME ONLY')
+    console.log('🎮 Initial isMultiplayer:', isMultiplayer)
     console.log('🎮 canvasRef.current:', !!canvasRef.current)
     
     // Apply mobile game class for full screen optimization
@@ -3605,14 +3605,7 @@ const AgarIOGame = () => {
       cashOutProgress
     }
 
-    // Make sendInputToServer and multiplayer state available globally for Game class
-    window.sendInputToServer = sendInputToServer
-    window.isMultiplayer = isMultiplayer
-    window.wsRef = wsRef
-
-    console.log('🎮 CREATING NEW GAME ENGINE - Current state:')
-    console.log('🎮 isMultiplayer:', isMultiplayer)
-    console.log('🎮 Previous gameRef.current:', !!gameRef.current)
+    console.log('🎮 CREATING GAME ENGINE - ONE TIME INITIALIZATION')
     
     const game = new GameEngine(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates)
     gameRef.current = game
@@ -3620,7 +3613,7 @@ const AgarIOGame = () => {
     
     game.start()
     setGameReady(true)
-    console.log('🎮 Game started - Joystick should now be functional')
+    console.log('🎮 Game started - Input should work in both local and multiplayer modes')
 
     // Game loop
     const gameLoop = () => {
@@ -3661,6 +3654,22 @@ const AgarIOGame = () => {
       document.documentElement.style.margin = ''
       document.documentElement.style.padding = ''
       document.documentElement.style.background = ''
+    }
+  }, []) // CRITICAL FIX: Empty dependency array - don't recreate on multiplayer change
+
+  // Separate useEffect to update game state when multiplayer changes
+  useEffect(() => {
+    console.log('🎮 MULTIPLAYER MODE UPDATE:')
+    console.log('🎮 isMultiplayer changed to:', isMultiplayer)
+    console.log('🎮 gameRef.current exists:', !!gameRef.current)
+    
+    // Update global state for existing game engine
+    window.sendInputToServer = sendInputToServer
+    window.isMultiplayer = isMultiplayer
+    window.wsRef = wsRef
+    
+    if (gameRef.current) {
+      console.log('🎮 Updated existing game engine with multiplayer state')
     }
   }, [isMultiplayer])
 
