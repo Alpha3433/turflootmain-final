@@ -159,11 +159,13 @@ const MultiplayerArena = () => {
       this.world = { width: 4000, height: 4000 }
       this.camera = { x: 0, y: 0 }
       
-      // Player setup
+      // Player setup  
       this.player = {
         x: 2000, y: 2000, mass: 100, radius: 25,
         color: '#4A90E2', name: playerName, alive: true
       }
+      
+      console.log('🎮 Game engine initialized with player name:', playerName)
       
       // Server state - no local generation
       this.serverState = null
