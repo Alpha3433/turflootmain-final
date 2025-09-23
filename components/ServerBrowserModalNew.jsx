@@ -261,8 +261,12 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     if (showRefresh) setRefreshing(true)
     setErrorMessage('') // Clear previous errors
     
-    console.log('🌐 Fetching servers from /api/servers...')
-    const response = await fetch('/api/servers', {
+    // Use base URL for external access, fallback to relative path for local
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ''
+    const apiUrl = `${baseUrl}/api/servers`
+    
+    console.log('🌐 Fetching servers from:', apiUrl)
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
