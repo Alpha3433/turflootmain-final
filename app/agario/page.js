@@ -267,12 +267,30 @@ const AgarIOGame = () => {
       room.onStateChange((state) => {
         console.log('📡 Colyseus state update received')
         console.log('👥 Players in state:', state.players ? Object.keys(state.players).length : 0)
+        console.log('🔍 State structure:', { 
+          hasPlayers: !!state.players, 
+          playersType: typeof state.players,
+          isMultiplayer: window.isMultiplayer 
+        })
+        
+        // Log actual player data (only once per state change, not in render)
+        if (state.players) {
+          Object.entries(state.players).forEach(([sessionId, player]) => {
+            console.log(`👤 Player ${sessionId}:`, {
+              name: player?.name || player?.playerName,
+              alive: player?.alive,
+              x: player?.x,
+              y: player?.y
+            })
+          })
+        }
+        
         serverStateRef.current = state
         
         // CRITICAL: Update the game's serverState for rendering
         if (gameRef.current) {
           gameRef.current.serverState = state
-          console.log('🎮 Updated game serverState with', state.players ? Object.keys(state.players).length : 0, 'players')
+          console.log('🎮 Updated game serverState - isMultiplayer:', window.isMultiplayer)
         }
         
         // Update connected players count
