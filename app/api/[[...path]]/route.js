@@ -1,4 +1,20 @@
 import { NextResponse } from 'next/server'
+import { MongoClient } from 'mongodb'
+import { v4 as uuidv4 } from 'uuid'
+
+// MongoDB connection
+let client
+let db
+
+async function connectToDatabase() {
+  if (!client) {
+    client = new MongoClient(process.env.MONGO_URL)
+    await client.connect()
+    db = client.db()
+    console.log('🔗 Connected to MongoDB for room management')
+  }
+  return db
+}
 
 // CORS headers
 const corsHeaders = {
