@@ -1270,13 +1270,15 @@ const AgarIOGame = () => {
       
       // Update current player from server state if in multiplayer
       const currentPlayer = this.serverState.players.find(p => p.isCurrentPlayer)
-      if (currentPlayer && isMultiplayer) {
+      if (currentPlayer && window.isMultiplayer) {
         // Apply server-authoritative position directly (maintain server authority)
         this.player.x = currentPlayer.x
         this.player.y = currentPlayer.y
         this.player.mass = currentPlayer.mass
         this.player.radius = currentPlayer.radius
         this.player.name = currentPlayer.name
+        this.player.color = currentPlayer.color || this.player.color
+        this.player.alive = currentPlayer.alive
         
         // Update UI state
         if (typeof setMass === 'function') setMass(Math.floor(currentPlayer.mass))
