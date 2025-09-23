@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://multi-rooms-fix.preview.emergentagent.com"
+BASE_URL = "https://browser-click-error.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraRoomCreationTester:

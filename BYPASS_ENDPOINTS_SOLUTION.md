@@ -6,7 +6,7 @@ The TurfLoot application experienced persistent **502 Bad Gateway** errors on th
 ## Root Cause Analysis
 - **Infrastructure Issue**: Kubernetes ingress/gateway configuration blocks requests to `/api/*` paths on external deployment
 - **Not a Code Issue**: All backend endpoints work perfectly on localhost (http://localhost:3000)
-- **External Routing Limitation**: External URL (https://multi-rooms-fix.preview.emergentagent.com) cannot reach `/api/*` endpoints
+- **External Routing Limitation**: External URL (https://browser-click-error.preview.emergentagent.com) cannot reach `/api/*` endpoints
 
 ## Solution Implemented
 

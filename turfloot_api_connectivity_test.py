@@ -16,7 +16,7 @@ from datetime import datetime
 
 # Configuration
 LOCALHOST_URL = "http://localhost:3000"
-PREVIEW_URL = "https://multi-rooms-fix.preview.emergentagent.com"
+PREVIEW_URL = "https://browser-click-error.preview.emergentagent.com"
 LOCALHOST_API = f"{LOCALHOST_URL}/api"
 PREVIEW_API = f"{PREVIEW_URL}/api"
 
