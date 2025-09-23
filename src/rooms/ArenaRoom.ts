@@ -89,37 +89,45 @@ export class ArenaRoom extends Room<GameState> {
     console.log(`👋 Player attempting to join: ${playerName} (${client.sessionId}) - privyUserId: ${privyUserId}`);
     
     // Check for existing players with the same privyUserId or playerName to prevent duplicates
-    let existingSessionId: string | null = null;
+    let existingSessionIds: string[] = [];
+    
+    // First pass: Check against existing client userData for privyUserId matches
+    if (!privyUserId.startsWith('anonymous_')) {
+      this.clients.forEach(existingClient => {
+        if (existingClient.sessionId !== client.sessionId && 
+            (existingClient as any).userData?.privyUserId === privyUserId) {
+          existingSessionIds.push(existingClient.sessionId);
+          console.log(`⚠️ Found existing client with same privyUserId: ${privyUserId} (session: ${existingClient.sessionId})`);
+        }
+      });
+    }
+    
+    // Second pass: Check against player state for name matches (fallback for anonymous)
     this.state.players.forEach((existingPlayer, sessionId) => {
-      // Check if there's already a player with same privyUserId (for authenticated users)
-      if (privyUserId !== `anonymous_${Date.now()}` && 
-          this.clients.find(c => (c as any).userData?.privyUserId === privyUserId)) {
-        existingSessionId = sessionId;
-        console.log(`⚠️ Found existing player with same privyUserId: ${privyUserId} (session: ${sessionId})`);
-      }
-      // Also check for same player name as fallback (for anonymous users)
-      else if (existingPlayer.name === playerName) {
-        existingSessionId = sessionId;
-        console.log(`⚠️ Found existing player with same name: ${playerName} (session: ${sessionId})`);
+      if (sessionId !== client.sessionId && existingPlayer.name === playerName) {
+        if (!existingSessionIds.includes(sessionId)) {
+          existingSessionIds.push(sessionId);
+          console.log(`⚠️ Found existing player with same name: ${playerName} (session: ${sessionId})`);
+        }
       }
     });
     
-    // Remove duplicate player if found
-    if (existingSessionId) {
-      console.log(`🧹 Removing duplicate player (session: ${existingSessionId}) to prevent camera confusion`);
-      this.state.players.delete(existingSessionId);
+    // Remove ALL duplicate players found
+    existingSessionIds.forEach(sessionId => {
+      console.log(`🧹 Removing duplicate player (session: ${sessionId}) to prevent camera confusion`);
+      this.state.players.delete(sessionId);
       
       // Also try to disconnect the old client if still connected
-      const oldClient = this.clients.find(c => c.sessionId === existingSessionId);
+      const oldClient = this.clients.find(c => c.sessionId === sessionId);
       if (oldClient) {
-        console.log(`🔌 Disconnecting old client session: ${existingSessionId}`);
+        console.log(`🔌 Disconnecting old client session: ${sessionId}`);
         try {
           oldClient.leave(1000, 'Duplicate connection detected');
         } catch (error) {
           console.log('⚠️ Error disconnecting old client:', error);
         }
       }
-    }
+    });
     
     // Create new player
     const player = new Player();
