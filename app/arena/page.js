@@ -703,7 +703,13 @@ const MultiplayerArena = () => {
         radius: 25,
         color: '#4A90E2',
         name: playerName || 'Anonymous Player',
-        isCurrentPlayer: true
+        isCurrentPlayer: true,
+        speed: 2,
+        targetX: 2000,
+        targetY: 2000,
+        spawnProtection: true,
+        spawnProtectionTime: 6000,
+        spawnProtectionStart: Date.now()
       }
       
       // Initialize camera centered on player to prevent jarring (matching local agario)
@@ -720,13 +726,6 @@ const MultiplayerArena = () => {
       this.zoneTransitionSpeed = 20 // Pixels per second zone change
       this.isCashGame = false // Can be set based on game mode
       console.log('🎯 Arena initialized with smooth camera and circular zone - radius:', this.currentPlayableRadius)
-        speed: 2,
-        targetX: 2000,
-        targetY: 2000,
-        spawnProtection: true,
-        spawnProtectionTime: 6000,
-        spawnProtectionStart: Date.now()
-      }
 
       this.serverState = null
       this.lastUpdate = Date.now()
