@@ -93,6 +93,29 @@ const MultiplayerArena = () => {
 
   // Authentication loading state
   const [authMessage, setAuthMessage] = useState('')
+  
+  // Selected skin from landing page customization
+  const [selectedSkin, setSelectedSkin] = useState({
+    id: 'default',
+    name: 'Default Warrior',
+    color: '#4A90E2',
+    type: 'circle',
+    pattern: 'solid'
+  })
+  
+  // Load selected skin from localStorage
+  useEffect(() => {
+    const savedSkin = localStorage.getItem('selectedSkin')
+    if (savedSkin) {
+      try {
+        const parsedSkin = JSON.parse(savedSkin)
+        setSelectedSkin(parsedSkin)
+        console.log('🎨 Loaded selected skin for arena:', parsedSkin)
+      } catch (error) {
+        console.log('❌ Error loading saved skin:', error)
+      }
+    }
+  }, [])
 
   // Authentication check - redirect to login if not authenticated with user feedback
   useEffect(() => {
