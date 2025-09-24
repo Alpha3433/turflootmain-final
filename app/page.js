@@ -6830,10 +6830,10 @@ export default function TurfLootTactical() {
                     const isCompleted = progress.completed || progress.current >= challenge.target
                     const canClaim = isCompleted && !progress.claimed
                     
-                    return \`
+                    return `
                       <div style="
-                        background: \${isCompleted ? 'rgba(34, 197, 94, 0.1)' : 'rgba(45, 55, 72, 0.5)'};
-                        border: 2px solid \${isCompleted ? '#22c55e' : 'rgba(148, 163, 184, 0.3)'};
+                        background: ${isCompleted ? 'rgba(34, 197, 94, 0.1)' : 'rgba(45, 55, 72, 0.5)'};
+                        border: 2px solid ${isCompleted ? '#22c55e' : 'rgba(148, 163, 184, 0.3)'};
                         border-radius: 8px;
                         padding: 16px;
                         display: grid;
@@ -6846,15 +6846,15 @@ export default function TurfLootTactical() {
                         <div style="
                           width: 48px;
                           height: 48px;
-                          background: \${isCompleted ? 'rgba(34, 197, 94, 0.2)' : 'rgba(252, 129, 129, 0.2)'};
+                          background: ${isCompleted ? 'rgba(34, 197, 94, 0.2)' : 'rgba(252, 129, 129, 0.2)'};
                           border-radius: 50%;
                           display: flex;
                           align-items: center;
                           justify-content: center;
                           font-size: 24px;
-                          border: 2px solid \${isCompleted ? '#22c55e' : '#fc8181'};
+                          border: 2px solid ${isCompleted ? '#22c55e' : '#fc8181'};
                         ">
-                          \${challenge.icon}
+                          ${challenge.icon}
                         </div>
                         
                         <!-- Content -->
@@ -6862,12 +6862,12 @@ export default function TurfLootTactical() {
                           <div style="
                             font-size: 16px;
                             font-weight: 700;
-                            color: \${isCompleted ? '#22c55e' : '#e2e8f0'};
+                            color: ${isCompleted ? '#22c55e' : '#e2e8f0'};
                             font-family: 'Rajdhani', sans-serif;
                             text-transform: uppercase;
                             margin-bottom: 4px;
                           ">
-                            \${challenge.name}
+                            ${challenge.name}
                           </div>
                           <div style="
                             font-size: 12px;
@@ -6875,7 +6875,7 @@ export default function TurfLootTactical() {
                             font-family: 'Rajdhani', sans-serif;
                             margin-bottom: 8px;
                           ">
-                            \${challenge.description}
+                            ${challenge.description}
                           </div>
                           
                           <!-- Progress Bar -->
@@ -6888,11 +6888,11 @@ export default function TurfLootTactical() {
                             position: relative;
                           ">
                             <div style="
-                              background: \${isCompleted ? 
+                              background: ${isCompleted ? 
                                 'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)' : 
                                 'linear-gradient(90deg, #fc8181 0%, #f87171 100)'};
                               height: 100%;
-                              width: \${progressPercent}%;
+                              width: ${progressPercent}%;
                               transition: width 0.3s ease;
                             "></div>
                           </div>
@@ -6904,7 +6904,7 @@ export default function TurfLootTactical() {
                             font-family: 'Rajdhani', sans-serif;
                             font-weight: 600;
                           ">
-                            \${progress.current}/\${challenge.target} (\${Math.round(progressPercent)}%)
+                            ${progress.current}/${challenge.target} (${Math.round(progressPercent)}%)
                           </div>
                         </div>
                         
@@ -6918,11 +6918,11 @@ export default function TurfLootTactical() {
                             text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
                             margin-bottom: 8px;
                           ">
-                            +\${challenge.reward} coins
+                            +${challenge.reward} coins
                           </div>
                           
-                          \${canClaim ? \`
-                            <button onclick="claimReward('\${challenge.id}', \${challenge.reward})" style="
+                          ${canClaim ? `
+                            <button onclick="claimReward('${challenge.id}', ${challenge.reward})" style="
                               background: linear-gradient(45deg, #22c55e 0%, #16a34a 100%);
                               border: none;
                               border-radius: 6px;
@@ -6939,7 +6939,7 @@ export default function TurfLootTactical() {
                             " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                               🎉 CLAIM
                             </button>
-                          \` : (isCompleted ? \`
+                          ` : (isCompleted ? `
                             <div style="
                               color: #22c55e;
                               font-size: 12px;
@@ -6948,7 +6948,7 @@ export default function TurfLootTactical() {
                             ">
                               ✅ CLAIMED
                             </div>
-                          \` : \`
+                          ` : `
                             <div style="
                               color: #64748b;
                               font-size: 11px;
@@ -6957,10 +6957,10 @@ export default function TurfLootTactical() {
                             ">
                               In Progress
                             </div>
-                          \`)}
+                          `)}
                         </div>
                       </div>
-                    \`
+                    `
                   }).join('')
                 }
                 
