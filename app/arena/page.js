@@ -168,7 +168,7 @@ const MultiplayerArena = () => {
           console.log('🎮 Desktop split toward mouse:', gameRef.current.mouse.worldX?.toFixed(1), gameRef.current.mouse.worldY?.toFixed(1))
           
           // Send split command to multiplayer server
-          if (wsRef.current && connectionStatus === 'connected') {
+          if (wsRef.current && wsRef.current.sessionId) {
             wsRef.current.send("split", { 
               targetX: gameRef.current.mouse.worldX, 
               targetY: gameRef.current.mouse.worldY 
