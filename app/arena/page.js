@@ -877,10 +877,12 @@ const MultiplayerArena = () => {
               const leaderboardData = serverState.players
                 ? serverState.players
                     .filter(player => player.alive)
-                    .map(player => ({
+                    .map((player, playerIndex) => ({
                       name: player.name || 'Anonymous',
                       score: Math.floor(player.score || 0),
-                      isPlayer: player.isCurrentPlayer
+                      isPlayer: player.isCurrentPlayer,
+                      sessionId: player.sessionId || `player_${playerIndex}`,
+                      uniqueKey: `${player.sessionId || playerIndex}_${player.name || 'anonymous'}`
                     }))
                     .sort((a, b) => b.score - a.score)
                 : []
@@ -888,7 +890,7 @@ const MultiplayerArena = () => {
               // Take top 3 (compact) or top 5 (expanded) players for mobile, always 5 for desktop
               const maxPlayers = isMobile ? (leaderboardExpanded ? 5 : 3) : 5
               return leaderboardData.slice(0, maxPlayers).map((player, index) => (
-                <div key={player.name} style={{ 
+                <div key={player.uniqueKey} style={{ 
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
