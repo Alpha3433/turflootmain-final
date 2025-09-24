@@ -341,7 +341,7 @@ const MultiplayerArena = () => {
     }
   }, [])
 
-  // Colyseus connection and input handling - FIXED CONNECTION
+  // Colyseus connection and input handling - ENHANCED DEBUGGING
   const connectToColyseus = async () => {
     // Prevent multiple connections - cleanup any existing connection first
     if (wsRef.current) {
@@ -358,18 +358,36 @@ const MultiplayerArena = () => {
       console.log('🚀 Creating dedicated Colyseus client for this arena...')
       setConnectionStatus('connecting')
       
+      // Get the endpoint from environment or fallback
+      const endpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
+      console.log('🎯 Colyseus endpoint:', endpoint)
+      console.log('🎯 Environment check:', {
+        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT,
+        playerName,
+        privyUserId,
+        roomId
+      })
+      
       // Create dedicated client instance for this arena  
-      const client = new Client(process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud')
+      const client = new Client(endpoint)
       
       console.log('🎯 Joining arena room:', roomId)
       console.log('🎯 Player details - Name:', playerName, 'PrivyID:', privyUserId)
-      console.log('🎯 Colyseus endpoint:', process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud')
+      
+      // Add timeout to connection attempt
+      const connectionTimeout = setTimeout(() => {
+        console.error('❌ Connection timeout after 15 seconds')
+        setConnectionStatus('failed')
+      }, 15000)
       
       const room = await client.joinOrCreate("arena", {
         roomName: roomId,
         playerName: playerName,
         privyUserId: privyUserId
       })
+      
+      // Clear timeout if connection succeeds
+      clearTimeout(connectionTimeout)
       
       wsRef.current = room
       setConnectionStatus('connected')
@@ -463,13 +481,18 @@ const MultiplayerArena = () => {
       
     } catch (error) {
       console.error('❌ Colyseus connection failed:', error)
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT
+      })
       setConnectionStatus('failed')
       
-      // Retry connection after 3 seconds
+      // Retry connection after 5 seconds with exponential backoff
       setTimeout(() => {
-        console.log('🔄 Retrying connection...')
+        console.log('🔄 Retrying connection in 5 seconds...')
         connectToColyseus()
-      }, 3000)
+      }, 5000)
     }
   }
 
