@@ -465,12 +465,21 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Send input to server - matching agario input handling
+  // Send input to server - enhanced debugging
   const sendInput = (dx, dy) => {
-    if (!wsRef.current || connectionStatus !== 'connected') return
+    if (!wsRef.current || connectionStatus !== 'connected') {
+      console.log('❌ Cannot send input - connection status:', connectionStatus)
+      return
+    }
     
     inputSequenceRef.current++
     lastInputRef.current = { dx, dy }
+    
+    console.log('📤 Sending input to server:', {
+      sequence: inputSequenceRef.current,
+      direction: { dx: dx.toFixed(3), dy: dy.toFixed(3) },
+      connectionStatus
+    })
     
     try {
       wsRef.current.send("input", {
@@ -478,6 +487,7 @@ const MultiplayerArena = () => {
         dx: dx,
         dy: dy
       })
+      console.log('✅ Input sent successfully')
     } catch (error) {
       console.error('❌ Failed to send input:', error)
     }
