@@ -6374,7 +6374,7 @@ export default function TurfLootTactical() {
                   description: 'Reach mass 200', 
                   target: 200, 
                   reward: 200,
-                  icon: '🪙', // Changed from 📈 to coin emoji
+                  icon: '🪙', // Changed to use the same coin emoji as Coin Collector
                   type: 'weekly'
                 },
                 { 
