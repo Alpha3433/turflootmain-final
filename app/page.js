@@ -6744,7 +6744,7 @@ export default function TurfLootTactical() {
                 
                 // Get user challenges data
                 const userKey = isAuthenticated ? 
-                  \`challenges_\${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}\` :
+                  'challenges_' + (user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10) :
                   'challenges_guest'
                 
                 let challengesData = {}
