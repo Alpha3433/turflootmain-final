@@ -711,6 +711,15 @@ const MultiplayerArena = () => {
         x: this.player.x - (this.canvas?.width || 800) / 2, 
         y: this.player.y - (this.canvas?.height || 600) / 2 
       }
+      
+      // Dynamic circular zone system (matching local agario)
+      this.basePlayableRadius = 1000 // Minimum zone radius
+      this.maxPlayableRadius = 1800  // Maximum zone radius  
+      this.currentPlayableRadius = 1400 // Starting zone size
+      this.targetPlayableRadius = this.currentPlayableRadius
+      this.zoneTransitionSpeed = 20 // Pixels per second zone change
+      this.isCashGame = false // Can be set based on game mode
+      console.log('🎯 Arena initialized with smooth camera and circular zone - radius:', this.currentPlayableRadius)
         speed: 2,
         targetX: 2000,
         targetY: 2000,
