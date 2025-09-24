@@ -1560,6 +1560,147 @@ const MultiplayerArena = () => {
         >
           Exit Arena
         </button>
+
+        {/* Cash Out Button - ported from agario */}
+        <div 
+          style={{
+            position: 'fixed',
+            bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 120px)' : '20px',
+            left: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 20px)' : '20px',
+            zIndex: 1000,
+            backgroundColor: isCashingOut ? 'rgba(255, 140, 0, 0.95)' : 'rgba(255, 165, 0, 0.95)',
+            border: '3px solid #ff8c00',
+            borderRadius: isMobile ? '12px' : '8px',
+            color: '#ffffff',
+            fontSize: isMobile ? '11px' : '16px',
+            fontWeight: '700',
+            cursor: cashOutComplete ? 'default' : 'pointer',
+            padding: isMobile ? '10px 16px' : '12px 24px',
+            minWidth: isMobile ? '120px' : '200px',
+            textAlign: 'center',
+            fontFamily: '"Rajdhani", sans-serif',
+            userSelect: 'none',
+            opacity: cashOutComplete ? 0.6 : 1,
+            pointerEvents: cashOutComplete ? 'none' : 'auto',
+            boxShadow: isCashingOut 
+              ? '0 0 20px rgba(255, 165, 0, 0.8)' 
+              : (isMobile ? '0 4px 25px rgba(255, 165, 0, 0.7)' : '0 4px 12px rgba(255, 165, 0, 0.4)'),
+            transition: 'all 0.3s ease',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+          onMouseOver={(e) => {
+            if (!isCashingOut && !cashOutComplete) {
+              e.target.style.backgroundColor = 'rgba(255, 140, 0, 1)'
+              e.target.style.transform = 'scale(1.05)'
+              e.target.style.boxShadow = isMobile ? '0 6px 30px rgba(255, 165, 0, 0.8)' : '0 6px 20px rgba(255, 165, 0, 0.6)'
+            }
+          }}
+          onMouseOut={(e) => {
+            if (!isCashingOut) {
+              e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
+              e.target.style.transform = 'scale(1)'
+              e.target.style.boxShadow = isMobile ? '0 4px 25px rgba(255, 165, 0, 0.7)' : '0 4px 12px rgba(255, 165, 0, 0.4)'
+            }
+          }}
+          onTouchStart={(e) => {
+            if (!isMobile) return
+            handleCashOut()
+            e.target.style.transform = 'scale(0.95)'
+            e.target.style.backgroundColor = 'rgba(255, 140, 0, 1)'
+          }}
+          onTouchEnd={(e) => {
+            if (!isMobile) return
+            e.target.style.transform = 'scale(1)'
+            e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
+          }}
+          onMouseDown={isMobile ? undefined : handleCashOut}
+        >
+          {/* Progress fill overlay */}
+          {isCashingOut && (
+            <div style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              height: '100%',
+              width: `${cashOutProgress}%`,
+              backgroundColor: 'rgba(34, 197, 94, 0.8)',
+              transition: 'width 0.1s ease-out',
+              zIndex: -1
+            }} />
+          )}
+          
+          <span style={{ 
+            position: 'relative',
+            zIndex: 1,
+            display: 'block',
+            textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
+          }}>
+            {cashOutComplete 
+              ? `✅ Cashed Out! +$${score}`
+              : isMobile 
+                ? (isCashingOut ? `🔥 ${Math.floor(cashOutProgress)}%` : `🔥 $${score}`)
+                : (isCashingOut 
+                  ? `🔥 Cashing Out... ${Math.floor(cashOutProgress)}%`
+                  : `🔥 Hold E to Cash Out ($${score})`)
+            }
+          </span>
+        </div>
+
+        {/* Split Button - ported from agario */}
+        <div 
+          onClick={(e) => handleSplit(e)}
+          style={{
+            backgroundColor: 'rgba(0, 100, 255, 0.9)',
+            border: '3px solid #0064ff',
+            borderRadius: isMobile ? '50%' : '8px',
+            color: '#ffffff',
+            fontSize: isMobile ? '12px' : '16px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            padding: isMobile ? '0' : '12px 24px',
+            width: isMobile ? '80px' : 'auto',
+            height: isMobile ? '80px' : 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'fixed',
+            bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 120px)' : '20px',
+            right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 20px)' : '20px',
+            zIndex: 1000,
+            fontFamily: '"Rajdhani", sans-serif',
+            userSelect: 'none',
+            boxShadow: isMobile ? '0 4px 25px rgba(0, 100, 255, 0.6)' : '0 4px 12px rgba(0, 100, 255, 0.4)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
+            e.target.style.transform = 'scale(1.05)'
+            e.target.style.boxShadow = isMobile ? '0 6px 30px rgba(0, 100, 255, 0.8)' : '0 6px 20px rgba(0, 100, 255, 0.6)'
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
+            e.target.style.transform = 'scale(1)'
+            e.target.style.boxShadow = isMobile ? '0 4px 25px rgba(0, 100, 255, 0.6)' : '0 4px 12px rgba(0, 100, 255, 0.4)'
+          }}
+          onTouchStart={(e) => {
+            if (!isMobile) return
+            e.target.style.transform = 'scale(0.95)'
+            e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
+          }}
+          onTouchEnd={(e) => {
+            if (!isMobile) return
+            e.target.style.transform = 'scale(1)'
+            e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
+          }}
+        >
+          <span style={{ 
+            textAlign: 'center',
+            textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)'
+          }}>
+            {isMobile ? '✂️' : '✂️ Split (SPACE)'}
+          </span>
+        </div>
       </div>
 
       {/* CSS Animations */}
