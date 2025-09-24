@@ -547,7 +547,7 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Send input to server - enhanced debugging with direct room check
+  // Send input to server with immediate client-side prediction
   const sendInput = (dx, dy) => {
     // Check actual room connection state instead of React state
     if (!wsRef.current) {
@@ -577,7 +577,13 @@ const MultiplayerArena = () => {
         dx: dx,
         dy: dy
       })
-      console.log('✅ Input sent successfully')
+      
+      // CLIENT-SIDE PREDICTION: Apply movement immediately for responsiveness
+      if (gameRef.current && gameRef.current.player.x !== undefined) {
+        gameRef.current.applyClientSideMovement(dx, dy)
+      }
+      
+      console.log('✅ Input sent successfully with client prediction')
     } catch (error) {
       console.error('❌ Failed to send input:', error)
     }
