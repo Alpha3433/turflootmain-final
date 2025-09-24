@@ -1049,30 +1049,26 @@ const MultiplayerArena = () => {
     }
     
     drawCoin(coin) {
-      // Enhanced coin rendering matching 2nd image density
-      const coinSize = coin.radius || 6
+      // Simple coin rendering matching local agario style
+      const coinRadius = coin.radius || 6
       
-      // Main coin body with gradient
-      const gradient = this.ctx.createRadialGradient(coin.x, coin.y, 0, coin.x, coin.y, coinSize)
-      gradient.addColorStop(0, '#FFD700')
-      gradient.addColorStop(0.7, '#FFA500')
-      gradient.addColorStop(1, '#FF8C00')
-      
-      this.ctx.fillStyle = gradient
+      // Main coin body - use coin color from server or default gold
       this.ctx.beginPath()
-      this.ctx.arc(coin.x, coin.y, coinSize, 0, Math.PI * 2)
+      this.ctx.arc(coin.x, coin.y, coinRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = coin.color || '#FFD700'
       this.ctx.fill()
       
-      // Bright outline for visibility
-      this.ctx.strokeStyle = '#FFFF00'
+      // Orange/gold border like local agario
+      this.ctx.strokeStyle = '#FFB000'
       this.ctx.lineWidth = 2
       this.ctx.stroke()
       
-      // Inner sparkle
-      this.ctx.fillStyle = '#FFFFFF'
-      this.ctx.beginPath()
-      this.ctx.arc(coin.x - coinSize * 0.3, coin.y - coinSize * 0.3, coinSize * 0.2, 0, Math.PI * 2)
-      this.ctx.fill()
+      // Draw $ symbol like local agario
+      this.ctx.fillStyle = '#000000'
+      this.ctx.font = 'bold 12px Arial'
+      this.ctx.textAlign = 'center'
+      this.ctx.textBaseline = 'middle'
+      this.ctx.fillText('$', coin.x, coin.y + 1) // Slight vertical adjustment for better centering
     }
     
     drawVirus(virus) {
