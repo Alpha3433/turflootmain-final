@@ -862,45 +862,61 @@ const MultiplayerArena = () => {
       let currentPlayer = state.players.find(p => p.isCurrentPlayer)
       
       if (currentPlayer) {
-        // Verify this is actually our session to prevent camera jumping
-        if (currentPlayer.sessionId === this.expectedSessionId) {
-          console.log('🎮 Camera following authenticated player:', currentPlayer.name, 
-                     'session:', currentPlayer.sessionId, 
-                     'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
+        console.log('🎮 Server update for player:', currentPlayer.name, 
+                   'session:', currentPlayer.sessionId, 
+                   'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
+        
+        // IMPROVED SERVER RECONCILIATION for client-side prediction
+        if (this.player.x && this.player.y) {
+          const distance = Math.sqrt(
+            Math.pow(currentPlayer.x - this.player.x, 2) + 
+            Math.pow(currentPlayer.y - this.player.y, 2)
+          )
           
-          // Smooth position updates to prevent camera jumping
-          if (this.player.x && this.player.y) {
-            const distance = Math.sqrt(
-              Math.pow(currentPlayer.x - this.player.x, 2) + 
-              Math.pow(currentPlayer.y - this.player.y, 2)
-            )
-            
-            // If the distance is large, apply directly (avoid desync)
-            // If small, smooth interpolate to prevent jitter
-            if (distance > 100) {
-              this.player.x = currentPlayer.x
-              this.player.y = currentPlayer.y
-            } else {
-              const lerpFactor = 0.3
-              this.player.x += (currentPlayer.x - this.player.x) * lerpFactor
-              this.player.y += (currentPlayer.y - this.player.y) * lerpFactor
-            }
-          } else {
-            // First update - apply directly
+          console.log('🔄 Position reconciliation:', {
+            client: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
+            server: { x: currentPlayer.x.toFixed(1), y: currentPlayer.y.toFixed(1) },
+            distance: distance.toFixed(1)
+          })
+          
+          // Adaptive reconciliation based on distance
+          if (distance > 200) {
+            // Large desync - snap to server position immediately
+            console.log('⚡ Large desync detected - snapping to server position')
             this.player.x = currentPlayer.x
             this.player.y = currentPlayer.y
+          } else if (distance > 50) {
+            // Medium desync - use stronger correction
+            const correctionFactor = 0.6
+            this.player.x += (currentPlayer.x - this.player.x) * correctionFactor
+            this.player.y += (currentPlayer.y - this.player.y) * correctionFactor
+          } else if (distance > 10) {
+            // Small desync - gentle correction to maintain smooth prediction
+            const correctionFactor = 0.2
+            this.player.x += (currentPlayer.x - this.player.x) * correctionFactor
+            this.player.y += (currentPlayer.y - this.player.y) * correctionFactor
           }
+          // If distance <= 10, trust client prediction (no correction needed)
           
-          // Update mass and score
-          setMass(Math.round(currentPlayer.mass) || 100)
-          setScore(Math.round(currentPlayer.score) || 0)
         } else {
-          console.log('⚠️ Session ID mismatch - ignoring player update for session:', 
-                     currentPlayer.sessionId, 'expected:', this.expectedSessionId)
+          // First update - apply directly
+          this.player.x = currentPlayer.x
+          this.player.y = currentPlayer.y
         }
+        
+        // Update mass and score (server is always authoritative for these)
+        setMass(Math.round(currentPlayer.mass) || 25)
+        setScore(Math.round(currentPlayer.score) || 0)
+        
+        // Update other player properties
+        this.player.mass = currentPlayer.mass
+        this.player.radius = currentPlayer.radius
+        this.player.color = currentPlayer.color
+        this.player.skinColor = currentPlayer.skinColor
+        
       } else {
-        console.log('⚠️ Current player not found in state - camera remains stationary')
-        // Do NOT use any fallback - camera should not jump to other players
+        console.log('❌ No current player found in server state - players available:', 
+                   Array.from(state.players.keys()))
       }
     }
     
