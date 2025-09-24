@@ -987,15 +987,22 @@ const MultiplayerArena = () => {
       this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
       this.ctx.stroke()
       
-      // Player name with better contrast
-      this.ctx.fillStyle = '#FFFFFF'
-      this.ctx.font = `bold ${Math.max(12, playerRadius * 0.5)}px "Rajdhani", sans-serif`
-      this.ctx.textAlign = 'center'
-      this.ctx.textBaseline = 'middle'
-      this.ctx.strokeStyle = '#000000'
-      this.ctx.lineWidth = 3
-      this.ctx.strokeText(player.name || 'Player', player.x, player.y)
-      this.ctx.fillText(player.name || 'Player', player.x, player.y)
+      // Black eyes (classic Agar.io style)
+      const eyeSize = Math.max(3, playerRadius * 0.15)
+      const eyeOffsetX = playerRadius * 0.3
+      const eyeOffsetY = -playerRadius * 0.1
+      
+      this.ctx.fillStyle = '#000000'
+      
+      // Left eye
+      this.ctx.beginPath()
+      this.ctx.arc(player.x - eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
+      this.ctx.fill()
+      
+      // Right eye
+      this.ctx.beginPath()
+      this.ctx.arc(player.x + eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
+      this.ctx.fill()
     }
     
     drawCoin(coin) {
