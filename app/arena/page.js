@@ -874,7 +874,11 @@ const MultiplayerArena = () => {
         clearInterval(this.zoneUpdateInterval)
         this.zoneUpdateInterval = null
       }
-      console.log('🎮 Multiplayer game engine stopped')
+      // Clear animation cache to prevent memory leaks
+      if (this.virusAnimationCache) {
+        this.virusAnimationCache.clear()
+      }
+      console.log('🎮 Multiplayer game engine stopped with animation cleanup')
       
       // Clean up event listeners
       if (this.handleMouseMove) {
