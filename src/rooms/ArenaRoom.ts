@@ -494,10 +494,10 @@ export class ArenaRoom extends Room<GameState> {
     const centerX = this.worldSize / 2; // 2000 for 4000x4000 world
     const centerY = this.worldSize / 2; // 2000 for 4000x4000 world
     
-    // Use much more conservative spawn radius to ensure players are well within safe zone
-    const maxSafeRadius = 1200; // Reduced from 1400 to ensure spawns are safely within zone
-    const safetyMargin = 100; // Increased safety margin
-    const spawnRadius = maxSafeRadius - safetyMargin; // 1100 radius for spawning
+    // EMERGENCY FIX: Use extremely conservative spawn radius 
+    const maxSafeRadius = 800; // Much smaller to ensure safe spawning
+    const safetyMargin = 200; // Large safety margin
+    const spawnRadius = maxSafeRadius - safetyMargin; // 600 radius for spawning
     
     // Generate random point within circle using polar coordinates
     const angle = Math.random() * Math.PI * 2; // Random angle
@@ -507,8 +507,8 @@ export class ArenaRoom extends Room<GameState> {
     const y = centerY + Math.sin(angle) * distance;
     
     // Double-check that spawn is within world bounds and not too close to edges
-    const clampedX = Math.max(100, Math.min(this.worldSize - 100, x));
-    const clampedY = Math.max(100, Math.min(this.worldSize - 100, y));
+    const clampedX = Math.max(200, Math.min(this.worldSize - 200, x));
+    const clampedY = Math.max(200, Math.min(this.worldSize - 200, y));
     
     // Verify the spawn is within circular safe zone
     const distanceFromCenter = Math.sqrt(
@@ -516,11 +516,11 @@ export class ArenaRoom extends Room<GameState> {
       Math.pow(clampedY - centerY, 2)
     );
     
-    console.log(`🎯 Generated safe spawn position: (${clampedX.toFixed(1)}, ${clampedY.toFixed(1)}) at distance ${distanceFromCenter.toFixed(1)} from center (max safe: ${maxSafeRadius})`);
+    console.log(`🎯 EMERGENCY SAFE SPAWN: (${clampedX.toFixed(1)}, ${clampedY.toFixed(1)}) at distance ${distanceFromCenter.toFixed(1)} from center (max safe: ${maxSafeRadius})`);
     
-    // Final safety check - if still outside safe zone, spawn at center
-    if (distanceFromCenter > maxSafeRadius) {
-      console.log('⚠️ Spawn outside safe zone detected, using center spawn');
+    // Emergency safety - if ANY doubt, spawn at center
+    if (distanceFromCenter > 500) {
+      console.log('🚨 EMERGENCY CENTER SPAWN - ensuring 100% safety');
       return { x: centerX, y: centerY };
     }
     
