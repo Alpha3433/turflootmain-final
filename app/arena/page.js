@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
+import { usePrivy } from '@privy-io/react-auth'
 
 const MultiplayerArena = () => {
   console.log('🎮 MULTIPLAYER ARENA - Pure Colyseus multiplayer mode')
@@ -12,6 +13,9 @@ const MultiplayerArena = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const wsRef = useRef(null)
+  
+  // Privy authentication
+  const { ready, authenticated, user, login } = usePrivy()
   
   // Game states - matching agario completely
   const [gameReady, setGameReady] = useState(false)
