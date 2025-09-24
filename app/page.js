@@ -6242,24 +6242,39 @@ export default function TurfLootTactical() {
           position: 'absolute',
           left: '200px',
           top: '210px',
-          width: '280px',
+          width: '240px', // Reduced from 280px
           zIndex: 20,
-          ...tacticalPanelStyle
+          ...tacticalPanelStyle,
+          background: 'linear-gradient(135deg, rgba(26, 32, 44, 0.95) 0%, rgba(45, 55, 72, 0.95) 100%)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(252, 129, 129, 0.4)',
+          borderRadius: '12px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(252, 129, 129, 0.1)'
         }}>
           <div style={{
             position: 'absolute',
-            top: '5px',
-            right: '5px',
-            width: '8px',
-            height: '8px',
+            top: '8px',
+            right: '8px',
+            width: '6px',
+            height: '6px',
             background: '#fc8181',
             borderRadius: '50%',
-            boxShadow: '0 0 10px #fc8181',
+            boxShadow: '0 0 8px #fc8181',
             animation: 'statusBlink 2s ease-in-out infinite 1s'
           }} />
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <h3 style={{ color: '#fc8181', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(252, 129, 129, 0.6)', textTransform: 'uppercase' }}>CHALLENGES</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <h3 style={{ 
+              color: '#fc8181', 
+              fontWeight: '600', 
+              fontSize: '14px', 
+              margin: 0, 
+              fontFamily: '"Inter", sans-serif', 
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase'
+            }}>
+              Challenges
+            </h3>
             <div style={{ marginLeft: 'auto' }}>
               <button 
                 onClick={async () => {
@@ -6289,39 +6304,40 @@ export default function TurfLootTactical() {
                   }
                 }}
                 style={{ 
-                  fontSize: '10px', 
-                  color: '#fc8181', 
-                  background: 'none', 
-                  border: 'none', 
+                  fontSize: '9px', 
+                  color: '#a0aec0', 
+                  background: 'rgba(160, 174, 192, 0.1)', 
+                  border: '1px solid rgba(160, 174, 192, 0.2)',
+                  borderRadius: '4px',
                   cursor: 'pointer', 
-                  fontWeight: '600', 
-                  fontFamily: '"Rajdhani", sans-serif',
-                  textDecoration: 'none',
-                  padding: '2px 4px',
-                  borderRadius: '2px',
+                  fontWeight: '500', 
+                  fontFamily: '"Inter", sans-serif',
+                  padding: '3px 6px',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.color = '#fbb6b6'
+                  e.target.style.color = '#e2e8f0'
+                  e.target.style.background = 'rgba(160, 174, 192, 0.2)'
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.color = '#fc8181'
+                  e.target.style.color = '#a0aec0'
+                  e.target.style.background = 'rgba(160, 174, 192, 0.1)'
                 }}
-                title="Refresh challenge progress"
+                title="Refresh progress"
               >
-                🔄 REFRESH
+                ↻
               </button>
             </div>
           </div>
           
           <div style={{ 
-            background: 'rgba(26, 32, 44, 0.8)', 
+            background: 'rgba(15, 23, 42, 0.8)', 
             borderRadius: '8px', 
-            padding: '16px', 
-            border: '2px solid rgba(252, 129, 129, 0.3)',
-            marginBottom: '16px',
+            padding: '12px', 
+            border: '1px solid rgba(252, 129, 129, 0.2)',
+            marginBottom: '12px',
             position: 'relative',
-            minHeight: '140px'
+            minHeight: '100px' // Reduced from 140px
           }}>
             {/* Challenge Carousel */}
             {(() => {
@@ -6352,7 +6368,7 @@ export default function TurfLootTactical() {
                 { 
                   id: 'survive_5_minutes', 
                   name: 'Survivor', 
-                  description: 'Survive for 5 minutes', 
+                  description: 'Survive 5 minutes', 
                   target: 300, // seconds
                   reward: 150,
                   icon: '⏱️',
@@ -6385,42 +6401,44 @@ export default function TurfLootTactical() {
               
               return (
                 <div style={{ position: 'relative' }}>
-                  {/* Navigation Arrows */}
+                  {/* Navigation Arrows - Modern Design */}
                   <button
                     onClick={() => setCurrentChallengeIndex(prev => 
                       prev === 0 ? defaultChallenges.length - 1 : prev - 1
                     )}
                     style={{
                       position: 'absolute',
-                      left: '-8px',
+                      left: '-4px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      background: 'rgba(252, 129, 129, 0.8)',
-                      border: '2px solid #fc8181',
+                      background: 'rgba(252, 129, 129, 0.9)',
+                      border: 'none',
                       borderRadius: '50%',
-                      width: '32px',
-                      height: '32px',
+                      width: '24px',
+                      height: '24px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
                       color: 'white',
-                      fontSize: '14px',
+                      fontSize: '10px',
                       fontWeight: 'bold',
-                      boxShadow: '0 0 10px rgba(252, 129, 129, 0.4)',
+                      boxShadow: '0 2px 8px rgba(252, 129, 129, 0.3)',
                       zIndex: 10,
                       transition: 'all 0.2s ease'
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 1)'
+                      e.target.style.background = '#fc8181'
                       e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                      e.target.style.boxShadow = '0 4px 12px rgba(252, 129, 129, 0.5)'
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 0.8)'
+                      e.target.style.background = 'rgba(252, 129, 129, 0.9)'
                       e.target.style.transform = 'translateY(-50%) scale(1)'
+                      e.target.style.boxShadow = '0 2px 8px rgba(252, 129, 129, 0.3)'
                     }}
                   >
-                    ←
+                    ‹
                   </button>
                   
                   <button
@@ -6429,85 +6447,87 @@ export default function TurfLootTactical() {
                     )}
                     style={{
                       position: 'absolute',
-                      right: '-8px',
+                      right: '-4px',
                       top: '50%',
                       transform: 'translateY(-50%)',
-                      background: 'rgba(252, 129, 129, 0.8)',
-                      border: '2px solid #fc8181',
+                      background: 'rgba(252, 129, 129, 0.9)',
+                      border: 'none',
                       borderRadius: '50%',
-                      width: '32px',
-                      height: '32px',
+                      width: '24px',
+                      height: '24px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
                       color: 'white',
-                      fontSize: '14px',
+                      fontSize: '10px',
                       fontWeight: 'bold',
-                      boxShadow: '0 0 10px rgba(252, 129, 129, 0.4)',
+                      boxShadow: '0 2px 8px rgba(252, 129, 129, 0.3)',
                       zIndex: 10,
                       transition: 'all 0.2s ease'
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 1)'
+                      e.target.style.background = '#fc8181'
                       e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                      e.target.style.boxShadow = '0 4px 12px rgba(252, 129, 129, 0.5)'
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 0.8)'
+                      e.target.style.background = 'rgba(252, 129, 129, 0.9)'
                       e.target.style.transform = 'translateY(-50%) scale(1)'
+                      e.target.style.boxShadow = '0 2px 8px rgba(252, 129, 129, 0.3)'
                     }}
                   >
-                    →
+                    ›
                   </button>
                   
-                  {/* Challenge Card */}
+                  {/* Challenge Card - Modern Design */}
                   <div style={{
-                    padding: '16px',
-                    background: isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)',
-                    borderRadius: '8px',
-                    border: `2px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`,
+                    padding: '12px',
+                    background: isCompleted ? 'rgba(34, 197, 94, 0.1)' : 'rgba(51, 65, 85, 0.4)',
+                    borderRadius: '6px',
+                    border: `1px solid ${isCompleted ? 'rgba(34, 197, 94, 0.3)' : 'rgba(148, 163, 184, 0.2)'}`,
                     position: 'relative',
-                    margin: '0 24px',
-                    textAlign: 'center'
+                    margin: '0 16px',
+                    textAlign: 'left'
                   }}>
                     {/* Challenge Header */}
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'center',
-                      gap: '12px', 
-                      marginBottom: '12px' 
+                      justifyContent: 'space-between',
+                      marginBottom: '8px' 
                     }}>
-                      <span style={{ fontSize: '24px' }}>{currentChallenge.icon}</span>
-                      <div>
-                        <div style={{
-                          fontSize: '16px',
-                          fontWeight: '700',
-                          color: isCompleted ? '#68d391' : '#e2e8f0',
-                          fontFamily: '"Rajdhani", sans-serif',
-                          textTransform: 'uppercase',
-                          marginBottom: '4px'
-                        }}>
-                          {currentChallenge.name}
-                        </div>
-                        <div style={{
-                          fontSize: '12px',
-                          color: '#a0aec0',
-                          fontFamily: '"Rajdhani", sans-serif'
-                        }}>
-                          {currentChallenge.description}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '16px' }}>{currentChallenge.icon}</span>
+                        <div>
+                          <div style={{
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: isCompleted ? '#22c55e' : '#e2e8f0',
+                            fontFamily: '"Inter", sans-serif',
+                            marginBottom: '2px'
+                          }}>
+                            {currentChallenge.name}
+                          </div>
+                          <div style={{
+                            fontSize: '10px',
+                            color: '#94a3b8',
+                            fontFamily: '"Inter", sans-serif'
+                          }}>
+                            {currentChallenge.description}
+                          </div>
                         </div>
                       </div>
                       <div style={{
-                        padding: '4px 8px',
-                        background: currentChallenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 'rgba(139, 92, 246, 0.2)',
-                        border: `1px solid ${currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6'}`,
-                        borderRadius: '4px',
-                        fontSize: '10px',
-                        color: currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
+                        padding: '2px 6px',
+                        background: currentChallenge.type === 'daily' ? 'rgba(249, 115, 22, 0.2)' : 'rgba(139, 92, 246, 0.2)',
+                        border: `1px solid ${currentChallenge.type === 'daily' ? '#f97316' : '#8b5cf6'}`,
+                        borderRadius: '3px',
+                        fontSize: '8px',
+                        color: currentChallenge.type === 'daily' ? '#f97316' : '#8b5cf6',
                         textTransform: 'uppercase',
-                        fontFamily: '"Rajdhani", sans-serif',
-                        fontWeight: '600'
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '500'
                       }}>
                         {currentChallenge.type}
                       </div>
@@ -6515,16 +6535,16 @@ export default function TurfLootTactical() {
                     
                     {/* Progress Bar */}
                     <div style={{
-                      background: 'rgba(45, 55, 72, 0.8)',
-                      borderRadius: '6px',
-                      height: '8px',
+                      background: 'rgba(30, 41, 59, 0.8)',
+                      borderRadius: '3px',
+                      height: '4px',
                       overflow: 'hidden',
-                      marginBottom: '12px'
+                      marginBottom: '8px'
                     }}>
                       <div style={{
                         background: isCompleted ? 
-                          'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
-                          'linear-gradient(90deg, #fc8181 0%, #f56565 100%)',
+                          'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)' : 
+                          'linear-gradient(90deg, #fc8181 0%, #f87171 100%)',
                         height: '100%',
                         width: `${progressPercent}%`,
                         transition: 'width 0.3s ease'
@@ -6536,53 +6556,54 @@ export default function TurfLootTactical() {
                       display: 'flex', 
                       justifyContent: 'space-between', 
                       alignItems: 'center',
-                      marginBottom: '8px'
+                      marginBottom: '6px'
                     }}>
                       <span style={{
-                        fontSize: '12px',
-                        color: '#a0aec0',
-                        fontFamily: '"Rajdhani", sans-serif',
-                        fontWeight: '600'
+                        fontSize: '10px',
+                        color: '#94a3b8',
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '500'
                       }}>
                         {isCompleted ? 'COMPLETED' : `${progress.current}/${currentChallenge.target}`}
                       </span>
                       <span style={{
-                        fontSize: '12px',
-                        color: '#f6ad55',
-                        fontFamily: '"Rajdhani", sans-serif',
-                        fontWeight: '700'
+                        fontSize: '10px',
+                        color: '#f59e0b',
+                        fontFamily: '"Inter", sans-serif',
+                        fontWeight: '600'
                       }}>
-                        {isCompleted ? '✅ REWARD READY' : `+${currentChallenge.reward} coins`}
+                        {isCompleted ? '✓ Ready' : `+${currentChallenge.reward}`}
                       </span>
                     </div>
                     
                     {/* Challenge Counter */}
                     <div style={{
-                      fontSize: '10px',
-                      color: '#68d391',
-                      fontFamily: '"Rajdhani", sans-serif',
-                      fontWeight: '600'
+                      fontSize: '8px',
+                      color: '#64748b',
+                      fontFamily: '"Inter", sans-serif',
+                      fontWeight: '500',
+                      textAlign: 'center'
                     }}>
-                      {currentChallengeIndex + 1} / {defaultChallenges.length}
+                      {currentChallengeIndex + 1} of {defaultChallenges.length}
                     </div>
                     
-                    {/* Completion Overlay */}
+                    {/* Completion Badge */}
                     {isCompleted && (
                       <div style={{
                         position: 'absolute',
-                        top: '8px',
-                        right: '8px',
-                        background: '#68d391',
-                        color: '#1a202c',
+                        top: '6px',
+                        right: '6px',
+                        background: '#22c55e',
+                        color: 'white',
                         borderRadius: '50%',
-                        width: '24px',
-                        height: '24px',
+                        width: '16px',
+                        height: '16px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '12px',
+                        fontSize: '8px',
                         fontWeight: 'bold',
-                        boxShadow: '0 0 8px rgba(104, 211, 145, 0.6)'
+                        boxShadow: '0 2px 8px rgba(34, 197, 94, 0.4)'
                       }}>
                         ✓
                       </div>
@@ -6593,187 +6614,181 @@ export default function TurfLootTactical() {
             })()}
           </div>
           
-          <button 
-            onClick={async () => {
-              console.log('VIEW ALL CHALLENGES button clicked!')
-              const authenticated = await requireAuthentication('VIEW ALL CHALLENGES')
-              if (authenticated) {
-                console.log('🎯 User authenticated, opening challenges modal...')
-                
-                // Create detailed challenges modal
-                const modal = document.createElement('div')
-                modal.style.cssText = `
-                  position: fixed;
-                  top: 0;
-                  left: 0;
-                  width: 100vw;
-                  height: 100vh;
-                  background: rgba(0, 0, 0, 0.8);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  z-index: 10000;
-                  backdrop-filter: blur(5px);
-                `
-                
-                modal.innerHTML = `
-                  <div style="
-                    background: linear-gradient(145deg, #1a202c 0%, #2d3748 100%);
-                    border: 2px solid #fc8181;
-                    border-radius: 12px;
-                    padding: 24px;
-                    max-width: 600px;
-                    width: 90%;
-                    max-height: 80vh;
-                    overflow-y: auto;
-                    box-shadow: 0 0 30px rgba(252, 129, 129, 0.4);
-                  ">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                      <h2 style="color: #fc8181; font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; margin: 0; text-transform: uppercase;">
-                        🎯 ALL CHALLENGES
-                      </h2>
-                      <button onclick="this.closest('div').remove()" style="
-                        background: rgba(252, 129, 129, 0.2);
-                        border: 1px solid #fc8181;
-                        border-radius: 4px;
-                        color: #fc8181;
-                        cursor: pointer;
-                        padding: 8px 12px;
-                        font-family: 'Rajdhani', sans-serif;
-                        font-weight: 600;
-                      ">CLOSE</button>
-                    </div>
-                    
-                    <div style="color: #e2e8f0; font-family: 'Rajdhani', sans-serif; margin-bottom: 20px; padding: 12px; background: rgba(252, 129, 129, 0.1); border-radius: 6px; border: 1px solid rgba(252, 129, 129, 0.3);">
-                      <strong>How Challenges Work:</strong><br>
-                      • Complete challenges by playing games<br>
-                      • Daily challenges reset every 24 hours<br>
-                      • Weekly challenges reset every Monday<br>
-                      • Earn coins as rewards for completion<br>
-                      • Progress is tracked automatically during gameplay
-                    </div>
-                    
-                    <div id="all-challenges-list" style="display: grid; gap: 12px;">
-                      <!-- Challenges will be populated here -->
-                    </div>
-                  </div>
-                `
-                
-                document.body.appendChild(modal)
-              } else {
-                console.log('❌ Authentication failed, blocking access to VIEW ALL CHALLENGES')
-              }
-            }}
-            style={{
-            width: '100%',
-            padding: '12px',
-            background: 'rgba(26, 32, 44, 0.8)',
-            border: '2px solid #fc8181',
-            borderRadius: '4px',
-            color: '#fc8181',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 0 15px rgba(252, 129, 129, 0.3)',
-            fontFamily: '"Rajdhani", sans-serif',
-            textTransform: 'uppercase',
-            marginBottom: '12px'
-          }}>
-            VIEW ALL CHALLENGES
-          </button>
-          
-          <button 
-            onClick={async () => {
-              console.log('CLAIM REWARDS button clicked!')
-              const authenticated = await requireAuthentication('CLAIM REWARDS')
-              if (authenticated) {
-                console.log('💰 User authenticated, claiming completed challenge rewards...')
-                
-                try {
-                  // Get user-specific challenges data
-                  const userKey = isAuthenticated ? 
-                    `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
-                    'challenges_guest'
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              onClick={async () => {
+                console.log('VIEW ALL CHALLENGES button clicked!')
+                const authenticated = await requireAuthentication('VIEW ALL CHALLENGES')
+                if (authenticated) {
+                  console.log('🎯 User authenticated, opening challenges modal...')
                   
-                  let challengesData = {}
-                  try {
-                    const saved = localStorage.getItem(userKey)
-                    challengesData = saved ? JSON.parse(saved) : {}
-                  } catch (error) {
-                    console.error('Error loading challenges:', error)
-                  }
+                  // Create detailed challenges modal
+                  const modal = document.createElement('div')
+                  modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(0, 0, 0, 0.8);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                    backdrop-filter: blur(5px);
+                  `
                   
-                  // Default challenges
-                  const defaultChallenges = [
-                    { id: 'eat_50_coins', name: 'Coin Collector', target: 50, reward: 100 },
-                    { id: 'survive_5_minutes', name: 'Survivor', target: 300, reward: 150 },
-                    { id: 'reach_mass_200', name: 'Growing Strong', target: 200, reward: 200 },
-                    { id: 'cashout_5_times', name: 'Cash Master', target: 5, reward: 250 }
-                  ]
-                  
-                  let totalRewards = 0
-                  let claimedCount = 0
-                  
-                  // Check for completed challenges that haven't been claimed
-                  defaultChallenges.forEach(challenge => {
-                    const progress = challengesData[challenge.id] || { current: 0, completed: false, claimed: false }
-                    const isCompleted = progress.current >= challenge.target
-                    
-                    if (isCompleted && !progress.claimed) {
-                      totalRewards += challenge.reward
-                      claimedCount++
+                  modal.innerHTML = `
+                    <div style="
+                      background: linear-gradient(145deg, #1a202c 0%, #2d3748 100%);
+                      border: 2px solid #fc8181;
+                      border-radius: 12px;
+                      padding: 24px;
+                      max-width: 600px;
+                      width: 90%;
+                      max-height: 80vh;
+                      overflow-y: auto;
+                      box-shadow: 0 0 30px rgba(252, 129, 129, 0.4);
+                    ">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: #fc8181; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600; margin: 0;">
+                          🎯 All Challenges
+                        </h2>
+                        <button onclick="this.closest('div').remove()" style="
+                          background: rgba(252, 129, 129, 0.2);
+                          border: 1px solid #fc8181;
+                          border-radius: 4px;
+                          color: #fc8181;
+                          cursor: pointer;
+                          padding: 6px 10px;
+                          font-family: 'Inter', sans-serif;
+                          font-weight: 500;
+                        ">Close</button>
+                      </div>
                       
-                      // Mark as claimed
-                      challengesData[challenge.id] = {
-                        ...progress,
-                        completed: true,
-                        claimed: true
-                      }
-                    }
-                  })
+                      <div style="color: #e2e8f0; font-family: 'Inter', sans-serif; margin-bottom: 20px; padding: 12px; background: rgba(252, 129, 129, 0.1); border-radius: 6px; border: 1px solid rgba(252, 129, 129, 0.3);">
+                        <strong>Challenge System:</strong><br>
+                        • Complete objectives by playing games<br>
+                        • Daily challenges reset every 24 hours<br>
+                        • Weekly challenges reset every Monday<br>
+                        • Earn coins for completing challenges
+                      </div>
+                    </div>
+                  `
                   
-                  if (totalRewards > 0) {
-                    // Save updated challenges data
-                    localStorage.setItem(userKey, JSON.stringify(challengesData))
-                    
-                    // Add rewards to currency
-                    setCurrency(prev => prev + totalRewards)
-                    
-                    // Show success message
-                    alert(`🎉 Rewards Claimed!\\n\\n• ${claimedCount} challenge${claimedCount > 1 ? 's' : ''} completed\\n• +${totalRewards} coins earned\\n\\nKeep playing to unlock more challenges!`)
-                    
-                    console.log(`✅ Claimed ${totalRewards} coins from ${claimedCount} completed challenges`)
-                  } else {
-                    alert('📋 No rewards to claim\\n\\nComplete challenges by playing games to earn coin rewards!')
-                    console.log('ℹ️ No completed challenges available for claiming')
-                  }
-                  
-                } catch (error) {
-                  console.error('❌ Error claiming rewards:', error)
-                  alert('❌ Error claiming rewards. Please try again.')
+                  document.body.appendChild(modal)
+                } else {
+                  console.log('❌ Authentication failed, blocking access to VIEW ALL CHALLENGES')
                 }
-              } else {
-                console.log('❌ Authentication failed, blocking access to CLAIM REWARDS')
-              }
-            }}
-            style={{
-            width: '100%',
-            padding: '12px',
-            background: 'rgba(26, 32, 44, 0.8)',
-            border: '2px solid #68d391',
-            borderRadius: '4px',
-            color: '#68d391',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
-            fontFamily: '"Rajdhani", sans-serif',
-            textTransform: 'uppercase'
-          }}>
-            CLAIM REWARDS
-          </button>
+              }}
+              style={{
+                flex: 1,
+                padding: '8px',
+                background: 'rgba(15, 23, 42, 0.8)',
+                border: '1px solid rgba(252, 129, 129, 0.4)',
+                borderRadius: '6px',
+                color: '#fc8181',
+                fontSize: '10px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: '"Inter", sans-serif'
+              }}
+            >
+              View All
+            </button>
+            
+            <button 
+              onClick={async () => {
+                console.log('CLAIM REWARDS button clicked!')
+                const authenticated = await requireAuthentication('CLAIM REWARDS')
+                if (authenticated) {
+                  console.log('💰 User authenticated, claiming completed challenge rewards...')
+                  
+                  try {
+                    // Get user-specific challenges data
+                    const userKey = isAuthenticated ? 
+                      `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
+                      'challenges_guest'
+                    
+                    let challengesData = {}
+                    try {
+                      const saved = localStorage.getItem(userKey)
+                      challengesData = saved ? JSON.parse(saved) : {}
+                    } catch (error) {
+                      console.error('Error loading challenges:', error)
+                    }
+                    
+                    // Default challenges
+                    const defaultChallenges = [
+                      { id: 'eat_50_coins', name: 'Coin Collector', target: 50, reward: 100 },
+                      { id: 'survive_5_minutes', name: 'Survivor', target: 300, reward: 150 },
+                      { id: 'reach_mass_200', name: 'Growing Strong', target: 200, reward: 200 },
+                      { id: 'cashout_5_times', name: 'Cash Master', target: 5, reward: 250 }
+                    ]
+                    
+                    let totalRewards = 0
+                    let claimedCount = 0
+                    
+                    // Check for completed challenges that haven't been claimed
+                    defaultChallenges.forEach(challenge => {
+                      const progress = challengesData[challenge.id] || { current: 0, completed: false, claimed: false }
+                      const isCompleted = progress.current >= challenge.target
+                      
+                      if (isCompleted && !progress.claimed) {
+                        totalRewards += challenge.reward
+                        claimedCount++
+                        
+                        // Mark as claimed
+                        challengesData[challenge.id] = {
+                          ...progress,
+                          completed: true,
+                          claimed: true
+                        }
+                      }
+                    })
+                    
+                    if (totalRewards > 0) {
+                      // Save updated challenges data
+                      localStorage.setItem(userKey, JSON.stringify(challengesData))
+                      
+                      // Add rewards to currency
+                      setCurrency(prev => prev + totalRewards)
+                      
+                      // Show success message
+                      alert(`🎉 Rewards Claimed!\\n\\n• ${claimedCount} challenge${claimedCount > 1 ? 's' : ''} completed\\n• +${totalRewards} coins earned`)
+                      
+                      console.log(`✅ Claimed ${totalRewards} coins from ${claimedCount} completed challenges`)
+                    } else {
+                      alert('📋 No rewards to claim\\n\\nComplete challenges to earn rewards!')
+                      console.log('ℹ️ No completed challenges available for claiming')
+                    }
+                    
+                  } catch (error) {
+                    console.error('❌ Error claiming rewards:', error)
+                    alert('❌ Error claiming rewards. Please try again.')
+                  }
+                } else {
+                  console.log('❌ Authentication failed, blocking access to CLAIM REWARDS')
+                }
+              }}
+              style={{
+                flex: 1,
+                padding: '8px',
+                background: 'rgba(15, 23, 42, 0.8)',
+                border: '1px solid rgba(34, 197, 94, 0.4)',
+                borderRadius: '6px',
+                color: '#22c55e',
+                fontSize: '10px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: '"Inter", sans-serif'
+              }}
+            >
+              Claim
+            </button>
+          </div>
         </div>
 
         {/* Bottom Right - Loadout */}
