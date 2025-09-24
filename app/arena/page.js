@@ -1144,8 +1144,8 @@ const MultiplayerArena = () => {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     
-    // Create game instance
-    const game = new MultiplayerGameEngine(canvas, sendInput)
+    // Create game instance with selected skin
+    const game = new MultiplayerGameEngine(canvas, sendInput, selectedSkin)
     gameRef.current = game
     
     game.start()
