@@ -6627,7 +6627,7 @@ export default function TurfLootTactical() {
               if (authenticated) {
                 console.log('🎯 User authenticated, opening challenges modal...')
                 
-                // Create detailed challenges modal
+                // Create enhanced challenges modal
                 const modal = document.createElement('div')
                 modal.style.cssText = `
                   position: fixed;
@@ -6644,17 +6644,19 @@ export default function TurfLootTactical() {
                 `
                 
                 modal.innerHTML = `
-                  <div style="
+                  <div id="challenges-modal" style="
                     background: linear-gradient(145deg, #1a202c 0%, #2d3748 100%);
                     border: 2px solid #fc8181;
                     border-radius: 12px;
                     padding: 24px;
-                    max-width: 600px;
+                    max-width: 700px;
                     width: 90%;
                     max-height: 80vh;
-                    overflow-y: auto;
+                    overflow: hidden;
                     box-shadow: 0 0 30px rgba(252, 129, 129, 0.4);
+                    position: relative;
                   ">
+                    <!-- Header -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                       <h2 style="color: #fc8181; font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; margin: 0; text-transform: uppercase;">
                         🎯 ALL CHALLENGES
@@ -6668,25 +6670,364 @@ export default function TurfLootTactical() {
                         padding: 8px 12px;
                         font-family: 'Rajdhani', sans-serif;
                         font-weight: 600;
+                        font-size: 12px;
                       ">CLOSE</button>
                     </div>
                     
-                    <div style="color: #e2e8f0; font-family: 'Rajdhani', sans-serif; margin-bottom: 20px; padding: 12px; background: rgba(252, 129, 129, 0.1); border-radius: 6px; border: 1px solid rgba(252, 129, 129, 0.3);">
-                      <strong>How Challenges Work:</strong><br>
-                      • Complete challenges by playing games<br>
-                      • Daily challenges reset every 24 hours<br>
-                      • Weekly challenges reset every Monday<br>
-                      • Earn coins as rewards for completion<br>
-                      • Progress is tracked automatically during gameplay
+                    <!-- Tabs -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid rgba(252, 129, 129, 0.3); padding-bottom: 16px;">
+                      <button class="challenge-tab active-tab" data-tab="daily" style="
+                        background: linear-gradient(45deg, #fc8181 0%, #f56565 100%);
+                        border: none;
+                        border-radius: 6px;
+                        color: white;
+                        cursor: pointer;
+                        padding: 10px 16px;
+                        font-family: 'Rajdhani', sans-serif;
+                        font-weight: 600;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 8px rgba(252, 129, 129, 0.4);
+                      ">
+                        Daily
+                        <div style="font-size: 10px; opacity: 0.9; margin-top: 2px;" id="daily-timer">Resets in: 12h 45m</div>
+                      </button>
+                      <button class="challenge-tab" data-tab="weekly" style="
+                        background: rgba(139, 92, 246, 0.3);
+                        border: 1px solid #8b5cf6;
+                        border-radius: 6px;
+                        color: #8b5cf6;
+                        cursor: pointer;
+                        padding: 10px 16px;
+                        font-family: 'Rajdhani', sans-serif;
+                        font-weight: 600;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        transition: all 0.3s ease;
+                      ">
+                        Weekly
+                        <div style="font-size: 10px; opacity: 0.9; margin-top: 2px;" id="weekly-timer">Resets in: 5d 11h</div>
+                      </button>
+                      <button class="challenge-tab" data-tab="seasonal" style="
+                        background: rgba(246, 173, 85, 0.3);
+                        border: 1px solid #f6ad55;
+                        border-radius: 6px;
+                        color: #f6ad55;
+                        cursor: pointer;
+                        padding: 10px 16px;
+                        font-family: 'Rajdhani', sans-serif;
+                        font-weight: 600;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        transition: all 0.3s ease;
+                      ">
+                        Seasonal
+                        <div style="font-size: 10px; opacity: 0.9; margin-top: 2px;" id="seasonal-timer">Resets in: 28d 5h</div>
+                      </button>
                     </div>
                     
-                    <div id="all-challenges-list" style="display: grid; gap: 12px;">
-                      <!-- Challenges will be populated here -->
+                    <!-- Challenge Content -->
+                    <div style="max-height: 400px; overflow-y: auto; padding-right: 8px;">
+                      <div id="challenges-grid" style="
+                        display: grid;
+                        grid-template-columns: 1fr;
+                        gap: 12px;
+                      ">
+                        <!-- Challenges will be populated here -->
+                      </div>
                     </div>
                   </div>
                 `
                 
                 document.body.appendChild(modal)
+                
+                // Get user challenges data
+                const userKey = isAuthenticated ? 
+                  \`challenges_\${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}\` :
+                  'challenges_guest'
+                
+                let challengesData = {}
+                try {
+                  const saved = localStorage.getItem(userKey)
+                  challengesData = saved ? JSON.parse(saved) : {}
+                } catch (error) {
+                  console.error('Error loading challenges:', error)
+                }
+                
+                // Define all challenges with categories
+                const allChallenges = {
+                  daily: [
+                    { 
+                      id: 'eat_50_coins', 
+                      name: 'Coin Collector', 
+                      description: 'Eat 50 coins', 
+                      target: 50, 
+                      reward: 100,
+                      icon: '🪙',
+                      type: 'daily'
+                    },
+                    { 
+                      id: 'survive_5_minutes', 
+                      name: 'Survivor', 
+                      description: 'Survive for 5 minutes', 
+                      target: 300,
+                      reward: 150,
+                      icon: '⏱️',
+                      type: 'daily'
+                    }
+                  ],
+                  weekly: [
+                    { 
+                      id: 'reach_mass_200', 
+                      name: 'Growing Strong', 
+                      description: 'Reach mass 200', 
+                      target: 200, 
+                      reward: 200,
+                      icon: '🪙',
+                      type: 'weekly'
+                    },
+                    { 
+                      id: 'cashout_5_times', 
+                      name: 'Cash Master', 
+                      description: 'Cash out 5 times', 
+                      target: 5, 
+                      reward: 250,
+                      icon: '💰',
+                      type: 'weekly'
+                    }
+                  ],
+                  seasonal: [
+                    {
+                      id: 'seasonal_champion',
+                      name: 'Arena Champion',
+                      description: 'Win 25 multiplayer games',
+                      target: 25,
+                      reward: 500,
+                      icon: '🏆',
+                      type: 'seasonal'
+                    },
+                    {
+                      id: 'seasonal_collector',
+                      name: 'Ultimate Collector',
+                      description: 'Collect 1000 coins total',
+                      target: 1000,
+                      reward: 1000,
+                      icon: '👑',
+                      type: 'seasonal'
+                    }
+                  ]
+                }
+                
+                // Function to render challenges
+                function renderChallenges(category) {
+                  const grid = document.getElementById('challenges-grid')
+                  const challenges = allChallenges[category] || []
+                  
+                  grid.innerHTML = challenges.map(challenge => {
+                    const progress = challengesData[challenge.id] || { current: 0, completed: false, claimed: false }
+                    const progressPercent = Math.min((progress.current / challenge.target) * 100, 100)
+                    const isCompleted = progress.completed || progress.current >= challenge.target
+                    const canClaim = isCompleted && !progress.claimed
+                    
+                    return \`
+                      <div style="
+                        background: \${isCompleted ? 'rgba(34, 197, 94, 0.1)' : 'rgba(45, 55, 72, 0.5)'};
+                        border: 2px solid \${isCompleted ? '#22c55e' : 'rgba(148, 163, 184, 0.3)'};
+                        border-radius: 8px;
+                        padding: 16px;
+                        display: grid;
+                        grid-template-columns: auto 1fr auto;
+                        gap: 12px;
+                        align-items: center;
+                        transition: all 0.3s ease;
+                      ">
+                        <!-- Icon -->
+                        <div style="
+                          width: 48px;
+                          height: 48px;
+                          background: \${isCompleted ? 'rgba(34, 197, 94, 0.2)' : 'rgba(252, 129, 129, 0.2)'};
+                          border-radius: 50%;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          font-size: 24px;
+                          border: 2px solid \${isCompleted ? '#22c55e' : '#fc8181'};
+                        ">
+                          \${challenge.icon}
+                        </div>
+                        
+                        <!-- Content -->
+                        <div>
+                          <div style="
+                            font-size: 16px;
+                            font-weight: 700;
+                            color: \${isCompleted ? '#22c55e' : '#e2e8f0'};
+                            font-family: 'Rajdhani', sans-serif;
+                            text-transform: uppercase;
+                            margin-bottom: 4px;
+                          ">
+                            \${challenge.name}
+                          </div>
+                          <div style="
+                            font-size: 12px;
+                            color: #94a3b8;
+                            font-family: 'Rajdhani', sans-serif;
+                            margin-bottom: 8px;
+                          ">
+                            \${challenge.description}
+                          </div>
+                          
+                          <!-- Progress Bar -->
+                          <div style="
+                            background: rgba(30, 41, 59, 0.8);
+                            border-radius: 4px;
+                            height: 6px;
+                            overflow: hidden;
+                            margin-bottom: 6px;
+                            position: relative;
+                          ">
+                            <div style="
+                              background: \${isCompleted ? 
+                                'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)' : 
+                                'linear-gradient(90deg, #fc8181 0%, #f87171 100)'};
+                              height: 100%;
+                              width: \${progressPercent}%;
+                              transition: width 0.3s ease;
+                            "></div>
+                          </div>
+                          
+                          <!-- Progress Text -->
+                          <div style="
+                            font-size: 11px;
+                            color: #64748b;
+                            font-family: 'Rajdhani', sans-serif;
+                            font-weight: 600;
+                          ">
+                            \${progress.current}/\${challenge.target} (\${Math.round(progressPercent)}%)
+                          </div>
+                        </div>
+                        
+                        <!-- Reward & Claim -->
+                        <div style="text-align: center;">
+                          <div style="
+                            font-size: 14px;
+                            color: #fbbf24;
+                            font-family: 'Rajdhani', sans-serif;
+                            font-weight: 800;
+                            text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+                            margin-bottom: 8px;
+                          ">
+                            +\${challenge.reward} coins
+                          </div>
+                          
+                          \${canClaim ? \`
+                            <button onclick="claimReward('\${challenge.id}', \${challenge.reward})" style="
+                              background: linear-gradient(45deg, #22c55e 0%, #16a34a 100%);
+                              border: none;
+                              border-radius: 6px;
+                              color: white;
+                              cursor: pointer;
+                              padding: 8px 16px;
+                              font-family: 'Rajdhani', sans-serif;
+                              font-weight: 700;
+                              font-size: 12px;
+                              text-transform: uppercase;
+                              box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+                              transition: all 0.2s ease;
+                              animation: claimGlow 2s ease-in-out infinite;
+                            " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                              🎉 CLAIM
+                            </button>
+                          \` : (isCompleted ? \`
+                            <div style="
+                              color: #22c55e;
+                              font-size: 12px;
+                              font-family: 'Rajdhani', sans-serif;
+                              font-weight: 600;
+                            ">
+                              ✅ CLAIMED
+                            </div>
+                          \` : \`
+                            <div style="
+                              color: #64748b;
+                              font-size: 11px;
+                              font-family: 'Rajdhani', sans-serif;
+                              font-weight: 600;
+                            ">
+                              In Progress
+                            </div>
+                          \`)}
+                        </div>
+                      </div>
+                    \`
+                  }).join('')
+                }
+                
+                // Claim reward function
+                window.claimReward = function(challengeId, rewardAmount) {
+                  try {
+                    challengesData[challengeId] = {
+                      ...challengesData[challengeId],
+                      claimed: true
+                    }
+                    localStorage.setItem(userKey, JSON.stringify(challengesData))
+                    setCurrency(prev => prev + rewardAmount)
+                    
+                    // Re-render current tab
+                    const activeTab = document.querySelector('.active-tab')
+                    if (activeTab) {
+                      renderChallenges(activeTab.dataset.tab)
+                    }
+                    
+                    console.log(\`✅ Claimed \${rewardAmount} coins for challenge \${challengeId}\`)
+                  } catch (error) {
+                    console.error('Error claiming reward:', error)
+                  }
+                }
+                
+                // Tab switching functionality
+                document.querySelectorAll('.challenge-tab').forEach(tab => {
+                  tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.challenge-tab').forEach(t => {
+                      t.classList.remove('active-tab')
+                      t.style.background = t.dataset.tab === 'daily' ? 'rgba(252, 129, 129, 0.3)' : 
+                                         t.dataset.tab === 'weekly' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(246, 173, 85, 0.3)'
+                      t.style.color = t.dataset.tab === 'daily' ? '#fc8181' : 
+                                     t.dataset.tab === 'weekly' ? '#8b5cf6' : '#f6ad55'
+                      t.style.boxShadow = 'none'
+                    })
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active-tab')
+                    tab.style.background = tab.dataset.tab === 'daily' ? 'linear-gradient(45deg, #fc8181 0%, #f56565 100%)' : 
+                                          tab.dataset.tab === 'weekly' ? 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)' : 
+                                          'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)'
+                    tab.style.color = 'white'
+                    tab.style.boxShadow = \`0 4px 8px \${tab.dataset.tab === 'daily' ? 'rgba(252, 129, 129, 0.4)' : 
+                                                      tab.dataset.tab === 'weekly' ? 'rgba(139, 92, 246, 0.4)' : 
+                                                      'rgba(246, 173, 85, 0.4)'}\`
+                    
+                    // Render challenges for selected tab
+                    renderChallenges(tab.dataset.tab)
+                  })
+                })
+                
+                // Add CSS animation for claim button glow
+                const style = document.createElement('style')
+                style.textContent = \`
+                  @keyframes claimGlow {
+                    0% { box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); }
+                    50% { box-shadow: 0 6px 20px rgba(34, 197, 94, 0.7); }
+                    100% { box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); }
+                  }
+                \`
+                document.head.appendChild(style)
+                
+                // Initial render - daily tab
+                renderChallenges('daily')
+                
               } else {
                 console.log('❌ Authentication failed, blocking access to VIEW ALL CHALLENGES')
               }
