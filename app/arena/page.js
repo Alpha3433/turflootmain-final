@@ -426,7 +426,8 @@ const MultiplayerArena = () => {
       const room = await client.joinOrCreate("arena", {
         roomName: roomId,
         playerName: playerName,
-        privyUserId: privyUserId
+        privyUserId: privyUserId,
+        selectedSkin: selectedSkin // Pass skin data to server for multiplayer visibility
       })
       
       // Clear timeout if connection succeeds
