@@ -186,14 +186,18 @@ const MultiplayerArena = () => {
       console.log('🚀 Creating dedicated Colyseus client for this arena...')
       setConnectionStatus('connecting')
       
-      // Create dedicated client instance for this arena
+      // Create dedicated client instance for this arena  
       const client = new Client(process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud')
       
       console.log('🎯 Joining arena room:', roomId)
+      console.log('🎯 Player details - Name:', playerName, 'PrivyID:', privyUserId)
+      
       const room = await client.joinOrCreate("arena", {
         roomName: roomId,
         playerName: playerName,
-        privyUserId: privyUserId
+        privyUserId: privyUserId,
+        forceNew: true, // Force creation of new session
+        timestamp: Date.now() // Add timestamp for uniqueness
       })
       
       wsRef.current = room
