@@ -645,7 +645,7 @@ const MultiplayerArena = () => {
     bindEvents() {
       if (typeof window === 'undefined') return
       
-      // Mouse movement for non-mobile
+      // Mouse movement for non-mobile - FIXED
       const handleMouseMove = (e) => {
         if (isMobile || !this.canvas) return
         
@@ -653,23 +653,38 @@ const MultiplayerArena = () => {
         const mouseX = e.clientX - rect.left
         const mouseY = e.clientY - rect.top
         
-        // Calculate world position
-        const worldMouseX = mouseX - this.canvas.width / 2 + this.camera.x + this.player.x
-        const worldMouseY = mouseY - this.canvas.height / 2 + this.camera.y + this.player.y
+        // Convert screen coordinates to world coordinates - CORRECTED FORMULA
+        const worldMouseX = this.camera.x + mouseX
+        const worldMouseY = this.camera.y + mouseY
         
-        // Calculate direction toward mouse
+        // Calculate direction toward mouse cursor
         const dx = worldMouseX - this.player.x
         const dy = worldMouseY - this.player.y
         const distance = Math.sqrt(dx * dx + dy * dy)
         
-        if (distance > 0.1) {
+        if (distance > 5) { // Minimum distance threshold
           const normalizedDx = dx / distance
           const normalizedDy = dy / distance
+          
+          // Send normalized input to multiplayer server
           sendInput(normalizedDx, normalizedDy)
+          
+          // Debug logging
+          console.log('🖱️ Mouse movement:', {
+            mouseScreen: { x: mouseX.toFixed(1), y: mouseY.toFixed(1) },
+            mouseWorld: { x: worldMouseX.toFixed(1), y: worldMouseY.toFixed(1) },
+            player: { x: this.player.x?.toFixed(1), y: this.player.y?.toFixed(1) },
+            direction: { dx: normalizedDx.toFixed(3), dy: normalizedDy.toFixed(3) },
+            distance: distance.toFixed(1)
+          })
         }
       }
       
+      // Add event listener
       window.addEventListener('mousemove', handleMouseMove)
+      
+      // Store reference for cleanup
+      this.handleMouseMove = handleMouseMove
     }
     
     updateFromServer(state) {
