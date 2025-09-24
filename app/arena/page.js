@@ -158,7 +158,7 @@ const MultiplayerArena = () => {
           console.log('🎮 Mobile split toward:', worldTargetX.toFixed(1), worldTargetY.toFixed(1))
           
           // Send split command to multiplayer server
-          if (wsRef.current && connectionStatus === 'connected') {
+          if (wsRef.current && wsRef.current.sessionId) {
             wsRef.current.send("split", { targetX: worldTargetX, targetY: worldTargetY })
           }
         }
