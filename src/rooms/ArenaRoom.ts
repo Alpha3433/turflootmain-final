@@ -371,7 +371,7 @@ export class ArenaRoom extends Room<GameState> {
           player.score += 10;
         } else {
           // Player gets damaged
-          player.mass = Math.max(20, player.mass * 0.8); // Minimum mass is now 20
+          player.mass = Math.max(25, player.mass * 0.8); // Minimum mass is now 25 (matching starting mass)
           player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
         }
       }
