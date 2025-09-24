@@ -329,21 +329,41 @@ export class ArenaRoom extends Room<GameState> {
     const deltaTime = 1 / this.tickRate; // Fixed timestep
     this.state.timestamp = Date.now();
     
-    // Update all players
+    // Update all players with smooth movement (matching local agario)
     this.state.players.forEach((player, sessionId) => {
       if (!player.alive) return;
       
-      // Apply movement
-      player.x += player.vx * deltaTime * 10; // Scale for game feel
-      player.y += player.vy * deltaTime * 10;
+      // Smooth movement toward target (vx and vy are being used as targetX and targetY)
+      const targetX = player.vx;
+      const targetY = player.vy;
+      
+      const dx = targetX - player.x;
+      const dy = targetY - player.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance > 1) { // Only move if target is far enough
+        // Calculate dynamic speed based on mass (matching local agario formula)
+        const baseSpeed = 6.0;
+        const massSpeedFactor = Math.sqrt(player.mass / 20);
+        const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor);
+        
+        // Calculate move distance based on speed and delta time
+        const moveDistance = dynamicSpeed * deltaTime * 60; // 60 for frame rate normalization
+        
+        // Clamp movement to not overshoot target
+        const actualMoveDistance = Math.min(moveDistance, distance);
+        
+        // Normalize direction and apply smooth movement
+        const moveX = (dx / distance) * actualMoveDistance;
+        const moveY = (dy / distance) * actualMoveDistance;
+        
+        player.x += moveX;
+        player.y += moveY;
+      }
       
       // Keep player in bounds
       player.x = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.x));
       player.y = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.y));
-      
-      // Apply friction
-      player.vx *= 0.95;
-      player.vy *= 0.95;
       
       // Check collisions
       this.checkCollisions(player, sessionId);
