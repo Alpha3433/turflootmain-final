@@ -117,20 +117,131 @@ const MultiplayerArena = () => {
   console.log('  - privyUserId (from Privy):', privyUserId)
   console.log('  - user object:', user)
 
-  // Authentication check - redirect to login if not authenticated
+  // Handle cash out functionality - ported from agario
+  const handleCashOut = () => {
+    if (!isCashingOut && !cashOutComplete && gameReady) {
+      console.log('Starting cash out process via button')
+      setIsCashingOut(true)
+      setCashOutProgress(0)
+    } else if (isCashingOut) {
+      console.log('Canceling cash out via button')
+      setIsCashingOut(false)
+      setCashOutProgress(0)
+      if (cashOutIntervalRef.current) {
+        clearInterval(cashOutIntervalRef.current)
+        cashOutIntervalRef.current = null
+      }
+    }
+  }
+
+  // Handle split functionality - ported from agario
+  const handleSplit = (e) => {
+    if (gameRef.current && gameReady) {
+      if (isMobile) {
+        // Mobile: Use joystick direction for split
+        if (joystickPosition.x !== 0 || joystickPosition.y !== 0) {
+          const joystickAngle = Math.atan2(joystickPosition.y, joystickPosition.x)
+          const splitDistance = 300
+          
+          const worldTargetX = gameRef.current.player.x + Math.cos(joystickAngle) * splitDistance
+          const worldTargetY = gameRef.current.player.y + Math.sin(joystickAngle) * splitDistance
+          
+          console.log('🎮 Mobile split toward:', worldTargetX.toFixed(1), worldTargetY.toFixed(1))
+          
+          // Send split command to multiplayer server
+          if (wsRef.current && connectionStatus === 'connected') {
+            wsRef.current.send("split", { targetX: worldTargetX, targetY: worldTargetY })
+          }
+        }
+      } else {
+        // Desktop: Use mouse position for split
+        if (gameRef.current.mouse) {
+          console.log('🎮 Desktop split toward mouse:', gameRef.current.mouse.worldX?.toFixed(1), gameRef.current.mouse.worldY?.toFixed(1))
+          
+          // Send split command to multiplayer server
+          if (wsRef.current && connectionStatus === 'connected') {
+            wsRef.current.send("split", { 
+              targetX: gameRef.current.mouse.worldX, 
+              targetY: gameRef.current.mouse.worldY 
+            })
+          }
+        }
+      }
+    }
+  }
+
+  // Cash out key event handlers - ported from agario
   useEffect(() => {
-    if (ready && !authenticated) {
-      console.log('❌ User not authenticated - redirecting to login')
-      router.push('/')
-      return
+    const handleKeyDown = (e) => {
+      if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameReady) {
+        console.log('Starting cash out process with E key')
+        setIsCashingOut(true)
+        setCashOutProgress(0)
+      }
+      
+      // Handle SPACE key for splitting
+      if (e.key === ' ' && gameReady && gameRef.current) {
+        e.preventDefault()
+        console.log('SPACE pressed - attempting split')
+        handleSplit(e)
+      }
     }
     
-    if (ready && authenticated && !user?.id) {
-      console.log('❌ User authenticated but no user ID - redirecting to home')
-      router.push('/')
-      return
+    const handleKeyUp = (e) => {
+      if (e.key.toLowerCase() === 'e' && isCashingOut) {
+        console.log('Canceling cash out - E key released')
+        setIsCashingOut(false)
+        setCashOutProgress(0)
+        if (cashOutIntervalRef.current) {
+          clearInterval(cashOutIntervalRef.current)
+          cashOutIntervalRef.current = null
+        }
+      }
     }
-  }, [ready, authenticated, user, router])
+    
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('keyup', handleKeyUp)
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [isCashingOut, cashOutComplete, gameReady])
+
+  // Cash out progress interval - ported from agario
+  useEffect(() => {
+    if (isCashingOut && !cashOutComplete) {
+      console.log('Starting cash out progress interval')
+      
+      cashOutIntervalRef.current = setInterval(() => {
+        setCashOutProgress(prev => {
+          const newProgress = prev + 2 // 2% per 100ms = 5 second duration
+          
+          if (newProgress >= 100) {
+            console.log('Cash out completed!')
+            setIsCashingOut(false)
+            setCashOutComplete(true)
+            clearInterval(cashOutIntervalRef.current)
+            cashOutIntervalRef.current = null
+            
+            // Add currency based on score
+            setCurrency(prevCurrency => prevCurrency + score)
+            
+            return 100
+          }
+          
+          return newProgress
+        })
+      }, 100) // Update every 100ms for smooth progress
+    }
+    
+    return () => {
+      if (cashOutIntervalRef.current) {
+        clearInterval(cashOutIntervalRef.current)
+        cashOutIntervalRef.current = null
+      }
+    }
+  }, [isCashingOut, score])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction - matching agario
   useEffect(() => {
