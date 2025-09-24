@@ -27,6 +27,31 @@ const MultiplayerArena = () => {
   const [timeSurvived, setTimeSurvived] = useState(0)
   const [eliminations, setEliminations] = useState(0)
 
+  // Cash out system - ported from agario
+  const [cashOutProgress, setCashOutProgress] = useState(0)
+  const [isCashingOut, setIsCashingOut] = useState(false)
+  const [cashOutComplete, setCashOutComplete] = useState(false)
+  const cashOutIntervalRef = useRef(null)
+
+  // Mission system - ported from agario  
+  const [currency, setCurrency] = useState(0)
+  const [completedMissions, setCompletedMissions] = useState([])
+  const [activeMissions, setActiveMissions] = useState([])
+  const [currentMissionIndex, setCurrentMissionIndex] = useState(0)
+
+  // Mission definitions - ported from agario
+  const missionTypes = [
+    { id: 'collect_coins_10', name: 'Coin Hunter I', description: 'Collect 10 coins', target: 10, reward: 50, icon: '🪙' },
+    { id: 'collect_coins_25', name: 'Coin Hunter II', description: 'Collect 25 coins', target: 25, reward: 100, icon: '🪙' },
+    { id: 'collect_coins_50', name: 'Coin Master', description: 'Collect 50 coins', target: 50, reward: 200, icon: '💰' },
+    { id: 'reach_mass_50', name: 'Growing Strong', description: 'Reach 50 mass', target: 50, reward: 75, icon: '💪' },
+    { id: 'reach_mass_100', name: 'Heavy Weight', description: 'Reach 100 mass', target: 100, reward: 150, icon: '🏋️' },
+    { id: 'eliminate_1', name: 'First Blood', description: 'Eliminate 1 enemy', target: 1, reward: 100, icon: '⚔️' },
+    { id: 'eliminate_3', name: 'Warrior', description: 'Eliminate 3 enemies', target: 3, reward: 250, icon: '🗡️' },
+    { id: 'survive_60', name: 'Survivor', description: 'Survive for 60 seconds', target: 60, reward: 100, icon: '⏰' },
+    { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
+  ]
+
   // Mobile detection and UI states - matching agario
   const [isMobile, setIsMobile] = useState(false)
   const [leaderboardExpanded, setLeaderboardExpanded] = useState(false)
