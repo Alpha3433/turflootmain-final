@@ -628,9 +628,9 @@ const MultiplayerArena = () => {
         this.mouse.x = e.clientX - rect.left
         this.mouse.y = e.clientY - rect.top
         
-        // Convert screen coordinates to world coordinates
-        this.mouse.worldX = this.mouse.x - this.canvas.width / 2 + this.camera.x + this.player.x
-        this.mouse.worldY = this.mouse.y - this.canvas.height / 2 + this.camera.y + this.player.y
+        // Convert screen coordinates to world coordinates - CORRECTED
+        this.mouse.worldX = this.camera.x + this.mouse.x
+        this.mouse.worldY = this.camera.y + this.mouse.y
       }
       
       this.canvas.addEventListener('mousemove', updateMousePosition)
@@ -640,6 +640,9 @@ const MultiplayerArena = () => {
           updateMousePosition(e.touches[0])
         }
       })
+      
+      // Store reference for cleanup
+      this.updateMousePosition = updateMousePosition
     }
 
     bindEvents() {
