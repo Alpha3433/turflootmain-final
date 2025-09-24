@@ -815,26 +815,28 @@ const MultiplayerArena = () => {
     }
     
     applyClientSideMovement(dx, dy) {
-      // Immediate client-side movement prediction (matching local agario responsiveness)
+      // AGGRESSIVE client-side movement prediction for maximum responsiveness
       if (!this.player.x || !this.player.y) return
       
-      // Use same speed calculation as server (for consistency)
+      // Use same speed calculation as server but with higher responsiveness
       const mass = this.player.mass || 25
       const baseSpeed = 6.0
       const massSpeedFactor = Math.sqrt(mass / 20)
       const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
       
-      // Apply movement with frame rate compensation
+      // Much more aggressive movement for instant responsiveness
       const frameRate = 60 // Target 60fps
       const speedPerFrame = dynamicSpeed / frameRate
+      const responsivenessMultiplier = 4 // Increased from 2 to 4 for more immediate response
       
-      this.player.x += dx * speedPerFrame * 2 // 2x multiplier for responsiveness
-      this.player.y += dy * speedPerFrame * 2
+      // Apply immediate movement
+      this.player.x += dx * speedPerFrame * responsivenessMultiplier
+      this.player.y += dy * speedPerFrame * responsivenessMultiplier
       
       // Simple boundary check to prevent going too far off
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
-      const maxDistance = 2000 // Allow some overshoot, server will correct
+      const maxDistance = 2500 // Increased from 2000 to allow more freedom
       
       const distanceFromCenter = Math.sqrt(
         Math.pow(this.player.x - centerX, 2) + 
@@ -848,9 +850,10 @@ const MultiplayerArena = () => {
         this.player.y = centerY + Math.sin(angle) * maxDistance
       }
       
-      console.log('🎯 Client prediction applied:', {
+      console.log('⚡ Aggressive client prediction applied:', {
         position: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
         speed: dynamicSpeed.toFixed(2),
+        multiplier: responsivenessMultiplier,
         input: { dx: dx.toFixed(3), dy: dy.toFixed(3) }
       })
     }
