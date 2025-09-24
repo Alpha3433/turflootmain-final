@@ -7016,13 +7016,13 @@ export default function TurfLootTactical() {
                 
                 // Add CSS animation for claim button glow
                 const style = document.createElement('style')
-                style.textContent = \`
+                style.textContent = `
                   @keyframes claimGlow {
                     0% { box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); }
                     50% { box-shadow: 0 6px 20px rgba(34, 197, 94, 0.7); }
                     100% { box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4); }
                   }
-                \`
+                `
                 document.head.appendChild(style)
                 
                 // Initial render - daily tab
