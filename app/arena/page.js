@@ -20,12 +20,15 @@ const MultiplayerArena = () => {
   // Core game states
   const [gameReady, setGameReady] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState('connecting')
+  const connectionStatusRef = useRef('connecting')
   const [playerCount, setPlayerCount] = useState(0)
   const [mass, setMass] = useState(100)
   const [score, setScore] = useState(0)
   const [serverState, setServerState] = useState(null)
   const [timeSurvived, setTimeSurvived] = useState(0)
   const [eliminations, setEliminations] = useState(0)
+  const [gameOver, setGameOver] = useState(false)
+  const gameOverRef = useRef(false)
 
   // Cash out system - ported from agario
   const [cashOutProgress, setCashOutProgress] = useState(0)
@@ -65,6 +68,7 @@ const MultiplayerArena = () => {
   // Input handling
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
+  const inputWarningRef = useRef(null)
   
   // Mission definitions - ported from agario
   const missionTypes = [
@@ -92,6 +96,18 @@ const MultiplayerArena = () => {
   console.log('  - playerName (from Privy):', playerName)
   console.log('  - privyUserId (from Privy):', privyUserId)
 
+  useEffect(() => {
+    connectionStatusRef.current = connectionStatus
+
+    if (connectionStatus === 'connected') {
+      inputWarningRef.current = null
+    }
+  }, [connectionStatus])
+
+  useEffect(() => {
+    gameOverRef.current = gameOver
+  }, [gameOver])
+
   // Authentication check - redirect to login if not authenticated
   useEffect(() => {
     if (ready && !authenticated) {
@@ -109,7 +125,7 @@ const MultiplayerArena = () => {
 
   // Handle cash out functionality - ported from agario
   const handleCashOut = () => {
-    if (!isCashingOut && !cashOutComplete && gameReady) {
+    if (!isCashingOut && !cashOutComplete && gameReady && !gameOver) {
       console.log('Starting cash out process via button')
       setIsCashingOut(true)
       setCashOutProgress(0)
@@ -126,6 +142,10 @@ const MultiplayerArena = () => {
 
   // Handle split functionality - ported from agario
   const handleSplit = (e) => {
+    if (gameOver || cashOutComplete) {
+      return
+    }
+
     if (gameRef.current && gameReady) {
       if (isMobile) {
         // Mobile: Use joystick direction for split
@@ -139,7 +159,7 @@ const MultiplayerArena = () => {
           console.log('🎮 Mobile split toward:', worldTargetX.toFixed(1), worldTargetY.toFixed(1))
           
           // Send split command to multiplayer server
-          if (wsRef.current && connectionStatus === 'connected') {
+          if (wsRef.current && connectionStatusRef.current === 'connected') {
             wsRef.current.send("split", { targetX: worldTargetX, targetY: worldTargetY })
           }
         }
@@ -149,7 +169,7 @@ const MultiplayerArena = () => {
           console.log('🎮 Desktop split toward mouse:', gameRef.current.mouse.worldX?.toFixed(1), gameRef.current.mouse.worldY?.toFixed(1))
           
           // Send split command to multiplayer server
-          if (wsRef.current && connectionStatus === 'connected') {
+          if (wsRef.current && connectionStatusRef.current === 'connected') {
             wsRef.current.send("split", { 
               targetX: gameRef.current.mouse.worldX, 
               targetY: gameRef.current.mouse.worldY 
@@ -160,17 +180,48 @@ const MultiplayerArena = () => {
     }
   }
 
+  const handleRestart = () => {
+    console.log('🔄 Restarting arena session UI state')
+    setGameOver(false)
+    gameOverRef.current = false
+    setCashOutComplete(false)
+    setCashOutProgress(0)
+    setIsCashingOut(false)
+
+    if (cashOutIntervalRef.current) {
+      clearInterval(cashOutIntervalRef.current)
+      cashOutIntervalRef.current = null
+    }
+
+    setScore(0)
+    setMass(100)
+    setEliminations(0)
+    setTimeSurvived(0)
+
+    if (gameRef.current) {
+      gameRef.current.gameStartTime = Date.now()
+      if (typeof gameRef.current.updateGameStates === 'function') {
+        gameRef.current.updateGameStates({
+          isCashingOut: false,
+          cashOutProgress: 0,
+          cashOutComplete: false,
+          gameOver: false
+        })
+      }
+    }
+  }
+
   // Cash out key event handlers - ported from agario
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameReady) {
+      if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameReady && !gameOver) {
         console.log('Starting cash out process with E key')
         setIsCashingOut(true)
         setCashOutProgress(0)
       }
-      
+
       // Handle SPACE key for splitting
-      if (e.key === ' ' && gameReady && gameRef.current) {
+      if (e.key === ' ' && gameReady && gameRef.current && !gameOver && !cashOutComplete) {
         e.preventDefault()
         console.log('SPACE pressed - attempting split')
         handleSplit(e)
@@ -196,7 +247,7 @@ const MultiplayerArena = () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     }
-  }, [isCashingOut, cashOutComplete, gameReady])
+  }, [isCashingOut, cashOutComplete, gameReady, gameOver])
 
   // Cash out progress interval - ported from agario
   useEffect(() => {
@@ -233,16 +284,31 @@ const MultiplayerArena = () => {
     }
   }, [isCashingOut, score])
 
+  useEffect(() => {
+    if (!gameOver) {
+      return
+    }
+
+    setIsCashingOut(false)
+    setCashOutProgress(0)
+
+    if (cashOutIntervalRef.current) {
+      clearInterval(cashOutIntervalRef.current)
+      cashOutIntervalRef.current = null
+    }
+  }, [gameOver])
+
   // Sync cash out visuals with game engine rendering
   useEffect(() => {
     if (gameRef.current?.updateGameStates) {
       gameRef.current.updateGameStates({
         isCashingOut,
         cashOutProgress,
-        cashOutComplete
+        cashOutComplete,
+        gameOver
       })
     }
-  }, [isCashingOut, cashOutProgress, cashOutComplete])
+  }, [isCashingOut, cashOutProgress, cashOutComplete, gameOver])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
@@ -506,7 +572,21 @@ const MultiplayerArena = () => {
 
   // Send input to server - matching agario input handling
   const sendInput = (dx, dy) => {
-    if (!wsRef.current || connectionStatus !== 'connected') return
+    if (gameOver || cashOutComplete) {
+      return
+    }
+
+    const currentStatus = connectionStatusRef.current
+
+    if (!wsRef.current || currentStatus !== 'connected') {
+      const roomState = !wsRef.current ? 'missing room reference' : `connection status: ${currentStatus}`
+      const now = Date.now()
+      if (!inputWarningRef.current || now - inputWarningRef.current.timestamp > 750 || inputWarningRef.current.reason !== roomState) {
+        console.warn(`❌ Cannot send input - ${roomState}`)
+        inputWarningRef.current = { timestamp: now, reason: roomState }
+      }
+      return
+    }
     
     inputSequenceRef.current++
     lastInputRef.current = { dx, dy }
@@ -526,7 +606,8 @@ const MultiplayerArena = () => {
   const handleJoystickStart = (e) => {
     e.preventDefault()
     if (!isMobile) return
-    
+    if (gameOver || cashOutComplete) return
+
     console.log('🕹️ Joystick Started - Mobile:', isMobile, 'Game Available:', !!gameRef.current?.player)
     
     setJoystickActive(true)
@@ -573,6 +654,7 @@ const MultiplayerArena = () => {
   const handleJoystickMove = (e) => {
     e.preventDefault()
     if (!isMobile || !joystickActive) return
+    if (gameOver || cashOutComplete) return
     
     const rect = joystickRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -665,7 +747,8 @@ const MultiplayerArena = () => {
       this.gameStates = {
         isCashingOut: false,
         cashOutProgress: 0,
-        cashOutComplete: false
+        cashOutComplete: false,
+        gameOver: false
       }
       this.updateGameStates = (updates = {}) => {
         this.gameStates = { ...this.gameStates, ...updates }
@@ -796,6 +879,22 @@ const MultiplayerArena = () => {
           // Update mass and score
           setMass(Math.round(currentPlayer.mass) || 100)
           setScore(Math.round(currentPlayer.score) || 0)
+
+          if (typeof currentPlayer.eliminations === 'number') {
+            setEliminations(Math.max(0, Math.floor(currentPlayer.eliminations)))
+          }
+
+          const isAlive = currentPlayer.alive !== false
+          if (!isAlive && !gameOverRef.current) {
+            console.log('💀 Current player eliminated - triggering Game Over modal')
+            if (this.gameStartTime) {
+              const finalTime = Math.floor((Date.now() - this.gameStartTime) / 1000)
+              setTimeSurvived(finalTime)
+            }
+            gameOverRef.current = true
+            this.gameStates.gameOver = true
+            setGameOver(true)
+          }
         } else {
           console.log('⚠️ Session ID mismatch - ignoring player update for session:', 
                      currentPlayer.sessionId, 'expected:', this.expectedSessionId)
@@ -818,7 +917,12 @@ const MultiplayerArena = () => {
     
     update() {
       if (!this.running) return
-      
+
+      if (this.gameStates.cashOutComplete || this.gameStates.gameOver) {
+        this.lastUpdate = Date.now()
+        return
+      }
+
       const deltaTime = (Date.now() - this.lastUpdate) / 1000
       this.lastUpdate = Date.now()
       
@@ -1334,6 +1438,11 @@ const MultiplayerArena = () => {
     }
   }, [ready, authenticated, user])
   
+  const safeScore = Number.isFinite(score) ? score : 0
+  const safeMass = Number.isFinite(mass) ? mass : 0
+  const safeEliminations = Number.isFinite(eliminations) ? eliminations : 0
+  const safeTimeSurvived = Number.isFinite(timeSurvived) ? timeSurvived : 0
+
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
       {/* Authentication Required Screen */}
@@ -2117,6 +2226,501 @@ const MultiplayerArena = () => {
         >
           Exit Arena
         </button>
+
+        {/* Cash Out Success Popup */}
+        {cashOutComplete && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999999,
+            pointerEvents: 'auto'
+          }}>
+            <div style={{
+              backgroundColor: '#1a202c',
+              border: '3px solid #ffd700',
+              borderRadius: isMobile ? '8px' : '12px',
+              maxWidth: isMobile ? '300px' : '500px',
+              width: '90%',
+              padding: '0',
+              color: 'white',
+              boxShadow: '0 0 60px rgba(255, 215, 0, 0.6)',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              <div style={{
+                padding: isMobile ? '12px' : '24px',
+                borderBottom: '2px solid #ffd700',
+                background: 'linear-gradient(45deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: isMobile ? '40px' : '70px',
+                  height: isMobile ? '40px' : '70px',
+                  background: 'linear-gradient(45deg, #ffd700 0%, #ffb000 100%)',
+                  borderRadius: isMobile ? '8px' : '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: isMobile ? '20px' : '36px',
+                  margin: isMobile ? '0 auto 8px' : '0 auto 16px',
+                  boxShadow: '0 0 20px rgba(255, 215, 0, 0.6)'
+                }}>
+                  🏆
+                </div>
+                <h2 style={{
+                  color: '#ffd700',
+                  fontSize: isMobile ? '18px' : '28px',
+                  fontWeight: '700',
+                  margin: isMobile ? '0 0 4px' : '0 0 8px',
+                  textTransform: 'uppercase',
+                  textShadow: '0 0 15px rgba(255, 215, 0, 0.8)',
+                  letterSpacing: isMobile ? '0.5px' : '1px'
+                }}>
+                  Cashout Successful!
+                </h2>
+                <p style={{
+                  color: '#e2e8f0',
+                  fontSize: isMobile ? '11px' : '16px',
+                  margin: '0',
+                  opacity: '0.9'
+                }}>
+                  Congratulations! You've successfully cashed out from the arena!
+                </p>
+              </div>
+
+              <div style={{ padding: isMobile ? '12px' : '24px' }}>
+                {(() => {
+                  if (typeof window === 'undefined') return null
+                  const urlParams = new URLSearchParams(window.location.search)
+                  const fee = urlParams.get('fee')
+                  const isPaidRoom = fee && parseFloat(fee) > 0
+
+                  if (!isPaidRoom) return null
+
+                  return (
+                    <div style={{
+                      backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                      border: '1px solid rgba(255, 215, 0, 0.3)',
+                      borderRadius: '8px',
+                      padding: isMobile ? '8px' : '16px',
+                      marginBottom: isMobile ? '12px' : '24px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{
+                        color: '#ffd700',
+                        fontSize: isMobile ? '10px' : '14px',
+                        fontWeight: '600',
+                        marginBottom: isMobile ? '4px' : '8px',
+                        textTransform: 'uppercase'
+                      }}>
+                        AMOUNT RECEIVED
+                      </div>
+                      <div style={{
+                        color: '#ffffff',
+                        fontSize: isMobile ? '16px' : '24px',
+                        fontWeight: '700',
+                        marginBottom: isMobile ? '2px' : '4px'
+                      }}>
+                        ${(safeScore * 0.54).toFixed(2)}
+                      </div>
+                      <div style={{
+                        color: '#a0aec0',
+                        fontSize: isMobile ? '8px' : '12px',
+                        fontWeight: '400'
+                      }}>
+                        {(safeScore * 0.026).toFixed(6)} SOL
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: isMobile ? '8px' : '16px',
+                  marginBottom: isMobile ? '12px' : '24px'
+                }}>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: isMobile ? '8px' : '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: isMobile ? '4px' : '8px'
+                  }}>
+                    <div style={{ fontSize: isMobile ? '16px' : '24px' }}>⏱️</div>
+                    <div style={{
+                      color: '#ffffff',
+                      fontSize: isMobile ? '12px' : '18px',
+                      fontWeight: '700'
+                    }}>
+                      {Math.floor(safeTimeSurvived / 60)}m {safeTimeSurvived % 60}s
+                    </div>
+                    <div style={{
+                      color: '#a0aec0',
+                      fontSize: isMobile ? '8px' : '12px',
+                      textTransform: 'uppercase'
+                    }}>
+                      Time Survived
+                    </div>
+                  </div>
+
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: isMobile ? '8px' : '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: isMobile ? '4px' : '8px'
+                  }}>
+                    <div style={{ fontSize: isMobile ? '16px' : '24px' }}>⚔️</div>
+                    <div style={{
+                      color: '#ffffff',
+                      fontSize: isMobile ? '12px' : '18px',
+                      fontWeight: '700'
+                    }}>
+                      {safeEliminations}
+                    </div>
+                    <div style={{
+                      color: '#a0aec0',
+                      fontSize: isMobile ? '8px' : '12px',
+                      textTransform: 'uppercase'
+                    }}>
+                      Eliminations
+                    </div>
+                  </div>
+                </div>
+
+                {(() => {
+                  if (typeof window === 'undefined') return null
+                  const urlParams = new URLSearchParams(window.location.search)
+                  const fee = urlParams.get('fee')
+                  const isPaidRoom = fee && parseFloat(fee) > 0
+
+                  if (!isPaidRoom) return null
+
+                  return (
+                    <div style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      padding: isMobile ? '8px' : '16px',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      marginBottom: isMobile ? '12px' : '24px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                      <div style={{
+                        color: '#a0aec0',
+                        fontSize: isMobile ? '8px' : '12px',
+                        marginBottom: isMobile ? '4px' : '8px',
+                        textTransform: 'uppercase'
+                      }}>
+                        Current Balance
+                      </div>
+                      <div style={{
+                        color: '#ffffff',
+                        fontSize: isMobile ? '12px' : '18px',
+                        fontWeight: '700'
+                      }}>
+                        ${(14.69 + (safeScore * 0.54)).toFixed(2)} / {(0.070710 + (safeScore * 0.026)).toFixed(6)} SOL
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                <div style={{
+                  display: 'flex',
+                  gap: isMobile ? '8px' : '12px',
+                  flexDirection: 'column'
+                }}>
+                  <button
+                    onClick={handleRestart}
+                    style={{
+                      backgroundColor: '#ffd700',
+                      border: '2px solid #ffb000',
+                      borderRadius: '8px',
+                      color: '#1a202c',
+                      fontSize: isMobile ? '14px' : '16px',
+                      fontWeight: '700',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#ffb000'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#ffd700'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    PLAY AGAIN
+                  </button>
+
+                  <button
+                    onClick={() => router.push('/')}
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '2px solid #a0aec0',
+                      borderRadius: '8px',
+                      color: '#a0aec0',
+                      fontSize: isMobile ? '12px' : '16px',
+                      fontWeight: '600',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#a0aec0'
+                      e.target.style.color = '#1a202c'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#a0aec0'
+                    }}
+                  >
+                    BACK TO MAIN MENU
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Game Over Popup */}
+        {gameOver && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 999999999,
+            pointerEvents: 'auto'
+          }}>
+            <div style={{
+              backgroundColor: '#1a202c',
+              border: '3px solid #ff4444',
+              borderRadius: isMobile ? '8px' : '12px',
+              maxWidth: isMobile ? '300px' : '500px',
+              width: '90%',
+              padding: '0',
+              color: 'white',
+              boxShadow: '0 0 50px rgba(255, 68, 68, 0.5)',
+              fontFamily: '"Rajdhani", sans-serif'
+            }}>
+              <div style={{
+                padding: isMobile ? '12px' : '24px',
+                borderBottom: '2px solid #ff4444',
+                background: 'linear-gradient(45deg, rgba(255, 68, 68, 0.1) 0%, rgba(255, 68, 68, 0.05) 100%)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: isMobile ? '40px' : '60px',
+                  height: isMobile ? '40px' : '60px',
+                  background: 'linear-gradient(45deg, #ff4444 0%, #cc3333 100%)',
+                  borderRadius: isMobile ? '8px' : '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: isMobile ? '20px' : '30px',
+                  margin: isMobile ? '0 auto 8px' : '0 auto 16px'
+                }}>
+                  💀
+                </div>
+                <h2 style={{
+                  color: '#ff4444',
+                  fontSize: isMobile ? '20px' : '32px',
+                  fontWeight: '700',
+                  margin: isMobile ? '0 0 4px' : '0 0 8px',
+                  textTransform: 'uppercase',
+                  textShadow: '0 0 10px rgba(255, 68, 68, 0.6)'
+                }}>
+                  GAME OVER
+                </h2>
+                <p style={{
+                  color: '#e2e8f0',
+                  fontSize: isMobile ? '12px' : '16px',
+                  margin: '0',
+                  opacity: '0.8'
+                }}>
+                  You have been eliminated from the arena.
+                </p>
+              </div>
+
+              <div style={{ padding: isMobile ? '12px' : '24px' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: isMobile ? '8px' : '16px',
+                  marginBottom: isMobile ? '12px' : '24px'
+                }}>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: isMobile ? '8px' : '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      color: '#68d391',
+                      fontSize: isMobile ? '16px' : '24px',
+                      fontWeight: '700'
+                    }}>
+                      ${Math.max(0, Math.round(safeScore))}
+                    </div>
+                    <div style={{
+                      color: '#a0aec0',
+                      fontSize: isMobile ? '10px' : '14px'
+                    }}>Final Score</div>
+                  </div>
+                  <div style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    padding: isMobile ? '8px' : '16px',
+                    borderRadius: '8px',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      color: '#60a5fa',
+                      fontSize: isMobile ? '16px' : '24px',
+                      fontWeight: '700'
+                    }}>
+                      {Math.max(0, Math.round(safeMass))} KG
+                    </div>
+                    <div style={{
+                      color: '#a0aec0',
+                      fontSize: isMobile ? '10px' : '14px'
+                    }}>Final Mass</div>
+                  </div>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  gap: isMobile ? '8px' : '12px',
+                  flexDirection: 'column'
+                }}>
+                  <button
+                    onClick={handleRestart}
+                    style={{
+                      backgroundColor: '#68d391',
+                      border: '2px solid #48bb78',
+                      borderRadius: '8px',
+                      color: '#1a202c',
+                      fontSize: isMobile ? '14px' : '18px',
+                      fontWeight: '700',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#48bb78'
+                      e.target.style.transform = 'translateY(-2px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = '#68d391'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    PLAY AGAIN
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('📣 Report player flow coming soon for arena mode')
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                      border: '2px solid #ff4444',
+                      borderRadius: '8px',
+                      color: '#ff4444',
+                      fontSize: isMobile ? '11px' : '14px',
+                      fontWeight: '600',
+                      padding: isMobile ? '6px 12px' : '8px 16px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 68, 68, 0.2)'
+                      e.target.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 68, 68, 0.1)'
+                      e.target.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    REPORT PLAYER
+                  </button>
+                  <button
+                    onClick={() => router.push('/')}
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: '2px solid #a0aec0',
+                      borderRadius: '8px',
+                      color: '#a0aec0',
+                      fontSize: isMobile ? '12px' : '16px',
+                      fontWeight: '600',
+                      padding: isMobile ? '8px 16px' : '12px 24px',
+                      cursor: 'pointer',
+                      transition: 'all 150ms',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.backgroundColor = '#a0aec0'
+                      e.target.style.color = '#1a202c'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.backgroundColor = 'transparent'
+                      e.target.style.color = '#a0aec0'
+                    }}
+                  >
+                    BACK TO LOBBY
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* CSS Animations */}

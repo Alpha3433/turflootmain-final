@@ -202,7 +202,48 @@ class ArenaRoom extends core_1.Room {
     onJoin(client, options = {}) {
         const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
         const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
-        console.log(`👋 Player joined: ${playerName} (${client.sessionId})`);
+        console.log(`👋 Player attempting to join: ${playerName} (${client.sessionId}) - privyUserId: ${privyUserId}`);
+        const duplicateSessions = [];
+        this.state.players.forEach((existingPlayer, existingSessionId) => {
+            if (existingSessionId === client.sessionId) {
+                return;
+            }
+            let isDuplicate = false;
+            if (!privyUserId.startsWith('anonymous_')) {
+                const existingClient = this.clients.find((c) => c.sessionId === existingSessionId);
+                if (existingClient && existingClient.userData && existingClient.userData.privyUserId === privyUserId) {
+                    isDuplicate = true;
+                    console.log(`⚠️ DUPLICATE by privyUserId: ${privyUserId} (existing: ${existingSessionId}, new: ${client.sessionId})`);
+                }
+            }
+            if (!isDuplicate && existingPlayer.name === playerName) {
+                isDuplicate = true;
+                console.log(`⚠️ DUPLICATE by playerName: ${playerName} (existing: ${existingSessionId}, new: ${client.sessionId})`);
+            }
+            if (isDuplicate) {
+                duplicateSessions.push(existingSessionId);
+            }
+        });
+        if (duplicateSessions.length > 0) {
+            console.log(`🧹 Removing ${duplicateSessions.length} duplicate player(s) to prevent confusion`);
+            duplicateSessions.forEach((sessionId) => {
+                console.log(`🧹 Removing duplicate player: ${sessionId}`);
+                this.state.players.delete(sessionId);
+                const oldClient = this.clients.find((c) => c.sessionId === sessionId);
+                if (oldClient) {
+                    console.log(`🔌 Disconnecting old client: ${sessionId}`);
+                    try {
+                        oldClient.leave(1000, 'Duplicate connection detected');
+                    }
+                    catch (error) {
+                        console.log('⚠️ Error disconnecting old client:', error);
+                    }
+                }
+            });
+        }
+        else {
+            console.log(`✅ No duplicates found for ${playerName} - proceeding with join`);
+        }
         // Create new player
         const player = new Player();
         player.name = playerName;
@@ -224,7 +265,7 @@ class ArenaRoom extends core_1.Room {
             playerName,
             lastInputTime: Date.now()
         };
-        console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)})`);
+        console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)}) - No duplicates!`);
     }
     handleInput(client, message) {
         const player = this.state.players.get(client.sessionId);
