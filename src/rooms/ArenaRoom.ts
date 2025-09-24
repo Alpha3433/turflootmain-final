@@ -343,7 +343,7 @@ export class ArenaRoom extends Room<GameState> {
         // Player consumes coin
         player.mass += coin.value;
         player.score += coin.value;
-        player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+        player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
         
         // Remove coin and spawn new one
         this.state.coins.delete(coinId);
