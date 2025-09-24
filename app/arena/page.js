@@ -772,7 +772,7 @@ const MultiplayerArena = () => {
     bindEvents() {
       if (typeof window === 'undefined') return
       
-      // Mouse movement for non-mobile - FIXED
+      // Mouse movement for non-mobile - ENHANCED RESPONSIVENESS
       const handleMouseMove = (e) => {
         if (isMobile || !this.canvas) return
         
@@ -789,21 +789,23 @@ const MultiplayerArena = () => {
         const dy = worldMouseY - this.player.y
         const distance = Math.sqrt(dx * dx + dy * dy)
         
-        if (distance > 5) { // Minimum distance threshold
+        if (distance > 2) { // Reduced threshold from 5 to 2 for more sensitivity
           const normalizedDx = dx / distance
           const normalizedDy = dy / distance
           
-          // Send normalized input to multiplayer server
+          // IMMEDIATE INPUT - no throttling for maximum responsiveness
           this.sendInputFn(normalizedDx, normalizedDy)
           
-          // Debug logging
-          console.log('🖱️ Mouse movement:', {
-            mouseScreen: { x: mouseX.toFixed(1), y: mouseY.toFixed(1) },
-            mouseWorld: { x: worldMouseX.toFixed(1), y: worldMouseY.toFixed(1) },
-            player: { x: this.player.x?.toFixed(1), y: this.player.y?.toFixed(1) },
-            direction: { dx: normalizedDx.toFixed(3), dy: normalizedDy.toFixed(3) },
-            distance: distance.toFixed(1)
-          })
+          // Reduced debug logging to prevent console spam
+          if (Math.random() < 0.1) { // Only log 10% of movements
+            console.log('🖱️ Mouse movement:', {
+              mouseScreen: { x: mouseX.toFixed(1), y: mouseY.toFixed(1) },
+              mouseWorld: { x: worldMouseX.toFixed(1), y: worldMouseY.toFixed(1) },
+              player: { x: this.player.x?.toFixed(1), y: this.player.y?.toFixed(1) },
+              direction: { dx: normalizedDx.toFixed(3), dy: normalizedDy.toFixed(3) },
+              distance: distance.toFixed(1)
+            })
+          }
         }
       }
       
