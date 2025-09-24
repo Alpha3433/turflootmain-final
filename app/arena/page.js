@@ -1646,7 +1646,7 @@ const MultiplayerArena = () => {
               right: '5px',
               bottom: '5px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, transparent 75%, rgba(255, 68, 68, 0.4) 85%, rgba(255, 68, 68, 0.6) 100%)',
+              background: '#000000', // Solid black like local agario
               zIndex: 1
             }} />
             
