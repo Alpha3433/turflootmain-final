@@ -980,6 +980,9 @@ const MultiplayerArena = () => {
       this.ctx.save()
       this.ctx.translate(-this.camera.x, -this.camera.y)
       
+      // Draw optimized grid first (matching local agario render order)
+      this.drawGrid()
+      
       // Draw world boundary with enhanced visuals
       this.drawWorldBoundary()
       
