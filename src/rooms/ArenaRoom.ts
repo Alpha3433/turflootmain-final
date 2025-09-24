@@ -223,9 +223,9 @@ export class ArenaRoom extends Room<GameState> {
       mass: player.mass
     });
     
-    // Check if player can split (minimum mass requirement)
-    if (player.mass < 150) {
-      console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 150`);
+    // Check if player can split (minimum mass requirement - adjusted for smaller starting size)
+    if (player.mass < 40) {
+      console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 40`);
       return;
     }
     
