@@ -6325,15 +6325,15 @@ export default function TurfLootTactical() {
           </div>
           
           <div style={{ 
-            background: 'rgba(26, 32, 44, 0.8)', // Restored original background
+            background: 'rgba(26, 32, 44, 0.8)', 
             borderRadius: '8px', 
             padding: '16px', 
-            border: '2px solid rgba(252, 129, 129, 0.3)', // Restored 2px border
+            border: '2px solid rgba(252, 129, 129, 0.3)',
             marginBottom: '16px',
             position: 'relative',
-            minHeight: '140px' // Restored original height
+            minHeight: '140px'
           }}>
-            {/* Challenge Carousel */}
+            {/* Challenge Cycle */}
             {(() => {
               // Get user-specific challenges data
               const userKey = isAuthenticated ? 
@@ -6395,96 +6395,20 @@ export default function TurfLootTactical() {
               
               return (
                 <div style={{ position: 'relative' }}>
-                  {/* Navigation Arrows - Restored original size */}
-                  <button
-                    onClick={() => setCurrentChallengeIndex(prev => 
-                      prev === 0 ? defaultChallenges.length - 1 : prev - 1
-                    )}
-                    style={{
-                      position: 'absolute',
-                      left: '-8px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'rgba(252, 129, 129, 0.8)',
-                      border: '2px solid #fc8181', // Restored 2px border
-                      borderRadius: '50%',
-                      width: '32px', // Restored original size
-                      height: '32px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      boxShadow: '0 0 10px rgba(252, 129, 129, 0.4)',
-                      zIndex: 10,
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 1)'
-                      e.target.style.transform = 'translateY(-50%) scale(1.1)'
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 0.8)'
-                      e.target.style.transform = 'translateY(-50%) scale(1)'
-                    }}
-                  >
-                    ←
-                  </button>
-                  
-                  <button
-                    onClick={() => setCurrentChallengeIndex(prev => 
-                      prev === defaultChallenges.length - 1 ? 0 : prev + 1
-                    )}
-                    style={{
-                      position: 'absolute',
-                      right: '-8px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'rgba(252, 129, 129, 0.8)',
-                      border: '2px solid #fc8181', // Restored 2px border
-                      borderRadius: '50%',
-                      width: '32px', // Restored original size
-                      height: '32px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      boxShadow: '0 0 10px rgba(252, 129, 129, 0.4)',
-                      zIndex: 10,
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseOver={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 1)'
-                      e.target.style.transform = 'translateY(-50%) scale(1.1)'
-                    }}
-                    onMouseOut={(e) => {
-                      e.target.style.background = 'rgba(252, 129, 129, 0.8)'
-                      e.target.style.transform = 'translateY(-50%) scale(1)'
-                    }}
-                  >
-                    →
-                  </button>
-                  
-                  {/* Challenge Card - Restored original design */}
+                  {/* Challenge Card - Compact Design */}
                   <div style={{
                     padding: '16px',
                     background: isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)',
                     borderRadius: '8px',
-                    border: `2px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`, // Restored 2px border
+                    border: `2px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`,
                     position: 'relative',
-                    margin: '0 24px',
-                    textAlign: 'center' // Restored center alignment
+                    textAlign: 'center'
                   }}>
                     {/* Challenge Header */}
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'center', // Restored center alignment
+                      justifyContent: 'center',
                       gap: '12px', 
                       marginBottom: '12px' 
                     }}>
@@ -6494,7 +6418,7 @@ export default function TurfLootTactical() {
                           fontSize: '16px',
                           fontWeight: '700',
                           color: isCompleted ? '#68d391' : '#e2e8f0',
-                          fontFamily: '"Rajdhani", sans-serif', // Restored Rajdhani font
+                          fontFamily: '"Rajdhani", sans-serif',
                           textTransform: 'uppercase',
                           marginBottom: '4px'
                         }}>
@@ -6503,7 +6427,7 @@ export default function TurfLootTactical() {
                         <div style={{
                           fontSize: '12px',
                           color: '#a0aec0',
-                          fontFamily: '"Rajdhani", sans-serif' // Restored Rajdhani font
+                          fontFamily: '"Rajdhani", sans-serif'
                         }}>
                           {currentChallenge.description}
                         </div>
@@ -6516,29 +6440,50 @@ export default function TurfLootTactical() {
                         fontSize: '10px',
                         color: currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
                         textTransform: 'uppercase',
-                        fontFamily: '"Rajdhani", sans-serif', // Restored Rajdhani font
+                        fontFamily: '"Rajdhani", sans-serif',
                         fontWeight: '600'
                       }}>
                         {currentChallenge.type}
                       </div>
                     </div>
                     
-                    {/* Progress Bar - Restored original thickness */}
+                    {/* Animated Progress Bar */}
                     <div style={{
                       background: 'rgba(45, 55, 72, 0.8)',
-                      borderRadius: '6px',
-                      height: '8px', // Restored original height
+                      borderRadius: '10px',
+                      height: '6px',
                       overflow: 'hidden',
-                      marginBottom: '12px'
+                      marginBottom: '12px',
+                      position: 'relative',
+                      border: '1px solid rgba(148, 163, 184, 0.2)'
                     }}>
                       <div style={{
                         background: isCompleted ? 
-                          'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
-                          'linear-gradient(90deg, #fc8181 0%, #f56565 100%)',
+                          'linear-gradient(90deg, #68d391 0%, #48bb78 50%, #68d391 100%)' : 
+                          'linear-gradient(90deg, #fc8181 0%, #f56565 50%, #fc8181 100%)',
                         height: '100%',
                         width: `${progressPercent}%`,
-                        transition: 'width 0.3s ease'
-                      }} />
+                        transition: 'width 0.8s ease-in-out',
+                        borderRadius: '10px',
+                        boxShadow: isCompleted ? 
+                          '0 0 8px rgba(104, 211, 145, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)' : 
+                          `0 0 8px rgba(252, 129, 129, ${Math.max(0.3, progressPercent / 100 * 0.8)}), inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
+                        position: 'relative'
+                      }}>
+                        {/* Glow animation for active progress */}
+                        {!isCompleted && progressPercent > 0 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            right: '-4px',
+                            width: '8px',
+                            height: '100%',
+                            background: 'linear-gradient(90deg, transparent, rgba(252, 129, 129, 0.8), transparent)',
+                            borderRadius: '10px',
+                            animation: 'progressGlow 2s ease-in-out infinite'
+                          }} />
+                        )}
+                      </div>
                     </div>
                     
                     {/* Progress Text & Reward */}
@@ -6546,34 +6491,24 @@ export default function TurfLootTactical() {
                       display: 'flex', 
                       justifyContent: 'space-between', 
                       alignItems: 'center',
-                      marginBottom: '8px'
+                      marginBottom: '12px'
                     }}>
                       <span style={{
                         fontSize: '12px',
                         color: '#a0aec0',
-                        fontFamily: '"Rajdhani", sans-serif', // Restored Rajdhani font
+                        fontFamily: '"Rajdhani", sans-serif',
                         fontWeight: '600'
                       }}>
-                        {isCompleted ? 'COMPLETED' : `${progress.current}/${currentChallenge.target}`}
+                        {isCompleted ? 'COMPLETED' : `${Math.round(progressPercent)}% Complete`}
                       </span>
                       <span style={{
                         fontSize: '12px',
                         color: '#f6ad55',
-                        fontFamily: '"Rajdhani", sans-serif', // Restored Rajdhani font
+                        fontFamily: '"Rajdhani", sans-serif',
                         fontWeight: '700'
                       }}>
                         {isCompleted ? '✅ REWARD READY' : `+${currentChallenge.reward} coins`}
                       </span>
-                    </div>
-                    
-                    {/* Challenge Counter */}
-                    <div style={{
-                      fontSize: '10px',
-                      color: '#68d391',
-                      fontFamily: '"Rajdhani", sans-serif', // Restored Rajdhani font
-                      fontWeight: '600'
-                    }}>
-                      {currentChallengeIndex + 1} / {defaultChallenges.length}
                     </div>
                     
                     {/* Completion Overlay */}
@@ -6597,6 +6532,63 @@ export default function TurfLootTactical() {
                         ✓
                       </div>
                     )}
+                  </div>
+                  
+                  {/* Navigation Dots */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginTop: '12px'
+                  }}>
+                    {defaultChallenges.map((_, index) => {
+                      const challengeProgress = challengesData[defaultChallenges[index].id] || { current: 0, completed: false }
+                      const challengeCompleted = challengeProgress.completed || challengeProgress.current >= defaultChallenges[index].target
+                      const isActive = index === currentChallengeIndex
+                      
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentChallengeIndex(index)}
+                          style={{
+                            width: isActive ? '24px' : '8px',
+                            height: '8px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            background: challengeCompleted ? 
+                              'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
+                              (isActive ? 
+                                'linear-gradient(90deg, #fc8181 0%, #f56565 100%)' : 
+                                'rgba(148, 163, 184, 0.4)'),
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: isActive ? 
+                              (challengeCompleted ? 
+                                '0 0 8px rgba(104, 211, 145, 0.6)' : 
+                                '0 0 8px rgba(252, 129, 129, 0.6)') : 
+                              'none',
+                            transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                          }}
+                          onMouseOver={(e) => {
+                            if (!isActive) {
+                              e.target.style.background = challengeCompleted ? 
+                                'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
+                                'rgba(252, 129, 129, 0.6)'
+                              e.target.style.transform = 'scale(1.05)'
+                            }
+                          }}
+                          onMouseOut={(e) => {
+                            if (!isActive) {
+                              e.target.style.background = challengeCompleted ? 
+                                'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
+                                'rgba(148, 163, 184, 0.4)'
+                              e.target.style.transform = 'scale(1)'
+                            }
+                          }}
+                        />
+                      )
+                    })}
                   </div>
                 </div>
               )
