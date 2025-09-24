@@ -6,7 +6,7 @@ import { Client } from 'colyseus.js'
 import { usePrivy } from '@privy-io/react-auth'
 
 const MultiplayerArena = () => {
-  console.log('🎮 MULTIPLAYER ARENA - Pure Colyseus multiplayer mode')
+  console.log('🎮 MULTIPLAYER ARENA - Pure Colyseus multiplayer mode with game mechanics')
   
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
@@ -17,7 +17,7 @@ const MultiplayerArena = () => {
   // Privy authentication
   const { ready, authenticated, user, login } = usePrivy()
   
-  // Game states - matching agario completely
+  // Core game states
   const [gameReady, setGameReady] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState('connecting')
   const [playerCount, setPlayerCount] = useState(0)
@@ -39,58 +39,20 @@ const MultiplayerArena = () => {
   const [activeMissions, setActiveMissions] = useState([])
   const [currentMissionIndex, setCurrentMissionIndex] = useState(0)
 
-  // Mission definitions - ported from agario
-  const missionTypes = [
-    { id: 'collect_coins_10', name: 'Coin Hunter I', description: 'Collect 10 coins', target: 10, reward: 50, icon: '🪙' },
-    { id: 'collect_coins_25', name: 'Coin Hunter II', description: 'Collect 25 coins', target: 25, reward: 100, icon: '🪙' },
-    { id: 'collect_coins_50', name: 'Coin Master', description: 'Collect 50 coins', target: 50, reward: 200, icon: '💰' },
-    { id: 'reach_mass_50', name: 'Growing Strong', description: 'Reach 50 mass', target: 50, reward: 75, icon: '💪' },
-    { id: 'reach_mass_100', name: 'Heavy Weight', description: 'Reach 100 mass', target: 100, reward: 150, icon: '🏋️' },
-    { id: 'eliminate_1', name: 'First Blood', description: 'Eliminate 1 enemy', target: 1, reward: 100, icon: '⚔️' },
-    { id: 'eliminate_3', name: 'Warrior', description: 'Eliminate 3 enemies', target: 3, reward: 250, icon: '🗡️' },
-    { id: 'survive_60', name: 'Survivor', description: 'Survive for 60 seconds', target: 60, reward: 100, icon: '⏰' },
-    { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
-  ]
-
-  // Cash out system - ported from agario
-  const [cashOutProgress, setCashOutProgress] = useState(0)
-  const [isCashingOut, setIsCashingOut] = useState(false)
-  const [cashOutComplete, setCashOutComplete] = useState(false)
-  const cashOutIntervalRef = useRef(null)
-
-  // Mission system - ported from agario  
-  const [currency, setCurrency] = useState(0)
-  const [completedMissions, setCompletedMissions] = useState([])
-  const [activeMissions, setActiveMissions] = useState([])
-  const [currentMissionIndex, setCurrentMissionIndex] = useState(0)
-
-  // Mission definitions - ported from agario
-  const missionTypes = [
-    { id: 'collect_coins_10', name: 'Coin Hunter I', description: 'Collect 10 coins', target: 10, reward: 50, icon: '🪙' },
-    { id: 'collect_coins_25', name: 'Coin Hunter II', description: 'Collect 25 coins', target: 25, reward: 100, icon: '🪙' },
-    { id: 'collect_coins_50', name: 'Coin Master', description: 'Collect 50 coins', target: 50, reward: 200, icon: '💰' },
-    { id: 'reach_mass_50', name: 'Growing Strong', description: 'Reach 50 mass', target: 50, reward: 75, icon: '💪' },
-    { id: 'reach_mass_100', name: 'Heavy Weight', description: 'Reach 100 mass', target: 100, reward: 150, icon: '🏋️' },
-    { id: 'eliminate_1', name: 'First Blood', description: 'Eliminate 1 enemy', target: 1, reward: 100, icon: '⚔️' },
-    { id: 'eliminate_3', name: 'Warrior', description: 'Eliminate 3 enemies', target: 3, reward: 250, icon: '🗡️' },
-    { id: 'survive_60', name: 'Survivor', description: 'Survive for 60 seconds', target: 60, reward: 100, icon: '⏰' },
-    { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
-  ]
-
-  // Mobile detection and UI states - matching agario
+  // Mobile detection and UI states
   const [isMobile, setIsMobile] = useState(false)
   const [leaderboardExpanded, setLeaderboardExpanded] = useState(false)
   const leaderboardTimerRef = useRef(null)
   const [statsExpanded, setStatsExpanded] = useState(false)
   const statsTimerRef = useRef(null)
   
-  // Virtual joystick state for mobile - matching agario
+  // Virtual joystick state for mobile
   const [joystickActive, setJoystickActive] = useState(false)
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
 
-  // Minimap state for real-time updates - matching agario
+  // Minimap state for real-time updates
   const [minimapData, setMinimapData] = useState({
     playerX: 2000,
     playerY: 2000,
@@ -102,6 +64,19 @@ const MultiplayerArena = () => {
   // Input handling
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
+  
+  // Mission definitions - ported from agario
+  const missionTypes = [
+    { id: 'collect_coins_10', name: 'Coin Hunter I', description: 'Collect 10 coins', target: 10, reward: 50, icon: '🪙' },
+    { id: 'collect_coins_25', name: 'Coin Hunter II', description: 'Collect 25 coins', target: 25, reward: 100, icon: '🪙' },
+    { id: 'collect_coins_50', name: 'Coin Master', description: 'Collect 50 coins', target: 50, reward: 200, icon: '💰' },
+    { id: 'reach_mass_50', name: 'Growing Strong', description: 'Reach 50 mass', target: 50, reward: 75, icon: '💪' },
+    { id: 'reach_mass_100', name: 'Heavy Weight', description: 'Reach 100 mass', target: 100, reward: 150, icon: '🏋️' },
+    { id: 'eliminate_1', name: 'First Blood', description: 'Eliminate 1 enemy', target: 1, reward: 100, icon: '⚔️' },
+    { id: 'eliminate_3', name: 'Warrior', description: 'Eliminate 3 enemies', target: 3, reward: 250, icon: '🗡️' },
+    { id: 'survive_60', name: 'Survivor', description: 'Survive for 60 seconds', target: 60, reward: 100, icon: '⏰' },
+    { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
+  ]
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
@@ -115,7 +90,6 @@ const MultiplayerArena = () => {
   console.log('  - authenticated user:', !!user)
   console.log('  - playerName (from Privy):', playerName)
   console.log('  - privyUserId (from Privy):', privyUserId)
-  console.log('  - user object:', user)
 
   // Authentication check - redirect to login if not authenticated
   useEffect(() => {
@@ -258,7 +232,7 @@ const MultiplayerArena = () => {
     }
   }, [isCashingOut, score])
 
-  // Auto-collapse leaderboard after 5 seconds of no interaction - matching agario
+  // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
     if (leaderboardExpanded && isMobile) {
       leaderboardTimerRef.current = setTimeout(() => {
@@ -284,7 +258,7 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Auto-collapse stats panel after 5 seconds of no interaction - matching agario
+  // Auto-collapse stats panel after 5 seconds of no interaction
   useEffect(() => {
     if (statsExpanded && isMobile) {
       statsTimerRef.current = setTimeout(() => {
@@ -610,7 +584,7 @@ const MultiplayerArena = () => {
   // Pure multiplayer game engine - updated to match agario visual features
   class MultiplayerGameEngine {
     constructor(canvas) {
-      console.log('🎮 Initializing pure multiplayer game engine')
+      console.log('🎮 Initializing pure multiplayer game engine with enhanced mechanics')
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
       this.running = false
@@ -749,7 +723,7 @@ const MultiplayerArena = () => {
     
     start() {
       this.running = true
-      console.log('🎮 Multiplayer game engine started')
+      console.log('🎮 Multiplayer game engine started with enhanced mechanics')
     }
     
     stop() {
@@ -1068,6 +1042,7 @@ const MultiplayerArena = () => {
           )}
         </div>
       )}
+
       {/* Game Canvas - Full Screen */}
       <canvas
         ref={canvasRef}
@@ -1087,13 +1062,13 @@ const MultiplayerArena = () => {
 
       {/* UI Elements */}
       <div>
-          {/* Live Leaderboard - Mobile Optimized */}
-          <div 
-            style={{ 
-              position: 'fixed', 
-              top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 5px)' : '10px', 
-              left: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 5px)' : '10px', 
-              zIndex: 1000,
+        {/* Live Leaderboard - Mobile Optimized */}
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 5px)' : '10px', 
+            left: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 5px)' : '10px', 
+            zIndex: 1000,
             backgroundColor: 'rgba(0, 0, 0, 0.85)',
             border: isMobile ? '1px solid rgba(0, 255, 255, 0.3)' : '2px solid rgba(0, 255, 255, 0.3)',
             borderRadius: isMobile ? '8px' : '6px',
@@ -1231,7 +1206,7 @@ const MultiplayerArena = () => {
           </div>
         </div>
 
-        {/* Enhanced Stats Panel - Bottom Left with compact mobile view - Matching agario */}
+        {/* Enhanced Stats Panel - Bottom Left with compact mobile view */}
         <div 
           onClick={handleStatsToggle}
           style={{ 
@@ -1357,7 +1332,7 @@ const MultiplayerArena = () => {
           )}
         </div>
 
-        {/* Virtual Joystick - Mobile Only - Matching agario exactly */}
+        {/* Virtual Joystick - Mobile Only */}
         {isMobile && (
           <div 
             ref={joystickRef}
@@ -1412,7 +1387,6 @@ const MultiplayerArena = () => {
                 fontSize: '14px'
               }}
             >
-              {/* Joystick inner indicator */}
               <div style={{
                 width: '12px',
                 height: '12px',
@@ -1422,7 +1396,6 @@ const MultiplayerArena = () => {
               }} />
             </div>
             
-            {/* Joystick instruction text */}
             <div style={{
               position: 'absolute',
               bottom: '-25px',
@@ -1441,7 +1414,7 @@ const MultiplayerArena = () => {
           </div>
         )}
 
-        {/* Circular Minimap - Top Right - Matching agario exactly */}
+        {/* Circular Minimap - Top Right */}
         <div style={{
           position: 'fixed',
           top: '10px',
@@ -1450,7 +1423,6 @@ const MultiplayerArena = () => {
           width: isMobile ? '121px' : '220px',
           height: isMobile ? '121px' : '220px'
         }}>
-          {/* Minimap Container */}
           <div style={{
             width: isMobile ? '121px' : '220px',
             height: isMobile ? '121px' : '220px',
@@ -1461,7 +1433,6 @@ const MultiplayerArena = () => {
             overflow: 'hidden',
             boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
-            {/* Danger zone overlay (red border indicating world boundary) */}
             <div style={{
               position: 'absolute',
               top: '5px',
@@ -1473,7 +1444,6 @@ const MultiplayerArena = () => {
               zIndex: 1
             }} />
             
-            {/* Player dot on minimap - using state data */}
             <div style={{
               position: 'absolute',
               width: isMobile ? '6px' : '12px',
@@ -1488,7 +1458,6 @@ const MultiplayerArena = () => {
               zIndex: 10
             }} />
             
-            {/* Player/Enemy dots on minimap - different colors for real players vs AI */}
             {minimapData.enemies.map((enemy, i) => (
               <div
                 key={i}
@@ -1497,22 +1466,21 @@ const MultiplayerArena = () => {
                   position: 'absolute',
                   width: isMobile ? '4px' : '7px',
                   height: isMobile ? '4px' : '7px',
-                  backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b', // Green for real players, red for AI
+                  backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
                   borderRadius: '50%',
                   left: `${(enemy.x / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
                   top: `${(enemy.y / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
                   transform: 'translate(-50%, -50%)',
-                  opacity: enemy.isPlayer ? '1.0' : '0.8', // Real players more opaque
+                  opacity: enemy.isPlayer ? '1.0' : '0.8',
                   border: enemy.isPlayer 
                     ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff') 
                     : (isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff'),
-                  boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none', // Glow for real players
-                  zIndex: enemy.isPlayer ? 10 : 8 // Real players on top
+                  boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none',
+                  zIndex: enemy.isPlayer ? 10 : 8
                 }}
               />
             ))}
             
-            {/* Border spikes effect overlay */}
             <div style={{
               position: 'absolute',
               top: '0',
@@ -1527,39 +1495,6 @@ const MultiplayerArena = () => {
             }} />
           </div>
         </div>
-
-        {/* Exit Arena Button - Top Right */}
-        <button
-          onClick={() => router.push('/')}
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: isMobile ? '20px' : '250px', // Adjust for minimap
-            zIndex: 1001,
-            backgroundColor: '#dc2626',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            padding: isMobile ? '8px 12px' : '10px 16px',
-            fontSize: isMobile ? '12px' : '14px',
-            fontWeight: 'bold',
-            fontFamily: '"Rajdhani", sans-serif',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-            transition: 'all 0.2s ease',
-            userSelect: 'none'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = '#b91c1c'
-            e.target.style.transform = 'translateY(-1px)'
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = '#dc2626'
-            e.target.style.transform = 'translateY(0)'
-          }}
-        >
-          Exit Arena
-        </button>
 
         {/* Cash Out Button - ported from agario */}
         <div 
@@ -1701,15 +1636,43 @@ const MultiplayerArena = () => {
             {isMobile ? '✂️' : '✂️ Split (SPACE)'}
           </span>
         </div>
+
+        {/* Exit Arena Button - Top Right */}
+        <button
+          onClick={() => router.push('/')}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: isMobile ? '20px' : '250px', // Adjust for minimap
+            zIndex: 1001,
+            backgroundColor: '#dc2626',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: isMobile ? '8px 12px' : '10px 16px',
+            fontSize: isMobile ? '12px' : '14px',
+            fontWeight: 'bold',
+            fontFamily: '"Rajdhani", sans-serif',
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            transition: 'all 0.2s ease',
+            userSelect: 'none'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = '#b91c1c'
+            e.target.style.transform = 'translateY(-1px)'
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = '#dc2626'
+            e.target.style.transform = 'translateY(0)'
+          }}
+        >
+          Exit Arena
+        </button>
       </div>
 
       {/* CSS Animations */}
       <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        
         @keyframes pulse {
           0% { opacity: 1; }
           100% { opacity: 0.5; }
