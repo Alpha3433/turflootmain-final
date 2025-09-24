@@ -747,6 +747,15 @@ const MultiplayerArena = () => {
     stop() {
       this.running = false
       console.log('🎮 Multiplayer game engine stopped')
+      
+      // Clean up event listeners
+      if (this.handleMouseMove) {
+        window.removeEventListener('mousemove', this.handleMouseMove)
+      }
+      
+      if (this.updateMousePosition && this.canvas) {
+        this.canvas.removeEventListener('mousemove', this.updateMousePosition)
+      }
     }
     
     update() {
