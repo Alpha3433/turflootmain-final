@@ -7005,9 +7005,9 @@ export default function TurfLootTactical() {
                                           tab.dataset.tab === 'weekly' ? 'linear-gradient(45deg, #8b5cf6 0%, #7c3aed 100%)' : 
                                           'linear-gradient(45deg, #f6ad55 0%, #ed8936 100%)'
                     tab.style.color = 'white'
-                    tab.style.boxShadow = \`0 4px 8px \${tab.dataset.tab === 'daily' ? 'rgba(252, 129, 129, 0.4)' : 
+                    tab.style.boxShadow = '0 4px 8px ' + (tab.dataset.tab === 'daily' ? 'rgba(252, 129, 129, 0.4)' : 
                                                       tab.dataset.tab === 'weekly' ? 'rgba(139, 92, 246, 0.4)' : 
-                                                      'rgba(246, 173, 85, 0.4)'}\`
+                                                      'rgba(246, 173, 85, 0.4)')
                     
                     // Render challenges for selected tab
                     renderChallenges(tab.dataset.tab)
