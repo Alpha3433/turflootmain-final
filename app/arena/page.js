@@ -53,16 +53,34 @@ const MultiplayerArena = () => {
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   
-  // Parse URL parameters with proper decoding
+  // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
-  const playerName = decodeURIComponent(searchParams.get('playerName') || 'Anonymous Player')
-  const privyUserId = searchParams.get('privyUserId') || `anonymous_${Date.now()}`
+  
+  // Use authenticated Privy user data instead of URL parameters
+  const playerName = user?.discord?.username || user?.twitter?.username || user?.google?.name || user?.wallet?.address?.slice(0, 8) || 'Player'
+  const privyUserId = user?.id || null
   
   console.log('🎮 Arena parameters:')
   console.log('  - roomId:', roomId)  
-  console.log('  - playerName (decoded):', playerName)
-  console.log('  - privyUserId:', privyUserId)
-  console.log('  - raw playerName param:', searchParams.get('playerName'))
+  console.log('  - authenticated user:', !!user)
+  console.log('  - playerName (from Privy):', playerName)
+  console.log('  - privyUserId (from Privy):', privyUserId)
+  console.log('  - user object:', user)
+
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (ready && !authenticated) {
+      console.log('❌ User not authenticated - redirecting to login')
+      router.push('/')
+      return
+    }
+    
+    if (ready && authenticated && !user?.id) {
+      console.log('❌ User authenticated but no user ID - redirecting to home')
+      router.push('/')
+      return
+    }
+  }, [ready, authenticated, user, router])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction - matching agario
   useEffect(() => {
