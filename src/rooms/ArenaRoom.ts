@@ -14,6 +14,13 @@ export class Player extends Schema {
   @type("number") score: number = 0;
   @type("number") lastSeq: number = 0;
   @type("boolean") alive: boolean = true;
+  
+  // Server-side skin properties for multiplayer visibility
+  @type("string") skinId: string = "default";
+  @type("string") skinName: string = "Default Warrior";
+  @type("string") skinColor: string = "#4A90E2";
+  @type("string") skinType: string = "circle";
+  @type("string") skinPattern: string = "solid";
 }
 
 // Coin state schema
