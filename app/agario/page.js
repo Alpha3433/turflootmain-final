@@ -1123,7 +1123,7 @@ const AgarIOGame = () => {
       this.player = {
         x: this.world.width / 2,
         y: this.world.height / 2,
-        mass: 20,
+        mass: 25, // Updated to 25 for consistency
         radius: 25,
         color: this.selectedSkin.color, // Use selected skin color instead of hardcoded blue
         name: 'You',
