@@ -706,8 +706,8 @@ const MultiplayerArena = () => {
       this.player = {
         x: 2000,
         y: 2000,
-        mass: 100,
-        radius: 25,
+        mass: 25, // Fixed to match server spawn mass
+        radius: Math.sqrt(25) * 3, // Proper radius calculation: √25 * 3 = 15
         color: '#4A90E2',
         name: playerName || 'Anonymous Player',
         isCurrentPlayer: true,
