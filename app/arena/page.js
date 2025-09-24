@@ -197,7 +197,7 @@ const MultiplayerArena = () => {
     if (wsRef.current) {
       console.log('🔄 Cleaning up existing connection before creating new one...')
       try {
-        wsRef.current.leave()
+        await wsRef.current.leave()
       } catch (error) {
         console.log('⚠️ Error cleaning up existing connection:', error)
       }

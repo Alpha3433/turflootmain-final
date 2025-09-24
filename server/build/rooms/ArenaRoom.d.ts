@@ -2,6 +2,7 @@ import { Room, Client } from "@colyseus/core";
 import { Schema, MapSchema } from "@colyseus/schema";
 export declare class Player extends Schema {
     name: string;
+    privyUserId: string;
     x: number;
     y: number;
     vx: number;
@@ -35,6 +36,7 @@ export declare class GameState extends Schema {
 }
 export declare class ArenaRoom extends Room<GameState> {
     maxClients: number;
+    private privyToSession;
     worldSize: number;
     maxCoins: number;
     maxViruses: number;

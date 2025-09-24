@@ -17,6 +17,7 @@ class Player extends schema_1.Schema {
     constructor() {
         super(...arguments);
         this.name = "Player";
+        this.privyUserId = "";
         this.x = 0;
         this.y = 0;
         this.vx = 0;
@@ -34,6 +35,10 @@ __decorate([
     (0, schema_1.type)("string"),
     __metadata("design:type", String)
 ], Player.prototype, "name", void 0);
+__decorate([
+    (0, schema_1.type)("string"),
+    __metadata("design:type", String)
+], Player.prototype, "privyUserId", void 0);
 __decorate([
     (0, schema_1.type)("number"),
     __metadata("design:type", Number)
@@ -169,6 +174,7 @@ class ArenaRoom extends core_1.Room {
     constructor() {
         super(...arguments);
         this.maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
+        this.privyToSession = new Map();
         // Game configuration
         this.worldSize = parseInt(process.env.WORLD_SIZE || '4000');
         this.maxCoins = 100;
@@ -203,9 +209,28 @@ class ArenaRoom extends core_1.Room {
         const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
         const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
         console.log(`👋 Player joined: ${playerName} (${client.sessionId})`);
+        if (privyUserId) {
+            const existingSession = this.privyToSession.get(privyUserId);
+            if (existingSession && existingSession !== client.sessionId) {
+                console.log(`♻️ Existing session found for ${playerName} (${privyUserId}) - removing old session ${existingSession}`);
+                if (this.state.players.has(existingSession)) {
+                    this.state.players.delete(existingSession);
+                }
+                const existingClient = this.clients.find((c) => c.sessionId === existingSession);
+                if (existingClient) {
+                    try {
+                        existingClient.leave(1000, 'replaced by new session');
+                    }
+                    catch (error) {
+                        console.warn(`⚠️ Failed to disconnect previous session ${existingSession}:`, error);
+                    }
+                }
+            }
+        }
         // Create new player
         const player = new Player();
         player.name = playerName;
+        player.privyUserId = privyUserId;
         player.x = Math.random() * this.worldSize;
         player.y = Math.random() * this.worldSize;
         player.vx = 0;
@@ -224,6 +249,9 @@ class ArenaRoom extends core_1.Room {
             playerName,
             lastInputTime: Date.now()
         };
+        if (privyUserId) {
+            this.privyToSession.set(privyUserId, client.sessionId);
+        }
         console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)})`);
     }
     handleInput(client, message) {
@@ -247,6 +275,10 @@ class ArenaRoom extends core_1.Room {
         if (player) {
             console.log(`👋 Player left: ${player.name} (${client.sessionId})`);
             this.state.players.delete(client.sessionId);
+        }
+        const privyUserId = client.userData?.privyUserId;
+        if (privyUserId && this.privyToSession.get(privyUserId) === client.sessionId) {
+            this.privyToSession.delete(privyUserId);
         }
     }
     update() {
