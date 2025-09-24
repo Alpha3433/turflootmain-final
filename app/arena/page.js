@@ -702,6 +702,10 @@ const MultiplayerArena = () => {
       this.world = { width: 4000, height: 4000 }
       this.expectedSessionId = null // Will be set when we connect to Colyseus
       
+      // Simple camera initialization matching local agario exactly
+      this.camera = { x: 0, y: 0 }
+      this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
+      
       // Player setup with visual properties matching agario
       this.player = {
         x: 2000,
@@ -717,12 +721,6 @@ const MultiplayerArena = () => {
         spawnProtection: true,
         spawnProtectionTime: 6000,
         spawnProtectionStart: Date.now()
-      }
-      
-      // Initialize camera centered on player to prevent jarring (matching local agario)
-      this.camera = { 
-        x: this.player.x - (this.canvas?.width || 800) / 2, 
-        y: this.player.y - (this.canvas?.height || 600) / 2 
       }
       
       // Initialize client-side animation cache for persistent virus animations
