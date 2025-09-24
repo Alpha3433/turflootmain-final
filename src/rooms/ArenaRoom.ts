@@ -168,12 +168,22 @@ export class ArenaRoom extends Room<GameState> {
 
   handleInput(client: Client, message: any) {
     const player = this.state.players.get(client.sessionId);
-    if (!player || !player.alive) return;
+    if (!player || !player.alive) {
+      console.log(`⚠️ Input ignored - player not found or dead for session: ${client.sessionId}`);
+      return;
+    }
 
     const { seq, dx, dy } = message;
     
+    console.log(`📥 Received input from ${player.name} (${client.sessionId}):`, {
+      sequence: seq,
+      direction: { dx: dx?.toFixed(3), dy: dy?.toFixed(3) },
+      currentPos: { x: player.x?.toFixed(1), y: player.y?.toFixed(1) }
+    });
+    
     // Validate input sequence to prevent replay attacks
     if (seq <= player.lastSeq) {
+      console.log(`⚠️ Ignoring old input sequence: ${seq} <= ${player.lastSeq}`);
       return; // Ignore old inputs
     }
     
@@ -182,8 +192,16 @@ export class ArenaRoom extends Room<GameState> {
     
     // Apply movement (dx, dy are normalized direction vectors)
     const speed = Math.max(1, 5 * (100 / player.mass)); // Speed inversely proportional to mass
-    player.vx = dx * speed;
-    player.vy = dy * speed;
+    const newVx = dx * speed;
+    const newVy = dy * speed;
+    
+    player.vx = newVx;
+    player.vy = newVy;
+    
+    console.log(`✅ Applied movement to ${player.name}:`, {
+      speed: speed.toFixed(2),
+      velocity: { vx: newVx.toFixed(2), vy: newVy.toFixed(2) }
+    });
   }
 
   onLeave(client: Client, consented?: boolean) {
