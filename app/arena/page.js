@@ -682,11 +682,13 @@ const MultiplayerArena = () => {
 
   // Pure multiplayer game engine - updated to match agario visual features
   class MultiplayerGameEngine {
-    constructor(canvas, inputSender) {
+    constructor(canvas, inputSender, selectedSkin) {
       console.log('🎮 Initializing pure multiplayer game engine with enhanced mechanics')
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
       this.sendInputFn = inputSender  // Store the sendInput function
+      this.selectedSkin = selectedSkin || { color: '#4A90E2' } // Store the selected skin
+      console.log('🎨 Using selected skin in game engine:', this.selectedSkin)
       this.running = false
       
       // World setup
