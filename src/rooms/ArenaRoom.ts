@@ -208,6 +208,87 @@ export class ArenaRoom extends Room<GameState> {
     });
   }
 
+  handleSplit(client: Client, message: any) {
+    const player = this.state.players.get(client.sessionId);
+    if (!player || !player.alive) {
+      console.log(`⚠️ Split ignored - player not found or dead for session: ${client.sessionId}`);
+      return;
+    }
+
+    const { targetX, targetY } = message;
+    
+    console.log(`🔄 Split requested by ${player.name} (${client.sessionId}) toward:`, {
+      target: { x: targetX?.toFixed(1), y: targetY?.toFixed(1) },
+      currentPos: { x: player.x?.toFixed(1), y: player.y?.toFixed(1) },
+      mass: player.mass
+    });
+    
+    // Check if player can split (minimum mass requirement)
+    if (player.mass < 150) {
+      console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 150`);
+      return;
+    }
+    
+    // Calculate direction from player to target
+    const dx = targetX - player.x;
+    const dy = targetY - player.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distance < 10) {
+      console.log(`⚠️ Split denied - target too close: ${distance}`);
+      return;
+    }
+    
+    // Normalize direction
+    const dirX = dx / distance;
+    const dirY = dy / distance;
+    
+    // Split the player mass
+    const originalMass = player.mass;
+    const splitMass = Math.floor(originalMass / 2);
+    
+    // Update original player
+    player.mass = originalMass - splitMass;
+    player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+    
+    // Create split piece
+    const splitId = `${client.sessionId}_split_${Date.now()}`;
+    const splitPlayer = new Player();
+    splitPlayer.name = `${player.name}*`;
+    splitPlayer.x = player.x + dirX * (player.radius + 50); // Spawn split piece ahead
+    splitPlayer.y = player.y + dirY * (player.radius + 50);
+    splitPlayer.vx = dirX * 15; // Give initial velocity toward target
+    splitPlayer.vy = dirY * 15;
+    splitPlayer.mass = splitMass;
+    splitPlayer.radius = Math.sqrt(splitPlayer.mass / Math.PI) * 10;
+    splitPlayer.color = player.color;
+    splitPlayer.score = Math.floor(player.score / 2);
+    splitPlayer.alive = true;
+    
+    // Add split piece to game (temporary - it will merge back after 5 seconds)
+    this.state.players.set(splitId, splitPlayer);
+    
+    console.log(`✅ Split completed for ${player.name}:`, {
+      originalMass: originalMass,
+      remainingMass: player.mass,
+      splitMass: splitMass,
+      splitPosition: { x: splitPlayer.x.toFixed(1), y: splitPlayer.y.toFixed(1) }
+    });
+    
+    // Auto-merge the split piece back after 5 seconds
+    setTimeout(() => {
+      const splitPiece = this.state.players.get(splitId);
+      const mainPlayer = this.state.players.get(client.sessionId);
+      
+      if (splitPiece && mainPlayer) {
+        console.log(`🔄 Auto-merging split piece for ${player.name}`);
+        mainPlayer.mass += splitPiece.mass;
+        mainPlayer.radius = Math.sqrt(mainPlayer.mass / Math.PI) * 10;
+        this.state.players.delete(splitId);
+      }
+    }, 5000);
+  }
+
   onLeave(client: Client, consented?: boolean) {
     const player = this.state.players.get(client.sessionId);
     if (player) {
