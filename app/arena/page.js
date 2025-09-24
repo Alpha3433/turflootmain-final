@@ -223,9 +223,11 @@ const MultiplayerArena = () => {
         // Process players with proper current player identification
         if (state.players) {
           console.log('🎮 Current session ID:', room.sessionId)
+          console.log('🎮 Players in state:', Array.from(state.players.keys()))
           let currentPlayerFound = false
           
           state.players.forEach((player, sessionId) => {
+            console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}`)
             const isCurrentPlayer = sessionId === room.sessionId
             if (isCurrentPlayer) {
               console.log('✅ Found current player:', sessionId, player.name)
@@ -242,6 +244,14 @@ const MultiplayerArena = () => {
           if (!currentPlayerFound) {
             console.log('❌ Current player not found! Available sessions:', 
               Array.from(state.players.keys()))
+          }
+          
+          // Check for duplicate player names
+          const playerNames = gameState.players.map(p => p.name)
+          const duplicateNames = playerNames.filter((name, index) => playerNames.indexOf(name) !== index)
+          if (duplicateNames.length > 0) {
+            console.warn('⚠️ DUPLICATE PLAYER NAMES DETECTED:', duplicateNames)
+            console.warn('⚠️ All players:', gameState.players.map(p => `${p.name}(${p.sessionId})`))
           }
         }
         
