@@ -194,10 +194,13 @@ export class ArenaRoom extends Room<GameState> {
     player.lastSeq = seq;
     (client as any).userData.lastInputTime = Date.now();
     
-    // Apply movement (dx, dy are normalized direction vectors)
-    const speed = Math.max(1, 5 * (100 / player.mass)); // Speed inversely proportional to mass
-    const newVx = dx * speed;
-    const newVy = dy * speed;
+    // Apply movement using local agario speed formula
+    const baseSpeed = 6.0;  // Base speed for small players (matching local agario)
+    const massSpeedFactor = Math.sqrt(player.mass / 20); // Gradual slowdown (matching local agario)
+    const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor); // Minimum speed of 1.5 (matching local agario)
+    
+    const newVx = dx * dynamicSpeed;
+    const newVy = dy * dynamicSpeed;
     
     player.vx = newVx;
     player.vy = newVy;
