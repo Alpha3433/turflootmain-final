@@ -413,14 +413,17 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   respawnPlayer(player: Player) {
-    player.x = Math.random() * this.worldSize;
-    player.y = Math.random() * this.worldSize;
+    // Generate respawn position within circular playable area
+    const spawnPosition = this.generateCircularSpawnPosition();
+    player.x = spawnPosition.x;
+    player.y = spawnPosition.y;
+    
     player.vx = 0;
     player.vy = 0;
     player.mass = 25; // Updated to 25 to match user requirement
     player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
     player.alive = true;
-    console.log(`🔄 Player respawned: ${player.name}`);
+    console.log(`🔄 Player respawned: ${player.name} at (${player.x.toFixed(1)}, ${player.y.toFixed(1)})`);
   }
 
   generateCoins() {
