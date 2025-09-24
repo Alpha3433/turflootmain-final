@@ -6318,10 +6318,10 @@ export default function TurfLootTactical() {
             padding: '16px', 
             border: '2px solid rgba(252, 129, 129, 0.3)',
             marginBottom: '16px',
-            maxHeight: '200px',
-            overflowY: 'auto'
+            position: 'relative',
+            minHeight: '140px'
           }}>
-            {/* Challenge List */}
+            {/* Challenge Carousel */}
             {(() => {
               // Get user-specific challenges data
               const userKey = isAuthenticated ? 
@@ -6376,68 +6376,148 @@ export default function TurfLootTactical() {
                 }
               ]
               
-              return defaultChallenges.map(challenge => {
-                const progress = challengesData[challenge.id] || { current: 0, completed: false }
-                const progressPercent = Math.min((progress.current / challenge.target) * 100, 100)
-                const isCompleted = progress.completed || progress.current >= challenge.target
-                
-                return (
-                  <div key={challenge.id} style={{
-                    marginBottom: '12px',
-                    padding: '10px',
+              const currentChallenge = defaultChallenges[currentChallengeIndex] || defaultChallenges[0]
+              const progress = challengesData[currentChallenge.id] || { current: 0, completed: false }
+              const progressPercent = Math.min((progress.current / currentChallenge.target) * 100, 100)
+              const isCompleted = progress.completed || progress.current >= currentChallenge.target
+              
+              return (
+                <div style={{ position: 'relative' }}>
+                  {/* Navigation Arrows */}
+                  <button
+                    onClick={() => setCurrentChallengeIndex(prev => 
+                      prev === 0 ? defaultChallenges.length - 1 : prev - 1
+                    )}
+                    style={{
+                      position: 'absolute',
+                      left: '-8px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(252, 129, 129, 0.8)',
+                      border: '2px solid #fc8181',
+                      borderRadius: '50%',
+                      width: '32px',
+                      height: '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      boxShadow: '0 0 10px rgba(252, 129, 129, 0.4)',
+                      zIndex: 10,
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(252, 129, 129, 1)'
+                      e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(252, 129, 129, 0.8)'
+                      e.target.style.transform = 'translateY(-50%) scale(1)'
+                    }}
+                  >
+                    ←
+                  </button>
+                  
+                  <button
+                    onClick={() => setCurrentChallengeIndex(prev => 
+                      prev === defaultChallenges.length - 1 ? 0 : prev + 1
+                    )}
+                    style={{
+                      position: 'absolute',
+                      right: '-8px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'rgba(252, 129, 129, 0.8)',
+                      border: '2px solid #fc8181',
+                      borderRadius: '50%',
+                      width: '32px',
+                      height: '32px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      boxShadow: '0 0 10px rgba(252, 129, 129, 0.4)',
+                      zIndex: 10,
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = 'rgba(252, 129, 129, 1)'
+                      e.target.style.transform = 'translateY(-50%) scale(1.1)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = 'rgba(252, 129, 129, 0.8)'
+                      e.target.style.transform = 'translateY(-50%) scale(1)'
+                    }}
+                  >
+                    →
+                  </button>
+                  
+                  {/* Challenge Card */}
+                  <div style={{
+                    padding: '16px',
                     background: isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)',
-                    borderRadius: '6px',
-                    border: `1px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`,
-                    position: 'relative'
+                    borderRadius: '8px',
+                    border: `2px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`,
+                    position: 'relative',
+                    margin: '0 24px',
+                    textAlign: 'center'
                   }}>
                     {/* Challenge Header */}
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: '8px', 
-                      marginBottom: '6px' 
+                      justifyContent: 'center',
+                      gap: '12px', 
+                      marginBottom: '12px' 
                     }}>
-                      <span style={{ fontSize: '16px' }}>{challenge.icon}</span>
-                      <div style={{ flex: 1 }}>
+                      <span style={{ fontSize: '24px' }}>{currentChallenge.icon}</span>
+                      <div>
                         <div style={{
-                          fontSize: '12px',
+                          fontSize: '16px',
                           fontWeight: '700',
                           color: isCompleted ? '#68d391' : '#e2e8f0',
                           fontFamily: '"Rajdhani", sans-serif',
-                          textTransform: 'uppercase'
+                          textTransform: 'uppercase',
+                          marginBottom: '4px'
                         }}>
-                          {challenge.name}
+                          {currentChallenge.name}
                         </div>
                         <div style={{
-                          fontSize: '10px',
+                          fontSize: '12px',
                           color: '#a0aec0',
                           fontFamily: '"Rajdhani", sans-serif'
                         }}>
-                          {challenge.description}
+                          {currentChallenge.description}
                         </div>
                       </div>
                       <div style={{
-                        padding: '2px 6px',
-                        background: challenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 'rgba(139, 92, 246, 0.2)',
-                        border: `1px solid ${challenge.type === 'daily' ? '#f6ad55' : '#8b5cf6'}`,
-                        borderRadius: '3px',
-                        fontSize: '8px',
-                        color: challenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
+                        padding: '4px 8px',
+                        background: currentChallenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 'rgba(139, 92, 246, 0.2)',
+                        border: `1px solid ${currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6'}`,
+                        borderRadius: '4px',
+                        fontSize: '10px',
+                        color: currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
                         textTransform: 'uppercase',
                         fontFamily: '"Rajdhani", sans-serif',
                         fontWeight: '600'
                       }}>
-                        {challenge.type}
+                        {currentChallenge.type}
                       </div>
                     </div>
                     
                     {/* Progress Bar */}
                     <div style={{
                       background: 'rgba(45, 55, 72, 0.8)',
-                      borderRadius: '4px',
-                      height: '6px',
+                      borderRadius: '6px',
+                      height: '8px',
                       overflow: 'hidden',
-                      marginBottom: '6px'
+                      marginBottom: '12px'
                     }}>
                       <div style={{
                         background: isCompleted ? 
@@ -6453,40 +6533,52 @@ export default function TurfLootTactical() {
                     <div style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between', 
-                      alignItems: 'center' 
+                      alignItems: 'center',
+                      marginBottom: '8px'
                     }}>
                       <span style={{
-                        fontSize: '10px',
+                        fontSize: '12px',
                         color: '#a0aec0',
-                        fontFamily: '"Rajdhani", sans-serif'
+                        fontFamily: '"Rajdhani", sans-serif',
+                        fontWeight: '600'
                       }}>
-                        {isCompleted ? 'COMPLETED' : `${progress.current}/${challenge.target}`}
+                        {isCompleted ? 'COMPLETED' : `${progress.current}/${currentChallenge.target}`}
                       </span>
                       <span style={{
-                        fontSize: '10px',
+                        fontSize: '12px',
                         color: '#f6ad55',
                         fontFamily: '"Rajdhani", sans-serif',
                         fontWeight: '700'
                       }}>
-                        {isCompleted ? '✅' : `+${challenge.reward} coins`}
+                        {isCompleted ? '✅ REWARD READY' : `+${currentChallenge.reward} coins`}
                       </span>
+                    </div>
+                    
+                    {/* Challenge Counter */}
+                    <div style={{
+                      fontSize: '10px',
+                      color: '#68d391',
+                      fontFamily: '"Rajdhani", sans-serif',
+                      fontWeight: '600'
+                    }}>
+                      {currentChallengeIndex + 1} / {defaultChallenges.length}
                     </div>
                     
                     {/* Completion Overlay */}
                     {isCompleted && (
                       <div style={{
                         position: 'absolute',
-                        top: '2px',
-                        right: '2px',
+                        top: '8px',
+                        right: '8px',
                         background: '#68d391',
                         color: '#1a202c',
                         borderRadius: '50%',
-                        width: '16px',
-                        height: '16px',
+                        width: '24px',
+                        height: '24px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '8px',
+                        fontSize: '12px',
                         fontWeight: 'bold',
                         boxShadow: '0 0 8px rgba(104, 211, 145, 0.6)'
                       }}>
@@ -6494,8 +6586,8 @@ export default function TurfLootTactical() {
                       </div>
                     )}
                   </div>
-                )
-              })
+                </div>
+              )
             })()}
           </div>
           
