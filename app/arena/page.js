@@ -732,7 +732,7 @@ const MultiplayerArena = () => {
           const normalizedDy = dy / distance
           
           // Send normalized input to multiplayer server
-          sendInput(normalizedDx, normalizedDy)
+          this.sendInputFn(normalizedDx, normalizedDy)
           
           // Debug logging
           console.log('🖱️ Mouse movement:', {
