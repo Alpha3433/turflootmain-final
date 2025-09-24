@@ -1108,33 +1108,29 @@ const MultiplayerArena = () => {
     drawPlayer(player, isCurrentPlayer = false) {
       const playerRadius = player.radius || 25
       
+      // Use server-provided skin color for all players (enables multiplayer skin visibility)
+      const playerSkinColor = player.skinColor || player.color || '#4A90E2'
+      
       // Player glow effect for current player
       if (isCurrentPlayer) {
-        this.ctx.shadowColor = this.selectedSkin.color || '#00BFFF'
+        this.ctx.shadowColor = playerSkinColor
         this.ctx.shadowBlur = 20
       }
       
-      // Player circle with gradient using selected skin color for current player
+      // Player circle with gradient using server-provided skin color
       const gradient = this.ctx.createRadialGradient(
         player.x, player.y, 0,
         player.x, player.y, playerRadius
       )
       
-      if (isCurrentPlayer) {
-        // Use selected skin color for current player
-        const baseColor = this.selectedSkin.color || '#4A90E2'
-        const lighterColor = this.adjustColorBrightness(baseColor, 20)  
-        const darkerColor = this.adjustColorBrightness(baseColor, -40)   
-        
-        gradient.addColorStop(0, lighterColor)  // Lighter center
-        gradient.addColorStop(0.7, baseColor)   // Base color
-        gradient.addColorStop(1, darkerColor)   // Darker edge
-      } else {
-        // Keep red gradient for other players
-        gradient.addColorStop(0, '#FF6B6B')  // Red center for enemies
-        gradient.addColorStop(0.7, '#FF4444') // Medium red
-        gradient.addColorStop(1, '#CC2222')   // Dark red edge
-      }
+      // All players now use their server-side skin colors
+      const baseColor = playerSkinColor
+      const lighterColor = this.adjustColorBrightness(baseColor, 20)  
+      const darkerColor = this.adjustColorBrightness(baseColor, -40)   
+      
+      gradient.addColorStop(0, lighterColor)  // Lighter center
+      gradient.addColorStop(0.7, baseColor)   // Base color
+      gradient.addColorStop(1, darkerColor)   // Darker edge
       
       this.ctx.fillStyle = gradient
       this.ctx.beginPath()
