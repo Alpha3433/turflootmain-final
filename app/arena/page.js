@@ -1100,7 +1100,7 @@ const MultiplayerArena = () => {
     canvas.height = window.innerHeight
     
     // Create game instance
-    const game = new MultiplayerGameEngine(canvas)
+    const game = new MultiplayerGameEngine(canvas, sendInput)
     gameRef.current = game
     
     game.start()
