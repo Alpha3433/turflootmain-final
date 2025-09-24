@@ -126,7 +126,7 @@ user_problem_statement: "COLYSEUS DISCONNECTION ISSUE INVESTIGATION: User report
 
 test_plan:
   current_focus:
-    - "Colyseus Authentication and Connection Infrastructure Testing"
+    - "Challenges/Missions Panel Backend Integration Testing"
   stuck_tasks:
     - "Frontend Build Issues - Missing Solana wallet adapters"
   test_all: false
