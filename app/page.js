@@ -6356,7 +6356,7 @@ export default function TurfLootTactical() {
                   description: 'Eat 50 coins', 
                   target: 50, 
                   reward: 100,
-                  icon: '🪙',
+                  icon: '💰', // Changed from 🪙 to 💰
                   type: 'daily'
                 },
                 { 
