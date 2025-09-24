@@ -436,6 +436,12 @@ const MultiplayerArena = () => {
         console.log('🎮 Arena state update - Players:', state.players?.size || 0, 'Connection:', connectionStatus)
         setPlayerCount(state.players?.size || 0)
         
+        // Ensure connection status is set to connected when receiving state updates
+        if (connectionStatus !== 'connected') {
+          console.log('🔗 Setting connection status to connected (state update received)')
+          setConnectionStatus('connected')
+        }
+        
         // Convert MapSchema to usable format
         const gameState = {
           players: [],
