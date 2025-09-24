@@ -1168,18 +1168,31 @@ const MultiplayerArena = () => {
             textAlign: 'center',
             marginBottom: '20px'
           }}>
-            🔒 Authentication Required
+            🔒 Arena Access Control
           </div>
           <div style={{
             color: '#ffffff',
             fontSize: '18px',
             textAlign: 'center',
-            marginBottom: '30px',
+            marginBottom: '20px',
             maxWidth: '600px',
             lineHeight: '1.5'
           }}>
             Arena matches are restricted to authenticated Privy users only.<br/>
             This prevents duplicate players and ensures fair gameplay.
+          </div>
+          {/* Dynamic Authentication Status */}
+          <div style={{
+            color: '#00ff88',
+            fontSize: '16px',
+            textAlign: 'center',
+            marginBottom: '30px',
+            padding: '10px 20px',
+            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+            border: '1px solid rgba(0, 255, 136, 0.3)',
+            borderRadius: '8px'
+          }}>
+            {authMessage || '🔄 Initializing authentication...'}
           </div>
           {ready && !authenticated && (
             <button
