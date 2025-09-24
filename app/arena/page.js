@@ -778,29 +778,30 @@ const MultiplayerArena = () => {
     render() {
       if (!this.ctx || !this.running) return
       
-      // Clear canvas
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+      // Clear canvas with darker background matching 2nd image
+      this.ctx.fillStyle = '#1a1a1a' // Dark background like 2nd image
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
       
       // Save context for camera transform
       this.ctx.save()
       this.ctx.translate(-this.camera.x, -this.camera.y)
       
-      // Draw world boundary with grid pattern (matching agario)
+      // Draw world boundary with enhanced visuals
       this.drawWorldBoundary()
       
       // Draw server state if available
       if (this.serverState) {
-        // Draw coins
+        // Draw coins first (background layer)
         this.serverState.coins.forEach(coin => {
           this.drawCoin(coin)
         })
         
-        // Draw viruses
+        // Draw viruses (middle layer)
         this.serverState.viruses.forEach(virus => {
           this.drawVirus(virus)
         })
         
-        // Draw all players
+        // Draw all players (foreground layer)
         this.serverState.players.forEach(player => {
           if (player.alive) {
             this.drawPlayer(player, player.isCurrentPlayer)
