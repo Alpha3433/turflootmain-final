@@ -8,7 +8,7 @@ export class Player extends Schema {
   @type("number") y: number = 0;
   @type("number") vx: number = 0;
   @type("number") vy: number = 0;
-  @type("number") mass: number = 100;
+  @type("number") mass: number = 25; // Fixed default mass to 25
   @type("number") radius: number = 20;
   @type("string") color: string = "#FF6B6B";
   @type("number") score: number = 0;
