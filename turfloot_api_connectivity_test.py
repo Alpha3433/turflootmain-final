@@ -16,7 +16,7 @@ from datetime import datetime
 
 # Configuration
 LOCALHOST_URL = "http://localhost:3000"
-PREVIEW_URL = "https://agar-clone-debug.preview.emergentagent.com"
+PREVIEW_URL = "https://agario-evolved-1.preview.emergentagent.com"
 LOCALHOST_API = f"{LOCALHOST_URL}/api"
 PREVIEW_API = f"{PREVIEW_URL}/api"
 

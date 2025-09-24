@@ -29,7 +29,7 @@ from datetime import datetime
 class CameraStabilityBackendTester:
     def __init__(self):
         # Get base URL from environment or use default
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://agar-clone-debug.preview.emergentagent.com')
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://agario-evolved-1.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         self.test_results = []
         self.session = requests.Session()
