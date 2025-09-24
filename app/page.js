@@ -6784,7 +6784,7 @@ export default function TurfLootTactical() {
                       description: 'Reach mass 200', 
                       target: 200, 
                       reward: 200,
-                      icon: '🪙',
+                      icon: '📈', // Changed back to chart emoji which should render better
                       type: 'weekly'
                     },
                     { 
