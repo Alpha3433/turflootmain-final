@@ -6503,10 +6503,12 @@ export default function TurfLootTactical() {
                         {isCompleted ? 'COMPLETED' : `${Math.round(progressPercent)}% Complete`}
                       </span>
                       <span style={{
-                        fontSize: '12px',
-                        color: '#f6ad55',
+                        fontSize: '16px', // Increased from 12px
+                        color: '#fbbf24', // Enhanced gold color
                         fontFamily: '"Rajdhani", sans-serif',
-                        fontWeight: '700'
+                        fontWeight: '800', // Increased from 700
+                        textShadow: '0 0 12px rgba(251, 191, 36, 0.8), 0 0 6px rgba(251, 191, 36, 0.6)', // Glowing effect
+                        animation: isCompleted ? 'goldPulse 2s ease-in-out infinite' : 'none'
                       }}>
                         {isCompleted ? '✅ REWARD READY' : `+${currentChallenge.reward} coins`}
                       </span>
