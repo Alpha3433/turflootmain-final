@@ -249,7 +249,7 @@ export class ArenaRoom extends Room<GameState> {
     
     // Update original player
     player.mass = originalMass - splitMass;
-    player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+    player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
     
     // Create split piece
     const splitId = `${client.sessionId}_split_${Date.now()}`;
@@ -260,7 +260,7 @@ export class ArenaRoom extends Room<GameState> {
     splitPlayer.vx = dirX * 15; // Give initial velocity toward target
     splitPlayer.vy = dirY * 15;
     splitPlayer.mass = splitMass;
-    splitPlayer.radius = Math.sqrt(splitPlayer.mass / Math.PI) * 10;
+    splitPlayer.radius = Math.sqrt(splitPlayer.mass) * 3; // Match agario radius formula
     splitPlayer.color = player.color;
     splitPlayer.score = Math.floor(player.score / 2);
     splitPlayer.alive = true;
