@@ -4455,12 +4455,14 @@ export default function TurfLootTactical() {
     padding: 0,
     background: 'radial-gradient(ellipse at center, #2d3748 0%, #1a202c 50%, #0d1117 100%)',
     color: '#e2e8f0',
-    overflow: 'hidden',
+    overflow: isMobile ? 'auto' : 'hidden',
     position: 'relative',
     fontFamily: '"Rajdhani", "Arial Black", sans-serif',
     ...(isMobile && {
-      overflow: 'auto',
-      paddingBottom: '20px'
+      paddingBottom: '20px',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      WebkitOverflowScrolling: 'touch' // iOS smooth scrolling
     })
   }
 
