@@ -979,21 +979,27 @@ const MultiplayerArena = () => {
       
       // Player glow effect for current player
       if (isCurrentPlayer) {
-        this.ctx.shadowColor = '#00BFFF'
+        this.ctx.shadowColor = this.selectedSkin.color || '#00BFFF'
         this.ctx.shadowBlur = 20
       }
       
-      // Player circle with gradient
+      // Player circle with gradient using selected skin color for current player
       const gradient = this.ctx.createRadialGradient(
         player.x, player.y, 0,
         player.x, player.y, playerRadius
       )
       
       if (isCurrentPlayer) {
-        gradient.addColorStop(0, '#00BFFF')  // Bright blue center
-        gradient.addColorStop(0.7, '#0080FF') // Medium blue
-        gradient.addColorStop(1, '#0040AA')   // Dark blue edge
+        // Use selected skin color for current player
+        const baseColor = this.selectedSkin.color || '#4A90E2'
+        const lighterColor = this.adjustColorBrightness(baseColor, 20)  
+        const darkerColor = this.adjustColorBrightness(baseColor, -40)   
+        
+        gradient.addColorStop(0, lighterColor)  // Lighter center
+        gradient.addColorStop(0.7, baseColor)   // Base color
+        gradient.addColorStop(1, darkerColor)   // Darker edge
       } else {
+        // Keep red gradient for other players
         gradient.addColorStop(0, '#FF6B6B')  // Red center for enemies
         gradient.addColorStop(0.7, '#FF4444') // Medium red
         gradient.addColorStop(1, '#CC2222')   // Dark red edge
@@ -1028,6 +1034,18 @@ const MultiplayerArena = () => {
       this.ctx.beginPath()
       this.ctx.arc(player.x + eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
       this.ctx.fill()
+    }
+    
+    // Helper function to adjust color brightness
+    adjustColorBrightness(hexColor, percent) {
+      const num = parseInt(hexColor.replace("#", ""), 16)
+      const amt = Math.round(2.55 * percent)
+      const R = (num >> 16) + amt
+      const G = (num >> 8 & 0x00FF) + amt
+      const B = (num & 0x0000FF) + amt
+      return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + 
+        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + 
+        (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1)
     }
     
     drawCoin(coin) {
