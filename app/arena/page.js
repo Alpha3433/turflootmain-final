@@ -691,10 +691,19 @@ const MultiplayerArena = () => {
       console.log('🎨 Using selected skin in game engine:', this.selectedSkin)
       this.running = false
       
-      // World setup
+      // World setup with circular zone system
       this.world = { width: 4000, height: 4000 }
       this.camera = { x: 0, y: 0 }
       this.expectedSessionId = null // Will be set when we connect to Colyseus
+      
+      // Dynamic circular zone system (matching local agario)
+      this.basePlayableRadius = 1000 // Minimum zone radius
+      this.maxPlayableRadius = 1800  // Maximum zone radius  
+      this.currentPlayableRadius = 1400 // Starting zone size
+      this.targetPlayableRadius = this.currentPlayableRadius
+      this.zoneTransitionSpeed = 20 // Pixels per second zone change
+      this.isCashGame = false // Can be set based on game mode
+      console.log('🎯 Arena initialized with circular zone system - radius:', this.currentPlayableRadius)
 
       // Player setup with visual properties matching agario
       this.player = {
