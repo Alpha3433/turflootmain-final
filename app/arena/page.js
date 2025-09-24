@@ -812,12 +812,12 @@ const MultiplayerArena = () => {
     }
     
     drawWorldBoundary() {
-      // Draw grid pattern (matching agario style)
-      const gridSize = 50
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
+      // Draw richer background matching 2nd image style
+      const gridSize = 25 // Smaller grid for denser pattern
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
       this.ctx.lineWidth = 1
       
-      // Vertical lines
+      // Vertical lines - denser grid
       for (let x = 0; x <= this.world.width; x += gridSize) {
         this.ctx.beginPath()
         this.ctx.moveTo(x, 0)
@@ -825,7 +825,7 @@ const MultiplayerArena = () => {
         this.ctx.stroke()
       }
       
-      // Horizontal lines
+      // Horizontal lines - denser grid  
       for (let y = 0; y <= this.world.height; y += gridSize) {
         this.ctx.beginPath()
         this.ctx.moveTo(0, y)
@@ -833,10 +833,15 @@ const MultiplayerArena = () => {
         this.ctx.stroke()
       }
       
-      // World border
-      this.ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)'
-      this.ctx.lineWidth = 4
+      // World border - bright green like 2nd image
+      this.ctx.strokeStyle = '#00ff00'
+      this.ctx.lineWidth = 8
       this.ctx.strokeRect(0, 0, this.world.width, this.world.height)
+      
+      // Add inner border glow
+      this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)'
+      this.ctx.lineWidth = 20
+      this.ctx.strokeRect(-10, -10, this.world.width + 20, this.world.height + 20)
     }
     
     drawPlayer(player, isCurrentPlayer = false) {
