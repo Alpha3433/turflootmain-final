@@ -91,24 +91,38 @@ const MultiplayerArena = () => {
   console.log('  - playerName (from Privy):', playerName)
   console.log('  - privyUserId (from Privy):', privyUserId)
 
+  // Authentication loading state
+  const [authMessage, setAuthMessage] = useState('')
+
   // Authentication check - redirect to login if not authenticated with user feedback
   useEffect(() => {
+    if (!ready) {
+      setAuthMessage('🔒 Checking authentication...')
+      return
+    }
+
     if (ready && !authenticated) {
       console.log('❌ User not authenticated - redirecting to login')
       console.log('🔗 To access the arena, please login first at the main page')
+      setAuthMessage('❌ Authentication required! Redirecting to login...')
       // Add a slight delay to show feedback before redirect
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         router.push('/?auth_required=arena')
-      }, 1000)
-      return
+      }, 2000)
+      return () => clearTimeout(timer)
     }
     
     if (ready && authenticated && !user?.id) {
       console.log('❌ User authenticated but no user ID - redirecting to home')
-      setTimeout(() => {
+      setAuthMessage('❌ Authentication error! Redirecting...')
+      const timer = setTimeout(() => {
         router.push('/?auth_error=no_user_id')
-      }, 1000)
-      return
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+
+    if (ready && authenticated && user?.id) {
+      setAuthMessage('✅ Authentication successful! Loading arena...')
     }
   }, [ready, authenticated, user, router])
 
