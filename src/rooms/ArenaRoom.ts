@@ -163,10 +163,23 @@ export class ArenaRoom extends Room<GameState> {
     player.vy = 0;
     player.mass = 25; // Updated to 25 to match user requirement
     player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
-    player.color = this.generatePlayerColor();
+    
+    // Apply skin data from client options (server-side storage for multiplayer visibility)
+    const selectedSkin = options.selectedSkin || {};
+    player.skinId = selectedSkin.id || "default";
+    player.skinName = selectedSkin.name || "Default Warrior";
+    player.skinColor = selectedSkin.color || "#4A90E2";
+    player.skinType = selectedSkin.type || "circle";
+    player.skinPattern = selectedSkin.pattern || "solid";
+    
+    // Use skin color as player color for consistent appearance
+    player.color = player.skinColor;
+    
     player.score = 0;
     player.lastSeq = 0;
     player.alive = true;
+    
+    console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
     
     // Add player to game state
     this.state.players.set(client.sessionId, player);
