@@ -386,7 +386,7 @@ export class ArenaRoom extends Room<GameState> {
         if (player.mass > otherPlayer.mass * 1.2) {
           player.mass += otherPlayer.mass * 0.8;
           player.score += otherPlayer.score * 0.5;
-          player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+          player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
           
           // Eliminate other player
           otherPlayer.alive = false;
