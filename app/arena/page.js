@@ -894,6 +894,17 @@ const MultiplayerArena = () => {
           this.currentPlayableRadius = Math.max(this.currentPlayableRadius, this.targetPlayableRadius)
         }
       }
+      
+      // Simulate dynamic zone changes for demonstration (optional)
+      // Uncomment to see zone shrinking/expanding every 30 seconds:
+      /*
+      const gameTime = Date.now() - this.gameStartTime
+      if (gameTime > 30000 && gameTime % 60000 < 1000) {
+        // Shrink zone every 60 seconds after first 30 seconds
+        this.targetPlayableRadius = Math.max(this.basePlayableRadius, this.targetPlayableRadius - 200)
+        console.log('🔻 Zone shrinking to radius:', this.targetPlayableRadius)
+      }
+      */
     }
     
     update() {
