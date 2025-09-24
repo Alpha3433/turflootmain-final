@@ -462,7 +462,23 @@ export class ArenaRoom extends Room<GameState> {
     return colors[Math.floor(Math.random() * colors.length)];
   }
 
-  onDispose() {
-    console.log('🛑 Arena room disposed');
+  // Generate random spawn position within circular playable area
+  generateCircularSpawnPosition(): { x: number, y: number } {
+    const centerX = this.worldSize / 2;
+    const centerY = this.worldSize / 2;
+    const maxRadius = 1400; // Match arena's currentPlayableRadius
+    const safetyMargin = 50; // Spawn slightly away from zone edge for safety
+    const spawnRadius = maxRadius - safetyMargin;
+    
+    // Generate random point within circle using polar coordinates
+    const angle = Math.random() * Math.PI * 2; // Random angle
+    const distance = Math.sqrt(Math.random()) * spawnRadius; // Square root for uniform distribution
+    
+    const x = centerX + Math.cos(angle) * distance;
+    const y = centerY + Math.sin(angle) * distance;
+    
+    console.log(`🎯 Generated spawn position: (${x.toFixed(1)}, ${y.toFixed(1)}) at distance ${distance.toFixed(1)} from center`);
+    
+    return { x, y };
   }
 }
