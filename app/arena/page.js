@@ -91,17 +91,23 @@ const MultiplayerArena = () => {
   console.log('  - playerName (from Privy):', playerName)
   console.log('  - privyUserId (from Privy):', privyUserId)
 
-  // Authentication check - redirect to login if not authenticated
+  // Authentication check - redirect to login if not authenticated with user feedback
   useEffect(() => {
     if (ready && !authenticated) {
       console.log('❌ User not authenticated - redirecting to login')
-      router.push('/')
+      console.log('🔗 To access the arena, please login first at the main page')
+      // Add a slight delay to show feedback before redirect
+      setTimeout(() => {
+        router.push('/?auth_required=arena')
+      }, 1000)
       return
     }
     
     if (ready && authenticated && !user?.id) {
       console.log('❌ User authenticated but no user ID - redirecting to home')
-      router.push('/')
+      setTimeout(() => {
+        router.push('/?auth_error=no_user_id')
+      }, 1000)
       return
     }
   }, [ready, authenticated, user, router])
