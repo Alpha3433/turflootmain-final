@@ -718,8 +718,8 @@ const MultiplayerArena = () => {
         y: this.player.y - (this.canvas?.height || 600) / 2 
       }
       
-      // Dynamic circular zone system (matching local agario)
-      this.basePlayableRadius = 1000 // Minimum zone radius
+      // Initialize client-side animation cache for persistent virus animations
+      this.virusAnimationCache = new Map() // Persistent animation state across server updates
       this.maxPlayableRadius = 1800  // Maximum zone radius  
       this.currentPlayableRadius = 1400 // Starting zone size
       this.targetPlayableRadius = this.currentPlayableRadius
