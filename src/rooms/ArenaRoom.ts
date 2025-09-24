@@ -206,7 +206,9 @@ export class ArenaRoom extends Room<GameState> {
     player.vy = newVy;
     
     console.log(`✅ Applied movement to ${player.name}:`, {
-      speed: speed.toFixed(2),
+      baseSpeed: baseSpeed.toFixed(2),
+      massSpeedFactor: massSpeedFactor.toFixed(2), 
+      dynamicSpeed: dynamicSpeed.toFixed(2),
       velocity: { vx: newVx.toFixed(2), vy: newVy.toFixed(2) }
     });
   }
