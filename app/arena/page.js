@@ -917,9 +917,21 @@ const MultiplayerArena = () => {
       const currentTimeSurvived = Math.floor((Date.now() - this.gameStartTime) / 1000)
       setTimeSurvived(currentTimeSurvived)
       
-      // Update camera to follow player
-      this.camera.x = this.player.x - this.canvas.width / 2
-      this.camera.y = this.player.y - this.canvas.height / 2
+      // Update camera to follow player with smooth interpolation (matching local agario)
+      if (this.player.x !== undefined && this.player.y !== undefined) {
+        const targetX = this.player.x - this.canvas.width / 2
+        const targetY = this.player.y - this.canvas.height / 2
+        
+        // Use consistent smoothing matching local agario (0.2 lerp factor)
+        const smoothing = 0.2
+        this.camera.x += (targetX - this.camera.x) * smoothing
+        this.camera.y += (targetY - this.camera.y) * smoothing
+        
+        // Keep camera within world bounds with extension (matching local agario)
+        const boundaryExtension = 100
+        this.camera.x = Math.max(-boundaryExtension, Math.min(this.world.width - this.canvas.width + boundaryExtension, this.camera.x))
+        this.camera.y = Math.max(-boundaryExtension, Math.min(this.world.height - this.canvas.height + boundaryExtension, this.camera.y))
+      }
       
       // Update minimap data every few frames for better performance
       if (Date.now() % 100 < 16) {
