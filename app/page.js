@@ -6428,20 +6428,21 @@ export default function TurfLootTactical() {
                         </span>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{
-                            fontSize: '14px',
+                            fontSize: '13px', // Slightly reduced from 14px
                             fontWeight: '700',
                             color: isCompleted ? '#68d391' : '#e2e8f0',
                             fontFamily: '"Rajdhani", sans-serif',
                             textTransform: 'uppercase',
                             marginBottom: '2px', // Reduced from 4px
                             whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
+                            overflow: 'visible', // Changed from 'hidden' to 'visible'
+                            width: 'auto', // Allow natural width
+                            maxWidth: 'none' // Remove max width restriction
                           }}>
                             {currentChallenge.name}
                           </div>
                           <div style={{
-                            fontSize: '11px',
+                            fontSize: '10px', // Reduced from 11px
                             color: '#a0aec0',
                             fontFamily: '"Rajdhani", sans-serif',
                             whiteSpace: 'nowrap',
