@@ -6327,11 +6327,11 @@ export default function TurfLootTactical() {
           <div style={{ 
             background: 'rgba(26, 32, 44, 0.8)', 
             borderRadius: '8px', 
-            padding: '16px', 
+            padding: '12px', // Reduced from 16px
             border: '2px solid rgba(252, 129, 129, 0.3)',
-            marginBottom: '16px',
+            marginBottom: '12px', // Reduced from 16px
             position: 'relative',
-            minHeight: '140px'
+            minHeight: '120px' // Reduced from 140px
           }}>
             {/* Challenge Cycle */}
             {(() => {
@@ -6397,7 +6397,7 @@ export default function TurfLootTactical() {
                 <div style={{ position: 'relative' }}>
                   {/* Challenge Card - Compact Design */}
                   <div style={{
-                    padding: '16px',
+                    padding: '12px', // Reduced from 16px
                     background: isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)',
                     borderRadius: '8px',
                     border: `2px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`,
@@ -6408,21 +6408,21 @@ export default function TurfLootTactical() {
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'space-between', // Changed from center to space-between
-                      gap: '8px', // Reduced from 12px
-                      marginBottom: '12px',
-                      width: '100%' // Ensure full width utilization
+                      justifyContent: 'space-between',
+                      gap: '8px',
+                      marginBottom: '8px', // Reduced from 12px
+                      width: '100%'
                     }}>
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
                         flex: '1',
-                        minWidth: 0 // Allow shrinking
+                        minWidth: 0
                       }}>
                         <span style={{ 
-                          fontSize: '20px', // Reduced from 24px to prevent overflow
-                          flexShrink: 0 // Don't shrink emoji
+                          fontSize: '20px',
+                          flexShrink: 0
                         }}>
                           {currentChallenge.icon}
                         </span>
@@ -6433,10 +6433,10 @@ export default function TurfLootTactical() {
                             color: isCompleted ? '#68d391' : '#e2e8f0',
                             fontFamily: '"Rajdhani", sans-serif',
                             textTransform: 'uppercase',
-                            marginBottom: '4px',
+                            marginBottom: '2px', // Reduced from 4px
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
-                            textOverflow: 'ellipsis' // Add ellipsis if text is too long
+                            textOverflow: 'ellipsis'
                           }}>
                             {currentChallenge.name}
                           </div>
@@ -6453,16 +6453,16 @@ export default function TurfLootTactical() {
                         </div>
                       </div>
                       <div style={{
-                        padding: '3px 6px', // Reduced padding
+                        padding: '3px 6px',
                         background: currentChallenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 'rgba(139, 92, 246, 0.2)',
                         border: `1px solid ${currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6'}`,
-                        borderRadius: '3px', // Reduced from 4px
-                        fontSize: '9px', // Reduced from 10px
+                        borderRadius: '3px',
+                        fontSize: '9px',
                         color: currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
                         textTransform: 'uppercase',
                         fontFamily: '"Rajdhani", sans-serif',
                         fontWeight: '600',
-                        flexShrink: 0, // Don't shrink the badge
+                        flexShrink: 0,
                         whiteSpace: 'nowrap'
                       }}>
                         {currentChallenge.type}
@@ -6475,7 +6475,7 @@ export default function TurfLootTactical() {
                       borderRadius: '10px',
                       height: '6px',
                       overflow: 'hidden',
-                      marginBottom: '12px',
+                      marginBottom: '8px', // Reduced from 12px
                       position: 'relative',
                       border: '1px solid rgba(148, 163, 184, 0.2)'
                     }}>
@@ -6513,7 +6513,7 @@ export default function TurfLootTactical() {
                       display: 'flex', 
                       justifyContent: 'space-between', 
                       alignItems: 'center',
-                      marginBottom: '12px'
+                      marginBottom: '8px' // Reduced from 12px
                     }}>
                       <span style={{
                         fontSize: '12px',
@@ -6524,11 +6524,11 @@ export default function TurfLootTactical() {
                         {isCompleted ? 'COMPLETED' : `${Math.round(progressPercent)}% Complete`}
                       </span>
                       <span style={{
-                        fontSize: '16px', // Increased from 12px
-                        color: '#fbbf24', // Enhanced gold color
+                        fontSize: '16px',
+                        color: '#fbbf24',
                         fontFamily: '"Rajdhani", sans-serif',
-                        fontWeight: '800', // Increased from 700
-                        textShadow: '0 0 12px rgba(251, 191, 36, 0.8), 0 0 6px rgba(251, 191, 36, 0.6)', // Glowing effect
+                        fontWeight: '800',
+                        textShadow: '0 0 12px rgba(251, 191, 36, 0.8), 0 0 6px rgba(251, 191, 36, 0.6)',
                         animation: isCompleted ? 'goldPulse 2s ease-in-out infinite' : 'none'
                       }}>
                         {isCompleted ? '✅ REWARD READY' : `+${currentChallenge.reward} coins`}
@@ -6564,7 +6564,7 @@ export default function TurfLootTactical() {
                     justifyContent: 'center',
                     alignItems: 'center',
                     gap: '8px',
-                    marginTop: '12px'
+                    marginTop: '8px' // Reduced from 12px
                   }}>
                     {defaultChallenges.map((_, index) => {
                       const challengeProgress = challengesData[defaultChallenges[index].id] || { current: 0, completed: false }
