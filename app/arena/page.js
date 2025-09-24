@@ -1171,55 +1171,118 @@ const MultiplayerArena = () => {
     }
     
     drawVirus(virus) {
-      // Enhanced virus rendering matching 2nd image - green spiky circles
-      const virusRadius = virus.radius || 50
-      const spikes = 12
+      // Initialize animation properties if not present (like local agario)
+      virus.currentRotation = virus.currentRotation || 0
+      virus.rotationSpeed = virus.rotationSpeed || 0.5
+      virus.pulsePhase = virus.pulsePhase || 0
+      virus.pulseSpeed = virus.pulseSpeed || 0.02
+      virus.spikeWavePhase = virus.spikeWavePhase || 0
+      virus.spikeWaveSpeed = virus.spikeWaveSpeed || 0.05
+      virus.colorShift = virus.colorShift || 0
+      virus.glowIntensity = virus.glowIntensity || 0.5
+      virus.radius = virus.radius || 50
+      virus.spikes = virus.spikes || 12
       
-      // Main virus body - bright green
-      this.ctx.fillStyle = '#00FF00'
+      // Update animation properties (matching local agario)
+      virus.currentRotation += virus.rotationSpeed
+      virus.pulsePhase += virus.pulseSpeed
+      virus.spikeWavePhase += virus.spikeWaveSpeed
+      
+      // Calculate animated values
+      const pulseScale = 1 + Math.sin(virus.pulsePhase) * 0.1 // Pulsing effect
+      const glowPulse = 0.5 + Math.sin(virus.pulsePhase * 1.5) * 0.3 // Glow pulsing
+      
+      this.ctx.save()
+      this.ctx.translate(virus.x, virus.y)
+      this.ctx.rotate((virus.currentRotation * Math.PI) / 180)
+      this.ctx.scale(pulseScale, pulseScale)
+      
+      // Create gradient for depth effect (matching local agario)
+      const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, virus.radius + 20)
+      gradient.addColorStop(0, `hsl(120, 100%, ${50 + virus.colorShift}%)`)
+      gradient.addColorStop(0.6, '#00FF41')
+      gradient.addColorStop(1, '#00AA00')
+      
+      // Draw outer glow effect
+      this.ctx.shadowColor = '#00FF41'
+      this.ctx.shadowBlur = 15 * virus.glowIntensity * glowPulse
+      this.ctx.shadowOffsetX = 0
+      this.ctx.shadowOffsetY = 0
+      
+      // Draw animated spikes (matching local agario complexity)
       this.ctx.beginPath()
-      
-      // Draw spiky outline
-      for (let i = 0; i < spikes; i++) {
-        const angle = (i / spikes) * Math.PI * 2
-        const isSpike = i % 2 === 0
-        const radius = isSpike ? virusRadius * 1.3 : virusRadius * 0.8
+      for (let i = 0; i < virus.spikes; i++) {
+        const baseAngle = (i / virus.spikes) * Math.PI * 2
         
-        const x = virus.x + Math.cos(angle) * radius
-        const y = virus.y + Math.sin(angle) * radius
+        // Individual spike wave animation
+        const spikeWave = Math.sin(virus.spikeWavePhase + i * 0.5) * 3
+        const spikeLength = virus.radius + 12 + spikeWave
+        const innerRadius = virus.radius - 3
+        
+        // Outer spike point
+        const outerX = Math.cos(baseAngle) * spikeLength
+        const outerY = Math.sin(baseAngle) * spikeLength
+        
+        // Inner points (between spikes)
+        const nextAngle = ((i + 0.5) / virus.spikes) * Math.PI * 2
+        const innerX = Math.cos(nextAngle) * innerRadius
+        const innerY = Math.sin(nextAngle) * innerRadius
         
         if (i === 0) {
-          this.ctx.moveTo(x, y)
+          this.ctx.moveTo(outerX, outerY)
         } else {
-          this.ctx.lineTo(x, y)
+          this.ctx.lineTo(outerX, outerY)
         }
+        this.ctx.lineTo(innerX, innerY)
       }
-      
       this.ctx.closePath()
+      
+      // Fill with gradient
+      this.ctx.fillStyle = gradient
       this.ctx.fill()
       
-      // Virus border - darker green
-      this.ctx.strokeStyle = '#00AA00'
-      this.ctx.lineWidth = 4
+      // Draw spike outlines with animation
+      this.ctx.strokeStyle = `rgba(0, 170, 0, ${0.8 + glowPulse * 0.2})`
+      this.ctx.lineWidth = 2 + Math.sin(virus.pulsePhase * 2) * 0.5
       this.ctx.stroke()
       
-      // Inner pattern - darker core
-      this.ctx.fillStyle = '#008800'
+      // Reset shadow for inner elements
+      this.ctx.shadowBlur = 0
+      
+      // Draw animated inner core
+      const coreRadius = virus.radius - 15
+      const coreGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius)
+      coreGradient.addColorStop(0, `rgba(0, 255, 65, ${0.8 + glowPulse * 0.2})`)
+      coreGradient.addColorStop(0.5, 'rgba(0, 68, 0, 0.9)')
+      coreGradient.addColorStop(1, 'rgba(0, 34, 0, 1)')
+      
       this.ctx.beginPath()
-      this.ctx.arc(virus.x, virus.y, virusRadius * 0.5, 0, Math.PI * 2)
+      this.ctx.arc(0, 0, coreRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = coreGradient
       this.ctx.fill()
       
-      // Virus "eyes" or spots
-      this.ctx.fillStyle = '#004400'
-      for (let i = 0; i < 3; i++) {
-        const spotAngle = (i / 3) * Math.PI * 2
-        const spotX = virus.x + Math.cos(spotAngle) * virusRadius * 0.25
-        const spotY = virus.y + Math.sin(spotAngle) * virusRadius * 0.25
+      // Draw pulsing energy lines in the core
+      this.ctx.strokeStyle = `rgba(0, 255, 65, ${0.4 + glowPulse * 0.3})`
+      this.ctx.lineWidth = 1
+      
+      for (let i = 0; i < 6; i++) {
+        const lineAngle = (i / 6) * Math.PI * 2 + virus.currentRotation * 0.02
+        const lineLength = coreRadius * 0.6
         
         this.ctx.beginPath()
-        this.ctx.arc(spotX, spotY, virusRadius * 0.08, 0, Math.PI * 2)
-        this.ctx.fill()
+        this.ctx.moveTo(0, 0)
+        this.ctx.lineTo(Math.cos(lineAngle) * lineLength, Math.sin(lineAngle) * lineLength)
+        this.ctx.stroke()
       }
+      
+      // Draw central pulsing dot
+      const centralDotRadius = 3 + Math.sin(virus.pulsePhase * 3) * 1.5
+      this.ctx.beginPath()
+      this.ctx.arc(0, 0, centralDotRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${0.8 + glowPulse * 0.2})`
+      this.ctx.fill()
+      
+      this.ctx.restore()
     }
   }
 
