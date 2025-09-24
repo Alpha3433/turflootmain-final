@@ -882,24 +882,24 @@ const MultiplayerArena = () => {
             distance: distance.toFixed(1)
           })
           
-          // Adaptive reconciliation based on distance
-          if (distance > 200) {
-            // Large desync - snap to server position immediately
-            console.log('⚡ Large desync detected - snapping to server position')
+          // REDUCED SERVER RECONCILIATION for better client prediction dominance
+          if (distance > 300) {
+            // Very large desync - snap to server position immediately
+            console.log('⚡ Major desync detected - snapping to server position')
             this.player.x = currentPlayer.x
             this.player.y = currentPlayer.y
-          } else if (distance > 50) {
-            // Medium desync - use stronger correction
-            const correctionFactor = 0.6
+          } else if (distance > 150) {
+            // Large desync - use moderate correction (reduced from 0.6 to 0.3)
+            const correctionFactor = 0.3
             this.player.x += (currentPlayer.x - this.player.x) * correctionFactor
             this.player.y += (currentPlayer.y - this.player.y) * correctionFactor
-          } else if (distance > 10) {
-            // Small desync - gentle correction to maintain smooth prediction
-            const correctionFactor = 0.2
+          } else if (distance > 50) {
+            // Medium desync - very gentle correction (reduced from 0.2 to 0.1)
+            const correctionFactor = 0.1
             this.player.x += (currentPlayer.x - this.player.x) * correctionFactor
             this.player.y += (currentPlayer.y - this.player.y) * correctionFactor
           }
-          // If distance <= 10, trust client prediction (no correction needed)
+          // If distance <= 50, trust client prediction completely (no correction)
           
         } else {
           // First update - apply directly
