@@ -978,36 +978,88 @@ const MultiplayerArena = () => {
     }
     
     drawWorldBoundary() {
-      // Draw richer background matching 2nd image style
-      const gridSize = 25 // Smaller grid for denser pattern
+      // Circular zone system matching local agario
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
+      
+      // Draw red danger zone outside playable area  
+      this.ctx.fillStyle = '#1a0000'
+      this.ctx.fillRect(0, 0, this.world.width, this.world.height)
+      
+      // Draw playable area (black circle to create the safe zone)
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fill()
+      
+      // Dynamic zone color based on size changes
+      let zoneColor = '#00ff00' // Default green
+      if (Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
+        // Zone is changing - use yellow color
+        zoneColor = '#ffff00'
+      }
+      if (this.isCashGame) {
+        // Cash games get a distinctive blue-green color
+        zoneColor = this.targetPlayableRadius > this.currentPlayableRadius ? '#00ffff' : '#0080ff'
+      }
+      
+      // Draw the boundary circle
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = zoneColor
+      this.ctx.lineWidth = 8
+      this.ctx.stroke()
+      
+      // Add glowing effect
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.6)')
+      this.ctx.lineWidth = 16
+      this.ctx.stroke()
+      
+      // Add inner glow
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius - 8, 0, Math.PI * 2)
+      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.3)')
+      this.ctx.lineWidth = 8
+      this.ctx.stroke()
+      
+      // Draw subtle grid within the playable area only
+      this.drawGrid(centerX, centerY, playableRadius)
+    }
+    
+    drawGrid(centerX, centerY, radius) {
+      // Optimized grid rendering only within circular zone
       this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
       this.ctx.lineWidth = 1
+      const gridSize = 50
       
-      // Vertical lines - denser grid
-      for (let x = 0; x <= this.world.width; x += gridSize) {
+      // Only draw grid lines that intersect with the circular zone
+      const minX = centerX - radius
+      const maxX = centerX + radius
+      const minY = centerY - radius  
+      const maxY = centerY + radius
+      
+      // Vertical lines
+      for (let x = Math.floor(minX / gridSize) * gridSize; x <= maxX; x += gridSize) {
+        if (x < 0 || x > this.world.width) continue
+        
         this.ctx.beginPath()
-        this.ctx.moveTo(x, 0)
-        this.ctx.lineTo(x, this.world.height)
+        this.ctx.moveTo(x, Math.max(0, minY))
+        this.ctx.lineTo(x, Math.min(this.world.height, maxY))
         this.ctx.stroke()
       }
       
-      // Horizontal lines - denser grid  
-      for (let y = 0; y <= this.world.height; y += gridSize) {
+      // Horizontal lines  
+      for (let y = Math.floor(minY / gridSize) * gridSize; y <= maxY; y += gridSize) {
+        if (y < 0 || y > this.world.height) continue
+        
         this.ctx.beginPath()
-        this.ctx.moveTo(0, y)
-        this.ctx.lineTo(this.world.width, y)
+        this.ctx.moveTo(Math.max(0, minX), y)
+        this.ctx.lineTo(Math.min(this.world.width, maxX), y)
         this.ctx.stroke()
       }
-      
-      // World border - bright green like 2nd image
-      this.ctx.strokeStyle = '#00ff00'
-      this.ctx.lineWidth = 8
-      this.ctx.strokeRect(0, 0, this.world.width, this.world.height)
-      
-      // Add inner border glow
-      this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)'
-      this.ctx.lineWidth = 20
-      this.ctx.strokeRect(-10, -10, this.world.width + 20, this.world.height + 20)
     }
     
     drawPlayer(player, isCurrentPlayer = false) {
