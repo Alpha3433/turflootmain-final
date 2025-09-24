@@ -2291,11 +2291,25 @@ export default function TurfLootTactical() {
       console.log('🧪 Testing functions available:')
       console.log('  - window.updateSolBalance(0.5) // Updates balance to 0.5 SOL')
       console.log('  - 💡 Try increasing balance to simulate deposit and fee processing!')
+      console.log('🎯 Challenge Testing Functions:')
+      console.log('  - window.updateChallengeProgress("coins_eaten", 10) // Add 10 coins eaten')
+      console.log('  - window.updateChallengeProgress("survival_time", 180) // 3 minutes survived') 
+      console.log('  - window.updateChallengeProgress("max_mass", 150) // Reached mass 150')
+      console.log('  - window.updateChallengeProgress("cashout") // Cashed out once')
       
       // Show fee configuration
       const feePercentage = process.env.NEXT_PUBLIC_DEPOSIT_FEE_PERCENTAGE || 10
       const siteWallet = process.env.NEXT_PUBLIC_SITE_FEE_WALLET
       console.log(`💰 Fee Configuration: ${feePercentage}% → ${siteWallet}`)
+      
+      // Add demo function for testing challenges
+      window.testChallengeCompletion = () => {
+        console.log('🧪 Testing challenge completion...')
+        window.updateChallengeProgress("coins_eaten", 50) // Complete coin collector
+        setTimeout(() => window.updateChallengeProgress("survival_time", 300), 1000) // Complete survivor
+        setTimeout(() => window.updateChallengeProgress("cashout"), 2000) // Add cashout progress
+      }
+      console.log('  - window.testChallengeCompletion() // Complete some challenges for testing')
     }
   }, [currentWalletAddress])
 
