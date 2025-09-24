@@ -218,22 +218,21 @@ export class ArenaRoom extends Room<GameState> {
     player.lastSeq = seq;
     (client as any).userData.lastInputTime = Date.now();
     
-    // Apply movement using local agario speed formula
-    const baseSpeed = 6.0;  // Base speed for small players (matching local agario)
-    const massSpeedFactor = Math.sqrt(player.mass / 20); // Gradual slowdown (matching local agario)
-    const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor); // Minimum speed of 1.5 (matching local agario)
+    // Set target position instead of direct velocity (matching local agario)
+    const moveSpeed = 500; // Base move speed matching local agario
     
-    const newVx = dx * dynamicSpeed;
-    const newVy = dy * dynamicSpeed;
+    // Calculate target position based on input direction
+    const targetX = player.x + dx * moveSpeed;
+    const targetY = player.y + dy * moveSpeed;
     
-    player.vx = newVx;
-    player.vy = newVy;
+    // Store target in velocity fields for now (we'll use them as target storage)
+    player.vx = targetX;
+    player.vy = targetY;
     
-    console.log(`✅ Applied movement to ${player.name}:`, {
-      baseSpeed: baseSpeed.toFixed(2),
-      massSpeedFactor: massSpeedFactor.toFixed(2), 
-      dynamicSpeed: dynamicSpeed.toFixed(2),
-      velocity: { vx: newVx.toFixed(2), vy: newVy.toFixed(2) }
+    console.log(`✅ Set movement target for ${player.name}:`, {
+      input: { dx: dx.toFixed(3), dy: dy.toFixed(3) },
+      currentPos: { x: player.x.toFixed(1), y: player.y.toFixed(1) },
+      targetPos: { x: targetX.toFixed(1), y: targetY.toFixed(1) }
     });
   }
 
