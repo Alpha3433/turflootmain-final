@@ -88,46 +88,56 @@ export class ArenaRoom extends Room<GameState> {
     
     console.log(`👋 Player attempting to join: ${playerName} (${client.sessionId}) - privyUserId: ${privyUserId}`);
     
-    // Check for existing players with the same privyUserId or playerName to prevent duplicates
-    let existingSessionIds: string[] = [];
+    // ROBUST DEDUPLICATION: Check existing players in game state directly
+    let duplicateSessions: string[] = [];
     
-    // First pass: Check against existing client userData for privyUserId matches
-    if (!privyUserId.startsWith('anonymous_')) {
-      this.clients.forEach(existingClient => {
-        if (existingClient.sessionId !== client.sessionId && 
-            (existingClient as any).userData?.privyUserId === privyUserId) {
-          existingSessionIds.push(existingClient.sessionId);
-          console.log(`⚠️ Found existing client with same privyUserId: ${privyUserId} (session: ${existingClient.sessionId})`);
+    this.state.players.forEach((existingPlayer, existingSessionId) => {
+      // Skip checking against self
+      if (existingSessionId === client.sessionId) return;
+      
+      let isDuplicate = false;
+      
+      // Method 1: Check by privyUserId for authenticated users
+      if (!privyUserId.startsWith('anonymous_')) {
+        const existingClient = this.clients.find(c => c.sessionId === existingSessionId);
+        if (existingClient && (existingClient as any).userData?.privyUserId === privyUserId) {
+          isDuplicate = true;
+          console.log(`⚠️ DUPLICATE by privyUserId: ${privyUserId} (existing: ${existingSessionId}, new: ${client.sessionId})`);
         }
-      });
-    }
-    
-    // Second pass: Check against player state for name matches (fallback for anonymous)
-    this.state.players.forEach((existingPlayer, sessionId) => {
-      if (sessionId !== client.sessionId && existingPlayer.name === playerName) {
-        if (!existingSessionIds.includes(sessionId)) {
-          existingSessionIds.push(sessionId);
-          console.log(`⚠️ Found existing player with same name: ${playerName} (session: ${sessionId})`);
-        }
+      }
+      
+      // Method 2: Check by playerName (always, as fallback)
+      if (!isDuplicate && existingPlayer.name === playerName) {
+        isDuplicate = true;
+        console.log(`⚠️ DUPLICATE by playerName: ${playerName} (existing: ${existingSessionId}, new: ${client.sessionId})`);
+      }
+      
+      if (isDuplicate) {
+        duplicateSessions.push(existingSessionId);
       }
     });
     
     // Remove ALL duplicate players found
-    existingSessionIds.forEach(sessionId => {
-      console.log(`🧹 Removing duplicate player (session: ${sessionId}) to prevent camera confusion`);
-      this.state.players.delete(sessionId);
-      
-      // Also try to disconnect the old client if still connected
-      const oldClient = this.clients.find(c => c.sessionId === sessionId);
-      if (oldClient) {
-        console.log(`🔌 Disconnecting old client session: ${sessionId}`);
-        try {
-          oldClient.leave(1000, 'Duplicate connection detected');
-        } catch (error) {
-          console.log('⚠️ Error disconnecting old client:', error);
+    if (duplicateSessions.length > 0) {
+      console.log(`🧹 Removing ${duplicateSessions.length} duplicate player(s) to prevent confusion`);
+      duplicateSessions.forEach(sessionId => {
+        console.log(`🧹 Removing duplicate player: ${sessionId}`);
+        this.state.players.delete(sessionId);
+        
+        // Also disconnect the old client
+        const oldClient = this.clients.find(c => c.sessionId === sessionId);
+        if (oldClient) {
+          console.log(`🔌 Disconnecting old client: ${sessionId}`);
+          try {
+            oldClient.leave(1000, 'Duplicate connection detected');
+          } catch (error) {
+            console.log('⚠️ Error disconnecting old client:', error);
+          }
         }
-      }
-    });
+      });
+    } else {
+      console.log(`✅ No duplicates found for ${playerName} - proceeding with join`);
+    }
     
     // Create new player
     const player = new Player();
