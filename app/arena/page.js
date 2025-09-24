@@ -51,6 +51,7 @@ const MultiplayerArena = () => {
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
+  const hasInitializedRef = useRef(false)
 
   // Minimap state for real-time updates
   const [minimapData, setMinimapData] = useState({
@@ -201,7 +202,7 @@ const MultiplayerArena = () => {
   useEffect(() => {
     if (isCashingOut && !cashOutComplete) {
       console.log('Starting cash out progress interval')
-      
+
       cashOutIntervalRef.current = setInterval(() => {
         setCashOutProgress(prev => {
           const newProgress = prev + 2 // 2% per 100ms = 5 second duration
@@ -231,6 +232,17 @@ const MultiplayerArena = () => {
       }
     }
   }, [isCashingOut, score])
+
+  // Sync cash out visuals with game engine rendering
+  useEffect(() => {
+    if (gameRef.current?.updateGameStates) {
+      gameRef.current.updateGameStates({
+        isCashingOut,
+        cashOutProgress,
+        cashOutComplete
+      })
+    }
+  }, [isCashingOut, cashOutProgress, cashOutComplete])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
@@ -340,6 +352,20 @@ const MultiplayerArena = () => {
       }
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+
+    if (isMobile) {
+      document.body.classList.add('mobile-game-active')
+    } else {
+      document.body.classList.remove('mobile-game-active')
+    }
+
+    return () => {
+      document.body.classList.remove('mobile-game-active')
+    }
+  }, [isMobile])
 
   // Colyseus connection and input handling  
   const connectToColyseus = async () => {
@@ -458,7 +484,20 @@ const MultiplayerArena = () => {
           }
         }
       })
-      
+
+      room.onLeave((code) => {
+        console.log('👋 Server left arena room with code:', code)
+        if (wsRef.current === room) {
+          wsRef.current = null
+        }
+        setConnectionStatus('disconnected')
+      })
+
+      room.onError((code, message) => {
+        console.error('❌ Arena room error:', code, message)
+        setConnectionStatus('failed')
+      })
+
     } catch (error) {
       console.error('❌ Colyseus connection failed:', error)
       setConnectionStatus('failed')
@@ -613,7 +652,32 @@ const MultiplayerArena = () => {
       this.serverState = null
       this.lastUpdate = Date.now()
       this.gameStartTime = Date.now()
-      
+
+      // Match Agar.io dynamic zone defaults
+      this.isCashGame = false
+      this.realPlayerCount = 0
+      this.basePlayableRadius = 800
+      this.maxPlayableRadius = 1800
+      this.currentPlayableRadius = 1800
+      this.targetPlayableRadius = 1800
+
+      // Local game state mirrors for visual elements
+      this.gameStates = {
+        isCashingOut: false,
+        cashOutProgress: 0,
+        cashOutComplete: false
+      }
+      this.updateGameStates = (updates = {}) => {
+        this.gameStates = { ...this.gameStates, ...updates }
+      }
+
+      // Maintain caches for animations and helper collections
+      this.enemies = []
+      this.coins = []
+      this.viruses = []
+      this.playerPieces = []
+      this.virusCache = new Map()
+
       this.bindEvents()
       this.setupMouse()
     }
@@ -673,25 +737,40 @@ const MultiplayerArena = () => {
     }
     
     updateFromServer(state) {
-      this.serverState = state
-      
+      const clonedPlayers = state.players ? state.players.map(player => ({ ...player })) : []
+      const mergedViruses = state.viruses
+        ? state.viruses.map(virus => {
+            const previous = this.virusCache.get(virus.id) || {}
+            const merged = { ...previous, ...virus }
+            this.virusCache.set(virus.id, merged)
+            return merged
+          })
+        : []
+
+      this.serverState = {
+        ...state,
+        players: clonedPlayers,
+        coins: state.coins ? state.coins.map(coin => ({ ...coin })) : [],
+        viruses: mergedViruses
+      }
+
       // Find ONLY the current player based on session ID - NO FALLBACK
-      let currentPlayer = state.players.find(p => p.isCurrentPlayer)
-      
+      const currentPlayer = clonedPlayers.find(p => p.isCurrentPlayer)
+
       if (currentPlayer) {
         // Verify this is actually our session to prevent camera jumping
         if (currentPlayer.sessionId === this.expectedSessionId) {
-          console.log('🎮 Camera following authenticated player:', currentPlayer.name, 
-                     'session:', currentPlayer.sessionId, 
+          console.log('🎮 Camera following authenticated player:', currentPlayer.name,
+                     'session:', currentPlayer.sessionId,
                      'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
-          
+
           // Smooth position updates to prevent camera jumping
           if (this.player.x && this.player.y) {
             const distance = Math.sqrt(
-              Math.pow(currentPlayer.x - this.player.x, 2) + 
+              Math.pow(currentPlayer.x - this.player.x, 2) +
               Math.pow(currentPlayer.y - this.player.y, 2)
             )
-            
+
             // If the distance is large, apply directly (avoid desync)
             // If small, smooth interpolate to prevent jitter
             if (distance > 100) {
@@ -707,7 +786,13 @@ const MultiplayerArena = () => {
             this.player.x = currentPlayer.x
             this.player.y = currentPlayer.y
           }
-          
+
+          this.player.mass = currentPlayer.mass || this.player.mass
+          this.player.radius = currentPlayer.radius || this.player.radius
+          this.player.name = currentPlayer.name || this.player.name
+          this.player.color = currentPlayer.color || this.player.color
+          this.player.sessionId = currentPlayer.sessionId
+
           // Update mass and score
           setMass(Math.round(currentPlayer.mass) || 100)
           setScore(Math.round(currentPlayer.score) || 0)
@@ -777,220 +862,417 @@ const MultiplayerArena = () => {
     
     render() {
       if (!this.ctx || !this.running) return
-      
-      // Clear canvas with darker background matching 2nd image
-      this.ctx.fillStyle = '#1a1a1a' // Dark background like 2nd image
+
+      this.ctx.fillStyle = '#000000'
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
-      
-      // Save context for camera transform
+
       this.ctx.save()
       this.ctx.translate(-this.camera.x, -this.camera.y)
-      
-      // Draw world boundary with enhanced visuals
+
+      this.drawGrid()
       this.drawWorldBoundary()
-      
-      // Draw server state if available
+
       if (this.serverState) {
-        // Draw coins first (background layer)
-        this.serverState.coins.forEach(coin => {
-          this.drawCoin(coin)
-        })
-        
-        // Draw viruses (middle layer)
-        this.serverState.viruses.forEach(virus => {
-          this.drawVirus(virus)
-        })
-        
-        // Draw all players (foreground layer)
-        this.serverState.players.forEach(player => {
-          if (player.alive) {
-            this.drawPlayer(player, player.isCurrentPlayer)
+        const { coins = [], viruses = [], players = [] } = this.serverState
+
+        coins.forEach(coin => this.drawCoin(coin))
+        viruses.forEach(virus => this.drawVirus(virus))
+        players.forEach(player => {
+          if (player && player.alive !== false) {
+            const isMainPlayer = player.isCurrentPlayer || player.sessionId === this.expectedSessionId
+            this.drawPlayer(player, isMainPlayer)
           }
         })
       }
-      
+
       this.ctx.restore()
     }
-    
-    drawWorldBoundary() {
-      // Draw richer background matching 2nd image style
-      const gridSize = 25 // Smaller grid for denser pattern
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
+
+    drawGrid() {
+      this.ctx.strokeStyle = '#808080'
       this.ctx.lineWidth = 1
-      
-      // Vertical lines - denser grid
-      for (let x = 0; x <= this.world.width; x += gridSize) {
+      this.ctx.globalAlpha = 0.3
+
+      const gridSize = 50
+      const startX = Math.floor(this.camera.x / gridSize) * gridSize
+      const startY = Math.floor(this.camera.y / gridSize) * gridSize
+      const endX = startX + this.canvas.width + gridSize
+      const endY = startY + this.canvas.height + gridSize
+
+      for (let x = startX; x <= endX; x += gridSize) {
         this.ctx.beginPath()
-        this.ctx.moveTo(x, 0)
-        this.ctx.lineTo(x, this.world.height)
+        this.ctx.moveTo(x, startY)
+        this.ctx.lineTo(x, endY)
         this.ctx.stroke()
       }
-      
-      // Horizontal lines - denser grid  
-      for (let y = 0; y <= this.world.height; y += gridSize) {
+
+      for (let y = startY; y <= endY; y += gridSize) {
         this.ctx.beginPath()
-        this.ctx.moveTo(0, y)
-        this.ctx.lineTo(this.world.width, y)
+        this.ctx.moveTo(startX, y)
+        this.ctx.lineTo(endX, y)
         this.ctx.stroke()
       }
-      
-      // World border - bright green like 2nd image
-      this.ctx.strokeStyle = '#00ff00'
+
+      this.ctx.globalAlpha = 1.0
+    }
+
+    drawWorldBoundary() {
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const playableRadius = this.currentPlayableRadius
+
+      this.ctx.fillStyle = '#1a0000'
+      this.ctx.fillRect(0, 0, this.world.width, this.world.height)
+
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fill()
+
+      let zoneColor = '#00ff00'
+      if (Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
+        zoneColor = '#ffff00'
+      }
+      if (this.isCashGame) {
+        zoneColor = this.targetPlayableRadius > this.currentPlayableRadius ? '#00ffff' : '#0080ff'
+      }
+
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = zoneColor
       this.ctx.lineWidth = 8
-      this.ctx.strokeRect(0, 0, this.world.width, this.world.height)
-      
-      // Add inner border glow
-      this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)'
-      this.ctx.lineWidth = 20
-      this.ctx.strokeRect(-10, -10, this.world.width + 20, this.world.height + 20)
+      this.ctx.stroke()
+
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.6)')
+      this.ctx.lineWidth = 16
+      this.ctx.stroke()
+
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.3)')
+      this.ctx.lineWidth = 24
+      this.ctx.stroke()
+
+      if (this.isCashGame && Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
+        this.ctx.fillStyle = '#ffffff'
+        this.ctx.font = 'bold 16px Arial'
+        this.ctx.textAlign = 'center'
+        const direction = this.targetPlayableRadius > this.currentPlayableRadius ? 'EXPANDING' : 'SHRINKING'
+        this.ctx.fillText(`ZONE ${direction}`, centerX, centerY - playableRadius - 40)
+        this.ctx.font = 'bold 12px Arial'
+        this.ctx.fillText(`Players: ${this.realPlayerCount} | Radius: ${Math.floor(playableRadius)}`, centerX, centerY - playableRadius - 20)
+      }
     }
-    
+
     drawPlayer(player, isCurrentPlayer = false) {
-      const playerRadius = player.radius || 25
-      
-      // Player glow effect for current player
-      if (isCurrentPlayer) {
-        this.ctx.shadowColor = '#00BFFF'
-        this.ctx.shadowBlur = 20
-      }
-      
-      // Player circle with gradient
-      const gradient = this.ctx.createRadialGradient(
-        player.x, player.y, 0,
-        player.x, player.y, playerRadius
-      )
-      
-      if (isCurrentPlayer) {
-        gradient.addColorStop(0, '#00BFFF')  // Bright blue center
-        gradient.addColorStop(0.7, '#0080FF') // Medium blue
-        gradient.addColorStop(1, '#0040AA')   // Dark blue edge
-      } else {
-        gradient.addColorStop(0, '#FF6B6B')  // Red center for enemies
-        gradient.addColorStop(0.7, '#FF4444') // Medium red
-        gradient.addColorStop(1, '#CC2222')   // Dark red edge
-      }
-      
-      this.ctx.fillStyle = gradient
+      const radius = player.radius || Math.max(15, Math.sqrt(player.mass || 20) * 3)
+      const fillColor = player.color || (isCurrentPlayer ? '#4A90E2' : '#FF6B6B')
+
       this.ctx.beginPath()
-      this.ctx.arc(player.x, player.y, playerRadius, 0, Math.PI * 2)
+      this.ctx.arc(player.x, player.y, radius, 0, Math.PI * 2)
+      this.ctx.fillStyle = fillColor
       this.ctx.fill()
-      
-      // Remove shadow for border
-      this.ctx.shadowBlur = 0
-      
-      // Enhanced border
-      this.ctx.strokeStyle = isCurrentPlayer ? '#FFFFFF' : '#DDDDDD'
-      this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
-      this.ctx.stroke()
-      
-      // Player name with better contrast
-      this.ctx.fillStyle = '#FFFFFF'
-      this.ctx.font = `bold ${Math.max(12, playerRadius * 0.5)}px "Rajdhani", sans-serif`
-      this.ctx.textAlign = 'center'
-      this.ctx.textBaseline = 'middle'
-      this.ctx.strokeStyle = '#000000'
-      this.ctx.lineWidth = 3
-      this.ctx.strokeText(player.name || 'Player', player.x, player.y)
-      this.ctx.fillText(player.name || 'Player', player.x, player.y)
-    }
-    
-    drawCoin(coin) {
-      // Enhanced coin rendering matching 2nd image density
-      const coinSize = coin.radius || 6
-      
-      // Main coin body with gradient
-      const gradient = this.ctx.createRadialGradient(coin.x, coin.y, 0, coin.x, coin.y, coinSize)
-      gradient.addColorStop(0, '#FFD700')
-      gradient.addColorStop(0.7, '#FFA500')
-      gradient.addColorStop(1, '#FF8C00')
-      
-      this.ctx.fillStyle = gradient
-      this.ctx.beginPath()
-      this.ctx.arc(coin.x, coin.y, coinSize, 0, Math.PI * 2)
-      this.ctx.fill()
-      
-      // Bright outline for visibility
-      this.ctx.strokeStyle = '#FFFF00'
-      this.ctx.lineWidth = 2
-      this.ctx.stroke()
-      
-      // Inner sparkle
-      this.ctx.fillStyle = '#FFFFFF'
-      this.ctx.beginPath()
-      this.ctx.arc(coin.x - coinSize * 0.3, coin.y - coinSize * 0.3, coinSize * 0.2, 0, Math.PI * 2)
-      this.ctx.fill()
-    }
-    
-    drawVirus(virus) {
-      // Enhanced virus rendering matching 2nd image - green spiky circles
-      const virusRadius = virus.radius || 50
-      const spikes = 12
-      
-      // Main virus body - bright green
-      this.ctx.fillStyle = '#00FF00'
-      this.ctx.beginPath()
-      
-      // Draw spiky outline
-      for (let i = 0; i < spikes; i++) {
-        const angle = (i / spikes) * Math.PI * 2
-        const isSpike = i % 2 === 0
-        const radius = isSpike ? virusRadius * 1.3 : virusRadius * 0.8
-        
-        const x = virus.x + Math.cos(angle) * radius
-        const y = virus.y + Math.sin(angle) * radius
-        
-        if (i === 0) {
-          this.ctx.moveTo(x, y)
+
+      if (player.botType) {
+        if (player.botType === 'aggressive') {
+          this.ctx.strokeStyle = '#ff4444'
+          this.ctx.lineWidth = 4
+          this.ctx.setLineDash([8, 4])
+        } else if (player.botType === 'defensive') {
+          this.ctx.strokeStyle = '#44ff44'
+          this.ctx.lineWidth = 5
+          this.ctx.setLineDash([])
+        } else if (player.botType === 'fast') {
+          this.ctx.strokeStyle = '#ffff44'
+          this.ctx.lineWidth = 3
+          this.ctx.setLineDash([4, 2, 4, 2])
         } else {
-          this.ctx.lineTo(x, y)
+          this.ctx.strokeStyle = '#4444ff'
+          this.ctx.lineWidth = 3
+          this.ctx.setLineDash([6, 3])
+        }
+
+        if (player.behavior === 'hunting_player') {
+          this.ctx.shadowColor = '#ff0000'
+          this.ctx.shadowBlur = 8
+        } else if (player.behavior === 'fleeing') {
+          this.ctx.shadowColor = '#ffff00'
+          this.ctx.shadowBlur = 6
+        } else if (player.behavior === 'hunting_enemy') {
+          this.ctx.shadowColor = '#ff8800'
+          this.ctx.shadowBlur = 5
+        }
+
+        this.ctx.stroke()
+        this.ctx.shadowBlur = 0
+        this.ctx.setLineDash([])
+      } else {
+        this.ctx.strokeStyle = '#ffffff'
+        this.ctx.lineWidth = 3
+        this.ctx.stroke()
+      }
+
+      if (player.spawnProtection) {
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, radius + 8, 0, Math.PI * 2)
+        this.ctx.strokeStyle = '#3B82F6'
+        this.ctx.lineWidth = 4
+        this.ctx.setLineDash([10, 5])
+        this.ctx.stroke()
+        this.ctx.setLineDash([])
+
+        const time = Date.now() / 1000
+        const pulseIntensity = Math.sin(time * 4) * 0.3 + 0.7
+        this.ctx.globalAlpha = pulseIntensity
+
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, radius + 6, 0, Math.PI * 2)
+        this.ctx.strokeStyle = '#60A5FA'
+        this.ctx.lineWidth = 2
+        this.ctx.stroke()
+
+        this.ctx.globalAlpha = 1.0
+      }
+
+      const isMainPlayer = isCurrentPlayer || (this.expectedSessionId && player.sessionId === this.expectedSessionId)
+      if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0 && isMainPlayer) {
+        const ringRadius = radius + 8
+        const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
+
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
+        this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)'
+        this.ctx.lineWidth = 6
+        this.ctx.stroke()
+
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = '#00ff00'
+        this.ctx.lineWidth = 6
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius + 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)'
+        this.ctx.lineWidth = 3
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+
+        const time = Date.now() / 1000
+        const pulseIntensity = Math.sin(time * 6) * 0.3 + 0.8
+        this.ctx.globalAlpha = pulseIntensity
+
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = '#66ff66'
+        this.ctx.lineWidth = 3
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+
+        this.ctx.globalAlpha = 1.0
+      }
+
+      this.ctx.fillStyle = '#ffffff'
+      this.ctx.font = 'bold 14px Arial'
+      this.ctx.textAlign = 'center'
+
+      let displayName = player.name || 'Player'
+      if (player.botType) {
+        const botEmojis = {
+          aggressive: '⚔️',
+          defensive: '🛡️',
+          fast: '⚡',
+          balanced: '⚖️'
+        }
+        displayName = `${botEmojis[player.botType] || ''} ${displayName}`.trim()
+      }
+
+      this.ctx.fillText(displayName, player.x, player.y - radius - 15)
+
+      const eyeRadius = Math.max(2, radius * 0.12)
+      const eyeOffset = radius * 0.35
+
+      this.ctx.beginPath()
+      this.ctx.arc(player.x - eyeOffset, player.y - eyeOffset * 0.3, eyeRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fill()
+
+      this.ctx.beginPath()
+      this.ctx.arc(player.x + eyeOffset, player.y - eyeOffset * 0.3, eyeRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = '#000000'
+      this.ctx.fill()
+
+      if (player.botType && player.behavior && player.behavior !== 'exploring') {
+        this.ctx.fillStyle = '#ffff88'
+        this.ctx.font = '10px Arial'
+        this.ctx.textAlign = 'center'
+
+        const behaviorText = {
+          hunting_player: '🎯 HUNTING YOU!',
+          fleeing: '💨 FLEEING',
+          hunting_enemy: '🔍 HUNTING',
+          hunting_coins: '🪙 COIN HUNT'
+        }[player.behavior] || ''
+
+        if (behaviorText) {
+          this.ctx.fillText(behaviorText, player.x, player.y - radius - 35)
         }
       }
-      
-      this.ctx.closePath()
-      this.ctx.fill()
-      
-      // Virus border - darker green
-      this.ctx.strokeStyle = '#00AA00'
-      this.ctx.lineWidth = 4
-      this.ctx.stroke()
-      
-      // Inner pattern - darker core
-      this.ctx.fillStyle = '#008800'
+    }
+
+    drawCoin(coin) {
+      const radius = coin.radius || 8
+
       this.ctx.beginPath()
-      this.ctx.arc(virus.x, virus.y, virusRadius * 0.5, 0, Math.PI * 2)
+      this.ctx.arc(coin.x, coin.y, radius, 0, Math.PI * 2)
+      this.ctx.fillStyle = coin.color || '#FFD700'
       this.ctx.fill()
-      
-      // Virus "eyes" or spots
-      this.ctx.fillStyle = '#004400'
-      for (let i = 0; i < 3; i++) {
-        const spotAngle = (i / 3) * Math.PI * 2
-        const spotX = virus.x + Math.cos(spotAngle) * virusRadius * 0.25
-        const spotY = virus.y + Math.sin(spotAngle) * virusRadius * 0.25
-        
-        this.ctx.beginPath()
-        this.ctx.arc(spotX, spotY, virusRadius * 0.08, 0, Math.PI * 2)
-        this.ctx.fill()
+
+      this.ctx.strokeStyle = '#FFB000'
+      this.ctx.lineWidth = 2
+      this.ctx.stroke()
+
+      this.ctx.fillStyle = '#000000'
+      this.ctx.font = 'bold 12px Arial'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillText('$', coin.x, coin.y + 4)
+    }
+
+    drawVirus(virus) {
+      virus.currentRotation = isNaN(virus.currentRotation) ? 0 : virus.currentRotation
+      virus.rotationSpeed = isNaN(virus.rotationSpeed) ? 0.5 : virus.rotationSpeed
+      virus.pulsePhase = isNaN(virus.pulsePhase) ? 0 : virus.pulsePhase
+      virus.pulseSpeed = isNaN(virus.pulseSpeed) ? 0.02 : virus.pulseSpeed
+      virus.spikeWavePhase = isNaN(virus.spikeWavePhase) ? 0 : virus.spikeWavePhase
+      virus.spikeWaveSpeed = isNaN(virus.spikeWaveSpeed) ? 0.05 : virus.spikeWaveSpeed
+      virus.colorShift = isNaN(virus.colorShift) ? 0 : virus.colorShift
+      virus.glowIntensity = isNaN(virus.glowIntensity) ? 0.5 : virus.glowIntensity
+      virus.radius = isNaN(virus.radius) ? 30 : virus.radius
+      virus.spikes = isNaN(virus.spikes) ? 12 : virus.spikes
+
+      virus.currentRotation += virus.rotationSpeed
+      virus.pulsePhase += virus.pulseSpeed
+      virus.spikeWavePhase += virus.spikeWaveSpeed
+
+      const pulseScale = 1 + Math.sin(virus.pulsePhase) * 0.1
+      const glowPulse = 0.5 + Math.sin(virus.pulsePhase * 1.5) * 0.3
+
+      this.ctx.save()
+      this.ctx.translate(virus.x, virus.y)
+      this.ctx.rotate((virus.currentRotation * Math.PI) / 180)
+      this.ctx.scale(pulseScale, pulseScale)
+
+      const gradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, virus.radius + 20)
+      const safeColorShift = isNaN(virus.colorShift) ? 0 : virus.colorShift
+
+      gradient.addColorStop(0, `hsl(120, 100%, ${50 + safeColorShift}%)`)
+      gradient.addColorStop(0.6, '#00FF41')
+      gradient.addColorStop(1, '#00AA00')
+
+      this.ctx.shadowColor = '#00FF41'
+      const safeGlowIntensity = isNaN(virus.glowIntensity) ? 0.5 : virus.glowIntensity
+      this.ctx.shadowBlur = 15 * safeGlowIntensity * glowPulse
+      this.ctx.shadowOffsetX = 0
+      this.ctx.shadowOffsetY = 0
+
+      this.ctx.beginPath()
+      for (let i = 0; i < virus.spikes; i++) {
+        const baseAngle = (i / virus.spikes) * Math.PI * 2
+        const spikeWave = Math.sin(virus.spikeWavePhase + i * 0.5) * 3
+        const spikeLength = virus.radius + 12 + spikeWave
+        const innerRadius = virus.radius - 3
+
+        const outerX = Math.cos(baseAngle) * spikeLength
+        const outerY = Math.sin(baseAngle) * spikeLength
+
+        const nextAngle = ((i + 0.5) / virus.spikes) * Math.PI * 2
+        const innerX = Math.cos(nextAngle) * innerRadius
+        const innerY = Math.sin(nextAngle) * innerRadius
+
+        if (i === 0) {
+          this.ctx.moveTo(outerX, outerY)
+        } else {
+          this.ctx.lineTo(outerX, outerY)
+        }
+        this.ctx.lineTo(innerX, innerY)
       }
+      this.ctx.closePath()
+
+      this.ctx.fillStyle = gradient
+      this.ctx.fill()
+
+      this.ctx.strokeStyle = `rgba(0, 170, 0, ${0.8 + glowPulse * 0.2})`
+      this.ctx.lineWidth = 2 + Math.sin(virus.pulsePhase * 2) * 0.5
+      this.ctx.stroke()
+
+      this.ctx.shadowBlur = 0
+
+      const coreRadius = virus.radius - 15
+      const coreGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, coreRadius)
+      coreGradient.addColorStop(0, `rgba(0, 255, 65, ${0.8 + glowPulse * 0.2})`)
+      coreGradient.addColorStop(1, '#005500')
+
+      this.ctx.beginPath()
+      this.ctx.arc(0, 0, coreRadius, 0, Math.PI * 2)
+      this.ctx.fillStyle = coreGradient
+      this.ctx.fill()
+
+      const eyeRadius = Math.max(4, virus.radius * 0.1)
+      const eyeOffset = virus.radius * 0.35
+
+      this.ctx.fillStyle = 'rgba(0, 80, 0, 0.9)'
+      this.ctx.beginPath()
+      this.ctx.arc(-eyeOffset, -eyeOffset * 0.2, eyeRadius, 0, Math.PI * 2)
+      this.ctx.arc(eyeOffset, -eyeOffset * 0.2, eyeRadius, 0, Math.PI * 2)
+      this.ctx.fill()
+
+      this.ctx.fillStyle = 'rgba(0, 255, 65, 0.5)'
+      this.ctx.beginPath()
+      this.ctx.arc(0, eyeOffset * 0.3, eyeRadius, 0, Math.PI * 2)
+      this.ctx.fill()
+
+      this.ctx.restore()
     }
   }
 
   // Initialize game ONLY when authenticated
   useEffect(() => {
-    // Wait for Privy to be ready and user to be authenticated
     if (!ready || !authenticated || !user?.id) {
       console.log('🔒 Waiting for authentication...', { ready, authenticated, userId: user?.id })
       return
     }
-    
+
+    if (hasInitializedRef.current) {
+      return
+    }
+
+    hasInitializedRef.current = true
+
     console.log('🎮 Arena initialization - setting up game for authenticated user...')
     console.log('🎮 Authenticated as:', playerName, '(', privyUserId, ')')
-    
-    // Apply mobile game class for full screen optimization
-    if (isMobile) {
-      document.body.classList.add('mobile-game-active')
+
+    if (!canvasRef.current) {
+      console.log('❌ Canvas not ready')
+      hasInitializedRef.current = false
+      return
     }
-    
-    // Remove default body margins/padding that might cause white borders
+
+    const previousBodyStyle = {
+      margin: document.body.style.margin,
+      padding: document.body.style.padding,
+      overflow: document.body.style.overflow,
+      background: document.body.style.background
+    }
+
+    const previousDocumentStyle = {
+      margin: document.documentElement.style.margin,
+      padding: document.documentElement.style.padding,
+      background: document.documentElement.style.background
+    }
+
     document.body.style.margin = '0'
     document.body.style.padding = '0'
     document.body.style.overflow = 'hidden'
@@ -998,26 +1280,19 @@ const MultiplayerArena = () => {
     document.documentElement.style.margin = '0'
     document.documentElement.style.padding = '0'
     document.documentElement.style.background = '#000000'
-    
-    if (!canvasRef.current) {
-      console.log('❌ Canvas not ready')
-      return
-    }
-    
+
     console.log('✅ Creating game engine and connecting to arena...')
-    
+
     const canvas = canvasRef.current
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    
-    // Create game instance
+
     const game = new MultiplayerGameEngine(canvas)
     gameRef.current = game
-    
+
     game.start()
     setGameReady(true)
-    
-    // Game loop
+
     const gameLoop = () => {
       if (game.running) {
         game.update()
@@ -1025,35 +1300,39 @@ const MultiplayerArena = () => {
         requestAnimationFrame(gameLoop)
       }
     }
-    
+
     requestAnimationFrame(gameLoop)
-    
-    // Connect to Colyseus only once and only when authenticated
+
     connectToColyseus()
-    
-    // Handle resize
+
     const handleResize = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
     window.addEventListener('resize', handleResize)
-    
+
     return () => {
       console.log('🧹 Cleaning up arena connection...')
+      hasInitializedRef.current = false
       game.stop()
       window.removeEventListener('resize', handleResize)
+
       if (wsRef.current) {
         console.log('🔌 Disconnecting from Colyseus...')
         wsRef.current.leave()
         wsRef.current = null
+        setConnectionStatus('disconnected')
       }
-      
-      // Cleanup mobile styles
-      if (isMobile) {
-        document.body.classList.remove('mobile-game-active')
-      }
+
+      document.body.style.margin = previousBodyStyle.margin
+      document.body.style.padding = previousBodyStyle.padding
+      document.body.style.overflow = previousBodyStyle.overflow
+      document.body.style.background = previousBodyStyle.background
+      document.documentElement.style.margin = previousDocumentStyle.margin
+      document.documentElement.style.padding = previousDocumentStyle.padding
+      document.documentElement.style.background = previousDocumentStyle.background
     }
-  }, [ready, authenticated, user, isMobile, playerName, privyUserId])
+  }, [ready, authenticated, user])
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
@@ -1228,28 +1507,59 @@ const MultiplayerArena = () => {
             transition: 'all 0.3s ease'
           }}>
             {(() => {
-              if (!gameRef.current || !serverState) return null;
-              
-              // Create leaderboard data from server state
+              if (!serverState?.players || serverState.players.length === 0) {
+                return (
+                  <div style={{
+                    color: '#9ca3af',
+                    fontSize: isMobile ? '8px' : '10px',
+                    fontWeight: '500',
+                    textAlign: 'center',
+                    padding: '4px 0'
+                  }}>
+                    Waiting for players...
+                  </div>
+                )
+              }
+
               const leaderboardData = serverState.players
-                ? serverState.players
-                    .filter(player => player.alive)
-                    .map((player, playerIndex) => ({
-                      name: player.name || 'Anonymous',
-                      score: Math.floor(player.score || 0),
-                      isPlayer: player.isCurrentPlayer,
-                      sessionId: player.sessionId || `player_${playerIndex}`,
-                      uniqueKey: `${player.sessionId || playerIndex}_${player.name || 'anonymous'}`
-                    }))
-                    .sort((a, b) => b.score - a.score)
-                : []
-              
-              // Take top 3 (compact) or top 5 (expanded) players for mobile, always 5 for desktop
+                .filter(player => player && player.alive !== false)
+                .map((player, playerIndex) => {
+                  const rawScore = typeof player.score === 'number'
+                    ? player.score
+                    : typeof player.mass === 'number'
+                      ? player.mass
+                      : 0
+
+                  return {
+                    name: player.name || 'Anonymous',
+                    score: Math.max(0, Math.round(rawScore)),
+                    isPlayer: !!player.isCurrentPlayer,
+                    sessionId: player.sessionId || `player_${playerIndex}`
+                  }
+                })
+
+              if (leaderboardData.length === 0) {
+                return (
+                  <div style={{
+                    color: '#9ca3af',
+                    fontSize: isMobile ? '8px' : '10px',
+                    fontWeight: '500',
+                    textAlign: 'center',
+                    padding: '4px 0'
+                  }}>
+                    Waiting for players...
+                  </div>
+                )
+              }
+
+              leaderboardData.sort((a, b) => b.score - a.score)
+
               const maxPlayers = isMobile ? (leaderboardExpanded ? 5 : 3) : 5
+
               return leaderboardData.slice(0, maxPlayers).map((player, index) => (
-                <div key={player.uniqueKey} style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
+                <div key={`${player.sessionId}-${player.name}-${index}`} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: isMobile ? (leaderboardExpanded ? '2px 4px' : '1px 2px') : '4px 8px',
                   backgroundColor: player.isPlayer ? 'rgba(0, 255, 255, 0.1)' : 'transparent',
@@ -1261,19 +1571,38 @@ const MultiplayerArena = () => {
                   transform: isMobile && !leaderboardExpanded && index >= 3 ? 'translateY(-10px)' : 'translateY(0)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '3px' : '2px') : '6px' }}>
-                    <span style={{ 
-                      color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
-                      fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
-                      fontWeight: '700',
-                      minWidth: isMobile ? (leaderboardExpanded ? '10px' : '8px') : '14px'
-                    }}>
-                      #{index + 1}
-                    </span>
-                    <span style={{ 
-                      color: player.isPlayer ? '#00ffff' : '#ffffff', 
-                      fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px', 
+                    {isMobile ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <span style={{
+                          color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
+                          fontSize: leaderboardExpanded ? '9px' : '8px',
+                          fontWeight: '700',
+                          minWidth: leaderboardExpanded ? '10px' : '8px'
+                        }}>
+                          #{index + 1}
+                        </span>
+                        <span style={{
+                          fontSize: '5px',
+                          color: '#9ca3af',
+                          opacity: '0.7',
+                          fontWeight: '500'
+                        }}>Rank</span>
+                      </div>
+                    ) : (
+                      <span style={{
+                        color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        minWidth: '14px'
+                      }}>
+                        #{index + 1}
+                      </span>
+                    )}
+                    <span style={{
+                      color: player.isPlayer ? '#00ffff' : '#ffffff',
+                      fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px',
                       fontWeight: '600',
-                      maxWidth: isMobile ? (leaderboardExpanded ? '50px' : '40px') : '80px',
+                      maxWidth: isMobile ? (leaderboardExpanded ? '50px' : '40px') : '60px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
@@ -1281,17 +1610,47 @@ const MultiplayerArena = () => {
                       {player.name}
                     </span>
                   </div>
-                  <span style={{ 
-                    color: '#fbbf24', 
-                    fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px', 
-                    fontWeight: '700',
-                    textShadow: '0 0 4px rgba(251, 191, 36, 0.6)'
-                  }}>
-                    {player.score}
-                  </span>
+                  {isMobile ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <span style={{
+                        color: '#00ff88',
+                        fontSize: leaderboardExpanded ? '9px' : '8px',
+                        fontWeight: '700'
+                      }}>
+                        ${player.score.toLocaleString('en-US')}
+                      </span>
+                      <span style={{
+                        fontSize: '5px',
+                        color: '#9ca3af',
+                        opacity: '0.7',
+                        fontWeight: '500'
+                      }}>Score</span>
+                    </div>
+                  ) : (
+                    <span style={{
+                      color: '#00ff88',
+                      fontSize: '12px',
+                      fontWeight: '700'
+                    }}>
+                      ${player.score.toLocaleString('en-US')}
+                    </span>
+                  )}
                 </div>
               ))
             })()}
+            <div style={{
+              color: '#00ffff',
+              fontSize: isMobile ? '8px' : '10px',
+              fontWeight: '600',
+              textAlign: 'center',
+              paddingTop: '6px',
+              borderTop: '1px solid rgba(0, 255, 255, 0.3)'
+            }}>
+              {(() => {
+                const totalPlayers = playerCount || (serverState?.players?.length || 0)
+                return `${totalPlayers} player${totalPlayers === 1 ? '' : 's'} in game`
+              })()}
+            </div>
           </div>
         </div>
 
