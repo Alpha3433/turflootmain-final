@@ -851,12 +851,23 @@ const MultiplayerArena = () => {
     }
     
     start() {
+      if (this.running) return
       this.running = true
+      this.gameStartTime = Date.now()
       console.log('🎮 Multiplayer game engine started with enhanced mechanics')
+      
+      // Update zone periodically (matching local agario)
+      this.zoneUpdateInterval = setInterval(() => {
+        this.updateDynamicZone()
+      }, 100) // Update every 100ms
     }
     
     stop() {
       this.running = false
+      if (this.zoneUpdateInterval) {
+        clearInterval(this.zoneUpdateInterval)
+        this.zoneUpdateInterval = null
+      }
       console.log('🎮 Multiplayer game engine stopped')
       
       // Clean up event listeners
@@ -866,6 +877,22 @@ const MultiplayerArena = () => {
       
       if (this.updateMousePosition && this.canvas) {
         this.canvas.removeEventListener('mousemove', this.updateMousePosition)
+      }
+    }
+    
+    updateDynamicZone() {
+      // Smooth zone size transitions (matching local agario)
+      if (Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
+        const direction = this.currentPlayableRadius < this.targetPlayableRadius ? 1 : -1
+        const change = this.zoneTransitionSpeed * (100 / 1000) // Convert to per-frame change
+        this.currentPlayableRadius += direction * change
+        
+        // Clamp to target
+        if (direction > 0) {
+          this.currentPlayableRadius = Math.min(this.currentPlayableRadius, this.targetPlayableRadius)
+        } else {
+          this.currentPlayableRadius = Math.max(this.currentPlayableRadius, this.targetPlayableRadius)
+        }
       }
     }
     
