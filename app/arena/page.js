@@ -410,6 +410,7 @@ const MultiplayerArena = () => {
       clearTimeout(connectionTimeout)
       
       wsRef.current = room
+      console.log('🔗 Setting initial connection status to connected')
       setConnectionStatus('connected')
       console.log('✅ Connected to dedicated arena:', room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
