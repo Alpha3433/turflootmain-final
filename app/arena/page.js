@@ -846,23 +846,51 @@ const MultiplayerArena = () => {
     }
     
     drawPlayer(player, isCurrentPlayer = false) {
-      // Player circle
-      this.ctx.fillStyle = player.color || '#4A90E2'
+      const playerRadius = player.radius || 25
+      
+      // Player glow effect for current player
+      if (isCurrentPlayer) {
+        this.ctx.shadowColor = '#00BFFF'
+        this.ctx.shadowBlur = 20
+      }
+      
+      // Player circle with gradient
+      const gradient = this.ctx.createRadialGradient(
+        player.x, player.y, 0,
+        player.x, player.y, playerRadius
+      )
+      
+      if (isCurrentPlayer) {
+        gradient.addColorStop(0, '#00BFFF')  // Bright blue center
+        gradient.addColorStop(0.7, '#0080FF') // Medium blue
+        gradient.addColorStop(1, '#0040AA')   // Dark blue edge
+      } else {
+        gradient.addColorStop(0, '#FF6B6B')  // Red center for enemies
+        gradient.addColorStop(0.7, '#FF4444') // Medium red
+        gradient.addColorStop(1, '#CC2222')   // Dark red edge
+      }
+      
+      this.ctx.fillStyle = gradient
       this.ctx.beginPath()
-      this.ctx.arc(player.x, player.y, player.radius || 25, 0, Math.PI * 2)
+      this.ctx.arc(player.x, player.y, playerRadius, 0, Math.PI * 2)
       this.ctx.fill()
       
-      // Border (thicker for current player)
-      this.ctx.strokeStyle = isCurrentPlayer ? '#ffffff' : '#cccccc'
-      this.ctx.lineWidth = isCurrentPlayer ? 4 : 2
+      // Remove shadow for border
+      this.ctx.shadowBlur = 0
+      
+      // Enhanced border
+      this.ctx.strokeStyle = isCurrentPlayer ? '#FFFFFF' : '#DDDDDD'
+      this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
       this.ctx.stroke()
       
-      // Player name
-      this.ctx.fillStyle = '#ffffff'
-      this.ctx.font = '14px "Rajdhani", sans-serif'
-      this.ctx.fontWeight = 'bold'
+      // Player name with better contrast
+      this.ctx.fillStyle = '#FFFFFF'
+      this.ctx.font = `bold ${Math.max(12, playerRadius * 0.5)}px "Rajdhani", sans-serif`
       this.ctx.textAlign = 'center'
       this.ctx.textBaseline = 'middle'
+      this.ctx.strokeStyle = '#000000'
+      this.ctx.lineWidth = 3
+      this.ctx.strokeText(player.name || 'Player', player.x, player.y)
       this.ctx.fillText(player.name || 'Player', player.x, player.y)
     }
     
