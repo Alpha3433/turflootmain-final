@@ -6980,7 +6980,7 @@ export default function TurfLootTactical() {
                       renderChallenges(activeTab.dataset.tab)
                     }
                     
-                    console.log(\`✅ Claimed \${rewardAmount} coins for challenge \${challengeId}\`)
+                    console.log('✅ Claimed ' + rewardAmount + ' coins for challenge ' + challengeId)
                   } catch (error) {
                     console.error('Error claiming reward:', error)
                   }
