@@ -1054,41 +1054,47 @@ const MultiplayerArena = () => {
       this.ctx.lineWidth = 8
       this.ctx.stroke()
       
-      // Draw subtle grid within the playable area only
-      this.drawGrid(centerX, centerY, playableRadius)
+      // Draw optimized grid matching local agario
+      this.drawGrid()
     }
     
-    drawGrid(centerX, centerY, radius) {
-      // Optimized grid rendering only within circular zone
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
+    drawGrid() {
+      // Camera-optimized grid rendering matching local agario
+      this.ctx.strokeStyle = '#808080' // Brighter gray grid lines like local agario
       this.ctx.lineWidth = 1
+      this.ctx.globalAlpha = 0.3 // Add transparency so they don't interfere with gameplay
       const gridSize = 50
       
-      // Only draw grid lines that intersect with the circular zone
-      const minX = centerX - radius
-      const maxX = centerX + radius
-      const minY = centerY - radius  
-      const maxY = centerY + radius
+      // Only render grid lines visible in current camera viewport (performance optimization)
+      const startX = Math.floor(this.camera.x / gridSize) * gridSize
+      const startY = Math.floor(this.camera.y / gridSize) * gridSize
+      const endX = startX + this.canvas.width + gridSize
+      const endY = startY + this.canvas.height + gridSize
       
-      // Vertical lines
-      for (let x = Math.floor(minX / gridSize) * gridSize; x <= maxX; x += gridSize) {
-        if (x < 0 || x > this.world.width) continue
-        
+      // Constrain to world bounds for safety
+      const worldStartX = Math.max(startX, 0)
+      const worldEndX = Math.min(endX, this.world.width)
+      const worldStartY = Math.max(startY, 0)
+      const worldEndY = Math.min(endY, this.world.height)
+      
+      // Draw vertical lines (only visible ones)
+      for (let x = worldStartX; x <= worldEndX; x += gridSize) {
         this.ctx.beginPath()
-        this.ctx.moveTo(x, Math.max(0, minY))
-        this.ctx.lineTo(x, Math.min(this.world.height, maxY))
+        this.ctx.moveTo(x, worldStartY)
+        this.ctx.lineTo(x, worldEndY)
         this.ctx.stroke()
       }
       
-      // Horizontal lines  
-      for (let y = Math.floor(minY / gridSize) * gridSize; y <= maxY; y += gridSize) {
-        if (y < 0 || y > this.world.height) continue
-        
+      // Draw horizontal lines (only visible ones)
+      for (let y = worldStartY; y <= worldEndY; y += gridSize) {
         this.ctx.beginPath()
-        this.ctx.moveTo(Math.max(0, minX), y)
-        this.ctx.lineTo(Math.min(this.world.width, maxX), y)
+        this.ctx.moveTo(worldStartX, y)
+        this.ctx.lineTo(worldEndX, y)
         this.ctx.stroke()
       }
+      
+      // Reset alpha back to normal
+      this.ctx.globalAlpha = 1.0
     }
     
     drawPlayer(player, isCurrentPlayer = false) {
