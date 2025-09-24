@@ -523,10 +523,17 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Send input to server - enhanced debugging
+  // Send input to server - enhanced debugging with direct room check
   const sendInput = (dx, dy) => {
-    if (!wsRef.current || connectionStatus !== 'connected') {
-      console.log('❌ Cannot send input - connection status:', connectionStatus)
+    // Check actual room connection state instead of React state
+    if (!wsRef.current) {
+      console.log('❌ Cannot send input - no room connection')
+      return
+    }
+    
+    // Check if room is actually connected by verifying it has a sessionId
+    if (!wsRef.current.sessionId) {
+      console.log('❌ Cannot send input - room not fully connected (no sessionId)')
       return
     }
     
@@ -536,7 +543,8 @@ const MultiplayerArena = () => {
     console.log('📤 Sending input to server:', {
       sequence: inputSequenceRef.current,
       direction: { dx: dx.toFixed(3), dy: dy.toFixed(3) },
-      connectionStatus
+      roomId: wsRef.current.id,
+      sessionId: wsRef.current.sessionId
     })
     
     try {
