@@ -6077,7 +6077,7 @@ export default function TurfLootTactical() {
           </div>
         </div>
 
-        {/* Bottom Left - Squad */}
+        {/* Bottom Left - Challenges */}
         <div style={{
           position: 'absolute',
           left: '200px',
@@ -6099,444 +6099,410 @@ export default function TurfLootTactical() {
           }} />
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <h3 style={{ color: '#fc8181', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(252, 129, 129, 0.6)', textTransform: 'uppercase' }}>PARTY</h3>
+            <h3 style={{ color: '#fc8181', fontWeight: '700', fontSize: '18px', margin: 0, fontFamily: '"Rajdhani", sans-serif', textShadow: '0 0 10px rgba(252, 129, 129, 0.6)', textTransform: 'uppercase' }}>CHALLENGES</h3>
             <div style={{ marginLeft: 'auto' }}>
               <button 
                 onClick={async () => {
-                  console.log('🔄 PARTY REFRESH button clicked - refreshing lobby data...')
+                  console.log('🔄 CHALLENGES REFRESH button clicked - refreshing challenge data...')
                   
                   try {
-                    // Show loading state
-                    setLoadingParty(true)
+                    // Refresh challenges data from localStorage
+                    const userKey = isAuthenticated ? 
+                      `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
+                      'challenges_guest'
                     
-                    console.log('🔄 Step 1: Refreshing current party data...')
-                    await loadCurrentParty()
-                    
-                    console.log('🔄 Step 2: Refreshing friends list with updated skin data...')
-                    await loadFriendsList()
-                    
-                    console.log('🔄 Step 3: Refreshing friend requests and party invites...')
-                    await loadFriendRequests()
-                    
-                    console.log('🔄 Step 4: Refreshing available users list...')
-                    await loadAvailableUsers()
-                    
-                    // Force re-register user to update skin data
-                    if (isAuthenticated && user) {
-                      console.log('🔄 Step 5: Updating user skin data...')
-                      await registerPrivyUser()
+                    const savedChallenges = localStorage.getItem(userKey)
+                    if (savedChallenges) {
+                      const challengesData = JSON.parse(savedChallenges)
+                      console.log('✅ Challenge data refreshed:', challengesData)
+                    } else {
+                      console.log('ℹ️ No existing challenge data found')
                     }
                     
-                    console.log('✅ PARTY REFRESH completed successfully!')
-                    
-                    // Show success feedback
-                    const successMessage = currentParty 
-                      ? `🎯 Party "${currentParty.name}" refreshed - ${currentParty.members?.length || 0} member${currentParty.members?.length !== 1 ? 's' : ''} online`
-                      : '👥 Lobby refreshed - Party data updated'
-                    
-                    // Brief success indicator
-                    const originalText = document.querySelector('[data-refresh-text]')?.textContent
-                    const refreshButton = document.querySelector('[data-refresh-text]')
-                    if (refreshButton) {
-                      refreshButton.textContent = '✅ REFRESHED'
-                      setTimeout(() => {
-                        refreshButton.textContent = originalText || '[↻] REFRESH'
-                      }, 2000)
-                    }
+                    // Force re-render by updating a timestamp
+                    const refreshKey = `challenges_refresh_${Date.now()}`
+                    localStorage.setItem(refreshKey, 'true')
+                    setTimeout(() => localStorage.removeItem(refreshKey), 1000)
                     
                   } catch (error) {
-                    console.error('❌ PARTY REFRESH failed:', error)
-                    
-                    // Show error feedback
-                    const refreshButton = document.querySelector('[data-refresh-text]')
-                    if (refreshButton) {
-                      refreshButton.textContent = '❌ FAILED'
-                      setTimeout(() => {
-                        refreshButton.textContent = '[↻] REFRESH'
-                      }, 2000)
-                    }
-                  } finally {
-                    setLoadingParty(false)
+                    console.error('❌ Error refreshing challenge data:', error)
                   }
                 }}
                 style={{ 
-                  fontSize: '11px', 
-                  color: '#f6ad55', 
+                  fontSize: '10px', 
+                  color: '#fc8181', 
                   background: 'none', 
                   border: 'none', 
                   cursor: 'pointer', 
                   fontWeight: '600', 
                   fontFamily: '"Rajdhani", sans-serif',
+                  textDecoration: 'none',
                   padding: '2px 4px',
                   borderRadius: '2px',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.background = 'rgba(246, 173, 85, 0.1)'
-                  e.target.style.boxShadow = '0 0 5px rgba(246, 173, 85, 0.3)'
+                  e.target.style.color = '#fbb6b6'
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.background = 'none'
-                  e.target.style.boxShadow = 'none'
+                  e.target.style.color = '#fc8181'
                 }}
+                title="Refresh challenge progress"
               >
-                <span data-refresh-text>[↻] REFRESH</span>
+                🔄 REFRESH
               </button>
-              
-              {/* Leave Party Button - Only show when in a party */}
-              {currentParty && (
-                <button 
-                  onClick={async () => {
-                    console.log('🚪 LEAVE PARTY button clicked!')
-                    
-                    try {
-                      if (!isAuthenticated || !user) {
-                        console.log('❌ User not authenticated for leaving party')
-                        return
-                      }
-                      
-                      const userIdentifier = user.wallet?.address || user.email || user.id
-                      console.log('🚪 Leaving party for user:', userIdentifier)
-                      
-                      // Show loading feedback
-                      const leaveButton = document.querySelector('[data-leave-text]')
-                      if (leaveButton) {
-                        leaveButton.textContent = '⏳ LEAVING...'
-                      }
-                      
-                      // API call to leave party
-                      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/party`, {
-                        method: 'DELETE',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          userIdentifier: userIdentifier,
-                          partyId: currentParty.id
-                        })
-                      })
-                      
-                      const result = await response.json()
-                      
-                      if (response.ok) {
-                        console.log('✅ Successfully left party:', result)
-                        
-                        // Check if the party was disbanded (owner left or party became empty)
-                        if (result.partyDisbanded) {
-                          console.log('🗑️ Party was disbanded:', {
-                            isOwner: result.isOwner,
-                            message: result.message
-                          })
-                          
-                          // Show appropriate message based on whether user was owner
-                          if (result.isOwner) {
-                            // Show success feedback for party owner
-                            if (leaveButton) {
-                              leaveButton.textContent = '✅ DISBANDED'
-                              setTimeout(() => {
-                                leaveButton.textContent = '[✕] LEAVE'
-                              }, 2000)
-                            }
-                            alert(`👑 ${result.message}\n\nAs the party owner, your party has been completely removed.`)
-                          } else {
-                            // Show success feedback for member leaving empty party
-                            if (leaveButton) {
-                              leaveButton.textContent = '✅ LEFT'
-                              setTimeout(() => {
-                                leaveButton.textContent = '[✕] LEAVE'
-                              }, 2000)
-                            }
-                            alert(`🏁 ${result.message}`)
-                          }
-                        } else {
-                          // Regular member left, party still exists
-                          if (leaveButton) {
-                            leaveButton.textContent = '✅ LEFT'
-                            setTimeout(() => {
-                              leaveButton.textContent = '[✕] LEAVE'
-                            }, 2000)
-                          }
-                          alert(`👋 ${result.message}`)
-                        }
-                        
-                        // Clear current party state regardless of disbandment
-                        setCurrentParty(null)
-                        
-                        // Refresh party data to show updated state
-                        await loadCurrentParty()
-                        
-                      } else {
-                        console.error('❌ Failed to leave party:', response.status)
-                        if (leaveButton) {
-                          leaveButton.textContent = '❌ FAILED'
-                          setTimeout(() => {
-                            leaveButton.textContent = '[✕] LEAVE'
-                          }, 2000)
-                        }
-                      }
-                      
-                    } catch (error) {
-                      console.error('❌ Error leaving party:', error)
-                      const leaveButton = document.querySelector('[data-leave-text]')
-                      if (leaveButton) {
-                        leaveButton.textContent = '❌ ERROR'
-                        setTimeout(() => {
-                          leaveButton.textContent = '[✕] LEAVE'
-                        }, 2000)
-                      }
-                    }
-                  }}
-                  style={{ 
-                    fontSize: '11px', 
-                    color: '#fc8181', 
-                    background: 'none', 
-                    border: 'none', 
-                    cursor: 'pointer', 
-                    fontWeight: '600', 
-                    fontFamily: '"Rajdhani", sans-serif',
-                    padding: '2px 4px',
-                    borderRadius: '2px',
-                    transition: 'all 0.2s ease',
-                    marginLeft: '8px'
-                  }}
-                  onMouseOver={(e) => {
-                    e.target.style.background = 'rgba(252, 129, 129, 0.1)'
-                    e.target.style.boxShadow = '0 0 5px rgba(252, 129, 129, 0.3)'
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.style.background = 'none'
-                    e.target.style.boxShadow = 'none'
-                  }}
-                >
-                  <span data-leave-text>[✕] LEAVE</span>
-                </button>
-              )}
             </div>
           </div>
           
           <div style={{ 
-            background: currentParty ? 'rgba(26, 32, 44, 0.8)' : 'rgba(26, 32, 44, 0.6)', 
+            background: 'rgba(26, 32, 44, 0.8)', 
             borderRadius: '8px', 
             padding: '16px', 
-            textAlign: 'center',
-            border: currentParty ? '2px solid rgba(104, 211, 145, 0.6)' : '2px solid rgba(104, 211, 145, 0.3)',
+            border: '2px solid rgba(252, 129, 129, 0.3)',
             marginBottom: '16px',
-            boxShadow: currentParty ? '0 0 20px rgba(104, 211, 145, 0.4)' : 'none'
+            maxHeight: '200px',
+            overflowY: 'auto'
           }}>
-            {currentParty ? (
-              // Show current party members
-              <div>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  marginBottom: '12px'
-                }}>
-                  <div style={{
-                    color: '#68d391',
-                    fontSize: '16px',
-                    fontWeight: '700',
-                    fontFamily: '"Rajdhani", sans-serif'
-                  }}>
-                    {currentParty.name}
-                  </div>
-                  <div style={{
-                    padding: '2px 6px',
-                    background: 'rgba(104, 211, 145, 0.2)',
-                    border: '1px solid #68d391',
-                    borderRadius: '3px',
-                    fontSize: '10px',
-                    color: '#68d391',
-                    textTransform: 'uppercase'
-                  }}>
-                    {currentParty.privacy}
-                  </div>
-                </div>
+            {/* Challenge List */}
+            {(() => {
+              // Get user-specific challenges data
+              const userKey = isAuthenticated ? 
+                `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
+                'challenges_guest'
+              
+              let challengesData = {}
+              try {
+                const saved = localStorage.getItem(userKey)
+                challengesData = saved ? JSON.parse(saved) : {}
+              } catch (error) {
+                console.error('Error loading challenges:', error)
+              }
+              
+              // Default challenges for Agar.io game
+              const defaultChallenges = [
+                { 
+                  id: 'eat_50_coins', 
+                  name: 'Coin Collector', 
+                  description: 'Eat 50 coins', 
+                  target: 50, 
+                  reward: 100,
+                  icon: '🪙',
+                  type: 'daily'
+                },
+                { 
+                  id: 'survive_5_minutes', 
+                  name: 'Survivor', 
+                  description: 'Survive for 5 minutes', 
+                  target: 300, // seconds
+                  reward: 150,
+                  icon: '⏱️',
+                  type: 'daily'
+                },
+                { 
+                  id: 'reach_mass_200', 
+                  name: 'Growing Strong', 
+                  description: 'Reach mass 200', 
+                  target: 200, 
+                  reward: 200,
+                  icon: '📈',
+                  type: 'weekly'
+                },
+                { 
+                  id: 'cashout_5_times', 
+                  name: 'Cash Master', 
+                  description: 'Cash out 5 times', 
+                  target: 5, 
+                  reward: 250,
+                  icon: '💰',
+                  type: 'weekly'
+                }
+              ]
+              
+              return defaultChallenges.map(challenge => {
+                const progress = challengesData[challenge.id] || { current: 0, completed: false }
+                const progressPercent = Math.min((progress.current / challenge.target) * 100, 100)
+                const isCompleted = progress.completed || progress.current >= challenge.target
                 
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  marginBottom: '8px'
-                }}>
-                  {currentParty.members?.slice(0, 4).map((member, index) => {
-                    // Use current user's selected skin for their own avatar, otherwise use member's equipped skin
-                    const isCurrentUser = isAuthenticated && user && (
-                      member.userIdentifier === (user.wallet?.address || user.email || user.id)
-                    )
-                    const skinToUse = isCurrentUser ? selectedSkin : (member.equippedSkin || {
-                      type: 'circle',
-                      color: '#3b82f6',
-                      pattern: 'solid'
-                    })
-                    
-                    return (
-                      <div key={member.userIdentifier} style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
-                        {/* Member avatar circle */}
-                        <div style={getSkinAvatarStyle(skinToUse, 32, member.isOnline)}>
-                          {/* Skin inner content */}
-                          <div style={{ 
-                            width: '70%', 
-                            height: '70%', 
-                            borderRadius: '50%', 
-                            background: 'rgba(255, 255, 255, 0.2)' 
-                          }} />
-                          
-                          {/* Online status dot */}
-                          {member.isOnline && (
-                            <div style={{
-                              position: 'absolute',
-                              top: '-2px',
-                              right: '-2px',
-                              width: '8px',
-                              height: '8px',
-                              background: '#22c55e',
-                              borderRadius: '50%',
-                              border: '1px solid rgba(26, 32, 44, 1)',
-                              boxShadow: '0 0 4px rgba(34, 197, 94, 0.6)'
-                            }} />
-                          )}
-                        </div>
-                        
-                        {/* Username directly below the circle */}
+                return (
+                  <div key={challenge.id} style={{
+                    marginBottom: '12px',
+                    padding: '10px',
+                    background: isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)',
+                    borderRadius: '6px',
+                    border: `1px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`,
+                    position: 'relative'
+                  }}>
+                    {/* Challenge Header */}
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px', 
+                      marginBottom: '6px' 
+                    }}>
+                      <span style={{ fontSize: '16px' }}>{challenge.icon}</span>
+                      <div style={{ flex: 1 }}>
                         <div style={{
-                          color: member.isOnline ? '#e2e8f0' : '#9ca3af',
-                          fontSize: '10px',
-                          fontWeight: '500',
-                          textAlign: 'center',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          color: isCompleted ? '#68d391' : '#e2e8f0',
                           fontFamily: '"Rajdhani", sans-serif',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          maxWidth: '40px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
+                          textTransform: 'uppercase'
                         }}>
-                          {member.username || 'USER'}
+                          {challenge.name}
+                        </div>
+                        <div style={{
+                          fontSize: '10px',
+                          color: '#a0aec0',
+                          fontFamily: '"Rajdhani", sans-serif'
+                        }}>
+                          {challenge.description}
                         </div>
                       </div>
-                    )
-                  })}
-                  {currentParty.members?.length > 4 && (
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
-                      background: 'rgba(104, 211, 145, 0.2)',
-                      border: '2px solid #68d391',
-                      borderRadius: '6px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '10px',
-                      color: '#68d391',
-                      fontWeight: 'bold'
-                    }}>
-                      +{currentParty.members.length - 4}
+                      <div style={{
+                        padding: '2px 6px',
+                        background: challenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 'rgba(139, 92, 246, 0.2)',
+                        border: `1px solid ${challenge.type === 'daily' ? '#f6ad55' : '#8b5cf6'}`,
+                        borderRadius: '3px',
+                        fontSize: '8px',
+                        color: challenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
+                        textTransform: 'uppercase',
+                        fontFamily: '"Rajdhani", sans-serif',
+                        fontWeight: '600'
+                      }}>
+                        {challenge.type}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            ) : loadingParty ? (
-              // Loading state
-              <div>
-                <div style={{
-                  width: '50px',
-                  height: '50px',
-                  background: 'linear-gradient(135deg, rgba(104, 211, 145, 0.2) 0%, rgba(104, 211, 145, 0.4) 100%)',
-                  border: '2px solid #68d391',
-                  borderRadius: '4px',
-                  margin: '0 auto 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  animation: 'pulse 2s infinite'
-                }}>
-                  🔄
-                </div>
-                <div style={{ color: '#e2e8f0', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>LOADING PARTY...</div>
-              </div>
-            ) : (
-              // No party state
-              <div>
-                <div style={{
-                  width: '50px',
-                  height: '50px',
-                  background: 'linear-gradient(135deg, rgba(104, 211, 145, 0.2) 0%, rgba(104, 211, 145, 0.4) 100%)',
-                  border: '2px solid #68d391',
-                  borderRadius: '4px',
-                  margin: '0 auto 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  boxShadow: '0 0 20px rgba(104, 211, 145, 0.3)'
-                }}>
-                  👤
-                </div>
-                <div style={{ color: '#e2e8f0', fontSize: '15px', marginBottom: '8px', fontWeight: '600', fontFamily: '"Rajdhani", sans-serif', textTransform: 'uppercase' }}>NO PARTY MEMBERS</div>
-              </div>
-            )}
+                    
+                    {/* Progress Bar */}
+                    <div style={{
+                      background: 'rgba(45, 55, 72, 0.8)',
+                      borderRadius: '4px',
+                      height: '6px',
+                      overflow: 'hidden',
+                      marginBottom: '6px'
+                    }}>
+                      <div style={{
+                        background: isCompleted ? 
+                          'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
+                          'linear-gradient(90deg, #fc8181 0%, #f56565 100%)',
+                        height: '100%',
+                        width: `${progressPercent}%`,
+                        transition: 'width 0.3s ease'
+                      }} />
+                    </div>
+                    
+                    {/* Progress Text & Reward */}
+                    <div style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center' 
+                    }}>
+                      <span style={{
+                        fontSize: '10px',
+                        color: '#a0aec0',
+                        fontFamily: '"Rajdhani", sans-serif'
+                      }}>
+                        {isCompleted ? 'COMPLETED' : `${progress.current}/${challenge.target}`}
+                      </span>
+                      <span style={{
+                        fontSize: '10px',
+                        color: '#f6ad55',
+                        fontFamily: '"Rajdhani", sans-serif',
+                        fontWeight: '700'
+                      }}>
+                        {isCompleted ? '✅' : `+${challenge.reward} coins`}
+                      </span>
+                    </div>
+                    
+                    {/* Completion Overlay */}
+                    {isCompleted && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '2px',
+                        right: '2px',
+                        background: '#68d391',
+                        color: '#1a202c',
+                        borderRadius: '50%',
+                        width: '16px',
+                        height: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '8px',
+                        fontWeight: 'bold',
+                        boxShadow: '0 0 8px rgba(104, 211, 145, 0.6)'
+                      }}>
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            })()}
           </div>
           
           <button 
             onClick={async () => {
-              console.log('JOIN PARTY button clicked!')
-              const authenticated = await requireAuthentication('JOIN PARTY')
+              console.log('VIEW ALL CHALLENGES button clicked!')
+              const authenticated = await requireAuthentication('VIEW ALL CHALLENGES')
               if (authenticated) {
-                console.log('👥 User authenticated, opening join party...')
-                createDesktopJoinPartyPopup()
+                console.log('🎯 User authenticated, opening challenges modal...')
+                
+                // Create detailed challenges modal
+                const modal = document.createElement('div')
+                modal.style.cssText = `
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100vw;
+                  height: 100vh;
+                  background: rgba(0, 0, 0, 0.8);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  z-index: 10000;
+                  backdrop-filter: blur(5px);
+                `
+                
+                modal.innerHTML = `
+                  <div style="
+                    background: linear-gradient(145deg, #1a202c 0%, #2d3748 100%);
+                    border: 2px solid #fc8181;
+                    border-radius: 12px;
+                    padding: 24px;
+                    max-width: 600px;
+                    width: 90%;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    box-shadow: 0 0 30px rgba(252, 129, 129, 0.4);
+                  ">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                      <h2 style="color: #fc8181; font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; margin: 0; text-transform: uppercase;">
+                        🎯 ALL CHALLENGES
+                      </h2>
+                      <button onclick="this.closest('div').remove()" style="
+                        background: rgba(252, 129, 129, 0.2);
+                        border: 1px solid #fc8181;
+                        border-radius: 4px;
+                        color: #fc8181;
+                        cursor: pointer;
+                        padding: 8px 12px;
+                        font-family: 'Rajdhani', sans-serif;
+                        font-weight: 600;
+                      ">CLOSE</button>
+                    </div>
+                    
+                    <div style="color: #e2e8f0; font-family: 'Rajdhani', sans-serif; margin-bottom: 20px; padding: 12px; background: rgba(252, 129, 129, 0.1); border-radius: 6px; border: 1px solid rgba(252, 129, 129, 0.3);">
+                      <strong>How Challenges Work:</strong><br>
+                      • Complete challenges by playing games<br>
+                      • Daily challenges reset every 24 hours<br>
+                      • Weekly challenges reset every Monday<br>
+                      • Earn coins as rewards for completion<br>
+                      • Progress is tracked automatically during gameplay
+                    </div>
+                    
+                    <div id="all-challenges-list" style="display: grid; gap: 12px;">
+                      <!-- Challenges will be populated here -->
+                    </div>
+                  </div>
+                `
+                
+                document.body.appendChild(modal)
               } else {
-                console.log('❌ Authentication failed, blocking access to JOIN PARTY')
+                console.log('❌ Authentication failed, blocking access to VIEW ALL CHALLENGES')
               }
             }}
             style={{
             width: '100%',
             padding: '12px',
             background: 'rgba(26, 32, 44, 0.8)',
-            border: '2px solid #f6ad55',
+            border: '2px solid #fc8181',
             borderRadius: '4px',
-            color: '#f6ad55',
+            color: '#fc8181',
             fontSize: '14px',
             fontWeight: '600',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
-            boxShadow: '0 0 15px rgba(246, 173, 85, 0.3)',
+            boxShadow: '0 0 15px rgba(252, 129, 129, 0.3)',
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase',
             marginBottom: '12px'
           }}>
-            JOIN PARTY
+            VIEW ALL CHALLENGES
           </button>
           
           <button 
             onClick={async () => {
-              console.log('CREATE PARTY button clicked!')
-              const authenticated = await requireAuthentication('CREATE PARTY')
+              console.log('CLAIM REWARDS button clicked!')
+              const authenticated = await requireAuthentication('CLAIM REWARDS')
               if (authenticated) {
-                console.log('🎯 User authenticated, opening create party modal immediately...')
+                console.log('💰 User authenticated, claiming completed challenge rewards...')
                 
-                // Open modal immediately for better UX
-                createDesktopCreatePartyPopup()
-                
-                // Load friends asynchronously in background (non-blocking)
-                if (friendsList.length === 0 && !loadingFriends) {
-                  console.log('🔄 Loading friends list in background...')
-                  loadFriendsList().catch(error => {
-                    console.error('❌ Background friends loading failed:', error)
+                try {
+                  // Get user-specific challenges data
+                  const userKey = isAuthenticated ? 
+                    `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
+                    'challenges_guest'
+                  
+                  let challengesData = {}
+                  try {
+                    const saved = localStorage.getItem(userKey)
+                    challengesData = saved ? JSON.parse(saved) : {}
+                  } catch (error) {
+                    console.error('Error loading challenges:', error)
+                  }
+                  
+                  // Default challenges
+                  const defaultChallenges = [
+                    { id: 'eat_50_coins', name: 'Coin Collector', target: 50, reward: 100 },
+                    { id: 'survive_5_minutes', name: 'Survivor', target: 300, reward: 150 },
+                    { id: 'reach_mass_200', name: 'Growing Strong', target: 200, reward: 200 },
+                    { id: 'cashout_5_times', name: 'Cash Master', target: 5, reward: 250 }
+                  ]
+                  
+                  let totalRewards = 0
+                  let claimedCount = 0
+                  
+                  // Check for completed challenges that haven't been claimed
+                  defaultChallenges.forEach(challenge => {
+                    const progress = challengesData[challenge.id] || { current: 0, completed: false, claimed: false }
+                    const isCompleted = progress.current >= challenge.target
+                    
+                    if (isCompleted && !progress.claimed) {
+                      totalRewards += challenge.reward
+                      claimedCount++
+                      
+                      // Mark as claimed
+                      challengesData[challenge.id] = {
+                        ...progress,
+                        completed: true,
+                        claimed: true
+                      }
+                    }
                   })
+                  
+                  if (totalRewards > 0) {
+                    // Save updated challenges data
+                    localStorage.setItem(userKey, JSON.stringify(challengesData))
+                    
+                    // Add rewards to currency
+                    setCurrency(prev => prev + totalRewards)
+                    
+                    // Show success message
+                    alert(`🎉 Rewards Claimed!\\n\\n• ${claimedCount} challenge${claimedCount > 1 ? 's' : ''} completed\\n• +${totalRewards} coins earned\\n\\nKeep playing to unlock more challenges!`)
+                    
+                    console.log(`✅ Claimed ${totalRewards} coins from ${claimedCount} completed challenges`)
+                  } else {
+                    alert('📋 No rewards to claim\\n\\nComplete challenges by playing games to earn coin rewards!')
+                    console.log('ℹ️ No completed challenges available for claiming')
+                  }
+                  
+                } catch (error) {
+                  console.error('❌ Error claiming rewards:', error)
+                  alert('❌ Error claiming rewards. Please try again.')
                 }
-                
-                console.log('✅ Modal opened immediately - friends will load in background')
               } else {
-                console.log('❌ Authentication failed, blocking access to CREATE PARTY')
+                console.log('❌ Authentication failed, blocking access to CLAIM REWARDS')
               }
             }}
             style={{
@@ -6554,7 +6520,7 @@ export default function TurfLootTactical() {
             fontFamily: '"Rajdhani", sans-serif',
             textTransform: 'uppercase'
           }}>
-            CREATE PARTY
+            CLAIM REWARDS
           </button>
         </div>
 
