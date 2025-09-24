@@ -6661,7 +6661,7 @@ export default function TurfLootTactical() {
                       <h2 style="color: #fc8181; font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; margin: 0; text-transform: uppercase;">
                         🎯 ALL CHALLENGES
                       </h2>
-                      <button onclick="this.closest('div').remove()" style="
+                      <button onclick="document.body.removeChild(this.closest('#challenges-modal').parentElement)" style="
                         background: rgba(252, 129, 129, 0.2);
                         border: 1px solid #fc8181;
                         border-radius: 4px;
@@ -6671,59 +6671,66 @@ export default function TurfLootTactical() {
                         font-family: 'Rajdhani', sans-serif;
                         font-weight: 600;
                         font-size: 12px;
-                      ">CLOSE</button>
+                        transition: all 0.2s ease;
+                      " onmouseover="this.style.background='rgba(252, 129, 129, 0.4)'" onmouseout="this.style.background='rgba(252, 129, 129, 0.2)'">CLOSE</button>
                     </div>
                     
                     <!-- Tabs -->
                     <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid rgba(252, 129, 129, 0.3); padding-bottom: 16px;">
                       <button class="challenge-tab active-tab" data-tab="daily" style="
+                        flex: 1;
                         background: linear-gradient(45deg, #fc8181 0%, #f56565 100%);
                         border: none;
                         border-radius: 6px;
                         color: white;
                         cursor: pointer;
-                        padding: 10px 16px;
+                        padding: 12px 8px;
                         font-family: 'Rajdhani', sans-serif;
                         font-weight: 600;
                         font-size: 14px;
                         text-transform: uppercase;
                         transition: all 0.3s ease;
                         box-shadow: 0 4px 8px rgba(252, 129, 129, 0.4);
+                        text-align: center;
                       ">
                         Daily
-                        <div style="font-size: 10px; opacity: 0.9; margin-top: 2px;" id="daily-timer">Resets in: 12h 45m</div>
+                        <div style="font-size: 10px; opacity: 0.9; margin-top: 4px; font-weight: 500;" id="daily-timer">Resets in: 12h 45m</div>
                       </button>
                       <button class="challenge-tab" data-tab="weekly" style="
+                        flex: 1;
                         background: rgba(139, 92, 246, 0.3);
                         border: 1px solid #8b5cf6;
                         border-radius: 6px;
                         color: #8b5cf6;
                         cursor: pointer;
-                        padding: 10px 16px;
+                        padding: 12px 8px;
                         font-family: 'Rajdhani', sans-serif;
                         font-weight: 600;
                         font-size: 14px;
                         text-transform: uppercase;
                         transition: all 0.3s ease;
+                        text-align: center;
                       ">
                         Weekly
-                        <div style="font-size: 10px; opacity: 0.9; margin-top: 2px;" id="weekly-timer">Resets in: 5d 11h</div>
+                        <div style="font-size: 10px; opacity: 0.9; margin-top: 4px; font-weight: 500;" id="weekly-timer">Resets in: 5d 11h</div>
                       </button>
                       <button class="challenge-tab" data-tab="seasonal" style="
+                        flex: 1;
                         background: rgba(246, 173, 85, 0.3);
                         border: 1px solid #f6ad55;
                         border-radius: 6px;
                         color: #f6ad55;
                         cursor: pointer;
-                        padding: 10px 16px;
+                        padding: 12px 8px;
                         font-family: 'Rajdhani', sans-serif;
                         font-weight: 600;
                         font-size: 14px;
                         text-transform: uppercase;
                         transition: all 0.3s ease;
+                        text-align: center;
                       ">
                         Seasonal
-                        <div style="font-size: 10px; opacity: 0.9; margin-top: 2px;" id="seasonal-timer">Resets in: 28d 5h</div>
+                        <div style="font-size: 10px; opacity: 0.9; margin-top: 4px; font-weight: 500;" id="seasonal-timer">Resets in: 28d 5h</div>
                       </button>
                     </div>
                     
