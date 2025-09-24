@@ -518,37 +518,19 @@ export class ArenaRoom extends Room<GameState> {
     const centerX = this.worldSize / 2; // 2000 for 4000x4000 world
     const centerY = this.worldSize / 2; // 2000 for 4000x4000 world
     
-    // EMERGENCY FIX: Use extremely conservative spawn radius 
-    const maxSafeRadius = 800; // Much smaller to ensure safe spawning
-    const safetyMargin = 200; // Large safety margin
-    const spawnRadius = maxSafeRadius - safetyMargin; // 600 radius for spawning
+    // Use conservative radius to ensure players never spawn in red zone
+    const safeZoneRadius = 1200; // Well within the 1400 playable radius with safety margin
     
-    // Generate random point within circle using polar coordinates
+    // Generate random point within safe circular area
     const angle = Math.random() * Math.PI * 2; // Random angle
-    const distance = Math.sqrt(Math.random()) * spawnRadius; // Square root for uniform distribution
+    const distance = Math.sqrt(Math.random()) * safeZoneRadius; // Square root for uniform distribution
     
     const x = centerX + Math.cos(angle) * distance;
     const y = centerY + Math.sin(angle) * distance;
     
-    // Double-check that spawn is within world bounds and not too close to edges
-    const clampedX = Math.max(200, Math.min(this.worldSize - 200, x));
-    const clampedY = Math.max(200, Math.min(this.worldSize - 200, y));
+    console.log(`🎯 SAFE SPAWN: Player spawned at (${x.toFixed(1)}, ${y.toFixed(1)}) - distance ${distance.toFixed(1)} from center (safe radius: ${safeZoneRadius})`);
     
-    // Verify the spawn is within circular safe zone
-    const distanceFromCenter = Math.sqrt(
-      Math.pow(clampedX - centerX, 2) + 
-      Math.pow(clampedY - centerY, 2)
-    );
-    
-    console.log(`🎯 EMERGENCY SAFE SPAWN: (${clampedX.toFixed(1)}, ${clampedY.toFixed(1)}) at distance ${distanceFromCenter.toFixed(1)} from center (max safe: ${maxSafeRadius})`);
-    
-    // Emergency safety - if ANY doubt, spawn at center
-    if (distanceFromCenter > 500) {
-      console.log('🚨 EMERGENCY CENTER SPAWN - ensuring 100% safety');
-      return { x: centerX, y: centerY };
-    }
-    
-    return { x: clampedX, y: clampedY };
+    return { x, y };
   }
 
   onDispose() {
