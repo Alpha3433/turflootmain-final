@@ -10478,6 +10478,18 @@ export default function TurfLootTactical() {
           }
         }
         
+        @keyframes goldPulse {
+          0% { 
+            textShadow: 0 0 12px rgba(251, 191, 36, 0.8), 0 0 6px rgba(251, 191, 36, 0.6);
+          }
+          50% { 
+            textShadow: 0 0 20px rgba(251, 191, 36, 1), 0 0 10px rgba(251, 191, 36, 0.8), 0 0 30px rgba(251, 191, 36, 0.4);
+          }
+          100% { 
+            textShadow: 0 0 12px rgba(251, 191, 36, 0.8), 0 0 6px rgba(251, 191, 36, 0.6);
+          }
+        }
+        
         @keyframes radarLine {
           0% { 
             transform: translate(-50%, -100%) rotate(0deg);
