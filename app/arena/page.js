@@ -341,7 +341,7 @@ const MultiplayerArena = () => {
     }
   }, [])
 
-  // Colyseus connection and input handling  
+  // Colyseus connection and input handling - FIXED CONNECTION
   const connectToColyseus = async () => {
     // Prevent multiple connections - cleanup any existing connection first
     if (wsRef.current) {
@@ -363,13 +363,12 @@ const MultiplayerArena = () => {
       
       console.log('🎯 Joining arena room:', roomId)
       console.log('🎯 Player details - Name:', playerName, 'PrivyID:', privyUserId)
+      console.log('🎯 Colyseus endpoint:', process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud')
       
       const room = await client.joinOrCreate("arena", {
         roomName: roomId,
         playerName: playerName,
-        privyUserId: privyUserId,
-        forceNew: true, // Force creation of new session
-        timestamp: Date.now() // Add timestamp for uniqueness
+        privyUserId: privyUserId
       })
       
       wsRef.current = room
@@ -383,9 +382,20 @@ const MultiplayerArena = () => {
         console.log('🎯 Set expected session ID in game engine:', room.sessionId)
       }
       
+      // Handle connection errors
+      room.onError((code, message) => {
+        console.error('❌ Colyseus room error:', code, message)
+        setConnectionStatus('failed')
+      })
+      
+      room.onLeave((code) => {
+        console.log('👋 Left room with code:', code)
+        setConnectionStatus('disconnected')
+      })
+      
       // Handle server state updates
       room.onStateChange((state) => {
-        console.log('🎮 Arena state update - Players:', state.players?.size || 0)
+        console.log('🎮 Arena state update - Players:', state.players?.size || 0, 'Connection:', connectionStatus)
         setPlayerCount(state.players?.size || 0)
         
         // Convert MapSchema to usable format
@@ -421,14 +431,6 @@ const MultiplayerArena = () => {
             console.log('❌ Current player not found! Available sessions:', 
               Array.from(state.players.keys()))
           }
-          
-          // Check for duplicate player names
-          const playerNames = gameState.players.map(p => p.name)
-          const duplicateNames = playerNames.filter((name, index) => playerNames.indexOf(name) !== index)
-          if (duplicateNames.length > 0) {
-            console.warn('⚠️ DUPLICATE PLAYER NAMES DETECTED:', duplicateNames)
-            console.warn('⚠️ All players:', gameState.players.map(p => `${p.name}(${p.sessionId})`))
-          }
         }
         
         // Process coins
@@ -462,6 +464,12 @@ const MultiplayerArena = () => {
     } catch (error) {
       console.error('❌ Colyseus connection failed:', error)
       setConnectionStatus('failed')
+      
+      // Retry connection after 3 seconds
+      setTimeout(() => {
+        console.log('🔄 Retrying connection...')
+        connectToColyseus()
+      }, 3000)
     }
   }
 
