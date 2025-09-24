@@ -6408,41 +6408,62 @@ export default function TurfLootTactical() {
                     <div style={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'center',
-                      gap: '12px', 
-                      marginBottom: '12px' 
+                      justifyContent: 'space-between', // Changed from center to space-between
+                      gap: '8px', // Reduced from 12px
+                      marginBottom: '12px',
+                      width: '100%' // Ensure full width utilization
                     }}>
-                      <span style={{ fontSize: '24px' }}>{currentChallenge.icon}</span>
-                      <div>
-                        <div style={{
-                          fontSize: '14px', // Reduced from 16px
-                          fontWeight: '700',
-                          color: isCompleted ? '#68d391' : '#e2e8f0',
-                          fontFamily: '"Rajdhani", sans-serif',
-                          textTransform: 'uppercase',
-                          marginBottom: '4px',
-                          whiteSpace: 'nowrap' // Prevent text wrapping
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        flex: '1',
+                        minWidth: 0 // Allow shrinking
+                      }}>
+                        <span style={{ 
+                          fontSize: '20px', // Reduced from 24px to prevent overflow
+                          flexShrink: 0 // Don't shrink emoji
                         }}>
-                          {currentChallenge.name}
-                        </div>
-                        <div style={{
-                          fontSize: '11px', // Reduced from 12px
-                          color: '#a0aec0',
-                          fontFamily: '"Rajdhani", sans-serif'
-                        }}>
-                          {currentChallenge.description}
+                          {currentChallenge.icon}
+                        </span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{
+                            fontSize: '14px',
+                            fontWeight: '700',
+                            color: isCompleted ? '#68d391' : '#e2e8f0',
+                            fontFamily: '"Rajdhani", sans-serif',
+                            textTransform: 'uppercase',
+                            marginBottom: '4px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis' // Add ellipsis if text is too long
+                          }}>
+                            {currentChallenge.name}
+                          </div>
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#a0aec0',
+                            fontFamily: '"Rajdhani", sans-serif',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}>
+                            {currentChallenge.description}
+                          </div>
                         </div>
                       </div>
                       <div style={{
-                        padding: '4px 8px',
+                        padding: '3px 6px', // Reduced padding
                         background: currentChallenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 'rgba(139, 92, 246, 0.2)',
                         border: `1px solid ${currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6'}`,
-                        borderRadius: '4px',
-                        fontSize: '10px',
+                        borderRadius: '3px', // Reduced from 4px
+                        fontSize: '9px', // Reduced from 10px
                         color: currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
                         textTransform: 'uppercase',
                         fontFamily: '"Rajdhani", sans-serif',
-                        fontWeight: '600'
+                        fontWeight: '600',
+                        flexShrink: 0, // Don't shrink the badge
+                        whiteSpace: 'nowrap'
                       }}>
                         {currentChallenge.type}
                       </div>
