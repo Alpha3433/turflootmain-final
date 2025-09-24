@@ -951,6 +951,9 @@ export default function TurfLootTactical() {
     }
   }
 
+  // Challenge carousel state
+  const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0)
+
   // Expose challenge update function for game integration
   useEffect(() => {
     if (typeof window !== 'undefined') {
