@@ -735,9 +735,16 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Initialize game
+  // Initialize game ONLY when authenticated
   useEffect(() => {
-    console.log('🎮 Arena initialization - setting up game...')
+    // Wait for Privy to be ready and user to be authenticated
+    if (!ready || !authenticated || !user?.id) {
+      console.log('🔒 Waiting for authentication...', { ready, authenticated, userId: user?.id })
+      return
+    }
+    
+    console.log('🎮 Arena initialization - setting up game for authenticated user...')
+    console.log('🎮 Authenticated as:', playerName, '(', privyUserId, ')')
     
     // Apply mobile game class for full screen optimization
     if (isMobile) {
@@ -782,7 +789,7 @@ const MultiplayerArena = () => {
     
     requestAnimationFrame(gameLoop)
     
-    // Connect to Colyseus only once
+    // Connect to Colyseus only once and only when authenticated
     connectToColyseus()
     
     // Handle resize
@@ -807,7 +814,7 @@ const MultiplayerArena = () => {
         document.body.classList.remove('mobile-game-active')
       }
     }
-  }, [])
+  }, [ready, authenticated, user, isMobile, playerName, privyUserId])
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
