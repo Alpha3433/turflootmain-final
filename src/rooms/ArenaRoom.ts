@@ -481,4 +481,8 @@ export class ArenaRoom extends Room<GameState> {
     
     return { x, y };
   }
+
+  onDispose() {
+    console.log('🛑 Arena room disposed');
+  }
 }
