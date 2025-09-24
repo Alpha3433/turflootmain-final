@@ -126,6 +126,7 @@ user_problem_statement: "COLYSEUS DISCONNECTION ISSUE INVESTIGATION: User report
 
 test_plan:
   current_focus:
+    - "Mobile Scrolling Fix Verification"
     - "Challenges/Missions Panel Backend Integration Testing"
   stuck_tasks:
     - "Frontend Build Issues - Missing Solana wallet adapters"
