@@ -1412,59 +1412,102 @@ const MultiplayerArena = () => {
           </div>
         </div>
 
-        {/* Enhanced Stats Panel - Bottom Left with compact mobile view */}
-        <div 
-          onClick={handleStatsToggle}
-          style={{ 
-            position: 'fixed', 
-            bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 5px)' : '10px', 
-            right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 5px)' : '10px', 
-            zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.85)',
-            border: isMobile ? '1px solid rgba(139, 69, 19, 0.4)' : '2px solid rgba(139, 69, 19, 0.4)',
-            borderRadius: isMobile ? '8px' : '6px',
-            padding: isMobile ? (statsExpanded ? '6px' : '4px') : '10px',
-            minWidth: isMobile ? (statsExpanded ? '120px' : '100px') : '140px',
-            maxWidth: isMobile ? (statsExpanded ? '140px' : '120px') : '160px',
-            fontFamily: '"Rajdhani", sans-serif',
-            cursor: isMobile ? 'pointer' : 'default',
-            userSelect: 'none',
-            transition: 'all 0.3s ease',
-            backdropFilter: 'blur(8px)'
-          }}
-        >
-          {/* Stats Header */}
-          <div style={{ 
-            color: '#d97706', 
-            fontSize: isMobile ? (statsExpanded ? '11px' : '10px') : '13px', 
-            fontWeight: '700', 
-            marginBottom: isMobile ? (statsExpanded ? '6px' : '3px') : '8px',
-            textAlign: 'center',
-            letterSpacing: '0.2px',
-            textShadow: '0 0 8px rgba(217, 119, 6, 0.6)'
-          }}>
+        {/* Player Info Panel - Bottom Right (compact) - FROM LOCAL AGARIO */}
+        <div style={{
+          position: 'fixed',
+          bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 8px)' : '10px',
+          left: isMobile ? '50%' : 'auto',
+          right: isMobile ? 'auto' : '10px',
+          transform: isMobile ? 'translateX(-50%)' : 'none',
+          zIndex: 1000,
+          // Minimal mobile styling
+          background: isMobile 
+            ? 'rgba(0, 0, 0, 0.6)'
+            : 'rgba(0, 0, 0, 0.85)',
+          border: isMobile 
+            ? 'none' 
+            : '2px solid #333',
+          borderRadius: isMobile ? '6px' : '4px',
+          padding: isMobile ? (statsExpanded ? '4px 6px' : '2px 4px') : '12px 14px',
+          fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '11px',
+          color: '#ccc',
+          fontFamily: '"Rajdhani", sans-serif',
+          fontWeight: '600',
+          minWidth: isMobile ? (statsExpanded ? '100px' : '75px') : '160px',
+          maxWidth: isMobile ? 'none' : '180px',
+          transition: 'all 0.2s ease'
+        }}>
+          {/* Header */}
+          <div 
+            onClick={handleStatsToggle}
+            style={{ 
+              color: isMobile ? '#9ca3af' : '#22d3ee', 
+              fontSize: isMobile ? (statsExpanded ? '9px' : '8px') : '14px', 
+              fontWeight: '600', 
+              marginBottom: isMobile ? (statsExpanded ? '3px' : '1px') : '8px',
+              borderBottom: isMobile ? 'none' : '1px solid #333',
+              paddingBottom: isMobile ? '0' : '6px',
+              cursor: isMobile ? 'pointer' : 'default',
+              userSelect: 'none',
+              transition: 'all 0.2s ease',
+              textAlign: 'center',
+              opacity: isMobile ? '0.8' : '1'
+            }}
+            onTouchStart={isMobile ? (e) => { e.target.style.color = '#00ffff' } : undefined}
+            onTouchEnd={isMobile ? (e) => { e.target.style.color = '#22d3ee' } : undefined}
+          >
             {isMobile 
-              ? (statsExpanded ? '📊 Player Stats' : '📊')
-              : '📊 Player Stats'
+              ? (statsExpanded ? 'You' : 'Stats')
+              : 'You'
             }
           </div>
           
-          {/* Stats Content */}
-          {(!isMobile || statsExpanded) && (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: isMobile ? '4px' : '6px',
-              transition: 'all 0.3s ease'
+          {/* Stats - Compact or Expanded */}
+          {!isMobile || statsExpanded ? (
+            /* Full Stats - Desktop always, Mobile when expanded */
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: isMobile ? '3px' : '4px'
             }}>
-              {/* Line 1: Score • Mass */}
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Worth:</span>
+                <span style={{ color: '#22c55e', fontWeight: '700' }}>${score}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Mass:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{Math.floor(mass)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>K/D:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations}/0</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Streak:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{eliminations} 🔥</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Coins:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>{score}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af' }}>Time:</span>
+                <span style={{ color: '#ffffff', fontWeight: '700' }}>
+                  {Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* Compact 2-Line Stats - Mobile only */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              {/* Line 1: Net Worth • Mass */}
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                fontSize: isMobile ? '10px' : '11px',
-                fontWeight: '600',
-                padding: isMobile ? '3px 6px' : '4px 8px',
+                fontSize: '10px',
+                fontWeight: '700',
+                padding: '2px 4px',
                 background: 'rgba(34, 197, 94, 0.15)',
                 borderRadius: '6px',
                 border: '1px solid rgba(34, 197, 94, 0.3)'
@@ -1473,13 +1516,13 @@ const MultiplayerArena = () => {
                   <span style={{ 
                     color: '#22c55e',
                     textShadow: '0 0 6px rgba(34, 197, 94, 0.8)'
-                  }}>{score}</span>
+                  }}>${score}</span>
                   <span style={{ 
                     fontSize: '6px', 
                     color: '#9ca3af', 
                     opacity: '0.7',
                     fontWeight: '500'
-                  }}>Score</span>
+                  }}>Worth</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <span style={{ 
@@ -1494,44 +1537,41 @@ const MultiplayerArena = () => {
                   }}>Mass</span>
                 </div>
               </div>
-              {/* Line 2: K/D • Streak • Time */}
+              {/* Line 2: K/D • Streak */}
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                fontSize: isMobile ? '9px' : '10px',
-                fontWeight: '600',
+                fontSize: '9px',
+                fontWeight: '700',
                 padding: '2px 4px',
-                background: 'rgba(107, 114, 128, 0.15)',
+                background: 'rgba(59, 130, 246, 0.15)',
                 borderRadius: '6px',
-                border: '1px solid rgba(107, 114, 128, 0.2)'
+                border: '1px solid rgba(59, 130, 246, 0.3)'
               }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span style={{ color: '#fbbf24' }}>{eliminations}/0</span>
                   <span style={{ 
-                    fontSize: '5px', 
+                    color: '#3b82f6',
+                    textShadow: '0 0 6px rgba(59, 130, 246, 0.8)'
+                  }}>{eliminations}/0</span>
+                  <span style={{ 
+                    fontSize: '6px', 
                     color: '#9ca3af', 
                     opacity: '0.7',
                     fontWeight: '500'
                   }}>K/D</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span style={{ color: '#f87171' }}>{eliminations}</span>
                   <span style={{ 
-                    fontSize: '5px', 
+                    color: '#f59e0b',
+                    textShadow: '0 0 4px rgba(245, 158, 11, 0.8)'
+                  }}>{eliminations} 🔥</span>
+                  <span style={{ 
+                    fontSize: '6px', 
                     color: '#9ca3af', 
                     opacity: '0.7',
                     fontWeight: '500'
                   }}>Streak</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <span style={{ color: '#60a5fa' }}>{Math.floor(timeSurvived / 60)}:{(timeSurvived % 60).toString().padStart(2, '0')}</span>
-                  <span style={{ 
-                    fontSize: '5px', 
-                    color: '#9ca3af', 
-                    opacity: '0.7',
-                    fontWeight: '500'
-                  }}>Time</span>
                 </div>
               </div>
             </div>
