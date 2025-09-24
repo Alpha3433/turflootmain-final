@@ -67,6 +67,10 @@ export class ArenaRoom extends Room<GameState> {
       this.handleInput(client, message);
     });
     
+    this.onMessage("split", (client: Client, message: any) => {
+      this.handleSplit(client, message);
+    });
+    
     this.onMessage("ping", (client: Client, message: any) => {
       client.send("pong", {
         timestamp: Date.now(),
