@@ -10460,6 +10460,21 @@ export default function TurfLootTactical() {
           }
         }
         
+        @keyframes progressGlow {
+          0% { 
+            opacity: 0.6;
+            transform: translateX(-4px);
+          }
+          50% { 
+            opacity: 1;
+            transform: translateX(0px);
+          }
+          100% { 
+            opacity: 0.6;
+            transform: translateX(4px);
+          }
+        }
+        
         @keyframes radarLine {
           0% { 
             transform: translate(-50%, -100%) rotate(0deg);
