@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Colyseus Authentication and Connection Infrastructure Backend Testing
-Testing priorities from review request:
-1. Verify /api/servers endpoint returns correct Colyseus server data
-2. Test Colyseus endpoint configuration (wss://au-syd-ab3eaf4e.colyseus.cloud)
-3. Validate authentication flow and error handling
-4. Check arena room management and player session tracking
-5. Ensure the authentication improvements don't break backend functionality
+TurfLoot Challenges/Missions Panel Backend Integration Testing
+Testing backend systems that support the new challenges functionality:
+1. Authentication System - Verify user authentication works for challenge data persistence
+2. Currency/Wallet Integration - Test currency system for coin rewards from challenges
+3. User Data Storage - Ensure localStorage-based user identification works correctly
+4. API Stability - Verify core APIs remain stable with challenges implementation
+5. Challenge Update Functions - Test backend support for challenge tracking functions
 """
 
 import requests
