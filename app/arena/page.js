@@ -907,8 +907,8 @@ const MultiplayerArena = () => {
     render() {
       if (!this.ctx || !this.running) return
       
-      // Clear canvas with darker background matching 2nd image
-      this.ctx.fillStyle = '#1a1a1a' // Dark background like 2nd image
+      // Clear canvas with pure black background like local agario
+      this.ctx.fillStyle = '#000000' // Pure black background to match local agario
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
       
       // Save context for camera transform
