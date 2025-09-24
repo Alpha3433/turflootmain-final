@@ -822,6 +822,147 @@ export default function TurfLootTactical() {
     })
   }
 
+  // Challenge tracking system
+  const updateChallengeProgress = (challengeType, amount = 1) => {
+    try {
+      // Get user-specific key
+      const userKey = isAuthenticated ? 
+        `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
+        'challenges_guest'
+      
+      // Load current challenges
+      let challengesData = {}
+      try {
+        const saved = localStorage.getItem(userKey)
+        challengesData = saved ? JSON.parse(saved) : {}
+      } catch (error) {
+        console.error('Error loading challenges for update:', error)
+      }
+
+      // Map challenge types to challenge IDs
+      const challengeMapping = {
+        'coins_eaten': 'eat_50_coins',
+        'survival_time': 'survive_5_minutes',
+        'max_mass': 'reach_mass_200',
+        'cashout': 'cashout_5_times'
+      }
+
+      const challengeId = challengeMapping[challengeType]
+      if (!challengeId) return
+
+      // Update progress
+      if (!challengesData[challengeId]) {
+        challengesData[challengeId] = { current: 0, completed: false, claimed: false }
+      }
+
+      // For max_mass, set to highest value achieved, for others, increment
+      if (challengeType === 'max_mass') {
+        challengesData[challengeId].current = Math.max(challengesData[challengeId].current, amount)
+      } else if (challengeType === 'survival_time') {
+        challengesData[challengeId].current = Math.max(challengesData[challengeId].current, amount)
+      } else {
+        challengesData[challengeId].current = (challengesData[challengeId].current || 0) + amount
+      }
+
+      // Check completion based on targets
+      const targets = {
+        'eat_50_coins': 50,
+        'survive_5_minutes': 300, // 5 minutes in seconds
+        'reach_mass_200': 200,
+        'cashout_5_times': 5
+      }
+
+      if (challengesData[challengeId].current >= targets[challengeId]) {
+        challengesData[challengeId].completed = true
+      }
+
+      // Save updated data
+      localStorage.setItem(userKey, JSON.stringify(challengesData))
+      
+      console.log(`📈 Challenge updated: ${challengeType} = ${challengesData[challengeId].current}`)
+      
+      // Check if challenge was just completed for notification
+      if (challengesData[challengeId].completed && !challengesData[challengeId].notified) {
+        challengesData[challengeId].notified = true
+        localStorage.setItem(userKey, JSON.stringify(challengesData))
+        
+        // Show completion notification
+        const challengeNames = {
+          'eat_50_coins': 'Coin Collector',
+          'survive_5_minutes': 'Survivor',
+          'reach_mass_200': 'Growing Strong',
+          'cashout_5_times': 'Cash Master'
+        }
+        
+        const rewards = {
+          'eat_50_coins': 100,
+          'survive_5_minutes': 150,
+          'reach_mass_200': 200,
+          'cashout_5_times': 250
+        }
+
+        // Show notification toast
+        const notification = document.createElement('div')
+        notification.style.cssText = `
+          position: fixed;
+          top: 100px;
+          right: 20px;
+          background: linear-gradient(45deg, rgba(104, 211, 145, 0.95) 0%, rgba(72, 187, 120, 0.95) 100%);
+          border: 2px solid #68d391;
+          border-radius: 12px;
+          padding: 16px 20px;
+          max-width: 300px;
+          z-index: 9999;
+          box-shadow: 0 8px 32px rgba(104, 211, 145, 0.4);
+          backdrop-filter: blur(10px);
+          animation: slideInFromRight 0.5s ease-out;
+          font-family: "Rajdhani", sans-serif;
+          color: white;
+        `
+        
+        notification.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 24px;">🎉</div>
+            <div>
+              <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">
+                Challenge Completed!
+              </div>
+              <div style="font-size: 14px; opacity: 0.9;">
+                ${challengeNames[challengeId]} - +${rewards[challengeId]} coins
+              </div>
+            </div>
+          </div>
+        `
+        
+        document.body.appendChild(notification)
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove()
+          }
+        }, 5000)
+        
+        console.log(`🎉 Challenge completed: ${challengeNames[challengeId]} (+${rewards[challengeId]} coins)`)
+      }
+
+    } catch (error) {
+      console.error('Error updating challenge progress:', error)
+    }
+  }
+
+  // Expose challenge update function for game integration
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.updateChallengeProgress = updateChallengeProgress
+      console.log('🎯 Challenge tracking system initialized')
+      console.log('Usage: window.updateChallengeProgress("coins_eaten", 1)')
+      console.log('       window.updateChallengeProgress("survival_time", seconds)')
+      console.log('       window.updateChallengeProgress("max_mass", mass)')
+      console.log('       window.updateChallengeProgress("cashout")')
+    }
+  }, [isAuthenticated, user])
+
   // Cash Out Notifications System
   useEffect(() => {
     const countries = [
