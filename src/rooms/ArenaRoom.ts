@@ -151,7 +151,7 @@ export class ArenaRoom extends Room<GameState> {
     player.vx = 0;
     player.vy = 0;
     player.mass = 20; // Match local agario starting mass
-    player.radius = 25; // Match local agario starting radius
+    player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √20 * 3 ≈ 13.4
     player.color = this.generatePlayerColor();
     player.score = 0;
     player.lastSeq = 0;
