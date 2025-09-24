@@ -117,6 +117,21 @@ const MultiplayerArena = () => {
   console.log('  - privyUserId (from Privy):', privyUserId)
   console.log('  - user object:', user)
 
+  // Authentication check - redirect to login if not authenticated
+  useEffect(() => {
+    if (ready && !authenticated) {
+      console.log('❌ User not authenticated - redirecting to login')
+      router.push('/')
+      return
+    }
+    
+    if (ready && authenticated && !user?.id) {
+      console.log('❌ User authenticated but no user ID - redirecting to home')
+      router.push('/')
+      return
+    }
+  }, [ready, authenticated, user, router])
+
   // Handle cash out functionality - ported from agario
   const handleCashOut = () => {
     if (!isCashingOut && !cashOutComplete && gameReady) {
