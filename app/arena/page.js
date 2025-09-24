@@ -866,27 +866,82 @@ const MultiplayerArena = () => {
     }
     
     drawCoin(coin) {
-      this.ctx.fillStyle = coin.color || '#FFD700'
+      // Enhanced coin rendering matching 2nd image density
+      const coinSize = coin.radius || 6
+      
+      // Main coin body with gradient
+      const gradient = this.ctx.createRadialGradient(coin.x, coin.y, 0, coin.x, coin.y, coinSize)
+      gradient.addColorStop(0, '#FFD700')
+      gradient.addColorStop(0.7, '#FFA500')
+      gradient.addColorStop(1, '#FF8C00')
+      
+      this.ctx.fillStyle = gradient
       this.ctx.beginPath()
-      this.ctx.arc(coin.x, coin.y, coin.radius || 8, 0, Math.PI * 2)
+      this.ctx.arc(coin.x, coin.y, coinSize, 0, Math.PI * 2)
       this.ctx.fill()
       
-      // Coin sparkle effect
-      this.ctx.strokeStyle = '#FFF700'
+      // Bright outline for visibility
+      this.ctx.strokeStyle = '#FFFF00'
       this.ctx.lineWidth = 2
       this.ctx.stroke()
+      
+      // Inner sparkle
+      this.ctx.fillStyle = '#FFFFFF'
+      this.ctx.beginPath()
+      this.ctx.arc(coin.x - coinSize * 0.3, coin.y - coinSize * 0.3, coinSize * 0.2, 0, Math.PI * 2)
+      this.ctx.fill()
     }
     
     drawVirus(virus) {
-      this.ctx.fillStyle = virus.color || '#FF6B6B'
+      // Enhanced virus rendering matching 2nd image - green spiky circles
+      const virusRadius = virus.radius || 50
+      const spikes = 12
+      
+      // Main virus body - bright green
+      this.ctx.fillStyle = '#00FF00'
       this.ctx.beginPath()
-      this.ctx.arc(virus.x, virus.y, virus.radius || 60, 0, Math.PI * 2)
+      
+      // Draw spiky outline
+      for (let i = 0; i < spikes; i++) {
+        const angle = (i / spikes) * Math.PI * 2
+        const isSpike = i % 2 === 0
+        const radius = isSpike ? virusRadius * 1.3 : virusRadius * 0.8
+        
+        const x = virus.x + Math.cos(angle) * radius
+        const y = virus.y + Math.sin(angle) * radius
+        
+        if (i === 0) {
+          this.ctx.moveTo(x, y)
+        } else {
+          this.ctx.lineTo(x, y)
+        }
+      }
+      
+      this.ctx.closePath()
       this.ctx.fill()
       
-      // Virus spikes
-      this.ctx.strokeStyle = '#FF4444'
-      this.ctx.lineWidth = 3
+      // Virus border - darker green
+      this.ctx.strokeStyle = '#00AA00'
+      this.ctx.lineWidth = 4
       this.ctx.stroke()
+      
+      // Inner pattern - darker core
+      this.ctx.fillStyle = '#008800'
+      this.ctx.beginPath()
+      this.ctx.arc(virus.x, virus.y, virusRadius * 0.5, 0, Math.PI * 2)
+      this.ctx.fill()
+      
+      // Virus "eyes" or spots
+      this.ctx.fillStyle = '#004400'
+      for (let i = 0; i < 3; i++) {
+        const spotAngle = (i / 3) * Math.PI * 2
+        const spotX = virus.x + Math.cos(spotAngle) * virusRadius * 0.25
+        const spotY = virus.y + Math.sin(spotAngle) * virusRadius * 0.25
+        
+        this.ctx.beginPath()
+        this.ctx.arc(spotX, spotY, virusRadius * 0.08, 0, Math.PI * 2)
+        this.ctx.fill()
+      }
     }
   }
 
