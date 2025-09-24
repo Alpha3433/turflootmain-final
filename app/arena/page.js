@@ -814,6 +814,47 @@ const MultiplayerArena = () => {
       this.handleMouseMove = handleMouseMove
     }
     
+    applyClientSideMovement(dx, dy) {
+      // Immediate client-side movement prediction (matching local agario responsiveness)
+      if (!this.player.x || !this.player.y) return
+      
+      // Use same speed calculation as server (for consistency)
+      const mass = this.player.mass || 25
+      const baseSpeed = 6.0
+      const massSpeedFactor = Math.sqrt(mass / 20)
+      const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
+      
+      // Apply movement with frame rate compensation
+      const frameRate = 60 // Target 60fps
+      const speedPerFrame = dynamicSpeed / frameRate
+      
+      this.player.x += dx * speedPerFrame * 2 // 2x multiplier for responsiveness
+      this.player.y += dy * speedPerFrame * 2
+      
+      // Simple boundary check to prevent going too far off
+      const centerX = this.world.width / 2
+      const centerY = this.world.height / 2
+      const maxDistance = 2000 // Allow some overshoot, server will correct
+      
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(this.player.x - centerX, 2) + 
+        Math.pow(this.player.y - centerY, 2)
+      )
+      
+      if (distanceFromCenter > maxDistance) {
+        // Clamp to boundary if too far
+        const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
+        this.player.x = centerX + Math.cos(angle) * maxDistance
+        this.player.y = centerY + Math.sin(angle) * maxDistance
+      }
+      
+      console.log('🎯 Client prediction applied:', {
+        position: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
+        speed: dynamicSpeed.toFixed(2),
+        input: { dx: dx.toFixed(3), dy: dy.toFixed(3) }
+      })
+    }
+    
     updateFromServer(state) {
       this.serverState = state
       
