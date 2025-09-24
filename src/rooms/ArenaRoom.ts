@@ -408,8 +408,8 @@ export class ArenaRoom extends Room<GameState> {
     player.y = Math.random() * this.worldSize;
     player.vx = 0;
     player.vy = 0;
-    player.mass = 100;
-    player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+    player.mass = 20; // Match local agario starting mass
+    player.radius = 25; // Match local agario starting radius
     player.alive = true;
     console.log(`🔄 Player respawned: ${player.name}`);
   }
