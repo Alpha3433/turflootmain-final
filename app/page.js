@@ -10439,6 +10439,16 @@ export default function TurfLootTactical() {
           overflow-x: hidden;
         }
         
+        /* Mobile scrolling support */
+        @media (max-width: 768px) {
+          html, body {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            height: auto;
+            min-height: 100vh;
+          }
+        }
+        
         @keyframes radarSweep {
           0% { 
             transform: rotate(0deg);
