@@ -6415,17 +6415,18 @@ export default function TurfLootTactical() {
                       <span style={{ fontSize: '24px' }}>{currentChallenge.icon}</span>
                       <div>
                         <div style={{
-                          fontSize: '16px',
+                          fontSize: '14px', // Reduced from 16px
                           fontWeight: '700',
                           color: isCompleted ? '#68d391' : '#e2e8f0',
                           fontFamily: '"Rajdhani", sans-serif',
                           textTransform: 'uppercase',
-                          marginBottom: '4px'
+                          marginBottom: '4px',
+                          whiteSpace: 'nowrap' // Prevent text wrapping
                         }}>
                           {currentChallenge.name}
                         </div>
                         <div style={{
-                          fontSize: '12px',
+                          fontSize: '11px', // Reduced from 12px
                           color: '#a0aec0',
                           fontFamily: '"Rajdhani", sans-serif'
                         }}>
