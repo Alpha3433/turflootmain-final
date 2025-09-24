@@ -51,6 +51,7 @@ const MultiplayerArena = () => {
   const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 })
   const joystickRef = useRef(null)
   const joystickKnobRef = useRef(null)
+  const hasInitializedRef = useRef(false)
 
   // Minimap state for real-time updates
   const [minimapData, setMinimapData] = useState({
@@ -352,6 +353,20 @@ const MultiplayerArena = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+
+    if (isMobile) {
+      document.body.classList.add('mobile-game-active')
+    } else {
+      document.body.classList.remove('mobile-game-active')
+    }
+
+    return () => {
+      document.body.classList.remove('mobile-game-active')
+    }
+  }, [isMobile])
+
   // Colyseus connection and input handling  
   const connectToColyseus = async () => {
     // Prevent multiple connections - cleanup any existing connection first
@@ -469,7 +484,20 @@ const MultiplayerArena = () => {
           }
         }
       })
-      
+
+      room.onLeave((code) => {
+        console.log('👋 Server left arena room with code:', code)
+        if (wsRef.current === room) {
+          wsRef.current = null
+        }
+        setConnectionStatus('disconnected')
+      })
+
+      room.onError((code, message) => {
+        console.error('❌ Arena room error:', code, message)
+        setConnectionStatus('failed')
+      })
+
     } catch (error) {
       console.error('❌ Colyseus connection failed:', error)
       setConnectionStatus('failed')
@@ -1212,21 +1240,39 @@ const MultiplayerArena = () => {
 
   // Initialize game ONLY when authenticated
   useEffect(() => {
-    // Wait for Privy to be ready and user to be authenticated
     if (!ready || !authenticated || !user?.id) {
       console.log('🔒 Waiting for authentication...', { ready, authenticated, userId: user?.id })
       return
     }
-    
+
+    if (hasInitializedRef.current) {
+      return
+    }
+
+    hasInitializedRef.current = true
+
     console.log('🎮 Arena initialization - setting up game for authenticated user...')
     console.log('🎮 Authenticated as:', playerName, '(', privyUserId, ')')
-    
-    // Apply mobile game class for full screen optimization
-    if (isMobile) {
-      document.body.classList.add('mobile-game-active')
+
+    if (!canvasRef.current) {
+      console.log('❌ Canvas not ready')
+      hasInitializedRef.current = false
+      return
     }
-    
-    // Remove default body margins/padding that might cause white borders
+
+    const previousBodyStyle = {
+      margin: document.body.style.margin,
+      padding: document.body.style.padding,
+      overflow: document.body.style.overflow,
+      background: document.body.style.background
+    }
+
+    const previousDocumentStyle = {
+      margin: document.documentElement.style.margin,
+      padding: document.documentElement.style.padding,
+      background: document.documentElement.style.background
+    }
+
     document.body.style.margin = '0'
     document.body.style.padding = '0'
     document.body.style.overflow = 'hidden'
@@ -1234,26 +1280,19 @@ const MultiplayerArena = () => {
     document.documentElement.style.margin = '0'
     document.documentElement.style.padding = '0'
     document.documentElement.style.background = '#000000'
-    
-    if (!canvasRef.current) {
-      console.log('❌ Canvas not ready')
-      return
-    }
-    
+
     console.log('✅ Creating game engine and connecting to arena...')
-    
+
     const canvas = canvasRef.current
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    
-    // Create game instance
+
     const game = new MultiplayerGameEngine(canvas)
     gameRef.current = game
-    
+
     game.start()
     setGameReady(true)
-    
-    // Game loop
+
     const gameLoop = () => {
       if (game.running) {
         game.update()
@@ -1261,35 +1300,39 @@ const MultiplayerArena = () => {
         requestAnimationFrame(gameLoop)
       }
     }
-    
+
     requestAnimationFrame(gameLoop)
-    
-    // Connect to Colyseus only once and only when authenticated
+
     connectToColyseus()
-    
-    // Handle resize
+
     const handleResize = () => {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
     }
     window.addEventListener('resize', handleResize)
-    
+
     return () => {
       console.log('🧹 Cleaning up arena connection...')
+      hasInitializedRef.current = false
       game.stop()
       window.removeEventListener('resize', handleResize)
+
       if (wsRef.current) {
         console.log('🔌 Disconnecting from Colyseus...')
         wsRef.current.leave()
         wsRef.current = null
+        setConnectionStatus('disconnected')
       }
-      
-      // Cleanup mobile styles
-      if (isMobile) {
-        document.body.classList.remove('mobile-game-active')
-      }
+
+      document.body.style.margin = previousBodyStyle.margin
+      document.body.style.padding = previousBodyStyle.padding
+      document.body.style.overflow = previousBodyStyle.overflow
+      document.body.style.background = previousBodyStyle.background
+      document.documentElement.style.margin = previousDocumentStyle.margin
+      document.documentElement.style.padding = previousDocumentStyle.padding
+      document.documentElement.style.background = previousDocumentStyle.background
     }
-  }, [ready, authenticated, user, isMobile, playerName, privyUserId])
+  }, [ready, authenticated, user])
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
@@ -1464,28 +1507,59 @@ const MultiplayerArena = () => {
             transition: 'all 0.3s ease'
           }}>
             {(() => {
-              if (!gameRef.current || !serverState) return null;
-              
-              // Create leaderboard data from server state
+              if (!serverState?.players || serverState.players.length === 0) {
+                return (
+                  <div style={{
+                    color: '#9ca3af',
+                    fontSize: isMobile ? '8px' : '10px',
+                    fontWeight: '500',
+                    textAlign: 'center',
+                    padding: '4px 0'
+                  }}>
+                    Waiting for players...
+                  </div>
+                )
+              }
+
               const leaderboardData = serverState.players
-                ? serverState.players
-                    .filter(player => player.alive)
-                    .map((player, playerIndex) => ({
-                      name: player.name || 'Anonymous',
-                      score: Math.floor(player.score || 0),
-                      isPlayer: player.isCurrentPlayer,
-                      sessionId: player.sessionId || `player_${playerIndex}`,
-                      uniqueKey: `${player.sessionId || playerIndex}_${player.name || 'anonymous'}`
-                    }))
-                    .sort((a, b) => b.score - a.score)
-                : []
-              
-              // Take top 3 (compact) or top 5 (expanded) players for mobile, always 5 for desktop
+                .filter(player => player && player.alive !== false)
+                .map((player, playerIndex) => {
+                  const rawScore = typeof player.score === 'number'
+                    ? player.score
+                    : typeof player.mass === 'number'
+                      ? player.mass
+                      : 0
+
+                  return {
+                    name: player.name || 'Anonymous',
+                    score: Math.max(0, Math.round(rawScore)),
+                    isPlayer: !!player.isCurrentPlayer,
+                    sessionId: player.sessionId || `player_${playerIndex}`
+                  }
+                })
+
+              if (leaderboardData.length === 0) {
+                return (
+                  <div style={{
+                    color: '#9ca3af',
+                    fontSize: isMobile ? '8px' : '10px',
+                    fontWeight: '500',
+                    textAlign: 'center',
+                    padding: '4px 0'
+                  }}>
+                    Waiting for players...
+                  </div>
+                )
+              }
+
+              leaderboardData.sort((a, b) => b.score - a.score)
+
               const maxPlayers = isMobile ? (leaderboardExpanded ? 5 : 3) : 5
+
               return leaderboardData.slice(0, maxPlayers).map((player, index) => (
-                <div key={player.uniqueKey} style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
+                <div key={`${player.sessionId}-${player.name}-${index}`} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: isMobile ? (leaderboardExpanded ? '2px 4px' : '1px 2px') : '4px 8px',
                   backgroundColor: player.isPlayer ? 'rgba(0, 255, 255, 0.1)' : 'transparent',
@@ -1497,19 +1571,38 @@ const MultiplayerArena = () => {
                   transform: isMobile && !leaderboardExpanded && index >= 3 ? 'translateY(-10px)' : 'translateY(0)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? (leaderboardExpanded ? '3px' : '2px') : '6px' }}>
-                    <span style={{ 
-                      color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
-                      fontSize: isMobile ? (leaderboardExpanded ? '9px' : '8px') : '12px', 
-                      fontWeight: '700',
-                      minWidth: isMobile ? (leaderboardExpanded ? '10px' : '8px') : '14px'
-                    }}>
-                      #{index + 1}
-                    </span>
-                    <span style={{ 
-                      color: player.isPlayer ? '#00ffff' : '#ffffff', 
-                      fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px', 
+                    {isMobile ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <span style={{
+                          color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
+                          fontSize: leaderboardExpanded ? '9px' : '8px',
+                          fontWeight: '700',
+                          minWidth: leaderboardExpanded ? '10px' : '8px'
+                        }}>
+                          #{index + 1}
+                        </span>
+                        <span style={{
+                          fontSize: '5px',
+                          color: '#9ca3af',
+                          opacity: '0.7',
+                          fontWeight: '500'
+                        }}>Rank</span>
+                      </div>
+                    ) : (
+                      <span style={{
+                        color: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#ffffff',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        minWidth: '14px'
+                      }}>
+                        #{index + 1}
+                      </span>
+                    )}
+                    <span style={{
+                      color: player.isPlayer ? '#00ffff' : '#ffffff',
+                      fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px',
                       fontWeight: '600',
-                      maxWidth: isMobile ? (leaderboardExpanded ? '50px' : '40px') : '80px',
+                      maxWidth: isMobile ? (leaderboardExpanded ? '50px' : '40px') : '60px',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
@@ -1517,17 +1610,47 @@ const MultiplayerArena = () => {
                       {player.name}
                     </span>
                   </div>
-                  <span style={{ 
-                    color: '#fbbf24', 
-                    fontSize: isMobile ? (leaderboardExpanded ? '8px' : '7px') : '12px', 
-                    fontWeight: '700',
-                    textShadow: '0 0 4px rgba(251, 191, 36, 0.6)'
-                  }}>
-                    {player.score}
-                  </span>
+                  {isMobile ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <span style={{
+                        color: '#00ff88',
+                        fontSize: leaderboardExpanded ? '9px' : '8px',
+                        fontWeight: '700'
+                      }}>
+                        ${player.score.toLocaleString('en-US')}
+                      </span>
+                      <span style={{
+                        fontSize: '5px',
+                        color: '#9ca3af',
+                        opacity: '0.7',
+                        fontWeight: '500'
+                      }}>Score</span>
+                    </div>
+                  ) : (
+                    <span style={{
+                      color: '#00ff88',
+                      fontSize: '12px',
+                      fontWeight: '700'
+                    }}>
+                      ${player.score.toLocaleString('en-US')}
+                    </span>
+                  )}
                 </div>
               ))
             })()}
+            <div style={{
+              color: '#00ffff',
+              fontSize: isMobile ? '8px' : '10px',
+              fontWeight: '600',
+              textAlign: 'center',
+              paddingTop: '6px',
+              borderTop: '1px solid rgba(0, 255, 255, 0.3)'
+            }}>
+              {(() => {
+                const totalPlayers = playerCount || (serverState?.players?.length || 0)
+                return `${totalPlayers} player${totalPlayers === 1 ? '' : 's'} in game`
+              })()}
+            </div>
           </div>
         </div>
 
