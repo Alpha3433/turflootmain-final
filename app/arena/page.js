@@ -818,6 +818,80 @@ const MultiplayerArena = () => {
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
+      {/* Authentication Required Screen */}
+      {(!ready || !authenticated || !user?.id) && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: '#000000',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          fontFamily: '"Rajdhani", sans-serif'
+        }}>
+          <div style={{
+            color: '#ff6b6b',
+            fontSize: '48px',
+            fontWeight: '700',
+            textAlign: 'center',
+            marginBottom: '20px'
+          }}>
+            🔒 Authentication Required
+          </div>
+          <div style={{
+            color: '#ffffff',
+            fontSize: '18px',
+            textAlign: 'center',
+            marginBottom: '30px',
+            maxWidth: '600px',
+            lineHeight: '1.5'
+          }}>
+            Arena matches are restricted to authenticated Privy users only.<br/>
+            This prevents duplicate players and ensures fair gameplay.
+          </div>
+          {ready && !authenticated && (
+            <button
+              onClick={login}
+              style={{
+                backgroundColor: '#00ff88',
+                color: '#000000',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '15px 30px',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontFamily: '"Rajdhani", sans-serif',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#00cc6a'
+                e.target.style.transform = 'translateY(-2px)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#00ff88'
+                e.target.style.transform = 'translateY(0)'
+              }}
+            >
+              Login with Privy
+            </button>
+          )}
+          {!ready && (
+            <div style={{
+              color: '#ffffff',
+              fontSize: '16px',
+              opacity: '0.7'
+            }}>
+              Loading authentication...
+            </div>
+          )}
+        </div>
+      )}
       {/* Game Canvas - Full Screen */}
       <canvas
         ref={canvasRef}
