@@ -123,7 +123,12 @@ export class ArenaRoom extends Room<GameState> {
         const existingClient = this.clients.find(c => c.sessionId === existingSessionId);
         if (existingClient && (existingClient as any).userData?.privyUserId === privyUserId) {
           isDuplicate = true;
-          console.log(`⚠️ DUPLICATE by privyUserId: ${privyUserId} (existing: ${existingSessionId}, new: ${client.sessionId})`);
+          const oldPlayerName = existingPlayer.name;
+          if (oldPlayerName !== playerName) {
+            console.log(`⚠️ DUPLICATE by privyUserId with NAME CHANGE: ${privyUserId} "${oldPlayerName}" -> "${playerName}" (existing: ${existingSessionId}, new: ${client.sessionId})`);
+          } else {
+            console.log(`⚠️ DUPLICATE by privyUserId: ${privyUserId} (existing: ${existingSessionId}, new: ${client.sessionId})`);
+          }
         }
       }
       
