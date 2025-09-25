@@ -27,6 +27,9 @@ const MultiplayerArena = () => {
   // Privy authentication
   const { ready, authenticated, user, login } = usePrivy()
   
+  // Player name state that updates when localStorage changes
+  const [playerName, setPlayerName] = useState('Anonymous Player')
+  
   // Core game states
   const [gameReady, setGameReady] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState('connecting')
