@@ -1,0 +1,166 @@
+{
+  "test_start_time": "2025-09-25T08:40:45.452219",
+  "total_tests": 17,
+  "passed_tests": 17,
+  "failed_tests": 0,
+  "test_categories": {
+    "API Health Check": {
+      "passed": 1,
+      "failed": 0,
+      "total": 1
+    },
+    "Colyseus Arena Server": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Session Tracking Infrastructure": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Authentication Support": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Duplicate Session Handling": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Connection State Management": {
+      "passed": 3,
+      "failed": 0,
+      "total": 3
+    },
+    "Database Session Persistence": {
+      "passed": 4,
+      "failed": 0,
+      "total": 4
+    }
+  },
+  "critical_issues": [],
+  "test_details": [
+    {
+      "category": "API Health Check",
+      "test_name": "Backend Infrastructure Operational",
+      "status": "\u2705 PASSED",
+      "details": "Service: turfloot-api, Status: operational, Features: ['auth', 'blockchain', 'multiplayer']",
+      "timestamp": "2025-09-25T08:40:47.055553"
+    },
+    {
+      "category": "Colyseus Arena Server",
+      "test_name": "Arena Server Available",
+      "status": "\u2705 PASSED",
+      "details": "Arena server: colyseus-arena-global, Max: 50, Current: 1, Endpoint: wss://au-syd-ab3eaf4e.colyseus.cloud",
+      "timestamp": "2025-09-25T08:40:47.292064"
+    },
+    {
+      "category": "Colyseus Arena Server",
+      "test_name": "Arena Multi-Player Support",
+      "status": "\u2705 PASSED",
+      "details": "Arena supports 50 concurrent players for deduplication testing",
+      "timestamp": "2025-09-25T08:40:47.292102"
+    },
+    {
+      "category": "Session Tracking Infrastructure",
+      "test_name": "Session Tracking API Operational",
+      "status": "\u2705 PASSED",
+      "details": "Found 0 active sessions across 0 rooms",
+      "timestamp": "2025-09-25T08:40:47.471323"
+    },
+    {
+      "category": "Session Tracking Infrastructure",
+      "test_name": "Session Creation Capability",
+      "status": "\u2705 PASSED",
+      "details": "Backend can create sessions for connection tracking",
+      "timestamp": "2025-09-25T08:40:47.586520"
+    },
+    {
+      "category": "Authentication Support",
+      "test_name": "Authentication Infrastructure",
+      "status": "\u2705 PASSED",
+      "details": "Auth system operational: Balance: 0, Wallet: Not connected",
+      "timestamp": "2025-09-25T08:40:48.036297"
+    },
+    {
+      "category": "Authentication Support",
+      "test_name": "Privy Authentication Enabled",
+      "status": "\u2705 PASSED",
+      "details": "Authentication feature active: ['auth', 'blockchain', 'multiplayer']",
+      "timestamp": "2025-09-25T08:40:48.120178"
+    },
+    {
+      "category": "Duplicate Session Handling",
+      "test_name": "First Session Creation",
+      "status": "\u2705 PASSED",
+      "details": "First session created successfully",
+      "timestamp": "2025-09-25T08:40:48.212932"
+    },
+    {
+      "category": "Duplicate Session Handling",
+      "test_name": "Duplicate Session Handling",
+      "status": "\u2705 PASSED",
+      "details": "Server handled duplicate session creation (upsert behavior)",
+      "timestamp": "2025-09-25T08:40:54.099411"
+    },
+    {
+      "category": "Duplicate Session Handling",
+      "test_name": "Single Session Verification",
+      "status": "\u2705 PASSED",
+      "details": "Only 1 session(s) found for test user (deduplication working)",
+      "timestamp": "2025-09-25T08:40:54.702945"
+    },
+    {
+      "category": "Connection State Management",
+      "test_name": "Real-time Player Tracking",
+      "status": "\u2705 PASSED",
+      "details": "Backend tracking 1 players across 1 servers",
+      "timestamp": "2025-09-25T08:40:57.983616"
+    },
+    {
+      "category": "Connection State Management",
+      "test_name": "Arena Player Count Tracking",
+      "status": "\u2705 PASSED",
+      "details": "Arena tracking 1/50 players",
+      "timestamp": "2025-09-25T08:40:57.983667"
+    },
+    {
+      "category": "Connection State Management",
+      "test_name": "Player Count Validation",
+      "status": "\u2705 PASSED",
+      "details": "Player count within valid range: 1/50",
+      "timestamp": "2025-09-25T08:40:57.983677"
+    },
+    {
+      "category": "Database Session Persistence",
+      "test_name": "Database Connectivity",
+      "status": "\u2705 PASSED",
+      "details": "Database accessible, found 0 active sessions",
+      "timestamp": "2025-09-25T08:40:59.700502"
+    },
+    {
+      "category": "Database Session Persistence",
+      "test_name": "Session Write Operations",
+      "status": "\u2705 PASSED",
+      "details": "Successfully wrote session to database",
+      "timestamp": "2025-09-25T08:40:59.797907"
+    },
+    {
+      "category": "Database Session Persistence",
+      "test_name": "Session Read Consistency",
+      "status": "\u2705 PASSED",
+      "details": "Session found in database after creation",
+      "timestamp": "2025-09-25T08:41:00.374013"
+    },
+    {
+      "category": "Database Session Persistence",
+      "test_name": "Session Cleanup Operations",
+      "status": "\u2705 PASSED",
+      "details": "Successfully cleaned up test session",
+      "timestamp": "2025-09-25T08:41:00.449608"
+    }
+  ],
+  "test_end_time": "2025-09-25T08:41:00.455680"
+}
