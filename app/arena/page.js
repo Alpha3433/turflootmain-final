@@ -482,11 +482,13 @@ const MultiplayerArena = () => {
       // Handle connection errors
       room.onError((code, message) => {
         console.error('❌ Colyseus room error:', code, message)
+        isConnectingRef.current = false // Reset connection flag on room error
         setConnectionStatus('failed')
       })
       
       room.onLeave((code) => {
         console.log('👋 Left room with code:', code)
+        isConnectingRef.current = false // Reset connection flag on leave
         setConnectionStatus('disconnected')
       })
       
