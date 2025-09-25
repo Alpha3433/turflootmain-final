@@ -317,8 +317,8 @@ export class ArenaRoom extends Room<GameState> {
       const splitPiece = this.state.players.get(splitId);
       const mainPlayer = this.state.players.get(client.sessionId);
       
-      if (splitPiece && mainPlayer) {
-        console.log(`🔄 Auto-merging split piece for ${player.name}`);
+      if (splitPiece && mainPlayer && splitPiece.alive && mainPlayer.alive) {
+        console.log(`🔄 Auto-merging split piece for ${mainPlayer.name}`);
         mainPlayer.mass += splitPiece.mass;
         mainPlayer.radius = Math.sqrt(mainPlayer.mass) * 3; // Match agario radius formula
         this.state.players.delete(splitId);
