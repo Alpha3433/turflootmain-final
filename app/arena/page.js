@@ -122,6 +122,30 @@ const MultiplayerArena = () => {
     }
   }, [user?.id, user?.discord?.username, user?.twitter?.username, user?.google?.name, user?.wallet?.address])
   
+  // Listen for localStorage changes to detect username updates from landing page
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (user?.id) {
+        const updatedName = getCurrentPlayerName()
+        if (updatedName !== playerName) {
+          console.log('🔄 Username change detected in localStorage:', playerName, '->', updatedName)
+          setPlayerName(updatedName)
+        }
+      }
+    }
+    
+    // Listen for storage events (changes from other tabs/windows)
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Also check periodically for changes in same tab (localStorage doesn't fire storage event for same tab)
+    const interval = setInterval(handleStorageChange, 1000)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [user?.id, playerName])
+  
   console.log('🎮 Arena parameters:')
   console.log('  - roomId:', roomId)  
   console.log('  - authenticated user:', !!user)
