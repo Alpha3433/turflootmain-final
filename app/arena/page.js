@@ -669,7 +669,7 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Send input to server with immediate client-side prediction
+  // Send input to server with throttling for smooth networking (like agario)
   const sendInput = (dx, dy) => {
     // Check actual room connection state instead of React state
     if (!wsRef.current) {
@@ -683,15 +683,28 @@ const MultiplayerArena = () => {
       return
     }
     
+    // Input throttling for smooth networking (60fps max input rate)
+    const now = Date.now()
+    if (now - lastInputTimeRef.current < inputThrottleMs) {
+      // Still apply client-side prediction even when throttling server input
+      if (gameRef.current && gameRef.current.player.x !== undefined) {
+        gameRef.current.applyClientSideMovement(dx, dy)
+      }
+      return
+    }
+    lastInputTimeRef.current = now
+    
     inputSequenceRef.current++
     lastInputRef.current = { dx, dy }
     
-    console.log('📤 Sending input to server:', {
-      sequence: inputSequenceRef.current,
-      direction: { dx: dx.toFixed(3), dy: dy.toFixed(3) },
-      roomId: wsRef.current.id,
-      sessionId: wsRef.current.sessionId
-    })
+    // Only log occasionally to reduce spam
+    if (inputSequenceRef.current % 30 === 0) {
+      console.log('📤 Throttled input to server:', {
+        sequence: inputSequenceRef.current,
+        direction: { dx: dx.toFixed(3), dy: dy.toFixed(3) },
+        fps: Math.round(1000 / inputThrottleMs)
+      })
+    }
     
     try {
       wsRef.current.send("input", {
@@ -705,7 +718,6 @@ const MultiplayerArena = () => {
         gameRef.current.applyClientSideMovement(dx, dy)
       }
       
-      console.log('✅ Input sent successfully with client prediction')
     } catch (error) {
       console.error('❌ Failed to send input:', error)
     }
