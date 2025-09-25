@@ -10794,6 +10794,7 @@ export default function TurfLootTactical() {
               })()}
             </div>
           </div>
+        </div>
 
         {/* Mobile Communications Button */}
         <div style={{ textAlign: 'center' }}>
