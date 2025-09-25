@@ -14,6 +14,9 @@ export class Player extends Schema {
   @type("number") score: number = 0;
   @type("number") lastSeq: number = 0;
   @type("boolean") alive: boolean = true;
+  @type("boolean") spawnProtection: boolean = false; // Spawn protection status
+  @type("number") spawnProtectionStart: number = 0; // When protection started
+  @type("number") spawnProtectionTime: number = 6000; // 6 seconds protection
   
   // Server-side skin properties for multiplayer visibility
   @type("string") skinId: string = "default";
