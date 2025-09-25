@@ -134,10 +134,11 @@ user_problem_statement: "ARENA MODE STARTING MASS VERIFICATION: User reports tha
 
 test_plan:
   current_focus:
-    - "Duplicate Player Prevention Testing"
-    - "Colyseus Connection Deduplication Testing"  
-    - "Single Player Instance Verification"
-    - "Arena Join/Leave Connection Management"
+    - "Arena Mode Starting Mass Verification"
+    - "Server-side Spawn Mass Testing"
+    - "Respawn Mass Testing"
+    - "Client-server Mass Synchronization"
+    - "Arena Connection Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
