@@ -608,8 +608,9 @@ const MultiplayerArena = () => {
       
     } catch (error) {
       isConnectingRef.current = false // Reset connection flag on error
-      console.error('❌ Colyseus connection failed:', error)
-      console.error('❌ Error details:', {
+      GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on error
+      console.error(`❌ [${componentId}] Colyseus connection failed:`, error)
+      console.error(`❌ [${componentId}] Error details:`, {
         message: error.message,
         stack: error.stack,
         endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT
@@ -618,7 +619,7 @@ const MultiplayerArena = () => {
       
       // Retry connection after 5 seconds with exponential backoff
       setTimeout(() => {
-        console.log('🔄 Retrying connection in 5 seconds...')
+        console.log(`🔄 [${componentId}] Retrying connection in 5 seconds...`)
         connectToColyseus()
       }, 5000)
     }
