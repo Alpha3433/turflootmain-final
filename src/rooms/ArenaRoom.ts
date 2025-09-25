@@ -4,6 +4,7 @@ import { Schema, MapSchema, type } from "@colyseus/schema";
 // Player state schema
 export class Player extends Schema {
   @type("string") name: string = "Player";
+  @type("string") privyUserId: string = "";
   @type("number") x: number = 0;
   @type("number") y: number = 0;
   @type("number") vx: number = 0;
@@ -54,16 +55,96 @@ export class GameState extends Schema {
 
 export class ArenaRoom extends Room<GameState> {
   maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
-  
+
   // Game configuration
   worldSize = parseInt(process.env.WORLD_SIZE || '4000');
   maxCoins = 1000; // Increased from 100 to match local agario density
   maxViruses = 15;
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
-  
+  activePrivyUsers = new Map<string, string>();
+
+  private rebindExistingPrivyPlayer(privyUserId: string, newSessionId: string):
+    | { player: Player; previousSessionId: string }
+    | undefined {
+    const existingSessionId = this.activePrivyUsers.get(privyUserId);
+    if (!existingSessionId || existingSessionId === newSessionId) {
+      return undefined;
+    }
+
+    const existingPlayer = this.state.players.get(existingSessionId);
+    if (!existingPlayer) {
+      console.log(
+        `⚠️ Found stale privy mapping for ${privyUserId} (session ${existingSessionId}) while rebinding`
+      );
+      this.activePrivyUsers.delete(privyUserId);
+      this.removePrivyMappingForSession(existingSessionId);
+      return undefined;
+    }
+
+    console.log(
+      `🔄 Rebinding existing privy player ${existingPlayer.name} from session ${existingSessionId} to ${newSessionId}`
+    );
+
+    this.state.players.delete(existingSessionId);
+    this.state.players.set(newSessionId, existingPlayer);
+    this.activePrivyUsers.set(privyUserId, newSessionId);
+
+    const existingClient = this.clients.find((c) => c.sessionId === existingSessionId);
+    if (existingClient) {
+      try {
+        existingClient.leave(1000, "Privy reconnection superseded by new session");
+      } catch (error) {
+        console.log("⚠️ Error disconnecting superseded client during privy rebinding:", error);
+      }
+    }
+
+    return { player: existingPlayer, previousSessionId: existingSessionId };
+  }
+
+  private removePrivyMappingForSession(sessionId: string) {
+    const keysToDelete: string[] = [];
+    this.activePrivyUsers.forEach((value, key) => {
+      if (value === sessionId) {
+        keysToDelete.push(key);
+      }
+    });
+
+    keysToDelete.forEach((key) => this.activePrivyUsers.delete(key));
+  }
+
+  private forceRemoveSession(sessionId: string, reason: string) {
+    if (!sessionId) {
+      return;
+    }
+
+    console.log(`🧹 Force removing session ${sessionId}: ${reason}`);
+
+    const existingClient = this.clients.find((c) => c.sessionId === sessionId);
+    if (existingClient) {
+      const existingUserId = (existingClient as any).userData?.privyUserId;
+      if (existingUserId && this.activePrivyUsers.get(existingUserId) === sessionId) {
+        this.activePrivyUsers.delete(existingUserId);
+      } else {
+        this.removePrivyMappingForSession(sessionId);
+      }
+
+      try {
+        existingClient.leave(1000, reason);
+      } catch (error) {
+        console.log('⚠️ Error disconnecting existing client:', error);
+      }
+    } else {
+      this.removePrivyMappingForSession(sessionId);
+    }
+
+    if (this.state.players.has(sessionId)) {
+      this.state.players.delete(sessionId);
+    }
+  }
+
   onCreate() {
     console.log("🌍 Arena room initialized");
-    
+
     // Initialize game state
     this.setState(new GameState());
     this.state.worldSize = this.worldSize;
@@ -99,7 +180,7 @@ export class ArenaRoom extends Room<GameState> {
   onJoin(client: Client, options: any = {}) {
     const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
     const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
-    
+
     console.log(`👋 Player attempting to join: ${playerName} (${client.sessionId}) - privyUserId: ${privyUserId}`);
     
     // Store client metadata FIRST (before deduplication check)
@@ -108,16 +189,23 @@ export class ArenaRoom extends Room<GameState> {
       playerName,
       lastInputTime: Date.now()
     };
-    
+
+    // Ensure only a single active connection per authenticated Privy user
+    let reusedPlayer: { player: Player; previousSessionId: string } | undefined;
+    if (!privyUserId.startsWith('anonymous_')) {
+      reusedPlayer = this.rebindExistingPrivyPlayer(privyUserId, client.sessionId);
+    }
+
     // ROBUST DEDUPLICATION: Check existing players in game state directly
     let duplicateSessions: string[] = [];
-    
+
     this.state.players.forEach((existingPlayer, existingSessionId) => {
       // Skip checking against self
       if (existingSessionId === client.sessionId) return;
-      
+      if (existingSessionId.includes("_split_")) return;
+
       let isDuplicate = false;
-      
+
       // Method 1: Check by privyUserId for authenticated users
       if (!privyUserId.startsWith('anonymous_')) {
         const existingClient = this.clients.find(c => c.sessionId === existingSessionId);
@@ -125,8 +213,14 @@ export class ArenaRoom extends Room<GameState> {
           isDuplicate = true;
           console.log(`⚠️ DUPLICATE by privyUserId: ${privyUserId} (existing: ${existingSessionId}, new: ${client.sessionId})`);
         }
+        if (!isDuplicate && (existingPlayer as Player).privyUserId === privyUserId) {
+          isDuplicate = true;
+          console.log(
+            `⚠️ DUPLICATE player state by privyUserId stored on player schema: ${privyUserId} (existing: ${existingSessionId}, new: ${client.sessionId})`
+          );
+        }
       }
-      
+
       // Method 2: Check by playerName (always, as fallback)
       if (!isDuplicate && existingPlayer.name === playerName) {
         isDuplicate = true;
@@ -137,69 +231,73 @@ export class ArenaRoom extends Room<GameState> {
         duplicateSessions.push(existingSessionId);
       }
     });
-    
+
     // Remove ALL duplicate players found
     if (duplicateSessions.length > 0) {
       console.log(`🧹 Removing ${duplicateSessions.length} duplicate player(s) to prevent confusion`);
       duplicateSessions.forEach(sessionId => {
         console.log(`🧹 Removing duplicate player: ${sessionId}`);
-        this.state.players.delete(sessionId);
-        
-        // Also disconnect the old client
-        const oldClient = this.clients.find(c => c.sessionId === sessionId);
-        if (oldClient) {
-          console.log(`🔌 Disconnecting old client: ${sessionId}`);
-          try {
-            oldClient.leave(1000, 'Duplicate connection detected');
-          } catch (error) {
-            console.log('⚠️ Error disconnecting old client:', error);
-          }
-        }
+        this.forceRemoveSession(sessionId, 'Duplicate connection detected');
       });
     } else {
       console.log(`✅ No duplicates found for ${playerName} - proceeding with join`);
     }
-    
-    // Create new player
-    const player = new Player();
+
+    // Create new player or reuse existing privy player
+    const player = (reusedPlayer && reusedPlayer.player) || new Player();
     player.name = playerName;
-    
-    // Generate spawn position within circular playable area
-    const spawnPosition = this.generateCircularSpawnPosition();
-    player.x = spawnPosition.x;
-    player.y = spawnPosition.y;
-    
-    player.vx = 0;
-    player.vy = 0;
-    player.mass = 25; // Updated to 25 to match user requirement
-    player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
-    
-    // Apply skin data from client options (server-side storage for multiplayer visibility)
-    const selectedSkin = options.selectedSkin || {};
-    player.skinId = selectedSkin.id || "default";
-    player.skinName = selectedSkin.name || "Default Warrior";
-    player.skinColor = selectedSkin.color || "#4A90E2";
-    player.skinType = selectedSkin.type || "circle";
-    player.skinPattern = selectedSkin.pattern || "solid";
-    
-    // Use skin color as player color for consistent appearance
-    player.color = player.skinColor;
-    
-    player.score = 0;
-    player.lastSeq = 0;
-    player.alive = true;
-    
-    // Initialize spawn protection
-    player.spawnProtection = true;
-    player.spawnProtectionStart = Date.now();
-    player.spawnProtectionTime = 6000; // 6 seconds protection
-    
-    console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
-    
-    // Add player to game state
-    this.state.players.set(client.sessionId, player);
-    
-    console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)}) - No duplicates!`);
+    player.privyUserId = privyUserId;
+
+    if (!reusedPlayer) {
+      // Generate spawn position within circular playable area
+      const spawnPosition = this.generateCircularSpawnPosition();
+      player.x = spawnPosition.x;
+      player.y = spawnPosition.y;
+
+      player.vx = 0;
+      player.vy = 0;
+      player.mass = 25; // Updated to 25 to match user requirement
+      player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
+
+      // Apply skin data from client options (server-side storage for multiplayer visibility)
+      const selectedSkin = options.selectedSkin || {};
+      player.skinId = selectedSkin.id || "default";
+      player.skinName = selectedSkin.name || "Default Warrior";
+      player.skinColor = selectedSkin.color || "#4A90E2";
+      player.skinType = selectedSkin.type || "circle";
+      player.skinPattern = selectedSkin.pattern || "solid";
+
+      // Use skin color as player color for consistent appearance
+      player.color = player.skinColor;
+
+      player.score = 0;
+      player.lastSeq = 0;
+      player.alive = true;
+
+      // Initialize spawn protection
+      player.spawnProtection = true;
+      player.spawnProtectionStart = Date.now();
+      player.spawnProtectionTime = 6000; // 6 seconds protection
+
+      console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
+
+      // Add player to game state
+      this.state.players.set(client.sessionId, player);
+    } else {
+      console.log(
+        `🔁 Reused existing privy player state for ${playerName} with session ${client.sessionId} (replaced ${reusedPlayer.previousSessionId})`
+      );
+    }
+
+    if (!privyUserId.startsWith('anonymous_')) {
+      this.activePrivyUsers.set(privyUserId, client.sessionId);
+    }
+
+    if (!reusedPlayer) {
+      console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)}) - No duplicates!`);
+    } else {
+      console.log(`✅ Player session swapped without spawning new entity for privy user ${privyUserId}`);
+    }
   }
 
   handleInput(client: Client, message: any) {
@@ -291,6 +389,7 @@ export class ArenaRoom extends Room<GameState> {
     const splitId = `${client.sessionId}_split_${Date.now()}`;
     const splitPlayer = new Player();
     splitPlayer.name = `${player.name}*`;
+    splitPlayer.privyUserId = player.privyUserId;
     
     // Position split piece safely
     const spawnDistance = Math.max(player.radius + 30, 80); // Safe spawn distance
@@ -339,6 +438,13 @@ export class ArenaRoom extends Room<GameState> {
     if (player) {
       console.log(`👋 Player left: ${player.name} (${client.sessionId})`);
       this.state.players.delete(client.sessionId);
+    }
+
+    const userData = (client as any).userData;
+    if (userData?.privyUserId && this.activePrivyUsers.get(userData.privyUserId) === client.sessionId) {
+      this.activePrivyUsers.delete(userData.privyUserId);
+    } else {
+      this.removePrivyMappingForSession(client.sessionId);
     }
   }
 
