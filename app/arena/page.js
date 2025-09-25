@@ -2198,11 +2198,11 @@ const MultiplayerArena = () => {
           }}
           onMouseOver={(e) => {
             e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
-            e.target.style.transform = 'translateX(-50%) scale(1.05)'
+            e.target.style.boxShadow = '0 0 20px rgba(0, 100, 255, 0.8)'
           }}
           onMouseOut={(e) => {
             e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
-            e.target.style.transform = 'translateX(-50%) scale(1)'
+            e.target.style.boxShadow = '0 4px 12px rgba(0, 100, 255, 0.4)'
           }}
           onTouchStart={(e) => {
             if (!isMobile) return
