@@ -1519,6 +1519,46 @@ const MultiplayerArena = () => {
       return
     }
     
+    // Calculate playerName inside useEffect to track changes
+    const getPlayerDisplayName = () => {
+      // First, check for custom username from landing page
+      if (user?.id) {
+        const userKey = `turfloot_username_${user.id.slice(0, 10)}`
+        const customUsername = localStorage.getItem(userKey) || localStorage.getItem('turfloot_auth_username')
+        if (customUsername) {
+          console.log('🎯 Using custom username from landing page:', customUsername)
+          return customUsername
+        }
+      }
+      
+      // Fallback to Privy data or default
+      const fallbackName = user?.discord?.username || user?.twitter?.username || user?.google?.name || user?.wallet?.address?.slice(0, 8) || 'Player'
+      console.log('🎯 Using fallback username:', fallbackName)
+      return fallbackName
+    }
+    
+    const playerName = getPlayerDisplayName()
+    
+    // Check if playerName has changed and we need to cleanup existing connection
+    if (GLOBAL_CONNECTION_TRACKER.activeConnection && 
+        GLOBAL_CONNECTION_TRACKER.userId === privyUserId && 
+        GLOBAL_CONNECTION_TRACKER.lastPlayerName && 
+        GLOBAL_CONNECTION_TRACKER.lastPlayerName !== playerName) {
+      console.log(`🔄 Player name changed from "${GLOBAL_CONNECTION_TRACKER.lastPlayerName}" to "${playerName}" - cleaning up old connection`)
+      
+      // Cleanup existing connection due to name change
+      try {
+        GLOBAL_CONNECTION_TRACKER.activeConnection.leave()
+      } catch (error) {
+        console.log('⚠️ Error cleaning up connection due to name change:', error)
+      }
+      GLOBAL_CONNECTION_TRACKER.activeConnection = null
+      GLOBAL_CONNECTION_TRACKER.lastPlayerName = null
+    }
+    
+    // Store current playerName for future comparison
+    GLOBAL_CONNECTION_TRACKER.lastPlayerName = playerName
+    
     console.log('🎮 Arena initialization - setting up game for authenticated user...')
     console.log('🎮 Authenticated as:', playerName, '(', privyUserId, ')')
     
