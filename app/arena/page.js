@@ -5,6 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
 import { usePrivy } from '@privy-io/react-auth'
 
+// Global connection tracker to prevent duplicates across component instances
+const GLOBAL_CONNECTION_TRACKER = {
+  activeConnection: null,
+  isConnecting: false,
+  userId: null
+}
+
 const MultiplayerArena = () => {
   console.log('🎮 MULTIPLAYER ARENA - Pure Colyseus multiplayer mode with game mechanics')
   
