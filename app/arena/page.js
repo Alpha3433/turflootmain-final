@@ -1535,6 +1535,7 @@ const MultiplayerArena = () => {
         wsRef.current.leave()
         wsRef.current = null
       }
+      isConnectingRef.current = false // Reset connection flag on cleanup
       
       // Cleanup mobile styles
       if (isMobile) {
