@@ -172,12 +172,25 @@ const MultiplayerArena = () => {
       console.log('Starting cash out process via button')
       setIsCashingOut(true)
       setCashOutProgress(0)
+      
+      // Send cash out start message to server
+      if (roomRef.current) {
+        roomRef.current.send("cashout", { action: "start" })
+        console.log('📡 Sent cash out start message to server')
+      }
     } else if (isCashingOut) {
       console.log('Canceling cash out via button')
       setIsCashingOut(false)
       setCashOutProgress(0)
       if (cashOutIntervalRef.current) {
         clearInterval(cashOutIntervalRef.current)
+      }
+      
+      // Send cash out stop message to server  
+      if (roomRef.current) {
+        roomRef.current.send("cashout", { action: "stop" })
+        console.log('📡 Sent cash out stop message to server')
+      }
         cashOutIntervalRef.current = null
       }
     }
