@@ -54,16 +54,58 @@ export class GameState extends Schema {
 
 export class ArenaRoom extends Room<GameState> {
   maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
-  
+
   // Game configuration
   worldSize = parseInt(process.env.WORLD_SIZE || '4000');
   maxCoins = 1000; // Increased from 100 to match local agario density
   maxViruses = 15;
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
-  
+  activePrivyUsers = new Map<string, string>();
+
+  private removePrivyMappingForSession(sessionId: string) {
+    const keysToDelete: string[] = [];
+    this.activePrivyUsers.forEach((value, key) => {
+      if (value === sessionId) {
+        keysToDelete.push(key);
+      }
+    });
+
+    keysToDelete.forEach((key) => this.activePrivyUsers.delete(key));
+  }
+
+  private forceRemoveSession(sessionId: string, reason: string) {
+    if (!sessionId) {
+      return;
+    }
+
+    console.log(`🧹 Force removing session ${sessionId}: ${reason}`);
+
+    const existingClient = this.clients.find((c) => c.sessionId === sessionId);
+    if (existingClient) {
+      const existingUserId = (existingClient as any).userData?.privyUserId;
+      if (existingUserId && this.activePrivyUsers.get(existingUserId) === sessionId) {
+        this.activePrivyUsers.delete(existingUserId);
+      } else {
+        this.removePrivyMappingForSession(sessionId);
+      }
+
+      try {
+        existingClient.leave(1000, reason);
+      } catch (error) {
+        console.log('⚠️ Error disconnecting existing client:', error);
+      }
+    } else {
+      this.removePrivyMappingForSession(sessionId);
+    }
+
+    if (this.state.players.has(sessionId)) {
+      this.state.players.delete(sessionId);
+    }
+  }
+
   onCreate() {
     console.log("🌍 Arena room initialized");
-    
+
     // Initialize game state
     this.setState(new GameState());
     this.state.worldSize = this.worldSize;
@@ -99,7 +141,7 @@ export class ArenaRoom extends Room<GameState> {
   onJoin(client: Client, options: any = {}) {
     const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
     const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
-    
+
     console.log(`👋 Player attempting to join: ${playerName} (${client.sessionId}) - privyUserId: ${privyUserId}`);
     
     // Store client metadata FIRST (before deduplication check)
@@ -108,10 +150,19 @@ export class ArenaRoom extends Room<GameState> {
       playerName,
       lastInputTime: Date.now()
     };
-    
+
+    // Ensure only a single active connection per authenticated Privy user
+    if (!privyUserId.startsWith('anonymous_')) {
+      const existingSessionId = this.activePrivyUsers.get(privyUserId);
+      if (existingSessionId && existingSessionId !== client.sessionId) {
+        console.log(`⚠️ Active session already exists for privyUserId ${privyUserId} (${existingSessionId}) - cleaning up before joining`);
+        this.forceRemoveSession(existingSessionId, 'Duplicate Privy user connection detected');
+      }
+    }
+
     // ROBUST DEDUPLICATION: Check existing players in game state directly
     let duplicateSessions: string[] = [];
-    
+
     this.state.players.forEach((existingPlayer, existingSessionId) => {
       // Skip checking against self
       if (existingSessionId === client.sessionId) return;
@@ -137,29 +188,18 @@ export class ArenaRoom extends Room<GameState> {
         duplicateSessions.push(existingSessionId);
       }
     });
-    
+
     // Remove ALL duplicate players found
     if (duplicateSessions.length > 0) {
       console.log(`🧹 Removing ${duplicateSessions.length} duplicate player(s) to prevent confusion`);
       duplicateSessions.forEach(sessionId => {
         console.log(`🧹 Removing duplicate player: ${sessionId}`);
-        this.state.players.delete(sessionId);
-        
-        // Also disconnect the old client
-        const oldClient = this.clients.find(c => c.sessionId === sessionId);
-        if (oldClient) {
-          console.log(`🔌 Disconnecting old client: ${sessionId}`);
-          try {
-            oldClient.leave(1000, 'Duplicate connection detected');
-          } catch (error) {
-            console.log('⚠️ Error disconnecting old client:', error);
-          }
-        }
+        this.forceRemoveSession(sessionId, 'Duplicate connection detected');
       });
     } else {
       console.log(`✅ No duplicates found for ${playerName} - proceeding with join`);
     }
-    
+
     // Create new player
     const player = new Player();
     player.name = playerName;
@@ -195,10 +235,14 @@ export class ArenaRoom extends Room<GameState> {
     player.spawnProtectionTime = 6000; // 6 seconds protection
     
     console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
-    
+
     // Add player to game state
     this.state.players.set(client.sessionId, player);
-    
+
+    if (!privyUserId.startsWith('anonymous_')) {
+      this.activePrivyUsers.set(privyUserId, client.sessionId);
+    }
+
     console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)}) - No duplicates!`);
   }
 
@@ -339,6 +383,13 @@ export class ArenaRoom extends Room<GameState> {
     if (player) {
       console.log(`👋 Player left: ${player.name} (${client.sessionId})`);
       this.state.players.delete(client.sessionId);
+    }
+
+    const userData = (client as any).userData;
+    if (userData?.privyUserId && this.activePrivyUsers.get(userData.privyUserId) === client.sessionId) {
+      this.activePrivyUsers.delete(userData.privyUserId);
+    } else {
+      this.removePrivyMappingForSession(client.sessionId);
     }
   }
 
