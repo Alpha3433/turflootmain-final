@@ -489,7 +489,8 @@ const MultiplayerArena = () => {
       // Add timeout to connection attempt
       const connectionTimeout = setTimeout(() => {
         isConnectingRef.current = false // Reset connection flag on timeout
-        console.error('❌ Connection timeout after 15 seconds')
+        GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on timeout
+        console.error(`❌ [${componentId}] Connection timeout after 15 seconds`)
         setConnectionStatus('failed')
       }, 15000)
       
@@ -504,10 +505,12 @@ const MultiplayerArena = () => {
       clearTimeout(connectionTimeout)
       
       wsRef.current = room
+      GLOBAL_CONNECTION_TRACKER.activeConnection = room // Store in global tracker
       isConnectingRef.current = false // Reset connection flag on success
-      console.log('🔗 Setting initial connection status to connected')
+      GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on success
+      console.log(`🔗 [${componentId}] Setting initial connection status to connected`)
       setConnectionStatus('connected')
-      console.log('✅ Connected to dedicated arena:', room.id)
+      console.log(`✅ [${componentId}] Connected to dedicated arena:`, room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
       
       // Set expected session ID in game engine for camera stability
