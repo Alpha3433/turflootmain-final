@@ -172,10 +172,10 @@ const MultiplayerArena = () => {
       console.log('Starting cash out process via button')
       setIsCashingOut(true)
       setCashOutProgress(0)
-      
+
       // Send cash out start message to server
-      if (roomRef.current) {
-        roomRef.current.send("cashout", { action: "start" })
+      if (wsRef.current) {
+        wsRef.current.send("cashout", { action: "start" })
         console.log('📡 Sent cash out start message to server')
       }
     } else if (isCashingOut) {
@@ -184,14 +184,13 @@ const MultiplayerArena = () => {
       setCashOutProgress(0)
       if (cashOutIntervalRef.current) {
         clearInterval(cashOutIntervalRef.current)
-      }
-      
-      // Send cash out stop message to server  
-      if (roomRef.current) {
-        roomRef.current.send("cashout", { action: "stop" })
-        console.log('📡 Sent cash out stop message to server')
-      }
         cashOutIntervalRef.current = null
+      }
+
+      // Send cash out stop message to server
+      if (wsRef.current) {
+        wsRef.current.send("cashout", { action: "stop" })
+        console.log('📡 Sent cash out stop message to server')
       }
     }
   }
@@ -241,12 +240,12 @@ const MultiplayerArena = () => {
         setCashOutProgress(0)
         
         // Send cash out start message to server
-        if (roomRef.current) {
-          roomRef.current.send("cashout", { action: "start" })
+        if (wsRef.current) {
+          wsRef.current.send("cashout", { action: "start" })
           console.log('📡 Sent cash out start message to server')
         }
       }
-      
+
       // Handle SPACE key for splitting
       if (e.key === ' ' && gameReady && gameRef.current) {
         e.preventDefault()
@@ -262,8 +261,8 @@ const MultiplayerArena = () => {
         setCashOutProgress(0)
         
         // Send cash out stop message to server
-        if (roomRef.current) {
-          roomRef.current.send("cashout", { action: "stop" })
+        if (wsRef.current) {
+          wsRef.current.send("cashout", { action: "stop" })
           console.log('📡 Sent cash out stop message to server')
         }
         if (cashOutIntervalRef.current) {
