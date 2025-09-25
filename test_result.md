@@ -323,6 +323,17 @@ backend:
     stuck_count: 0
     priority: "high"
     needs_retesting: false
+  - task: "Arena Playable Area Expansion"
+    implemented: true
+    working: "NA"
+    file: "/app/src/rooms/ArenaRoom.ts, /app/build/rooms/ArenaRoom.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "ARENA PLAYABLE AREA EXPANSION COMPLETED: Successfully expanded the playable area in arena mode from 1200 to 1800 pixel radius to match the minimap representation and local agario mode. KEY CHANGES: 1) Updated safeZoneRadius from 1200 to 1800 pixels in both generateSafeSpawnPosition() and generateCircularSpawnPosition() functions, 2) Modified both TypeScript source (/app/src/rooms/ArenaRoom.ts) and compiled JavaScript (/app/build/rooms/ArenaRoom.js) for immediate effect, 3) Updated comments to reflect 'Expanded to match minimap and local agario (full playable area)', 4) Arena now uses same 1800 pixel radius as local agario practice mode and matches what minimap displays. Services restarted to apply changes. EXPECTED RESULT: Players and objects now spawn across the full 1800 pixel radius area, giving much more spacious gameplay that matches the minimap boundaries and local agario experience."
     status_history:
         - working: "NA"
         - agent: "main"
