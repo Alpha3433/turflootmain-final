@@ -132,12 +132,12 @@ user_problem_statement: "CASH OUT RING SYSTEM IN ARENA MODE: User requests compr
 
 test_plan:
   current_focus:
-    - "Server-Side Spawn Protection Testing"
-    - "Protection Timer Logic Verification"
-    - "Collision Prevention Testing"
-    - "Respawn Protection Testing"
-    - "Protection Synchronization Testing"
-    - "Protection Properties Testing"
+    - "Server-Side Cash Out State Testing"
+    - "Cash Out Message Handling Verification"
+    - "Progress Tracking Testing"
+    - "Reward System Testing"
+    - "State Synchronization Testing"
+    - "Multi-User Visibility Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
