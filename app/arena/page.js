@@ -108,13 +108,11 @@ const MultiplayerArena = () => {
     return fallbackName
   }
   
-  const playerName = getPlayerDisplayName()
   const privyUserId = user?.id || null
   
   console.log('🎮 Arena parameters:')
   console.log('  - roomId:', roomId)  
   console.log('  - authenticated user:', !!user)
-  console.log('  - playerName (from Privy):', playerName)
   console.log('  - privyUserId (from Privy):', privyUserId)
 
   // Authentication loading state
