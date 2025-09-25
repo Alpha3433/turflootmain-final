@@ -123,12 +123,12 @@ class PlayerMassTestSuite:
                 'success': False
             }
 
-    async def test_api_health(self):
+    def test_api_health(self):
         """Test API health and availability"""
         print("🏥 Testing API health and backend availability...")
         
         # Test root API endpoint
-        response = await self.make_request('GET', '')
+        response = self.make_request('GET', '')
         
         if response['success']:
             data = response['data']
@@ -151,12 +151,12 @@ class PlayerMassTestSuite:
             print(f"❌ API Health Check Failed: {error_msg}")
             self.record_test_result("API Health Check", False, f"API not accessible: {error_msg}")
 
-    async def test_colyseus_server_integration(self):
+    def test_colyseus_server_integration(self):
         """Test Colyseus server integration for arena mode"""
         print("🎮 Testing Colyseus server integration...")
         
         # Test servers endpoint
-        response = await self.make_request('GET', 'servers')
+        response = self.make_request('GET', 'servers')
         
         if response['success']:
             data = response['data']
@@ -191,7 +191,7 @@ class PlayerMassTestSuite:
             print(f"❌ Colyseus Server Integration Failed: {error_msg}")
             self.record_test_result("Colyseus Server Integration", False, f"Failed to get server info: {error_msg}")
 
-    async def test_player_schema_default_mass(self):
+    def test_player_schema_default_mass(self):
         """Test Player schema default mass value by analyzing source code"""
         print("📋 Testing Player schema default mass value...")
         
@@ -248,7 +248,7 @@ class PlayerMassTestSuite:
             print(f"❌ Error analyzing Player schema: {str(e)}")
             self.record_test_result("Player Schema Analysis", False, f"Error reading source files: {str(e)}")
 
-    async def test_arena_server_player_creation(self):
+    def test_arena_server_player_creation(self):
         """Test arena server player creation logic"""
         print("👤 Testing arena server player creation logic...")
         
@@ -305,7 +305,7 @@ class PlayerMassTestSuite:
             print(f"❌ Error analyzing player creation: {str(e)}")
             self.record_test_result("Player Creation Analysis", False, f"Error analyzing source: {str(e)}")
 
-    async def test_player_starting_mass_code(self):
+    def test_player_starting_mass_code(self):
         """Test player starting mass in all code paths"""
         print("🔍 Testing player starting mass in all code paths...")
         
@@ -357,7 +357,7 @@ class PlayerMassTestSuite:
             print(f"❌ Error analyzing starting mass code: {str(e)}")
             self.record_test_result("Starting Mass Code Analysis", False, f"Error: {str(e)}")
 
-    async def test_player_respawn_mass_code(self):
+    def test_player_respawn_mass_code(self):
         """Test player respawn mass logic"""
         print("🔄 Testing player respawn mass logic...")
         
@@ -444,7 +444,7 @@ class PlayerMassTestSuite:
             print(f"❌ Error analyzing respawn mass: {str(e)}")
             self.record_test_result("Respawn Mass Analysis", False, f"Error: {str(e)}")
 
-    async def test_mass_consistency_verification(self):
+    def test_mass_consistency_verification(self):
         """Test mass consistency across all game mechanics"""
         print("⚖️  Testing mass consistency across all game mechanics...")
         
@@ -505,13 +505,13 @@ class PlayerMassTestSuite:
             print(f"❌ Error analyzing mass consistency: {str(e)}")
             self.record_test_result("Mass Consistency Analysis", False, f"Error: {str(e)}")
 
-    async def test_arena_server_configuration(self):
+    def test_arena_server_configuration(self):
         """Test arena server configuration for proper player mass handling"""
         print("⚙️  Testing arena server configuration...")
         
         try:
             # Test if we can get server configuration
-            response = await self.make_request('GET', 'servers')
+            response = self.make_request('GET', 'servers')
             
             if response['success']:
                 data = response['data']
