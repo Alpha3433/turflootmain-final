@@ -21,7 +21,7 @@ import os
 import re
 
 # Configuration
-BASE_URL = "https://smooth-mover.preview.emergentagent.com"
+BASE_URL = "https://turfloot-multiplayer-1.preview.emergentagent.com"
 COLYSEUS_ENDPOINT = "wss://au-syd-ab3eaf4e.colyseus.cloud"
 
 class SpawnProtectionTester:
