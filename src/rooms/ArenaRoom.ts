@@ -394,6 +394,26 @@ export class ArenaRoom extends Room<GameState> {
         }
       }
       
+      // Update cash out progress (3-second duration like local agario)
+      if (player.isCashingOut) {
+        const cashOutDuration = 3000; // 3 seconds to complete
+        const elapsed = now - player.cashOutStart;
+        player.cashOutProgress = Math.min((elapsed / cashOutDuration) * 100, 100);
+        
+        // Complete cash out when progress reaches 100%
+        if (player.cashOutProgress >= 100) {
+          player.isCashingOut = false;
+          player.cashOutProgress = 0;
+          player.cashOutStart = 0;
+          
+          // Award points based on mass (similar to local agario)
+          const cashOutReward = Math.floor(player.mass * 2); // 2x mass as reward
+          player.score += cashOutReward;
+          
+          console.log(`✅ ${player.name} completed cash out - reward: ${cashOutReward} points`);
+        }
+      }
+      
       // Smooth movement toward target (vx and vy are being used as targetX and targetY)
       const targetX = player.vx;
       const targetY = player.vy;
