@@ -21,7 +21,7 @@ const MultiplayerArena = () => {
   const [gameReady, setGameReady] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState('connecting')
   const [playerCount, setPlayerCount] = useState(0)
-  const [mass, setMass] = useState(100)
+  const [mass, setMass] = useState(25) // Fixed to match server starting mass
   const [score, setScore] = useState(0)
   const [serverState, setServerState] = useState(null)
   const [timeSurvived, setTimeSurvived] = useState(0)
