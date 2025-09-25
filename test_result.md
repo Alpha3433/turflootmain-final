@@ -128,7 +128,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "DUPLICATE PLAYER INSTANCES FIX: User reports getting duplicate instances of their character appearing in the Colyseus cloud game when joining an arena game. The issue prevents having only 1 user character appear in game as expected. Fix required to eliminate multiple player instances for the same user connection."
+user_problem_statement: "ARENA MODE STARTING MASS VERIFICATION: User reports that when players join arena mode, their starting mass is still 100 instead of the expected 25. Need to verify that server-side spawn mass testing, respawn mass testing, client-server mass synchronization, and arena connection testing all correctly use mass = 25."
 
 # Test plan for this run
 
