@@ -182,6 +182,11 @@ export class ArenaRoom extends Room<GameState> {
     player.lastSeq = 0;
     player.alive = true;
     
+    // Initialize spawn protection
+    player.spawnProtection = true;
+    player.spawnProtectionStart = Date.now();
+    player.spawnProtectionTime = 6000; // 6 seconds protection
+    
     console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
     
     // Add player to game state
