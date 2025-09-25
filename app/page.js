@@ -10311,13 +10311,13 @@ export default function TurfLootTactical() {
             </button>
           </div>
 
-          {/* Squad Panel - Enhanced Missions Style */}
+          {/* Missions Panel - Mobile Version (replacing PARTY) */}
           <div style={{
             ...tacticalPanelStyle,
             border: '2px solid rgba(252, 129, 129, 0.3)',
             position: 'relative'
           }}>
-            {/* Status Indicator (like missions panel) */}
+            {/* Status Indicator */}
             <div style={{
               position: 'absolute',
               top: '5px',
@@ -10340,59 +10340,34 @@ export default function TurfLootTactical() {
                 textShadow: '0 0 10px rgba(252, 129, 129, 0.6)',
                 textTransform: 'uppercase'
               }}>
-                PARTY
+                MISSIONS
               </h3>
               <div style={{ marginLeft: 'auto' }}>
                 <button 
                   onClick={async () => {
-                    console.log('🔄 Mobile PARTY REFRESH button clicked - refreshing lobby data...')
+                    console.log('🔄 Mobile MISSIONS REFRESH button clicked - refreshing mission data...')
                     
                     try {
-                      // Show loading state
-                      setLoadingParty(true)
+                      // Refresh challenges data from localStorage
+                      const userKey = isAuthenticated ? 
+                        `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
+                        'challenges_guest'
                       
-                      console.log('🔄 Mobile Step 1: Refreshing current party data...')
-                      await loadCurrentParty()
-                      
-                      console.log('🔄 Mobile Step 2: Refreshing friends list with updated skin data...')
-                      await loadFriendsList()
-                      
-                      console.log('🔄 Mobile Step 3: Refreshing friend requests and party invites...')
-                      await loadFriendRequests()
-                      
-                      console.log('🔄 Mobile Step 4: Refreshing available users list...')
-                      await loadAvailableUsers()
-                      
-                      // Force re-register user to update skin data
-                      if (isAuthenticated && user) {
-                        console.log('🔄 Mobile Step 5: Updating user skin data...')
-                        await registerPrivyUser()
+                      const savedChallenges = localStorage.getItem(userKey)
+                      if (savedChallenges) {
+                        const challengesData = JSON.parse(savedChallenges)
+                        console.log('✅ Mission data refreshed:', challengesData)
+                      } else {
+                        console.log('ℹ️ No existing mission data found')
                       }
                       
-                      console.log('✅ Mobile PARTY REFRESH completed successfully!')
-                      
-                      // Brief success indicator for mobile
-                      const refreshButton = document.querySelector('[data-mobile-refresh-text]')
-                      if (refreshButton) {
-                        refreshButton.textContent = '✅'
-                        setTimeout(() => {
-                          refreshButton.textContent = '🔄 REFRESH'
-                        }, 1500)
-                      }
+                      // Force re-render by updating a timestamp
+                      const refreshKey = `missions_refresh_${Date.now()}`
+                      localStorage.setItem(refreshKey, 'true')
+                      setTimeout(() => localStorage.removeItem(refreshKey), 1000)
                       
                     } catch (error) {
-                      console.error('❌ Mobile PARTY REFRESH failed:', error)
-                      
-                      // Show error feedback for mobile
-                      const refreshButton = document.querySelector('[data-mobile-refresh-text]')
-                      if (refreshButton) {
-                        refreshButton.textContent = '❌'
-                        setTimeout(() => {
-                          refreshButton.textContent = '🔄 REFRESH'
-                        }, 1500)
-                      }
-                    } finally {
-                      setLoadingParty(false)
+                      console.error('❌ Error refreshing mission data:', error)
                     }
                   }}
                   style={{ 
@@ -10414,10 +10389,410 @@ export default function TurfLootTactical() {
                   onMouseOut={(e) => {
                     e.target.style.color = '#fc8181'
                   }}
-                  title="Refresh party data"
+                  title="Refresh mission progress"
                 >
-                  <span data-mobile-refresh-text>🔄 REFRESH</span>
+                  🔄 REFRESH
                 </button>
+                
+                {/* Mobile View All Missions Button */}
+                <button 
+                  onClick={() => {
+                    console.log('📱 Mobile ALL MISSIONS button clicked')
+                    // Create mobile missions modal
+                    // You can add modal functionality here if needed
+                    alert('Mobile missions modal - Coming soon!')
+                  }}
+                  style={{ 
+                    fontSize: '9px', 
+                    color: '#fc8181', 
+                    background: 'rgba(252, 129, 129, 0.1)', 
+                    border: '1px solid rgba(252, 129, 129, 0.3)', 
+                    cursor: 'pointer', 
+                    fontWeight: '600', 
+                    fontFamily: '"Rajdhani", sans-serif',
+                    padding: '2px 6px',
+                    borderRadius: '2px',
+                    marginLeft: '4px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.2)'
+                    e.target.style.borderColor = '#fc8181'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.background = 'rgba(252, 129, 129, 0.1)'
+                    e.target.style.borderColor = 'rgba(252, 129, 129, 0.3)'
+                  }}
+                >
+                  ALL
+                </button>
+              </div>
+            </div>
+            
+            <div style={{ 
+              background: 'rgba(26, 32, 44, 0.8)', 
+              borderRadius: '8px', 
+              padding: '10px', 
+              border: '2px solid rgba(252, 129, 129, 0.3)',
+              marginBottom: '8px',
+              position: 'relative',
+              minHeight: '100px'
+            }}>
+              {/* Mobile Mission Cycle */}
+              {(() => {
+                // Get user-specific challenges data
+                const userKey = isAuthenticated ? 
+                  `challenges_${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}` :
+                  'challenges_guest'
+                
+                let challengesData = {}
+                try {
+                  const saved = localStorage.getItem(userKey)
+                  challengesData = saved ? JSON.parse(saved) : {}
+                } catch (error) {
+                  console.error('Error loading challenges:', error)
+                }
+                
+                // Mobile-optimized challenges
+                const mobileDefaultChallenges = [
+                  { 
+                    id: 'eat_50_coins', 
+                    name: 'Coin Collector', 
+                    description: 'Eat 50 coins', 
+                    target: 50, 
+                    reward: 100,
+                    icon: '💰',
+                    type: 'daily'
+                  },
+                  { 
+                    id: 'survive_5_minutes', 
+                    name: 'Survivor', 
+                    description: 'Survive 5 mins', 
+                    target: 300,
+                    reward: 150,
+                    icon: '⏱️',
+                    type: 'daily'
+                  },
+                  { 
+                    id: 'reach_mass_200', 
+                    name: 'Growing Strong', 
+                    description: 'Reach mass 200', 
+                    target: 200, 
+                    reward: 200,
+                    icon: '📈',
+                    type: 'weekly'
+                  },
+                  { 
+                    id: 'cashout_5_times', 
+                    name: 'Cash Master', 
+                    description: 'Cash out 5 times', 
+                    target: 5, 
+                    reward: 250,
+                    icon: '💰',
+                    type: 'weekly'
+                  }
+                ]
+                
+                const currentChallenge = mobileDefaultChallenges[currentChallengeIndex] || mobileDefaultChallenges[0]
+                const progress = challengesData[currentChallenge.id] || { current: 0, completed: false }
+                const progressPercent = Math.min((progress.current / currentChallenge.target) * 100, 100)
+                const isCompleted = progress.completed || progress.current >= currentChallenge.target
+                
+                return (
+                  <div style={{ position: 'relative' }}>
+                    {/* Mobile Mission Card */}
+                    <div style={{
+                      padding: '8px',
+                      background: isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)',
+                      borderRadius: '6px',
+                      border: `2px solid ${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'}`,
+                      position: 'relative',
+                      textAlign: 'center'
+                    }}>
+                      {/* Mission Header - Mobile Optimized */}
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between',
+                        gap: '6px',
+                        marginBottom: '6px',
+                        width: '100%'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          flex: '1',
+                          minWidth: 0
+                        }}>
+                          <span style={{ 
+                            fontSize: '16px',
+                            flexShrink: 0
+                          }}>
+                            {currentChallenge.icon}
+                          </span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{
+                              fontSize: '11px',
+                              fontWeight: '700',
+                              color: isCompleted ? '#68d391' : '#e2e8f0',
+                              fontFamily: '"Rajdhani", sans-serif',
+                              textTransform: 'uppercase',
+                              marginBottom: '1px',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}>
+                              {currentChallenge.name}
+                            </div>
+                            <div style={{
+                              fontSize: '9px',
+                              color: '#a0aec0',
+                              fontFamily: '"Rajdhani", sans-serif',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}>
+                              {currentChallenge.description}
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{
+                          padding: '2px 4px',
+                          background: currentChallenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 'rgba(139, 92, 246, 0.2)',
+                          border: `1px solid ${currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6'}`,
+                          borderRadius: '2px',
+                          fontSize: '8px',
+                          color: currentChallenge.type === 'daily' ? '#f6ad55' : '#8b5cf6',
+                          textTransform: 'uppercase',
+                          fontFamily: '"Rajdhani", sans-serif',
+                          fontWeight: '600',
+                          flexShrink: 0
+                        }}>
+                          {currentChallenge.type}
+                        </div>
+                      </div>
+                      
+                      {/* Mobile Progress Bar */}
+                      <div style={{
+                        background: 'rgba(45, 55, 72, 0.8)',
+                        borderRadius: '8px',
+                        height: '4px',
+                        overflow: 'hidden',
+                        marginBottom: '6px',
+                        position: 'relative',
+                        border: '1px solid rgba(148, 163, 184, 0.2)'
+                      }}>
+                        <div style={{
+                          background: isCompleted ? 
+                            'linear-gradient(90deg, #68d391 0%, #48bb78 50%, #68d391 100%)' : 
+                            'linear-gradient(90deg, #fc8181 0%, #f56565 50%, #fc8181 100%)',
+                          height: '100%',
+                          width: `${progressPercent}%`,
+                          transition: 'width 0.8s ease-in-out',
+                          borderRadius: '8px',
+                          boxShadow: isCompleted ? 
+                            '0 0 6px rgba(104, 211, 145, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)' : 
+                            `0 0 6px rgba(252, 129, 129, ${Math.max(0.3, progressPercent / 100 * 0.8)}), inset 0 1px 0 rgba(255, 255, 255, 0.2)`,
+                          position: 'relative'
+                        }}>
+                          {!isCompleted && progressPercent > 0 && (
+                            <div style={{
+                              position: 'absolute',
+                              top: 0,
+                              right: '-3px',
+                              width: '6px',
+                              height: '100%',
+                              background: 'linear-gradient(90deg, transparent, rgba(252, 129, 129, 0.8), transparent)',
+                              borderRadius: '8px',
+                              animation: 'progressGlow 2s ease-in-out infinite'
+                            }} />
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Mobile Progress Text & Reward */}
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        marginBottom: '6px'
+                      }}>
+                        <span style={{
+                          fontSize: '10px',
+                          color: '#a0aec0',
+                          fontFamily: '"Rajdhani", sans-serif',
+                          fontWeight: '600'
+                        }}>
+                          {isCompleted ? 'COMPLETED' : `${Math.round(progressPercent)}%`}
+                        </span>
+                        <span style={{
+                          fontSize: '12px',
+                          color: '#fbbf24',
+                          fontFamily: '"Rajdhani", sans-serif',
+                          fontWeight: '800',
+                          textShadow: '0 0 8px rgba(251, 191, 36, 0.8)',
+                          animation: isCompleted ? 'goldPulse 2s ease-in-out infinite' : 'none'
+                        }}>
+                          {isCompleted ? '✅ READY' : `+${currentChallenge.reward}`}
+                        </span>
+                      </div>
+                      
+                      {/* Completion Overlay */}
+                      {isCompleted && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '6px',
+                          right: '6px',
+                          background: '#68d391',
+                          color: '#1a202c',
+                          borderRadius: '50%',
+                          width: '18px',
+                          height: '18px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          fontWeight: 'bold',
+                          boxShadow: '0 0 6px rgba(104, 211, 145, 0.6)'
+                        }}>
+                          ✓
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Mobile Navigation with Arrows and Dots */}
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: '6px',
+                      marginTop: '6px'
+                    }}>
+                      {/* Left Arrow - Mobile */}
+                      <button
+                        onClick={() => {
+                          const newIndex = currentChallengeIndex === 0 ? mobileDefaultChallenges.length - 1 : currentChallengeIndex - 1
+                          setCurrentChallengeIndex(newIndex)
+                        }}
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '3px',
+                          border: 'none',
+                          background: 'linear-gradient(90deg, #fc8181 0%, #f56565 100%)',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 0 6px rgba(252, 129, 129, 0.4)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          color: '#ffffff',
+                          fontWeight: 'bold'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #f56565 0%, #e53e3e 100%)'
+                          e.target.style.transform = 'scale(1.1)'
+                          e.target.style.boxShadow = '0 0 8px rgba(252, 129, 129, 0.8)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #fc8181 0%, #f56565 100%)'
+                          e.target.style.transform = 'scale(1)'
+                          e.target.style.boxShadow = '0 0 6px rgba(252, 129, 129, 0.4)'
+                        }}
+                      >
+                        ‹
+                      </button>
+
+                      {mobileDefaultChallenges.map((_, index) => {
+                        const challengeProgress = challengesData[mobileDefaultChallenges[index].id] || { current: 0, completed: false }
+                        const challengeCompleted = challengeProgress.completed || challengeProgress.current >= mobileDefaultChallenges[index].target
+                        const isActive = index === currentChallengeIndex
+                        
+                        return (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentChallengeIndex(index)}
+                            style={{
+                              width: isActive ? '18px' : '6px',
+                              height: '6px',
+                              borderRadius: '3px',
+                              border: 'none',
+                              background: challengeCompleted ? 
+                                'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
+                                (isActive ? 
+                                  'linear-gradient(90deg, #fc8181 0%, #f56565 100%)' : 
+                                  'rgba(148, 163, 184, 0.4)'),
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease',
+                              boxShadow: isActive ? 
+                                (challengeCompleted ? 
+                                  '0 0 6px rgba(104, 211, 145, 0.6)' : 
+                                  '0 0 6px rgba(252, 129, 129, 0.6)') : 
+                                'none',
+                              transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                            }}
+                            onMouseOver={(e) => {
+                              if (!isActive) {
+                                e.target.style.background = challengeCompleted ? 
+                                  'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
+                                  'rgba(252, 129, 129, 0.6)'
+                                e.target.style.transform = 'scale(1.05)'
+                              }
+                            }}
+                            onMouseOut={(e) => {
+                              if (!isActive) {
+                                e.target.style.background = challengeCompleted ? 
+                                  'linear-gradient(90deg, #68d391 0%, #48bb78 100%)' : 
+                                  'rgba(148, 163, 184, 0.4)'
+                                e.target.style.transform = 'scale(1)'
+                              }
+                            }}
+                          />
+                        )
+                      })}
+
+                      {/* Right Arrow - Mobile */}
+                      <button
+                        onClick={() => {
+                          const newIndex = currentChallengeIndex === mobileDefaultChallenges.length - 1 ? 0 : currentChallengeIndex + 1
+                          setCurrentChallengeIndex(newIndex)
+                        }}
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '3px',
+                          border: 'none',
+                          background: 'linear-gradient(90deg, #fc8181 0%, #f56565 100%)',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 0 6px rgba(252, 129, 129, 0.4)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          color: '#ffffff',
+                          fontWeight: 'bold'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #f56565 0%, #e53e3e 100%)'
+                          e.target.style.transform = 'scale(1.1)'
+                          e.target.style.boxShadow = '0 0 8px rgba(252, 129, 129, 0.8)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.background = 'linear-gradient(90deg, #fc8181 0%, #f56565 100%)'
+                          e.target.style.transform = 'scale(1)'
+                          e.target.style.boxShadow = '0 0 6px rgba(252, 129, 129, 0.4)'
+                        }}
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </div>
+                )
+              })()}
+            </div>
                 
                 {/* Mobile Leave Party Button - Only show when in a party */}
                 {currentParty && (
