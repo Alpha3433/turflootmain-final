@@ -1512,7 +1512,7 @@ const MultiplayerArena = () => {
       
       this.ctx.restore()
     }
-  }
+  } // End of MultiplayerGameEngine class
 
   // Initialize game ONLY when authenticated
   useEffect(() => {
