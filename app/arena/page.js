@@ -2212,7 +2212,6 @@ const MultiplayerArena = () => {
             if (!isMobile) return
             // No transform on touch end to prevent movement
           }}
-          }}
         >
           <span style={{ 
             textAlign: 'center',
