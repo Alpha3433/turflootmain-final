@@ -132,11 +132,12 @@ user_problem_statement: "SPAWN PROTECTION SYSTEM IN ARENA MODE: User requests co
 
 test_plan:
   current_focus:
-    - "Player Starting Mass Verification"
-    - "Player Schema Default Mass Testing"
-    - "Player Respawn Mass Testing"
-    - "Mass Consistency Verification"
-    - "Arena Server Configuration Testing"
+    - "Server-Side Spawn Protection Testing"
+    - "Protection Timer Logic Verification"
+    - "Collision Prevention Testing"
+    - "Respawn Protection Testing"
+    - "Protection Synchronization Testing"
+    - "Protection Properties Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
