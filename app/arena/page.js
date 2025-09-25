@@ -1017,7 +1017,7 @@ const MultiplayerArena = () => {
                    'session:', currentPlayer.sessionId, 
                    'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
         
-        // IMPROVED SERVER RECONCILIATION for client-side prediction
+        // IMPROVED SERVER RECONCILIATION for smooth gliding movement
         if (this.player.x && this.player.y) {
           const distance = Math.sqrt(
             Math.pow(currentPlayer.x - this.player.x, 2) + 
@@ -1030,20 +1030,33 @@ const MultiplayerArena = () => {
             distance: distance.toFixed(1)
           })
           
-          // REDUCED SERVER RECONCILIATION for better client prediction dominance
+          // SMOOTH RECONCILIATION that works with gliding movement
           if (distance > 300) {
-            // Very large desync - snap to server position immediately
+            // Very large desync - snap to server position and reset targets
             console.log('⚡ Major desync detected - snapping to server position')
             this.player.x = currentPlayer.x
             this.player.y = currentPlayer.y
-          } else if (distance > 150) {
-            // Large desync - use moderate correction (reduced from 0.6 to 0.3)
-            const correctionFactor = 0.3
-            this.player.x += (currentPlayer.x - this.player.x) * correctionFactor
-            this.player.y += (currentPlayer.y - this.player.y) * correctionFactor
+            this.player.targetX = currentPlayer.x
+            this.player.targetY = currentPlayer.y
+          } else if (distance > 100) {
+            // Large desync - smooth correction by updating target position
+            const correctionFactor = 0.4
+            const correctedX = this.player.x + (currentPlayer.x - this.player.x) * correctionFactor
+            const correctedY = this.player.y + (currentPlayer.y - this.player.y) * correctionFactor
+            
+            this.player.x = correctedX
+            this.player.y = correctedY
+            
+            // Also update target to maintain smooth movement
+            if (this.player.targetX && this.player.targetY) {
+              const targetOffsetX = this.player.targetX - this.player.x
+              const targetOffsetY = this.player.targetY - this.player.y
+              this.player.targetX = correctedX + targetOffsetX
+              this.player.targetY = correctedY + targetOffsetY
+            }
           } else if (distance > 50) {
-            // Medium desync - very gentle correction (reduced from 0.2 to 0.1)
-            const correctionFactor = 0.1
+            // Medium desync - very gentle correction
+            const correctionFactor = 0.15
             this.player.x += (currentPlayer.x - this.player.x) * correctionFactor
             this.player.y += (currentPlayer.y - this.player.y) * correctionFactor
           }
