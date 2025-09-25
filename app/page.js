@@ -10795,7 +10795,7 @@ export default function TurfLootTactical() {
             </div>
           </div>
 
-          {/* Mobile Communications Button */}
+        {/* Mobile Communications Button */}
         <div style={{ textAlign: 'center' }}>
           <button 
             onClick={() => window.open('https://discord.gg/WbGTJPPTPs', '_blank')}
