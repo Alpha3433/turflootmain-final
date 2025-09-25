@@ -479,7 +479,13 @@ export class ArenaRoom extends Room<GameState> {
     player.mass = 25; // Updated to 25 to match user requirement
     player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
     player.alive = true;
-    console.log(`🔄 Player respawned: ${player.name} at (${player.x.toFixed(1)}, ${player.y.toFixed(1)})`);
+    
+    // Enable spawn protection on respawn
+    player.spawnProtection = true;
+    player.spawnProtectionStart = Date.now();
+    player.spawnProtectionTime = 6000; // 6 seconds protection
+    
+    console.log(`🔄 Player respawned: ${player.name} at (${player.x.toFixed(1)}, ${player.y.toFixed(1)}) with spawn protection`);
   }
 
   generateCoins() {
