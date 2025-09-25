@@ -283,10 +283,19 @@ export class ArenaRoom extends Room<GameState> {
     const splitId = `${client.sessionId}_split_${Date.now()}`;
     const splitPlayer = new Player();
     splitPlayer.name = `${player.name}*`;
-    splitPlayer.x = player.x + dirX * (player.radius + 50); // Spawn split piece ahead
-    splitPlayer.y = player.y + dirY * (player.radius + 50);
-    splitPlayer.vx = dirX * 15; // Give initial velocity toward target
-    splitPlayer.vy = dirY * 15;
+    
+    // Position split piece safely
+    const spawnDistance = Math.max(player.radius + 30, 80); // Safe spawn distance
+    splitPlayer.x = player.x + dirX * spawnDistance;
+    splitPlayer.y = player.y + dirY * spawnDistance;
+    
+    // Keep split piece in bounds
+    splitPlayer.x = Math.max(50, Math.min(this.worldSize - 50, splitPlayer.x));
+    splitPlayer.y = Math.max(50, Math.min(this.worldSize - 50, splitPlayer.y));
+    
+    // Set split piece properties
+    splitPlayer.vx = 0; // Use target positioning instead of velocity
+    splitPlayer.vy = 0;
     splitPlayer.mass = splitMass;
     splitPlayer.radius = Math.sqrt(splitPlayer.mass) * 3; // Match agario radius formula
     splitPlayer.color = player.color;
