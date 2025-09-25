@@ -1632,7 +1632,7 @@ const MultiplayerArena = () => {
         document.body.classList.remove('mobile-game-active')
       }
     }
-  }, [ready, authenticated, user?.id]) // Add user.id to dependencies so effect responds to user data
+  }, [ready, authenticated, user?.id, playerName]) // Add playerName to dependencies so effect responds to name changes
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
