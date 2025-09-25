@@ -202,8 +202,13 @@ class SmoothMovementTester:
             # Test WebSocket connection to Colyseus server
             ws_url = COLYSEUS_ENDPOINT
             
-            # Create a simple connection test
-            async with websockets.connect(ws_url, timeout=10) as websocket:
+            # Create a simple connection test with proper timeout handling
+            try:
+                websocket = await asyncio.wait_for(
+                    websockets.connect(ws_url), 
+                    timeout=10
+                )
+                
                 # Send a basic connection message
                 await websocket.send(json.dumps({
                     "method": "joinOrCreate",
@@ -217,6 +222,8 @@ class SmoothMovementTester:
                 # Wait for response
                 response = await asyncio.wait_for(websocket.recv(), timeout=5)
                 response_data = json.loads(response)
+                
+                await websocket.close()
                 
                 if "roomId" in response_data or "sessionId" in response_data:
                     self.log_test(
@@ -233,13 +240,14 @@ class SmoothMovementTester:
                     )
                     return False
                     
-        except asyncio.TimeoutError:
-            self.log_test(
-                "Game State Synchronization", 
-                False, 
-                "WebSocket connection timeout - server may not be responding"
-            )
-            return False
+            except asyncio.TimeoutError:
+                self.log_test(
+                    "Game State Synchronization", 
+                    False, 
+                    "WebSocket connection timeout - server may not be responding"
+                )
+                return False
+                
         except Exception as e:
             self.log_test("Game State Synchronization", False, error_msg=str(e))
             return False
