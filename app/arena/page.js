@@ -1594,7 +1594,7 @@ const MultiplayerArena = () => {
       }
     }
   }, [ready, authenticated, user, isMobile, privyUserId, selectedSkin])
-  
+
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
       {/* Authentication Required Screen */}
