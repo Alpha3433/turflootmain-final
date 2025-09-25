@@ -412,29 +412,58 @@ const MultiplayerArena = () => {
 
   // Colyseus connection and input handling - ENHANCED DEBUGGING
   const connectToColyseus = async () => {
+    const componentId = componentIdRef.current
+    console.log(`🔗 [${componentId}] Connection attempt started for user:`, privyUserId)
+    
+    // GLOBAL duplicate connection prevention
+    if (GLOBAL_CONNECTION_TRACKER.isConnecting) {
+      console.log(`🔄 [${componentId}] Global connection already in progress - skipping duplicate attempt`)
+      return
+    }
+    
+    if (GLOBAL_CONNECTION_TRACKER.activeConnection && GLOBAL_CONNECTION_TRACKER.userId === privyUserId) {
+      console.log(`✅ [${componentId}] User already has active global connection - reusing existing connection`)
+      wsRef.current = GLOBAL_CONNECTION_TRACKER.activeConnection
+      setConnectionStatus('connected')
+      return
+    }
+    
     // Prevent multiple simultaneous connections
     if (isConnectingRef.current) {
-      console.log('🔄 Connection already in progress - skipping duplicate attempt')
+      console.log(`🔄 [${componentId}] Component connection already in progress - skipping duplicate attempt`)
       return
     }
     
     // Check if already connected
     if (wsRef.current && wsRef.current.sessionId) {
-      console.log('✅ Already connected to arena - skipping duplicate connection')
+      console.log(`✅ [${componentId}] Already connected to arena - skipping duplicate connection`)
       return
     }
     
     isConnectingRef.current = true
+    GLOBAL_CONNECTION_TRACKER.isConnecting = true
+    GLOBAL_CONNECTION_TRACKER.userId = privyUserId
     
-    // Prevent multiple connections - cleanup any existing connection first
+    // Cleanup any existing connection first
     if (wsRef.current) {
-      console.log('🔄 Cleaning up existing connection before creating new one...')
+      console.log(`🔄 [${componentId}] Cleaning up existing connection before creating new one...`)
       try {
         wsRef.current.leave()
       } catch (error) {
-        console.log('⚠️ Error cleaning up existing connection:', error)
+        console.log(`⚠️ [${componentId}] Error cleaning up existing connection:`, error)
       }
       wsRef.current = null
+    }
+    
+    // Also cleanup global connection if it's for a different user
+    if (GLOBAL_CONNECTION_TRACKER.activeConnection && GLOBAL_CONNECTION_TRACKER.userId !== privyUserId) {
+      console.log(`🔄 [${componentId}] Cleaning up global connection for different user`)
+      try {
+        GLOBAL_CONNECTION_TRACKER.activeConnection.leave()
+      } catch (error) {
+        console.log(`⚠️ [${componentId}] Error cleaning up global connection:`, error)
+      }
+      GLOBAL_CONNECTION_TRACKER.activeConnection = null
     }
     
     try {
