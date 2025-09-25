@@ -6650,6 +6650,42 @@ export default function TurfLootTactical() {
                         />
                       )
                     })}
+
+                    {/* Right Arrow */}
+                    <button
+                      onClick={() => {
+                        const newIndex = currentChallengeIndex === defaultChallenges.length - 1 ? 0 : currentChallengeIndex + 1
+                        setCurrentChallengeIndex(newIndex)
+                      }}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: 'linear-gradient(90deg, #fc8181 0%, #f56565 100%)',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 0 8px rgba(252, 129, 129, 0.4)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        color: '#ffffff',
+                        fontWeight: 'bold'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.background = 'linear-gradient(90deg, #f56565 0%, #e53e3e 100%)'
+                        e.target.style.transform = 'scale(1.1)'
+                        e.target.style.boxShadow = '0 0 12px rgba(252, 129, 129, 0.8)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.background = 'linear-gradient(90deg, #fc8181 0%, #f56565 100%)'
+                        e.target.style.transform = 'scale(1)'
+                        e.target.style.boxShadow = '0 0 8px rgba(252, 129, 129, 0.4)'
+                      }}
+                    >
+                      ›
+                    </button>
                   </div>
                 </div>
               )
