@@ -4652,7 +4652,10 @@ export default function TurfLootTactical() {
     boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
     fontFamily: '"Rajdhani", sans-serif',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em'
+    letterSpacing: '0.05em',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 
   const iconStyle = {
