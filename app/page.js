@@ -12542,20 +12542,7 @@ export default function TurfLootTactical() {
         </div>
       )}
       
-      {/* Debug: Local Practice Loading State */}
-      <div style={{
-        position: 'fixed',
-        bottom: '10px',
-        left: '10px',
-        background: localPracticeLoading ? 'green' : 'gray',
-        color: 'white',
-        padding: '8px',
-        zIndex: 9999,
-        fontSize: '12px',
-        borderRadius: '4px'
-      }}>
-        Loading State: {localPracticeLoading.toString()}
-      </div>
+      {/* Debug: Local Practice Loading State - REMOVED FOR MOBILE */}
 
       {/* Local Practice Loading Popup - Desktop Only - SIMPLIFIED */}
       {localPracticeLoading && (
