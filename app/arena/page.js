@@ -2133,7 +2133,7 @@ const MultiplayerArena = () => {
           }}
           onTouchEnd={(e) => {
             if (!isMobile) return
-            e.target.style.transform = 'translateX(-50%) scale(1)'
+            // No transform on touch end to prevent movement
           }}
           onMouseDown={isMobile ? undefined : handleCashOut}
         >
