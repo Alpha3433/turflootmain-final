@@ -260,6 +260,12 @@ const MultiplayerArena = () => {
         console.log('Canceling cash out - E key released')
         setIsCashingOut(false)
         setCashOutProgress(0)
+        
+        // Send cash out stop message to server
+        if (roomRef.current) {
+          roomRef.current.send("cashout", { action: "stop" })
+          console.log('📡 Sent cash out stop message to server')
+        }
         if (cashOutIntervalRef.current) {
           clearInterval(cashOutIntervalRef.current)
           cashOutIntervalRef.current = null
