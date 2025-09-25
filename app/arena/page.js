@@ -404,6 +404,20 @@ const MultiplayerArena = () => {
 
   // Colyseus connection and input handling - ENHANCED DEBUGGING
   const connectToColyseus = async () => {
+    // Prevent multiple simultaneous connections
+    if (isConnectingRef.current) {
+      console.log('🔄 Connection already in progress - skipping duplicate attempt')
+      return
+    }
+    
+    // Check if already connected
+    if (wsRef.current && wsRef.current.sessionId) {
+      console.log('✅ Already connected to arena - skipping duplicate connection')
+      return
+    }
+    
+    isConnectingRef.current = true
+    
     // Prevent multiple connections - cleanup any existing connection first
     if (wsRef.current) {
       console.log('🔄 Cleaning up existing connection before creating new one...')
