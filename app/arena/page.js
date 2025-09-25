@@ -1028,6 +1028,7 @@ const MultiplayerArena = () => {
         }
         
         // Update mass and score (server is always authoritative for these)
+        console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', Math.round(currentPlayer.mass) || 25, ')')
         setMass(Math.round(currentPlayer.mass) || 25)
         setScore(Math.round(currentPlayer.score) || 0)
         
