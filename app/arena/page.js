@@ -564,6 +564,7 @@ const MultiplayerArena = () => {
       })
       
     } catch (error) {
+      isConnectingRef.current = false // Reset connection flag on error
       console.error('❌ Colyseus connection failed:', error)
       console.error('❌ Error details:', {
         message: error.message,
