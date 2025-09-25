@@ -126,7 +126,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "SMOOTH MOVEMENT IMPLEMENTATION FOR ARENA MODE: User reports arena mode has 'buggy and choppy' player movement compared to the smooth local agario mode. Investigation reveals the server-side movement implementation needs to be updated from direct velocity application to smooth target-based interpolation system matching the local agario's fluid movement experience. The goal is to implement the same smooth movement algorithm used in the local game for consistent player experience across both modes."
+user_problem_statement: "ARENA PLAYABLE AREA EXPANSION: User wants to expand the playable area in arena mode to match the minimap representation. Investigation shows arena was constrained to 1200 pixel safe zone radius while local agario uses 1800 pixels and minimap shows full area. The goal is to expand arena playable area from 1200 to 1800 pixel radius to match minimap and provide same spacious gameplay as local agario mode."
 
 # Test plan for this run
 
