@@ -538,7 +538,7 @@ export class ArenaRoom extends Room<GameState> {
     const centerY = this.worldSize / 2; // 2000 for 4000x4000 world
     
     // Use conservative radius to ensure players never spawn in red zone
-    const safeZoneRadius = 1200; // Well within the 1400 playable radius with safety margin
+    const safeZoneRadius = 1800; // Expanded to match minimap and local agario (full playable area)
     
     // Generate random point within safe circular area
     const angle = Math.random() * Math.PI * 2; // Random angle
