@@ -17,6 +17,9 @@ export class Player extends Schema {
   @type("boolean") spawnProtection: boolean = false; // Spawn protection status
   @type("number") spawnProtectionStart: number = 0; // When protection started
   @type("number") spawnProtectionTime: number = 6000; // 6 seconds protection
+  @type("boolean") isCashingOut: boolean = false; // Cash out status
+  @type("number") cashOutProgress: number = 0; // Cash out progress 0-100
+  @type("number") cashOutStart: number = 0; // When cash out started
   
   // Server-side skin properties for multiplayer visibility
   @type("string") skinId: string = "default";
