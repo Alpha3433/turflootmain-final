@@ -451,6 +451,11 @@ export class ArenaRoom extends Room<GameState> {
     this.state.players.forEach((otherPlayer, otherSessionId) => {
       if (sessionId === otherSessionId || !otherPlayer.alive) return;
       
+      // Skip collision if either player has spawn protection
+      if (player.spawnProtection || otherPlayer.spawnProtection) {
+        return;
+      }
+      
       const dx = player.x - otherPlayer.x;
       const dy = player.y - otherPlayer.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
