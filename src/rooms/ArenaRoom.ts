@@ -199,13 +199,6 @@ export class ArenaRoom extends Room<GameState> {
     // Add player to game state
     this.state.players.set(client.sessionId, player);
     
-    // Store client metadata
-    (client as any).userData = {
-      privyUserId,
-      playerName,
-      lastInputTime: Date.now()
-    };
-    
     console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)}) - No duplicates!`);
   }
 
