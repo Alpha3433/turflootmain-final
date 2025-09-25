@@ -23,6 +23,8 @@ const MultiplayerArena = () => {
   const wsRef = useRef(null)
   const isConnectingRef = useRef(false) // Track connection state to prevent duplicates
   const componentIdRef = useRef(Math.random().toString(36).substring(7)) // Unique component ID for debugging
+  const lastInputTimeRef = useRef(0) // For input throttling
+  const inputThrottleMs = 16 // ~60fps input rate (like agario)
   
   // Privy authentication
   const { ready, authenticated, user, login } = usePrivy()
