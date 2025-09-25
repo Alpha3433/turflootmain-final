@@ -132,8 +132,8 @@ user_problem_statement: "ARENA PLAYABLE AREA EXPANSION: User wants to expand the
 
 test_plan:
   current_focus:
-    - "Smooth Movement Implementation for Arena Mode"
-    - "Target-Based Interpolation System Testing"
+    - "Arena Playable Area Expansion"
+    - "Minimap Matching Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
