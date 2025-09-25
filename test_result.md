@@ -132,8 +132,8 @@ user_problem_statement: "ARENA SPLIT FUNCTIONALITY FIX: User reports that pressi
 
 test_plan:
   current_focus:
-    - "Arena Playable Area Expansion"
-    - "Minimap Matching Verification"
+    - "Arena Split Functionality Fix"
+    - "Split Stability and Disconnection Prevention"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
