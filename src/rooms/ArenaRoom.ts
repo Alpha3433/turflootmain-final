@@ -345,10 +345,19 @@ export class ArenaRoom extends Room<GameState> {
   update() {
     const deltaTime = 1 / this.tickRate; // Fixed timestep
     this.state.timestamp = Date.now();
+    const now = Date.now();
     
-    // Update all players with smooth movement (matching local agario)
+    // Update all players with smooth movement and spawn protection
     this.state.players.forEach((player, sessionId) => {
       if (!player.alive) return;
+      
+      // Update spawn protection status
+      if (player.spawnProtection) {
+        if (now - player.spawnProtectionStart >= player.spawnProtectionTime) {
+          player.spawnProtection = false;
+          console.log(`🛡️ Spawn protection ended for ${player.name}`);
+        }
+      }
       
       // Smooth movement toward target (vx and vy are being used as targetX and targetY)
       const targetX = player.vx;
