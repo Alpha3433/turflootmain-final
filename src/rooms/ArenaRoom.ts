@@ -341,6 +341,34 @@ export class ArenaRoom extends Room<GameState> {
     }, 5000);
   }
 
+  handleCashOut(client: Client, message: any) {
+    const player = this.state.players.get(client.sessionId);
+    if (!player || !player.alive) {
+      console.log(`⚠️ Cash out ignored - player not found or dead for session: ${client.sessionId}`);
+      return;
+    }
+
+    const { action } = message; // 'start' or 'stop'
+    
+    if (action === 'start') {
+      // Start cash out process
+      if (!player.isCashingOut) {
+        player.isCashingOut = true;
+        player.cashOutStart = Date.now();
+        player.cashOutProgress = 0;
+        console.log(`💰 ${player.name} started cashing out`);
+      }
+    } else if (action === 'stop') {
+      // Stop cash out process
+      if (player.isCashingOut) {
+        player.isCashingOut = false;
+        player.cashOutProgress = 0;
+        player.cashOutStart = 0;
+        console.log(`❌ ${player.name} stopped cashing out`);
+      }
+    }
+  }
+
   onLeave(client: Client, consented?: boolean) {
     const player = this.state.players.get(client.sessionId);
     if (player) {
