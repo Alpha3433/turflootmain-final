@@ -2115,13 +2115,15 @@ const MultiplayerArena = () => {
           onMouseOver={(e) => {
             if (!isCashingOut && !cashOutComplete) {
               e.target.style.backgroundColor = 'rgba(255, 140, 0, 1)'
-              e.target.style.transform = 'translateX(-50%) scale(1.05)'
+              e.target.style.boxShadow = '0 0 25px rgba(255, 165, 0, 0.9)'
             }
           }}
           onMouseOut={(e) => {
             if (!isCashingOut) {
               e.target.style.backgroundColor = 'rgba(255, 165, 0, 0.95)'
-              e.target.style.transform = 'translateX(-50%) scale(1)'
+              e.target.style.boxShadow = isCashingOut 
+                ? '0 0 20px rgba(255, 165, 0, 0.8)' 
+                : '0 4px 12px rgba(255, 165, 0, 0.4)'
             }
           }}
           onTouchStart={(e) => {
