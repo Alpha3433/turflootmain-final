@@ -1466,23 +1466,10 @@ const MultiplayerArena = () => {
 
   // Initialize game ONLY when authenticated
   useEffect(() => {
-    // Wait for Privy to be ready and user to be authenticated
-    if (!ready || !authenticated) {
-      console.log('🔒 Waiting for authentication...', { ready, authenticated })
+    // Wait for Privy to be ready and user to be authenticated with user data available
+    if (!ready || !authenticated || !user?.id) {
+      console.log('🔒 Waiting for authentication and user data...', { ready, authenticated, userId: user?.id })
       return
-    }
-    
-    // Additional check for user data - wait a bit if needed
-    if (!user?.id) {
-      console.log('🔒 User data not yet available, waiting...', { userId: user?.id })
-      // Set a short delay to wait for user data to populate
-      const userWaitTimeout = setTimeout(() => {
-        if (user?.id) {
-          console.log('🎮 User data now available, proceeding...')
-          // The effect will re-run when dependencies change
-        }
-      }, 100)
-      return () => clearTimeout(userWaitTimeout)
     }
     
     console.log('🎮 Arena initialization - setting up game for authenticated user...')
