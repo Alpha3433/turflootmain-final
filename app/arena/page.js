@@ -1578,15 +1578,24 @@ const MultiplayerArena = () => {
     window.addEventListener('resize', handleResize)
     
     return () => {
-      console.log('🧹 Cleaning up arena connection...')
+      const componentId = componentIdRef.current
+      console.log(`🧹 [${componentId}] Cleaning up arena connection...`)
       game.stop()
       window.removeEventListener('resize', handleResize)
       if (wsRef.current) {
-        console.log('🔌 Disconnecting from Colyseus...')
+        console.log(`🔌 [${componentId}] Disconnecting from Colyseus...`)
         wsRef.current.leave()
         wsRef.current = null
       }
+      
+      // Clear global connection if it's this component's connection
+      if (GLOBAL_CONNECTION_TRACKER.activeConnection === wsRef.current) {
+        GLOBAL_CONNECTION_TRACKER.activeConnection = null
+        console.log(`🧹 [${componentId}] Cleared global connection reference`)
+      }
+      
       isConnectingRef.current = false // Reset connection flag on cleanup
+      GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on cleanup
       
       // Cleanup mobile styles
       if (isMobile) {
