@@ -1,0 +1,143 @@
+{
+  "test_start_time": "2025-09-25T08:38:37.806318",
+  "total_tests": 13,
+  "passed_tests": 10,
+  "failed_tests": 3,
+  "test_categories": {
+    "API Health Check": {
+      "passed": 1,
+      "failed": 0,
+      "total": 1
+    },
+    "Colyseus Server Availability": {
+      "passed": 1,
+      "failed": 0,
+      "total": 1
+    },
+    "Connection Management Infrastructure": {
+      "passed": 1,
+      "failed": 1,
+      "total": 2
+    },
+    "Authentication Integration": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Duplicate Detection Logic": {
+      "passed": 0,
+      "failed": 1,
+      "total": 1
+    },
+    "Arena Room Configuration": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Connection State Persistence": {
+      "passed": 2,
+      "failed": 0,
+      "total": 2
+    },
+    "Database Integration": {
+      "passed": 1,
+      "failed": 1,
+      "total": 2
+    }
+  },
+  "critical_issues": [],
+  "test_details": [
+    {
+      "category": "API Health Check",
+      "test_name": "Backend Infrastructure Operational",
+      "status": "\u2705 PASSED",
+      "details": "Service: turfloot-api, Status: operational, Features: ['auth', 'blockchain', 'multiplayer']",
+      "timestamp": "2025-09-25T08:38:38.945118"
+    },
+    {
+      "category": "Colyseus Server Availability",
+      "test_name": "Arena Server Available",
+      "status": "\u2705 PASSED",
+      "details": "Arena server found: colyseus-arena-global, Max players: 50, Endpoint: wss://au-syd-ab3eaf4e.colyseus.cloud",
+      "timestamp": "2025-09-25T08:38:39.043762"
+    },
+    {
+      "category": "Connection Management Infrastructure",
+      "test_name": "Game Sessions API Operational",
+      "status": "\u2705 PASSED",
+      "details": "Sessions API working, found 0 sessions",
+      "timestamp": "2025-09-25T08:38:39.265580"
+    },
+    {
+      "category": "Connection Management Infrastructure",
+      "test_name": "Session Creation Capability",
+      "status": "\u274c FAILED",
+      "details": "Cannot create sessions: HTTP 400",
+      "timestamp": "2025-09-25T08:38:39.352665"
+    },
+    {
+      "category": "Authentication Integration",
+      "test_name": "Authentication API Accessible",
+      "status": "\u2705 PASSED",
+      "details": "Wallet API working: Balance: 0, Wallet: Not connected",
+      "timestamp": "2025-09-25T08:38:40.140886"
+    },
+    {
+      "category": "Authentication Integration",
+      "test_name": "Authentication Feature Enabled",
+      "status": "\u2705 PASSED",
+      "details": "Authentication feature active in API features: ['auth', 'blockchain', 'multiplayer']",
+      "timestamp": "2025-09-25T08:38:40.230540"
+    },
+    {
+      "category": "Duplicate Detection Logic",
+      "test_name": "First Session Creation",
+      "status": "\u274c FAILED",
+      "details": "Cannot create test session: HTTP 400",
+      "timestamp": "2025-09-25T08:38:40.318526"
+    },
+    {
+      "category": "Arena Room Configuration",
+      "test_name": "Arena Player Capacity",
+      "status": "\u2705 PASSED",
+      "details": "Arena colyseus-arena-global supports 50 players (current: 1)",
+      "timestamp": "2025-09-25T08:38:40.405747"
+    },
+    {
+      "category": "Arena Room Configuration",
+      "test_name": "Arena Server Type",
+      "status": "\u2705 PASSED",
+      "details": "Arena using Colyseus server type: colyseus",
+      "timestamp": "2025-09-25T08:38:40.405788"
+    },
+    {
+      "category": "Connection State Persistence",
+      "test_name": "Real-time Player Tracking",
+      "status": "\u2705 PASSED",
+      "details": "Backend tracking 1 players across 1 servers",
+      "timestamp": "2025-09-25T08:38:40.493335"
+    },
+    {
+      "category": "Connection State Persistence",
+      "test_name": "Server Activity Tracking",
+      "status": "\u2705 PASSED",
+      "details": "Found 1 servers with player activity tracking",
+      "timestamp": "2025-09-25T08:38:40.493379"
+    },
+    {
+      "category": "Database Integration",
+      "test_name": "Database Connectivity",
+      "status": "\u2705 PASSED",
+      "details": "Database accessible through sessions API, found 0 sessions",
+      "timestamp": "2025-09-25T08:38:40.577987"
+    },
+    {
+      "category": "Database Integration",
+      "test_name": "Database Write Operations",
+      "status": "\u274c FAILED",
+      "details": "Cannot create test session: HTTP 400",
+      "timestamp": "2025-09-25T08:38:40.659235"
+    }
+  ],
+  "test_end_time": "2025-09-25T08:38:40.661924"
+}
