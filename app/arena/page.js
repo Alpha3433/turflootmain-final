@@ -2207,11 +2207,12 @@ const MultiplayerArena = () => {
           }}
           onTouchStart={(e) => {
             if (!isMobile) return
-            e.target.style.transform = 'translateX(-50%) scale(0.95)'
+            // No transform on touch to prevent movement
           }}
           onTouchEnd={(e) => {
             if (!isMobile) return
-            e.target.style.transform = 'translateX(-50%) scale(1)'
+            // No transform on touch end to prevent movement
+          }}
           }}
         >
           <span style={{ 
