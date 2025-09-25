@@ -2382,6 +2382,5 @@ const MultiplayerArena = () => {
       `}</style>
     </div>
   )
-}
 
 export default MultiplayerArena
