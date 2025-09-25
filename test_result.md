@@ -126,14 +126,17 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "ARENA SPLIT FUNCTIONALITY FIX: User reports that pressing space bar to split in arena mode breaks the game and disconnects the user. Investigation reveals multiple issues in the server-side split implementation: inconsistent radius calculations, improper split piece positioning causing boundary issues, and problematic auto-merge logic. The goal is to fix these issues to provide stable split functionality matching the local agario experience."
+user_problem_statement: "PLAYER STARTING MASS IN ARENA MODE: User requests verification that players spawn with exactly 25 mass when joining the arena. Testing requirements include: 1) Player Starting Mass - new players spawn with exactly 25 mass, 2) Player Schema Default - Player schema initializes with mass = 25, 3) Respawn Mass - players respawn with mass reset to 25, 4) Mass Consistency - no code paths override the mass value incorrectly, 5) Arena Server Configuration - server creates players with correct starting mass."
 
 # Test plan for this run
 
 test_plan:
   current_focus:
-    - "Arena Split Functionality Fix"
-    - "Split Stability and Disconnection Prevention"
+    - "Player Starting Mass Verification"
+    - "Player Schema Default Mass Testing"
+    - "Player Respawn Mass Testing"
+    - "Mass Consistency Verification"
+    - "Arena Server Configuration Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
