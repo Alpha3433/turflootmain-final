@@ -577,7 +577,7 @@ class PlayerMassTestSuite:
             print(f"❌ Error testing arena server configuration: {str(e)}")
             self.record_test_result("Arena Server Configuration", False, f"Error: {str(e)}")
 
-async def main():
+def main():
     """Main test execution function"""
     print("🎯 PLAYER STARTING MASS IN ARENA MODE - BACKEND TESTING")
     print("=" * 80)
@@ -593,7 +593,7 @@ async def main():
     test_suite = PlayerMassTestSuite()
     
     # Run all tests
-    success = await test_suite.run_all_tests()
+    success = test_suite.run_all_tests()
     
     # Exit with appropriate code
     if success:
@@ -604,4 +604,4 @@ async def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
