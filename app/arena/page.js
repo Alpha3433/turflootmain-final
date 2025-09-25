@@ -466,6 +466,7 @@ const MultiplayerArena = () => {
       clearTimeout(connectionTimeout)
       
       wsRef.current = room
+      isConnectingRef.current = false // Reset connection flag on success
       console.log('🔗 Setting initial connection status to connected')
       setConnectionStatus('connected')
       console.log('✅ Connected to dedicated arena:', room.id)
