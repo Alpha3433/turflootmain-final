@@ -249,11 +249,11 @@ class ArenaExpansionTester:
             print(f"   New Playable Area: {new_playable_area:,.0f} square pixels")
             print(f"   Area Increase: {area_ratio:.2f}x ({(area_ratio - 1) * 100:.1f}% more space)")
             
-            if area_ratio >= 2.25:  # 1800²/1200² = 2.25
+            if abs(area_ratio - 2.25) < 0.01:  # 1800²/1200² = 2.25
                 print(f"   ✅ PASSED: Area increase matches expected 2.25x expansion")
                 minimap_expansion_passed = True
             else:
-                print(f"   ❌ FAILED: Area increase doesn't match expected expansion")
+                print(f"   ❌ FAILED: Area increase doesn't match expected expansion (got {area_ratio:.2f}, expected 2.25)")
                 minimap_expansion_passed = False
             
             if all_tests_passed and minimap_expansion_passed:
