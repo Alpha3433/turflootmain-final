@@ -953,6 +953,14 @@ const MultiplayerArena = () => {
         setMass(Math.round(currentPlayer.mass) || 25)
         setScore(Math.round(currentPlayer.score) || 0)
         
+        // Update cash out state from server (server is authoritative)
+        if (currentPlayer.isCashingOut !== undefined) {
+          setIsCashingOut(currentPlayer.isCashingOut)
+        }
+        if (currentPlayer.cashOutProgress !== undefined) {
+          setCashOutProgress(currentPlayer.cashOutProgress)
+        }
+        
         // Update other player properties
         this.player.mass = currentPlayer.mass
         this.player.radius = currentPlayer.radius
