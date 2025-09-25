@@ -126,7 +126,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "ARENA PLAYABLE AREA EXPANSION: User wants to expand the playable area in arena mode to match the minimap representation. Investigation shows arena was constrained to 1200 pixel safe zone radius while local agario uses 1800 pixels and minimap shows full area. The goal is to expand arena playable area from 1200 to 1800 pixel radius to match minimap and provide same spacious gameplay as local agario mode."
+user_problem_statement: "ARENA SPLIT FUNCTIONALITY FIX: User reports that pressing space bar to split in arena mode breaks the game and disconnects the user. Investigation reveals multiple issues in the server-side split implementation: inconsistent radius calculations, improper split piece positioning causing boundary issues, and problematic auto-merge logic. The goal is to fix these issues to provide stable split functionality matching the local agario experience."
 
 # Test plan for this run
 
