@@ -5336,12 +5336,13 @@ export default function TurfLootTactical() {
               👤
             </div>
             
-            {/* Login/Logout Button - FIXED */}
+            {/* Login/Logout Button - FIXED HEIGHT */}
             {authenticated ? (
               <button
                 onClick={handleLogout}
                 style={{
-                  padding: '8px 16px',
+                  height: '32px',
+                  padding: '0 16px',
                   background: 'rgba(252, 129, 129, 0.2)',
                   border: '2px solid #fc8181',
                   borderRadius: '4px',
@@ -5353,7 +5354,10 @@ export default function TurfLootTactical() {
                   boxShadow: '0 0 15px rgba(252, 129, 129, 0.4)',
                   fontFamily: '"Rajdhani", sans-serif',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.05em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 onMouseOver={(e) => {
                   e.target.style.background = 'rgba(252, 129, 129, 0.3)'
@@ -5370,7 +5374,8 @@ export default function TurfLootTactical() {
               <button
                 onClick={handleLogin}
                 style={{
-                  padding: '8px 16px',
+                  height: '32px',
+                  padding: '0 16px',
                   background: 'linear-gradient(45deg, #68d391 0%, #48bb78 100%)',
                   border: '2px solid #68d391',
                   borderRadius: '4px',
@@ -5382,7 +5387,10 @@ export default function TurfLootTactical() {
                   boxShadow: '0 0 20px rgba(104, 211, 145, 0.4)',
                   fontFamily: '"Rajdhani", sans-serif',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.05em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 onMouseOver={(e) => {
                   e.target.style.transform = 'scale(1.05)'
