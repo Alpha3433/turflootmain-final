@@ -35,7 +35,7 @@ class PlayerMassTestSuite:
         print(f"📋 Testing Requirements: Player spawn mass = 25, respawn mass = 25, schema default = 25")
         print("=" * 80)
 
-    async def run_all_tests(self):
+    def run_all_tests(self):
         """Run all player starting mass tests"""
         print("🚀 Starting Player Starting Mass Testing...")
         start_time = time.time()
@@ -55,7 +55,7 @@ class PlayerMassTestSuite:
             print(f"\n📊 TESTING CATEGORY: {category_name}")
             print("-" * 60)
             try:
-                await test_func()
+                test_func()
                 print(f"✅ {category_name} - COMPLETED")
             except Exception as e:
                 print(f"❌ {category_name} - FAILED: {str(e)}")
