@@ -935,28 +935,52 @@ const MultiplayerArena = () => {
     }
     
     applyClientSideMovement(dx, dy) {
-      // AGGRESSIVE client-side movement prediction for maximum responsiveness
+      // SMOOTH GLIDING CLIENT-SIDE MOVEMENT (like local agario)
       if (!this.player.x || !this.player.y) return
       
-      // Use same speed calculation as server but with higher responsiveness
+      // Calculate target position based on input (like agario's mouse-following)
       const mass = this.player.mass || 25
-      const baseSpeed = 6.0
+      const baseSpeed = 6.0 // Same as agario for consistency
       const massSpeedFactor = Math.sqrt(mass / 20)
       const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
       
-      // Much more aggressive movement for instant responsiveness
-      const frameRate = 60 // Target 60fps
-      const speedPerFrame = dynamicSpeed / frameRate
-      const responsivenessMultiplier = 4 // Increased from 2 to 4 for more immediate response
+      // Convert input to target position (smooth gliding system)
+      const inputStrength = Math.sqrt(dx * dx + dy * dy)
+      if (inputStrength > 0) {
+        // Set target position at a reasonable distance from current position
+        const targetDistance = Math.min(inputStrength * 800, 400) // Max 400px target distance
+        const normalizedDx = dx / inputStrength
+        const normalizedDy = dy / inputStrength
+        
+        this.player.targetX = this.player.x + normalizedDx * targetDistance
+        this.player.targetY = this.player.y + normalizedDy * targetDistance
+      } else {
+        // No input - target current position (stop smoothly)
+        this.player.targetX = this.player.x
+        this.player.targetY = this.player.y
+      }
       
-      // Apply immediate movement
-      this.player.x += dx * speedPerFrame * responsivenessMultiplier
-      this.player.y += dy * speedPerFrame * responsivenessMultiplier
+      // Apply smooth movement towards target (exactly like agario)
+      const targetDx = this.player.targetX - this.player.x
+      const targetDy = this.player.targetY - this.player.y
+      const distanceToTarget = Math.sqrt(targetDx * targetDx + targetDy * targetDy)
+      
+      // Only move if distance is significant (prevents jittering)
+      if (distanceToTarget > 0.1) {
+        const moveDistance = Math.min(dynamicSpeed * 0.5, distanceToTarget) // Smoother movement
+        
+        // Normalize direction and apply smooth movement
+        const moveX = (targetDx / distanceToTarget) * moveDistance
+        const moveY = (targetDy / distanceToTarget) * moveDistance
+        
+        this.player.x += moveX
+        this.player.y += moveY
+      }
       
       // Simple boundary check to prevent going too far off
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
-      const maxDistance = 2500 // Increased from 2000 to allow more freedom
+      const maxDistance = 2500 
       
       const distanceFromCenter = Math.sqrt(
         Math.pow(this.player.x - centerX, 2) + 
@@ -970,12 +994,16 @@ const MultiplayerArena = () => {
         this.player.y = centerY + Math.sin(angle) * maxDistance
       }
       
-      console.log('⚡ Aggressive client prediction applied:', {
-        position: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
-        speed: dynamicSpeed.toFixed(2),
-        multiplier: responsivenessMultiplier,
-        input: { dx: dx.toFixed(3), dy: dy.toFixed(3) }
-      })
+      // Debug logging (occasional)
+      if (Math.random() < 0.01) {
+        console.log('🎮 Smooth gliding movement:', {
+          position: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
+          target: { x: this.player.targetX?.toFixed(1), y: this.player.targetY?.toFixed(1) },
+          distance: distanceToTarget.toFixed(1),
+          speed: dynamicSpeed.toFixed(2),
+          input: { dx: dx.toFixed(3), dy: dy.toFixed(3) }
+        })
+      }
     }
     
     updateFromServer(state) {
