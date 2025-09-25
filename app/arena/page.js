@@ -451,6 +451,7 @@ const MultiplayerArena = () => {
       
       // Add timeout to connection attempt
       const connectionTimeout = setTimeout(() => {
+        isConnectingRef.current = false // Reset connection flag on timeout
         console.error('❌ Connection timeout after 15 seconds')
         setConnectionStatus('failed')
       }, 15000)
