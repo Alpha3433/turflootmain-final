@@ -1557,7 +1557,7 @@ const MultiplayerArena = () => {
         document.body.classList.remove('mobile-game-active')
       }
     }
-  }, [ready, authenticated])
+  }, [ready, authenticated, user?.id]) // Add user.id to dependencies so effect responds to user data
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
