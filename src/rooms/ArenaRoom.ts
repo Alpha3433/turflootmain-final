@@ -102,6 +102,13 @@ export class ArenaRoom extends Room<GameState> {
     
     console.log(`👋 Player attempting to join: ${playerName} (${client.sessionId}) - privyUserId: ${privyUserId}`);
     
+    // Store client metadata FIRST (before deduplication check)
+    (client as any).userData = {
+      privyUserId,
+      playerName,
+      lastInputTime: Date.now()
+    };
+    
     // ROBUST DEDUPLICATION: Check existing players in game state directly
     let duplicateSessions: string[] = [];
     
