@@ -96,6 +96,32 @@ const MultiplayerArena = () => {
   
   const privyUserId = user?.id || null
   
+  // Function to get current player display name
+  const getCurrentPlayerName = () => {
+    // First, check for custom username from landing page
+    if (user?.id) {
+      const userKey = `turfloot_username_${user.id.slice(0, 10)}`
+      const customUsername = localStorage.getItem(userKey) || localStorage.getItem('turfloot_auth_username')
+      if (customUsername) {
+        console.log('🎯 Using custom username from landing page:', customUsername)
+        return customUsername
+      }
+    }
+    
+    // Fallback to Privy data or default
+    const fallbackName = user?.discord?.username || user?.twitter?.username || user?.google?.name || user?.wallet?.address?.slice(0, 8) || 'Anonymous Player'
+    console.log('🎯 Using fallback username:', fallbackName)
+    return fallbackName
+  }
+  
+  // Update playerName state when user data is available
+  useEffect(() => {
+    if (user?.id) {
+      const currentName = getCurrentPlayerName()
+      setPlayerName(currentName)
+    }
+  }, [user?.id, user?.discord?.username, user?.twitter?.username, user?.google?.name, user?.wallet?.address])
+  
   console.log('🎮 Arena parameters:')
   console.log('  - roomId:', roomId)  
   console.log('  - authenticated user:', !!user)
