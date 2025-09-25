@@ -1580,7 +1580,9 @@ const MultiplayerArena = () => {
     
     return () => {
       console.log('🧹 Cleaning up arena connection...')
-      game.stop()
+      if (gameRef.current) {
+        gameRef.current.stop()
+      }
       window.removeEventListener('resize', handleResize)
       if (wsRef.current) {
         console.log('🔌 Disconnecting from Colyseus...')
