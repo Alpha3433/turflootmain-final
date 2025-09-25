@@ -10311,10 +10311,35 @@ export default function TurfLootTactical() {
             </button>
           </div>
 
-          {/* Squad Panel - Dynamic Party Display */}
-          <div style={tacticalPanelStyle}>
+          {/* Squad Panel - Enhanced Missions Style */}
+          <div style={{
+            ...tacticalPanelStyle,
+            border: '2px solid rgba(252, 129, 129, 0.3)',
+            position: 'relative'
+          }}>
+            {/* Status Indicator (like missions panel) */}
+            <div style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              width: '8px',
+              height: '8px',
+              background: '#fc8181',
+              borderRadius: '50%',
+              boxShadow: '0 0 10px #fc8181',
+              animation: 'statusBlink 2s ease-in-out infinite 1s'
+            }} />
+            
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <h3 style={{ color: '#68d391', fontWeight: '700', fontSize: '12px', margin: 0, fontFamily: '"Rajdhani", sans-serif' }}>
+              <h3 style={{ 
+                color: '#fc8181', 
+                fontWeight: '700', 
+                fontSize: '12px', 
+                margin: 0, 
+                fontFamily: '"Rajdhani", sans-serif',
+                textShadow: '0 0 10px rgba(252, 129, 129, 0.6)',
+                textTransform: 'uppercase'
+              }}>
                 PARTY
               </h3>
               <div style={{ marginLeft: 'auto' }}>
@@ -10351,7 +10376,7 @@ export default function TurfLootTactical() {
                       if (refreshButton) {
                         refreshButton.textContent = '✅'
                         setTimeout(() => {
-                          refreshButton.textContent = '↻'
+                          refreshButton.textContent = '🔄 REFRESH'
                         }, 1500)
                       }
                       
@@ -10363,7 +10388,7 @@ export default function TurfLootTactical() {
                       if (refreshButton) {
                         refreshButton.textContent = '❌'
                         setTimeout(() => {
-                          refreshButton.textContent = '↻'
+                          refreshButton.textContent = '🔄 REFRESH'
                         }, 1500)
                       }
                     } finally {
@@ -10371,27 +10396,27 @@ export default function TurfLootTactical() {
                     }
                   }}
                   style={{ 
-                    fontSize: '9px', 
-                    color: '#f6ad55', 
+                    fontSize: '10px', 
+                    color: '#fc8181', 
                     background: 'none', 
                     border: 'none', 
                     cursor: 'pointer', 
                     fontWeight: '600', 
                     fontFamily: '"Rajdhani", sans-serif',
-                    padding: '1px 3px',
+                    textDecoration: 'none',
+                    padding: '2px 4px',
                     borderRadius: '2px',
                     transition: 'all 0.2s ease'
                   }}
                   onMouseOver={(e) => {
-                    e.target.style.background = 'rgba(246, 173, 85, 0.1)'
-                    e.target.style.boxShadow = '0 0 3px rgba(246, 173, 85, 0.3)'
+                    e.target.style.color = '#fbb6b6'
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.background = 'none'
-                    e.target.style.boxShadow = 'none'
+                    e.target.style.color = '#fc8181'
                   }}
+                  title="Refresh party data"
                 >
-                  <span data-mobile-refresh-text>↻</span>
+                  <span data-mobile-refresh-text>🔄 REFRESH</span>
                 </button>
                 
                 {/* Mobile Leave Party Button - Only show when in a party */}
