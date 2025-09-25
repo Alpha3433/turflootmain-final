@@ -1526,30 +1526,10 @@ const MultiplayerArena = () => {
   // Initialize game ONLY when authenticated
   useEffect(() => {
     // Wait for Privy to be ready and user to be authenticated with user data available
-    if (!ready || !authenticated || !user?.id) {
-      console.log('🔒 Waiting for authentication and user data...', { ready, authenticated, userId: user?.id })
+    if (!ready || !authenticated || !user?.id || !playerName || playerName === 'Anonymous Player') {
+      console.log('🔒 Waiting for authentication and player name...', { ready, authenticated, userId: user?.id, playerName })
       return
     }
-    
-    // Calculate playerName inside useEffect to track changes
-    const getPlayerDisplayName = () => {
-      // First, check for custom username from landing page
-      if (user?.id) {
-        const userKey = `turfloot_username_${user.id.slice(0, 10)}`
-        const customUsername = localStorage.getItem(userKey) || localStorage.getItem('turfloot_auth_username')
-        if (customUsername) {
-          console.log('🎯 Using custom username from landing page:', customUsername)
-          return customUsername
-        }
-      }
-      
-      // Fallback to Privy data or default
-      const fallbackName = user?.discord?.username || user?.twitter?.username || user?.google?.name || user?.wallet?.address?.slice(0, 8) || 'Player'
-      console.log('🎯 Using fallback username:', fallbackName)
-      return fallbackName
-    }
-    
-    const playerName = getPlayerDisplayName()
     
     // Check if playerName has changed and we need to cleanup existing connection
     if (GLOBAL_CONNECTION_TRACKER.activeConnection && 
