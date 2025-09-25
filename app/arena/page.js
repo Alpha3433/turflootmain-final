@@ -239,6 +239,12 @@ const MultiplayerArena = () => {
         console.log('Starting cash out process with E key')
         setIsCashingOut(true)
         setCashOutProgress(0)
+        
+        // Send cash out start message to server
+        if (roomRef.current) {
+          roomRef.current.send("cashout", { action: "start" })
+          console.log('📡 Sent cash out start message to server')
+        }
       }
       
       // Handle SPACE key for splitting
