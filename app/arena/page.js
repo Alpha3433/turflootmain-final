@@ -13,6 +13,7 @@ const MultiplayerArena = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const wsRef = useRef(null)
+  const isConnectingRef = useRef(false) // Track connection state to prevent duplicates
   
   // Privy authentication
   const { ready, authenticated, user, login } = usePrivy()
