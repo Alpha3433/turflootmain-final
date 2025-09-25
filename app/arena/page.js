@@ -9,7 +9,8 @@ import { usePrivy } from '@privy-io/react-auth'
 const GLOBAL_CONNECTION_TRACKER = {
   activeConnection: null,
   isConnecting: false,
-  userId: null
+  userId: null,
+  lastPlayerName: null
 }
 
 const MultiplayerArena = () => {
