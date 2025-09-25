@@ -128,10 +128,9 @@ user_problem_statement: "SMOOTH MOVEMENT IMPLEMENTATION FOR ARENA MODE: User rep
 
 test_plan:
   current_focus:
-    - "Mobile Scrolling Fix Verification"
-    - "Challenges/Missions Panel Backend Integration Testing"
-  stuck_tasks:
-    - "Frontend Build Issues - Missing Solana wallet adapters"
+    - "Smooth Movement Implementation for Arena Mode"
+    - "Target-Based Interpolation System Testing"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
