@@ -2131,7 +2131,6 @@ const MultiplayerArena = () => {
             handleCashOut()
             // No transform on touch to prevent movement
           }}
-          }}
           onTouchEnd={(e) => {
             if (!isMobile) return
             e.target.style.transform = 'translateX(-50%) scale(1)'
