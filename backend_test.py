@@ -22,7 +22,7 @@ from typing import Dict, List, Any, Optional
 class PlayerMassTestSuite:
     def __init__(self):
         # Get base URL from environment
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://smooth-mover.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         
         # Test results tracking
