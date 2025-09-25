@@ -168,7 +168,7 @@ def test_websocket_url_scenarios():
     scenarios = [
         {
             "name": "Production HTTPS Environment",
-            "base_url": "https://smooth-mover.preview.emergentagent.com",
+            "base_url": "https://turfloot-arena-3.preview.emergentagent.com",
             "expected_protocol": "wss:",
             "expected_port": "443"
         },

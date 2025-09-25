@@ -13,7 +13,7 @@ from typing import Dict, Any, List
 
 class CashOutRingSystemTester:
     def __init__(self):
-        self.base_url = "https://smooth-mover.preview.emergentagent.com"
+        self.base_url = "https://turfloot-arena-3.preview.emergentagent.com"
         self.api_base = f"{self.base_url}/api"
         self.test_results = []
         self.total_tests = 0
