@@ -6285,9 +6285,9 @@ export default function TurfLootTactical() {
         {/* Bottom Left - Challenges */}
         <div style={{
           position: 'absolute',
-          left: '200px',
+          left: Math.max(20, window.innerWidth * 0.02) + 'px', // Responsive left margin: 2% of screen width, minimum 20px  
           top: '210px',
-          width: '280px', // Restored original width
+          width: Math.min(280, window.innerWidth * 0.22) + 'px', // Responsive width: 22% of screen width, maximum 280px
           zIndex: 20,
           ...tacticalPanelStyle // Restored original tacticalPanelStyle
         }}>
