@@ -4574,7 +4574,11 @@ export default function TurfLootTactical() {
   }
 
   const mainTitleStyle = {
-    fontSize: isMobile ? '3rem' : '5.5rem',
+    fontSize: typeof window !== 'undefined' ?
+      (isMobile ? '3rem' :
+        window.innerWidth >= 1600 ? '5.5rem' : // Large screens: original size
+        window.innerWidth >= 1200 ? '4.5rem' : // Laptop screens: smaller but prominent
+        '4rem') : '5.5rem', // Fallback for server-side rendering
     fontWeight: '900',
     margin: '0 0 8px 0',
     background: 'linear-gradient(45deg, #68d391 0%, #f6ad55 50%, #fc8181 100%)',
