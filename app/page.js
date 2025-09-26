@@ -1964,7 +1964,7 @@ export default function TurfLootTactical() {
     }, 200) // Check every 200ms initially
     
     return () => {
-      window.removeEventListener('resize', checkMobile)
+      window.removeEventListener('resize', handleResize)
       clearTimeout(friendsTimer)
       clearInterval(authCheckInterval)
     }
