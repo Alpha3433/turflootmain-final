@@ -4751,7 +4751,11 @@ export default function TurfLootTactical() {
   }
 
   const statNumberStyle = {
-    fontSize: isMobile ? '28px' : '42px',
+    fontSize: typeof window !== 'undefined' ?
+      (isMobile ? '28px' :
+        window.innerWidth >= 1600 ? '42px' : // Large screens: original size
+        window.innerWidth >= 1200 ? '36px' : // Laptop screens: smaller but prominent
+        '32px') : '42px', // Fallback for server-side rendering
     fontWeight: '900',
     background: 'linear-gradient(45deg, #68d391 0%, #f6ad55 100%)',
     backgroundClip: 'text',
