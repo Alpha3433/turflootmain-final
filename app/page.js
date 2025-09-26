@@ -4649,14 +4649,26 @@ export default function TurfLootTactical() {
   }
 
   const stakeButtonStyle = {
-    padding: isMobile ? '12px 20px' : '16px 32px',
+    padding: typeof window !== 'undefined' ?
+      (isMobile ? '12px 20px' :
+        window.innerWidth >= 1600 ? '16px 32px' : // Large screens: original padding
+        window.innerWidth >= 1200 ? '14px 28px' : // Laptop screens: slightly smaller
+        '12px 24px') : '16px 32px', // Fallback for server-side rendering
     borderRadius: '4px',
     fontWeight: '700',
-    fontSize: isMobile ? '14px' : '16px',
+    fontSize: typeof window !== 'undefined' ?
+      (isMobile ? '14px' :
+        window.innerWidth >= 1600 ? '16px' : // Large screens: original size
+        window.innerWidth >= 1200 ? '15px' : // Laptop screens: slightly smaller
+        '14px') : '16px', // Fallback for server-side rendering
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     border: '2px solid',
-    margin: isMobile ? '0 4px' : '0 8px',
+    margin: typeof window !== 'undefined' ?
+      (isMobile ? '0 4px' :
+        window.innerWidth >= 1600 ? '0 8px' : // Large screens: original margin
+        window.innerWidth >= 1200 ? '0 6px' : // Laptop screens: slightly smaller
+        '0 4px') : '0 8px', // Fallback for server-side rendering
     fontFamily: '"Rajdhani", sans-serif',
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
