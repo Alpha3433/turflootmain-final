@@ -4685,10 +4685,22 @@ export default function TurfLootTactical() {
     background: 'linear-gradient(45deg, #fc8181 0%, #f56565 50%, #e53e3e 100%)',
     color: '#ffffff',
     fontWeight: '900',
-    padding: isMobile ? '16px 48px' : '20px 64px',
+    padding: typeof window !== 'undefined' ?
+      (isMobile ? '16px 48px' :
+        window.innerWidth >= 1600 ? '20px 64px' : // Large screens: original padding
+        window.innerWidth >= 1200 ? '18px 56px' : // Laptop screens: slightly smaller
+        '16px 48px') : '20px 64px', // Fallback for server-side rendering
     borderRadius: '6px',
-    fontSize: isMobile ? '16px' : '20px',
-    marginBottom: isMobile ? '20px' : '32px',
+    fontSize: typeof window !== 'undefined' ?
+      (isMobile ? '16px' :
+        window.innerWidth >= 1600 ? '20px' : // Large screens: original size
+        window.innerWidth >= 1200 ? '18px' : // Laptop screens: slightly smaller
+        '16px') : '20px', // Fallback for server-side rendering
+    marginBottom: typeof window !== 'undefined' ?
+      (isMobile ? '20px' :
+        window.innerWidth >= 1600 ? '32px' : // Large screens: original margin
+        window.innerWidth >= 1200 ? '28px' : // Laptop screens: slightly smaller
+        '24px') : '32px', // Fallback for server-side rendering
     cursor: 'pointer',
     border: '2px solid #fc8181',
     boxShadow: '0 0 40px rgba(252, 129, 129, 0.6), 0 0 80px rgba(252, 129, 129, 0.3)',
