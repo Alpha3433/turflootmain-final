@@ -10396,11 +10396,435 @@ export default function TurfLootTactical() {
                 
                 {/* Mobile View All Missions Button */}
                 <button 
-                  onClick={() => {
+                  onClick={async () => {
                     console.log('📱 Mobile ALL MISSIONS button clicked')
-                    // Create mobile missions modal
-                    // You can add modal functionality here if needed
-                    alert('Mobile missions modal - Coming soon!')
+                    
+                    // Check authentication first
+                    const authenticated = await requireAuthentication('VIEW ALL MISSIONS')
+                    if (!authenticated) {
+                      console.log('❌ Authentication failed, blocking access to mobile missions modal')
+                      return
+                    }
+                    
+                    console.log('🎯 User authenticated, opening mobile missions modal...')
+                    
+                    // Create mobile-optimized missions modal
+                    const modal = document.createElement('div')
+                    modal.style.cssText = `
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      width: 100vw;
+                      height: 100vh;
+                      background: rgba(0, 0, 0, 0.9);
+                      display: flex;
+                      align-items: flex-end;
+                      justify-content: center;
+                      z-index: 10000;
+                      backdrop-filter: blur(5px);
+                      animation: mobileModalFadeIn 0.3s ease-out;
+                    `
+                    
+                    modal.innerHTML = `
+                      <div id="mobile-missions-modal" style="
+                        background: linear-gradient(145deg, #1a202c 0%, #2d3748 100%);
+                        border: 2px solid #fc8181;
+                        border-radius: 16px 16px 0 0;
+                        padding: 16px;
+                        width: 100%;
+                        max-height: 85vh;
+                        overflow: hidden;
+                        box-shadow: 0 -5px 30px rgba(252, 129, 129, 0.4);
+                        position: relative;
+                        transform: translateY(100%);
+                        animation: mobileSlideUp 0.4s ease-out forwards;
+                      ">
+                        <!-- Mobile Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(252, 129, 129, 0.3);">
+                          <h2 style="color: #fc8181; font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; margin: 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(252, 129, 129, 0.6);">
+                            🎯 ALL MISSIONS
+                          </h2>
+                          <button onclick="this.closest('#mobile-missions-modal').parentElement.style.animation = 'mobileModalFadeOut 0.3s ease-out forwards'; setTimeout(() => document.body.removeChild(this.closest('#mobile-missions-modal').parentElement), 300)" style="
+                            background: rgba(252, 129, 129, 0.2);
+                            border: 1px solid #fc8181;
+                            border-radius: 6px;
+                            color: #fc8181;
+                            cursor: pointer;
+                            padding: 6px 10px;
+                            font-family: 'Rajdhani', sans-serif;
+                            font-weight: 600;
+                            font-size: 14px;
+                            transition: all 0.2s ease;
+                          " onmouseover="this.style.background='rgba(252, 129, 129, 0.3)'" onmouseout="this.style.background='rgba(252, 129, 129, 0.2)'">
+                            ✕
+                          </button>
+                        </div>
+                        
+                        <!-- Mobile Tab Navigation -->
+                        <div style="display: flex; gap: 4px; margin-bottom: 16px;">
+                          <button id="mobile-daily-tab" onclick="mobileSwitchTab('daily')" style="
+                            flex: 1;
+                            padding: 8px;
+                            background: linear-gradient(90deg, #f6ad55 0%, #ed8936 100%);
+                            border: 2px solid #f6ad55;
+                            border-radius: 6px;
+                            color: #1a202c;
+                            font-size: 12px;
+                            font-weight: 700;
+                            cursor: pointer;
+                            font-family: 'Rajdhani', sans-serif;
+                            text-transform: uppercase;
+                            transition: all 0.2s ease;
+                            box-shadow: 0 0 8px rgba(246, 173, 85, 0.4);
+                          ">
+                            📅 DAILY
+                          </button>
+                          <button id="mobile-weekly-tab" onclick="mobileSwitchTab('weekly')" style="
+                            flex: 1;
+                            padding: 8px;
+                            background: rgba(139, 92, 246, 0.2);
+                            border: 2px solid #8b5cf6;
+                            border-radius: 6px;
+                            color: #8b5cf6;
+                            font-size: 12px;
+                            font-weight: 700;
+                            cursor: pointer;
+                            font-family: 'Rajdhani', sans-serif;
+                            text-transform: uppercase;
+                            transition: all 0.2s ease;
+                          ">
+                            🗓️ WEEKLY
+                          </button>
+                          <button id="mobile-special-tab" onclick="mobileSwitchTab('special')" style="
+                            flex: 1;
+                            padding: 8px;
+                            background: rgba(236, 72, 153, 0.2);
+                            border: 2px solid #ec4899;
+                            border-radius: 6px;
+                            color: #ec4899;
+                            font-size: 12px;
+                            font-weight: 700;
+                            cursor: pointer;
+                            font-family: 'Rajdhani', sans-serif;
+                            text-transform: uppercase;
+                            transition: all 0.2s ease;
+                          ">
+                            ⭐ SPECIAL
+                          </button>
+                        </div>
+                        
+                        <!-- Mobile Missions Container -->
+                        <div id="mobile-missions-container" style="
+                          max-height: 60vh;
+                          overflow-y: auto;
+                          padding-right: 8px;
+                        ">
+                          <!-- Missions will be rendered here -->
+                        </div>
+                      </div>
+                    `
+                    
+                    document.body.appendChild(modal)
+                    
+                    // Get user challenges data
+                    const userKey = isAuthenticated ? 
+                      \`challenges_\${(user?.wallet?.address || user?.email?.address || user?.id || 'guest').substring(0, 10)}\` :
+                      'challenges_guest'
+                    
+                    let challengesData = {}
+                    try {
+                      const saved = localStorage.getItem(userKey)
+                      challengesData = saved ? JSON.parse(saved) : {}
+                    } catch (error) {
+                      console.error('Error loading mobile challenges:', error)
+                    }
+                    
+                    // Mobile-optimized challenges data
+                    const mobileAllChallenges = {
+                      daily: [
+                        { 
+                          id: 'eat_50_coins', 
+                          name: 'Coin Collector', 
+                          description: 'Eat 50 coins in any game mode', 
+                          target: 50, 
+                          reward: 100,
+                          icon: '💰',
+                          type: 'daily'
+                        },
+                        { 
+                          id: 'survive_5_minutes', 
+                          name: 'Survivor', 
+                          description: 'Survive for 5 minutes without dying', 
+                          target: 300,
+                          reward: 150,
+                          icon: '⏱️',
+                          type: 'daily'
+                        },
+                        { 
+                          id: 'eat_10_viruses', 
+                          name: 'Virus Hunter', 
+                          description: 'Consume 10 green viruses', 
+                          target: 10, 
+                          reward: 120,
+                          icon: '🦠',
+                          type: 'daily'
+                        },
+                        { 
+                          id: 'use_split_10_times', 
+                          name: 'Split Master', 
+                          description: 'Use split ability 10 times', 
+                          target: 10, 
+                          reward: 80,
+                          icon: '🔄',
+                          type: 'daily'
+                        }
+                      ],
+                      weekly: [
+                        { 
+                          id: 'reach_mass_200', 
+                          name: 'Growing Strong', 
+                          description: 'Reach a mass of 200 in any single game', 
+                          target: 200, 
+                          reward: 200,
+                          icon: '📈',
+                          type: 'weekly'
+                        },
+                        { 
+                          id: 'cashout_5_times', 
+                          name: 'Cash Master', 
+                          description: 'Successfully cash out 5 times', 
+                          target: 5, 
+                          reward: 250,
+                          icon: '💰',
+                          type: 'weekly'
+                        },
+                        { 
+                          id: 'win_3_matches', 
+                          name: 'Champion', 
+                          description: 'Win 3 multiplayer matches', 
+                          target: 3, 
+                          reward: 300,
+                          icon: '🏆',
+                          type: 'weekly'
+                        },
+                        { 
+                          id: 'play_10_arena_games', 
+                          name: 'Arena Warrior', 
+                          description: 'Play 10 arena mode games', 
+                          target: 10, 
+                          reward: 180,
+                          icon: '⚔️',
+                          type: 'weekly'
+                        }
+                      ],
+                      special: [
+                        { 
+                          id: 'first_victory', 
+                          name: 'First Blood', 
+                          description: 'Win your first multiplayer match', 
+                          target: 1, 
+                          reward: 500,
+                          icon: '🥇',
+                          type: 'special'
+                        },
+                        { 
+                          id: 'mass_500', 
+                          name: 'Titan', 
+                          description: 'Reach a mass of 500 in any game', 
+                          target: 500, 
+                          reward: 1000,
+                          icon: '👹',
+                          type: 'special'
+                        },
+                        { 
+                          id: 'eliminate_50_players', 
+                          name: 'Executioner', 
+                          description: 'Eliminate 50 other players', 
+                          target: 50, 
+                          reward: 750,
+                          icon: '💀',
+                          type: 'special'
+                        }
+                      ]
+                    }
+                    
+                    // Mobile render function
+                    window.mobileRenderChallenges = (category) => {
+                      const container = document.getElementById('mobile-missions-container')
+                      if (!container) return
+                      
+                      const challenges = mobileAllChallenges[category] || []
+                      
+                      container.innerHTML = challenges.map(challenge => {
+                        const progress = challengesData[challenge.id] || { current: 0, completed: false }
+                        const progressPercent = Math.min((progress.current / challenge.target) * 100, 100)
+                        const isCompleted = progress.completed || progress.current >= challenge.target
+                        
+                        return \`
+                          <div style="
+                            background: \${isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)'};
+                            border: 2px solid \${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'};
+                            border-radius: 8px;
+                            padding: 12px;
+                            margin-bottom: 12px;
+                            position: relative;
+                          ">
+                            <!-- Mobile Mission Header -->
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                              <span style="font-size: 20px; flex-shrink: 0;">\${challenge.icon}</span>
+                              <div style="flex: 1; min-width: 0;">
+                                <div style="
+                                  font-size: 14px;
+                                  font-weight: 700;
+                                  color: \${isCompleted ? '#68d391' : '#e2e8f0'};
+                                  font-family: 'Rajdhani', sans-serif;
+                                  text-transform: uppercase;
+                                  margin-bottom: 2px;
+                                ">\${challenge.name}</div>
+                                <div style="
+                                  font-size: 11px;
+                                  color: #a0aec0;
+                                  font-family: 'Rajdhani', sans-serif;
+                                  line-height: 1.2;
+                                ">\${challenge.description}</div>
+                              </div>
+                              <div style="
+                                padding: 3px 6px;
+                                background: \${challenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 
+                                           challenge.type === 'weekly' ? 'rgba(139, 92, 246, 0.2)' : 
+                                           'rgba(236, 72, 153, 0.2)'};
+                                border: 1px solid \${challenge.type === 'daily' ? '#f6ad55' : 
+                                                   challenge.type === 'weekly' ? '#8b5cf6' : 
+                                                   '#ec4899'};
+                                border-radius: 4px;
+                                font-size: 9px;
+                                color: \${challenge.type === 'daily' ? '#f6ad55' : 
+                                       challenge.type === 'weekly' ? '#8b5cf6' : 
+                                       '#ec4899'};
+                                text-transform: uppercase;
+                                font-family: 'Rajdhani', sans-serif;
+                                font-weight: 600;
+                              ">\${challenge.type}</div>
+                            </div>
+                            
+                            <!-- Mobile Progress Bar -->
+                            <div style="
+                              background: rgba(45, 55, 72, 0.8);
+                              border-radius: 8px;
+                              height: 6px;
+                              overflow: hidden;
+                              margin-bottom: 8px;
+                              border: 1px solid rgba(148, 163, 184, 0.2);
+                            ">
+                              <div style="
+                                background: \${isCompleted ? 
+                                  'linear-gradient(90deg, #68d391 0%, #48bb78 50%, #68d391 100%)' : 
+                                  'linear-gradient(90deg, #fc8181 0%, #f56565 50%, #fc8181 100%)'};
+                                height: 100%;
+                                width: \${progressPercent}%;
+                                transition: width 0.8s ease-in-out;
+                                border-radius: 8px;
+                                box-shadow: \${isCompleted ? 
+                                  '0 0 8px rgba(104, 211, 145, 0.6)' : 
+                                  \`0 0 8px rgba(252, 129, 129, \${Math.max(0.3, progressPercent / 100 * 0.8)})\`};
+                              "></div>
+                            </div>
+                            
+                            <!-- Mobile Progress Text & Reward -->
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                              <span style="
+                                font-size: 11px;
+                                color: #a0aec0;
+                                font-family: 'Rajdhani', sans-serif;
+                                font-weight: 600;
+                              ">\${progress.current}/\${challenge.target} (\${Math.round(progressPercent)}%)</span>
+                              <span style="
+                                font-size: 14px;
+                                color: #fbbf24;
+                                font-family: 'Rajdhani', sans-serif;
+                                font-weight: 800;
+                                text-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+                              ">+\${challenge.reward} 💰</span>
+                            </div>
+                            
+                            <!-- Mobile Completion Badge -->
+                            \${isCompleted ? \`
+                              <div style="
+                                position: absolute;
+                                top: 8px;
+                                right: 8px;
+                                background: #68d391;
+                                color: #1a202c;
+                                border-radius: 50%;
+                                width: 20px;
+                                height: 20px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 12px;
+                                font-weight: bold;
+                                box-shadow: 0 0 8px rgba(104, 211, 145, 0.6);
+                                animation: completionPulse 2s ease-in-out infinite;
+                              ">✓</div>
+                            \` : ''}
+                          </div>
+                        \`
+                      }).join('')
+                      
+                      // Update tab active states
+                      document.querySelectorAll('[id$="-tab"]').forEach(tab => {
+                        const isActive = tab.id === \`mobile-\${category}-tab\`
+                        if (isActive) {
+                          tab.style.background = category === 'daily' ? 'linear-gradient(90deg, #f6ad55 0%, #ed8936 100%)' :
+                                                category === 'weekly' ? 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)' :
+                                                'linear-gradient(90deg, #ec4899 0%, #db2777 100%)'
+                          tab.style.color = '#1a202c'
+                          tab.style.boxShadow = category === 'daily' ? '0 0 8px rgba(246, 173, 85, 0.4)' :
+                                               category === 'weekly' ? '0 0 8px rgba(139, 92, 246, 0.4)' :
+                                               '0 0 8px rgba(236, 72, 153, 0.4)'
+                        } else {
+                          tab.style.background = category === 'daily' ? 'rgba(246, 173, 85, 0.2)' :
+                                                category === 'weekly' ? 'rgba(139, 92, 246, 0.2)' :
+                                                'rgba(236, 72, 153, 0.2)'
+                          tab.style.color = category === 'daily' ? '#f6ad55' :
+                                           category === 'weekly' ? '#8b5cf6' :
+                                           '#ec4899'
+                          tab.style.boxShadow = 'none'
+                        }
+                      })
+                    }
+                    
+                    // Mobile tab switching function
+                    window.mobileSwitchTab = (category) => {
+                      mobileRenderChallenges(category)
+                    }
+                    
+                    // Add mobile animations
+                    const mobileStyle = document.createElement('style')
+                    mobileStyle.textContent = \`
+                      @keyframes mobileModalFadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                      }
+                      @keyframes mobileModalFadeOut {
+                        from { opacity: 1; }
+                        to { opacity: 0; }
+                      }
+                      @keyframes mobileSlideUp {
+                        from { transform: translateY(100%); }
+                        to { transform: translateY(0); }
+                      }
+                      @keyframes completionPulse {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.1); }
+                      }
+                    \`
+                    document.head.appendChild(mobileStyle)
+                    
+                    // Initial render - daily tab
+                    mobileRenderChallenges('daily')
+                    
+                    console.log('✅ Mobile missions modal created successfully')
                   }}
                   style={{ 
                     fontSize: '9px', 
