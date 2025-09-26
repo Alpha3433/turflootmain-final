@@ -6167,9 +6167,15 @@ export default function TurfLootTactical() {
         {/* Top Right - Arsenal (Wallet) */}
         <div style={{
           position: 'absolute',
-          right: typeof window !== 'undefined' ? Math.max(20, window.innerWidth * 0.02) + 'px' : '200px', // Default to 200px on server
+          right: typeof window !== 'undefined' ? 
+            (window.innerWidth >= 1600 ? '200px' : // Large screens: original positioning
+             window.innerWidth >= 1200 ? Math.max(40, window.innerWidth * 0.03) + 'px' : // Medium screens: 3% margin, min 40px
+             '20px') : '200px', // Fallback for server-side rendering
           top: '160px',
-          width: typeof window !== 'undefined' ? Math.min(280, window.innerWidth * 0.22) + 'px' : '280px', // Default to 280px on server
+          width: typeof window !== 'undefined' ? 
+            (window.innerWidth >= 1600 ? '280px' : // Large screens: original width
+             window.innerWidth >= 1200 ? Math.max(260, Math.min(320, window.innerWidth * 0.24)) + 'px' : // Medium screens: 24% width, 260-320px range
+             '260px') : '280px', // Fallback for server-side rendering
           zIndex: 20,
           ...ambrerPanelStyle
         }}>
