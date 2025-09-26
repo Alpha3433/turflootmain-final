@@ -6071,19 +6071,19 @@ export default function TurfLootTactical() {
 
 
 
-        {/* Desktop 4-Panel Layout - Enhanced Responsive */}
+        {/* Desktop 4-Panel Layout - Laptop Optimized */}
         {/* Top Left - Command (Leaderboard) */}
         <div style={{
           position: 'absolute',
           left: typeof window !== 'undefined' ? 
             (window.innerWidth >= 1600 ? '200px' : // Large screens: original positioning
-             window.innerWidth >= 1200 ? Math.max(40, window.innerWidth * 0.03) + 'px' : // Medium screens: 3% margin, min 40px
+             window.innerWidth >= 1200 ? Math.max(30, window.innerWidth * 0.015) + 'px' : // Laptop screens: 1.5% margin, min 30px
              '20px') : '200px', // Fallback for server-side rendering
           top: '160px',
           width: typeof window !== 'undefined' ? 
             (window.innerWidth >= 1600 ? '280px' : // Large screens: original width
-             window.innerWidth >= 1200 ? Math.max(260, Math.min(320, window.innerWidth * 0.24)) + 'px' : // Medium screens: 24% width, 260-320px range
-             '260px') : '280px', // Fallback for server-side rendering
+             window.innerWidth >= 1200 ? Math.max(240, Math.min(280, window.innerWidth * 0.18)) + 'px' : // Laptop screens: 18% width, 240-280px range
+             '240px') : '280px', // Fallback for server-side rendering
           zIndex: 20,
           ...tacticalPanelStyle
         }}>
