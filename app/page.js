@@ -10660,120 +10660,117 @@ export default function TurfLootTactical() {
                         const progressPercent = Math.min((progress.current / challenge.target) * 100, 100)
                         const isCompleted = progress.completed || progress.current >= challenge.target
                         
-                        return \`
-                          <div style="
-                            background: \${isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)'};
-                            border: 2px solid \${isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)'};
-                            border-radius: 8px;
-                            padding: 12px;
-                            margin-bottom: 12px;
-                            position: relative;
-                          ">
-                            <!-- Mobile Mission Header -->
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                              <span style="font-size: 20px; flex-shrink: 0;">\${challenge.icon}</span>
-                              <div style="flex: 1; min-width: 0;">
-                                <div style="
-                                  font-size: 14px;
-                                  font-weight: 700;
-                                  color: \${isCompleted ? '#68d391' : '#e2e8f0'};
-                                  font-family: 'Rajdhani', sans-serif;
-                                  text-transform: uppercase;
-                                  margin-bottom: 2px;
-                                ">\${challenge.name}</div>
-                                <div style="
-                                  font-size: 11px;
-                                  color: #a0aec0;
-                                  font-family: 'Rajdhani', sans-serif;
-                                  line-height: 1.2;
-                                ">\${challenge.description}</div>
-                              </div>
-                              <div style="
-                                padding: 3px 6px;
-                                background: \${challenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 
-                                           challenge.type === 'weekly' ? 'rgba(139, 92, 246, 0.2)' : 
-                                           'rgba(236, 72, 153, 0.2)'};
-                                border: 1px solid \${challenge.type === 'daily' ? '#f6ad55' : 
-                                                   challenge.type === 'weekly' ? '#8b5cf6' : 
-                                                   '#ec4899'};
-                                border-radius: 4px;
-                                font-size: 9px;
-                                color: \${challenge.type === 'daily' ? '#f6ad55' : 
-                                       challenge.type === 'weekly' ? '#8b5cf6' : 
-                                       '#ec4899'};
-                                text-transform: uppercase;
-                                font-family: 'Rajdhani', sans-serif;
-                                font-weight: 600;
-                              ">\${challenge.type}</div>
-                            </div>
-                            
-                            <!-- Mobile Progress Bar -->
-                            <div style="
-                              background: rgba(45, 55, 72, 0.8);
-                              border-radius: 8px;
-                              height: 6px;
-                              overflow: hidden;
-                              margin-bottom: 8px;
-                              border: 1px solid rgba(148, 163, 184, 0.2);
-                            ">
-                              <div style="
-                                background: \${isCompleted ? 
-                                  'linear-gradient(90deg, #68d391 0%, #48bb78 50%, #68d391 100%)' : 
-                                  'linear-gradient(90deg, #fc8181 0%, #f56565 50%, #fc8181 100%)'};
-                                height: 100%;
-                                width: \${progressPercent}%;
-                                transition: width 0.8s ease-in-out;
-                                border-radius: 8px;
-                                box-shadow: \${isCompleted ? 
-                                  '0 0 8px rgba(104, 211, 145, 0.6)' : 
-                                  \`0 0 8px rgba(252, 129, 129, \${Math.max(0.3, progressPercent / 100 * 0.8)})\`};
-                              "></div>
-                            </div>
-                            
-                            <!-- Mobile Progress Text & Reward -->
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                              <span style="
-                                font-size: 11px;
-                                color: #a0aec0;
-                                font-family: 'Rajdhani', sans-serif;
-                                font-weight: 600;
-                              ">\${progress.current}/\${challenge.target} (\${Math.round(progressPercent)}%)</span>
-                              <span style="
-                                font-size: 14px;
-                                color: #fbbf24;
-                                font-family: 'Rajdhani', sans-serif;
-                                font-weight: 800;
-                                text-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
-                              ">+\${challenge.reward} 💰</span>
-                            </div>
-                            
-                            <!-- Mobile Completion Badge -->
-                            \${isCompleted ? \`
-                              <div style="
-                                position: absolute;
-                                top: 8px;
-                                right: 8px;
-                                background: #68d391;
-                                color: #1a202c;
-                                border-radius: 50%;
-                                width: 20px;
-                                height: 20px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                font-size: 12px;
-                                font-weight: bold;
-                                box-shadow: 0 0 8px rgba(104, 211, 145, 0.6);
-                                animation: completionPulse 2s ease-in-out infinite;
-                              ">✓</div>
-                            \` : ''}
-                          </div>
-                        \`
+                        return '<div style="' +
+                          'background: ' + (isCompleted ? 'rgba(104, 211, 145, 0.1)' : 'rgba(45, 55, 72, 0.5)') + ';' +
+                          'border: 2px solid ' + (isCompleted ? '#68d391' : 'rgba(252, 129, 129, 0.3)') + ';' +
+                          'border-radius: 8px;' +
+                          'padding: 12px;' +
+                          'margin-bottom: 12px;' +
+                          'position: relative;' +
+                        '">' +
+                          '<!-- Mobile Mission Header -->' +
+                          '<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">' +
+                            '<span style="font-size: 20px; flex-shrink: 0;">' + challenge.icon + '</span>' +
+                            '<div style="flex: 1; min-width: 0;">' +
+                              '<div style="' +
+                                'font-size: 14px;' +
+                                'font-weight: 700;' +
+                                'color: ' + (isCompleted ? '#68d391' : '#e2e8f0') + ';' +
+                                'font-family: \'Rajdhani\', sans-serif;' +
+                                'text-transform: uppercase;' +
+                                'margin-bottom: 2px;' +
+                              '">' + challenge.name + '</div>' +
+                              '<div style="' +
+                                'font-size: 11px;' +
+                                'color: #a0aec0;' +
+                                'font-family: \'Rajdhani\', sans-serif;' +
+                                'line-height: 1.2;' +
+                              '">' + challenge.description + '</div>' +
+                            '</div>' +
+                            '<div style="' +
+                              'padding: 3px 6px;' +
+                              'background: ' + (challenge.type === 'daily' ? 'rgba(246, 173, 85, 0.2)' : 
+                                               challenge.type === 'weekly' ? 'rgba(139, 92, 246, 0.2)' : 
+                                               'rgba(236, 72, 153, 0.2)') + ';' +
+                              'border: 1px solid ' + (challenge.type === 'daily' ? '#f6ad55' : 
+                                                     challenge.type === 'weekly' ? '#8b5cf6' : 
+                                                     '#ec4899') + ';' +
+                              'border-radius: 4px;' +
+                              'font-size: 9px;' +
+                              'color: ' + (challenge.type === 'daily' ? '#f6ad55' : 
+                                         challenge.type === 'weekly' ? '#8b5cf6' : 
+                                         '#ec4899') + ';' +
+                              'text-transform: uppercase;' +
+                              'font-family: \'Rajdhani\', sans-serif;' +
+                              'font-weight: 600;' +
+                            '">' + challenge.type + '</div>' +
+                          '</div>' +
+                          
+                          '<!-- Mobile Progress Bar -->' +
+                          '<div style="' +
+                            'background: rgba(45, 55, 72, 0.8);' +
+                            'border-radius: 8px;' +
+                            'height: 6px;' +
+                            'overflow: hidden;' +
+                            'margin-bottom: 8px;' +
+                            'border: 1px solid rgba(148, 163, 184, 0.2);' +
+                          '">' +
+                            '<div style="' +
+                              'background: ' + (isCompleted ? 
+                                'linear-gradient(90deg, #68d391 0%, #48bb78 50%, #68d391 100%)' : 
+                                'linear-gradient(90deg, #fc8181 0%, #f56565 50%, #fc8181 100%)') + ';' +
+                              'height: 100%;' +
+                              'width: ' + progressPercent + '%;' +
+                              'transition: width 0.8s ease-in-out;' +
+                              'border-radius: 8px;' +
+                              'box-shadow: ' + (isCompleted ? 
+                                '0 0 8px rgba(104, 211, 145, 0.6)' : 
+                                '0 0 8px rgba(252, 129, 129, ' + Math.max(0.3, progressPercent / 100 * 0.8) + ')') + ';' +
+                            '"></div>' +
+                          '</div>' +
+                          
+                          '<!-- Mobile Progress Text & Reward -->' +
+                          '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+                            '<span style="' +
+                              'font-size: 11px;' +
+                              'color: #a0aec0;' +
+                              'font-family: \'Rajdhani\', sans-serif;' +
+                              'font-weight: 600;' +
+                            '">' + progress.current + '/' + challenge.target + ' (' + Math.round(progressPercent) + '%)</span>' +
+                            '<span style="' +
+                              'font-size: 14px;' +
+                              'color: #fbbf24;' +
+                              'font-family: \'Rajdhani\', sans-serif;' +
+                              'font-weight: 800;' +
+                              'text-shadow: 0 0 8px rgba(251, 191, 36, 0.8);' +
+                            '">+' + challenge.reward + ' 💰</span>' +
+                          '</div>' +
+                          
+                          '<!-- Mobile Completion Badge -->' +
+                          (isCompleted ? 
+                            '<div style="' +
+                              'position: absolute;' +
+                              'top: 8px;' +
+                              'right: 8px;' +
+                              'background: #68d391;' +
+                              'color: #1a202c;' +
+                              'border-radius: 50%;' +
+                              'width: 20px;' +
+                              'height: 20px;' +
+                              'display: flex;' +
+                              'align-items: center;' +
+                              'justify-content: center;' +
+                              'font-size: 12px;' +
+                              'font-weight: bold;' +
+                              'box-shadow: 0 0 8px rgba(104, 211, 145, 0.6);' +
+                              'animation: completionPulse 2s ease-in-out infinite;' +
+                            '">✓</div>' : '') +
+                        '</div>'
                       }).join('')
                       
                       // Update tab active states
                       document.querySelectorAll('[id$="-tab"]').forEach(tab => {
-                        const isActive = tab.id === \`mobile-\${category}-tab\`
+                        const isActive = tab.id === 'mobile-' + category + '-tab'
                         if (isActive) {
                           tab.style.background = category === 'daily' ? 'linear-gradient(90deg, #f6ad55 0%, #ed8936 100%)' :
                                                 category === 'weekly' ? 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)' :
