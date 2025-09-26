@@ -1798,39 +1798,73 @@ export default function TurfLootTactical() {
   }, []) // Only run once after mount
 
   useEffect(() => {
-    // Aggressive mobile detection - prioritizes screen size
+    // Enhanced laptop-friendly device detection
     const checkMobile = () => {
-      // Screen dimensions - mobile if height <= 768 OR smallest dimension <= 768
-      const heightCheck = window.innerHeight <= 768
-      const smallestCheck = Math.min(window.innerWidth, window.innerHeight) <= 768
-      const isSmallScreen = heightCheck || smallestCheck
-      
-      // Mobile landscape detection (wide but short screens - like phones in landscape)
-      const aspectRatio = window.innerWidth / window.innerHeight
-      const isMobileLandscape = window.innerHeight <= 500 && aspectRatio >= 1.5
+      // Screen dimensions - be more specific about what constitutes mobile
+      const screenWidth = window.innerWidth
+      const screenHeight = window.innerHeight
+      const minDimension = Math.min(screenWidth, screenHeight)
+      const aspectRatio = screenWidth / screenHeight
       
       // Touch and user agent detection (for real devices)
       const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       
-      // ALWAYS mobile if screen is very small (for automation/testing)
-      const isVerySmallScreen = window.innerHeight <= 600 || window.innerWidth <= 600
+      // Laptop detection - prioritize laptop characteristics
+      const isLikelyLaptop = !isMobileUA && screenWidth >= 1024 && screenHeight >= 600
+      const hasLaptopAspectRatio = aspectRatio >= 1.2 && aspectRatio <= 2.5 // Typical laptop ratios
       
-      // Device is mobile if ANY of these conditions are true:
-      const mobile = isSmallScreen || isMobileLandscape || isVerySmallScreen || (isTouchDevice && isMobileUA)
+      // Mobile phone detection (portrait phones)
+      const isPhonePortrait = screenWidth < 768 && aspectRatio < 1
       
-      console.log('📱 AGGRESSIVE Mobile Detection:', {
-        heightCheck,
-        smallestCheck,
-        isSmallScreen,
-        isMobileLandscape,
-        isVerySmallScreen,
+      // Mobile phone detection (landscape phones)  
+      const isPhoneLandscape = screenHeight < 500 && aspectRatio >= 1.5 && screenWidth < 900
+      
+      // Tablet detection (larger touch devices)
+      const isTablet = isTouchDevice && isMobileUA && minDimension >= 768 && minDimension < 1024
+      
+      // Very small screens (definitely mobile)
+      const isTinyScreen = screenWidth < 600 && screenHeight < 600
+      
+      // LAPTOP PRIORITY: If it looks like a laptop, treat as desktop
+      if (isLikelyLaptop && hasLaptopAspectRatio && !isMobileUA) {
+        console.log('💻 LAPTOP DETECTED - Using desktop layout')
+        const mobile = false
+        
+        console.log('📱 Enhanced Device Detection (LAPTOP):', {
+          screenWidth,
+          screenHeight,
+          minDimension,
+          aspectRatio: aspectRatio.toFixed(2),
+          isTouchDevice,
+          isMobileUA,
+          isLikelyLaptop,
+          hasLaptopAspectRatio,
+          result: mobile,
+          '*** FINAL DECISION ***': mobile ? 'MOBILE LAYOUT' : 'DESKTOP LAYOUT'
+        })
+        
+        setIsMobile(mobile)
+        return
+      }
+      
+      // Device is mobile if ANY of these mobile conditions are true:
+      const mobile = isPhonePortrait || isPhoneLandscape || isTablet || isTinyScreen || 
+                     (isTouchDevice && isMobileUA && screenWidth < 1024)
+      
+      console.log('📱 Enhanced Device Detection:', {
+        screenWidth,
+        screenHeight, 
+        minDimension,
+        aspectRatio: aspectRatio.toFixed(2),
         isTouchDevice,
         isMobileUA,
-        screenWidth: window.innerWidth,
-        screenHeight: window.innerHeight,
-        minDimension: Math.min(window.innerWidth, window.innerHeight),
-        aspectRatio: aspectRatio.toFixed(2),
+        isLikelyLaptop,
+        hasLaptopAspectRatio,
+        isPhonePortrait,
+        isPhoneLandscape,
+        isTablet,
+        isTinyScreen,
         result: mobile,
         '*** FINAL DECISION ***': mobile ? 'MOBILE LAYOUT' : 'DESKTOP LAYOUT'
       })
