@@ -4594,7 +4594,11 @@ export default function TurfLootTactical() {
   const subtitleStyle = {
     color: '#68d391',
     fontWeight: '700',
-    fontSize: isMobile ? '12px' : '16px',
+    fontSize: typeof window !== 'undefined' ?
+      (isMobile ? '12px' :
+        window.innerWidth >= 1600 ? '16px' : // Large screens: original size
+        window.innerWidth >= 1200 ? '14px' : // Laptop screens: slightly smaller
+        '12px') : '16px', // Fallback for server-side rendering
     letterSpacing: '0.3em',
     margin: 0,
     textTransform: 'uppercase',
