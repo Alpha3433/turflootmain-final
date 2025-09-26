@@ -553,7 +553,6 @@ export default function TurfLootTactical() {
   const [userName, setUserName] = useState('PLAYER')
   const [isMobile, setIsMobile] = useState(false)
   const [forceUpdate, setForceUpdate] = useState(0) // Force re-render for responsive positioning
-  const [forceUpdate, setForceUpdate] = useState(0)
   const [eyePosition, setEyePosition] = useState({ x: 0, y: 0 })
   
   // Orientation state for mobile
