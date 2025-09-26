@@ -7186,9 +7186,9 @@ export default function TurfLootTactical() {
         {/* Bottom Right - Loadout */}
         <div style={{
           position: 'absolute',
-          right: Math.max(20, window.innerWidth * 0.02) + 'px', // Responsive right margin: 2% of screen width, minimum 20px
+          right: typeof window !== 'undefined' ? Math.max(20, window.innerWidth * 0.02) + 'px' : '200px', // Default to 200px on server
           bottom: '160px',
-          width: Math.min(280, window.innerWidth * 0.22) + 'px', // Responsive width: 22% of screen width, maximum 280px  
+          width: typeof window !== 'undefined' ? Math.min(280, window.innerWidth * 0.22) + 'px' : '280px', // Default to 280px on server  
           zIndex: 20,
           ...ambrerPanelStyle
         }}>
