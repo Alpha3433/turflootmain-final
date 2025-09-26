@@ -4622,12 +4622,24 @@ export default function TurfLootTactical() {
     background: 'rgba(26, 32, 44, 0.9)',
     border: '2px solid #68d391',
     borderRadius: '4px',
-    padding: isMobile ? '12px 16px' : '14px 20px',
+    padding: typeof window !== 'undefined' ?
+      (isMobile ? '12px 16px' :
+        window.innerWidth >= 1600 ? '14px 20px' : // Large screens: original padding
+        window.innerWidth >= 1200 ? '12px 18px' : // Laptop screens: slightly smaller
+        '10px 16px') : '14px 20px', // Fallback for server-side rendering
     color: '#68d391',
     fontWeight: '700',
     textAlign: 'center',
-    width: isMobile ? '160px' : '200px',
-    fontSize: isMobile ? '14px' : '16px',
+    width: typeof window !== 'undefined' ?
+      (isMobile ? '160px' :
+        window.innerWidth >= 1600 ? '200px' : // Large screens: original width
+        window.innerWidth >= 1200 ? '180px' : // Laptop screens: slightly smaller
+        '160px') : '200px', // Fallback for server-side rendering
+    fontSize: typeof window !== 'undefined' ?
+      (isMobile ? '14px' :
+        window.innerWidth >= 1600 ? '16px' : // Large screens: original size
+        window.innerWidth >= 1200 ? '15px' : // Laptop screens: slightly smaller
+        '14px') : '16px', // Fallback for server-side rendering
     boxShadow: '0 0 20px rgba(104, 211, 145, 0.3), inset 0 0 10px rgba(104, 211, 145, 0.1)',
     outline: 'none',
     transition: 'all 0.3s ease',
