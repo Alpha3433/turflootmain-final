@@ -4770,7 +4770,11 @@ export default function TurfLootTactical() {
   const statsStyle = {
     textAlign: 'center',
     display: 'flex',
-    gap: isMobile ? '48px' : '80px',
+    gap: typeof window !== 'undefined' ?
+      (isMobile ? '48px' :
+        window.innerWidth >= 1600 ? '80px' : // Large screens: original gap
+        window.innerWidth >= 1200 ? '60px' : // Laptop screens: smaller gap
+        '48px') : '80px', // Fallback for server-side rendering
     justifyContent: 'center',
     padding: isMobile ? '20px 0' : '0',
     zIndex: 25,
