@@ -7204,9 +7204,15 @@ export default function TurfLootTactical() {
         {/* Bottom Right - Loadout */}
         <div style={{
           position: 'absolute',
-          right: typeof window !== 'undefined' ? Math.max(20, window.innerWidth * 0.02) + 'px' : '200px', // Default to 200px on server
+          right: typeof window !== 'undefined' ? 
+            (window.innerWidth >= 1600 ? '200px' : // Large screens: original positioning
+             window.innerWidth >= 1200 ? Math.max(30, window.innerWidth * 0.015) + 'px' : // Laptop screens: 1.5% margin, min 30px
+             '20px') : '200px', // Fallback for server-side rendering
           bottom: '160px',
-          width: typeof window !== 'undefined' ? Math.min(280, window.innerWidth * 0.22) + 'px' : '280px', // Default to 280px on server  
+          width: typeof window !== 'undefined' ? 
+            (window.innerWidth >= 1600 ? '280px' : // Large screens: original width
+             window.innerWidth >= 1200 ? Math.max(240, Math.min(280, window.innerWidth * 0.18)) + 'px' : // Laptop screens: 18% width, 240-280px range
+             '240px') : '280px', // Fallback for server-side rendering  
           zIndex: 20,
           ...ambrerPanelStyle
         }}>
