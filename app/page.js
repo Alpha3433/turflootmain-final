@@ -1873,8 +1873,15 @@ export default function TurfLootTactical() {
       setIsMobile(mobile)
     }
     
+    // Force component re-render when screen size changes to update responsive positioning
+    const handleResize = () => {
+      checkMobile()
+      // Trigger re-render for responsive panel positioning
+      setForceUpdate(prev => prev + 1)
+    }
+    
     checkMobile()
-    window.addEventListener('resize', checkMobile)
+    window.addEventListener('resize', handleResize)
     
     // Live stats will be updated when users join/leave games and cash out
     
