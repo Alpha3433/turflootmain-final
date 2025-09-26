@@ -4713,16 +4713,28 @@ export default function TurfLootTactical() {
   }
 
   const secondaryButtonStyle = {
-    padding: isMobile ? '10px 20px' : '12px 24px',
+    padding: typeof window !== 'undefined' ?
+      (isMobile ? '10px 20px' :
+        window.innerWidth >= 1600 ? '12px 24px' : // Large screens: original padding
+        window.innerWidth >= 1200 ? '11px 22px' : // Laptop screens: slightly smaller
+        '10px 20px') : '12px 24px', // Fallback for server-side rendering
     background: 'rgba(26, 32, 44, 0.8)',
     border: '2px solid #68d391',
     borderRadius: '4px',
     color: '#68d391',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    margin: isMobile ? '0 6px' : '0 10px',
+    margin: typeof window !== 'undefined' ?
+      (isMobile ? '0 6px' :
+        window.innerWidth >= 1600 ? '0 10px' : // Large screens: original margin
+        window.innerWidth >= 1200 ? '0 8px' : // Laptop screens: slightly smaller
+        '0 6px') : '0 10px', // Fallback for server-side rendering
     fontWeight: '600',
-    fontSize: isMobile ? '12px' : '14px',
+    fontSize: typeof window !== 'undefined' ?
+      (isMobile ? '12px' :
+        window.innerWidth >= 1600 ? '14px' : // Large screens: original size
+        window.innerWidth >= 1200 ? '13px' : // Laptop screens: slightly smaller
+        '12px') : '14px', // Fallback for server-side rendering
     boxShadow: '0 0 15px rgba(104, 211, 145, 0.3)',
     fontFamily: '"Rajdhani", sans-serif',
     textTransform: 'uppercase',
