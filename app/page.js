@@ -6063,13 +6063,13 @@ export default function TurfLootTactical() {
 
 
 
-        {/* Desktop 4-Panel Layout - Fixed */}
-        {/* Top Left - Command */}
+        {/* Desktop 4-Panel Layout - Responsive Fixed */}
+        {/* Top Left - Command (Leaderboard) */}
         <div style={{
           position: 'absolute',
-          left: '200px',
+          left: Math.max(20, window.innerWidth * 0.02) + 'px', // Responsive left margin: 2% of screen width, minimum 20px
           top: '160px',
-          width: '280px',  
+          width: Math.min(280, window.innerWidth * 0.22) + 'px', // Responsive width: 22% of screen width, maximum 280px
           zIndex: 20,
           ...tacticalPanelStyle
         }}>
