@@ -10798,24 +10798,23 @@ export default function TurfLootTactical() {
                     
                     // Add mobile animations
                     const mobileStyle = document.createElement('style')
-                    mobileStyle.textContent = \`
-                      @keyframes mobileModalFadeIn {
-                        from { opacity: 0; }
-                        to { opacity: 1; }
-                      }
-                      @keyframes mobileModalFadeOut {
-                        from { opacity: 1; }
-                        to { opacity: 0; }
-                      }
-                      @keyframes mobileSlideUp {
-                        from { transform: translateY(100%); }
-                        to { transform: translateY(0); }
-                      }
-                      @keyframes completionPulse {
-                        0%, 100% { transform: scale(1); }
-                        50% { transform: scale(1.1); }
-                      }
-                    \`
+                    mobileStyle.textContent = 
+                      '@keyframes mobileModalFadeIn {' +
+                        'from { opacity: 0; }' +
+                        'to { opacity: 1; }' +
+                      '}' +
+                      '@keyframes mobileModalFadeOut {' +
+                        'from { opacity: 1; }' +
+                        'to { opacity: 0; }' +
+                      '}' +
+                      '@keyframes mobileSlideUp {' +
+                        'from { transform: translateY(100%); }' +
+                        'to { transform: translateY(0); }' +
+                      '}' +
+                      '@keyframes completionPulse {' +
+                        '0%, 100% { transform: scale(1); }' +
+                        '50% { transform: scale(1.1); }' +
+                      '}'
                     document.head.appendChild(mobileStyle)
                     
                     // Initial render - daily tab
