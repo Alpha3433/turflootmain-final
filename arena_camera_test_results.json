@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-09-27T09:27:30.990082",
+  "timestamp": "2025-09-27T09:28:40.903114",
   "total_tests": 10,
   "passed_tests": 7,
   "failed_tests": 3,
@@ -61,7 +61,7 @@
     {
       "test": "Camera Bounds Checking",
       "status": "\u274c FAILED",
-      "details": "Bounds check found: False, World limits: True, Math.max/min: False",
+      "details": "Bounds check found: False, World limits: False, Math.max/min: False, Boundary extension: False",
       "error": ""
     }
   ]
