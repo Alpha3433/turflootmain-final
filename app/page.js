@@ -4492,6 +4492,7 @@ export default function TurfLootTactical() {
 
   const containerStyle = {
     minHeight: '100vh',
+    height: '100vh', // Lock height to viewport to prevent layout changes from height adjustments
     width: '100vw',
     margin: 0,
     padding: 0,
