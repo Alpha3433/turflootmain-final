@@ -180,24 +180,96 @@ class CircularBoundaryTester:
                 is_safe == should_be_safe,
                 f"Position: ({x:.0f}, {y:.0f}), Distance: {distance:.1f}px, Safe: {is_safe}"
             )
-            print(f"  {status} {check.replace('_', ' ').title()}: {'Found' if result else 'Not Found'}")
-        
-        print(f"📈 Camera Code Analysis: {passed_checks}/{total_checks} checks passed ({passed_checks/total_checks*100:.1f}%)")
-        
-        return passed_checks >= 6  # Require at least 6/7 checks to pass
-        
-    except Exception as e:
-        print(f"❌ Camera System Code Analysis Error: {e}")
-        return False
 
-def test_unified_camera_implementation():
-    """Test that there's only one camera implementation for both modes"""
-    print("\n🔍 Testing Unified Camera Implementation...")
-    
-    try:
-        # Read the agario page.js file
-        with open('/app/app/agario/page.js', 'r') as f:
-            content = f.read()
+    def test_client_side_boundary_implementation(self):
+        """Test 4: Client-Side Boundary Implementation Analysis"""
+        print("\n🔍 TESTING CATEGORY 4: CLIENT-SIDE BOUNDARY IMPLEMENTATION")
+        
+        # Since we can't directly test client-side JavaScript from Python,
+        # we'll verify the implementation exists by checking the code patterns
+        
+        try:
+            # Read the client-side code
+            with open('/app/app/agario/page.js', 'r') as f:
+                client_code = f.read()
+            
+            # Check for circular boundary patterns
+            patterns = {
+                "currentPlayableRadius Usage": "currentPlayableRadius - this.player.radius" in client_code,
+                "Distance Calculation": "Math.sqrt(Math.pow(this.player.x - centerX, 2)" in client_code,
+                "Angle-Based Clamping": "Math.atan2(this.player.y - centerY, this.player.x - centerX)" in client_code,
+                "Boundary Repositioning": "Math.cos(angle) * maxRadius" in client_code,
+                "drawWorldBoundary Method": "drawWorldBoundary()" in client_code,
+                "Green Circle Rendering": "strokeStyle = zoneColor" in client_code
+            }
+            
+            for pattern_name, found in patterns.items():
+                self.log_test(
+                    "Client-Side Boundary Implementation",
+                    pattern_name,
+                    found,
+                    f"Pattern {'found' if found else 'not found'} in client code"
+                )
+                
+        except FileNotFoundError:
+            self.log_test(
+                "Client-Side Boundary Implementation",
+                "Code Analysis",
+                False,
+                "Client code file not accessible"
+            )
+
+    def test_server_side_boundary_enforcement(self):
+        """Test 5: Server-Side Boundary Enforcement"""
+        print("\n🔍 TESTING CATEGORY 5: SERVER-SIDE BOUNDARY ENFORCEMENT")
+        
+        try:
+            # Read server-side TypeScript code
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                server_ts_code = f.read()
+            
+            # Read compiled JavaScript code
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                server_js_code = f.read()
+            
+            # Check server-side boundary patterns
+            ts_patterns = {
+                "Circular Bounds Check": "distanceFromCenter > maxRadius" in server_ts_code,
+                "Playable Radius": "playableRadius = 1800" in server_ts_code,
+                "Angle-Based Clamping": "Math.atan2(player.y - centerY, player.x - centerX)" in server_ts_code,
+                "Player Repositioning": "Math.cos(angle) * maxRadius" in server_ts_code
+            }
+            
+            js_patterns = {
+                "Compiled Circular Bounds": "distanceFromCenter > maxRadius" in server_js_code,
+                "Compiled Playable Radius": "playableRadius = 1800" in server_js_code,
+                "Compiled Angle Clamping": "Math.atan2" in server_js_code,
+                "Compiled Repositioning": "Math.cos(angle)" in server_js_code
+            }
+            
+            for pattern_name, found in ts_patterns.items():
+                self.log_test(
+                    "Server-Side Boundary Enforcement",
+                    f"TypeScript: {pattern_name}",
+                    found,
+                    f"Pattern {'found' if found else 'not found'} in TypeScript code"
+                )
+            
+            for pattern_name, found in js_patterns.items():
+                self.log_test(
+                    "Server-Side Boundary Enforcement",
+                    f"JavaScript: {pattern_name}",
+                    found,
+                    f"Pattern {'found' if found else 'not found'} in compiled JavaScript"
+                )
+                
+        except FileNotFoundError as e:
+            self.log_test(
+                "Server-Side Boundary Enforcement",
+                "Code Analysis",
+                False,
+                f"Server code file not accessible: {str(e)}"
+            )
         
         # Count camera-related method definitions
         camera_method_count = content.count('updateCamera()')
