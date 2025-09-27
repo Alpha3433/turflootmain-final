@@ -947,11 +947,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                                   color: 'white',
                                   border: 'none',
                                   borderRadius: '6px',
-                                  padding: '8px 16px',
+                                  padding: isMobile ? '12px 20px' : '8px 16px',
                                   cursor: 'pointer',
-                                  fontSize: '12px',
+                                  fontSize: isMobile ? '13px' : '12px',
                                   fontWeight: 'bold',
-                                  boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)'
+                                  boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)',
+                                  minHeight: isMobile ? '44px' : 'auto',
+                                  minWidth: isMobile ? '70px' : 'auto'
                                 }}
                               >
                                 CREATE
