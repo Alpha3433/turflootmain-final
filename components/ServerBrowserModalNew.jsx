@@ -20,8 +20,16 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
       const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       
-      // Mobile detection for modal
-      const mobile = screenWidth < 768 || (isTouchDevice && isMobileUA && screenWidth < 1024)
+      // Enhanced mobile detection for modal - more inclusive
+      const mobile = screenWidth <= 768 || screenHeight <= 600 || isTouchDevice || isMobileUA
+      
+      console.log('🔧 ServerBrowserModal Mobile Detection:', {
+        screenWidth,
+        screenHeight,
+        isTouchDevice,
+        isMobileUA,
+        result: mobile ? 'MOBILE' : 'DESKTOP'
+      })
       
       setIsMobile(mobile)
     }
