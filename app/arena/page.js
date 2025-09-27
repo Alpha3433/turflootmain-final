@@ -303,7 +303,7 @@ const MultiplayerArena = () => {
           hasWsRef: !!wsRef.current,
           hasConnection: !!wsRef.current?.connection,
           readyState: wsRef.current?.connection?.readyState,
-          expectedState: WebSocket.OPEN
+          expectedState: 1 // WebSocket.OPEN
         })
         return
       }
