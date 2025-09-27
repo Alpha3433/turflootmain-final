@@ -212,20 +212,20 @@ backend:
         - agent: "testing"
         - comment: "❌ CAMERA DESYNC DETECTION NOT IMPLEMENTED: No distance checking logic found in updateCamera method. The current camera system lacks desync detection which can cause camera to get 'lost' and not properly track the player in arena mode multiplayer games."
 
-  - task: "Arena Connection Testing"
-    implemented: true
-    working: true
-    file: "/app/src/rooms/ArenaRoom.ts, /app/build/rooms/ArenaRoom.js, /app/app/api/servers/route.js"
+  - task: "Robust Snap Logic (500px threshold)"
+    implemented: false
+    working: false
+    file: "/app/app/agario/page.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
         - agent: "testing"
-        - comment: "ARENA CONNECTION TESTING INITIATED: Testing the full join flow to verify starting mass."
-        - working: true
+        - comment: "ROBUST SNAP LOGIC TESTING INITIATED: Testing for robust snap logic with 500px threshold - if camera distance from player exceeds 500px, immediately snap to correct position."
+        - working: false
         - agent: "testing"
-        - comment: "✅ ARENA CONNECTION TESTING VERIFIED (100% SUCCESS): Full arena connection flow operational with correct mass = 25. API Health Check: turfloot-api operational with multiplayer features enabled. Colyseus Servers Endpoint: Arena server found (colyseus-arena-global, Max: 50, Current: 1) with proper endpoint configuration (wss://au-syd-ab3eaf4e.colyseus.cloud). Database Integration: Session tracking operational for connection management. Arena connection infrastructure ready for mass = 25 gameplay."
+        - comment: "❌ ROBUST SNAP LOGIC (500px threshold) NOT IMPLEMENTED: No 500px threshold logic found in camera system. The current camera only uses basic smoothing without distance-based snap logic. This can cause camera drift issues in arena mode when server updates player position significantly."
 
   - task: "Protection Timer Logic Verification"
     implemented: true
