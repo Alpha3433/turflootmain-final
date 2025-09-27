@@ -410,9 +410,23 @@ export class ArenaRoom extends Room<GameState> {
         player.y += moveY;
       }
       
-      // Keep player in bounds
-      player.x = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.x));
-      player.y = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.y));
+      // Keep player in circular bounds (matching client-side circular boundary)
+      const centerX = this.worldSize / 2;
+      const centerY = this.worldSize / 2;
+      const playableRadius = 1800; // Match client-side maxPlayableRadius
+      const maxRadius = playableRadius - player.radius;
+      
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(player.x - centerX, 2) + 
+        Math.pow(player.y - centerY, 2)
+      );
+      
+      if (distanceFromCenter > maxRadius) {
+        // Clamp player to circular boundary (server-side enforcement)
+        const angle = Math.atan2(player.y - centerY, player.x - centerX);
+        player.x = centerX + Math.cos(angle) * maxRadius;
+        player.y = centerY + Math.sin(angle) * maxRadius;
+      }
       
       // Check collisions
       this.checkCollisions(player, sessionId);
