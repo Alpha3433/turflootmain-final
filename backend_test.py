@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Spawn Protection System in Arena Mode
-Testing all requirements from the review request:
-1. Server-Side Spawn Protection
-2. Protection Timer Logic  
-3. Collision Prevention
-4. Respawn Protection
-5. Protection Synchronization
-6. Protection Properties
+Arena Mode Camera System Testing
+Testing arena mode camera system to ensure it's identical to local agario mode camera behavior
 """
 
-import asyncio
-import json
-import time
 import requests
-import websockets
-from datetime import datetime
-import sys
+import time
+import json
 import os
-import re
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+import subprocess
 
-# Configuration
-BASE_URL = "https://arenapatch.preview.emergentagent.com"
-COLYSEUS_ENDPOINT = "wss://au-syd-ab3eaf4e.colyseus.cloud"
+def get_base_url():
+    """Get the base URL from environment variables"""
+    try:
+        with open('/app/.env', 'r') as f:
+            for line in f:
+                if line.startswith('NEXT_PUBLIC_BASE_URL='):
+                    return line.split('=', 1)[1].strip().strip('"\'')
+    except:
+        pass
+    return 'http://localhost:3000'
+
+BASE_URL = get_base_url()
+print(f"🌐 Using base URL: {BASE_URL}")
 
 class SpawnProtectionTester:
     def __init__(self):
