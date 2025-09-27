@@ -733,9 +733,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        padding: '8px 16px',
+                        padding: isMobile ? '12px 20px' : '8px 16px',
                         cursor: 'pointer',
-                        fontSize: '12px'
+                        fontSize: isMobile ? '13px' : '12px',
+                        minHeight: isMobile ? '44px' : 'auto'
                       }}
                     >
                       🔄 Retry
