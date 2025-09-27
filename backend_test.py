@@ -364,40 +364,141 @@ class CircularBoundaryTester:
                 False,
                 "Visual boundary code analysis failed"
             )
-        for check, result in unified_checks.items():
-            status = "✅" if result else "❌"
-            print(f"  {status} {check.replace('_', ' ').title()}: {'Pass' if result else 'Fail'}")
-        
-        print(f"📈 Unified Camera Implementation: {passed_checks}/{total_checks} checks passed ({passed_checks/total_checks*100:.1f}%)")
-        
-        return passed_checks >= 3  # Require at least 3/4 checks to pass
-        
-    except Exception as e:
-        print(f"❌ Unified Camera Implementation Error: {e}")
-        return False
 
-def test_camera_specifications():
-    """Test that camera specifications match the review request requirements"""
-    print("\n🔍 Testing Camera Specifications...")
-    
-    try:
-        # Read the agario page.js file
-        with open('/app/app/agario/page.js', 'r') as f:
-            content = f.read()
+    def test_boundary_consistency_client_server(self):
+        """Test 8: Boundary Consistency Between Client and Server"""
+        print("\n🔍 TESTING CATEGORY 8: CLIENT-SERVER BOUNDARY CONSISTENCY")
         
-        # Extract camera update method
-        camera_method_start = content.find('updateCamera() {')
-        if camera_method_start == -1:
-            print("❌ updateCamera method not found")
-            return False
+        try:
+            # Read both client and server code
+            with open('/app/app/agario/page.js', 'r') as f:
+                client_code = f.read()
             
-        camera_method_end = content.find('\n    }', camera_method_start)
-        if camera_method_end == -1:
-            camera_method_end = content.find('\n  }', camera_method_start)
-        if camera_method_end == -1:
-            camera_method_end = camera_method_start + 500  # fallback
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                server_code = f.read()
             
-        camera_method = content[camera_method_start:camera_method_end + 1]
+            # Extract key values
+            consistency_checks = {
+                "Playable Radius Value": ("1800" in client_code and "1800" in server_code),
+                "World Size Value": ("4000" in client_code and "4000" in server_code),
+                "Center Calculation": ("world.width / 2" in client_code and "worldSize / 2" in server_code),
+                "Distance Formula": ("Math.sqrt(Math.pow(" in client_code and "Math.sqrt(" in server_code),
+                "Angle Calculation": ("Math.atan2(" in client_code and "Math.atan2(" in server_code),
+                "Boundary Enforcement": ("maxRadius" in client_code and "maxRadius" in server_code)
+            }
+            
+            for check_name, is_consistent in consistency_checks.items():
+                self.log_test(
+                    "Client-Server Boundary Consistency",
+                    check_name,
+                    is_consistent,
+                    f"Consistency {'verified' if is_consistent else 'failed'} between client and server"
+                )
+                
+        except FileNotFoundError:
+            self.log_test(
+                "Client-Server Boundary Consistency",
+                "Code Analysis",
+                False,
+                "Consistency analysis failed - files not accessible"
+            )
+
+    def test_database_integration(self):
+        """Test 9: Database Integration for Game Sessions"""
+        print("\n🔍 TESTING CATEGORY 9: DATABASE INTEGRATION")
+        
+        # Test game sessions API
+        response = self.make_request("/game-sessions")
+        if response:
+            self.log_test(
+                "Database Integration",
+                "Game Sessions API",
+                True,
+                "Game sessions endpoint accessible"
+            )
+        else:
+            self.log_test(
+                "Database Integration",
+                "Game Sessions API",
+                False,
+                "Game sessions endpoint not accessible"
+            )
+
+    def run_all_tests(self):
+        """Run all circular boundary barrier tests"""
+        print("🚀 STARTING COMPREHENSIVE CIRCULAR BOUNDARY BARRIER TESTING")
+        print("Testing circular boundary barrier system identical to agario")
+        print("=" * 80)
+        
+        start_time = time.time()
+        
+        # Run all test categories
+        self.test_api_health_check()
+        self.test_colyseus_server_availability()
+        self.test_circular_boundary_mathematics()
+        self.test_client_side_boundary_implementation()
+        self.test_server_side_boundary_enforcement()
+        self.test_split_pieces_boundary_respect()
+        self.test_visual_green_circle_boundary()
+        self.test_boundary_consistency_client_server()
+        self.test_database_integration()
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        # Print final results
+        print("\n" + "=" * 80)
+        print("🎯 CIRCULAR BOUNDARY BARRIER TESTING COMPLETED")
+        print("=" * 80)
+        
+        success_rate = (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
+        
+        print(f"📊 OVERALL RESULTS:")
+        print(f"   Total Tests: {self.total_tests}")
+        print(f"   Passed: {self.passed_tests}")
+        print(f"   Failed: {self.total_tests - self.passed_tests}")
+        print(f"   Success Rate: {success_rate:.1f}%")
+        print(f"   Duration: {duration:.2f} seconds")
+        
+        # Categorize results
+        categories = {}
+        for result in self.test_results:
+            cat = result['category']
+            if cat not in categories:
+                categories[cat] = {'passed': 0, 'total': 0}
+            categories[cat]['total'] += 1
+            if result['passed']:
+                categories[cat]['passed'] += 1
+        
+        print(f"\n📋 RESULTS BY CATEGORY:")
+        for category, stats in categories.items():
+            cat_success = (stats['passed'] / stats['total'] * 100) if stats['total'] > 0 else 0
+            status = "✅" if cat_success == 100 else "⚠️" if cat_success >= 75 else "❌"
+            print(f"   {status} {category}: {stats['passed']}/{stats['total']} ({cat_success:.1f}%)")
+        
+        # Critical findings
+        print(f"\n🔍 CRITICAL FINDINGS:")
+        
+        if success_rate >= 90:
+            print("   ✅ EXCELLENT: Circular boundary barrier implementation is working excellently")
+        elif success_rate >= 75:
+            print("   ⚠️ GOOD: Circular boundary barrier implementation is working well with minor issues")
+        elif success_rate >= 50:
+            print("   ❌ ISSUES: Circular boundary barrier implementation has significant issues")
+        else:
+            print("   🚨 CRITICAL: Circular boundary barrier implementation has major problems")
+        
+        # Specific findings
+        failed_tests = [r for r in self.test_results if not r['passed']]
+        if failed_tests:
+            print(f"\n❌ FAILED TESTS ({len(failed_tests)}):")
+            for test in failed_tests[:5]:  # Show first 5 failures
+                print(f"   • {test['category']}: {test['test']}")
+                if test['details']:
+                    print(f"     {test['details']}")
+        
+        print("\n" + "=" * 80)
+        return success_rate >= 75  # Return True if 75% or more tests passed
         
         # Check specific requirements from review request
         spec_checks = {
