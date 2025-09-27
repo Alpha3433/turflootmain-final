@@ -1084,21 +1084,21 @@ const MultiplayerArena = () => {
         this.player.y += moveY
       }
       
-      // Simple boundary check to prevent going too far off
+      // Circular boundary check - IDENTICAL to agario (prevents leaving green circle)
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
-      const maxDistance = 2500 
+      const maxRadius = this.currentPlayableRadius - this.player.radius
       
       const distanceFromCenter = Math.sqrt(
         Math.pow(this.player.x - centerX, 2) + 
         Math.pow(this.player.y - centerY, 2)
       )
       
-      if (distanceFromCenter > maxDistance) {
-        // Clamp to boundary if too far
+      if (distanceFromCenter > maxRadius) {
+        // Clamp player to circular boundary (just like agario)
         const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
-        this.player.x = centerX + Math.cos(angle) * maxDistance
-        this.player.y = centerY + Math.sin(angle) * maxDistance
+        this.player.x = centerX + Math.cos(angle) * maxRadius
+        this.player.y = centerY + Math.sin(angle) * maxRadius
       }
       
       // Debug logging (occasional)
