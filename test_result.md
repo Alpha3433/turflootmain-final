@@ -2994,7 +2994,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Hathora WebSocket Connection Fix Verification"
+    - "Arena Mode Camera System Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
