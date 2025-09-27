@@ -584,7 +584,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
           <div>
             <h2 style={{
               color: '#10b981',
-              fontSize: '24px',
+              fontSize: isMobile ? '20px' : '24px',
               fontWeight: 'bold',
               margin: 0,
               fontFamily: '"Rajdhani", sans-serif',
@@ -592,12 +592,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               letterSpacing: '1px',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              flexWrap: isMobile ? 'wrap' : 'nowrap'
             }}>
               SERVER BROWSER
               {pingingRegions && (
                 <span style={{ 
-                  fontSize: '12px', 
+                  fontSize: isMobile ? '11px' : '12px', 
                   color: '#10b981',
                   fontWeight: 'normal'
                 }}>
