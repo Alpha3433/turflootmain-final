@@ -295,9 +295,9 @@ const MultiplayerArena = () => {
         transport: wsRef.current?.connection?.transport?.readyState
       })
       
-      // Check if connection is still valid before sending
+      // Check if connection is still valid before sending (WebSocket.OPEN = 1)
       if (!wsRef.current || !wsRef.current.connection || 
-          wsRef.current.connection.readyState !== WebSocket.OPEN) {
+          wsRef.current.connection.readyState !== 1) {
         console.log('⚠️ Connection not ready for split - skipping split attempt')
         console.log('🔗 Connection details:', {
           hasWsRef: !!wsRef.current,
