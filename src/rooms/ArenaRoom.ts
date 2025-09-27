@@ -351,6 +351,10 @@ export class ArenaRoom extends Room<GameState> {
         this.state.players.delete(splitId);
       }
     }, 5000);
+    } catch (error) {
+      console.error(`❌ Error handling split for session ${client.sessionId}:`, error);
+      // Don't disconnect the client, just log the error and continue
+    }
   }
 
   onLeave(client: Client, consented?: boolean) {
