@@ -13112,21 +13112,7 @@ export default function TurfLootTactical() {
         </div>
       )}
       
-      {/* Debug Info - Show loading state */}
-      {isServerBrowserOpen && (
-        <div style={{
-          position: 'fixed',
-          top: '10px',
-          left: '10px',
-          background: 'red',
-          color: 'white',
-          padding: '10px',
-          zIndex: 9999,
-          fontSize: '12px'
-        }}>
-          Modal should be open: {isServerBrowserOpen.toString()}
-        </div>
-      )}
+      {/* Debug message removed */}
       
       {/* Debug: Local Practice Loading State - REMOVED FOR MOBILE */}
 
