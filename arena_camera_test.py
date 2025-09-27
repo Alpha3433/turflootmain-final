@@ -297,17 +297,18 @@ class ArenaCameraTestSuite:
                 # Extract updateCamera method (next 1000 characters should contain bounds logic)
                 updateCamera_section = content[updateCamera_start:updateCamera_start + 1000]
                 
-                # Check for bounds checking
+                # Check for bounds checking - look for exact patterns
                 has_bounds_check = 'bounds' in updateCamera_section.lower()
-                has_world_limits = 'world' in updateCamera_section and ('width' in updateCamera_section or 'height' in updateCamera_section)
-                has_math_max_min = 'Math.max' in updateCamera_section and 'Math.min' in updateCamera_section
+                has_world_limits = 'this.world.width' in updateCamera_section and 'this.world.height' in updateCamera_section
+                has_math_max_min = 'Math.max(' in updateCamera_section and 'Math.min(' in updateCamera_section
+                has_boundary_extension = 'boundaryExtension' in updateCamera_section
                 
                 self.log_test(
                     "Camera Bounds Checking",
-                    has_bounds_check or (has_world_limits and has_math_max_min),
-                    f"Bounds check found: {has_bounds_check}, World limits: {has_world_limits}, Math.max/min: {has_math_max_min}"
+                    has_world_limits and has_math_max_min,
+                    f"Bounds check found: {has_bounds_check}, World limits: {has_world_limits}, Math.max/min: {has_math_max_min}, Boundary extension: {has_boundary_extension}"
                 )
-                return has_bounds_check or (has_world_limits and has_math_max_min)
+                return has_world_limits and has_math_max_min
             else:
                 self.log_test("Camera Bounds Checking", False, "updateCamera method not found")
                 return False
