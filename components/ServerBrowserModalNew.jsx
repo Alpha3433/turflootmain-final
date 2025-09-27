@@ -564,11 +564,11 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       <div style={{
         backgroundColor: '#1a202c',
         border: '2px solid #10b981',
-        borderRadius: '8px',
-        padding: '24px',
-        width: '90%',
-        maxWidth: '800px',
-        maxHeight: '80vh',
+        borderRadius: isMobile ? '12px' : '8px',
+        padding: isMobile ? '16px' : '24px',
+        width: isMobile ? '95%' : '90%',
+        maxWidth: isMobile ? '480px' : '800px',
+        maxHeight: isMobile ? '85vh' : '80vh',
         overflowY: 'auto',
         position: 'relative'
       }}>
