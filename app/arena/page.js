@@ -838,6 +838,7 @@ const MultiplayerArena = () => {
       
       // Simple camera initialization matching local agario exactly
       this.camera = { x: 0, y: 0 }
+      this.cameraInitialized = false // Track if camera has been properly positioned
       this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
       
       // Player setup with visual properties matching agario
