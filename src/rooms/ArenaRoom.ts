@@ -250,13 +250,27 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   handleSplit(client: Client, message: any) {
-    const player = this.state.players.get(client.sessionId);
-    if (!player || !player.alive) {
-      console.log(`⚠️ Split ignored - player not found or dead for session: ${client.sessionId}`);
-      return;
-    }
+    try {
+      const player = this.state.players.get(client.sessionId);
+      if (!player || !player.alive) {
+        console.log(`⚠️ Split ignored - player not found or dead for session: ${client.sessionId}`);
+        return;
+      }
 
-    const { targetX, targetY } = message;
+      // Validate message format and data
+      if (!message || typeof message !== 'object') {
+        console.log(`⚠️ Split ignored - invalid message format for session: ${client.sessionId}`, message);
+        return;
+      }
+
+      const { targetX, targetY } = message;
+      
+      // Validate coordinates are numbers
+      if (typeof targetX !== 'number' || typeof targetY !== 'number' || 
+          !isFinite(targetX) || !isFinite(targetY)) {
+        console.log(`⚠️ Split ignored - invalid coordinates for session: ${client.sessionId}`, { targetX, targetY });
+        return;
+      }
     
     console.log(`🔄 Split requested by ${player.name} (${client.sessionId}) toward:`, {
       target: { x: targetX?.toFixed(1), y: targetY?.toFixed(1) },
