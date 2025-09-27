@@ -628,12 +628,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
         {/* Stats */}
         <div style={{
           display: 'flex',
-          gap: '16px',
+          gap: isMobile ? '12px' : '16px',
           marginBottom: '20px',
-          padding: '12px',
+          padding: isMobile ? '10px' : '12px',
           backgroundColor: '#2d3748',
           borderRadius: '6px',
-          fontSize: '14px'
+          fontSize: isMobile ? '12px' : '14px',
+          flexWrap: isMobile ? 'wrap' : 'nowrap'
         }}>
           <div>
             <strong style={{ color: '#10b981' }}>{totalStats.totalPlayers || 0}</strong>
