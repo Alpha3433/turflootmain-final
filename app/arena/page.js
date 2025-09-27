@@ -2282,6 +2282,21 @@ const MultiplayerArena = () => {
               />
             ))}
             
+            {/* Playable zone boundary circle */}
+            <div style={{
+              position: 'absolute',
+              width: `${(isMobile ? 115 : 210)}px`,
+              height: `${(isMobile ? 115 : 210)}px`,
+              borderRadius: '50%',
+              border: '2px solid #00ff00',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              opacity: '0.6',
+              zIndex: 5,
+              pointerEvents: 'none'
+            }} />
+            
             <div style={{
               position: 'absolute',
               top: '0',
