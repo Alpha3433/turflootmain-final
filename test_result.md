@@ -138,15 +138,13 @@ user_problem_statement: "SPACEBAR SPLIT FUNCTIONALITY FIX VERIFICATION: Test the
 
 test_plan:
   current_focus:
-    - "Arena Mode Camera Lock Fix Implementation"
-    - "Camera Initialization Tracking"
-    - "Immediate Camera Positioning"
-    - "Camera Desync Detection"
-    - "Robust Snap Logic (500px threshold)"
-    - "Enhanced Debug Logging"
-    - "Visual Debug Cross"
-    - "Camera Smoothing Verification"
-    - "Camera Bounds Checking"
+    - "Spacebar Split Client-Side Validation"
+    - "Spacebar Split Server-Side Validation"
+    - "Split Mass Requirements Consistency"
+    - "Split Cooldown Mechanism"
+    - "Split Error Handling Robustness"
+    - "Split Coordinate Validation"
+    - "Split Visual Feedback System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
