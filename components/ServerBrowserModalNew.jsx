@@ -680,11 +680,12 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
 
         {/* Server List */}
         <div style={{ 
-          maxHeight: '400px', 
+          maxHeight: isMobile ? '350px' : '400px', 
           overflowY: 'auto',
           border: '1px solid #374151',
           borderRadius: '8px',
-          backgroundColor: '#2d3748'
+          backgroundColor: '#2d3748',
+          WebkitOverflowScrolling: 'touch' // iOS smooth scrolling
         }}>
           {(() => {
             // Filter and categorize servers
