@@ -228,39 +228,63 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Handle split functionality - ported from agario
+  // Handle split functionality - ported from agario with improved error handling
   const handleSplit = (e) => {
-    if (gameRef.current && gameReady) {
-      if (isMobile) {
-        // Mobile: Use joystick direction for split
-        if (joystickPosition.x !== 0 || joystickPosition.y !== 0) {
-          const joystickAngle = Math.atan2(joystickPosition.y, joystickPosition.x)
-          const splitDistance = 300
-          
-          const worldTargetX = gameRef.current.player.x + Math.cos(joystickAngle) * splitDistance
-          const worldTargetY = gameRef.current.player.y + Math.sin(joystickAngle) * splitDistance
-          
-          console.log('🎮 Mobile split toward:', worldTargetX.toFixed(1), worldTargetY.toFixed(1))
-          
-          // Send split command to multiplayer server
-          if (wsRef.current && wsRef.current.sessionId) {
-            wsRef.current.send("split", { targetX: worldTargetX, targetY: worldTargetY })
-          }
-        }
+    if (!gameRef.current || !gameReady || !wsRef.current || !wsRef.current.sessionId) {
+      console.log('⚠️ Split denied - game not ready or not connected to server')
+      return
+    }
+    
+    // Check if player has sufficient mass to split (server requirement: >= 40)
+    if (gameRef.current.player.mass < 40) {
+      console.log('⚠️ Split denied - insufficient mass:', gameRef.current.player.mass, '< 40')
+      return
+    }
+    
+    let targetX, targetY
+    
+    if (isMobile) {
+      // Mobile: Use joystick direction for split
+      if (joystickPosition.x !== 0 || joystickPosition.y !== 0) {
+        const joystickAngle = Math.atan2(joystickPosition.y, joystickPosition.x)
+        const splitDistance = 300
+        
+        targetX = gameRef.current.player.x + Math.cos(joystickAngle) * splitDistance
+        targetY = gameRef.current.player.y + Math.sin(joystickAngle) * splitDistance
+        
+        console.log('🎮 Mobile split toward:', targetX.toFixed(1), targetY.toFixed(1))
       } else {
-        // Desktop: Use mouse position for split
-        if (gameRef.current.mouse) {
-          console.log('🎮 Desktop split toward mouse:', gameRef.current.mouse.worldX?.toFixed(1), gameRef.current.mouse.worldY?.toFixed(1))
-          
-          // Send split command to multiplayer server
-          if (wsRef.current && wsRef.current.sessionId) {
-            wsRef.current.send("split", { 
-              targetX: gameRef.current.mouse.worldX, 
-              targetY: gameRef.current.mouse.worldY 
-            })
-          }
-        }
+        console.log('⚠️ Mobile split denied - no joystick input')
+        return
       }
+    } else {
+      // Desktop: Use mouse position for split
+      if (gameRef.current.mouse && 
+          typeof gameRef.current.mouse.worldX === 'number' && 
+          typeof gameRef.current.mouse.worldY === 'number') {
+        
+        targetX = gameRef.current.mouse.worldX
+        targetY = gameRef.current.mouse.worldY
+        
+        console.log('🎮 Desktop split toward mouse:', targetX.toFixed(1), targetY.toFixed(1))
+      } else {
+        console.log('⚠️ Desktop split denied - invalid mouse coordinates:', gameRef.current.mouse)
+        return
+      }
+    }
+    
+    // Validate coordinates are reasonable numbers
+    if (!isFinite(targetX) || !isFinite(targetY)) {
+      console.log('⚠️ Split denied - invalid target coordinates:', targetX, targetY)
+      return
+    }
+    
+    // Send split command to multiplayer server with error handling
+    try {
+      console.log('📤 Sending split command to server:', { targetX, targetY })
+      wsRef.current.send("split", { targetX, targetY })
+    } catch (error) {
+      console.error('❌ Error sending split command:', error)
     }
   }
 
