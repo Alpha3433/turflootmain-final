@@ -132,17 +132,21 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "ARENA MODE STARTING MASS VERIFICATION: User reports that when players join arena mode, their starting mass is still 100 instead of the expected 25. Need to verify that server-side spawn mass testing, respawn mass testing, client-server mass synchronization, and arena connection testing all correctly use mass = 25."
+user_problem_statement: "ARENA MODE CAMERA LOCK FIX VERIFICATION: Test the arena mode camera lock fix implementation with several improvements to ensure the camera properly locks to the player character like in local agario mode: 1) Camera Initialization Tracking with cameraInitialized flag, 2) Immediate Camera Positioning on first player position from server, 3) Camera Desync Detection with distance checking, 4) Robust Snap Logic if camera distance exceeds 500px, 5) Enhanced Debug Logging for camera tracking, 6) Visual Debug Cross at player position. Need to verify the complete camera system from connection to gameplay to ensure camera stays locked on player throughout the session."
 
 # Test plan for this run
 
 test_plan:
   current_focus:
-    - "Arena Mode Starting Mass Verification"
-    - "Server-side Spawn Mass Testing"
-    - "Respawn Mass Testing"
-    - "Client-server Mass Synchronization"
-    - "Arena Connection Testing"
+    - "Arena Mode Camera Lock Fix Implementation"
+    - "Camera Initialization Tracking"
+    - "Immediate Camera Positioning"
+    - "Camera Desync Detection"
+    - "Robust Snap Logic (500px threshold)"
+    - "Enhanced Debug Logging"
+    - "Visual Debug Cross"
+    - "Camera Smoothing Verification"
+    - "Camera Bounds Checking"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
