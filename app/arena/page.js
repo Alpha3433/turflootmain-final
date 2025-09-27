@@ -288,9 +288,24 @@ const MultiplayerArena = () => {
     // Send split command to multiplayer server with error handling
     try {
       console.log('📤 Sending split command to server:', { targetX, targetY })
+      console.log('🔗 WebSocket connection state before split:', {
+        wsRef: !!wsRef.current,
+        sessionId: wsRef.current?.sessionId,
+        connection: wsRef.current?.connection?.readyState,
+        transport: wsRef.current?.connection?.transport?.readyState
+      })
+      
       wsRef.current.send("split", { targetX, targetY })
+      
+      console.log('✅ Split command sent successfully')
     } catch (error) {
       console.error('❌ Error sending split command:', error)
+      console.log('🔗 WebSocket connection state after error:', {
+        wsRef: !!wsRef.current,
+        sessionId: wsRef.current?.sessionId,
+        connection: wsRef.current?.connection?.readyState,
+        transport: wsRef.current?.connection?.transport?.readyState
+      })
     }
   }
 
