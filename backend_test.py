@@ -1,53 +1,105 @@
 #!/usr/bin/env python3
 """
-Arena Mode Camera System Testing
-Testing arena mode camera system to ensure it's identical to local agario mode camera behavior
+Comprehensive Backend Testing for Circular Boundary Barrier Implementation
+Testing circular boundary barrier system identical to agario that prevents players from leaving the playable area
 """
 
 import requests
-import time
 import json
+import time
+import sys
 import os
+from typing import Dict, List, Any, Optional
 
-def get_base_url():
-    """Get the base URL from environment variables"""
-    try:
-        with open('/app/.env', 'r') as f:
-            for line in f:
-                if line.startswith('NEXT_PUBLIC_BASE_URL='):
-                    return line.split('=', 1)[1].strip().strip('"\'')
-    except:
-        pass
-    return 'http://localhost:3000'
+class CircularBoundaryTester:
+    def __init__(self):
+        # Get base URL from environment or use default
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+        self.api_base = f"{self.base_url}/api"
+        
+        # Test configuration
+        self.world_size = 4000
+        self.world_center_x = 2000
+        self.world_center_y = 2000
+        self.playable_radius = 1800
+        self.player_radius = 15  # √25 * 3 = 15 for mass = 25
+        self.max_player_distance = self.playable_radius - self.player_radius  # 1785
+        
+        # Test results tracking
+        self.test_results = []
+        self.total_tests = 0
+        self.passed_tests = 0
+        
+        print(f"🎯 CIRCULAR BOUNDARY BARRIER TESTING INITIALIZED")
+        print(f"📍 Base URL: {self.base_url}")
+        print(f"🌍 World: {self.world_size}x{self.world_size}, Center: ({self.world_center_x}, {self.world_center_y})")
+        print(f"🔵 Playable Radius: {self.playable_radius}px")
+        print(f"👤 Player Radius: {self.player_radius}px")
+        print(f"📏 Max Player Distance from Center: {self.max_player_distance}px")
+        print("=" * 80)
 
-BASE_URL = get_base_url()
-print(f"🌐 Using base URL: {BASE_URL}")
-
-def test_api_health():
-    """Test API health and basic functionality"""
-    print("\n🔍 Testing API Health...")
-    
-    try:
-        response = requests.get(f"{BASE_URL}/api", timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-            print(f"✅ API Health Check: {data.get('service', 'Unknown')} - {data.get('status', 'Unknown')}")
-            return True
+    def log_test(self, category: str, test_name: str, passed: bool, details: str = ""):
+        """Log test result"""
+        self.total_tests += 1
+        if passed:
+            self.passed_tests += 1
+            status = "✅ PASSED"
         else:
-            print(f"❌ API Health Check Failed: HTTP {response.status_code}")
-            return False
-    except Exception as e:
-        print(f"❌ API Health Check Error: {e}")
-        return False
+            status = "❌ FAILED"
+        
+        result = {
+            'category': category,
+            'test': test_name,
+            'passed': passed,
+            'details': details
+        }
+        self.test_results.append(result)
+        
+        print(f"{status} | {category} | {test_name}")
+        if details:
+            print(f"    📝 {details}")
 
-def test_camera_system_code_analysis():
-    """Analyze the camera system implementation in the code"""
-    print("\n🔍 Testing Camera System Code Analysis...")
-    
-    try:
-        # Read the agario page.js file
-        with open('/app/app/agario/page.js', 'r') as f:
-            content = f.read()
+    def make_request(self, endpoint: str, method: str = 'GET', data: Dict = None) -> Optional[Dict]:
+        """Make HTTP request with error handling"""
+        try:
+            url = f"{self.api_base}{endpoint}"
+            
+            if method == 'GET':
+                response = requests.get(url, timeout=10)
+            elif method == 'POST':
+                response = requests.post(url, json=data, timeout=10)
+            else:
+                raise ValueError(f"Unsupported method: {method}")
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"⚠️ HTTP {response.status_code}: {response.text[:200]}")
+                return None
+                
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Request failed: {str(e)}")
+            return None
+
+    def test_api_health_check(self):
+        """Test 1: API Health Check"""
+        print("\n🔍 TESTING CATEGORY 1: API HEALTH CHECK")
+        
+        # Test root API endpoint
+        response = self.make_request("/")
+        if response:
+            service = response.get('service', '')
+            status = response.get('status', '')
+            features = response.get('features', [])
+            
+            self.log_test(
+                "API Health Check", 
+                "Root API Endpoint",
+                service == 'turfloot-api' and status == 'operational',
+                f"Service: {service}, Status: {status}, Features: {features}"
+            )
+        else:
+            self.log_test("API Health Check", "Root API Endpoint", False, "API not accessible")
         
         # Check for camera system implementation
         camera_checks = {
