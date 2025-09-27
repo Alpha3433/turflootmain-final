@@ -997,8 +997,11 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               color: 'white',
               border: 'none',
               borderRadius: '6px',
-              padding: '8px 16px',
-              cursor: 'pointer'
+              padding: isMobile ? '12px 20px' : '8px 16px',
+              cursor: 'pointer',
+              fontSize: isMobile ? '13px' : '14px',
+              minHeight: isMobile ? '44px' : 'auto',
+              fontWeight: '600'
             }}
           >
             CLOSE
