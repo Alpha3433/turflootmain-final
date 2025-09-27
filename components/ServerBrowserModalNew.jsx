@@ -613,9 +613,12 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
               backgroundColor: 'transparent',
               border: 'none',
               color: '#10b981',
-              fontSize: '24px',
+              fontSize: isMobile ? '28px' : '24px',
               cursor: 'pointer',
-              padding: '4px'
+              padding: isMobile ? '12px' : '4px',
+              minWidth: isMobile ? '44px' : 'auto',
+              minHeight: isMobile ? '44px' : 'auto',
+              borderRadius: '4px'
             }}
           >
             ×
