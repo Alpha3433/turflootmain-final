@@ -132,7 +132,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "ARENA MODE CAMERA LOCK FIX VERIFICATION: Test the arena mode camera lock fix implementation with several improvements to ensure the camera properly locks to the player character like in local agario mode: 1) Camera Initialization Tracking with cameraInitialized flag, 2) Immediate Camera Positioning on first player position from server, 3) Camera Desync Detection with distance checking, 4) Robust Snap Logic if camera distance exceeds 500px, 5) Enhanced Debug Logging for camera tracking, 6) Visual Debug Cross at player position. Need to verify the complete camera system from connection to gameplay to ensure camera stays locked on player throughout the session."
+user_problem_statement: "SPACEBAR SPLIT FUNCTIONALITY FIX VERIFICATION: Test the spacebar split functionality fix in arena mode. Comprehensive fixes implemented to prevent disconnections when spacebar is pressed: Client-Side Fixes (Enhanced Input Validation, Mass Requirement Validation >=40 mass, Coordinate Validation, Split Cooldown 500ms, Error Handling, Visual Feedback), Server-Side Fixes (Message Validation, Input Sanitization, Error Isolation, Graceful Degradation). Need to verify both successful and failed split scenarios ensure robust error handling throughout the split system."
 
 # Test plan for this run
 
