@@ -627,6 +627,8 @@ const MultiplayerArena = () => {
       // Handle connection errors
       room.onError((code, message) => {
         console.error(`❌ [${componentId}] Colyseus room error:`, code, message)
+        console.error(`🔍 ERROR DEBUG - Code: ${code}, Message: ${message}`)
+        console.error(`🔍 ERROR DEBUG - Stack trace:`, new Error().stack)
         isConnectingRef.current = false // Reset connection flag on room error
         GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on room error
         if (GLOBAL_CONNECTION_TRACKER.activeConnection === room) {
