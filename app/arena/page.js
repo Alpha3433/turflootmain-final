@@ -1185,10 +1185,24 @@ const MultiplayerArena = () => {
         const targetX = this.player.x - this.canvas.width / 2
         const targetY = this.player.y - this.canvas.height / 2
         
-        // Use consistent smoothing matching local agario (0.2 lerp factor)
-        const smoothing = 0.2
-        this.camera.x += (targetX - this.camera.x) * smoothing
-        this.camera.y += (targetY - this.camera.y) * smoothing
+        // Check if camera is far from target (indicates desync or initialization issue)
+        const cameraDist = Math.sqrt(
+          Math.pow(this.camera.x - targetX, 2) + 
+          Math.pow(this.camera.y - targetY, 2)
+        )
+        
+        // If camera is very far from player, snap it immediately (prevents camera getting "lost")
+        if (cameraDist > 500 || !this.cameraInitialized) {
+          console.log('📹 Camera snap - distance too large:', cameraDist.toFixed(1), 'or not initialized:', !this.cameraInitialized)
+          this.camera.x = targetX
+          this.camera.y = targetY
+          this.cameraInitialized = true
+        } else {
+          // Use consistent smoothing matching local agario (0.2 lerp factor)
+          const smoothing = 0.2
+          this.camera.x += (targetX - this.camera.x) * smoothing
+          this.camera.y += (targetY - this.camera.y) * smoothing
+        }
         
         // Keep camera within world bounds with extension (matching local agario)
         const boundaryExtension = 100
@@ -1196,13 +1210,14 @@ const MultiplayerArena = () => {
         this.camera.y = Math.max(-boundaryExtension, Math.min(this.world.height - this.canvas.height + boundaryExtension, this.camera.y))
         
         // Debug camera tracking every few frames
-        if (Date.now() % 1000 < 50) {  // Log once per second
+        if (Date.now() % 2000 < 50) {  // Log every 2 seconds
           console.log('📹 Camera Debug:', {
             playerPos: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
             cameraPos: { x: this.camera.x.toFixed(1), y: this.camera.y.toFixed(1) },
             canvasSize: { w: this.canvas.width, h: this.canvas.height },
             targetCamera: { x: targetX.toFixed(1), y: targetY.toFixed(1) },
-            isPlayerCentered: Math.abs(this.camera.x - targetX) < 10 && Math.abs(this.camera.y - targetY) < 10
+            distance: cameraDist.toFixed(1),
+            initialized: this.cameraInitialized
           })
         }
       }
