@@ -325,6 +325,14 @@ const MultiplayerArena = () => {
       if (e.key === ' ' && gameReady && gameRef.current) {
         e.preventDefault()
         
+        console.log('🔍 SPACEBAR DEBUG: Space key pressed, checking conditions...', {
+          gameReady,
+          gameRef: !!gameRef.current,
+          wsRef: !!wsRef.current,
+          wsConnection: wsRef.current?.connection?.readyState,
+          sessionId: wsRef.current?.sessionId
+        })
+        
         const now = Date.now()
         if (now - lastSplitTimeRef.current < SPLIT_COOLDOWN) {
           console.log('⚠️ Split cooldown active, ignoring spacebar press')
@@ -333,7 +341,12 @@ const MultiplayerArena = () => {
         
         console.log('SPACE pressed - attempting split')
         lastSplitTimeRef.current = now
-        handleSplit(e)
+        
+        try {
+          handleSplit(e)
+        } catch (error) {
+          console.error('❌ Error in handleSplit:', error)
+        }
       }
     }
     
