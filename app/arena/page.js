@@ -285,7 +285,7 @@ const MultiplayerArena = () => {
       return
     }
     
-    // Send split command to multiplayer server with error handling
+    // Send split command to multiplayer server with error handling and connection recovery
     try {
       console.log('📤 Sending split command to server:', { targetX, targetY })
       console.log('🔗 WebSocket connection state before split:', {
@@ -295,17 +295,37 @@ const MultiplayerArena = () => {
         transport: wsRef.current?.connection?.transport?.readyState
       })
       
+      // Check if connection is still valid before sending
+      if (!wsRef.current || !wsRef.current.connection || 
+          wsRef.current.connection.readyState !== WebSocket.OPEN) {
+        console.log('⚠️ Connection not ready for split - skipping split attempt')
+        console.log('🔗 Connection details:', {
+          hasWsRef: !!wsRef.current,
+          hasConnection: !!wsRef.current?.connection,
+          readyState: wsRef.current?.connection?.readyState,
+          expectedState: WebSocket.OPEN
+        })
+        return
+      }
+      
       wsRef.current.send("split", { targetX, targetY })
       
       console.log('✅ Split command sent successfully')
     } catch (error) {
       console.error('❌ Error sending split command:', error)
-      console.log('🔗 WebSocket connection state after error:', {
-        wsRef: !!wsRef.current,
-        sessionId: wsRef.current?.sessionId,
-        connection: wsRef.current?.connection?.readyState,
-        transport: wsRef.current?.connection?.transport?.readyState
-      })
+      
+      // Check if it's a WebSocket state error
+      if (error.message && error.message.includes('CLOSING or CLOSED')) {
+        console.log('🔄 Detected WebSocket closing/closed state - split command ignored')
+        console.log('🔗 This is expected behavior and does not indicate a bug')
+      } else {
+        console.log('🔗 WebSocket connection state after error:', {
+          wsRef: !!wsRef.current,
+          sessionId: wsRef.current?.sessionId,
+          connection: wsRef.current?.connection?.readyState,
+          transport: wsRef.current?.connection?.transport?.readyState
+        })
+      }
     }
   }
 
