@@ -661,10 +661,14 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '6px 12px',
-                fontSize: '12px',
+                padding: isMobile ? '10px 14px' : '6px 12px',
+                fontSize: isMobile ? '11px' : '12px',
                 cursor: 'pointer',
-                fontWeight: selectedStakeFilter === stake ? 'bold' : 'normal'
+                fontWeight: selectedStakeFilter === stake ? 'bold' : 'normal',
+                minHeight: isMobile ? '44px' : 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
               {stake === 'Micro Stakes' ? 'Micro ($0.01-$0.02)' :
