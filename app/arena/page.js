@@ -1184,6 +1184,17 @@ const MultiplayerArena = () => {
         const boundaryExtension = 100
         this.camera.x = Math.max(-boundaryExtension, Math.min(this.world.width - this.canvas.width + boundaryExtension, this.camera.x))
         this.camera.y = Math.max(-boundaryExtension, Math.min(this.world.height - this.canvas.height + boundaryExtension, this.camera.y))
+        
+        // Debug camera tracking every few frames
+        if (Date.now() % 1000 < 50) {  // Log once per second
+          console.log('📹 Camera Debug:', {
+            playerPos: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
+            cameraPos: { x: this.camera.x.toFixed(1), y: this.camera.y.toFixed(1) },
+            canvasSize: { w: this.canvas.width, h: this.canvas.height },
+            targetCamera: { x: targetX.toFixed(1), y: targetY.toFixed(1) },
+            isPlayerCentered: Math.abs(this.camera.x - targetX) < 10 && Math.abs(this.camera.y - targetY) < 10
+          })
+        }
       }
       
       // Update minimap data every few frames for better performance
