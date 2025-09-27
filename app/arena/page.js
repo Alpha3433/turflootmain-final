@@ -639,6 +639,8 @@ const MultiplayerArena = () => {
       
       room.onLeave((code) => {
         console.log(`👋 [${componentId}] Left room with code:`, code)
+        console.log(`🔍 LEAVE DEBUG - Code: ${code}, Reason: ${code === 1000 ? 'Normal closure' : code === 1006 ? 'Abnormal closure' : 'Other: ' + code}`)
+        console.log(`🔍 LEAVE DEBUG - Stack trace:`, new Error().stack)
         isConnectingRef.current = false // Reset connection flag on leave
         GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on leave
         if (GLOBAL_CONNECTION_TRACKER.activeConnection === room) {
