@@ -2284,12 +2284,14 @@ const AgarIOGame = () => {
         }
         
         // Move towards mouse target only when no split velocity remains
-        if (distance > 0.1 && Math.abs(piece.vx) < 0.05 && Math.abs(piece.vy) < 0.05) {
+        // FIXED: Same continuous movement fix for player pieces
+        if (distance > 0.01 && Math.abs(piece.vx) < 0.05 && Math.abs(piece.vy) < 0.05) {
           const baseSpeed = 6.0
           const massSpeedFactor = Math.sqrt(piece.mass / 20)
           const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
           
-          const moveDistance = Math.min(dynamicSpeed, distance)
+          // FIXED: Continuous movement towards target like main player
+          const moveDistance = dynamicSpeed * deltaTime * 60 // Normalize for 60fps
           const moveX = (dx / distance) * moveDistance
           const moveY = (dy / distance) * moveDistance
           
