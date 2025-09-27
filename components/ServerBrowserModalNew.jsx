@@ -802,11 +802,12 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                                 </span>
                               </div>
                               <div style={{ 
-                                fontSize: '12px', 
+                                fontSize: isMobile ? '11px' : '12px', 
                                 color: '#9ca3af',
                                 marginTop: '4px',
                                 display: 'flex',
-                                gap: '12px'
+                                gap: isMobile ? '8px' : '12px',
+                                flexWrap: 'wrap'
                               }}>
                                 <span>{room.region}</span>
                                 <span>${room.entryFee.toFixed(2)} entry</span>
