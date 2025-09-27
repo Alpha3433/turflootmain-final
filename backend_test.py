@@ -270,34 +270,100 @@ class CircularBoundaryTester:
                 False,
                 f"Server code file not accessible: {str(e)}"
             )
+
+    def test_split_pieces_boundary_respect(self):
+        """Test 6: Split Pieces Boundary Respect"""
+        print("\n🔍 TESTING CATEGORY 6: SPLIT PIECES BOUNDARY RESPECT")
         
-        # Count camera-related method definitions
-        camera_method_count = content.count('updateCamera()')
-        camera_class_count = content.count('class.*Camera')
-        mode_specific_camera = any([
-            'arenaCamera' in content,
-            'localCamera' in content,
-            'multiplayerCamera' in content,
-            'practiceCamera' in content
-        ])
+        try:
+            # Read server-side code for split functionality
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                server_code = f.read()
+            
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                compiled_code = f.read()
+            
+            # Check split boundary patterns
+            split_patterns = {
+                "Split Boundary Check": "distanceFromCenter > maxRadius" in server_code and "splitPlayer" in server_code,
+                "Split Angle Calculation": "Math.atan2(splitPlayer.y - centerY" in server_code,
+                "Split Repositioning": "splitPlayer.x = centerX + Math.cos(angle)" in server_code,
+                "Split Radius Constraint": "maxRadius - splitPlayer.radius" in server_code
+            }
+            
+            compiled_split_patterns = {
+                "Compiled Split Boundary": "distanceFromCenter > maxRadius" in compiled_code and "splitPlayer" in compiled_code,
+                "Compiled Split Angle": "Math.atan2" in compiled_code and "splitPlayer" in compiled_code,
+                "Compiled Split Reposition": "Math.cos(angle)" in compiled_code and "splitPlayer" in compiled_code
+            }
+            
+            for pattern_name, found in split_patterns.items():
+                self.log_test(
+                    "Split Pieces Boundary Respect",
+                    f"TypeScript: {pattern_name}",
+                    found,
+                    f"Split boundary pattern {'found' if found else 'not found'}"
+                )
+            
+            for pattern_name, found in compiled_split_patterns.items():
+                self.log_test(
+                    "Split Pieces Boundary Respect",
+                    f"JavaScript: {pattern_name}",
+                    found,
+                    f"Compiled split pattern {'found' if found else 'not found'}"
+                )
+                
+        except FileNotFoundError:
+            self.log_test(
+                "Split Pieces Boundary Respect",
+                "Code Analysis",
+                False,
+                "Split code analysis failed - files not accessible"
+            )
+
+    def test_visual_green_circle_boundary(self):
+        """Test 7: Visual Green Circle Boundary Display"""
+        print("\n🔍 TESTING CATEGORY 7: VISUAL GREEN CIRCLE BOUNDARY")
         
-        # Check for conditional camera logic
-        conditional_camera_logic = any([
-            'if (isMultiplayer)' in line and 'camera' in line.lower() 
-            for line in content.split('\n')
-        ])
-        
-        unified_checks = {
-            'single_update_camera_method': camera_method_count == 1,
-            'no_camera_classes': camera_class_count == 0,
-            'no_mode_specific_cameras': not mode_specific_camera,
-            'unified_camera_logic': not conditional_camera_logic
-        }
-        
-        passed_checks = sum(unified_checks.values())
-        total_checks = len(unified_checks)
-        
-        print(f"📊 Unified Camera Implementation Results:")
+        try:
+            # Read client-side code for visual boundary
+            with open('/app/app/agario/page.js', 'r') as f:
+                client_code = f.read()
+            
+            # Check visual boundary patterns
+            visual_patterns = {
+                "drawWorldBoundary Method": "drawWorldBoundary()" in client_code,
+                "Green Zone Color": "#00ff00" in client_code or "zoneColor = '#00ff00'" in client_code,
+                "Circle Arc Drawing": "ctx.arc(centerX, centerY, playableRadius" in client_code,
+                "Stroke Style Setting": "ctx.strokeStyle = zoneColor" in client_code,
+                "Glowing Effect": "glowing effect" in client_code.lower() or "glow" in client_code.lower(),
+                "Boundary Circle Stroke": "ctx.stroke()" in client_code and "playableRadius" in client_code
+            }
+            
+            for pattern_name, found in visual_patterns.items():
+                self.log_test(
+                    "Visual Green Circle Boundary",
+                    pattern_name,
+                    found,
+                    f"Visual pattern {'found' if found else 'not found'} in client code"
+                )
+                
+            # Check for arena mode specific boundary
+            arena_boundary = "arena" in client_code.lower() and "boundary" in client_code.lower()
+            self.log_test(
+                "Visual Green Circle Boundary",
+                "Arena Mode Boundary",
+                arena_boundary,
+                f"Arena boundary references {'found' if arena_boundary else 'not found'}"
+            )
+                
+        except FileNotFoundError:
+            self.log_test(
+                "Visual Green Circle Boundary",
+                "Code Analysis",
+                False,
+                "Visual boundary code analysis failed"
+            )
         for check, result in unified_checks.items():
             status = "✅" if result else "❌"
             print(f"  {status} {check.replace('_', ' ').title()}: {'Pass' if result else 'Fail'}")
