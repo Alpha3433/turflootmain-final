@@ -138,6 +138,7 @@ user_problem_statement: "ENHANCED WEBSOCKET CONNECTION STATE HANDLING FOR SPACEB
 
 test_plan:
   current_focus:
+    - "Enhanced WebSocket Connection State Handling for Split"
     - "Spacebar Split Client-Side Validation"
     - "Spacebar Split Server-Side Validation"
     - "Split Mass Requirements Consistency"
@@ -145,7 +146,8 @@ test_plan:
     - "Split Error Handling Robustness"
     - "Split Coordinate Validation"
     - "Split Visual Feedback System"
-  stuck_tasks: []
+  stuck_tasks: 
+    - "Enhanced WebSocket Connection State Handling for Split"
   test_all: false
   test_priority: "high_first"
 
