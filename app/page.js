@@ -4601,7 +4601,7 @@ export default function TurfLootTactical() {
         window.innerWidth >= 1200 ? '14px' : // Laptop screens: slightly smaller
         '12px') : '16px', // Fallback for server-side rendering
     letterSpacing: '0.3em',
-    margin: 0,
+    margin: isMobile ? 0 : '-8px 0 0 0', // Move up slightly on desktop only
     textTransform: 'uppercase',
     textShadow: '0 0 10px rgba(104, 211, 145, 0.6)',
     fontFamily: '"Rajdhani", sans-serif'
