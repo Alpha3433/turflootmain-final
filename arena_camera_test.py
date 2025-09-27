@@ -264,17 +264,17 @@ class ArenaCameraTestSuite:
                 # Extract updateCamera method (next 500 characters should contain the smoothing logic)
                 updateCamera_section = content[updateCamera_start:updateCamera_start + 500]
                 
-                # Check for 0.2 smoothing factor
-                has_02_smoothing = '0.2' in updateCamera_section
+                # Check for 0.2 smoothing factor - look for exact patterns
+                has_02_smoothing = 'smoothing = 0.2' in updateCamera_section
                 has_smoothing_var = 'smoothing' in updateCamera_section
-                has_lerp_logic = '*' in updateCamera_section and 'camera' in updateCamera_section
+                has_lerp_logic = '* smoothing' in updateCamera_section
                 
                 self.log_test(
                     "Camera Smoothing Factor (0.2 lerp)",
-                    has_02_smoothing and has_smoothing_var,
+                    has_02_smoothing and has_lerp_logic,
                     f"0.2 smoothing found: {has_02_smoothing}, Smoothing variable: {has_smoothing_var}, Lerp logic: {has_lerp_logic}"
                 )
-                return has_02_smoothing and has_smoothing_var
+                return has_02_smoothing and has_lerp_logic
             else:
                 self.log_test("Camera Smoothing Factor (0.2 lerp)", False, "updateCamera method not found")
                 return False
