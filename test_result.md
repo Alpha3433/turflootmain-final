@@ -132,7 +132,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "SPACEBAR SPLIT FUNCTIONALITY FIX VERIFICATION: Test the spacebar split functionality fix in arena mode. Comprehensive fixes implemented to prevent disconnections when spacebar is pressed: Client-Side Fixes (Enhanced Input Validation, Mass Requirement Validation >=40 mass, Coordinate Validation, Split Cooldown 500ms, Error Handling, Visual Feedback), Server-Side Fixes (Message Validation, Input Sanitization, Error Isolation, Graceful Degradation). Need to verify both successful and failed split scenarios ensure robust error handling throughout the split system."
+user_problem_statement: "ENHANCED WEBSOCKET CONNECTION STATE HANDLING FOR SPACEBAR SPLIT FUNCTIONALITY: Test the enhanced WebSocket connection state handling for spacebar split functionality. Enhanced fixes implemented to prevent 'WebSocket is already in CLOSING or CLOSED state' errors: 1) Pre-Send Connection Check - Validate WebSocket readyState is OPEN before sending split commands, 2) Connection State Logging - Detailed logging of connection state before/after split attempts, 3) Graceful Error Handling - Specific handling for WebSocket CLOSING/CLOSED state errors, 4) Connection Recovery - Skip split attempts when connection is not ready. Expected: Spacebar presses when WebSocket is closing/closed should log informative messages but not cause errors, connection state properly validated before sending messages, split attempts gracefully skipped when connection not ready."
 
 # Test plan for this run
 
