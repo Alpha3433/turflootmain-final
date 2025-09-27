@@ -10,6 +10,27 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   // Shows actual Hathora rooms, not simulated servers
   // ========================================
   
+  // Mobile detection for responsive design
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      const screenWidth = window.innerWidth
+      const screenHeight = window.innerHeight
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      
+      // Mobile detection for modal
+      const mobile = screenWidth < 768 || (isTouchDevice && isMobileUA && screenWidth < 1024)
+      
+      setIsMobile(mobile)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+  
   const [realHathoraRooms, setRealHathoraRooms] = useState([])
   const [roomsLoading, setRoomsLoading] = useState(false)
   const [error, setError] = useState(null)
