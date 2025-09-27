@@ -781,12 +781,13 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                           >
                             <div style={{ flex: 1 }}>
                               <div style={{ 
-                                fontSize: '14px',
+                                fontSize: isMobile ? '13px' : '14px',
                                 color: 'white',
                                 fontWeight: '600',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '8px'
+                                gap: isMobile ? '6px' : '8px',
+                                flexWrap: isMobile ? 'wrap' : 'nowrap'
                               }}>
                                 <span>🎮</span>
                                 <span>{room.name || `${room.gameType} Room`}</span>
