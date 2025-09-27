@@ -288,7 +288,10 @@ const MultiplayerArena = () => {
     }
   }
 
-  // Cash out key event handlers - ported from agario
+  // Cash out key event handlers - ported from agario with split spam prevention
+  const lastSplitTimeRef = useRef(0)
+  const SPLIT_COOLDOWN = 500 // 500ms cooldown between splits
+  
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameReady) {
@@ -297,10 +300,18 @@ const MultiplayerArena = () => {
         setCashOutProgress(0)
       }
       
-      // Handle SPACE key for splitting
+      // Handle SPACE key for splitting with cooldown
       if (e.key === ' ' && gameReady && gameRef.current) {
         e.preventDefault()
+        
+        const now = Date.now()
+        if (now - lastSplitTimeRef.current < SPLIT_COOLDOWN) {
+          console.log('⚠️ Split cooldown active, ignoring spacebar press')
+          return
+        }
+        
         console.log('SPACE pressed - attempting split')
+        lastSplitTimeRef.current = now
         handleSplit(e)
       }
     }
