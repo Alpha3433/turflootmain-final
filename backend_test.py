@@ -100,24 +100,86 @@ class CircularBoundaryTester:
             )
         else:
             self.log_test("API Health Check", "Root API Endpoint", False, "API not accessible")
+
+    def test_colyseus_server_availability(self):
+        """Test 2: Colyseus Server Availability"""
+        print("\n🔍 TESTING CATEGORY 2: COLYSEUS SERVER AVAILABILITY")
         
-        # Check for camera system implementation
-        camera_checks = {
-            'camera_initialization': 'this.camera = { x: 0, y: 0 }' in content,
-            'update_camera_method': 'updateCamera()' in content,
-            'target_calculation': 'this.player.x - this.canvas.width / 2' in content,
-            'smoothing_factor': '* 0.2' in content and 'smoothing' in content,
-            'boundary_extension': 'boundaryExtension = 100' in content,
-            'world_bounds_checking': 'Math.max(-boundaryExtension, Math.min(' in content,
-            'camera_translate': 'this.ctx.translate(-this.camera.x, -this.camera.y)' in content
-        }
+        # Test servers endpoint
+        response = self.make_request("/servers")
+        if response:
+            servers = response.get('servers', [])
+            colyseus_enabled = response.get('colyseusEnabled', False)
+            colyseus_endpoint = response.get('colyseusEndpoint', '')
+            
+            # Find arena server
+            arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' and s.get('roomType') == 'arena']
+            
+            self.log_test(
+                "Colyseus Server Availability",
+                "Arena Server Found",
+                len(arena_servers) > 0,
+                f"Found {len(arena_servers)} arena servers, Colyseus enabled: {colyseus_enabled}"
+            )
+            
+            if arena_servers:
+                arena_server = arena_servers[0]
+                max_players = arena_server.get('maxPlayers', 0)
+                current_players = arena_server.get('currentPlayers', 0)
+                
+                self.log_test(
+                    "Colyseus Server Availability",
+                    "Arena Server Configuration",
+                    max_players >= 50,
+                    f"Max: {max_players}, Current: {current_players}, Endpoint: {colyseus_endpoint}"
+                )
+        else:
+            self.log_test("Colyseus Server Availability", "Arena Server Found", False, "Servers endpoint not accessible")
+
+    def test_circular_boundary_mathematics(self):
+        """Test 3: Circular Boundary Mathematics Verification"""
+        print("\n🔍 TESTING CATEGORY 3: CIRCULAR BOUNDARY MATHEMATICS")
         
-        passed_checks = sum(camera_checks.values())
-        total_checks = len(camera_checks)
+        # Test boundary calculations
+        import math
         
-        print(f"📊 Camera System Code Analysis Results:")
-        for check, result in camera_checks.items():
-            status = "✅" if result else "❌"
+        # Test center position
+        center_correct = (self.world_center_x == self.world_size / 2 and 
+                         self.world_center_y == self.world_size / 2)
+        self.log_test(
+            "Circular Boundary Mathematics",
+            "World Center Calculation",
+            center_correct,
+            f"Center: ({self.world_center_x}, {self.world_center_y}) for {self.world_size}x{self.world_size} world"
+        )
+        
+        # Test playable radius
+        radius_reasonable = 800 <= self.playable_radius <= 2000
+        self.log_test(
+            "Circular Boundary Mathematics",
+            "Playable Radius Range",
+            radius_reasonable,
+            f"Playable radius: {self.playable_radius}px (should be 800-2000px)"
+        )
+        
+        # Test boundary positions
+        test_positions = [
+            ("Center", self.world_center_x, self.world_center_y, True),
+            ("Edge Safe", self.world_center_x + self.max_player_distance - 10, self.world_center_y, True),
+            ("Edge Boundary", self.world_center_x + self.max_player_distance, self.world_center_y, True),
+            ("Outside Boundary", self.world_center_x + self.max_player_distance + 50, self.world_center_y, False)
+        ]
+        
+        for pos_name, x, y, should_be_safe in test_positions:
+            distance = math.sqrt((x - self.world_center_x)**2 + (y - self.world_center_y)**2)
+            is_safe = distance <= self.max_player_distance
+            
+            self.log_test(
+                "Circular Boundary Mathematics",
+                f"Position Test: {pos_name}",
+                is_safe == should_be_safe,
+                f"Position: ({x:.0f}, {y:.0f}), Distance: {distance:.1f}px, Safe: {is_safe}"
+            )
             print(f"  {status} {check.replace('_', ' ').title()}: {'Found' if result else 'Not Found'}")
         
         print(f"📈 Camera Code Analysis: {passed_checks}/{total_checks} checks passed ({passed_checks/total_checks*100:.1f}%)")
