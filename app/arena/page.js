@@ -1171,18 +1171,10 @@ const MultiplayerArena = () => {
           // If distance <= 50, trust client prediction completely (no correction)
           
         } else {
-          // First update - apply directly and initialize camera immediately
+          // First update - apply directly (camera will be updated in updateCamera method)
           console.log('🎯 First player position received from server:', currentPlayer.x, currentPlayer.y)
           this.player.x = currentPlayer.x
           this.player.y = currentPlayer.y
-          
-          // Initialize camera to center on player immediately (no smoothing for first frame)
-          if (!this.cameraInitialized) {
-            this.camera.x = currentPlayer.x - this.canvas.width / 2
-            this.camera.y = currentPlayer.y - this.canvas.height / 2
-            this.cameraInitialized = true
-            console.log('📹 Camera initialized to center on player:', this.camera)
-          }
         }
         
         // Update mass and score (server is always authoritative for these)
