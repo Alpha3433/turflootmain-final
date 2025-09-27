@@ -1326,18 +1326,6 @@ const MultiplayerArena = () => {
       // Apply camera translation (this is what makes the camera follow the player)
       this.ctx.translate(-this.camera.x, -this.camera.y)
       
-      // Debug: Draw a cross at player position to verify camera tracking
-      if (this.player.x !== undefined && this.player.y !== undefined) {
-        this.ctx.strokeStyle = '#ff0000'
-        this.ctx.lineWidth = 2
-        this.ctx.beginPath()
-        this.ctx.moveTo(this.player.x - 20, this.player.y)
-        this.ctx.lineTo(this.player.x + 20, this.player.y)
-        this.ctx.moveTo(this.player.x, this.player.y - 20)
-        this.ctx.lineTo(this.player.x, this.player.y + 20)
-        this.ctx.stroke()
-      }
-      
       // Draw optimized grid first (matching local agario render order)
       this.drawGrid()
       
