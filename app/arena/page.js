@@ -2217,15 +2217,15 @@ const MultiplayerArena = () => {
             position: 'relative',
             overflow: 'hidden'
           }}>
-            {/* Player dot - positioned relative to playable area center (2000, 2000) */}
+            {/* Player dot - positioned within playable area bounds only */}
             <div style={{
               position: 'absolute',
               width: isMobile ? '6px' : '12px',
               height: isMobile ? '6px' : '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${((minimapData.playerX - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
-              top: `${((minimapData.playerY - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
+              left: `${((minimapData.playerX - (2000 - 1800)) / (1800 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Map playable area (200-3800) to full minimap
+              top: `${((minimapData.playerY - (2000 - 1800)) / (1800 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Map playable area (200-3800) to full minimap
               transform: 'translate(-50%, -50%)',
               border: isMobile ? '1px solid #ffffff' : '3px solid #ffffff',
               zIndex: 10
