@@ -1087,7 +1087,7 @@ const MultiplayerArena = () => {
       // Circular boundary check - IDENTICAL to agario (prevents leaving green circle)
       const centerX = this.world.width / 2
       const centerY = this.world.height / 2
-      const maxRadius = this.currentPlayableRadius - this.player.radius
+      const maxRadius = this.currentPlayableRadius // Allow player edge to touch green circle
       
       const distanceFromCenter = Math.sqrt(
         Math.pow(this.player.x - centerX, 2) + 
