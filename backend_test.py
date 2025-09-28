@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Arena Playable Area Extension
-Testing the backend changes for extending the arena playable area from 1800 to 2500 radius.
+Backend Testing for Minimap and Red Zone Extension
+Testing the backend changes for updating minimap dimensions and extending the red zone.
+Focuses on world size expansion from 4000 to 6000 pixels and center positioning at (3000,3000).
 """
 
 import requests
@@ -10,16 +11,18 @@ import time
 import os
 from typing import Dict, Any, List
 
-class ArenaPlayableAreaTester:
+class MinimapRedZoneExtensionTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         self.test_results = []
         
-        print(f"🎯 ARENA PLAYABLE AREA EXTENSION BACKEND TESTING INITIALIZED")
+        print(f"🎯 MINIMAP AND RED ZONE EXTENSION BACKEND TESTING INITIALIZED")
         print(f"📍 Base URL: {self.base_url}")
-        print(f"🔵 Expected Playable Radius: 2500px (expanded from 1800px)")
+        print(f"🌍 Expected World Size: 6000x6000 pixels (expanded from 4000x4000)")
+        print(f"🎯 Expected World Center: (3000,3000) instead of (2000,2000)")
+        print(f"🔵 Expected Playable Radius: 2500px within the larger world")
         print("=" * 80)
         
     def log_test(self, test_name: str, passed: bool, details: str = ""):
