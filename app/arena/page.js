@@ -2240,7 +2240,6 @@ const MultiplayerArena = () => {
               top: `${(minimapData.playerY / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
               transform: 'translate(-50%, -50%)',
               border: isMobile ? '1px solid #ffffff' : '3px solid #ffffff',
-              boxShadow: isMobile ? '0 0 6px rgba(96, 165, 250, 1)' : '0 0 12px rgba(96, 165, 250, 1)',
               zIndex: 10
             }} />
             
