@@ -2215,8 +2215,7 @@ const MultiplayerArena = () => {
             backgroundColor: '#000000',
             border: isMobile ? '2px solid #00ff00' : '4px solid #00ff00',
             position: 'relative',
-            overflow: 'hidden',
-            boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
+            overflow: 'hidden'
           }}>
             {/* Much larger black playable area circle on minimap - positioned at top-left */}
             <div style={{
