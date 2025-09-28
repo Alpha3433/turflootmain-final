@@ -39,67 +39,63 @@ class ArenaPlayableAreaTester:
             'passed': passed,
             'details': details
         }
-        self.test_results.append(result)
         
-        print(f"{status} | {category} | {test_name}")
-        if details:
-            print(f"    📝 {details}")
-
-    def make_request(self, endpoint: str, method: str = 'GET', data: Dict = None) -> Optional[Dict]:
-        """Make HTTP request with error handling"""
+    def test_api_health_check(self) -> bool:
+        """Test 1: API Health Check - Verify backend infrastructure is operational"""
         try:
-            url = f"{self.api_base}{endpoint}"
-            
-            if method == 'GET':
-                response = requests.get(url, timeout=10)
-            elif method == 'POST':
-                response = requests.post(url, json=data, timeout=10)
-            else:
-                raise ValueError(f"Unsupported method: {method}")
+            print("\n🔍 TEST 1: API Health Check")
+            response = requests.get(f"{self.api_base}", timeout=10)
             
             if response.status_code == 200:
-                return response.json()
-            else:
-                print(f"⚠️ HTTP {response.status_code}: {response.text[:200]}")
-                return None
+                data = response.json()
+                service = data.get('service', '')
+                status = data.get('status', '')
+                features = data.get('features', [])
                 
-        except requests.exceptions.RequestException as e:
-            print(f"❌ Request failed: {str(e)}")
-            return None
-
-    def test_api_health_check(self):
-        """Test 1: API Health Check"""
-        print("\n🔍 TESTING CATEGORY 1: API HEALTH CHECK")
-        
-        # Test root API endpoint
-        response = self.make_request("/")
-        if response:
-            service = response.get('service', '')
-            status = response.get('status', '')
-            features = response.get('features', [])
+                if service == 'turfloot-api' and status == 'operational':
+                    self.log_test("API Health Check", True, f"Service: {service}, Status: {status}, Features: {features}")
+                    return True
+                else:
+                    self.log_test("API Health Check", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_test("API Health Check", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("API Health Check", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_colyseus_server_availability(self) -> bool:
+        """Test 2: Colyseus Server Availability - Verify arena servers are running"""
+        try:
+            print("\n🔍 TEST 2: Colyseus Server Availability")
+            response = requests.get(f"{self.api_base}/servers", timeout=10)
             
-            self.log_test(
-                "API Health Check", 
-                "Root API Endpoint",
-                service == 'turfloot-api' and status == 'operational',
-                f"Service: {service}, Status: {status}, Features: {features}"
-            )
-        else:
-            self.log_test("API Health Check", "Root API Endpoint", False, "API not accessible")
-
-    def test_colyseus_server_availability(self):
-        """Test 2: Colyseus Server Availability"""
-        print("\n🔍 TESTING CATEGORY 2: COLYSEUS SERVER AVAILABILITY")
-        
-        # Test servers endpoint
-        response = self.make_request("/servers")
-        if response:
-            servers = response.get('servers', [])
-            colyseus_enabled = response.get('colyseusEnabled', False)
-            colyseus_endpoint = response.get('colyseusEndpoint', '')
-            
-            # Find arena server
-            arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' and s.get('roomType') == 'arena']
+            if response.status_code == 200:
+                data = response.json()
+                colyseus_enabled = data.get('colyseusEnabled', False)
+                colyseus_endpoint = data.get('colyseusEndpoint', '')
+                servers = data.get('servers', [])
+                
+                # Find arena servers
+                arena_servers = [s for s in servers if s.get('roomType') == 'arena' or s.get('serverType') == 'colyseus']
+                
+                if colyseus_enabled and arena_servers:
+                    self.log_test("Colyseus Server Availability", True, 
+                                f"Endpoint: {colyseus_endpoint}, Arena servers: {len(arena_servers)}")
+                    return True
+                else:
+                    self.log_test("Colyseus Server Availability", False, 
+                                f"Colyseus enabled: {colyseus_enabled}, Arena servers: {len(arena_servers)}")
+                    return False
+            else:
+                self.log_test("Colyseus Server Availability", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Colyseus Server Availability", False, f"Exception: {str(e)}")
+            return False
             
             self.log_test(
                 "Colyseus Server Availability",
