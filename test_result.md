@@ -138,16 +138,8 @@ user_problem_statement: "EXTEND GREEN CIRCLE AND PLAYABLE AREA IN ARENA MODE: Us
 
 test_plan:
   current_focus:
-    - "Enhanced WebSocket Connection State Handling for Split"
-    - "Spacebar Split Client-Side Validation"
-    - "Spacebar Split Server-Side Validation"
-    - "Split Mass Requirements Consistency"
-    - "Split Cooldown Mechanism"
-    - "Split Error Handling Robustness"
-    - "Split Coordinate Validation"
-    - "Split Visual Feedback System"
-  stuck_tasks: 
-    - "Enhanced WebSocket Connection State Handling for Split"
+    - "Extend Arena Playable Area"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
