@@ -1286,32 +1286,7 @@ const MultiplayerArena = () => {
       this.ctx.fillStyle = '#000000'
       this.ctx.fill()
       
-      // Dynamic zone color based on size changes
-      let zoneColor = '#00ff00' // Default green
-      if (Math.abs(this.currentPlayableRadius - this.targetPlayableRadius) > 1) {
-        // Zone is changing - use yellow color
-        zoneColor = '#ffff00'
-      }
-      if (this.isCashGame) {
-        // Cash games get a distinctive blue-green color
-        zoneColor = this.targetPlayableRadius > this.currentPlayableRadius ? '#00ffff' : '#0080ff'
-      }
-      
-      // No boundary circle - players can move freely throughout the world
-      
-      // Add glowing effect
-      this.ctx.beginPath()
-      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
-      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.6)')
-      this.ctx.lineWidth = 16
-      this.ctx.stroke()
-      
-      // Add inner glow
-      this.ctx.beginPath()
-      this.ctx.arc(centerX, centerY, playableRadius - 8, 0, Math.PI * 2)
-      this.ctx.strokeStyle = zoneColor.replace(')', ', 0.3)')
-      this.ctx.lineWidth = 8
-      this.ctx.stroke()
+      // No boundary circles - players can move freely throughout the world
       
       // Draw optimized grid matching local agario
       this.drawGrid()
