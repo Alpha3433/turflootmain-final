@@ -148,7 +148,7 @@ user_problem_statement: "EXTEND GREEN CIRCLE AND PLAYABLE AREA IN ARENA MODE: Us
 
 test_plan:
   current_focus:
-    - "Extend Arena Playable Area"
+    - "Boundary Enforcement Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
