@@ -82,29 +82,33 @@ class BoundarySyncTester:
     def test_api_health_check(self) -> bool:
         """Test 1: API Health Check - Verify backend infrastructure is operational"""
         print("\n🔍 TEST 1: API HEALTH CHECK")
+        print("-" * 40)
+        
         try:
-            response = requests.get(f"{self.api_base}", timeout=10)
+            response = requests.get(f"{self.base_url}/api", timeout=10)
+            
             if response.status_code == 200:
                 data = response.json()
-                service = data.get('service', 'unknown')
-                status = data.get('status', 'unknown')
+                service = data.get('service', '')
+                status = data.get('status', '')
                 features = data.get('features', [])
                 
-                print(f"✅ API Health Check PASSED")
-                print(f"   Service: {service}")
-                print(f"   Status: {status}")
-                print(f"   Features: {features}")
+                # Check for required service info
+                is_operational = (
+                    service == 'turfloot-api' and
+                    status == 'operational' and
+                    'multiplayer' in features
+                )
                 
-                if status == 'operational' and 'multiplayer' in features:
-                    return True
-                else:
-                    print(f"❌ API not fully operational: status={status}, multiplayer={'multiplayer' in features}")
-                    return False
+                details = f"Service: {service}, Status: {status}, Features: {features}"
+                self.log_test("API Health Check", "Backend Infrastructure", is_operational, details)
+                return is_operational
             else:
-                print(f"❌ API Health Check FAILED: HTTP {response.status_code}")
+                self.log_test("API Health Check", "Backend Infrastructure", False, f"HTTP {response.status_code}")
                 return False
+                
         except Exception as e:
-            print(f"❌ API Health Check FAILED: {str(e)}")
+            self.log_test("API Health Check", "Backend Infrastructure", False, f"Error: {str(e)}")
             return False
 
     def test_colyseus_server_availability(self) -> bool:
