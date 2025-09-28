@@ -30,22 +30,27 @@ import math
 import os
 from typing import Dict, List, Tuple, Any
 
-class VirusCoinSpawnTester:
+class ExtendedRedZoneBackendTester:
     def __init__(self):
-        # Get base URL from environment
+        # Get base URL from environment or use default
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
         self.api_base = f"{self.base_url}/api"
         
         # Expected configuration based on review request
-        self.world_size = 4000
-        self.world_center = (2000, 2000)  # Center at (2000,2000) for 4000x4000 world
-        self.playable_radius = 1800  # 1800px radius from center
+        self.world_size = 8000  # Extended from 4000 to 8000
+        self.world_center = (4000, 4000)  # Center at (4000,4000) for 8000x8000 world
+        self.playable_radius = 1800  # 1800px radius maintained (unchanged)
         self.safe_zone_radius = 1800  # safeZoneRadius = 1800
         
-        # Test results tracking
+        # Test configuration
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
+        
+        print(f"🎯 EXTENDED RED ZONE BACKEND TESTING INITIATED")
+        print(f"📍 Testing against: {self.base_url}")
+        print(f"🎮 Focus: Extended red zone implementation (8000x8000 world)")
+        print("=" * 80)
         
     def log_test(self, test_name: str, passed: bool, details: str = ""):
         """Log test result"""
