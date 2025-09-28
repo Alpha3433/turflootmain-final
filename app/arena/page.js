@@ -1096,6 +1096,14 @@ const MultiplayerArena = () => {
       
       if (distanceFromCenter > maxRadius) {
         // Clamp player to circular boundary (just like agario)
+        console.log('🚫 BOUNDARY ENFORCED:', {
+          distanceFromCenter: distanceFromCenter.toFixed(1),
+          maxRadius: maxRadius.toFixed(1),
+          playerRadius: this.player.radius.toFixed(1),
+          playableRadius: this.currentPlayableRadius,
+          center: `(${centerX}, ${centerY})`,
+          playerPos: `(${this.player.x.toFixed(1)}, ${this.player.y.toFixed(1)})`
+        })
         const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
         this.player.x = centerX + Math.cos(angle) * maxRadius
         this.player.y = centerY + Math.sin(angle) * maxRadius
