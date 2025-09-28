@@ -26,28 +26,26 @@ API_BASE = f"{BASE_URL}/api"
 class ArenaBackendTester:
     def __init__(self):
         self.test_results = []
-        self.total_tests = 0
-        self.passed_tests = 0
+        self.start_time = time.time()
         
-    def log_test(self, test_name: str, passed: bool, details: str = ""):
+    def log_test(self, test_name, passed, details="", error=""):
         """Log test result"""
-        self.total_tests += 1
-        if passed:
-            self.passed_tests += 1
-            status = "✅ PASSED"
-        else:
-            status = "❌ FAILED"
-            
-        result = f"{status}: {test_name}"
-        if details:
-            result += f" - {details}"
-            
-        print(result)
-        self.test_results.append({
+        result = {
             'test': test_name,
             'passed': passed,
-            'details': details
-        })
+            'details': details,
+            'error': error,
+            'timestamp': datetime.now().isoformat()
+        }
+        self.test_results.append(result)
+        
+        status = "✅ PASSED" if passed else "❌ FAILED"
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        if error:
+            print(f"   Error: {error}")
+        print()
         
     def test_api_health_check(self) -> bool:
         """Test 1: API Health Check - Verify backend infrastructure is operational after server restart"""
