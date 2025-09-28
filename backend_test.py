@@ -95,10 +95,10 @@ class MinimapRedZoneExtensionTester:
             self.log_test("Colyseus Server Availability", False, f"Exception: {str(e)}")
             return False
     
-    def test_playable_radius_configuration(self) -> bool:
-        """Test 3: Playable Radius Configuration - Verify server-side playable radius is 2500"""
+    def test_world_size_configuration(self) -> bool:
+        """Test 3: World Size Configuration - Verify server-side worldSize is now set to 6000 instead of 4000"""
         try:
-            print("\n🔍 TEST 3: Playable Radius Configuration")
+            print("\n🔍 TEST 3: World Size Configuration")
             
             # Check TypeScript source file
             ts_file_path = "/app/src/rooms/ArenaRoom.ts"
@@ -112,9 +112,13 @@ class MinimapRedZoneExtensionTester:
                 with open(ts_file_path, 'r') as f:
                     ts_content = f.read()
                     
-                # Look for playableRadius = 2500 in key locations
-                if "playableRadius = 2500" in ts_content:
-                    ts_checks += ts_content.count("playableRadius = 2500")
+                # Look for worldSize = 6000 in key locations
+                if "worldSize: number = 6000" in ts_content:
+                    ts_checks += 1
+                if "worldSize = parseInt(process.env.WORLD_SIZE || '6000')" in ts_content:
+                    ts_checks += 1
+                if "this.worldSize = this.worldSize" in ts_content or "this.state.worldSize = this.worldSize" in ts_content:
+                    ts_checks += 1
                     
             except Exception as e:
                 print(f"⚠️ Could not read TypeScript file: {e}")
@@ -124,24 +128,28 @@ class MinimapRedZoneExtensionTester:
                 with open(js_file_path, 'r') as f:
                     js_content = f.read()
                     
-                # Look for playableRadius = 2500 in key locations
-                if "playableRadius = 2500" in js_content:
-                    js_checks += js_content.count("playableRadius = 2500")
+                # Look for worldSize = 6000 in key locations
+                if "6000" in js_content and "worldSize" in js_content:
+                    # Count occurrences of 6000 in worldSize context
+                    lines = js_content.split('\n')
+                    for line in lines:
+                        if "worldSize" in line and "6000" in line:
+                            js_checks += 1
                     
             except Exception as e:
                 print(f"⚠️ Could not read JavaScript file: {e}")
             
             if ts_checks >= 2 and js_checks >= 2:
-                self.log_test("Playable Radius Configuration", True, 
-                            f"TS: {ts_checks} occurrences, JS: {js_checks} occurrences of playableRadius = 2500")
+                self.log_test("World Size Configuration", True, 
+                            f"TS: {ts_checks} worldSize=6000 references, JS: {js_checks} worldSize=6000 references")
                 return True
             else:
-                self.log_test("Playable Radius Configuration", False, 
-                            f"TS: {ts_checks} occurrences, JS: {js_checks} occurrences (expected >= 2 each)")
+                self.log_test("World Size Configuration", False, 
+                            f"TS: {ts_checks} references, JS: {js_checks} references (expected >= 2 each)")
                 return False
                 
         except Exception as e:
-            self.log_test("Playable Radius Configuration", False, f"Exception: {str(e)}")
+            self.log_test("World Size Configuration", False, f"Exception: {str(e)}")
             return False
     
     def test_circular_boundary_enforcement(self) -> bool:
