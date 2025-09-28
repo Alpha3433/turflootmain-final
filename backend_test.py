@@ -76,39 +76,23 @@ class VirusCoinSpawnTester:
     def test_api_health_check(self):
         """Test 1: API Health Check - Verify backend infrastructure is operational"""
         try:
-            response = requests.get(f"{API_BASE}", timeout=10)
-            
+            response = requests.get(f"{self.api_base}", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                service = data.get('service', '')
+                service_name = data.get('service', '')
                 status = data.get('status', '')
                 features = data.get('features', [])
                 
-                if service == 'turfloot-api' and status == 'operational':
-                    self.log_test(
-                        "API Health Check",
-                        True,
-                        f"Service: {service}, Status: {status}, Features: {features}"
-                    )
-                    return True
+                if 'multiplayer' in features and status == 'operational':
+                    self.log_test("API Health Check", True, 
+                                f"Backend infrastructure operational (service={service_name}, status={status}, features={features})")
                 else:
-                    self.log_test(
-                        "API Health Check",
-                        False,
-                        f"Unexpected response: {data}"
-                    )
-                    return False
+                    self.log_test("API Health Check", False, 
+                                f"Backend not fully operational (service={service_name}, status={status}, features={features})")
             else:
-                self.log_test(
-                    "API Health Check",
-                    False,
-                    f"HTTP {response.status_code}: {response.text}"
-                )
-                return False
-                
+                self.log_test("API Health Check", False, f"API returned status {response.status_code}")
         except Exception as e:
-            self.log_test("API Health Check", False, error=str(e))
-            return False
+            self.log_test("API Health Check", False, f"API request failed: {str(e)}")
     
     def test_colyseus_server_availability(self):
         """Test 2: Colyseus Server Availability - Verify arena servers are running with 4000x4000 world"""
