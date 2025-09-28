@@ -18,15 +18,11 @@ Testing Requirements:
 import requests
 import json
 import time
+import math
 import os
-import sys
-from datetime import datetime
+from typing import Dict, List, Tuple, Any
 
-# Configuration
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
-API_BASE = f"{BASE_URL}/api"
-
-class ArenaBackendTester:
+class VirusCoinSpawnTester:
     def __init__(self):
         self.test_results = []
         self.start_time = time.time()
