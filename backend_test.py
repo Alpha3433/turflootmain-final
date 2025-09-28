@@ -210,63 +210,62 @@ class MinimapRedZoneExtensionTester:
             self.log_test("Player Spawn Positioning", False, f"Exception: {str(e)}")
             return False
     
-    def test_split_player_boundary(self) -> bool:
-        """Test 5: Split Player Boundary - Test split players are constrained within expanded boundary"""
+    def test_boundary_enforcement(self) -> bool:
+        """Test 5: Boundary Enforcement - Test that circular boundary is still enforced within the larger world"""
         try:
-            print("\n🔍 TEST 5: Split Player Boundary")
+            print("\n🔍 TEST 5: Boundary Enforcement")
             
-            # Check for split boundary logic in both files
+            # Check for boundary enforcement logic in both files
             ts_file_path = "/app/src/rooms/ArenaRoom.ts"
             js_file_path = "/app/build/rooms/ArenaRoom.js"
             
-            ts_split_checks = 0
-            js_split_checks = 0
+            ts_boundary_checks = 0
+            js_boundary_checks = 0
             
-            # Check TypeScript source for split boundary enforcement
+            # Check TypeScript source for boundary enforcement patterns
             try:
                 with open(ts_file_path, 'r') as f:
                     ts_content = f.read()
                     
-                # Look for split boundary enforcement in handleSplit method
-                split_patterns = [
-                    "handleSplit",
-                    "splitPlayer.x",
-                    "splitPlayer.y",
-                    "playableRadius",
-                    "distanceFromCenter"
+                # Look for boundary enforcement patterns
+                boundary_patterns = [
+                    "distanceFromCenter > maxRadius",
+                    "Math.atan2",
+                    "Math.cos(angle) * maxRadius",
+                    "Math.sin(angle) * maxRadius"
                 ]
                 
-                for pattern in split_patterns:
+                for pattern in boundary_patterns:
                     if pattern in ts_content:
-                        ts_split_checks += 1
+                        ts_boundary_checks += 1
                         
             except Exception as e:
                 print(f"⚠️ Could not read TypeScript file: {e}")
             
-            # Check compiled JavaScript for split boundary enforcement
+            # Check compiled JavaScript for boundary enforcement patterns
             try:
                 with open(js_file_path, 'r') as f:
                     js_content = f.read()
                     
-                # Look for split boundary enforcement patterns
-                for pattern in split_patterns:
+                # Look for boundary enforcement patterns
+                for pattern in boundary_patterns:
                     if pattern in js_content:
-                        js_split_checks += 1
+                        js_boundary_checks += 1
                         
             except Exception as e:
                 print(f"⚠️ Could not read JavaScript file: {e}")
             
-            if ts_split_checks >= 4 and js_split_checks >= 4:
-                self.log_test("Split Player Boundary", True, 
-                            f"TS: {ts_split_checks}/5 patterns, JS: {js_split_checks}/5 patterns found")
+            if ts_boundary_checks >= 3 and js_boundary_checks >= 3:
+                self.log_test("Boundary Enforcement", True, 
+                            f"TS: {ts_boundary_checks}/4 patterns, JS: {js_boundary_checks}/4 patterns found")
                 return True
             else:
-                self.log_test("Split Player Boundary", False, 
-                            f"TS: {ts_split_checks}/5 patterns, JS: {js_split_checks}/5 patterns (expected >= 4 each)")
+                self.log_test("Boundary Enforcement", False, 
+                            f"TS: {ts_boundary_checks}/4 patterns, JS: {js_boundary_checks}/4 patterns (expected >= 3 each)")
                 return False
                 
         except Exception as e:
-            self.log_test("Split Player Boundary", False, f"Exception: {str(e)}")
+            self.log_test("Boundary Enforcement", False, f"Exception: {str(e)}")
             return False
     
     def test_database_integration(self) -> bool:
