@@ -3017,7 +3017,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Circular Boundary Barrier Implementation"
+    - "Virus and Coin Playable Area Spawn Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
