@@ -23,7 +23,7 @@ from datetime import datetime
 BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
-class BackendTester:
+class ArenaBackendTester:
     def __init__(self):
         self.test_results = []
         self.total_tests = 0
