@@ -317,22 +317,7 @@ export class ArenaRoom extends Room<GameState> {
     splitPlayer.y = player.y + dirY * spawnDistance;
     
     // Keep split piece in bounds
-    // Keep split player in circular bounds - identical to local agario practice mode
-    const centerX = this.worldSize / 2;
-    const centerY = this.worldSize / 2;
-    const playableRadius = 1800;
-    const maxRadius = playableRadius - splitPlayer.radius; // Split player EDGE constrained at green circle boundary
-    
-    const distanceFromCenter = Math.sqrt(
-      Math.pow(splitPlayer.x - centerX, 2) + 
-      Math.pow(splitPlayer.y - centerY, 2)
-    );
-    
-    if (distanceFromCenter > maxRadius) {
-      const angle = Math.atan2(splitPlayer.y - centerY, splitPlayer.x - centerX);
-      splitPlayer.x = centerX + Math.cos(angle) * maxRadius;
-      splitPlayer.y = centerY + Math.sin(angle) * maxRadius;
-    }
+    // No boundary enforcement for split players - they can move freely throughout the world
     
     // Set split piece properties
     splitPlayer.vx = 0; // Use target positioning instead of velocity
