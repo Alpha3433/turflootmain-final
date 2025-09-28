@@ -252,12 +252,23 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   handleSplit(client: Client, message: any) {
+    console.log(`🎯 SPLIT COMMAND RECEIVED from ${client.sessionId}:`, message);
+    console.log(`🎯 Current players in room:`, Array.from(this.state.players.keys()));
+    
     try {
       const player = this.state.players.get(client.sessionId);
       if (!player || !player.alive) {
         console.log(`⚠️ Split ignored - player not found or dead for session: ${client.sessionId}`);
+        console.log(`⚠️ Available players:`, Array.from(this.state.players.keys()));
         return;
       }
+      
+      console.log(`🎯 Player found for split:`, {
+        sessionId: client.sessionId,
+        mass: player.mass,
+        position: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
+        radius: player.radius.toFixed(1)
+      });
 
       // Validate message format and data
       if (!message || typeof message !== 'object') {
