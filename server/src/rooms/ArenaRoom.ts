@@ -8,7 +8,7 @@ export class Player extends Schema {
   @type("number") y: number = 0;
   @type("number") vx: number = 0;
   @type("number") vy: number = 0;
-  @type("number") mass: number = 100;
+  @type("number") mass: number = 25;
   @type("number") radius: number = 20;
   @type("string") color: string = "#FF6B6B";
   @type("number") score: number = 0;
@@ -95,7 +95,7 @@ export class ArenaRoom extends Room<GameState> {
     player.y = Math.random() * this.worldSize;
     player.vx = 0;
     player.vy = 0;
-    player.mass = 100;
+    player.mass = 25;
     player.radius = Math.sqrt(player.mass / Math.PI) * 10;
     player.color = this.generatePlayerColor();
     player.score = 0;
@@ -254,7 +254,7 @@ export class ArenaRoom extends Room<GameState> {
     player.y = Math.random() * this.worldSize;
     player.vx = 0;
     player.vy = 0;
-    player.mass = 100;
+    player.mass = 25;
     player.radius = Math.sqrt(player.mass / Math.PI) * 10;
     player.alive = true;
     console.log(`🔄 Player respawned: ${player.name}`);
