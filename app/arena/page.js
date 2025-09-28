@@ -2368,8 +2368,8 @@ const MultiplayerArena = () => {
                   height: isMobile ? '4px' : '7px',
                   backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
                   borderRadius: '50%',
-                  left: `${(enemy.x / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  top: `${(enemy.y / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+                  left: `${(enemy.x / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+                  top: `${(enemy.y / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
                   transform: 'translate(-50%, -50%)',
                   opacity: enemy.isPlayer ? '1.0' : '0.8',
                   border: enemy.isPlayer 
