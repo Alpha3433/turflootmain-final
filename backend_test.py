@@ -569,22 +569,14 @@ class BoundarySyncTester:
 
 def main():
     """Main test execution"""
-    tester = PlayerSpawnPositionTester()
+    tester = BoundarySyncTester()
     results = tester.run_all_tests()
     
-    # Exit with appropriate code
-    passed_tests = sum(1 for result in results.values() if result)
-    total_tests = len(results)
-    
-    if passed_tests == total_tests:
-        print(f"\n🎉 ALL TESTS PASSED - PLAYER SPAWN POSITION FIX IS FULLY OPERATIONAL")
-        sys.exit(0)
-    elif passed_tests >= total_tests * 0.8:  # 80% pass rate
-        print(f"\n✅ MOST TESTS PASSED - PLAYER SPAWN POSITION FIX IS WORKING WELL")
-        sys.exit(0)
+    # Return appropriate exit code
+    if results['success_rate'] >= 90:
+        exit(0)  # Success
     else:
-        print(f"\n❌ MULTIPLE TESTS FAILED - PLAYER SPAWN POSITION FIX NEEDS ATTENTION")
-        sys.exit(1)
+        exit(1)  # Failure
 
 if __name__ == "__main__":
     main()
