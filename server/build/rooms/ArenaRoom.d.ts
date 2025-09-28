@@ -39,6 +39,10 @@ export declare class ArenaRoom extends Room<GameState> {
     maxCoins: number;
     maxViruses: number;
     tickRate: number;
+    playableRadius: number;
+    maxRadius: number;
+    centerX: number;
+    centerY: number;
     onCreate(): void;
     onJoin(client: Client, options?: any): void;
     handleInput(client: Client, message: any): void;
@@ -55,5 +59,7 @@ export declare class ArenaRoom extends Room<GameState> {
     spawnVirus(): void;
     generatePlayerColor(): string;
     onDispose(): void;
+    private getRandomPositionWithinRadius;
+    private clampPlayerToArena;
 }
 //# sourceMappingURL=ArenaRoom.d.ts.map
