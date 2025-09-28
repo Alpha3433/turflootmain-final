@@ -369,10 +369,10 @@ class MinimapRedZoneExtensionTester:
         tests = [
             self.test_api_health_check,
             self.test_colyseus_server_availability,
-            self.test_playable_radius_configuration,
-            self.test_circular_boundary_enforcement,
-            self.test_split_player_boundary,
-            self.test_database_integration,
+            self.test_world_size_configuration,
+            self.test_player_spawn_positioning,
+            self.test_boundary_enforcement,
+            self.test_minimap_data_synchronization,
             self.test_backend_api_integration
         ]
         
