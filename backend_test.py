@@ -47,10 +47,9 @@ class ArenaBackendTester:
             print(f"   Error: {error}")
         print()
         
-    def test_api_health_check(self) -> bool:
-        """Test 1: API Health Check - Verify backend infrastructure is operational after server restart"""
+    def test_api_health_check(self):
+        """Test 1: API Health Check - Verify backend infrastructure is operational"""
         try:
-            print("\n🔍 TEST 1: API Health Check")
             response = requests.get(f"{API_BASE}", timeout=10)
             
             if response.status_code == 200:
@@ -60,17 +59,29 @@ class ArenaBackendTester:
                 features = data.get('features', [])
                 
                 if service == 'turfloot-api' and status == 'operational':
-                    self.log_test("API Health Check", True, f"Service: {service}, Status: {status}, Features: {features}")
+                    self.log_test(
+                        "API Health Check",
+                        True,
+                        f"Service: {service}, Status: {status}, Features: {features}"
+                    )
                     return True
                 else:
-                    self.log_test("API Health Check", False, f"Unexpected response: {data}")
+                    self.log_test(
+                        "API Health Check",
+                        False,
+                        f"Unexpected response: {data}"
+                    )
                     return False
             else:
-                self.log_test("API Health Check", False, f"HTTP {response.status_code}")
+                self.log_test(
+                    "API Health Check",
+                    False,
+                    f"HTTP {response.status_code}: {response.text}"
+                )
                 return False
                 
         except Exception as e:
-            self.log_test("API Health Check", False, f"Exception: {str(e)}")
+            self.log_test("API Health Check", False, error=str(e))
             return False
     
     def test_colyseus_server_availability(self) -> bool:
