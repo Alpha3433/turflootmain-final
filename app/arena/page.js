@@ -1194,6 +1194,22 @@ const MultiplayerArena = () => {
         } else {
           // First update - apply directly (camera will be updated in updateCamera method)
           console.log('🎯 First player position received from server:', currentPlayer.x, currentPlayer.y)
+          
+          // Verify spawn position is within playable area
+          const worldCenterX = this.world.width / 2 // 4000
+          const worldCenterY = this.world.height / 2 // 4000
+          const distanceFromCenter = Math.sqrt(
+            Math.pow(currentPlayer.x - worldCenterX, 2) + 
+            Math.pow(currentPlayer.y - worldCenterY, 2)
+          )
+          console.log('🎯 SPAWN VERIFICATION CLIENT:', {
+            spawnPos: `(${currentPlayer.x.toFixed(1)}, ${currentPlayer.y.toFixed(1)})`,
+            worldCenter: `(${worldCenterX}, ${worldCenterY})`,
+            distanceFromCenter: distanceFromCenter.toFixed(1),
+            playableRadius: this.currentPlayableRadius,
+            inPlayableArea: distanceFromCenter <= this.currentPlayableRadius
+          })
+          
           this.player.x = currentPlayer.x
           this.player.y = currentPlayer.y
         }
