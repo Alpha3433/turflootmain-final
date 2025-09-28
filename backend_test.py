@@ -414,16 +414,16 @@ class MinimapRedZoneExtensionTester:
         }
 
 def main():
-    """Main function to run arena playable area extension backend tests"""
-    tester = ArenaPlayableAreaTester()
+    """Main function to run minimap and red zone extension backend tests"""
+    tester = MinimapRedZoneExtensionTester()
     results = tester.run_all_tests()
     
     # Return appropriate exit code
     if results['success_rate'] == 100:
-        print("\n🎉 ALL TESTS PASSED - Arena playable area extension backend is working correctly!")
+        print("\n🎉 ALL TESTS PASSED - Minimap and red zone extension backend is working correctly!")
         return 0
     else:
-        print(f"\n⚠️ {results['total_tests'] - results['passed_tests']} TEST(S) FAILED - Issues found in arena playable area extension backend")
+        print(f"\n⚠️ {results['total_tests'] - results['passed_tests']} TEST(S) FAILED - Issues found in minimap and red zone extension backend")
         return 1
 
 if __name__ == "__main__":
