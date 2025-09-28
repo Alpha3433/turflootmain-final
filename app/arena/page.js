@@ -1286,7 +1286,12 @@ const MultiplayerArena = () => {
       this.ctx.fillStyle = '#000000'
       this.ctx.fill()
       
-      // No boundary circles - players can move freely throughout the world
+      // Draw red divider border between playable area and red zone
+      this.ctx.beginPath()
+      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
+      this.ctx.strokeStyle = '#ff0000' // Bright red divider
+      this.ctx.lineWidth = 6 // Thick border for visibility
+      this.ctx.stroke()
       
       // Draw optimized grid matching local agario
       this.drawGrid()
