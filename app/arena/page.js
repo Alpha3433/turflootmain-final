@@ -1394,22 +1394,12 @@ const MultiplayerArena = () => {
         zoneColor = this.targetPlayableRadius > this.currentPlayableRadius ? '#00ffff' : '#0080ff'
       }
       
-      // Draw the boundary circle at the actual enforcement radius (where player center gets clamped)
-      const enforcementRadius = playableRadius - 15 // Assuming 15px player radius, this is where enforcement happens
-      this.ctx.beginPath()
-      this.ctx.arc(centerX, centerY, enforcementRadius, 0, Math.PI * 2)
-      this.ctx.strokeStyle = zoneColor
-      this.ctx.lineWidth = 8
-      this.ctx.stroke()
-      
-      // Draw outer playable area boundary (where player edge should touch)
+      // Draw the boundary circle - this represents where player EDGE should be constrained
       this.ctx.beginPath()
       this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
       this.ctx.strokeStyle = zoneColor
-      this.ctx.lineWidth = 2
-      this.ctx.setLineDash([5, 5])
+      this.ctx.lineWidth = 8
       this.ctx.stroke()
-      this.ctx.setLineDash([]) // Reset dash
       
       // Add glowing effect
       this.ctx.beginPath()
