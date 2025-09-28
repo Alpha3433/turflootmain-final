@@ -424,34 +424,7 @@ export class ArenaRoom extends Room<GameState> {
         player.y += moveY;
       }
       
-      // Keep player in circular bounds (matching client-side circular boundary) - identical to local agario practice mode
-      const centerX = this.worldSize / 2;
-      const centerY = this.worldSize / 2;
-      const playableRadius = 1800; // MUST MATCH client-side currentPlayableRadius exactly
-      const maxRadius = playableRadius - player.radius; // Player EDGE constrained at green circle boundary
-      
-      const distanceFromCenter = Math.sqrt(
-        Math.pow(player.x - centerX, 2) + 
-        Math.pow(player.y - centerY, 2)
-      );
-      
-      if (distanceFromCenter > maxRadius) {
-        // Clamp player to circular boundary (server-side enforcement)
-        console.log('🚫 SERVER BOUNDARY ENFORCED:', {
-          distanceFromCenter: distanceFromCenter.toFixed(1),
-          maxRadius: maxRadius.toFixed(1),
-          playerRadius: player.radius.toFixed(1),
-          playableRadius: playableRadius,
-          center: `(${centerX}, ${centerY})`,
-          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
-          worldSize: `${this.worldSize}x${this.worldSize}`,
-          calculation: `Player center clamped at ${maxRadius.toFixed(1)}px (${playableRadius} - ${player.radius.toFixed(1)}) so edge touches green circle`
-        });
-        
-        const angle = Math.atan2(player.y - centerY, player.x - centerX);
-        player.x = centerX + Math.cos(angle) * maxRadius;
-        player.y = centerY + Math.sin(angle) * maxRadius;
-      }
+      // No boundary enforcement - players can move freely throughout the world
       
       // Check collisions
       this.checkCollisions(player, sessionId);
