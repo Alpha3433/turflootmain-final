@@ -477,11 +477,6 @@ if __name__ == "__main__":
     tester = VirusCoinSpawnTester()
     success = tester.run_all_tests()
     exit(0 if success else 1)
-            
-            # Check JavaScript compiled file
-            try:
-                with open(js_file, 'r') as f:
-                    js_content = f.read()
                     
                 # Look for worldSize = 4000 patterns
                 if 'worldSize: 4000' in js_content:
