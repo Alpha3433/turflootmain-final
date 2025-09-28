@@ -114,31 +114,40 @@ class BoundarySyncTester:
     def test_colyseus_server_availability(self) -> bool:
         """Test 2: Colyseus Server Availability - Verify arena servers are running"""
         print("\n🔍 TEST 2: COLYSEUS SERVER AVAILABILITY")
+        print("-" * 40)
+        
         try:
-            response = requests.get(f"{self.api_base}/servers", timeout=10)
+            response = requests.get(f"{self.base_url}/api/servers", timeout=10)
+            
             if response.status_code == 200:
                 data = response.json()
                 servers = data.get('servers', [])
-                colyseus_endpoint = data.get('colyseusEndpoint', 'not found')
+                colyseus_enabled = data.get('colyseusEnabled', False)
+                colyseus_endpoint = data.get('colyseusEndpoint', '')
                 
-                # Look for Colyseus arena servers
-                arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' or 'arena' in s.get('name', '').lower()]
+                # Find arena servers
+                arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' and s.get('roomType') == 'arena']
                 
-                print(f"✅ Colyseus Server Availability PASSED")
-                print(f"   Total Servers: {len(servers)}")
-                print(f"   Arena Servers: {len(arena_servers)}")
-                print(f"   Colyseus Endpoint: {colyseus_endpoint}")
+                is_available = (
+                    colyseus_enabled and
+                    colyseus_endpoint and
+                    len(arena_servers) > 0
+                )
                 
-                if arena_servers:
-                    for server in arena_servers[:3]:  # Show first 3
-                        print(f"   Server: {server.get('name', 'Unknown')} (Max: {server.get('maxPlayers', 'N/A')})")
+                if is_available:
+                    server_info = arena_servers[0]
+                    details = f"Arena server found ({server_info.get('name', 'Unknown')}, Max: {server_info.get('maxPlayers', 0)}) with endpoint='{colyseus_endpoint}'"
+                else:
+                    details = f"Colyseus enabled: {colyseus_enabled}, Endpoint: {colyseus_endpoint}, Arena servers: {len(arena_servers)}"
                 
-                return len(arena_servers) > 0 or colyseus_endpoint != 'not found'
+                self.log_test("Colyseus Server", "Arena Server Availability", is_available, details)
+                return is_available
             else:
-                print(f"❌ Colyseus Server Availability FAILED: HTTP {response.status_code}")
+                self.log_test("Colyseus Server", "Arena Server Availability", False, f"HTTP {response.status_code}")
                 return False
+                
         except Exception as e:
-            print(f"❌ Colyseus Server Availability FAILED: {str(e)}")
+            self.log_test("Colyseus Server", "Arena Server Availability", False, f"Error: {str(e)}")
             return False
 
     def test_world_size_sync(self) -> bool:
