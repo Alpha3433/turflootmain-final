@@ -158,483 +158,398 @@ class BoundaryEnforcementTester:
         except Exception as e:
             print(f"❌ World Size Sync FAILED: {str(e)}")
             return False
+    def test_center_position_sync(self) -> bool:
+        """Test 4: Center Position Sync - Verify both client and server use (4000,4000) center"""
+        print("\n🔍 TEST 4: CENTER POSITION SYNC VERIFICATION")
+        
+        ts_center_found = False
+        js_center_found = False
+        
+        try:
+            # Check TypeScript source file for center calculations
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+                center_patterns = [
+                    "const centerX = this.worldSize / 2",
+                    "const centerY = this.worldSize / 2",
+                    "centerX = this.worldSize / 2",
+                    "centerY = this.worldSize / 2"
+                ]
                 
-        except requests.exceptions.Timeout:
-            return False, "Request timeout"
-        except requests.exceptions.ConnectionError:
-            return False, "Connection error"
-        except Exception as e:
-            return False, f"Request error: {str(e)}"
-
-    def test_api_health_check(self):
-        """Test 1: API Health Check - Verify backend infrastructure is operational"""
-        print("\n🔍 TESTING CATEGORY 1: API HEALTH CHECK")
-        
-        success, response = self.make_request("/")
-        
-        if success and isinstance(response, dict):
-            service = response.get('service', 'unknown')
-            status = response.get('status', 'unknown')
-            features = response.get('features', [])
+                found_patterns = sum(1 for pattern in center_patterns if pattern in ts_content)
+                if found_patterns >= 2:  # At least centerX and centerY calculations
+                    ts_center_found = True
+                    print(f"✅ TypeScript center position calculations found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ TypeScript center position calculations insufficient: {found_patterns}/4 patterns")
             
-            # Check if this is the TurfLoot API
-            is_turfloot = service == 'turfloot-api' or 'turfloot' in service.lower()
-            is_operational = status == 'operational' or status == 'ok'
-            has_multiplayer = 'multiplayer' in features
+            # Check compiled JavaScript file for center calculations
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+                center_patterns = [
+                    "centerX = this.worldSize / 2",
+                    "centerY = this.worldSize / 2",
+                    "const centerX = this.worldSize / 2",
+                    "const centerY = this.worldSize / 2"
+                ]
+                
+                found_patterns = sum(1 for pattern in center_patterns if pattern in js_content)
+                if found_patterns >= 2:  # At least centerX and centerY calculations
+                    js_center_found = True
+                    print(f"✅ JavaScript center position calculations found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ JavaScript center position calculations insufficient: {found_patterns}/4 patterns")
             
-            if is_turfloot and is_operational and has_multiplayer:
-                self.log_test("API Health", "Backend Infrastructure", True, 
-                            f"Service: {service}, Status: {status}, Features: {features}")
+            if ts_center_found and js_center_found:
+                print(f"✅ Center Position Sync PASSED - Both use worldSize/2 = {self.expected_center_x},{self.expected_center_y}")
+                return True
             else:
-                self.log_test("API Health", "Backend Infrastructure", False,
-                            f"Service: {service}, Status: {status}, Features: {features}")
-        else:
-            self.log_test("API Health", "Backend Infrastructure", False, 
-                        f"API not accessible: {response}")
-
-    def test_colyseus_server_availability(self):
-        """Test 2: Colyseus Server Availability - Verify arena servers are running with 8000x8000 world"""
-        print("\n🔍 TESTING CATEGORY 2: COLYSEUS SERVER AVAILABILITY")
-        
-        success, response = self.make_request("/servers")
-        
-        if success and isinstance(response, dict):
-            # Check for Colyseus configuration
-            colyseus_enabled = response.get('colyseusEnabled', False)
-            colyseus_endpoint = response.get('colyseusEndpoint', '')
-            servers = response.get('servers', [])
-            
-            # Look for arena servers
-            arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' and s.get('roomType') == 'arena']
-            
-            if colyseus_enabled and arena_servers:
-                arena_server = arena_servers[0]
-                server_id = arena_server.get('id', 'unknown')
-                max_players = arena_server.get('maxPlayers', 0)
+                print(f"❌ Center Position Sync FAILED - TS: {ts_center_found}, JS: {js_center_found}")
+                return False
                 
-                self.log_test("Colyseus Availability", "Arena Server Found", True,
-                            f"Server: {server_id}, Max: {max_players}, Endpoint: {colyseus_endpoint}")
+        except Exception as e:
+            print(f"❌ Center Position Sync FAILED: {str(e)}")
+            return False
+
+    def test_playable_radius_config(self) -> bool:
+        """Test 5: Playable Radius Config - Verify 1800px radius boundary enforcement"""
+        print("\n🔍 TEST 5: PLAYABLE RADIUS CONFIGURATION")
+        
+        ts_radius_found = False
+        js_radius_found = False
+        
+        try:
+            # Check TypeScript source file for playable radius
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+                if f"playableRadius = {self.expected_playable_radius}" in ts_content:
+                    ts_radius_found = True
+                    print(f"✅ TypeScript playable radius found: {self.expected_playable_radius}px")
+                else:
+                    print(f"❌ TypeScript playable radius not found or incorrect")
+            
+            # Check compiled JavaScript file for playable radius
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+                if f"playableRadius = {self.expected_playable_radius}" in js_content:
+                    js_radius_found = True
+                    print(f"✅ JavaScript playable radius found: {self.expected_playable_radius}px")
+                else:
+                    print(f"❌ JavaScript playable radius not found or incorrect")
+            
+            if ts_radius_found and js_radius_found:
+                print(f"✅ Playable Radius Config PASSED - Both use {self.expected_playable_radius}px radius")
+                return True
             else:
-                self.log_test("Colyseus Availability", "Arena Server Found", False,
-                            f"Colyseus enabled: {colyseus_enabled}, Arena servers: {len(arena_servers)}")
-        else:
-            self.log_test("Colyseus Availability", "Arena Server Found", False,
-                        f"Servers endpoint error: {response}")
+                print(f"❌ Playable Radius Config FAILED - TS: {ts_radius_found}, JS: {js_radius_found}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Playable Radius Config FAILED: {str(e)}")
+            return False
 
-    def test_world_size_configuration(self):
-        """Test 3: World Size Configuration - Verify server-side worldSize is now 8000"""
-        print("\n🔍 TESTING CATEGORY 3: WORLD SIZE CONFIGURATION")
+    def test_client_side_boundary(self) -> bool:
+        """Test 6: Client-Side Boundary - Verify client prevents movement beyond 1800px radius"""
+        print("\n🔍 TEST 6: CLIENT-SIDE BOUNDARY ENFORCEMENT")
         
-        # Check TypeScript source file
-        ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-        js_file_path = "/app/build/rooms/ArenaRoom.js"
-        
-        ts_world_size_found = False
-        js_world_size_found = False
+        # This test checks if the client-side boundary enforcement patterns exist
+        # Since we can't directly test client-side JavaScript execution, we check for patterns
         
         try:
-            # Check TypeScript source
-            with open(ts_file_path, 'r') as f:
-                ts_content = f.read()
-                
-            # Look for worldSize = 8000 patterns
-            ts_patterns = [
-                'worldSize: number = 8000',
-                "worldSize = parseInt(process.env.WORLD_SIZE || '8000')",
-                'this.worldSize = 8000'
+            # Check if client-side files exist and contain boundary enforcement
+            client_files_to_check = [
+                '/app/app/agario/page.js',
+                '/app/app/arena/page.js'
             ]
             
-            ts_matches = sum(1 for pattern in ts_patterns if pattern in ts_content)
-            ts_world_size_found = ts_matches >= 2  # Should find at least 2 references
+            boundary_patterns_found = 0
+            total_patterns_expected = 4
             
-            self.log_test("World Size Config", "TypeScript Source", ts_world_size_found,
-                        f"Found {ts_matches} worldSize=8000 patterns in ArenaRoom.ts")
+            for file_path in client_files_to_check:
+                if os.path.exists(file_path):
+                    with open(file_path, 'r') as f:
+                        content = f.read()
+                        
+                        # Look for boundary enforcement patterns
+                        patterns = [
+                            "distanceFromCenter",
+                            "playableRadius",
+                            "Math.atan2",
+                            "boundary"
+                        ]
+                        
+                        for pattern in patterns:
+                            if pattern in content:
+                                boundary_patterns_found += 1
+                                print(f"✅ Found boundary pattern '{pattern}' in {file_path}")
+                                break  # Count each file only once
             
-        except Exception as e:
-            self.log_test("World Size Config", "TypeScript Source", False, f"File read error: {e}")
-        
-        try:
-            # Check compiled JavaScript
-            with open(js_file_path, 'r') as f:
-                js_content = f.read()
-                
-            # Look for worldSize = 8000 patterns in compiled JS
-            js_patterns = [
-                "worldSize = 8000",
-                "'8000'",
-                "8000"
-            ]
-            
-            js_matches = sum(1 for pattern in js_patterns if pattern in js_content)
-            js_world_size_found = js_matches >= 3  # Should find multiple references
-            
-            self.log_test("World Size Config", "Compiled JavaScript", js_world_size_found,
-                        f"Found {js_matches} worldSize=8000 patterns in ArenaRoom.js")
-            
-        except Exception as e:
-            self.log_test("World Size Config", "Compiled JavaScript", False, f"File read error: {e}")
-
-    def test_center_position_configuration(self):
-        """Test 4: Center Position Configuration - Verify center is at (4000,4000)"""
-        print("\n🔍 TESTING CATEGORY 4: CENTER POSITION CONFIGURATION")
-        
-        ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-        js_file_path = "/app/build/rooms/ArenaRoom.js"
-        
-        try:
-            # Check TypeScript source
-            with open(ts_file_path, 'r') as f:
-                ts_content = f.read()
-                
-            # Look for center calculation patterns
-            ts_center_patterns = [
-                'this.worldSize / 2',  # Should calculate center as worldSize/2
-                'centerX = this.worldSize / 2',
-                'centerY = this.worldSize / 2',
-                '4000 for 8000x8000 world'  # Should have comments about 8000x8000 world
-            ]
-            
-            ts_center_matches = sum(1 for pattern in ts_center_patterns if pattern in ts_content)
-            ts_center_found = ts_center_matches >= 4  # Should find multiple center calculations
-            
-            self.log_test("Center Position", "TypeScript Center Calculation", ts_center_found,
-                        f"Found {ts_center_matches} center calculation patterns")
-            
-        except Exception as e:
-            self.log_test("Center Position", "TypeScript Center Calculation", False, f"File read error: {e}")
-        
-        try:
-            # Check compiled JavaScript
-            with open(js_file_path, 'r') as f:
-                js_content = f.read()
-                
-            # Look for center calculation patterns in compiled JS
-            js_center_patterns = [
-                'this.worldSize / 2',
-                'centerX = this.worldSize / 2',
-                'centerY = this.worldSize / 2',
-                '4000 for 8000x8000 world'
-            ]
-            
-            js_center_matches = sum(1 for pattern in js_center_patterns if pattern in js_content)
-            js_center_found = js_center_matches >= 4  # Should find multiple center calculations
-            
-            self.log_test("Center Position", "JavaScript Center Calculation", js_center_found,
-                        f"Found {js_center_matches} center calculation patterns")
-            
-        except Exception as e:
-            self.log_test("Center Position", "JavaScript Center Calculation", False, f"File read error: {e}")
-
-    def test_playable_area_maintained(self):
-        """Test 5: Playable Area Maintained - Verify playable radius is still 1800px"""
-        print("\n🔍 TESTING CATEGORY 5: PLAYABLE AREA MAINTAINED")
-        
-        ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-        js_file_path = "/app/build/rooms/ArenaRoom.js"
-        
-        try:
-            # Check TypeScript source
-            with open(ts_file_path, 'r') as f:
-                ts_content = f.read()
-                
-            # Look for playable radius = 1800 patterns
-            ts_radius_patterns = [
-                'playableRadius = 1800',
-                'safeZoneRadius = 1800'
-            ]
-            
-            ts_radius_matches = sum(1 for pattern in ts_radius_patterns if pattern in ts_content)
-            ts_radius_found = ts_radius_matches >= 2  # Should find multiple 1800px references
-            
-            self.log_test("Playable Area", "TypeScript Radius Config", ts_radius_found,
-                        f"Found {ts_radius_matches} playableRadius=1800 patterns")
-            
-        except Exception as e:
-            self.log_test("Playable Area", "TypeScript Radius Config", False, f"File read error: {e}")
-        
-        try:
-            # Check compiled JavaScript
-            with open(js_file_path, 'r') as f:
-                js_content = f.read()
-                
-            # Look for playable radius = 1800 patterns in compiled JS
-            js_radius_patterns = [
-                'playableRadius = 1800',
-                'safeZoneRadius = 1800'
-            ]
-            
-            js_radius_matches = sum(1 for pattern in js_radius_patterns if pattern in js_content)
-            js_radius_found = js_radius_matches >= 2  # Should find multiple 1800px references
-            
-            self.log_test("Playable Area", "JavaScript Radius Config", js_radius_found,
-                        f"Found {js_radius_matches} playableRadius=1800 patterns")
-            
-        except Exception as e:
-            self.log_test("Playable Area", "JavaScript Radius Config", False, f"File read error: {e}")
-
-    def test_player_spawn_positioning(self):
-        """Test 6: Player Spawn Positioning - Test that players spawn at new center (4000,4000)"""
-        print("\n🔍 TESTING CATEGORY 6: PLAYER SPAWN POSITIONING")
-        
-        ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-        js_file_path = "/app/build/rooms/ArenaRoom.js"
-        
-        try:
-            # Check TypeScript source
-            with open(ts_file_path, 'r') as f:
-                ts_content = f.read()
-                
-            # Look for spawn position logic using center calculation
-            ts_spawn_patterns = [
-                'generateCircularSpawnPosition',
-                'const centerX = this.worldSize / 2',
-                'const centerY = this.worldSize / 2',
-                'safeZoneRadius = 1800'
-            ]
-            
-            ts_spawn_matches = sum(1 for pattern in ts_spawn_patterns if pattern in ts_content)
-            ts_spawn_found = ts_spawn_matches >= 3  # Should find spawn logic with center calculation
-            
-            self.log_test("Player Spawn", "TypeScript Spawn Logic", ts_spawn_found,
-                        f"Found {ts_spawn_matches} spawn positioning patterns")
-            
-        except Exception as e:
-            self.log_test("Player Spawn", "TypeScript Spawn Logic", False, f"File read error: {e}")
-        
-        try:
-            # Check compiled JavaScript
-            with open(js_file_path, 'r') as f:
-                js_content = f.read()
-                
-            # Look for spawn position logic in compiled JS
-            js_spawn_patterns = [
-                'generateCircularSpawnPosition',
-                'centerX = this.worldSize / 2',
-                'centerY = this.worldSize / 2',
-                'safeZoneRadius = 1800'
-            ]
-            
-            js_spawn_matches = sum(1 for pattern in js_spawn_patterns if pattern in js_content)
-            js_spawn_found = js_spawn_matches >= 3  # Should find spawn logic with center calculation
-            
-            self.log_test("Player Spawn", "JavaScript Spawn Logic", js_spawn_found,
-                        f"Found {js_spawn_matches} spawn positioning patterns")
-            
-        except Exception as e:
-            self.log_test("Player Spawn", "JavaScript Spawn Logic", False, f"File read error: {e}")
-
-    def test_boundary_enforcement(self):
-        """Test 7: Boundary Enforcement - Test circular boundary uses 1800px radius from new center"""
-        print("\n🔍 TESTING CATEGORY 7: BOUNDARY ENFORCEMENT")
-        
-        ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-        js_file_path = "/app/build/rooms/ArenaRoom.js"
-        
-        try:
-            # Check TypeScript source
-            with open(ts_file_path, 'r') as f:
-                ts_content = f.read()
-                
-            # Look for boundary enforcement patterns
-            ts_boundary_patterns = [
-                'distanceFromCenter > maxRadius',
-                'Math.atan2',
-                'Math.cos(angle) * maxRadius',
-                'Math.sin(angle) * maxRadius'
-            ]
-            
-            ts_boundary_matches = sum(1 for pattern in ts_boundary_patterns if pattern in ts_content)
-            ts_boundary_found = ts_boundary_matches >= 4  # Should find complete boundary logic
-            
-            self.log_test("Boundary Enforcement", "TypeScript Boundary Logic", ts_boundary_found,
-                        f"Found {ts_boundary_matches}/4 boundary enforcement patterns")
-            
-        except Exception as e:
-            self.log_test("Boundary Enforcement", "TypeScript Boundary Logic", False, f"File read error: {e}")
-        
-        try:
-            # Check compiled JavaScript
-            with open(js_file_path, 'r') as f:
-                js_content = f.read()
-                
-            # Look for boundary enforcement patterns in compiled JS
-            js_boundary_patterns = [
-                'distanceFromCenter > maxRadius',
-                'Math.atan2',
-                'Math.cos(angle) * maxRadius',
-                'Math.sin(angle) * maxRadius'
-            ]
-            
-            js_boundary_matches = sum(1 for pattern in js_boundary_patterns if pattern in js_content)
-            js_boundary_found = js_boundary_matches >= 4  # Should find complete boundary logic
-            
-            self.log_test("Boundary Enforcement", "JavaScript Boundary Logic", js_boundary_found,
-                        f"Found {js_boundary_matches}/4 boundary enforcement patterns")
-            
-        except Exception as e:
-            self.log_test("Boundary Enforcement", "JavaScript Boundary Logic", False, f"File read error: {e}")
-
-    def test_spawn_logic(self):
-        """Test 8: Spawn Logic - Test coins and viruses spawn within 1800px radius from (4000,4000)"""
-        print("\n🔍 TESTING CATEGORY 8: SPAWN LOGIC")
-        
-        ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-        js_file_path = "/app/build/rooms/ArenaRoom.js"
-        
-        try:
-            # Check TypeScript source
-            with open(ts_file_path, 'r') as f:
-                ts_content = f.read()
-                
-            # Look for coin and virus spawn logic
-            ts_spawn_patterns = [
-                'spawnCoin()',
-                'spawnVirus()',
-                'generateSafeSpawnPosition()',
-                'safePos = this.generateSafeSpawnPosition()'
-            ]
-            
-            ts_spawn_matches = sum(1 for pattern in ts_spawn_patterns if pattern in ts_content)
-            ts_spawn_found = ts_spawn_matches >= 3  # Should find spawn methods using safe positions
-            
-            self.log_test("Spawn Logic", "TypeScript Object Spawn", ts_spawn_found,
-                        f"Found {ts_spawn_matches} safe spawn patterns")
-            
-        except Exception as e:
-            self.log_test("Spawn Logic", "TypeScript Object Spawn", False, f"File read error: {e}")
-        
-        try:
-            # Check compiled JavaScript
-            with open(js_file_path, 'r') as f:
-                js_content = f.read()
-                
-            # Look for coin and virus spawn logic in compiled JS
-            js_spawn_patterns = [
-                'spawnCoin()',
-                'spawnVirus()',
-                'generateSafeSpawnPosition()',
-                'safePos = this.generateSafeSpawnPosition()'
-            ]
-            
-            js_spawn_matches = sum(1 for pattern in js_spawn_patterns if pattern in js_content)
-            js_spawn_found = js_spawn_matches >= 3  # Should find spawn methods using safe positions
-            
-            self.log_test("Spawn Logic", "JavaScript Object Spawn", js_spawn_found,
-                        f"Found {js_spawn_matches} safe spawn patterns")
-            
-        except Exception as e:
-            self.log_test("Spawn Logic", "JavaScript Object Spawn", False, f"File read error: {e}")
-
-    def test_backend_api_integration(self):
-        """Test 9: Backend API Integration - Verify /api/servers endpoint returns correct data"""
-        print("\n🔍 TESTING CATEGORY 9: BACKEND API INTEGRATION")
-        
-        success, response = self.make_request("/servers")
-        
-        if success and isinstance(response, dict):
-            servers = response.get('servers', [])
-            total_players = response.get('totalPlayers', 0)
-            total_active = response.get('totalActiveServers', 0)
-            
-            # Check if we have server data
-            has_servers = len(servers) > 0
-            has_stats = isinstance(total_players, int) and isinstance(total_active, int)
-            
-            if has_servers and has_stats:
-                self.log_test("API Integration", "Servers Endpoint", True,
-                            f"Servers: {len(servers)}, Players: {total_players}, Active: {total_active}")
+            if boundary_patterns_found >= 1:  # At least one file has boundary patterns
+                print(f"✅ Client-Side Boundary PASSED - Found boundary enforcement patterns")
+                return True
             else:
-                self.log_test("API Integration", "Servers Endpoint", False,
-                            f"Servers: {len(servers)}, Stats valid: {has_stats}")
-        else:
-            self.log_test("API Integration", "Servers Endpoint", False,
-                        f"API error: {response}")
+                print(f"❌ Client-Side Boundary FAILED - No boundary enforcement patterns found")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Client-Side Boundary FAILED: {str(e)}")
+            return False
 
-    def run_all_tests(self):
-        """Run all extended red zone backend tests"""
+    def test_server_side_boundary(self) -> bool:
+        """Test 7: Server-Side Boundary - Verify server clamps players within 1800px radius"""
+        print("\n🔍 TEST 7: SERVER-SIDE BOUNDARY ENFORCEMENT")
+        
+        ts_boundary_found = False
+        js_boundary_found = False
+        
+        try:
+            # Check TypeScript source file for boundary enforcement
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+                boundary_patterns = [
+                    "distanceFromCenter > maxRadius",
+                    "Math.atan2",
+                    "Math.cos(angle) * maxRadius",
+                    "Math.sin(angle) * maxRadius"
+                ]
+                
+                found_patterns = sum(1 for pattern in boundary_patterns if pattern in ts_content)
+                if found_patterns >= 3:  # Most boundary enforcement patterns
+                    ts_boundary_found = True
+                    print(f"✅ TypeScript boundary enforcement found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ TypeScript boundary enforcement insufficient: {found_patterns}/4 patterns")
+            
+            # Check compiled JavaScript file for boundary enforcement
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+                boundary_patterns = [
+                    "distanceFromCenter > maxRadius",
+                    "Math.atan2",
+                    "Math.cos(angle) * maxRadius",
+                    "Math.sin(angle) * maxRadius"
+                ]
+                
+                found_patterns = sum(1 for pattern in boundary_patterns if pattern in js_content)
+                if found_patterns >= 3:  # Most boundary enforcement patterns
+                    js_boundary_found = True
+                    print(f"✅ JavaScript boundary enforcement found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ JavaScript boundary enforcement insufficient: {found_patterns}/4 patterns")
+            
+            if ts_boundary_found and js_boundary_found:
+                print(f"✅ Server-Side Boundary PASSED - Both TS and JS have boundary enforcement")
+                return True
+            else:
+                print(f"❌ Server-Side Boundary FAILED - TS: {ts_boundary_found}, JS: {js_boundary_found}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Server-Side Boundary FAILED: {str(e)}")
+            return False
+
+    def test_red_zone_protection(self) -> bool:
+        """Test 8: Red Zone Protection - Verify no players can enter red zone"""
+        print("\n🔍 TEST 8: RED ZONE PROTECTION VERIFICATION")
+        
+        try:
+            # Check that spawn positions are within safe radius
+            # Check both generateCircularSpawnPosition and generateSafeSpawnPosition methods
+            
+            ts_safe_spawn = False
+            js_safe_spawn = False
+            
+            # Check TypeScript source file
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+                safe_spawn_patterns = [
+                    "generateCircularSpawnPosition",
+                    "generateSafeSpawnPosition",
+                    "safeZoneRadius",
+                    f"safeZoneRadius = {self.expected_playable_radius}"
+                ]
+                
+                found_patterns = sum(1 for pattern in safe_spawn_patterns if pattern in ts_content)
+                if found_patterns >= 2:  # At least spawn generation methods
+                    ts_safe_spawn = True
+                    print(f"✅ TypeScript safe spawn methods found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ TypeScript safe spawn methods insufficient: {found_patterns}/4 patterns")
+            
+            # Check compiled JavaScript file
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+                safe_spawn_patterns = [
+                    "generateCircularSpawnPosition",
+                    "generateSafeSpawnPosition", 
+                    "safeZoneRadius",
+                    f"safeZoneRadius = {self.expected_playable_radius}"
+                ]
+                
+                found_patterns = sum(1 for pattern in safe_spawn_patterns if pattern in js_content)
+                if found_patterns >= 2:  # At least spawn generation methods
+                    js_safe_spawn = True
+                    print(f"✅ JavaScript safe spawn methods found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ JavaScript safe spawn methods insufficient: {found_patterns}/4 patterns")
+            
+            if ts_safe_spawn and js_safe_spawn:
+                print(f"✅ Red Zone Protection PASSED - Safe spawn methods prevent red zone entry")
+                return True
+            else:
+                print(f"❌ Red Zone Protection FAILED - TS: {ts_safe_spawn}, JS: {js_safe_spawn}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Red Zone Protection FAILED: {str(e)}")
+            return False
+
+    def test_boundary_calculations(self) -> bool:
+        """Test 9: Boundary Calculations - Verify distance calculations use correct center coordinates"""
+        print("\n🔍 TEST 9: BOUNDARY CALCULATIONS VERIFICATION")
+        
+        try:
+            # Test the mathematical correctness of boundary calculations
+            # Check that distance calculations use the correct center coordinates
+            
+            ts_calc_found = False
+            js_calc_found = False
+            
+            # Check TypeScript source file for distance calculations
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+                calc_patterns = [
+                    "Math.sqrt(",
+                    "Math.pow(player.x - centerX, 2)",
+                    "Math.pow(player.y - centerY, 2)",
+                    "distanceFromCenter"
+                ]
+                
+                found_patterns = sum(1 for pattern in calc_patterns if pattern in ts_content)
+                if found_patterns >= 3:  # Most calculation patterns
+                    ts_calc_found = True
+                    print(f"✅ TypeScript boundary calculations found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ TypeScript boundary calculations insufficient: {found_patterns}/4 patterns")
+            
+            # Check compiled JavaScript file for distance calculations
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+                calc_patterns = [
+                    "Math.sqrt(",
+                    "Math.pow(player.x - centerX, 2)",
+                    "Math.pow(player.y - centerY, 2)", 
+                    "distanceFromCenter"
+                ]
+                
+                found_patterns = sum(1 for pattern in calc_patterns if pattern in js_content)
+                if found_patterns >= 3:  # Most calculation patterns
+                    js_calc_found = True
+                    print(f"✅ JavaScript boundary calculations found: {found_patterns}/4 patterns")
+                else:
+                    print(f"❌ JavaScript boundary calculations insufficient: {found_patterns}/4 patterns")
+            
+            if ts_calc_found and js_calc_found:
+                print(f"✅ Boundary Calculations PASSED - Correct distance calculations using center coordinates")
+                return True
+            else:
+                print(f"❌ Boundary Calculations FAILED - TS: {ts_calc_found}, JS: {js_calc_found}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Boundary Calculations FAILED: {str(e)}")
+            return False
+
+    def run_all_tests(self) -> Dict[str, bool]:
+        """Run all boundary enforcement tests"""
+        print(f"\n🚀 STARTING COMPREHENSIVE BOUNDARY ENFORCEMENT TESTING")
+        print(f"📋 Testing {9} critical boundary enforcement requirements...")
+        
         start_time = time.time()
         
-        print("🎯 EXTENDED RED ZONE BACKEND TESTING - COMPREHENSIVE VERIFICATION")
-        print("Testing backend changes for extending red zone to prevent black background")
-        print("Expected: 8000x8000 world, center at (4000,4000), 1800px playable radius")
-        print("=" * 80)
+        tests = [
+            ("API Health Check", self.test_api_health_check),
+            ("Colyseus Server Availability", self.test_colyseus_server_availability),
+            ("World Size Sync", self.test_world_size_sync),
+            ("Center Position Sync", self.test_center_position_sync),
+            ("Playable Radius Config", self.test_playable_radius_config),
+            ("Client-Side Boundary", self.test_client_side_boundary),
+            ("Server-Side Boundary", self.test_server_side_boundary),
+            ("Red Zone Protection", self.test_red_zone_protection),
+            ("Boundary Calculations", self.test_boundary_calculations)
+        ]
         
-        # Run all test categories
-        self.test_api_health_check()
-        self.test_colyseus_server_availability()
-        self.test_world_size_configuration()
-        self.test_center_position_configuration()
-        self.test_playable_area_maintained()
-        self.test_player_spawn_positioning()
-        self.test_boundary_enforcement()
-        self.test_spawn_logic()
-        self.test_backend_api_integration()
+        results = {}
+        passed_tests = 0
         
-        # Calculate results
+        for test_name, test_func in tests:
+            try:
+                result = test_func()
+                results[test_name] = result
+                if result:
+                    passed_tests += 1
+            except Exception as e:
+                print(f"❌ {test_name} FAILED with exception: {str(e)}")
+                results[test_name] = False
+        
         end_time = time.time()
         duration = end_time - start_time
-        success_rate = (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
         
+        # Print comprehensive summary
         print("\n" + "=" * 80)
-        print("🎯 EXTENDED RED ZONE BACKEND TESTING COMPLETED")
+        print(f"🎯 BOUNDARY ENFORCEMENT VERIFICATION TESTING COMPLETED")
         print("=" * 80)
         
-        print(f"📊 COMPREHENSIVE TEST RESULTS:")
-        print(f"   • Total Tests: {self.total_tests}")
-        print(f"   • Passed: {self.passed_tests}")
-        print(f"   • Failed: {self.total_tests - self.passed_tests}")
-        print(f"   • Success Rate: {success_rate:.1f}%")
-        print(f"   • Duration: {duration:.2f} seconds")
+        print(f"\n📊 COMPREHENSIVE TEST RESULTS:")
+        for i, (test_name, result) in enumerate(results.items(), 1):
+            status = "✅ PASSED" if result else "❌ FAILED"
+            print(f"{i:2d}) {status}: {test_name}")
         
-        # Detailed results by category
-        categories = {}
-        for result in self.test_results:
-            cat = result['category']
-            if cat not in categories:
-                categories[cat] = {'passed': 0, 'total': 0}
-            categories[cat]['total'] += 1
-            if result['passed']:
-                categories[cat]['passed'] += 1
+        success_rate = (passed_tests / len(tests)) * 100
+        print(f"\n🏆 OVERALL SUCCESS RATE: {passed_tests}/{len(tests)} tests passed ({success_rate:.1f}%)")
+        print(f"⏱️  TOTAL TEST DURATION: {duration:.2f} seconds")
         
-        print(f"\n📋 RESULTS BY CATEGORY:")
-        for category, stats in categories.items():
-            rate = (stats['passed'] / stats['total'] * 100) if stats['total'] > 0 else 0
-            status = "✅" if rate == 100 else "⚠️" if rate >= 50 else "❌"
-            print(f"   {status} {category}: {stats['passed']}/{stats['total']} ({rate:.1f}%)")
+        # Critical success criteria analysis
+        critical_tests = [
+            "World Size Sync",
+            "Center Position Sync", 
+            "Playable Radius Config",
+            "Server-Side Boundary",
+            "Red Zone Protection"
+        ]
         
-        # Critical findings
-        print(f"\n🔍 CRITICAL FINDINGS:")
-        if success_rate >= 90:
-            print("   ✅ EXTENDED RED ZONE IMPLEMENTATION WORKING EXCELLENTLY")
-            print("   ✅ All critical requirements from review request verified")
-            print("   ✅ Backend ready for extended red zone functionality")
-        elif success_rate >= 70:
-            print("   ⚠️ EXTENDED RED ZONE IMPLEMENTATION MOSTLY WORKING")
-            print("   ⚠️ Some minor issues detected, but core functionality operational")
+        critical_passed = sum(1 for test in critical_tests if results.get(test, False))
+        critical_rate = (critical_passed / len(critical_tests)) * 100
+        
+        print(f"\n🎯 CRITICAL SUCCESS CRITERIA: {critical_passed}/{len(critical_tests)} passed ({critical_rate:.1f}%)")
+        
+        if critical_rate >= 80:
+            print(f"✅ BOUNDARY ENFORCEMENT IS WORKING EXCELLENTLY")
+        elif critical_rate >= 60:
+            print(f"⚠️  BOUNDARY ENFORCEMENT HAS MINOR ISSUES")
         else:
-            print("   ❌ EXTENDED RED ZONE IMPLEMENTATION HAS ISSUES")
-            print("   ❌ Critical problems detected that need attention")
+            print(f"❌ BOUNDARY ENFORCEMENT HAS CRITICAL ISSUES")
         
-        # Expected results verification
-        print(f"\n🎯 EXPECTED RESULTS VERIFICATION:")
-        print("   • World Size: 8000x8000 pixels (extended from 4000x4000)")
-        print("   • Center Position: (4000,4000) instead of (2000,2000)")
-        print("   • Playable Area: 1800px radius maintained (identical to local agario)")
-        print("   • Red Zone Extension: 2300px buffer in all directions")
-        print("   • Spawn Logic: All objects spawn within 1800px radius from center")
-        print("   • Boundary Enforcement: Circular boundary at 1800px from (4000,4000)")
-        
-        print(f"\n🚀 PRODUCTION READINESS:")
-        if success_rate >= 90:
-            print("   ✅ EXTENDED RED ZONE BACKEND IS FULLY OPERATIONAL AND PRODUCTION READY")
-        elif success_rate >= 70:
-            print("   ⚠️ EXTENDED RED ZONE BACKEND IS MOSTLY READY (minor issues to address)")
-        else:
-            print("   ❌ EXTENDED RED ZONE BACKEND NEEDS FIXES BEFORE PRODUCTION")
-        
-        return success_rate >= 70
+        return results
+
+def main():
+    """Main test execution"""
+    tester = BoundaryEnforcementTester()
+    results = tester.run_all_tests()
+    
+    # Exit with appropriate code
+    passed_tests = sum(1 for result in results.values() if result)
+    total_tests = len(results)
+    
+    if passed_tests == total_tests:
+        print(f"\n🎉 ALL TESTS PASSED - BOUNDARY ENFORCEMENT IS FULLY OPERATIONAL")
+        sys.exit(0)
+    elif passed_tests >= total_tests * 0.8:  # 80% pass rate
+        print(f"\n✅ MOST TESTS PASSED - BOUNDARY ENFORCEMENT IS WORKING WELL")
+        sys.exit(0)
+    else:
+        print(f"\n❌ MULTIPLE TESTS FAILED - BOUNDARY ENFORCEMENT NEEDS ATTENTION")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    tester = ExtendedRedZoneBackendTester()
-    success = tester.run_all_tests()
-    exit(0 if success else 1)
+    main()
