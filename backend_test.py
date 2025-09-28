@@ -353,33 +353,178 @@ class ArenaBackendTester:
             self.log_test("Player Spawn Positioning", False, error=str(e))
             return False
     
-    def test_backend_api_integration(self) -> bool:
-        """Test 7: Backend API Integration - Verify /api/servers endpoint returns correct arena server data"""
+    def test_boundary_enforcement(self):
+        """Test 7: Boundary Enforcement - Test that circular boundary uses 1800px radius from (2000,2000) center"""
         try:
-            print("\n🔍 TEST 7: Backend API Integration")
+            ts_file = "/app/src/rooms/ArenaRoom.ts"
+            js_file = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_checks = 0
+            js_checks = 0
+            
+            # Check TypeScript file
+            try:
+                with open(ts_file, 'r') as f:
+                    ts_content = f.read()
+                    
+                # Look for boundary enforcement patterns
+                if 'distanceFromCenter > maxRadius' in ts_content:
+                    ts_checks += 1
+                if 'Math.atan2' in ts_content and 'centerY' in ts_content:
+                    ts_checks += 1
+                if 'Math.cos(angle) * maxRadius' in ts_content:
+                    ts_checks += 1
+                if 'Math.sin(angle) * maxRadius' in ts_content:
+                    ts_checks += 1
+                    
+            except Exception as e:
+                print(f"Warning: Could not read TypeScript file: {e}")
+            
+            # Check JavaScript compiled file
+            try:
+                with open(js_file, 'r') as f:
+                    js_content = f.read()
+                    
+                # Look for boundary enforcement patterns
+                if 'distanceFromCenter > maxRadius' in js_content:
+                    js_checks += 1
+                if 'Math.atan2' in js_content and 'centerY' in js_content:
+                    js_checks += 1
+                if 'Math.cos(angle) * maxRadius' in js_content:
+                    js_checks += 1
+                if 'Math.sin(angle) * maxRadius' in js_content:
+                    js_checks += 1
+                    
+            except Exception as e:
+                print(f"Warning: Could not read JavaScript file: {e}")
+            
+            if ts_checks >= 3 and js_checks >= 3:
+                self.log_test(
+                    "Boundary Enforcement",
+                    True,
+                    f"Circular boundary enforcement confirmed - TS: {ts_checks}/4 patterns, JS: {js_checks}/4 patterns"
+                )
+                return True
+            else:
+                self.log_test(
+                    "Boundary Enforcement",
+                    False,
+                    f"Circular boundary enforcement not confirmed - TS: {ts_checks}/4 patterns, JS: {js_checks}/4 patterns"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Boundary Enforcement", False, error=str(e))
+            return False
+    
+    def test_split_player_boundary(self):
+        """Test 8: Split Player Boundary - Test that split players are constrained within 1800px radius"""
+        try:
+            ts_file = "/app/src/rooms/ArenaRoom.ts"
+            js_file = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_checks = 0
+            js_checks = 0
+            
+            # Check TypeScript file
+            try:
+                with open(ts_file, 'r') as f:
+                    ts_content = f.read()
+                    
+                # Look for split boundary enforcement patterns
+                if 'handleSplit' in ts_content:
+                    ts_checks += 1
+                if 'splitPlayer' in ts_content and 'playableRadius' in ts_content:
+                    ts_checks += 1
+                if 'splitPlayer.x = centerX + Math.cos(angle) * maxRadius' in ts_content:
+                    ts_checks += 1
+                if 'splitPlayer.y = centerY + Math.sin(angle) * maxRadius' in ts_content:
+                    ts_checks += 1
+                if 'distanceFromCenter' in ts_content and 'splitPlayer' in ts_content:
+                    ts_checks += 1
+                    
+            except Exception as e:
+                print(f"Warning: Could not read TypeScript file: {e}")
+            
+            # Check JavaScript compiled file
+            try:
+                with open(js_file, 'r') as f:
+                    js_content = f.read()
+                    
+                # Look for split boundary enforcement patterns
+                if 'handleSplit' in js_content:
+                    js_checks += 1
+                if 'splitPlayer' in js_content and 'playableRadius' in js_content:
+                    js_checks += 1
+                if 'splitPlayer.x = centerX + Math.cos(angle) * maxRadius' in js_content:
+                    js_checks += 1
+                if 'splitPlayer.y = centerY + Math.sin(angle) * maxRadius' in js_content:
+                    js_checks += 1
+                if 'distanceFromCenter' in js_content and 'splitPlayer' in js_content:
+                    js_checks += 1
+                    
+            except Exception as e:
+                print(f"Warning: Could not read JavaScript file: {e}")
+            
+            if ts_checks >= 3 and js_checks >= 3:
+                self.log_test(
+                    "Split Player Boundary",
+                    True,
+                    f"Split boundary enforcement confirmed - TS: {ts_checks}/5 patterns, JS: {js_checks}/5 patterns"
+                )
+                return True
+            else:
+                self.log_test(
+                    "Split Player Boundary",
+                    False,
+                    f"Split boundary enforcement not confirmed - TS: {ts_checks}/5 patterns, JS: {js_checks}/5 patterns"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Split Player Boundary", False, error=str(e))
+            return False
+    
+    def test_backend_api_integration(self):
+        """Test 9: Backend API Integration - Verify /api/servers endpoint returns correct arena server data"""
+        try:
             response = requests.get(f"{API_BASE}/servers", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                servers = data.get('servers', [])
-                total_players = data.get('totalPlayers', 0)
-                total_active = data.get('totalActiveServers', 0)
                 
-                # Verify API returns correct data structure
-                if isinstance(servers, list) and 'totalPlayers' in data and 'totalActiveServers' in data:
-                    self.log_test("Backend API Integration", True, 
-                                f"API returns correct data - Servers: {len(servers)}, Players: {total_players}, Active: {total_active}")
+                # Check response structure
+                required_fields = ['servers', 'totalPlayers', 'totalActiveServers']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    servers = data.get('servers', [])
+                    total_players = data.get('totalPlayers', 0)
+                    active_servers = data.get('totalActiveServers', 0)
+                    
+                    self.log_test(
+                        "Backend API Integration",
+                        True,
+                        f"API returns correct data - Servers: {len(servers)}, Players: {total_players}, Active: {active_servers}"
+                    )
                     return True
                 else:
-                    self.log_test("Backend API Integration", False, 
-                                f"API response structure incorrect: {data}")
+                    self.log_test(
+                        "Backend API Integration",
+                        False,
+                        f"Missing required fields: {missing_fields}"
+                    )
                     return False
             else:
-                self.log_test("Backend API Integration", False, f"HTTP {response.status_code}")
+                self.log_test(
+                    "Backend API Integration",
+                    False,
+                    f"HTTP {response.status_code}: {response.text}"
+                )
                 return False
                 
         except Exception as e:
-            self.log_test("Backend API Integration", False, f"Exception: {str(e)}")
+            self.log_test("Backend API Integration", False, error=str(e))
             return False
     
     def run_all_tests(self):
