@@ -936,7 +936,7 @@ const MultiplayerArena = () => {
       // Player setup with visual properties matching agario
       this.player = {
         x: 2000, // Updated center for left-side playable area (worldSize/4)
-        y: 4000, // Updated center for 8000x8000 world (worldSize/2)
+        y: 2000, // Updated center for top-side playable area (worldSize/4)
         mass: 25, // Fixed to match server spawn mass
         radius: Math.sqrt(25) * 3, // Proper radius calculation: √25 * 3 = 15
         color: '#4A90E2',
