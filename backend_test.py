@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 """
-VIRUS AND COIN PLAYABLE AREA SPAWN VERIFICATION TESTING
-Test that viruses/spikes and coins only spawn within the playable area (1800px radius from center 2000,2000) in arena mode.
+Extended Red Zone Backend Testing
+Testing the backend changes for extending the red zone to prevent users from seeing black background beyond the red zone.
 
-Testing Requirements:
-1. API Health Check - Verify backend infrastructure is operational
-2. Colyseus Server Availability - Verify arena servers are running
-3. Safe Spawn Position Logic - Verify generateSafeSpawnPosition uses 1800px radius
-4. Coin Spawn Logic - Verify spawnCoin() uses safe spawn positions only
-5. Virus Spawn Logic - Verify spawnVirus() uses safe spawn positions only
-6. Playable Area Boundary - Verify spawn radius matches playable area (1800px)
-7. Center Position - Verify spawn center is at (2000,2000)
-8. No Red Zone Spawning - Verify no objects can spawn outside 1800px radius
-9. World Size Consistency - Verify spawning works with 4000x4000 world
+Review Request Requirements:
+1. API Health Check - Verify backend infrastructure is operational after server restart
+2. Colyseus Server Availability - Verify arena servers are running with 8000x8000 world
+3. World Size Configuration - Verify server-side worldSize is now 8000 instead of 4000
+4. Center Position Configuration - Verify server-side center is now at (4000,4000) instead of (2000,2000)
+5. Playable Area Maintained - Verify playable radius is still 1800px (unchanged)
+6. Player Spawn Positioning - Test that players spawn at new center (4000,4000)
+7. Boundary Enforcement - Test that circular boundary still uses 1800px radius from new center
+8. Spawn Logic - Test that coins and viruses spawn within 1800px radius from (4000,4000)
+9. Backend API Integration - Verify /api/servers endpoint returns correct arena server data
+
+Expected Results:
+- Server-side world should now be 8000x8000 instead of 4000x4000
+- Players should spawn at world center (4000,4000) instead of (2000,2000)
+- Playable area should remain 1800px radius (identical to local agario)
+- Red zone should extend much further out (2300px buffer vs previous 1100px)
+- All existing functionality should remain intact with extended world
+- No players should ever see black background beyond red zone
 """
 
 import requests
