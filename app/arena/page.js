@@ -2218,13 +2218,13 @@ const MultiplayerArena = () => {
             overflow: 'hidden',
             boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
-            {/* Black playable area circle on minimap - positioned at top-left */}
+            {/* Expanded black playable area circle on minimap - positioned at top-left */}
             <div style={{
               position: 'absolute',
-              width: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Playable area diameter scaled to minimap
-              height: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Playable area diameter scaled to minimap
+              width: `${((2400 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Expanded playable area diameter 
+              height: `${((2400 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Expanded playable area diameter
               borderRadius: '50%',
-              background: '#000000', // Black playable area
+              background: '#000000', // Solid black playable area - no gradient
               left: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
               top: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
               transform: 'translate(-50%, -50%)', // Center the circle on the calculated position
