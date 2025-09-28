@@ -320,7 +320,7 @@ export class ArenaRoom extends Room<GameState> {
     // Keep split player in circular bounds
     const centerX = this.worldSize / 2;
     const centerY = this.worldSize / 2;
-    const playableRadius = 1800;
+    const playableRadius = 2500;
     const maxRadius = playableRadius - splitPlayer.radius;
     
     const distanceFromCenter = Math.sqrt(
@@ -427,7 +427,7 @@ export class ArenaRoom extends Room<GameState> {
       // Keep player in circular bounds (matching client-side circular boundary)
       const centerX = this.worldSize / 2;
       const centerY = this.worldSize / 2;
-      const playableRadius = 1800; // Match client-side maxPlayableRadius
+      const playableRadius = 2500; // Match client-side maxPlayableRadius
       const maxRadius = playableRadius - player.radius;
       
       const distanceFromCenter = Math.sqrt(
