@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
 import { usePrivy } from '@privy-io/react-auth'
 
+const DEFAULT_PLAYABLE_RADIUS = 1800
+const DEFAULT_PLAYABLE_CENTER = 2000
+
 // Global connection tracker to prevent duplicates across component instances
 const GLOBAL_CONNECTION_TRACKER = {
   activeConnection: null,
@@ -69,11 +72,14 @@ const MultiplayerArena = () => {
 
   // Minimap state for real-time updates
   const [minimapData, setMinimapData] = useState({
-    playerX: 2000,
-    playerY: 2000,
+    playerX: DEFAULT_PLAYABLE_CENTER,
+    playerY: DEFAULT_PLAYABLE_CENTER,
     enemies: [],
     coins: [],
-    viruses: []
+    viruses: [],
+    playableRadius: DEFAULT_PLAYABLE_RADIUS,
+    playableCenterX: DEFAULT_PLAYABLE_CENTER,
+    playableCenterY: DEFAULT_PLAYABLE_CENTER
   })
   
   // Input handling
@@ -1222,7 +1228,10 @@ const MultiplayerArena = () => {
             playerY: this.player.y,
             enemies: minimapPlayers,
             coins: minimapCoins.map(coin => ({ x: coin.x, y: coin.y })),
-            viruses: minimapViruses.map(virus => ({ x: virus.x, y: virus.y }))
+            viruses: minimapViruses.map(virus => ({ x: virus.x, y: virus.y })),
+            playableRadius: this.currentPlayableRadius,
+            playableCenterX: this.world.width / 4,
+            playableCenterY: this.world.height / 4
           })
         }
       }
@@ -1698,6 +1707,29 @@ const MultiplayerArena = () => {
     }
   }, [ready, authenticated, user?.id, playerName]) // Add playerName to dependencies so effect responds to name changes
   
+  const minimapOuterSize = isMobile ? 121 : 220
+  const minimapContentSize = isMobile ? 115 : 210
+  const minimapPadding = isMobile ? 3 : 5
+  const minimapCenter = minimapPadding + minimapContentSize / 2
+  const safeZoneRadiusWorld = minimapData.playableRadius ?? DEFAULT_PLAYABLE_RADIUS
+  const safeZoneCenterX = minimapData.playableCenterX ?? DEFAULT_PLAYABLE_CENTER
+  const safeZoneCenterY = minimapData.playableCenterY ?? DEFAULT_PLAYABLE_CENTER
+  const safeZoneRadiusPx = Math.max(0, (minimapContentSize / 2) * (safeZoneRadiusWorld / DEFAULT_PLAYABLE_RADIUS))
+  const effectivePlayableRadius = safeZoneRadiusWorld === 0 ? 1 : safeZoneRadiusWorld
+  const clampToMinimap = value => Math.max(minimapPadding, Math.min(minimapPadding + minimapContentSize, value))
+  const projectCoordinate = (value, center) => clampToMinimap(
+    minimapCenter + ((value - center) / effectivePlayableRadius) * safeZoneRadiusPx
+  )
+  const getMinimapPosition = (x, y) => {
+    const targetX = typeof x === 'number' ? x : safeZoneCenterX
+    const targetY = typeof y === 'number' ? y : safeZoneCenterY
+    return {
+      x: projectCoordinate(targetX, safeZoneCenterX),
+      y: projectCoordinate(targetY, safeZoneCenterY)
+    }
+  }
+  const playerMinimapPosition = getMinimapPosition(minimapData.playerX, minimapData.playerY)
+
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
       {/* Authentication Required Screen */}
@@ -2205,12 +2237,12 @@ const MultiplayerArena = () => {
           top: '10px',
           right: '10px',
           zIndex: 1000,
-          width: isMobile ? '121px' : '220px',
-          height: isMobile ? '121px' : '220px'
+          width: `${minimapOuterSize}px`,
+          height: `${minimapOuterSize}px`
         }}>
           <div style={{
-            width: isMobile ? '121px' : '220px',
-            height: isMobile ? '121px' : '220px',
+            width: `${minimapOuterSize}px`,
+            height: `${minimapOuterSize}px`,
             borderRadius: '50%',
             backgroundColor: '#000000',
             border: isMobile ? '2px solid #00ff00' : '4px solid #00ff00',
@@ -2218,70 +2250,60 @@ const MultiplayerArena = () => {
             overflow: 'hidden',
             boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
-            {/* Much larger black playable area circle on minimap - positioned at top-left */}
+            {/* Playable safe-zone visual based on live radius */}
             <div style={{
               position: 'absolute',
-              width: `${((3200 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Much larger playable area diameter 
-              height: `${((3200 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Much larger playable area diameter
+              width: `${safeZoneRadiusPx * 2}px`,
+              height: `${safeZoneRadiusPx * 2}px`,
               borderRadius: '50%',
-              background: '#000000', // Solid black playable area - no gradient
-              left: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
-              top: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
-              transform: 'translate(-50%, -50%)', // Center the circle on the calculated position
-              zIndex: 2
+              background: '#000000',
+              border: '2px solid rgba(0, 255, 0, 0.4)',
+              left: `${minimapCenter}px`,
+              top: `${minimapCenter}px`,
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2,
+              pointerEvents: 'none'
             }} />
-            
+
             <div style={{
               position: 'absolute',
               width: isMobile ? '6px' : '12px',
               height: isMobile ? '6px' : '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${(minimapData.playerX / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-              top: `${(minimapData.playerY / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+              left: `${playerMinimapPosition.x}px`,
+              top: `${playerMinimapPosition.y}px`,
               transform: 'translate(-50%, -50%)',
               border: isMobile ? '1px solid #ffffff' : '3px solid #ffffff',
               boxShadow: isMobile ? '0 0 6px rgba(96, 165, 250, 1)' : '0 0 12px rgba(96, 165, 250, 1)',
               zIndex: 10
             }} />
-            
-            {minimapData.enemies.map((enemy, i) => (
-              <div
-                key={i}
-                title={enemy.isPlayer ? `Player: ${enemy.name || 'Anonymous'}` : 'AI Enemy'}
-                style={{
-                  position: 'absolute',
-                  width: isMobile ? '4px' : '7px',
-                  height: isMobile ? '4px' : '7px',
-                  backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
-                  borderRadius: '50%',
-                  left: `${(enemy.x / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  top: `${(enemy.y / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  transform: 'translate(-50%, -50%)',
-                  opacity: enemy.isPlayer ? '1.0' : '0.8',
-                  border: enemy.isPlayer 
-                    ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff') 
-                    : (isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff'),
-                  boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none',
-                  zIndex: enemy.isPlayer ? 10 : 8
-                }}
-              />
-            ))}
-            
-            {/* No boundary circle - players can move freely throughout the world */}
-            
-            <div style={{
-              position: 'absolute',
-              top: '0',
-              left: '0',
-              right: '0',
-              bottom: '0',
-              borderRadius: '50%',
-              border: '3px solid rgba(0, 255, 0, 0.8)',
-              background: 'conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 0, 0.1) 10%, transparent 20%, rgba(0, 255, 0, 0.1) 30%, transparent 40%, rgba(0, 255, 0, 0.1) 50%, transparent 60%, rgba(0, 255, 0, 0.1) 70%, transparent 80%, rgba(0, 255, 0, 0.1) 90%, transparent 100%)',
-              animation: 'minimapRotate 20s linear infinite',
-              pointerEvents: 'none'
-            }} />
+
+            {minimapData.enemies.map((enemy, i) => {
+              const enemyPosition = getMinimapPosition(enemy?.x, enemy?.y)
+              return (
+                <div
+                  key={i}
+                  title={enemy.isPlayer ? `Player: ${enemy.name || 'Anonymous'}` : 'AI Enemy'}
+                  style={{
+                    position: 'absolute',
+                    width: isMobile ? '4px' : '7px',
+                    height: isMobile ? '4px' : '7px',
+                    backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
+                    borderRadius: '50%',
+                    left: `${enemyPosition.x}px`,
+                    top: `${enemyPosition.y}px`,
+                    transform: 'translate(-50%, -50%)',
+                    opacity: enemy.isPlayer ? '1.0' : '0.8',
+                    border: enemy.isPlayer
+                      ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff')
+                      : (isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff'),
+                    boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none',
+                    zIndex: enemy.isPlayer ? 10 : 8
+                  }}
+                />
+              )
+            })}
           </div>
         </div>
 
@@ -2475,11 +2497,6 @@ const MultiplayerArena = () => {
           }
         }
         
-        @keyframes minimapRotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
         .mobile-game-active {
           margin: 0 !important;
           padding: 0 !important;
