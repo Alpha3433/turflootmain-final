@@ -2218,6 +2218,7 @@ const MultiplayerArena = () => {
             overflow: 'hidden',
             boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
+            {/* Red zone background on minimap */}
             <div style={{
               position: 'absolute',
               top: '5px',
@@ -2225,8 +2226,21 @@ const MultiplayerArena = () => {
               right: '5px',
               bottom: '5px',
               borderRadius: '50%',
-              background: '#000000', // Solid black like local agario
+              background: '#1a0000', // Red zone color matching game world
               zIndex: 1
+            }} />
+            
+            {/* Black playable area circle on minimap - positioned at top-left */}
+            <div style={{
+              position: 'absolute',
+              width: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Playable area diameter scaled to minimap
+              height: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Playable area diameter scaled to minimap
+              borderRadius: '50%',
+              background: '#000000', // Black playable area
+              left: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
+              top: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
+              transform: 'translate(-50%, -50%)', // Center the circle on the calculated position
+              zIndex: 2
             }} />
             
             <div style={{
