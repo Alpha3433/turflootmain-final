@@ -297,6 +297,8 @@ export class ArenaRoom extends Room<GameState> {
       return;
     }
     
+    console.log(`✅ Mass requirement met: ${player.mass} >= 40`);
+    
     // Calculate direction from player to target
     const dx = targetX - player.x;
     const dy = targetY - player.y;
