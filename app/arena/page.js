@@ -952,8 +952,8 @@ const MultiplayerArena = () => {
       
       // Initialize client-side animation cache for persistent virus animations
       this.virusAnimationCache = new Map() // Persistent animation state across server updates
-      this.maxPlayableRadius = 2000  // Maximum zone radius  
-      this.currentPlayableRadius = 2000 // Starting zone size
+      this.maxPlayableRadius = 1800  // Maximum zone radius - matching local agario practice mode
+      this.currentPlayableRadius = 1800 // Starting zone size - matching local agario practice mode
       this.targetPlayableRadius = this.currentPlayableRadius
       this.zoneTransitionSpeed = 20 // Pixels per second zone change
       this.isCashGame = false // Can be set based on game mode
