@@ -22,16 +22,18 @@ class ArenaPlayableAreaTester:
         print(f"🔵 Expected Playable Radius: 2500px (expanded from 1800px)")
         print("=" * 80)
 
-    def log_test(self, category: str, test_name: str, passed: bool, details: str = ""):
-        """Log test result"""
-        self.total_tests += 1
-        if passed:
-            self.passed_tests += 1
-            status = "✅ PASSED"
-        else:
-            status = "❌ FAILED"
-        
-        result = {
+    def log_test(self, test_name: str, passed: bool, details: str = ""):
+        """Log test results"""
+        status = "✅ PASSED" if passed else "❌ FAILED"
+        result = f"{status}: {test_name}"
+        if details:
+            result += f" - {details}"
+        print(result)
+        self.test_results.append({
+            'test': test_name,
+            'passed': passed,
+            'details': details
+        })
             'category': category,
             'test': test_name,
             'passed': passed,
