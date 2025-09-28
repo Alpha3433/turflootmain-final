@@ -2269,8 +2269,7 @@ const MultiplayerArena = () => {
               bottom: '0',
               borderRadius: '50%',
               border: '3px solid rgba(0, 255, 0, 0.8)',
-              background: 'conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 0, 0.1) 10%, transparent 20%, rgba(0, 255, 0, 0.1) 30%, transparent 40%, rgba(0, 255, 0, 0.1) 50%, transparent 60%, rgba(0, 255, 0, 0.1) 70%, transparent 80%, rgba(0, 255, 0, 0.1) 90%, transparent 100%)',
-              animation: 'minimapRotate 20s linear infinite',
+              backgroundColor: '#000000',
               pointerEvents: 'none'
             }} />
           </div>
