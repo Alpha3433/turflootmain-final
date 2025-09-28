@@ -16,13 +16,8 @@ class PlayableAreaBackendTester:
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         self.test_results = []
-        
-        print(f"🎯 MINIMAP AND RED ZONE EXTENSION BACKEND TESTING INITIALIZED")
-        print(f"📍 Base URL: {self.base_url}")
-        print(f"🌍 Expected World Size: 6000x6000 pixels (expanded from 4000x4000)")
-        print(f"🎯 Expected World Center: (3000,3000) instead of (2000,2000)")
-        print(f"🔵 Expected Playable Radius: 2500px within the larger world")
-        print("=" * 80)
+        self.total_tests = 0
+        self.passed_tests = 0
         
     def log_test(self, test_name: str, passed: bool, details: str = ""):
         """Log test results"""
