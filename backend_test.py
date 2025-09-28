@@ -551,7 +551,7 @@ class PlayerSpawnPositionTester:
 
 def main():
     """Main test execution"""
-    tester = BoundaryEnforcementTester()
+    tester = PlayerSpawnPositionTester()
     results = tester.run_all_tests()
     
     # Exit with appropriate code
@@ -559,13 +559,13 @@ def main():
     total_tests = len(results)
     
     if passed_tests == total_tests:
-        print(f"\n🎉 ALL TESTS PASSED - BOUNDARY ENFORCEMENT IS FULLY OPERATIONAL")
+        print(f"\n🎉 ALL TESTS PASSED - PLAYER SPAWN POSITION FIX IS FULLY OPERATIONAL")
         sys.exit(0)
     elif passed_tests >= total_tests * 0.8:  # 80% pass rate
-        print(f"\n✅ MOST TESTS PASSED - BOUNDARY ENFORCEMENT IS WORKING WELL")
+        print(f"\n✅ MOST TESTS PASSED - PLAYER SPAWN POSITION FIX IS WORKING WELL")
         sys.exit(0)
     else:
-        print(f"\n❌ MULTIPLE TESTS FAILED - BOUNDARY ENFORCEMENT NEEDS ATTENTION")
+        print(f"\n❌ MULTIPLE TESTS FAILED - PLAYER SPAWN POSITION FIX NEEDS ATTENTION")
         sys.exit(1)
 
 if __name__ == "__main__":
