@@ -1101,14 +1101,18 @@ const MultiplayerArena = () => {
         this.player.y = centerY + Math.sin(angle) * maxRadius
       }
       
-      // Debug logging (occasional)
+      // Debug logging (occasional) - Enhanced for boundary troubleshooting
       if (Math.random() < 0.01) {
-        console.log('🎮 Smooth gliding movement:', {
+        console.log('🎯 Movement Debug:', {
           position: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
           target: { x: this.player.targetX?.toFixed(1), y: this.player.targetY?.toFixed(1) },
-          distance: distanceToTarget.toFixed(1),
-          speed: dynamicSpeed.toFixed(2),
-          input: { dx: dx.toFixed(3), dy: dy.toFixed(3) }
+          center: { x: centerX, y: centerY },
+          distance: distanceFromCenter.toFixed(1),
+          maxRadius: maxRadius.toFixed(1),
+          playerRadius: this.player.radius.toFixed(1),
+          playableRadius: this.currentPlayableRadius,
+          boundaryEnforced: distanceFromCenter > maxRadius,
+          expectedBoundaryRadius: this.currentPlayableRadius - this.player.radius
         })
       }
     }
