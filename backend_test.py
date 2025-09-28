@@ -102,38 +102,23 @@ class VirusCoinSpawnTester:
             if response.status_code == 200:
                 data = response.json()
                 servers = data.get('servers', [])
+                colyseus_enabled = data.get('colyseusEnabled', False)
                 colyseus_endpoint = data.get('colyseusEndpoint', '')
                 
-                # Look for Colyseus arena server
-                arena_servers = [s for s in servers if 'arena' in s.get('name', '').lower() or 'colyseus' in str(s)]
+                arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' and s.get('roomType') == 'arena']
                 
-                if arena_servers or 'colyseus' in colyseus_endpoint:
-                    self.log_test(
-                        "Colyseus Server Availability",
-                        True,
-                        f"Arena servers found: {len(arena_servers)}, Endpoint: {colyseus_endpoint}"
-                    )
-                    return True
+                if colyseus_enabled and arena_servers:
+                    arena_server = arena_servers[0]
+                    max_players = arena_server.get('maxPlayers', 0)
+                    self.log_test("Colyseus Server Availability", True, 
+                                f"Arena server found ({arena_server.get('id')}, Max: {max_players}) with endpoint='{colyseus_endpoint}'")
                 else:
-                    # Check if we have any servers at all
-                    total_servers = len(servers)
-                    self.log_test(
-                        "Colyseus Server Availability",
-                        True,  # Still pass if we have server infrastructure
-                        f"Server infrastructure available: {total_servers} servers, Endpoint: {colyseus_endpoint}"
-                    )
-                    return True
+                    self.log_test("Colyseus Server Availability", False, 
+                                f"No arena servers found (colyseusEnabled={colyseus_enabled}, servers={len(servers)})")
             else:
-                self.log_test(
-                    "Colyseus Server Availability",
-                    False,
-                    f"HTTP {response.status_code}: {response.text}"
-                )
-                return False
-                
+                self.log_test("Colyseus Server Availability", False, f"Servers API returned status {response.status_code}")
         except Exception as e:
-            self.log_test("Colyseus Server Availability", False, error=str(e))
-            return False
+            self.log_test("Colyseus Server Availability", False, f"Servers API request failed: {str(e)}")
     
     def test_world_size_configuration(self):
         """Test 3: World Size Configuration - Verify server-side worldSize is now 4000 instead of 6000"""
