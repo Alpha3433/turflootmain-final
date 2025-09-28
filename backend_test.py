@@ -34,11 +34,6 @@ class ArenaPlayableAreaTester:
             'passed': passed,
             'details': details
         })
-            'category': category,
-            'test': test_name,
-            'passed': passed,
-            'details': details
-        }
         
     def test_api_health_check(self) -> bool:
         """Test 1: API Health Check - Verify backend infrastructure is operational"""
