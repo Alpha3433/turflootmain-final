@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
-Arena Mode Backend Testing - 1:1 Local Agario Replica
-Testing the backend changes for making arena mode identical to local agario practice mode.
+VIRUS AND COIN PLAYABLE AREA SPAWN VERIFICATION TESTING
+Test that viruses/spikes and coins only spawn within the playable area (1800px radius from center 2000,2000) in arena mode.
 
-Key Changes to Test:
-1. World size: 6000x6000 → 4000x4000 pixels
-2. Playable radius: 2000px → 1800px  
-3. Center position: (3000,2500) → (2000,2000)
-4. Minimap calculations: Now use (position/4000)*minimap_size
-5. Boundary enforcement: Updated to use 1800px radius with (2000,2000) center
-6. Spawn positions: Updated to use (2000,2000) center
+Testing Requirements:
+1. API Health Check - Verify backend infrastructure is operational
+2. Colyseus Server Availability - Verify arena servers are running
+3. Safe Spawn Position Logic - Verify generateSafeSpawnPosition uses 1800px radius
+4. Coin Spawn Logic - Verify spawnCoin() uses safe spawn positions only
+5. Virus Spawn Logic - Verify spawnVirus() uses safe spawn positions only
+6. Playable Area Boundary - Verify spawn radius matches playable area (1800px)
+7. Center Position - Verify spawn center is at (2000,2000)
+8. No Red Zone Spawning - Verify no objects can spawn outside 1800px radius
+9. World Size Consistency - Verify spawning works with 4000x4000 world
 """
 
 import requests
