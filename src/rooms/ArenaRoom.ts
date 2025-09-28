@@ -428,7 +428,7 @@ export class ArenaRoom extends Room<GameState> {
       const centerX = this.worldSize / 2;
       const centerY = this.worldSize / 2;
       const playableRadius = 1800; // MUST MATCH client-side currentPlayableRadius exactly
-      const maxRadius = playableRadius; // Player center can reach the green circle boundary
+      const maxRadius = playableRadius - player.radius; // Player EDGE constrained at green circle boundary
       
       const distanceFromCenter = Math.sqrt(
         Math.pow(player.x - centerX, 2) + 
