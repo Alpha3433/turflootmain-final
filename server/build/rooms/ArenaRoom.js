@@ -175,6 +175,15 @@ class ArenaRoom extends core_1.Room {
         this.maxViruses = 15;
         this.tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
     }
+    getSafeSpawnPosition() {
+        const center = this.worldSize / 2;
+        const radius = 1800;
+        const distance = Math.sqrt(Math.random()) * radius;
+        const angle = Math.random() * Math.PI * 2;
+        const x = center + distance * Math.cos(angle);
+        const y = center + distance * Math.sin(angle);
+        return { x, y };
+    }
     onCreate() {
         console.log("🌍 Arena room initialized");
         // Initialize game state
@@ -206,8 +215,9 @@ class ArenaRoom extends core_1.Room {
         // Create new player
         const player = new Player();
         player.name = playerName;
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
+        const spawnPosition = this.getSafeSpawnPosition();
+        player.x = spawnPosition.x;
+        player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
         player.mass = 100;
@@ -340,8 +350,9 @@ class ArenaRoom extends core_1.Room {
         });
     }
     respawnPlayer(player) {
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
+        const spawnPosition = this.getSafeSpawnPosition();
+        player.x = spawnPosition.x;
+        player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
         player.mass = 100;
