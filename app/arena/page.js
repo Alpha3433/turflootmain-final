@@ -926,7 +926,7 @@ const MultiplayerArena = () => {
       this.running = false
       
       // World setup with circular zone system
-      this.world = { width: 4000, height: 4000 }
+      this.world = { width: 8000, height: 8000 }
       this.expectedSessionId = null // Will be set when we connect to Colyseus
       
       // Simple camera initialization matching local agario exactly
