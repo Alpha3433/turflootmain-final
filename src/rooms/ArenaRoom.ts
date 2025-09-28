@@ -411,7 +411,32 @@ export class ArenaRoom extends Room<GameState> {
         player.y += moveY;
       }
       
-      // No boundary enforcement - players can move freely throughout the world
+      // Arena boundary enforcement - prevent players from entering red zone
+      const centerX = this.worldSize / 4; // 2000 - playable area center X
+      const centerY = this.worldSize / 4; // 2000 - playable area center Y
+      const playableRadius = 1800; // Match the red divider radius
+      const maxRadius = playableRadius - player.radius; // Player edge constrained at red divider
+      
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(player.x - centerX, 2) + 
+        Math.pow(player.y - centerY, 2)
+      );
+      
+      if (distanceFromCenter > maxRadius) {
+        // Clamp player to circular boundary (prevent red zone entry)
+        console.log('🚫 RED ZONE BOUNDARY ENFORCED:', {
+          distanceFromCenter: distanceFromCenter.toFixed(1),
+          maxRadius: maxRadius.toFixed(1),
+          playerRadius: player.radius.toFixed(1),
+          playableRadius: playableRadius,
+          center: `(${centerX}, ${centerY})`,
+          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`
+        });
+        
+        const angle = Math.atan2(player.y - centerY, player.x - centerX);
+        player.x = centerX + Math.cos(angle) * maxRadius;
+        player.y = centerY + Math.sin(angle) * maxRadius;
+      }
       
       // Check collisions
       this.checkCollisions(player, sessionId);
