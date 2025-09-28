@@ -437,6 +437,17 @@ export class ArenaRoom extends Room<GameState> {
       
       if (distanceFromCenter > maxRadius) {
         // Clamp player to circular boundary (server-side enforcement)
+        console.log('🚫 SERVER BOUNDARY ENFORCED:', {
+          distanceFromCenter: distanceFromCenter.toFixed(1),
+          maxRadius: maxRadius.toFixed(1),
+          playerRadius: player.radius.toFixed(1),
+          playableRadius: playableRadius,
+          center: `(${centerX}, ${centerY})`,
+          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
+          worldSize: `${this.worldSize}x${this.worldSize}`,
+          calculation: `${playableRadius} - (${player.radius.toFixed(1)} * 0.8) = ${maxRadius.toFixed(1)}`
+        });
+        
         const angle = Math.atan2(player.y - centerY, player.x - centerX);
         player.x = centerX + Math.cos(angle) * maxRadius;
         player.y = centerY + Math.sin(angle) * maxRadius;
