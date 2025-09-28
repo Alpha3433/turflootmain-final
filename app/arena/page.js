@@ -1352,12 +1352,30 @@ const MultiplayerArena = () => {
           const minimapCoins = this.serverState.coins || []
           const minimapViruses = this.serverState.viruses || []
 
+          const rawWorldSize = this.serverState?.worldSize
+          let derivedWorldHalf = null
+
+          if (rawWorldSize !== undefined && rawWorldSize !== null) {
+            const numericWorldSize = typeof rawWorldSize === 'string'
+              ? parseFloat(rawWorldSize)
+              : rawWorldSize
+
+            if (Number.isFinite(numericWorldSize)) {
+              derivedWorldHalf = numericWorldSize / 2
+            }
+          }
+
+          const safeDerivedWorldHalf = Number.isFinite(derivedWorldHalf) ? derivedWorldHalf : undefined
+          const safeWorldWidthHalf = Number.isFinite(this.world?.width) ? this.world.width / 2 : undefined
+          const safeWorldHeightHalf = Number.isFinite(this.world?.height) ? this.world.height / 2 : undefined
+          const safePlayableRadius = Number.isFinite(this.currentPlayableRadius) ? this.currentPlayableRadius : undefined
+
           setMinimapData({
             playerX: this.player.x,
             playerY: this.player.y,
-            centerX: this.serverState.zone?.centerX ?? this.world.width / 2,
-            centerY: this.serverState.zone?.centerY ?? this.world.height / 2,
-            currentPlayableRadius: this.serverState.zone?.radius ?? this.currentPlayableRadius,
+            centerX: this.serverState.zone?.centerX ?? safeDerivedWorldHalf ?? safeWorldWidthHalf ?? 0,
+            centerY: this.serverState.zone?.centerY ?? safeDerivedWorldHalf ?? safeWorldHeightHalf ?? 0,
+            currentPlayableRadius: this.serverState.zone?.radius ?? safeDerivedWorldHalf ?? safeWorldWidthHalf ?? safePlayableRadius ?? 0,
             enemies: minimapPlayers,
             coins: minimapCoins.map(coin => ({ x: coin.x, y: coin.y })),
             viruses: minimapViruses.map(virus => ({ x: virus.x, y: virus.y }))
@@ -1868,9 +1886,38 @@ const MultiplayerArena = () => {
   
   const minimapSize = isMobile ? 121 : 220
   const minimapRadius = minimapSize / 2
-  const minimapCenterX = minimapData.centerX ?? (gameRef.current?.world?.width ?? 8000) / 2
-  const minimapCenterY = minimapData.centerY ?? (gameRef.current?.world?.height ?? 8000) / 2
-  const minimapPlayableRadius = minimapData.currentPlayableRadius ?? gameRef.current?.currentPlayableRadius ?? 1800
+
+  const rawWorldSizeForMinimap = gameRef.current?.serverState?.worldSize ?? serverState?.worldSize
+  let derivedWorldHalfForMinimap = null
+
+  if (rawWorldSizeForMinimap !== undefined && rawWorldSizeForMinimap !== null) {
+    const numericWorldSize = typeof rawWorldSizeForMinimap === 'string'
+      ? parseFloat(rawWorldSizeForMinimap)
+      : rawWorldSizeForMinimap
+
+    if (Number.isFinite(numericWorldSize)) {
+      derivedWorldHalfForMinimap = numericWorldSize / 2
+    }
+  }
+
+  const safeDerivedWorldHalfForMinimap = Number.isFinite(derivedWorldHalfForMinimap) ? derivedWorldHalfForMinimap : undefined
+  const safeWorldWidthHalfForMinimap = Number.isFinite(gameRef.current?.world?.width)
+    ? gameRef.current.world.width / 2
+    : undefined
+  const safeWorldHeightHalfForMinimap = Number.isFinite(gameRef.current?.world?.height)
+    ? gameRef.current.world.height / 2
+    : undefined
+  const rawCurrentPlayableRadius = gameRef.current?.currentPlayableRadius
+  const safeCurrentPlayableRadius = Number.isFinite(rawCurrentPlayableRadius) ? rawCurrentPlayableRadius : undefined
+
+  const minimapCenterX = minimapData.centerX ?? safeDerivedWorldHalfForMinimap ?? safeWorldWidthHalfForMinimap ?? (gameRef.current?.world?.width ?? 8000) / 2
+  const minimapCenterY = minimapData.centerY ?? safeDerivedWorldHalfForMinimap ?? safeWorldHeightHalfForMinimap ?? (gameRef.current?.world?.height ?? 8000) / 2
+  const minimapPlayableRadius = minimapData.currentPlayableRadius
+    ?? gameRef.current?.serverState?.zone?.radius
+    ?? safeDerivedWorldHalfForMinimap
+    ?? safeCurrentPlayableRadius
+    ?? safeWorldWidthHalfForMinimap
+    ?? 1800
   const getMinimapPosition = (x, y) => {
     const normalizedX = normalizeMinimapCoordinate(x, minimapCenterX, minimapPlayableRadius)
     const normalizedY = normalizeMinimapCoordinate(y, minimapCenterY, minimapPlayableRadius)
