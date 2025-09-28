@@ -2241,8 +2241,8 @@ const MultiplayerArena = () => {
                   height: isMobile ? '4px' : '7px',
                   backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
                   borderRadius: '50%',
-                  left: `${((enemy.x - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
-                  top: `${((enemy.y - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
+                  left: `${((enemy.x - (2000 - 1800)) / (1800 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Map playable area (200-3800) to full minimap
+                  top: `${((enemy.y - (2000 - 1800)) / (1800 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Map playable area (200-3800) to full minimap
                   transform: 'translate(-50%, -50%)',
                   opacity: enemy.isPlayer ? '1.0' : '0.8',
                   border: enemy.isPlayer 
