@@ -69,12 +69,24 @@ const MultiplayerArena = () => {
 
   // Minimap state for real-time updates
   const [minimapData, setMinimapData] = useState({
-    playerX: 2000,
-    playerY: 2000,
+    playerX: 4000,
+    playerY: 4000,
+    centerX: 4000,
+    centerY: 4000,
+    currentPlayableRadius: 1800,
     enemies: [],
     coins: [],
     viruses: []
   })
+
+  const normalizeMinimapCoordinate = (value, center, playableRadius) => {
+    if (!playableRadius || playableRadius <= 0) {
+      return 0
+    }
+
+    const normalized = (value - center) / playableRadius
+    return Math.max(-1, Math.min(1, normalized))
+  }
   
   // Input handling
   const inputSequenceRef = useRef(0)
@@ -1343,6 +1355,9 @@ const MultiplayerArena = () => {
           setMinimapData({
             playerX: this.player.x,
             playerY: this.player.y,
+            centerX: this.serverState.zone?.centerX ?? this.world.width / 2,
+            centerY: this.serverState.zone?.centerY ?? this.world.height / 2,
+            currentPlayableRadius: this.serverState.zone?.radius ?? this.currentPlayableRadius,
             enemies: minimapPlayers,
             coins: minimapCoins.map(coin => ({ x: coin.x, y: coin.y })),
             viruses: minimapViruses.map(virus => ({ x: virus.x, y: virus.y }))
@@ -1853,12 +1868,12 @@ const MultiplayerArena = () => {
   
   const minimapSize = isMobile ? 121 : 220
   const minimapRadius = minimapSize / 2
-  const center = 4000
-  const playableRadius = 1800
-  const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+  const minimapCenterX = minimapData.centerX ?? (gameRef.current?.world?.width ?? 8000) / 2
+  const minimapCenterY = minimapData.centerY ?? (gameRef.current?.world?.height ?? 8000) / 2
+  const minimapPlayableRadius = minimapData.currentPlayableRadius ?? gameRef.current?.currentPlayableRadius ?? 1800
   const getMinimapPosition = (x, y) => {
-    const normalizedX = clamp((x - center) / playableRadius, -1, 1)
-    const normalizedY = clamp((y - center) / playableRadius, -1, 1)
+    const normalizedX = normalizeMinimapCoordinate(x, minimapCenterX, minimapPlayableRadius)
+    const normalizedY = normalizeMinimapCoordinate(y, minimapCenterY, minimapPlayableRadius)
     return {
       left: `${minimapRadius + normalizedX * minimapRadius}px`,
       top: `${minimapRadius + normalizedY * minimapRadius}px`
