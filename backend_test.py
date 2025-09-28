@@ -42,7 +42,7 @@ import os
 from typing import Dict, List, Tuple, Any
 from typing import Dict, Any, List, Tuple
 
-class PlayerSpawnPositionTester:
+class BoundarySyncTester:
     def __init__(self):
         # Get base URL from environment or use default
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
