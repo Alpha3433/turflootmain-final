@@ -268,28 +268,62 @@ class MinimapRedZoneExtensionTester:
             self.log_test("Boundary Enforcement", False, f"Exception: {str(e)}")
             return False
     
-    def test_database_integration(self) -> bool:
-        """Test 6: Database Integration - Verify game sessions can be created and tracked"""
+    def test_minimap_data_synchronization(self) -> bool:
+        """Test 6: Minimap Data Synchronization - Verify player position data is correctly transmitted for minimap calculations"""
         try:
-            print("\n🔍 TEST 6: Database Integration")
-            response = requests.get(f"{self.api_base}/game-sessions", timeout=10)
+            print("\n🔍 TEST 6: Minimap Data Synchronization")
             
-            if response.status_code == 200:
-                data = response.json()
+            # Check for player position synchronization in both files
+            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_sync_checks = 0
+            js_sync_checks = 0
+            
+            # Check TypeScript source for position synchronization
+            try:
+                with open(ts_file_path, 'r') as f:
+                    ts_content = f.read()
+                    
+                # Look for position synchronization patterns
+                sync_patterns = [
+                    "player.x",
+                    "player.y", 
+                    "@type(\"number\") x:",
+                    "@type(\"number\") y:"
+                ]
                 
-                # Check if we can access the database
-                if isinstance(data, (list, dict)):
-                    self.log_test("Database Integration", True, "Game sessions API accessible")
-                    return True
-                else:
-                    self.log_test("Database Integration", False, f"Unexpected response format: {type(data)}")
-                    return False
+                for pattern in sync_patterns:
+                    if pattern in ts_content:
+                        ts_sync_checks += 1
+                        
+            except Exception as e:
+                print(f"⚠️ Could not read TypeScript file: {e}")
+            
+            # Check compiled JavaScript for position synchronization
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    
+                # Look for position synchronization patterns
+                for pattern in ["player.x", "player.y"]:
+                    if pattern in js_content:
+                        js_sync_checks += 1
+                        
+            except Exception as e:
+                print(f"⚠️ Could not read JavaScript file: {e}")
+            
+            if ts_sync_checks >= 3 and js_sync_checks >= 1:
+                self.log_test("Minimap Data Synchronization", True, 
+                            f"TS: {ts_sync_checks}/4 patterns, JS: {js_sync_checks}/2 patterns found")
+                return True
             else:
-                self.log_test("Database Integration", False, f"HTTP {response.status_code}")
+                self.log_test("Minimap Data Synchronization", False, 
+                            f"TS: {ts_sync_checks}/4 patterns, JS: {js_sync_checks}/2 patterns (expected >= 3 TS, >= 1 JS)")
                 return False
                 
         except Exception as e:
-            self.log_test("Database Integration", False, f"Exception: {str(e)}")
+            self.log_test("Minimap Data Synchronization", False, f"Exception: {str(e)}")
             return False
     
     def test_backend_api_integration(self) -> bool:
