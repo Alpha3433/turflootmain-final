@@ -317,9 +317,9 @@ export class ArenaRoom extends Room<GameState> {
     splitPlayer.y = player.y + dirY * spawnDistance;
     
     // Keep split piece in bounds
-    // Keep split player in circular bounds
+    // Keep split player in circular bounds - shifted up for more bottom out-of-bounds
     const centerX = this.worldSize / 2;
-    const centerY = this.worldSize / 2;
+    const centerY = this.worldSize / 2 - 500; // Shift playable area up by 500px
     const playableRadius = 2000;
     const maxRadius = playableRadius - splitPlayer.radius;
     
