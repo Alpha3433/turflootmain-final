@@ -935,16 +935,16 @@ const MultiplayerArena = () => {
       
       // Player setup with visual properties matching agario
       this.player = {
-        x: 2000,
-        y: 2000,
+        x: 4000, // Updated center for 8000x8000 world
+        y: 4000, // Updated center for 8000x8000 world
         mass: 25, // Fixed to match server spawn mass
         radius: Math.sqrt(25) * 3, // Proper radius calculation: √25 * 3 = 15
         color: '#4A90E2',
         name: playerName || 'Anonymous Player',
         isCurrentPlayer: true,
         speed: 2,
-        targetX: 2000,
-        targetY: 2000,
+        targetX: 4000, // Updated center for 8000x8000 world
+        targetY: 4000, // Updated center for 8000x8000 world
         spawnProtection: true,
         spawnProtectionTime: 6000,
         spawnProtectionStart: Date.now()
