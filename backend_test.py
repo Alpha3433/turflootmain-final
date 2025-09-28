@@ -588,8 +588,6 @@ class ArenaBackendTester:
         return success_rate >= 75
 
 if __name__ == "__main__":
-    tester = BackendTester()
-    success_rate = tester.run_all_tests()
-    
-    # Exit with appropriate code
-    sys.exit(0 if success_rate == 100 else 1)
+    tester = ArenaBackendTester()
+    success = tester.run_all_tests()
+    sys.exit(0 if success else 1)
