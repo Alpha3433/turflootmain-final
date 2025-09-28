@@ -393,7 +393,7 @@ class MinimapRedZoneExtensionTester:
         success_rate = (passed_tests / total_tests) * 100
         
         print("\n" + "=" * 60)
-        print("🎯 ARENA PLAYABLE AREA EXTENSION BACKEND TEST SUMMARY")
+        print("🎯 MINIMAP AND RED ZONE EXTENSION BACKEND TEST SUMMARY")
         print("=" * 60)
         print(f"✅ Tests Passed: {passed_tests}/{total_tests}")
         print(f"📊 Success Rate: {success_rate:.1f}%")
