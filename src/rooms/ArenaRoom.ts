@@ -451,6 +451,17 @@ export class ArenaRoom extends Room<GameState> {
         Math.pow(player.y - centerY, 2)
       );
       
+      // DEBUG: Always log boundary check
+      console.log('🔍 BOUNDARY CHECK:', {
+        playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
+        center: `(${centerX}, ${centerY})`,
+        distanceFromCenter: distanceFromCenter.toFixed(1),
+        maxRadius: maxRadius.toFixed(1),
+        playableRadius: playableRadius,
+        playerRadius: player.radius.toFixed(1),
+        isViolating: distanceFromCenter > maxRadius
+      });
+      
       if (distanceFromCenter > maxRadius) {
         // Clamp player to circular boundary (prevent red zone entry)
         console.log('🚫 RED ZONE BOUNDARY ENFORCED:', {
