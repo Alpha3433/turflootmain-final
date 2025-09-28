@@ -1297,12 +1297,7 @@ const MultiplayerArena = () => {
         zoneColor = this.targetPlayableRadius > this.currentPlayableRadius ? '#00ffff' : '#0080ff'
       }
       
-      // Draw the boundary circle - this represents where player EDGE should be constrained
-      this.ctx.beginPath()
-      this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
-      this.ctx.strokeStyle = zoneColor
-      this.ctx.lineWidth = 8
-      this.ctx.stroke()
+      // No boundary circle - players can move freely throughout the world
       
       // Add glowing effect
       this.ctx.beginPath()
