@@ -91,8 +91,9 @@ export class ArenaRoom extends Room<GameState> {
     // Create new player
     const player = new Player();
     player.name = playerName;
-    player.x = Math.random() * this.worldSize;
-    player.y = Math.random() * this.worldSize;
+    const spawnPosition = this.generateSafeSpawnPosition();
+    player.x = spawnPosition.x;
+    player.y = spawnPosition.y;
     player.vx = 0;
     player.vy = 0;
     player.mass = 25;
@@ -250,8 +251,9 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   respawnPlayer(player: Player) {
-    player.x = Math.random() * this.worldSize;
-    player.y = Math.random() * this.worldSize;
+    const spawnPosition = this.generateSafeSpawnPosition();
+    player.x = spawnPosition.x;
+    player.y = spawnPosition.y;
     player.vx = 0;
     player.vy = 0;
     player.mass = 25;
