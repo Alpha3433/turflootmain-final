@@ -2,6 +2,23 @@
 
 import { useState, useEffect } from 'react'
 
+const createTimeoutSignal = (timeoutMs) => {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+    return { signal: AbortSignal.timeout(timeoutMs), cleanup: () => {} }
+  }
+
+  if (typeof AbortController !== 'undefined') {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+    return {
+      signal: controller.signal,
+      cleanup: () => clearTimeout(timeoutId)
+    }
+  }
+
+  return { signal: undefined, cleanup: () => {} }
+}
+
 const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
   // Removed console.log to prevent render loop spam
   
@@ -150,6 +167,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     }
 
     // Method 1: Try to ping a reliable CDN endpoint for realistic latency measurement
+    let cleanup = () => {}
     try {
       const startTime = performance.now()
       
@@ -170,12 +188,20 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       // Use region-specific CDN if available, otherwise use Google's global CDN
       testEndpoint = cdnEndpoints[hathoraRegion] || testEndpoint
       
-      const response = await fetch(testEndpoint, {
+      const timeoutConfig = createTimeoutSignal(5000)
+      cleanup = timeoutConfig.cleanup || (() => {})
+      const { signal } = timeoutConfig
+      const fetchOptions = {
         method: 'HEAD',
         mode: 'no-cors',
-        cache: 'no-cache',
-        signal: AbortSignal.timeout(5000)
-      })
+        cache: 'no-cache'
+      }
+
+      if (signal) {
+        fetchOptions.signal = signal
+      }
+
+      const response = await fetch(testEndpoint, fetchOptions)
       
       const endTime = performance.now()
       const ping = Math.round(endTime - startTime)
@@ -210,6 +236,8 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       
       console.log(`🎯 Simulated ping for ${hathoraRegion || endpoint}: ${simulatedPing}ms (geographic estimate)`)
       return simulatedPing
+    } finally {
+      cleanup()
     }
   }
 
