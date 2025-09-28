@@ -41,10 +41,11 @@ class BackendTester:
             'details': details
         })
         
-    def test_api_health_check(self):
-        """Test 1: API Health Check - Verify backend infrastructure is operational"""
+    def test_api_health_check(self) -> bool:
+        """Test 1: API Health Check - Verify backend infrastructure is operational after server restart"""
         try:
-            response = requests.get(f"{self.api_base}", timeout=10)
+            print("\n🔍 TEST 1: API Health Check")
+            response = requests.get(f"{API_BASE}", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
