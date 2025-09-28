@@ -50,10 +50,10 @@ import sys
 import os
 from typing import Dict, Any, List, Tuple
 
-class BoundaryEnforcementTester:
+class PlayerSpawnPositionTester:
     def __init__(self):
         # Get base URL from environment or use default
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         
         # Test configuration
@@ -61,7 +61,7 @@ class BoundaryEnforcementTester:
         self.total_tests = 0
         self.passed_tests = 0
         
-        # Expected boundary configuration based on review request
+        # Expected spawn configuration based on review request
         self.expected_world_size = 8000
         self.expected_center_x = 4000  # worldSize / 2
         self.expected_center_y = 4000  # worldSize / 2
