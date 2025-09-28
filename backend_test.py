@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Bottom Out-of-Bounds Extension and Minimap Sync
-Testing the backend changes for adding more out-of-bounds area to the bottom and synchronizing the minimap.
+Arena Mode Backend Testing - 1:1 Local Agario Replica
+Testing the backend changes for making arena mode identical to local agario practice mode.
+
+Key Changes to Test:
+1. World size: 6000x6000 → 4000x4000 pixels
+2. Playable radius: 2000px → 1800px  
+3. Center position: (3000,2500) → (2000,2000)
+4. Minimap calculations: Now use (position/4000)*minimap_size
+5. Boundary enforcement: Updated to use 1800px radius with (2000,2000) center
+6. Spawn positions: Updated to use (2000,2000) center
 """
 
 import requests
 import json
 import time
-import sys
 import os
-from typing import Dict, Any, List, Tuple
+import sys
+from datetime import datetime
 
-# Get base URL from environment
+# Configuration
 BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
