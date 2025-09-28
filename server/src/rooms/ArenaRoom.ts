@@ -50,6 +50,13 @@ export class ArenaRoom extends Room<GameState> {
   maxCoins = 100;
   maxViruses = 15;
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+  playableRadius = parseInt(process.env.PLAYABLE_RADIUS || '1800');
+  maxRadius = Math.max(
+    this.playableRadius,
+    parseInt(process.env.MAX_RADIUS || `${Math.floor(this.worldSize / 2)}`)
+  );
+  centerX = this.worldSize / 2;
+  centerY = this.worldSize / 2;
   
   onCreate() {
     console.log("🌍 Arena room initialized");
@@ -91,8 +98,9 @@ export class ArenaRoom extends Room<GameState> {
     // Create new player
     const player = new Player();
     player.name = playerName;
-    player.x = Math.random() * this.worldSize;
-    player.y = Math.random() * this.worldSize;
+    const spawnPosition = this.getRandomPositionWithinRadius(this.playableRadius - player.radius);
+    player.x = spawnPosition.x;
+    player.y = spawnPosition.y;
     player.vx = 0;
     player.vy = 0;
     player.mass = 100;
@@ -154,10 +162,9 @@ export class ArenaRoom extends Room<GameState> {
       // Apply movement
       player.x += player.vx * deltaTime * 10; // Scale for game feel
       player.y += player.vy * deltaTime * 10;
-      
-      // Keep player in bounds
-      player.x = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.x));
-      player.y = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.y));
+
+      // Keep player within circular arena bounds
+      this.clampPlayerToArena(player);
       
       // Apply friction
       player.vx *= 0.95;
@@ -250,8 +257,9 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   respawnPlayer(player: Player) {
-    player.x = Math.random() * this.worldSize;
-    player.y = Math.random() * this.worldSize;
+    const spawnPosition = this.getRandomPositionWithinRadius(this.playableRadius - player.radius);
+    player.x = spawnPosition.x;
+    player.y = spawnPosition.y;
     player.vx = 0;
     player.vy = 0;
     player.mass = 100;
@@ -275,8 +283,9 @@ export class ArenaRoom extends Room<GameState> {
   spawnCoin() {
     const coinId = `coin_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     const coin = new Coin();
-    coin.x = Math.random() * this.worldSize;
-    coin.y = Math.random() * this.worldSize;
+    const position = this.getRandomPositionWithinRadius(this.maxRadius - coin.radius);
+    coin.x = position.x;
+    coin.y = position.y;
     coin.value = 1;
     coin.radius = 8;
     coin.color = "#FFD700";
@@ -287,8 +296,9 @@ export class ArenaRoom extends Room<GameState> {
   spawnVirus() {
     const virusId = `virus_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     const virus = new Virus();
-    virus.x = Math.random() * this.worldSize;
-    virus.y = Math.random() * this.worldSize;
+    const position = this.getRandomPositionWithinRadius(this.maxRadius - virus.radius);
+    virus.x = position.x;
+    virus.y = position.y;
     virus.radius = 60 + Math.random() * 40;
     virus.color = "#FF6B6B";
     
@@ -305,5 +315,51 @@ export class ArenaRoom extends Room<GameState> {
 
   onDispose() {
     console.log('🛑 Arena room disposed');
+  }
+
+  private getRandomPositionWithinRadius(radius: number) {
+    const effectiveRadius = Math.max(0, Math.min(radius, this.maxRadius));
+    if (effectiveRadius === 0) {
+      return { x: this.centerX, y: this.centerY };
+    }
+
+    // Use square root of random to ensure uniform distribution across the circle
+    const distance = Math.sqrt(Math.random()) * effectiveRadius;
+    const angle = Math.random() * Math.PI * 2;
+
+    const x = this.centerX + Math.cos(angle) * distance;
+    const y = this.centerY + Math.sin(angle) * distance;
+
+    return {
+      x: Math.max(0, Math.min(this.worldSize, x)),
+      y: Math.max(0, Math.min(this.worldSize, y))
+    };
+  }
+
+  private clampPlayerToArena(player: Player) {
+    const dx = player.x - this.centerX;
+    const dy = player.y - this.centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const allowedRadius = Math.max(
+      0,
+      Math.min(this.playableRadius, this.maxRadius) - player.radius
+    );
+
+    if (distance > allowedRadius) {
+      const angle = Math.atan2(dy, dx);
+      const clampedX = this.centerX + Math.cos(angle) * allowedRadius;
+      const clampedY = this.centerY + Math.sin(angle) * allowedRadius;
+      player.x = clampedX;
+      player.y = clampedY;
+
+      // Prevent momentum from pushing the player outside repeatedly
+      const tangentAngle = angle + Math.PI / 2;
+      const tangentX = Math.cos(tangentAngle);
+      const tangentY = Math.sin(tangentAngle);
+      const speedAlongTangent = player.vx * tangentX + player.vy * tangentY;
+
+      player.vx = tangentX * speedAlongTangent;
+      player.vy = tangentY * speedAlongTangent;
+    }
   }
 }
