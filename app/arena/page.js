@@ -2296,20 +2296,7 @@ const MultiplayerArena = () => {
               />
             ))}
             
-            {/* Playable zone boundary circle - positioned correctly in world coordinates */}
-            <div style={{
-              position: 'absolute',
-              width: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Actual playable diameter relative to world
-              height: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Actual playable diameter relative to world
-              borderRadius: '50%',
-              border: '2px solid #00ff00',
-              left: `${(4000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (4000, 4000)
-              top: `${(4000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (4000, 4000)
-              transform: 'translate(-50%, -50%)', // Center the circle on the calculated position
-              opacity: '0.6',
-              zIndex: 5,
-              pointerEvents: 'none'
-            }} />
+            {/* No boundary circle - players can move freely throughout the world */}
             
             <div style={{
               position: 'absolute',
