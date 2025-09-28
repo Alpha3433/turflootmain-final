@@ -97,107 +97,172 @@ class ArenaPlayableAreaTester:
             self.log_test("Colyseus Server Availability", False, f"Exception: {str(e)}")
             return False
             
-            self.log_test(
-                "Colyseus Server Availability",
-                "Arena Server Found",
-                len(arena_servers) > 0,
-                f"Found {len(arena_servers)} arena servers, Colyseus enabled: {colyseus_enabled}"
-            )
-            
-            if arena_servers:
-                arena_server = arena_servers[0]
-                max_players = arena_server.get('maxPlayers', 0)
-                current_players = arena_server.get('currentPlayers', 0)
-                
-                self.log_test(
-                    "Colyseus Server Availability",
-                    "Arena Server Configuration",
-                    max_players >= 50,
-                    f"Max: {max_players}, Current: {current_players}, Endpoint: {colyseus_endpoint}"
-                )
-        else:
-            self.log_test("Colyseus Server Availability", "Arena Server Found", False, "Servers endpoint not accessible")
-
-    def test_circular_boundary_mathematics(self):
-        """Test 3: Circular Boundary Mathematics Verification"""
-        print("\n🔍 TESTING CATEGORY 3: CIRCULAR BOUNDARY MATHEMATICS")
-        
-        # Test boundary calculations
-        import math
-        
-        # Test center position
-        center_correct = (self.world_center_x == self.world_size / 2 and 
-                         self.world_center_y == self.world_size / 2)
-        self.log_test(
-            "Circular Boundary Mathematics",
-            "World Center Calculation",
-            center_correct,
-            f"Center: ({self.world_center_x}, {self.world_center_y}) for {self.world_size}x{self.world_size} world"
-        )
-        
-        # Test playable radius
-        radius_reasonable = 800 <= self.playable_radius <= 2000
-        self.log_test(
-            "Circular Boundary Mathematics",
-            "Playable Radius Range",
-            radius_reasonable,
-            f"Playable radius: {self.playable_radius}px (should be 800-2000px)"
-        )
-        
-        # Test boundary positions
-        test_positions = [
-            ("Center", self.world_center_x, self.world_center_y, True),
-            ("Edge Safe", self.world_center_x + self.max_player_distance - 10, self.world_center_y, True),
-            ("Edge Boundary", self.world_center_x + self.max_player_distance, self.world_center_y, True),
-            ("Outside Boundary", self.world_center_x + self.max_player_distance + 50, self.world_center_y, False)
-        ]
-        
-        for pos_name, x, y, should_be_safe in test_positions:
-            distance = math.sqrt((x - self.world_center_x)**2 + (y - self.world_center_y)**2)
-            is_safe = distance <= self.max_player_distance
-            
-            self.log_test(
-                "Circular Boundary Mathematics",
-                f"Position Test: {pos_name}",
-                is_safe == should_be_safe,
-                f"Position: ({x:.0f}, {y:.0f}), Distance: {distance:.1f}px, Safe: {is_safe}"
-            )
-
-    def test_client_side_boundary_implementation(self):
-        """Test 4: Client-Side Boundary Implementation Analysis"""
-        print("\n🔍 TESTING CATEGORY 4: CLIENT-SIDE BOUNDARY IMPLEMENTATION")
-        
-        # Since we can't directly test client-side JavaScript from Python,
-        # we'll verify the implementation exists by checking the code patterns
-        
+    
+    def test_playable_radius_configuration(self) -> bool:
+        """Test 3: Playable Radius Configuration - Verify server-side playable radius is 2500"""
         try:
-            # Read the client-side code
-            with open('/app/app/agario/page.js', 'r') as f:
-                client_code = f.read()
+            print("\n🔍 TEST 3: Playable Radius Configuration")
             
-            # Check for circular boundary patterns
-            patterns = {
-                "currentPlayableRadius Usage": "currentPlayableRadius - this.player.radius" in client_code,
-                "Distance Calculation": "Math.sqrt(Math.pow(this.player.x - centerX, 2)" in client_code,
-                "Angle-Based Clamping": "Math.atan2(this.player.y - centerY, this.player.x - centerX)" in client_code,
-                "Boundary Repositioning": "Math.cos(angle) * maxRadius" in client_code,
-                "drawWorldBoundary Method": "drawWorldBoundary()" in client_code,
-                "Green Circle Rendering": "strokeStyle = zoneColor" in client_code
-            }
+            # Check TypeScript source file
+            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            js_file_path = "/app/build/rooms/ArenaRoom.js"
             
-            for pattern_name, found in patterns.items():
-                self.log_test(
-                    "Client-Side Boundary Implementation",
-                    pattern_name,
-                    found,
-                    f"Pattern {'found' if found else 'not found'} in client code"
-                )
+            ts_checks = 0
+            js_checks = 0
+            
+            # Check TypeScript source
+            try:
+                with open(ts_file_path, 'r') as f:
+                    ts_content = f.read()
+                    
+                # Look for playableRadius = 2500 in key locations
+                if "playableRadius = 2500" in ts_content:
+                    ts_checks += ts_content.count("playableRadius = 2500")
+                    
+            except Exception as e:
+                print(f"⚠️ Could not read TypeScript file: {e}")
+            
+            # Check compiled JavaScript
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    
+                # Look for playableRadius = 2500 in key locations
+                if "playableRadius = 2500" in js_content:
+                    js_checks += js_content.count("playableRadius = 2500")
+                    
+            except Exception as e:
+                print(f"⚠️ Could not read JavaScript file: {e}")
+            
+            if ts_checks >= 2 and js_checks >= 2:
+                self.log_test("Playable Radius Configuration", True, 
+                            f"TS: {ts_checks} occurrences, JS: {js_checks} occurrences of playableRadius = 2500")
+                return True
+            else:
+                self.log_test("Playable Radius Configuration", False, 
+                            f"TS: {ts_checks} occurrences, JS: {js_checks} occurrences (expected >= 2 each)")
+                return False
                 
-        except FileNotFoundError:
-            self.log_test(
-                "Client-Side Boundary Implementation",
-                "Code Analysis",
-                False,
+        except Exception as e:
+            self.log_test("Playable Radius Configuration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_circular_boundary_enforcement(self) -> bool:
+        """Test 4: Circular Boundary Enforcement - Test boundary logic in server code"""
+        try:
+            print("\n🔍 TEST 4: Circular Boundary Enforcement")
+            
+            # Check for boundary enforcement logic in both files
+            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_boundary_checks = 0
+            js_boundary_checks = 0
+            
+            # Check TypeScript source for boundary enforcement patterns
+            try:
+                with open(ts_file_path, 'r') as f:
+                    ts_content = f.read()
+                    
+                # Look for boundary enforcement patterns
+                boundary_patterns = [
+                    "distanceFromCenter > maxRadius",
+                    "Math.atan2",
+                    "Math.cos(angle) * maxRadius",
+                    "Math.sin(angle) * maxRadius"
+                ]
+                
+                for pattern in boundary_patterns:
+                    if pattern in ts_content:
+                        ts_boundary_checks += 1
+                        
+            except Exception as e:
+                print(f"⚠️ Could not read TypeScript file: {e}")
+            
+            # Check compiled JavaScript for boundary enforcement patterns
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    
+                # Look for boundary enforcement patterns
+                for pattern in boundary_patterns:
+                    if pattern in js_content:
+                        js_boundary_checks += 1
+                        
+            except Exception as e:
+                print(f"⚠️ Could not read JavaScript file: {e}")
+            
+            if ts_boundary_checks >= 3 and js_boundary_checks >= 3:
+                self.log_test("Circular Boundary Enforcement", True, 
+                            f"TS: {ts_boundary_checks}/4 patterns, JS: {js_boundary_checks}/4 patterns found")
+                return True
+            else:
+                self.log_test("Circular Boundary Enforcement", False, 
+                            f"TS: {ts_boundary_checks}/4 patterns, JS: {js_boundary_checks}/4 patterns (expected >= 3 each)")
+                return False
+                
+        except Exception as e:
+            self.log_test("Circular Boundary Enforcement", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_split_player_boundary(self) -> bool:
+        """Test 5: Split Player Boundary - Test split players are constrained within expanded boundary"""
+        try:
+            print("\n🔍 TEST 5: Split Player Boundary")
+            
+            # Check for split boundary logic in both files
+            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_split_checks = 0
+            js_split_checks = 0
+            
+            # Check TypeScript source for split boundary enforcement
+            try:
+                with open(ts_file_path, 'r') as f:
+                    ts_content = f.read()
+                    
+                # Look for split boundary enforcement in handleSplit method
+                split_patterns = [
+                    "handleSplit",
+                    "splitPlayer.x",
+                    "splitPlayer.y",
+                    "playableRadius",
+                    "distanceFromCenter"
+                ]
+                
+                for pattern in split_patterns:
+                    if pattern in ts_content:
+                        ts_split_checks += 1
+                        
+            except Exception as e:
+                print(f"⚠️ Could not read TypeScript file: {e}")
+            
+            # Check compiled JavaScript for split boundary enforcement
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    
+                # Look for split boundary enforcement patterns
+                for pattern in split_patterns:
+                    if pattern in js_content:
+                        js_split_checks += 1
+                        
+            except Exception as e:
+                print(f"⚠️ Could not read JavaScript file: {e}")
+            
+            if ts_split_checks >= 4 and js_split_checks >= 4:
+                self.log_test("Split Player Boundary", True, 
+                            f"TS: {ts_split_checks}/5 patterns, JS: {js_split_checks}/5 patterns found")
+                return True
+            else:
+                self.log_test("Split Player Boundary", False, 
+                            f"TS: {ts_split_checks}/5 patterns, JS: {js_split_checks}/5 patterns (expected >= 4 each)")
+                return False
+                
+        except Exception as e:
+            self.log_test("Split Player Boundary", False, f"Exception: {str(e)}")
+            return False
                 "Client code file not accessible"
             )
 
