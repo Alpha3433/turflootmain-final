@@ -321,7 +321,7 @@ export class ArenaRoom extends Room<GameState> {
     const centerX = this.worldSize / 2;
     const centerY = this.worldSize / 2;
     const playableRadius = 1800;
-    const maxRadius = playableRadius - (splitPlayer.radius * 0.8); // Allow split player edge to get closer to green circle
+    const maxRadius = playableRadius; // Split player center can reach the green circle boundary
     
     const distanceFromCenter = Math.sqrt(
       Math.pow(splitPlayer.x - centerX, 2) + 
