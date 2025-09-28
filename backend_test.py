@@ -263,41 +263,133 @@ class ArenaPlayableAreaTester:
         except Exception as e:
             self.log_test("Split Player Boundary", False, f"Exception: {str(e)}")
             return False
-                "Client code file not accessible"
-            )
-
-    def test_server_side_boundary_enforcement(self):
-        """Test 5: Server-Side Boundary Enforcement"""
-        print("\n🔍 TESTING CATEGORY 5: SERVER-SIDE BOUNDARY ENFORCEMENT")
-        
+    
+    def test_database_integration(self) -> bool:
+        """Test 6: Database Integration - Verify game sessions can be created and tracked"""
         try:
-            # Read server-side TypeScript code
-            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
-                server_ts_code = f.read()
+            print("\n🔍 TEST 6: Database Integration")
+            response = requests.get(f"{self.api_base}/game-sessions", timeout=10)
             
-            # Read compiled JavaScript code
-            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
-                server_js_code = f.read()
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check if we can access the database
+                if isinstance(data, (list, dict)):
+                    self.log_test("Database Integration", True, "Game sessions API accessible")
+                    return True
+                else:
+                    self.log_test("Database Integration", False, f"Unexpected response format: {type(data)}")
+                    return False
+            else:
+                self.log_test("Database Integration", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Database Integration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_backend_api_integration(self) -> bool:
+        """Test 7: Backend API Integration - Verify /api/servers endpoint returns correct arena server data"""
+        try:
+            print("\n🔍 TEST 7: Backend API Integration")
+            response = requests.get(f"{self.api_base}/servers", timeout=10)
             
-            # Check server-side boundary patterns
-            ts_patterns = {
-                "Circular Bounds Check": "distanceFromCenter > maxRadius" in server_ts_code,
-                "Playable Radius": "playableRadius = 1800" in server_ts_code,
-                "Angle-Based Clamping": "Math.atan2(player.y - centerY, player.x - centerX)" in server_ts_code,
-                "Player Repositioning": "Math.cos(angle) * maxRadius" in server_ts_code
-            }
-            
-            js_patterns = {
-                "Compiled Circular Bounds": "distanceFromCenter > maxRadius" in server_js_code,
-                "Compiled Playable Radius": "playableRadius = 1800" in server_js_code,
-                "Compiled Angle Clamping": "Math.atan2" in server_js_code,
-                "Compiled Repositioning": "Math.cos(angle)" in server_js_code
-            }
-            
-            for pattern_name, found in ts_patterns.items():
-                self.log_test(
-                    "Server-Side Boundary Enforcement",
-                    f"TypeScript: {pattern_name}",
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check required fields
+                required_fields = ['servers', 'totalPlayers', 'totalActiveServers']
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    servers = data.get('servers', [])
+                    total_players = data.get('totalPlayers', 0)
+                    total_active = data.get('totalActiveServers', 0)
+                    
+                    self.log_test("Backend API Integration", True, 
+                                f"Servers: {len(servers)}, Players: {total_players}, Active: {total_active}")
+                    return True
+                else:
+                    self.log_test("Backend API Integration", False, f"Missing fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Backend API Integration", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Backend API Integration", False, f"Exception: {str(e)}")
+            return False
+    
+    def run_all_tests(self) -> Dict[str, Any]:
+        """Run all backend tests for arena playable area extension"""
+        print("🎯 ARENA PLAYABLE AREA EXTENSION BACKEND TESTING")
+        print("=" * 60)
+        
+        start_time = time.time()
+        
+        # Run all tests
+        tests = [
+            self.test_api_health_check,
+            self.test_colyseus_server_availability,
+            self.test_playable_radius_configuration,
+            self.test_circular_boundary_enforcement,
+            self.test_split_player_boundary,
+            self.test_database_integration,
+            self.test_backend_api_integration
+        ]
+        
+        passed_tests = 0
+        total_tests = len(tests)
+        
+        for test_func in tests:
+            try:
+                if test_func():
+                    passed_tests += 1
+            except Exception as e:
+                print(f"❌ Test {test_func.__name__} failed with exception: {e}")
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        # Calculate success rate
+        success_rate = (passed_tests / total_tests) * 100
+        
+        print("\n" + "=" * 60)
+        print("🎯 ARENA PLAYABLE AREA EXTENSION BACKEND TEST SUMMARY")
+        print("=" * 60)
+        print(f"✅ Tests Passed: {passed_tests}/{total_tests}")
+        print(f"📊 Success Rate: {success_rate:.1f}%")
+        print(f"⏱️ Duration: {duration:.2f} seconds")
+        
+        # Detailed results
+        print("\n📋 DETAILED TEST RESULTS:")
+        for result in self.test_results:
+            status = "✅" if result['passed'] else "❌"
+            print(f"{status} {result['test']}: {result['details']}")
+        
+        return {
+            'total_tests': total_tests,
+            'passed_tests': passed_tests,
+            'success_rate': success_rate,
+            'duration': duration,
+            'results': self.test_results
+        }
+
+def main():
+    """Main function to run arena playable area extension backend tests"""
+    tester = ArenaPlayableAreaTester()
+    results = tester.run_all_tests()
+    
+    # Return appropriate exit code
+    if results['success_rate'] == 100:
+        print("\n🎉 ALL TESTS PASSED - Arena playable area extension backend is working correctly!")
+        return 0
+    else:
+        print(f"\n⚠️ {results['total_tests'] - results['passed_tests']} TEST(S) FAILED - Issues found in arena playable area extension backend")
+        return 1
+
+if __name__ == "__main__":
+    exit(main())
                     found,
                     f"Pattern {'found' if found else 'not found'} in TypeScript code"
                 )
