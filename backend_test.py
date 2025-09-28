@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Minimap and Red Zone Extension
-Testing the backend changes for updating minimap dimensions and extending the red zone.
-Focuses on world size expansion from 4000 to 6000 pixels and center positioning at (3000,3000).
+Backend Testing Script for Playable Area Adjustment (2500px → 2000px)
+Testing all backend changes for adjusting the playable area from 2500px to 2000px radius.
 """
 
 import requests
@@ -11,7 +10,7 @@ import time
 import os
 from typing import Dict, Any, List
 
-class MinimapRedZoneExtensionTester:
+class PlayableAreaBackendTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
