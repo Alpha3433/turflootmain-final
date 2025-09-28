@@ -646,7 +646,9 @@ export class ArenaRoom extends Room<GameState> {
     const x = centerX + Math.cos(angle) * distance;
     const y = centerY + Math.sin(angle) * distance;
     
-    console.log(`🎯 SAFE SPAWN: Player spawned at (${x.toFixed(1)}, ${y.toFixed(1)}) - distance ${distance.toFixed(1)} from center (safe radius: ${safeZoneRadius})`);
+    console.log(`🎯 SAFE SPAWN: Player spawned at (${x.toFixed(1)}, ${y.toFixed(1)}) - distance ${distance.toFixed(1)} from center (${centerX}, ${centerY}) (safe radius: ${safeZoneRadius})`);
+    console.log(`🎯 SPAWN VERIFICATION: World size: ${this.worldSize}x${this.worldSize}, Playable area: ${safeZoneRadius}px radius from center`);
+    console.log(`🎯 SPAWN BOUNDS: X range: ${(centerX - safeZoneRadius).toFixed(1)} to ${(centerX + safeZoneRadius).toFixed(1)}, Y range: ${(centerY - safeZoneRadius).toFixed(1)} to ${(centerY + safeZoneRadius).toFixed(1)}`);
     
     return { x, y };
   }
