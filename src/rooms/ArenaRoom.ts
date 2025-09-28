@@ -427,7 +427,7 @@ export class ArenaRoom extends Room<GameState> {
       // Keep player in circular bounds (matching client-side circular boundary) - identical to local agario practice mode
       const centerX = this.worldSize / 2;
       const centerY = this.worldSize / 2;
-      const playableRadius = 1800; // Match client-side maxPlayableRadius
+      const playableRadius = 1800; // MUST MATCH client-side currentPlayableRadius exactly
       const maxRadius = playableRadius - (player.radius * 0.8); // Allow player edge to get closer to green circle
       
       const distanceFromCenter = Math.sqrt(
