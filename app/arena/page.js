@@ -963,6 +963,7 @@ const MultiplayerArena = () => {
       this.lastUpdate = Date.now()
       this.gameStartTime = Date.now()
       this.lastMovementUpdate = null // For deltaTime calculation in movement
+      this.lastMovementUpdate = null // For deltaTime calculation in movement
       
       this.bindEvents()
       this.setupMouse()
