@@ -39,31 +39,29 @@ class PlayableAreaBackendTester:
             'details': details
         })
         
-    def test_api_health_check(self) -> bool:
+    def test_api_health_check(self):
         """Test 1: API Health Check - Verify backend infrastructure is operational"""
         try:
-            print("\n🔍 TEST 1: API Health Check")
             response = requests.get(f"{self.api_base}", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
-                service = data.get('service', '')
+                service_name = data.get('service', '')
                 status = data.get('status', '')
                 features = data.get('features', [])
                 
-                if service == 'turfloot-api' and status == 'operational':
-                    self.log_test("API Health Check", True, f"Service: {service}, Status: {status}, Features: {features}")
-                    return True
+                if service_name == 'turfloot-api' and status == 'operational':
+                    self.log_test("API Health Check", True, 
+                                f"Service: {service_name}, Status: {status}, Features: {features}")
                 else:
-                    self.log_test("API Health Check", False, f"Unexpected response: {data}")
-                    return False
+                    self.log_test("API Health Check", False, 
+                                f"Unexpected response: {data}")
             else:
-                self.log_test("API Health Check", False, f"HTTP {response.status_code}")
-                return False
+                self.log_test("API Health Check", False, 
+                            f"HTTP {response.status_code}: {response.text}")
                 
         except Exception as e:
             self.log_test("API Health Check", False, f"Exception: {str(e)}")
-            return False
     
     def test_colyseus_server_availability(self) -> bool:
         """Test 2: Colyseus Server Availability - Verify arena servers are running"""
