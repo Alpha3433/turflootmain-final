@@ -132,7 +132,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "ENHANCED WEBSOCKET CONNECTION STATE HANDLING FOR SPACEBAR SPLIT FUNCTIONALITY: Test the enhanced WebSocket connection state handling for spacebar split functionality. Enhanced fixes implemented to prevent 'WebSocket is already in CLOSING or CLOSED state' errors: 1) Pre-Send Connection Check - Validate WebSocket readyState is OPEN before sending split commands, 2) Connection State Logging - Detailed logging of connection state before/after split attempts, 3) Graceful Error Handling - Specific handling for WebSocket CLOSING/CLOSED state errors, 4) Connection Recovery - Skip split attempts when connection is not ready. Expected: Spacebar presses when WebSocket is closing/closed should log informative messages but not cause errors, connection state properly validated before sending messages, split attempts gracefully skipped when connection not ready."
+user_problem_statement: "EXTEND GREEN CIRCLE AND PLAYABLE AREA IN ARENA MODE: User requested to extend the green circle and playable area to match the local agario practice mode. The current implementation was too small according to user feedback. Implementation needed to increase the playable radius values on both client-side and server-side to provide a larger playing area similar to the local agario experience."
 
 # Test plan for this run
 
