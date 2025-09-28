@@ -44,9 +44,17 @@ class BoundaryEnforcementTester:
         self.total_tests = 0
         self.passed_tests = 0
         
-        print(f"🎯 EXTENDED RED ZONE BACKEND TESTING INITIATED")
+        # Expected boundary configuration based on review request
+        self.expected_world_size = 8000
+        self.expected_center_x = 4000  # worldSize / 2
+        self.expected_center_y = 4000  # worldSize / 2
+        self.expected_playable_radius = 1800
+        
+        print(f"🎯 BOUNDARY ENFORCEMENT VERIFICATION TESTING")
         print(f"📍 Testing against: {self.base_url}")
-        print(f"🎮 Focus: Extended red zone implementation (8000x8000 world)")
+        print(f"🌍 Expected World Size: {self.expected_world_size}x{self.expected_world_size}")
+        print(f"📍 Expected Center: ({self.expected_center_x}, {self.expected_center_y})")
+        print(f"🔵 Expected Playable Radius: {self.expected_playable_radius}px")
         print("=" * 80)
 
     def log_test(self, category: str, test_name: str, passed: bool, details: str = ""):
