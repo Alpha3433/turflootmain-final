@@ -1146,52 +1146,18 @@ const MultiplayerArena = () => {
                    'session:', currentPlayer.sessionId, 
                    'at', currentPlayer.x?.toFixed(1), currentPlayer.y?.toFixed(1))
         
-        // IMPROVED SERVER RECONCILIATION for smooth gliding movement
-        if (this.player.x && this.player.y) {
-          const distance = Math.sqrt(
-            Math.pow(currentPlayer.x - this.player.x, 2) + 
-            Math.pow(currentPlayer.y - this.player.y, 2)
-          )
-          
-          console.log('🔄 Position reconciliation:', {
-            client: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
-            server: { x: currentPlayer.x.toFixed(1), y: currentPlayer.y.toFixed(1) },
-            distance: distance.toFixed(1)
-          })
-          
-          // SMOOTH RECONCILIATION that works with gliding movement
-          if (distance > 300) {
-            // Very large desync - snap to server position and reset targets
-            console.log('⚡ Major desync detected - snapping to server position')
-            this.player.x = currentPlayer.x
-            this.player.y = currentPlayer.y
-            this.player.targetX = currentPlayer.x
-            this.player.targetY = currentPlayer.y
-          } else if (distance > 100) {
-            // Large desync - smooth correction by updating target position
-            const correctionFactor = 0.4
-            const correctedX = this.player.x + (currentPlayer.x - this.player.x) * correctionFactor
-            const correctedY = this.player.y + (currentPlayer.y - this.player.y) * correctionFactor
-            
-            this.player.x = correctedX
-            this.player.y = correctedY
-            
-            // Also update target to maintain smooth movement
-            if (this.player.targetX && this.player.targetY) {
-              const targetOffsetX = this.player.targetX - this.player.x
-              const targetOffsetY = this.player.targetY - this.player.y
-              this.player.targetX = correctedX + targetOffsetX
-              this.player.targetY = correctedY + targetOffsetY
-            }
-          } else if (distance > 50) {
-            // Medium desync - very gentle correction
-            const correctionFactor = 0.15
-            this.player.x += (currentPlayer.x - this.player.x) * correctionFactor
-            this.player.y += (currentPlayer.y - this.player.y) * correctionFactor
-          }
-          // If distance <= 50, trust client prediction completely (no correction)
-          
-        } else {
+        // PURE SERVER AUTHORITY - No client-side prediction, just use server position
+        console.log('🎮 Applying server authoritative position:', {
+          server: { x: currentPlayer.x.toFixed(1), y: currentPlayer.y.toFixed(1) }
+        })
+        
+        // Always use server position (no reconciliation needed)
+        this.player.x = currentPlayer.x
+        this.player.y = currentPlayer.y
+        this.player.targetX = currentPlayer.x  
+        this.player.targetY = currentPlayer.y
+        
+        if (false) { // Disabled client prediction reconciliation
           // First update - apply directly (camera will be updated in updateCamera method)
           console.log('🎯 First player position received from server:', currentPlayer.x, currentPlayer.y)
           
