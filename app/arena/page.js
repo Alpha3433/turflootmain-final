@@ -943,8 +943,8 @@ const MultiplayerArena = () => {
         name: playerName || 'Anonymous Player',
         isCurrentPlayer: true,
         speed: 2,
-        targetX: 4000, // Updated center for 8000x8000 world
-        targetY: 4000, // Updated center for 8000x8000 world
+        targetX: 2000, // Updated center for left-side playable area (worldSize/4)
+        targetY: 4000, // Updated center for 8000x8000 world (worldSize/2)
         spawnProtection: true,
         spawnProtectionTime: 6000,
         spawnProtectionStart: Date.now()
