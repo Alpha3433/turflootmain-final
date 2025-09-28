@@ -183,52 +183,56 @@ class ArenaBackendTester:
             self.log_test("World Size Configuration", False, error=str(e))
             return False
     
-    def test_player_spawn_positioning(self) -> bool:
-        """Test 4: Player Spawn Positioning - Test that players spawn at new center coordinates (3000, 2500)"""
+    def test_playable_radius_configuration(self):
+        """Test 4: Playable Radius Configuration - Verify server-side playableRadius is now 1800 instead of 2000"""
         try:
-            print("\n🔍 TEST 4: Player Spawn Positioning")
+            ts_file = "/app/src/rooms/ArenaRoom.ts"
+            js_file = "/app/build/rooms/ArenaRoom.js"
             
-            # Check spawn position functions in both files
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            ts_checks = 0
+            js_checks = 0
             
-            ts_spawn_found = False
-            js_spawn_found = False
-            
-            # Check TypeScript file for spawn positioning
+            # Check TypeScript file
             try:
-                with open(ts_file_path, 'r') as f:
+                with open(ts_file, 'r') as f:
                     ts_content = f.read()
-                    # Look for generateCircularSpawnPosition with shifted center
-                    if ("generateCircularSpawnPosition" in ts_content and 
-                        "const centerY = this.worldSize / 2 - 500" in ts_content and
-                        "// 2500 for 6000x6000 world - shifted up for more bottom out-of-bounds" in ts_content):
-                        ts_spawn_found = True
+                    
+                # Look for playableRadius = 1800 patterns
+                if 'playableRadius = 1800' in ts_content:
+                    ts_checks += ts_content.count('playableRadius = 1800')
+                    
             except Exception as e:
-                print(f"Could not read TypeScript file: {e}")
+                print(f"Warning: Could not read TypeScript file: {e}")
             
-            # Check JavaScript file for spawn positioning
+            # Check JavaScript compiled file
             try:
-                with open(js_file_path, 'r') as f:
+                with open(js_file, 'r') as f:
                     js_content = f.read()
-                    # Look for generateCircularSpawnPosition with shifted center
-                    if ("generateCircularSpawnPosition" in js_content and 
-                        "this.worldSize / 2 - 500" in js_content):
-                        js_spawn_found = True
+                    
+                # Look for playableRadius = 1800 patterns
+                if 'playableRadius = 1800' in js_content:
+                    js_checks += js_content.count('playableRadius = 1800')
+                    
             except Exception as e:
-                print(f"Could not read JavaScript file: {e}")
+                print(f"Warning: Could not read JavaScript file: {e}")
             
-            if ts_spawn_found and js_spawn_found:
-                self.log_test("Player Spawn Positioning", True, 
-                            "Player spawn positioning correctly uses shifted center (3000, 2500) in both TS and JS")
+            if ts_checks >= 2 and js_checks >= 2:  # Should appear multiple times in each file
+                self.log_test(
+                    "Playable Radius Configuration",
+                    True,
+                    f"PlayableRadius 1800 confirmed - TS: {ts_checks} occurrences, JS: {js_checks} occurrences"
+                )
                 return True
             else:
-                self.log_test("Player Spawn Positioning", False, 
-                            f"Spawn positioning not properly configured - TS: {ts_spawn_found}, JS: {js_spawn_found}")
+                self.log_test(
+                    "Playable Radius Configuration",
+                    False,
+                    f"PlayableRadius 1800 not sufficiently confirmed - TS: {ts_checks} occurrences, JS: {js_checks} occurrences"
+                )
                 return False
                 
         except Exception as e:
-            self.log_test("Player Spawn Positioning", False, f"Exception: {str(e)}")
+            self.log_test("Playable Radius Configuration", False, error=str(e))
             return False
     
     def test_boundary_enforcement(self) -> bool:
