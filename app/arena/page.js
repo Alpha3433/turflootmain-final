@@ -1851,6 +1851,21 @@ const MultiplayerArena = () => {
     }
   }, [ready, authenticated, user?.id, playerName]) // Add playerName to dependencies so effect responds to name changes
   
+  const minimapSize = isMobile ? 121 : 220
+  const minimapRadius = minimapSize / 2
+  const center = 4000
+  const playableRadius = 1800
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+  const getMinimapPosition = (x, y) => {
+    const normalizedX = clamp((x - center) / playableRadius, -1, 1)
+    const normalizedY = clamp((y - center) / playableRadius, -1, 1)
+    return {
+      left: `${minimapRadius + normalizedX * minimapRadius}px`,
+      top: `${minimapRadius + normalizedY * minimapRadius}px`
+    }
+  }
+  const playerMinimapPosition = getMinimapPosition(minimapData.playerX, minimapData.playerY)
+
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
       {/* Authentication Required Screen */}
@@ -2358,12 +2373,12 @@ const MultiplayerArena = () => {
           top: '10px',
           right: '10px',
           zIndex: 1000,
-          width: isMobile ? '121px' : '220px',
-          height: isMobile ? '121px' : '220px'
+          width: `${minimapSize}px`,
+          height: `${minimapSize}px`
         }}>
           <div style={{
-            width: isMobile ? '121px' : '220px',
-            height: isMobile ? '121px' : '220px',
+            width: `${minimapSize}px`,
+            height: `${minimapSize}px`,
             borderRadius: '50%',
             backgroundColor: '#000000',
             border: isMobile ? '2px solid #00ff00' : '4px solid #00ff00',
@@ -2373,78 +2388,54 @@ const MultiplayerArena = () => {
           }}>
             <div style={{
               position: 'absolute',
-              top: '5px',
-              left: '5px',
-              right: '5px',
-              bottom: '5px',
-              borderRadius: '50%',
-              background: '#000000', // Solid black like local agario
-              zIndex: 1
-            }} />
-            
-            <div style={{
-              position: 'absolute',
               width: isMobile ? '6px' : '12px',
               height: isMobile ? '6px' : '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${(minimapData.playerX / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-              top: `${(minimapData.playerY / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+              ...playerMinimapPosition,
               transform: 'translate(-50%, -50%)',
               border: isMobile ? '1px solid #ffffff' : '3px solid #ffffff',
               boxShadow: isMobile ? '0 0 6px rgba(96, 165, 250, 1)' : '0 0 12px rgba(96, 165, 250, 1)',
               zIndex: 10
             }} />
-            
-            {minimapData.enemies.map((enemy, i) => (
-              <div
-                key={i}
-                title={enemy.isPlayer ? `Player: ${enemy.name || 'Anonymous'}` : 'AI Enemy'}
-                style={{
-                  position: 'absolute',
-                  width: isMobile ? '4px' : '7px',
-                  height: isMobile ? '4px' : '7px',
-                  backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
-                  borderRadius: '50%',
-                  left: `${(enemy.x / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  top: `${(enemy.y / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  transform: 'translate(-50%, -50%)',
-                  opacity: enemy.isPlayer ? '1.0' : '0.8',
-                  border: enemy.isPlayer 
-                    ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff') 
-                    : (isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff'),
-                  boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none',
-                  zIndex: enemy.isPlayer ? 10 : 8
-                }}
-              />
-            ))}
-            
-            {/* Playable zone boundary circle - positioned correctly in world coordinates */}
+
+            {minimapData.enemies.map((enemy, i) => {
+              const enemyPosition = getMinimapPosition(enemy.x, enemy.y)
+              return (
+                <div
+                  key={i}
+                  title={enemy.isPlayer ? `Player: ${enemy.name || 'Anonymous'}` : 'AI Enemy'}
+                  style={{
+                    position: 'absolute',
+                    width: isMobile ? '4px' : '7px',
+                    height: isMobile ? '4px' : '7px',
+                    backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
+                    borderRadius: '50%',
+                    ...enemyPosition,
+                    transform: 'translate(-50%, -50%)',
+                    opacity: enemy.isPlayer ? '1.0' : '0.8',
+                    border: enemy.isPlayer
+                      ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff')
+                      : (isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff'),
+                    boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none',
+                    zIndex: enemy.isPlayer ? 10 : 8
+                  }}
+                />
+              )
+            })}
+
+            {/* Playable zone boundary circle - fills entire minimap */}
             <div style={{
               position: 'absolute',
-              width: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Actual playable diameter relative to world
-              height: `${((1800 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Actual playable diameter relative to world
+              width: `${minimapSize}px`,
+              height: `${minimapSize}px`,
               borderRadius: '50%',
-              border: '2px solid #00ff00',
-              left: `${(4000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (4000, 4000)
-              top: `${(4000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (4000, 4000)
-              transform: 'translate(-50%, -50%)', // Center the circle on the calculated position
-              opacity: '0.6',
-              zIndex: 5,
-              pointerEvents: 'none'
-            }} />
-            
-            <div style={{
-              position: 'absolute',
-              top: '0',
-              left: '0',
-              right: '0',
-              bottom: '0',
-              borderRadius: '50%',
-              border: '3px solid rgba(0, 255, 0, 0.8)',
-              background: 'conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 0, 0.1) 10%, transparent 20%, rgba(0, 255, 0, 0.1) 30%, transparent 40%, rgba(0, 255, 0, 0.1) 50%, transparent 60%, rgba(0, 255, 0, 0.1) 70%, transparent 80%, rgba(0, 255, 0, 0.1) 90%, transparent 100%)',
-              animation: 'minimapRotate 20s linear infinite',
-              pointerEvents: 'none'
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              opacity: '0.4',
+              pointerEvents: 'none',
+              boxShadow: 'inset 0 0 20px rgba(0, 255, 0, 0.25)'
             }} />
           </div>
         </div>
