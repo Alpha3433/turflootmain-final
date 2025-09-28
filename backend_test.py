@@ -17,9 +17,6 @@ API_BASE = f"{BASE_URL}/api"
 
 class BackendTester:
     def __init__(self):
-        # Get base URL from environment
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
-        self.api_base = f"{self.base_url}/api"
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
