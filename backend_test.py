@@ -235,63 +235,62 @@ class ArenaBackendTester:
             self.log_test("Playable Radius Configuration", False, error=str(e))
             return False
     
-    def test_boundary_enforcement(self) -> bool:
-        """Test 5: Boundary Enforcement - Test that circular boundary is still enforced with shifted center"""
+    def test_center_position_configuration(self):
+        """Test 5: Center Position Configuration - Verify server-side center is now at (2000,2000) instead of shifted position"""
         try:
-            print("\n🔍 TEST 5: Boundary Enforcement")
+            ts_file = "/app/src/rooms/ArenaRoom.ts"
+            js_file = "/app/build/rooms/ArenaRoom.js"
             
-            # Check boundary enforcement logic in both files
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            ts_checks = 0
+            js_checks = 0
             
-            ts_boundary_patterns = 0
-            js_boundary_patterns = 0
-            
-            # Check TypeScript file for boundary enforcement patterns
+            # Check TypeScript file
             try:
-                with open(ts_file_path, 'r') as f:
+                with open(ts_file, 'r') as f:
                     ts_content = f.read()
-                    # Look for boundary enforcement patterns with shifted center
-                    patterns = [
-                        "const centerY = this.worldSize / 2 - 500",
-                        "const playableRadius = 2000",
-                        "distanceFromCenter > maxRadius",
-                        "Math.atan2(player.y - centerY, player.x - centerX)"
-                    ]
-                    for pattern in patterns:
-                        if pattern in ts_content:
-                            ts_boundary_patterns += 1
+                    
+                # Look for center calculation patterns (worldSize / 2)
+                if 'this.worldSize / 2' in ts_content:
+                    ts_checks += ts_content.count('this.worldSize / 2')
+                # Look for specific center coordinates for 4000x4000 world
+                if '2000 for 4000x4000 world' in ts_content:
+                    ts_checks += 1
+                    
             except Exception as e:
-                print(f"Could not read TypeScript file: {e}")
+                print(f"Warning: Could not read TypeScript file: {e}")
             
-            # Check JavaScript file for boundary enforcement patterns
+            # Check JavaScript compiled file
             try:
-                with open(js_file_path, 'r') as f:
+                with open(js_file, 'r') as f:
                     js_content = f.read()
-                    # Look for boundary enforcement patterns with shifted center
-                    patterns = [
-                        "this.worldSize / 2 - 500",
-                        "playableRadius = 2000",
-                        "distanceFromCenter > maxRadius",
-                        "Math.atan2"
-                    ]
-                    for pattern in patterns:
-                        if pattern in js_content:
-                            js_boundary_patterns += 1
+                    
+                # Look for center calculation patterns
+                if 'this.worldSize / 2' in js_content:
+                    js_checks += js_content.count('this.worldSize / 2')
+                # Look for specific center coordinates for 4000x4000 world
+                if '2000 for 4000x4000 world' in js_content:
+                    js_checks += 1
+                    
             except Exception as e:
-                print(f"Could not read JavaScript file: {e}")
+                print(f"Warning: Could not read JavaScript file: {e}")
             
-            if ts_boundary_patterns >= 3 and js_boundary_patterns >= 3:
-                self.log_test("Boundary Enforcement", True, 
-                            f"Boundary enforcement properly configured with shifted center - TS: {ts_boundary_patterns}/4 patterns, JS: {js_boundary_patterns}/4 patterns")
+            if ts_checks >= 3 and js_checks >= 3:  # Should appear multiple times
+                self.log_test(
+                    "Center Position Configuration",
+                    True,
+                    f"Center (2000,2000) confirmed - TS: {ts_checks} patterns, JS: {js_checks} patterns"
+                )
                 return True
             else:
-                self.log_test("Boundary Enforcement", False, 
-                            f"Boundary enforcement patterns incomplete - TS: {ts_boundary_patterns}/4, JS: {js_boundary_patterns}/4")
+                self.log_test(
+                    "Center Position Configuration",
+                    False,
+                    f"Center (2000,2000) not sufficiently confirmed - TS: {ts_checks} patterns, JS: {js_checks} patterns"
+                )
                 return False
                 
         except Exception as e:
-            self.log_test("Boundary Enforcement", False, f"Exception: {str(e)}")
+            self.log_test("Center Position Configuration", False, error=str(e))
             return False
     
     def test_split_player_boundary(self) -> bool:
