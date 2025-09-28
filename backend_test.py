@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Playable Area Adjustment (2500px → 2000px)
-Testing all backend changes for adjusting the playable area from 2500px to 2000px radius.
+Backend Testing Script for Bottom Out-of-Bounds Extension and Minimap Sync
+Testing the backend changes for adding more out-of-bounds area to the bottom and synchronizing the minimap.
 """
 
 import requests
 import json
 import time
+import sys
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
-class PlayableAreaBackendTester:
+# Get base URL from environment
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
+API_BASE = f"{BASE_URL}/api"
+
+class BackendTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
