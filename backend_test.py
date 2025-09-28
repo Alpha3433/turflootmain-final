@@ -125,49 +125,62 @@ class ArenaBackendTester:
             self.log_test("Colyseus Server Availability", False, error=str(e))
             return False
     
-    def test_center_position_configuration(self) -> bool:
-        """Test 3: Center Position Configuration - Verify server-side center is now at (3000, 2500) instead of (3000, 3000)"""
+    def test_world_size_configuration(self):
+        """Test 3: World Size Configuration - Verify server-side worldSize is now 4000 instead of 6000"""
         try:
-            print("\n🔍 TEST 3: Center Position Configuration")
+            # Check TypeScript source file
+            ts_file = "/app/src/rooms/ArenaRoom.ts"
+            js_file = "/app/build/rooms/ArenaRoom.js"
             
-            # Check TypeScript source file for shifted center
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-            js_file_path = "/app/build/rooms/ArenaRoom.js"
-            
-            ts_center_found = False
-            js_center_found = False
+            ts_checks = 0
+            js_checks = 0
             
             # Check TypeScript file
             try:
-                with open(ts_file_path, 'r') as f:
+                with open(ts_file, 'r') as f:
                     ts_content = f.read()
-                    # Look for the shifted center pattern: worldSize / 2 - 500
-                    if "this.worldSize / 2 - 500" in ts_content and "// Shift playable area up by 500px" in ts_content:
-                        ts_center_found = True
+                    
+                # Look for worldSize = 4000 patterns
+                if 'worldSize: number = 4000' in ts_content:
+                    ts_checks += 1
+                if "worldSize = parseInt(process.env.WORLD_SIZE || '4000')" in ts_content:
+                    ts_checks += 1
+                    
             except Exception as e:
-                print(f"Could not read TypeScript file: {e}")
+                print(f"Warning: Could not read TypeScript file: {e}")
             
-            # Check JavaScript file
+            # Check JavaScript compiled file
             try:
-                with open(js_file_path, 'r') as f:
+                with open(js_file, 'r') as f:
                     js_content = f.read()
-                    # Look for the shifted center pattern: worldSize / 2 - 500
-                    if "this.worldSize / 2 - 500" in js_content:
-                        js_center_found = True
+                    
+                # Look for worldSize = 4000 patterns
+                if 'worldSize: 4000' in js_content:
+                    js_checks += 1
+                if "worldSize = parseInt(process.env.WORLD_SIZE || '4000')" in js_content:
+                    js_checks += 1
+                    
             except Exception as e:
-                print(f"Could not read JavaScript file: {e}")
+                print(f"Warning: Could not read JavaScript file: {e}")
             
-            if ts_center_found and js_center_found:
-                self.log_test("Center Position Configuration", True, 
-                            "Server-side center correctly shifted to (3000, 2500) in both TS and JS files")
+            total_checks = ts_checks + js_checks
+            if total_checks >= 2:  # At least 2 confirmations
+                self.log_test(
+                    "World Size Configuration",
+                    True,
+                    f"WorldSize 4000 confirmed - TS: {ts_checks}/2 checks, JS: {js_checks}/2 checks"
+                )
                 return True
             else:
-                self.log_test("Center Position Configuration", False, 
-                            f"Center shift not found - TS: {ts_center_found}, JS: {js_center_found}")
+                self.log_test(
+                    "World Size Configuration",
+                    False,
+                    f"WorldSize 4000 not confirmed - TS: {ts_checks}/2 checks, JS: {js_checks}/2 checks"
+                )
                 return False
                 
         except Exception as e:
-            self.log_test("Center Position Configuration", False, f"Exception: {str(e)}")
+            self.log_test("World Size Configuration", False, error=str(e))
             return False
     
     def test_player_spawn_positioning(self) -> bool:
