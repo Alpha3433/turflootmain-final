@@ -2218,18 +2218,6 @@ const MultiplayerArena = () => {
             overflow: 'hidden',
             boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
-            {/* Red zone background on minimap */}
-            <div style={{
-              position: 'absolute',
-              top: '5px',
-              left: '5px',
-              right: '5px',
-              bottom: '5px',
-              borderRadius: '50%',
-              background: '#1a0000', // Red zone color matching game world
-              zIndex: 1
-            }} />
-            
             {/* Black playable area circle on minimap - positioned at top-left */}
             <div style={{
               position: 'absolute',
