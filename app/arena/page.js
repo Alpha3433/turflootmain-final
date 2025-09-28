@@ -1044,95 +1044,14 @@ const MultiplayerArena = () => {
     }
     
     applyClientSideMovement(dx, dy) {
-      // SMOOTH GLIDING CLIENT-SIDE MOVEMENT (like local agario) - IDENTICAL TO SERVER
-      if (!this.player.x || !this.player.y) return
+      // PURE SERVER AUTHORITY - Only send input to server, no client-side movement
+      // This eliminates position mismatches between client and server
       
-      // Calculate delta time for movement (MATCH SERVER LOGIC)
-      const now = Date.now()
-      const deltaTime = this.lastMovementUpdate ? (now - this.lastMovementUpdate) / 1000 : 1/60
-      this.lastMovementUpdate = now
+      // We don't move the player locally anymore - server handles all movement
+      // Player position will be updated via updateFromServer() method
       
-      // Calculate target position based on input (like agario's mouse-following)
-      const mass = this.player.mass || 25
-      const baseSpeed = 6.0 // Same as agario and server for consistency
-      const massSpeedFactor = Math.sqrt(mass / 20)
-      const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
-      
-      // Convert input to target position (smooth gliding system)
-      const inputStrength = Math.sqrt(dx * dx + dy * dy)
-      if (inputStrength > 0) {
-        // Set target position at a reasonable distance from current position
-        const targetDistance = Math.min(inputStrength * 800, 400) // Max 400px target distance
-        const normalizedDx = dx / inputStrength
-        const normalizedDy = dy / inputStrength
-        
-        this.player.targetX = this.player.x + normalizedDx * targetDistance
-        this.player.targetY = this.player.y + normalizedDy * targetDistance
-      } else {
-        // No input - target current position (stop smoothly)
-        this.player.targetX = this.player.x
-        this.player.targetY = this.player.y
-      }
-      
-      // Apply smooth movement towards target (exactly like agario)
-      const targetDx = this.player.targetX - this.player.x
-      const targetDy = this.player.targetY - this.player.y
-      const distanceToTarget = Math.sqrt(targetDx * targetDx + targetDy * targetDy)
-      
-      // Only move if distance is significant (prevents jittering) - MATCH SERVER LOGIC
-      if (distanceToTarget > 1) { // Match server threshold
-        // Calculate move distance based on speed and delta time (IDENTICAL TO SERVER)
-        const moveDistance = Math.min(dynamicSpeed * deltaTime * 60, distanceToTarget) // Match server calculation
-        
-        // Normalize direction and apply smooth movement
-        const moveX = (targetDx / distanceToTarget) * moveDistance
-        const moveY = (targetDy / distanceToTarget) * moveDistance
-        
-        this.player.x += moveX
-        this.player.y += moveY
-      }
-      
-      // Circular boundary check - IDENTICAL to agario (prevents leaving green circle)
-      const centerX = this.world.width / 2
-      const centerY = this.world.height / 2
-      const maxRadius = this.currentPlayableRadius - (this.player.radius * 0.8) // Allow player edge to get closer to green circle
-      
-      const distanceFromCenter = Math.sqrt(
-        Math.pow(this.player.x - centerX, 2) + 
-        Math.pow(this.player.y - centerY, 2)
-      )
-      
-      if (distanceFromCenter > maxRadius) {
-        // Clamp player to circular boundary (just like agario)
-        console.log('🚫 CLIENT BOUNDARY ENFORCED:', {
-          distanceFromCenter: distanceFromCenter.toFixed(1),
-          maxRadius: maxRadius.toFixed(1),
-          playerRadius: this.player.radius.toFixed(1),
-          playableRadius: this.currentPlayableRadius,
-          center: `(${centerX}, ${centerY})`,
-          playerPos: `(${this.player.x.toFixed(1)}, ${this.player.y.toFixed(1)})`,
-          worldSize: `${this.world.width}x${this.world.height}`,
-          calculation: `${this.currentPlayableRadius} - (${this.player.radius.toFixed(1)} * 0.8) = ${maxRadius.toFixed(1)}`
-        })
-        const angle = Math.atan2(this.player.y - centerY, this.player.x - centerX)
-        this.player.x = centerX + Math.cos(angle) * maxRadius
-        this.player.y = centerY + Math.sin(angle) * maxRadius
-      }
-      
-      // Debug logging (occasional) - Enhanced for boundary troubleshooting
-      if (Math.random() < 0.01) {
-        console.log('🎯 Movement Debug:', {
-          position: { x: this.player.x.toFixed(1), y: this.player.y.toFixed(1) },
-          target: { x: this.player.targetX?.toFixed(1), y: this.player.targetY?.toFixed(1) },
-          center: { x: centerX, y: centerY },
-          distance: distanceFromCenter.toFixed(1),
-          maxRadius: maxRadius.toFixed(1),
-          playerRadius: this.player.radius.toFixed(1),
-          playableRadius: this.currentPlayableRadius,
-          boundaryEnforced: distanceFromCenter > maxRadius,
-          expectedBoundaryRadius: this.currentPlayableRadius - this.player.radius
-        })
-      }
+      // Just send the input to the server (this is already handled in the input processing)
+      console.log('🎮 Client input sent to server - no local movement applied')
     }
     
     updateFromServer(state) {
