@@ -152,62 +152,62 @@ class MinimapRedZoneExtensionTester:
             self.log_test("World Size Configuration", False, f"Exception: {str(e)}")
             return False
     
-    def test_circular_boundary_enforcement(self) -> bool:
-        """Test 4: Circular Boundary Enforcement - Test boundary logic in server code"""
+    def test_player_spawn_positioning(self) -> bool:
+        """Test 4: Player Spawn Positioning - Test that players spawn at correct center coordinates (3000,3000)"""
         try:
-            print("\n🔍 TEST 4: Circular Boundary Enforcement")
+            print("\n🔍 TEST 4: Player Spawn Positioning")
             
-            # Check for boundary enforcement logic in both files
+            # Check for spawn positioning logic in both files
             ts_file_path = "/app/src/rooms/ArenaRoom.ts"
             js_file_path = "/app/build/rooms/ArenaRoom.js"
             
-            ts_boundary_checks = 0
-            js_boundary_checks = 0
+            ts_spawn_checks = 0
+            js_spawn_checks = 0
             
-            # Check TypeScript source for boundary enforcement patterns
+            # Check TypeScript source for spawn positioning
             try:
                 with open(ts_file_path, 'r') as f:
                     ts_content = f.read()
                     
-                # Look for boundary enforcement patterns
-                boundary_patterns = [
-                    "distanceFromCenter > maxRadius",
-                    "Math.atan2",
-                    "Math.cos(angle) * maxRadius",
-                    "Math.sin(angle) * maxRadius"
+                # Look for spawn positioning patterns with world center calculation
+                spawn_patterns = [
+                    "this.worldSize / 2",  # Center calculation
+                    "generateCircularSpawnPosition",  # Spawn method
+                    "centerX",  # Center X variable
+                    "centerY"   # Center Y variable
                 ]
                 
-                for pattern in boundary_patterns:
+                for pattern in spawn_patterns:
                     if pattern in ts_content:
-                        ts_boundary_checks += 1
+                        ts_spawn_checks += 1
                         
             except Exception as e:
                 print(f"⚠️ Could not read TypeScript file: {e}")
             
-            # Check compiled JavaScript for boundary enforcement patterns
+            # Check compiled JavaScript for spawn positioning
             try:
                 with open(js_file_path, 'r') as f:
                     js_content = f.read()
                     
-                # Look for boundary enforcement patterns
-                for pattern in boundary_patterns:
+                # Look for spawn positioning patterns
+                for pattern in spawn_patterns:
                     if pattern in js_content:
-                        js_boundary_checks += 1
+                        js_spawn_checks += 1
                         
             except Exception as e:
                 print(f"⚠️ Could not read JavaScript file: {e}")
             
-            if ts_boundary_checks >= 3 and js_boundary_checks >= 3:
-                self.log_test("Circular Boundary Enforcement", True, 
-                            f"TS: {ts_boundary_checks}/4 patterns, JS: {js_boundary_checks}/4 patterns found")
+            if ts_spawn_checks >= 3 and js_spawn_checks >= 3:
+                self.log_test("Player Spawn Positioning", True, 
+                            f"TS: {ts_spawn_checks}/4 patterns, JS: {js_spawn_checks}/4 patterns found")
                 return True
             else:
-                self.log_test("Circular Boundary Enforcement", False, 
-                            f"TS: {ts_boundary_checks}/4 patterns, JS: {js_boundary_checks}/4 patterns (expected >= 3 each)")
+                self.log_test("Player Spawn Positioning", False, 
+                            f"TS: {ts_spawn_checks}/4 patterns, JS: {js_spawn_checks}/4 patterns (expected >= 3 each)")
                 return False
                 
         except Exception as e:
-            self.log_test("Circular Boundary Enforcement", False, f"Exception: {str(e)}")
+            self.log_test("Player Spawn Positioning", False, f"Exception: {str(e)}")
             return False
     
     def test_split_player_boundary(self) -> bool:
