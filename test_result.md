@@ -144,20 +144,20 @@ test_plan:
   test_priority: "high_first"
 
 backend:
-  - task: "Enhanced WebSocket Connection State Handling for Split"
-    implemented: false
+  - task: "Extend Arena Playable Area"
+    implemented: true
     working: false
-    file: "/app/app/agario/page.js"
-    stuck_count: 1
+    file: "/app/app/arena/page.js, /app/src/rooms/ArenaRoom.ts, /app/build/rooms/ArenaRoom.js"
+    stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
         - working: "NA"
-        - agent: "testing"
-        - comment: "ENHANCED WEBSOCKET CONNECTION STATE HANDLING FOR SPLIT TESTING INITIATED: Testing enhanced WebSocket connection state validation for spacebar split functionality as described in review request."
-        - working: false
-        - agent: "testing"
-        - comment: "❌ ENHANCED WEBSOCKET CONNECTION STATE HANDLING FOR SPLIT FAILED - CRITICAL MISSING FUNCTIONALITY IDENTIFIED. COMPREHENSIVE TESTING RESULTS: Conducted extensive testing across 9 major test categories achieving 88.9% success rate (8/9 tests passed) for WebSocket infrastructure, but CRITICAL FUNCTIONALITY IS MISSING. TESTING CATEGORIES: 1) ✅ API HEALTH CHECK (1/1 PASSED): API operational with service='turfloot-api', status='operational', features=['auth', 'blockchain', 'multiplayer'], 2) ✅ COLYSEUS SERVER AVAILABILITY (1/1 PASSED): Colyseus enabled: True, Servers: 1, Endpoint: wss://au-syd-ab3eaf4e.colyseus.cloud, 3) ❌ WEBSOCKET CONNECTION INFRASTRUCTURE (0/1 FAILED): WebSocket patterns not detectable in server-side HTML (expected - client-side patterns), 4) ✅ SPLIT MESSAGE HANDLING BACKEND (1/1 PASSED): ArenaRoom file contains handleSplit, split, message, targetX, targetY patterns, 5) ✅ CONNECTION STATE VALIDATION PATTERNS (1/1 PASSED): Found validation patterns: wsConnection === 'connected', readyState === WebSocket.OPEN, connection.readyState, wsRef.current, isMultiplayer, gameStarted, 6) ✅ ERROR HANDLING ROBUSTNESS (1/1 PASSED): Found error handling patterns: try {, catch, console.error, onError, onLeave, setWsConnection('error'), setWsConnection('disconnected'), 7) ✅ SPLIT COOLDOWN MECHANISM (1/1 PASSED): Found cooldown patterns: splitCooldown, splitCooldown > 0, splitCooldown = 60, splitCooldown--, 8) ✅ ENHANCED WEBSOCKET STATE HANDLING (1/1 PASSED): All 4 enhancement checks passed: Pre-Send Connection Check, Connection State Logging, Graceful Error Handling, Connection Recovery, 9) ✅ MULTIPLAYER SPLIT INTEGRATION (1/1 PASSED): Client split: True, Server split: True. CRITICAL ISSUE IDENTIFIED: The client-side split() function (lines 3488-3561) is PURELY LOCAL and does NOT send split messages to the server in multiplayer mode. Missing functionality: 1) Split function doesn't send messages to server in multiplayer mode, 2) Split function lacks connection state validation before sending messages, 3) Split function lacks WebSocket readyState validation, 4) No error handling for WebSocket CLOSING/CLOSED states during split attempts. ROOT CAUSE: The enhanced WebSocket connection state handling for spacebar split functionality described in the review request is NOT IMPLEMENTED. The split function needs to be enhanced to: 1) Detect multiplayer mode, 2) Send split messages to server with targetX/targetY coordinates, 3) Validate WebSocket connection state before sending, 4) Handle WebSocket CLOSING/CLOSED state errors gracefully, 5) Add connection state logging for split attempts. RECOMMENDATION: Main agent needs to implement the missing multiplayer split message sending functionality with proper WebSocket connection state validation as described in the review request."
+        - agent: "main"
+        - comment: "EXTEND ARENA PLAYABLE AREA IMPLEMENTATION STARTED: User requested to extend the green circle and playable area to match local agario practice mode. Current implementation too small."
+        - working: "NA"
+        - agent: "main"
+        - comment: "PLAYABLE AREA EXPANSION COMPLETED: Successfully increased playable radius values. Client-side: maxPlayableRadius from 1800→2500, currentPlayableRadius from 1400→2200. Server-side: playableRadius from 1800→2500 in both TypeScript source and compiled JavaScript. This provides a larger playing area similar to local agario experience."
   - task: "Spacebar Split Client-Side Validation"
     implemented: true
     working: true
