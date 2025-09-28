@@ -477,11 +477,6 @@ if __name__ == "__main__":
     tester = VirusCoinSpawnTester()
     success = tester.run_all_tests()
     exit(0 if success else 1)
-                if "worldSize = parseInt(process.env.WORLD_SIZE || '4000')" in ts_content:
-                    ts_checks += 1
-                    
-            except Exception as e:
-                print(f"Warning: Could not read TypeScript file: {e}")
             
             # Check JavaScript compiled file
             try:
