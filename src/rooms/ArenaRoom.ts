@@ -536,8 +536,8 @@ export class ArenaRoom extends Room<GameState> {
 
   // Generate safe spawn position within circular playable area (avoiding red zone)
   generateSafeSpawnPosition(): { x: number, y: number } {
-    const centerX = this.worldSize / 2; // 4000 for 8000x8000 world
-    const centerY = this.worldSize / 2; // 4000 for 8000x8000 world
+    const centerX = this.worldSize / 4; // 2000 for 8000x8000 world - moved to left side
+    const centerY = this.worldSize / 2; // 4000 for 8000x8000 world - keep Y centered
     
     // Use conservative radius to ensure objects never spawn in red zone
     const safeZoneRadius = 1800; // Expanded to match minimap and local agario (full playable area)
