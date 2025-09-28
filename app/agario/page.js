@@ -2130,14 +2130,18 @@ const AgarIOGame = () => {
       const deltaTime = (now - this.lastUpdate) / 1000
       this.lastUpdate = now
 
-      // Always update player movement (for client-side prediction)
-      this.updatePlayer(deltaTime)
-      
+      const hasAuthoritativeState = window.isMultiplayer && this.serverState
+
+      // Only update local player movement when we don't have server authority
+      if (!hasAuthoritativeState) {
+        this.updatePlayer(deltaTime)
+      }
+
       // Always update camera
       this.updateCamera()
-      
+
       // Skip local AI and collision detection in multiplayer mode
-      if (window.isMultiplayer && this.serverState) {
+      if (hasAuthoritativeState) {
         console.log('🌐 Multiplayer mode: Using server-authoritative state')
         return // Server handles all game logic
       }
