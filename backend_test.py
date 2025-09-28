@@ -93,11 +93,11 @@ class VirusCoinSpawnTester:
                 self.log_test("API Health Check", False, f"API returned status {response.status_code}")
         except Exception as e:
             self.log_test("API Health Check", False, f"API request failed: {str(e)}")
-    
+            
     def test_colyseus_server_availability(self):
-        """Test 2: Colyseus Server Availability - Verify arena servers are running with 4000x4000 world"""
+        """Test 2: Colyseus Server Availability - Verify arena servers are running"""
         try:
-            response = requests.get(f"{API_BASE}/servers", timeout=10)
+            response = requests.get(f"{self.api_base}/servers", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
