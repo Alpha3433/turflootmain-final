@@ -48,7 +48,7 @@ export class GameState extends Schema {
   @type({ map: Player }) players = new MapSchema<Player>();
   @type({ map: Coin }) coins = new MapSchema<Coin>();
   @type({ map: Virus }) viruses = new MapSchema<Virus>();
-  @type("number") worldSize: number = 6000;
+  @type("number") worldSize: number = 4000;
   @type("number") timestamp: number = 0;
 }
 
