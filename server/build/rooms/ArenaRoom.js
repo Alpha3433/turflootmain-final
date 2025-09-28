@@ -359,11 +359,25 @@ class ArenaRoom extends core_1.Room {
             this.spawnVirus();
         }
     }
+    // Generate safe spawn position within circular playable area (avoiding red zone)
+    generateSafeSpawnPosition() {
+        const centerX = this.worldSize / 2;
+        const centerY = this.worldSize / 2;
+        // Use conservative radius to ensure objects never spawn in red zone
+        const safeZoneRadius = Math.min(1800, this.worldSize / 2);
+        // Generate random point within safe circular area
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.sqrt(Math.random()) * safeZoneRadius;
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
+        return { x, y };
+    }
     spawnCoin() {
         const coinId = `coin_${Date.now()}_${Math.random().toString(36).substring(7)}`;
         const coin = new Coin();
-        coin.x = Math.random() * this.worldSize;
-        coin.y = Math.random() * this.worldSize;
+        const safePos = this.generateSafeSpawnPosition();
+        coin.x = safePos.x;
+        coin.y = safePos.y;
         coin.value = 1;
         coin.radius = 8;
         coin.color = "#FFD700";
@@ -372,8 +386,9 @@ class ArenaRoom extends core_1.Room {
     spawnVirus() {
         const virusId = `virus_${Date.now()}_${Math.random().toString(36).substring(7)}`;
         const virus = new Virus();
-        virus.x = Math.random() * this.worldSize;
-        virus.y = Math.random() * this.worldSize;
+        const safePos = this.generateSafeSpawnPosition();
+        virus.x = safePos.x;
+        virus.y = safePos.y;
         virus.radius = 60 + Math.random() * 40;
         virus.color = "#FF6B6B";
         this.state.viruses.set(virusId, virus);
