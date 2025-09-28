@@ -3036,7 +3036,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Virus and Coin Playable Area Spawn Verification"
+    - "Player Spawn Position Fix Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
