@@ -359,8 +359,8 @@ class MinimapRedZoneExtensionTester:
             return False
     
     def run_all_tests(self) -> Dict[str, Any]:
-        """Run all backend tests for arena playable area extension"""
-        print("🎯 ARENA PLAYABLE AREA EXTENSION BACKEND TESTING")
+        """Run all backend tests for minimap and red zone extension"""
+        print("🎯 MINIMAP AND RED ZONE EXTENSION BACKEND TESTING")
         print("=" * 60)
         
         start_time = time.time()
