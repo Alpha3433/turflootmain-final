@@ -1084,10 +1084,22 @@ const AgarIOGame = () => {
   const [minimapData, setMinimapData] = useState({
     playerX: 2000,
     playerY: 2000,
+    centerX: 4000,
+    centerY: 4000,
+    currentPlayableRadius: 1800,
     enemies: [],
     coins: [],
     viruses: []
   })
+
+  const normalizeMinimapCoordinate = (value, center, playableRadius) => {
+    if (!playableRadius || playableRadius <= 0) {
+      return 0
+    }
+
+    const normalized = (value - center) / playableRadius
+    return Math.max(-1, Math.min(1, normalized))
+  }
 
   // Modal states
   const [withdrawalModalVisible, setWithdrawalModalVisible] = useState(false)
@@ -3661,6 +3673,9 @@ const AgarIOGame = () => {
             setMinimapData({
               playerX: game.player.x,
               playerY: game.player.y,
+              centerX: game.serverState.zone?.centerX ?? game.world.width / 2,
+              centerY: game.serverState.zone?.centerY ?? game.world.height / 2,
+              currentPlayableRadius: game.serverState.zone?.radius ?? game.currentPlayableRadius,
               enemies: minimapPlayers,
               coins: minimapCoins.map(coin => ({ x: coin.x, y: coin.y })),
               viruses: minimapViruses.map(virus => ({ x: virus.x, y: virus.y }))
@@ -3670,6 +3685,9 @@ const AgarIOGame = () => {
             setMinimapData({
               playerX: game.player.x,
               playerY: game.player.y,
+              centerX: game.world.width / 2,
+              centerY: game.world.height / 2,
+              currentPlayableRadius: game.currentPlayableRadius,
               enemies: game.enemies.map(enemy => ({ x: enemy.x, y: enemy.y })),
               coins: game.coins.map(coin => ({ x: coin.x, y: coin.y })),
               viruses: game.viruses.map(virus => ({ x: virus.x, y: virus.y }))
@@ -3980,6 +3998,14 @@ const AgarIOGame = () => {
       y: (player.y / world.height) * 100
     }
   }
+
+  const minimapSize = isMobile ? 115 : 210
+  const minimapOffset = isMobile ? 3 : 5
+  const minimapCenterX = minimapData.centerX ?? (gameRef.current?.world?.width ?? 8000) / 2
+  const minimapCenterY = minimapData.centerY ?? (gameRef.current?.world?.height ?? 8000) / 2
+  const minimapPlayableRadius = minimapData.currentPlayableRadius ?? gameRef.current?.currentPlayableRadius ?? 1800
+  const getMinimapPixelPosition = (value, center) =>
+    minimapOffset + ((normalizeMinimapCoordinate(value, center, minimapPlayableRadius) + 1) / 2) * minimapSize
 
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
@@ -4918,14 +4944,14 @@ const AgarIOGame = () => {
               height: isMobile ? '6px' : '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${(minimapData.playerX / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-              top: `${(minimapData.playerY / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+              left: `${getMinimapPixelPosition(minimapData.playerX, minimapCenterX)}px`,
+              top: `${getMinimapPixelPosition(minimapData.playerY, minimapCenterY)}px`,
               transform: 'translate(-50%, -50%)',
               border: isMobile ? '1px solid #ffffff' : '3px solid #ffffff',
               boxShadow: isMobile ? '0 0 6px rgba(96, 165, 250, 1)' : '0 0 12px rgba(96, 165, 250, 1)',
               zIndex: 10
             }} />
-            
+
             {/* Player/Enemy dots on minimap - different colors for real players vs AI */}
             {minimapData.enemies.map((enemy, i) => (
               <div
@@ -4937,12 +4963,12 @@ const AgarIOGame = () => {
                   height: isMobile ? '4px' : '7px',
                   backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b', // Green for real players, red for AI
                   borderRadius: '50%',
-                  left: `${(enemy.x / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  top: `${(enemy.y / 4000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+                  left: `${getMinimapPixelPosition(enemy.x, minimapCenterX)}px`,
+                  top: `${getMinimapPixelPosition(enemy.y, minimapCenterY)}px`,
                   transform: 'translate(-50%, -50%)',
                   opacity: enemy.isPlayer ? '1.0' : '0.8', // Real players more opaque
-                  border: enemy.isPlayer 
-                    ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff') 
+                  border: enemy.isPlayer
+                    ? (isMobile ? '1px solid #ffffff' : '2px solid #ffffff')
                     : (isMobile ? '0.5px solid #ffffff' : '1px solid #ffffff'),
                   boxShadow: enemy.isPlayer ? '0 0 4px rgba(0, 255, 136, 0.6)' : 'none', // Glow for real players
                   zIndex: enemy.isPlayer ? 10 : 8 // Real players on top
