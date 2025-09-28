@@ -24,27 +24,54 @@ from typing import Dict, List, Tuple, Any
 
 class VirusCoinSpawnTester:
     def __init__(self):
-        self.test_results = []
-        self.start_time = time.time()
+        # Get base URL from environment
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+        self.api_base = f"{self.base_url}/api"
         
-    def log_test(self, test_name, passed, details="", error=""):
+        # Expected configuration based on review request
+        self.world_size = 4000
+        self.world_center = (2000, 2000)  # Center at (2000,2000) for 4000x4000 world
+        self.playable_radius = 1800  # 1800px radius from center
+        self.safe_zone_radius = 1800  # safeZoneRadius = 1800
+        
+        # Test results tracking
+        self.test_results = []
+        self.total_tests = 0
+        self.passed_tests = 0
+        
+    def log_test(self, test_name: str, passed: bool, details: str = ""):
         """Log test result"""
-        result = {
+        self.total_tests += 1
+        if passed:
+            self.passed_tests += 1
+            status = "✅ PASSED"
+        else:
+            status = "❌ FAILED"
+            
+        result = f"{status}: {test_name}"
+        if details:
+            result += f" - {details}"
+            
+        print(result)
+        self.test_results.append({
             'test': test_name,
             'passed': passed,
-            'details': details,
-            'error': error,
-            'timestamp': datetime.now().isoformat()
-        }
-        self.test_results.append(result)
+            'details': details
+        })
         
-        status = "✅ PASSED" if passed else "❌ FAILED"
-        print(f"{status}: {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        if error:
-            print(f"   Error: {error}")
-        print()
+    def calculate_distance_from_center(self, x: float, y: float) -> float:
+        """Calculate distance from world center (2000,2000)"""
+        center_x, center_y = self.world_center
+        return math.sqrt((x - center_x) ** 2 + (y - center_y) ** 2)
+        
+    def is_within_playable_area(self, x: float, y: float) -> bool:
+        """Check if position is within playable area (1800px radius)"""
+        distance = self.calculate_distance_from_center(x, y)
+        return distance <= self.playable_radius
+        
+    def is_in_red_zone(self, x: float, y: float) -> bool:
+        """Check if position is in red zone (outside 1800px radius)"""
+        return not self.is_within_playable_area(x, y)
         
     def test_api_health_check(self):
         """Test 1: API Health Check - Verify backend infrastructure is operational"""
