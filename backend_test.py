@@ -73,7 +73,7 @@ class ExtendedRedZoneBackendTester:
         })
         
     def calculate_distance_from_center(self, x: float, y: float) -> float:
-        """Calculate distance from world center (2000,2000)"""
+        """Calculate distance from world center (4000,4000)"""
         center_x, center_y = self.world_center
         return math.sqrt((x - center_x) ** 2 + (y - center_y) ** 2)
         
