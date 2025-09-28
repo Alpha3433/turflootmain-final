@@ -2199,7 +2199,7 @@ const MultiplayerArena = () => {
           </div>
         )}
 
-        {/* Circular Minimap - Top Right */}
+        {/* Circular Minimap - Shows Only Playable Area */}
         <div style={{
           position: 'fixed',
           top: '10px',
@@ -2212,32 +2212,20 @@ const MultiplayerArena = () => {
             width: isMobile ? '121px' : '220px',
             height: isMobile ? '121px' : '220px',
             borderRadius: '50%',
-            backgroundColor: '#000000',
+            backgroundColor: '#000000', // Black background representing playable area
             border: isMobile ? '2px solid #00ff00' : '4px solid #00ff00',
             position: 'relative',
             overflow: 'hidden'
           }}>
-            {/* Much larger black playable area circle on minimap - positioned at top-left */}
-            <div style={{
-              position: 'absolute',
-              width: `${((3200 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Much larger playable area diameter 
-              height: `${((3200 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Much larger playable area diameter
-              borderRadius: '50%',
-              background: '#000000', // Solid black playable area - no gradient
-              left: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
-              top: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
-              transform: 'translate(-50%, -50%)', // Center the circle on the calculated position
-              zIndex: 2
-            }} />
-            
+            {/* Player dot - positioned relative to playable area center (2000, 2000) */}
             <div style={{
               position: 'absolute',
               width: isMobile ? '6px' : '12px',
               height: isMobile ? '6px' : '12px',
               backgroundColor: '#60a5fa',
               borderRadius: '50%',
-              left: `${(minimapData.playerX / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-              top: `${(minimapData.playerY / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+              left: `${((minimapData.playerX - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
+              top: `${((minimapData.playerY - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
               transform: 'translate(-50%, -50%)',
               border: isMobile ? '1px solid #ffffff' : '3px solid #ffffff',
               zIndex: 10
@@ -2253,8 +2241,8 @@ const MultiplayerArena = () => {
                   height: isMobile ? '4px' : '7px',
                   backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
                   borderRadius: '50%',
-                  left: `${(enemy.x / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
-                  top: `${(enemy.y / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`,
+                  left: `${((enemy.x - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
+                  top: `${((enemy.y - 2000 + 3200) / (3200 * 2)) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Relative to playable area bounds
                   transform: 'translate(-50%, -50%)',
                   opacity: enemy.isPlayer ? '1.0' : '0.8',
                   border: enemy.isPlayer 
