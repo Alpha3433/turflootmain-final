@@ -179,6 +179,8 @@ export class ArenaRoom extends Room<GameState> {
     player.mass = 25; // Updated to 25 to match user requirement
     player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
     
+    console.log(`🎮 NEW PLAYER SPAWN: mass=${player.mass}, radius=${player.radius.toFixed(1)}px at (${player.x.toFixed(1)}, ${player.y.toFixed(1)})`);
+    
     // Apply skin data from client options (server-side storage for multiplayer visibility)
     const selectedSkin = options.selectedSkin || {};
     player.skinId = selectedSkin.id || "default";
