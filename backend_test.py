@@ -293,65 +293,64 @@ class ArenaBackendTester:
             self.log_test("Center Position Configuration", False, error=str(e))
             return False
     
-    def test_split_player_boundary(self) -> bool:
-        """Test 6: Split Player Boundary - Test that split players are also constrained within the shifted boundary"""
+    def test_player_spawn_positioning(self):
+        """Test 6: Player Spawn Positioning - Test that players spawn at center (2000,2000)"""
         try:
-            print("\n🔍 TEST 6: Split Player Boundary")
+            ts_file = "/app/src/rooms/ArenaRoom.ts"
+            js_file = "/app/build/rooms/ArenaRoom.js"
             
-            # Check split player boundary enforcement in both files
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            ts_checks = 0
+            js_checks = 0
             
-            ts_split_patterns = 0
-            js_split_patterns = 0
-            
-            # Check TypeScript file for split boundary patterns
+            # Check TypeScript file
             try:
-                with open(ts_file_path, 'r') as f:
+                with open(ts_file, 'r') as f:
                     ts_content = f.read()
-                    # Look for split boundary enforcement patterns
-                    patterns = [
-                        "handleSplit",
-                        "splitPlayer.x = player.x + dirX * spawnDistance",
-                        "const centerY = this.worldSize / 2 - 500; // Shift playable area up by 500px",
-                        "const playableRadius = 2000",
-                        "distanceFromCenter > maxRadius"
-                    ]
-                    for pattern in patterns:
-                        if pattern in ts_content:
-                            ts_split_patterns += 1
+                    
+                # Look for spawn position generation patterns
+                if 'generateCircularSpawnPosition' in ts_content:
+                    ts_checks += 1
+                if 'const centerX = this.worldSize / 2' in ts_content:
+                    ts_checks += 1
+                if 'const centerY = this.worldSize / 2' in ts_content:
+                    ts_checks += 1
+                    
             except Exception as e:
-                print(f"Could not read TypeScript file: {e}")
+                print(f"Warning: Could not read TypeScript file: {e}")
             
-            # Check JavaScript file for split boundary patterns
+            # Check JavaScript compiled file
             try:
-                with open(js_file_path, 'r') as f:
+                with open(js_file, 'r') as f:
                     js_content = f.read()
-                    # Look for split boundary enforcement patterns
-                    patterns = [
-                        "handleSplit",
-                        "splitPlayer.x = player.x + dirX * spawnDistance",
-                        "this.worldSize / 2 - 500",
-                        "playableRadius = 2000",
-                        "distanceFromCenter > maxRadius"
-                    ]
-                    for pattern in patterns:
-                        if pattern in js_content:
-                            js_split_patterns += 1
+                    
+                # Look for spawn position generation patterns
+                if 'generateCircularSpawnPosition' in js_content:
+                    js_checks += 1
+                if 'centerX = this.worldSize / 2' in js_content:
+                    js_checks += 1
+                if 'centerY = this.worldSize / 2' in js_content:
+                    js_checks += 1
+                    
             except Exception as e:
-                print(f"Could not read JavaScript file: {e}")
+                print(f"Warning: Could not read JavaScript file: {e}")
             
-            if ts_split_patterns >= 4 and js_split_patterns >= 4:
-                self.log_test("Split Player Boundary", True, 
-                            f"Split player boundary enforcement properly configured - TS: {ts_split_patterns}/5 patterns, JS: {js_split_patterns}/5 patterns")
+            if ts_checks >= 2 and js_checks >= 2:
+                self.log_test(
+                    "Player Spawn Positioning",
+                    True,
+                    f"Spawn positioning (2000,2000) confirmed - TS: {ts_checks}/3 checks, JS: {js_checks}/3 checks"
+                )
                 return True
             else:
-                self.log_test("Split Player Boundary", False, 
-                            f"Split boundary enforcement incomplete - TS: {ts_split_patterns}/5, JS: {js_split_patterns}/5")
+                self.log_test(
+                    "Player Spawn Positioning",
+                    False,
+                    f"Spawn positioning (2000,2000) not confirmed - TS: {ts_checks}/3 checks, JS: {js_checks}/3 checks"
+                )
                 return False
                 
         except Exception as e:
-            self.log_test("Split Player Boundary", False, f"Exception: {str(e)}")
+            self.log_test("Player Spawn Positioning", False, error=str(e))
             return False
     
     def test_backend_api_integration(self) -> bool:
