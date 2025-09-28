@@ -51,6 +51,10 @@ export declare class ArenaRoom extends Room<GameState> {
     respawnPlayer(player: Player): void;
     generateCoins(): void;
     generateViruses(): void;
+    generateSafeSpawnPosition(): {
+        x: number;
+        y: number;
+    };
     spawnCoin(): void;
     spawnVirus(): void;
     generatePlayerColor(): string;
