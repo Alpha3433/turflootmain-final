@@ -21,7 +21,7 @@ class Player extends schema_1.Schema {
         this.y = 0;
         this.vx = 0;
         this.vy = 0;
-        this.mass = 100;
+        this.mass = 25;
         this.radius = 20;
         this.color = "#FF6B6B";
         this.score = 0;
@@ -215,7 +215,7 @@ class ArenaRoom extends core_1.Room {
         player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
-        player.mass = 100;
+        player.mass = 25;
         player.radius = Math.sqrt(player.mass / Math.PI) * 10;
         player.color = this.generatePlayerColor();
         player.score = 0;
@@ -311,7 +311,7 @@ class ArenaRoom extends core_1.Room {
                 }
                 else {
                     // Player gets damaged
-                    player.mass = Math.max(50, player.mass * 0.8);
+                    player.mass = Math.max(25, player.mass * 0.8);
                     player.radius = Math.sqrt(player.mass / Math.PI) * 10;
                 }
             }
@@ -349,7 +349,7 @@ class ArenaRoom extends core_1.Room {
         player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
-        player.mass = 100;
+        player.mass = 25;
         player.radius = Math.sqrt(player.mass / Math.PI) * 10;
         player.alive = true;
         console.log(`🔄 Player respawned: ${player.name}`);
