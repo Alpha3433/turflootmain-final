@@ -432,50 +432,43 @@ export class ArenaRoom extends Room<GameState> {
         // Clamp movement to not overshoot target
         const actualMoveDistance = Math.min(moveDistance, distance);
         
-        // Normalize direction and apply smooth movement
+        // Arena boundary enforcement - check target position BEFORE moving
+        const centerX = this.worldSize / 4; // 2000 - playable area center X
+        const centerY = this.worldSize / 4; // 2000 - playable area center Y
+        const playableRadius = 1800; // Match the red divider radius
+        const maxRadius = playableRadius - player.radius; // Player edge constrained at red divider
+        
+        // Calculate proposed new position
         const moveX = (dx / distance) * actualMoveDistance;
         const moveY = (dy / distance) * actualMoveDistance;
+        const newX = player.x + moveX;
+        const newY = player.y + moveY;
         
-        player.x += moveX;
-        player.y += moveY;
-      }
-      
-      // Arena boundary enforcement - prevent players from entering red zone
-      const centerX = this.worldSize / 4; // 2000 - playable area center X
-      const centerY = this.worldSize / 4; // 2000 - playable area center Y
-      const playableRadius = 1800; // Match the red divider radius
-      const maxRadius = playableRadius - player.radius; // Player edge constrained at red divider
-      
-      const distanceFromCenter = Math.sqrt(
-        Math.pow(player.x - centerX, 2) + 
-        Math.pow(player.y - centerY, 2)
-      );
-      
-      // DEBUG: Always log boundary check
-      console.log('🔍 BOUNDARY CHECK:', {
-        playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
-        center: `(${centerX}, ${centerY})`,
-        distanceFromCenter: distanceFromCenter.toFixed(1),
-        maxRadius: maxRadius.toFixed(1),
-        playableRadius: playableRadius,
-        playerRadius: player.radius.toFixed(1),
-        isViolating: distanceFromCenter > maxRadius
-      });
-      
-      if (distanceFromCenter > maxRadius) {
-        // Clamp player to circular boundary (prevent red zone entry)
-        console.log('🚫 RED ZONE BOUNDARY ENFORCED:', {
-          distanceFromCenter: distanceFromCenter.toFixed(1),
-          maxRadius: maxRadius.toFixed(1),
-          playerRadius: player.radius.toFixed(1),
-          playableRadius: playableRadius,
-          center: `(${centerX}, ${centerY})`,
-          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`
-        });
+        // Check if new position would violate boundary
+        const newDistanceFromCenter = Math.sqrt(
+          Math.pow(newX - centerX, 2) + 
+          Math.pow(newY - centerY, 2)
+        );
         
-        const angle = Math.atan2(player.y - centerY, player.x - centerX);
-        player.x = centerX + Math.cos(angle) * maxRadius;
-        player.y = centerY + Math.sin(angle) * maxRadius;
+        if (newDistanceFromCenter > maxRadius) {
+          // Clamp to boundary instead of allowing movement into red zone
+          console.log('🚫 MOVEMENT BLOCKED - would enter red zone:', {
+            currentPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
+            targetPos: `(${newX.toFixed(1)}, ${newY.toFixed(1)})`,
+            center: `(${centerX}, ${centerY})`,
+            newDistance: newDistanceFromCenter.toFixed(1),
+            maxRadius: maxRadius.toFixed(1)
+          });
+          
+          // Move player to boundary edge instead
+          const angle = Math.atan2(newY - centerY, newX - centerX);
+          player.x = centerX + Math.cos(angle) * maxRadius;
+          player.y = centerY + Math.sin(angle) * maxRadius;
+        } else {
+          // Safe to move - apply normal movement
+          player.x = newX;
+          player.y = newY;
+        }
       }
       
       // Check collisions
