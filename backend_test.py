@@ -1,41 +1,25 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Circular Boundary Barrier Implementation
-Testing circular boundary barrier system identical to agario that prevents players from leaving the playable area
+Backend Testing for Arena Playable Area Extension
+Testing the backend changes for extending the arena playable area from 1800 to 2500 radius.
 """
 
 import requests
 import json
 import time
-import sys
 import os
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, List
 
-class CircularBoundaryTester:
+class ArenaPlayableAreaTester:
     def __init__(self):
-        # Get base URL from environment or use default
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
+        # Get base URL from environment
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
-        
-        # Test configuration
-        self.world_size = 4000
-        self.world_center_x = 2000
-        self.world_center_y = 2000
-        self.playable_radius = 1800
-        self.player_radius = 15  # √25 * 3 = 15 for mass = 25
-        self.max_player_distance = self.playable_radius - self.player_radius  # 1785
-        
-        # Test results tracking
         self.test_results = []
-        self.total_tests = 0
-        self.passed_tests = 0
         
-        print(f"🎯 CIRCULAR BOUNDARY BARRIER TESTING INITIALIZED")
+        print(f"🎯 ARENA PLAYABLE AREA EXTENSION BACKEND TESTING INITIALIZED")
         print(f"📍 Base URL: {self.base_url}")
-        print(f"🌍 World: {self.world_size}x{self.world_size}, Center: ({self.world_center_x}, {self.world_center_y})")
-        print(f"🔵 Playable Radius: {self.playable_radius}px")
-        print(f"👤 Player Radius: {self.player_radius}px")
-        print(f"📏 Max Player Distance from Center: {self.max_player_distance}px")
+        print(f"🔵 Expected Playable Radius: 2500px (expanded from 1800px)")
         print("=" * 80)
 
     def log_test(self, category: str, test_name: str, passed: bool, details: str = ""):
