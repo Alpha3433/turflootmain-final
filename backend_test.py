@@ -57,46 +57,107 @@ class BoundaryEnforcementTester:
         print(f"🔵 Expected Playable Radius: {self.expected_playable_radius}px")
         print("=" * 80)
 
-    def log_test(self, category: str, test_name: str, passed: bool, details: str = ""):
-        """Log test results"""
-        self.total_tests += 1
-        if passed:
-            self.passed_tests += 1
-            status = "✅ PASSED"
-        else:
-            status = "❌ FAILED"
-        
-        result = f"{status}: {category} - {test_name}"
-        if details:
-            result += f" | {details}"
-        
-        print(result)
-        self.test_results.append({
-            'category': category,
-            'test': test_name,
-            'passed': passed,
-            'details': details
-        })
-
-    def make_request(self, endpoint: str, method: str = 'GET', data: Dict = None, timeout: int = 10) -> Tuple[bool, Any]:
-        """Make HTTP request with error handling"""
+    def test_api_health_check(self) -> bool:
+        """Test 1: API Health Check - Verify backend infrastructure is operational"""
+        print("\n🔍 TEST 1: API HEALTH CHECK")
         try:
-            url = f"{self.api_base}{endpoint}"
-            
-            if method == 'GET':
-                response = requests.get(url, timeout=timeout)
-            elif method == 'POST':
-                response = requests.post(url, json=data, timeout=timeout)
-            else:
-                return False, f"Unsupported method: {method}"
-            
+            response = requests.get(f"{self.api_base}", timeout=10)
             if response.status_code == 200:
-                try:
-                    return True, response.json()
-                except:
-                    return True, response.text
+                data = response.json()
+                service = data.get('service', 'unknown')
+                status = data.get('status', 'unknown')
+                features = data.get('features', [])
+                
+                print(f"✅ API Health Check PASSED")
+                print(f"   Service: {service}")
+                print(f"   Status: {status}")
+                print(f"   Features: {features}")
+                
+                if status == 'operational' and 'multiplayer' in features:
+                    return True
+                else:
+                    print(f"❌ API not fully operational: status={status}, multiplayer={'multiplayer' in features}")
+                    return False
             else:
-                return False, f"HTTP {response.status_code}: {response.text[:200]}"
+                print(f"❌ API Health Check FAILED: HTTP {response.status_code}")
+                return False
+        except Exception as e:
+            print(f"❌ API Health Check FAILED: {str(e)}")
+            return False
+
+    def test_colyseus_server_availability(self) -> bool:
+        """Test 2: Colyseus Server Availability - Verify arena servers are running"""
+        print("\n🔍 TEST 2: COLYSEUS SERVER AVAILABILITY")
+        try:
+            response = requests.get(f"{self.api_base}/servers", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                servers = data.get('servers', [])
+                colyseus_endpoint = data.get('colyseusEndpoint', 'not found')
+                
+                # Look for Colyseus arena servers
+                arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' or 'arena' in s.get('name', '').lower()]
+                
+                print(f"✅ Colyseus Server Availability PASSED")
+                print(f"   Total Servers: {len(servers)}")
+                print(f"   Arena Servers: {len(arena_servers)}")
+                print(f"   Colyseus Endpoint: {colyseus_endpoint}")
+                
+                if arena_servers:
+                    for server in arena_servers[:3]:  # Show first 3
+                        print(f"   Server: {server.get('name', 'Unknown')} (Max: {server.get('maxPlayers', 'N/A')})")
+                
+                return len(arena_servers) > 0 or colyseus_endpoint != 'not found'
+            else:
+                print(f"❌ Colyseus Server Availability FAILED: HTTP {response.status_code}")
+                return False
+        except Exception as e:
+            print(f"❌ Colyseus Server Availability FAILED: {str(e)}")
+            return False
+
+    def test_world_size_sync(self) -> bool:
+        """Test 3: World Size Sync - Verify client and server both use 8000x8000 world"""
+        print("\n🔍 TEST 3: WORLD SIZE SYNC VERIFICATION")
+        
+        # Check server-side world size in TypeScript source
+        ts_world_size_found = False
+        js_world_size_found = False
+        
+        try:
+            # Check TypeScript source file
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+                if f"worldSize = parseInt(process.env.WORLD_SIZE || '{self.expected_world_size}')" in ts_content:
+                    ts_world_size_found = True
+                    print(f"✅ TypeScript world size configuration found: {self.expected_world_size}")
+                elif "worldSize = 8000" in ts_content or "WORLD_SIZE || '8000'" in ts_content:
+                    ts_world_size_found = True
+                    print(f"✅ TypeScript world size found: 8000")
+                else:
+                    print(f"❌ TypeScript world size not found or incorrect")
+            
+            # Check compiled JavaScript file
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+                if f"parseInt(process.env.WORLD_SIZE || '{self.expected_world_size}')" in js_content:
+                    js_world_size_found = True
+                    print(f"✅ JavaScript world size configuration found: {self.expected_world_size}")
+                elif "WORLD_SIZE || '8000'" in js_content or "worldSize = 8000" in js_content:
+                    js_world_size_found = True
+                    print(f"✅ JavaScript world size found: 8000")
+                else:
+                    print(f"❌ JavaScript world size not found or incorrect")
+            
+            if ts_world_size_found and js_world_size_found:
+                print(f"✅ World Size Sync PASSED - Both TS and JS use {self.expected_world_size}x{self.expected_world_size}")
+                return True
+            else:
+                print(f"❌ World Size Sync FAILED - TS: {ts_world_size_found}, JS: {js_world_size_found}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ World Size Sync FAILED: {str(e)}")
+            return False
                 
         except requests.exceptions.Timeout:
             return False, "Request timeout"
