@@ -685,7 +685,7 @@ const MultiplayerArena = () => {
           players: [],
           coins: [],
           viruses: [],
-          worldSize: state.worldSize || 4000
+          worldSize: state.worldSize || 6000
         }
         
         // Process players with proper current player identification
