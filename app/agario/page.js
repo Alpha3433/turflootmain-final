@@ -1101,7 +1101,7 @@ const AgarIOGame = () => {
     constructor(canvas, setCheatingBan, setTimeSurvived, selectedSkin, gameStates) {
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
-      this.world = { width: 4000, height: 4000 }
+      this.world = { width: 8000, height: 8000 }
       this.camera = { x: 0, y: 0 }
       this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
       this.setCheatingBan = setCheatingBan // Store the function reference
