@@ -2369,7 +2369,7 @@ const MultiplayerArena = () => {
                   backgroundColor: enemy.isPlayer ? '#00ff88' : '#ff6b6b',
                   borderRadius: '50%',
                   left: `${((enemy.x - 3000) / (gameRef.current?.currentPlayableRadius || 2000)) * (isMobile ? 57.5 : 105) + (isMobile ? 60.5 : 110)}px`,
-                  top: `${((enemy.y - 3000) / (gameRef.current?.currentPlayableRadius || 2000)) * (isMobile ? 57.5 : 105) + (isMobile ? 60.5 : 110)}px`,
+                  top: `${((enemy.y - 2500) / (gameRef.current?.currentPlayableRadius || 2000)) * (isMobile ? 57.5 : 105) + (isMobile ? 60.5 : 110)}px`,
                   transform: 'translate(-50%, -50%)',
                   opacity: enemy.isPlayer ? '1.0' : '0.8',
                   border: enemy.isPlayer 
