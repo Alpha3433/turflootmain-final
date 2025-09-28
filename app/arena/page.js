@@ -1271,16 +1271,16 @@ const MultiplayerArena = () => {
     }
     
     drawWorldBoundary() {
-      // Circular zone system identical to local agario practice mode
-      const centerX = this.world.width / 2
-      const centerY = this.world.height / 2
+      // Circular zone system for top-left playable area
+      const centerX = this.world.width / 4  // 2000 - top left area center X
+      const centerY = this.world.height / 4 // 2000 - top left area center Y
       const playableRadius = this.currentPlayableRadius
       
-      // Draw red danger zone outside playable area  
+      // Draw red danger zone everywhere  
       this.ctx.fillStyle = '#1a0000'
       this.ctx.fillRect(0, 0, this.world.width, this.world.height)
       
-      // Draw playable area (black circle to create the safe zone)
+      // Draw playable area (black circle to create the safe zone) in top left
       this.ctx.beginPath()
       this.ctx.arc(centerX, centerY, playableRadius, 0, Math.PI * 2)
       this.ctx.fillStyle = '#000000'
