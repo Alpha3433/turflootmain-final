@@ -1042,12 +1042,17 @@ const MultiplayerArena = () => {
     }
     
     applyClientSideMovement(dx, dy) {
-      // SMOOTH GLIDING CLIENT-SIDE MOVEMENT (like local agario)
+      // SMOOTH GLIDING CLIENT-SIDE MOVEMENT (like local agario) - IDENTICAL TO SERVER
       if (!this.player.x || !this.player.y) return
+      
+      // Calculate delta time for movement (MATCH SERVER LOGIC)
+      const now = Date.now()
+      const deltaTime = this.lastMovementUpdate ? (now - this.lastMovementUpdate) / 1000 : 1/60
+      this.lastMovementUpdate = now
       
       // Calculate target position based on input (like agario's mouse-following)
       const mass = this.player.mass || 25
-      const baseSpeed = 6.0 // Same as agario for consistency
+      const baseSpeed = 6.0 // Same as agario and server for consistency
       const massSpeedFactor = Math.sqrt(mass / 20)
       const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
       
