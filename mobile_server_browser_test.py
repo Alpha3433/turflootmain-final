@@ -32,7 +32,7 @@ import os
 from datetime import datetime
 
 # Test configuration
-BASE_URL = "https://arenapatch.preview.emergentagent.com"
+BASE_URL = "https://split-bug-solved.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class MobileServerBrowserTester:
