@@ -1072,9 +1072,11 @@ const MultiplayerArena = () => {
       const targetDy = this.player.targetY - this.player.y
       const distanceToTarget = Math.sqrt(targetDx * targetDx + targetDy * targetDy)
       
-      // Only move if distance is significant (prevents jittering)
-      if (distanceToTarget > 0.1) {
-        const moveDistance = Math.min(dynamicSpeed * 0.5, distanceToTarget) // Smoother movement
+      // Only move if distance is significant (prevents jittering) - MATCH SERVER LOGIC
+      if (distanceToTarget > 1) { // Match server threshold
+        // Calculate move distance based on speed and delta time (IDENTICAL TO SERVER)
+        const deltaTime = 1/60 // Assume 60fps for consistency with server
+        const moveDistance = Math.min(dynamicSpeed * deltaTime * 60, distanceToTarget) // Match server calculation
         
         // Normalize direction and apply smooth movement
         const moveX = (targetDx / distanceToTarget) * moveDistance
