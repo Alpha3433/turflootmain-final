@@ -119,8 +119,8 @@ class VirusCoinSpawnTester:
                 self.log_test("Colyseus Server Availability", False, f"Servers API returned status {response.status_code}")
         except Exception as e:
             self.log_test("Colyseus Server Availability", False, f"Servers API request failed: {str(e)}")
-    
-    def test_world_size_configuration(self):
+            
+    def test_safe_spawn_position_logic(self):
         """Test 3: World Size Configuration - Verify server-side worldSize is now 4000 instead of 6000"""
         try:
             # Check TypeScript source file
