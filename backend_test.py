@@ -507,6 +507,13 @@ class BoundarySyncTester:
         test_functions = [
             self.test_api_health_check,
             self.test_colyseus_server_availability,
+            self.test_client_server_radius_sync,
+            self.test_client_server_center_sync,
+            self.test_player_radius_consistency,
+            self.test_boundary_enforcement_logic,
+            self.test_visual_boundary_match,
+            self.test_boundary_position_testing,
+            self.test_realtime_sync_verification,
         ]
         
         passed_tests = 0
