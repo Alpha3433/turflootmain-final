@@ -44,27 +44,40 @@ from typing import Dict, Any, List, Tuple
 
 class BoundarySyncTester:
     def __init__(self):
-        # Get base URL from environment or use default
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
-        self.api_base = f"{self.base_url}/api"
-        
-        # Test configuration
+        # Get base URL from environment
+        self.base_url = self.get_base_url()
         self.test_results = []
-        self.total_tests = 0
-        self.passed_tests = 0
+        self.start_time = time.time()
         
-        # Expected spawn configuration based on review request
-        self.expected_world_size = 8000
-        self.expected_center_x = 4000  # worldSize / 2
-        self.expected_center_y = 4000  # worldSize / 2
-        self.expected_playable_radius = 1800
-        
-        print(f"🎯 BOUNDARY ENFORCEMENT VERIFICATION TESTING")
-        print(f"📍 Testing against: {self.base_url}")
-        print(f"🌍 Expected World Size: {self.expected_world_size}x{self.expected_world_size}")
-        print(f"📍 Expected Center: ({self.expected_center_x}, {self.expected_center_y})")
-        print(f"🔵 Expected Playable Radius: {self.expected_playable_radius}px")
+        print("🎯 BOUNDARY SYNC VERIFICATION TESTING INITIATED")
+        print(f"🌐 Testing against: {self.base_url}")
         print("=" * 80)
+    
+    def get_base_url(self) -> str:
+        """Get the base URL from environment variables"""
+        try:
+            with open('/app/.env', 'r') as f:
+                env_content = f.read()
+                for line in env_content.split('\n'):
+                    if line.startswith('NEXT_PUBLIC_BASE_URL='):
+                        return line.split('=', 1)[1].strip().strip('"')
+        except:
+            pass
+        return "http://localhost:3000"
+    
+    def log_test(self, category: str, test_name: str, passed: bool, details: str = ""):
+        """Log test result"""
+        status = "✅ PASSED" if passed else "❌ FAILED"
+        print(f"{status}: {category} - {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        
+        self.test_results.append({
+            'category': category,
+            'test': test_name,
+            'passed': passed,
+            'details': details
+        })
 
     def test_api_health_check(self) -> bool:
         """Test 1: API Health Check - Verify backend infrastructure is operational"""
