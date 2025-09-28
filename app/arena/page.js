@@ -1356,9 +1356,9 @@ const MultiplayerArena = () => {
     }
     
     drawWorldBoundary() {
-      // Circular zone system matching local agario - shifted up for more bottom out-of-bounds
+      // Circular zone system identical to local agario practice mode
       const centerX = this.world.width / 2
-      const centerY = this.world.height / 2 - 500 // Shift playable area up by 500px
+      const centerY = this.world.height / 2
       const playableRadius = this.currentPlayableRadius
       
       // Draw red danger zone outside playable area  
