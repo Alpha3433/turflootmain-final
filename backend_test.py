@@ -391,14 +391,6 @@ def main():
 if __name__ == "__main__":
     exit(main())
                     found,
-                    f"Pattern {'found' if found else 'not found'} in TypeScript code"
-                )
-            
-            for pattern_name, found in js_patterns.items():
-                self.log_test(
-                    "Server-Side Boundary Enforcement",
-                    f"JavaScript: {pattern_name}",
-                    found,
                     f"Pattern {'found' if found else 'not found'} in compiled JavaScript"
                 )
                 
