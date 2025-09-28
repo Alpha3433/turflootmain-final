@@ -25,6 +25,7 @@ const MultiplayerArena = () => {
   const componentIdRef = useRef(Math.random().toString(36).substring(7)) // Unique component ID for debugging
   const lastInputTimeRef = useRef(0) // For input throttling
   const inputThrottleMs = 16 // ~60fps input rate (like agario)
+  const pingIntervalRef = useRef(null) // Track active ping interval for cleanup
   
   // Privy authentication
   const { ready, authenticated, user, login } = usePrivy()
@@ -39,6 +40,7 @@ const MultiplayerArena = () => {
   const [mass, setMass] = useState(25) // Fixed to match server starting mass
   const [score, setScore] = useState(0)
   const [serverState, setServerState] = useState(null)
+  const [pingMs, setPingMs] = useState(null)
   const [timeSurvived, setTimeSurvived] = useState(0)
   const [eliminations, setEliminations] = useState(0)
 
@@ -535,11 +537,49 @@ const MultiplayerArena = () => {
     }
   }, [])
 
+  const startPingMonitoring = (room, componentId) => {
+    if (!room) return
+
+    setPingMs(null)
+
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current)
+      pingIntervalRef.current = null
+    }
+
+    if (!room.__turflootPingListenerAttached) {
+      room.onMessage('pong', (payload) => {
+        const clientTimestamp = payload?.clientTimestamp || payload?.timestamp
+        if (typeof clientTimestamp === 'number') {
+          const latency = Math.max(0, Date.now() - clientTimestamp)
+          setPingMs((previous) => {
+            if (previous === null) {
+              return latency
+            }
+            return Math.round(previous * 0.6 + latency * 0.4)
+          })
+        }
+      })
+      room.__turflootPingListenerAttached = true
+    }
+
+    const sendPing = () => {
+      try {
+        room.send('ping', { timestamp: Date.now() })
+      } catch (pingError) {
+        console.log(`⚠️ [${componentId}] Unable to send ping:`, pingError)
+      }
+    }
+
+    sendPing()
+    pingIntervalRef.current = setInterval(sendPing, 3000)
+  }
+
   // Colyseus connection and input handling - ENHANCED DEBUGGING
   const connectToColyseus = async () => {
     const componentId = componentIdRef.current
     console.log(`🔗 [${componentId}] Connection attempt started for user:`, privyUserId)
-    
+
     // GLOBAL duplicate connection prevention
     if (GLOBAL_CONNECTION_TRACKER.isConnecting) {
       console.log(`🔄 [${componentId}] Global connection already in progress - skipping duplicate attempt`)
@@ -550,6 +590,7 @@ const MultiplayerArena = () => {
       console.log(`✅ [${componentId}] User already has active global connection - reusing existing connection`)
       wsRef.current = GLOBAL_CONNECTION_TRACKER.activeConnection
       setConnectionStatus('connected')
+      startPingMonitoring(wsRef.current, componentId)
       return
     }
     
@@ -594,6 +635,11 @@ const MultiplayerArena = () => {
     try {
       console.log('🚀 Creating dedicated Colyseus client for this arena...')
       setConnectionStatus('connecting')
+
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
+        pingIntervalRef.current = null
+      }
       
       // Get the endpoint from environment or fallback
       const endpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
@@ -637,6 +683,8 @@ const MultiplayerArena = () => {
       setConnectionStatus('connected')
       console.log(`✅ [${componentId}] Connected to dedicated arena:`, room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
+
+      startPingMonitoring(room, componentId)
       
       // Set expected session ID in game engine for camera stability
       if (gameRef.current) {
@@ -654,9 +702,14 @@ const MultiplayerArena = () => {
         if (GLOBAL_CONNECTION_TRACKER.activeConnection === room) {
           GLOBAL_CONNECTION_TRACKER.activeConnection = null // Clear global connection if it's this room
         }
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current)
+          pingIntervalRef.current = null
+        }
+        setPingMs(null)
         setConnectionStatus('failed')
       })
-      
+
       room.onLeave((code) => {
         console.log(`👋 [${componentId}] Left room with code:`, code)
         console.log(`🔍 LEAVE DEBUG - Code: ${code}, Reason: ${code === 1000 ? 'Normal closure' : code === 1006 ? 'Abnormal closure' : 'Other: ' + code}`)
@@ -666,6 +719,11 @@ const MultiplayerArena = () => {
         if (GLOBAL_CONNECTION_TRACKER.activeConnection === room) {
           GLOBAL_CONNECTION_TRACKER.activeConnection = null // Clear global connection if it's this room
         }
+        if (pingIntervalRef.current) {
+          clearInterval(pingIntervalRef.current)
+          pingIntervalRef.current = null
+        }
+        setPingMs(null)
         setConnectionStatus('disconnected')
       })
       
@@ -752,8 +810,13 @@ const MultiplayerArena = () => {
         stack: error.stack,
         endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT
       })
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
+        pingIntervalRef.current = null
+      }
+      setPingMs(null)
       setConnectionStatus('failed')
-      
+
       // Retry connection after 5 seconds with exponential backoff
       setTimeout(() => {
         console.log(`🔄 [${componentId}] Retrying connection in 5 seconds...`)
@@ -1701,6 +1764,11 @@ const MultiplayerArena = () => {
       console.log(`🧹 [${componentId}] Cleaning up arena connection...`)
       game.stop()
       window.removeEventListener('resize', handleResize)
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
+        pingIntervalRef.current = null
+      }
+      setPingMs(null)
       if (wsRef.current) {
         console.log(`🔌 [${componentId}] Disconnecting from Colyseus...`)
         wsRef.current.leave()
@@ -1722,7 +1790,27 @@ const MultiplayerArena = () => {
       }
     }
   }, [ready, authenticated, user?.id, playerName]) // Add playerName to dependencies so effect responds to name changes
-  
+
+  const pingQualityColor = pingMs === null
+    ? '#94a3b8'
+    : pingMs <= 80
+      ? '#22c55e'
+      : pingMs <= 150
+        ? '#facc15'
+        : '#ef4444'
+
+  const pingStatusLabel = pingMs === null
+    ? connectionStatus === 'connected'
+      ? 'Measuring'
+      : 'Offline'
+    : pingMs <= 80
+      ? 'Excellent'
+      : pingMs <= 150
+        ? 'Stable'
+        : 'Unstable'
+
+  const pingDisplayValue = pingMs === null ? '--' : `${Math.max(0, Math.round(pingMs))} ms`
+
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
       {/* Authentication Required Screen */}
@@ -1973,6 +2061,57 @@ const MultiplayerArena = () => {
                 </div>
               ))
             })()}
+          </div>
+        </div>
+
+        {/* Ping Meter - Bottom Left */}
+        <div
+          style={{
+            position: 'fixed',
+            left: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 10px)' : '15px',
+            bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 12px)' : '18px',
+            zIndex: 1000,
+            background: 'rgba(0, 0, 0, 0.78)',
+            border: `1px solid ${connectionStatus === 'connected' ? 'rgba(34, 197, 94, 0.45)' : 'rgba(148, 163, 184, 0.35)'}`,
+            borderRadius: '10px',
+            padding: isMobile ? '6px 10px' : '8px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            minWidth: isMobile ? '120px' : '150px',
+            boxShadow: '0 0 14px rgba(15, 118, 110, 0.35)',
+            fontFamily: '"Rajdhani", sans-serif',
+            transition: 'all 0.25s ease'
+          }}
+        >
+          <div
+            style={{
+              width: isMobile ? '10px' : '12px',
+              height: isMobile ? '10px' : '12px',
+              borderRadius: '50%',
+              backgroundColor: connectionStatus === 'connected' ? pingQualityColor : '#f97316',
+              boxShadow: connectionStatus === 'connected'
+                ? `0 0 10px ${pingQualityColor}`
+                : '0 0 6px rgba(249, 115, 22, 0.6)',
+              transition: 'all 0.2s ease'
+            }}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+            <span style={{ color: '#94a3b8', fontSize: isMobile ? '10px' : '11px', letterSpacing: '0.5px' }}>Ping</span>
+            <span style={{ color: pingQualityColor, fontSize: isMobile ? '16px' : '18px', fontWeight: 700 }}>
+              {pingDisplayValue}
+            </span>
+          </div>
+          <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+            <span style={{
+              display: 'block',
+              color: '#e2e8f0',
+              fontSize: isMobile ? '9px' : '10px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.8px'
+            }}>
+              {pingStatusLabel}
+            </span>
           </div>
         </div>
 
