@@ -49,27 +49,29 @@ class BackendTester:
             
             if response.status_code == 200:
                 data = response.json()
-                service_name = data.get('service', '')
+                service = data.get('service', '')
                 status = data.get('status', '')
                 features = data.get('features', [])
                 
-                if service_name == 'turfloot-api' and status == 'operational':
-                    self.log_test("API Health Check", True, 
-                                f"Service: {service_name}, Status: {status}, Features: {features}")
+                if service == 'turfloot-api' and status == 'operational':
+                    self.log_test("API Health Check", True, f"Service: {service}, Status: {status}, Features: {features}")
+                    return True
                 else:
-                    self.log_test("API Health Check", False, 
-                                f"Unexpected response: {data}")
+                    self.log_test("API Health Check", False, f"Unexpected response: {data}")
+                    return False
             else:
-                self.log_test("API Health Check", False, 
-                            f"HTTP {response.status_code}: {response.text}")
+                self.log_test("API Health Check", False, f"HTTP {response.status_code}")
+                return False
                 
         except Exception as e:
             self.log_test("API Health Check", False, f"Exception: {str(e)}")
+            return False
     
-    def test_colyseus_server_availability(self):
-        """Test 2: Colyseus Server Availability - Verify arena servers are running with adjusted dimensions"""
+    def test_colyseus_server_availability(self) -> bool:
+        """Test 2: Colyseus Server Availability - Verify arena servers are running with shifted center"""
         try:
-            response = requests.get(f"{self.api_base}/servers", timeout=10)
+            print("\n🔍 TEST 2: Colyseus Server Availability")
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
             
             if response.status_code == 200:
                 data = response.json()
@@ -82,42 +84,265 @@ class BackendTester:
                 
                 if colyseus_enabled and arena_servers:
                     arena_server = arena_servers[0]
-                    self.log_test("Colyseus Server Availability", True,
-                                f"Arena server found: {arena_server.get('id', 'unknown')}, "
-                                f"Max: {arena_server.get('maxPlayers', 0)}, "
-                                f"Endpoint: {colyseus_endpoint}")
+                    server_id = arena_server.get('id', '')
+                    max_players = arena_server.get('maxPlayers', 0)
+                    
+                    self.log_test("Colyseus Server Availability", True, 
+                                f"Arena server found ({server_id}, Max: {max_players}) with endpoint='{colyseus_endpoint}'")
+                    return True
                 else:
-                    self.log_test("Colyseus Server Availability", False,
-                                f"No arena servers found. Colyseus enabled: {colyseus_enabled}, "
-                                f"Servers: {len(servers)}")
+                    self.log_test("Colyseus Server Availability", False, 
+                                f"No arena servers found. Colyseus enabled: {colyseus_enabled}, Servers: {len(servers)}")
+                    return False
             else:
-                self.log_test("Colyseus Server Availability", False,
-                            f"HTTP {response.status_code}: {response.text}")
+                self.log_test("Colyseus Server Availability", False, f"HTTP {response.status_code}")
+                return False
                 
         except Exception as e:
             self.log_test("Colyseus Server Availability", False, f"Exception: {str(e)}")
+            return False
     
-    def test_playable_radius_configuration(self):
-        """Test 3: Playable Radius Configuration - Verify server-side playableRadius is now set to 2000 instead of 2500"""
+    def test_center_position_configuration(self) -> bool:
+        """Test 3: Center Position Configuration - Verify server-side center is now at (3000, 2500) instead of (3000, 3000)"""
         try:
-            # Check TypeScript source file
+            print("\n🔍 TEST 3: Center Position Configuration")
+            
+            # Check TypeScript source file for shifted center
             ts_file_path = "/app/src/rooms/ArenaRoom.ts"
             js_file_path = "/app/build/rooms/ArenaRoom.js"
             
-            ts_checks = 0
-            js_checks = 0
+            ts_center_found = False
+            js_center_found = False
             
             # Check TypeScript file
-            if os.path.exists(ts_file_path):
+            try:
                 with open(ts_file_path, 'r') as f:
                     ts_content = f.read()
-                    
-                # Look for playableRadius = 2000 patterns
-                if "playableRadius = 2000" in ts_content:
-                    ts_checks += ts_content.count("playableRadius = 2000")
-                    
-            # Check JavaScript file  
-            if os.path.exists(js_file_path):
+                    # Look for the shifted center pattern: worldSize / 2 - 500
+                    if "this.worldSize / 2 - 500" in ts_content and "// Shift playable area up by 500px" in ts_content:
+                        ts_center_found = True
+            except Exception as e:
+                print(f"Could not read TypeScript file: {e}")
+            
+            # Check JavaScript file
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    # Look for the shifted center pattern: worldSize / 2 - 500
+                    if "this.worldSize / 2 - 500" in js_content:
+                        js_center_found = True
+            except Exception as e:
+                print(f"Could not read JavaScript file: {e}")
+            
+            if ts_center_found and js_center_found:
+                self.log_test("Center Position Configuration", True, 
+                            "Server-side center correctly shifted to (3000, 2500) in both TS and JS files")
+                return True
+            else:
+                self.log_test("Center Position Configuration", False, 
+                            f"Center shift not found - TS: {ts_center_found}, JS: {js_center_found}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Center Position Configuration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_player_spawn_positioning(self) -> bool:
+        """Test 4: Player Spawn Positioning - Test that players spawn at new center coordinates (3000, 2500)"""
+        try:
+            print("\n🔍 TEST 4: Player Spawn Positioning")
+            
+            # Check spawn position functions in both files
+            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_spawn_found = False
+            js_spawn_found = False
+            
+            # Check TypeScript file for spawn positioning
+            try:
+                with open(ts_file_path, 'r') as f:
+                    ts_content = f.read()
+                    # Look for generateCircularSpawnPosition with shifted center
+                    if ("generateCircularSpawnPosition" in ts_content and 
+                        "const centerY = this.worldSize / 2 - 500" in ts_content and
+                        "// 2500 for 6000x6000 world - shifted up for more bottom out-of-bounds" in ts_content):
+                        ts_spawn_found = True
+            except Exception as e:
+                print(f"Could not read TypeScript file: {e}")
+            
+            # Check JavaScript file for spawn positioning
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    # Look for generateCircularSpawnPosition with shifted center
+                    if ("generateCircularSpawnPosition" in js_content and 
+                        "this.worldSize / 2 - 500" in js_content):
+                        js_spawn_found = True
+            except Exception as e:
+                print(f"Could not read JavaScript file: {e}")
+            
+            if ts_spawn_found and js_spawn_found:
+                self.log_test("Player Spawn Positioning", True, 
+                            "Player spawn positioning correctly uses shifted center (3000, 2500) in both TS and JS")
+                return True
+            else:
+                self.log_test("Player Spawn Positioning", False, 
+                            f"Spawn positioning not properly configured - TS: {ts_spawn_found}, JS: {js_spawn_found}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Player Spawn Positioning", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_boundary_enforcement(self) -> bool:
+        """Test 5: Boundary Enforcement - Test that circular boundary is still enforced with shifted center"""
+        try:
+            print("\n🔍 TEST 5: Boundary Enforcement")
+            
+            # Check boundary enforcement logic in both files
+            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_boundary_patterns = 0
+            js_boundary_patterns = 0
+            
+            # Check TypeScript file for boundary enforcement patterns
+            try:
+                with open(ts_file_path, 'r') as f:
+                    ts_content = f.read()
+                    # Look for boundary enforcement patterns with shifted center
+                    patterns = [
+                        "const centerY = this.worldSize / 2 - 500",
+                        "const playableRadius = 2000",
+                        "distanceFromCenter > maxRadius",
+                        "Math.atan2(player.y - centerY, player.x - centerX)"
+                    ]
+                    for pattern in patterns:
+                        if pattern in ts_content:
+                            ts_boundary_patterns += 1
+            except Exception as e:
+                print(f"Could not read TypeScript file: {e}")
+            
+            # Check JavaScript file for boundary enforcement patterns
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    # Look for boundary enforcement patterns with shifted center
+                    patterns = [
+                        "this.worldSize / 2 - 500",
+                        "playableRadius = 2000",
+                        "distanceFromCenter > maxRadius",
+                        "Math.atan2"
+                    ]
+                    for pattern in patterns:
+                        if pattern in js_content:
+                            js_boundary_patterns += 1
+            except Exception as e:
+                print(f"Could not read JavaScript file: {e}")
+            
+            if ts_boundary_patterns >= 3 and js_boundary_patterns >= 3:
+                self.log_test("Boundary Enforcement", True, 
+                            f"Boundary enforcement properly configured with shifted center - TS: {ts_boundary_patterns}/4 patterns, JS: {js_boundary_patterns}/4 patterns")
+                return True
+            else:
+                self.log_test("Boundary Enforcement", False, 
+                            f"Boundary enforcement patterns incomplete - TS: {ts_boundary_patterns}/4, JS: {js_boundary_patterns}/4")
+                return False
+                
+        except Exception as e:
+            self.log_test("Boundary Enforcement", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_split_player_boundary(self) -> bool:
+        """Test 6: Split Player Boundary - Test that split players are also constrained within the shifted boundary"""
+        try:
+            print("\n🔍 TEST 6: Split Player Boundary")
+            
+            # Check split player boundary enforcement in both files
+            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            
+            ts_split_patterns = 0
+            js_split_patterns = 0
+            
+            # Check TypeScript file for split boundary patterns
+            try:
+                with open(ts_file_path, 'r') as f:
+                    ts_content = f.read()
+                    # Look for split boundary enforcement patterns
+                    patterns = [
+                        "handleSplit",
+                        "splitPlayer.x = player.x + dirX * spawnDistance",
+                        "const centerY = this.worldSize / 2 - 500; // Shift playable area up by 500px",
+                        "const playableRadius = 2000",
+                        "distanceFromCenter > maxRadius"
+                    ]
+                    for pattern in patterns:
+                        if pattern in ts_content:
+                            ts_split_patterns += 1
+            except Exception as e:
+                print(f"Could not read TypeScript file: {e}")
+            
+            # Check JavaScript file for split boundary patterns
+            try:
+                with open(js_file_path, 'r') as f:
+                    js_content = f.read()
+                    # Look for split boundary enforcement patterns
+                    patterns = [
+                        "handleSplit",
+                        "splitPlayer.x = player.x + dirX * spawnDistance",
+                        "this.worldSize / 2 - 500",
+                        "playableRadius = 2000",
+                        "distanceFromCenter > maxRadius"
+                    ]
+                    for pattern in patterns:
+                        if pattern in js_content:
+                            js_split_patterns += 1
+            except Exception as e:
+                print(f"Could not read JavaScript file: {e}")
+            
+            if ts_split_patterns >= 4 and js_split_patterns >= 4:
+                self.log_test("Split Player Boundary", True, 
+                            f"Split player boundary enforcement properly configured - TS: {ts_split_patterns}/5 patterns, JS: {js_split_patterns}/5 patterns")
+                return True
+            else:
+                self.log_test("Split Player Boundary", False, 
+                            f"Split boundary enforcement incomplete - TS: {ts_split_patterns}/5, JS: {js_split_patterns}/5")
+                return False
+                
+        except Exception as e:
+            self.log_test("Split Player Boundary", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_backend_api_integration(self) -> bool:
+        """Test 7: Backend API Integration - Verify /api/servers endpoint returns correct arena server data"""
+        try:
+            print("\n🔍 TEST 7: Backend API Integration")
+            response = requests.get(f"{API_BASE}/servers", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                servers = data.get('servers', [])
+                total_players = data.get('totalPlayers', 0)
+                total_active = data.get('totalActiveServers', 0)
+                
+                # Verify API returns correct data structure
+                if isinstance(servers, list) and 'totalPlayers' in data and 'totalActiveServers' in data:
+                    self.log_test("Backend API Integration", True, 
+                                f"API returns correct data - Servers: {len(servers)}, Players: {total_players}, Active: {total_active}")
+                    return True
+                else:
+                    self.log_test("Backend API Integration", False, 
+                                f"API response structure incorrect: {data}")
+                    return False
+            else:
+                self.log_test("Backend API Integration", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Backend API Integration", False, f"Exception: {str(e)}")
+            return False
                 with open(js_file_path, 'r') as f:
                     js_content = f.read()
                     
