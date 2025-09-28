@@ -2218,11 +2218,11 @@ const MultiplayerArena = () => {
             overflow: 'hidden',
             boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
-            {/* Expanded black playable area circle on minimap - positioned at top-left */}
+            {/* Much larger black playable area circle on minimap - positioned at top-left */}
             <div style={{
               position: 'absolute',
-              width: `${((2400 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Expanded playable area diameter 
-              height: `${((2400 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Expanded playable area diameter
+              width: `${((3200 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Much larger playable area diameter 
+              height: `${((3200 * 2) / 8000) * (isMobile ? 115 : 210)}px`, // Much larger playable area diameter
               borderRadius: '50%',
               background: '#000000', // Solid black playable area - no gradient
               left: `${(2000 / 8000) * (isMobile ? 115 : 210) + (isMobile ? 3 : 5)}px`, // Center at world coordinates (2000, 2000)
