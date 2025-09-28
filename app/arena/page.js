@@ -2217,7 +2217,7 @@ const MultiplayerArena = () => {
             width: isMobile ? '121px' : '220px',
             height: isMobile ? '121px' : '220px',
             borderRadius: '50%',
-            backgroundColor: '#000000', // Black background representing playable area
+            backgroundColor: '#000000', // Pure black background
             border: isMobile ? '2px solid #00ff00' : '4px solid #00ff00',
             position: 'relative',
             overflow: 'hidden'
