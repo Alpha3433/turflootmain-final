@@ -20,11 +20,18 @@ class PlayableAreaBackendTester:
         self.passed_tests = 0
         
     def log_test(self, test_name: str, passed: bool, details: str = ""):
-        """Log test results"""
-        status = "✅ PASSED" if passed else "❌ FAILED"
+        """Log test result"""
+        self.total_tests += 1
+        if passed:
+            self.passed_tests += 1
+            status = "✅ PASSED"
+        else:
+            status = "❌ FAILED"
+            
         result = f"{status}: {test_name}"
         if details:
             result += f" - {details}"
+            
         print(result)
         self.test_results.append({
             'test': test_name,
