@@ -11,7 +11,7 @@ import math
 import sys
 from typing import Dict, List, Tuple, Any
 
-class BoundarySyncTester:
+class ArenaSpawnPositionTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = self.get_base_url()
