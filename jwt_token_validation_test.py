@@ -15,7 +15,7 @@ import jwt
 from urllib.parse import urlparse, parse_qs
 
 # Get base URL from environment
-BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://split-bug-solved.preview.emergentagent.com')
+BASE_URL = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-arena-4.preview.emergentagent.com')
 API_BASE = f"{BASE_URL}/api"
 
 def test_jwt_token_validation_fix():

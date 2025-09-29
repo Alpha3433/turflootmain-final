@@ -10,7 +10,7 @@ import time
 from urllib.parse import quote, unquote
 
 # Configuration
-BASE_URL = "https://split-bug-solved.preview.emergentagent.com"
+BASE_URL = "https://turfloot-arena-4.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/party-api"
 
 # Real user IDs from server logs
