@@ -1,6 +1,8 @@
 import { Room, Client } from "@colyseus/core";
 import { Schema, MapSchema, type } from "@colyseus/schema";
 
+const INITIAL_MASS = 25;
+
 // Player state schema
 export class Player extends Schema {
   @type("string") name: string = "Player";
@@ -8,7 +10,7 @@ export class Player extends Schema {
   @type("number") y: number = 0;
   @type("number") vx: number = 0;
   @type("number") vy: number = 0;
-  @type("number") mass: number = 100;
+  @type("number") mass: number = INITIAL_MASS;
   @type("number") radius: number = 20;
   @type("string") color: string = "#FF6B6B";
   @type("number") score: number = 0;
@@ -95,7 +97,7 @@ export class ArenaRoom extends Room<GameState> {
     player.y = Math.random() * this.worldSize;
     player.vx = 0;
     player.vy = 0;
-    player.mass = 100;
+    player.mass = INITIAL_MASS;
     player.radius = Math.sqrt(player.mass / Math.PI) * 10;
     player.color = this.generatePlayerColor();
     player.score = 0;
@@ -130,7 +132,7 @@ export class ArenaRoom extends Room<GameState> {
     (client as any).userData.lastInputTime = Date.now();
     
     // Apply movement (dx, dy are normalized direction vectors)
-    const speed = Math.max(1, 5 * (100 / player.mass)); // Speed inversely proportional to mass
+    const speed = Math.max(1, 5 * (INITIAL_MASS / player.mass)); // Speed inversely proportional to mass
     player.vx = dx * speed;
     player.vy = dy * speed;
   }
@@ -254,7 +256,7 @@ export class ArenaRoom extends Room<GameState> {
     player.y = Math.random() * this.worldSize;
     player.vx = 0;
     player.vy = 0;
-    player.mass = 100;
+    player.mass = INITIAL_MASS;
     player.radius = Math.sqrt(player.mass / Math.PI) * 10;
     player.alive = true;
     console.log(`🔄 Player respawned: ${player.name}`);
