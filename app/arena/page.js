@@ -47,6 +47,7 @@ const MultiplayerArena = () => {
   const [isCashingOut, setIsCashingOut] = useState(false)
   const [cashOutComplete, setCashOutComplete] = useState(false)
   const cashOutIntervalRef = useRef(null)
+  const hasAuthoritativeCashOutRef = useRef(false)
 
   // Mission system - ported from agario  
   const [currency, setCurrency] = useState(0)
@@ -396,38 +397,51 @@ const MultiplayerArena = () => {
 
   // Cash out progress interval - ported from agario
   useEffect(() => {
+    if (hasAuthoritativeCashOutRef.current) {
+      if (cashOutIntervalRef.current) {
+        clearInterval(cashOutIntervalRef.current)
+        cashOutIntervalRef.current = null
+      }
+      return () => {
+        if (cashOutIntervalRef.current) {
+          clearInterval(cashOutIntervalRef.current)
+          cashOutIntervalRef.current = null
+        }
+      }
+    }
+
     if (isCashingOut && !cashOutComplete) {
       console.log('Starting cash out progress interval')
-      
+
       cashOutIntervalRef.current = setInterval(() => {
         setCashOutProgress(prev => {
           const newProgress = prev + 2 // 2% per 100ms = 5 second duration
-          
+
           if (newProgress >= 100) {
             console.log('Cash out completed!')
             setIsCashingOut(false)
             setCashOutComplete(true)
             clearInterval(cashOutIntervalRef.current)
             cashOutIntervalRef.current = null
-            
+
             // Add currency based on score
             setCurrency(prevCurrency => prevCurrency + score)
-            
+
             return 100
           }
-          
+
           return newProgress
         })
       }, 100) // Update every 100ms for smooth progress
     }
-    
+
     return () => {
       if (cashOutIntervalRef.current) {
         clearInterval(cashOutIntervalRef.current)
         cashOutIntervalRef.current = null
       }
     }
-  }, [isCashingOut, score])
+  }, [cashOutComplete, isCashingOut, score])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
@@ -1104,7 +1118,30 @@ const MultiplayerArena = () => {
         this.player.radius = currentPlayer.radius
         this.player.color = currentPlayer.color
         this.player.skinColor = currentPlayer.skinColor
-        
+
+        if (typeof currentPlayer.cashOutProgress === 'number') {
+          const normalizedProgress = Math.max(0, Math.min(100, currentPlayer.cashOutProgress))
+          hasAuthoritativeCashOutRef.current = true
+
+          if (cashOutIntervalRef.current) {
+            clearInterval(cashOutIntervalRef.current)
+            cashOutIntervalRef.current = null
+          }
+
+          setCashOutProgress(normalizedProgress)
+          const cashingOutFromServer = Boolean(currentPlayer.isCashingOut) || normalizedProgress > 0
+          setIsCashingOut(cashingOutFromServer)
+
+          const serverMarkedComplete = typeof currentPlayer.cashOutComplete === 'boolean'
+            ? currentPlayer.cashOutComplete
+            : normalizedProgress >= 100
+          setCashOutComplete(serverMarkedComplete)
+
+          this.player.cashOutProgress = normalizedProgress
+          this.player.isCashingOut = cashingOutFromServer
+          this.player.cashOutComplete = serverMarkedComplete
+        }
+
       } else {
         console.log('❌ No current player found in server state - players available:', 
                    Array.from(state.players.keys()))
@@ -1417,8 +1454,57 @@ const MultiplayerArena = () => {
         this.ctx.strokeStyle = '#60A5FA' // Lighter blue
         this.ctx.lineWidth = 2
         this.ctx.stroke()
-        
+
         this.ctx.globalAlpha = 1.0 // Reset alpha
+      }
+
+      // Draw cash out progress ring when provided by server state
+      const serverCashOutProgress = typeof player.cashOutProgress === 'number'
+        ? Math.max(0, Math.min(100, player.cashOutProgress))
+        : 0
+
+      if (serverCashOutProgress > 0) {
+        const ringRadius = playerRadius + 10
+        const startAngle = -Math.PI / 2
+        const progressAngle = (serverCashOutProgress / 100) * Math.PI * 2
+        const baseStrokeWidth = isCurrentPlayer ? 8 : 6
+        const progressStrokeColor = isCurrentPlayer ? '#16A34A' : '#22C55E'
+        const glowStrokeColor = isCurrentPlayer ? 'rgba(34, 197, 94, 0.75)' : 'rgba(74, 222, 128, 0.6)'
+        const fillColor = isCurrentPlayer ? 'rgba(34, 197, 94, 0.18)' : 'rgba(74, 222, 128, 0.15)'
+
+        // Background ring for full circumference
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
+        this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.25)'
+        this.ctx.lineWidth = baseStrokeWidth
+        this.ctx.stroke()
+
+        // Filled arc section to create subtle radial fill without covering the avatar
+        const innerRadius = Math.max(ringRadius - baseStrokeWidth, playerRadius + 2)
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, startAngle, startAngle + progressAngle, false)
+        this.ctx.arc(player.x, player.y, innerRadius, startAngle + progressAngle, startAngle, true)
+        this.ctx.closePath()
+        this.ctx.fillStyle = fillColor
+        this.ctx.fill()
+
+        // Main progress arc
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, startAngle, startAngle + progressAngle)
+        this.ctx.strokeStyle = progressStrokeColor
+        this.ctx.lineWidth = baseStrokeWidth
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+
+        // Subtle glow outline just outside the main arc
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius + 2, startAngle, startAngle + progressAngle)
+        this.ctx.strokeStyle = glowStrokeColor
+        this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
+        this.ctx.stroke()
+
+        // Reset styles to defaults for subsequent drawing
+        this.ctx.lineCap = 'butt'
       }
     }
     
@@ -2334,7 +2420,7 @@ const MultiplayerArena = () => {
           onMouseDown={isMobile ? undefined : handleCashOut}
         >
           {/* Progress fill overlay */}
-          {isCashingOut && (
+          {isCashingOut && (!hasAuthoritativeCashOutRef.current || cashOutProgress <= 0) && (
             <div style={{
               position: 'absolute',
               left: 0,
