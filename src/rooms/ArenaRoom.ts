@@ -16,7 +16,7 @@ export class Player extends Schema {
   @type("boolean") alive: boolean = true;
   @type("boolean") spawnProtection: boolean = false; // Spawn protection status
   @type("number") spawnProtectionStart: number = 0; // When protection started
-  @type("number") spawnProtectionTime: number = 6000; // 6 seconds protection
+  @type("number") spawnProtectionTime: number = 5000; // 5 seconds protection
   
   // Server-side skin properties for multiplayer visibility
   @type("string") skinId: string = "default";
@@ -199,7 +199,7 @@ export class ArenaRoom extends Room<GameState> {
     // Initialize spawn protection
     player.spawnProtection = true;
     player.spawnProtectionStart = Date.now();
-    player.spawnProtectionTime = 6000; // 6 seconds protection
+    player.spawnProtectionTime = 5000; // 5 seconds protection
     
     console.log(`🎨 Player ${playerName} joined with skin: ${player.skinName} (${player.skinColor})`);
     
@@ -662,7 +662,7 @@ export class ArenaRoom extends Room<GameState> {
     // Enable spawn protection on respawn
     player.spawnProtection = true;
     player.spawnProtectionStart = Date.now();
-    player.spawnProtectionTime = 6000; // 6 seconds protection
+    player.spawnProtectionTime = 5000; // 5 seconds protection
     
     console.log(`🔄 Player respawned: ${player.name} at (${player.x.toFixed(1)}, ${player.y.toFixed(1)}) with spawn protection`);
   }
