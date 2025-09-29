@@ -507,34 +507,70 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   checkVirusCollisions(player: Player) {
+    const originalMass = player.mass;
+    
     this.state.viruses.forEach((virus, virusId) => {
+      if (!virus || virus.radius <= 0) return; // Skip invalid viruses
+      
       const dx = player.x - virus.x;
       const dy = player.y - virus.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance < player.radius + virus.radius) {
+        // Collision detected - calculate virus mass from radius for comparison
+        const virusMass = Math.pow(virus.radius / 3, 2); // Reverse of radius = sqrt(mass) * 3
+        
+        console.log(`🦠 VIRUS COLLISION DETECTED:`, {
+          playerName: player.name,
+          playerMass: player.mass.toFixed(1),
+          virusRadius: virus.radius.toFixed(1),
+          virusMass: virusMass.toFixed(1),
+          threshold: (virus.radius * 2).toFixed(1),
+          canEat: player.mass > virus.radius * 2
+        });
+        
         if (player.mass > virus.radius * 2) {
-          // Player destroys virus
+          // Player eats virus
+          const massGain = 10; // Fixed score gain
+          player.score += massGain;
           this.state.viruses.delete(virusId);
           this.spawnVirus();
-          player.score += 10;
+          
+          console.log(`🍽️ PLAYER EATS VIRUS:`, {
+            playerName: player.name,
+            scoreGain: massGain,
+            newScore: player.score
+          });
         } else {
           // Player gets damaged by virus
           const oldMass = player.mass;
-          const newMass = Math.max(25, player.mass * 0.8);
+          const reducedMass = player.mass * 0.8;
+          const newMass = Math.max(25, reducedMass);
           player.mass = newMass;
           player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
           
-          console.log(`🦠 VIRUS COLLISION:`, {
+          console.log(`💥 PLAYER HIT BY VIRUS:`, {
             playerName: player.name,
             oldMass: oldMass.toFixed(1),
-            newMass: newMass.toFixed(1),
+            reducedTo: reducedMass.toFixed(1),
+            finalMass: newMass.toFixed(1),
             reduction: (oldMass - newMass).toFixed(1),
-            minimumEnforced: newMass === 25
+            minimumEnforced: newMass === 25,
+            formula: `max(25, ${oldMass.toFixed(1)} * 0.8) = max(25, ${reducedMass.toFixed(1)}) = ${newMass.toFixed(1)}`
           });
         }
       }
     });
+    
+    // Log any unexpected mass changes
+    if (player.mass !== originalMass && player.mass === 50) {
+      console.log(`⚠️ SUSPICIOUS MASS CHANGE TO 50:`, {
+        playerName: player.name,
+        originalMass: originalMass.toFixed(1),
+        newMass: player.mass.toFixed(1),
+        stackTrace: new Error().stack
+      });
+    }
   }
 
   checkPlayerCollisions(player: Player, sessionId: string) {
