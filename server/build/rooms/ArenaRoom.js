@@ -141,7 +141,7 @@ class GameState extends schema_1.Schema {
         this.players = new schema_1.MapSchema();
         this.coins = new schema_1.MapSchema();
         this.viruses = new schema_1.MapSchema();
-        this.worldSize = 4000;
+        this.worldSize = 8000;
         this.timestamp = 0;
     }
 }
@@ -171,19 +171,24 @@ class ArenaRoom extends core_1.Room {
         super(...arguments);
         this.maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
         // Game configuration
-        this.worldSize = parseInt(process.env.WORLD_SIZE || '4000');
+        this.worldSize = parseInt(process.env.WORLD_SIZE || '8000');
+        this.playableRadius = parseInt(process.env.PLAYABLE_RADIUS || '1800');
         this.maxCoins = 100;
         this.maxViruses = 15;
         this.tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
     }
-    getRandomPlayablePosition(buffer) {
-        const center = this.worldSize / 2;
-        const maxRadius = Math.max(0, center - buffer);
+    getPlayableCenter() {
+        const center = this.worldSize / 4;
+        return { x: center, y: center };
+    }
+    generateCircularSpawnPosition(buffer = 0) {
+        const { x: centerX, y: centerY } = this.getPlayableCenter();
+        const maxRadius = Math.max(0, this.playableRadius - buffer);
         const angle = Math.random() * Math.PI * 2;
         const radius = Math.sqrt(Math.random()) * maxRadius;
         return {
-            x: center + Math.cos(angle) * radius,
-            y: center + Math.sin(angle) * radius
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius
         };
     }
     onCreate() {
@@ -217,12 +222,13 @@ class ArenaRoom extends core_1.Room {
         // Create new player
         const player = new Player();
         player.name = playerName;
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
-        player.vx = 0;
-        player.vy = 0;
         player.mass = INITIAL_MASS;
         player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+        const spawn = this.generateCircularSpawnPosition(player.radius);
+        player.x = spawn.x;
+        player.y = spawn.y;
+        player.vx = 0;
+        player.vy = 0;
         player.color = this.generatePlayerColor();
         player.score = 0;
         player.lastSeq = 0;
@@ -270,9 +276,19 @@ class ArenaRoom extends core_1.Room {
             // Apply movement
             player.x += player.vx * deltaTime * 10; // Scale for game feel
             player.y += player.vy * deltaTime * 10;
-            // Keep player in bounds
-            player.x = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.x));
-            player.y = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.y));
+            // Keep player within the circular boundary
+            const { x: centerX, y: centerY } = this.getPlayableCenter();
+            const dx = player.x - centerX;
+            const dy = player.y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const maxDistance = Math.max(0, this.playableRadius - player.radius);
+            if (distance > maxDistance && distance > 0) {
+                const scale = maxDistance / distance;
+                player.x = centerX + dx * scale;
+                player.y = centerY + dy * scale;
+                player.vx = 0;
+                player.vy = 0;
+            }
             // Apply friction
             player.vx *= 0.95;
             player.vy *= 0.95;
@@ -351,12 +367,13 @@ class ArenaRoom extends core_1.Room {
         });
     }
     respawnPlayer(player) {
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
-        player.vx = 0;
-        player.vy = 0;
         player.mass = INITIAL_MASS;
         player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+        const spawn = this.generateCircularSpawnPosition(player.radius);
+        player.x = spawn.x;
+        player.y = spawn.y;
+        player.vx = 0;
+        player.vy = 0;
         player.alive = true;
         console.log(`🔄 Player respawned: ${player.name}`);
     }
@@ -373,21 +390,21 @@ class ArenaRoom extends core_1.Room {
     spawnCoin() {
         const coinId = `coin_${Date.now()}_${Math.random().toString(36).substring(7)}`;
         const coin = new Coin();
-        const position = this.getRandomPlayablePosition(20);
-        coin.x = position.x;
-        coin.y = position.y;
         coin.value = 1;
         coin.radius = 8;
+        const position = this.generateCircularSpawnPosition(coin.radius);
+        coin.x = position.x;
+        coin.y = position.y;
         coin.color = "#FFD700";
         this.state.coins.set(coinId, coin);
     }
     spawnVirus() {
         const virusId = `virus_${Date.now()}_${Math.random().toString(36).substring(7)}`;
         const virus = new Virus();
-        const position = this.getRandomPlayablePosition(100);
+        virus.radius = 60 + Math.random() * 40;
+        const position = this.generateCircularSpawnPosition(virus.radius);
         virus.x = position.x;
         virus.y = position.y;
-        virus.radius = 60 + Math.random() * 40;
         virus.color = "#FF6B6B";
         this.state.viruses.set(virusId, virus);
     }
