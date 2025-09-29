@@ -13,10 +13,26 @@ from typing import Dict, List, Tuple, Any
 
 class ArenaSpawnPositionTester:
     def __init__(self):
-        # Get base URL from environment
-        self.base_url = self.get_base_url()
+        self.base_url = "https://turfloot-arena-4.preview.emergentagent.com"
+        self.api_url = f"{self.base_url}/api"
         self.test_results = []
-        self.start_time = time.time()
+        self.total_tests = 0
+        self.passed_tests = 0
+        
+        # Expected values from review request
+        self.expected_world_size = 8000
+        self.expected_center_x = 2000  # worldSize / 4 = 8000 / 4 = 2000
+        self.expected_center_y = 2000  # worldSize / 4 = 8000 / 4 = 2000
+        self.expected_playable_radius = 1800
+        self.expected_max_spawn_distance = 1800  # Players should spawn within 1800px radius
+        
+        print("🎯 ARENA SPAWN POSITION FIX VERIFICATION TEST")
+        print("=" * 60)
+        print(f"Base URL: {self.base_url}")
+        print(f"Expected World Size: {self.expected_world_size}x{self.expected_world_size}")
+        print(f"Expected Center: ({self.expected_center_x}, {self.expected_center_y})")
+        print(f"Expected Playable Radius: {self.expected_playable_radius}px")
+        print("=" * 60)
         
         print("🎯 BOUNDARY SYNC VERIFICATION TESTING INITIATED")
         print(f"🌐 Testing against: {self.base_url}")
