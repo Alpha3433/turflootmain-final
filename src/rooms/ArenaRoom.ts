@@ -519,9 +519,19 @@ export class ArenaRoom extends Room<GameState> {
           this.spawnVirus();
           player.score += 10;
         } else {
-          // Player gets damaged
-          player.mass = Math.max(25, player.mass * 0.8); // Minimum mass is now 25 (matching starting mass)
+          // Player gets damaged by virus
+          const oldMass = player.mass;
+          const newMass = Math.max(25, player.mass * 0.8);
+          player.mass = newMass;
           player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
+          
+          console.log(`🦠 VIRUS COLLISION:`, {
+            playerName: player.name,
+            oldMass: oldMass.toFixed(1),
+            newMass: newMass.toFixed(1),
+            reduction: (oldMass - newMass).toFixed(1),
+            minimumEnforced: newMass === 25
+          });
         }
       }
     });
