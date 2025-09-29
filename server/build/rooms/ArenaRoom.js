@@ -28,6 +28,8 @@ class Player extends schema_1.Schema {
         this.score = 0;
         this.lastSeq = 0;
         this.alive = true;
+        this.spawnProtection = false;
+        this.spawnProtectionEndTime = 0;
     }
 }
 exports.Player = Player;
@@ -75,6 +77,14 @@ __decorate([
     (0, schema_1.type)("boolean"),
     __metadata("design:type", Boolean)
 ], Player.prototype, "alive", void 0);
+__decorate([
+    (0, schema_1.type)("boolean"),
+    __metadata("design:type", Boolean)
+], Player.prototype, "spawnProtection", void 0);
+__decorate([
+    (0, schema_1.type)("number"),
+    __metadata("design:type", Number)
+], Player.prototype, "spawnProtectionEndTime", void 0);
 // Coin state schema
 class Coin extends schema_1.Schema {
     constructor() {
@@ -175,6 +185,18 @@ class ArenaRoom extends core_1.Room {
         this.maxCoins = 100;
         this.maxViruses = 15;
         this.tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+        this.spawnProtectionDurationMs = 5000;
+        this.spawnProtectionEndTimes = new Map();
+    }
+    getRandomPlayablePosition(buffer) {
+        const center = this.worldSize / 2;
+        const maxRadius = Math.max(0, center - buffer);
+        const angle = Math.random() * Math.PI * 2;
+        const radius = Math.sqrt(Math.random()) * maxRadius;
+        return {
+            x: center + Math.cos(angle) * radius,
+            y: center + Math.sin(angle) * radius
+        };
     }
     onCreate() {
         console.log("🌍 Arena room initialized");
@@ -207,8 +229,9 @@ class ArenaRoom extends core_1.Room {
         // Create new player
         const player = new Player();
         player.name = playerName;
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
+        const spawnPosition = this.getRandomPlayablePosition(50);
+        player.x = spawnPosition.x;
+        player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
         player.mass = INITIAL_MASS;
@@ -217,6 +240,9 @@ class ArenaRoom extends core_1.Room {
         player.score = 0;
         player.lastSeq = 0;
         player.alive = true;
+        player.spawnProtection = true;
+        player.spawnProtectionEndTime = Date.now() + this.spawnProtectionDurationMs;
+        this.spawnProtectionEndTimes.set(client.sessionId, player.spawnProtectionEndTime);
         // Add player to game state
         this.state.players.set(client.sessionId, player);
         // Store client metadata
@@ -249,14 +275,22 @@ class ArenaRoom extends core_1.Room {
             console.log(`👋 Player left: ${player.name} (${client.sessionId})`);
             this.state.players.delete(client.sessionId);
         }
+        this.spawnProtectionEndTimes.delete(client.sessionId);
     }
     update() {
         const deltaTime = 1 / this.tickRate; // Fixed timestep
         this.state.timestamp = Date.now();
+        const now = this.state.timestamp;
         // Update all players
         this.state.players.forEach((player, sessionId) => {
             if (!player.alive)
                 return;
+            const protectionEnd = this.spawnProtectionEndTimes.get(sessionId);
+            if (player.spawnProtection && protectionEnd !== undefined && now >= protectionEnd) {
+                player.spawnProtection = false;
+                player.spawnProtectionEndTime = 0;
+                this.spawnProtectionEndTimes.delete(sessionId);
+            }
             // Apply movement
             player.x += player.vx * deltaTime * 10; // Scale for game feel
             player.y += player.vy * deltaTime * 10;
@@ -296,6 +330,9 @@ class ArenaRoom extends core_1.Room {
     }
     checkVirusCollisions(player) {
         this.state.viruses.forEach((virus, virusId) => {
+            if (player.spawnProtection) {
+                return;
+            }
             const dx = player.x - virus.x;
             const dy = player.y - virus.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -322,6 +359,9 @@ class ArenaRoom extends core_1.Room {
             const dy = player.y - otherPlayer.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < player.radius + otherPlayer.radius) {
+                if (player.spawnProtection || otherPlayer.spawnProtection) {
+                    return;
+                }
                 // Larger player absorbs smaller player
                 if (player.mass > otherPlayer.mass * 1.2) {
                     player.mass += otherPlayer.mass * 0.8;
@@ -329,25 +369,32 @@ class ArenaRoom extends core_1.Room {
                     player.radius = Math.sqrt(player.mass / Math.PI) * 10;
                     // Eliminate other player
                     otherPlayer.alive = false;
+                    otherPlayer.spawnProtection = false;
+                    otherPlayer.spawnProtectionEndTime = 0;
+                    this.spawnProtectionEndTimes.delete(otherSessionId);
                     console.log(`💀 ${player.name} eliminated ${otherPlayer.name}`);
                     // Respawn eliminated player after 3 seconds
                     setTimeout(() => {
                         if (this.state.players.has(otherSessionId)) {
-                            this.respawnPlayer(otherPlayer);
+                            this.respawnPlayer(otherPlayer, otherSessionId);
                         }
                     }, 3000);
                 }
             }
         });
     }
-    respawnPlayer(player) {
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
+    respawnPlayer(player, sessionId) {
+        const spawnPosition = this.getRandomPlayablePosition(50);
+        player.x = spawnPosition.x;
+        player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
         player.mass = INITIAL_MASS;
         player.radius = Math.sqrt(player.mass / Math.PI) * 10;
         player.alive = true;
+        player.spawnProtection = true;
+        player.spawnProtectionEndTime = Date.now() + this.spawnProtectionDurationMs;
+        this.spawnProtectionEndTimes.set(sessionId, player.spawnProtectionEndTime);
         console.log(`🔄 Player respawned: ${player.name}`);
     }
     generateCoins() {
@@ -363,8 +410,9 @@ class ArenaRoom extends core_1.Room {
     spawnCoin() {
         const coinId = `coin_${Date.now()}_${Math.random().toString(36).substring(7)}`;
         const coin = new Coin();
-        coin.x = Math.random() * this.worldSize;
-        coin.y = Math.random() * this.worldSize;
+        const position = this.getRandomPlayablePosition(20);
+        coin.x = position.x;
+        coin.y = position.y;
         coin.value = 1;
         coin.radius = 8;
         coin.color = "#FFD700";
@@ -373,8 +421,9 @@ class ArenaRoom extends core_1.Room {
     spawnVirus() {
         const virusId = `virus_${Date.now()}_${Math.random().toString(36).substring(7)}`;
         const virus = new Virus();
-        virus.x = Math.random() * this.worldSize;
-        virus.y = Math.random() * this.worldSize;
+        const position = this.getRandomPlayablePosition(100);
+        virus.x = position.x;
+        virus.y = position.y;
         virus.radius = 60 + Math.random() * 40;
         virus.color = "#FF6B6B";
         this.state.viruses.set(virusId, virus);

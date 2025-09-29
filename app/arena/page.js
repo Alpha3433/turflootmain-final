@@ -948,9 +948,8 @@ const MultiplayerArena = () => {
         speed: 2,
         targetX: 2000, // Updated center for left-side playable area (worldSize/4)
         targetY: 2000, // Updated center for top-side playable area (worldSize/4)
-        spawnProtection: true,
-        spawnProtectionTime: 6000,
-        spawnProtectionStart: Date.now()
+        spawnProtection: false,
+        spawnProtectionEndTime: 0
       }
       
       // Initialize client-side animation cache for persistent virus animations
@@ -1104,6 +1103,8 @@ const MultiplayerArena = () => {
         this.player.radius = currentPlayer.radius
         this.player.color = currentPlayer.color
         this.player.skinColor = currentPlayer.skinColor
+        this.player.spawnProtection = currentPlayer.spawnProtection
+        this.player.spawnProtectionEndTime = currentPlayer.spawnProtectionEndTime
         
       } else {
         console.log('❌ No current player found in server state - players available:', 
