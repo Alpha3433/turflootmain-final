@@ -421,6 +421,14 @@ export class ArenaRoom extends Room<GameState> {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance > 1) { // Only move if target is far enough
+        console.log('🎯 PLAYER MOVEMENT DETECTED:', {
+          playerName: player.name,
+          sessionId: client.sessionId,
+          currentPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
+          targetPos: `(${targetX.toFixed(1)}, ${targetY.toFixed(1)})`,
+          distance: distance.toFixed(1)
+        });
+        
         // Calculate dynamic speed based on mass (matching local agario formula)
         const baseSpeed = 6.0;
         const massSpeedFactor = Math.sqrt(player.mass / 20);
@@ -438,12 +446,14 @@ export class ArenaRoom extends Room<GameState> {
         const playableRadius = 1800; // Match the red divider radius exactly
         const maxRadius = playableRadius - player.radius; // Player edge stops at red divider
         
-        console.log('🔍 BOUNDARY CHECK:', {
-          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
-          center: `(${centerX}, ${centerY})`,
+        console.log('🔍 ARENA BOUNDARY VALUES:', {
+          worldSize: this.worldSize,
+          centerX: centerX,
+          centerY: centerY,
           playableRadius: playableRadius,
+          playerRadius: player.radius.toFixed(1),
           maxRadius: maxRadius.toFixed(1),
-          playerRadius: player.radius.toFixed(1)
+          playerName: player.name
         });
         
         // Calculate proposed new position
