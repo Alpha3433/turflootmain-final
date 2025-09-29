@@ -307,7 +307,7 @@ class ArenaRoom extends core_1.Room {
                 }
                 else {
                     // Player gets damaged
-                    player.mass = Math.max(50, player.mass * 0.8);
+                    player.mass = Math.max(25, player.mass * 0.8);
                     player.radius = Math.sqrt(player.mass / Math.PI) * 10;
                 }
             }
