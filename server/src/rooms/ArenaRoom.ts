@@ -52,6 +52,18 @@ export class ArenaRoom extends Room<GameState> {
   maxCoins = 100;
   maxViruses = 15;
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+
+  private getRandomPlayablePosition(buffer: number) {
+    const center = this.worldSize / 2;
+    const maxRadius = Math.max(0, center - buffer);
+    const angle = Math.random() * Math.PI * 2;
+    const radius = Math.sqrt(Math.random()) * maxRadius;
+
+    return {
+      x: center + Math.cos(angle) * radius,
+      y: center + Math.sin(angle) * radius
+    };
+  }
   
   onCreate() {
     console.log("🌍 Arena room initialized");
@@ -277,23 +289,25 @@ export class ArenaRoom extends Room<GameState> {
   spawnCoin() {
     const coinId = `coin_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     const coin = new Coin();
-    coin.x = Math.random() * this.worldSize;
-    coin.y = Math.random() * this.worldSize;
+    const position = this.getRandomPlayablePosition(20);
+    coin.x = position.x;
+    coin.y = position.y;
     coin.value = 1;
     coin.radius = 8;
     coin.color = "#FFD700";
-    
+
     this.state.coins.set(coinId, coin);
   }
 
   spawnVirus() {
     const virusId = `virus_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     const virus = new Virus();
-    virus.x = Math.random() * this.worldSize;
-    virus.y = Math.random() * this.worldSize;
+    const position = this.getRandomPlayablePosition(100);
+    virus.x = position.x;
+    virus.y = position.y;
     virus.radius = 60 + Math.random() * 40;
     virus.color = "#FF6B6B";
-    
+
     this.state.viruses.set(virusId, virus);
   }
 

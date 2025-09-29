@@ -39,6 +39,7 @@ export declare class ArenaRoom extends Room<GameState> {
     maxCoins: number;
     maxViruses: number;
     tickRate: number;
+    private getRandomPlayablePosition;
     onCreate(): void;
     onJoin(client: Client, options?: any): void;
     handleInput(client: Client, message: any): void;
