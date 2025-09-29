@@ -412,6 +412,12 @@ export class ArenaRoom extends Room<GameState> {
         }
       }
       
+      // ARENA BOUNDARY ENFORCEMENT CONSTANTS - declare at function scope
+      const centerX = this.worldSize / 4; // 2000 - playable area center X
+      const centerY = this.worldSize / 4; // 2000 - playable area center Y
+      const playableRadius = 1800; // Match the red divider radius exactly
+      const maxRadius = playableRadius - player.radius; // Player edge stops at red divider
+      
       // Smooth movement toward target (vx and vy are being used as targetX and targetY)
       const targetX = player.vx;
       const targetY = player.vy;
