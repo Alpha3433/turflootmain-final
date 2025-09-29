@@ -432,11 +432,19 @@ export class ArenaRoom extends Room<GameState> {
         // Clamp movement to not overshoot target
         const actualMoveDistance = Math.min(moveDistance, distance);
         
-        // Arena boundary enforcement - check target position BEFORE moving
+        // STRICT ARENA BOUNDARY ENFORCEMENT - prevent red zone entry
         const centerX = this.worldSize / 4; // 2000 - playable area center X
         const centerY = this.worldSize / 4; // 2000 - playable area center Y
-        const playableRadius = 1800; // Match the red divider radius
-        const maxRadius = playableRadius - player.radius; // Player edge constrained at red divider
+        const playableRadius = 1800; // Match the red divider radius exactly
+        const maxRadius = playableRadius - player.radius; // Player edge stops at red divider
+        
+        console.log('🔍 BOUNDARY CHECK:', {
+          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
+          center: `(${centerX}, ${centerY})`,
+          playableRadius: playableRadius,
+          maxRadius: maxRadius.toFixed(1),
+          playerRadius: player.radius.toFixed(1)
+        });
         
         // Calculate proposed new position
         const moveX = (dx / distance) * actualMoveDistance;
