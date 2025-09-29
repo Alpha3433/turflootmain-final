@@ -423,7 +423,7 @@ export class ArenaRoom extends Room<GameState> {
       if (distance > 1) { // Only move if target is far enough
         console.log('🎯 PLAYER MOVEMENT DETECTED:', {
           playerName: player.name,
-          sessionId: client.sessionId,
+          sessionId: sessionId,
           currentPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
           targetPos: `(${targetX.toFixed(1)}, ${targetY.toFixed(1)})`,
           distance: distance.toFixed(1)
