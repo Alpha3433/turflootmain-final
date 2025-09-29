@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArenaRoom = exports.GameState = exports.Virus = exports.Coin = exports.Player = void 0;
 const core_1 = require("@colyseus/core");
 const schema_1 = require("@colyseus/schema");
+const STARTING_MASS = 25;
 // Player state schema
 class Player extends schema_1.Schema {
     constructor() {
@@ -21,7 +22,7 @@ class Player extends schema_1.Schema {
         this.y = 0;
         this.vx = 0;
         this.vy = 0;
-        this.mass = 100;
+        this.mass = STARTING_MASS;
         this.radius = 20;
         this.color = "#FF6B6B";
         this.score = 0;
@@ -215,7 +216,7 @@ class ArenaRoom extends core_1.Room {
         player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
-        player.mass = 100;
+        player.mass = STARTING_MASS;
         player.radius = Math.sqrt(player.mass / Math.PI) * 10;
         player.color = this.generatePlayerColor();
         player.score = 0;
@@ -243,7 +244,7 @@ class ArenaRoom extends core_1.Room {
         player.lastSeq = seq;
         client.userData.lastInputTime = Date.now();
         // Apply movement (dx, dy are normalized direction vectors)
-        const speed = Math.max(1, 5 * (100 / player.mass)); // Speed inversely proportional to mass
+        const speed = Math.max(1, 5 * (STARTING_MASS / player.mass)); // Speed inversely proportional to mass
         player.vx = dx * speed;
         player.vy = dy * speed;
     }
@@ -349,7 +350,7 @@ class ArenaRoom extends core_1.Room {
         player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
-        player.mass = 100;
+        player.mass = STARTING_MASS;
         player.radius = Math.sqrt(player.mass / Math.PI) * 10;
         player.alive = true;
         console.log(`🔄 Player respawned: ${player.name}`);
