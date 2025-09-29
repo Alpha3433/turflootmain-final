@@ -471,6 +471,27 @@ export class ArenaRoom extends Room<GameState> {
         }
       }
       
+      // ADDITIONAL SAFETY CHECK: Ensure player is always within bounds
+      const currentDistance = Math.sqrt(
+        Math.pow(player.x - centerX, 2) + 
+        Math.pow(player.y - centerY, 2)
+      );
+      
+      if (currentDistance > maxRadius) {
+        console.log('🚨 EMERGENCY BOUNDARY ENFORCEMENT:', {
+          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
+          center: `(${centerX}, ${centerY})`,
+          distance: currentDistance.toFixed(1),
+          maxRadius: maxRadius.toFixed(1),
+          violation: (currentDistance - maxRadius).toFixed(1)
+        });
+        
+        // Force player back within boundary
+        const angle = Math.atan2(player.y - centerY, player.x - centerX);
+        player.x = centerX + Math.cos(angle) * maxRadius;
+        player.y = centerY + Math.sin(angle) * maxRadius;
+      }
+      
       // Check collisions
       this.checkCollisions(player, sessionId);
     });
