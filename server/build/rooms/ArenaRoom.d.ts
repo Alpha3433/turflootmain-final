@@ -36,10 +36,12 @@ export declare class GameState extends Schema {
 export declare class ArenaRoom extends Room<GameState> {
     maxClients: number;
     worldSize: number;
+    playableRadius: number;
     maxCoins: number;
     maxViruses: number;
     tickRate: number;
-    private getRandomPlayablePosition;
+    private getPlayableCenter;
+    private generateCircularSpawnPosition;
     onCreate(): void;
     onJoin(client: Client, options?: any): void;
     handleInput(client: Client, message: any): void;
