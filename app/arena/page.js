@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
 import { usePrivy } from '@privy-io/react-auth'
@@ -46,7 +46,9 @@ const MultiplayerArena = () => {
   const [cashOutProgress, setCashOutProgress] = useState(0)
   const [isCashingOut, setIsCashingOut] = useState(false)
   const [cashOutComplete, setCashOutComplete] = useState(false)
-  const cashOutIntervalRef = useRef(null)
+  const cashOutPayoutRef = useRef(0)
+  const prevCashOutCompleteRef = useRef(false)
+  const prevIsCashingOutRef = useRef(false)
 
   // Mission system - ported from agario  
   const [currency, setCurrency] = useState(0)
@@ -211,20 +213,63 @@ const MultiplayerArena = () => {
     }
   }, [ready, authenticated, user, router])
 
+  const sendCashoutRequest = useCallback((action) => {
+    if (!wsRef.current || !wsRef.current.sessionId) {
+      console.log('⚠️ Cash out request ignored - not connected to server')
+      return false
+    }
+
+    const connection = wsRef.current.connection
+    if (connection && connection.isOpen === false) {
+      console.log('⚠️ Cash out request ignored - connection closing or closed')
+      return false
+    }
+
+    if (connection?.transport && connection.transport.isOpen === false) {
+      console.log('⚠️ Cash out request ignored - transport closing or closed')
+      return false
+    }
+
+    try {
+      wsRef.current.send('cashout', { action })
+      return true
+    } catch (error) {
+      console.error(`❌ Failed to send cashout ${action} request:`, error)
+      return false
+    }
+  }, [])
+
   // Handle cash out functionality - ported from agario
   const handleCashOut = () => {
-    if (!isCashingOut && !cashOutComplete && gameReady) {
+    if (!gameReady) {
+      console.log('⚠️ Cash out ignored - game not ready')
+      return
+    }
+
+    if (cashOutComplete) {
+      console.log('⚠️ Cash out ignored - already completed')
+      return
+    }
+
+    if (!isCashingOut) {
       console.log('Starting cash out process via button')
-      setIsCashingOut(true)
-      setCashOutProgress(0)
-    } else if (isCashingOut) {
-      console.log('Canceling cash out via button')
+      const started = sendCashoutRequest('start')
+      if (started) {
+        setIsCashingOut(true)
+        setCashOutProgress(0)
+        setCashOutComplete(false)
+        cashOutPayoutRef.current = score
+      }
+      return
+    }
+
+    console.log('Canceling cash out via button')
+    const cancelled = sendCashoutRequest('cancel')
+    if (cancelled) {
       setIsCashingOut(false)
       setCashOutProgress(0)
-      if (cashOutIntervalRef.current) {
-        clearInterval(cashOutIntervalRef.current)
-        cashOutIntervalRef.current = null
-      }
+      setCashOutComplete(false)
+      cashOutPayoutRef.current = 0
     }
   }
 
@@ -338,10 +383,17 @@ const MultiplayerArena = () => {
   
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameReady) {
-        console.log('Starting cash out process with E key')
-        setIsCashingOut(true)
-        setCashOutProgress(0)
+      if (e.key.toLowerCase() === 'e' && !cashOutComplete && gameReady) {
+        if (!isCashingOut) {
+          console.log('Starting cash out process with E key')
+          const started = sendCashoutRequest('start')
+          if (started) {
+            setIsCashingOut(true)
+            setCashOutProgress(0)
+            setCashOutComplete(false)
+            cashOutPayoutRef.current = score
+          }
+        }
       }
       
       // Handle SPACE key for splitting with cooldown
@@ -374,13 +426,14 @@ const MultiplayerArena = () => {
     }
     
     const handleKeyUp = (e) => {
-      if (e.key.toLowerCase() === 'e' && isCashingOut) {
+      if (e.key.toLowerCase() === 'e' && isCashingOut && !cashOutComplete) {
         console.log('Canceling cash out - E key released')
-        setIsCashingOut(false)
-        setCashOutProgress(0)
-        if (cashOutIntervalRef.current) {
-          clearInterval(cashOutIntervalRef.current)
-          cashOutIntervalRef.current = null
+        const cancelled = sendCashoutRequest('cancel')
+        if (cancelled) {
+          setIsCashingOut(false)
+          setCashOutProgress(0)
+          setCashOutComplete(false)
+          cashOutPayoutRef.current = 0
         }
       }
     }
@@ -392,42 +445,33 @@ const MultiplayerArena = () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     }
-  }, [isCashingOut, cashOutComplete, gameReady])
+  }, [isCashingOut, cashOutComplete, gameReady, sendCashoutRequest, score])
 
-  // Cash out progress interval - ported from agario
+  // Track cash out lifecycle transitions using authoritative server state
   useEffect(() => {
-    if (isCashingOut && !cashOutComplete) {
-      console.log('Starting cash out progress interval')
-      
-      cashOutIntervalRef.current = setInterval(() => {
-        setCashOutProgress(prev => {
-          const newProgress = prev + 2 // 2% per 100ms = 5 second duration
-          
-          if (newProgress >= 100) {
-            console.log('Cash out completed!')
-            setIsCashingOut(false)
-            setCashOutComplete(true)
-            clearInterval(cashOutIntervalRef.current)
-            cashOutIntervalRef.current = null
-            
-            // Add currency based on score
-            setCurrency(prevCurrency => prevCurrency + score)
-            
-            return 100
-          }
-          
-          return newProgress
-        })
-      }, 100) // Update every 100ms for smooth progress
+    if (isCashingOut && !prevIsCashingOutRef.current) {
+      cashOutPayoutRef.current = score
     }
-    
-    return () => {
-      if (cashOutIntervalRef.current) {
-        clearInterval(cashOutIntervalRef.current)
-        cashOutIntervalRef.current = null
-      }
+
+    if (!isCashingOut && prevIsCashingOutRef.current && !cashOutComplete) {
+      cashOutPayoutRef.current = 0
     }
-  }, [isCashingOut, score])
+
+    prevIsCashingOutRef.current = isCashingOut
+  }, [isCashingOut, cashOutComplete, score])
+
+  useEffect(() => {
+    if (cashOutComplete && !prevCashOutCompleteRef.current) {
+      const payout = cashOutPayoutRef.current || score
+      setCurrency(prevCurrency => prevCurrency + payout)
+    }
+
+    if (!cashOutComplete && prevCashOutCompleteRef.current) {
+      cashOutPayoutRef.current = 0
+    }
+
+    prevCashOutCompleteRef.current = cashOutComplete
+  }, [cashOutComplete, score])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
@@ -1098,7 +1142,14 @@ const MultiplayerArena = () => {
         console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', Math.round(currentPlayer.mass) || 25, ')')
         setMass(Math.round(currentPlayer.mass) || 25)
         setScore(Math.round(currentPlayer.score) || 0)
-        
+        setIsCashingOut(!!currentPlayer.isCashingOut)
+
+        const serverProgress = typeof currentPlayer.cashOutProgress === 'number'
+          ? Math.min(100, Math.max(0, currentPlayer.cashOutProgress))
+          : 0
+        setCashOutProgress(serverProgress)
+        setCashOutComplete(!!currentPlayer.cashOutComplete)
+
         // Update other player properties
         this.player.mass = currentPlayer.mass
         this.player.radius = currentPlayer.radius

@@ -17,6 +17,10 @@ export class Player extends Schema {
   @type("boolean") spawnProtection: boolean = false; // Spawn protection status
   @type("number") spawnProtectionStart: number = 0; // When protection started
   @type("number") spawnProtectionTime: number = 5000; // 5 seconds protection
+  @type("boolean") isCashingOut: boolean = false;
+  @type("number") cashOutProgress: number = 0;
+  @type("number") cashOutStartTime: number = 0;
+  @type("boolean") cashOutComplete: boolean = false;
   
   // Server-side skin properties for multiplayer visibility
   @type("string") skinId: string = "default";
@@ -60,7 +64,8 @@ export class ArenaRoom extends Room<GameState> {
   maxCoins = 1000; // Increased from 100 to match local agario density
   maxViruses = 15;
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
-  
+  cashOutDurationSeconds = 5;
+
   onCreate() {
     console.log("🌍 Arena room initialized");
     
@@ -87,7 +92,35 @@ export class ArenaRoom extends Room<GameState> {
         clientTimestamp: message.timestamp
       });
     });
-    
+
+    this.onMessage("cashout", (client: Client, message: any) => {
+      const player = this.state.players.get(client.sessionId);
+      if (!player || !player.alive) {
+        console.log(`⚠️ Cashout ignored - player not found or dead for session: ${client.sessionId}`);
+        return;
+      }
+
+      const action = typeof message === 'string' ? message : message?.action;
+
+      if (action === 'start') {
+        if (!player.isCashingOut && !player.cashOutComplete) {
+          player.isCashingOut = true;
+          player.cashOutStartTime = Date.now();
+          player.cashOutProgress = 0;
+          player.cashOutComplete = false;
+          console.log(`💸 Cashout started for ${player.name} (${client.sessionId})`);
+        }
+        return;
+      }
+
+      if (action === 'cancel') {
+        if (player.isCashingOut || player.cashOutProgress > 0) {
+          this.resetCashOutState(player);
+          console.log(`🛑 Cashout cancelled for ${player.name} (${client.sessionId})`);
+        }
+      }
+    });
+
     // Start game loop at 20 TPS
     this.setSimulationInterval(() => this.update(), 1000 / this.tickRate);
     
@@ -402,8 +435,30 @@ export class ArenaRoom extends Room<GameState> {
     
     // Update all players with smooth movement and spawn protection
     this.state.players.forEach((player, sessionId) => {
-      if (!player.alive) return;
-      
+      if (!player.alive) {
+        if (player.isCashingOut || player.cashOutProgress > 0 || player.cashOutComplete) {
+          this.resetCashOutState(player);
+        }
+        return;
+      }
+
+      if (player.isCashingOut) {
+        if (!player.cashOutStartTime) {
+          player.cashOutStartTime = now;
+        }
+
+        const progressIncrement = (deltaTime / this.cashOutDurationSeconds) * 100;
+        player.cashOutProgress = Math.min(100, player.cashOutProgress + progressIncrement);
+
+        if (player.cashOutProgress >= 100) {
+          this.completeCashOut(player, sessionId);
+        }
+      } else if (!player.cashOutComplete && player.cashOutProgress > 0) {
+        // Player cancelled - reset partial progress
+        player.cashOutProgress = 0;
+        player.cashOutStartTime = 0;
+      }
+
       // Update spawn protection status
       if (player.spawnProtection) {
         if (now - player.spawnProtectionStart >= player.spawnProtectionTime) {
@@ -631,9 +686,10 @@ export class ArenaRoom extends Room<GameState> {
           player.mass += otherPlayer.mass * 0.8;
           player.score += otherPlayer.score * 0.5;
           player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
-          
+
           // Eliminate other player
           otherPlayer.alive = false;
+          this.resetCashOutState(otherPlayer);
           console.log(`💀 ${player.name} eliminated ${otherPlayer.name}`);
           
           // Respawn eliminated player after 3 seconds
@@ -663,8 +719,24 @@ export class ArenaRoom extends Room<GameState> {
     player.spawnProtection = true;
     player.spawnProtectionStart = Date.now();
     player.spawnProtectionTime = 5000; // 5 seconds protection
-    
+    this.resetCashOutState(player);
+
     console.log(`🔄 Player respawned: ${player.name} at (${player.x.toFixed(1)}, ${player.y.toFixed(1)}) with spawn protection`);
+  }
+
+  private resetCashOutState(player: Player) {
+    player.isCashingOut = false;
+    player.cashOutProgress = 0;
+    player.cashOutStartTime = 0;
+    player.cashOutComplete = false;
+  }
+
+  private completeCashOut(player: Player, sessionId: string) {
+    player.isCashingOut = false;
+    player.cashOutProgress = 100;
+    player.cashOutStartTime = 0;
+    player.cashOutComplete = true;
+    console.log(`✅ Cashout complete for ${player.name} (${sessionId}) with score ${player.score}`);
   }
 
   generateCoins() {
