@@ -732,11 +732,13 @@ export class ArenaRoom extends Room<GameState> {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance < player.radius + otherPlayer.radius) {
-        // Check for split piece merging (agario-style)
+        // Check for split piece merging (agario-style) - simplified
         const isPlayerSplit = sessionId.includes('_split_');
         const isOtherSplit = otherSessionId.includes('_split_');
-        const playerOwner = player.ownerSessionId || sessionId;
-        const otherOwner = otherPlayer.ownerSessionId || otherSessionId;
+        
+        // Extract owner from session ID for split pieces
+        const playerOwner = isPlayerSplit ? sessionId.split('_split_')[0] : sessionId;
+        const otherOwner = isOtherSplit ? otherSessionId.split('_split_')[0] : otherSessionId;
         
         // Merge split pieces from the same player
         if ((isPlayerSplit || isOtherSplit) && playerOwner === otherOwner) {
