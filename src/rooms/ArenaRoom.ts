@@ -459,6 +459,24 @@ export class ArenaRoom extends Room<GameState> {
         }
       }
       
+      // Update cash out progress
+      if (player.isCashingOut && player.cashOutStartTime > 0) {
+        const cashOutDuration = 3000; // 3 seconds to complete cash out
+        const elapsedTime = now - player.cashOutStartTime;
+        const progress = Math.min((elapsedTime / cashOutDuration) * 100, 100);
+        
+        player.cashOutProgress = progress;
+        
+        // Complete cash out when progress reaches 100%
+        if (progress >= 100) {
+          player.isCashingOut = false;
+          player.cashOutProgress = 0;
+          player.cashOutStartTime = 0;
+          console.log(`💰 Cash out completed for ${player.name} - score: ${player.score}`);
+          // Here you could add logic to actually cash out the player's score
+        }
+      }
+      
       // ARENA BOUNDARY ENFORCEMENT CONSTANTS - declare at function scope
       const centerX = this.worldSize / 4; // 2000 - playable area center X
       const centerY = this.worldSize / 4; // 2000 - playable area center Y
