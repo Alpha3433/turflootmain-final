@@ -794,6 +794,10 @@ const MultiplayerArena = () => {
       GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on success
       console.log(`🔗 [${componentId}] Setting initial connection status to connected`)
       setConnectionStatus('connected')
+      
+      // Hide loading modal on successful connection
+      setShowLoadingModal(false)
+      
       console.log(`✅ [${componentId}] Connected to dedicated arena:`, room.id)
       console.log('🎮 DEDICATED Session ID (should stay stable):', room.sessionId)
       
