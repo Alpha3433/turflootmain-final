@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 """
-Cash Out Ring Functionality Backend Testing
-Testing the newly implemented multiplayer cash out ring system for arena mode.
+Backend Testing for Cash Out Ring Functionality
+Testing the FIXED cash out ring functionality to verify the disconnection bug is resolved.
+
+This test focuses on:
+1. Backend API and Colyseus server availability
+2. Server-side cash out message handlers (cashOutStart, cashOutStop)
+3. Cash out state field synchronization (isCashingOut, cashOutProgress, cashOutStartTime)
+4. Cash out progress updates over 3 seconds
+5. WebSocket connection state validation (the fix mentioned in review request)
+6. Server-side message handling without crashes
 """
 
 import requests
