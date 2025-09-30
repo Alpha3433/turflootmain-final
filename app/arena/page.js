@@ -413,10 +413,30 @@ const MultiplayerArena = () => {
         // Send cash out stop message to server for multiplayer visibility
         if (wsRef.current && wsRef.current.sessionId) {
           try {
+            console.log('💰 Attempting to send cash out stop message to server')
+            console.log('🔗 WebSocket connection state check:', {
+              hasWsRef: !!wsRef.current,
+              hasConnection: !!wsRef.current?.connection,
+              readyState: wsRef.current?.connection?.readyState,
+              expectedState: 1 // WebSocket.OPEN
+            })
+            
+            // Check if connection is still valid before sending (WebSocket.OPEN = 1)
+            if (!wsRef.current || !wsRef.current.connection || 
+                wsRef.current.connection.readyState !== 1) {
+              console.log('⚠️ Connection not ready for cash out stop - skipping message')
+              return
+            }
+            
             wsRef.current.send("cashOutStop", {})
-            console.log('💰 Sent cash out stop message to server')
+            console.log('✅ Cash out stop message sent successfully')
           } catch (error) {
             console.error('❌ Error sending cash out stop message:', error)
+            
+            // Check if it's a WebSocket state error
+            if (error.message && error.message.includes('CLOSING or CLOSED')) {
+              console.log('🔄 Detected WebSocket closing/closed state - cash out stop ignored')
+            }
           }
         }
       }
