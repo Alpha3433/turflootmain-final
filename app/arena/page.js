@@ -1579,7 +1579,7 @@ const MultiplayerArena = () => {
           this.ctx.font = 'bold 14px Arial'
           this.ctx.textAlign = 'center'
           this.ctx.textBaseline = 'middle'
-          this.ctx.fillText(`CASHING OUT ${Math.floor(player.cashOutProgress)}%`, 
+          this.ctx.fillText(`CASHING OUT ${Math.floor(actualProgress)}%`, 
                           player.x, player.y - playerRadius - 25)
         }
       }
