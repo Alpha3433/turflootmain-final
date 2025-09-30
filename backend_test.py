@@ -46,11 +46,17 @@ class CashOutRingTester:
         else:
             status = "❌ FAILED"
         
-        result = f"{status}: {test_name}"
+        result = f"{status} - {test_name}"
         if details:
-            result += f" - {details}"
+            result += f": {details}"
         
         print(result)
+        self.test_results.append({
+            'test': test_name,
+            'passed': passed,
+            'details': details,
+            'timestamp': datetime.now().isoformat()
+        })
         self.test_results.append({
             'test': test_name,
             'passed': passed,
