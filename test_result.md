@@ -3042,7 +3042,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Updated Spawn Protection System (4-second duration) Verification"
+    - "Agario-Style Split Functionality Comprehensive Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
