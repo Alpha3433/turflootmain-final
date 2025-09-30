@@ -12,6 +12,8 @@ export declare class Player extends Schema {
     score: number;
     lastSeq: number;
     alive: boolean;
+    spawnProtection: boolean;
+    spawnProtectionEndTime: number;
 }
 export declare class Coin extends Schema {
     x: number;
@@ -39,6 +41,9 @@ export declare class ArenaRoom extends Room<GameState> {
     maxCoins: number;
     maxViruses: number;
     tickRate: number;
+    private readonly spawnProtectionDurationMs;
+    private spawnProtectionEndTimes;
+    private getRandomPlayablePosition;
     onCreate(): void;
     onJoin(client: Client, options?: any): void;
     handleInput(client: Client, message: any): void;
@@ -48,7 +53,7 @@ export declare class ArenaRoom extends Room<GameState> {
     checkCoinCollisions(player: Player): void;
     checkVirusCollisions(player: Player): void;
     checkPlayerCollisions(player: Player, sessionId: string): void;
-    respawnPlayer(player: Player): void;
+    respawnPlayer(player: Player, sessionId: string): void;
     generateCoins(): void;
     generateViruses(): void;
     spawnCoin(): void;

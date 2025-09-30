@@ -291,19 +291,21 @@ const MultiplayerArena = () => {
       console.log('🔗 WebSocket connection state before split:', {
         wsRef: !!wsRef.current,
         sessionId: wsRef.current?.sessionId,
-        connection: wsRef.current?.connection?.readyState,
-        transport: wsRef.current?.connection?.transport?.readyState
+        connectionIsOpen: wsRef.current?.connection?.isOpen,
+        transportIsOpen: wsRef.current?.connection?.transport?.isOpen,
+        transportReadyState: wsRef.current?.connection?.transport?.readyState
       })
-      
-      // Check if connection is still valid before sending (WebSocket.OPEN = 1)
-      if (!wsRef.current || !wsRef.current.connection || 
-          wsRef.current.connection.readyState !== 1) {
+
+      // Check if connection is still valid before sending
+      if (!wsRef.current || !wsRef.current.connection ||
+          !wsRef.current.connection.isOpen) {
         console.log('⚠️ Connection not ready for split - skipping split attempt')
         console.log('🔗 Connection details:', {
           hasWsRef: !!wsRef.current,
           hasConnection: !!wsRef.current?.connection,
-          readyState: wsRef.current?.connection?.readyState,
-          expectedState: 1 // WebSocket.OPEN
+          isOpen: wsRef.current?.connection?.isOpen,
+          transportIsOpen: wsRef.current?.connection?.transport?.isOpen,
+          transportReadyState: wsRef.current?.connection?.transport?.readyState
         })
         return
       }
@@ -322,8 +324,9 @@ const MultiplayerArena = () => {
         console.log('🔗 WebSocket connection state after error:', {
           wsRef: !!wsRef.current,
           sessionId: wsRef.current?.sessionId,
-          connection: wsRef.current?.connection?.readyState,
-          transport: wsRef.current?.connection?.transport?.readyState
+          connectionIsOpen: wsRef.current?.connection?.isOpen,
+          transportIsOpen: wsRef.current?.connection?.transport?.isOpen,
+          transportReadyState: wsRef.current?.connection?.transport?.readyState
         })
       }
     }
@@ -1005,9 +1008,8 @@ const MultiplayerArena = () => {
         speed: 2,
         targetX: 2000, // Updated center for left-side playable area (worldSize/4)
         targetY: 2000, // Updated center for top-side playable area (worldSize/4)
-        spawnProtection: true,
-        spawnProtectionTime: 6000,
-        spawnProtectionStart: Date.now()
+        spawnProtection: false,
+        spawnProtectionEndTime: 0
       }
       
       // Initialize client-side animation cache for persistent virus animations
@@ -1161,6 +1163,8 @@ const MultiplayerArena = () => {
         this.player.radius = currentPlayer.radius
         this.player.color = currentPlayer.color
         this.player.skinColor = currentPlayer.skinColor
+        this.player.spawnProtection = currentPlayer.spawnProtection
+        this.player.spawnProtectionEndTime = currentPlayer.spawnProtectionEndTime
         
       } else {
         console.log('❌ No current player found in server state - players available:', 
