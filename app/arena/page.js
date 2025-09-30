@@ -492,6 +492,9 @@ const MultiplayerArena = () => {
             // Add currency based on score
             setCurrency(prevCurrency => prevCurrency + score)
             
+            // Show cashout success modal
+            setShowCashOutSuccessModal(true)
+            
             return 100
           }
           
