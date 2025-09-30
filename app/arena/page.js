@@ -2611,11 +2611,194 @@ const MultiplayerArena = () => {
         </button>
       </div>
 
+      {/* Cashout Success Modal */}
+      {showCashOutSuccessModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          fontFamily: '"Rajdhani", sans-serif'
+        }}>
+          <div style={{
+            backgroundColor: '#1f1f1f',
+            border: '3px solid #ffff00',
+            borderRadius: '12px',
+            padding: '40px',
+            maxWidth: '500px',
+            width: '90%',
+            textAlign: 'center',
+            boxShadow: '0 0 30px rgba(255, 255, 0, 0.5)',
+            animation: 'pulse 2s ease-in-out infinite'
+          }}>
+            {/* Trophy Icon */}
+            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🏆</div>
+            
+            {/* Main Title */}
+            <h1 style={{
+              color: '#ffff00',
+              fontSize: '32px',
+              fontWeight: 'bold',
+              margin: '0 0 16px 0',
+              textTransform: 'uppercase',
+              letterSpacing: '2px'
+            }}>
+              CASHOUT SUCCESSFUL!
+            </h1>
+            
+            {/* Subtitle */}
+            <p style={{
+              color: '#ffffff',
+              fontSize: '16px',
+              margin: '0 0 32px 0',
+              opacity: 0.9
+            }}>
+              Congratulations! You've successfully cashed out!
+            </p>
+            
+            {/* Stats Cards */}
+            <div style={{
+              display: 'flex',
+              gap: '20px',
+              marginBottom: '32px',
+              justifyContent: 'center'
+            }}>
+              {/* Time Survived Card */}
+              <div style={{
+                backgroundColor: '#2a2a2a',
+                borderRadius: '8px',
+                padding: '20px',
+                minWidth: '120px',
+                border: '1px solid #404040'
+              }}>
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>⏱️</div>
+                <div style={{
+                  color: '#ffffff',
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  marginBottom: '4px'
+                }}>
+                  {Math.floor((Date.now() - gameStats.timeStarted) / 60000)}m {Math.floor(((Date.now() - gameStats.timeStarted) % 60000) / 1000)}s
+                </div>
+                <div style={{
+                  color: '#9ca3af',
+                  fontSize: '12px',
+                  textTransform: 'uppercase'
+                }}>
+                  TIME SURVIVED
+                </div>
+              </div>
+              
+              {/* Eliminations Card */}
+              <div style={{
+                backgroundColor: '#2a2a2a',
+                borderRadius: '8px',
+                padding: '20px',
+                minWidth: '120px',
+                border: '1px solid #404040'
+              }}>
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>⚔️</div>
+                <div style={{
+                  color: '#ffffff',
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  marginBottom: '4px'
+                }}>
+                  {gameStats.eliminations}
+                </div>
+                <div style={{
+                  color: '#9ca3af',
+                  fontSize: '12px',
+                  textTransform: 'uppercase'
+                }}>
+                  ELIMINATIONS
+                </div>
+              </div>
+            </div>
+            
+            {/* Buttons */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <button
+                onClick={() => {
+                  setShowCashOutSuccessModal(false)
+                  setCashOutComplete(false)
+                  setGameStats({ timeStarted: Date.now(), eliminations: 0 })
+                  // Reset game state but stay in arena
+                  window.location.reload()
+                }}
+                style={{
+                  backgroundColor: '#ffff00',
+                  color: '#1f1f1f',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '16px 32px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontFamily: '"Rajdhani", sans-serif'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#ffff66'
+                  e.target.style.transform = 'scale(1.05)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#ffff00'
+                  e.target.style.transform = 'scale(1)'
+                }}
+              >
+                PLAY AGAIN
+              </button>
+              
+              <button
+                onClick={() => {
+                  window.location.href = '/'
+                }}
+                style={{
+                  backgroundColor: '#404040',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '16px 32px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontFamily: '"Rajdhani", sans-serif'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#505050'
+                  e.target.style.transform = 'scale(1.05)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#404040'
+                  e.target.style.transform = 'scale(1)'
+                }}
+              >
+                BACK TO MAIN MENU
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* CSS Animations */}
       <style jsx>{`
         @keyframes pulse {
-          0% { opacity: 1; }
-          100% { opacity: 0.5; }
+          0%, 100% { box-shadow: 0 0 30px rgba(255, 255, 0, 0.5); }
+          50% { box-shadow: 0 0 50px rgba(255, 255, 0, 0.8); }
         }
         
         @keyframes joystickPulse {
