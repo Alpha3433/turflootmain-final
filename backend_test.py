@@ -373,21 +373,6 @@ if __name__ == "__main__":
     tester = CashOutRingTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
-            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
-                arena_js_content = f.read()
-            
-            # Check world size configuration
-            world_size_checks = {
-                'ts_world_size_8000': 'worldSize = 8000' in arena_ts_content,
-                'js_world_size_8000': 'worldSize = 8000' in arena_js_content,
-                'ts_env_world_size': 'WORLD_SIZE || \'8000\'' in arena_ts_content,
-                'js_env_world_size': 'WORLD_SIZE || \'8000\'' in arena_js_content
-            }
-            
-            # Check center positioning (top-left quadrant)
-            center_checks = {
-                'ts_center_calculation': 'this.worldSize / 4' in arena_ts_content,
-                'js_center_calculation': 'this.worldSize / 4' in arena_js_content,
                 'ts_center_comment': '2000 for 8000x8000 world' in arena_ts_content,
                 'js_center_comment': '2000 for 8000x8000 world' in arena_js_content
             }
