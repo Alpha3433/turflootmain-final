@@ -736,7 +736,51 @@ export class ArenaRoom extends Room<GameState> {
       const distance = Math.sqrt(dx * dx + dy * dy);
       
       if (distance < player.radius + otherPlayer.radius) {
-        // Larger player absorbs smaller player
+        // Check for split piece merging (agario-style)
+        const isPlayerSplit = sessionId.includes('_split_');
+        const isOtherSplit = otherSessionId.includes('_split_');
+        const playerOwner = player.ownerSessionId || sessionId;
+        const otherOwner = otherPlayer.ownerSessionId || otherSessionId;
+        
+        // Merge split pieces from the same player
+        if ((isPlayerSplit || isOtherSplit) && playerOwner === otherOwner) {
+          // Check merge cooldown (split pieces can't merge immediately)
+          const now = Date.now();
+          const mergeCooldown = 10000; // 10 seconds before pieces can merge
+          
+          const playerSplitAge = player.splitTime > 0 ? now - player.splitTime : mergeCooldown + 1;
+          const otherSplitAge = otherPlayer.splitTime > 0 ? now - otherPlayer.splitTime : mergeCooldown + 1;
+          
+          if (playerSplitAge >= mergeCooldown && otherSplitAge >= mergeCooldown) {
+            // Merge the pieces - keep the larger one, merge the smaller one into it
+            let keepPlayer, mergePlayer, keepSessionId, mergeSessionId;
+            
+            if (player.mass >= otherPlayer.mass) {
+              keepPlayer = player;
+              mergePlayer = otherPlayer;
+              keepSessionId = sessionId;
+              mergeSessionId = otherSessionId;
+            } else {
+              keepPlayer = otherPlayer;
+              mergePlayer = player;
+              keepSessionId = otherSessionId;
+              mergeSessionId = sessionId;
+            }
+            
+            // Merge mass and score
+            keepPlayer.mass += mergePlayer.mass;
+            keepPlayer.radius = Math.sqrt(keepPlayer.mass) * 3;
+            keepPlayer.score += mergePlayer.score;
+            
+            // Remove the merged piece
+            this.state.players.delete(mergeSessionId);
+            
+            console.log(`🔄 Split pieces merged: ${keepPlayer.name} absorbed split piece. New mass: ${keepPlayer.mass}`);
+            return; // Skip normal collision logic
+          }
+        }
+        
+        // Normal player vs player collision (larger absorbs smaller)
         if (player.mass > otherPlayer.mass * 1.2) {
           player.mass += otherPlayer.mass * 0.8;
           player.score += otherPlayer.score * 0.5;
