@@ -18,6 +18,11 @@ export class Player extends Schema {
   @type("number") spawnProtectionStart: number = 0; // When protection started
   @type("number") spawnProtectionTime: number = 6000; // 6 seconds protection
   
+  // Cash out state for multiplayer visibility
+  @type("boolean") isCashingOut: boolean = false; // Whether player is cashing out
+  @type("number") cashOutProgress: number = 0; // Cash out progress (0-100)
+  @type("number") cashOutStartTime: number = 0; // When cash out started
+  
   // Server-side skin properties for multiplayer visibility
   @type("string") skinId: string = "default";
   @type("string") skinName: string = "Default Warrior";
