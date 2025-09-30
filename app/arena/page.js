@@ -2670,10 +2670,20 @@ const MultiplayerArena = () => {
             <p style={{
               color: '#ffffff',
               fontSize: '16px',
-              margin: '0 0 32px 0',
+              margin: '0 0 16px 0',
               opacity: 0.9
             }}>
               Congratulations! You've successfully cashed out!
+            </p>
+            
+            {/* Auto-redirect countdown */}
+            <p style={{
+              color: '#ffff00',
+              fontSize: '14px',
+              margin: '0 0 32px 0',
+              opacity: 0.8
+            }}>
+              Returning to main menu in {autoRedirectCountdown} seconds...
             </p>
             
             {/* Stats Cards */}
