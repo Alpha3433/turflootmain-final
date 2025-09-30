@@ -912,6 +912,10 @@ const MultiplayerArena = () => {
     } catch (error) {
       isConnectingRef.current = false // Reset connection flag on error
       GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on error
+      
+      // Hide loading modal on error
+      setShowLoadingModal(false)
+      
       console.error(`❌ [${componentId}] Colyseus connection failed:`, error)
       console.error(`❌ [${componentId}] Error details:`, {
         message: error.message,
