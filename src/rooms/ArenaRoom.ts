@@ -461,7 +461,7 @@ export class ArenaRoom extends Room<GameState> {
       
       // Update cash out progress
       if (player.isCashingOut && player.cashOutStartTime > 0) {
-        const cashOutDuration = 3000; // 3 seconds to complete cash out
+        const cashOutDuration = 5000; // 5 seconds to complete cash out
         const elapsedTime = now - player.cashOutStartTime;
         const progress = Math.min((elapsedTime / cashOutDuration) * 100, 100);
         
