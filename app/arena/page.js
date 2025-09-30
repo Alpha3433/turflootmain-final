@@ -1499,29 +1499,57 @@ const MultiplayerArena = () => {
       this.ctx.arc(player.x + eyeOffsetX, player.y + eyeOffsetY, eyeSize, 0, Math.PI * 2)
       this.ctx.fill()
       
-      // Draw spawn protection ring (matching local agario)
+      // Draw spawn protection ring with blue checkered pattern
       if (player.spawnProtection) {
-        this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, playerRadius + 8, 0, Math.PI * 2)
-        this.ctx.strokeStyle = '#3B82F6' // Bright blue color
-        this.ctx.lineWidth = 4
-        this.ctx.setLineDash([10, 5]) // Dashed line pattern
-        this.ctx.stroke()
-        this.ctx.setLineDash([]) // Reset line dash
-        
-        // Add pulsing effect
+        const ringRadius = playerRadius + 8
         const time = Date.now() / 1000
         const pulseIntensity = Math.sin(time * 4) * 0.3 + 0.7 // Pulse between 0.4 and 1.0
+        
+        // Draw checkered pattern ring
+        this.ctx.save()
         this.ctx.globalAlpha = pulseIntensity
         
-        // Draw inner glow ring
-        this.ctx.beginPath()
-        this.ctx.arc(player.x, player.y, playerRadius + 6, 0, Math.PI * 2)
-        this.ctx.strokeStyle = '#60A5FA' // Lighter blue
-        this.ctx.lineWidth = 2
-        this.ctx.stroke()
+        // Create checkered pattern by drawing segments
+        const segments = 24 // Number of segments around the circle
+        const anglePerSegment = (Math.PI * 2) / segments
         
-        this.ctx.globalAlpha = 1.0 // Reset alpha
+        for (let i = 0; i < segments; i++) {
+          const startAngle = i * anglePerSegment
+          const endAngle = (i + 1) * anglePerSegment
+          
+          // Alternate between two shades of blue for checkered effect
+          if (i % 2 === 0) {
+            this.ctx.strokeStyle = '#3B82F6' // Bright blue
+          } else {
+            this.ctx.strokeStyle = '#1E40AF' // Darker blue
+          }
+          
+          this.ctx.lineWidth = 6
+          this.ctx.beginPath()
+          this.ctx.arc(player.x, player.y, ringRadius, startAngle, endAngle)
+          this.ctx.stroke()
+        }
+        
+        // Draw inner glow ring with checkered pattern
+        const innerRingRadius = playerRadius + 5
+        for (let i = 0; i < segments; i++) {
+          const startAngle = i * anglePerSegment
+          const endAngle = (i + 1) * anglePerSegment
+          
+          // Alternate pattern for inner ring (offset by 1 for better visual)
+          if ((i + 1) % 2 === 0) {
+            this.ctx.strokeStyle = '#60A5FA' // Light blue
+          } else {
+            this.ctx.strokeStyle = '#2563EB' // Medium blue
+          }
+          
+          this.ctx.lineWidth = 3
+          this.ctx.beginPath()
+          this.ctx.arc(player.x, player.y, innerRingRadius, startAngle, endAngle)
+          this.ctx.stroke()
+        }
+        
+        this.ctx.restore()
       }
       
       // Draw cash out progress ring - visible to ALL players when someone is cashing out
