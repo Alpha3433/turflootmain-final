@@ -228,6 +228,15 @@ const MultiplayerArena = () => {
     }
   }
 
+  const logConnectionDiagnostics = () => {
+    console.log('🔗 Connection details:', {
+      hasWsRef: !!wsRef.current,
+      hasConnection: !!wsRef.current?.connection,
+      readyState: wsRef.current?.connection?.readyState,
+      expectedState: typeof WebSocket !== 'undefined' ? WebSocket.OPEN : 1
+    })
+  }
+
   // Handle split functionality - ported from agario with improved error handling
   const handleSplit = (e) => {
     if (!gameRef.current || !gameReady || !wsRef.current || !wsRef.current.sessionId) {
@@ -296,20 +305,15 @@ const MultiplayerArena = () => {
       })
       
       // Check if connection is still valid before sending (WebSocket.OPEN = 1)
-      if (!wsRef.current || !wsRef.current.connection || 
-          wsRef.current.connection.readyState !== 1) {
+      if (!wsRef.current || !wsRef.current.connection ||
+          wsRef.current.connection.readyState !== (typeof WebSocket !== 'undefined' ? WebSocket.OPEN : 1)) {
         console.log('⚠️ Connection not ready for split - skipping split attempt')
-        console.log('🔗 Connection details:', {
-          hasWsRef: !!wsRef.current,
-          hasConnection: !!wsRef.current?.connection,
-          readyState: wsRef.current?.connection?.readyState,
-          expectedState: 1 // WebSocket.OPEN
-        })
+        logConnectionDiagnostics()
         return
       }
-      
+
       wsRef.current.send("split", { targetX, targetY })
-      
+
       console.log('✅ Split command sent successfully')
     } catch (error) {
       console.error('❌ Error sending split command:', error)
@@ -343,6 +347,13 @@ const MultiplayerArena = () => {
         // Send cash out start message to server for multiplayer visibility
         if (wsRef.current && wsRef.current.sessionId) {
           try {
+            if (!wsRef.current.connection ||
+                wsRef.current.connection.readyState !== (typeof WebSocket !== 'undefined' ? WebSocket.OPEN : 1)) {
+              console.log('⚠️ Connection not ready for cash out start - skipping cash out start message')
+              logConnectionDiagnostics()
+              return
+            }
+
             wsRef.current.send("cashOutStart", {})
             console.log('💰 Sent cash out start message to server')
           } catch (error) {
@@ -393,6 +404,13 @@ const MultiplayerArena = () => {
         // Send cash out stop message to server for multiplayer visibility
         if (wsRef.current && wsRef.current.sessionId) {
           try {
+            if (!wsRef.current.connection ||
+                wsRef.current.connection.readyState !== (typeof WebSocket !== 'undefined' ? WebSocket.OPEN : 1)) {
+              console.log('⚠️ Connection not ready for cash out stop - skipping cash out stop message')
+              logConnectionDiagnostics()
+              return
+            }
+
             wsRef.current.send("cashOutStop", {})
             console.log('💰 Sent cash out stop message to server')
           } catch (error) {
