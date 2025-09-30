@@ -41,6 +41,7 @@ class CashOutRingTester:
         self.passed_tests = 0
         
         print(f"🎯 CASH OUT RING FUNCTIONALITY TESTING")
+        print(f"📋 Testing the FIXED cash out ring functionality to verify disconnection bug is resolved")
         print(f"🌐 Base URL: {self.base_url}")
         print(f"🔗 API URL: {self.api_url}")
         print("=" * 80)
