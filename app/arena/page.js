@@ -340,6 +340,11 @@ const MultiplayerArena = () => {
         setIsCashingOut(true)
         setCashOutProgress(0)
         
+        // Update local state in game engine for immediate ring display
+        if (gameRef.current) {
+          gameRef.current.updateLocalCashOutState(true, 0)
+        }
+        
         // Send cash out start message to server for multiplayer visibility
         if (wsRef.current && wsRef.current.sessionId) {
           try {
