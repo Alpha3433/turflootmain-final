@@ -345,8 +345,6 @@ export class ArenaRoom extends Room<GameState> {
     const splitId = `${client.sessionId}_split_${Date.now()}`;
     const splitPlayer = new Player();
     splitPlayer.name = `${player.name}*`;
-    splitPlayer.sessionId = splitId;
-    splitPlayer.ownerSessionId = client.sessionId; // Track original owner
     
     // Position split piece with launch distance
     const launchDistance = 100;
