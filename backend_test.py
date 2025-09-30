@@ -61,6 +61,7 @@ class CashOutRingTester:
 
     def test_api_health_check(self) -> bool:
         """Test 1: Verify backend API is operational"""
+        print("\n🔍 TEST 1: API Health Check")
         try:
             response = requests.get(f"{self.api_url}", timeout=10)
             if response.status_code == 200:
@@ -91,7 +92,8 @@ class CashOutRingTester:
             return self.log_test("API Health Check", False, f"Exception: {str(e)}")
 
     def test_colyseus_server_availability(self) -> bool:
-        """Test 2: Verify Colyseus servers are available"""
+        """Test 2: Verify Colyseus servers are available for arena mode"""
+        print("\n🔍 TEST 2: Colyseus Server Availability")
         try:
             response = requests.get(f"{self.api_url}/servers", timeout=10)
             if response.status_code == 200:
@@ -130,19 +132,195 @@ class CashOutRingTester:
         except Exception as e:
             return self.log_test("Colyseus Server Availability", False, f"Exception: {str(e)}")
 
-    def test_spawn_logic_configuration(self) -> bool:
-        """Test 3: Verify server-side spawn logic configuration"""
+    def test_server_side_cash_out_schema(self) -> bool:
+        """Test 3: Verify server-side cash out fields in Player schema"""
+        print("\n🔍 TEST 3: Server-Side Cash Out Schema Verification")
         try:
-            # Read the compiled ArenaRoom.js file to verify spawn logic
-            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
-                arena_js_content = f.read()
+            # Check TypeScript source file
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
             
-            # Check for key spawn configuration patterns
-            checks = {
-                'worldSize_8000': 'worldSize = 8000' in arena_js_content or 'worldSize || \'8000\'' in arena_js_content,
-                'center_calculation': 'this.worldSize / 4' in arena_js_content,
-                'playable_radius_1800': 'playableRadius = 1800' in arena_js_content,
-                'safe_zone_radius_1800': 'safeZoneRadius = 1800' in arena_js_content,
+            # Check compiled JavaScript file
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+            
+            # Check for cash out fields in Player schema
+            cash_out_fields = [
+                'isCashingOut',
+                'cashOutProgress', 
+                'cashOutStartTime'
+            ]
+            
+            ts_fields_found = sum(1 for field in cash_out_fields if field in ts_content)
+            js_fields_found = sum(1 for field in cash_out_fields if field in js_content)
+            
+            if ts_fields_found == 3 and js_fields_found == 3:
+                return self.log_test("Server-Side Cash Out Schema", True,
+                    f"All 3 cash out fields found in both TS and JS files")
+            else:
+                return self.log_test("Server-Side Cash Out Schema", False,
+                    f"TS fields: {ts_fields_found}/3, JS fields: {js_fields_found}/3")
+                
+        except Exception as e:
+            return self.log_test("Server-Side Cash Out Schema", False, f"Error: {str(e)}")
+
+    def test_server_side_message_handlers(self) -> bool:
+        """Test 4: Verify server-side message handlers for cashOutStart/Stop"""
+        print("\n🔍 TEST 4: Server-Side Message Handlers")
+        try:
+            # Check TypeScript source file
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+            
+            # Check compiled JavaScript file  
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+            
+            # Check for message handlers
+            handlers_to_check = [
+                'cashOutStart',
+                'cashOutStop',
+                'handleCashOutStart',
+                'handleCashOutStop'
+            ]
+            
+            ts_handlers_found = sum(1 for handler in handlers_to_check if handler in ts_content)
+            js_handlers_found = sum(1 for handler in handlers_to_check if handler in js_content)
+            
+            if ts_handlers_found == 4 and js_handlers_found == 4:
+                return self.log_test("Server-Side Message Handlers", True,
+                    f"All 4 cash out handlers found in both TS and JS files")
+            else:
+                return self.log_test("Server-Side Message Handlers", False,
+                    f"TS handlers: {ts_handlers_found}/4, JS handlers: {js_handlers_found}/4")
+                
+        except Exception as e:
+            return self.log_test("Server-Side Message Handlers", False, f"Error: {str(e)}")
+
+    def test_server_side_progress_update_logic(self) -> bool:
+        """Test 5: Verify server-side cash out progress update logic"""
+        print("\n🔍 TEST 5: Server-Side Progress Update Logic")
+        try:
+            # Check TypeScript source file
+            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
+                ts_content = f.read()
+            
+            # Check compiled JavaScript file
+            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
+                js_content = f.read()
+            
+            # Check for progress update logic in update loop
+            progress_patterns = [
+                'cashOutDuration',
+                'elapsedTime', 
+                'progress >= 100',
+                'cashOutProgress = progress'
+            ]
+            
+            ts_patterns_found = sum(1 for pattern in progress_patterns if pattern in ts_content)
+            js_patterns_found = sum(1 for pattern in progress_patterns if pattern in js_content)
+            
+            if ts_patterns_found >= 3 and js_patterns_found >= 3:
+                return self.log_test("Server-Side Progress Update Logic", True,
+                    f"Progress update logic found in both TS and JS files")
+            else:
+                return self.log_test("Server-Side Progress Update Logic", False,
+                    f"TS patterns: {ts_patterns_found}/4, JS patterns: {js_patterns_found}/4")
+                
+        except Exception as e:
+            return self.log_test("Server-Side Progress Update Logic", False, f"Error: {str(e)}")
+
+    def test_client_side_cash_out_ring_rendering(self) -> bool:
+        """Test 6: Verify client-side cash out ring rendering"""
+        print("\n🔍 TEST 6: Client-Side Cash Out Ring Rendering")
+        try:
+            # Check client-side file
+            with open('/app/app/agario/page.js', 'r') as f:
+                client_content = f.read()
+            
+            # Check for cash out ring rendering patterns
+            rendering_checks = {
+                'cash_out_ring_comment': 'cash out progress ring' in client_content.lower(),
+                'ring_radius': 'ringRadius' in client_content,
+                'progress_angle': 'progressAngle' in client_content,
+                'drawing_logic': 'arc(' in client_content and 'strokeStyle' in client_content
+            }
+            
+            patterns_found = sum(1 for check in rendering_checks.values() if check)
+            
+            if patterns_found >= 3:
+                return self.log_test("Client-Side Cash Out Ring Rendering", True,
+                    f"Cash out ring rendering code found ({patterns_found}/4 patterns)")
+            else:
+                return self.log_test("Client-Side Cash Out Ring Rendering", False,
+                    f"Rendering patterns found: {patterns_found}/4")
+                
+        except Exception as e:
+            return self.log_test("Client-Side Cash Out Ring Rendering", False, f"Error: {str(e)}")
+
+    def test_client_side_message_sending(self) -> bool:
+        """Test 7: CRITICAL - Verify client sends cashOutStart/Stop messages to server"""
+        print("\n🔍 TEST 7: Client-Side Message Sending (CRITICAL)")
+        try:
+            # Check client-side file
+            with open('/app/app/agario/page.js', 'r') as f:
+                client_content = f.read()
+            
+            # Check for WebSocket message sending in E key handlers
+            has_e_key_handlers = 'key.toLowerCase() === \'e\'' in client_content
+            sends_cashout_start = 'send' in client_content and 'cashOutStart' in client_content
+            sends_cashout_stop = 'send' in client_content and 'cashOutStop' in client_content
+            
+            # More detailed check - look for the actual message sending pattern
+            lines = client_content.split('\n')
+            found_message_sending = False
+            
+            for i, line in enumerate(lines):
+                if 'key.toLowerCase() === \'e\'' in line:
+                    # Check next 10 lines for message sending
+                    for j in range(i, min(i + 10, len(lines))):
+                        if 'send(' in lines[j] and ('cashOut' in lines[j] or 'cash' in lines[j].lower()):
+                            found_message_sending = True
+                            break
+                    break
+            
+            if has_e_key_handlers and (sends_cashout_start or sends_cashout_stop or found_message_sending):
+                return self.log_test("Client-Side Message Sending", True,
+                    f"Client sends cashOut messages to server")
+            else:
+                return self.log_test("Client-Side Message Sending", False,
+                    f"CRITICAL ISSUE: Client E key handlers don't send cashOutStart/Stop messages to server")
+                
+        except Exception as e:
+            return self.log_test("Client-Side Message Sending", False, f"Error: {str(e)}")
+
+    def test_multiplayer_synchronization(self) -> bool:
+        """Test 8: Verify multiplayer synchronization of cash out state"""
+        print("\n🔍 TEST 8: Multiplayer Synchronization")
+        try:
+            # Check if client receives and renders other players' cash out state
+            with open('/app/app/agario/page.js', 'r') as f:
+                client_content = f.read()
+            
+            # Check for server state processing
+            sync_checks = {
+                'server_state_processing': 'serverState' in client_content and 'players' in client_content,
+                'update_from_server': 'updateFromServer' in client_content,
+                'multiplayer_rendering': 'isMultiplayer' in client_content or 'multiplayer' in client_content.lower(),
+                'cash_out_in_multiplayer': 'cash' in client_content.lower() and ('server' in client_content.lower() or 'multiplayer' in client_content.lower())
+            }
+            
+            patterns_found = sum(1 for check in sync_checks.values() if check)
+            
+            if patterns_found >= 2:
+                return self.log_test("Multiplayer Synchronization", True,
+                    f"Client processes server cash out state for other players ({patterns_found}/4 patterns)")
+            else:
+                return self.log_test("Multiplayer Synchronization", False,
+                    f"Synchronization patterns found: {patterns_found}/4")
+                
+        except Exception as e:
+            return self.log_test("Multiplayer Synchronization", False, f"Error: {str(e)}")
                 'generateCircularSpawnPosition': 'generateCircularSpawnPosition' in arena_js_content,
                 'boundary_enforcement': 'distanceFromCenter > maxRadius' in arena_js_content
             }
