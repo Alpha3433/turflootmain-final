@@ -470,12 +470,22 @@ const MultiplayerArena = () => {
         setCashOutProgress(prev => {
           const newProgress = prev + 2 // 2% per 100ms = 5 second duration
           
+          // Update local state in game engine for immediate ring display
+          if (gameRef.current && newProgress < 100) {
+            gameRef.current.updateLocalCashOutState(true, newProgress)
+          }
+          
           if (newProgress >= 100) {
             console.log('Cash out completed!')
             setIsCashingOut(false)
             setCashOutComplete(true)
             clearInterval(cashOutIntervalRef.current)
             cashOutIntervalRef.current = null
+            
+            // Update local state in game engine to stop ring display
+            if (gameRef.current) {
+              gameRef.current.updateLocalCashOutState(false, 100)
+            }
             
             // Add currency based on score
             setCurrency(prevCurrency => prevCurrency + score)
