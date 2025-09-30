@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Updated Spawn Protection System (4-second duration)
-Testing the updated spawn protection system with 4-second duration and blue checkered ring implementation.
+Backend Testing Script for Agario-Style Split Functionality
+Testing the completely rewritten split mechanics to match agario exactly with mouse direction, 
+momentum movement, independent pieces, touch-based merging, and 16-piece limit.
 """
 
 import requests
@@ -10,7 +11,7 @@ import time
 import os
 from typing import Dict, Any, List, Tuple
 
-class SpawnProtectionBackendTester:
+class AgarIOSplitBackendTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-arena-4.preview.emergentagent.com')
