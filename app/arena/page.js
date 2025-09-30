@@ -233,10 +233,23 @@ const MultiplayerArena = () => {
 
   // Handle split functionality - ported from agario with improved error handling
   const handleSplit = (e) => {
+    console.log('🎯 handleSplit called - checking initial conditions...')
+    
     if (!gameRef.current || !gameReady || !wsRef.current || !wsRef.current.sessionId) {
-      console.log('⚠️ Split denied - game not ready or not connected to server')
+      console.log('❌ Split denied - initial conditions not met:', {
+        gameRef: !!gameRef.current,
+        gameReady,
+        wsRef: !!wsRef.current,
+        sessionId: wsRef.current?.sessionId,
+        reason: !gameRef.current ? 'No gameRef' : 
+                !gameReady ? 'Game not ready' :
+                !wsRef.current ? 'No wsRef' :
+                !wsRef.current.sessionId ? 'No sessionId' : 'Unknown'
+      })
       return
     }
+    
+    console.log('✅ Initial conditions passed - checking player mass...')
     
     // Check if player has sufficient mass to split (server requirement: >= 40)
     if (gameRef.current.player.mass < 40) {
