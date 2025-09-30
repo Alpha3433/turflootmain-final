@@ -415,6 +415,11 @@ const MultiplayerArena = () => {
           cashOutIntervalRef.current = null
         }
         
+        // Update local state in game engine to stop ring display
+        if (gameRef.current) {
+          gameRef.current.updateLocalCashOutState(false, 0)
+        }
+        
         // Send cash out stop message to server for multiplayer visibility
         if (wsRef.current && wsRef.current.sessionId) {
           try {
