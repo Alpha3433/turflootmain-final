@@ -2999,6 +2999,16 @@ const MultiplayerArena = () => {
           50% { box-shadow: 0 0 50px rgba(255, 255, 0, 0.8); }
         }
         
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeInOut {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 1; }
+        }
+        
         @keyframes joystickPulse {
           0%, 100% { 
             transform: scale(1); 
