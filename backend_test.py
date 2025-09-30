@@ -1,26 +1,16 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Cash Out Ring Functionality
-Testing the FIXED cash out ring functionality to verify the disconnection bug is resolved.
-
-This test focuses on:
-1. Backend API and Colyseus server availability
-2. Server-side cash out message handlers (cashOutStart, cashOutStop)
-3. Cash out state field synchronization (isCashingOut, cashOutProgress, cashOutStartTime)
-4. Cash out progress updates over 3 seconds
-5. WebSocket connection state validation (the fix mentioned in review request)
-6. Server-side message handling without crashes
+Backend Testing Script for Updated Spawn Protection System (4-second duration)
+Testing the updated spawn protection system with 4-second duration and blue checkered ring implementation.
 """
 
 import requests
 import json
 import time
-import math
-import sys
-from typing import Dict, List, Tuple, Any
-from datetime import datetime
+import os
+from typing import Dict, Any, List, Tuple
 
-class CashOutRingTester:
+class SpawnProtectionBackendTester:
     def __init__(self):
         # Get base URL from environment
         try:
