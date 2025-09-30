@@ -3042,7 +3042,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Cash Out Ring Functionality Fix Verification"
+    - "Updated Spawn Protection System (4-second duration) Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
