@@ -383,27 +383,47 @@ const MultiplayerArena = () => {
       if (e.key === ' ' && gameReady && gameRef.current) {
         e.preventDefault()
         
-        console.log('🔍 SPACEBAR DEBUG: Space key pressed, checking conditions...', {
+        console.log('🚀 SPACEBAR PRESSED - Detailed Debug Info:', {
           gameReady,
           gameRef: !!gameRef.current,
           wsRef: !!wsRef.current,
           wsConnection: wsRef.current?.connection?.readyState,
-          sessionId: wsRef.current?.sessionId
+          sessionId: wsRef.current?.sessionId,
+          playerMass: gameRef.current?.player?.mass,
+          mouseCoords: gameRef.current?.mouse ? {
+            worldX: gameRef.current.mouse.worldX,
+            worldY: gameRef.current.mouse.worldY,
+            x: gameRef.current.mouse.x,
+            y: gameRef.current.mouse.y
+          } : null,
+          isMobile,
+          joystickPosition
         })
         
         const now = Date.now()
         if (now - lastSplitTimeRef.current < SPLIT_COOLDOWN) {
-          console.log('⚠️ Split cooldown active, ignoring spacebar press')
+          console.log('⚠️ Split cooldown active, ignoring spacebar press. Time remaining:', (SPLIT_COOLDOWN - (now - lastSplitTimeRef.current)) + 'ms')
           return
         }
         
-        console.log('SPACE pressed - attempting split')
+        console.log('✅ Spacebar conditions met - calling handleSplit')
         lastSplitTimeRef.current = now
         
         try {
           handleSplit(e)
         } catch (error) {
           console.error('❌ Error in handleSplit:', error)
+          console.error('❌ Stack trace:', error.stack)
+        }
+      } else {
+        // Debug why spacebar didn't trigger
+        if (e.key === ' ') {
+          console.log('🔍 SPACEBAR BLOCKED - Conditions not met:', {
+            spacePressed: e.key === ' ',
+            gameReady,
+            gameRef: !!gameRef.current,
+            reasonBlocked: !gameReady ? 'gameReady=false' : !gameRef.current ? 'gameRef.current=null' : 'unknown'
+          })
         }
       }
     }
