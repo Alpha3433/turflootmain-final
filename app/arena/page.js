@@ -389,6 +389,16 @@ const MultiplayerArena = () => {
           clearInterval(cashOutIntervalRef.current)
           cashOutIntervalRef.current = null
         }
+        
+        // Send cash out stop message to server for multiplayer visibility
+        if (wsRef.current && wsRef.current.sessionId) {
+          try {
+            wsRef.current.send("cashOutStop", {})
+            console.log('💰 Sent cash out stop message to server')
+          } catch (error) {
+            console.error('❌ Error sending cash out stop message:', error)
+          }
+        }
       }
     }
     
