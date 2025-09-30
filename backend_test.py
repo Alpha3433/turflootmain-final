@@ -14,26 +14,28 @@ from datetime import datetime
 
 class CashOutRingTester:
     def __init__(self):
-        self.base_url = "https://turfloot-arena-4.preview.emergentagent.com"
+        # Get base URL from environment
+        try:
+            with open('/app/.env', 'r') as f:
+                env_content = f.read()
+                for line in env_content.split('\n'):
+                    if line.startswith('NEXT_PUBLIC_BASE_URL='):
+                        self.base_url = line.split('=', 1)[1].strip()
+                        break
+                else:
+                    self.base_url = "http://localhost:3000"
+        except:
+            self.base_url = "http://localhost:3000"
+        
         self.api_url = f"{self.base_url}/api"
         self.test_results = []
         self.total_tests = 0
         self.passed_tests = 0
         
-        # Expected values from review request
-        self.expected_world_size = 8000
-        self.expected_center_x = 2000  # worldSize / 4 = 8000 / 4 = 2000
-        self.expected_center_y = 2000  # worldSize / 4 = 8000 / 4 = 2000
-        self.expected_playable_radius = 1800
-        self.expected_max_spawn_distance = 1800  # Players should spawn within 1800px radius
-        
-        print("🎯 ARENA SPAWN POSITION FIX VERIFICATION TEST")
-        print("=" * 60)
-        print(f"Base URL: {self.base_url}")
-        print(f"Expected World Size: {self.expected_world_size}x{self.expected_world_size}")
-        print(f"Expected Center: ({self.expected_center_x}, {self.expected_center_y})")
-        print(f"Expected Playable Radius: {self.expected_playable_radius}px")
-        print("=" * 60)
+        print(f"🎯 CASH OUT RING FUNCTIONALITY TESTING")
+        print(f"🌐 Base URL: {self.base_url}")
+        print(f"🔗 API URL: {self.api_url}")
+        print("=" * 80)
 
     def log_test(self, test_name: str, passed: bool, details: str = ""):
         """Log test result"""
