@@ -710,7 +710,7 @@ const MultiplayerArena = () => {
           console.log('🎮 Current session ID:', room.sessionId)
           console.log('🎮 Players in state:', Array.from(state.players.keys()))
           let currentPlayerFound = false
-          
+
           state.players.forEach((player, sessionId) => {
             console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}`)
             const isCurrentPlayer = sessionId === room.sessionId
@@ -718,16 +718,27 @@ const MultiplayerArena = () => {
               console.log('✅ Found current player:', sessionId, player.name)
               currentPlayerFound = true
             }
-            
+
+            const normalizedCashOutProgress = typeof player.cashOutProgress === 'number'
+              ? Math.max(0, Math.min(100, player.cashOutProgress))
+              : 0
+            const cashingOutFromServer = Boolean(player.isCashingOut) || normalizedCashOutProgress > 0
+            const serverMarkedComplete = typeof player.cashOutComplete === 'boolean'
+              ? player.cashOutComplete
+              : normalizedCashOutProgress >= 100
+
             gameState.players.push({
               ...player,
               sessionId,
-              isCurrentPlayer
+              isCurrentPlayer,
+              cashOutProgress: normalizedCashOutProgress,
+              isCashingOut: cashingOutFromServer,
+              cashOutComplete: serverMarkedComplete
             })
           })
-          
+
           if (!currentPlayerFound) {
-            console.log('❌ Current player not found! Available sessions:', 
+            console.log('❌ Current player not found! Available sessions:',
               Array.from(state.players.keys()))
           }
         }
@@ -1140,6 +1151,23 @@ const MultiplayerArena = () => {
           this.player.cashOutProgress = normalizedProgress
           this.player.isCashingOut = cashingOutFromServer
           this.player.cashOutComplete = serverMarkedComplete
+        } else {
+          const serverIsCashingOut = Boolean(currentPlayer.isCashingOut)
+          const serverMarkedComplete = Boolean(currentPlayer.cashOutComplete)
+
+          this.player.cashOutProgress = 0
+          this.player.isCashingOut = serverIsCashingOut
+          this.player.cashOutComplete = serverMarkedComplete
+
+          setIsCashingOut(serverIsCashingOut)
+          setCashOutComplete(serverMarkedComplete)
+          if (!serverIsCashingOut) {
+            setCashOutProgress(0)
+          }
+
+          if (hasAuthoritativeCashOutRef.current && !serverIsCashingOut) {
+            hasAuthoritativeCashOutRef.current = false
+          }
         }
 
       } else {
@@ -1464,6 +1492,7 @@ const MultiplayerArena = () => {
         : 0
 
       if (serverCashOutProgress > 0) {
+        this.ctx.save()
         const ringRadius = playerRadius + 10
         const startAngle = -Math.PI / 2
         const progressAngle = (serverCashOutProgress / 100) * Math.PI * 2
@@ -1503,8 +1532,7 @@ const MultiplayerArena = () => {
         this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
         this.ctx.stroke()
 
-        // Reset styles to defaults for subsequent drawing
-        this.ctx.lineCap = 'butt'
+        this.ctx.restore()
       }
     }
     
