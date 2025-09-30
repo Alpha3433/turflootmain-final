@@ -1573,15 +1573,7 @@ const MultiplayerArena = () => {
         
         this.ctx.globalAlpha = 1.0 // Reset alpha
         
-        // Optional: Add cash out indicator text above player (only if current player)
-        if (isCurrentPlayer) {
-          this.ctx.fillStyle = '#00ff00'
-          this.ctx.font = 'bold 14px Arial'
-          this.ctx.textAlign = 'center'
-          this.ctx.textBaseline = 'middle'
-          this.ctx.fillText(`CASHING OUT ${Math.floor(actualProgress)}%`, 
-                          player.x, player.y - playerRadius - 25)
-        }
+        // Cash out text removed as per user request
       }
     }
     
