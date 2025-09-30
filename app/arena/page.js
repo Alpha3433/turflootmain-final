@@ -252,16 +252,27 @@ const MultiplayerArena = () => {
     console.log('✅ Initial conditions passed - checking player mass...')
     
     // Check if player has sufficient mass to split (server requirement: >= 40)
-    if (gameRef.current.player.mass < 40) {
-      console.log('⚠️ Split denied - insufficient mass:', gameRef.current.player.mass, '< 40')
+    const playerMass = gameRef.current.player?.mass || 0;
+    console.log('🎯 Player mass check:', {
+      player: gameRef.current.player,
+      mass: playerMass,
+      hasPlayer: !!gameRef.current.player,
+      massType: typeof playerMass,
+      sufficient: playerMass >= 40
+    });
+    
+    if (playerMass < 40) {
+      console.log('⚠️ Split denied - insufficient mass:', playerMass, '< 40')
       
       // Show visual feedback to user
-      const message = `Need ${40 - gameRef.current.player.mass} more mass to split`
+      const message = `Need ${40 - playerMass} more mass to split`
       console.log('📢 User feedback:', message)
       
       // Could add a toast notification here in the future
       return
     }
+    
+    console.log('✅ Mass requirement met:', playerMass, '>= 40')
     
     let targetX, targetY
     
