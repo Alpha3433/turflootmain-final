@@ -324,31 +324,32 @@ const MultiplayerArena = () => {
     // Send split command to multiplayer server with error handling and connection recovery
     try {
       console.log('📤 Sending split command to server:', { targetX, targetY })
-      console.log('🔗 WebSocket connection state before split:', {
+      // Check Colyseus connection structure properly
+      console.log('🔗 Colyseus connection check:', {
         wsRef: !!wsRef.current,
         sessionId: wsRef.current?.sessionId,
-        connection: wsRef.current?.connection?.readyState,
-        transport: wsRef.current?.connection?.transport?.readyState
+        hasWebSocket: !!wsRef.current?.connection,
+        readyState: wsRef.current?.connection?.readyState,
+        colyseusState: wsRef.current?.state,
+        hasRoom: !!wsRef.current?.room
       })
       
-      // Try to send the message even if connection state check fails (sometimes it works anyway)
-      let connectionReady = wsRef.current && wsRef.current.connection && 
-                           wsRef.current.connection.readyState === 1;
-      
-      if (!connectionReady) {
-        console.log('⚠️ Connection state not optimal, but attempting split anyway')
-        console.log('🔗 Connection details:', {
-          hasWsRef: !!wsRef.current,
-          hasConnection: !!wsRef.current?.connection,
-          readyState: wsRef.current?.connection?.readyState,
-          expectedState: 1, // WebSocket.OPEN
-          attemptingAnyway: true
-        })
+      // Proper Colyseus connection validation
+      if (!wsRef.current || !wsRef.current.sessionId) {
+        console.log('❌ Split failed - no valid Colyseus session')
+        return
       }
       
-      wsRef.current.send("split", { targetX, targetY })
-      
-      console.log('✅ Split command sent successfully')
+      // Check if we have a proper Colyseus room connection
+      try {
+        // Use the Colyseus client's send method directly
+        wsRef.current.send('split', { targetX, targetY });
+        console.log('✅ Split command sent via Colyseus client')
+      } catch (sendError) {
+        console.error('❌ Failed to send split message:', sendError)
+        console.log('🔄 Connection might be in invalid state - avoiding disconnection')
+        return
+      }
     } catch (error) {
       console.error('❌ Error sending split command:', error)
       
