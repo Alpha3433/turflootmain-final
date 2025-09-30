@@ -295,15 +295,13 @@ const MultiplayerArena = () => {
         transport: wsRef.current?.connection?.transport?.readyState
       })
       
-      // Check if connection is still valid before sending (WebSocket.OPEN = 1)
-      if (!wsRef.current || !wsRef.current.connection || 
-          wsRef.current.connection.readyState !== 1) {
+      // Check if connection is still valid before sending
+      if (!wsRef.current?.connection?.isOpen) {
         console.log('⚠️ Connection not ready for split - skipping split attempt')
         console.log('🔗 Connection details:', {
           hasWsRef: !!wsRef.current,
           hasConnection: !!wsRef.current?.connection,
-          readyState: wsRef.current?.connection?.readyState,
-          expectedState: 1 // WebSocket.OPEN
+          isOpen: wsRef.current?.connection?.isOpen
         })
         return
       }
@@ -351,9 +349,8 @@ const MultiplayerArena = () => {
               expectedState: 1 // WebSocket.OPEN
             })
             
-            // Check if connection is still valid before sending (WebSocket.OPEN = 1)
-            if (!wsRef.current || !wsRef.current.connection || 
-                wsRef.current.connection.readyState !== 1) {
+            // Check if connection is still valid before sending
+            if (!wsRef.current?.connection?.isOpen) {
               console.log('⚠️ Connection not ready for cash out start - skipping message')
               return
             }
@@ -421,9 +418,8 @@ const MultiplayerArena = () => {
               expectedState: 1 // WebSocket.OPEN
             })
             
-            // Check if connection is still valid before sending (WebSocket.OPEN = 1)
-            if (!wsRef.current || !wsRef.current.connection || 
-                wsRef.current.connection.readyState !== 1) {
+            // Check if connection is still valid before sending
+            if (!wsRef.current?.connection?.isOpen) {
               console.log('⚠️ Connection not ready for cash out stop - skipping message')
               return
             }
