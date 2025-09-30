@@ -1130,7 +1130,10 @@ const AgarIOGame = () => {
             color: player.color,
             score: player.score,
             alive: player.alive,
-            isCurrentPlayer: sessionId === (wsRef.current?.sessionId)
+            isCurrentPlayer: sessionId === (wsRef.current?.sessionId),
+            isCashingOut: player.isCashingOut,
+            cashOutProgress: player.cashOutProgress,
+            cashOutStartTime: player.cashOutStartTime
           })
         })
       }
@@ -2737,58 +2740,68 @@ const AgarIOGame = () => {
         this.ctx.globalAlpha = 1.0 // Reset alpha
       }
       
-      // Draw cash out progress ring - show ONLY on the actual main player when cashing out
-      if (this.gameStates && this.gameStates.isCashingOut && this.gameStates.cashOutProgress > 0) {
-        // Only show on the main player (the one controlled by the user)
-        // Use strict comparison - main player should be the exact object reference or have name 'You'
-        const isMainPlayer = (player === this.player) || (player.name === 'You' && player !== this.enemies.find(e => e.name === 'You'))
-        
-        if (isMainPlayer) {
-          console.log('🎯 Drawing compact cash out ring on main player:', player.name)
-          
-          const ringRadius = player.radius + 8  // Much smaller - closer to player circle
-          const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
-          
-          // Draw a compact background ring (full circle)
-          this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
-          this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)' // Semi-transparent background
-          this.ctx.lineWidth = 6  // Thinner for compact look
-          this.ctx.stroke()
-          
-          // Draw the main progress arc - bright and compact
-          this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
-          this.ctx.strokeStyle = '#00ff00' // Bright neon green
-          this.ctx.lineWidth = 6  // Thinner for compact look
-          this.ctx.lineCap = 'round'
-          this.ctx.stroke()
-          
-          // Add a subtle outer glow effect
-          this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, ringRadius + 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
-          this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)' // Subtle glow
-          this.ctx.lineWidth = 3
-          this.ctx.lineCap = 'round'
-          this.ctx.stroke()
-          
-          // Add pulsing effect for cash out ring
-          const time = Date.now() / 1000
-          const pulseIntensity = Math.sin(time * 6) * 0.3 + 0.8 // Subtle pulsing
-          this.ctx.globalAlpha = pulseIntensity
-          
-          // Draw inner glow for cash out
-          this.ctx.beginPath()
-          this.ctx.arc(player.x, player.y, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
-          this.ctx.strokeStyle = '#66ff66' // Bright green inner glow
-          this.ctx.lineWidth = 3  // Thinner inner glow
-          this.ctx.lineCap = 'round'
-          this.ctx.stroke()
-          
-          this.ctx.globalAlpha = 1.0 // Reset alpha
-          
-          // REMOVED: No more "CASHING OUT" text above player to avoid interference with "You" label
-        }
+      // Draw cash out progress ring
+      const playerHasServerCashOutState = player && typeof player.isCashingOut === 'boolean'
+      const playerIsCashingOut = playerHasServerCashOutState
+        ? player.isCashingOut
+        : !!(this.gameStates && this.gameStates.isCashingOut)
+
+      let cashOutProgressValue
+      if (player && typeof player.cashOutProgress !== 'undefined') {
+        cashOutProgressValue = Number(player.cashOutProgress)
+      } else if (this.gameStates && typeof this.gameStates.cashOutProgress !== 'undefined') {
+        cashOutProgressValue = Number(this.gameStates.cashOutProgress)
+      } else {
+        cashOutProgressValue = 0
+      }
+
+      if (!Number.isFinite(cashOutProgressValue)) {
+        cashOutProgressValue = 0
+      }
+
+      const normalizedProgress = Math.max(0, Math.min(100, cashOutProgressValue))
+
+      if ((playerIsCashingOut || normalizedProgress > 0) && normalizedProgress >= 0) {
+        const ringRadius = player.radius + 8 // Compact ring close to player circle
+        const progressAngle = (normalizedProgress / 100) * Math.PI * 2
+
+        // Draw a compact background ring (full circle)
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, 0, Math.PI * 2)
+        this.ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)' // Semi-transparent background
+        this.ctx.lineWidth = 6 // Thinner for compact look
+        this.ctx.stroke()
+
+        // Draw the main progress arc - bright and compact
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = '#00ff00' // Bright neon green
+        this.ctx.lineWidth = 6 // Thinner for compact look
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+
+        // Add a subtle outer glow effect
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius + 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)' // Subtle glow
+        this.ctx.lineWidth = 3
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+
+        // Add pulsing effect for cash out ring
+        const time = Date.now() / 1000
+        const pulseIntensity = Math.sin(time * 6) * 0.3 + 0.8 // Subtle pulsing
+        this.ctx.globalAlpha = pulseIntensity
+
+        // Draw inner glow for cash out
+        this.ctx.beginPath()
+        this.ctx.arc(player.x, player.y, ringRadius - 2, -Math.PI / 2, -Math.PI / 2 + progressAngle)
+        this.ctx.strokeStyle = '#66ff66' // Bright green inner glow
+        this.ctx.lineWidth = 3 // Thinner inner glow
+        this.ctx.lineCap = 'round'
+        this.ctx.stroke()
+
+        this.ctx.globalAlpha = 1.0 // Reset alpha
       }
       
       // Draw player name
