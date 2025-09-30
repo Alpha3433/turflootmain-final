@@ -1479,7 +1479,27 @@ const MultiplayerArena = () => {
       }
       
       // Draw cash out progress ring - visible to ALL players when someone is cashing out
-      if (player.isCashingOut) {
+      // For current player, also check local state in case server sync is delayed
+      const shouldShowCashOutRing = player.isCashingOut || 
+        (isCurrentPlayer && window.gameState?.isCashingOut)
+      
+      if (shouldShowCashOutRing) {
+        // Use server progress if available, otherwise use local progress for current player
+        const actualProgress = player.cashOutProgress || 
+          (isCurrentPlayer && window.gameState?.cashOutProgress) || 0
+        
+        // Debug logging for cash out ring
+        if (isCurrentPlayer) {
+          console.log('💰 Cash out ring debug:', {
+            playerName: player.name,
+            serverIsCashingOut: player.isCashingOut,
+            serverProgress: player.cashOutProgress,
+            localIsCashingOut: window.gameState?.isCashingOut,
+            localProgress: window.gameState?.cashOutProgress,
+            shouldShow: shouldShowCashOutRing,
+            actualProgress: actualProgress
+          })
+        }
         const ringRadius = playerRadius + 12  // Slightly larger than spawn protection ring
         const progressAngle = (player.cashOutProgress / 100) * Math.PI * 2
         
