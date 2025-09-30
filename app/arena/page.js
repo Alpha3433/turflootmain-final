@@ -988,6 +988,7 @@ const MultiplayerArena = () => {
       // World setup with circular zone system
       this.world = { width: 8000, height: 8000 }
       this.expectedSessionId = null // Will be set when we connect to Colyseus
+      this.localCashOutState = { isCashingOut: false, cashOutProgress: 0 } // Local state for immediate feedback
       
       // Simple camera initialization matching local agario exactly
       this.camera = { x: 0, y: 0 }
