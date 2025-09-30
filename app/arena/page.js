@@ -776,6 +776,9 @@ const MultiplayerArena = () => {
         GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on timeout
         console.error(`❌ [${componentId}] Connection timeout after 15 seconds`)
         setConnectionStatus('failed')
+        
+        // Hide loading modal on timeout
+        setShowLoadingModal(false)
       }, 15000)
       
       const room = await client.joinOrCreate("arena", {
