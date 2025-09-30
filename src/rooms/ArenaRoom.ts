@@ -727,7 +727,7 @@ export class ArenaRoom extends Room<GameState> {
     // Enable spawn protection on respawn
     player.spawnProtection = true;
     player.spawnProtectionStart = Date.now();
-    player.spawnProtectionTime = 6000; // 6 seconds protection
+    player.spawnProtectionTime = 4000; // 4 seconds protection
     
     console.log(`🔄 Player respawned: ${player.name} at (${player.x.toFixed(1)}, ${player.y.toFixed(1)}) with spawn protection`);
   }
