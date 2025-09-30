@@ -1533,7 +1533,7 @@ const MultiplayerArena = () => {
           })
         }
         const ringRadius = playerRadius + 12  // Slightly larger than spawn protection ring
-        const progressAngle = (player.cashOutProgress / 100) * Math.PI * 2
+        const progressAngle = (actualProgress / 100) * Math.PI * 2
         
         // Draw background ring (full circle)
         this.ctx.beginPath()
