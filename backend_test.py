@@ -661,7 +661,7 @@ class SimplifiedSplitBackendTester:
 
 def main():
     """Main function to run agario-style split backend tests"""
-    tester = AgarIOSplitBackendTester()
+    tester = SimplifiedSplitBackendTester()
     results = tester.run_all_tests()
     
     # Return appropriate exit code
