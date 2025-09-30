@@ -57,11 +57,6 @@ class CashOutRingTester:
             'details': details,
             'timestamp': datetime.now().isoformat()
         })
-        self.test_results.append({
-            'test': test_name,
-            'passed': passed,
-            'details': details
-        })
         return passed
 
     def test_api_health_check(self) -> bool:
