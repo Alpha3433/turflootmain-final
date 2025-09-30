@@ -321,83 +321,58 @@ class CashOutRingTester:
                 
         except Exception as e:
             return self.log_test("Multiplayer Synchronization", False, f"Error: {str(e)}")
-                'generateCircularSpawnPosition': 'generateCircularSpawnPosition' in arena_js_content,
-                'boundary_enforcement': 'distanceFromCenter > maxRadius' in arena_js_content
-            }
-            
-            passed_checks = sum(1 for check in checks.values() if check)
-            total_checks = len(checks)
-            
-            if passed_checks >= total_checks - 1:  # Allow 1 minor variation
-                return self.log_test(
-                    "Server-Side Spawn Logic Configuration",
-                    True,
-                    f"Spawn logic properly configured ({passed_checks}/{total_checks} checks passed)"
-                )
-            else:
-                failed_checks = [name for name, passed in checks.items() if not passed]
-                return self.log_test(
-                    "Server-Side Spawn Logic Configuration",
-                    False,
-                    f"Missing configurations: {failed_checks} ({passed_checks}/{total_checks} checks passed)"
-                )
-        except Exception as e:
-            return self.log_test("Server-Side Spawn Logic Configuration", False, f"Exception: {str(e)}")
 
-    def test_boundary_enforcement_variables(self) -> bool:
-        """Test 4: Verify boundary enforcement variables are properly scoped"""
-        try:
-            # Read both TypeScript source and compiled JavaScript
-            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
-                arena_ts_content = f.read()
-            
-            with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
-                arena_js_content = f.read()
-            
-            # Check that boundary enforcement variables are declared at function scope in update method
-            ts_checks = {
-                'centerX_declaration': 'const centerX = this.worldSize / 4' in arena_ts_content,
-                'centerY_declaration': 'const centerY = this.worldSize / 4' in arena_ts_content,
-                'playableRadius_declaration': 'const playableRadius = 1800' in arena_ts_content,
-                'maxRadius_declaration': 'const maxRadius = playableRadius - player.radius' in arena_ts_content,
-                'function_scope_comment': 'declare at function scope' in arena_ts_content
-            }
-            
-            js_checks = {
-                'centerX_declaration': 'const centerX = this.worldSize / 4' in arena_js_content,
-                'centerY_declaration': 'const centerY = this.worldSize / 4' in arena_js_content,
-                'playableRadius_declaration': 'const playableRadius = 1800' in arena_js_content,
-                'maxRadius_declaration': 'const maxRadius = playableRadius - player.radius' in arena_js_content
-            }
-            
-            ts_passed = sum(1 for check in ts_checks.values() if check)
-            js_passed = sum(1 for check in js_checks.values() if check)
-            
-            if ts_passed >= 4 and js_passed >= 4:
-                return self.log_test(
-                    "Boundary Enforcement Variable Scope Fix",
-                    True,
-                    f"Variables properly scoped in both TS ({ts_passed}/5) and JS ({js_passed}/4)"
-                )
-            else:
-                return self.log_test(
-                    "Boundary Enforcement Variable Scope Fix",
-                    False,
-                    f"Variable scope issues: TS ({ts_passed}/5), JS ({js_passed}/4)"
-                )
-        except Exception as e:
-            return self.log_test("Boundary Enforcement Variable Scope Fix", False, f"Exception: {str(e)}")
+    def run_all_tests(self):
+        """Run all cash out ring functionality tests"""
+        print("🚀 Starting Cash Out Ring Functionality Tests...")
+        start_time = time.time()
+        
+        # Run all tests
+        tests = [
+            self.test_api_health_check,
+            self.test_colyseus_server_availability,
+            self.test_server_side_cash_out_schema,
+            self.test_server_side_message_handlers,
+            self.test_server_side_progress_update_logic,
+            self.test_client_side_cash_out_ring_rendering,
+            self.test_client_side_message_sending,
+            self.test_multiplayer_synchronization
+        ]
+        
+        for test in tests:
+            try:
+                test()
+            except Exception as e:
+                print(f"❌ Test failed with exception: {e}")
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        # Print summary
+        print("\n" + "=" * 80)
+        print("🎯 CASH OUT RING FUNCTIONALITY TEST SUMMARY")
+        print("=" * 80)
+        print(f"📊 Total Tests: {self.total_tests}")
+        print(f"✅ Passed: {self.passed_tests}")
+        print(f"❌ Failed: {self.total_tests - self.passed_tests}")
+        print(f"📈 Success Rate: {(self.passed_tests/self.total_tests*100):.1f}%")
+        print(f"⏱️  Duration: {duration:.2f} seconds")
+        
+        # Critical issues summary
+        print("\n🔍 CRITICAL FINDINGS:")
+        failed_tests = [r for r in self.test_results if not r['passed']]
+        if failed_tests:
+            for test in failed_tests:
+                print(f"❌ {test['test']}: {test['details']}")
+        else:
+            print("✅ All tests passed - Cash out ring functionality is working correctly")
+        
+        return self.passed_tests == self.total_tests
 
-    def test_spawn_position_mathematics(self) -> bool:
-        """Test 5: Verify spawn position mathematical calculations"""
-        try:
-            # Test the mathematical correctness of spawn positions
-            center_x = self.expected_center_x
-            center_y = self.expected_center_y
-            max_radius = self.expected_playable_radius
-            
-            # Simulate spawn position generation (similar to server logic)
-            test_positions = []
+if __name__ == "__main__":
+    tester = CashOutRingTester()
+    success = tester.run_all_tests()
+    sys.exit(0 if success else 1)
             for i in range(10):
                 # Generate random angle and distance (using square root for uniform distribution)
                 angle = (i / 10.0) * 2 * math.pi  # Distribute evenly for testing
