@@ -280,18 +280,27 @@ const MultiplayerArena = () => {
         return
       }
     } else {
-      // Desktop: Use mouse position for split
+      // Desktop: Use mouse position for split with fallback
       if (gameRef.current.mouse && 
           typeof gameRef.current.mouse.worldX === 'number' && 
-          typeof gameRef.current.mouse.worldY === 'number') {
+          typeof gameRef.current.mouse.worldY === 'number' &&
+          isFinite(gameRef.current.mouse.worldX) &&
+          isFinite(gameRef.current.mouse.worldY)) {
         
         targetX = gameRef.current.mouse.worldX
         targetY = gameRef.current.mouse.worldY
         
         console.log('🎮 Desktop split toward mouse:', targetX.toFixed(1), targetY.toFixed(1))
       } else {
-        console.log('⚠️ Desktop split denied - invalid mouse coordinates:', gameRef.current.mouse)
-        return
+        // Fallback: Split forward (right direction) if mouse coordinates are invalid
+        console.log('⚠️ Invalid mouse coordinates, using fallback direction:', gameRef.current.mouse)
+        console.log('🎮 Using fallback split direction: right')
+        
+        const fallbackDistance = 200
+        targetX = gameRef.current.player.x + fallbackDistance
+        targetY = gameRef.current.player.y
+        
+        console.log('🎮 Fallback split toward:', targetX.toFixed(1), targetY.toFixed(1))
       }
     }
     
