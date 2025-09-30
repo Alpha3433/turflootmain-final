@@ -46,7 +46,9 @@ const MultiplayerArena = () => {
   const [cashOutProgress, setCashOutProgress] = useState(0)
   const [isCashingOut, setIsCashingOut] = useState(false)
   const [cashOutComplete, setCashOutComplete] = useState(false)
-  const cashOutIntervalRef = useRef(null)
+  const previousCashOutStateRef = useRef({ isCashingOut: false, progress: 0 })
+  const cashOutCompletionHandledRef = useRef(false)
+  const cashOutRequestRef = useRef({ startPending: false, stopPending: false })
 
   // Mission system - ported from agario  
   const [currency, setCurrency] = useState(0)
@@ -213,17 +215,37 @@ const MultiplayerArena = () => {
 
   // Handle cash out functionality - ported from agario
   const handleCashOut = () => {
-    if (!isCashingOut && !cashOutComplete && gameReady) {
+    if (!gameReady || cashOutComplete) {
+      return
+    }
+
+    if (!wsRef.current || !wsRef.current.sessionId) {
+      console.log('⚠️ Cash out action ignored - no active room connection')
+      return
+    }
+
+    if (!wsRef.current?.connection?.isOpen) {
+      console.log('⚠️ Cash out action ignored - connection not open')
+      return
+    }
+
+    if (!isCashingOut && !cashOutRequestRef.current.startPending) {
       console.log('Starting cash out process via button')
-      setIsCashingOut(true)
-      setCashOutProgress(0)
-    } else if (isCashingOut) {
+      try {
+        cashOutRequestRef.current.startPending = true
+        wsRef.current.send("cashOutStart", {})
+      } catch (error) {
+        cashOutRequestRef.current.startPending = false
+        console.error('❌ Error sending cash out start message from button:', error)
+      }
+    } else if ((isCashingOut || cashOutRequestRef.current.startPending) && !cashOutRequestRef.current.stopPending) {
       console.log('Canceling cash out via button')
-      setIsCashingOut(false)
-      setCashOutProgress(0)
-      if (cashOutIntervalRef.current) {
-        clearInterval(cashOutIntervalRef.current)
-        cashOutIntervalRef.current = null
+      try {
+        cashOutRequestRef.current.stopPending = true
+        wsRef.current.send("cashOutStop", {})
+      } catch (error) {
+        cashOutRequestRef.current.stopPending = false
+        console.error('❌ Error sending cash out stop message from button:', error)
       }
     }
   }
@@ -333,34 +355,27 @@ const MultiplayerArena = () => {
   
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameReady) {
-        console.log('Starting cash out process with E key')
-        setIsCashingOut(true)
-        setCashOutProgress(0)
-        
-        // Send cash out start message to server for multiplayer visibility
-        if (wsRef.current && wsRef.current.sessionId) {
+      if (e.key.toLowerCase() === 'e' && !cashOutComplete && gameReady) {
+        if (!wsRef.current || !wsRef.current.sessionId) {
+          console.log('⚠️ Cash out start ignored - no active room connection')
+          return
+        }
+
+        if (wsRef.current?.connection && !wsRef.current.connection.isOpen) {
+          console.log('⚠️ Connection not ready for cash out start - skipping message')
+          return
+        }
+
+        if (!isCashingOut && !cashOutRequestRef.current.startPending) {
+          console.log('Starting cash out process with E key')
           try {
-            console.log('💰 Attempting to send cash out start message to server')
-            console.log('🔗 WebSocket connection state check:', {
-              hasWsRef: !!wsRef.current,
-              hasConnection: !!wsRef.current?.connection,
-              readyState: wsRef.current?.connection?.readyState,
-              expectedState: 1 // WebSocket.OPEN
-            })
-            
-            // Check if connection is still valid before sending
-            if (!wsRef.current?.connection?.isOpen) {
-              console.log('⚠️ Connection not ready for cash out start - skipping message')
-              return
-            }
-            
+            cashOutRequestRef.current.startPending = true
             wsRef.current.send("cashOutStart", {})
             console.log('✅ Cash out start message sent successfully')
           } catch (error) {
+            cashOutRequestRef.current.startPending = false
             console.error('❌ Error sending cash out start message:', error)
-            
-            // Check if it's a WebSocket state error
+
             if (error.message && error.message.includes('CLOSING or CLOSED')) {
               console.log('🔄 Detected WebSocket closing/closed state - cash out start ignored')
             }
@@ -398,38 +413,26 @@ const MultiplayerArena = () => {
     }
     
     const handleKeyUp = (e) => {
-      if (e.key.toLowerCase() === 'e' && isCashingOut) {
-        console.log('Canceling cash out - E key released')
-        setIsCashingOut(false)
-        setCashOutProgress(0)
-        if (cashOutIntervalRef.current) {
-          clearInterval(cashOutIntervalRef.current)
-          cashOutIntervalRef.current = null
+      if (e.key.toLowerCase() === 'e' && (isCashingOut || cashOutRequestRef.current.startPending)) {
+        if (!wsRef.current || !wsRef.current.sessionId) {
+          return
         }
-        
-        // Send cash out stop message to server for multiplayer visibility
-        if (wsRef.current && wsRef.current.sessionId) {
+
+        if (wsRef.current?.connection && !wsRef.current.connection.isOpen) {
+          console.log('⚠️ Connection not ready for cash out stop - skipping message')
+          return
+        }
+
+        if (!cashOutRequestRef.current.stopPending) {
+          console.log('Canceling cash out - E key released')
           try {
-            console.log('💰 Attempting to send cash out stop message to server')
-            console.log('🔗 WebSocket connection state check:', {
-              hasWsRef: !!wsRef.current,
-              hasConnection: !!wsRef.current?.connection,
-              readyState: wsRef.current?.connection?.readyState,
-              expectedState: 1 // WebSocket.OPEN
-            })
-            
-            // Check if connection is still valid before sending
-            if (!wsRef.current?.connection?.isOpen) {
-              console.log('⚠️ Connection not ready for cash out stop - skipping message')
-              return
-            }
-            
+            cashOutRequestRef.current.stopPending = true
             wsRef.current.send("cashOutStop", {})
             console.log('✅ Cash out stop message sent successfully')
           } catch (error) {
+            cashOutRequestRef.current.stopPending = false
             console.error('❌ Error sending cash out stop message:', error)
-            
-            // Check if it's a WebSocket state error
+
             if (error.message && error.message.includes('CLOSING or CLOSED')) {
               console.log('🔄 Detected WebSocket closing/closed state - cash out stop ignored')
             }
@@ -446,41 +449,6 @@ const MultiplayerArena = () => {
       document.removeEventListener('keyup', handleKeyUp)
     }
   }, [isCashingOut, cashOutComplete, gameReady])
-
-  // Cash out progress interval - ported from agario
-  useEffect(() => {
-    if (isCashingOut && !cashOutComplete) {
-      console.log('Starting cash out progress interval')
-      
-      cashOutIntervalRef.current = setInterval(() => {
-        setCashOutProgress(prev => {
-          const newProgress = prev + 2 // 2% per 100ms = 5 second duration
-          
-          if (newProgress >= 100) {
-            console.log('Cash out completed!')
-            setIsCashingOut(false)
-            setCashOutComplete(true)
-            clearInterval(cashOutIntervalRef.current)
-            cashOutIntervalRef.current = null
-            
-            // Add currency based on score
-            setCurrency(prevCurrency => prevCurrency + score)
-            
-            return 100
-          }
-          
-          return newProgress
-        })
-      }, 100) // Update every 100ms for smooth progress
-    }
-    
-    return () => {
-      if (cashOutIntervalRef.current) {
-        clearInterval(cashOutIntervalRef.current)
-        cashOutIntervalRef.current = null
-      }
-    }
-  }, [isCashingOut, score])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
@@ -745,11 +713,13 @@ const MultiplayerArena = () => {
         }
         
         // Process players with proper current player identification
+        let currentPlayerData = null
+
         if (state.players) {
           console.log('🎮 Current session ID:', room.sessionId)
           console.log('🎮 Players in state:', Array.from(state.players.keys()))
           let currentPlayerFound = false
-          
+
           state.players.forEach((player, sessionId) => {
             console.log(`🎮 Player: ${player.name} (${sessionId}) - isCurrentPlayer: ${sessionId === room.sessionId}`)
             const isCurrentPlayer = sessionId === room.sessionId
@@ -757,16 +727,22 @@ const MultiplayerArena = () => {
               console.log('✅ Found current player:', sessionId, player.name)
               currentPlayerFound = true
             }
-            
-            gameState.players.push({
+
+            const playerData = {
               ...player,
               sessionId,
               isCurrentPlayer
-            })
+            }
+
+            if (isCurrentPlayer) {
+              currentPlayerData = playerData
+            }
+
+            gameState.players.push(playerData)
           })
-          
+
           if (!currentPlayerFound) {
-            console.log('❌ Current player not found! Available sessions:', 
+            console.log('❌ Current player not found! Available sessions:',
               Array.from(state.players.keys()))
           }
         }
@@ -786,11 +762,61 @@ const MultiplayerArena = () => {
         }
         
         setServerState(gameState)
-        
+
+        if (currentPlayerData) {
+          const serverProgress = Number(currentPlayerData.cashOutProgress ?? 0)
+          const serverIsCashingOut = !!currentPlayerData.isCashingOut
+
+          setCashOutProgress(serverProgress)
+          setIsCashingOut(serverIsCashingOut)
+
+          if (serverIsCashingOut) {
+            cashOutRequestRef.current.startPending = false
+          } else {
+            cashOutRequestRef.current.stopPending = false
+            cashOutRequestRef.current.startPending = false
+          }
+
+          const previousCashState = previousCashOutStateRef.current
+
+          if (serverIsCashingOut && !previousCashState.isCashingOut) {
+            cashOutCompletionHandledRef.current = false
+            setCashOutComplete(false)
+          }
+
+          const reachedServerCompletion = !serverIsCashingOut && serverProgress >= 100
+
+          if (reachedServerCompletion && !cashOutCompletionHandledRef.current) {
+            cashOutCompletionHandledRef.current = true
+            setCashOutComplete(true)
+            setCurrency(prevCurrency => prevCurrency + (Math.round(currentPlayerData.score) || 0))
+          }
+
+          if (!serverIsCashingOut && serverProgress < 100 && previousCashState.isCashingOut) {
+            cashOutCompletionHandledRef.current = false
+            setCashOutComplete(false)
+          }
+
+          previousCashOutStateRef.current = {
+            isCashingOut: serverIsCashingOut,
+            progress: serverProgress
+          }
+        } else {
+          previousCashOutStateRef.current = {
+            isCashingOut: false,
+            progress: 0
+          }
+          cashOutRequestRef.current.startPending = false
+          cashOutRequestRef.current.stopPending = false
+          setIsCashingOut(false)
+          setCashOutProgress(0)
+          setCashOutComplete(false)
+        }
+
         // Update game engine if it exists
         if (gameRef.current) {
           gameRef.current.updateFromServer(gameState)
-          
+
           // Ensure session ID is set (in case game was initialized before connection)
           if (!gameRef.current.expectedSessionId) {
             gameRef.current.expectedSessionId = room.sessionId
