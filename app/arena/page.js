@@ -339,6 +339,16 @@ const MultiplayerArena = () => {
         console.log('Starting cash out process with E key')
         setIsCashingOut(true)
         setCashOutProgress(0)
+        
+        // Send cash out start message to server for multiplayer visibility
+        if (wsRef.current && wsRef.current.sessionId) {
+          try {
+            wsRef.current.send("cashOutStart", {})
+            console.log('💰 Sent cash out start message to server')
+          } catch (error) {
+            console.error('❌ Error sending cash out start message:', error)
+          }
+        }
       }
       
       // Handle SPACE key for splitting with cooldown
