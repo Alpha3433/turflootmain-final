@@ -3040,7 +3040,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Arena Spawn Position Fix Verification"
+    - "Cash Out Ring Functionality Fix Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
