@@ -16,7 +16,7 @@ export class Player extends Schema {
   @type("boolean") alive: boolean = true;
   @type("boolean") spawnProtection: boolean = false; // Spawn protection status
   @type("number") spawnProtectionStart: number = 0; // When protection started
-  @type("number") spawnProtectionTime: number = 6000; // 6 seconds protection
+  @type("number") spawnProtectionTime: number = 4000; // 4 seconds protection
   
   // Cash out state for multiplayer visibility
   @type("boolean") isCashingOut: boolean = false; // Whether player is cashing out
