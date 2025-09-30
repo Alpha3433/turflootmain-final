@@ -400,6 +400,40 @@ export class ArenaRoom extends Room<GameState> {
     }
   }
 
+  handleCashOutStart(client: Client, message: any) {
+    console.log(`💰 CASH OUT START received from ${client.sessionId}`);
+    
+    const player = this.state.players.get(client.sessionId);
+    if (!player || !player.alive) {
+      console.log(`⚠️ Cash out start ignored - player not found or dead for session: ${client.sessionId}`);
+      return;
+    }
+
+    // Start cash out process
+    player.isCashingOut = true;
+    player.cashOutProgress = 0;
+    player.cashOutStartTime = Date.now();
+    
+    console.log(`💰 Cash out started for ${player.name} (${client.sessionId})`);
+  }
+
+  handleCashOutStop(client: Client, message: any) {
+    console.log(`💰 CASH OUT STOP received from ${client.sessionId}`);
+    
+    const player = this.state.players.get(client.sessionId);
+    if (!player || !player.alive) {
+      console.log(`⚠️ Cash out stop ignored - player not found or dead for session: ${client.sessionId}`);
+      return;
+    }
+
+    // Stop cash out process
+    player.isCashingOut = false;
+    player.cashOutProgress = 0;
+    player.cashOutStartTime = 0;
+    
+    console.log(`💰 Cash out stopped for ${player.name} (${client.sessionId})`);
+  }
+
   onLeave(client: Client, consented?: boolean) {
     const player = this.state.players.get(client.sessionId);
     if (player) {
