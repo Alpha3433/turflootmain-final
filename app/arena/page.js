@@ -696,6 +696,9 @@ const MultiplayerArena = () => {
     const componentId = componentIdRef.current
     console.log(`🔗 [${componentId}] Connection attempt started for user:`, privyUserId)
     
+    // Show loading modal when starting connection
+    setShowLoadingModal(true)
+    
     // GLOBAL duplicate connection prevention
     if (GLOBAL_CONNECTION_TRACKER.isConnecting) {
       console.log(`🔄 [${componentId}] Global connection already in progress - skipping duplicate attempt`)
