@@ -2741,16 +2741,23 @@ const AgarIOGame = () => {
       }
       
       // Draw cash out progress ring
-      const playerHasServerCashOutState = player && typeof player.isCashingOut === 'boolean'
-      const playerIsCashingOut = playerHasServerCashOutState
-        ? player.isCashingOut
+      const serverReportsActiveCashOut = !!(
+        player &&
+        ((typeof player.isCashingOut === 'boolean' && player.isCashingOut) ||
+          (typeof player.cashOutProgress !== 'undefined' && Number(player.cashOutProgress) > 0))
+      )
+
+      const playerIsCashingOut = serverReportsActiveCashOut
+        ? !!player.isCashingOut
         : !!(this.gameStates && this.gameStates.isCashingOut)
 
       let cashOutProgressValue
-      if (player && typeof player.cashOutProgress !== 'undefined') {
+      if (serverReportsActiveCashOut && typeof player.cashOutProgress !== 'undefined') {
         cashOutProgressValue = Number(player.cashOutProgress)
       } else if (this.gameStates && typeof this.gameStates.cashOutProgress !== 'undefined') {
         cashOutProgressValue = Number(this.gameStates.cashOutProgress)
+      } else if (player && typeof player.cashOutProgress !== 'undefined') {
+        cashOutProgressValue = Number(player.cashOutProgress)
       } else {
         cashOutProgressValue = 0
       }
