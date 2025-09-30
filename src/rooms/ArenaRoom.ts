@@ -265,23 +265,14 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   handleSplit(client: Client, message: any) {
-    console.log(`🎯 SPLIT COMMAND RECEIVED from ${client.sessionId}:`, message);
-    console.log(`🎯 Current players in room:`, Array.from(this.state.players.keys()));
+    console.log(`🚀 SPLIT COMMAND RECEIVED from ${client.sessionId}:`, message);
     
     try {
       const player = this.state.players.get(client.sessionId);
       if (!player || !player.alive) {
         console.log(`⚠️ Split ignored - player not found or dead for session: ${client.sessionId}`);
-        console.log(`⚠️ Available players:`, Array.from(this.state.players.keys()));
         return;
       }
-      
-      console.log(`🎯 Player found for split:`, {
-        sessionId: client.sessionId,
-        mass: player.mass,
-        position: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
-        radius: player.radius.toFixed(1)
-      });
 
       // Validate message format and data
       if (!message || typeof message !== 'object') {
@@ -298,21 +289,27 @@ export class ArenaRoom extends Room<GameState> {
         return;
       }
     
-    console.log(`🔄 Split requested by ${player.name} (${client.sessionId}) toward:`, {
-      target: { x: targetX?.toFixed(1), y: targetY?.toFixed(1) },
-      currentPos: { x: player.x?.toFixed(1), y: player.y?.toFixed(1) },
-      mass: player.mass
-    });
-    
-    // Check if player can split (minimum mass requirement - adjusted for smaller starting size)
+    // Check if player can split (minimum mass requirement)
     if (player.mass < 40) {
       console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 40`);
       return;
     }
+
+    // Count existing split pieces for this player  
+    let playerPieces = 0;
+    this.state.players.forEach((p, id) => {
+      if (id.startsWith(client.sessionId)) {
+        playerPieces++;
+      }
+    });
+
+    // Limit maximum split pieces (like agario)
+    if (playerPieces >= 16) {
+      console.log(`⚠️ Split denied - too many pieces: ${playerPieces}/16`);
+      return;
+    }
     
-    console.log(`✅ Mass requirement met: ${player.mass} >= 40`);
-    
-    // Calculate direction from player to target
+    // Calculate direction from player to target (mouse direction)
     const dx = targetX - player.x;
     const dy = targetY - player.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -326,30 +323,55 @@ export class ArenaRoom extends Room<GameState> {
     const dirX = dx / distance;
     const dirY = dy / distance;
     
-    // Split the player mass
+    // Split the player mass in half (agario style)
     const originalMass = player.mass;
-    const splitMass = Math.floor(originalMass / 2);
+    const halfMass = Math.floor(originalMass / 2);
     
-    // Update original player
-    player.mass = originalMass - splitMass;
-    player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
+    // Update original player mass and radius
+    player.mass = halfMass;
+    player.radius = Math.sqrt(player.mass) * 3;
     
-    // Create split piece
+    // Apply recoil to original player (opposite direction)
+    const recoilDistance = 20;
+    player.x = player.x - dirX * recoilDistance;
+    player.y = player.y - dirY * recoilDistance;
+    
+    // Create split piece with momentum toward mouse
     const splitId = `${client.sessionId}_split_${Date.now()}`;
     const splitPlayer = new Player();
     splitPlayer.name = `${player.name}*`;
+    splitPlayer.sessionId = splitId;
+    splitPlayer.ownerSessionId = client.sessionId; // Track original owner
     
-    // Position split piece safely
-    const spawnDistance = Math.max(player.radius + 30, 80); // Safe spawn distance
-    splitPlayer.x = player.x + dirX * spawnDistance;
-    splitPlayer.y = player.y + dirY * spawnDistance;
+    // Position split piece with launch distance
+    const launchDistance = 100;
+    splitPlayer.x = player.x + dirX * launchDistance;
+    splitPlayer.y = player.y + dirY * launchDistance;
+    
+    // Set split piece properties  
+    splitPlayer.mass = halfMass;
+    splitPlayer.radius = Math.sqrt(splitPlayer.mass) * 3;
+    splitPlayer.color = player.color;
+    splitPlayer.skinId = player.skinId;
+    splitPlayer.skinName = player.skinName;
+    splitPlayer.skinColor = player.skinColor;
+    splitPlayer.skinType = player.skinType;
+    splitPlayer.score = Math.floor(player.score / 2);
+    splitPlayer.alive = true;
+    
+    // Set momentum velocity toward target (like agario)
+    const splitVelocity = 15; // Initial momentum speed
+    splitPlayer.vx = targetX; // Store target position
+    splitPlayer.vy = targetY;
+    splitPlayer.momentumX = dirX * splitVelocity; // Store momentum
+    splitPlayer.momentumY = dirY * splitVelocity;
+    splitPlayer.splitTime = Date.now(); // Track split time for merge cooldown
     
     // Keep split piece in bounds
-    // Arena boundary enforcement for split players - prevent entering red zone
     const centerX = this.worldSize / 4; // 2000 - playable area center X
     const centerY = this.worldSize / 4; // 2000 - playable area center Y
     const playableRadius = 1800; // Match the red divider radius
-    const maxRadius = playableRadius - splitPlayer.radius; // Split player edge constrained at red divider
+    const maxRadius = playableRadius - splitPlayer.radius;
     
     const distanceFromCenter = Math.sqrt(
       Math.pow(splitPlayer.x - centerX, 2) + 
@@ -363,37 +385,14 @@ export class ArenaRoom extends Room<GameState> {
       splitPlayer.y = centerY + Math.sin(angle) * maxRadius;
     }
     
-    // Set split piece properties
-    splitPlayer.vx = 0; // Use target positioning instead of velocity
-    splitPlayer.vy = 0;
-    splitPlayer.mass = splitMass;
-    splitPlayer.radius = Math.sqrt(splitPlayer.mass) * 3; // Match agario radius formula
-    splitPlayer.color = player.color;
-    splitPlayer.score = Math.floor(player.score / 2);
-    splitPlayer.alive = true;
-    
-    // Add split piece to game (temporary - it will merge back after 5 seconds)
+    // Add split piece to game
     this.state.players.set(splitId, splitPlayer);
     
-    console.log(`✅ Split completed for ${player.name}:`, {
-      originalMass: originalMass,
-      remainingMass: player.mass,
-      splitMass: splitMass,
-      splitPosition: { x: splitPlayer.x.toFixed(1), y: splitPlayer.y.toFixed(1) }
+    console.log(`🚀 Split completed - ${player.name} split toward mouse. Original: ${halfMass}, Split: ${halfMass}`, {
+      direction: { x: dirX.toFixed(2), y: dirY.toFixed(2) },
+      splitPosition: { x: splitPlayer.x.toFixed(1), y: splitPlayer.y.toFixed(1) },
+      totalPieces: playerPieces + 1
     });
-    
-    // Auto-merge the split piece back after 5 seconds
-    setTimeout(() => {
-      const splitPiece = this.state.players.get(splitId);
-      const mainPlayer = this.state.players.get(client.sessionId);
-      
-      if (splitPiece && mainPlayer && splitPiece.alive && mainPlayer.alive) {
-        console.log(`🔄 Auto-merging split piece for ${mainPlayer.name}`);
-        mainPlayer.mass += splitPiece.mass;
-        mainPlayer.radius = Math.sqrt(mainPlayer.mass) * 3; // Match agario radius formula
-        this.state.players.delete(splitId);
-      }
-    }, 5000);
     } catch (error) {
       console.error(`❌ Error handling split for session ${client.sessionId}:`, error);
       // Don't disconnect the client, just log the error and continue
