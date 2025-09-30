@@ -373,5 +373,3 @@ if __name__ == "__main__":
     tester = CashOutRingTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
-
-                'ts_center_comment': '2000 for 8000x8000 world' in arena_ts_content,
