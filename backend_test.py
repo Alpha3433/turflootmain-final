@@ -373,11 +373,6 @@ if __name__ == "__main__":
     tester = CashOutRingTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
-            for i in range(10):
-                # Generate random angle and distance (using square root for uniform distribution)
-                angle = (i / 10.0) * 2 * math.pi  # Distribute evenly for testing
-                distance = math.sqrt(0.5) * max_radius  # Use sqrt(0.5) for mid-range distance
-                
                 x = center_x + math.cos(angle) * distance
                 y = center_y + math.sin(angle) * distance
                 
