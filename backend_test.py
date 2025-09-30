@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Agario-Style Split Functionality
-Testing the completely rewritten split mechanics to match agario exactly with mouse direction, 
-momentum movement, independent pieces, touch-based merging, and 16-piece limit.
+Backend Testing Script for Simplified Split Functionality
+Tests the backend API and Colyseus servers after schema simplification to prevent disconnections.
+The main agent has simplified the Player schema by removing problematic sessionId and ownerSessionId fields.
 """
 
 import requests
@@ -11,7 +11,7 @@ import time
 import os
 from typing import Dict, Any, List, Tuple
 
-class AgarIOSplitBackendTester:
+class SimplifiedSplitBackendTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-arena-4.preview.emergentagent.com')
