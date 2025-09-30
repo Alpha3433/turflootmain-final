@@ -1046,7 +1046,7 @@ const MultiplayerArena = () => {
         targetX: 2000, // Updated center for left-side playable area (worldSize/4)
         targetY: 2000, // Updated center for top-side playable area (worldSize/4)
         spawnProtection: true,
-        spawnProtectionTime: 6000,
+        spawnProtectionTime: 4000,
         spawnProtectionStart: Date.now()
       }
       
