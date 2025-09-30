@@ -495,6 +495,11 @@ const MultiplayerArena = () => {
             // Show cashout success modal
             setShowCashOutSuccessModal(true)
             
+            // Automatically redirect to main menu after 10 seconds
+            setTimeout(() => {
+              window.location.href = '/'
+            }, 10000)
+            
             return 100
           }
           
