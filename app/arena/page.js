@@ -1029,6 +1029,12 @@ const MultiplayerArena = () => {
       this.bindEvents()
       this.setupMouse()
     }
+    
+    // Method to update local cash out state for immediate feedback
+    updateLocalCashOutState(isCashingOut, cashOutProgress = 0) {
+      this.localCashOutState = { isCashingOut, cashOutProgress }
+      console.log('💰 Local cash out state updated:', this.localCashOutState)
+    }
 
     setupMouse() {
       this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
