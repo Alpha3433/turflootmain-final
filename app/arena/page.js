@@ -2724,6 +2724,81 @@ const MultiplayerArena = () => {
         </button>
       </div>
 
+      {/* Loading Modal */}
+      {showLoadingModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10001,
+          fontFamily: '"Rajdhani", sans-serif'
+        }}>
+          <div style={{
+            backgroundColor: '#1a1a1a',
+            border: '3px solid #ffff00',
+            borderRadius: '16px',
+            padding: '60px 40px',
+            maxWidth: '400px',
+            width: '90%',
+            textAlign: 'center',
+            boxShadow: '0 0 40px rgba(255, 255, 0, 0.4)',
+            animation: 'pulse 2s ease-in-out infinite'
+          }}>
+            {/* Loading Spinner */}
+            <div style={{
+              width: '60px',
+              height: '60px',
+              margin: '0 auto 30px auto',
+              border: '4px solid rgba(255, 255, 0, 0.3)',
+              borderTop: '4px solid #ffff00',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }}></div>
+            
+            {/* Main Title */}
+            <h1 style={{
+              color: '#ffff00',
+              fontSize: '28px',
+              fontWeight: 'bold',
+              margin: '0 0 16px 0',
+              textTransform: 'uppercase',
+              letterSpacing: '2px'
+            }}>
+              JOINING ARENA
+            </h1>
+            
+            {/* Subtitle */}
+            <p style={{
+              color: '#ffffff',
+              fontSize: '16px',
+              margin: '0 0 24px 0',
+              opacity: 0.9,
+              lineHeight: '1.4'
+            }}>
+              Connecting to arena room...<br />
+              Please wait while we set up your game.
+            </p>
+            
+            {/* Loading dots animation */}
+            <div style={{
+              color: '#ffff00',
+              fontSize: '24px',
+              fontWeight: 'bold'
+            }}>
+              <span style={{ animation: 'fadeInOut 1.5s ease-in-out infinite' }}>●</span>
+              <span style={{ animation: 'fadeInOut 1.5s ease-in-out infinite 0.5s' }}>●</span>
+              <span style={{ animation: 'fadeInOut 1.5s ease-in-out infinite 1s' }}>●</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Cashout Success Modal */}
       {showCashOutSuccessModal && (
         <div style={{
