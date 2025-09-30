@@ -493,13 +493,21 @@ const MultiplayerArena = () => {
             // Add currency based on score
             setCurrency(prevCurrency => prevCurrency + score)
             
-            // Show cashout success modal
+            // Show cashout success modal and start countdown
             setShowCashOutSuccessModal(true)
+            setAutoRedirectCountdown(10)
             
-            // Automatically redirect to main menu after 10 seconds
-            setTimeout(() => {
-              window.location.href = '/'
-            }, 10000)
+            // Start countdown timer
+            const countdownInterval = setInterval(() => {
+              setAutoRedirectCountdown(prev => {
+                if (prev <= 1) {
+                  clearInterval(countdownInterval)
+                  window.location.href = '/'
+                  return 0
+                }
+                return prev - 1
+              })
+            }, 1000)
             
             return 100
           }
