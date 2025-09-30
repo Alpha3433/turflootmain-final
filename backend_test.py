@@ -373,21 +373,6 @@ if __name__ == "__main__":
     tester = CashOutRingTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
-                x = center_x + math.cos(angle) * distance
-                y = center_y + math.sin(angle) * distance
-                
-                # Calculate distance from center
-                actual_distance = math.sqrt((x - center_x)**2 + (y - center_y)**2)
-                
-                test_positions.append({
-                    'x': x,
-                    'y': y,
-                    'distance': actual_distance,
-                    'within_bounds': actual_distance <= max_radius
-                })
-            
-            # Check that all positions are within bounds
-            valid_positions = [pos for pos in test_positions if pos['within_bounds']]
             
             if len(valid_positions) == len(test_positions):
                 avg_distance = sum(pos['distance'] for pos in test_positions) / len(test_positions)
