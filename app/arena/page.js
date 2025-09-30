@@ -46,6 +46,8 @@ const MultiplayerArena = () => {
   const [cashOutProgress, setCashOutProgress] = useState(0)
   const [isCashingOut, setIsCashingOut] = useState(false)
   const [cashOutComplete, setCashOutComplete] = useState(false)
+  const [showCashOutSuccessModal, setShowCashOutSuccessModal] = useState(false)
+  const [gameStats, setGameStats] = useState({ timeStarted: Date.now(), eliminations: 0 })
   const cashOutIntervalRef = useRef(null)
 
   // Mission system - ported from agario  
