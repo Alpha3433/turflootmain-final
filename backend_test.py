@@ -13,28 +13,18 @@ from typing import Dict, Any, List, Tuple
 class SpawnProtectionBackendTester:
     def __init__(self):
         # Get base URL from environment
-        try:
-            with open('/app/.env', 'r') as f:
-                env_content = f.read()
-                for line in env_content.split('\n'):
-                    if line.startswith('NEXT_PUBLIC_BASE_URL='):
-                        self.base_url = line.split('=', 1)[1].strip()
-                        break
-                else:
-                    self.base_url = "http://localhost:3000"
-        except:
-            self.base_url = "http://localhost:3000"
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-arena-4.preview.emergentagent.com')
+        self.api_base = f"{self.base_url}/api"
+        self.colyseus_endpoint = os.getenv('NEXT_PUBLIC_COLYSEUS_ENDPOINT', 'wss://au-syd-ab3eaf4e.colyseus.cloud')
         
-        self.api_url = f"{self.base_url}/api"
+        print(f"🔧 Testing Configuration:")
+        print(f"   Base URL: {self.base_url}")
+        print(f"   API Base: {self.api_base}")
+        print(f"   Colyseus Endpoint: {self.colyseus_endpoint}")
+        print()
+        
         self.test_results = []
-        self.total_tests = 0
-        self.passed_tests = 0
-        
-        print(f"🎯 CASH OUT RING FUNCTIONALITY TESTING")
-        print(f"📋 Testing the FIXED cash out ring functionality to verify disconnection bug is resolved")
-        print(f"🌐 Base URL: {self.base_url}")
-        print(f"🔗 API URL: {self.api_url}")
-        print("=" * 80)
+        self.start_time = time.time()
 
     def log_test(self, test_name: str, passed: bool, details: str = ""):
         """Log test result"""
