@@ -373,31 +373,6 @@ if __name__ == "__main__":
     tester = CashOutRingTester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
-            
-            if len(valid_positions) == len(test_positions):
-                avg_distance = sum(pos['distance'] for pos in test_positions) / len(test_positions)
-                return self.log_test(
-                    "Spawn Position Mathematics",
-                    True,
-                    f"All {len(test_positions)} test positions within {max_radius}px radius (avg distance: {avg_distance:.1f}px)"
-                )
-            else:
-                invalid_count = len(test_positions) - len(valid_positions)
-                return self.log_test(
-                    "Spawn Position Mathematics",
-                    False,
-                    f"{invalid_count}/{len(test_positions)} positions outside bounds"
-                )
-        except Exception as e:
-            return self.log_test("Spawn Position Mathematics", False, f"Exception: {str(e)}")
-
-    def test_world_size_configuration(self) -> bool:
-        """Test 6: Verify world size is 8000x8000 with playable area at top-left quadrant"""
-        try:
-            # Check configuration in both source files
-            with open('/app/src/rooms/ArenaRoom.ts', 'r') as f:
-                arena_ts_content = f.read()
-            
             with open('/app/build/rooms/ArenaRoom.js', 'r') as f:
                 arena_js_content = f.read()
             
