@@ -310,9 +310,9 @@ export class ArenaRoom extends Room<GameState> {
       
       // TODO: Implement actual split logic here once connection stability is confirmed
       
-    } catch (error) {
+    } catch (error: any) {
       console.error(`❌ Error handling split for session ${client.sessionId}:`, error);
-      console.error(`❌ Stack trace:`, error.stack);
+      console.error(`❌ Stack trace:`, error?.stack || 'No stack trace available');
       // Don't disconnect the client, just log the error and continue
     }
   }
