@@ -1580,8 +1580,8 @@ const MultiplayerArena = () => {
       }
     }
     
-    updateSplitCells(deltaTime) {
-      if (!this.playerCells || this.playerCells.length === 0) return
+    updatePlayerPieces(deltaTime) {
+      if (!this.playerPieces || this.playerPieces.length === 0) return
       
       const now = Date.now()
       
