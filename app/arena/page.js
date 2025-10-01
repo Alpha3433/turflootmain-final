@@ -366,7 +366,7 @@ const MultiplayerArena = () => {
         const canSplitPieces = gameRef.current.playerPieces && 
                               gameRef.current.playerPieces.some(piece => piece.mass >= 36)
         
-        if (canSplitPlayer || canSplitCells) {
+        if (canSplitPlayer || canSplitPieces) {
           // Check if player already has split pieces (exact agario naming)
           if (!gameRef.current.playerPieces) {
             gameRef.current.playerPieces = []
