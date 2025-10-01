@@ -1519,6 +1519,11 @@ const MultiplayerArena = () => {
       const currentTimeSurvived = Math.floor((Date.now() - this.gameStartTime) / 1000)
       setTimeSurvived(currentTimeSurvived)
       
+      // Update split cooldown (like agario)
+      if (this.splitCooldown > 0) {
+        this.splitCooldown--
+      }
+      
       // Update split cells
       this.updateSplitCells(deltaTime)
       
