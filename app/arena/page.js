@@ -421,8 +421,11 @@ const MultiplayerArena = () => {
       }
       
       // Update main player (reduce mass and add recoil - CRITICAL AGARIO BEHAVIOR)
+      const originalMass = gameRef.current.player.mass
+      console.log(`🔥 CRITICAL SPLIT: Original mass: ${originalMass}, Half mass: ${halfMass}`)
       gameRef.current.player.mass = halfMass
       gameRef.current.player.radius = halfRadius
+      console.log(`🔥 AFTER SPLIT: Player mass: ${gameRef.current.player.mass}, Player radius: ${gameRef.current.player.radius}`)
       
       // Small recoil movement in opposite direction (like agario)
       const recoilDistance = 20
