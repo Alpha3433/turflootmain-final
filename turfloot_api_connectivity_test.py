@@ -16,7 +16,7 @@ from datetime import datetime
 
 # Configuration
 LOCALHOST_URL = "http://localhost:3000"
-PREVIEW_URL = "https://turfloot-arena-4.preview.emergentagent.com"
+PREVIEW_URL = "https://arena-cashout.preview.emergentagent.com"
 LOCALHOST_API = f"{LOCALHOST_URL}/api"
 PREVIEW_API = f"{PREVIEW_URL}/api"
 

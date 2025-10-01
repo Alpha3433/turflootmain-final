@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://turfloot-arena-4.preview.emergentagent.com"
+BASE_URL = "https://arena-cashout.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class PrivyAuthenticationTester:

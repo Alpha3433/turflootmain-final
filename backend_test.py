@@ -28,7 +28,7 @@ from typing import Dict, Any, List, Tuple
 class RebuiltSplitBackendTester:
     def __init__(self):
         # Get base URL from environment
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-arena-4.preview.emergentagent.com')
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://arena-cashout.preview.emergentagent.com')
         self.api_base = f"{self.base_url}/api"
         self.colyseus_endpoint = os.getenv('NEXT_PUBLIC_COLYSEUS_ENDPOINT', 'wss://au-syd-ab3eaf4e.colyseus.cloud')
         
