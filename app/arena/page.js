@@ -1585,9 +1585,9 @@ const MultiplayerArena = () => {
       
       const now = Date.now()
       
-      // Update each split cell
-      for (let i = this.playerCells.length - 1; i >= 0; i--) {
-        const cell = this.playerCells[i]
+      // Update each player piece (exact agario loop)
+      for (let i = this.playerPieces.length - 1; i >= 0; i--) {
+        const piece = this.playerPieces[i]
         
         // AGARIO MOVEMENT: Split cells move toward mouse cursor (like main cell)
         if (this.mouse && typeof this.mouse.worldX === 'number' && typeof this.mouse.worldY === 'number') {
