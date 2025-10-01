@@ -4694,6 +4694,17 @@ export default function TurfLootTactical() {
     width: '100%'
   }
 
+  const serverBrowserModal = (
+    <ServerBrowserModal
+      isOpen={isServerBrowserOpen}
+      onClose={() => {
+        console.log('Closing server browser modal')
+        setIsServerBrowserOpen(false)
+      }}
+      onJoinLobby={handleJoinLobby}
+    />
+  )
+
   // Desktop Layout
   if (!isMobile) {
     return (
@@ -7265,14 +7276,7 @@ export default function TurfLootTactical() {
         `}</style>
 
         {/* Server Browser Modal */}
-        <ServerBrowserModal
-          isOpen={isServerBrowserOpen}
-          onClose={() => {
-            console.log('Closing server browser modal')
-            setIsServerBrowserOpen(false)
-          }}
-          onJoinLobby={handleJoinLobby}
-        />
+        {serverBrowserModal}
 
         {/* User Profile Modal */}
         {isProfileModalOpen && (
@@ -10424,7 +10428,8 @@ export default function TurfLootTactical() {
         }
       `}</style>
 
-      {/* Server Browser Modal instance removed - using the one in desktop view to avoid duplication */}
+      {/* Shared Server Browser Modal */}
+      {serverBrowserModal}
 
       {/* Mobile Orientation Modal */}
       {showOrientationModal && isMobile && (
