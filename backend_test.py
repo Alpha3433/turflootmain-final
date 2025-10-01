@@ -18,35 +18,62 @@ TESTING FOCUS:
 - WebSocket stability during split operations
 """
 
-import requests
+import asyncio
 import json
 import time
-import os
-from typing import Dict, Any, List, Tuple
+import requests
+import logging
+from typing import Dict, Any, List, Optional
 
-class RebuiltSplitBackendTester:
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+class ArenaModeSplitTester:
     def __init__(self):
-        # Get base URL from environment
-        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://arena-cashout.preview.emergentagent.com')
-        self.api_base = f"{self.base_url}/api"
-        self.colyseus_endpoint = os.getenv('NEXT_PUBLIC_COLYSEUS_ENDPOINT', 'wss://au-syd-ab3eaf4e.colyseus.cloud')
-        
-        print(f"🔧 REBUILT SPLIT FUNCTIONALITY TESTING")
-        print(f"   Testing the completely rebuilt split system from scratch")
-        print(f"   Base URL: {self.base_url}")
-        print(f"   API Base: {self.api_base}")
-        print(f"   Colyseus Endpoint: {self.colyseus_endpoint}")
-        print()
-        
+        self.base_url = "https://arena-cashout.preview.emergentagent.com"
+        self.api_url = f"{self.base_url}/api"
+        self.colyseus_endpoint = "wss://au-syd-ab3eaf4e.colyseus.cloud"
         self.test_results = []
-        self.start_time = time.time()
-
-    def log_test(self, test_name: str, passed: bool, details: str = ""):
+        
+    def log_test_result(self, test_name: str, passed: bool, details: str = ""):
         """Log test result with details"""
         status = "✅ PASSED" if passed else "❌ FAILED"
-        self.test_results.append({
-            'test': test_name,
-            'passed': passed,
+        result = {
+            "test": test_name,
+            "passed": passed,
+            "details": details,
+            "timestamp": time.time()
+        }
+        self.test_results.append(result)
+        logger.info(f"{status}: {test_name} - {details}")
+        
+    async def test_api_health_check(self) -> bool:
+        """Test 1: Verify backend API is operational"""
+        try:
+            response = requests.get(f"{self.api_url}", timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                service_name = data.get('service', 'unknown')
+                status = data.get('status', 'unknown')
+                features = data.get('features', [])
+                
+                is_operational = (
+                    service_name == 'turfloot-api' and 
+                    status == 'operational' and 
+                    'multiplayer' in features
+                )
+                
+                details = f"Service: {service_name}, Status: {status}, Features: {features}"
+                self.log_test_result("API Health Check", is_operational, details)
+                return is_operational
+            else:
+                self.log_test_result("API Health Check", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test_result("API Health Check", False, f"Exception: {str(e)}")
+            return False
             'details': details,
             'timestamp': time.time()
         })
