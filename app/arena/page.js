@@ -1671,25 +1671,29 @@ const MultiplayerArena = () => {
           }
         }
         
-        // Check for merge between split cells (agario allows this)
+        // Check for merge between pieces (agario allows this)
         for (let j = i - 1; j >= 0; j--) {
-          const otherCell = this.playerCells[j]
+          const otherPiece = this.playerPieces[j]
           
-          if (cell.canMerge && otherCell.canMerge) {
-            const dx = cell.x - otherCell.x
-            const dy = cell.y - otherCell.y
+          if (piece.canMerge && otherPiece.canMerge) {
+            const dx = piece.x - otherPiece.x
+            const dy = piece.y - otherPiece.y
             const distance = Math.sqrt(dx * dx + dy * dy)
-            const minMergeDistance = (cell.radius + otherCell.radius) * 0.8
+            const minMergeDistance = (piece.radius + otherPiece.radius) * 0.8
             
             if (distance < minMergeDistance) {
-              // Merge the two split cells
-              otherCell.mass += cell.mass
-              otherCell.radius = Math.sqrt(otherCell.mass) * 3
+              // Merge the two pieces (exact agario style)
+              otherPiece.mass += piece.mass
+              otherPiece.radius = Math.sqrt(otherPiece.mass / Math.PI) * 6  // Exact agario radius
               
-              // Remove the merged cell
-              this.playerCells.splice(i, 1)
+              // Remove the merged piece
+              this.playerPieces.splice(i, 1)
               
-              console.log('🔄 Split cells merged! New cell mass:', Math.round(otherCell.mass))
+              // Update total mass UI
+              const totalMass = this.player.mass + this.playerPieces.reduce((sum, p) => sum + p.mass, 0)
+              setMass(Math.floor(totalMass))
+              
+              console.log('🔄 Pieces merged! New piece mass:', Math.round(otherPiece.mass))
               break
             }
           }
