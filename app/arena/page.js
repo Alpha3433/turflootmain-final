@@ -2172,40 +2172,40 @@ const MultiplayerArena = () => {
       // Draw each player piece (exact agario style)
       this.playerPieces.forEach(piece => {
         this.ctx.save()
-        this.ctx.translate(cell.x, cell.y)
+        this.ctx.translate(piece.x, piece.y)
         
-        // Main cell body
+        // Main piece body (exact agario style)
         this.ctx.beginPath()
-        this.ctx.arc(0, 0, cell.radius, 0, Math.PI * 2)
-        this.ctx.fillStyle = cell.color
+        this.ctx.arc(0, 0, piece.radius, 0, Math.PI * 2)
+        this.ctx.fillStyle = piece.color
         this.ctx.fill()
         
-        // Cell border
+        // Piece border (like agario)
         this.ctx.strokeStyle = '#ffffff'
         this.ctx.lineWidth = 2
         this.ctx.stroke()
         
-        // Add split cell indicator (small dot)
+        // Add split piece indicator (small dot like agario)
         this.ctx.beginPath()
-        this.ctx.arc(0, -cell.radius * 0.3, 3, 0, Math.PI * 2)
+        this.ctx.arc(0, -piece.radius * 0.3, 3, 0, Math.PI * 2)
         this.ctx.fillStyle = '#ffffff'
         this.ctx.fill()
         
-        // Merge cooldown indicator (agario style)
-        if (!cell.canMerge) {
-          const elapsed = Date.now() - cell.splitTime
-          const progress = Math.min(elapsed / 5000, 1) // 5 second cooldown
+        // Merge cooldown indicator (30 second cooldown like agario)
+        if (!piece.canMerge) {
+          const elapsed = Date.now() - piece.splitTime
+          const progress = Math.min(elapsed / 30000, 1) // 30 second cooldown like agario
           
-          // Draw cooldown ring (thinner, more subtle like agario)
+          // Draw cooldown ring (subtle like agario)
           this.ctx.beginPath()
-          this.ctx.arc(0, 0, cell.radius + 4, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2)
+          this.ctx.arc(0, 0, piece.radius + 4, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2)
           this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)'
           this.ctx.lineWidth = 2
           this.ctx.stroke()
         } else {
-          // Draw merge available indicator (subtle green glow)
+          // Draw merge available indicator (subtle green glow like agario)
           this.ctx.beginPath()
-          this.ctx.arc(0, 0, cell.radius + 2, 0, Math.PI * 2)
+          this.ctx.arc(0, 0, piece.radius + 2, 0, Math.PI * 2)
           this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.4)'
           this.ctx.lineWidth = 1
           this.ctx.stroke()
