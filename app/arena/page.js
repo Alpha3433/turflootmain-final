@@ -2081,16 +2081,23 @@ const MultiplayerArena = () => {
         this.ctx.fillStyle = '#ffffff'
         this.ctx.fill()
         
-        // Merge cooldown indicator
+        // Merge cooldown indicator (agario style)
         if (!cell.canMerge) {
           const elapsed = Date.now() - cell.splitTime
-          const progress = Math.min(elapsed / 10000, 1) // 10 second cooldown
+          const progress = Math.min(elapsed / 5000, 1) // 5 second cooldown
           
-          // Draw cooldown ring
+          // Draw cooldown ring (thinner, more subtle like agario)
           this.ctx.beginPath()
-          this.ctx.arc(0, 0, cell.radius + 8, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2)
-          this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)'
-          this.ctx.lineWidth = 3
+          this.ctx.arc(0, 0, cell.radius + 4, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2)
+          this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)'
+          this.ctx.lineWidth = 2
+          this.ctx.stroke()
+        } else {
+          // Draw merge available indicator (subtle green glow)
+          this.ctx.beginPath()
+          this.ctx.arc(0, 0, cell.radius + 2, 0, Math.PI * 2)
+          this.ctx.strokeStyle = 'rgba(0, 255, 0, 0.4)'
+          this.ctx.lineWidth = 1
           this.ctx.stroke()
         }
         
