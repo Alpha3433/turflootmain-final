@@ -946,6 +946,12 @@ const MultiplayerArena = () => {
       return
     }
     
+    // Check WebSocket connection state to prevent "CLOSING or CLOSED" errors
+    if (wsRef.current.connection && wsRef.current.connection.readyState !== 1) {
+      console.log('❌ Cannot send input - WebSocket not in OPEN state:', wsRef.current.connection.readyState)
+      return
+    }
+    
     // Input throttling for smooth networking (60fps max input rate)
     const now = Date.now()
     if (now - lastInputTimeRef.current < inputThrottleMs) {
