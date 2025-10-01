@@ -1581,6 +1581,9 @@ const MultiplayerArena = () => {
             this.drawPlayer(player, player.isCurrentPlayer)
           }
         })
+        
+        // Draw split cells for current player
+        this.drawSplitCells()
       }
       
       this.ctx.restore()
