@@ -2166,11 +2166,11 @@ const MultiplayerArena = () => {
       this.ctx.restore()
     }
     
-    drawSplitCells() {
-      if (!this.playerCells || this.playerCells.length === 0) return
+    drawPlayerPieces() {
+      if (!this.playerPieces || this.playerPieces.length === 0) return
       
-      // Draw each split cell
-      this.playerCells.forEach(cell => {
+      // Draw each player piece (exact agario style)
+      this.playerPieces.forEach(piece => {
         this.ctx.save()
         this.ctx.translate(cell.x, cell.y)
         
