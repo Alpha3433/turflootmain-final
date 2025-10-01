@@ -1488,16 +1488,36 @@ const MultiplayerArena = () => {
       for (let i = this.playerCells.length - 1; i >= 0; i--) {
         const cell = this.playerCells[i]
         
-        // Apply velocity (momentum from split)
-        cell.x += cell.velocityX * deltaTime * 60
-        cell.y += cell.velocityY * deltaTime * 60
+        // AGARIO MOVEMENT: Split cells move toward mouse cursor (like main cell)
+        if (this.mouse && typeof this.mouse.worldX === 'number' && typeof this.mouse.worldY === 'number') {
+          const dx = this.mouse.worldX - cell.x
+          const dy = this.mouse.worldY - cell.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance > 5) {
+            // Move toward mouse (same speed calculation as main player)
+            const speed = Math.max(2, 20 - cell.radius * 0.02) // Agario-style speed based on size
+            const moveDistance = speed * deltaTime * 60
+            
+            const dirX = dx / distance
+            const dirY = dy / distance
+            
+            cell.x += dirX * moveDistance
+            cell.y += dirY * moveDistance
+          }
+        }
         
-        // Decay velocity (like agario)
-        cell.velocityX *= 0.98
-        cell.velocityY *= 0.98
-        
-        // Stop very small velocities
-        if (Math.abs(cell.velocityX) < 0.1 && Math.abs(cell.velocityY) < 0.1) {
+        // Apply split momentum (only initially after split)
+        const splitAge = now - cell.splitTime
+        if (splitAge < 1000) { // First 1 second after split
+          cell.x += cell.velocityX * deltaTime * 60
+          cell.y += cell.velocityY * deltaTime * 60
+          
+          // Decay velocity quickly
+          cell.velocityX *= 0.95
+          cell.velocityY *= 0.95
+        } else {
+          // Stop momentum after 1 second, only mouse movement remains
           cell.velocityX = 0
           cell.velocityY = 0
         }
