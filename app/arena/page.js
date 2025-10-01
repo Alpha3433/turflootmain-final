@@ -434,6 +434,16 @@ const MultiplayerArena = () => {
       // Add new piece to array
       gameRef.current.playerPieces.push(newPiece)
       
+      // Set merge cooldown (3 seconds like agario - matches the agario file)
+      setTimeout(() => {
+        const pieceToUpdate = gameRef.current.playerPieces.find(p => p === newPiece)
+        if (pieceToUpdate) {
+          pieceToUpdate.recombineReady = true
+          pieceToUpdate.canMerge = true
+          console.log('🔄 Split piece can now merge')
+        }
+      }, 3000) // 3 seconds like agario
+      
       // Update UI immediately (total mass should remain the same)
       const totalMass = gameRef.current.player.mass + 
                        gameRef.current.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
