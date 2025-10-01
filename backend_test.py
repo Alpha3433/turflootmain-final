@@ -19,7 +19,7 @@ class RebuiltSplitBackendTester:
         self.api_base = f"{self.base_url}/api"
         self.colyseus_endpoint = os.getenv('NEXT_PUBLIC_COLYSEUS_ENDPOINT', 'wss://au-syd-ab3eaf4e.colyseus.cloud')
         
-        print(f"🔧 Testing Configuration:")
+        print(f"🔧 REBUILT SPLIT FUNCTIONALITY TESTING")
         print(f"   Base URL: {self.base_url}")
         print(f"   API Base: {self.api_base}")
         print(f"   Colyseus Endpoint: {self.colyseus_endpoint}")
