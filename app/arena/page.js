@@ -388,17 +388,18 @@ const MultiplayerArena = () => {
               gameRef.current.player.x = gameRef.current.player.x - dirX * recoilDistance
               gameRef.current.player.y = gameRef.current.player.y - dirY * recoilDistance
               
-              // Create new split cell
-              const splitDistance = 200
+              // Create new split cell (exact agario style)
+              const splitDistance = 100  // Match agario distance
+              const splitVelocity = 20   // Match agario velocity
               const splitCell = {
                 id: `split_${Date.now()}_${totalSplits}`,
                 x: gameRef.current.player.x + dirX * splitDistance,
                 y: gameRef.current.player.y + dirY * splitDistance,
                 mass: halfMass,
-                radius: Math.sqrt(halfMass) * 3,
+                radius: halfRadius,  // Use the agario radius calculation
                 color: gameRef.current.player.color,
-                velocityX: dirX * 25,
-                velocityY: dirY * 25,
+                velocityX: dirX * splitVelocity,
+                velocityY: dirY * splitVelocity,
                 splitTime: Date.now(),
                 canMerge: false
               }
