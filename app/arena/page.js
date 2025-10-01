@@ -398,6 +398,16 @@ const MultiplayerArena = () => {
               }
               
               gameRef.current.playerCells.push(splitCell)
+              
+              // Set merge cooldown for this specific cell
+              setTimeout(() => {
+                const cellToUpdate = gameRef.current.playerCells.find(c => c.id === splitCell.id)
+                if (cellToUpdate) {
+                  cellToUpdate.canMerge = true
+                  console.log('🔄 Main split cell can now merge')
+                }
+              }, 5000)
+              
               totalSplits++
             }
           }
@@ -437,19 +447,20 @@ const MultiplayerArena = () => {
                 }
                 
                 gameRef.current.playerCells.push(newSplitCell)
+                
+                // Set merge cooldown for this specific cell
+                setTimeout(() => {
+                  const cellToUpdate = gameRef.current.playerCells.find(c => c.id === newSplitCell.id)
+                  if (cellToUpdate) {
+                    cellToUpdate.canMerge = true
+                    console.log('🔄 Secondary split cell can now merge')
+                  }
+                }, 5000)
+                
                 totalSplits++
               }
             }
           })
-          
-          // Set merge cooldown (5 seconds like agario)
-          setTimeout(() => {
-            const cell = gameRef.current.playerCells.find(c => c.id === splitCell.id)
-            if (cell) {
-              cell.canMerge = true
-              console.log('🔄 Split cell can now merge')
-            }
-          }, 5000)
           
           console.log(`✅ AGARIO multi-split completed: ${totalSplits} cells split`)
           console.log(`📊 Total cells now: ${gameRef.current.playerCells.length + 1}`)
