@@ -74,77 +74,39 @@ class ArenaModeSplitTester:
         except Exception as e:
             self.log_test_result("API Health Check", False, f"Exception: {str(e)}")
             return False
-            'details': details,
-            'timestamp': time.time()
-        })
-        print(f"{status}: {test_name}")
-        if details:
-            print(f"   Details: {details}")
-        print()
-
-    def test_backend_api_operational(self) -> bool:
-        """Test 1: Verify backend API and Colyseus servers are operational after rebuild"""
-        print("🔍 TEST 1: Backend API Operational - Backend infrastructure operational after rebuild")
-        
+    
+    async def test_colyseus_server_availability(self) -> bool:
+        """Test 2: Verify Colyseus arena servers are running"""
         try:
-            response = requests.get(f"{self.api_base}", timeout=10)
-            
-            if response.status_code == 200:
-                data = response.json()
-                service = data.get('service', 'unknown')
-                status = data.get('status', 'unknown')
-                features = data.get('features', [])
-                
-                multiplayer_enabled = 'multiplayer' in features
-                
-                details = f"Service: {service}, Status: {status}, Multiplayer: {multiplayer_enabled}"
-                
-                if status == 'operational' and multiplayer_enabled:
-                    self.log_test("Backend API Operational", True, details)
-                    return True
-                else:
-                    self.log_test("Backend API Operational", False, f"Service issues - {details}")
-                    return False
-            else:
-                self.log_test("Backend API Operational", False, f"HTTP {response.status_code}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Backend API Operational", False, f"Exception: {str(e)}")
-            return False
-
-    def test_colyseus_servers_operational(self) -> bool:
-        """Test 2: Verify Colyseus servers are operational after rebuild"""
-        print("🔍 TEST 2: Colyseus Servers Operational - Arena servers running after rebuild")
-        
-        try:
-            response = requests.get(f"{self.api_base}/servers", timeout=10)
-            
+            response = requests.get(f"{self.api_url}/servers", timeout=10)
             if response.status_code == 200:
                 data = response.json()
                 servers = data.get('servers', [])
                 colyseus_enabled = data.get('colyseusEnabled', False)
                 colyseus_endpoint = data.get('colyseusEndpoint', '')
                 
+                # Find arena servers
                 arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' and s.get('roomType') == 'arena']
                 
-                if colyseus_enabled and arena_servers:
-                    server = arena_servers[0]
-                    server_name = server.get('name', 'Unknown')
-                    max_players = server.get('maxPlayers', 0)
-                    
-                    details = f"Arena server: {server_name}, Max: {max_players}, Endpoint: {colyseus_endpoint}"
-                    self.log_test("Colyseus Servers Operational", True, details)
-                    return True
-                else:
-                    self.log_test("Colyseus Servers Operational", False, f"No arena servers found or Colyseus disabled")
-                    return False
+                is_available = (
+                    colyseus_enabled and 
+                    colyseus_endpoint and 
+                    len(arena_servers) > 0
+                )
+                
+                details = f"Colyseus enabled: {colyseus_enabled}, Endpoint: {colyseus_endpoint}, Arena servers: {len(arena_servers)}"
+                if arena_servers:
+                    arena_server = arena_servers[0]
+                    details += f", Sample server: {arena_server.get('name', 'Unknown')} (Max: {arena_server.get('maxPlayers', 0)})"
+                
+                self.log_test_result("Colyseus Server Availability", is_available, details)
+                return is_available
             else:
-                self.log_test("Colyseus Servers Operational", False, f"HTTP {response.status_code}")
+                self.log_test_result("Colyseus Server Availability", False, f"HTTP {response.status_code}")
                 return False
                 
         except Exception as e:
-            self.log_test("Colyseus Servers Operational", False, f"Exception: {str(e)}")
+            self.log_test_result("Colyseus Server Availability", False, f"Exception: {str(e)}")
             return False
 
     def test_split_messages_processed(self) -> bool:
