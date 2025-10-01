@@ -1478,6 +1478,72 @@ const MultiplayerArena = () => {
       }
     }
     
+    updateSplitCells(deltaTime) {
+      if (!this.playerCells || this.playerCells.length === 0) return
+      
+      const now = Date.now()
+      
+      // Update each split cell
+      for (let i = this.playerCells.length - 1; i >= 0; i--) {
+        const cell = this.playerCells[i]
+        
+        // Apply velocity (momentum from split)
+        cell.x += cell.velocityX * deltaTime * 60
+        cell.y += cell.velocityY * deltaTime * 60
+        
+        // Decay velocity (like agario)
+        cell.velocityX *= 0.98
+        cell.velocityY *= 0.98
+        
+        // Stop very small velocities
+        if (Math.abs(cell.velocityX) < 0.1 && Math.abs(cell.velocityY) < 0.1) {
+          cell.velocityX = 0
+          cell.velocityY = 0
+        }
+        
+        // Keep cells within arena boundaries
+        const centerX = this.world.width / 4
+        const centerY = this.world.height / 4
+        const playableRadius = 1800
+        const maxRadius = playableRadius - cell.radius
+        
+        const distFromCenter = Math.sqrt(
+          Math.pow(cell.x - centerX, 2) + 
+          Math.pow(cell.y - centerY, 2)
+        )
+        
+        if (distFromCenter > maxRadius) {
+          const angle = Math.atan2(cell.y - centerY, cell.x - centerX)
+          cell.x = centerX + Math.cos(angle) * maxRadius
+          cell.y = centerY + Math.sin(angle) * maxRadius
+          cell.velocityX = 0
+          cell.velocityY = 0
+        }
+        
+        // Check for merge with main player
+        if (cell.canMerge) {
+          const dx = cell.x - this.player.x
+          const dy = cell.y - this.player.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          const minMergeDistance = cell.radius + this.player.radius
+          
+          if (distance < minMergeDistance) {
+            // Merge cells
+            this.player.mass += cell.mass
+            this.player.radius = Math.sqrt(this.player.mass) * 3
+            
+            // Update UI
+            setMass(Math.round(this.player.mass))
+            
+            // Remove the split cell
+            this.playerCells.splice(i, 1)
+            
+            console.log('🔄 Cells merged! New mass:', Math.round(this.player.mass))
+          }
+        }
+      }
+    }
+    
     render() {
       if (!this.ctx || !this.running) return
       
