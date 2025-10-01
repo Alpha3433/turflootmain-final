@@ -397,14 +397,14 @@ const MultiplayerArena = () => {
           // Add split cell to player's cells array
           gameRef.current.playerCells.push(splitCell)
           
-          // Set merge cooldown (10 seconds like agario)
+          // Set merge cooldown (5 seconds like agario)
           setTimeout(() => {
             const cell = gameRef.current.playerCells.find(c => c.id === splitCell.id)
             if (cell) {
               cell.canMerge = true
               console.log('🔄 Split cell can now merge')
             }
-          }, 10000)
+          }, 5000)
           
           console.log(`✅ AGARIO split completed: ${originalMass} → two cells of ${halfMass} each`)
           console.log(`📊 Total cells: ${gameRef.current.playerCells.length + 1}`)
