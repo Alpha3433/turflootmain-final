@@ -88,10 +88,7 @@ export class ArenaRoom extends Room<GameState> {
     });
     
     this.onMessage("split", (client: Client, message: any) => {
-      console.log(`🚀 INLINE SPLIT HANDLER - Session: ${client.sessionId}`);
-      console.log(`📋 Message:`, message);
-      console.log(`✅ Split message processed inline - no function calls`);
-      // Don't call handleSplit to avoid any potential issues with that function
+      this.handleSplit(client, message);
     });
     
     this.onMessage("cashOutStart", (client: Client, message: any) => {
