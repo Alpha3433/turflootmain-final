@@ -3707,16 +3707,28 @@ const AgarIOGame = () => {
     console.log('🎮 MULTIPLAYER MODE UPDATE:')
     console.log('🎮 isMultiplayer changed to:', isMultiplayer)
     console.log('🎮 gameRef.current exists:', !!gameRef.current)
-    
-    // Update global state for existing game engine
-    window.sendInputToServer = sendInputToServer
+    console.log('🎮 wsConnection state:', wsConnection)
+
+    if (typeof window === 'undefined') {
+      return
+    }
+
     window.isMultiplayer = isMultiplayer
-    window.wsRef = wsRef
-    
+
+    if (wsConnection === 'connected') {
+      window.sendInputToServer = sendInputToServer
+      window.wsRef = wsRef
+      console.log('🎮 Global sendInputToServer assigned (connection active)')
+    } else {
+      window.sendInputToServer = undefined
+      window.wsRef = null
+      console.log('🎮 Global sendInputToServer cleared (connection inactive)')
+    }
+
     if (gameRef.current) {
       console.log('🎮 Updated existing game engine with multiplayer state')
     }
-  }, [isMultiplayer])
+  }, [isMultiplayer, sendInputToServer, wsConnection])
 
   // Debug: Monitor multiplayer state synchronization
   useEffect(() => {
