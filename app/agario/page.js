@@ -307,6 +307,9 @@ const AgarIOGame = () => {
         setIsMultiplayer(false)
         setWsConnection('disconnected')
         setConnectedPlayers(0)
+        if (wsRef.current === room) {
+          wsRef.current = null
+        }
       })
       
       return {
@@ -518,13 +521,47 @@ const AgarIOGame = () => {
       hasRoom: !!wsRef.current
     })
 
-    if (!isMultiplayer || !wsRef.current || wsConnection !== 'connected') {
+    const room = wsRef.current
+    const connection = room?.connection || room?.transport || room?.client
+    const hasWebSocketGlobal = typeof WebSocket !== 'undefined'
+    const transport = connection?.transport || connection?.ws || connection?.websocket || connection
+    const readyState = hasWebSocketGlobal
+      ? (transport?.ws?.readyState ?? transport?.connection?.readyState ?? transport?.readyState ?? connection?.readyState)
+      : undefined
+
+    const isReadyStateClosed = typeof readyState === 'number' && hasWebSocketGlobal && readyState !== WebSocket.OPEN
+    if (
+      !isMultiplayer ||
+      !room ||
+      wsConnection !== 'connected' ||
+      !connection?.isOpen ||
+      isReadyStateClosed
+    ) {
+      let reason = 'unknown'
+      if (!isMultiplayer) {
+        reason = 'not multiplayer'
+      } else if (!room) {
+        reason = 'no wsRef'
+      } else if (wsConnection !== 'connected') {
+        reason = 'not connected'
+      } else if (!connection?.isOpen) {
+        reason = 'connection not open'
+      } else if (isReadyStateClosed) {
+        reason = 'websocket not open'
+      }
+
       console.log('❌ INPUT BLOCKED:', {
         isMultiplayer,
-        hasWsRef: !!wsRef.current,
+        hasWsRef: !!room,
         wsConnection,
-        reason: !isMultiplayer ? 'not multiplayer' : !wsRef.current ? 'no wsRef' : 'not connected'
+        connectionIsOpen: connection?.isOpen,
+        readyState,
+        reason
       })
+      if (wsConnection === 'connected' && (!connection?.isOpen || isReadyStateClosed)) {
+        console.warn('⚠️ WebSocket connection appears closed. Updating connection state to disconnected.')
+        setWsConnection('disconnected')
+      }
       return // Skip if not in multiplayer mode or not connected
     }
 
@@ -541,7 +578,7 @@ const AgarIOGame = () => {
 
     try {
       console.log('📡 SENDING INPUT to server:', { seq: inputSequenceRef.current, dx, dy })
-      wsRef.current.send("input", {
+      room.send("input", {
         seq: inputSequenceRef.current,
         dx: dx,
         dy: dy
@@ -1024,6 +1061,9 @@ const AgarIOGame = () => {
         room.onLeave((code) => {
           console.log('👋 Left Colyseus room:', code)
           setWsConnection('disconnected')
+          if (wsRef.current === room) {
+            wsRef.current = null
+          }
         })
 
         // Send ping every 5 seconds for latency measurement
@@ -1039,6 +1079,9 @@ const AgarIOGame = () => {
           clearInterval(pingInterval)
           if (room) {
             room.leave()
+          }
+          if (wsRef.current === room) {
+            wsRef.current = null
           }
         }
 
