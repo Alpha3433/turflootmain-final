@@ -993,7 +993,12 @@ const MultiplayerArena = () => {
       }
       
     } catch (error) {
-      console.error('❌ Failed to send input:', error)
+      // Handle WebSocket CLOSING/CLOSED errors gracefully without breaking movement
+      if (error.message && error.message.includes('CLOSING or CLOSED')) {
+        console.log('⚠️ WebSocket closing - skipping input send (this is expected during disconnection)')
+      } else {
+        console.error('❌ Failed to send input:', error)
+      }
     }
   }
 
