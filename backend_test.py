@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Simplified Split Functionality
-Tests the backend API and Colyseus servers after schema simplification to prevent disconnections.
-The main agent has simplified the Player schema by removing problematic sessionId and ownerSessionId fields.
+Backend Testing Script for Completely Rebuilt Split Functionality
+Tests the completely rebuilt split system for arena mode that was rebuilt from scratch.
+The new implementation is much simpler - no momentum-based movement, split piece tracking, merge logic.
+When user presses spacebar, player mass is halved and player moves in split direction.
 """
 
 import requests
@@ -11,7 +12,7 @@ import time
 import os
 from typing import Dict, Any, List, Tuple
 
-class SimplifiedSplitBackendTester:
+class RebuiltSplitBackendTester:
     def __init__(self):
         # Get base URL from environment
         self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'https://turfloot-arena-4.preview.emergentagent.com')
