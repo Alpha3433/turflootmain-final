@@ -232,6 +232,27 @@ const MultiplayerArena = () => {
     }
   }
 
+  const isSplitConnectionOpen = () => {
+    const openState =
+      typeof WebSocket !== 'undefined' && typeof WebSocket.OPEN === 'number'
+        ? WebSocket.OPEN
+        : 1
+
+    const readyState = wsRef.current?.connection?.readyState
+    const isOpen = readyState === openState
+
+    if (!isOpen) {
+      console.warn('⚠️ Split denied - WebSocket connection not open:', {
+        hasWsRef: !!wsRef.current,
+        hasConnection: !!wsRef.current?.connection,
+        readyState,
+        expectedOpenState: openState
+      })
+    }
+
+    return isOpen
+  }
+
   // Handle split functionality - ported from agario with improved error handling
   const handleSplit = (e) => {
     console.log('🎯 handleSplit called - checking initial conditions...')
@@ -340,7 +361,11 @@ const MultiplayerArena = () => {
         console.log('❌ Split failed - no valid Colyseus session')
         return
       }
-      
+
+      if (!isSplitConnectionOpen()) {
+        return
+      }
+
       // Send split message to server (server-authoritative approach)
       console.log('🚀 Sending split message to server')
       wsRef.current.send("split", { targetX, targetY })
