@@ -1589,38 +1589,42 @@ const MultiplayerArena = () => {
       for (let i = this.playerPieces.length - 1; i >= 0; i--) {
         const piece = this.playerPieces[i]
         
-        // AGARIO MOVEMENT: Split cells move toward mouse cursor (like main cell)
-        if (this.mouse && typeof this.mouse.worldX === 'number' && typeof this.mouse.worldY === 'number') {
-          const dx = this.mouse.worldX - cell.x
-          const dy = this.mouse.worldY - cell.y
+        // AGARIO MOVEMENT: Pieces follow main player target (exact agario logic)
+        if (this.player && typeof this.player.targetX === 'number' && typeof this.player.targetY === 'number') {
+          // Update piece target to follow main player (exact agario behavior)
+          piece.targetX = this.player.targetX
+          piece.targetY = this.player.targetY
+          
+          const dx = piece.targetX - piece.x
+          const dy = piece.targetY - piece.y
           const distance = Math.sqrt(dx * dx + dy * dy)
           
           if (distance > 5) {
-            // Move toward mouse (same speed calculation as main player)
-            const speed = Math.max(2, 20 - cell.radius * 0.02) // Agario-style speed based on size
+            // Move toward target (exact agario speed calculation)
+            const speed = Math.max(2, 20 - piece.radius * 0.02) 
             const moveDistance = speed * deltaTime * 60
             
             const dirX = dx / distance
             const dirY = dy / distance
             
-            cell.x += dirX * moveDistance
-            cell.y += dirY * moveDistance
+            piece.x += dirX * moveDistance
+            piece.y += dirY * moveDistance
           }
         }
         
-        // Apply split momentum (only initially after split)
-        const splitAge = now - cell.splitTime
-        if (splitAge < 1000) { // First 1 second after split
-          cell.x += cell.velocityX * deltaTime * 60
-          cell.y += cell.velocityY * deltaTime * 60
+        // Apply initial split momentum (only first 1 second like agario)
+        const splitAge = now - piece.splitTime
+        if (splitAge < 1000) {
+          piece.x += piece.vx * deltaTime * 60
+          piece.y += piece.vy * deltaTime * 60
           
-          // Decay velocity quickly
-          cell.velocityX *= 0.95
-          cell.velocityY *= 0.95
+          // Decay velocity quickly like agario
+          piece.vx *= 0.95
+          piece.vy *= 0.95
         } else {
-          // Stop momentum after 1 second, only mouse movement remains
-          cell.velocityX = 0
-          cell.velocityY = 0
+          // Stop momentum after 1 second, only target following remains
+          piece.vx = 0
+          piece.vy = 0
         }
         
         // Keep cells within arena boundaries
