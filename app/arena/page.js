@@ -1657,7 +1657,11 @@ const MultiplayerArena = () => {
             // Remove the split cell
             this.playerCells.splice(i, 1)
             
-            console.log('🔄 Cells merged! New mass:', Math.round(this.player.mass))
+            // Update total mass UI like agario
+            const totalMass = this.player.mass + this.playerCells.reduce((sum, cell) => sum + cell.mass, 0)
+            setMass(Math.floor(totalMass))
+            
+            console.log('🔄 Cells merged! New player mass:', Math.round(this.player.mass), 'Total mass:', Math.floor(totalMass))
             continue
           }
         }
