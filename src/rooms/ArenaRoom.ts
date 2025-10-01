@@ -745,26 +745,44 @@ export class ArenaRoom extends Room<GameState> {
           // Check merge cooldown (split pieces can't merge immediately)
           const now = Date.now();
           const mergeCooldown = 10000; // 10 seconds before pieces can merge
-          
+
           const playerSplitAge = player.splitTime > 0 ? now - player.splitTime : mergeCooldown + 1;
           const otherSplitAge = otherPlayer.splitTime > 0 ? now - otherPlayer.splitTime : mergeCooldown + 1;
-          
+
           if (playerSplitAge >= mergeCooldown && otherSplitAge >= mergeCooldown) {
             // Merge the pieces - keep the larger one, merge the smaller one into it
+            const ownerBaseSessionId = playerOwner.split('_split_')[0];
+            const playerIsOwnerEntry = sessionId === ownerBaseSessionId;
+            const otherIsOwnerEntry = otherSessionId === ownerBaseSessionId;
+
             let keepPlayer, mergePlayer, keepSessionId, mergeSessionId;
-            
-            if (player.mass >= otherPlayer.mass) {
-              keepPlayer = player;
-              mergePlayer = otherPlayer;
-              keepSessionId = sessionId;
-              mergeSessionId = otherSessionId;
+
+            if (playerIsOwnerEntry || otherIsOwnerEntry) {
+              if (playerIsOwnerEntry) {
+                keepPlayer = player;
+                mergePlayer = otherPlayer;
+                keepSessionId = sessionId;
+                mergeSessionId = otherSessionId;
+              } else {
+                keepPlayer = otherPlayer;
+                mergePlayer = player;
+                keepSessionId = otherSessionId;
+                mergeSessionId = sessionId;
+              }
             } else {
-              keepPlayer = otherPlayer;
-              mergePlayer = player;
-              keepSessionId = otherSessionId;
-              mergeSessionId = sessionId;
+              if (player.mass >= otherPlayer.mass) {
+                keepPlayer = player;
+                mergePlayer = otherPlayer;
+                keepSessionId = sessionId;
+                mergeSessionId = otherSessionId;
+              } else {
+                keepPlayer = otherPlayer;
+                mergePlayer = player;
+                keepSessionId = otherSessionId;
+                mergeSessionId = sessionId;
+              }
             }
-            
+
             // Merge mass and score
             keepPlayer.mass += mergePlayer.mass;
             keepPlayer.radius = Math.sqrt(keepPlayer.mass) * 3;
