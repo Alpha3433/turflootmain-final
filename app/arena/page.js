@@ -362,44 +362,85 @@ const MultiplayerArena = () => {
             return
           }
           
-          const originalMass = gameRef.current.player.mass
-          const halfMass = Math.floor(originalMass / 2)
+          let totalSplits = 0
           
-          // Calculate split direction toward cursor
-          const dx = targetX - gameRef.current.player.x
-          const dy = targetY - gameRef.current.player.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-          
-          if (distance < 10) {
-            console.log('⚠️ Split denied - cursor too close')
-            return
+          // Split main player if it has enough mass
+          if (gameRef.current.player.mass >= 40) {
+            const originalMass = gameRef.current.player.mass
+            const halfMass = Math.floor(originalMass / 2)
+            
+            // Calculate split direction toward cursor
+            const dx = targetX - gameRef.current.player.x
+            const dy = targetY - gameRef.current.player.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            
+            if (distance >= 10) {
+              const dirX = dx / distance
+              const dirY = dy / distance
+              
+              // Update original cell
+              gameRef.current.player.mass = halfMass
+              gameRef.current.player.radius = Math.sqrt(halfMass) * 3
+              
+              // Create new split cell
+              const splitDistance = 200
+              const splitCell = {
+                id: `split_${Date.now()}_${totalSplits}`,
+                x: gameRef.current.player.x + dirX * splitDistance,
+                y: gameRef.current.player.y + dirY * splitDistance,
+                mass: halfMass,
+                radius: Math.sqrt(halfMass) * 3,
+                color: gameRef.current.player.color,
+                velocityX: dirX * 25,
+                velocityY: dirY * 25,
+                splitTime: Date.now(),
+                canMerge: false
+              }
+              
+              gameRef.current.playerCells.push(splitCell)
+              totalSplits++
+            }
           }
           
-          const dirX = dx / distance
-          const dirY = dy / distance
-          
-          // Update original cell
-          gameRef.current.player.mass = halfMass
-          gameRef.current.player.radius = Math.sqrt(halfMass) * 3
-          
-          // Create new split cell that shoots toward cursor (agario style)
-          const splitDistance = 200 // Much further like agario
-          const splitCell = {
-            id: `split_${Date.now()}`,
-            x: gameRef.current.player.x + dirX * splitDistance,
-            y: gameRef.current.player.y + dirY * splitDistance,
-            mass: halfMass,
-            radius: Math.sqrt(halfMass) * 3,
-            color: gameRef.current.player.color,
-            velocityX: dirX * 25, // Much faster initial velocity like agario
-            velocityY: dirY * 25,
-            splitTime: Date.now(),
-            canMerge: false, // Can't merge immediately
-            isMoving: false // Not currently moving toward mouse
-          }
-          
-          // Add split cell to player's cells array
-          gameRef.current.playerCells.push(splitCell)
+          // Split existing split cells that have enough mass (AGARIO MULTI-SPLIT)
+          const cellsToSplit = [...gameRef.current.playerCells]
+          cellsToSplit.forEach(cell => {
+            if (cell.mass >= 40 && gameRef.current.playerCells.length + totalSplits < 16) {
+              const halfMass = Math.floor(cell.mass / 2)
+              
+              // Calculate split direction from cell toward cursor
+              const dx = targetX - cell.x
+              const dy = targetY - cell.y
+              const distance = Math.sqrt(dx * dx + dy * dy)
+              
+              if (distance >= 10) {
+                const dirX = dx / distance
+                const dirY = dy / distance
+                
+                // Update existing cell
+                cell.mass = halfMass
+                cell.radius = Math.sqrt(halfMass) * 3
+                
+                // Create new split cell from existing cell
+                const splitDistance = 200
+                const newSplitCell = {
+                  id: `split_${Date.now()}_${totalSplits}`,
+                  x: cell.x + dirX * splitDistance,
+                  y: cell.y + dirY * splitDistance,
+                  mass: halfMass,
+                  radius: Math.sqrt(halfMass) * 3,
+                  color: gameRef.current.player.color,
+                  velocityX: dirX * 25,
+                  velocityY: dirY * 25,
+                  splitTime: Date.now(),
+                  canMerge: false
+                }
+                
+                gameRef.current.playerCells.push(newSplitCell)
+                totalSplits++
+              }
+            }
+          })
           
           // Set merge cooldown (5 seconds like agario)
           setTimeout(() => {
