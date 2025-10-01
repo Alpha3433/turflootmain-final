@@ -976,6 +976,12 @@ const MultiplayerArena = () => {
     }
     
     try {
+      // Double-check connection state right before sending
+      if (!wsRef.current || !wsRef.current.connection || wsRef.current.connection.readyState !== 1) {
+        console.log('❌ Skipping input send - connection not ready')
+        return
+      }
+      
       wsRef.current.send("input", {
         seq: inputSequenceRef.current,
         dx: dx,
