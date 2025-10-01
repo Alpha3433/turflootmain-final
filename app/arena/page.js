@@ -405,23 +405,26 @@ const MultiplayerArena = () => {
               gameRef.current.player.x = gameRef.current.player.x - dirX * recoilDistance
               gameRef.current.player.y = gameRef.current.player.y - dirY * recoilDistance
               
-              // Create new split cell (exact agario style)
-              const splitDistance = 100  // Match agario distance
-              const splitVelocity = 20   // Match agario velocity
-              const splitCell = {
-                id: `split_${Date.now()}_${totalSplits}`,
+              // Create new split piece (EXACT agario implementation)
+              const splitDistance = 80   // Exact agario distance
+              const splitVelocity = 22   // Exact agario velocity 
+              const newPiece = {
+                id: `piece_${Date.now()}_${totalSplits}`,
                 x: gameRef.current.player.x + dirX * splitDistance,
                 y: gameRef.current.player.y + dirY * splitDistance,
                 mass: halfMass,
-                radius: halfRadius,  // Use the agario radius calculation
+                radius: halfRadius,
                 color: gameRef.current.player.color,
-                velocityX: dirX * splitVelocity,
-                velocityY: dirY * splitVelocity,
+                vx: dirX * splitVelocity,  // Initial velocity (like agario)
+                vy: dirY * splitVelocity,
+                targetX: gameRef.current.player.x, // Will be updated to follow main player target
+                targetY: gameRef.current.player.y,
                 splitTime: Date.now(),
-                canMerge: false
+                canMerge: false,
+                recombineTime: 0 // For agario recombine logic
               }
               
-              gameRef.current.playerCells.push(splitCell)
+              gameRef.current.playerPieces.push(newPiece)
               
               // Set merge cooldown for this specific cell
               setTimeout(() => {
