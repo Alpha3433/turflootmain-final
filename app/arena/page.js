@@ -1541,12 +1541,13 @@ const MultiplayerArena = () => {
           cell.velocityY = 0
         }
         
-        // Check for merge with main player
+        // Check for merge with main player (agario-style merge detection)
         if (cell.canMerge) {
           const dx = cell.x - this.player.x
           const dy = cell.y - this.player.y
           const distance = Math.sqrt(dx * dx + dy * dy)
-          const minMergeDistance = cell.radius + this.player.radius
+          // More generous merge distance like agario
+          const minMergeDistance = (cell.radius + this.player.radius) * 0.8
           
           if (distance < minMergeDistance) {
             // Merge cells
@@ -1560,6 +1561,31 @@ const MultiplayerArena = () => {
             this.playerCells.splice(i, 1)
             
             console.log('🔄 Cells merged! New mass:', Math.round(this.player.mass))
+            continue
+          }
+        }
+        
+        // Check for merge between split cells (agario allows this)
+        for (let j = i - 1; j >= 0; j--) {
+          const otherCell = this.playerCells[j]
+          
+          if (cell.canMerge && otherCell.canMerge) {
+            const dx = cell.x - otherCell.x
+            const dy = cell.y - otherCell.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            const minMergeDistance = (cell.radius + otherCell.radius) * 0.8
+            
+            if (distance < minMergeDistance) {
+              // Merge the two split cells
+              otherCell.mass += cell.mass
+              otherCell.radius = Math.sqrt(otherCell.mass) * 3
+              
+              // Remove the merged cell
+              this.playerCells.splice(i, 1)
+              
+              console.log('🔄 Split cells merged! New cell mass:', Math.round(otherCell.mass))
+              break
+            }
           }
         }
       }
