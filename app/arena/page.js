@@ -341,45 +341,80 @@ const MultiplayerArena = () => {
         return
       }
       
-      // CLIENT-SIDE ONLY SPLIT - Don't send to server to avoid disconnection
+      // AGARIO-STYLE SPLIT MECHANIC - Create two separate cells
       try {
-        console.log('🚀 Performing CLIENT-SIDE split (no server communication)')
+        console.log('🚀 Performing AGARIO split - creating two cells')
         
         // Get current player from game engine
         if (gameRef.current && gameRef.current.player && gameRef.current.player.mass >= 40) {
-          // Simulate split locally for immediate feedback
+          // Check if player already has split cells (limit splits)
+          if (!gameRef.current.playerCells) {
+            gameRef.current.playerCells = []
+          }
+          
+          // Limit maximum number of cells (agario typically allows up to 16)
+          if (gameRef.current.playerCells.length >= 16) {
+            console.log('⚠️ Split denied - maximum cells reached (16)')
+            return
+          }
+          
           const originalMass = gameRef.current.player.mass
-          const newMass = Math.floor(originalMass / 2)
+          const halfMass = Math.floor(originalMass / 2)
           
-          // Update local player
-          gameRef.current.player.mass = newMass
-          gameRef.current.player.radius = Math.sqrt(newMass) * 3
-          
-          // Calculate split direction
+          // Calculate split direction toward cursor
           const dx = targetX - gameRef.current.player.x
           const dy = targetY - gameRef.current.player.y
           const distance = Math.sqrt(dx * dx + dy * dy)
           
-          if (distance > 10) {
-            const dirX = dx / distance
-            const dirY = dy / distance
-            const splitDistance = 50
-            
-            // Move player in split direction
-            gameRef.current.player.x += dirX * splitDistance
-            gameRef.current.player.y += dirY * splitDistance
+          if (distance < 10) {
+            console.log('⚠️ Split denied - cursor too close')
+            return
           }
           
-          console.log(`✅ CLIENT-SIDE split completed: ${originalMass} → ${newMass}`)
+          const dirX = dx / distance
+          const dirY = dy / distance
+          
+          // Update original cell
+          gameRef.current.player.mass = halfMass
+          gameRef.current.player.radius = Math.sqrt(halfMass) * 3
+          
+          // Create new split cell that shoots toward cursor
+          const splitDistance = 120 // Distance the new cell travels
+          const splitCell = {
+            id: `split_${Date.now()}`,
+            x: gameRef.current.player.x + dirX * splitDistance,
+            y: gameRef.current.player.y + dirY * splitDistance,
+            mass: halfMass,
+            radius: Math.sqrt(halfMass) * 3,
+            color: gameRef.current.player.color,
+            velocityX: dirX * 15, // Initial momentum
+            velocityY: dirY * 15,
+            splitTime: Date.now(),
+            canMerge: false // Can't merge immediately
+          }
+          
+          // Add split cell to player's cells array
+          gameRef.current.playerCells.push(splitCell)
+          
+          // Set merge cooldown (10 seconds like agario)
+          setTimeout(() => {
+            const cell = gameRef.current.playerCells.find(c => c.id === splitCell.id)
+            if (cell) {
+              cell.canMerge = true
+              console.log('🔄 Split cell can now merge')
+            }
+          }, 10000)
+          
+          console.log(`✅ AGARIO split completed: ${originalMass} → two cells of ${halfMass} each`)
+          console.log(`📊 Total cells: ${gameRef.current.playerCells.length + 1}`)
         } else {
-          console.log('⚠️ CLIENT-SIDE split denied - insufficient mass or no player')
+          console.log('⚠️ Split denied - insufficient mass (need ≥40) or no player')
         }
         
-        // DON'T send to server to avoid disconnection
-        // wsRef.current.send('split', { targetX, targetY });
+        // DON'T send to server to avoid disconnection issues
         
       } catch (error) {
-        console.error('❌ Client-side split error:', error)
+        console.error('❌ Agario split error:', error)
       }
     } catch (error) {
       console.error('❌ Error sending split command:', error)
