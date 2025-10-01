@@ -497,13 +497,13 @@ const MultiplayerArena = () => {
           // Set split cooldown (1 second like agario)
           gameRef.current.splitCooldown = 60 // 60 frames = ~1 second at 60fps
           
-          // Final mass update (ensure UI shows correct total)
+          // Final mass update (ensure UI shows correct total - EXACT agario)
           const finalTotalMass = gameRef.current.player.mass + 
-                               gameRef.current.playerCells.reduce((sum, cell) => sum + cell.mass, 0)
+                               gameRef.current.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
           setMass(Math.floor(finalTotalMass))
           
-          console.log(`✅ AGARIO split completed: ${totalSplits} cells split`)
-          console.log(`📊 Total cells: ${gameRef.current.playerCells.length + 1}, Total mass: ${Math.floor(finalTotalMass)}`)
+          console.log(`✅ AGARIO split completed: ${totalSplits} pieces split`)
+          console.log(`📊 Total pieces: ${gameRef.current.playerPieces.length + 1}, Total mass: ${Math.floor(finalTotalMass)}`)
         } else {
           console.log('⚠️ Split denied - insufficient mass (need ≥40) or no player')
         }
