@@ -423,8 +423,6 @@ export class ArenaRoom extends Room<GameState> {
       const maxRadius = playableRadius - player.radius; // Player edge stops at red divider
       
       // Removed complex momentum system for simplicity
-        return;
-      }
       
       // Smooth movement toward target (vx and vy are being used as targetX and targetY)
       const targetX = player.vx;
