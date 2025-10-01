@@ -270,15 +270,76 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   handleSplit(client: Client, message: any) {
-    // ULTRA-MINIMAL IMPLEMENTATION - Just log and immediately return
-    console.log(`🚀 SPLIT MESSAGE RECEIVED from ${client.sessionId} - doing nothing to prevent disconnection`);
-    console.log(`📋 Message content:`, message);
+    console.log(`🚀 NEW SPLIT IMPLEMENTATION - Session: ${client.sessionId}`);
     
-    // Don't access player state, don't validate, don't do ANYTHING that could cause errors
-    // Just log and return to test if the message handling itself is the issue
-    
-    console.log(`✅ Split handler completed safely - no operations performed`);
-    return;
+    try {
+      const player = this.state.players.get(client.sessionId);
+      if (!player || !player.alive) {
+        console.log(`⚠️ Split ignored - player not found or dead`);
+        return;
+      }
+
+      // Simple mass check - need at least 40 mass to split
+      if (player.mass < 40) {
+        console.log(`⚠️ Split denied - insufficient mass: ${player.mass}`);
+        return;
+      }
+
+      // Get split direction from message
+      const { targetX, targetY } = message;
+      if (typeof targetX !== 'number' || typeof targetY !== 'number') {
+        console.log(`⚠️ Split denied - invalid coordinates`);
+        return;
+      }
+
+      // Calculate split direction
+      const dx = targetX - player.x;
+      const dy = targetY - player.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance < 10) {
+        console.log(`⚠️ Split denied - target too close`);
+        return;
+      }
+
+      // Normalize direction
+      const dirX = dx / distance;
+      const dirY = dy / distance;
+
+      // Simple split: halve the mass and create visual split effect
+      const newMass = Math.floor(player.mass / 2);
+      
+      // Update player with new mass
+      player.mass = newMass;
+      player.radius = Math.sqrt(player.mass) * 3;
+
+      // Apply split momentum (move player in split direction)
+      const splitDistance = 50;
+      player.x = player.x + dirX * splitDistance;
+      player.y = player.y + dirY * splitDistance;
+
+      // Keep player in bounds
+      const centerX = this.worldSize / 4;
+      const centerY = this.worldSize / 4;
+      const playableRadius = 1800;
+      const maxRadius = playableRadius - player.radius;
+      
+      const distFromCenter = Math.sqrt(
+        Math.pow(player.x - centerX, 2) + 
+        Math.pow(player.y - centerY, 2)
+      );
+      
+      if (distFromCenter > maxRadius) {
+        const angle = Math.atan2(player.y - centerY, player.x - centerX);
+        player.x = centerX + Math.cos(angle) * maxRadius;
+        player.y = centerY + Math.sin(angle) * maxRadius;
+      }
+
+      console.log(`✅ Split completed - new mass: ${player.mass}`);
+      
+    } catch (error: any) {
+      console.error(`❌ Split error:`, error);
+    }
   }
 
   handleCashOutStart(client: Client, message: any) {
