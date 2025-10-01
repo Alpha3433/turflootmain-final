@@ -346,19 +346,11 @@ const MultiplayerArena = () => {
       wsRef.current.send("split", { targetX, targetY })
       console.log('✅ Split message sent to server successfully')
     } catch (error) {
-      console.error('❌ Error sending split command:', error)
+      console.error('❌ Error sending split message:', error)
       
       // Check if it's a WebSocket state error
       if (error.message && error.message.includes('CLOSING or CLOSED')) {
-        console.log('🔄 Detected WebSocket closing/closed state - split command ignored')
-        console.log('🔗 This is expected behavior and does not indicate a bug')
-      } else {
-        console.log('🔗 WebSocket connection state after error:', {
-          wsRef: !!wsRef.current,
-          sessionId: wsRef.current?.sessionId,
-          connection: wsRef.current?.connection?.readyState,
-          transport: wsRef.current?.connection?.transport?.readyState
-        })
+        console.log('🔄 Detected WebSocket closing/closed state - split message ignored')
       }
     }
   }
