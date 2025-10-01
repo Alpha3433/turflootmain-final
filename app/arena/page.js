@@ -451,8 +451,8 @@ const MultiplayerArena = () => {
             }
           }, 5000)
           
-          console.log(`✅ AGARIO split completed: ${originalMass} → two cells of ${halfMass} each`)
-          console.log(`📊 Total cells: ${gameRef.current.playerCells.length + 1}`)
+          console.log(`✅ AGARIO multi-split completed: ${totalSplits} cells split`)
+          console.log(`📊 Total cells now: ${gameRef.current.playerCells.length + 1}`)
         } else {
           console.log('⚠️ Split denied - insufficient mass (need ≥40) or no player')
         }
