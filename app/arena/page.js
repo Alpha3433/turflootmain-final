@@ -361,10 +361,10 @@ const MultiplayerArena = () => {
           return
         }
         
-        // Check if any cells can split (36 mass minimum like agario)
+        // Check if any pieces can split (36 mass minimum like agario)
         const canSplitPlayer = gameRef.current.player.mass >= 36
-        const canSplitCells = gameRef.current.playerCells && 
-                             gameRef.current.playerCells.some(cell => cell.mass >= 36)
+        const canSplitPieces = gameRef.current.playerPieces && 
+                              gameRef.current.playerPieces.some(piece => piece.mass >= 36)
         
         if (canSplitPlayer || canSplitCells) {
           // Check if player already has split pieces (exact agario naming)
