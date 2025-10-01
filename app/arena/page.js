@@ -426,14 +426,14 @@ const MultiplayerArena = () => {
               
               gameRef.current.playerPieces.push(newPiece)
               
-              // Set merge cooldown for this specific cell
+              // Set merge cooldown for this specific piece (agario uses 30 seconds)
               setTimeout(() => {
-                const cellToUpdate = gameRef.current.playerCells.find(c => c.id === splitCell.id)
-                if (cellToUpdate) {
-                  cellToUpdate.canMerge = true
-                  console.log('🔄 Main split cell can now merge')
+                const pieceToUpdate = gameRef.current.playerPieces.find(p => p.id === newPiece.id)
+                if (pieceToUpdate) {
+                  pieceToUpdate.canMerge = true
+                  console.log('🔄 Main split piece can now merge')
                 }
-              }, 5000)
+              }, 30000) // 30 seconds like agario
               
               totalSplits++
               
