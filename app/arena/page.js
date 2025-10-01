@@ -439,7 +439,7 @@ const MultiplayerArena = () => {
               
               // Update UI immediately like agario (total mass of all pieces)
               const totalMass = gameRef.current.player.mass + 
-                               gameRef.current.playerCells.reduce((sum, cell) => sum + cell.mass, 0)
+                               gameRef.current.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
               setMass(Math.floor(totalMass))
             }
           }
