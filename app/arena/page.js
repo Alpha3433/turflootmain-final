@@ -364,10 +364,11 @@ const MultiplayerArena = () => {
           
           let totalSplits = 0
           
-          // Split main player if it has enough mass
-          if (gameRef.current.player.mass >= 40) {
+          // Split main player if it has enough mass (matching agario requirements)
+          if (gameRef.current.player.mass >= 36) {
             const originalMass = gameRef.current.player.mass
-            const halfMass = Math.floor(originalMass / 2)
+            const halfMass = originalMass / 2  // Exact division like agario (not Math.floor)
+            const halfRadius = Math.sqrt(halfMass / Math.PI) * 6  // Exact agario radius calculation
             
             // Calculate split direction toward cursor
             const dx = targetX - gameRef.current.player.x
@@ -378,9 +379,14 @@ const MultiplayerArena = () => {
               const dirX = dx / distance
               const dirY = dy / distance
               
-              // Update original cell
+              // Update original cell (exact agario style)
               gameRef.current.player.mass = halfMass
-              gameRef.current.player.radius = Math.sqrt(halfMass) * 3
+              gameRef.current.player.radius = halfRadius
+              
+              // Apply recoil effect like agario
+              const recoilDistance = 20
+              gameRef.current.player.x = gameRef.current.player.x - dirX * recoilDistance
+              gameRef.current.player.y = dirY * recoilDistance
               
               // Create new split cell
               const splitDistance = 200
