@@ -30,10 +30,7 @@ export class Player extends Schema {
   @type("string") skinType: string = "circle";
   @type("string") skinPattern: string = "solid";
   
-  // Split functionality properties (simplified)
-  @type("number") momentumX: number = 0; // Split momentum X
-  @type("number") momentumY: number = 0; // Split momentum Y
-  @type("number") splitTime: number = 0; // When this piece was split
+  // Removed complex split functionality for simplicity
 }
 
 // Coin state schema
