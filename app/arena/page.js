@@ -386,7 +386,7 @@ const MultiplayerArena = () => {
               // Apply recoil effect like agario
               const recoilDistance = 20
               gameRef.current.player.x = gameRef.current.player.x - dirX * recoilDistance
-              gameRef.current.player.y = dirY * recoilDistance
+              gameRef.current.player.y = gameRef.current.player.y - dirY * recoilDistance
               
               // Create new split cell
               const splitDistance = 200
