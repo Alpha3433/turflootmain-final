@@ -272,6 +272,7 @@ export class ArenaRoom extends Room<GameState> {
   handleSplit(client: Client, message: any) {
     console.log(`🚀 SPLIT COMMAND RECEIVED from ${client.sessionId}:`, message);
     
+    // TEMPORARY SAFE IMPLEMENTATION - Just log and return without doing anything complex
     try {
       const player = this.state.players.get(client.sessionId);
       if (!player || !player.alive) {
@@ -279,7 +280,7 @@ export class ArenaRoom extends Room<GameState> {
         return;
       }
 
-      // Validate message format and data
+      // Basic validation
       if (!message || typeof message !== 'object') {
         console.log(`⚠️ Split ignored - invalid message format for session: ${client.sessionId}`, message);
         return;
@@ -287,117 +288,31 @@ export class ArenaRoom extends Room<GameState> {
 
       const { targetX, targetY } = message;
       
-      // Validate coordinates are numbers
-      if (typeof targetX !== 'number' || typeof targetY !== 'number' || 
-          !isFinite(targetX) || !isFinite(targetY)) {
+      // Just validate and log - don't actually split yet
+      if (typeof targetX !== 'number' || typeof targetY !== 'number') {
         console.log(`⚠️ Split ignored - invalid coordinates for session: ${client.sessionId}`, { targetX, targetY });
         return;
       }
     
-    // Check if player can split (minimum mass requirement)
-    if (player.mass < 40) {
-      console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 40`);
-      return;
-    }
-
-    // Count existing split pieces for this player  
-    let playerPieces = 0;
-    this.state.players.forEach((p, id) => {
-      if (id.startsWith(client.sessionId)) {
-        playerPieces++;
+      // Check mass
+      if (player.mass < 40) {
+        console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 40`);
+        return;
       }
-    });
-
-    // Limit maximum split pieces (like agario)
-    if (playerPieces >= 16) {
-      console.log(`⚠️ Split denied - too many pieces: ${playerPieces}/16`);
-      return;
-    }
     
-    // Calculate direction from player to target (mouse direction)
-    const dx = targetX - player.x;
-    const dy = targetY - player.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    if (distance < 10) {
-      console.log(`⚠️ Split denied - target too close: ${distance}`);
-      return;
-    }
-    
-    // Normalize direction
-    const dirX = dx / distance;
-    const dirY = dy / distance;
-    
-    // Split the player mass in half (agario style)
-    const originalMass = player.mass;
-    const halfMass = Math.floor(originalMass / 2);
-    
-    // Update original player mass and radius
-    player.mass = halfMass;
-    player.radius = Math.sqrt(player.mass) * 3;
-    
-    // Apply recoil to original player (opposite direction)
-    const recoilDistance = 20;
-    player.x = player.x - dirX * recoilDistance;
-    player.y = player.y - dirY * recoilDistance;
-    
-    // Create split piece with momentum toward mouse
-    const splitId = `${client.sessionId}_split_${Date.now()}`;
-    const splitPlayer = new Player();
-    splitPlayer.name = `${player.name}*`;
-    
-    // Position split piece with launch distance
-    const launchDistance = 100;
-    splitPlayer.x = player.x + dirX * launchDistance;
-    splitPlayer.y = player.y + dirY * launchDistance;
-    
-    // Set split piece properties  
-    splitPlayer.mass = halfMass;
-    splitPlayer.radius = Math.sqrt(splitPlayer.mass) * 3;
-    splitPlayer.color = player.color;
-    splitPlayer.skinId = player.skinId;
-    splitPlayer.skinName = player.skinName;
-    splitPlayer.skinColor = player.skinColor;
-    splitPlayer.skinType = player.skinType;
-    splitPlayer.score = Math.floor(player.score / 2);
-    splitPlayer.alive = true;
-    
-    // Set momentum velocity toward target (like agario)
-    const splitVelocity = 15; // Initial momentum speed
-    splitPlayer.vx = targetX; // Store target position
-    splitPlayer.vy = targetY;
-    splitPlayer.momentumX = dirX * splitVelocity; // Store momentum
-    splitPlayer.momentumY = dirY * splitVelocity;
-    splitPlayer.splitTime = Date.now(); // Track split time for merge cooldown
-    
-    // Keep split piece in bounds
-    const centerX = this.worldSize / 4; // 2000 - playable area center X
-    const centerY = this.worldSize / 4; // 2000 - playable area center Y
-    const playableRadius = 1800; // Match the red divider radius
-    const maxRadius = playableRadius - splitPlayer.radius;
-    
-    const distanceFromCenter = Math.sqrt(
-      Math.pow(splitPlayer.x - centerX, 2) + 
-      Math.pow(splitPlayer.y - centerY, 2)
-    );
-    
-    if (distanceFromCenter > maxRadius) {
-      // Clamp split player to circular boundary
-      const angle = Math.atan2(splitPlayer.y - centerY, splitPlayer.x - centerX);
-      splitPlayer.x = centerX + Math.cos(angle) * maxRadius;
-      splitPlayer.y = centerY + Math.sin(angle) * maxRadius;
-    }
-    
-    // Add split piece to game
-    this.state.players.set(splitId, splitPlayer);
-    
-    console.log(`🚀 Split completed - ${player.name} split toward mouse. Original: ${halfMass}, Split: ${halfMass}`, {
-      direction: { x: dirX.toFixed(2), y: dirY.toFixed(2) },
-      splitPosition: { x: splitPlayer.x.toFixed(1), y: splitPlayer.y.toFixed(1) },
-      totalPieces: playerPieces + 1
-    });
+      // SAFE IMPLEMENTATION: Just log success without actually splitting
+      console.log(`✅ Split request validated successfully for ${player.name}`, {
+        playerMass: player.mass,
+        targetX: targetX.toFixed(1),
+        targetY: targetY.toFixed(1),
+        sessionId: client.sessionId
+      });
+      
+      // TODO: Implement actual split logic here once connection stability is confirmed
+      
     } catch (error) {
       console.error(`❌ Error handling split for session ${client.sessionId}:`, error);
+      console.error(`❌ Stack trace:`, error.stack);
       // Don't disconnect the client, just log the error and continue
     }
   }
