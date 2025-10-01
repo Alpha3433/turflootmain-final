@@ -270,51 +270,15 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   handleSplit(client: Client, message: any) {
-    console.log(`🚀 SPLIT COMMAND RECEIVED from ${client.sessionId}:`, message);
+    // ULTRA-MINIMAL IMPLEMENTATION - Just log and immediately return
+    console.log(`🚀 SPLIT MESSAGE RECEIVED from ${client.sessionId} - doing nothing to prevent disconnection`);
+    console.log(`📋 Message content:`, message);
     
-    // TEMPORARY SAFE IMPLEMENTATION - Just log and return without doing anything complex
-    try {
-      const player = this.state.players.get(client.sessionId);
-      if (!player || !player.alive) {
-        console.log(`⚠️ Split ignored - player not found or dead for session: ${client.sessionId}`);
-        return;
-      }
-
-      // Basic validation
-      if (!message || typeof message !== 'object') {
-        console.log(`⚠️ Split ignored - invalid message format for session: ${client.sessionId}`, message);
-        return;
-      }
-
-      const { targetX, targetY } = message;
-      
-      // Just validate and log - don't actually split yet
-      if (typeof targetX !== 'number' || typeof targetY !== 'number') {
-        console.log(`⚠️ Split ignored - invalid coordinates for session: ${client.sessionId}`, { targetX, targetY });
-        return;
-      }
+    // Don't access player state, don't validate, don't do ANYTHING that could cause errors
+    // Just log and return to test if the message handling itself is the issue
     
-      // Check mass
-      if (player.mass < 40) {
-        console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 40`);
-        return;
-      }
-    
-      // SAFE IMPLEMENTATION: Just log success without actually splitting
-      console.log(`✅ Split request validated successfully for ${player.name}`, {
-        playerMass: player.mass,
-        targetX: targetX.toFixed(1),
-        targetY: targetY.toFixed(1),
-        sessionId: client.sessionId
-      });
-      
-      // TODO: Implement actual split logic here once connection stability is confirmed
-      
-    } catch (error: any) {
-      console.error(`❌ Error handling split for session ${client.sessionId}:`, error);
-      console.error(`❌ Stack trace:`, error?.stack || 'No stack trace available');
-      // Don't disconnect the client, just log the error and continue
-    }
+    console.log(`✅ Split handler completed safely - no operations performed`);
+    return;
   }
 
   handleCashOutStart(client: Client, message: any) {
