@@ -443,21 +443,6 @@ const MultiplayerArena = () => {
       gameRef.current.splitCooldown = 60 // 60 frames = ~1 second at 60fps
       
       console.log(`🚀 Player split toward mouse! Now ${currentPieces + 1} pieces. Total mass: ${Math.floor(totalMass)}. Direction: (${directionX.toFixed(2)}, ${directionY.toFixed(2)})`)
-          const finalTotalMass = gameRef.current.player.mass + 
-                               gameRef.current.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
-          setMass(Math.floor(finalTotalMass))
-          
-          console.log(`✅ AGARIO split completed: ${totalSplits} pieces split`)
-          console.log(`📊 Total pieces: ${gameRef.current.playerPieces.length + 1}, Total mass: ${Math.floor(finalTotalMass)}`)
-        } else {
-          console.log('⚠️ Split denied - insufficient mass (need ≥40) or no player')
-        }
-        
-        // DON'T send to server to avoid disconnection issues
-        
-      } catch (error) {
-        console.error('❌ Agario split error:', error)
-      }
     } catch (error) {
       console.error('❌ Error sending split command:', error)
       
