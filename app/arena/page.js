@@ -1739,8 +1739,8 @@ const MultiplayerArena = () => {
           }
         })
         
-        // Draw split cells for current player
-        this.drawSplitCells()
+        // Draw player pieces (exact agario naming)
+        this.drawPlayerPieces()
       }
       
       this.ctx.restore()
