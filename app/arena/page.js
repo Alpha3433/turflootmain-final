@@ -2008,6 +2008,48 @@ const MultiplayerArena = () => {
       
       this.ctx.restore()
     }
+    
+    drawSplitCells() {
+      if (!this.playerCells || this.playerCells.length === 0) return
+      
+      // Draw each split cell
+      this.playerCells.forEach(cell => {
+        this.ctx.save()
+        this.ctx.translate(cell.x, cell.y)
+        
+        // Main cell body
+        this.ctx.beginPath()
+        this.ctx.arc(0, 0, cell.radius, 0, Math.PI * 2)
+        this.ctx.fillStyle = cell.color
+        this.ctx.fill()
+        
+        // Cell border
+        this.ctx.strokeStyle = '#ffffff'
+        this.ctx.lineWidth = 2
+        this.ctx.stroke()
+        
+        // Add split cell indicator (small dot)
+        this.ctx.beginPath()
+        this.ctx.arc(0, -cell.radius * 0.3, 3, 0, Math.PI * 2)
+        this.ctx.fillStyle = '#ffffff'
+        this.ctx.fill()
+        
+        // Merge cooldown indicator
+        if (!cell.canMerge) {
+          const elapsed = Date.now() - cell.splitTime
+          const progress = Math.min(elapsed / 10000, 1) // 10 second cooldown
+          
+          // Draw cooldown ring
+          this.ctx.beginPath()
+          this.ctx.arc(0, 0, cell.radius + 8, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2)
+          this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)'
+          this.ctx.lineWidth = 3
+          this.ctx.stroke()
+        }
+        
+        this.ctx.restore()
+      })
+    }
   }
 
   // Initialize game ONLY when authenticated
