@@ -1528,8 +1528,8 @@ const MultiplayerArena = () => {
         this.splitCooldown--
       }
       
-      // Update split cells
-      this.updateSplitCells(deltaTime)
+      // Update player pieces (exact agario naming)
+      this.updatePlayerPieces(deltaTime)
       
       // Update camera - EXACTLY matching local agario implementation
       this.updateCamera()
