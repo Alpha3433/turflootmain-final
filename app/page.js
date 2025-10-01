@@ -7838,11 +7838,11 @@ export default function TurfLootTactical() {
           }
         `}</style>
 
-        {/* Server Browser Modal */}
+        {/* Desktop Server Browser Modal */}
         <ServerBrowserModal
-          isOpen={isServerBrowserOpen}
+          isOpen={isServerBrowserOpen && !isMobile}
           onClose={() => {
-            console.log('Closing server browser modal')
+            console.log('Closing desktop server browser modal')
             setIsServerBrowserOpen(false)
           }}
           onJoinLobby={handleJoinLobby}
