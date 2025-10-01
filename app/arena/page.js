@@ -378,8 +378,8 @@ const MultiplayerArena = () => {
           gameRef.current.player.mass = halfMass
           gameRef.current.player.radius = Math.sqrt(halfMass) * 3
           
-          // Create new split cell that shoots toward cursor
-          const splitDistance = 120 // Distance the new cell travels
+          // Create new split cell that shoots toward cursor (agario style)
+          const splitDistance = 200 // Much further like agario
           const splitCell = {
             id: `split_${Date.now()}`,
             x: gameRef.current.player.x + dirX * splitDistance,
@@ -387,10 +387,11 @@ const MultiplayerArena = () => {
             mass: halfMass,
             radius: Math.sqrt(halfMass) * 3,
             color: gameRef.current.player.color,
-            velocityX: dirX * 15, // Initial momentum
-            velocityY: dirY * 15,
+            velocityX: dirX * 25, // Much faster initial velocity like agario
+            velocityY: dirY * 25,
             splitTime: Date.now(),
-            canMerge: false // Can't merge immediately
+            canMerge: false, // Can't merge immediately
+            isMoving: false // Not currently moving toward mouse
           }
           
           // Add split cell to player's cells array
