@@ -1426,6 +1426,9 @@ const MultiplayerArena = () => {
       const currentTimeSurvived = Math.floor((Date.now() - this.gameStartTime) / 1000)
       setTimeSurvived(currentTimeSurvived)
       
+      // Update split cells
+      this.updateSplitCells(deltaTime)
+      
       // Update camera - EXACTLY matching local agario implementation
       this.updateCamera()
     }
