@@ -341,163 +341,108 @@ const MultiplayerArena = () => {
         return
       }
       
-      // AGARIO-STYLE SPLIT MECHANIC - Create two separate cells
-      try {
-        console.log('🚀 Performing AGARIO split - creating two cells')
-        
-        // Check split cooldown and conditions (exact agario style)
-        if (!gameRef.current || !gameRef.current.player) {
-          console.log('⚠️ Split denied - no player or game not ready')
-          return
-        }
-        
-        // Add split cooldown like agario
-        if (!gameRef.current.splitCooldown) {
-          gameRef.current.splitCooldown = 0
-        }
-        
-        if (gameRef.current.splitCooldown > 0) {
-          console.log('⚠️ Split denied - cooldown active')
-          return
-        }
-        
-        // Check if any pieces can split (36 mass minimum like agario)
-        const canSplitPlayer = gameRef.current.player.mass >= 36
-        const canSplitPieces = gameRef.current.playerPieces && 
-                              gameRef.current.playerPieces.some(piece => piece.mass >= 36)
-        
-        if (canSplitPlayer || canSplitPieces) {
-          // Check if player already has split pieces (exact agario naming)
-          if (!gameRef.current.playerPieces) {
-            gameRef.current.playerPieces = []
-          }
-          
-          // Limit maximum number of pieces (exact agario limit check)
-          const currentPieces = 1 + gameRef.current.playerPieces.length
-          if (currentPieces >= 16) {
-            console.log('⚠️ Split denied - maximum pieces reached (16)')
-            return
-          }
-          
-          let totalSplits = 0
-          
-          // Split main player if it has enough mass (matching agario requirements)
-          if (gameRef.current.player.mass >= 36) {
-            const originalMass = gameRef.current.player.mass
-            const halfMass = originalMass / 2  // Exact division like agario (not Math.floor)
-            const halfRadius = Math.sqrt(halfMass / Math.PI) * 6  // Exact agario radius calculation
-            
-            // Calculate split direction toward cursor
-            const dx = targetX - gameRef.current.player.x
-            const dy = targetY - gameRef.current.player.y
-            const distance = Math.sqrt(dx * dx + dy * dy)
-            
-            if (distance >= 10) {
-              const dirX = dx / distance
-              const dirY = dy / distance
-              
-              // Update original cell (exact agario style)
-              gameRef.current.player.mass = halfMass
-              gameRef.current.player.radius = halfRadius
-              
-              // Apply recoil effect like agario
-              const recoilDistance = 20
-              gameRef.current.player.x = gameRef.current.player.x - dirX * recoilDistance
-              gameRef.current.player.y = gameRef.current.player.y - dirY * recoilDistance
-              
-              // Create new split piece (EXACT agario implementation)
-              const splitDistance = 80   // Exact agario distance
-              const splitVelocity = 22   // Exact agario velocity 
-              const newPiece = {
-                id: `piece_${Date.now()}_${totalSplits}`,
-                x: gameRef.current.player.x + dirX * splitDistance,
-                y: gameRef.current.player.y + dirY * splitDistance,
-                mass: halfMass,
-                radius: halfRadius,
-                color: gameRef.current.player.color,
-                vx: dirX * splitVelocity,  // Initial velocity (like agario)
-                vy: dirY * splitVelocity,
-                targetX: gameRef.current.player.x, // Will be updated to follow main player target
-                targetY: gameRef.current.player.y,
-                splitTime: Date.now(),
-                canMerge: false,
-                recombineTime: 0 // For agario recombine logic
-              }
-              
-              gameRef.current.playerPieces.push(newPiece)
-              
-              // Set merge cooldown for this specific piece (agario uses 30 seconds)
-              setTimeout(() => {
-                const pieceToUpdate = gameRef.current.playerPieces.find(p => p.id === newPiece.id)
-                if (pieceToUpdate) {
-                  pieceToUpdate.canMerge = true
-                  console.log('🔄 Main split piece can now merge')
-                }
-              }, 30000) // 30 seconds like agario
-              
-              totalSplits++
-              
-              // Update UI immediately like agario (total mass of all pieces)
-              const totalMass = gameRef.current.player.mass + 
-                               gameRef.current.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
-              setMass(Math.floor(totalMass))
-            }
-          }
-          
-          // Split existing split cells that have enough mass (AGARIO MULTI-SPLIT)
-          const cellsToSplit = [...gameRef.current.playerCells]
-          cellsToSplit.forEach(cell => {
-            if (cell.mass >= 40 && gameRef.current.playerCells.length + totalSplits < 16) {
-              const halfMass = Math.floor(cell.mass / 2)
-              
-              // Calculate split direction from cell toward cursor
-              const dx = targetX - cell.x
-              const dy = targetY - cell.y
-              const distance = Math.sqrt(dx * dx + dy * dy)
-              
-              if (distance >= 10) {
-                const dirX = dx / distance
-                const dirY = dy / distance
-                
-                // Update existing cell
-                cell.mass = halfMass
-                cell.radius = Math.sqrt(halfMass) * 3
-                
-                // Create new split cell from existing cell
-                const splitDistance = 200
-                const newSplitCell = {
-                  id: `split_${Date.now()}_${totalSplits}`,
-                  x: cell.x + dirX * splitDistance,
-                  y: cell.y + dirY * splitDistance,
-                  mass: halfMass,
-                  radius: Math.sqrt(halfMass) * 3,
-                  color: gameRef.current.player.color,
-                  velocityX: dirX * 25,
-                  velocityY: dirY * 25,
-                  splitTime: Date.now(),
-                  canMerge: false
-                }
-                
-                gameRef.current.playerCells.push(newSplitCell)
-                
-                // Set merge cooldown for this specific cell
-                setTimeout(() => {
-                  const cellToUpdate = gameRef.current.playerCells.find(c => c.id === newSplitCell.id)
-                  if (cellToUpdate) {
-                    cellToUpdate.canMerge = true
-                    console.log('🔄 Secondary split cell can now merge')
-                  }
-                }, 5000)
-                
-                totalSplits++
-              }
-            }
-          })
-          
-          // Set split cooldown (1 second like agario)
-          gameRef.current.splitCooldown = 60 // 60 frames = ~1 second at 60fps
-          
-          // Final mass update (ensure UI shows correct total - EXACT agario)
+      // AGARIO-STYLE SPLIT MECHANIC - Actually split the player in half
+      console.log('🚀 Performing AGARIO split - splitting player in half')
+      
+      // Check split cooldown and conditions (exact agario style)
+      if (!gameRef.current || !gameRef.current.player) {
+        console.log('⚠️ Split denied - no player or game not ready')
+        return
+      }
+      
+      // Add split cooldown like agario
+      if (!gameRef.current.splitCooldown) {
+        gameRef.current.splitCooldown = 0
+      }
+      
+      if (gameRef.current.splitCooldown > 0) {
+        console.log('⚠️ Split denied - cooldown active')
+        return
+      }
+      
+      // Check if player has minimum mass to split (36 like agario)
+      if (gameRef.current.player.mass < 36) {
+        console.log('⚠️ Split denied - insufficient mass for split')
+        return
+      }
+      
+      // Initialize playerPieces array if it doesn't exist
+      if (!gameRef.current.playerPieces) {
+        gameRef.current.playerPieces = []
+      }
+      
+      // Limit maximum number of pieces (exact agario limit check)
+      const currentPieces = 1 + gameRef.current.playerPieces.length
+      if (currentPieces >= 16) {
+        console.log('⚠️ Split denied - maximum pieces reached (16)')
+        return
+      }
+      
+      // Calculate mass for each piece (split in half exactly like agario)
+      const halfMass = gameRef.current.player.mass / 2
+      const halfRadius = Math.sqrt(halfMass / Math.PI) * 6
+      
+      // Calculate direction toward mouse cursor (agario style)
+      const dx = targetX - gameRef.current.player.x
+      const dy = targetY - gameRef.current.player.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      
+      // Normalize direction vector (prevent division by zero)
+      let directionX = 0
+      let directionY = 0
+      if (distance > 0) {
+        directionX = dx / distance
+        directionY = dy / distance
+      } else {
+        // Default direction if mouse is exactly on player
+        directionX = 1
+        directionY = 0
+      }
+      
+      // Split distance and velocity (matching agario)
+      const splitDistance = 100
+      const splitVelocity = 20
+      
+      // Create new piece (the split-off piece)
+      const newPiece = {
+        x: gameRef.current.player.x + directionX * splitDistance,
+        y: gameRef.current.player.y + directionY * splitDistance,
+        mass: halfMass,
+        radius: halfRadius,
+        color: gameRef.current.player.color,
+        name: 'You',
+        speed: gameRef.current.player.speed,
+        targetX: targetX, // Target the mouse position
+        targetY: targetY,
+        splitTime: Date.now(), // Track when split occurred
+        recombineReady: false,
+        vx: directionX * splitVelocity, // Initial velocity toward mouse
+        vy: directionY * splitVelocity
+      }
+      
+      // Update main player (reduce mass and add recoil - CRITICAL AGARIO BEHAVIOR)
+      gameRef.current.player.mass = halfMass
+      gameRef.current.player.radius = halfRadius
+      
+      // Small recoil movement in opposite direction (like agario)
+      const recoilDistance = 20
+      gameRef.current.player.x = gameRef.current.player.x - directionX * recoilDistance
+      gameRef.current.player.y = gameRef.current.player.y - directionY * recoilDistance
+      gameRef.current.player.targetX = targetX // Keep following mouse
+      gameRef.current.player.targetY = targetY
+      
+      // Add new piece to array
+      gameRef.current.playerPieces.push(newPiece)
+      
+      // Update UI immediately (total mass should remain the same)
+      const totalMass = gameRef.current.player.mass + 
+                       gameRef.current.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
+      setMass(Math.floor(totalMass))
+      
+      // Set cooldown (1 second like agario)
+      gameRef.current.splitCooldown = 60 // 60 frames = ~1 second at 60fps
+      
+      console.log(`🚀 Player split toward mouse! Now ${currentPieces + 1} pieces. Total mass: ${Math.floor(totalMass)}. Direction: (${directionX.toFixed(2)}, ${directionY.toFixed(2)})`)
           const finalTotalMass = gameRef.current.player.mass + 
                                gameRef.current.playerPieces.reduce((sum, piece) => sum + piece.mass, 0)
           setMass(Math.floor(finalTotalMass))
