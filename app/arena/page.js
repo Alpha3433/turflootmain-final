@@ -1627,23 +1627,23 @@ const MultiplayerArena = () => {
           piece.vy = 0
         }
         
-        // Keep cells within arena boundaries
+        // Keep pieces within arena boundaries (exact agario style)
         const centerX = this.world.width / 4
         const centerY = this.world.height / 4
         const playableRadius = 1800
-        const maxRadius = playableRadius - cell.radius
+        const maxRadius = playableRadius - piece.radius
         
         const distFromCenter = Math.sqrt(
-          Math.pow(cell.x - centerX, 2) + 
-          Math.pow(cell.y - centerY, 2)
+          Math.pow(piece.x - centerX, 2) + 
+          Math.pow(piece.y - centerY, 2)
         )
         
         if (distFromCenter > maxRadius) {
-          const angle = Math.atan2(cell.y - centerY, cell.x - centerX)
-          cell.x = centerX + Math.cos(angle) * maxRadius
-          cell.y = centerY + Math.sin(angle) * maxRadius
-          cell.velocityX = 0
-          cell.velocityY = 0
+          const angle = Math.atan2(piece.y - centerY, piece.x - centerX)
+          piece.x = centerX + Math.cos(angle) * maxRadius
+          piece.y = centerY + Math.sin(angle) * maxRadius
+          piece.vx = 0
+          piece.vy = 0
         }
         
         // Check for merge with main player (agario-style merge detection)
