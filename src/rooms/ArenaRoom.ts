@@ -271,8 +271,7 @@ export class ArenaRoom extends Room<GameState> {
 
   handleSplit(client: Client, message: any) {
     console.log(`🚀 SPLIT COMMAND RECEIVED from ${client.sessionId}:`, message);
-    
-    // TEMPORARY SAFE IMPLEMENTATION - Just log and return without doing anything complex
+
     try {
       const player = this.state.players.get(client.sessionId);
       if (!player || !player.alive) {
@@ -280,40 +279,169 @@ export class ArenaRoom extends Room<GameState> {
         return;
       }
 
-      // Basic validation
       if (!message || typeof message !== 'object') {
         console.log(`⚠️ Split ignored - invalid message format for session: ${client.sessionId}`, message);
         return;
       }
 
       const { targetX, targetY } = message;
-      
-      // Just validate and log - don't actually split yet
       if (typeof targetX !== 'number' || typeof targetY !== 'number') {
         console.log(`⚠️ Split ignored - invalid coordinates for session: ${client.sessionId}`, { targetX, targetY });
         return;
       }
-    
-      // Check mass
-      if (player.mass < 40) {
-        console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 40`);
+
+      const originalMass = player.mass;
+      const originalRadius = player.radius;
+      const originalScore = player.score;
+      let splitScore = 0;
+      const minimumMassToSplit = 40;
+      const minimumPieceMass = 20;
+
+      if (originalMass < minimumMassToSplit) {
+        console.log(`⚠️ Split denied - insufficient mass: ${originalMass} < ${minimumMassToSplit}`);
         return;
       }
-    
-      // SAFE IMPLEMENTATION: Just log success without actually splitting
-      console.log(`✅ Split request validated successfully for ${player.name}`, {
-        playerMass: player.mass,
-        targetX: targetX.toFixed(1),
-        targetY: targetY.toFixed(1),
-        sessionId: client.sessionId
+
+      let splitMass = Math.max(originalMass / 2, minimumPieceMass);
+      let remainingMass = originalMass - splitMass;
+
+      if (remainingMass < minimumPieceMass) {
+        // Try keeping minimum mass on the original piece instead
+        const adjustedRemaining = Math.max(minimumPieceMass, originalMass - minimumPieceMass);
+        const adjustedSplit = originalMass - adjustedRemaining;
+
+        if (adjustedSplit < minimumPieceMass || adjustedRemaining < minimumPieceMass) {
+          console.log(`⚠️ Split denied - cannot maintain minimum mass for both pieces`, {
+            originalMass,
+            minimumPieceMass
+          });
+          return;
+        }
+
+        splitMass = adjustedSplit;
+        remainingMass = adjustedRemaining;
+      }
+
+      const newPieceRadius = Math.sqrt(splitMass) * 3;
+
+      // Determine split direction (normalize towards target)
+      let directionX = targetX - player.x;
+      let directionY = targetY - player.y;
+      const directionLength = Math.sqrt(directionX * directionX + directionY * directionY);
+
+      if (directionLength === 0) {
+        const angle = Math.random() * Math.PI * 2;
+        directionX = Math.cos(angle);
+        directionY = Math.sin(angle);
+      } else {
+        directionX /= directionLength;
+        directionY /= directionLength;
+      }
+
+      const offsetDistance = originalRadius + newPieceRadius + 10;
+      const proposedPieceX = player.x + directionX * offsetDistance;
+      const proposedPieceY = player.y + directionY * offsetDistance;
+
+      // Clamp the new piece inside the playable arena circle
+      const arenaCenterX = this.worldSize / 4;
+      const arenaCenterY = this.worldSize / 4;
+      const playableRadius = 1800;
+      const maxDistanceFromCenter = playableRadius - newPieceRadius;
+      let newPieceX = proposedPieceX;
+      let newPieceY = proposedPieceY;
+
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(proposedPieceX - arenaCenterX, 2) +
+        Math.pow(proposedPieceY - arenaCenterY, 2)
+      );
+
+      if (distanceFromCenter > maxDistanceFromCenter) {
+        const clampAngle = Math.atan2(proposedPieceY - arenaCenterY, proposedPieceX - arenaCenterX);
+        newPieceX = arenaCenterX + Math.cos(clampAngle) * maxDistanceFromCenter;
+        newPieceY = arenaCenterY + Math.sin(clampAngle) * maxDistanceFromCenter;
+      }
+
+      // Update original player's mass and radius
+      player.mass = remainingMass;
+      player.radius = Math.sqrt(player.mass) * 3;
+
+      // Split score proportionally
+      if (originalScore > 0) {
+        const scoreRatio = splitMass / originalMass;
+        splitScore = Math.floor(originalScore * scoreRatio);
+        player.score = originalScore - splitScore;
+      }
+
+      const newPlayer = new Player();
+      newPlayer.name = player.name;
+      newPlayer.x = newPieceX;
+      newPlayer.y = newPieceY;
+      newPlayer.mass = splitMass;
+      newPlayer.radius = newPieceRadius;
+      newPlayer.vx = player.vx;
+      newPlayer.vy = player.vy;
+      newPlayer.color = player.color;
+      newPlayer.skinId = player.skinId;
+      newPlayer.skinName = player.skinName;
+      newPlayer.skinColor = player.skinColor;
+      newPlayer.skinType = player.skinType;
+      newPlayer.skinPattern = player.skinPattern;
+      newPlayer.alive = true;
+      newPlayer.spawnProtection = player.spawnProtection;
+      newPlayer.spawnProtectionStart = player.spawnProtectionStart;
+      newPlayer.spawnProtectionTime = player.spawnProtectionTime;
+      newPlayer.isCashingOut = player.isCashingOut;
+      newPlayer.cashOutProgress = player.cashOutProgress;
+      newPlayer.cashOutStartTime = player.cashOutStartTime;
+      newPlayer.lastSeq = player.lastSeq;
+
+      newPlayer.score = splitScore;
+
+      // Apply momentum to propel the split piece forward and recoil original
+      const splitSpeed = 18; // Tuned speed value for noticeable split movement
+      newPlayer.momentumX = directionX * splitSpeed;
+      newPlayer.momentumY = directionY * splitSpeed;
+      player.momentumX = (player.momentumX || 0) - directionX * (splitSpeed * 0.5);
+      player.momentumY = (player.momentumY || 0) - directionY * (splitSpeed * 0.5);
+
+      const splitTimestamp = Date.now();
+
+      // Reset merge timers for all of this player's existing pieces
+      this.state.players.forEach((existingPlayer, existingSessionId) => {
+        if (!existingPlayer || !existingPlayer.alive) return;
+        const ownerId = existingSessionId.includes('_split_')
+          ? existingSessionId.split('_split_')[0]
+          : existingSessionId;
+        if (ownerId === client.sessionId) {
+          existingPlayer.splitTime = splitTimestamp;
+        }
       });
-      
-      // TODO: Implement actual split logic here once connection stability is confirmed
-      
+
+      newPlayer.splitTime = splitTimestamp;
+      player.splitTime = splitTimestamp;
+
+      const baseSplitId = `${client.sessionId}_split_${splitTimestamp}`;
+      let splitSessionId = baseSplitId;
+      let counter = 1;
+      while (this.state.players.has(splitSessionId)) {
+        splitSessionId = `${baseSplitId}_${counter++}`;
+      }
+
+      this.state.players.set(splitSessionId, newPlayer);
+
+      console.log(`✅ Split executed for ${player.name}`, {
+        originalSession: client.sessionId,
+        splitSession: splitSessionId,
+        originalMass: originalMass.toFixed(1),
+        newOriginalMass: player.mass.toFixed(1),
+        splitMass: splitMass.toFixed(1),
+        direction: { x: directionX.toFixed(3), y: directionY.toFixed(3) },
+        position: { originalX: player.x.toFixed(1), originalY: player.y.toFixed(1), splitX: newPieceX.toFixed(1), splitY: newPieceY.toFixed(1) }
+      });
+
     } catch (error: any) {
       console.error(`❌ Error handling split for session ${client.sessionId}:`, error);
       console.error(`❌ Stack trace:`, error?.stack || 'No stack trace available');
-      // Don't disconnect the client, just log the error and continue
     }
   }
 
