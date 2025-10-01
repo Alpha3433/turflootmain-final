@@ -158,7 +158,7 @@ user_problem_statement: "SIMPLIFIED SPLIT FUNCTIONALITY DISCONNECTION PREVENTION
 
 test_plan:
   current_focus:
-    - "Simplified Split Functionality Testing"
+    - "Completely Rebuilt Split Functionality Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
