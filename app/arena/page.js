@@ -345,10 +345,26 @@ const MultiplayerArena = () => {
       try {
         console.log('🚀 Performing AGARIO split - creating two cells')
         
-        // Get current player from game engine
-        const canSplitPlayer = gameRef.current && gameRef.current.player && gameRef.current.player.mass >= 40
-        const canSplitCells = gameRef.current && gameRef.current.playerCells && 
-                             gameRef.current.playerCells.some(cell => cell.mass >= 40)
+        // Check split cooldown and conditions (exact agario style)
+        if (!gameRef.current || !gameRef.current.player) {
+          console.log('⚠️ Split denied - no player or game not ready')
+          return
+        }
+        
+        // Add split cooldown like agario
+        if (!gameRef.current.splitCooldown) {
+          gameRef.current.splitCooldown = 0
+        }
+        
+        if (gameRef.current.splitCooldown > 0) {
+          console.log('⚠️ Split denied - cooldown active')
+          return
+        }
+        
+        // Check if any cells can split (36 mass minimum like agario)
+        const canSplitPlayer = gameRef.current.player.mass >= 36
+        const canSplitCells = gameRef.current.playerCells && 
+                             gameRef.current.playerCells.some(cell => cell.mass >= 36)
         
         if (canSplitPlayer || canSplitCells) {
           // Check if player already has split cells (limit splits)
