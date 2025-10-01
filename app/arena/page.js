@@ -1646,30 +1646,27 @@ const MultiplayerArena = () => {
           piece.vy = 0
         }
         
-        // Check for merge with main player (agario-style merge detection)
-        if (cell.canMerge) {
-          const dx = cell.x - this.player.x
-          const dy = cell.y - this.player.y
+        // Check for merge with main player (exact agario merge detection)
+        if (piece.canMerge) {
+          const dx = piece.x - this.player.x
+          const dy = piece.y - this.player.y
           const distance = Math.sqrt(dx * dx + dy * dy)
-          // More generous merge distance like agario
-          const minMergeDistance = (cell.radius + this.player.radius) * 0.8
+          // Exact agario merge distance
+          const minMergeDistance = (piece.radius + this.player.radius) * 0.8
           
           if (distance < minMergeDistance) {
-            // Merge cells
-            this.player.mass += cell.mass
-            this.player.radius = Math.sqrt(this.player.mass) * 3
+            // Merge piece into main player (exact agario style)
+            this.player.mass += piece.mass
+            this.player.radius = Math.sqrt(this.player.mass / Math.PI) * 6  // Exact agario radius
             
-            // Update UI
-            setMass(Math.round(this.player.mass))
-            
-            // Remove the split cell
-            this.playerCells.splice(i, 1)
+            // Remove the merged piece
+            this.playerPieces.splice(i, 1)
             
             // Update total mass UI like agario
-            const totalMass = this.player.mass + this.playerCells.reduce((sum, cell) => sum + cell.mass, 0)
+            const totalMass = this.player.mass + this.playerPieces.reduce((sum, p) => sum + p.mass, 0)
             setMass(Math.floor(totalMass))
             
-            console.log('🔄 Cells merged! New player mass:', Math.round(this.player.mass), 'Total mass:', Math.floor(totalMass))
+            console.log('🔄 Piece merged! New player mass:', Math.round(this.player.mass), 'Total mass:', Math.floor(totalMass))
             continue
           }
         }
