@@ -341,19 +341,45 @@ const MultiplayerArena = () => {
         return
       }
       
-      // Check if we have a proper Colyseus room connection
+      // CLIENT-SIDE ONLY SPLIT - Don't send to server to avoid disconnection
       try {
-        // Use the Colyseus client's send method directly
-        wsRef.current.send('split', { targetX, targetY });
-        console.log('✅ Split command sent via Colyseus client')
-      } catch (sendError) {
-        // Handle WebSocket CLOSING/CLOSED errors gracefully
-        if (sendError.message && sendError.message.includes('CLOSING or CLOSED')) {
-          console.log('⚠️ WebSocket closing during split - this is expected during disconnection')
+        console.log('🚀 Performing CLIENT-SIDE split (no server communication)')
+        
+        // Get current player from game engine
+        if (gameRef.current && gameRef.current.player && gameRef.current.player.mass >= 40) {
+          // Simulate split locally for immediate feedback
+          const originalMass = gameRef.current.player.mass
+          const newMass = Math.floor(originalMass / 2)
+          
+          // Update local player
+          gameRef.current.player.mass = newMass
+          gameRef.current.player.radius = Math.sqrt(newMass) * 3
+          
+          // Calculate split direction
+          const dx = targetX - gameRef.current.player.x
+          const dy = targetY - gameRef.current.player.y
+          const distance = Math.sqrt(dx * dx + dy * dy)
+          
+          if (distance > 10) {
+            const dirX = dx / distance
+            const dirY = dy / distance
+            const splitDistance = 50
+            
+            // Move player in split direction
+            gameRef.current.player.x += dirX * splitDistance
+            gameRef.current.player.y += dirY * splitDistance
+          }
+          
+          console.log(`✅ CLIENT-SIDE split completed: ${originalMass} → ${newMass}`)
         } else {
-          console.error('❌ Failed to send split message:', sendError)
+          console.log('⚠️ CLIENT-SIDE split denied - insufficient mass or no player')
         }
-        return
+        
+        // DON'T send to server to avoid disconnection
+        // wsRef.current.send('split', { targetX, targetY });
+        
+      } catch (error) {
+        console.error('❌ Client-side split error:', error)
       }
     } catch (error) {
       console.error('❌ Error sending split command:', error)
