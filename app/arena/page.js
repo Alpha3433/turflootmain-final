@@ -346,7 +346,11 @@ const MultiplayerArena = () => {
         console.log('🚀 Performing AGARIO split - creating two cells')
         
         // Get current player from game engine
-        if (gameRef.current && gameRef.current.player && gameRef.current.player.mass >= 40) {
+        const canSplitPlayer = gameRef.current && gameRef.current.player && gameRef.current.player.mass >= 40
+        const canSplitCells = gameRef.current && gameRef.current.playerCells && 
+                             gameRef.current.playerCells.some(cell => cell.mass >= 40)
+        
+        if (canSplitPlayer || canSplitCells) {
           // Check if player already has split cells (limit splits)
           if (!gameRef.current.playerCells) {
             gameRef.current.playerCells = []
