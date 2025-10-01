@@ -367,14 +367,15 @@ const MultiplayerArena = () => {
                              gameRef.current.playerCells.some(cell => cell.mass >= 36)
         
         if (canSplitPlayer || canSplitCells) {
-          // Check if player already has split cells (limit splits)
-          if (!gameRef.current.playerCells) {
-            gameRef.current.playerCells = []
+          // Check if player already has split pieces (exact agario naming)
+          if (!gameRef.current.playerPieces) {
+            gameRef.current.playerPieces = []
           }
           
-          // Limit maximum number of cells (agario typically allows up to 16)
-          if (gameRef.current.playerCells.length >= 16) {
-            console.log('⚠️ Split denied - maximum cells reached (16)')
+          // Limit maximum number of pieces (exact agario limit check)
+          const currentPieces = 1 + gameRef.current.playerPieces.length
+          if (currentPieces >= 16) {
+            console.log('⚠️ Split denied - maximum pieces reached (16)')
             return
           }
           
