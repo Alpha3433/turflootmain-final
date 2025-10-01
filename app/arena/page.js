@@ -343,12 +343,23 @@ const MultiplayerArena = () => {
       
       // Check if we have a proper Colyseus room connection
       try {
+        // Double-check WebSocket state before sending split command
+        if (!wsRef.current.connection || wsRef.current.connection.readyState !== 1) {
+          console.log('❌ Split command blocked - WebSocket not in OPEN state:', wsRef.current.connection?.readyState)
+          return
+        }
+        
         // Use the Colyseus client's send method directly
         wsRef.current.send('split', { targetX, targetY });
         console.log('✅ Split command sent via Colyseus client')
       } catch (sendError) {
         console.error('❌ Failed to send split message:', sendError)
         console.log('🔄 Connection might be in invalid state - avoiding disconnection')
+        
+        // Check if it's the specific WebSocket closing error
+        if (sendError.message && sendError.message.includes('CLOSING or CLOSED')) {
+          console.log('🔍 Detected WebSocket CLOSING/CLOSED error - this is the root cause of disconnection')
+        }
         return
       }
     } catch (error) {
