@@ -422,42 +422,7 @@ export class ArenaRoom extends Room<GameState> {
       const playableRadius = 1800; // Match the red divider radius exactly
       const maxRadius = playableRadius - player.radius; // Player edge stops at red divider
       
-      // Handle split piece momentum (agario-style split movement)
-      if (player.momentumX !== 0 || player.momentumY !== 0) {
-        // Apply momentum movement for split pieces
-        const momentumDecay = 0.95; // Momentum decay factor
-        const minMomentum = 0.1; // Stop momentum when it gets too small
-        
-        // Apply momentum to position
-        player.x += player.momentumX * deltaTime * 60;
-        player.y += player.momentumY * deltaTime * 60;
-        
-        // Decay momentum over time
-        player.momentumX *= momentumDecay;
-        player.momentumY *= momentumDecay;
-        
-        // Stop momentum when it gets too small
-        if (Math.abs(player.momentumX) < minMomentum && Math.abs(player.momentumY) < minMomentum) {
-          player.momentumX = 0;
-          player.momentumY = 0;
-        }
-        
-        // Boundary check for momentum movement
-        const currentDistance = Math.sqrt(
-          Math.pow(player.x - centerX, 2) + 
-          Math.pow(player.y - centerY, 2)
-        );
-        
-        if (currentDistance > maxRadius) {
-          // Clamp to boundary and stop momentum
-          const angle = Math.atan2(player.y - centerY, player.x - centerX);
-          player.x = centerX + Math.cos(angle) * maxRadius;
-          player.y = centerY + Math.sin(angle) * maxRadius;
-          player.momentumX = 0;
-          player.momentumY = 0;
-        }
-        
-        // Skip normal movement for split pieces with momentum
+      // Removed complex momentum system for simplicity
         return;
       }
       
