@@ -573,10 +573,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
         backgroundColor: '#1a202c',
         border: '2px solid #10b981',
         borderRadius: isMobile ? '12px' : '8px',
-        padding: isMobile ? '16px' : '24px',
+        padding: isMobile ? '12px' : '24px',
         width: isMobile ? '85%' : '90%',
-        maxWidth: isMobile ? '360px' : '800px',
-        maxHeight: isMobile ? '70vh' : '80vh',
+        maxWidth: isMobile ? '340px' : '800px',
+        maxHeight: isMobile ? '65vh' : '80vh',
         overflowY: 'auto',
         position: 'relative'
       }}>
