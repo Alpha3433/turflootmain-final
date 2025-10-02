@@ -30,7 +30,16 @@ export class Player extends Schema {
   @type("string") skinType: string = "circle";
   @type("string") skinPattern: string = "solid";
   
-  // Removed complex split functionality for simplicity
+  // Split piece tracking - Agar.io style
+  @type("string") ownerSessionId: string = ""; // Session ID of the owner (empty for main player)
+  @type("boolean") isSplitPiece: boolean = false; // Whether this is a split piece
+  @type("number") splitTime: number = 0; // When this piece was created
+  @type("number") targetX: number = 0; // Target position for split piece
+  @type("number") targetY: number = 0; // Target position for split piece
+  @type("number") momentumX: number = 0; // Momentum velocity X
+  @type("number") momentumY: number = 0; // Momentum velocity Y
+  @type("number") noMergeUntil: number = 0; // Timestamp when merge is allowed
+  @type("number") lastSplitTime: number = 0; // Last time this player split (for cooldown)
 }
 
 // Coin state schema
