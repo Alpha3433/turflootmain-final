@@ -19,6 +19,8 @@ const SPEED_SPLIT = 1100;
 const MOMENTUM_DRAG = 4.5;
 const NO_MERGE_MS = 12000;
 const MOMENTUM_THRESHOLD = 0.1;
+const SPLIT_ATTRACTION_FORCE = 300;
+const SPLIT_ATTRACTION_DISTANCE_SCALE = 6;
 // Player state schema
 class Player extends schema_1.Schema {
     constructor() {
@@ -394,6 +396,9 @@ class ArenaRoom extends core_1.Room {
             if (!player.alive)
                 return;
             this.applyMomentum(player, deltaTime);
+            if (player.isSplitPiece) {
+                this.applySplitAttraction(player, deltaTime, now);
+            }
             // Apply movement
             player.x += player.vx * deltaTime * 10; // Scale for game feel
             player.y += player.vy * deltaTime * 10;
@@ -529,6 +534,31 @@ class ArenaRoom extends core_1.Room {
             player.y = maxY;
             player.momentumY = 0;
         }
+    }
+    applySplitAttraction(player, deltaTime, currentTime) {
+        if (!player.ownerSessionId) {
+            return;
+        }
+        const owner = this.state.players.get(player.ownerSessionId);
+        if (!owner || !owner.alive) {
+            return;
+        }
+        if (currentTime < player.noMergeUntil || currentTime < owner.noMergeUntil) {
+            return;
+        }
+        const dx = owner.x - player.x;
+        const dy = owner.y - player.y;
+        const distanceSq = dx * dx + dy * dy;
+        if (distanceSq < 1) {
+            return;
+        }
+        const distance = Math.sqrt(distanceSq);
+        const dirX = dx / distance;
+        const dirY = dy / distance;
+        const scaledForce = Math.min(SPLIT_ATTRACTION_FORCE, distance * SPLIT_ATTRACTION_DISTANCE_SCALE);
+        const attraction = scaledForce * deltaTime;
+        player.momentumX += dirX * attraction;
+        player.momentumY += dirY * attraction;
     }
     handleSplitMerging(currentTime) {
         const piecesToRemove = [];
