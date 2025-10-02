@@ -2896,38 +2896,6 @@ const MultiplayerArena = () => {
           </span>
         </div>
 
-        {/* Exit Arena Button - Top Right */}
-        <button
-          onClick={() => router.push('/')}
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: isMobile ? '20px' : '250px', // Adjust for minimap
-            zIndex: 1001,
-            backgroundColor: '#dc2626',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            padding: isMobile ? '8px 12px' : '10px 16px',
-            fontSize: isMobile ? '12px' : '14px',
-            fontWeight: 'bold',
-            fontFamily: '"Rajdhani", sans-serif',
-            cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-            transition: 'all 0.2s ease',
-            userSelect: 'none'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = '#b91c1c'
-            e.target.style.transform = 'translateY(-1px)'
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = '#dc2626'
-            e.target.style.transform = 'translateY(0)'
-          }}
-        >
-          Exit Arena
-        </button>
       </div>
 
       {/* Loading Modal */}
