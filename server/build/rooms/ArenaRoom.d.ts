@@ -12,6 +12,15 @@ export declare class Player extends Schema {
     score: number;
     lastSeq: number;
     alive: boolean;
+    ownerSessionId: string;
+    isSplitPiece: boolean;
+    splitTime: number;
+    targetX: number;
+    targetY: number;
+    momentumX: number;
+    momentumY: number;
+    noMergeUntil: number;
+    lastSplitTime: number;
 }
 export declare class Coin extends Schema {
     x: number;
@@ -42,12 +51,18 @@ export declare class ArenaRoom extends Room<GameState> {
     onCreate(): void;
     onJoin(client: Client, options?: any): void;
     handleInput(client: Client, message: any): void;
+    handleSplit(client: Client, message: any): void;
     onLeave(client: Client, consented?: boolean): void;
     update(): void;
     checkCollisions(player: Player, sessionId: string): void;
     checkCoinCollisions(player: Player): void;
     checkVirusCollisions(player: Player): void;
     checkPlayerCollisions(player: Player, sessionId: string): void;
+    countOwnedPieces(ownerSessionId: string): number;
+    applyMomentum(player: Player, deltaTime: number): void;
+    handleSplitMerging(currentTime: number): void;
+    areSameOwner(player: Player, sessionId: string, otherPlayer: Player, otherSessionId: string): boolean;
+    calculateRadius(mass: number): number;
     respawnPlayer(player: Player): void;
     generateCoins(): void;
     generateViruses(): void;

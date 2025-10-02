@@ -1,6 +1,14 @@
 import { Room, Client } from "@colyseus/core";
 import { Schema, MapSchema, type } from "@colyseus/schema";
 
+const MIN_SPLIT_MASS = 40;
+const MAX_SPLIT_PIECES = 16;
+const SPLIT_COOLDOWN_MS = 500;
+const SPEED_SPLIT = 1100;
+const MOMENTUM_DRAG = 4.5;
+const NO_MERGE_MS = 12000;
+const MOMENTUM_THRESHOLD = 0.1;
+
 // Player state schema
 export class Player extends Schema {
   @type("string") name: string = "Player";
@@ -14,6 +22,15 @@ export class Player extends Schema {
   @type("number") score: number = 0;
   @type("number") lastSeq: number = 0;
   @type("boolean") alive: boolean = true;
+  @type("string") ownerSessionId: string = "";
+  @type("boolean") isSplitPiece: boolean = false;
+  @type("number") splitTime: number = 0;
+  @type("number") targetX: number = 0;
+  @type("number") targetY: number = 0;
+  @type("number") momentumX: number = 0;
+  @type("number") momentumY: number = 0;
+  @type("number") noMergeUntil: number = 0;
+  @type("number") lastSplitTime: number = 0;
 }
 
 // Coin state schema
@@ -66,7 +83,11 @@ export class ArenaRoom extends Room<GameState> {
     this.onMessage("input", (client: Client, message: any) => {
       this.handleInput(client, message);
     });
-    
+
+    this.onMessage("split", (client: Client, message: any) => {
+      this.handleSplit(client, message);
+    });
+
     this.onMessage("ping", (client: Client, message: any) => {
       client.send("pong", {
         timestamp: Date.now(),
@@ -96,12 +117,21 @@ export class ArenaRoom extends Room<GameState> {
     player.vx = 0;
     player.vy = 0;
     player.mass = 100;
-    player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+    player.radius = this.calculateRadius(player.mass);
     player.color = this.generatePlayerColor();
     player.score = 0;
     player.lastSeq = 0;
     player.alive = true;
-    
+    player.ownerSessionId = client.sessionId;
+    player.isSplitPiece = false;
+    player.splitTime = 0;
+    player.targetX = player.x;
+    player.targetY = player.y;
+    player.momentumX = 0;
+    player.momentumY = 0;
+    player.noMergeUntil = 0;
+    player.lastSplitTime = 0;
+
     // Add player to game state
     this.state.players.set(client.sessionId, player);
     
@@ -135,6 +165,96 @@ export class ArenaRoom extends Room<GameState> {
     player.vy = dy * speed;
   }
 
+  handleSplit(client: Client, message: any) {
+    const player = this.state.players.get(client.sessionId);
+    if (!player || !player.alive) {
+      return;
+    }
+
+    console.log(`🚀 Split command received from ${client.sessionId}`);
+
+    if (player.isSplitPiece) {
+      return;
+    }
+
+    if (!message || typeof message !== "object") {
+      return;
+    }
+
+    const { targetX, targetY } = message;
+
+    if (
+      typeof targetX !== "number" ||
+      typeof targetY !== "number" ||
+      !isFinite(targetX) ||
+      !isFinite(targetY)
+    ) {
+      return;
+    }
+
+    const now = Date.now();
+
+    if (player.mass < MIN_SPLIT_MASS) {
+      return;
+    }
+
+    if (now - player.lastSplitTime < SPLIT_COOLDOWN_MS) {
+      return;
+    }
+
+    const ownedPieces = this.countOwnedPieces(client.sessionId);
+    if (ownedPieces >= MAX_SPLIT_PIECES) {
+      return;
+    }
+
+    const dirXRaw = targetX - player.x;
+    const dirYRaw = targetY - player.y;
+    const distance = Math.sqrt(dirXRaw * dirXRaw + dirYRaw * dirYRaw) || 1;
+    const dirX = distance === 0 ? 1 : dirXRaw / distance;
+    const dirY = distance === 0 ? 0 : dirYRaw / distance;
+
+    const splitMass = player.mass / 2;
+    const splitRadius = this.calculateRadius(splitMass);
+
+    player.mass = splitMass;
+    player.radius = splitRadius;
+    player.splitTime = now;
+    player.targetX = targetX;
+    player.targetY = targetY;
+    player.lastSplitTime = now;
+    player.noMergeUntil = now + NO_MERGE_MS;
+    player.ownerSessionId = client.sessionId;
+    player.momentumX -= dirX * (SPEED_SPLIT * 0.25);
+    player.momentumY -= dirY * (SPEED_SPLIT * 0.25);
+
+    const splitId = `split_${now}_${client.sessionId}_${Math.random().toString(36).substring(2, 8)}`;
+    const splitPlayer = new Player();
+    splitPlayer.name = player.name;
+    splitPlayer.x = player.x;
+    splitPlayer.y = player.y;
+    splitPlayer.vx = player.vx;
+    splitPlayer.vy = player.vy;
+    splitPlayer.mass = splitMass;
+    splitPlayer.radius = splitRadius;
+    splitPlayer.color = player.color;
+    splitPlayer.score = player.score;
+    splitPlayer.lastSeq = player.lastSeq;
+    splitPlayer.alive = true;
+    splitPlayer.ownerSessionId = client.sessionId;
+    splitPlayer.isSplitPiece = true;
+    splitPlayer.splitTime = now;
+    splitPlayer.targetX = targetX;
+    splitPlayer.targetY = targetY;
+    splitPlayer.momentumX = dirX * SPEED_SPLIT;
+    splitPlayer.momentumY = dirY * SPEED_SPLIT;
+    splitPlayer.noMergeUntil = now + NO_MERGE_MS;
+    splitPlayer.lastSplitTime = now;
+
+    this.state.players.set(splitId, splitPlayer);
+
+    console.log(`✅ Split created for ${client.sessionId} -> ${splitId}`);
+  }
+
   onLeave(client: Client, consented?: boolean) {
     const player = this.state.players.get(client.sessionId);
     if (player) {
@@ -145,16 +265,19 @@ export class ArenaRoom extends Room<GameState> {
 
   update() {
     const deltaTime = 1 / this.tickRate; // Fixed timestep
-    this.state.timestamp = Date.now();
-    
+    const now = Date.now();
+    this.state.timestamp = now;
+
     // Update all players
     this.state.players.forEach((player, sessionId) => {
       if (!player.alive) return;
-      
+
+      this.applyMomentum(player, deltaTime);
+
       // Apply movement
       player.x += player.vx * deltaTime * 10; // Scale for game feel
       player.y += player.vy * deltaTime * 10;
-      
+
       // Keep player in bounds
       player.x = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.x));
       player.y = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.y));
@@ -166,6 +289,8 @@ export class ArenaRoom extends Room<GameState> {
       // Check collisions
       this.checkCollisions(player, sessionId);
     });
+
+    this.handleSplitMerging(now);
   }
 
   checkCollisions(player: Player, sessionId: string) {
@@ -189,7 +314,7 @@ export class ArenaRoom extends Room<GameState> {
         // Player consumes coin
         player.mass += coin.value;
         player.score += coin.value;
-        player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+        player.radius = this.calculateRadius(player.mass);
         
         // Remove coin and spawn new one
         this.state.coins.delete(coinId);
@@ -213,7 +338,7 @@ export class ArenaRoom extends Room<GameState> {
         } else {
           // Player gets damaged
           player.mass = Math.max(50, player.mass * 0.8);
-          player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+          player.radius = this.calculateRadius(player.mass);
         }
       }
     });
@@ -222,22 +347,26 @@ export class ArenaRoom extends Room<GameState> {
   checkPlayerCollisions(player: Player, sessionId: string) {
     this.state.players.forEach((otherPlayer, otherSessionId) => {
       if (sessionId === otherSessionId || !otherPlayer.alive) return;
-      
+
+      if (this.areSameOwner(player, sessionId, otherPlayer, otherSessionId)) {
+        return;
+      }
+
       const dx = player.x - otherPlayer.x;
       const dy = player.y - otherPlayer.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
-      
+
       if (distance < player.radius + otherPlayer.radius) {
         // Larger player absorbs smaller player
         if (player.mass > otherPlayer.mass * 1.2) {
           player.mass += otherPlayer.mass * 0.8;
           player.score += otherPlayer.score * 0.5;
-          player.radius = Math.sqrt(player.mass / Math.PI) * 10;
-          
+          player.radius = this.calculateRadius(player.mass);
+
           // Eliminate other player
           otherPlayer.alive = false;
           console.log(`💀 ${player.name} eliminated ${otherPlayer.name}`);
-          
+
           // Respawn eliminated player after 3 seconds
           setTimeout(() => {
             if (this.state.players.has(otherSessionId)) {
@@ -249,14 +378,126 @@ export class ArenaRoom extends Room<GameState> {
     });
   }
 
+  countOwnedPieces(ownerSessionId: string) {
+    let count = 0;
+    this.state.players.forEach((player, sessionId) => {
+      const owner = player.isSplitPiece ? player.ownerSessionId : sessionId;
+      if (owner === ownerSessionId) {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  applyMomentum(player: Player, deltaTime: number) {
+    if (
+      Math.abs(player.momentumX) < MOMENTUM_THRESHOLD &&
+      Math.abs(player.momentumY) < MOMENTUM_THRESHOLD
+    ) {
+      player.momentumX = 0;
+      player.momentumY = 0;
+      return;
+    }
+
+    player.x += player.momentumX * deltaTime;
+    player.y += player.momentumY * deltaTime;
+
+    const dragFactor = Math.exp(-MOMENTUM_DRAG * deltaTime);
+    player.momentumX *= dragFactor;
+    player.momentumY *= dragFactor;
+
+    if (Math.abs(player.momentumX) < MOMENTUM_THRESHOLD) {
+      player.momentumX = 0;
+    }
+
+    if (Math.abs(player.momentumY) < MOMENTUM_THRESHOLD) {
+      player.momentumY = 0;
+    }
+
+    const minX = player.radius;
+    const maxX = this.worldSize - player.radius;
+    const minY = player.radius;
+    const maxY = this.worldSize - player.radius;
+
+    if (player.x <= minX) {
+      player.x = minX;
+      player.momentumX = 0;
+    } else if (player.x >= maxX) {
+      player.x = maxX;
+      player.momentumX = 0;
+    }
+
+    if (player.y <= minY) {
+      player.y = minY;
+      player.momentumY = 0;
+    } else if (player.y >= maxY) {
+      player.y = maxY;
+      player.momentumY = 0;
+    }
+  }
+
+  handleSplitMerging(currentTime: number) {
+    const piecesToRemove: string[] = [];
+
+    this.state.players.forEach((player, sessionId) => {
+      if (!player.isSplitPiece || !player.alive) {
+        return;
+      }
+
+      const owner = this.state.players.get(player.ownerSessionId);
+      if (!owner || !owner.alive) {
+        return;
+      }
+
+      if (currentTime < player.noMergeUntil || currentTime < owner.noMergeUntil) {
+        return;
+      }
+
+      const dx = player.x - owner.x;
+      const dy = player.y - owner.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance <= player.radius + owner.radius) {
+        owner.mass += player.mass;
+        owner.radius = this.calculateRadius(owner.mass);
+        owner.score += player.score;
+        owner.momentumX += player.momentumX * 0.2;
+        owner.momentumY += player.momentumY * 0.2;
+        piecesToRemove.push(sessionId);
+      }
+    });
+
+    piecesToRemove.forEach((pieceId) => {
+      this.state.players.delete(pieceId);
+    });
+  }
+
+  areSameOwner(player: Player, sessionId: string, otherPlayer: Player, otherSessionId: string) {
+    const ownerA = player.isSplitPiece ? player.ownerSessionId : sessionId;
+    const ownerB = otherPlayer.isSplitPiece ? otherPlayer.ownerSessionId : otherSessionId;
+    return ownerA !== "" && ownerA === ownerB;
+  }
+
+  calculateRadius(mass: number) {
+    return Math.sqrt(mass / Math.PI) * 10;
+  }
+
   respawnPlayer(player: Player) {
     player.x = Math.random() * this.worldSize;
     player.y = Math.random() * this.worldSize;
     player.vx = 0;
     player.vy = 0;
     player.mass = 100;
-    player.radius = Math.sqrt(player.mass / Math.PI) * 10;
+    player.radius = this.calculateRadius(player.mass);
     player.alive = true;
+    player.isSplitPiece = false;
+    player.splitTime = 0;
+    player.targetX = player.x;
+    player.targetY = player.y;
+    player.momentumX = 0;
+    player.momentumY = 0;
+    player.noMergeUntil = 0;
+    player.lastSplitTime = 0;
     console.log(`🔄 Player respawned: ${player.name}`);
   }
 
