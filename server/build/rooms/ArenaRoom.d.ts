@@ -60,6 +60,7 @@ export declare class ArenaRoom extends Room<GameState> {
     checkPlayerCollisions(player: Player, sessionId: string): void;
     countOwnedPieces(ownerSessionId: string): number;
     applyMomentum(player: Player, deltaTime: number): void;
+    applySplitAttraction(player: Player, deltaTime: number, currentTime: number): void;
     handleSplitMerging(currentTime: number): void;
     areSameOwner(player: Player, sessionId: string, otherPlayer: Player, otherSessionId: string): boolean;
     calculateRadius(mass: number): number;
