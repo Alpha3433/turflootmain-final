@@ -2340,23 +2340,41 @@ const MultiplayerArena = () => {
               if (!gameRef.current || !serverState) return null;
               
               // Create leaderboard data from server state
-              const leaderboardData = serverState.players
-                ? serverState.players
-                    .filter(player => player.alive)
-                    .map((player, playerIndex) => ({
+              const leaderboardMap = new Map()
+
+              if (serverState.players) {
+                serverState.players.forEach((player, playerIndex) => {
+                  if (!player?.alive) return
+
+                  const ownerId = player.ownerSessionId || player.sessionId || `player_${playerIndex}`
+                  const playerScore = Math.floor(player.score || 0)
+                  const existingEntry = leaderboardMap.get(ownerId)
+
+                  if (existingEntry) {
+                    const useNewName = playerScore > existingEntry.score && player?.name
+                    leaderboardMap.set(ownerId, {
+                      ownerId,
+                      name: useNewName ? player.name : existingEntry.name,
+                      score: Math.max(existingEntry.score, playerScore),
+                      isPlayer: existingEntry.isPlayer || player.isCurrentPlayer
+                    })
+                  } else {
+                    leaderboardMap.set(ownerId, {
+                      ownerId,
                       name: player.name || 'Anonymous',
-                      score: Math.floor(player.score || 0),
-                      isPlayer: player.isCurrentPlayer,
-                      sessionId: player.sessionId || `player_${playerIndex}`,
-                      uniqueKey: `${player.sessionId || playerIndex}_${player.name || 'anonymous'}`
-                    }))
-                    .sort((a, b) => b.score - a.score)
-                : []
-              
+                      score: playerScore,
+                      isPlayer: player.isCurrentPlayer
+                    })
+                  }
+                })
+              }
+
+              const leaderboardData = Array.from(leaderboardMap.values()).sort((a, b) => b.score - a.score)
+
               // Take top 3 (compact) or top 5 (expanded) players for mobile, always 5 for desktop
               const maxPlayers = isMobile ? (leaderboardExpanded ? 5 : 3) : 5
               return leaderboardData.slice(0, maxPlayers).map((player, index) => (
-                <div key={player.uniqueKey} style={{ 
+                <div key={player.ownerId} style={{
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
