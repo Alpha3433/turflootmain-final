@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 class ArenaModeSplitTester:
     def __init__(self):
-        self.base_url = "https://arena-cashout.preview.emergentagent.com"
+        self.base_url = "https://serverfix.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.colyseus_endpoint = "wss://au-syd-ab3eaf4e.colyseus.cloud"
         self.test_results = []
