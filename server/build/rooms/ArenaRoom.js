@@ -543,9 +543,6 @@ class ArenaRoom extends core_1.Room {
         if (!owner || !owner.alive) {
             return;
         }
-        if (currentTime < player.noMergeUntil || currentTime < owner.noMergeUntil) {
-            return;
-        }
         const dx = owner.x - player.x;
         const dy = owner.y - player.y;
         const distanceSq = dx * dx + dy * dy;
