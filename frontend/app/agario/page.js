@@ -23,7 +23,9 @@ const AgarIOGame = () => {
   const [isMultiplayer, setIsMultiplayer] = useState(false)
   const [connectedPlayers, setConnectedPlayers] = useState(0)
   const [wsConnection, setWsConnection] = useState('disconnected')
+  const [pingMs, setPingMs] = useState(null)
   const wsRef = useRef(null)
+  const pingSentAtRef = useRef(null)
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   const serverStateRef = useRef(null)
@@ -58,6 +60,29 @@ const AgarIOGame = () => {
   const leaderboardTimerRef = useRef(null)
   const [statsExpanded, setStatsExpanded] = useState(false)
   const statsTimerRef = useRef(null)
+
+  const getPingColor = (latency) => {
+    if (latency == null) return '#888888'
+    if (latency <= 60) return '#00ff88'
+    if (latency <= 120) return '#ffb400'
+    return '#ff4d4d'
+  }
+
+  const pingIndicatorColor = (() => {
+    if (wsConnection === 'connected') return getPingColor(pingMs)
+    if (wsConnection === 'connecting') return '#ffb400'
+    if (wsConnection === 'error') return '#ff4d4d'
+    return '#666666'
+  })()
+  const pingDisplayText = wsConnection === 'connected'
+    ? (pingMs == null ? 'Measuring…' : `${pingMs}ms`)
+    : (wsConnection === 'connecting' ? 'Connecting…' : 'No connection')
+  const pingSubtitle = (() => {
+    if (wsConnection === 'connecting') return 'Connecting…'
+    if (wsConnection === 'error') return 'Connection error'
+    if (wsConnection === 'disconnected') return 'Waiting for arena'
+    return pingMs == null ? 'Measuring latency' : 'Live latency'
+  })()
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
@@ -838,11 +863,16 @@ const AgarIOGame = () => {
         // Only connect to Colyseus for multiplayer rooms
         if (mode === 'local' || mode === 'practice' || server !== 'colyseus') {
           console.log('🚫 Not a Colyseus multiplayer room - skipping WebSocket connection')
+          setPingMs(null)
+          pingSentAtRef.current = null
           return
         }
 
         setIsMultiplayer(true)
         setConnectedPlayers(1) // At least the current player
+        setWsConnection('connecting')
+        setPingMs(null)
+        pingSentAtRef.current = null
 
         // Import Colyseus client
         const { joinArena } = await import('../../lib/colyseus')
@@ -868,6 +898,8 @@ const AgarIOGame = () => {
         const room = await joinArena({ privyUserId, playerName })
         
         setWsConnection('connected')
+        setPingMs(null)
+        pingSentAtRef.current = null
         console.log('✅ Connected to Colyseus arena')
 
         // Store room reference for sending inputs
@@ -910,25 +942,43 @@ const AgarIOGame = () => {
         room.onError((code, message) => {
           console.error('❌ Colyseus room error:', code, message)
           setWsConnection('error')
+          setPingMs(null)
+          pingSentAtRef.current = null
         })
 
         // Handle disconnection
         room.onLeave((code) => {
           console.log('👋 Left Colyseus room:', code)
           setWsConnection('disconnected')
+          setPingMs(null)
+          pingSentAtRef.current = null
+        })
+
+        // Handle latency measurements
+        room.onMessage('pong', (message) => {
+          const now = Date.now()
+          const clientTimestamp = message?.clientTimestamp || pingSentAtRef.current
+          if (clientTimestamp) {
+            const latency = Math.max(0, Math.round(now - clientTimestamp))
+            setPingMs(latency)
+          }
         })
 
         // Send ping every 5 seconds for latency measurement
         const pingInterval = setInterval(() => {
           if (room && room.connection && room.connection.readyState === WebSocket.OPEN) {
             // Send ping message through Colyseus room
-            room.send("ping", { timestamp: Date.now() })
+            const timestamp = Date.now()
+            pingSentAtRef.current = timestamp
+            room.send('ping', { timestamp })
           }
         }, 5000)
 
         // Cleanup on unmount
         return () => {
           clearInterval(pingInterval)
+          setPingMs(null)
+          pingSentAtRef.current = null
           if (room) {
             room.leave()
           }
@@ -937,6 +987,8 @@ const AgarIOGame = () => {
       } catch (error) {
         console.error('❌ Failed to connect to Colyseus server:', error)
         setWsConnection('error')
+        setPingMs(null)
+        pingSentAtRef.current = null
       }
     }
 
@@ -4375,28 +4427,53 @@ const AgarIOGame = () => {
           left: '10px',
           zIndex: 1000,
           backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          border: '2px solid #333',
-          borderRadius: '4px',
-          padding: '6px 10px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '6px',
+          padding: '8px 12px',
           fontSize: '11px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
-          fontWeight: '600'
+          fontWeight: '600',
+          minWidth: '110px',
+          backdropFilter: 'blur(6px)'
         }}>
-          <div style={{ 
-            color: '#00ff88', 
-            fontWeight: 'bold',
+          <div style={{
+            fontSize: '10px',
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'rgba(255, 255, 255, 0.55)',
+            marginBottom: '4px'
+          }}>
+            Ping
+          </div>
+          <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '8px'
           }}>
-            <div style={{ 
-              width: '8px', 
-              height: '8px', 
-              backgroundColor: '#00ff88', 
-              borderRadius: '50%' 
+            <div style={{
+              width: '10px',
+              height: '10px',
+              borderRadius: '50%',
+              backgroundColor: pingIndicatorColor,
+              boxShadow: `0 0 8px ${pingIndicatorColor}`,
+              transition: 'background-color 0.2s ease, box-shadow 0.2s ease'
             }}></div>
-            <span>24ms</span>
+            <span style={{
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: '700',
+              textShadow: '0 0 6px rgba(0, 0, 0, 0.6)'
+            }}>{pingDisplayText}</span>
+          </div>
+          <div style={{
+            marginTop: '4px',
+            fontSize: '10px',
+            color: pingIndicatorColor,
+            fontWeight: '600',
+            opacity: 0.8
+          }}>
+            {pingSubtitle}
           </div>
         </div>
 
