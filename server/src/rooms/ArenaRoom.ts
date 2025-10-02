@@ -8,8 +8,9 @@ const SPEED_SPLIT = 1100;
 const MOMENTUM_DRAG = 4.5;
 const NO_MERGE_MS = 12000;
 const MOMENTUM_THRESHOLD = 0.1;
-const SPLIT_ATTRACTION_FORCE = 300;
-const SPLIT_ATTRACTION_DISTANCE_SCALE = 6;
+export const MERGE_ATTRACTION_RATE = 0.02;
+export const MERGE_ATTRACTION_MAX = 120;
+export const MERGE_ATTRACTION_SPACING = 0.05;
 
 // Player state schema
 export class Player extends Schema {
@@ -270,16 +271,36 @@ export class ArenaRoom extends Room<GameState> {
     const now = Date.now();
     this.state.timestamp = now;
 
-    // Update all players
+    const alivePlayers: Array<{ player: Player; sessionId: string }> = [];
+    const ownerIds = new Set<string>();
+
+    // Update momentum and collect ownership groups
     this.state.players.forEach((player, sessionId) => {
-      if (!player.alive) return;
+      if (!player.alive) {
+        return;
+      }
 
       this.applyMomentum(player, deltaTime);
 
-      if (player.isSplitPiece) {
-        this.applySplitAttraction(player, deltaTime, now);
+      const ownerId = player.isSplitPiece && player.ownerSessionId
+        ? player.ownerSessionId
+        : sessionId;
+
+      if (ownerId) {
+        ownerIds.add(ownerId);
       }
 
+      alivePlayers.push({ player, sessionId });
+    });
+
+    ownerIds.forEach((ownerId) => {
+      const ownedCells = this.getOwnedCells(ownerId);
+      if (ownedCells.length > 1) {
+        this.applySplitAttraction(ownedCells, deltaTime);
+      }
+    });
+
+    alivePlayers.forEach(({ player, sessionId }) => {
       // Apply movement
       player.x += player.vx * deltaTime * 10; // Scale for game feel
       player.y += player.vy * deltaTime * 10;
@@ -287,11 +308,11 @@ export class ArenaRoom extends Room<GameState> {
       // Keep player in bounds
       player.x = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.x));
       player.y = Math.max(player.radius, Math.min(this.worldSize - player.radius, player.y));
-      
+
       // Apply friction
       player.vx *= 0.95;
       player.vy *= 0.95;
-      
+
       // Check collisions
       this.checkCollisions(player, sessionId);
     });
@@ -302,12 +323,32 @@ export class ArenaRoom extends Room<GameState> {
   checkCollisions(player: Player, sessionId: string) {
     // Check coin collisions
     this.checkCoinCollisions(player);
-    
+
     // Check virus collisions
     this.checkVirusCollisions(player);
-    
+
     // Check player collisions
     this.checkPlayerCollisions(player, sessionId);
+  }
+
+  getOwnedCells(ownerSessionId: string) {
+    const cells: Player[] = [];
+
+    this.state.players.forEach((player, sessionId) => {
+      if (!player.alive) {
+        return;
+      }
+
+      const controllingId = player.isSplitPiece && player.ownerSessionId
+        ? player.ownerSessionId
+        : sessionId;
+
+      if (controllingId === ownerSessionId) {
+        cells.push(player);
+      }
+    });
+
+    return cells;
   }
 
   checkCoinCollisions(player: Player) {
@@ -442,37 +483,63 @@ export class ArenaRoom extends Room<GameState> {
     }
   }
 
-  applySplitAttraction(player: Player, deltaTime: number, currentTime: number) {
-    if (!player.ownerSessionId) {
+  applySplitAttraction(cells: Player[], deltaTime: number) {
+    if (cells.length <= 1) {
       return;
     }
 
-    const owner = this.state.players.get(player.ownerSessionId);
-    if (!owner || !owner.alive) {
+    let totalMass = 0;
+    let centroidX = 0;
+    let centroidY = 0;
+
+    cells.forEach((cell) => {
+      if (!cell.alive || cell.mass <= 0) {
+        return;
+      }
+
+      totalMass += cell.mass;
+      centroidX += cell.x * cell.mass;
+      centroidY += cell.y * cell.mass;
+    });
+
+    if (totalMass <= 0) {
       return;
     }
 
-    const dx = owner.x - player.x;
-    const dy = owner.y - player.y;
-    const distanceSq = dx * dx + dy * dy;
+    centroidX /= totalMass;
+    centroidY /= totalMass;
 
-    if (distanceSq < 1) {
-      return;
-    }
+    cells.forEach((cell) => {
+      if (!cell.alive) {
+        return;
+      }
 
-    const distance = Math.sqrt(distanceSq);
-    const dirX = dx / distance;
-    const dirY = dy / distance;
+      const dx = centroidX - cell.x;
+      const dy = centroidY - cell.y;
+      const distanceSq = dx * dx + dy * dy;
 
-    const scaledForce = Math.min(
-      SPLIT_ATTRACTION_FORCE,
-      distance * SPLIT_ATTRACTION_DISTANCE_SCALE
-    );
+      if (distanceSq <= 0.0001) {
+        return;
+      }
 
-    const attraction = scaledForce * deltaTime;
+      const distance = Math.sqrt(distanceSq);
+      const spacing = cell.radius * MERGE_ATTRACTION_SPACING;
+      const distanceAfterSpacing = Math.max(0, distance - spacing);
 
-    player.momentumX += dirX * attraction;
-    player.momentumY += dirY * attraction;
+      if (distanceAfterSpacing <= 0) {
+        return;
+      }
+
+      const dirX = dx / distance;
+      const dirY = dy / distance;
+
+      const attraction = distanceAfterSpacing * totalMass * MERGE_ATTRACTION_RATE;
+      const cappedAttraction = Math.min(MERGE_ATTRACTION_MAX, attraction);
+      const acceleration = cappedAttraction * deltaTime;
+
+      cell.momentumX += dirX * acceleration;
+      cell.momentumY += dirY * acceleration;
+    });
   }
 
   handleSplitMerging(currentTime: number) {
