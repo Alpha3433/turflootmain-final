@@ -473,98 +473,111 @@ export class ArenaRoom extends Room<GameState> {
       const playableRadius = 1800; // Match the red divider radius exactly
       const maxRadius = playableRadius - player.radius; // Player edge stops at red divider
       
-      // Removed complex momentum system for simplicity
-      
-      // Smooth movement toward target (vx and vy are being used as targetX and targetY)
-      const targetX = player.vx;
-      const targetY = player.vy;
-      
-      const dx = targetX - player.x;
-      const dy = targetY - player.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      if (distance > 1) { // Only move if target is far enough
-        console.log('🎯 PLAYER MOVEMENT DETECTED:', {
-          playerName: player.name,
-          sessionId: sessionId,
-          currentPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
-          targetPos: `(${targetX.toFixed(1)}, ${targetY.toFixed(1)})`,
-          distance: distance.toFixed(1)
-        });
+      // SPLIT PIECE PHYSICS: Handle momentum-based movement for split pieces
+      if (player.isSplitPiece) {
+        const splitAge = now - player.splitTime;
+        const DRAG = 4.5;
         
-        // Calculate dynamic speed based on mass (matching local agario formula)
-        const baseSpeed = 6.0;
-        const massSpeedFactor = Math.sqrt(player.mass / 20);
-        const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor);
+        // Apply drag to momentum (velocity decay)
+        const dragFactor = Math.pow(1 - DRAG / 100, deltaTime * 60);
+        player.momentumX *= dragFactor;
+        player.momentumY *= dragFactor;
         
-        // Calculate move distance based on speed and delta time
-        const moveDistance = dynamicSpeed * deltaTime * 60; // 60 for frame rate normalization
+        // Move based on momentum
+        player.x += player.momentumX * deltaTime;
+        player.y += player.momentumY * deltaTime;
         
-        // Clamp movement to not overshoot target
-        const actualMoveDistance = Math.min(moveDistance, distance);
-        
-        console.log('🔍 ARENA BOUNDARY VALUES:', {
-          worldSize: this.worldSize,
-          centerX: centerX,
-          centerY: centerY,
-          playableRadius: playableRadius,
-          playerRadius: player.radius.toFixed(1),
-          maxRadius: maxRadius.toFixed(1),
-          playerName: player.name
-        });
-        
-        // Calculate proposed new position
-        const moveX = (dx / distance) * actualMoveDistance;
-        const moveY = (dy / distance) * actualMoveDistance;
-        const newX = player.x + moveX;
-        const newY = player.y + moveY;
-        
-        // Check if new position would violate boundary
-        const newDistanceFromCenter = Math.sqrt(
-          Math.pow(newX - centerX, 2) + 
-          Math.pow(newY - centerY, 2)
+        // Keep within boundaries
+        const distFromCenter = Math.sqrt(
+          Math.pow(player.x - centerX, 2) + 
+          Math.pow(player.y - centerY, 2)
         );
         
-        if (newDistanceFromCenter > maxRadius) {
-          // Clamp to boundary instead of allowing movement into red zone
-          console.log('🚫 MOVEMENT BLOCKED - would enter red zone:', {
-            currentPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
-            targetPos: `(${newX.toFixed(1)}, ${newY.toFixed(1)})`,
-            center: `(${centerX}, ${centerY})`,
-            newDistance: newDistanceFromCenter.toFixed(1),
-            maxRadius: maxRadius.toFixed(1)
-          });
-          
-          // Move player to boundary edge instead
-          const angle = Math.atan2(newY - centerY, newX - centerX);
+        if (distFromCenter > maxRadius) {
+          const angle = Math.atan2(player.y - centerY, player.x - centerX);
           player.x = centerX + Math.cos(angle) * maxRadius;
           player.y = centerY + Math.sin(angle) * maxRadius;
-        } else {
-          // Safe to move - apply normal movement
-          player.x = newX;
-          player.y = newY;
+          // Stop momentum when hitting boundary
+          player.momentumX = 0;
+          player.momentumY = 0;
         }
-      }
-      
-      // ADDITIONAL SAFETY CHECK: Ensure player is always within bounds
-      const currentDistance = Math.sqrt(
-        Math.pow(player.x - centerX, 2) + 
-        Math.pow(player.y - centerY, 2)
-      );
-      
-      if (currentDistance > maxRadius) {
-        console.log('🚨 EMERGENCY BOUNDARY ENFORCEMENT:', {
-          playerPos: `(${player.x.toFixed(1)}, ${player.y.toFixed(1)})`,
-          center: `(${centerX}, ${centerY})`,
-          distance: currentDistance.toFixed(1),
-          maxRadius: maxRadius.toFixed(1),
-          violation: (currentDistance - maxRadius).toFixed(1)
-        });
         
-        // Force player back within boundary
-        const angle = Math.atan2(player.y - centerY, player.x - centerX);
-        player.x = centerX + Math.cos(angle) * maxRadius;
-        player.y = centerY + Math.sin(angle) * maxRadius;
+        // Check for merge with owner after 5 seconds (matching test expectations)
+        if (splitAge >= 5000 && now >= player.noMergeUntil) {
+          const owner = this.state.players.get(player.ownerSessionId);
+          if (owner && owner.alive) {
+            const dx = player.x - owner.x;
+            const dy = player.y - owner.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const touchDistance = player.radius + owner.radius;
+            
+            if (distance < touchDistance) {
+              console.log(`🔄 Auto-merging split piece ${sessionId} into owner ${player.ownerSessionId}`);
+              owner.mass += player.mass;
+              owner.radius = Math.sqrt(owner.mass) * 3;
+              player.alive = false;
+              this.state.players.delete(sessionId);
+              return;
+            }
+          }
+        }
+      } else {
+        // NORMAL PLAYER MOVEMENT: Smooth movement toward target (vx and vy are being used as targetX and targetY)
+        const targetX = player.vx;
+        const targetY = player.vy;
+        
+        const dx = targetX - player.x;
+        const dy = targetY - player.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > 1) { // Only move if target is far enough
+          // Calculate dynamic speed based on mass (matching local agario formula)
+          const baseSpeed = 6.0;
+          const massSpeedFactor = Math.sqrt(player.mass / 20);
+          const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor);
+          
+          // Calculate move distance based on speed and delta time
+          const moveDistance = dynamicSpeed * deltaTime * 60; // 60 for frame rate normalization
+          
+          // Clamp movement to not overshoot target
+          const actualMoveDistance = Math.min(moveDistance, distance);
+          
+          // Calculate proposed new position
+          const moveX = (dx / distance) * actualMoveDistance;
+          const moveY = (dy / distance) * actualMoveDistance;
+          const newX = player.x + moveX;
+          const newY = player.y + moveY;
+          
+          // Check if new position would violate boundary
+          const newDistanceFromCenter = Math.sqrt(
+            Math.pow(newX - centerX, 2) + 
+            Math.pow(newY - centerY, 2)
+          );
+          
+          if (newDistanceFromCenter > maxRadius) {
+            // Move player to boundary edge instead
+            const angle = Math.atan2(newY - centerY, newX - centerX);
+            player.x = centerX + Math.cos(angle) * maxRadius;
+            player.y = centerY + Math.sin(angle) * maxRadius;
+          } else {
+            // Safe to move - apply normal movement
+            player.x = newX;
+            player.y = newY;
+          }
+        }
+        
+        // ADDITIONAL SAFETY CHECK: Ensure player is always within bounds
+        const currentDistance = Math.sqrt(
+          Math.pow(player.x - centerX, 2) + 
+          Math.pow(player.y - centerY, 2)
+        );
+        
+        if (currentDistance > maxRadius) {
+          // Force player back within boundary
+          const angle = Math.atan2(player.y - centerY, player.x - centerX);
+          player.x = centerX + Math.cos(angle) * maxRadius;
+          player.y = centerY + Math.sin(angle) * maxRadius;
+        }
       }
       
       // Check collisions
