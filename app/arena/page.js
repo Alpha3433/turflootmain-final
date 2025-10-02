@@ -2346,9 +2346,25 @@ const MultiplayerArena = () => {
                 serverState.players.forEach((player, playerIndex) => {
                   if (!player?.alive) return
 
-                  const ownerId = player.ownerSessionId || player.sessionId || `player_${playerIndex}`
+                  const isSplitPiece = player?.isSplitPiece
+                  const ownerSessionId = player?.ownerSessionId
+
+                  // Ignore orphaned split pieces that don't have an owner reference.
+                  if (isSplitPiece && !ownerSessionId) {
+                    return
+                  }
+
+                  const ownerId = isSplitPiece
+                    ? ownerSessionId
+                    : (player.sessionId || ownerSessionId || `player_${playerIndex}`)
+
+                  if (!ownerId) {
+                    return
+                  }
+
                   const playerScore = Math.floor(player.score || 0)
                   const existingEntry = leaderboardMap.get(ownerId)
+                  const isCurrentPlayer = !!player.isCurrentPlayer
 
                   if (existingEntry) {
                     const useNewName = playerScore > existingEntry.score && player?.name
@@ -2356,14 +2372,14 @@ const MultiplayerArena = () => {
                       ownerId,
                       name: useNewName ? player.name : existingEntry.name,
                       score: Math.max(existingEntry.score, playerScore),
-                      isPlayer: existingEntry.isPlayer || player.isCurrentPlayer
+                      isPlayer: existingEntry.isPlayer || isCurrentPlayer
                     })
                   } else {
                     leaderboardMap.set(ownerId, {
                       ownerId,
                       name: player.name || 'Anonymous',
                       score: playerScore,
-                      isPlayer: player.isCurrentPlayer
+                      isPlayer: isCurrentPlayer
                     })
                   }
                 })
