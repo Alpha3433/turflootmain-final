@@ -711,13 +711,53 @@ export class ArenaRoom extends Room<GameState> {
           // Eliminate other player
           otherPlayer.alive = false;
           console.log(`💀 ${player.name} eliminated ${otherPlayer.name}`);
-          
-          // Respawn eliminated player after 3 seconds
-          setTimeout(() => {
-            if (this.state.players.has(otherSessionId)) {
-              this.respawnPlayer(otherPlayer);
+
+          if (otherPlayer.isSplitPiece) {
+            console.log(`🧩 Removing split piece ${otherSessionId} owned by ${otherPlayer.ownerSessionId}`);
+            this.state.players.delete(otherSessionId);
+            return;
+          }
+
+          const eliminatedBy = player.name;
+          const finalScore = otherPlayer.score;
+          const finalMass = otherPlayer.mass;
+
+          const eliminatedClient = this.clients.find(c => c.sessionId === otherSessionId);
+          if (eliminatedClient) {
+            try {
+              eliminatedClient.send("gameOver", {
+                finalScore,
+                finalMass,
+                eliminatedBy
+              });
+            } catch (error) {
+              console.log(`⚠️ Failed to send gameOver to ${otherPlayer.name} (${otherSessionId}):`, error);
             }
-          }, 3000);
+          } else {
+            console.log(`⚠️ No active client found for eliminated player ${otherPlayer.name} (${otherSessionId})`);
+          }
+
+          this.state.players.delete(otherSessionId);
+
+          const splitPiecesToRemove: string[] = [];
+          this.state.players.forEach((candidate, candidateSessionId) => {
+            if (candidate.isSplitPiece && candidate.ownerSessionId === otherSessionId) {
+              splitPiecesToRemove.push(candidateSessionId);
+            }
+          });
+
+          splitPiecesToRemove.forEach(splitSessionId => {
+            console.log(`🧹 Removing split piece ${splitSessionId} for eliminated player ${otherSessionId}`);
+            this.state.players.delete(splitSessionId);
+          });
+
+          if (eliminatedClient) {
+            try {
+              eliminatedClient.leave(1000, "Eliminated from arena");
+            } catch (error) {
+              console.log(`⚠️ Failed to disconnect eliminated player ${otherPlayer.name} (${otherSessionId}):`, error);
+            }
+          }
         }
       }
     });
