@@ -276,7 +276,7 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   handleSplit(client: Client, message: any) {
-    console.log(`🚀 NEW SPLIT IMPLEMENTATION - Session: ${client.sessionId}`);
+    console.log(`🚀 SPLIT COMMAND RECEIVED - Session: ${client.sessionId}`);
     
     try {
       const player = this.state.players.get(client.sessionId);
@@ -285,16 +285,37 @@ export class ArenaRoom extends Room<GameState> {
         return;
       }
 
-      // Simple mass check - need at least 40 mass to split
+      // Validation 1: Check minimum mass (40 = MIN_SPLIT_MASS * 2)
       if (player.mass < 40) {
-        console.log(`⚠️ Split denied - insufficient mass: ${player.mass}`);
+        console.log(`⚠️ Split denied - insufficient mass: ${player.mass} < 40`);
         return;
       }
 
-      // Get split direction from message
+      // Validation 2: Get and validate target coordinates
       const { targetX, targetY } = message;
-      if (typeof targetX !== 'number' || typeof targetY !== 'number') {
-        console.log(`⚠️ Split denied - invalid coordinates`);
+      if (typeof targetX !== 'number' || typeof targetY !== 'number' || 
+          !isFinite(targetX) || !isFinite(targetY)) {
+        console.log(`⚠️ Split denied - invalid coordinates: ${targetX}, ${targetY}`);
+        return;
+      }
+
+      // Validation 3: Enforce 500ms cooldown
+      const now = Date.now();
+      if (player.lastSplitTime > 0 && (now - player.lastSplitTime) < 500) {
+        console.log(`⚠️ Split denied - cooldown active (${now - player.lastSplitTime}ms / 500ms)`);
+        return;
+      }
+
+      // Validation 4: Count player's pieces (main + splits) and enforce 16 piece limit
+      let pieceCount = 1; // Main player counts as 1
+      this.state.players.forEach((p) => {
+        if (p.isSplitPiece && p.ownerSessionId === client.sessionId && p.alive) {
+          pieceCount++;
+        }
+      });
+      
+      if (pieceCount >= 16) {
+        console.log(`⚠️ Split denied - max pieces reached: ${pieceCount}/16`);
         return;
       }
 
@@ -303,7 +324,7 @@ export class ArenaRoom extends Room<GameState> {
       const dy = targetY - player.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       
-      if (distance < 10) {
+      if (distance < 1) {
         console.log(`⚠️ Split denied - target too close`);
         return;
       }
@@ -312,36 +333,57 @@ export class ArenaRoom extends Room<GameState> {
       const dirX = dx / distance;
       const dirY = dy / distance;
 
-      // Simple split: halve the mass and create visual split effect
-      const newMass = Math.floor(player.mass / 2);
-      
-      // Update player with new mass
+      // Halve the owner's mass
+      const originalMass = player.mass;
+      const newMass = Math.floor(originalMass / 2);
       player.mass = newMass;
       player.radius = Math.sqrt(player.mass) * 3;
-
-      // Apply split momentum (move player in split direction)
-      const splitDistance = 50;
-      player.x = player.x + dirX * splitDistance;
-      player.y = player.y + dirY * splitDistance;
-
-      // Keep player in bounds
-      const centerX = this.worldSize / 4;
-      const centerY = this.worldSize / 4;
-      const playableRadius = 1800;
-      const maxRadius = playableRadius - player.radius;
+      player.lastSplitTime = now;
       
-      const distFromCenter = Math.sqrt(
-        Math.pow(player.x - centerX, 2) + 
-        Math.pow(player.y - centerY, 2)
-      );
-      
-      if (distFromCenter > maxRadius) {
-        const angle = Math.atan2(player.y - centerY, player.x - centerX);
-        player.x = centerX + Math.cos(angle) * maxRadius;
-        player.y = centerY + Math.sin(angle) * maxRadius;
-      }
+      console.log(`📊 Mass halved: ${originalMass} → ${newMass}`);
 
-      console.log(`✅ Split completed - new mass: ${player.mass}`);
+      // Create new split piece with unique ID
+      const splitPieceId = `split_${Date.now()}_${client.sessionId}`;
+      const splitPiece = new Player();
+      
+      // Copy basic properties from owner
+      splitPiece.name = player.name;
+      splitPiece.color = player.color;
+      splitPiece.skinId = player.skinId;
+      splitPiece.skinName = player.skinName;
+      splitPiece.skinColor = player.skinColor;
+      splitPiece.skinType = player.skinType;
+      splitPiece.skinPattern = player.skinPattern;
+      
+      // Set split piece properties
+      splitPiece.mass = newMass;
+      splitPiece.radius = Math.sqrt(newMass) * 3;
+      splitPiece.x = player.x;
+      splitPiece.y = player.y;
+      splitPiece.alive = true;
+      
+      // Split piece metadata
+      splitPiece.isSplitPiece = true;
+      splitPiece.ownerSessionId = client.sessionId;
+      splitPiece.splitTime = now;
+      
+      // Apply initial momentum (SPEED_SPLIT = 1100)
+      const SPEED_SPLIT = 1100;
+      splitPiece.momentumX = dirX * SPEED_SPLIT;
+      splitPiece.momentumY = dirY * SPEED_SPLIT;
+      
+      // Set merge timer (NO_MERGE_MS = 12000 = 12 seconds)
+      const NO_MERGE_MS = 12000;
+      splitPiece.noMergeUntil = now + NO_MERGE_MS;
+      player.noMergeUntil = now + NO_MERGE_MS;
+      
+      // Add split piece to game state
+      this.state.players.set(splitPieceId, splitPiece);
+      
+      console.log(`✅ Split completed - created piece ${splitPieceId}`);
+      console.log(`📍 Owner at (${player.x.toFixed(1)}, ${player.y.toFixed(1)}) mass=${player.mass}`);
+      console.log(`📍 Piece at (${splitPiece.x.toFixed(1)}, ${splitPiece.y.toFixed(1)}) mass=${splitPiece.mass}`);
+      console.log(`🚀 Initial momentum: (${splitPiece.momentumX.toFixed(1)}, ${splitPiece.momentumY.toFixed(1)})`);
       
     } catch (error: any) {
       console.error(`❌ Split error:`, error);
