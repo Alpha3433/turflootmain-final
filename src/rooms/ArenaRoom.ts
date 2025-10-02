@@ -339,6 +339,12 @@ export class ArenaRoom extends Room<GameState> {
       player.mass = newMass;
       player.radius = Math.sqrt(player.mass) * 3;
       player.lastSplitTime = now;
+
+      // Reset movement targets and clear any residual momentum so the owner stays put
+      player.vx = player.x;
+      player.vy = player.y;
+      player.momentumX = 0;
+      player.momentumY = 0;
       
       console.log(`📊 Mass halved: ${originalMass} → ${newMass}`);
 
