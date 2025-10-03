@@ -229,6 +229,17 @@ class ArenaRoom extends core_1.Room {
         this.maxCoins = 300; // Triple the original 100-coin cap for higher arena density
         this.maxViruses = 30; // Double the spike count to intensify arena hazards
         this.tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+        this.spawnOffsets = [
+            { x: 0, y: 0 },
+            { x: 1500, y: 0 },
+            { x: -1500, y: 0 },
+            { x: 0, y: 1500 },
+            { x: 0, y: -1500 },
+            { x: 1100, y: 1100 },
+            { x: -1100, y: 1100 },
+            { x: 1100, y: -1100 }
+        ];
+        this.nextSpawnIndex = 0;
     }
     onCreate() {
         console.log("🌍 Arena room initialized");
@@ -257,6 +268,17 @@ class ArenaRoom extends core_1.Room {
         console.log(`🦠 Generated ${this.maxViruses} viruses`);
         console.log(`🔄 Game loop started at ${this.tickRate} TPS`);
     }
+    getNextSpawnPosition() {
+        const centerX = this.worldSize / 2;
+        const centerY = this.worldSize / 2;
+        const currentIndex = this.nextSpawnIndex;
+        const offset = this.spawnOffsets[currentIndex];
+        this.nextSpawnIndex = (this.nextSpawnIndex + 1) % this.spawnOffsets.length;
+        const x = centerX + offset.x;
+        const y = centerY + offset.y;
+        console.log(`🎯 ARENA SPAWN SLOT: Assigned slot ${currentIndex} at (${x.toFixed(1)}, ${y.toFixed(1)}) relative to center (${centerX}, ${centerY})`);
+        return { x, y };
+    }
     onJoin(client, options = {}) {
         const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
         const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
@@ -264,8 +286,9 @@ class ArenaRoom extends core_1.Room {
         // Create new player
         const player = new Player();
         player.name = playerName;
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
+        const spawnPosition = this.getNextSpawnPosition();
+        player.x = spawnPosition.x;
+        player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
         player.mass = 25;
@@ -277,8 +300,8 @@ class ArenaRoom extends core_1.Room {
         player.ownerSessionId = client.sessionId;
         player.isSplitPiece = false;
         player.splitTime = 0;
-        player.targetX = player.x;
-        player.targetY = player.y;
+        player.targetX = spawnPosition.x;
+        player.targetY = spawnPosition.y;
         player.momentumX = 0;
         player.momentumY = 0;
         player.noMergeUntil = 0;
@@ -649,8 +672,9 @@ class ArenaRoom extends core_1.Room {
         return Math.sqrt(mass / Math.PI) * 10;
     }
     respawnPlayer(player) {
-        player.x = Math.random() * this.worldSize;
-        player.y = Math.random() * this.worldSize;
+        const spawnPosition = this.getNextSpawnPosition();
+        player.x = spawnPosition.x;
+        player.y = spawnPosition.y;
         player.vx = 0;
         player.vy = 0;
         player.mass = 25;
@@ -658,8 +682,8 @@ class ArenaRoom extends core_1.Room {
         player.alive = true;
         player.isSplitPiece = false;
         player.splitTime = 0;
-        player.targetX = player.x;
-        player.targetY = player.y;
+        player.targetX = spawnPosition.x;
+        player.targetY = spawnPosition.y;
         player.momentumX = 0;
         player.momentumY = 0;
         player.noMergeUntil = 0;

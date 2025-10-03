@@ -51,7 +51,10 @@ export declare class ArenaRoom extends Room<GameState> {
     maxCoins: number;
     maxViruses: number;
     tickRate: number;
+    private spawnOffsets;
+    private nextSpawnIndex;
     onCreate(): void;
+    private getNextSpawnPosition;
     onJoin(client: Client, options?: any): void;
     handleInput(client: Client, message: any): void;
     handleSplit(client: Client, message: any): void;
