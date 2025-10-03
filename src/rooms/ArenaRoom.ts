@@ -405,8 +405,8 @@ export class ArenaRoom extends Room<GameState> {
       splitPiece.ownerSessionId = client.sessionId;
       splitPiece.splitTime = now;
       
-      // Apply initial momentum (SPEED_SPLIT = 1100)
-      const SPEED_SPLIT = 1100;
+      // Apply initial momentum (SPEED_SPLIT = 800)
+      const SPEED_SPLIT = 800;
       splitPiece.momentumX = dirX * SPEED_SPLIT;
       splitPiece.momentumY = dirY * SPEED_SPLIT;
       

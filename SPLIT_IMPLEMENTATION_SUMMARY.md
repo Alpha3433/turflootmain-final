@@ -26,10 +26,10 @@ Implemented `handleSplit()` with:
 - ✅ **Validation 2**: Valid and finite target coordinates
 - ✅ **Validation 3**: 500ms cooldown enforcement
 - ✅ **Validation 4**: 16-piece limit per player
-- ✅ **Split Logic**: 
+- ✅ **Split Logic**:
   - Halves owner's mass
   - Creates split piece with unique ID: `split_${timestamp}_${sessionId}`
-  - Applies SPEED_SPLIT momentum (1100 pixels/sec) toward cursor
+  - Applies SPEED_SPLIT momentum (800 pixels/sec) toward cursor
   - Sets NO_MERGE_MS timer (12 seconds)
 - ✅ **Logging**: "SPLIT COMMAND RECEIVED", "Split completed", mass/position details
 
@@ -68,7 +68,7 @@ Client automatically handles split pieces:
 ```javascript
 MIN_SPLIT_MASS = 40          // Minimum mass to split (40 = 20*2)
 MAX_CELLS = 16               // Maximum pieces per player
-SPEED_SPLIT = 1100           // Initial split velocity
+SPEED_SPLIT = 800            // Initial split velocity
 DRAG = 4.5                   // Momentum decay rate
 NO_MERGE_MS = 12000          // 12 seconds before merge allowed
 SPLIT_COOLDOWN = 500         // 500ms between splits
@@ -79,7 +79,7 @@ SPLIT_COOLDOWN = 500         // 500ms between splits
 2. **Server validates**: Mass ≥ 40, under 16 pieces, cooldown passed
 3. **Owner halves**: Original player mass is halved
 4. **Piece spawns**: New piece at same position with half mass
-5. **Momentum applied**: Piece shoots toward cursor at 1100 pixels/sec
+5. **Momentum applied**: Piece shoots toward cursor at 800 pixels/sec
 6. **Velocity decays**: Drag reduces momentum exponentially
 7. **After 5 seconds**: Piece becomes merge-ready
 8. **Touch to merge**: When piece touches owner (after timer), masses combine
