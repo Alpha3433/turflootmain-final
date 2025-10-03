@@ -1,5 +1,8 @@
 import { Room, Client } from "@colyseus/core";
 import { Schema, MapSchema } from "@colyseus/schema";
+export declare const MERGE_ATTRACTION_RATE = 0.02;
+export declare const MERGE_ATTRACTION_MAX = 120;
+export declare const MERGE_ATTRACTION_SPACING = 0.05;
 export declare class Player extends Schema {
     name: string;
     x: number;
@@ -55,12 +58,13 @@ export declare class ArenaRoom extends Room<GameState> {
     onLeave(client: Client, consented?: boolean): void;
     update(): void;
     checkCollisions(player: Player, sessionId: string): void;
+    getOwnedCells(ownerSessionId: string): Player[];
     checkCoinCollisions(player: Player): void;
     checkVirusCollisions(player: Player): void;
     checkPlayerCollisions(player: Player, sessionId: string): void;
     countOwnedPieces(ownerSessionId: string): number;
     applyMomentum(player: Player, deltaTime: number): void;
-    applySplitAttraction(player: Player, deltaTime: number, currentTime: number): void;
+    applySplitAttraction(cells: Player[], deltaTime: number): void;
     handleSplitMerging(currentTime: number): void;
     areSameOwner(player: Player, sessionId: string, otherPlayer: Player, otherSessionId: string): boolean;
     calculateRadius(mass: number): number;
