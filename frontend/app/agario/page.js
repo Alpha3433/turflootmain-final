@@ -28,6 +28,9 @@ const AgarIOGame = () => {
   const pingSentAtRef = useRef(null)
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
+  const lastInputSentAtRef = useRef(0)
+  const inputHeartbeatTimeoutRef = useRef(null)
+  const inputActiveRef = useRef(false)
   const serverStateRef = useRef(null)
   
   // Missions system
@@ -452,16 +455,43 @@ const AgarIOGame = () => {
     }
   }, [isMobile])
 
+  const HEARTBEAT_INTERVAL_MS = 50
+
+  const stopInputHeartbeat = () => {
+    inputActiveRef.current = false
+    lastInputSentAtRef.current = 0
+    if (inputHeartbeatTimeoutRef.current) {
+      clearTimeout(inputHeartbeatTimeoutRef.current)
+      inputHeartbeatTimeoutRef.current = null
+    }
+  }
+
   // Multiplayer input transmission system
-  const sendInputToServer = (dx, dy) => {
+  const sendInputToServer = (dx, dy, options = {}) => {
+    const { force = false, fromHeartbeat = false } = options
+
     if (!isMultiplayer || !wsRef.current || wsConnection !== 'connected') {
+      if (!fromHeartbeat) {
+        stopInputHeartbeat()
+      }
       return // Skip if not in multiplayer mode or not connected
     }
 
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now()
+
     // Only send if input changed significantly to reduce network traffic
     const threshold = 0.01
-    if (Math.abs(dx - lastInputRef.current.dx) < threshold && 
-        Math.abs(dy - lastInputRef.current.dy) < threshold) {
+    const movementMagnitude = Math.sqrt(dx * dx + dy * dy)
+    const movementActive = movementMagnitude > threshold
+    const inputChanged = Math.abs(dx - lastInputRef.current.dx) >= threshold ||
+      Math.abs(dy - lastInputRef.current.dy) >= threshold
+    const timeSinceLast = now - (lastInputSentAtRef.current || 0)
+    const shouldBypassThreshold = movementActive && timeSinceLast >= HEARTBEAT_INTERVAL_MS
+
+    if (!inputChanged && !(force || shouldBypassThreshold)) {
+      if (!movementActive && inputActiveRef.current) {
+        stopInputHeartbeat()
+      }
       return
     }
 
@@ -469,15 +499,47 @@ const AgarIOGame = () => {
     lastInputRef.current = { dx, dy }
 
     try {
-      wsRef.current.send("input", {
+      wsRef.current.send('input', {
         seq: inputSequenceRef.current,
         dx: dx,
         dy: dy
       })
+      lastInputSentAtRef.current = now
     } catch (error) {
       console.error('❌ Failed to send input to server:', error)
+      if (!fromHeartbeat) {
+        stopInputHeartbeat()
+      }
+      return
+    }
+
+    if (movementActive) {
+      inputActiveRef.current = true
+      if (!inputHeartbeatTimeoutRef.current) {
+        inputHeartbeatTimeoutRef.current = setTimeout(() => {
+          inputHeartbeatTimeoutRef.current = null
+          if (!inputActiveRef.current) {
+            return
+          }
+          sendInputToServer(lastInputRef.current.dx, lastInputRef.current.dy, { force: true, fromHeartbeat: true })
+        }, HEARTBEAT_INTERVAL_MS)
+      }
+    } else {
+      stopInputHeartbeat()
     }
   }
+
+  useEffect(() => {
+    return () => {
+      stopInputHeartbeat()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (wsConnection !== 'connected') {
+      stopInputHeartbeat()
+    }
+  }, [wsConnection])
 
   // Virtual joystick handlers for mobile
   const handleJoystickStart = (e) => {
@@ -638,12 +700,16 @@ const AgarIOGame = () => {
   const handleJoystickEnd = (e) => {
     e.preventDefault()
     if (!isMobile) return
-    
+
     console.log('🕹️ Joystick Ended - Stopping Movement')
-    
+
     setJoystickActive(false)
     setJoystickPosition({ x: 0, y: 0 })
-    
+
+    // Notify server that movement has stopped
+    sendInputToServer(0, 0, { force: true })
+    stopInputHeartbeat()
+
     // Stop player movement by setting target to current position
     if (gameRef.current?.game?.player) {
       const game = gameRef.current.game
@@ -1884,17 +1950,24 @@ const AgarIOGame = () => {
           const dx = this.mouse.worldX - this.player.x
           const dy = this.mouse.worldY - this.player.y
           const distance = Math.sqrt(dx * dx + dy * dy)
-          
+
           if (distance > 1) { // Only send if there's meaningful movement
             const normalizedDx = dx / distance
             const normalizedDy = dy / distance
-            
+
             // Send input to multiplayer server
             if (window.sendInputToServer) {
               window.sendInputToServer(normalizedDx, normalizedDy)
             }
+          } else {
+            if (window.sendInputToServer) {
+              window.sendInputToServer(0, 0, { force: true })
+            }
+            if (window.stopInputHeartbeat) {
+              window.stopInputHeartbeat()
+            }
           }
-          
+
           // For local prediction, still update local targets
           this.player.targetX = this.mouse.worldX
           this.player.targetY = this.mouse.worldY
@@ -3129,6 +3202,7 @@ const AgarIOGame = () => {
 
     // Make sendInputToServer and multiplayer state available globally for Game class
     window.sendInputToServer = sendInputToServer
+    window.stopInputHeartbeat = stopInputHeartbeat
     window.isMultiplayer = isMultiplayer
     window.wsRef = wsRef
 
