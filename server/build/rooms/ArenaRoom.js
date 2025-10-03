@@ -9,18 +9,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArenaRoom = exports.GameState = exports.Virus = exports.Coin = exports.Player = void 0;
+exports.ArenaRoom = exports.GameState = exports.Virus = exports.Coin = exports.Player = exports.MERGE_ATTRACTION_SPACING = exports.MERGE_ATTRACTION_MAX = exports.MERGE_ATTRACTION_RATE = void 0;
 const core_1 = require("@colyseus/core");
 const schema_1 = require("@colyseus/schema");
 const MIN_SPLIT_MASS = 40;
 const MAX_SPLIT_PIECES = 16;
 const SPLIT_COOLDOWN_MS = 500;
 const SPEED_SPLIT = 1100;
-const MOMENTUM_DRAG = 4.5;
+const MOMENTUM_DRAG = 1.2;
 const NO_MERGE_MS = 12000;
 const MOMENTUM_THRESHOLD = 0.1;
-const SPLIT_ATTRACTION_FORCE = 300;
-const SPLIT_ATTRACTION_DISTANCE_SCALE = 6;
+exports.MERGE_ATTRACTION_RATE = 0.02;
+exports.MERGE_ATTRACTION_MAX = 120;
+exports.MERGE_ATTRACTION_SPACING = 0.05;
 // Player state schema
 class Player extends schema_1.Schema {
     constructor() {
@@ -30,7 +31,7 @@ class Player extends schema_1.Schema {
         this.y = 0;
         this.vx = 0;
         this.vy = 0;
-        this.mass = 100;
+        this.mass = 25;
         this.radius = 20;
         this.color = "#FF6B6B";
         this.score = 0;
@@ -267,7 +268,7 @@ class ArenaRoom extends core_1.Room {
         player.y = Math.random() * this.worldSize;
         player.vx = 0;
         player.vy = 0;
-        player.mass = 100;
+        player.mass = 25;
         player.radius = this.calculateRadius(player.mass);
         player.color = this.generatePlayerColor();
         player.score = 0;
@@ -391,14 +392,29 @@ class ArenaRoom extends core_1.Room {
         const deltaTime = 1 / this.tickRate; // Fixed timestep
         const now = Date.now();
         this.state.timestamp = now;
-        // Update all players
+        const alivePlayers = [];
+        const ownerIds = new Set();
+        // Update momentum and collect ownership groups
         this.state.players.forEach((player, sessionId) => {
-            if (!player.alive)
+            if (!player.alive) {
                 return;
-            this.applyMomentum(player, deltaTime);
-            if (player.isSplitPiece) {
-                this.applySplitAttraction(player, deltaTime, now);
             }
+            this.applyMomentum(player, deltaTime);
+            const ownerId = player.isSplitPiece && player.ownerSessionId
+                ? player.ownerSessionId
+                : sessionId;
+            if (ownerId) {
+                ownerIds.add(ownerId);
+            }
+            alivePlayers.push({ player, sessionId });
+        });
+        ownerIds.forEach((ownerId) => {
+            const ownedCells = this.getOwnedCells(ownerId);
+            if (ownedCells.length > 1) {
+                this.applySplitAttraction(ownedCells, deltaTime);
+            }
+        });
+        alivePlayers.forEach(({ player, sessionId }) => {
             // Apply movement
             player.x += player.vx * deltaTime * 10; // Scale for game feel
             player.y += player.vy * deltaTime * 10;
@@ -420,6 +436,21 @@ class ArenaRoom extends core_1.Room {
         this.checkVirusCollisions(player);
         // Check player collisions
         this.checkPlayerCollisions(player, sessionId);
+    }
+    getOwnedCells(ownerSessionId) {
+        const cells = [];
+        this.state.players.forEach((player, sessionId) => {
+            if (!player.alive) {
+                return;
+            }
+            const controllingId = player.isSplitPiece && player.ownerSessionId
+                ? player.ownerSessionId
+                : sessionId;
+            if (controllingId === ownerSessionId) {
+                cells.push(player);
+            }
+        });
+        return cells;
     }
     checkCoinCollisions(player) {
         this.state.coins.forEach((coin, coinId) => {
@@ -535,27 +566,50 @@ class ArenaRoom extends core_1.Room {
             player.momentumY = 0;
         }
     }
-    applySplitAttraction(player, deltaTime, currentTime) {
-        if (!player.ownerSessionId) {
+    applySplitAttraction(cells, deltaTime) {
+        if (cells.length <= 1) {
             return;
         }
-        const owner = this.state.players.get(player.ownerSessionId);
-        if (!owner || !owner.alive) {
+        let totalMass = 0;
+        let centroidX = 0;
+        let centroidY = 0;
+        cells.forEach((cell) => {
+            if (!cell.alive || cell.mass <= 0) {
+                return;
+            }
+            totalMass += cell.mass;
+            centroidX += cell.x * cell.mass;
+            centroidY += cell.y * cell.mass;
+        });
+        if (totalMass <= 0) {
             return;
         }
-        const dx = owner.x - player.x;
-        const dy = owner.y - player.y;
-        const distanceSq = dx * dx + dy * dy;
-        if (distanceSq < 1) {
-            return;
-        }
-        const distance = Math.sqrt(distanceSq);
-        const dirX = dx / distance;
-        const dirY = dy / distance;
-        const scaledForce = Math.min(SPLIT_ATTRACTION_FORCE, distance * SPLIT_ATTRACTION_DISTANCE_SCALE);
-        const attraction = scaledForce * deltaTime;
-        player.momentumX += dirX * attraction;
-        player.momentumY += dirY * attraction;
+        centroidX /= totalMass;
+        centroidY /= totalMass;
+        cells.forEach((cell) => {
+            if (!cell.alive) {
+                return;
+            }
+            const dx = centroidX - cell.x;
+            const dy = centroidY - cell.y;
+            const distanceSq = dx * dx + dy * dy;
+            if (distanceSq <= 0.0001) {
+                return;
+            }
+            const distance = Math.sqrt(distanceSq);
+            const spacing = cell.radius * exports.MERGE_ATTRACTION_SPACING;
+            const distanceAfterSpacing = Math.max(0, distance - spacing);
+            if (distanceAfterSpacing <= 0) {
+                return;
+            }
+            const dirX = dx / distance;
+            const dirY = dy / distance;
+            const attraction = distanceAfterSpacing * totalMass * exports.MERGE_ATTRACTION_RATE;
+            const cappedAttraction = Math.min(exports.MERGE_ATTRACTION_MAX, attraction);
+            const acceleration = cappedAttraction * deltaTime;
+            cell.momentumX += dirX * acceleration;
+            cell.momentumY += dirY * acceleration;
+        });
     }
     handleSplitMerging(currentTime) {
         const piecesToRemove = [];
@@ -599,7 +653,7 @@ class ArenaRoom extends core_1.Room {
         player.y = Math.random() * this.worldSize;
         player.vx = 0;
         player.vy = 0;
-        player.mass = 100;
+        player.mass = 25;
         player.radius = this.calculateRadius(player.mass);
         player.alive = true;
         player.isSplitPiece = false;
