@@ -1153,6 +1153,8 @@ const AgarIOGame = () => {
       this.coins = []
       this.enemies = []
       this.viruses = []
+      this.serverState = null
+      this.previousServerState = null
       this.running = false
       this.lastUpdate = Date.now()
       this.gameStartTime = null // Track when game starts
@@ -1227,18 +1229,26 @@ const AgarIOGame = () => {
         timestamp: serverState.timestamp
       })
       
-      // Store server state for rendering
+      const snapshotTimestamp = serverState.timestamp || Date.now()
+
+      // Preserve the previous snapshot before storing the new one
+      if (this.serverState) {
+        this.previousServerState = this.serverState
+      }
+
+      // Store server state for rendering (including lookup map for interpolation)
       this.serverState = {
         players: [],
+        playersById: new Map(),
         coins: [],
         viruses: [],
-        timestamp: serverState.timestamp || Date.now()
+        timestamp: snapshotTimestamp
       }
       
       // Convert Colyseus MapSchema to arrays for easier processing
       if (serverState.players) {
         serverState.players.forEach((player, sessionId) => {
-          this.serverState.players.push({
+          const playerSnapshot = {
             sessionId,
             x: player.x,
             y: player.y,
@@ -1249,7 +1259,10 @@ const AgarIOGame = () => {
             score: player.score,
             alive: player.alive,
             isCurrentPlayer: sessionId === (wsRef.current?.sessionId)
-          })
+          }
+
+          this.serverState.players.push(playerSnapshot)
+          this.serverState.playersById.set(sessionId, playerSnapshot)
         })
       }
       
@@ -1276,6 +1289,10 @@ const AgarIOGame = () => {
             color: virus.color
           })
         })
+      }
+
+      if (!this.previousServerState) {
+        this.previousServerState = this.serverState
       }
       
       // Update current player from server state if in multiplayer
@@ -2689,16 +2706,40 @@ const AgarIOGame = () => {
       
       // In multiplayer mode, render server state; otherwise render local state
       if (this.serverState && window.isMultiplayer) {
+        const currentSnapshot = this.serverState
+        const previousSnapshot = this.previousServerState || currentSnapshot
+        const renderTime = Date.now()
+        let interpolationFactor = 0
+
+        const previousTimestamp = previousSnapshot.timestamp || currentSnapshot.timestamp
+        const deltaT = currentSnapshot.timestamp - previousTimestamp
+        if (deltaT > 0) {
+          const rawFactor = (renderTime - currentSnapshot.timestamp) / deltaT
+          interpolationFactor = Math.max(0, Math.min(1, rawFactor))
+        }
+
         // Draw server coins
-        this.serverState.coins.forEach(coin => this.drawCoin(coin))
-        
+        currentSnapshot.coins.forEach(coin => this.drawCoin(coin))
+
         // Draw server viruses
-        this.serverState.viruses.forEach(virus => this.drawVirus(virus))
-        
+        currentSnapshot.viruses.forEach(virus => this.drawVirus(virus))
+
         // Draw all server players (including other players)
-        this.serverState.players.forEach(player => {
+        currentSnapshot.players.forEach(player => {
           if (player.alive) {
-            this.drawPlayer(player)
+            let playerToRender = player
+
+            if (!player.isCurrentPlayer) {
+              const previousPlayer = previousSnapshot.playersById?.get(player.sessionId)
+              if (previousPlayer) {
+                const interpolatedPlayer = { ...player }
+                interpolatedPlayer.x = previousPlayer.x + (player.x - previousPlayer.x) * interpolationFactor
+                interpolatedPlayer.y = previousPlayer.y + (player.y - previousPlayer.y) * interpolationFactor
+                playerToRender = interpolatedPlayer
+              }
+            }
+
+            this.drawPlayer(playerToRender)
           }
         })
       } else {
