@@ -1113,7 +1113,7 @@ const AgarIOGame = () => {
       this.ctx = canvas.getContext('2d')
       this.world = { width: 4000, height: 4000 }
       this.camera = { x: 0, y: 0 }
-      this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0 }
+      this.mouse = { x: 0, y: 0, worldX: 0, worldY: 0, hasPosition: false }
       this.setCheatingBan = setCheatingBan // Store the function reference
       this.setTimeSurvived = setTimeSurvived // Store the function reference
       this.selectedSkin = selectedSkin || { id: 'default', name: 'Default Warrior', color: '#4A90E2' } // Store selected skin
@@ -1956,10 +1956,11 @@ const AgarIOGame = () => {
         const rect = this.canvas.getBoundingClientRect()
         this.mouse.x = e.clientX - rect.left
         this.mouse.y = e.clientY - rect.top
-        
+
         // Convert to world coordinates
         this.mouse.worldX = this.mouse.x + this.camera.x
         this.mouse.worldY = this.mouse.y + this.camera.y
+        this.mouse.hasPosition = true
         
         // Direct target update like Agar.io (only for desktop)
         if (!window.isMobileDevice) {
@@ -2020,9 +2021,21 @@ const AgarIOGame = () => {
       const deltaTime = (now - this.lastUpdate) / 1000
       this.lastUpdate = now
 
+      const hasWindow = typeof window !== 'undefined'
+      const usingJoystick = hasWindow && Boolean(window.isUsingJoystick)
+      const usingServerState = hasWindow && Boolean(window.isMultiplayer && this.serverState)
+
+      if (!usingJoystick && this.mouse.hasPosition && !usingServerState) {
+        this.mouse.worldX = this.mouse.x + this.camera.x
+        this.mouse.worldY = this.mouse.y + this.camera.y
+
+        this.player.targetX = this.mouse.worldX
+        this.player.targetY = this.mouse.worldY
+      }
+
       // Always update player movement (for client-side prediction)
       this.updatePlayer(deltaTime)
-      
+
       // Always update camera
       this.updateCamera()
       
