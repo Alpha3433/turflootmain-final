@@ -43,18 +43,20 @@ export declare class GameState extends Schema {
     coins: MapSchema<Coin, string>;
     viruses: MapSchema<Virus, string>;
     worldSize: number;
+    playableRadius: number;
     timestamp: number;
 }
 export declare class ArenaRoom extends Room<GameState> {
     maxClients: number;
     worldSize: number;
+    playableRadius: number;
     maxCoins: number;
     maxViruses: number;
     tickRate: number;
-    private spawnOffsets;
-    private nextSpawnIndex;
     onCreate(): void;
     private getNextSpawnPosition;
+    private samplePositionWithinPlayableRadius;
+    private enforcePlayableBoundary;
     onJoin(client: Client, options?: any): void;
     handleInput(client: Client, message: any): void;
     handleSplit(client: Client, message: any): void;
