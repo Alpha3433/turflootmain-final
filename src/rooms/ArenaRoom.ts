@@ -70,16 +70,28 @@ export class GameState extends Schema {
 
 export class ArenaRoom extends Room<GameState> {
   maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
-  
+
   // Game configuration
   worldSize = parseInt(process.env.WORLD_SIZE || '8000');
   maxCoins = 3000; // Tripled coin density within the playable arena
   maxViruses = 30; // Doubled virus (spike) density for arena mode
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+
+  private spawnOffsets: Array<{ x: number, y: number }> = [
+    { x: 0, y: 0 },
+    { x: 1200, y: 0 },
+    { x: -1200, y: 0 },
+    { x: 0, y: 1200 },
+    { x: 0, y: -1200 },
+    { x: 850, y: 850 },
+    { x: -850, y: 850 },
+    { x: 850, y: -850 }
+  ];
+  private nextSpawnIndex = 0;
   
   onCreate() {
     console.log("🌍 Arena room initialized");
-    
+
     // Initialize game state
     this.setState(new GameState());
     this.state.worldSize = this.worldSize;
@@ -118,6 +130,26 @@ export class ArenaRoom extends Room<GameState> {
     console.log(`🪙 Generated ${this.maxCoins} coins`);
     console.log(`🦠 Generated ${this.maxViruses} viruses`);
     console.log(`🔄 Game loop started at ${this.tickRate} TPS`);
+  }
+
+  private getNextSpawnPosition(): { x: number, y: number } {
+    const centerX = this.worldSize / 4; // 2000 for 8000x8000 world - moved to left side
+    const centerY = this.worldSize / 4; // 2000 for 8000x8000 world - moved to top side
+    const currentIndex = this.nextSpawnIndex;
+    const offset = this.spawnOffsets[currentIndex];
+    this.nextSpawnIndex = (this.nextSpawnIndex + 1) % this.spawnOffsets.length;
+
+    const x = centerX + offset.x;
+    const y = centerY + offset.y;
+
+    console.log(
+      `🎯 SAFE SPAWN SLOT: Player assigned slot ${currentIndex} at (${x.toFixed(1)}, ${y.toFixed(1)}) relative to center (${centerX}, ${centerY})`
+    );
+    console.log(
+      `🎯 SPAWN BOUNDS: X range: ${(centerX - 1800).toFixed(1)} to ${(centerX + 1800).toFixed(1)}, Y range: ${(centerY - 1800).toFixed(1)} to ${(centerY + 1800).toFixed(1)}`
+    );
+
+    return { x, y };
   }
 
   onJoin(client: Client, options: any = {}) {
@@ -194,7 +226,7 @@ export class ArenaRoom extends Room<GameState> {
     player.name = playerName;
     
     // Generate spawn position within circular playable area
-    const spawnPosition = this.generateCircularSpawnPosition();
+    const spawnPosition = this.getNextSpawnPosition();
     player.x = spawnPosition.x;
     player.y = spawnPosition.y;
     
@@ -765,7 +797,7 @@ export class ArenaRoom extends Room<GameState> {
 
   respawnPlayer(player: Player) {
     // Generate respawn position within circular playable area
-    const spawnPosition = this.generateCircularSpawnPosition();
+    const spawnPosition = this.getNextSpawnPosition();
     player.x = spawnPosition.x;
     player.y = spawnPosition.y;
     
@@ -848,28 +880,6 @@ export class ArenaRoom extends Room<GameState> {
       '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
     ];
     return colors[Math.floor(Math.random() * colors.length)];
-  }
-
-  // Generate random spawn position within circular playable area
-  generateCircularSpawnPosition(): { x: number, y: number } {
-    const centerX = this.worldSize / 4; // 2000 for 8000x8000 world - moved to left side
-    const centerY = this.worldSize / 4; // 2000 for 8000x8000 world - moved to top side
-    
-    // Use conservative radius to ensure players never spawn in red zone
-    const safeZoneRadius = 1800; // Expanded to match minimap and local agario (full playable area)
-    
-    // Generate random point within safe circular area
-    const angle = Math.random() * Math.PI * 2; // Random angle
-    const distance = Math.sqrt(Math.random()) * safeZoneRadius; // Square root for uniform distribution
-    
-    const x = centerX + Math.cos(angle) * distance;
-    const y = centerY + Math.sin(angle) * distance;
-    
-    console.log(`🎯 SAFE SPAWN: Player spawned at (${x.toFixed(1)}, ${y.toFixed(1)}) - distance ${distance.toFixed(1)} from center (${centerX}, ${centerY}) (safe radius: ${safeZoneRadius})`);
-    console.log(`🎯 SPAWN VERIFICATION: World size: ${this.worldSize}x${this.worldSize}, Playable area: ${safeZoneRadius}px radius from center`);
-    console.log(`🎯 SPAWN BOUNDS: X range: ${(centerX - safeZoneRadius).toFixed(1)} to ${(centerX + safeZoneRadius).toFixed(1)}, Y range: ${(centerY - safeZoneRadius).toFixed(1)} to ${(centerY + safeZoneRadius).toFixed(1)}`);
-    
-    return { x, y };
   }
 
   onDispose() {

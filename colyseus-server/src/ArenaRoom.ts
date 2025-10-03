@@ -44,12 +44,24 @@ export class GameState extends Schema {
 
 export class ArenaRoom extends Room<GameState> {
   maxClients = 50;
-  
+
   // Game configuration
   worldSize = 4000;
   maxCoins = 1500; // Triple the previous coin cap for denser arenas
   maxViruses = 30; // Double the spike (virus) count for increased challenge
   tickRate = 20; // 20 TPS server logic
+
+  private spawnOffsets: Array<{ x: number, y: number }> = [
+    { x: 0, y: 0 },
+    { x: 1500, y: 0 },
+    { x: -1500, y: 0 },
+    { x: 0, y: 1500 },
+    { x: 0, y: -1500 },
+    { x: 1100, y: 1100 },
+    { x: -1100, y: 1100 },
+    { x: 1100, y: -1100 }
+  ];
+  private nextSpawnIndex = 0;
   
   onCreate() {
     console.log('🌍 Arena room initialized');
@@ -82,6 +94,23 @@ export class ArenaRoom extends Room<GameState> {
     console.log(`🔄 Game loop started at ${this.tickRate} TPS`);
   }
 
+  private getNextSpawnPosition(): { x: number, y: number } {
+    const centerX = this.worldSize / 2;
+    const centerY = this.worldSize / 2;
+    const currentIndex = this.nextSpawnIndex;
+    const offset = this.spawnOffsets[currentIndex];
+    this.nextSpawnIndex = (this.nextSpawnIndex + 1) % this.spawnOffsets.length;
+
+    const x = centerX + offset.x;
+    const y = centerY + offset.y;
+
+    console.log(
+      `🎯 ARENA SPAWN SLOT: Assigned slot ${currentIndex} at (${x.toFixed(1)}, ${y.toFixed(1)}) relative to center (${centerX}, ${centerY})`
+    );
+
+    return { x, y };
+  }
+
   onJoin(client: Client, options: any = {}) {
     const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
     const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
@@ -91,8 +120,9 @@ export class ArenaRoom extends Room<GameState> {
     // Create new player
     const player = new Player();
     player.name = playerName;
-    player.x = Math.random() * this.worldSize;
-    player.y = Math.random() * this.worldSize;
+    const spawnPosition = this.getNextSpawnPosition();
+    player.x = spawnPosition.x;
+    player.y = spawnPosition.y;
     player.vx = 0;
     player.vy = 0;
     player.mass = 100;
@@ -250,8 +280,9 @@ export class ArenaRoom extends Room<GameState> {
   }
 
   respawnPlayer(player: Player) {
-    player.x = Math.random() * this.worldSize;
-    player.y = Math.random() * this.worldSize;
+    const spawnPosition = this.getNextSpawnPosition();
+    player.x = spawnPosition.x;
+    player.y = spawnPosition.y;
     player.vx = 0;
     player.vy = 0;
     player.mass = 100;
