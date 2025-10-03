@@ -47,8 +47,8 @@ export class ArenaRoom extends Room<GameState> {
   
   // Game configuration
   worldSize = 4000;
-  maxCoins = 500;
-  maxViruses = 15;
+  maxCoins = 1500; // Triple the previous coin cap for denser arenas
+  maxViruses = 30; // Double the spike (virus) count for increased challenge
   tickRate = 20; // 20 TPS server logic
   
   onCreate() {

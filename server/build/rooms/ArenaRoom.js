@@ -226,8 +226,8 @@ class ArenaRoom extends core_1.Room {
         this.maxClients = parseInt(process.env.MAX_PLAYERS_PER_ROOM || '50');
         // Game configuration
         this.worldSize = parseInt(process.env.WORLD_SIZE || '4000');
-        this.maxCoins = 100;
-        this.maxViruses = 15;
+        this.maxCoins = 300; // Triple the original 100-coin cap for higher arena density
+        this.maxViruses = 30; // Double the spike count to intensify arena hazards
         this.tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
     }
     onCreate() {

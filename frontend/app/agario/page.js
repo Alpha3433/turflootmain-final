@@ -1683,7 +1683,7 @@ const AgarIOGame = () => {
       const centerY = this.world.height / 2 // 2000
       const playableRadius = this.currentPlayableRadius
       
-      for (let i = 0; i < 1000; i++) { // Increased to 1000 coins to match Agar.io food density
+      for (let i = 0; i < 3000; i++) { // Tripled to 3000 coins for higher arena density
         let x, y, distance
         
         // Keep generating random positions until we get one inside the circular boundary
@@ -1762,8 +1762,8 @@ const AgarIOGame = () => {
       const centerY = this.world.height / 2
       const playableRadius = this.currentPlayableRadius
       
-      // Increased virus count from 6 to 12 for more challenging gameplay
-      for (let i = 0; i < 12; i++) {
+      // Increased virus count from 6 to 24 for more challenging gameplay
+      for (let i = 0; i < 24; i++) {
         let x, y, distance
         
         // Generate virus within the playable radius
@@ -1958,7 +1958,7 @@ const AgarIOGame = () => {
       this.checkCollisions()
       
       // Maintain coin count (local coin generation)
-      while (this.coins.length < 1000) { // Increased to 1000 to match Agar.io food density
+      while (this.coins.length < 3000) { // Maintain 3000 coins to match upgraded arena density
         const centerX = this.world.width / 2  // 2000
         const centerY = this.world.height / 2 // 2000
         const playableRadius = 1800 // Same as boundary radius

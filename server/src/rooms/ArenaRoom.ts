@@ -67,8 +67,8 @@ export class ArenaRoom extends Room<GameState> {
   
   // Game configuration
   worldSize = parseInt(process.env.WORLD_SIZE || '4000');
-  maxCoins = 100;
-  maxViruses = 15;
+  maxCoins = 300; // Triple the original 100-coin cap for higher arena density
+  maxViruses = 30; // Double the spike count to intensify arena hazards
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
   
   onCreate() {
