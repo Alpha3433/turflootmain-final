@@ -3393,12 +3393,32 @@ export default function TurfLootTactical() {
             pattern: skin.pattern || 'solid'
           }))
           
+          const applyEquipUiFeedback = () => {
+            btn.textContent = 'EQUIPPED!'
+            btn.style.background = 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)'
+            btn.style.borderColor = '#22c55e'
+          }
+
+          const refreshSkinStore = (logMessage = '🔄 Skin store UI refreshed to show new equipped status') => {
+            renderSkins()
+            console.log(logMessage)
+          }
+
+          applyEquipUiFeedback()
+          refreshSkinStore()
+
+          // Show feedback for 2 seconds, then update the entire store again
+          setTimeout(() => {
+            refreshSkinStore('🔄 Skin store UI refreshed to show new equipped status (delayed)')
+          }, 2000)
+
           // Save equipped skin to backend/database
           if (isAuthenticated && user) {
+            const userIdentifier = user.wallet?.address || user.email || user.id
+
             try {
-              const userIdentifier = user.wallet?.address || user.email || user.id
               console.log('💾 Saving equipped skin to backend for user:', userIdentifier)
-              
+
               const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/friends`, {
                 method: 'PUT',
                 headers: {
@@ -3416,39 +3436,29 @@ export default function TurfLootTactical() {
                   }
                 })
               })
-              
+
               if (response.ok) {
                 console.log('✅ Equipped skin saved to backend successfully')
-                
+
                 // Refresh party data to show updated skin
                 console.log('🔄 Refreshing party data to show updated skin...')
                 await loadCurrentParty()
-                
+
               } else {
                 console.error('❌ Failed to save equipped skin to backend:', response.status)
               }
             } catch (error) {
               console.error('❌ Error saving equipped skin to backend:', error)
+            } finally {
+              refreshSkinStore('🔄 Skin store UI refreshed after backend sync attempt')
             }
           }
-          
+
           console.log('✅ Skin equipped successfully:', {
             skinId: skin.id,
             skinName: skin.name,
             skinColor: skin.color
           })
-          
-          // Visual feedback for successful equip BEFORE re-rendering
-          btn.textContent = 'EQUIPPED!'
-          btn.style.background = 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)'
-          btn.style.borderColor = '#22c55e'
-          
-          // Show feedback for 2 seconds, then update the entire store
-          setTimeout(() => {
-            // Update the skin store display to show new equipped status
-            renderSkins()
-            console.log('🔄 Skin store UI refreshed to show new equipped status')
-          }, 2000)
           
           // Save to localStorage for persistence across sessions
           localStorage.setItem('selectedSkin', JSON.stringify({
@@ -3459,8 +3469,6 @@ export default function TurfLootTactical() {
           
           console.log('🎨 Equipped skin:', skin.name)
           // Removed popup notification for smoother UX
-          
-          renderSkins() // Re-render to update equipped status
         })
       })
       
