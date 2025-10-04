@@ -800,26 +800,6 @@ export class ArenaRoom extends Room<GameState> {
     });
   }
 
-  respawnPlayer(player: Player) {
-    // Generate respawn position within circular playable area
-    const spawnPosition = this.getNextSpawnPosition();
-    player.x = spawnPosition.x;
-    player.y = spawnPosition.y;
-    
-    player.vx = 0;
-    player.vy = 0;
-    player.mass = 25; // Updated to 25 to match user requirement
-    player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
-    player.alive = true;
-    
-    // Enable spawn protection on respawn
-    player.spawnProtection = true;
-    player.spawnProtectionStart = Date.now();
-    player.spawnProtectionTime = 4000; // 4 seconds protection
-    
-    console.log(`🔄 Player respawned: ${player.name} at (${player.x.toFixed(1)}, ${player.y.toFixed(1)}) with spawn protection`);
-  }
-
   generateCoins() {
     for (let i = 0; i < this.maxCoins; i++) {
       this.spawnCoin();

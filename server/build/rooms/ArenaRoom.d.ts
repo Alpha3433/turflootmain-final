@@ -73,7 +73,6 @@ export declare class ArenaRoom extends Room<GameState> {
     handleSplitMerging(currentTime: number): void;
     areSameOwner(player: Player, sessionId: string, otherPlayer: Player, otherSessionId: string): boolean;
     calculateRadius(mass: number): number;
-    respawnPlayer(player: Player): void;
     generateCoins(): void;
     generateViruses(): void;
     spawnCoin(): void;
