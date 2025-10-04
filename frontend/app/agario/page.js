@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+const MIN_SPLIT_MASS = 40 // Keep in sync with server/src/rooms/ArenaRoom.ts
+
 const AgarIOGame = () => {
   const canvasRef = useRef(null)
   const gameRef = useRef(null)
@@ -16,6 +18,8 @@ const AgarIOGame = () => {
   const [missionTime, setMissionTime] = useState(60)
   const [score, setScore] = useState(0)
   const [mass, setMass] = useState(20)
+  const [splitCooldownRemaining, setSplitCooldownRemaining] = useState(0)
+  const [canSplit, setCanSplit] = useState(false)
   const [eliminations, setEliminations] = useState(0)
   const [timeSurvived, setTimeSurvived] = useState(0)
   
@@ -86,6 +90,31 @@ const AgarIOGame = () => {
     if (wsConnection === 'disconnected') return 'Waiting for arena'
     return pingMs == null ? 'Measuring latency' : 'Live latency'
   })()
+
+  useEffect(() => {
+    let animationFrameId
+
+    const updateSplitState = () => {
+      const cooldown = Math.max(0, Math.ceil(gameRef.current?.splitCooldown ?? 0))
+      const playerMass = gameRef.current?.player?.mass ?? 0
+
+      setSplitCooldownRemaining(prev => (prev !== cooldown ? cooldown : prev))
+      setCanSplit(prev => {
+        const next = cooldown <= 0 && playerMass >= MIN_SPLIT_MASS
+        return prev === next ? prev : next
+      })
+
+      animationFrameId = requestAnimationFrame(updateSplitState)
+    }
+
+    updateSplitState()
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [])
 
   // Auto-collapse leaderboard after 5 seconds of no interaction
   useEffect(() => {
@@ -3454,6 +3483,10 @@ const AgarIOGame = () => {
   }, [gameStarted, gameOver, cashOutComplete])
 
   const handleSplit = (e) => {
+    if (!canSplit) {
+      return
+    }
+
     if (gameRef.current) {
       if (isMobile) {
         // Mobile: Use joystick direction for split
@@ -3561,6 +3594,11 @@ const AgarIOGame = () => {
       y: (player.y / world.height) * 100
     }
   }
+
+  const splitCooldownSeconds = Math.max(0, splitCooldownRemaining / 60)
+  const currentPlayerMass = gameRef.current?.player?.mass ?? mass
+  const meetsMassRequirement = currentPlayerMass >= MIN_SPLIT_MASS
+  const splitButtonDisabled = !canSplit
 
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
@@ -4291,16 +4329,16 @@ const AgarIOGame = () => {
           </div>
 
           {/* Split Button - Larger circular for mobile, rectangular for desktop */}
-          <div 
+          <div
             onClick={(e) => handleSplit(e)}
             style={{
-              backgroundColor: 'rgba(0, 100, 255, 0.9)',
-              border: '3px solid #0064ff',
+              backgroundColor: splitButtonDisabled ? 'rgba(120, 120, 120, 0.75)' : 'rgba(0, 100, 255, 0.9)',
+              border: splitButtonDisabled ? '3px solid rgba(160, 160, 160, 0.9)' : '3px solid #0064ff',
               borderRadius: isMobile ? '50%' : '8px',
               color: '#ffffff',
               fontSize: isMobile ? '12px' : '16px',
               fontWeight: '700',
-              cursor: 'pointer',
+              cursor: splitButtonDisabled ? 'not-allowed' : 'pointer',
               padding: isMobile ? '0' : '12px 24px',
               width: isMobile ? '80px' : 'auto',
               height: isMobile ? '80px' : 'auto',
@@ -4309,9 +4347,11 @@ const AgarIOGame = () => {
               justifyContent: 'center',
               gap: isMobile ? '0' : '8px',
               transition: 'all 150ms',
-              pointerEvents: 'auto',
+              pointerEvents: splitButtonDisabled ? 'none' : 'auto',
               fontFamily: '"Rajdhani", sans-serif',
-              boxShadow: isMobile ? '0 4px 25px rgba(0, 100, 255, 0.7)' : '0 4px 12px rgba(0, 100, 255, 0.3)',
+              boxShadow: splitButtonDisabled
+                ? 'none'
+                : (isMobile ? '0 4px 25px rgba(0, 100, 255, 0.7)' : '0 4px 12px rgba(0, 100, 255, 0.3)'),
               flexDirection: isMobile ? 'column' : 'row',
               touchAction: 'manipulation',
               userSelect: 'none',
@@ -4320,35 +4360,57 @@ const AgarIOGame = () => {
               WebkitTapHighlightColor: 'transparent'
             }}
             onMouseOver={(e) => {
+              if (splitButtonDisabled) return
               e.target.style.backgroundColor = 'rgba(50, 120, 255, 0.95)'
               e.target.style.transform = isMobile ? 'scale(1.08)' : 'translateY(-2px)'
               e.target.style.boxShadow = isMobile ? '0 6px 30px rgba(0, 100, 255, 0.9)' : '0 6px 20px rgba(0, 100, 255, 0.4)'
             }}
             onMouseOut={(e) => {
+              if (splitButtonDisabled) return
               e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
               e.target.style.transform = 'scale(1)'
               e.target.style.boxShadow = isMobile ? '0 4px 25px rgba(0, 100, 255, 0.7)' : '0 4px 12px rgba(0, 100, 255, 0.3)'
             }}
             onTouchStart={(e) => {
-              if (!isMobile) return
+              if (!isMobile || splitButtonDisabled) return
               e.target.style.transform = 'scale(0.95)'
               e.target.style.backgroundColor = 'rgba(0, 80, 200, 1)'
             }}
             onTouchEnd={(e) => {
-              if (!isMobile) return
+              if (!isMobile || splitButtonDisabled) return
               e.target.style.transform = 'scale(1)'
               e.target.style.backgroundColor = 'rgba(0, 100, 255, 0.9)'
             }}
           >
             {isMobile ? (
-              // Mobile: Show icon and short text
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ fontSize: '20px' }}>⚡</div>
-                <div style={{ fontSize: '10px', fontWeight: '600' }}>SPLIT</div>
-              </div>
+              splitCooldownRemaining > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div style={{ fontSize: '20px' }}>⏳</div>
+                  <div style={{ fontSize: '10px', fontWeight: '600' }}>{splitCooldownSeconds.toFixed(1)}s</div>
+                </div>
+              ) : meetsMassRequirement ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div style={{ fontSize: '20px' }}>⚡</div>
+                  <div style={{ fontSize: '10px', fontWeight: '600' }}>SPLIT</div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div style={{ fontSize: '20px' }}>📉</div>
+                  <div style={{ fontSize: '9px', fontWeight: '600', textAlign: 'center', lineHeight: '1.1' }}>
+                    Need
+                    <br />
+                    {MIN_SPLIT_MASS} mass
+                  </div>
+                </div>
+              )
             ) : (
-              // Desktop: Show full text
-              <span>⚡ Split (Space)</span>
+              splitCooldownRemaining > 0 ? (
+                <span>⏳ Split in {splitCooldownSeconds.toFixed(1)}s</span>
+              ) : meetsMassRequirement ? (
+                <span>⚡ Split (Space)</span>
+              ) : (
+                <span>📉 Need {MIN_SPLIT_MASS} mass</span>
+              )
             )}
           </div>
           </div>
