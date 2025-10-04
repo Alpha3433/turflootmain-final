@@ -543,7 +543,27 @@ const MultiplayerArena = () => {
         return
       }
 
-      if (e.key.toLowerCase() === 'e' && !isCashingOut && !cashOutComplete && gameReady) {
+      const key = e.key.toLowerCase()
+
+      if (key === 'm') {
+        if (visibleMissions.length > 0) {
+          if (missionCondenseTimeoutRef.current) {
+            clearTimeout(missionCondenseTimeoutRef.current)
+            missionCondenseTimeoutRef.current = null
+          }
+
+          if (!missionPopupVisible || missionPopupCondensed) {
+            setMissionPopupCondensed(false)
+            setMissionPopupVisible(true)
+          } else {
+            setMissionPopupCondensed(true)
+            setMissionPopupVisible(true)
+          }
+        }
+        return
+      }
+
+      if (key === 'e' && !isCashingOut && !cashOutComplete && gameReady) {
         console.log('Starting cash out process with E key')
         setIsCashingOut(true)
         setCashOutProgress(0)
@@ -587,7 +607,7 @@ const MultiplayerArena = () => {
       // Handle SPACE key for splitting with cooldown
       if (e.key === ' ' && gameReady && gameRef.current) {
         e.preventDefault()
-        
+
         console.log('🚀 SPACEBAR PRESSED - Detailed Debug Info:', {
           gameReady,
           gameRef: !!gameRef.current,
@@ -691,7 +711,15 @@ const MultiplayerArena = () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     }
-  }, [gameOver, isCashingOut, cashOutComplete, gameReady])
+  }, [
+    gameOver,
+    isCashingOut,
+    cashOutComplete,
+    gameReady,
+    missionPopupVisible,
+    missionPopupCondensed,
+    visibleMissions.length
+  ])
 
   // Cash out progress interval - ported from agario
   useEffect(() => {
