@@ -6,15 +6,28 @@ const dotenv = require('dotenv')
 process.env.NEXT_TELEMETRY_DISABLED = '1'
 process.env.DISABLE_OPENCOLLECTIVE = 'true'
 
-// Load environment variables from .env file explicitly
-const envPath = path.join(__dirname, '.env')
-if (fs.existsSync(envPath)) {
-  const envConfig = dotenv.config({ path: envPath })
-  if (envConfig.error) {
-    console.warn('Warning: Could not load .env file:', envConfig.error)
-  } else {
-    console.log('✅ Loaded environment variables from .env file')
+// Load environment variables from .env.local (highest priority) and fallback to .env
+const envFiles = ['.env.local', '.env']
+for (const fileName of envFiles) {
+  const envPath = path.join(__dirname, fileName)
+  if (fs.existsSync(envPath)) {
+    const envConfig = dotenv.config({ path: envPath })
+    if (envConfig.error) {
+      console.warn(`Warning: Could not load ${fileName}:`, envConfig.error)
+    } else {
+      console.log(`✅ Loaded environment variables from ${fileName}`)
+    }
+    break
   }
+}
+
+// Provide default Helius configuration so both frontend and API routes have access
+const DEFAULT_HELIUS_API_KEY = '9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+if (!process.env.HELIUS_API_KEY) {
+  process.env.HELIUS_API_KEY = DEFAULT_HELIUS_API_KEY
+}
+if (!process.env.NEXT_PUBLIC_HELIUS_RPC) {
+  process.env.NEXT_PUBLIC_HELIUS_RPC = `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY || DEFAULT_HELIUS_API_KEY}`
 }
 
 const nextConfig = {
@@ -53,6 +66,7 @@ const nextConfig = {
     NEXT_PUBLIC_MOCK_WALLET_BALANCE: process.env.NEXT_PUBLIC_MOCK_WALLET_BALANCE,
     NEXT_PUBLIC_ENV: process.env.NEXT_PUBLIC_ENV,
     NEXT_PUBLIC_COLYSEUS_ENDPOINT: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT,
+    NEXT_PUBLIC_HELIUS_RPC: process.env.NEXT_PUBLIC_HELIUS_RPC,
   },
   webpack(config, { dev, isServer }) {
     // Production optimizations
