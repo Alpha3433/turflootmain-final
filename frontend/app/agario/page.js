@@ -993,6 +993,9 @@ const AgarIOGame = () => {
     }
   }, [gameStarted])
 
+  const stakeAmount = parseFloat(searchParams?.get('fee') || '0')
+  const isPaidGame = stakeAmount > 0
+
   // REAL PLAYER SESSION TRACKING - Track when real Privy users join/leave games
   useEffect(() => {
     if (!gameStarted) return
@@ -1301,7 +1304,77 @@ const AgarIOGame = () => {
   const [cashOutProgress, setCashOutProgress] = useState(0)
   const [isCashingOut, setIsCashingOut] = useState(false)
   const [cashOutComplete, setCashOutComplete] = useState(false)
-  
+  const loyaltySyncPromiseRef = useRef(null)
+
+  const submitLoyaltyResult = useCallback(async ({ userId, stake, gameResult }) => {
+    try {
+      const response = await fetch('/api/loyalty', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId,
+          isPaidGame: true,
+          stake,
+          gameResult
+        })
+      })
+
+      if (!response.ok) {
+        console.warn('⚠️ Failed to record loyalty update:', response.status)
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to record loyalty update:', error)
+    }
+  }, [])
+
+  const ensureLoyaltySyncBeforeExit = useCallback(async () => {
+    if (!isPaidGame || (!cashOutComplete && !gameOver)) {
+      return
+    }
+
+    const identifier = privyUser?.wallet?.address || privyUser?.id
+    if (!identifier) {
+      console.warn('⚠️ Skipping loyalty update - missing user identifier')
+      return
+    }
+
+    if (!loyaltySyncPromiseRef.current) {
+      loyaltySyncPromiseRef.current = submitLoyaltyResult({
+        userId: identifier,
+        stake: stakeAmount,
+        gameResult: cashOutComplete ? 'cash_out' : 'eliminated'
+      })
+    }
+
+    if (loyaltySyncPromiseRef.current) {
+      await loyaltySyncPromiseRef.current
+    }
+  }, [cashOutComplete, gameOver, isPaidGame, privyUser, stakeAmount, submitLoyaltyResult])
+
+  const handleReturnToLobby = useCallback(async () => {
+    await ensureLoyaltySyncBeforeExit()
+    if (typeof window !== 'undefined') {
+      window.location.href = '/'
+    }
+  }, [ensureLoyaltySyncBeforeExit])
+
+  useEffect(() => {
+    if (!isPaidGame) return
+    if (!cashOutComplete && !gameOver) return
+    if (loyaltySyncPromiseRef.current) return
+
+    const identifier = privyUser?.wallet?.address || privyUser?.id
+    if (!identifier) return
+
+    loyaltySyncPromiseRef.current = submitLoyaltyResult({
+      userId: identifier,
+      stake: stakeAmount,
+      gameResult: cashOutComplete ? 'cash_out' : 'eliminated'
+    })
+  }, [isPaidGame, cashOutComplete, gameOver, privyUser, stakeAmount, submitLoyaltyResult])
+
   // Update game engine's gameStates when cash out state changes
   useEffect(() => {
     if (gameRef.current && gameRef.current.updateGameStates) {
@@ -1951,7 +2024,7 @@ const AgarIOGame = () => {
         // Fallback if state setter is not available
         alert('⚠️ ACCOUNT SUSPENDED\n\nMultiple violations of fair play policies detected.\nContact support if you believe this is an error.')
         setTimeout(() => {
-          window.location.href = '/'
+          handleReturnToLobby()
         }, 3000)
       }
     }
@@ -3751,6 +3824,7 @@ const AgarIOGame = () => {
   }
 
   const handleRestart = () => {
+    loyaltySyncPromiseRef.current = null
     setGameOver(false)
     setMissionTime(60)
     setScore(0)
@@ -4359,7 +4433,7 @@ const AgarIOGame = () => {
                   flexDirection: 'column'
                 }}>
                   <button
-                    onClick={() => window.location.href = '/'}
+                    onClick={handleReturnToLobby}
                     style={{
                       backgroundColor: '#4a5568',
                       border: '2px solid #718096',
@@ -5297,7 +5371,7 @@ const AgarIOGame = () => {
                   
                   {/* Home Button */}
                   <button
-                    onClick={() => window.location.href = '/'}
+                    onClick={handleReturnToLobby}
                     style={{
                       backgroundColor: 'transparent',
                       border: '2px solid #a0aec0',
@@ -5515,7 +5589,7 @@ const AgarIOGame = () => {
                     REPORT PLAYER
                   </button>
                   <button
-                    onClick={() => window.location.href = '/'}
+                    onClick={handleReturnToLobby}
                     style={{
                       backgroundColor: 'transparent',
                       border: '2px solid #a0aec0',
