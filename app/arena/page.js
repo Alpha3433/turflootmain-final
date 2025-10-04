@@ -661,6 +661,10 @@ const MultiplayerArena = () => {
       })
       
       setIsMobile(mobile)
+
+      if (gameRef.current && typeof gameRef.current.setCameraZoom === 'function') {
+        gameRef.current.setCameraZoom(mobile ? 0.75 : 1)
+      }
     }
     
     checkMobile()
@@ -1077,7 +1081,7 @@ const MultiplayerArena = () => {
 
   // Pure multiplayer game engine - updated to match agario visual features
   class MultiplayerGameEngine {
-    constructor(canvas, inputSender, selectedSkin) {
+    constructor(canvas, inputSender, selectedSkin, isMobileFlag = false) {
       console.log('🎮 Initializing pure multiplayer game engine with enhanced mechanics')
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
@@ -1085,6 +1089,8 @@ const MultiplayerArena = () => {
       this.selectedSkin = selectedSkin || { color: '#4A90E2' } // Store the selected skin
       console.log('🎨 Using selected skin in game engine:', this.selectedSkin)
       this.running = false
+
+      this.cameraZoom = isMobileFlag ? 0.75 : 1
       
       // World setup with circular zone system
       this.world = { width: 8000, height: 8000 }
@@ -1130,6 +1136,18 @@ const MultiplayerArena = () => {
       this.bindEvents()
       this.setupMouse()
     }
+
+    setCameraZoom(nextZoom = 1) {
+      const safeZoom = Math.max(0.1, Number.isFinite(nextZoom) ? nextZoom : 1)
+      if (this.cameraZoom !== safeZoom) {
+        console.log('🔍 Updating camera zoom:', safeZoom)
+        this.cameraZoom = safeZoom
+        if (this.mouse) {
+          this.mouse.worldX = this.camera.x + (this.mouse.x || 0) / safeZoom
+          this.mouse.worldY = this.camera.y + (this.mouse.y || 0) / safeZoom
+        }
+      }
+    }
     
     // Method to update local cash out state for immediate feedback
     updateLocalCashOutState(isCashingOut, cashOutProgress = 0) {
@@ -1142,14 +1160,15 @@ const MultiplayerArena = () => {
       
       const updateMousePosition = (e) => {
         if (!this.canvas) return
-        
+
         const rect = this.canvas.getBoundingClientRect()
         this.mouse.x = e.clientX - rect.left
         this.mouse.y = e.clientY - rect.top
-        
+
         // Convert screen coordinates to world coordinates - CORRECTED
-        this.mouse.worldX = this.camera.x + this.mouse.x
-        this.mouse.worldY = this.camera.y + this.mouse.y
+        const zoom = this.cameraZoom || 1
+        this.mouse.worldX = this.camera.x + this.mouse.x / zoom
+        this.mouse.worldY = this.camera.y + this.mouse.y / zoom
       }
       
       this.canvas.addEventListener('mousemove', updateMousePosition)
@@ -1176,8 +1195,9 @@ const MultiplayerArena = () => {
         const mouseY = e.clientY - rect.top
         
         // Convert screen coordinates to world coordinates - CORRECTED FORMULA
-        const worldMouseX = this.camera.x + mouseX
-        const worldMouseY = this.camera.y + mouseY
+        const zoom = this.cameraZoom || 1
+        const worldMouseX = this.camera.x + mouseX / zoom
+        const worldMouseY = this.camera.y + mouseY / zoom
         
         // Calculate direction toward mouse cursor
         const dx = worldMouseX - this.player.x
@@ -1361,8 +1381,10 @@ const MultiplayerArena = () => {
     
     updateCamera() {
       // IDENTICAL to local agario camera - super snappy camera that moves aggressively toward player
-      const targetX = this.player.x - this.canvas.width / 2
-      const targetY = this.player.y - this.canvas.height / 2
+      const viewportWidth = this.canvas.width / (this.cameraZoom || 1)
+      const viewportHeight = this.canvas.height / (this.cameraZoom || 1)
+      const targetX = this.player.x - viewportWidth / 2
+      const targetY = this.player.y - viewportHeight / 2
       
       // Use consistent smoothing for both local and multiplayer (identical to agario)
       const smoothing = 0.2
@@ -1371,8 +1393,14 @@ const MultiplayerArena = () => {
       
       // Keep camera within world bounds (identical to agario)
       const boundaryExtension = 100
-      this.camera.x = Math.max(-boundaryExtension, Math.min(this.world.width - this.canvas.width + boundaryExtension, this.camera.x))
-      this.camera.y = Math.max(-boundaryExtension, Math.min(this.world.height - this.canvas.height + boundaryExtension, this.camera.y))
+      this.camera.x = Math.max(
+        -boundaryExtension,
+        Math.min(this.world.width - viewportWidth + boundaryExtension, this.camera.x)
+      )
+      this.camera.y = Math.max(
+        -boundaryExtension,
+        Math.min(this.world.height - viewportHeight + boundaryExtension, this.camera.y)
+      )
       
       // Update minimap data every few frames for better performance
       if (Date.now() % 100 < 16) {
@@ -1534,8 +1562,10 @@ const MultiplayerArena = () => {
       
       // Save context for camera transform
       this.ctx.save()
-      
+
       // Apply camera translation (this is what makes the camera follow the player)
+      const zoom = this.cameraZoom || 1
+      this.ctx.scale(zoom, zoom)
       this.ctx.translate(-this.camera.x, -this.camera.y)
       
       // Draw optimized grid first (matching local agario render order)
@@ -1607,8 +1637,10 @@ const MultiplayerArena = () => {
       // Only render grid lines visible in current camera viewport (performance optimization)
       const startX = Math.floor(this.camera.x / gridSize) * gridSize
       const startY = Math.floor(this.camera.y / gridSize) * gridSize
-      const endX = startX + this.canvas.width + gridSize
-      const endY = startY + this.canvas.height + gridSize
+      const viewportWidth = this.canvas.width / (this.cameraZoom || 1)
+      const viewportHeight = this.canvas.height / (this.cameraZoom || 1)
+      const endX = startX + viewportWidth + gridSize
+      const endY = startY + viewportHeight + gridSize
       
       // Constrain to world bounds for safety
       const worldStartX = Math.max(startX, 0)
@@ -2097,7 +2129,7 @@ const MultiplayerArena = () => {
     canvas.height = window.innerHeight
     
     // Create game instance with selected skin
-    const game = new MultiplayerGameEngine(canvas, sendInput, selectedSkin)
+    const game = new MultiplayerGameEngine(canvas, sendInput, selectedSkin, isMobile)
     gameRef.current = game
     
     game.start()
