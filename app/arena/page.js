@@ -89,6 +89,7 @@ const MultiplayerArena = () => {
   // Input handling
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
+  const continuousInputIntervalRef = useRef(null)
   
   // Mission definitions - ported from agario
   const missionTypes = [
@@ -142,6 +143,8 @@ const MultiplayerArena = () => {
     if (gameRef.current) {
       gameRef.current.stop()
     }
+
+    lastInputRef.current = { dx: 0, dy: 0 }
 
     setJoystickActive(false)
     setJoystickPosition({ x: 0, y: 0 })
@@ -884,6 +887,7 @@ const MultiplayerArena = () => {
         if (GLOBAL_CONNECTION_TRACKER.activeConnection === room) {
           GLOBAL_CONNECTION_TRACKER.activeConnection = null // Clear global connection if it's this room
         }
+        lastInputRef.current = { dx: 0, dy: 0 }
         setConnectionStatus(prevStatus => (prevStatus === 'eliminated' ? prevStatus : 'disconnected'))
       })
 
@@ -1091,6 +1095,43 @@ const MultiplayerArena = () => {
       }
     }
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    if (continuousInputIntervalRef.current) {
+      clearInterval(continuousInputIntervalRef.current)
+      continuousInputIntervalRef.current = null
+    }
+
+    const usingTouchControls = isMobile || joystickActive
+    const hasActiveRoom = wsRef.current && wsRef.current.sessionId
+    const shouldRun = gameReady && !gameOver && connectionStatus === 'connected' && hasActiveRoom && !usingTouchControls
+
+    if (!shouldRun) {
+      return
+    }
+
+    const sendCachedDirection = () => {
+      const latestInput = lastInputRef.current || { dx: 0, dy: 0 }
+      sendInput(latestInput.dx, latestInput.dy)
+    }
+
+    // Ensure the server receives the most recent direction immediately when the loop starts
+    sendCachedDirection()
+
+    const intervalId = window.setInterval(sendCachedDirection, inputThrottleMs)
+    continuousInputIntervalRef.current = intervalId
+
+    return () => {
+      if (continuousInputIntervalRef.current) {
+        clearInterval(continuousInputIntervalRef.current)
+        continuousInputIntervalRef.current = null
+      }
+    }
+  }, [connectionStatus, gameReady, gameOver, isMobile, joystickActive])
 
   // Virtual joystick handlers for mobile - matching agario exactly
   const handleJoystickStart = (e) => {
@@ -1303,38 +1344,48 @@ const MultiplayerArena = () => {
       // Mouse movement for non-mobile - ENHANCED RESPONSIVENESS
       const handleMouseMove = (e) => {
         if (isMobile || !this.canvas) return
-        
+
         const rect = this.canvas.getBoundingClientRect()
         const mouseX = e.clientX - rect.left
         const mouseY = e.clientY - rect.top
-        
+
         // Convert screen coordinates to world coordinates - CORRECTED FORMULA
         const zoom = this.cameraZoom || 1
         const worldMouseX = this.camera.x + mouseX / zoom
         const worldMouseY = this.camera.y + mouseY / zoom
-        
+
         // Calculate direction toward mouse cursor
         const dx = worldMouseX - this.player.x
         const dy = worldMouseY - this.player.y
         const distance = Math.sqrt(dx * dx + dy * dy)
-        
+
+        let normalizedDx = 0
+        let normalizedDy = 0
+
         if (distance > 2) { // Reduced threshold from 5 to 2 for more sensitivity
-          const normalizedDx = dx / distance
-          const normalizedDy = dy / distance
-          
-          // IMMEDIATE INPUT - no throttling for maximum responsiveness
-          this.sendInputFn(normalizedDx, normalizedDy)
-          
-          // Reduced debug logging to prevent console spam
-          if (Math.random() < 0.1) { // Only log 10% of movements
-            console.log('🖱️ Mouse movement:', {
-              mouseScreen: { x: mouseX.toFixed(1), y: mouseY.toFixed(1) },
-              mouseWorld: { x: worldMouseX.toFixed(1), y: worldMouseY.toFixed(1) },
-              player: { x: this.player.x?.toFixed(1), y: this.player.y?.toFixed(1) },
-              direction: { dx: normalizedDx.toFixed(3), dy: normalizedDy.toFixed(3) },
-              distance: distance.toFixed(1)
-            })
-          }
+          normalizedDx = dx / distance
+          normalizedDy = dy / distance
+        }
+
+        // Cache the most recent normalized direction for the continuous sender loop
+        lastInputRef.current = { dx: normalizedDx, dy: normalizedDy }
+
+        if (!this.sendInputFn) {
+          return
+        }
+
+        // IMMEDIATE INPUT - no throttling for maximum responsiveness
+        this.sendInputFn(normalizedDx, normalizedDy)
+
+        // Reduced debug logging to prevent console spam
+        if (distance > 2 && Math.random() < 0.1) { // Only log 10% of movements
+          console.log('🖱️ Mouse movement:', {
+            mouseScreen: { x: mouseX.toFixed(1), y: mouseY.toFixed(1) },
+            mouseWorld: { x: worldMouseX.toFixed(1), y: worldMouseY.toFixed(1) },
+            player: { x: this.player.x?.toFixed(1), y: this.player.y?.toFixed(1) },
+            direction: { dx: normalizedDx.toFixed(3), dy: normalizedDy.toFixed(3) },
+            distance: distance.toFixed(1)
+          })
         }
       }
       
@@ -2274,6 +2325,11 @@ const MultiplayerArena = () => {
       const componentId = componentIdRef.current
       console.log(`🧹 [${componentId}] Cleaning up arena connection...`)
       game.stop()
+      if (continuousInputIntervalRef.current) {
+        clearInterval(continuousInputIntervalRef.current)
+        continuousInputIntervalRef.current = null
+      }
+      lastInputRef.current = { dx: 0, dy: 0 }
       window.removeEventListener('resize', handleResize)
       if (wsRef.current) {
         console.log(`🔌 [${componentId}] Disconnecting from Colyseus...`)
