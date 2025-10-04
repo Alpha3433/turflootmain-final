@@ -1,7 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { usePrivy } from '@privy-io/react-auth'
+import { v4 as uuidv4 } from 'uuid'
+
+const PLAYER_ID_STORAGE_KEY = 'turfloot-agario-player-id'
 
 const MIN_SPLIT_MASS = 40 // Keep in sync with server/src/rooms/ArenaRoom.ts
 
@@ -10,7 +14,12 @@ const AgarIOGame = () => {
   const gameRef = useRef(null)
   const router = useRouter()
   const searchParams = useSearchParams()
-  
+  const { user: privyUser } = usePrivy()
+
+  // Player identity tracking
+  const playerIdentifierRef = useRef(null)
+  const [, setPlayerIdentifier] = useState(null)
+
   // Game state
   const [gameStarted, setGameStarted] = useState(false)
   const [gameOver, setGameOver] = useState(false)
@@ -90,6 +99,45 @@ const AgarIOGame = () => {
     if (wsConnection === 'disconnected') return 'Waiting for arena'
     return pingMs == null ? 'Measuring latency' : 'Live latency'
   })()
+
+  const ensurePlayerIdentifier = useCallback(() => {
+    const assignIdentifier = (id) => {
+      playerIdentifierRef.current = id
+      setPlayerIdentifier(prev => (prev === id ? prev : id))
+      return id
+    }
+
+    if (privyUser?.id) {
+      if (playerIdentifierRef.current !== privyUser.id) {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(PLAYER_ID_STORAGE_KEY, privyUser.id)
+        }
+        return assignIdentifier(privyUser.id)
+      }
+      return playerIdentifierRef.current
+    }
+
+    if (playerIdentifierRef.current) {
+      return playerIdentifierRef.current
+    }
+
+    if (typeof window !== 'undefined') {
+      const stored = window.localStorage.getItem(PLAYER_ID_STORAGE_KEY)
+      if (stored) {
+        return assignIdentifier(stored)
+      }
+    }
+
+    const newId = uuidv4()
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(PLAYER_ID_STORAGE_KEY, newId)
+    }
+    return assignIdentifier(newId)
+  }, [privyUser])
+
+  useEffect(() => {
+    ensurePlayerIdentifier()
+  }, [ensurePlayerIdentifier])
 
   useEffect(() => {
     let animationFrameId
@@ -305,22 +353,31 @@ const AgarIOGame = () => {
   // New function to track real Hathora room sessions
   const trackRealHathoraSession = async (realRoomId, fee, mode, region, gameMode) => {
     try {
+      const userId = ensurePlayerIdentifier()
+
+      if (!userId) {
+        console.warn('⚠️ Unable to resolve player identifier for real Hathora session tracking')
+        return
+      }
+
       console.log('📊 Tracking real Hathora room session:', {
         realRoomId,
         fee,
         mode,
         region,
-        gameMode
+        gameMode,
+        userId
       })
-      
+
       // Format data according to API requirements (session object with required fields)
       const sessionData = {
         action: 'join',
+        userId,
         session: {
           roomId: realRoomId,
           joinedAt: new Date().toISOString(),
           lastActivity: new Date().toISOString(),
-          userId: 'anonymous_' + Math.random().toString(36).substr(2, 9),
+          userId,
           entryFee: fee || 0,
           mode: gameMode || mode,
           region: region || 'unknown',
@@ -351,16 +408,24 @@ const AgarIOGame = () => {
   // Define trackPlayerSession function (was being called but not defined)
   const trackPlayerSession = async (roomId, fee, mode, region) => {
     try {
-      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region })
-      
+      const userId = ensurePlayerIdentifier()
+
+      if (!userId) {
+        console.warn('⚠️ Unable to resolve player identifier for fallback session tracking')
+        return
+      }
+
+      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region, userId })
+
       // Format data according to API requirements (session object with required fields)
       const sessionData = {
         action: 'join',
+        userId,
         session: {
           roomId: roomId,
           joinedAt: new Date().toISOString(),
           lastActivity: new Date().toISOString(),
-          userId: 'fallback_' + Math.random().toString(36).substr(2, 9),
+          userId,
           entryFee: fee || 0,
           mode: mode || 'unknown',
           region: region || 'unknown',
@@ -852,13 +917,21 @@ const AgarIOGame = () => {
           return
         }
         
+        const userId = ensurePlayerIdentifier()
+
+        if (!userId) {
+          console.warn('⚠️ Unable to resolve player identifier for session join')
+          return
+        }
+
         console.log('🎯 Tracking real player session:', {
           roomId,
           fee: fee || 0,
           mode,
-          region
+          region,
+          userId
         })
-        
+
         // Record player joining the room
         const sessionData = {
           roomId,
@@ -867,9 +940,10 @@ const AgarIOGame = () => {
           region,
           joinedAt: new Date().toISOString(),
           lastActivity: new Date().toISOString(),
-          status: 'active'
+          status: 'active',
+          userId
         }
-        
+
         // Send to backend API to record session
         const response = await fetch('/api/game-sessions', {
           method: 'POST',
@@ -878,7 +952,8 @@ const AgarIOGame = () => {
           },
           body: JSON.stringify({
             action: 'join',
-            session: sessionData
+            session: sessionData,
+            userId
           })
         })
         
@@ -903,6 +978,13 @@ const AgarIOGame = () => {
       const mode = urlParams.get('mode')
       
       if (roomId && mode !== 'local' && mode !== 'practice') {
+        const userId = playerIdentifierRef.current || ensurePlayerIdentifier()
+
+        if (!userId) {
+          console.warn('⚠️ Unable to resolve player identifier for session update')
+          return
+        }
+
         fetch('/api/game-sessions', {
           method: 'POST',
           headers: {
@@ -911,6 +993,7 @@ const AgarIOGame = () => {
           body: JSON.stringify({
             action: 'update',
             roomId,
+            userId,
             lastActivity: new Date().toISOString()
           })
         }).catch(err => console.warn('⚠️ Failed to update session activity:', err))
@@ -924,8 +1007,15 @@ const AgarIOGame = () => {
       const urlParams = new URLSearchParams(window.location.search)
       const roomId = urlParams.get('roomId')
       const mode = urlParams.get('mode')
-      
+
       if (roomId && mode !== 'local' && mode !== 'practice') {
+        const userId = playerIdentifierRef.current || ensurePlayerIdentifier()
+
+        if (!userId) {
+          console.warn('⚠️ Unable to resolve player identifier for session leave')
+          return
+        }
+
         // Send leave event (don't await since component is unmounting)
         fetch('/api/game-sessions', {
           method: 'POST',
@@ -934,7 +1024,8 @@ const AgarIOGame = () => {
           },
           body: JSON.stringify({
             action: 'leave',
-            roomId
+            roomId,
+            userId
           })
         }).catch(err => console.warn('⚠️ Failed to record session leave:', err))
       }
@@ -947,7 +1038,7 @@ const AgarIOGame = () => {
     const connectToColyseusRoom = async () => {
       try {
         console.log('🌐 Initializing Colyseus room connection...')
-        
+
         const urlParams = new URLSearchParams(window.location.search)
         const mode = urlParams.get('mode')
         const multiplayer = urlParams.get('multiplayer')
@@ -963,6 +1054,18 @@ const AgarIOGame = () => {
           return
         }
 
+        if (wsRef.current) {
+          console.log('ℹ️ Existing Colyseus room connection detected, skipping re-initialization')
+          return
+        }
+
+        const privyUserId = ensurePlayerIdentifier()
+
+        if (!privyUserId) {
+          console.warn('⚠️ Unable to resolve player identifier for Colyseus connection')
+          return
+        }
+
         setIsMultiplayer(true)
         setConnectedPlayers(1) // At least the current player
         setWsConnection('connecting')
@@ -971,21 +1074,8 @@ const AgarIOGame = () => {
 
         // Import Colyseus client
         const { joinArena } = await import('../../lib/colyseus')
-        
-        // Get Privy user ID for authentication
-        let privyUserId = null
-        let playerName = null
-        
-        // Try to get Privy user info if available
-        try {
-          const { usePrivy } = await import('@privy-io/react-auth')
-          const { user } = usePrivy()
-          privyUserId = user?.id || `anonymous_${Date.now()}`
-          playerName = user?.username || user?.email?.split('@')[0] || null
-        } catch (error) {
-          console.log('⚠️ Privy not available, using anonymous user')
-          privyUserId = `anonymous_${Date.now()}`
-        }
+
+        const playerName = privyUser?.username || privyUser?.email?.split('@')[0] || null
 
         console.log('🔑 Connecting with user:', { privyUserId, playerName })
 
@@ -1047,6 +1137,7 @@ const AgarIOGame = () => {
           setWsConnection('disconnected')
           setPingMs(null)
           pingSentAtRef.current = null
+          wsRef.current = null
         })
 
         // Handle latency measurements
@@ -1077,6 +1168,7 @@ const AgarIOGame = () => {
           if (room) {
             room.leave()
           }
+          wsRef.current = null
         }
 
       } catch (error) {
@@ -1084,11 +1176,12 @@ const AgarIOGame = () => {
         setWsConnection('error')
         setPingMs(null)
         pingSentAtRef.current = null
+        wsRef.current = null
       }
     }
 
     connectToColyseusRoom()
-  }, [gameStarted])
+  }, [gameStarted, ensurePlayerIdentifier, privyUser])
 
   // Cycle through missions every 4 seconds
   useEffect(() => {
