@@ -865,6 +865,109 @@ const AgarIOGame = () => {
 
       return { ...mission, progress: newProgress }
     }))
+
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const missionChallengeMap = {
+      coin_collected: {
+        challengeType: 'coins_eaten',
+        challengeId: 'eat_50_coins',
+        updateMode: 'increment'
+      },
+      mass_reached: {
+        challengeType: 'max_mass',
+        challengeId: 'reach_mass_200',
+        updateMode: 'max'
+      },
+      survival_time: {
+        challengeType: 'survival_time',
+        challengeId: 'survive_5_minutes',
+        updateMode: 'max'
+      },
+      elimination: {
+        challengeType: 'eliminations',
+        challengeId: 'eliminate_50_players',
+        updateMode: 'increment'
+      }
+    }
+
+    const mapping = missionChallengeMap[type]
+    if (!mapping) {
+      return
+    }
+
+    const numericValue = typeof value === 'number' ? value : Number(value)
+    const amount = mapping.updateMode === 'increment'
+      ? (Number.isFinite(numericValue) && numericValue > 0 ? numericValue : 1)
+      : (Number.isFinite(numericValue) ? numericValue : 0)
+
+    if (mapping.updateMode !== 'increment' && !Number.isFinite(amount)) {
+      return
+    }
+
+    if (typeof window.updateChallengeProgress === 'function') {
+      window.updateChallengeProgress(mapping.challengeType, amount)
+      return
+    }
+
+    try {
+      const targets = {
+        eat_50_coins: 50,
+        survive_5_minutes: 300,
+        reach_mass_200: 200,
+        eliminate_50_players: 50
+      }
+
+      const userIdentifier = (
+        privyUser?.wallet?.address ||
+        privyUser?.email?.address ||
+        privyUser?.id ||
+        ensurePlayerIdentifier() ||
+        'guest'
+      )
+
+      const normalizedIdentifier = (userIdentifier || 'guest').toString()
+      const storageKey = `challenges_${normalizedIdentifier.substring(0, 10)}`
+
+      let challengesData = {}
+      const existingRaw = window.localStorage.getItem(storageKey)
+      if (existingRaw) {
+        try {
+          challengesData = JSON.parse(existingRaw) || {}
+        } catch (error) {
+          console.error('Failed to parse challenges data, resetting entry:', error)
+          challengesData = {}
+        }
+      }
+
+      const challengeId = mapping.challengeId
+      if (!challengeId) {
+        return
+      }
+
+      const currentEntry = challengesData[challengeId] || { current: 0, completed: false, claimed: false }
+      const currentValue = Number.isFinite(currentEntry.current) ? currentEntry.current : Number(currentEntry.current) || 0
+
+      let nextValue = currentValue
+      if (mapping.updateMode === 'max') {
+        nextValue = Math.max(currentValue, amount)
+      } else {
+        nextValue = currentValue + Math.max(amount, 0)
+      }
+
+      const updatedEntry = {
+        ...currentEntry,
+        current: nextValue,
+        completed: currentEntry.completed || nextValue >= (targets[challengeId] ?? Infinity)
+      }
+
+      challengesData[challengeId] = updatedEntry
+      window.localStorage.setItem(storageKey, JSON.stringify(challengesData))
+    } catch (error) {
+      console.error('Error updating challenge progress fallback:', error)
+    }
   }
 
   // Initialize missions when game starts (only for cash games)
