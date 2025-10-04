@@ -2590,12 +2590,13 @@ const MultiplayerArena = () => {
           style={{
             position: 'fixed',
             top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 12px)' : '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
+            left: isMobile ? 'auto' : 'calc(env(safe-area-inset-left, 0px) + 20px)',
+            right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 12px)' : 'auto',
             zIndex: 1200,
-            width: '100%',
+            width: 'auto',
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
             pointerEvents: 'none'
           }}
         >
@@ -2645,7 +2646,7 @@ const MultiplayerArena = () => {
                 border: '1px solid rgba(251, 191, 36, 0.55)',
                 borderRadius: isMobile ? '12px' : '16px',
                 padding: isMobile ? '14px' : '18px',
-                width: isMobile ? 'calc(100vw - 32px)' : '380px',
+                width: isMobile ? 'min(360px, calc(100vw - 32px))' : '380px',
                 maxWidth: '420px',
                 boxShadow: '0 18px 40px rgba(0, 0, 0, 0.55)',
                 color: '#ffffff',
