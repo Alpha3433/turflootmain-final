@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
 import { usePrivy } from '@privy-io/react-auth'
@@ -62,7 +62,8 @@ const MultiplayerArena = () => {
   const [currency, setCurrency] = useState(0)
   const [completedMissions, setCompletedMissions] = useState([])
   const [activeMissions, setActiveMissions] = useState([])
-  const [currentMissionIndex, setCurrentMissionIndex] = useState(0)
+  const [missionPopupVisible, setMissionPopupVisible] = useState(false)
+  const [missionPopupCondensed, setMissionPopupCondensed] = useState(false)
 
   // Mobile detection and UI states
   const [isMobile, setIsMobile] = useState(false)
@@ -90,9 +91,11 @@ const MultiplayerArena = () => {
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   const continuousInputIntervalRef = useRef(null)
+
+  const missionCondenseTimeoutRef = useRef(null)
   
   // Mission definitions - ported from agario
-  const missionTypes = [
+  const missionTypes = useMemo(() => ([
     { id: 'collect_coins_10', name: 'Coin Hunter I', description: 'Collect 10 coins', target: 10, reward: 50, icon: '🪙' },
     { id: 'collect_coins_25', name: 'Coin Hunter II', description: 'Collect 25 coins', target: 25, reward: 100, icon: '🪙' },
     { id: 'collect_coins_50', name: 'Coin Master', description: 'Collect 50 coins', target: 50, reward: 200, icon: '💰' },
@@ -102,7 +105,11 @@ const MultiplayerArena = () => {
     { id: 'eliminate_3', name: 'Warrior', description: 'Eliminate 3 enemies', target: 3, reward: 250, icon: '🗡️' },
     { id: 'survive_60', name: 'Survivor', description: 'Survive for 60 seconds', target: 60, reward: 100, icon: '⏰' },
     { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
-  ]
+  ]), [])
+
+  const visibleMissions = useMemo(() => {
+    return activeMissions.filter(mission => !mission.completed && !completedMissions.includes(mission.id))
+  }, [activeMissions, completedMissions])
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
@@ -166,19 +173,136 @@ const MultiplayerArena = () => {
         }
       }
     }
-    
+
     // Listen for storage events (changes from other tabs/windows)
     window.addEventListener('storage', handleStorageChange)
-    
+
     // Also check periodically for changes in same tab (localStorage doesn't fire storage event for same tab)
     const interval = setInterval(handleStorageChange, 1000)
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       clearInterval(interval)
     }
   }, [user?.id, playerName])
-  
+
+  useEffect(() => {
+    if (!gameReady || activeMissions.length > 0) {
+      return
+    }
+
+    const availableMissions = missionTypes.filter(mission => !completedMissions.includes(mission.id))
+
+    if (availableMissions.length === 0) {
+      setMissionPopupVisible(false)
+      setMissionPopupCondensed(false)
+      return
+    }
+
+    const shuffled = [...availableMissions].sort(() => 0.5 - Math.random())
+    const selected = shuffled
+      .slice(0, Math.min(3, shuffled.length))
+      .map(mission => ({
+        ...mission,
+        progress: mission.progress || 0,
+        completed: mission.completed || false
+      }))
+
+    setActiveMissions(selected)
+    setMissionPopupVisible(true)
+    setMissionPopupCondensed(false)
+  }, [gameReady, completedMissions, activeMissions.length, missionTypes])
+
+  useEffect(() => {
+    if (!gameReady || completedMissions.length === 0) {
+      return
+    }
+
+    setActiveMissions(prev => {
+      const filtered = prev.filter(mission => !completedMissions.includes(mission.id))
+      if (filtered.length === prev.length) {
+        return prev
+      }
+      return filtered
+    })
+  }, [gameReady, completedMissions])
+
+  useEffect(() => {
+    if (!missionPopupVisible) {
+      return
+    }
+
+    if (visibleMissions.length === 0) {
+      setMissionPopupVisible(false)
+      setMissionPopupCondensed(false)
+    }
+  }, [visibleMissions.length, missionPopupVisible])
+
+  useEffect(() => {
+    if (!missionPopupVisible || missionPopupCondensed || visibleMissions.length === 0) {
+      return
+    }
+
+    if (missionCondenseTimeoutRef.current) {
+      clearTimeout(missionCondenseTimeoutRef.current)
+    }
+
+    missionCondenseTimeoutRef.current = setTimeout(() => {
+      setMissionPopupCondensed(true)
+      missionCondenseTimeoutRef.current = null
+    }, 5000)
+
+    return () => {
+      if (missionCondenseTimeoutRef.current) {
+        clearTimeout(missionCondenseTimeoutRef.current)
+        missionCondenseTimeoutRef.current = null
+      }
+    }
+  }, [missionPopupVisible, missionPopupCondensed, visibleMissions.length])
+
+  useEffect(() => {
+    if (missionPopupVisible) {
+      return
+    }
+
+    if (missionCondenseTimeoutRef.current) {
+      clearTimeout(missionCondenseTimeoutRef.current)
+      missionCondenseTimeoutRef.current = null
+    }
+
+    setMissionPopupCondensed(false)
+  }, [missionPopupVisible])
+
+  useEffect(() => {
+    return () => {
+      if (missionCondenseTimeoutRef.current) {
+        clearTimeout(missionCondenseTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleMissionCondense = () => {
+    setMissionPopupCondensed(true)
+    if (missionCondenseTimeoutRef.current) {
+      clearTimeout(missionCondenseTimeoutRef.current)
+      missionCondenseTimeoutRef.current = null
+    }
+  }
+
+  const handleMissionExpand = () => {
+    if (visibleMissions.length === 0) {
+      return
+    }
+
+    if (missionCondenseTimeoutRef.current) {
+      clearTimeout(missionCondenseTimeoutRef.current)
+      missionCondenseTimeoutRef.current = null
+    }
+
+    setMissionPopupCondensed(false)
+    setMissionPopupVisible(true)
+  }
+
   console.log('🎮 Arena parameters:')
   console.log('  - roomId:', roomId)  
   console.log('  - authenticated user:', !!user)
@@ -2447,10 +2571,10 @@ const MultiplayerArena = () => {
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-crosshair bg-black m-0 p-0"
-        style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
           zIndex: 1,
           margin: 0,
           padding: 0,
@@ -2459,6 +2583,243 @@ const MultiplayerArena = () => {
           display: 'block'
         }}
       />
+
+      {/* Mission Popup */}
+      {missionPopupVisible && visibleMissions.length > 0 && (
+        <div
+          style={{
+            position: 'fixed',
+            top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 12px)' : '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1200,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'none'
+          }}
+        >
+          {missionPopupCondensed ? (
+            <button
+              type="button"
+              onClick={handleMissionExpand}
+              style={{
+                background: 'rgba(15, 15, 15, 0.92)',
+                border: '1px solid rgba(251, 191, 36, 0.6)',
+                borderRadius: '9999px',
+                padding: isMobile ? '8px 14px' : '10px 18px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: isMobile ? '6px' : '8px',
+                color: '#ffffff',
+                fontFamily: '"Rajdhani", sans-serif',
+                fontSize: isMobile ? '12px' : '13px',
+                fontWeight: 600,
+                letterSpacing: '0.5px',
+                cursor: 'pointer',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.45)',
+                pointerEvents: 'auto',
+                backdropFilter: 'blur(6px)'
+              }}
+            >
+              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>🎯</span>
+              <span style={{ color: '#fbbf24', textTransform: 'uppercase' }}>Missions</span>
+              <span
+                style={{
+                  background: 'rgba(251, 191, 36, 0.2)',
+                  color: '#fbbf24',
+                  borderRadius: '9999px',
+                  padding: '2px 10px',
+                  fontSize: isMobile ? '11px' : '12px',
+                  fontWeight: 700,
+                  letterSpacing: '0.5px'
+                }}
+              >
+                {visibleMissions.length}
+              </span>
+            </button>
+          ) : (
+            <div
+              style={{
+                background: 'rgba(15, 15, 15, 0.94)',
+                border: '1px solid rgba(251, 191, 36, 0.55)',
+                borderRadius: isMobile ? '12px' : '16px',
+                padding: isMobile ? '14px' : '18px',
+                width: isMobile ? 'calc(100vw - 32px)' : '380px',
+                maxWidth: '420px',
+                boxShadow: '0 18px 40px rgba(0, 0, 0, 0.55)',
+                color: '#ffffff',
+                fontFamily: '"Rajdhani", sans-serif',
+                pointerEvents: 'auto',
+                backdropFilter: 'blur(8px)'
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                  marginBottom: isMobile ? '10px' : '14px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div
+                    style={{
+                      fontSize: isMobile ? '22px' : '26px',
+                      lineHeight: 1
+                    }}
+                  >
+                    🎯
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        fontSize: isMobile ? '14px' : '16px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}
+                    >
+                      Mission Briefing
+                    </div>
+                    <div
+                      style={{
+                        fontSize: isMobile ? '11px' : '12px',
+                        color: '#fbbf24',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.8px'
+                      }}
+                    >
+                      Objectives online
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleMissionCondense}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(148, 163, 184, 0.4)',
+                    borderRadius: '9999px',
+                    padding: isMobile ? '4px 10px' : '6px 12px',
+                    color: '#cbd5f5',
+                    fontSize: isMobile ? '10px' : '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    letterSpacing: '0.8px',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  Minimize
+                </button>
+              </div>
+
+              <p
+                style={{
+                  fontSize: isMobile ? '11px' : '12px',
+                  color: '#cbd5f5',
+                  margin: '0 0 12px 0',
+                  letterSpacing: '0.4px'
+                }}
+              >
+                Complete the active objectives to earn bonus rewards.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '10px' : '12px' }}>
+                {visibleMissions.map(mission => {
+                  const progressValue = Math.min(mission.progress ?? 0, mission.target)
+                  const progressPercent = mission.target > 0
+                    ? Math.min(100, Math.round((progressValue / mission.target) * 100))
+                    : 0
+
+                  return (
+                    <div
+                      key={mission.id}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '12px',
+                        padding: isMobile ? '10px' : '12px',
+                        border: '1px solid rgba(251, 191, 36, 0.2)'
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          marginBottom: '8px'
+                        }}
+                      >
+                        <div style={{ fontSize: isMobile ? '20px' : '22px', lineHeight: 1 }}>{mission.icon}</div>
+                        <div style={{ flex: 1 }}>
+                          <div
+                            style={{
+                              fontWeight: 600,
+                              fontSize: isMobile ? '13px' : '14px',
+                              letterSpacing: '0.5px'
+                            }}
+                          >
+                            {mission.name}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: isMobile ? '11px' : '12px',
+                              color: 'rgba(203, 213, 225, 0.85)'
+                            }}
+                          >
+                            {mission.description}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            color: '#fbbf24',
+                            fontWeight: 700,
+                            fontSize: isMobile ? '12px' : '13px'
+                          }}
+                        >
+                          +{mission.reward}💰
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          height: '6px',
+                          borderRadius: '9999px',
+                          background: 'rgba(255, 255, 255, 0.12)',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${progressPercent}%`,
+                            background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
+                            height: '100%'
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          marginTop: '4px',
+                          fontSize: '10px',
+                          color: '#94a3b8',
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase'
+                        }}
+                      >
+                        <span>Progress</span>
+                        <span>{progressValue}/{mission.target}</span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* UI Elements */}
       <div>
