@@ -2437,7 +2437,7 @@ const AgarIOGame = () => {
         if (distance < this.player.radius + virus.radius) {
           if (this.player.mass > virus.mass) {
             // Player is bigger than virus - split player into multiple pieces (authentic Agar.io)
-            const splitCount = Math.min(4, Math.floor(this.player.mass / 40)) // More mass = more splits
+            const splitCount = Math.min(4, Math.floor(this.player.mass / MIN_SPLIT_MASS)) // More mass = more splits
             const pieceCount = Math.max(2, splitCount)
             const pieceMass = this.player.mass / pieceCount
             
@@ -2671,7 +2671,7 @@ const AgarIOGame = () => {
           if (distance < piece.radius + virus.radius) {
             if (piece.mass > virus.mass) {
               // Player piece hits virus - split the piece further
-              if (piece.mass > 40) { // Only split if piece has enough mass
+              if (piece.mass > MIN_SPLIT_MASS) { // Only split if piece has enough mass
                 const halfMass = piece.mass / 2
                 
                 // Update current piece
@@ -3158,7 +3158,7 @@ const AgarIOGame = () => {
 
     split() {
       // Check if split is allowed (minimum mass and cooldown)
-      if (this.player.mass < 36 || this.splitCooldown > 0) {
+      if (this.player.mass < MIN_SPLIT_MASS || this.splitCooldown > 0) {
         return
       }
       
