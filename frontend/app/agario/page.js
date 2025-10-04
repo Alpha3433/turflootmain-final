@@ -4,10 +4,156 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { usePrivy } from '@privy-io/react-auth'
 import { v4 as uuidv4 } from 'uuid'
+import MissionPopupMobile from '../../components/missions/MissionPopupMobile'
 
 const PLAYER_ID_STORAGE_KEY = 'turfloot-agario-player-id'
 
 const MIN_SPLIT_MASS = 40 // Keep in sync with server/src/rooms/ArenaRoom.ts
+
+const MissionPopup = ({ mission, missionIndex, totalMissions, currency }) => {
+  if (!mission) return null
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 1000,
+      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      border: '2px solid rgba(59, 130, 246, 0.6)',
+      borderRadius: '8px',
+      padding: '10px 16px',
+      fontFamily: '"Rajdhani", sans-serif',
+      maxWidth: '340px',
+      minWidth: '280px'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{
+          width: '36px',
+          height: '36px',
+          background: mission.completed
+            ? 'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)'
+            : 'linear-gradient(45deg, #3b82f6 0%, #1d4ed8 100%)',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '16px',
+          border: '2px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+        }}>
+          {mission.icon}
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '3px'
+          }}>
+            <span style={{
+              color: mission.completed ? '#22c55e' : '#ffffff',
+              fontSize: '13px',
+              fontWeight: '700',
+              textTransform: 'uppercase'
+            }}>
+              {mission.name}
+            </span>
+            <span style={{
+              color: '#FFD700',
+              fontSize: '11px',
+              fontWeight: '700'
+            }}>
+              +{mission.reward}💰
+            </span>
+          </div>
+
+          <div style={{
+            color: '#a0aec0',
+            fontSize: '10px',
+            marginBottom: '4px',
+            lineHeight: 1.4
+          }}>
+            {mission.description}
+          </div>
+
+          <div style={{
+            width: '100%',
+            height: '8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '999px',
+            overflow: 'hidden',
+            marginBottom: '6px'
+          }}>
+            <div style={{
+              width: `${Math.min(100, (mission.progress / mission.target) * 100)}%`,
+              height: '100%',
+              background: mission.completed
+                ? 'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)'
+                : 'linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%)',
+              transition: 'width 0.3s ease'
+            }} />
+          </div>
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            color: '#ffffff'
+          }}>
+            <span style={{ fontSize: '11px', fontWeight: '600' }}>
+              {mission.progress}/{mission.target}
+            </span>
+            {mission.completed && (
+              <span style={{
+                fontSize: '11px',
+                fontWeight: '700',
+                color: '#22c55e',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                ✅ Completed
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: '4px'
+        }}>
+          <div style={{
+            color: '#60a5fa',
+            fontSize: '9px',
+            fontWeight: '600',
+            textTransform: 'uppercase'
+          }}>
+            Mission
+          </div>
+          <div style={{
+            color: '#ffffff',
+            fontSize: '12px',
+            fontWeight: '700'
+          }}>
+            {missionIndex + 1}/{totalMissions}
+          </div>
+          <div style={{
+            color: '#FFD700',
+            fontSize: '9px',
+            fontWeight: '700'
+          }}>
+            💰 {currency}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const AgarIOGame = () => {
   const canvasRef = useRef(null)
@@ -4146,161 +4292,36 @@ const AgarIOGame = () => {
           )
         })()}
         
-        {/* Missions Panel - Mobile Optimized */}
-        {activeMissions.length > 0 && gameRef.current && gameRef.current.detectCashGame() && (
-          <div style={{
-            position: 'fixed',
-            top: isMobile ? '50%' : '20px',
-            left: '50%',
-            transform: isMobile ? 'translate(-50%, -50%)' : 'translateX(-50%)',
-            zIndex: isMobile ? 2000 : 1000,
-            backgroundColor: isMobile ? 'rgba(0, 0, 0, 0.95)' : 'rgba(0, 0, 0, 0.85)',
-            border: isMobile ? '3px solid rgba(59, 130, 246, 0.8)' : '2px solid rgba(59, 130, 246, 0.6)',
-            borderRadius: isMobile ? '14px' : '8px',
-            padding: isMobile ? '16px 18px' : '10px 16px',
-            fontFamily: '"Rajdhani", sans-serif',
-            maxWidth: isMobile ? '270px' : '340px',
-            minWidth: isMobile ? '240px' : '280px',
-            transition: 'all 0.3s ease',
-            boxShadow: isMobile ? '0 10px 40px rgba(59, 130, 246, 0.35)' : 'none'
-          }}>
-            {/* Mission Display */}
-            {(() => {
-              const currentMission = activeMissions[currentMissionIndex]
-              if (!currentMission) return null
-              
-              return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '14px' : '12px' }}>
-                  {/* Mission Icon */}
-                  <div style={{
-                    width: isMobile ? '44px' : '36px',
-                    height: isMobile ? '44px' : '36px',
-                    background: currentMission.completed ? 
-                      'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)' : 
-                      'linear-gradient(45deg, #3b82f6 0%, #1d4ed8 100%)',
-                    borderRadius: isMobile ? '10px' : '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: isMobile ? '20px' : '16px',
-                    border: '2px solid rgba(255, 255, 255, 0.2)',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
-                  }}>
-                    {currentMission.icon}
-                  </div>
-                  
-                  {/* Mission Info */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: isMobile ? '4px' : '3px'
-                    }}>
-                      <span style={{
-                        color: currentMission.completed ? '#22c55e' : '#ffffff',
-                        fontSize: isMobile ? '14px' : '13px',
-                        fontWeight: '700',
-                        textTransform: 'uppercase'
-                      }}>
-                        {currentMission.name}
-                      </span>
-                      <span style={{
-                        color: '#FFD700',
-                        fontSize: isMobile ? '13px' : '11px',
-                        fontWeight: '700'
-                      }}>
-                        +{currentMission.reward}💰
-                      </span>
-                    </div>
-                    
-                    <div style={{
-                      color: '#a0aec0',
-                      fontSize: isMobile ? '12px' : '10px',
-                      marginBottom: isMobile ? '6px' : '4px',
-                      lineHeight: 1.4
-                    }}>
-                      {currentMission.description}
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div style={{
-                      width: '100%',
-                      height: isMobile ? '6px' : '5px',
-                      backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      borderRadius: isMobile ? '3px' : '3px',
-                      overflow: 'hidden',
-                      border: '1px solid rgba(255, 255, 255, 0.1)'
-                    }}>
-                      <div style={{
-                        width: `${Math.min(100, (currentMission.progress / currentMission.target) * 100)}%`,
-                        height: '100%',
-                        background: currentMission.completed ?
-                          'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)' :
-                          'linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%)',
-                        transition: 'width 0.3s ease'
-                      }} />
-                    </div>
-                    
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginTop: isMobile ? '3px' : '2px'
-                    }}>
-                      <span style={{
-                        color: '#9ca3af',
-                        fontSize: isMobile ? '11px' : '9px'
-                      }}>
-                        {currentMission.progress}/{currentMission.target}
-                      </span>
-                      {currentMission.completed && (
-                        <span style={{
-                          color: '#22c55e',
-                          fontSize: isMobile ? '11px' : '9px',
-                          fontWeight: '700'
-                        }}>
-                          ✓ COMPLETE
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Mission Counter */}
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: isMobile ? '4px' : '4px'
-                  }}>
-                    <div style={{
-                      color: '#a0aec0',
-                      fontSize: isMobile ? '11px' : '9px',
-                      textTransform: 'uppercase'
-                    }}>
-                      Mission
-                    </div>
-                    <div style={{
-                      color: '#ffffff',
-                      fontSize: isMobile ? '14px' : '12px',
-                      fontWeight: '700'
-                    }}>
-                      {currentMissionIndex + 1}/{activeMissions.length}
-                    </div>
-                    <div style={{
-                      color: '#FFD700',
-                      fontSize: isMobile ? '11px' : '9px',
-                      fontWeight: '700'
-                    }}>
-                      💰 {currency}
-                    </div>
-                  </div>
-                </div>
-              )
-            })()}
-          </div>
-        )}
+        {/* Missions Panel */}
+        {(() => {
+          const currentMission = activeMissions[currentMissionIndex]
+          const shouldShowMission =
+            activeMissions.length > 0 &&
+            gameRef.current &&
+            gameRef.current.detectCashGame()
 
+          if (!shouldShowMission) return null
+
+          if (isMobile) {
+            return (
+              <MissionPopupMobile
+                mission={currentMission}
+                missionIndex={currentMissionIndex}
+                totalMissions={activeMissions.length}
+                currency={currency}
+              />
+            )
+          }
+
+          return (
+            <MissionPopup
+              mission={currentMission}
+              missionIndex={currentMissionIndex}
+              totalMissions={activeMissions.length}
+              currency={currency}
+            />
+          )
+        })()}
         {/* Cheating Ban Popup */}
         {cheatingBan && (
           <div style={{
