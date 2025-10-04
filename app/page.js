@@ -845,7 +845,8 @@ export default function TurfLootTactical() {
         'coins_eaten': 'eat_50_coins',
         'survival_time': 'survive_5_minutes',
         'max_mass': 'reach_mass_200',
-        'cashout': 'cashout_5_times'
+        'cashout': 'cashout_5_times',
+        'eliminations': 'eliminate_50_players'
       }
 
       const challengeId = challengeMapping[challengeType]
@@ -870,7 +871,8 @@ export default function TurfLootTactical() {
         'eat_50_coins': 50,
         'survive_5_minutes': 300, // 5 minutes in seconds
         'reach_mass_200': 200,
-        'cashout_5_times': 5
+        'cashout_5_times': 5,
+        'eliminate_50_players': 50
       }
 
       if (challengesData[challengeId].current >= targets[challengeId]) {
@@ -892,14 +894,16 @@ export default function TurfLootTactical() {
           'eat_50_coins': 'Coin Collector',
           'survive_5_minutes': 'Survivor',
           'reach_mass_200': 'Growing Strong',
-          'cashout_5_times': 'Cash Master'
+          'cashout_5_times': 'Cash Master',
+          'eliminate_50_players': 'Executioner'
         }
         
         const rewards = {
           'eat_50_coins': 100,
           'survive_5_minutes': 150,
           'reach_mass_200': 200,
-          'cashout_5_times': 250
+          'cashout_5_times': 250,
+          'eliminate_50_players': 750
         }
 
         // Show notification toast
