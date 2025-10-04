@@ -349,9 +349,11 @@ const WalletManager = ({ onBalanceUpdate }) => {
         try {
           await fundWallet({
             walletId,
-            uiConfig: {
-              receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
-              receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
+            options: {
+              uiConfig: {
+                receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
+                receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
+              },
             },
           })
           console.log('✅ Privy funding modal should have opened')

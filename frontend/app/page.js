@@ -2497,11 +2497,13 @@ export default function TurfLootTactical() {
         console.log('🧪 APPROACH 1: Solana cluster format with exchange method')
         await fundWallet({
           walletId,
-          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
-          amount: '0.1',                        // ✅ SOL amount
-          defaultFundingMethod: 'exchange',     // ✅ Force exchange transfer to show
-          card: {
-            preferredProvider: 'coinbase'       // ✅ Coinbase for exchange
+          options: {
+            cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
+            amount: '0.1',                        // ✅ SOL amount
+            defaultFundingMethod: 'exchange',     // ✅ Force exchange transfer to show
+            card: {
+              preferredProvider: 'coinbase'       // ✅ Coinbase for exchange
+            }
           }
         })
         
@@ -2517,8 +2519,10 @@ export default function TurfLootTactical() {
         console.log('🧪 APPROACH 2: Simplified Solana cluster format')
         await fundWallet({
           walletId,
-          cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
-          amount: '0.1'                         // ✅ SOL amount
+          options: {
+            cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
+            amount: '0.1'                         // ✅ SOL amount
+          }
         })
         
         console.log('✅ SUCCESS: Simplified Solana cluster format worked!')
@@ -2533,11 +2537,13 @@ export default function TurfLootTactical() {
         console.log('🧪 APPROACH 3: Working chain ID format (reliable fallback)')
         await fundWallet({
           walletId,
-          chain: {
-            id: 101, // Solana Mainnet chain ID
-            name: 'Solana'
-          },
-          asset: 'native-currency' // SOL
+          options: {
+            chain: {
+              id: 101, // Solana Mainnet chain ID
+              name: 'Solana'
+            },
+            asset: 'native-currency' // SOL
+          }
         })
         
         console.log('✅ SUCCESS: Working chain ID format succeeded!')
