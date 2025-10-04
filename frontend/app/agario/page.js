@@ -4156,13 +4156,13 @@ const AgarIOGame = () => {
             zIndex: isMobile ? 2000 : 1000,
             backgroundColor: isMobile ? 'rgba(0, 0, 0, 0.95)' : 'rgba(0, 0, 0, 0.85)',
             border: isMobile ? '3px solid rgba(59, 130, 246, 0.8)' : '2px solid rgba(59, 130, 246, 0.6)',
-            borderRadius: isMobile ? '16px' : '8px',
-            padding: isMobile ? '20px 24px' : '12px 20px',
+            borderRadius: isMobile ? '14px' : '8px',
+            padding: isMobile ? '16px 18px' : '10px 16px',
             fontFamily: '"Rajdhani", sans-serif',
-            maxWidth: isMobile ? '300px' : '400px',
-            minWidth: isMobile ? '280px' : '320px',
+            maxWidth: isMobile ? '270px' : '340px',
+            minWidth: isMobile ? '240px' : '280px',
             transition: 'all 0.3s ease',
-            boxShadow: isMobile ? '0 10px 40px rgba(59, 130, 246, 0.4)' : 'none'
+            boxShadow: isMobile ? '0 10px 40px rgba(59, 130, 246, 0.35)' : 'none'
           }}>
             {/* Mission Display */}
             {(() => {
@@ -4170,19 +4170,19 @@ const AgarIOGame = () => {
               if (!currentMission) return null
               
               return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '20px' : '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '14px' : '12px' }}>
                   {/* Mission Icon */}
                   <div style={{
-                    width: isMobile ? '50px' : '40px',
-                    height: isMobile ? '50px' : '40px',
+                    width: isMobile ? '44px' : '36px',
+                    height: isMobile ? '44px' : '36px',
                     background: currentMission.completed ? 
                       'linear-gradient(45deg, #22c55e 0%, #16a34a 100%)' : 
                       'linear-gradient(45deg, #3b82f6 0%, #1d4ed8 100%)',
-                    borderRadius: isMobile ? '12px' : '8px',
+                    borderRadius: isMobile ? '10px' : '8px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: isMobile ? '22px' : '18px',
+                    fontSize: isMobile ? '20px' : '16px',
                     border: '2px solid rgba(255, 255, 255, 0.2)',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
                   }}>
@@ -4195,11 +4195,11 @@ const AgarIOGame = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      marginBottom: isMobile ? '6px' : '4px'
+                      marginBottom: isMobile ? '4px' : '3px'
                     }}>
                       <span style={{
                         color: currentMission.completed ? '#22c55e' : '#ffffff',
-                        fontSize: isMobile ? '16px' : '14px',
+                        fontSize: isMobile ? '14px' : '13px',
                         fontWeight: '700',
                         textTransform: 'uppercase'
                       }}>
@@ -4207,7 +4207,7 @@ const AgarIOGame = () => {
                       </span>
                       <span style={{
                         color: '#FFD700',
-                        fontSize: isMobile ? '14px' : '12px',
+                        fontSize: isMobile ? '13px' : '11px',
                         fontWeight: '700'
                       }}>
                         +{currentMission.reward}💰
@@ -4216,8 +4216,9 @@ const AgarIOGame = () => {
                     
                     <div style={{
                       color: '#a0aec0',
-                      fontSize: isMobile ? '13px' : '11px',
-                      marginBottom: isMobile ? '8px' : '6px'
+                      fontSize: isMobile ? '12px' : '10px',
+                      marginBottom: isMobile ? '6px' : '4px',
+                      lineHeight: 1.4
                     }}>
                       {currentMission.description}
                     </div>
@@ -4225,9 +4226,9 @@ const AgarIOGame = () => {
                     {/* Progress Bar */}
                     <div style={{
                       width: '100%',
-                      height: isMobile ? '8px' : '6px',
+                      height: isMobile ? '6px' : '5px',
                       backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                      borderRadius: isMobile ? '4px' : '3px',
+                      borderRadius: isMobile ? '3px' : '3px',
                       overflow: 'hidden',
                       border: '1px solid rgba(255, 255, 255, 0.1)'
                     }}>
@@ -4245,18 +4246,18 @@ const AgarIOGame = () => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      marginTop: isMobile ? '4px' : '2px'
+                      marginTop: isMobile ? '3px' : '2px'
                     }}>
                       <span style={{
                         color: '#9ca3af',
-                        fontSize: isMobile ? '12px' : '10px'
+                        fontSize: isMobile ? '11px' : '9px'
                       }}>
                         {currentMission.progress}/{currentMission.target}
                       </span>
                       {currentMission.completed && (
                         <span style={{
                           color: '#22c55e',
-                          fontSize: isMobile ? '12px' : '10px',
+                          fontSize: isMobile ? '11px' : '9px',
                           fontWeight: '700'
                         }}>
                           ✓ COMPLETE
@@ -4270,25 +4271,25 @@ const AgarIOGame = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: isMobile ? '6px' : '4px'
+                    gap: isMobile ? '4px' : '4px'
                   }}>
                     <div style={{
                       color: '#a0aec0',
-                      fontSize: isMobile ? '12px' : '10px',
+                      fontSize: isMobile ? '11px' : '9px',
                       textTransform: 'uppercase'
                     }}>
                       Mission
                     </div>
                     <div style={{
                       color: '#ffffff',
-                      fontSize: isMobile ? '16px' : '14px',
+                      fontSize: isMobile ? '14px' : '12px',
                       fontWeight: '700'
                     }}>
                       {currentMissionIndex + 1}/{activeMissions.length}
                     </div>
                     <div style={{
                       color: '#FFD700',
-                      fontSize: isMobile ? '12px' : '10px',
+                      fontSize: isMobile ? '11px' : '9px',
                       fontWeight: '700'
                     }}>
                       💰 {currency}
