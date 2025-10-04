@@ -453,8 +453,24 @@ export class ArenaRoom extends Room<GameState> {
           player.score += 10;
         } else {
           // Player gets damaged
-          player.mass = Math.max(50, player.mass * 0.8);
+          const oldMass = player.mass;
+          const reducedMass = player.mass * 0.8;
+          const enforceFloor = !player.isSplitPiece && oldMass >= 25;
+          const newMass = enforceFloor
+            ? Math.max(25, reducedMass)
+            : Math.max(0, reducedMass);
+          player.mass = newMass;
           player.radius = this.calculateRadius(player.mass);
+
+          console.log("💥 Arena virus damage", {
+            player: player.name,
+            oldMass,
+            reducedMass,
+            newMass,
+            enforceFloor,
+            isSplitPiece: player.isSplitPiece,
+            wasBelowSpawnMass: oldMass < 25
+          });
         }
       }
     });

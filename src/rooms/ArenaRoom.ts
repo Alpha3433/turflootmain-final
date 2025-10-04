@@ -692,18 +692,23 @@ export class ArenaRoom extends Room<GameState> {
           // Player gets damaged by virus
           const oldMass = player.mass;
           const reducedMass = player.mass * 0.8;
-          const newMass = Math.max(25, reducedMass);
+          const enforceFloor = !player.isSplitPiece && oldMass >= 25;
+          const newMass = enforceFloor
+            ? Math.max(25, reducedMass)
+            : Math.max(0, reducedMass);
           player.mass = newMass;
           player.radius = Math.sqrt(player.mass) * 3; // Match agario radius formula
-          
+
           console.log(`💥 PLAYER HIT BY VIRUS:`, {
             playerName: player.name,
             oldMass: oldMass.toFixed(1),
             reducedTo: reducedMass.toFixed(1),
             finalMass: newMass.toFixed(1),
             reduction: (oldMass - newMass).toFixed(1),
-            minimumEnforced: newMass === 25,
-            formula: `max(25, ${oldMass.toFixed(1)} * 0.8) = max(25, ${reducedMass.toFixed(1)}) = ${newMass.toFixed(1)}`
+            minimumEnforced: enforceFloor && newMass === 25,
+            formula: `${enforceFloor ? "max(25," : ""}${oldMass.toFixed(1)} * 0.8${enforceFloor ? ")" : ""} = ${newMass.toFixed(1)}`,
+            wasSplitPiece: player.isSplitPiece,
+            wasBelowSpawnMass: oldMass < 25
           });
         }
       }
