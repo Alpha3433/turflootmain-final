@@ -8,6 +8,8 @@ export class Player extends Schema {
   @type("number") y: number = 0;
   @type("number") vx: number = 0;
   @type("number") vy: number = 0;
+  @type("number") moveTargetX: number = 0; // Smoothed movement target X
+  @type("number") moveTargetY: number = 0; // Smoothed movement target Y
   @type("number") mass: number = 25; // Fixed default mass to 25
   @type("number") radius: number = 20;
   @type("string") color: string = "#FF6B6B";
@@ -229,9 +231,11 @@ export class ArenaRoom extends Room<GameState> {
     const spawnPosition = this.getNextSpawnPosition();
     player.x = spawnPosition.x;
     player.y = spawnPosition.y;
-    
+
     player.vx = 0;
     player.vy = 0;
+    player.moveTargetX = player.x;
+    player.moveTargetY = player.y;
     player.mass = 25; // Updated to 25 to match user requirement
     player.radius = Math.sqrt(player.mass) * 3; // Use proper formula: √25 * 3 = 15
     
@@ -273,6 +277,11 @@ export class ArenaRoom extends Room<GameState> {
     }
 
     const { seq, dx, dy } = message;
+
+    if (typeof dx !== "number" || typeof dy !== "number" || !isFinite(dx) || !isFinite(dy)) {
+      console.log(`⚠️ Input ignored - invalid direction for ${client.sessionId}`);
+      return;
+    }
     
     console.log(`📥 Received input from ${player.name} (${client.sessionId}):`, {
       sequence: seq,
@@ -291,15 +300,14 @@ export class ArenaRoom extends Room<GameState> {
     
     // Set target position instead of direct velocity (matching local agario)
     const moveSpeed = 500; // Base move speed matching local agario
-    
+
     // Calculate target position based on input direction
     const targetX = player.x + dx * moveSpeed;
     const targetY = player.y + dy * moveSpeed;
-    
-    // Store target in velocity fields for now (we'll use them as target storage)
-    player.vx = targetX;
-    player.vy = targetY;
-    
+
+    player.moveTargetX = targetX;
+    player.moveTargetY = targetY;
+
     console.log(`✅ Set movement target for ${player.name}:`, {
       input: { dx: dx.toFixed(3), dy: dy.toFixed(3) },
       currentPos: { x: player.x.toFixed(1), y: player.y.toFixed(1) },
@@ -373,8 +381,10 @@ export class ArenaRoom extends Room<GameState> {
       player.lastSplitTime = now;
 
       // Reset movement targets and clear any residual momentum so the owner stays put
-      player.vx = player.x;
-      player.vy = player.y;
+      player.vx = 0;
+      player.vy = 0;
+      player.moveTargetX = player.x;
+      player.moveTargetY = player.y;
       player.momentumX = 0;
       player.momentumY = 0;
       
@@ -398,6 +408,8 @@ export class ArenaRoom extends Room<GameState> {
       splitPiece.radius = Math.sqrt(newMass) * 3;
       splitPiece.x = player.x;
       splitPiece.y = player.y;
+      splitPiece.moveTargetX = splitPiece.x;
+      splitPiece.moveTargetY = splitPiece.y;
       splitPiece.alive = true;
       
       // Split piece metadata
@@ -560,61 +572,79 @@ export class ArenaRoom extends Room<GameState> {
           }
         }
       } else {
-        // NORMAL PLAYER MOVEMENT: Smooth movement toward target (vx and vy are being used as targetX and targetY)
-        const targetX = player.vx;
-        const targetY = player.vy;
-        
+        // NORMAL PLAYER MOVEMENT: Smooth movement toward target with velocity smoothing
+        const targetX = player.moveTargetX ?? player.x;
+        const targetY = player.moveTargetY ?? player.y;
+
         const dx = targetX - player.x;
         const dy = targetY - player.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance > 1) { // Only move if target is far enough
-          // Calculate dynamic speed based on mass (matching local agario formula)
-          const baseSpeed = 6.0;
-          const massSpeedFactor = Math.sqrt(player.mass / 20);
-          const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor);
-          
-          // Calculate move distance based on speed and delta time
-          const moveDistance = dynamicSpeed * deltaTime * 60; // 60 for frame rate normalization
-          
-          // Clamp movement to not overshoot target
-          const actualMoveDistance = Math.min(moveDistance, distance);
-          
-          // Calculate proposed new position
-          const moveX = (dx / distance) * actualMoveDistance;
-          const moveY = (dy / distance) * actualMoveDistance;
-          const newX = player.x + moveX;
-          const newY = player.y + moveY;
-          
-          // Check if new position would violate boundary
-          const newDistanceFromCenter = Math.sqrt(
-            Math.pow(newX - centerX, 2) + 
-            Math.pow(newY - centerY, 2)
-          );
-          
-          if (newDistanceFromCenter > maxRadius) {
-            // Move player to boundary edge instead
-            const angle = Math.atan2(newY - centerY, newX - centerX);
-            player.x = centerX + Math.cos(angle) * maxRadius;
-            player.y = centerY + Math.sin(angle) * maxRadius;
-          } else {
-            // Safe to move - apply normal movement
-            player.x = newX;
-            player.y = newY;
+
+        // Calculate dynamic speed based on mass (matching local agario formula)
+        const baseSpeed = 6.0;
+        const massSpeedFactor = Math.sqrt(player.mass / 20);
+        const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor);
+        const desiredSpeedPerSecond = dynamicSpeed * 60; // Convert to units per second
+
+        if (distance > 0.5) {
+          // Smooth acceleration toward desired velocity to remove abrupt direction changes
+          const dirX = dx / distance;
+          const dirY = dy / distance;
+          const desiredVx = dirX * desiredSpeedPerSecond;
+          const desiredVy = dirY * desiredSpeedPerSecond;
+
+          const accelerationRate = 10; // Higher values accelerate faster
+          const accelLerp = 1 - Math.exp(-accelerationRate * deltaTime);
+
+          player.vx += (desiredVx - player.vx) * accelLerp;
+          player.vy += (desiredVy - player.vy) * accelLerp;
+        } else {
+          // Close to target - gently slow down to avoid jitter
+          const dampingRate = 14;
+          const dampingFactor = Math.exp(-dampingRate * deltaTime);
+          player.vx *= dampingFactor;
+          player.vy *= dampingFactor;
+
+          if (distance <= 0.1) {
+            player.moveTargetX = player.x;
+            player.moveTargetY = player.y;
           }
         }
-        
+
+        let newX = player.x + player.vx * deltaTime;
+        let newY = player.y + player.vy * deltaTime;
+
+        // Check if new position would violate boundary
+        const newDistanceFromCenter = Math.sqrt(
+          Math.pow(newX - centerX, 2) +
+          Math.pow(newY - centerY, 2)
+        );
+
+        if (newDistanceFromCenter > maxRadius) {
+          // Move player to boundary edge instead and clear velocity to prevent sliding
+          const angle = Math.atan2(newY - centerY, newX - centerX);
+          newX = centerX + Math.cos(angle) * maxRadius;
+          newY = centerY + Math.sin(angle) * maxRadius;
+          player.vx = 0;
+          player.vy = 0;
+        }
+
+        player.x = newX;
+        player.y = newY;
+
         // ADDITIONAL SAFETY CHECK: Ensure player is always within bounds
         const currentDistance = Math.sqrt(
-          Math.pow(player.x - centerX, 2) + 
+          Math.pow(player.x - centerX, 2) +
           Math.pow(player.y - centerY, 2)
         );
-        
+
         if (currentDistance > maxRadius) {
-          // Force player back within boundary
+          // Force player back within boundary and zero velocity when clamped
           const angle = Math.atan2(player.y - centerY, player.x - centerX);
           player.x = centerX + Math.cos(angle) * maxRadius;
           player.y = centerY + Math.sin(angle) * maxRadius;
+          player.vx = 0;
+          player.vy = 0;
         }
       }
       
