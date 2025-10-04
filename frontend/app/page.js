@@ -2416,15 +2416,11 @@ export default function TurfLootTactical() {
           chainType: privyUser.wallet.chainType || 'ethereum',
           walletClientType: privyUser.wallet.walletClientType
         })
-        
+
         // Check if embedded wallet is the Solana wallet we're looking for
         if (privyUser.wallet.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG' ||
             privyUser.wallet.chainType === 'solana') {
-          solanaWallet = {
-            address: privyUser.wallet.address,
-            chainType: 'solana',
-            connectorType: 'embedded'
-          }
+          solanaWallet = privyUser.wallet
           walletSource = 'privyUser.wallet'
         }
       }
@@ -2437,17 +2433,13 @@ export default function TurfLootTactical() {
           chainType: acc.chainType
         })))
         
-        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc => 
-          acc.type === 'wallet' && 
+        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc =>
+          acc.type === 'wallet' &&
           (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
         )
-        
+
         if (linkedSolanaWallet) {
-          solanaWallet = {
-            address: linkedSolanaWallet.address,
-            chainType: 'solana',
-            connectorType: 'linked'
-          }
+          solanaWallet = linkedSolanaWallet
           walletSource = 'linkedAccounts'
         }
       }
@@ -2467,11 +2459,20 @@ export default function TurfLootTactical() {
         return
       }
       
+      const walletId = solanaWallet.walletId ?? solanaWallet.id
+
       console.log('✅ Solana wallet found via:', walletSource, {
         address: solanaWallet.address,
         connectorType: solanaWallet.connectorType,
-        chainType: solanaWallet.chainType
+        chainType: solanaWallet.chainType,
+        walletId
       })
+
+      if (!walletId) {
+        console.error('❌ Solana wallet is missing walletId/id. Cannot open funding modal.')
+        alert('Unable to identify the selected Solana wallet. Please reconnect your wallet and try again.')
+        return
+      }
       
       // Check if fundWallet is available from useFundWallet hook
       if (!fundWallet || typeof fundWallet !== 'function') {
@@ -2494,7 +2495,8 @@ export default function TurfLootTactical() {
       // APPROACH 1: Use Solana cluster format with exchange method (per documentation)
       try {
         console.log('🧪 APPROACH 1: Solana cluster format with exchange method')
-        await fundWallet(solanaWallet.address, {
+        await fundWallet({
+          walletId,
           cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
           amount: '0.1',                        // ✅ SOL amount
           defaultFundingMethod: 'exchange',     // ✅ Force exchange transfer to show
@@ -2513,7 +2515,8 @@ export default function TurfLootTactical() {
       // APPROACH 2: Simplified Solana cluster format
       try {
         console.log('🧪 APPROACH 2: Simplified Solana cluster format')
-        await fundWallet(solanaWallet.address, {
+        await fundWallet({
+          walletId,
           cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
           amount: '0.1'                         // ✅ SOL amount
         })
@@ -2528,7 +2531,8 @@ export default function TurfLootTactical() {
       // APPROACH 3: Working chain ID format (reliable fallback)
       try {
         console.log('🧪 APPROACH 3: Working chain ID format (reliable fallback)')
-        await fundWallet(solanaWallet.address, {
+        await fundWallet({
+          walletId,
           chain: {
             id: 101, // Solana Mainnet chain ID
             name: 'Solana'

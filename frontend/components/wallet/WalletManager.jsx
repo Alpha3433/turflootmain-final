@@ -276,18 +276,43 @@ const WalletManager = ({ onBalanceUpdate }) => {
         userId: user?.id
       })
       
-      // Get user's wallet address
-      let walletAddress = null
-      
+      // Get user's Solana wallet, preserving Privy wallet metadata
+      let solanaWallet = null
+      let walletSource = null
+
       if (wallets && wallets.length > 0) {
-        walletAddress = wallets[0].address
-        console.log('💳 Using connected wallet address:', walletAddress)
-      } else if (user?.wallet?.address) {
-        walletAddress = user.wallet.address
-        console.log('💳 Using user wallet address:', walletAddress)
+        solanaWallet = wallets.find(w => w.chainType === 'solana') || wallets[0]
+        walletSource = 'useWallets'
+        console.log('💳 Using wallet from useWallets():', {
+          address: solanaWallet.address,
+          chainType: solanaWallet.chainType,
+          walletId: solanaWallet.walletId,
+          connectorType: solanaWallet.connectorType
+        })
+      } else if (user?.wallet) {
+        solanaWallet = user.wallet
+        walletSource = 'user.wallet'
+        console.log('💳 Using embedded user wallet:', {
+          address: solanaWallet.address,
+          chainType: solanaWallet.chainType,
+          walletId: solanaWallet.walletId,
+          connectorType: solanaWallet.connectorType
+        })
+      } else if (user?.linkedAccounts) {
+        const linkedSolanaWallet = user.linkedAccounts.find(acc => acc.type === 'wallet' && acc.chainType === 'solana')
+        if (linkedSolanaWallet) {
+          solanaWallet = linkedSolanaWallet
+          walletSource = 'linkedAccounts'
+          console.log('💳 Using linked account wallet:', {
+            address: solanaWallet.address,
+            chainType: solanaWallet.chainType,
+            walletId: solanaWallet.walletId,
+            connectorType: solanaWallet.connectorType
+          })
+        }
       }
-      
-      if (!walletAddress) {
+
+      if (!solanaWallet) {
         console.log('📱 No wallet address found, trying to connect wallet first...')
         if (typeof connectWallet === 'function') {
           console.log('🔗 Attempting wallet connection...')
@@ -301,12 +326,29 @@ const WalletManager = ({ onBalanceUpdate }) => {
         }
       }
       
+      const walletId = solanaWallet.walletId ?? solanaWallet.id
+
+      if (!walletId) {
+        console.error('❌ Selected wallet is missing walletId/id. Cannot open funding modal.', {
+          walletSource,
+          address: solanaWallet.address,
+          chainType: solanaWallet.chainType
+        })
+        alert('Unable to open the funding modal because the wallet ID is missing. Please reconnect your wallet and try again.')
+        return
+      }
+
       // Try to use Privy's native funding modal
       if (typeof fundWallet === 'function') {
-        console.log('🚀 Attempting to open Privy native funding modal for:', walletAddress)
-        
+        console.log('🚀 Attempting to open Privy native funding modal for:', {
+          walletId,
+          address: solanaWallet.address,
+          walletSource
+        })
+
         try {
-          await fundWallet(walletAddress, {
+          await fundWallet({
+            walletId,
             uiConfig: {
               receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
               receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
