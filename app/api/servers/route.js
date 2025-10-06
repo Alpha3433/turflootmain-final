@@ -35,10 +35,24 @@ export async function GET(request) {
       status: 'active',
       serverType: 'colyseus',
       endpoint: colyseusEndpoint,
-      lastUpdated: new Date().toISOString(),
-      timestamp: new Date().toISOString(),
+      lastUpdated: null,
+      timestamp: null,
       canJoin: true
     }
+
+    // Define lightweight cash room templates so players can jump straight into micro-stake games
+    const cashRoomConfigs = [
+      {
+        stake: 0.02,
+        idSuffix: '002',
+        description: 'Micro stakes head-to-head TurfLoot match for new wagers'
+      },
+      {
+        stake: 0.05,
+        idSuffix: '005',
+        description: 'Low stakes TurfLoot arena for casual competitive play'
+      }
+    ]
 
     // Try to get real player count from game sessions database
     let realPlayers = 0
@@ -77,34 +91,87 @@ export async function GET(request) {
     arenaServer.currentPlayers = realPlayers
     arenaServer.status = realPlayers > 0 ? 'active' : 'waiting'
     arenaServer.avgWaitTime = realPlayers > 0 ? 'Join Now' : 'Waiting for players'
-    
+
     // Add creator info for active rooms
     if (realPlayers > 0) {
       arenaServer.creatorName = 'Account A'
       arenaServer.creatorWallet = 'Demo_Wallet_123'
     }
 
-    // Return single server array
-    const servers = [arenaServer]
-    
-    console.log(`📊 Returning Colyseus arena server with ${realPlayers} players`)
-    
+    const timestamp = new Date().toISOString()
+
+    // Refresh timestamp metadata now that we have accurate player counts
+    arenaServer.lastUpdated = timestamp
+    arenaServer.timestamp = timestamp
+
+    // Build dedicated cash rooms for $0.02 and $0.05 wagers
+    const cashRooms = cashRoomConfigs.map(config => ({
+      id: `colyseus-cash-${config.idSuffix}-au`,
+      roomType: 'cash',
+      type: 'cash-room',
+      name: `TurfLoot $${config.stake.toFixed(2)} Room - Australia`,
+      region: 'Australia',
+      regionId: 'au-syd',
+      displayName: `$${config.stake.toFixed(2)} Cash Game`,
+      mode: 'cash-game',
+      gameType: 'Cash Game',
+      description: config.description,
+      maxPlayers: 50,
+      minPlayers: 2,
+      currentPlayers: 0,
+      waitingPlayers: 0,
+      isRunning: true,
+      ping: null,
+      avgWaitTime: 'Create Game',
+      difficulty: 'All Players',
+      entryFee: config.stake,
+      serverFee: 0,
+      totalCost: config.stake,
+      potentialWinning: Number((config.stake * 2).toFixed(2)),
+      prizePool: Number((config.stake * 2).toFixed(2)),
+      stake: config.stake,
+      status: 'waiting',
+      serverType: 'colyseus',
+      endpoint: colyseusEndpoint,
+      hathoraRegion: 'ap-southeast-2',
+      lastUpdated: timestamp,
+      timestamp,
+      canJoin: true,
+      canSpectate: false
+    }))
+
+    // Return all available server templates (arena + cash rooms)
+    const servers = [arenaServer, ...cashRooms]
+
+    const totalPlayers = servers.reduce((sum, server) => sum + (server.currentPlayers || 0), 0)
+    const totalActiveServers = servers.filter(server => (server.currentPlayers || 0) > 0).length
+    const practiceServers = servers.filter(server => (server.entryFee || 0) === 0).length
+    const cashServers = servers.filter(server => (server.entryFee || 0) > 0).length
+    const regions = [...new Set(servers.map(server => server.region))]
+
+    const gameTypes = [
+      { name: 'Arena Battle', servers: practiceServers }
+    ]
+
+    if (cashServers > 0) {
+      gameTypes.push({ name: 'Cash Game', servers: cashServers })
+    }
+
+    console.log(`📊 Returning ${servers.length} Colyseus rooms (${practiceServers} practice, ${cashServers} cash) with ${totalPlayers} total players`)
+
     return NextResponse.json({
-      servers: servers,
-      totalPlayers: realPlayers,
-      totalActiveServers: realPlayers > 0 ? 1 : 0,
-      totalServers: 1,
-      practiceServers: 0,
-      cashServers: 0,
-      regions: ['Global'],
-      gameTypes: [{ 
-        name: 'Arena Battle', 
-        servers: 1 
-      }],
+      servers,
+      totalPlayers,
+      totalActiveServers,
+      totalServers: servers.length,
+      practiceServers,
+      cashServers,
+      regions,
+      gameTypes,
       colyseusEnabled: true,
       colyseusEndpoint: colyseusEndpoint,
-      lastUpdated: new Date().toISOString(),
-      timestamp: new Date().toISOString()
+      lastUpdated: timestamp,
+      timestamp
     })
     
   } catch (error) {
