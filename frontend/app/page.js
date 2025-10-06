@@ -2613,9 +2613,9 @@ export default function TurfLootTactical() {
       console.log('💸 WITHDRAW button clicked - Desktop/Mobile')
       console.log('🔍 Current authentication state:', { authenticated, privyUser: !!privyUser })
       console.log('🔍 withdrawalModalVisible current state:', withdrawalModalVisible)
-      
+
       // Check authentication using Privy hooks directly
-      if (!authenticated || !privyUser) {
+      if (!authenticated) {
         console.log('❌ User not authenticated, triggering login')
         if (typeof login === 'function') {
           await login()
@@ -2625,12 +2625,23 @@ export default function TurfLootTactical() {
           return
         }
       }
-      
+
       console.log('✅ User authenticated via Privy, opening withdrawal modal')
-      console.log('👤 User wallet:', privyUser.wallet?.address || 'No wallet')
-      
-      // Open different modals for desktop vs mobile
-      if (window.innerWidth >= 768) {
+      if (privyUser?.wallet?.address) {
+        console.log('👤 User wallet:', privyUser.wallet.address)
+      } else {
+        console.log('👤 User wallet information unavailable (optional)')
+      }
+
+      const isDesktopView = (() => {
+        if (typeof window === 'undefined') {
+          console.warn('⚠️ Window object unavailable, falling back to layout state for modal selection')
+          return !isMobile
+        }
+        return window.innerWidth >= 768
+      })()
+
+      if (isDesktopView) {
         // Desktop: Open new desktop modal
         console.log('🖥️ Opening desktop withdrawal modal')
         setDesktopWithdrawalModalVisible(true)
@@ -2639,7 +2650,7 @@ export default function TurfLootTactical() {
         console.log('📱 Opening mobile withdrawal modal')
         setWithdrawalModalVisible(true)
       }
-      
+
     } catch (error) {
       console.error('❌ Withdraw error:', error)
       
