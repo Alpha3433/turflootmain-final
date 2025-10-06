@@ -24,6 +24,9 @@ export declare class Player extends Schema {
     momentumY: number;
     noMergeUntil: number;
     lastSplitTime: number;
+    stake: number;
+    userId: string;
+    walletEarnings: number;
 }
 export declare class Coin extends Schema {
     x: number;
@@ -53,14 +56,22 @@ export declare class ArenaRoom extends Room<GameState> {
     maxCoins: number;
     maxViruses: number;
     tickRate: number;
+    private normalizeStake;
+    private buildUserFilter;
+    private reserveStake;
+    private refundStake;
+    private transferStakeToWinner;
+    private resolveControllingPlayer;
+    private findClient;
+    private broadcastStakeTransfer;
     onCreate(): void;
     private getNextSpawnPosition;
     private samplePositionWithinPlayableRadius;
     private enforcePlayableBoundary;
-    onJoin(client: Client, options?: any): void;
+    onJoin(client: Client, options?: any): Promise<void>;
     handleInput(client: Client, message: any): void;
     handleSplit(client: Client, message: any): void;
-    onLeave(client: Client, consented?: boolean): void;
+    onLeave(client: Client, consented?: boolean): Promise<void>;
     update(): void;
     checkCollisions(player: Player, sessionId: string): void;
     getOwnedCells(ownerSessionId: string): Player[];

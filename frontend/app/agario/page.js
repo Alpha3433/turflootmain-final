@@ -456,7 +456,11 @@ const AgarIOGame = () => {
       
       // Join Colyseus arena room
       console.log(`🚀 Joining Colyseus arena room...`)
-      const room = await joinArena({ privyUserId: 'player-' + Date.now() })
+      const room = await joinArena({
+        privyUserId: 'player-' + Date.now(),
+        stakeAmount: fee,
+        isAuthenticated: false
+      })
       
       if (!room) {
         throw new Error('Failed to join Colyseus arena room')
@@ -1343,7 +1347,12 @@ const AgarIOGame = () => {
         console.log('🔑 Connecting with user:', { privyUserId, playerName })
 
         // Connect to Colyseus arena
-        const room = await joinArena({ privyUserId, playerName })
+        const room = await joinArena({
+          privyUserId,
+          playerName,
+          stakeAmount,
+          isAuthenticated: Boolean(privyUser?.id)
+        })
         
         setWsConnection('connected')
         setPingMs(null)
