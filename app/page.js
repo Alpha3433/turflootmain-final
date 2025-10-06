@@ -2544,20 +2544,19 @@ export default function TurfLootTactical() {
         return
       }
 
-      const desiredAmount = '0.1'
-      console.log('✅ fundWallet is available, opening Privy funding modal for amount:', desiredAmount)
-
-      await fundWallet({
+      const fundingRequest = {
         address: solanaWallet.address,
         options: {
           chain: 'solana:mainnet',
-          asset: 'native-currency',
-          amount: desiredAmount,
-          defaultFundingMethod: 'exchange'
+          asset: 'native-currency'
         }
-      })
+      }
 
-      console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
+      console.log('✅ fundWallet is available, opening Privy funding modal with options:', fundingRequest)
+
+      await fundWallet(fundingRequest)
+
+      console.log('✅ SUCCESS! Privy funding modal opened with selection screen!')
       
     } catch (error) {
       console.error('❌ Solana funding error details:', {
