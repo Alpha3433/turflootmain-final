@@ -3492,7 +3492,7 @@ const MultiplayerArena = () => {
               {connectionStatus === 'connected' && `🌐 MULTIPLAYER (${playerCount} players)`}
               {connectionStatus === 'connecting' && '🔄 CONNECTING...'}
               {connectionStatus === 'failed' && '❌ CONNECTION ERROR'}
-              {connectionStatus === 'disconnected' && '🔌 DISCONNECTED'}
+              {connectionStatus === 'disconnected' && null}
               {connectionStatus === 'eliminated' && '☠️ ELIMINATED'}
             </span>
           </div>
