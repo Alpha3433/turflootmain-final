@@ -13,7 +13,7 @@ export async function GET() {
         {
           id: 'global-turfloot-arena', // Use original working room identifier
           roomType: 'arena',
-          name: 'TurfLoot Arena 24/7',
+          name: 'Turfloot $1 Room - Australia',
           region: 'Australia',
           regionId: 'au-syd',
           endpoint: colyseusEndpoint,
