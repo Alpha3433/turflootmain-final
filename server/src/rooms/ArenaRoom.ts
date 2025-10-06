@@ -1,5 +1,7 @@
 import { Room, Client } from "@colyseus/core";
 import { Schema, MapSchema, type } from "@colyseus/schema";
+import { MongoClient, Db } from "mongodb";
+import crypto from "crypto";
 
 const MIN_SPLIT_MASS = 40;
 const MAX_SPLIT_PIECES = 16;
@@ -11,6 +13,36 @@ const MOMENTUM_THRESHOLD = 0.1;
 export const MERGE_ATTRACTION_RATE = 0.02;
 export const MERGE_ATTRACTION_MAX = 120;
 export const MERGE_ATTRACTION_SPACING = 0.05;
+
+const USERS_COLLECTION = "users";
+const TRANSACTIONS_COLLECTION = "transactions";
+
+let cachedMongoClient: MongoClient | null = null;
+let cachedDb: Db | null = null;
+
+async function getDatabase(): Promise<Db | null> {
+  if (!process.env.MONGO_URL) {
+    console.warn("⚠️ Arena wallet integration disabled - MONGO_URL not configured");
+    return null;
+  }
+
+  if (cachedDb) {
+    return cachedDb;
+  }
+
+  if (!cachedMongoClient) {
+    cachedMongoClient = new MongoClient(process.env.MONGO_URL, {
+      maxPoolSize: 5
+    });
+  }
+
+  if (!cachedDb) {
+    await cachedMongoClient.connect();
+    cachedDb = cachedMongoClient.db(process.env.MONGO_DB_NAME || "turfloot");
+  }
+
+  return cachedDb;
+}
 
 // Player state schema
 export class Player extends Schema {
@@ -34,6 +66,9 @@ export class Player extends Schema {
   @type("number") momentumY: number = 0;
   @type("number") noMergeUntil: number = 0;
   @type("number") lastSplitTime: number = 0;
+  @type("number") stake: number = 0;
+  @type("string") userId: string = "";
+  @type("number") walletEarnings: number = 0;
 }
 
 // Coin state schema
@@ -72,6 +107,219 @@ export class ArenaRoom extends Room<GameState> {
   maxCoins = 300; // Triple the original 100-coin cap for higher arena density
   maxViruses = 30; // Double the spike count to intensify arena hazards
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+
+  private normalizeStake(raw: unknown): number {
+    if (typeof raw === "number" && Number.isFinite(raw)) {
+      return Math.max(0, raw);
+    }
+
+    if (typeof raw === "string") {
+      const parsed = parseFloat(raw);
+      if (Number.isFinite(parsed)) {
+        return Math.max(0, parsed);
+      }
+    }
+
+    return 0;
+  }
+
+  private buildUserFilter(userId: string) {
+    return {
+      $or: [
+        { id: userId },
+        { privy_id: userId },
+        { user_id: userId },
+        { wallet_address: userId }
+      ]
+    };
+  }
+
+  private async reserveStake(userId: string, amount: number): Promise<boolean> {
+    if (!userId || amount <= 0) {
+      return false;
+    }
+
+    const db = await getDatabase();
+    if (!db) {
+      return false;
+    }
+
+    const users = db.collection(USERS_COLLECTION);
+    const transactions = db.collection(TRANSACTIONS_COLLECTION);
+
+    const filter = this.buildUserFilter(userId);
+    const user = await users.findOne(filter);
+
+    const currentBalance = typeof user?.balance === "number"
+      ? user.balance
+      : parseFloat(user?.balance ?? "0");
+
+    if (!user || !Number.isFinite(currentBalance) || currentBalance < amount) {
+      console.warn(`⚠️ Unable to reserve stake for ${userId} - insufficient balance or user missing`);
+      return false;
+    }
+
+    await users.updateOne(filter, {
+      $inc: {
+        balance: -amount,
+        arena_stake_locked: amount
+      },
+      $set: { updated_at: new Date() }
+    });
+
+    await transactions.insertOne({
+      id: crypto.randomUUID(),
+      type: "arena_stake_reserved",
+      user_id: userId,
+      amount,
+      currency: "USD",
+      game_room: this.roomId,
+      created_at: new Date(),
+      updated_at: new Date()
+    });
+
+    console.log(`💰 Reserved $${amount.toFixed(2)} stake for user ${userId}`);
+    return true;
+  }
+
+  private async refundStake(userId: string, amount: number) {
+    if (!userId || amount <= 0) {
+      return;
+    }
+
+    const db = await getDatabase();
+    if (!db) {
+      return;
+    }
+
+    const users = db.collection(USERS_COLLECTION);
+    const transactions = db.collection(TRANSACTIONS_COLLECTION);
+    const filter = this.buildUserFilter(userId);
+
+    await users.updateOne(filter, {
+      $inc: {
+        balance: amount,
+        arena_stake_locked: -amount
+      },
+      $set: { updated_at: new Date() }
+    });
+
+    await transactions.insertOne({
+      id: crypto.randomUUID(),
+      type: "arena_stake_refund",
+      user_id: userId,
+      amount,
+      currency: "USD",
+      game_room: this.roomId,
+      created_at: new Date(),
+      updated_at: new Date()
+    });
+
+    console.log(`↩️ Refunded $${amount.toFixed(2)} stake to user ${userId}`);
+  }
+
+  private async transferStakeToWinner(
+    winnerId: string | null,
+    loserId: string | null,
+    amount: number,
+    winnerName: string,
+    loserName: string
+  ): Promise<boolean> {
+    if (amount <= 0) {
+      return false;
+    }
+
+    const db = await getDatabase();
+    if (!db) {
+      return false;
+    }
+
+    const users = db.collection(USERS_COLLECTION);
+    const transactions = db.collection(TRANSACTIONS_COLLECTION);
+
+    const operations: Promise<unknown>[] = [];
+    const now = new Date();
+
+    if (loserId) {
+      operations.push(users.updateOne(this.buildUserFilter(loserId), {
+        $inc: {
+          arena_stake_locked: -amount,
+          arena_losses: amount
+        },
+        $set: { updated_at: now }
+      }));
+    }
+
+    if (winnerId) {
+      operations.push(users.updateOne(this.buildUserFilter(winnerId), {
+        $inc: {
+          balance: amount,
+          arena_winnings: amount
+        },
+        $set: { updated_at: now }
+      }));
+    }
+
+    await Promise.all(operations);
+
+    await transactions.insertOne({
+      id: crypto.randomUUID(),
+      type: "arena_stake_transfer",
+      from_user: loserId,
+      to_user: winnerId,
+      amount,
+      currency: "USD",
+      game_room: this.roomId,
+      metadata: {
+        winnerName,
+        loserName
+      },
+      created_at: now,
+      updated_at: now
+    });
+
+    console.log(`🏦 Transferred $${amount.toFixed(2)} from ${loserId ?? 'unknown'} to ${winnerId ?? 'unknown'}`);
+    return true;
+  }
+
+  private resolveControllingPlayer(player: Player, sessionId: string): Player | undefined {
+    if (player.isSplitPiece && player.ownerSessionId) {
+      return this.state.players.get(player.ownerSessionId);
+    }
+
+    return this.state.players.get(sessionId) || player;
+  }
+
+  private findClient(sessionId: string | undefined) {
+    if (!sessionId) {
+      return undefined;
+    }
+
+    return this.clients.find((client) => client.sessionId === sessionId);
+  }
+
+  private broadcastStakeTransfer(
+    amount: number,
+    winnerName: string,
+    loserName: string,
+    winnerSessionId?: string,
+    loserSessionId?: string
+  ) {
+    const payload = {
+      amount,
+      winner: winnerName,
+      loser: loserName,
+      timestamp: Date.now()
+    };
+
+    this.broadcast("arena_stake_transfer", payload);
+
+    const winnerClient = this.findClient(winnerSessionId);
+    const loserClient = this.findClient(loserSessionId);
+
+    winnerClient?.send("wallet_credit", payload);
+    loserClient?.send("wallet_debit", payload);
+  }
 
   onCreate() {
     console.log("🌍 Arena room initialized");
@@ -175,12 +423,17 @@ export class ArenaRoom extends Room<GameState> {
     }
   }
 
-  onJoin(client: Client, options: any = {}) {
-    const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
+  async onJoin(client: Client, options: any = {}) {
+    const privyUserId = typeof options.privyUserId === "string"
+      ? options.privyUserId
+      : `anonymous_${Date.now()}`;
     const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
-    
+    const rawStake = options?.stakeAmount ?? options?.stake ?? options?.entryFee ?? 0;
+    const stakeAmount = this.normalizeStake(rawStake);
+    const isAuthenticated = Boolean(options?.isAuthenticated);
+
     console.log(`👋 Player joined: ${playerName} (${client.sessionId})`);
-    
+
     // Create new player
     const player = new Player();
     player.name = playerName;
@@ -204,17 +457,36 @@ export class ArenaRoom extends Room<GameState> {
     player.momentumY = 0;
     player.noMergeUntil = 0;
     player.lastSplitTime = 0;
+    player.stake = 0;
+    player.userId = privyUserId;
+    player.walletEarnings = 0;
 
     // Add player to game state
     this.state.players.set(client.sessionId, player);
-    
+
     // Store client metadata
     (client as any).userData = {
       privyUserId,
       playerName,
-      lastInputTime: Date.now()
+      lastInputTime: Date.now(),
+      stake: stakeAmount,
+      isAuthenticated
     };
-    
+
+    if (stakeAmount > 0 && isAuthenticated && privyUserId && privyUserId !== "") {
+      try {
+        const reserved = await this.reserveStake(privyUserId, stakeAmount);
+        if (reserved) {
+          player.stake = stakeAmount;
+          (client as any).userData.stakeReserved = stakeAmount;
+        } else {
+          console.warn(`⚠️ Stake reservation failed for ${privyUserId} - continuing without wallet lock`);
+        }
+      } catch (error) {
+        console.error(`❌ Error reserving stake for user ${privyUserId}:`, error);
+      }
+    }
+
     console.log(`✅ Player spawned at (${Math.round(player.x)}, ${Math.round(player.y)})`);
   }
 
@@ -322,15 +594,26 @@ export class ArenaRoom extends Room<GameState> {
     splitPlayer.momentumY = dirY * SPEED_SPLIT;
     splitPlayer.noMergeUntil = now + NO_MERGE_MS;
     splitPlayer.lastSplitTime = now;
+    splitPlayer.stake = 0;
+    splitPlayer.userId = player.userId;
+    splitPlayer.walletEarnings = 0;
 
     this.state.players.set(splitId, splitPlayer);
 
     console.log(`✅ Split created for ${client.sessionId} -> ${splitId}`);
   }
 
-  onLeave(client: Client, consented?: boolean) {
+  async onLeave(client: Client, consented?: boolean) {
     const player = this.state.players.get(client.sessionId);
     if (player) {
+      if (player.alive && player.stake > 0 && player.userId) {
+        try {
+          await this.refundStake(player.userId, player.stake);
+        } catch (error) {
+          console.error(`❌ Failed to refund stake for ${player.userId}:`, error);
+        }
+      }
+
       console.log(`👋 Player left: ${player.name} (${client.sessionId})`);
       this.state.players.delete(client.sessionId);
     }
@@ -510,6 +793,19 @@ export class ArenaRoom extends Room<GameState> {
           const finalMass = otherPlayer.mass;
 
           const eliminatedClient = this.clients.find((client) => client.sessionId === otherSessionId);
+          const controllingWinner = this.resolveControllingPlayer(player, sessionId);
+          const controllingLoser = this.resolveControllingPlayer(otherPlayer, otherSessionId);
+          const winnerSessionOwnerId = player.isSplitPiece ? player.ownerSessionId : sessionId;
+          const winnerName = controllingWinner?.name || player.name;
+          const loserName = otherPlayer.name;
+          const winnerUserId = controllingWinner?.userId || null;
+          const loserUserId = controllingLoser?.userId || null;
+          const loserStake = controllingLoser?.stake ?? 0;
+
+          if (controllingLoser) {
+            controllingLoser.stake = 0;
+          }
+
           if (eliminatedClient) {
             try {
               eliminatedClient.send("gameOver", {
@@ -537,6 +833,31 @@ export class ArenaRoom extends Room<GameState> {
             console.log(`🧹 Removing split piece ${splitSessionId} for eliminated player ${otherSessionId}`);
             this.state.players.delete(splitSessionId);
           });
+
+          if (loserStake > 0 && winnerName) {
+            this.transferStakeToWinner(
+              winnerUserId,
+              loserUserId,
+              loserStake,
+              winnerName,
+              loserName
+            ).then((success) => {
+              if (success) {
+                if (controllingWinner) {
+                  controllingWinner.walletEarnings += loserStake;
+                }
+                this.broadcastStakeTransfer(
+                  loserStake,
+                  winnerName,
+                  loserName,
+                  winnerSessionOwnerId,
+                  otherSessionId
+                );
+              }
+            }).catch((error) => {
+              console.error("❌ Failed to transfer stake after elimination:", error);
+            });
+          }
 
           if (eliminatedClient) {
             try {
