@@ -3442,12 +3442,85 @@ const AgarIOGame = () => {
       this.ctx.strokeStyle = '#FFB000'
       this.ctx.lineWidth = 2
       this.ctx.stroke()
-      
+
       // Draw $ symbol
       this.ctx.fillStyle = '#000000'
       this.ctx.font = 'bold 12px Arial'
       this.ctx.textAlign = 'center'
       this.ctx.fillText('$', coin.x, coin.y + 4)
+    }
+
+    drawRoundedRect(ctx, x, y, width, height, radius = 6) {
+      const clampedRadius = Math.max(0, Math.min(radius, width / 2, height / 2))
+      ctx.beginPath()
+      ctx.moveTo(x + clampedRadius, y)
+      ctx.lineTo(x + width - clampedRadius, y)
+      ctx.quadraticCurveTo(x + width, y, x + width, y + clampedRadius)
+      ctx.lineTo(x + width, y + height - clampedRadius)
+      ctx.quadraticCurveTo(x + width, y + height, x + width - clampedRadius, y + height)
+      ctx.lineTo(x + clampedRadius, y + height)
+      ctx.quadraticCurveTo(x, y + height, x, y + height - clampedRadius)
+      ctx.lineTo(x, y + clampedRadius)
+      ctx.quadraticCurveTo(x, y, x + clampedRadius, y)
+      ctx.closePath()
+    }
+
+    isMainPlayerEntity(entity) {
+      if (!entity) return false
+
+      if (entity === this.player || entity.isCurrentPlayer) {
+        return true
+      }
+
+      const primaryOwnerId = this.player?.ownerSessionId || this.player?.sessionId || this.player?.id || null
+      if (primaryOwnerId && (entity.ownerSessionId === primaryOwnerId || entity.sessionId === primaryOwnerId)) {
+        return true
+      }
+
+      if (entity.name && this.player?.name && entity.name === this.player.name) {
+        return true
+      }
+
+      return false
+    }
+
+    getEntityWagedBalance(entity) {
+      if (!entity) return null
+
+      const balanceKeys = ['wagedBalance', 'wageredBalance', 'wagerBalance', 'netWorth', 'net_worth', 'balance', 'score']
+      for (const key of balanceKeys) {
+        const value = entity[key]
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return value
+        }
+      }
+
+      if (entity === this.player || entity.isCurrentPlayer || this.isMainPlayerEntity(entity)) {
+        const totalMass = (this.player?.mass || 0) + this.playerPieces.reduce((sum, piece) => sum + (piece.mass || 0), 0)
+        if (Number.isFinite(totalMass)) {
+          return Math.max(0, totalMass - 20)
+        }
+      }
+
+      if (typeof entity.mass === 'number' && Number.isFinite(entity.mass)) {
+        return Math.max(0, entity.mass - 20)
+      }
+
+      return null
+    }
+
+    formatWagedBalance(value) {
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        return null
+      }
+
+      const normalized = Math.max(0, value)
+      const showCents = normalized < 1000
+
+      return `$${normalized.toLocaleString('en-US', {
+        minimumFractionDigits: showCents ? 2 : 0,
+        maximumFractionDigits: showCents ? 2 : 0
+      })}`
     }
 
     drawPlayer(player) {
@@ -3490,10 +3563,10 @@ const AgarIOGame = () => {
         // Only show on the main player (the one controlled by the user)
         // Use strict comparison - main player should be the exact object reference or have name 'You'
         const isMainPlayer = (player === this.player) || (player.name === 'You' && player !== this.enemies.find(e => e.name === 'You'))
-        
+
         if (isMainPlayer) {
           console.log('🎯 Drawing compact cash out ring on main player:', player.name)
-          
+
           const ringRadius = player.radius + 8  // Much smaller - closer to player circle
           const progressAngle = (this.gameStates.cashOutProgress / 100) * Math.PI * 2
           
@@ -3534,16 +3607,60 @@ const AgarIOGame = () => {
           this.ctx.stroke()
           
           this.ctx.globalAlpha = 1.0 // Reset alpha
-          
+
           // REMOVED: No more "CASHING OUT" text above player to avoid interference with "You" label
         }
       }
-      
+
+      const nameBaselineY = player.y - player.radius - 15
+      const wagedBalanceValue = this.getEntityWagedBalance(player)
+      const balanceText = this.formatWagedBalance(wagedBalanceValue)
+
+      if (balanceText) {
+        const previousFont = this.ctx.font
+        const previousBaseline = this.ctx.textBaseline
+        const previousAlign = this.ctx.textAlign
+
+        this.ctx.font = 'bold 12px Arial'
+        this.ctx.textAlign = 'center'
+        this.ctx.textBaseline = 'middle'
+
+        const textMetrics = this.ctx.measureText(balanceText)
+        const paddingX = 8
+        const boxWidth = textMetrics.width + paddingX * 2
+        const boxHeight = 18
+        const boxX = player.x - boxWidth / 2
+        const boxY = nameBaselineY - boxHeight - 6
+        const isMainPlayerEntity = this.isMainPlayerEntity(player)
+
+        this.ctx.save()
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
+        this.ctx.shadowBlur = 6
+        this.ctx.fillStyle = 'rgba(3, 7, 18, 0.85)'
+        this.drawRoundedRect(this.ctx, boxX, boxY, boxWidth, boxHeight, 6)
+        this.ctx.fill()
+
+        this.ctx.shadowBlur = 0
+        this.ctx.lineWidth = 2
+        this.ctx.strokeStyle = isMainPlayerEntity ? '#FACC15' : 'rgba(52, 211, 153, 0.9)'
+        this.drawRoundedRect(this.ctx, boxX, boxY, boxWidth, boxHeight, 6)
+        this.ctx.stroke()
+
+        this.ctx.fillStyle = isMainPlayerEntity ? '#FACC15' : '#34d399'
+        this.ctx.fillText(balanceText, player.x, boxY + boxHeight / 2)
+        this.ctx.restore()
+
+        this.ctx.textBaseline = previousBaseline
+        this.ctx.textAlign = previousAlign
+        this.ctx.font = previousFont
+      }
+
       // Draw player name
       this.ctx.fillStyle = '#ffffff'
       this.ctx.font = 'bold 14px Arial'
       this.ctx.textAlign = 'center'
-      this.ctx.fillText(player.name, player.x, player.y - player.radius - 15)
+      this.ctx.textBaseline = 'alphabetic'
+      this.ctx.fillText(player.name, player.x, nameBaselineY)
       
       // Draw black eyes
       const eyeRadius = Math.max(2, player.radius * 0.12) // Made eyes smaller
