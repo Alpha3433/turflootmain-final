@@ -2719,6 +2719,10 @@ const AgarIOGame = () => {
       const centerY = this.world.height / 2
       const maxRadius = this.currentPlayableRadius
       
+      const hasWindow = typeof window !== 'undefined'
+      const usingJoystick = hasWindow && Boolean(window.isUsingJoystick)
+      const isDesktop = hasWindow && !window.isMobileDevice
+
       // Update each player piece
       for (let i = this.playerPieces.length - 1; i >= 0; i--) {
         const piece = this.playerPieces[i]
@@ -2763,8 +2767,11 @@ const AgarIOGame = () => {
         
         // Update piece properties
         piece.radius = Math.sqrt(piece.mass) * 3
-        piece.targetX = this.player.targetX // Follow main player's target
-        piece.targetY = this.player.targetY
+        if (isDesktop || usingJoystick) {
+          // Follow the actively controlled direction when the player is steering
+          piece.targetX = this.player.targetX
+          piece.targetY = this.player.targetY
+        }
         
         // Boundary check for pieces
         const distanceFromCenter = Math.sqrt(
@@ -3749,8 +3756,21 @@ const AgarIOGame = () => {
       const recoilDistance = 20
       this.player.x = this.player.x - directionX * recoilDistance
       this.player.y = this.player.y - directionY * recoilDistance
-      this.player.targetX = this.mouse.worldX // Keep following mouse
-      this.player.targetY = this.mouse.worldY
+      const hasWindow = typeof window !== 'undefined'
+      const isMobileDevice = hasWindow && Boolean(window.isMobileDevice)
+      const usingJoystick = hasWindow && Boolean(window.isUsingJoystick)
+      const shouldHoldPosition = isMobileDevice && !usingJoystick
+
+      if (shouldHoldPosition) {
+        // When mobile players tap the split button without steering, keep
+        // their primary cell anchored at its current position instead of
+        // pulling it toward the split target.
+        this.player.targetX = this.player.x
+        this.player.targetY = this.player.y
+      } else {
+        this.player.targetX = this.mouse.worldX // Keep following mouse/joystick
+        this.player.targetY = this.mouse.worldY
+      }
       
       // Add new piece to array
       this.playerPieces.push(newPiece)
