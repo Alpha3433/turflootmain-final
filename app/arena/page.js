@@ -68,6 +68,7 @@ const MultiplayerArena = () => {
   const [missionPopupCondensed, setMissionPopupCondensed] = useState(false)
   const [completedMissionsLoaded, setCompletedMissionsLoaded] = useState(false)
   const [missionRunCompleted, setMissionRunCompleted] = useState(false)
+  const [missionCompletionIndicator, setMissionCompletionIndicator] = useState(null)
 
   // Mobile detection and UI states
   const [isMobile, setIsMobile] = useState(false)
@@ -97,6 +98,7 @@ const MultiplayerArena = () => {
   const continuousInputIntervalRef = useRef(null)
 
   const missionCondenseTimeoutRef = useRef(null)
+  const currencyLoadedRef = useRef(false)
   const activeMissionsRef = useRef([])
   const missionStatsRef = useRef({
     initialized: false,
@@ -124,14 +126,34 @@ const MultiplayerArena = () => {
   }, [activeMissions, completedMissions])
   const missionsToDisplay = useMemo(() => visibleMissions.slice(0, 1), [visibleMissions])
   const activeMissionCount = missionsToDisplay.length
+  const hasActiveMissions = activeMissionCount > 0
+  const showMissionCompletion = Boolean(missionCompletionIndicator && !hasActiveMissions)
+  const shouldRenderMissionPopup = (missionPopupVisible && (hasActiveMissions || missionPopupCondensed)) || showMissionCompletion
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
   
   const privyUserId = user?.id || null
+  const walletAddress = user?.wallet?.address
+  const emailAddress = user?.email?.address
   const missionStorageKey = useMemo(() => (
     privyUserId ? `arena_completed_missions_${privyUserId}` : 'arena_completed_missions_guest'
   ), [privyUserId])
+
+  const getCurrencyStorageConfig = useCallback(() => {
+    if (authenticated && user) {
+      const identifier = walletAddress || emailAddress || user?.id || 'unknown'
+      return {
+        key: `userCurrency_${identifier}`,
+        defaultValue: 100
+      }
+    }
+
+    return {
+      key: 'guestCurrency',
+      defaultValue: 0
+    }
+  }, [authenticated, emailAddress, user, walletAddress])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -158,6 +180,56 @@ const MultiplayerArena = () => {
   }, [missionStorageKey])
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const { key, defaultValue } = getCurrencyStorageConfig()
+    const sanitizedDefault = Number.isFinite(defaultValue) ? defaultValue : 0
+
+    let nextCurrency = sanitizedDefault
+
+    try {
+      const storedValue = window.localStorage.getItem(key)
+      if (storedValue !== null) {
+        const parsed = parseInt(storedValue, 10)
+        if (!Number.isNaN(parsed)) {
+          nextCurrency = parsed
+        } else {
+          window.localStorage.removeItem(key)
+        }
+      } else {
+        window.localStorage.setItem(key, sanitizedDefault.toString())
+      }
+    } catch (error) {
+      console.error('❌ Failed to load mission currency from storage:', error)
+      nextCurrency = sanitizedDefault
+    }
+
+    setCurrency(nextCurrency)
+    currencyLoadedRef.current = true
+  }, [getCurrencyStorageConfig])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !currencyLoadedRef.current) {
+      return
+    }
+
+    const { key } = getCurrencyStorageConfig()
+    const numericCurrency = Number.isFinite(currency) ? currency : 0
+    const sanitizedCurrency = Math.max(0, Math.floor(numericCurrency))
+
+    try {
+      window.localStorage.setItem(key, sanitizedCurrency.toString())
+      window.dispatchEvent(new CustomEvent('turfloot:currencyUpdated', {
+        detail: { currency: sanitizedCurrency }
+      }))
+    } catch (error) {
+      console.error('❌ Failed to persist mission currency to storage:', error)
+    }
+  }, [currency, getCurrencyStorageConfig])
+
+  useEffect(() => {
     activeMissionsRef.current = activeMissions
   }, [activeMissions])
 
@@ -178,6 +250,7 @@ const MultiplayerArena = () => {
 
     let rewardDelta = 0
     let missionChanged = false
+    let completedMissionPayload = null
 
     setActiveMissions(prev => {
       if (!prev || prev.length === 0) {
@@ -237,6 +310,13 @@ const MultiplayerArena = () => {
         if (shouldComplete && !mission.completed) {
           rewardDelta += mission.reward || 0
           missionChanged = true
+          if (!completedMissionPayload) {
+            completedMissionPayload = {
+              id: mission.id,
+              name: mission.name,
+              reward: mission.reward || 0
+            }
+          }
           return { ...mission, progress: newProgress, completed: true }
         }
 
@@ -253,7 +333,15 @@ const MultiplayerArena = () => {
 
     if (missionChanged) {
       if (rewardDelta > 0) {
-        setCurrency(prev => prev + rewardDelta)
+        setCurrency(prev => {
+          const current = Number.isFinite(prev) ? prev : 0
+          return Math.max(0, current + rewardDelta)
+        })
+      }
+      if (completedMissionPayload) {
+        setMissionCompletionIndicator(completedMissionPayload)
+        setMissionPopupVisible(true)
+        setMissionPopupCondensed(true)
       }
       console.log('🎯 Mission progress updated:', { type, value: numericValue, rewardDelta })
     }
@@ -372,8 +460,13 @@ const MultiplayerArena = () => {
     const availableMissions = missionTypes.filter(mission => !completedMissions.includes(mission.id))
 
     if (availableMissions.length === 0) {
-      setMissionPopupVisible(false)
-      setMissionPopupCondensed(false)
+      if (missionCompletionIndicator) {
+        setMissionPopupVisible(true)
+        setMissionPopupCondensed(true)
+      } else {
+        setMissionPopupVisible(false)
+        setMissionPopupCondensed(false)
+      }
       return
     }
 
@@ -387,6 +480,7 @@ const MultiplayerArena = () => {
       }))
 
     setActiveMissions(selected)
+    setMissionCompletionIndicator(null)
     setMissionPopupVisible(true)
     setMissionPopupCondensed(false)
   }, [
@@ -395,7 +489,8 @@ const MultiplayerArena = () => {
     completedMissions,
     activeMissions.length,
     missionTypes,
-    completedMissionsLoaded
+    completedMissionsLoaded,
+    missionCompletionIndicator
   ])
 
   useEffect(() => {
@@ -418,10 +513,15 @@ const MultiplayerArena = () => {
     }
 
     if (visibleMissions.length === 0) {
+      if (missionCompletionIndicator) {
+        setMissionPopupCondensed(true)
+        return
+      }
+
       setMissionPopupVisible(false)
       setMissionPopupCondensed(false)
     }
-  }, [visibleMissions.length, missionPopupVisible])
+  }, [visibleMissions.length, missionPopupVisible, missionCompletionIndicator])
 
   useEffect(() => {
     if (!missionPopupVisible || missionPopupCondensed || visibleMissions.length === 0) {
@@ -2858,7 +2958,7 @@ const MultiplayerArena = () => {
       />
 
       {/* Mission Popup */}
-      {missionPopupVisible && activeMissionCount > 0 && (
+      {shouldRenderMissionPopup && (
         <div
           style={{
             position: 'fixed',
@@ -2876,7 +2976,49 @@ const MultiplayerArena = () => {
             paddingRight: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 12px)' : '0'
           }}
         >
-          {missionPopupCondensed ? (
+          {showMissionCompletion ? (
+            <div
+              title={missionCompletionIndicator?.name ? `Completed: ${missionCompletionIndicator.name}` : 'Mission complete'}
+              style={{
+                background: 'rgba(15, 15, 15, 0.92)',
+                border: '1px solid rgba(34, 197, 94, 0.65)',
+                borderRadius: '9999px',
+                padding: isMobile ? '8px 16px' : '10px 22px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: isMobile ? '8px' : '10px',
+                color: '#ffffff',
+                fontFamily: '"Rajdhani", sans-serif',
+                fontSize: isMobile ? '12px' : '13px',
+                fontWeight: 600,
+                letterSpacing: '0.5px',
+                cursor: 'default',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.45)',
+                pointerEvents: 'auto',
+                backdropFilter: 'blur(6px)'
+              }}
+              role="status"
+              aria-live="polite"
+            >
+              <span style={{ fontSize: isMobile ? '16px' : '18px' }}>✅</span>
+              <span style={{ color: '#22c55e', textTransform: 'uppercase' }}>Mission Complete</span>
+              {missionCompletionIndicator?.reward > 0 && (
+                <span
+                  style={{
+                    background: 'rgba(34, 197, 94, 0.2)',
+                    color: '#22c55e',
+                    borderRadius: '9999px',
+                    padding: '2px 10px',
+                    fontSize: isMobile ? '11px' : '12px',
+                    fontWeight: 700,
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  +{missionCompletionIndicator.reward}💰
+                </span>
+              )}
+            </div>
+          ) : missionPopupCondensed ? (
             <button
               type="button"
               onClick={handleMissionExpand}
