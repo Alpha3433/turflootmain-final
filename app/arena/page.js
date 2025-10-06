@@ -2375,12 +2375,6 @@ const MultiplayerArena = () => {
       // Use server-provided skin color for all players (enables multiplayer skin visibility)
       const playerSkinColor = player.skinColor || player.color || this.selectedSkin?.color || '#4A90E2'
       
-      // Player glow effect for current player
-      if (isCurrentPlayer) {
-        this.ctx.shadowColor = playerSkinColor
-        this.ctx.shadowBlur = 20
-      }
-      
       // Player circle with gradient using server-provided skin color
       const gradient = this.ctx.createRadialGradient(
         player.x, player.y, 0,
@@ -2397,13 +2391,12 @@ const MultiplayerArena = () => {
       gradient.addColorStop(1, darkerColor)   // Darker edge
       
       this.ctx.fillStyle = gradient
+      this.ctx.shadowColor = 'transparent'
+      this.ctx.shadowBlur = 0
       this.ctx.beginPath()
       this.ctx.arc(player.x, player.y, playerRadius, 0, Math.PI * 2)
       this.ctx.fill()
-      
-      // Remove shadow for border
-      this.ctx.shadowBlur = 0
-      
+
       // Enhanced border
       this.ctx.strokeStyle = isCurrentPlayer ? '#FFFFFF' : '#DDDDDD'
       this.ctx.lineWidth = isCurrentPlayer ? 4 : 3
