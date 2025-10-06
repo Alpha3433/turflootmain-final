@@ -238,7 +238,7 @@ const MultiplayerArena = () => {
     if (connectionStatus === 'eliminated') {
       return pingMs == null ? 'Eliminated' : 'Spectator latency'
     }
-    return pingMs == null ? 'Measuring latency' : 'Live latency'
+    return pingMs == null ? 'Measuring latency' : ''
   }, [connectionStatus, pingMs])
   
   // Parse URL parameters and get authenticated user data
@@ -3629,8 +3629,8 @@ const MultiplayerArena = () => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '10px',
+              justifyContent: 'flex-start',
+              gap: '6px',
               marginBottom: '4px'
             }}
           >

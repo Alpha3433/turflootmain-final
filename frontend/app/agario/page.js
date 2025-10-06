@@ -255,7 +255,7 @@ const AgarIOGame = () => {
     if (wsConnection === 'connecting') return 'Connecting…'
     if (wsConnection === 'error') return 'Connection error'
     if (wsConnection === 'disconnected') return 'Waiting for arena'
-    return pingMs == null ? 'Measuring latency' : 'Live latency'
+    return pingMs == null ? 'Measuring latency' : ''
   })()
 
   const ensurePlayerIdentifier = useCallback(() => {
@@ -5270,7 +5270,7 @@ const AgarIOGame = () => {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '6px'
           }}>
             <div style={{
               width: '10px',
