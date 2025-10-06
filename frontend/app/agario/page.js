@@ -2502,13 +2502,37 @@ const AgarIOGame = () => {
       const hasWindow = typeof window !== 'undefined'
       const usingJoystick = hasWindow && Boolean(window.isUsingJoystick)
       const usingServerState = hasWindow && Boolean(window.isMultiplayer && this.serverState)
+      const isDesktop = hasWindow && !window.isMobileDevice
 
-      if (!usingJoystick && this.mouse.hasPosition && !usingServerState) {
+      if (!usingJoystick && this.mouse.hasPosition) {
         this.mouse.worldX = this.mouse.x + this.camera.x
         this.mouse.worldY = this.mouse.y + this.camera.y
 
-        this.player.targetX = this.mouse.worldX
-        this.player.targetY = this.mouse.worldY
+        if (isDesktop) {
+          // Always keep the player chasing the mouse position on desktop
+          this.player.targetX = this.mouse.worldX
+          this.player.targetY = this.mouse.worldY
+
+          if (window.sendInputToServer) {
+            const dx = this.mouse.worldX - this.player.x
+            const dy = this.mouse.worldY - this.player.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+
+            if (distance > 1) {
+              const normalizedDx = dx / distance
+              const normalizedDy = dy / distance
+              window.sendInputToServer(normalizedDx, normalizedDy)
+            } else {
+              window.sendInputToServer(0, 0, { force: true })
+              if (window.stopInputHeartbeat) {
+                window.stopInputHeartbeat()
+              }
+            }
+          }
+        } else if (!usingServerState) {
+          this.player.targetX = this.mouse.worldX
+          this.player.targetY = this.mouse.worldY
+        }
       }
 
       // Always update player movement (for client-side prediction)
