@@ -13,6 +13,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
   const [loading, setLoading] = useState(false)
   const [showAddFunds, setShowAddFunds] = useState(false)
   const [showCashOut, setShowCashOut] = useState(false)
+  const [showPrivyConfirmation, setShowPrivyConfirmation] = useState(false)
+  const [privyConfirmationDetails, setPrivyConfirmationDetails] = useState(null)
   const [addFundsForm, setAddFundsForm] = useState({ amount: '', currency: 'SOL' })
   const [cashOutForm, setCashOutForm] = useState({ amount: '', currency: 'USD', address: '' })
   const [refreshing, setRefreshing] = useState(false)
@@ -385,82 +387,109 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
   }
 
-  const handleCashOut = async (e) => {
+  const handleCashOut = (e) => {
     e.preventDefault()
-    
+
     if (!authenticated) {
       alert('Please login first')
       return
     }
 
-    setLoading(true)
-    
+    const amount = parseFloat(cashOutForm.amount)
+    const minCashOut = cashOutForm.currency === 'SOL' ? 0.05 : 20 // 0.05 SOL or $20 USD
+    const platformFeePercent = 0
+    const platformFee = amount * (platformFeePercent / 100)
+    const netAmount = amount - platformFee
+
+    if (Number.isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid cash out amount')
+      return
+    }
+
+    // Enhanced validation
+    if (amount < minCashOut) {
+      const minDisplay = cashOutForm.currency === 'SOL' ? '0.05 SOL' : '$20 USD'
+      alert(`Minimum cash out is ${minDisplay}`)
+      return
+    }
+
+    // Check if user has sufficient balance
+    const availableBalance = cashOutForm.currency === 'SOL' ? balance.sol_balance : balance.balance
+    if (amount > availableBalance) {
+      alert(`Insufficient balance. Available: ${availableBalance.toFixed(4)} ${cashOutForm.currency}`)
+      return
+    }
+
+    const trimmedAddress = cashOutForm.address.trim()
+
+    if (!trimmedAddress) {
+      alert('Please enter recipient wallet address')
+      return
+    }
+
+    // Validate Solana address
     try {
-      const amount = parseFloat(cashOutForm.amount)
-      const minCashOut = cashOutForm.currency === 'SOL' ? 0.05 : 20 // 0.05 SOL or $20 USD
-      const platformFeePercent = 0
-      const platformFee = amount * (platformFeePercent / 100)
-      const netAmount = amount - platformFee
-      
-      // Enhanced validation
-      if (amount < minCashOut) {
-        const minDisplay = cashOutForm.currency === 'SOL' ? '0.05 SOL' : '$20 USD'
-        alert(`Minimum cash out is ${minDisplay}`)
-        setLoading(false)
-        return
-      }
+      new PublicKey(trimmedAddress)
+    } catch (err) {
+      alert('Invalid Solana wallet address. Please enter a valid Solana address.')
+      return
+    }
 
-      // Check if user has sufficient balance
-      const availableBalance = cashOutForm.currency === 'SOL' ? balance.sol_balance : balance.balance
-      if (amount > availableBalance) {
-        alert(`Insufficient balance. Available: ${availableBalance.toFixed(4)} ${cashOutForm.currency}`)
-        setLoading(false)
-        return
+    const formatAmountDisplay = (value, currency) => {
+      if (currency === 'SOL') {
+        return `${value.toFixed(4)} SOL`
       }
+      return `$${value.toFixed(2)} ${currency === 'USD' ? 'USD' : currency}`
+    }
 
-      if (!cashOutForm.address) {
-        alert('Please enter recipient wallet address')
-        setLoading(false)
-        return
-      }
+    const confirmationDetails = {
+      amount,
+      currency: cashOutForm.currency,
+      feeAmount: platformFee,
+      feePercent: platformFeePercent,
+      netAmount,
+      formattedAmount: formatAmountDisplay(amount, cashOutForm.currency),
+      formattedNet: formatAmountDisplay(netAmount, cashOutForm.currency),
+      address: trimmedAddress,
+      addressPreview: `${trimmedAddress.slice(0, 4)}...${trimmedAddress.slice(-4)}`,
+      network: cashOutForm.currency === 'SOL' ? 'Solana' : 'USD Off-Ramp'
+    }
 
-      // Validate Solana address
-      try {
-        new PublicKey(cashOutForm.address)
-      } catch (err) {
-        alert('Invalid Solana wallet address. Please enter a valid Solana address.')
-        setLoading(false)
-        return
-      }
-      
-      // Confirmation dialog with fee breakdown
-      const netDisplay = `${netAmount.toFixed(4)} ${cashOutForm.currency}`
-      const confirmMessage = `Confirm Cash Out:\n\nAmount: ${amount} ${cashOutForm.currency}\nYou'll receive: ${netDisplay} (no platform fee)\n\nProceed?`
-      
-      if (!confirm(confirmMessage)) {
-        setLoading(false)
-        return
-      }
-      
+    setPrivyConfirmationDetails(confirmationDetails)
+    setShowPrivyConfirmation(true)
+  }
+
+  const closePrivyConfirmation = () => {
+    setShowPrivyConfirmation(false)
+    setPrivyConfirmationDetails(null)
+  }
+
+  const submitPrivyCashOut = async () => {
+    if (!privyConfirmationDetails) return
+
+    setLoading(true)
+
+    try {
       const response = await fetch('/api/wallet/cash-out', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('auth_token') : ''}`
         },
         body: JSON.stringify({
-          amount,
-          currency: cashOutForm.currency,
-          recipient_address: cashOutForm.address
+          amount: privyConfirmationDetails.amount,
+          currency: privyConfirmationDetails.currency,
+          recipient_address: privyConfirmationDetails.address
         })
       })
 
       const data = await response.json()
-      
+
       if (response.ok) {
         alert(`✅ Cash out successful! ${data.message}\n\nTransaction will be processed within 24 hours.`)
         setCashOutForm({ amount: '', currency: 'SOL', address: '' })
         setShowCashOut(false)
+        closePrivyConfirmation()
         fetchBalance()
         fetchTransactions()
       } else {
@@ -648,7 +677,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
       {/* Cash Out Modal - Redesigned to Match Screenshot */}
       {showCashOut && typeof document !== 'undefined' && createPortal(
-        <div 
+        <div
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
           style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
@@ -763,6 +792,74 @@ const WalletManager = ({ onBalanceUpdate }) => {
                   {loading ? 'Processing...' : '💸 Cash Out'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {showPrivyConfirmation && privyConfirmationDetails && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 backdrop-blur" onClick={(e) => {
+          if (e.target === e.currentTarget && !loading) {
+            closePrivyConfirmation()
+          }
+        }}>
+          <div className="relative w-full max-w-sm mx-4 bg-[#1f1f23] border border-gray-700/70 rounded-2xl shadow-2xl text-white">
+            <button
+              onClick={closePrivyConfirmation}
+              disabled={loading}
+              className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors disabled:opacity-40"
+            >
+              ✕
+            </button>
+
+            <div className="p-6 space-y-5">
+              <div className="space-y-2">
+                <div className="text-sm uppercase tracking-widest text-gray-400">Cashout Transaction</div>
+                <div className="text-2xl font-semibold">Cash out {privyConfirmationDetails.formattedAmount}</div>
+              </div>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Network</span>
+                  <span className="font-medium">{privyConfirmationDetails.network}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Estimated fee</span>
+                  <span className="font-medium">{privyConfirmationDetails.feePercent ? `${privyConfirmationDetails.feePercent}% (${privyConfirmationDetails.feeAmount.toFixed(4)})` : 'Fee waived'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">You&apos;ll receive</span>
+                  <span className="font-semibold text-green-400">{privyConfirmationDetails.formattedNet}</span>
+                </div>
+              </div>
+
+              <div className="bg-gray-800/60 border border-gray-700/80 rounded-xl p-4">
+                <div className="text-xs text-gray-400 uppercase mb-1">Your wallet</div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-sm">{privyConfirmationDetails.addressPreview}</span>
+                  <span className="px-3 py-1 text-xs rounded-lg bg-gray-900/80 border border-gray-700/80">{privyConfirmationDetails.currency}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={submitPrivyCashOut}
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-yellow-400 text-black font-semibold hover:from-yellow-400 hover:to-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Processing...' : 'Confirm Withdrawal'}
+                </button>
+                <button
+                  onClick={closePrivyConfirmation}
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Go Back
+                </button>
+              </div>
+
+              <div className="text-center text-xs text-gray-500">Protected by <span className="text-white font-semibold">Privy</span></div>
             </div>
           </div>
         </div>,
