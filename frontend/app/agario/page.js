@@ -10,6 +10,17 @@ const PLAYER_ID_STORAGE_KEY = 'turfloot-agario-player-id'
 
 const MIN_SPLIT_MASS = 40 // Keep in sync with server/src/rooms/ArenaRoom.ts
 
+const BASE_MOVEMENT_SPEED = 5.5
+const MIN_MOVEMENT_SPEED = 2.0
+const MASS_SPEED_EXPONENT = 0.3
+const MIN_SPEED_MASS = 25
+
+const computeMassMovementSpeed = (mass) => {
+  const normalizedMass = Math.max(mass, MIN_SPEED_MASS)
+  const falloff = Math.pow(normalizedMass / MIN_SPEED_MASS, MASS_SPEED_EXPONENT)
+  return Math.max(MIN_MOVEMENT_SPEED, BASE_MOVEMENT_SPEED / falloff)
+}
+
 const MissionPopup = ({ mission, missionIndex, totalMissions, currency }) => {
   if (!mission) return null
 
@@ -2613,9 +2624,7 @@ const AgarIOGame = () => {
       // Use a much smaller threshold to prevent stopping when mouse is still
       if (distance > 0.1) {
         // Speed decreases as mass increases (like Agar.io)
-        const baseSpeed = 6.0  // Base speed for small players
-        const massSpeedFactor = Math.sqrt(this.player.mass / 20) // Gradual slowdown
-        const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor) // Minimum speed of 1.5
+        const dynamicSpeed = computeMassMovementSpeed(this.player.mass)
 
         const moveDistance = Math.min(dynamicSpeed, distance) // Don't overshoot target
 
@@ -2742,9 +2751,7 @@ const AgarIOGame = () => {
         
         // Move towards mouse target only when no split velocity remains
         if (distance > 0.1 && Math.abs(piece.vx) < 0.05 && Math.abs(piece.vy) < 0.05) {
-          const baseSpeed = 6.0
-          const massSpeedFactor = Math.sqrt(piece.mass / 20)
-          const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
+          const dynamicSpeed = computeMassMovementSpeed(piece.mass)
           
           const moveDistance = Math.min(dynamicSpeed, distance)
           const moveX = (dx / distance) * moveDistance

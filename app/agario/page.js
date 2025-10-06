@@ -3,6 +3,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
+const BASE_MOVEMENT_SPEED = 5.5
+const MIN_MOVEMENT_SPEED = 2.0
+const MASS_SPEED_EXPONENT = 0.3
+const MIN_SPEED_MASS = 25
+
+const computeMassMovementSpeed = (mass) => {
+  const normalizedMass = Math.max(mass, MIN_SPEED_MASS)
+  const falloff = Math.pow(normalizedMass / MIN_SPEED_MASS, MASS_SPEED_EXPONENT)
+  return Math.max(MIN_MOVEMENT_SPEED, BASE_MOVEMENT_SPEED / falloff)
+}
+
 const AgarIOGame = () => {
   console.log('🎮 AGARIO PAGE COMPONENT RENDERING - URL:', typeof window !== 'undefined' ? window.location.href : 'SSR')
   
@@ -2308,9 +2319,7 @@ const AgarIOGame = () => {
       // FIXED: Always move towards target unless player is exactly on target (like real Agar.io)
       if (distance > 0.01) { // Much smaller threshold - only stop when virtually on target
         // Speed decreases as mass increases (like Agar.io)
-        const baseSpeed = 6.0  // Base speed for small players
-        const massSpeedFactor = Math.sqrt(this.player.mass / 20) // Gradual slowdown
-        const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor) // Minimum speed of 1.5
+        const dynamicSpeed = computeMassMovementSpeed(this.player.mass)
         
         // FIXED: Don't limit movement by distance - always apply full speed towards target
         // This ensures continuous movement towards mouse cursor even when stationary
@@ -2400,9 +2409,7 @@ const AgarIOGame = () => {
         // Move towards mouse target only when no split velocity remains
         // FIXED: Same continuous movement fix for player pieces
         if (distance > 0.01 && Math.abs(piece.vx) < 0.05 && Math.abs(piece.vy) < 0.05) {
-          const baseSpeed = 6.0
-          const massSpeedFactor = Math.sqrt(piece.mass / 20)
-          const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor)
+          const dynamicSpeed = computeMassMovementSpeed(piece.mass)
           
           // FIXED: Continuous movement towards target like main player
           const moveDistance = dynamicSpeed * deltaTime * 60 // Normalize for 60fps

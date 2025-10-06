@@ -1,6 +1,17 @@
 import { Room, Client } from "@colyseus/core";
 import { Schema, MapSchema, type } from "@colyseus/schema";
 
+const BASE_MOVEMENT_SPEED = 5.5;
+const MIN_MOVEMENT_SPEED = 2.0;
+const MASS_SPEED_EXPONENT = 0.3;
+const MIN_SPEED_MASS = 25;
+
+const computeMassMovementSpeed = (mass: number): number => {
+  const normalizedMass = Math.max(mass, MIN_SPEED_MASS);
+  const falloff = Math.pow(normalizedMass / MIN_SPEED_MASS, MASS_SPEED_EXPONENT);
+  return Math.max(MIN_MOVEMENT_SPEED, BASE_MOVEMENT_SPEED / falloff);
+};
+
 // Player state schema
 export class Player extends Schema {
   @type("string") name: string = "Player";
@@ -580,10 +591,8 @@ export class ArenaRoom extends Room<GameState> {
         const dy = targetY - player.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Calculate dynamic speed based on mass (matching local agario formula)
-        const baseSpeed = 6.0;
-        const massSpeedFactor = Math.sqrt(player.mass / 20);
-        const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor);
+        // Calculate dynamic speed based on mass using a softened falloff curve
+        const dynamicSpeed = computeMassMovementSpeed(player.mass);
         const desiredSpeedPerSecond = dynamicSpeed * 60; // Convert to units per second
 
         if (distance > 0.5) {
