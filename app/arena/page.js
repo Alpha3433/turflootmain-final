@@ -3659,14 +3659,10 @@ const MultiplayerArena = () => {
             style={{
               fontSize: isMobile ? '9px' : '10px',
               letterSpacing: '0.03em',
-              color: '#9ca3af',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
+              color: '#9ca3af'
             }}
           >
-            <span role="img" aria-hidden="true">📡</span>
-            <span>{pingSubtitle}</span>
+            {pingSubtitle}
           </div>
         </div>
 
@@ -3984,8 +3980,8 @@ const MultiplayerArena = () => {
               bottom: '0',
               borderRadius: '50%',
               border: '3px solid rgba(0, 255, 0, 0.8)',
-              background: 'conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 0, 0.1) 10%, transparent 20%, rgba(0, 255, 0, 0.1) 30%, transparent 40%, rgba(0, 255, 0, 0.1) 50%, transparent 60%, rgba(0, 255, 0, 0.1) 70%, transparent 80%, rgba(0, 255, 0, 0.1) 90%, transparent 100%)',
-              animation: 'minimapRotate 20s linear infinite',
+              boxShadow: 'inset 0 0 18px rgba(0, 255, 0, 0.25)',
+              background: 'transparent',
               pointerEvents: 'none'
             }} />
           </div>
