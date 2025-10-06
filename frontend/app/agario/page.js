@@ -4191,37 +4191,6 @@ const AgarIOGame = () => {
             }
           </div>
           
-          {/* Multiplayer Status Indicator */}
-          {isMultiplayer && (
-            <div style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              color: wsConnection === 'connected' ? '#00ff00' : wsConnection === 'connecting' ? '#ffff00' : '#ff0000',
-              padding: isMobile ? '4px 8px' : '6px 12px',
-              borderRadius: '8px',
-              fontSize: isMobile ? '10px' : '12px',
-              fontWeight: 'bold',
-              marginBottom: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              border: `1px solid ${wsConnection === 'connected' ? '#00ff00' : wsConnection === 'connecting' ? '#ffff00' : '#ff0000'}`
-            }}>
-              <span style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: wsConnection === 'connected' ? '#00ff00' : wsConnection === 'connecting' ? '#ffff00' : '#ff0000',
-                animation: wsConnection === 'connecting' ? 'pulse 1s infinite alternate' : 'none'
-              }}></span>
-              <span>
-                {wsConnection === 'connected' && `🌐 MULTIPLAYER (${connectedPlayers} players)`}
-                {wsConnection === 'connecting' && '🔄 CONNECTING...'}
-                {wsConnection === 'error' && '❌ CONNECTION ERROR'}
-                {wsConnection === 'disconnected' && '🔌 DISCONNECTED'}
-              </span>
-            </div>
-          )}
-
           {/* Player Rankings - Dynamic Leaderboard */}
           <div style={{ 
             display: 'flex', 
@@ -4349,6 +4318,64 @@ const AgarIOGame = () => {
           </div>
         </div>
         
+        {/* Multiplayer Status Indicator - Fixed Bottom Left */}
+        {isMultiplayer && (
+          <div style={{
+            position: 'fixed',
+            bottom: isMobile
+              ? 'calc(env(safe-area-inset-bottom, 0px) + 12px)'
+              : '16px',
+            left: isMobile
+              ? 'calc(env(safe-area-inset-left, 0px) + 10px)'
+              : '16px',
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            color:
+              wsConnection === 'connected'
+                ? '#00ff00'
+                : wsConnection === 'connecting'
+                ? '#ffff00'
+                : '#ff0000',
+            padding: isMobile ? '4px 10px' : '6px 14px',
+            borderRadius: '10px',
+            fontSize: isMobile ? '10px' : '12px',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            border: `1px solid ${
+              wsConnection === 'connected'
+                ? '#00ff00'
+                : wsConnection === 'connecting'
+                ? '#ffff00'
+                : '#ff0000'
+            }`,
+            boxShadow: '0 0 10px rgba(0, 0, 0, 0.4)'
+          }}>
+            <span
+              style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                backgroundColor:
+                  wsConnection === 'connected'
+                    ? '#00ff00'
+                    : wsConnection === 'connecting'
+                    ? '#ffff00'
+                    : '#ff0000',
+                animation:
+                  wsConnection === 'connecting' ? 'pulse 1s infinite alternate' : 'none'
+              }}
+            ></span>
+            <span>
+              {wsConnection === 'connected' && `🌐 MULTIPLAYER (${connectedPlayers} players)`}
+              {wsConnection === 'connecting' && '🔄 CONNECTING...'}
+              {wsConnection === 'error' && '❌ CONNECTION ERROR'}
+              {wsConnection === 'disconnected' && '🔌 DISCONNECTED'}
+            </span>
+          </div>
+        )}
+
         {/* Anti-Cheat Status Indicator - Only show for cash games */}
         {(() => {
           if (typeof window === 'undefined') return null
