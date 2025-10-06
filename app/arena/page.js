@@ -64,6 +64,8 @@ const MultiplayerArena = () => {
   const [activeMissions, setActiveMissions] = useState([])
   const [missionPopupVisible, setMissionPopupVisible] = useState(false)
   const [missionPopupCondensed, setMissionPopupCondensed] = useState(false)
+  const [completedMissionsLoaded, setCompletedMissionsLoaded] = useState(false)
+  const [missionRunCompleted, setMissionRunCompleted] = useState(false)
 
   // Mobile detection and UI states
   const [isMobile, setIsMobile] = useState(false)
@@ -110,11 +112,75 @@ const MultiplayerArena = () => {
   const visibleMissions = useMemo(() => {
     return activeMissions.filter(mission => !mission.completed && !completedMissions.includes(mission.id))
   }, [activeMissions, completedMissions])
+  const missionsToDisplay = useMemo(() => visibleMissions.slice(0, 1), [visibleMissions])
+  const activeMissionCount = missionsToDisplay.length
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
   
   const privyUserId = user?.id || null
+  const missionStorageKey = useMemo(() => (
+    privyUserId ? `arena_completed_missions_${privyUserId}` : 'arena_completed_missions_guest'
+  ), [privyUserId])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    setCompletedMissionsLoaded(false)
+
+    let storedMissions = []
+    try {
+      const storedValue = window.localStorage.getItem(missionStorageKey)
+      if (storedValue) {
+        const parsed = JSON.parse(storedValue)
+        if (Array.isArray(parsed)) {
+          storedMissions = parsed
+        }
+      }
+    } catch (error) {
+      console.error('❌ Failed to load completed missions from storage:', error)
+    }
+
+    setCompletedMissions(storedMissions)
+    setCompletedMissionsLoaded(true)
+  }, [missionStorageKey])
+
+  useEffect(() => {
+    if (!completedMissionsLoaded || typeof window === 'undefined') {
+      return
+    }
+
+    try {
+      window.localStorage.setItem(missionStorageKey, JSON.stringify(completedMissions))
+    } catch (error) {
+      console.error('❌ Failed to persist completed missions to storage:', error)
+    }
+  }, [completedMissions, completedMissionsLoaded, missionStorageKey])
+
+  useEffect(() => {
+    if (activeMissions.length === 0) {
+      return
+    }
+
+    const newlyCompleted = activeMissions
+      .filter(mission => mission.completed && !completedMissions.includes(mission.id))
+      .map(mission => mission.id)
+
+    if (newlyCompleted.length === 0) {
+      return
+    }
+
+    setCompletedMissions(prev => {
+      const deduped = newlyCompleted.filter(id => !prev.includes(id))
+      if (deduped.length === 0) {
+        return prev
+      }
+      return [...prev, ...deduped]
+    })
+    setMissionRunCompleted(true)
+  }, [activeMissions, completedMissions])
   
   // Function to get current player display name
   const getCurrentPlayerName = () => {
@@ -187,7 +253,7 @@ const MultiplayerArena = () => {
   }, [user?.id, playerName])
 
   useEffect(() => {
-    if (!gameReady || activeMissions.length > 0) {
+    if (!gameReady || !completedMissionsLoaded || missionRunCompleted || activeMissions.length > 0) {
       return
     }
 
@@ -201,7 +267,7 @@ const MultiplayerArena = () => {
 
     const shuffled = [...availableMissions].sort(() => 0.5 - Math.random())
     const selected = shuffled
-      .slice(0, Math.min(3, shuffled.length))
+      .slice(0, Math.min(1, shuffled.length))
       .map(mission => ({
         ...mission,
         progress: mission.progress || 0,
@@ -211,7 +277,14 @@ const MultiplayerArena = () => {
     setActiveMissions(selected)
     setMissionPopupVisible(true)
     setMissionPopupCondensed(false)
-  }, [gameReady, completedMissions, activeMissions.length, missionTypes])
+  }, [
+    gameReady,
+    missionRunCompleted,
+    completedMissions,
+    activeMissions.length,
+    missionTypes,
+    completedMissionsLoaded
+  ])
 
   useEffect(() => {
     if (!gameReady || completedMissions.length === 0) {
@@ -2613,7 +2686,7 @@ const MultiplayerArena = () => {
       />
 
       {/* Mission Popup */}
-      {missionPopupVisible && visibleMissions.length > 0 && (
+      {missionPopupVisible && activeMissionCount > 0 && (
         <div
           style={{
             position: 'fixed',
@@ -2667,7 +2740,7 @@ const MultiplayerArena = () => {
                   letterSpacing: '0.5px'
                 }}
               >
-                {visibleMissions.length}
+                {activeMissionCount}
               </span>
             </button>
           ) : (
@@ -2759,7 +2832,7 @@ const MultiplayerArena = () => {
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '10px' : '12px' }}>
-                {visibleMissions.map(mission => {
+                {missionsToDisplay.map(mission => {
                   const progressValue = Math.min(mission.progress ?? 0, mission.target)
                   const progressPercent = mission.target > 0
                     ? Math.min(100, Math.round((progressValue / mission.target) * 100))
