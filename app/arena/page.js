@@ -76,6 +76,65 @@ const MultiplayerArena = () => {
   const leaderboardTimerRef = useRef(null)
   const [statsExpanded, setStatsExpanded] = useState(false)
   const statsTimerRef = useRef(null)
+
+  // Live latency tracking
+  const [pingMs, setPingMs] = useState(null)
+  const pingSentAtRef = useRef(null)
+  const pingIntervalRef = useRef(null)
+
+  const clearPingInterval = useCallback(() => {
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current)
+      pingIntervalRef.current = null
+    }
+  }, [])
+
+  const resetPingState = useCallback((clearValue = true) => {
+    pingSentAtRef.current = null
+    if (clearValue) {
+      setPingMs(null)
+    }
+  }, [])
+
+  const initializePingMeasurement = useCallback((room) => {
+    if (!room) {
+      return
+    }
+
+    if (!room.__arenaPingListenerAttached) {
+      room.onMessage('pong', (message) => {
+        const now = Date.now()
+        const clientTimestamp = message?.clientTimestamp ?? message?.timestamp ?? pingSentAtRef.current
+
+        if (clientTimestamp) {
+          const latency = Math.max(0, Math.round(now - clientTimestamp))
+          setPingMs(latency)
+        }
+      })
+      room.__arenaPingListenerAttached = true
+    }
+
+    const sendPing = () => {
+      try {
+        const websocket = room?.connection?.transport?.ws
+        const isOpen = websocket?.readyState === WebSocket.OPEN || room?.connection?.isConnected
+
+        if (isOpen) {
+          const timestamp = Date.now()
+          pingSentAtRef.current = timestamp
+          room.send('ping', { timestamp })
+        }
+      } catch (error) {
+        console.warn('⚠️ Failed to send ping:', error)
+      }
+    }
+
+    clearPingInterval()
+    sendPing()
+
+    const intervalId = setInterval(sendPing, 2000)
+    pingIntervalRef.current = intervalId
+  }, [clearPingInterval])
   
   // Virtual joystick state for mobile
   const [joystickActive, setJoystickActive] = useState(false)
@@ -129,6 +188,58 @@ const MultiplayerArena = () => {
   const hasActiveMissions = activeMissionCount > 0
   const showMissionCompletion = Boolean(missionCompletionIndicator && !hasActiveMissions)
   const shouldRenderMissionPopup = (missionPopupVisible && (hasActiveMissions || missionPopupCondensed)) || showMissionCompletion
+
+  const getPingColor = useCallback((latency) => {
+    if (latency == null) return '#6b7280'
+    if (latency <= 60) return '#10b981'
+    if (latency <= 120) return '#f59e0b'
+    return '#ef4444'
+  }, [])
+
+  const pingIndicatorColor = useMemo(() => {
+    if (connectionStatus === 'connected') {
+      return getPingColor(pingMs)
+    }
+    if (connectionStatus === 'connecting') {
+      return '#f59e0b'
+    }
+    if (connectionStatus === 'failed' || connectionStatus === 'disconnected') {
+      return '#ef4444'
+    }
+    if (connectionStatus === 'eliminated') {
+      return pingMs == null ? '#6b7280' : getPingColor(pingMs)
+    }
+    return '#6b7280'
+  }, [connectionStatus, getPingColor, pingMs])
+
+  const pingDisplayText = useMemo(() => {
+    if (connectionStatus === 'connecting') {
+      return 'Connecting…'
+    }
+    if (connectionStatus === 'failed') {
+      return 'Error'
+    }
+    if (connectionStatus === 'disconnected') {
+      return 'Offline'
+    }
+    return pingMs == null ? 'Measuring…' : `${pingMs}ms`
+  }, [connectionStatus, pingMs])
+
+  const pingSubtitle = useMemo(() => {
+    if (connectionStatus === 'connecting') {
+      return 'Establishing arena link'
+    }
+    if (connectionStatus === 'failed') {
+      return 'Connection failed'
+    }
+    if (connectionStatus === 'disconnected') {
+      return 'Reconnecting…'
+    }
+    if (connectionStatus === 'eliminated') {
+      return pingMs == null ? 'Eliminated' : 'Spectator latency'
+    }
+    return pingMs == null ? 'Measuring latency' : 'Live latency'
+  }, [connectionStatus, pingMs])
   
   // Parse URL parameters and get authenticated user data
   const roomId = searchParams.get('roomId') || 'global-turfloot-arena'
@@ -1208,7 +1319,10 @@ const MultiplayerArena = () => {
     }
     const componentId = componentIdRef.current
     console.log(`🔗 [${componentId}] Connection attempt started for user:`, privyUserId)
-    
+
+    clearPingInterval()
+    resetPingState(true)
+
     // Show loading modal when starting connection
     setShowLoadingModal(true)
     
@@ -1220,8 +1334,11 @@ const MultiplayerArena = () => {
     
     if (GLOBAL_CONNECTION_TRACKER.activeConnection && GLOBAL_CONNECTION_TRACKER.userId === privyUserId) {
       console.log(`✅ [${componentId}] User already has active global connection - reusing existing connection`)
-      wsRef.current = GLOBAL_CONNECTION_TRACKER.activeConnection
+      const existingRoom = GLOBAL_CONNECTION_TRACKER.activeConnection
+      wsRef.current = existingRoom
       setConnectionStatus('connected')
+      setShowLoadingModal(false)
+      initializePingMeasurement(existingRoom)
       return
     }
     
@@ -1314,6 +1431,8 @@ const MultiplayerArena = () => {
       console.log(`🔗 [${componentId}] Setting initial connection status to connected`)
       setConnectionStatus('connected')
 
+      initializePingMeasurement(room)
+
       missionStatsRef.current = {
         initialized: false,
         score: 0,
@@ -1339,6 +1458,8 @@ const MultiplayerArena = () => {
         console.error(`❌ [${componentId}] Colyseus room error:`, code, message)
         console.error(`🔍 ERROR DEBUG - Code: ${code}, Message: ${message}`)
         console.error(`🔍 ERROR DEBUG - Stack trace:`, new Error().stack)
+        clearPingInterval()
+        resetPingState(true)
         isConnectingRef.current = false // Reset connection flag on room error
         GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on room error
         if (GLOBAL_CONNECTION_TRACKER.activeConnection === room) {
@@ -1346,11 +1467,13 @@ const MultiplayerArena = () => {
         }
         setConnectionStatus('failed')
       })
-      
+
       room.onLeave((code) => {
         console.log(`👋 [${componentId}] Left room with code:`, code)
         console.log(`🔍 LEAVE DEBUG - Code: ${code}, Reason: ${code === 1000 ? 'Normal closure' : code === 1006 ? 'Abnormal closure' : 'Other: ' + code}`)
         console.log(`🔍 LEAVE DEBUG - Stack trace:`, new Error().stack)
+        clearPingInterval()
+        resetPingState(true)
         isConnectingRef.current = false // Reset connection flag on leave
         GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on leave
         if (wsRef.current === room) {
@@ -1485,10 +1608,13 @@ const MultiplayerArena = () => {
     } catch (error) {
       isConnectingRef.current = false // Reset connection flag on error
       GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on error
-      
+
       // Hide loading modal on error
       setShowLoadingModal(false)
-      
+
+      clearPingInterval()
+      resetPingState(true)
+
       console.error(`❌ [${componentId}] Colyseus connection failed:`, error)
       console.error(`❌ [${componentId}] Error details:`, {
         message: error.message,
@@ -2861,6 +2987,8 @@ const MultiplayerArena = () => {
       }
       lastInputRef.current = { dx: 0, dy: 0 }
       window.removeEventListener('resize', handleResize)
+      clearPingInterval()
+      resetPingState(true)
       if (wsRef.current) {
         console.log(`🔌 [${componentId}] Disconnecting from Colyseus...`)
         wsRef.current.leave()
@@ -3476,6 +3604,69 @@ const MultiplayerArena = () => {
                 </div>
               ))
             })()}
+          </div>
+        </div>
+
+        {/* Live Ping Meter - Bottom Left */}
+        <div
+          style={{
+            position: 'fixed',
+            bottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 8px)' : '10px',
+            left: '10px',
+            zIndex: 1000,
+            background: 'rgba(0, 0, 0, 0.82)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '8px',
+            padding: isMobile ? '6px 10px' : '8px 12px',
+            minWidth: '140px',
+            color: '#e5e7eb',
+            fontFamily: '"Rajdhani", sans-serif',
+            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(6px)'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '10px',
+              marginBottom: '4px'
+            }}
+          >
+            <div
+              style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: '9999px',
+                backgroundColor: pingIndicatorColor,
+                boxShadow: `0 0 10px ${pingIndicatorColor}66`
+              }}
+            />
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: isMobile ? '11px' : '12px',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                color: pingIndicatorColor
+              }}
+            >
+              {pingDisplayText}
+            </span>
+          </div>
+          <div
+            style={{
+              fontSize: isMobile ? '9px' : '10px',
+              letterSpacing: '0.03em',
+              color: '#9ca3af',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <span role="img" aria-hidden="true">📡</span>
+            <span>{pingSubtitle}</span>
           </div>
         </div>
 
