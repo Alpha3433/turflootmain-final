@@ -512,9 +512,61 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     instantJoinAvailable: emptyRooms.length
   }
 
+  const incrementRoomOccupancy = (room) => {
+    setServers(prevServers => {
+      let roomFound = false
+
+      const updatePlayerCount = (server) => {
+        if (server.id !== room.id) return server
+
+        roomFound = true
+        const maxPlayers = server.maxPlayers || room.maxPlayers || server.capacity || 50
+        const safeMaxPlayers = maxPlayers > 0 ? maxPlayers : 50
+        const currentPlayers = server.currentPlayers ?? room.currentPlayers ?? 0
+        const updatedPlayers = Math.min(currentPlayers + 1, safeMaxPlayers)
+
+        return {
+          ...server,
+          currentPlayers: updatedPlayers
+        }
+      }
+
+      const nextServers = prevServers.map(updatePlayerCount)
+
+      const finalServers = roomFound
+        ? nextServers
+        : (() => {
+            const fallbackMax = room.maxPlayers || room.capacity || 50
+            const safeMaxPlayers = fallbackMax > 0 ? fallbackMax : 50
+            const updatedPlayers = Math.min((room.currentPlayers ?? 0) + 1, safeMaxPlayers)
+
+            return [
+              ...prevServers,
+              {
+                ...room,
+                currentPlayers: updatedPlayers
+              }
+            ]
+          })()
+
+      const totalPlayers = finalServers.reduce((sum, server) => sum + (server.currentPlayers || 0), 0)
+      const totalActiveServers = finalServers.filter(server => (server.currentPlayers || 0) > 0).length
+
+      setTotalStats({
+        totalPlayers,
+        totalActiveServers
+      })
+      setLastUpdated(new Date().toISOString())
+
+      return finalServers
+    })
+  }
+
   const handleJoinServer = (room) => {
     console.log('🏠 HANDLEJOINSERVER CALLED! Joining Colyseus room:', room)
-    
+
+    incrementRoomOccupancy(room)
+
     const serverData = {
       id: room.id,
       region: room.region,
@@ -531,16 +583,18 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       multiplayer: 'true', // Force multiplayer flag
       serverType: 'colyseus' // Ensure server type is set
     }
-    
+
     console.log('🎮 HANDLEJOINSERVER: Processed room data for join:', serverData)
     console.log('🎮 HANDLEJOINSERVER: onJoinLobby type:', typeof onJoinLobby)
     console.log('🎮 HANDLEJOINSERVER: About to call onJoinLobby...')
-    
+
     try {
       onJoinLobby(serverData)
       console.log('🎮 HANDLEJOINSERVER: onJoinLobby called successfully!')
     } catch (error) {
       console.error('❌ HANDLEJOINSERVER: Error calling onJoinLobby:', error)
+      // Re-sync with server data if navigation fails
+      fetchServers()
     }
   }
 
@@ -828,10 +882,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                               </div>
                             </div>
                             <button
-                              onClick={() => {
-                                console.log('🎮 Joining room:', room.id)
-                                onJoinLobby(room)
-                              }}
+                              onClick={() => handleJoinServer(room)}
                               style={{
                                 backgroundColor: '#10b981',
                                 color: 'white',
@@ -951,7 +1002,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
                                     currentPlayers: 0,
                                     isNewRoom: true
                                   }
-                                  onJoinLobby(newRoom)
+                                  handleJoinServer(newRoom)
                                 }}
                                 style={{
                                   backgroundColor: '#10b981',
