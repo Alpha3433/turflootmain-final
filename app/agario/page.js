@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 const AgarIOGame = () => {
@@ -31,6 +31,8 @@ const AgarIOGame = () => {
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   const serverStateRef = useRef(null)
+  const sessionIdRef = useRef(null)
+  const sessionStorageKeyRef = useRef(null)
   
   // Missions system
   const [currency, setCurrency] = useState(0) // Coins earned from missions
@@ -50,6 +52,38 @@ const AgarIOGame = () => {
     { id: 'survive_60', name: 'Survivor', description: 'Survive for 60 seconds', target: 60, reward: 100, icon: '⏰' },
     { id: 'survive_120', name: 'Endurance', description: 'Survive for 120 seconds', target: 120, reward: 200, icon: '🕐' }
   ]
+
+  const getSessionTrackingInfo = useCallback((roomId) => {
+    if (typeof window === 'undefined' || !roomId) {
+      return { sessionId: null, userId: null, playerName: null, walletAddress: null, storageKey: null }
+    }
+
+    const storageKey = `colyseus_session_${roomId}`
+    sessionStorageKeyRef.current = storageKey
+
+    let sessionId = sessionIdRef.current
+    if (!sessionId) {
+      sessionId = window.sessionStorage.getItem(storageKey)
+
+      if (!sessionId) {
+        sessionId = window.crypto?.randomUUID?.()
+          || `session_${Date.now()}_${Math.random().toString(16).slice(2)}`
+        window.sessionStorage.setItem(storageKey, sessionId)
+      }
+
+      sessionIdRef.current = sessionId
+    }
+
+    const urlParams = new URLSearchParams(window.location.search)
+    const privyUserId = urlParams.get('privyUserId')
+    const playerNameParam = urlParams.get('playerName')
+    const walletAddress = urlParams.get('walletAddress')
+
+    const playerName = playerNameParam ? decodeURIComponent(playerNameParam) : 'Anonymous Player'
+    const userId = privyUserId || sessionId
+
+    return { sessionId, userId, playerName, walletAddress, storageKey }
+  }, [])
 
   // Mobile detection
   const [isMobile, setIsMobile] = useState(false)
@@ -328,22 +362,37 @@ const AgarIOGame = () => {
   // New function to track real Hathora room sessions
   const trackRealHathoraSession = async (realRoomId, fee, mode, region, gameMode) => {
     try {
+      const { sessionId, userId, playerName, walletAddress } = getSessionTrackingInfo(realRoomId)
+
+      if (!sessionId || !userId) {
+        console.warn('⚠️ Unable to resolve identifiers for real Hathora session tracking')
+        return
+      }
+
       console.log('📊 Tracking real Hathora room session:', {
         realRoomId,
         fee,
         mode,
         region,
-        gameMode
+        gameMode,
+        sessionId,
+        userId
       })
-      
-      // Format data according to API requirements (session object with required fields)
+
+      const joinedAt = new Date().toISOString()
+
       const sessionData = {
         action: 'join',
+        sessionId,
+        userId,
         session: {
           roomId: realRoomId,
-          joinedAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
-          userId: 'anonymous_' + Math.random().toString(36).substr(2, 9),
+          sessionId,
+          userId,
+          playerName,
+          walletAddress: walletAddress || null,
+          joinedAt,
+          lastActivity: joinedAt,
           entryFee: fee || 0,
           mode: gameMode || mode,
           region: region || 'unknown',
@@ -351,7 +400,7 @@ const AgarIOGame = () => {
           hathoraRoomProcess: true
         }
       }
-      
+
       const response = await fetch('/api/game-sessions', {
         method: 'POST',
         headers: {
@@ -359,13 +408,13 @@ const AgarIOGame = () => {
         },
         body: JSON.stringify(sessionData)
       })
-      
+
       if (response.ok) {
         console.log('✅ Real Hathora room session tracked successfully')
       } else {
         console.warn('⚠️ Failed to track real Hathora room session:', response.status)
       }
-      
+
     } catch (error) {
       console.error('❌ Error tracking real Hathora room session:', error)
     }
@@ -374,16 +423,29 @@ const AgarIOGame = () => {
   // Define trackPlayerSession function (was being called but not defined)
   const trackPlayerSession = async (roomId, fee, mode, region) => {
     try {
-      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region })
-      
-      // Format data according to API requirements (session object with required fields)
+      const { sessionId, userId, playerName, walletAddress } = getSessionTrackingInfo(roomId)
+
+      if (!sessionId || !userId) {
+        console.warn('⚠️ Unable to resolve identifiers for fallback session tracking')
+        return
+      }
+
+      console.log('📊 Tracking player session (fallback):', { roomId, fee, mode, region, sessionId, userId })
+
+      const joinedAt = new Date().toISOString()
+
       const sessionData = {
         action: 'join',
+        sessionId,
+        userId,
         session: {
           roomId: roomId,
-          joinedAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
-          userId: 'fallback_' + Math.random().toString(36).substr(2, 9),
+          sessionId,
+          userId,
+          playerName,
+          walletAddress: walletAddress || null,
+          joinedAt,
+          lastActivity: joinedAt,
           entryFee: fee || 0,
           mode: mode || 'unknown',
           region: region || 'unknown',
@@ -391,7 +453,7 @@ const AgarIOGame = () => {
           fallbackSession: true
         }
       }
-      
+
       const response = await fetch('/api/game-sessions', {
         method: 'POST',
         headers: {
@@ -399,13 +461,13 @@ const AgarIOGame = () => {
         },
         body: JSON.stringify(sessionData)
       })
-      
+
       if (response.ok) {
         console.log('✅ Fallback session tracked successfully')
       } else {
         console.warn('⚠️ Failed to track fallback session:', response.status)
       }
-      
+
     } catch (error) {
       console.error('❌ Error tracking fallback session:', error)
     }
@@ -829,25 +891,38 @@ const AgarIOGame = () => {
           return
         }
         
+        const { sessionId, userId, playerName, walletAddress } = getSessionTrackingInfo(roomId)
+
+        if (!sessionId || !userId) {
+          console.warn('⚠️ Unable to resolve identifiers for session join')
+          return
+        }
+
         console.log('🎯 Tracking real player session:', {
           roomId,
           fee: fee || 0,
           mode,
-          region
+          region,
+          sessionId,
+          userId
         })
-        
-        // Record player joining the room
+
+        const joinedAt = new Date().toISOString()
+
         const sessionData = {
           roomId,
+          sessionId,
+          userId,
+          playerName,
+          walletAddress: walletAddress || null,
           entryFee: parseFloat(fee) || 0,
           mode,
           region,
-          joinedAt: new Date().toISOString(),
-          lastActivity: new Date().toISOString(),
+          joinedAt,
+          lastActivity: joinedAt,
           status: 'active'
         }
-        
-        // Send to backend API to record session
+
         const response = await fetch('/api/game-sessions', {
           method: 'POST',
           headers: {
@@ -855,6 +930,8 @@ const AgarIOGame = () => {
           },
           body: JSON.stringify({
             action: 'join',
+            sessionId,
+            userId,
             session: sessionData
           })
         })
@@ -880,6 +957,13 @@ const AgarIOGame = () => {
       const mode = urlParams.get('mode')
       
       if (roomId && mode !== 'local' && mode !== 'practice') {
+        const { sessionId, userId } = getSessionTrackingInfo(roomId)
+
+        if (!sessionId || !userId) {
+          console.warn('⚠️ Unable to resolve identifiers for session update')
+          return
+        }
+
         fetch('/api/game-sessions', {
           method: 'POST',
           headers: {
@@ -888,6 +972,8 @@ const AgarIOGame = () => {
           body: JSON.stringify({
             action: 'update',
             roomId,
+            sessionId,
+            userId,
             lastActivity: new Date().toISOString()
           })
         }).catch(err => console.warn('⚠️ Failed to update session activity:', err))
@@ -903,7 +989,13 @@ const AgarIOGame = () => {
       const mode = urlParams.get('mode')
       
       if (roomId && mode !== 'local' && mode !== 'practice') {
-        // Send leave event (don't await since component is unmounting)
+        const { sessionId, userId, storageKey } = getSessionTrackingInfo(roomId)
+
+        if (!sessionId || !userId) {
+          console.warn('⚠️ Unable to resolve identifiers for session leave')
+          return
+        }
+
         fetch('/api/game-sessions', {
           method: 'POST',
           headers: {
@@ -911,12 +1003,21 @@ const AgarIOGame = () => {
           },
           body: JSON.stringify({
             action: 'leave',
-            roomId
+            roomId,
+            sessionId,
+            userId
           })
         }).catch(err => console.warn('⚠️ Failed to record session leave:', err))
+          .finally(() => {
+            if (storageKey && typeof window !== 'undefined') {
+              window.sessionStorage.removeItem(storageKey)
+            }
+            sessionIdRef.current = null
+            sessionStorageKeyRef.current = null
+          })
       }
     }
-  }, [gameStarted])
+  }, [gameStarted, getSessionTrackingInfo])
   // WebSocket connection for multiplayer Colyseus rooms
   useEffect(() => {
     if (!gameStarted) return
