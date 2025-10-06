@@ -4899,28 +4899,20 @@ const AgarIOGame = () => {
             overflow: 'hidden',
             boxShadow: isMobile ? '0 0 15px rgba(0, 255, 0, 0.6)' : '0 0 30px rgba(0, 255, 0, 0.6)'
           }}>
-            {/* Green spiky border effect */}
-            <div style={{
-              position: 'absolute',
-              top: '-3px',
-              left: '-3px',
-              right: '-3px',
-              bottom: '-3px',
-              borderRadius: '50%',
-              background: `conic-gradient(
-                #00ff00 0deg, #00dd00 10deg, #00ff00 20deg, #00ee00 30deg,
-                #00ff00 40deg, #00cc00 50deg, #00ff00 60deg, #00dd00 70deg,
-                #00ff00 80deg, #00ee00 90deg, #00ff00 100deg, #00dd00 110deg,
-                #00ff00 120deg, #00cc00 130deg, #00ff00 140deg, #00ee00 150deg,
-                #00ff00 160deg, #00dd00 170deg, #00ff00 180deg, #00cc00 190deg,
-                #00ff00 200deg, #00ee00 210deg, #00ff00 220deg, #00dd00 230deg,
-                #00ff00 240deg, #00cc00 250deg, #00ff00 260deg, #00ee00 270deg,
-                #00ff00 280deg, #00dd00 290deg, #00ff00 300deg, #00cc00 310deg,
-                #00ff00 320deg, #00ee00 330deg, #00ff00 340deg, #00dd00 350deg
-              )`,
-              zIndex: -1
-            }} />
-            
+            {/* Solid background layer to remove animated gradient */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                bottom: '0',
+                borderRadius: '50%',
+                backgroundColor: '#000000',
+                zIndex: 0
+              }}
+            />
+
             {/* Red danger zone ring (outer area) */}
             <div style={{
               position: 'absolute',
@@ -4974,7 +4966,7 @@ const AgarIOGame = () => {
             {/* Virus dots on minimap - REMOVED for cleaner minimap view */}
             {/* {minimapData.viruses.map((virus, i) => (...))} */}
             
-            {/* Border spikes effect overlay */}
+            {/* Border glow overlay */}
             <div style={{
               position: 'absolute',
               top: '0',
