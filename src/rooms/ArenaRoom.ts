@@ -401,6 +401,10 @@ export class ArenaRoom extends Room<GameState> {
       
       console.log(`📊 Mass halved: ${originalMass} → ${newMass}`);
 
+      const centerX = this.worldSize / 4;
+      const centerY = this.worldSize / 4;
+      const playableRadius = 1800;
+
       // Create new split piece with unique ID
       const splitPieceId = `split_${Date.now()}_${client.sessionId}`;
       const splitPiece = new Player();
@@ -438,6 +442,91 @@ export class ArenaRoom extends Room<GameState> {
       splitPiece.noMergeUntil = now + NO_MERGE_MS;
       player.noMergeUntil = now + NO_MERGE_MS;
       
+      const clampToPlayableArea = (x: number, y: number, radius: number) => {
+        const maxRadius = playableRadius - radius;
+        const dx = x - centerX;
+        const dy = y - centerY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > maxRadius) {
+          const angle = Math.atan2(dy, dx);
+          return {
+            x: centerX + Math.cos(angle) * maxRadius,
+            y: centerY + Math.sin(angle) * maxRadius
+          };
+        }
+
+        return { x, y };
+      };
+
+      const ownerStartX = player.x;
+      const ownerStartY = player.y;
+      const desiredSeparation = player.radius + splitPiece.radius + 4; // leave a small buffer
+
+      // Initial placement aims directly along the split direction with desired spacing
+      let proposedSplitX = ownerStartX + dirX * desiredSeparation;
+      let proposedSplitY = ownerStartY + dirY * desiredSeparation;
+
+      const clampedSplit = clampToPlayableArea(proposedSplitX, proposedSplitY, splitPiece.radius);
+      proposedSplitX = clampedSplit.x;
+      proposedSplitY = clampedSplit.y;
+
+      splitPiece.x = proposedSplitX;
+      splitPiece.y = proposedSplitY;
+
+      let ownerFinalX = ownerStartX;
+      let ownerFinalY = ownerStartY;
+
+      const ensureMinimumSeparation = () => {
+        const dxPieces = splitPiece.x - ownerFinalX;
+        const dyPieces = splitPiece.y - ownerFinalY;
+        const distance = Math.sqrt(dxPieces * dxPieces + dyPieces * dyPieces);
+        const minimumAllowed = player.radius + splitPiece.radius + 1; // ensure no overlap
+
+        if (distance >= minimumAllowed) {
+          return;
+        }
+
+        const normX = distance > 0 ? dxPieces / distance : dirX;
+        const normY = distance > 0 ? dyPieces / distance : dirY;
+        const separationShortfall = minimumAllowed - distance;
+
+        // First try pulling the owner slightly backward to increase the gap
+        ownerFinalX -= normX * separationShortfall;
+        ownerFinalY -= normY * separationShortfall;
+
+        const clampedOwner = clampToPlayableArea(ownerFinalX, ownerFinalY, player.radius);
+        ownerFinalX = clampedOwner.x;
+        ownerFinalY = clampedOwner.y;
+
+        // Recalculate separation after adjusting the owner
+        const newDx = splitPiece.x - ownerFinalX;
+        const newDy = splitPiece.y - ownerFinalY;
+        const newDistance = Math.sqrt(newDx * newDx + newDy * newDy);
+
+        if (newDistance >= minimumAllowed) {
+          return;
+        }
+
+        const remainingShortfall = minimumAllowed - newDistance;
+
+        // As a fallback, nudge the split piece forward along the separation axis
+        splitPiece.x += normX * remainingShortfall;
+        splitPiece.y += normY * remainingShortfall;
+
+        const fallbackSplit = clampToPlayableArea(splitPiece.x, splitPiece.y, splitPiece.radius);
+        splitPiece.x = fallbackSplit.x;
+        splitPiece.y = fallbackSplit.y;
+      };
+
+      ensureMinimumSeparation();
+
+      // Update owner position/targets if it was nudged for spacing
+      player.x = ownerFinalX;
+      player.y = ownerFinalY;
+      player.moveTargetX = ownerFinalX;
+      player.moveTargetY = ownerFinalY;
+
       // Add split piece to game state
       this.state.players.set(splitPieceId, splitPiece);
       
