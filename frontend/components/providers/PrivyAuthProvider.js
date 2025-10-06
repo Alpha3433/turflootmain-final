@@ -51,6 +51,69 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
     }, null, 2))
   }, [config, appId])
 
+  useEffect(() => {
+    if (!isClient) return
+
+    const closePrivyModal = () => {
+      if (typeof window !== 'undefined') {
+        const privy = window.privy
+        if (privy) {
+          if (typeof privy.close === 'function') {
+            privy.close()
+            return
+          }
+          if (typeof privy.closePrivyModal === 'function') {
+            privy.closePrivyModal()
+            return
+          }
+        }
+      }
+
+      const escapeEvent = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        which: 27,
+        bubbles: true,
+        cancelable: true,
+      })
+      document.dispatchEvent(escapeEvent)
+    }
+
+    const handleOutsideInteraction = (event) => {
+      const modalContent = document.getElementById('privy-modal-content')
+      if (!modalContent) {
+        return
+      }
+
+      const target = event.target
+      if (!(target instanceof Node)) {
+        return
+      }
+
+      if (modalContent.contains(target)) {
+        return
+      }
+
+      const backdrop = document.getElementById('privy-dialog-backdrop')
+      if (backdrop && !backdrop.contains(target)) {
+        return
+      }
+
+      event.preventDefault()
+      event.stopPropagation()
+      closePrivyModal()
+    }
+
+    document.addEventListener('mousedown', handleOutsideInteraction, true)
+    document.addEventListener('touchstart', handleOutsideInteraction, true)
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideInteraction, true)
+      document.removeEventListener('touchstart', handleOutsideInteraction, true)
+    }
+  }, [isClient])
+
   // Simple hydration check - no delays
   if (!isClient) {
     return null // Don't render anything on server
