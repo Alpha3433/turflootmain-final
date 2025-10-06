@@ -354,7 +354,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
     try {
       const amount = parseFloat(cashOutForm.amount)
       const minCashOut = cashOutForm.currency === 'SOL' ? 0.05 : 20 // 0.05 SOL or $20 USD
-      const platformFeePercent = 10
+      const platformFeePercent = 0
       const platformFee = amount * (platformFeePercent / 100)
       const netAmount = amount - platformFee
       
@@ -390,9 +390,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
       }
       
       // Confirmation dialog with fee breakdown
-      const feeDisplay = `${platformFee.toFixed(4)} ${cashOutForm.currency}`
       const netDisplay = `${netAmount.toFixed(4)} ${cashOutForm.currency}`
-      const confirmMessage = `Confirm Cash Out:\n\nAmount: ${amount} ${cashOutForm.currency}\nPlatform Fee (10%): ${feeDisplay}\nYou'll receive: ${netDisplay}\n\nProceed?`
+      const confirmMessage = `Confirm Cash Out:\n\nAmount: ${amount} ${cashOutForm.currency}\nYou'll receive: ${netDisplay} (no platform fee)\n\nProceed?`
       
       if (!confirm(confirmMessage)) {
         setLoading(false)
@@ -446,12 +445,14 @@ const WalletManager = ({ onBalanceUpdate }) => {
   // Calculate fee display for cash out
   const getCashOutFeeInfo = () => {
     const amount = parseFloat(cashOutForm.amount) || 0
-    const platformFee = amount * 0.1 // 10% fee
+    const platformFeePercent = 0
+    const platformFee = amount * (platformFeePercent / 100)
     const netAmount = amount - platformFee
-    
+
     return {
       amount: amount,
       fee: platformFee,
+      feePercent: platformFeePercent,
       net: netAmount,
       feeDisplay: `${platformFee.toFixed(4)} ${cashOutForm.currency}`,
       netDisplay: `${netAmount.toFixed(4)} ${cashOutForm.currency}`
