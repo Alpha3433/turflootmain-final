@@ -369,40 +369,116 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
     console.log('🔄 Using fallback server data due to routing issues')
     
     // Fallback server data when API endpoints are not accessible
+    const timestamp = new Date().toISOString()
+    const fallbackEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
+
+    const fallbackCashConfigs = [
+      {
+        stake: 0.02,
+        idSuffix: '002',
+        description: 'Micro stakes TurfLoot arena for fast wagers'
+      },
+      {
+        stake: 0.05,
+        idSuffix: '005',
+        description: 'Low stakes TurfLoot arena for casual competitive play'
+      }
+    ]
+
+    const fallbackCashRooms = fallbackCashConfigs.map((config) => {
+      const payout = Number((config.stake * 2).toFixed(2))
+
+      return {
+        id: `colyseus-cash-${config.idSuffix}-au`,
+        roomType: 'cash',
+        type: 'cash-room',
+        name: `TurfLoot $${config.stake.toFixed(2)} Room - Australia`,
+        region: 'Australia',
+        regionId: 'au-syd',
+        displayName: `$${config.stake.toFixed(2)} Cash Game`,
+        mode: 'cash-game',
+        gameType: 'Cash Game',
+        description: config.description,
+        maxPlayers: 50,
+        minPlayers: 2,
+        currentPlayers: 0,
+        waitingPlayers: 0,
+        isRunning: true,
+        ping: null,
+        avgWaitTime: 'Create Game',
+        difficulty: 'All Players',
+        entryFee: config.stake,
+        serverFee: 0,
+        totalCost: config.stake,
+        potentialWinning: payout,
+        prizePool: payout,
+        stake: config.stake,
+        status: 'waiting',
+        serverType: 'colyseus',
+        endpoint: fallbackEndpoint,
+        hathoraRegion: 'ap-southeast-2',
+        lastUpdated: timestamp,
+        timestamp,
+        canJoin: true,
+        canSpectate: false
+      }
+    })
+
+    const fallbackServers = [
+      {
+        id: 'colyseus-arena-global',
+        roomType: 'arena',
+        name: 'TurfLoot Arena',
+        region: 'Australia',
+        regionId: 'au-syd',
+        displayName: 'Global Arena',
+        mode: 'multiplayer',
+        gameType: 'Arena Battle',
+        description: 'Real-time multiplayer arena with up to 50 players',
+        maxPlayers: 50,
+        minPlayers: 1,
+        currentPlayers: 0,
+        waitingPlayers: 0,
+        isRunning: true,
+        ping: 0,
+        avgWaitTime: 'Join Now',
+        difficulty: 'All Players',
+        entryFee: 0,
+        serverFee: 0,
+        totalCost: 0,
+        potentialWinning: 0,
+        prizePool: 0,
+        stake: 0,
+        status: 'waiting',
+        serverType: 'colyseus',
+        endpoint: fallbackEndpoint,
+        hathoraRegion: 'ap-southeast-2',
+        lastUpdated: timestamp,
+        timestamp,
+        canJoin: true,
+        canSpectate: true
+      },
+      ...fallbackCashRooms
+    ]
+
     const fallbackServerData = {
-      servers: [
-        {
-          id: 'colyseus-arena-global',
-          roomType: 'arena',
-          name: 'TurfLoot Arena',
-          region: 'Australia',
-          regionId: 'au-syd',
-          endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud',
-          maxPlayers: 50,
-          currentPlayers: 0,
-          entryFee: 0,
-          gameType: 'Arena Battle',
-          serverType: 'colyseus',
-          isActive: true,
-          canSpectate: true,
-          ping: 0,
-          lastUpdated: new Date().toISOString(),
-          timestamp: new Date().toISOString()
-        }
-      ],
+      servers: fallbackServers,
       totalPlayers: 0,
-      totalActiveServers: 1,
-      totalServers: 1,
-      practiceServers: 0,
-      cashServers: 0,
+      totalActiveServers: 0,
+      totalServers: fallbackServers.length,
+      practiceServers: 1,
+      cashServers: fallbackCashRooms.length,
       regions: ['Australia'],
-      gameTypes: ['Arena Battle'],
+      gameTypes: [
+        { name: 'Arena Battle', servers: 1 },
+        { name: 'Cash Game', servers: fallbackCashRooms.length }
+      ],
       colyseusEnabled: true,
-      colyseusEndpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud',
-      lastUpdated: new Date().toISOString(),
-      timestamp: new Date().toISOString()
+      colyseusEndpoint: fallbackEndpoint,
+      lastUpdated: timestamp,
+      timestamp
     }
-    
+
     console.log('✅ Using fallback server data:', {
       servers: fallbackServerData.servers.length,
       endpoint: fallbackServerData.colyseusEndpoint,

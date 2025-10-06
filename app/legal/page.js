@@ -124,7 +124,7 @@ export default function LegalPage() {
               <div>
                 <h3 className="font-bold text-[#14F195] mb-2">6. Financial Terms</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  A 10% service fee is deducted from gross winnings. Minimum withdrawal amounts may apply. 
+                  TurfLoot does not deduct a platform service fee from gross winnings. Minimum withdrawal amounts may apply.
                   All transactions are processed in SOL cryptocurrency on the Solana blockchain.
                 </p>
               </div>
