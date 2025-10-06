@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Client } from 'colyseus.js'
 import { usePrivy } from '@privy-io/react-auth'
@@ -58,6 +58,8 @@ const MultiplayerArena = () => {
   const [showLoadingModal, setShowLoadingModal] = useState(false)
   const cashOutIntervalRef = useRef(null)
 
+  const gameStatsRef = useRef(gameStats)
+
   // Mission system - ported from agario  
   const [currency, setCurrency] = useState(0)
   const [completedMissions, setCompletedMissions] = useState([])
@@ -95,6 +97,14 @@ const MultiplayerArena = () => {
   const continuousInputIntervalRef = useRef(null)
 
   const missionCondenseTimeoutRef = useRef(null)
+  const activeMissionsRef = useRef([])
+  const missionStatsRef = useRef({
+    initialized: false,
+    score: 0,
+    massRaw: 25,
+    massRounded: 25,
+    maxMassAchieved: 25
+  })
   
   // Mission definitions - ported from agario
   const missionTypes = useMemo(() => ([
@@ -146,6 +156,108 @@ const MultiplayerArena = () => {
     setCompletedMissions(storedMissions)
     setCompletedMissionsLoaded(true)
   }, [missionStorageKey])
+
+  useEffect(() => {
+    activeMissionsRef.current = activeMissions
+  }, [activeMissions])
+
+  useEffect(() => {
+    gameStatsRef.current = gameStats
+  }, [gameStats])
+
+  const updateMissionProgress = useCallback((type, value) => {
+    const missions = activeMissionsRef.current
+    if (!missions || missions.length === 0) {
+      return
+    }
+
+    const numericValue = Number(value)
+    if (!Number.isFinite(numericValue)) {
+      return
+    }
+
+    let rewardDelta = 0
+    let missionChanged = false
+
+    setActiveMissions(prev => {
+      if (!prev || prev.length === 0) {
+        return prev
+      }
+
+      const nextMissions = prev.map(mission => {
+        if (!mission || mission.completed) {
+          return mission
+        }
+
+        const currentProgress = Number.isFinite(mission.progress) ? mission.progress : 0
+        let newProgress = currentProgress
+        let shouldComplete = false
+
+        switch (type) {
+          case 'coin_collected': {
+            if (mission.id.includes('collect_coins')) {
+              const increment = Math.max(0, Math.floor(numericValue))
+              if (increment > 0) {
+                newProgress = Math.min(mission.target, currentProgress + increment)
+                shouldComplete = newProgress >= mission.target
+              }
+            }
+            break
+          }
+          case 'mass_reached': {
+            if (mission.id.includes('reach_mass')) {
+              const roundedValue = Math.max(0, Math.floor(numericValue))
+              newProgress = Math.max(currentProgress, roundedValue)
+              shouldComplete = newProgress >= mission.target
+            }
+            break
+          }
+          case 'survival_time': {
+            if (mission.id.includes('survive')) {
+              const roundedValue = Math.max(0, Math.floor(numericValue))
+              newProgress = Math.max(currentProgress, roundedValue)
+              shouldComplete = newProgress >= mission.target
+            }
+            break
+          }
+          case 'elimination': {
+            if (mission.id.includes('eliminate')) {
+              const increment = Math.max(0, Math.floor(numericValue))
+              if (increment > 0) {
+                newProgress = Math.min(mission.target, currentProgress + increment)
+                shouldComplete = newProgress >= mission.target
+              }
+            }
+            break
+          }
+          default:
+            break
+        }
+
+        if (shouldComplete && !mission.completed) {
+          rewardDelta += mission.reward || 0
+          missionChanged = true
+          return { ...mission, progress: newProgress, completed: true }
+        }
+
+        if (newProgress !== currentProgress) {
+          missionChanged = true
+          return { ...mission, progress: newProgress }
+        }
+
+        return mission
+      })
+
+      return missionChanged ? nextMissions : prev
+    })
+
+    if (missionChanged) {
+      if (rewardDelta > 0) {
+        setCurrency(prev => prev + rewardDelta)
+      }
+      console.log('🎯 Mission progress updated:', { type, value: numericValue, rewardDelta })
+    }
+  }, [setActiveMissions, setCurrency])
 
   useEffect(() => {
     if (!completedMissionsLoaded || typeof window === 'undefined') {
@@ -1074,6 +1186,14 @@ const MultiplayerArena = () => {
       GLOBAL_CONNECTION_TRACKER.isConnecting = false // Reset global flag on success
       console.log(`🔗 [${componentId}] Setting initial connection status to connected`)
       setConnectionStatus('connected')
+
+      missionStatsRef.current = {
+        initialized: false,
+        score: 0,
+        massRaw: 25,
+        massRounded: 25,
+        maxMassAchieved: 25
+      }
       
       // Hide loading modal on successful connection
       setShowLoadingModal(false)
@@ -1670,10 +1790,62 @@ const MultiplayerArena = () => {
         })
         
         // Update mass and score (server is always authoritative for these)
-        console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', Math.round(currentPlayer.mass) || 25, ')')
-        setMass(Math.round(currentPlayer.mass) || 25)
-        setScore(Math.round(currentPlayer.score) || 0)
-        
+        const currentScoreRounded = Math.max(0, Math.round(currentPlayer.score || 0))
+        const rawMass = Number.isFinite(currentPlayer.mass) ? currentPlayer.mass : 0
+        const roundedMass = Math.max(0, Math.round(rawMass))
+
+        console.log('🎯 Mass update from server:', currentPlayer.mass, '(rounded:', roundedMass || 25, ')')
+        setMass(roundedMass || 25)
+        setScore(currentScoreRounded)
+
+        const missionStats = missionStatsRef.current || {}
+
+        if (!missionStats.initialized) {
+          missionStats.score = currentScoreRounded
+          missionStats.massRaw = rawMass
+          missionStats.massRounded = roundedMass
+          missionStats.maxMassAchieved = roundedMass
+          missionStats.initialized = true
+        } else {
+          const previousScore = Number.isFinite(missionStats.score) ? missionStats.score : 0
+          const scoreDelta = currentScoreRounded - previousScore
+          const previousRawMass = Number.isFinite(missionStats.massRaw) ? missionStats.massRaw : rawMass
+          const rawMassDelta = rawMass - previousRawMass
+          const approxMassDelta = Number.isFinite(rawMassDelta) ? Math.round(rawMassDelta) : 0
+
+          if (scoreDelta > 0) {
+            const isLikelyCoin =
+              Math.abs(scoreDelta - approxMassDelta) <= 2 ||
+              (approxMassDelta < 0 && scoreDelta === 1)
+            if (isLikelyCoin) {
+              updateMissionProgress('coin_collected', scoreDelta)
+            }
+          }
+
+          const previousMaxMass = Number.isFinite(missionStats.maxMassAchieved)
+            ? missionStats.maxMassAchieved
+            : missionStats.massRounded ?? roundedMass
+
+          if (roundedMass > previousMaxMass) {
+            updateMissionProgress('mass_reached', roundedMass)
+            missionStats.maxMassAchieved = roundedMass
+          } else {
+            missionStats.maxMassAchieved = Math.max(previousMaxMass, roundedMass)
+          }
+
+          const survivalStart = gameStatsRef.current?.timeStarted ?? Date.now()
+          const survivalSeconds = Math.max(0, Math.floor((Date.now() - survivalStart) / 1000))
+          if (survivalSeconds > 0) {
+            updateMissionProgress('survival_time', survivalSeconds)
+          }
+        }
+
+        missionStats.score = currentScoreRounded
+        missionStats.massRaw = rawMass
+        missionStats.massRounded = roundedMass
+        missionStats.maxMassAchieved = Math.max(missionStats.maxMassAchieved ?? roundedMass, roundedMass)
+        missionStatsRef.current = missionStats
+
         // Update other player properties
         this.player.mass = currentPlayer.mass
         this.player.radius = currentPlayer.radius
