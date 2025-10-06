@@ -31,14 +31,16 @@ export default function TurfLootTactical() {
   }
   
   // Calculate total cost including dynamic server fee based on loyalty tier
-  const calculateTotalCost = (entryFee) => {
-    const feePercentage = loyaltyData?.feePercentage || 10 // Default to 10% if no data
+  const calculateTotalCost = (entryFee, feePercentageOverride = null) => {
+    const defaultFeePercentage = loyaltyData?.feePercentage ?? 10
+    const feePercentage = feePercentageOverride ?? defaultFeePercentage
     const serverFee = entryFee * (feePercentage / 100) // Dynamic server fee
     const totalCost = entryFee + serverFee
     return {
       entryFee: entryFee,
       serverFee: serverFee,
-      totalCost: totalCost
+      totalCost: totalCost,
+      feePercentage
     }
   }
   
@@ -46,16 +48,16 @@ export default function TurfLootTactical() {
   const SERVER_WALLET_ADDRESS = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
   
   // Deduct entry fee + server fee when joining paid room
-  const deductRoomFees = async (entryFee, userWalletAddress) => {
+  const deductRoomFees = async (entryFee, userWalletAddress, feePercentageOverride = null) => {
     try {
       console.log(`💰 Deducting fees for paid room: Entry=$${entryFee}`)
-      
-      const costs = calculateTotalCost(entryFee)
+
+      const costs = calculateTotalCost(entryFee, feePercentageOverride)
       console.log(`📊 Fee breakdown:`)
       console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
-      console.log(`   Server Fee (10%): $${costs.serverFee.toFixed(3)}`)
+      console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): $${costs.serverFee.toFixed(3)}`)
       console.log(`   Total Cost: $${costs.totalCost.toFixed(3)}`)
-      
+
       // Check if user has sufficient balance
       const currentBalance = parseFloat(walletBalance.usd || 0)
       if (currentBalance < costs.totalCost) {
@@ -104,7 +106,7 @@ export default function TurfLootTactical() {
       return {
         success: false,
         error: error.message,
-        costs: calculateTotalCost(entryFee)
+        costs: calculateTotalCost(entryFee, feePercentageOverride)
       }
     }
   }
@@ -1863,7 +1865,72 @@ export default function TurfLootTactical() {
 
   const handleJoinLobby = async (serverData) => {
     console.log('🌐 COLYSEUS-FIRST: Joining multiplayer server:', serverData)
-    
+
+    const identifiersToCheck = [serverData?.id, serverData?.roomId].filter(Boolean)
+
+    const paidRoomConfigs = [
+      {
+        idMatches: ['turfloot-au-5'],
+        nameMatches: ['Turfloot $5 Room - Australia'],
+        entryFee: 0.05,
+        minBalance: 0.05,
+        feePercentage: 10
+      },
+      {
+        idMatches: ['turfloot-au-20'],
+        nameMatches: ['Turfloot $20 Room - Australia'],
+        entryFee: 0.10,
+        minBalance: 0.10,
+        feePercentage: 10
+      }
+    ]
+
+    const paidRoomConfig = paidRoomConfigs.find(config => {
+      const matchesId = config.idMatches?.some(id => identifiersToCheck.includes(id))
+      const matchesName = config.nameMatches?.some(name => name === serverData?.name)
+      return matchesId || matchesName
+    })
+
+    if (paidRoomConfig) {
+      if (!authenticated) {
+        alert('Please log in with your TurfLoot account before joining paid rooms.')
+        return
+      }
+
+      const currentBalance = parseFloat(walletBalance.usd || 0)
+      if (currentBalance < paidRoomConfig.minBalance) {
+        const shortfall = Math.max(0, paidRoomConfig.minBalance - currentBalance)
+        alert(`Insufficient balance for this room.\n\nRequired: $${paidRoomConfig.minBalance.toFixed(2)}\nAvailable: $${currentBalance.toFixed(2)}\nShortfall: $${shortfall.toFixed(2)}\n\nPlease top up your wallet to join.`)
+        return
+      }
+
+      const userWalletAddress = findWalletAddress()
+      if (!userWalletAddress) {
+        alert('A linked Solana wallet is required to join paid rooms. Please connect your wallet and try again.')
+        return
+      }
+
+      const feeResult = await deductRoomFees(
+        paidRoomConfig.entryFee,
+        userWalletAddress,
+        paidRoomConfig.feePercentage
+      )
+
+      if (!feeResult.success) {
+        console.error('❌ Paid room fee deduction failed:', feeResult.error)
+        alert(`Failed to process room entry fee: ${feeResult.error}`)
+        return
+      }
+
+      serverData.entryFee = paidRoomConfig.entryFee
+      serverData.totalCost = feeResult.costs.totalCost
+      serverData.feePercentage = paidRoomConfig.feePercentage
+      serverData.minBalance = paidRoomConfig.minBalance
+      serverData.paidRoom = true
+
+      console.log('✅ Paid room fee processed successfully:', feeResult)
+    }
+
     // Show enhanced loading modal with detailed progress
     const loadingModal = document.createElement('div')
     loadingModal.id = 'colyseus-loading-modal'

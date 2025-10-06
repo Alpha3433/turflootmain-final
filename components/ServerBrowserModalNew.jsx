@@ -649,7 +649,10 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
       region: room.region,
       regionId: room.regionId,
       name: room.name,
-      entryFee: room.entryFee,
+      entryFee: room.chargeAmount ?? room.entryFee,
+      chargeAmount: room.chargeAmount ?? room.entryFee,
+      minBalance: room.minBalance ?? null,
+      feePercentage: room.feePercentage ?? null,
       gameType: room.gameType || 'Arena Battle',
       mode: 'colyseus-multiplayer', // Force Colyseus multiplayer for all server browser games
       server: 'colyseus', // Explicitly set server type
