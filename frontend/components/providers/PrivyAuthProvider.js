@@ -81,36 +81,40 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
     }
 
     const handleOutsideInteraction = (event) => {
-      const modalContent = document.getElementById('privy-modal-content')
+      const modalContent =
+        document.getElementById('privy-modal-content') ||
+        document.querySelector('[data-privy-component="dialog"], [data-privy-component="content"]')
+
       if (!modalContent) {
         return
       }
 
       const target = event.target
-      if (!(target instanceof Node)) {
+      if (!(target instanceof EventTarget)) {
         return
       }
 
-      if (modalContent.contains(target)) {
+      if (
+        (target instanceof Node && modalContent.contains(target)) ||
+        (typeof event.composedPath === 'function' && event.composedPath().includes(modalContent))
+      ) {
         return
       }
 
       const backdrop = document.getElementById('privy-dialog-backdrop')
-      if (backdrop && !backdrop.contains(target)) {
+      if (backdrop && target instanceof Node && !backdrop.contains(target)) {
         return
       }
 
-      event.preventDefault()
-      event.stopPropagation()
       closePrivyModal()
     }
 
-    document.addEventListener('mousedown', handleOutsideInteraction, true)
-    document.addEventListener('touchstart', handleOutsideInteraction, true)
+    document.addEventListener('mousedown', handleOutsideInteraction)
+    document.addEventListener('touchstart', handleOutsideInteraction)
 
     return () => {
-      document.removeEventListener('mousedown', handleOutsideInteraction, true)
-      document.removeEventListener('touchstart', handleOutsideInteraction, true)
+      document.removeEventListener('mousedown', handleOutsideInteraction)
+      document.removeEventListener('touchstart', handleOutsideInteraction)
     }
   }, [isClient])
 
