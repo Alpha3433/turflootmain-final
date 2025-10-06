@@ -19,7 +19,9 @@ const gameServer = new Server({
 });
 
 // Define the arena room with 20 TPS (50ms intervals)
-gameServer.define("arena", ArenaRoom);
+gameServer
+  .define("arena", ArenaRoom)
+  .filterBy(["roomName"]);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
