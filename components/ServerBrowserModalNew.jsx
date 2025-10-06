@@ -645,6 +645,7 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
 
     const serverData = {
       id: room.id,
+      roomId: room.roomId || room.id,
       region: room.region,
       regionId: room.regionId,
       name: room.name,

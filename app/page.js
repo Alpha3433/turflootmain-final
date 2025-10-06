@@ -1999,8 +1999,10 @@ export default function TurfLootTactical() {
       // Return server configuration for handleJoinLobby to use
       console.log('✅ Colyseus server configuration ready for navigation')
       
+      const resolvedRoomId = serverData.roomId || serverData.id || 'colyseus-arena'
+
       return {
-        roomId: 'colyseus-arena',
+        roomId: resolvedRoomId,
         endpoint: colyseusServerInfo.endpoint,
         roomType: colyseusServerInfo.roomType,
         region: colyseusServerInfo.region,
@@ -2029,8 +2031,11 @@ export default function TurfLootTactical() {
         throw new Error('No server data provided')
       }
       
+      const resolvedRoomId = serverData.roomId || serverData.id || 'colyseus-arena-global'
+
       console.log('📊 Server configuration for Colyseus game:', {
         id: serverData.id,
+        roomId: resolvedRoomId,
         name: serverData.name,
         region: serverData.region,
         entryFee: serverData.entryFee,
@@ -2064,7 +2069,7 @@ export default function TurfLootTactical() {
       
       // Build URL parameters for Colyseus multiplayer game
       const gameParams = new URLSearchParams({
-        roomId: serverData.id || 'colyseus-arena-global',
+        roomId: resolvedRoomId,
         mode: 'colyseus-multiplayer', // Force Colyseus multiplayer
         server: 'colyseus', // Explicitly set server type
         serverType: 'colyseus', // Additional server type identifier

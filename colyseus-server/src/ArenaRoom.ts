@@ -14,6 +14,8 @@ export class Player extends Schema {
   @type("number") score: number = 0;
   @type("number") lastSeq: number = 0;
   @type("boolean") alive: boolean = true;
+  @type("boolean") isSplitPiece: boolean = false;
+  @type("string") ownerSessionId: string = "";
 }
 
 // Coin state schema
@@ -44,6 +46,7 @@ export class GameState extends Schema {
 
 export class ArenaRoom extends Room<GameState> {
   maxClients = 50;
+  protected currentRoomName: string = "global-turfloot-arena";
 
   // Game configuration
   worldSize = 4000;
@@ -63,8 +66,14 @@ export class ArenaRoom extends Room<GameState> {
   ];
   private nextSpawnIndex = 0;
   
-  onCreate() {
-    console.log('🌍 Arena room initialized');
+  onCreate(options: any) {
+    this.currentRoomName = options?.roomName || "global-turfloot-arena";
+    this.setMetadata({
+      roomName: this.currentRoomName,
+      createdAt: new Date().toISOString()
+    });
+
+    console.log(`🌍 Arena room initialized (${this.currentRoomName})`);
     
     // Initialize game state
     this.setState(new GameState());
@@ -115,7 +124,7 @@ export class ArenaRoom extends Room<GameState> {
     const privyUserId = options.privyUserId || `anonymous_${Date.now()}`;
     const playerName = options.playerName || `Player_${Math.random().toString(36).substring(7)}`;
     
-    console.log(`👋 Player joined: ${playerName} (${client.sessionId})`);
+    console.log(`👋 Player joined: ${playerName} (${client.sessionId}) in room ${this.currentRoomName}`);
     
     // Create new player
     const player = new Player();
@@ -168,7 +177,7 @@ export class ArenaRoom extends Room<GameState> {
   onLeave(client: Client, consented?: boolean) {
     const player = this.state.players.get(client.sessionId);
     if (player) {
-      console.log(`👋 Player left: ${player.name} (${client.sessionId})`);
+      console.log(`👋 Player left: ${player.name} (${client.sessionId}) from room ${this.currentRoomName}`);
       this.state.players.delete(client.sessionId);
     }
   }
