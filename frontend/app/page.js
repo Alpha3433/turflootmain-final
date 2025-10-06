@@ -1416,6 +1416,37 @@ export default function TurfLootTactical() {
       }
     }
   }, [currency, isAuthenticated, user])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const handleExternalCurrencyUpdate = (event) => {
+      const detail = event?.detail
+      if (!detail) {
+        return
+      }
+
+      const rawValue = typeof detail.currency === 'number'
+        ? detail.currency
+        : parseInt(detail.currency, 10)
+
+      if (!Number.isFinite(rawValue)) {
+        return
+      }
+
+      const sanitizedValue = Math.max(0, Math.floor(rawValue))
+
+      setCurrency(prev => (prev === sanitizedValue ? prev : sanitizedValue))
+    }
+
+    window.addEventListener('turfloot:currencyUpdated', handleExternalCurrencyUpdate)
+
+    return () => {
+      window.removeEventListener('turfloot:currencyUpdated', handleExternalCurrencyUpdate)
+    }
+  }, [])
   
   // Selected skin system for cross-component synchronization
   const [selectedSkin, setSelectedSkin] = useState({
