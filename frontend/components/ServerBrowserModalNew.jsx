@@ -438,12 +438,17 @@ const ServerBrowserModal = ({ isOpen, onClose, onJoinLobby }) => {
 
     incrementRoomOccupancy(room)
 
+    const chargeAmount = room.chargeAmount ?? room.entryFee
+
     const serverData = {
       id: room.id,
       region: room.region,
       regionId: room.regionId, // Pass the specific region ID (e.g., 'london', 'frankfurt')
       name: room.name,
-      entryFee: room.entryFee,
+      entryFee: chargeAmount,
+      chargeAmount,
+      minBalance: room.minBalance ?? null,
+      feePercentage: room.feePercentage ?? null,
       gameType: room.gameType || 'cash-game',
       mode: room.type === 'instant-join' ? 'hathora-multiplayer' : 'join-existing',
       maxPlayers: room.maxPlayers,
