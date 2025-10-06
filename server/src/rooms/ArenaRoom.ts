@@ -13,6 +13,7 @@ const MOMENTUM_THRESHOLD = 0.1;
 export const MERGE_ATTRACTION_RATE = 0.02;
 export const MERGE_ATTRACTION_MAX = 120;
 export const MERGE_ATTRACTION_SPACING = 0.05;
+const FRICTION_PER_TICK_60HZ = 0.9830475724915585;
 
 const USERS_COLLECTION = "users";
 const TRANSACTIONS_COLLECTION = "transactions";
@@ -107,6 +108,12 @@ export class ArenaRoom extends Room<GameState> {
   maxCoins = 300; // Triple the original 100-coin cap for higher arena density
   maxViruses = 30; // Double the spike count to intensify arena hazards
   tickRate = parseInt(process.env.TICK_RATE || '20'); // TPS server logic
+  private simulationRate = 60;
+  private simulationDelta = 1 / 60;
+  private simulationAccumulator = 0;
+  private broadcastAccumulator = 0;
+  private broadcastInterval = 1 / 20;
+  private simulationTimestampMs = Date.now();
 
   private normalizeStake(raw: unknown): number {
     if (typeof raw === "number" && Number.isFinite(raw)) {
@@ -349,12 +356,24 @@ export class ArenaRoom extends Room<GameState> {
       });
     });
     
-    // Start game loop at 20 TPS
-    this.setSimulationInterval(() => this.update(), 1000 / this.tickRate);
-    
+    // Configure fixed timestep simulation (60 Hz sim, 20 Hz broadcast)
+    this.simulationRate = 60;
+    this.simulationDelta = 1 / this.simulationRate;
+    this.broadcastInterval = 1 / this.tickRate;
+    this.simulationAccumulator = 0;
+    this.broadcastAccumulator = 0;
+    this.simulationTimestampMs = Date.now();
+
+    this.setSimulationInterval((deltaTime?: number) => {
+      const deltaSeconds = typeof deltaTime === "number"
+        ? Math.min(deltaTime, 250) / 1000
+        : this.simulationDelta;
+      this.stepSimulation(deltaSeconds);
+    }, 1000 / this.simulationRate);
+
     console.log(`🪙 Generated ${this.maxCoins} coins`);
     console.log(`🦠 Generated ${this.maxViruses} viruses`);
-    console.log(`🔄 Game loop started at ${this.tickRate} TPS`);
+    console.log(`🔄 Game loop started: ${this.simulationRate} Hz sim / ${this.tickRate} TPS broadcast`);
   }
 
   private getNextSpawnPosition(padding: number = 0): { x: number, y: number } {
@@ -619,11 +638,27 @@ export class ArenaRoom extends Room<GameState> {
     }
   }
 
-  update() {
-    const deltaTime = 1 / this.tickRate; // Fixed timestep
-    const now = Date.now();
-    this.state.timestamp = now;
+  private stepSimulation(deltaSeconds: number) {
+    if (deltaSeconds <= 0) {
+      return;
+    }
 
+    this.simulationAccumulator += deltaSeconds;
+
+    while (this.simulationAccumulator >= this.simulationDelta) {
+      this.simulationTimestampMs += this.simulationDelta * 1000;
+      this.simulateTick(this.simulationDelta, this.simulationTimestampMs);
+      this.simulationAccumulator -= this.simulationDelta;
+      this.broadcastAccumulator += this.simulationDelta;
+    }
+
+    while (this.broadcastAccumulator >= this.broadcastInterval) {
+      this.broadcastAccumulator -= this.broadcastInterval;
+      this.state.timestamp = this.simulationTimestampMs;
+    }
+  }
+
+  private simulateTick(deltaTime: number, now: number) {
     const alivePlayers: Array<{ player: Player; sessionId: string }> = [];
     const ownerIds = new Set<string>();
 
@@ -661,9 +696,9 @@ export class ArenaRoom extends Room<GameState> {
       // Keep player in bounds of the playable circle
       this.enforcePlayableBoundary(player, true);
 
-      // Apply friction
-      player.vx *= 0.95;
-      player.vy *= 0.95;
+      // Apply friction tuned for 60 Hz simulation
+      player.vx *= FRICTION_PER_TICK_60HZ;
+      player.vy *= FRICTION_PER_TICK_60HZ;
 
       // Check collisions
       this.checkCollisions(player, sessionId);
