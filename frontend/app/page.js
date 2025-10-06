@@ -2633,22 +2633,17 @@ export default function TurfLootTactical() {
         console.log('👤 User wallet information unavailable (optional)')
       }
 
-      const isDesktopView = (() => {
-        if (typeof window === 'undefined') {
-          console.warn('⚠️ Window object unavailable, falling back to layout state for modal selection')
-          return !isMobile
-        }
-        return window.innerWidth >= 768
-      })()
+      const shouldUseMobileModal =
+        isMobile || (typeof window !== 'undefined' && window.innerWidth < 768)
 
-      if (isDesktopView) {
-        // Desktop: Open new desktop modal
-        console.log('🖥️ Opening desktop withdrawal modal')
-        setDesktopWithdrawalModalVisible(true)
-      } else {
-        // Mobile: Use existing modal
+      if (shouldUseMobileModal) {
         console.log('📱 Opening mobile withdrawal modal')
         setWithdrawalModalVisible(true)
+        setDesktopWithdrawalModalVisible(false)
+      } else {
+        console.log('🖥️ Opening desktop withdrawal modal')
+        setDesktopWithdrawalModalVisible(true)
+        setWithdrawalModalVisible(false)
       }
 
     } catch (error) {
