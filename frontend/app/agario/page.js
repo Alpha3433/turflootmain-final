@@ -202,6 +202,8 @@ const AgarIOGame = () => {
   const lastInputSentAtRef = useRef(0)
   const inputHeartbeatTimeoutRef = useRef(null)
   const inputActiveRef = useRef(false)
+  const pendingInputRef = useRef(null)
+  const rateLimitTimeoutRef = useRef(null)
   const serverStateRef = useRef(null)
   
   // Missions system
@@ -711,11 +713,22 @@ const AgarIOGame = () => {
     }
   }, [isMobile])
 
-  const HEARTBEAT_INTERVAL_MS = 50
+  const INPUT_RATE_LIMIT_MS = 1000 / 30 // ~33ms for ~30Hz input cadence
+  const HEARTBEAT_INTERVAL_MS = 200 // 5Hz heartbeat to refresh last direction
+  const INPUT_EPSILON = 0.02
+
+  const clearRateLimitTimeout = () => {
+    if (rateLimitTimeoutRef.current) {
+      clearTimeout(rateLimitTimeoutRef.current)
+      rateLimitTimeoutRef.current = null
+    }
+  }
 
   const stopInputHeartbeat = () => {
     inputActiveRef.current = false
     lastInputSentAtRef.current = 0
+    pendingInputRef.current = null
+    clearRateLimitTimeout()
     if (inputHeartbeatTimeoutRef.current) {
       clearTimeout(inputHeartbeatTimeoutRef.current)
       inputHeartbeatTimeoutRef.current = null
@@ -724,7 +737,7 @@ const AgarIOGame = () => {
 
   // Multiplayer input transmission system
   const sendInputToServer = (dx, dy, options = {}) => {
-    const { force = false, fromHeartbeat = false } = options
+    const { force = false, fromHeartbeat = false, skipRateLimit = false } = options
 
     if (!isMultiplayer || !wsRef.current || wsConnection !== 'connected') {
       if (!fromHeartbeat) {
@@ -736,20 +749,45 @@ const AgarIOGame = () => {
     const now = typeof performance !== 'undefined' ? performance.now() : Date.now()
 
     // Only send if input changed significantly to reduce network traffic
-    const threshold = 0.01
     const movementMagnitude = Math.sqrt(dx * dx + dy * dy)
-    const movementActive = movementMagnitude > threshold
-    const inputChanged = Math.abs(dx - lastInputRef.current.dx) >= threshold ||
-      Math.abs(dy - lastInputRef.current.dy) >= threshold
+    const movementActive = movementMagnitude > INPUT_EPSILON
+    const inputChanged = Math.abs(dx - lastInputRef.current.dx) >= INPUT_EPSILON ||
+      Math.abs(dy - lastInputRef.current.dy) >= INPUT_EPSILON
     const timeSinceLast = now - (lastInputSentAtRef.current || 0)
     const shouldBypassThreshold = movementActive && timeSinceLast >= HEARTBEAT_INTERVAL_MS
 
-    if (!inputChanged && !(force || shouldBypassThreshold)) {
+    const withinRateLimit = !skipRateLimit && !force && timeSinceLast < INPUT_RATE_LIMIT_MS
+
+    if (withinRateLimit) {
+      pendingInputRef.current = { dx, dy }
+      if (!rateLimitTimeoutRef.current) {
+        const delay = Math.max(0, INPUT_RATE_LIMIT_MS - timeSinceLast)
+        rateLimitTimeoutRef.current = setTimeout(() => {
+          rateLimitTimeoutRef.current = null
+          const pending = pendingInputRef.current
+          if (pending) {
+            pendingInputRef.current = null
+            sendInputToServer(pending.dx, pending.dy, { force: true, skipRateLimit: true })
+          }
+        }, delay)
+      }
+
+      if (!movementActive && inputActiveRef.current) {
+        stopInputHeartbeat()
+      }
+
+      return
+    }
+
+    if (!force && !inputChanged && !shouldBypassThreshold) {
       if (!movementActive && inputActiveRef.current) {
         stopInputHeartbeat()
       }
       return
     }
+
+    clearRateLimitTimeout()
+    pendingInputRef.current = null
 
     inputSequenceRef.current++
     lastInputRef.current = { dx, dy }
