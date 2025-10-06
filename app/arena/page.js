@@ -604,7 +604,21 @@ const MultiplayerArena = () => {
     type: 'circle',
     pattern: 'solid'
   })
-  
+  const [selectedSkinLoaded, setSelectedSkinLoaded] = useState(false)
+  const normalizedSelectedSkin = useMemo(() => ({
+    id: selectedSkin?.id || 'default',
+    name: selectedSkin?.name || 'Default Warrior',
+    color: selectedSkin?.color || '#4A90E2',
+    type: selectedSkin?.type || 'circle',
+    pattern: selectedSkin?.pattern || 'solid'
+  }), [
+    selectedSkin?.id,
+    selectedSkin?.name,
+    selectedSkin?.color,
+    selectedSkin?.type,
+    selectedSkin?.pattern
+  ])
+
   // Load selected skin from localStorage
   useEffect(() => {
     const savedSkin = localStorage.getItem('selectedSkin')
@@ -617,10 +631,16 @@ const MultiplayerArena = () => {
         console.log('❌ Error loading saved skin:', error)
       }
     }
+    setSelectedSkinLoaded(true)
   }, [])
 
   // Authentication check - redirect to login if not authenticated with user feedback
   useEffect(() => {
+    if (!selectedSkinLoaded) {
+      console.log('⏳ Waiting for selected skin before initializing arena connection')
+      return
+    }
+
     if (!ready) {
       setAuthMessage('🔒 Checking authentication...')
       return
@@ -649,7 +669,7 @@ const MultiplayerArena = () => {
     if (ready && authenticated && user?.id) {
       setAuthMessage('✅ Authentication successful! Loading arena...')
     }
-  }, [ready, authenticated, user, router])
+  }, [ready, authenticated, user, router, selectedSkinLoaded])
 
   // Handle cash out functionality - ported from agario
   const handleCashOut = () => {
@@ -1182,6 +1202,10 @@ const MultiplayerArena = () => {
 
   // Colyseus connection and input handling - ENHANCED DEBUGGING
   const connectToColyseus = async () => {
+    if (!selectedSkinLoaded) {
+      console.log('⏳ Selected skin not loaded - delaying Colyseus connection attempt')
+      return
+    }
     const componentId = componentIdRef.current
     console.log(`🔗 [${componentId}] Connection attempt started for user:`, privyUserId)
     
@@ -1256,8 +1280,11 @@ const MultiplayerArena = () => {
       // Create dedicated client instance for this arena  
       const client = new Client(endpoint)
       
+      const skinPayload = { ...normalizedSelectedSkin }
+
       console.log('🎯 Joining arena room:', roomId)
       console.log('🎯 Player details - Name:', playerName, 'PrivyID:', privyUserId)
+      console.log('🎨 Selected skin payload:', skinPayload)
       
       // Add timeout to connection attempt
       const connectionTimeout = setTimeout(() => {
@@ -1274,7 +1301,7 @@ const MultiplayerArena = () => {
         roomName: roomId,
         playerName: playerName,
         privyUserId: privyUserId,
-        selectedSkin: selectedSkin // Pass skin data to server for multiplayer visibility
+        selectedSkin: skinPayload // Pass skin data to server for multiplayer visibility
       })
       
       // Clear timeout if connection succeeds
@@ -1686,12 +1713,19 @@ const MultiplayerArena = () => {
       this.canvas = canvas
       this.ctx = canvas.getContext('2d')
       this.sendInputFn = inputSender  // Store the sendInput function
-      this.selectedSkin = selectedSkin || { color: '#4A90E2' } // Store the selected skin
+      const normalizedSkin = {
+        id: selectedSkin?.id || 'default',
+        name: selectedSkin?.name || 'Default Warrior',
+        color: selectedSkin?.color || '#4A90E2',
+        type: selectedSkin?.type || 'circle',
+        pattern: selectedSkin?.pattern || 'solid'
+      }
+      this.selectedSkin = normalizedSkin // Store the selected skin
       console.log('🎨 Using selected skin in game engine:', this.selectedSkin)
       this.running = false
 
       this.cameraZoom = isMobileFlag ? 0.75 : 1
-      
+
       // World setup with circular zone system
       this.world = { width: 8000, height: 8000 }
       this.expectedSessionId = null // Will be set when we connect to Colyseus
@@ -1707,7 +1741,12 @@ const MultiplayerArena = () => {
         y: 2000, // Updated center for top-side playable area (worldSize/4)
         mass: 25, // Fixed to match server spawn mass
         radius: Math.sqrt(25) * 3, // Proper radius calculation: √25 * 3 = 15
-        color: '#4A90E2',
+        color: normalizedSkin.color,
+        skinColor: normalizedSkin.color,
+        skinId: normalizedSkin.id,
+        skinName: normalizedSkin.name,
+        skinType: normalizedSkin.type,
+        skinPattern: normalizedSkin.pattern,
         name: playerName || 'Anonymous Player',
         isCurrentPlayer: true,
         speed: 2,
@@ -2334,7 +2373,7 @@ const MultiplayerArena = () => {
       const playerRadius = player.radius || 25
       
       // Use server-provided skin color for all players (enables multiplayer skin visibility)
-      const playerSkinColor = player.skinColor || player.color || '#4A90E2'
+      const playerSkinColor = player.skinColor || player.color || this.selectedSkin?.color || '#4A90E2'
       
       // Player glow effect for current player
       if (isCurrentPlayer) {
@@ -2691,11 +2730,12 @@ const MultiplayerArena = () => {
       this.playerPieces.forEach(piece => {
         this.ctx.save()
         this.ctx.translate(piece.x, piece.y)
-        
+
         // Main piece body (exact agario style)
         this.ctx.beginPath()
         this.ctx.arc(0, 0, piece.radius, 0, Math.PI * 2)
-        this.ctx.fillStyle = piece.color
+        const pieceColor = piece.skinColor || piece.color || this.selectedSkin?.color || '#4A90E2'
+        this.ctx.fillStyle = pieceColor
         this.ctx.fill()
         
         // Piece border (like agario)
@@ -2791,7 +2831,7 @@ const MultiplayerArena = () => {
     canvas.height = window.innerHeight
     
     // Create game instance with selected skin
-    const game = new MultiplayerGameEngine(canvas, sendInput, selectedSkin, isMobile)
+    const game = new MultiplayerGameEngine(canvas, sendInput, normalizedSelectedSkin, isMobile)
     gameRef.current = game
     
     game.start()
@@ -2848,7 +2888,14 @@ const MultiplayerArena = () => {
         document.body.classList.remove('mobile-game-active')
       }
     }
-  }, [ready, authenticated, user?.id, playerName]) // Add playerName to dependencies so effect responds to name changes
+  }, [
+    ready,
+    authenticated,
+    user?.id,
+    playerName,
+    selectedSkinLoaded,
+    normalizedSelectedSkin
+  ]) // Add playerName to dependencies so effect responds to name changes
   
   return (
     <div className="w-screen h-screen bg-black overflow-hidden m-0 p-0" style={{ position: 'relative', margin: 0, padding: 0 }}>
