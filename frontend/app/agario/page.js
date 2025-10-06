@@ -1584,6 +1584,16 @@ const AgarIOGame = () => {
         speed: 2,
         targetX: this.world.width / 2,
         targetY: this.world.height / 2,
+        vx: 0,
+        vy: 0,
+        serverX: null,
+        serverY: null,
+        serverMass: null,
+        serverRadius: null,
+        serverVX: 0,
+        serverVY: 0,
+        lastServerUpdate: 0,
+        hasServerSync: false,
         spawnProtection: true,
         spawnProtectionTime: 6000, // Increased from 4 to 6 seconds for better protection
         spawnProtectionStart: Date.now()
@@ -1702,6 +1712,9 @@ const AgarIOGame = () => {
             color: player.color,
             score: player.score,
             alive: player.alive,
+            spawnProtection: player.spawnProtection,
+            spawnProtectionStart: player.spawnProtectionStart,
+            spawnProtectionTime: player.spawnProtectionTime,
             isCurrentPlayer: sessionId === (wsRef.current?.sessionId)
           }
 
@@ -1742,14 +1755,35 @@ const AgarIOGame = () => {
       // Update current player from server state if in multiplayer
       const currentPlayer = this.serverState.players.find(p => p.isCurrentPlayer)
       if (currentPlayer && isMultiplayer) {
-        // Apply server-authoritative position with client-side prediction
-        this.player.x = currentPlayer.x
-        this.player.y = currentPlayer.y
-        this.player.mass = currentPlayer.mass
-        this.player.radius = currentPlayer.radius
-        this.player.name = currentPlayer.name
-        
-        // Update UI state
+        const previousPlayer = this.previousServerState?.playersById?.get(currentPlayer.sessionId)
+        const previousTimestamp = this.previousServerState?.timestamp || snapshotTimestamp
+        const deltaSeconds = Math.max(0.016, (snapshotTimestamp - previousTimestamp) / 1000)
+
+        if (!this.player.hasServerSync) {
+          // Snap to the very first authoritative update so we start aligned with the server
+          this.player.x = currentPlayer.x
+          this.player.y = currentPlayer.y
+          this.player.mass = currentPlayer.mass
+          this.player.radius = currentPlayer.radius
+          this.player.targetX = currentPlayer.x
+          this.player.targetY = currentPlayer.y
+          this.player.hasServerSync = true
+        }
+
+        this.player.serverX = currentPlayer.x
+        this.player.serverY = currentPlayer.y
+        this.player.serverMass = currentPlayer.mass
+        this.player.serverRadius = currentPlayer.radius
+        this.player.serverVX = previousPlayer ? (currentPlayer.x - previousPlayer.x) / deltaSeconds : this.player.serverVX
+        this.player.serverVY = previousPlayer ? (currentPlayer.y - previousPlayer.y) / deltaSeconds : this.player.serverVY
+        this.player.lastServerUpdate = snapshotTimestamp
+        this.player.spawnProtection = currentPlayer.spawnProtection ?? this.player.spawnProtection
+        this.player.spawnProtectionStart = currentPlayer.spawnProtectionStart ?? this.player.spawnProtectionStart
+        this.player.spawnProtectionTime = currentPlayer.spawnProtectionTime ?? this.player.spawnProtectionTime
+        this.player.name = currentPlayer.name || this.player.name
+        this.player.color = currentPlayer.color || this.player.color
+
+        // Update UI state using the authoritative values
         if (typeof setMass === 'function') setMass(Math.floor(currentPlayer.mass))
         if (typeof setScore === 'function') setScore(Math.floor(currentPlayer.score))
       }
@@ -2538,7 +2572,9 @@ const AgarIOGame = () => {
       const dx = this.player.targetX - this.player.x
       const dy = this.player.targetY - this.player.y
       const distance = Math.sqrt(dx * dx + dy * dy)
-      
+      let moveX = 0
+      let moveY = 0
+
       // Debug player movement (only log occasionally to avoid spam)
       if (window.isUsingJoystick && Math.random() < 0.01) { // 1% chance to log
         console.log('🎮 Player Movement Update:', {
@@ -2556,17 +2592,57 @@ const AgarIOGame = () => {
         const baseSpeed = 6.0  // Base speed for small players
         const massSpeedFactor = Math.sqrt(this.player.mass / 20) // Gradual slowdown
         const dynamicSpeed = Math.max(1.5, baseSpeed / massSpeedFactor) // Minimum speed of 1.5
-        
+
         const moveDistance = Math.min(dynamicSpeed, distance) // Don't overshoot target
-        
+
         // Normalize direction and apply dynamic speed
-        const moveX = (dx / distance) * moveDistance
-        const moveY = (dy / distance) * moveDistance
-        
+        moveX = (dx / distance) * moveDistance
+        moveY = (dy / distance) * moveDistance
+
         this.player.x += moveX
         this.player.y += moveY
       }
-      
+
+      if (distance > 0.1 && deltaTime > 0) {
+        this.player.vx = moveX / deltaTime
+        this.player.vy = moveY / deltaTime
+      } else {
+        const damping = Math.exp(-12 * deltaTime)
+        this.player.vx *= damping
+        this.player.vy *= damping
+      }
+
+      if (window.isMultiplayer && this.player.hasServerSync) {
+        const serverX = this.player.serverX ?? this.player.x
+        const serverY = this.player.serverY ?? this.player.y
+        const serverMass = this.player.serverMass ?? this.player.mass
+        const serverRadius = this.player.serverRadius ?? this.player.radius
+        const distanceToServer = Math.hypot(serverX - this.player.x, serverY - this.player.y)
+
+        if (distanceToServer > 600) {
+          // Large corrections (e.g., respawn) should snap immediately
+          this.player.x = serverX
+          this.player.y = serverY
+          this.player.mass = serverMass
+          this.player.radius = serverRadius
+          this.player.vx = this.player.serverVX ?? this.player.vx
+          this.player.vy = this.player.serverVY ?? this.player.vy
+        } else {
+          const correctionRate = 14
+          const correctionFactor = 1 - Math.exp(-correctionRate * deltaTime)
+
+          this.player.x += (serverX - this.player.x) * correctionFactor
+          this.player.y += (serverY - this.player.y) * correctionFactor
+          this.player.mass += (serverMass - this.player.mass) * correctionFactor
+          this.player.radius += (serverRadius - this.player.radius) * correctionFactor
+
+          if (typeof this.player.serverVX === 'number' && typeof this.player.serverVY === 'number') {
+            this.player.vx += (this.player.serverVX - this.player.vx) * correctionFactor
+            this.player.vy += (this.player.serverVY - this.player.vy) * correctionFactor
+          }
+        }
+      }
+
       // Update all player pieces
       this.updatePlayerPieces(deltaTime)
       
@@ -3186,7 +3262,18 @@ const AgarIOGame = () => {
           if (player.alive) {
             let playerToRender = player
 
-            if (!player.isCurrentPlayer) {
+            if (player.isCurrentPlayer) {
+              playerToRender = {
+                ...player,
+                x: this.player.x,
+                y: this.player.y,
+                radius: this.player.radius,
+                mass: this.player.mass,
+                color: this.player.color,
+                spawnProtection: this.player.spawnProtection,
+                name: this.player.name
+              }
+            } else {
               const previousPlayer = previousSnapshot.playersById?.get(player.sessionId)
               if (previousPlayer) {
                 const interpolatedPlayer = { ...player }
