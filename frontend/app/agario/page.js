@@ -4286,6 +4286,10 @@ const AgarIOGame = () => {
       }
       
       gameRef.current.split()
+
+      const cooldownFrames = Math.max(0, Math.ceil(gameRef.current.splitCooldown ?? 0)) || 60
+      setSplitCooldownRemaining(cooldownFrames)
+      setCanSplit(false)
     }
   }
 
