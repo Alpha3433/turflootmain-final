@@ -2618,14 +2618,17 @@ const MultiplayerArena = () => {
           style={{
             position: 'fixed',
             top: isMobile ? 'calc(env(safe-area-inset-top, 0px) + 12px)' : '20px',
-            left: isMobile ? 'auto' : 'calc(env(safe-area-inset-left, 0px) + 20px)',
-            right: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 12px)' : 'auto',
+            left: '50%',
+            transform: 'translateX(-50%)',
             zIndex: 1200,
-            width: 'auto',
+            width: '100%',
+            maxWidth: '100%',
             display: 'flex',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             alignItems: 'flex-start',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            paddingLeft: isMobile ? 'calc(env(safe-area-inset-left, 0px) + 12px)' : '0',
+            paddingRight: isMobile ? 'calc(env(safe-area-inset-right, 0px) + 12px)' : '0'
           }}
         >
           {missionPopupCondensed ? (
