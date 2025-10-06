@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { MongoClient } from 'mongodb'
+import { randomUUID } from 'crypto'
 
 // MongoDB connection helper
 async function getDb() {
@@ -11,75 +12,137 @@ async function getDb() {
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { action, session, roomId, lastActivity } = body
-    
-    console.log(`🎮 Game session tracking: ${action}`, { roomId, session })
+    const {
+      action,
+      session,
+      roomId,
+      lastActivity,
+      sessionId: bodySessionId,
+      userId: bodyUserId
+    } = body
+
+    console.log(`🎮 Game session tracking: ${action}`, { roomId, session, bodySessionId, bodyUserId })
     
     const { client, db } = await getDb()
     const gameSessions = db.collection('game_sessions')
     
+    let resolvedSessionId = null
+    let resolvedUserId = null
+
     if (action === 'join') {
       // Player joining a room
-      if (!session || !session.roomId) {
+      const normalizedRoomId = session?.roomId || roomId
+
+      if (!normalizedRoomId) {
         return NextResponse.json({ error: 'Missing session data' }, { status: 400 })
       }
-      
-      // Create or update session record
+
+      resolvedSessionId = typeof session.sessionId === 'string' && session.sessionId.trim()
+        ? session.sessionId.trim()
+        : (typeof bodySessionId === 'string' && bodySessionId.trim() ? bodySessionId.trim() : randomUUID())
+
+      resolvedUserId = typeof session.userId === 'string' && session.userId.trim()
+        ? session.userId.trim()
+        : (typeof bodyUserId === 'string' && bodyUserId.trim() ? bodyUserId.trim() : resolvedSessionId)
+
+      const now = new Date()
+      const joinedAt = session.joinedAt ? new Date(session.joinedAt) : now
+      const lastActivityAt = session.lastActivity ? new Date(session.lastActivity) : now
+
       const sessionDoc = {
         ...session,
-        userId: 'anonymous', // TODO: Add real Privy user ID when available
-        joinedAt: new Date(session.joinedAt),
-        lastActivity: new Date(session.lastActivity),
+        roomId: normalizedRoomId,
+        sessionId: resolvedSessionId,
+        userId: resolvedUserId,
+        joinedAt,
+        lastActivity: lastActivityAt,
         status: 'active'
       }
-      
-      // Upsert session (create if new, update if exists)
+
       await gameSessions.updateOne(
-        { roomId: session.roomId, userId: sessionDoc.userId },
+        { sessionId: resolvedSessionId },
         { $set: sessionDoc },
         { upsert: true }
       )
-      
-      console.log(`✅ Player session recorded for room ${session.roomId}`)
-      
+
+      console.log(`✅ Player session recorded for room ${normalizedRoomId} (sessionId=${resolvedSessionId})`)
+
     } else if (action === 'update') {
       // Player updating activity (heartbeat)
+      resolvedSessionId = typeof bodySessionId === 'string' && bodySessionId.trim()
+        ? bodySessionId.trim()
+        : (typeof session?.sessionId === 'string' && session.sessionId.trim() ? session.sessionId.trim() : null)
+
+      resolvedUserId = typeof bodyUserId === 'string' && bodyUserId.trim()
+        ? bodyUserId.trim()
+        : (typeof session?.userId === 'string' && session.userId.trim() ? session.userId.trim() : null)
+
       if (!roomId || !lastActivity) {
         return NextResponse.json({ error: 'Missing roomId or lastActivity' }, { status: 400 })
       }
-      
-      // Update last activity timestamp
-      await gameSessions.updateMany(
-        { roomId, status: 'active' },
-        { $set: { lastActivity: new Date(lastActivity) } }
+
+      if (!resolvedSessionId && resolvedUserId) {
+        const existing = await gameSessions.findOne({ roomId, userId: resolvedUserId, status: 'active' })
+        if (existing) {
+          resolvedSessionId = existing.sessionId
+        }
+      }
+
+      if (!resolvedSessionId || !resolvedUserId) {
+        return NextResponse.json({ error: 'Missing roomId, sessionId, userId, or lastActivity' }, { status: 400 })
+      }
+
+      await gameSessions.updateOne(
+        { sessionId: resolvedSessionId, userId: resolvedUserId },
+        { $set: { lastActivity: new Date(lastActivity), status: 'active', roomId } }
       )
-      
-      console.log(`🔄 Updated activity for room ${roomId}`)
-      
+
+      console.log(`🔄 Updated activity for room ${roomId} (sessionId=${resolvedSessionId})`)
+
     } else if (action === 'leave') {
       // Player leaving a room
+      resolvedSessionId = typeof bodySessionId === 'string' && bodySessionId.trim()
+        ? bodySessionId.trim()
+        : (typeof session?.sessionId === 'string' && session.sessionId.trim() ? session.sessionId.trim() : null)
+
+      resolvedUserId = typeof bodyUserId === 'string' && bodyUserId.trim()
+        ? bodyUserId.trim()
+        : (typeof session?.userId === 'string' && session.userId.trim() ? session.userId.trim() : null)
+
       if (!roomId) {
         return NextResponse.json({ error: 'Missing roomId' }, { status: 400 })
       }
-      
-      // Mark session as inactive or remove it
-      await gameSessions.updateMany(
-        { roomId, status: 'active' },
-        { $set: { status: 'left', leftAt: new Date() } }
+
+      if (!resolvedSessionId && resolvedUserId) {
+        const existing = await gameSessions.findOne({ roomId, userId: resolvedUserId, status: 'active' })
+        if (existing) {
+          resolvedSessionId = existing.sessionId
+        }
+      }
+
+      if (!resolvedSessionId || !resolvedUserId) {
+        return NextResponse.json({ error: 'Missing roomId, sessionId, or userId' }, { status: 400 })
+      }
+
+      await gameSessions.updateOne(
+        { sessionId: resolvedSessionId, userId: resolvedUserId, status: 'active' },
+        { $set: { status: 'left', leftAt: new Date(), roomId } }
       )
-      
-      console.log(`👋 Player left room ${roomId}`)
-      
+
+      console.log(`👋 Player left room ${roomId} (sessionId=${resolvedSessionId})`)
+
     } else {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
-    
+
     await client.close()
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    return NextResponse.json({
+      success: true,
       action,
-      message: `Session ${action} completed successfully` 
+      message: `Session ${action} completed successfully`,
+      sessionId: resolvedSessionId,
+      userId: resolvedUserId
     })
     
   } catch (error) {
@@ -112,6 +175,7 @@ export async function GET(request) {
         sessionsByRoom[session.roomId] = []
       }
       sessionsByRoom[session.roomId].push({
+        sessionId: session.sessionId,
         userId: session.userId,
         joinedAt: session.joinedAt,
         lastActivity: session.lastActivity,
