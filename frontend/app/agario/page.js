@@ -196,6 +196,7 @@ const AgarIOGame = () => {
   const [pingMs, setPingMs] = useState(null)
   const wsRef = useRef(null)
   const pingSentAtRef = useRef(null)
+  const pingIntervalRef = useRef(null)
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   const lastInputSentAtRef = useRef(0)
@@ -1300,7 +1301,25 @@ const AgarIOGame = () => {
   }, [gameStarted])
   // WebSocket connection for multiplayer Colyseus rooms
   useEffect(() => {
-    if (!gameStarted) return
+    if (!gameStarted) {
+      return
+    }
+
+    let isActive = true
+
+    const clearPingInterval = () => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
+        pingIntervalRef.current = null
+      }
+    }
+
+    const resetPingState = (shouldUpdateState) => {
+      pingSentAtRef.current = null
+      if (shouldUpdateState && isActive) {
+        setPingMs(null)
+      }
+    }
 
     const connectToColyseusRoom = async () => {
       try {
@@ -1316,8 +1335,9 @@ const AgarIOGame = () => {
         // Only connect to Colyseus for multiplayer rooms
         if (mode === 'local' || mode === 'practice' || server !== 'colyseus') {
           console.log('🚫 Not a Colyseus multiplayer room - skipping WebSocket connection')
-          setPingMs(null)
-          pingSentAtRef.current = null
+          clearPingInterval()
+          resetPingState(true)
+          wsRef.current = null
           return
         }
 
@@ -1330,13 +1350,17 @@ const AgarIOGame = () => {
 
         if (!privyUserId) {
           console.warn('⚠️ Unable to resolve player identifier for Colyseus connection')
+          clearPingInterval()
+          resetPingState(true)
           return
         }
 
         setIsMultiplayer(true)
-        setConnectedPlayers(1) // At least the current player
-        setWsConnection('connecting')
-        setPingMs(null)
+        if (isActive) {
+          setConnectedPlayers(1) // At least the current player
+          setWsConnection('connecting')
+          setPingMs(null)
+        }
         pingSentAtRef.current = null
 
         // Import Colyseus client
@@ -1353,7 +1377,17 @@ const AgarIOGame = () => {
           stakeAmount,
           isAuthenticated: Boolean(privyUser?.id)
         })
-        
+
+        if (!isActive) {
+          console.log('⚠️ Colyseus room resolved after unmount, leaving immediately')
+          try {
+            room.leave()
+          } catch (leaveErr) {
+            console.warn('⚠️ Error leaving stale Colyseus room:', leaveErr)
+          }
+          return
+        }
+
         setWsConnection('connected')
         setPingMs(null)
         pingSentAtRef.current = null
@@ -1361,7 +1395,7 @@ const AgarIOGame = () => {
 
         // Store room reference for sending inputs
         wsRef.current = room
-        
+
         // Set up state change listener
         room.onStateChange((state) => {
           if (!state) {
@@ -1370,10 +1404,12 @@ const AgarIOGame = () => {
           }
           
           // Update connected player count with null checks
-          const playerCount = state.players ? 
+          const playerCount = state.players ?
             (state.players.size || Object.keys(state.players).length || 0) : 0
-          setConnectedPlayers(playerCount)
-          
+          if (isActive) {
+            setConnectedPlayers(playerCount)
+          }
+
           // Update local game state with server data
           if (gameRef.current && gameRef.current.updateFromServer) {
             gameRef.current.updateFromServer(state)
@@ -1385,12 +1421,16 @@ const AgarIOGame = () => {
           if (state && state.players) {
             state.players.onAdd((player, sessionId) => {
               console.log(`👋 Player joined: ${player.name || 'Unknown'}`)
-              setConnectedPlayers(prev => prev + 1)
+              if (isActive) {
+                setConnectedPlayers(prev => prev + 1)
+              }
             })
 
             state.players.onRemove((player, sessionId) => {
               console.log(`👋 Player left: ${sessionId}`)
-              setConnectedPlayers(prev => Math.max(0, prev - 1))
+              if (isActive) {
+                setConnectedPlayers(prev => Math.max(0, prev - 1))
+              }
             })
           }
         })
@@ -1398,17 +1438,21 @@ const AgarIOGame = () => {
         // Handle room errors
         room.onError((code, message) => {
           console.error('❌ Colyseus room error:', code, message)
-          setWsConnection('error')
-          setPingMs(null)
-          pingSentAtRef.current = null
+          clearPingInterval()
+          resetPingState(true)
+          if (isActive) {
+            setWsConnection('error')
+          }
         })
 
         // Handle disconnection
         room.onLeave((code) => {
           console.log('👋 Left Colyseus room:', code)
-          setWsConnection('disconnected')
-          setPingMs(null)
-          pingSentAtRef.current = null
+          clearPingInterval()
+          resetPingState(true)
+          if (isActive) {
+            setWsConnection('disconnected')
+          }
           wsRef.current = null
         })
 
@@ -1418,42 +1462,54 @@ const AgarIOGame = () => {
           const clientTimestamp = message?.clientTimestamp || pingSentAtRef.current
           if (clientTimestamp) {
             const latency = Math.max(0, Math.round(now - clientTimestamp))
-            setPingMs(latency)
+            if (isActive) {
+              setPingMs(latency)
+            }
           }
         })
 
-        // Send ping every 5 seconds for latency measurement
-        const pingInterval = setInterval(() => {
-          if (room && room.connection && room.connection.readyState === WebSocket.OPEN) {
-            // Send ping message through Colyseus room
+        const sendPing = () => {
+          const websocket = room?.connection?.transport?.ws
+          const isOpen = websocket?.readyState === WebSocket.OPEN || room?.connection?.isConnected
+
+          if (isOpen) {
             const timestamp = Date.now()
             pingSentAtRef.current = timestamp
             room.send('ping', { timestamp })
           }
-        }, 5000)
-
-        // Cleanup on unmount
-        return () => {
-          clearInterval(pingInterval)
-          setPingMs(null)
-          pingSentAtRef.current = null
-          if (room) {
-            room.leave()
-          }
-          wsRef.current = null
         }
+
+        sendPing()
+        clearPingInterval()
+        pingIntervalRef.current = setInterval(sendPing, 2000)
 
       } catch (error) {
         console.error('❌ Failed to connect to Colyseus server:', error)
-        setWsConnection('error')
-        setPingMs(null)
-        pingSentAtRef.current = null
+        clearPingInterval()
+        resetPingState(true)
+        if (isActive) {
+          setWsConnection('error')
+        }
         wsRef.current = null
       }
     }
 
     connectToColyseusRoom()
-  }, [gameStarted, ensurePlayerIdentifier, privyUser])
+    return () => {
+      isActive = false
+      clearPingInterval()
+      resetPingState(false)
+      const room = wsRef.current
+      if (room) {
+        try {
+          room.leave()
+        } catch (leaveErr) {
+          console.warn('⚠️ Error leaving Colyseus room during cleanup:', leaveErr)
+        }
+      }
+      wsRef.current = null
+    }
+  }, [gameStarted, ensurePlayerIdentifier, privyUser, stakeAmount])
 
   // Cycle through missions every 4 seconds
   useEffect(() => {
