@@ -14,8 +14,10 @@ export default function TurfLootTactical() {
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
-  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
-  const { signTransaction: privySignTransaction } = useSignTransaction()
+  const signAndSendTransactionResponse = useSignAndSendTransaction()
+  const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
+  const signTransactionResponse = useSignTransaction()
+  const privySignTransaction = signTransactionResponse?.signTransaction
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
