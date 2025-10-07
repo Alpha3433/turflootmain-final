@@ -18,7 +18,8 @@ export async function GET(_request, { params }) {
       feeLamports: quote.feeLamports,
       totalLamports: quote.totalLamports,
       feeBps: quote.feeBps,
-      recipient: quote.recipient,
+      prizeVault: quote.prizeVault,
+      feeVault: quote.feeVault,
       currencyDisplay: quote.currencyDisplay,
       priorityFeeMicroLamports: quote.priorityFeeMicroLamports
     });
