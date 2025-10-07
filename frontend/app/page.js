@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
-import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -47,12 +47,50 @@ export default function TurfLootTactical() {
   
   // Server wallet address for 10% fees
   const SERVER_WALLET_ADDRESS = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
-  const SOLANA_RPC_ENDPOINTS = Array.from(new Set([
-    process.env.NEXT_PUBLIC_SOLANA_RPC?.trim(),
-    'https://api.mainnet-beta.solana.com',
-    'https://rpc.ankr.com/solana',
-    'https://solana.public-rpc.com'
-  ].filter(Boolean)))
+  const buildSolanaRpcEndpoints = () => {
+    const normalizeList = (value) =>
+      (value || '')
+        .split(/[,\s]+/)
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+
+    const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').trim()
+    const candidateEndpoints = [process.env.NEXT_PUBLIC_SOLANA_RPC?.trim()]
+
+    candidateEndpoints.push(...normalizeList(process.env.NEXT_PUBLIC_SOLANA_RPC_LIST))
+    candidateEndpoints.push(...normalizeList(process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS))
+
+    try {
+      candidateEndpoints.push(clusterApiUrl(network))
+    } catch (error) {
+      console.warn('⚠️ Unable to derive Solana cluster RPC URL from network config:', error)
+    }
+
+    const defaultFallbacks =
+      network === 'mainnet-beta'
+        ? [
+            'https://api.mainnet-beta.solana.com',
+            'https://solana-api.projectserum.com',
+            'https://rpc.publicnode.com/solana',
+            'https://1rpc.io/solana'
+          ]
+        : [
+            'https://api.devnet.solana.com',
+            'https://rpc.publicnode.com/solana-devnet'
+          ]
+
+    candidateEndpoints.push(...defaultFallbacks)
+
+    return Array.from(
+      new Set(
+        candidateEndpoints.filter(
+          (endpoint) => typeof endpoint === 'string' && /^https?:\/\//.test(endpoint)
+        )
+      )
+    )
+  }
+
+  const SOLANA_RPC_ENDPOINTS = useMemo(() => buildSolanaRpcEndpoints(), [])
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
 
   const resolveSolanaWallet = () => {
