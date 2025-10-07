@@ -24,7 +24,6 @@ next-env.d.ts
 # Production builds
 /build
 dist/
-lib/
 
 # Environment files
 .env
