@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
+import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -46,11 +47,41 @@ export default function TurfLootTactical() {
   
   // Server wallet address for 10% fees
   const SERVER_WALLET_ADDRESS = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
-  
-  // Deduct entry fee + server fee when joining paid room
+  const SOLANA_RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
+  const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
+
+  const resolveSolanaWallet = () => {
+    if (wallets && wallets.length > 0) {
+      const prioritized = wallets.filter(w => w?.chainType === 'solana')
+      if (prioritized.length > 0) {
+        return prioritized[0]
+      }
+    }
+
+    if (privyUser?.wallet?.chainType === 'solana') {
+      return privyUser.wallet
+    }
+
+    const linkedSolana = privyUser?.linkedAccounts?.find(
+      account => account?.type === 'wallet' && account?.chainType === 'solana'
+    )
+
+    if (linkedSolana) {
+      return linkedSolana
+    }
+
+    return null
+  }
+
   const deductRoomFees = async (entryFee, userWalletAddress, feePercentageOverride = null) => {
     try {
+      if (isProcessingFee) {
+        console.log('⏳ Fee deduction already in progress, ignoring duplicate request')
+        return { success: false, error: 'Transaction already in progress' }
+      }
+
       console.log(`💰 Deducting fees for paid room: Entry=$${entryFee}`)
+      setIsProcessingFee(true)
 
       const costs = calculateTotalCost(entryFee, feePercentageOverride)
       console.log(`📊 Fee breakdown:`)
@@ -58,49 +89,134 @@ export default function TurfLootTactical() {
       console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): $${costs.serverFee.toFixed(3)}`)
       console.log(`   Total Cost: $${costs.totalCost.toFixed(3)}`)
 
-      // Check if user has sufficient balance
-      const currentBalance = parseFloat(walletBalance.usd || 0)
-      if (currentBalance < costs.totalCost) {
-        throw new Error(`Insufficient balance. Need $${costs.totalCost.toFixed(3)}, have $${currentBalance.toFixed(2)}`)
+      const currentUsdBalance = parseFloat(walletBalance.usd || 0)
+      if (currentUsdBalance < costs.totalCost) {
+        throw new Error(`Insufficient USD balance. Need $${costs.totalCost.toFixed(3)}, have $${currentUsdBalance.toFixed(2)}`)
       }
-      
-      console.log(`✅ Sufficient balance confirmed: $${currentBalance.toFixed(2)} >= $${costs.totalCost.toFixed(3)}`)
-      
-      // TODO: Implement actual blockchain transactions
-      // For now, we'll simulate the deduction and log the transfer details
-      
-      console.log(`🔄 Processing blockchain transactions...`)
-      console.log(`   Deducting $${costs.totalCost.toFixed(3)} from user wallet: ${userWalletAddress}`)
-      console.log(`   Transferring $${costs.serverFee.toFixed(3)} to server wallet: ${SERVER_WALLET_ADDRESS}`)
-      
-      // Simulate transaction processing time
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // Update local balance (in production, this would be updated by blockchain confirmation)
-      const newBalance = currentBalance - costs.totalCost
-      setWalletBalance(prev => ({
-        ...prev,
-        usd: newBalance.toFixed(6),
-        sol: (parseFloat(prev.sol || 0) - (costs.totalCost / 100)).toFixed(6) // Rough SOL conversion
+
+      const currentSolBalance = parseFloat(walletBalance.sol || 0)
+      const inferredUsdPerSol = currentSolBalance > 0
+        ? Math.max(0.0001, currentUsdBalance / currentSolBalance)
+        : USD_PER_SOL_FALLBACK
+
+      const totalCostSol = costs.totalCost / inferredUsdPerSol
+
+      if (currentSolBalance > 0 && currentSolBalance < totalCostSol) {
+        throw new Error(`Insufficient SOL balance. Need ${totalCostSol.toFixed(6)} SOL, have ${currentSolBalance.toFixed(6)} SOL`)
+      }
+
+      const solanaWallet = resolveSolanaWallet()
+
+      if (!solanaWallet) {
+        throw new Error('No Solana wallet available for fee deduction. Please connect a wallet and try again.')
+      }
+
+      const walletAddress = solanaWallet.address || userWalletAddress
+
+      if (!walletAddress) {
+        throw new Error('Connected Solana wallet is missing an address.')
+      }
+
+      const lamports = Math.round(totalCostSol * LAMPORTS_PER_SOL)
+
+      if (!Number.isFinite(lamports) || lamports <= 0) {
+        throw new Error(`Invalid transfer amount calculated (${lamports} lamports).`)
+      }
+
+      const connection = new Connection(SOLANA_RPC_ENDPOINT, 'confirmed')
+      const fromPublicKey = new PublicKey(walletAddress)
+      const toPublicKey = new PublicKey(SERVER_WALLET_ADDRESS)
+
+      const transaction = new Transaction()
+      transaction.add(SystemProgram.transfer({
+        fromPubkey: fromPublicKey,
+        toPubkey: toPublicKey,
+        lamports
       }))
-      
-      console.log(`✅ Fees deducted successfully!`)
-      console.log(`   New user balance: $${newBalance.toFixed(3)}`)
-      console.log(`   Server fee transferred to: ${SERVER_WALLET_ADDRESS}`)
-      
-      return {
-        success: true,
-        costs: costs,
-        newBalance: newBalance,
-        transactionDetails: {
-          userWallet: userWalletAddress,
-          serverWallet: SERVER_WALLET_ADDRESS,
-          entryFeeDeducted: costs.entryFee,
-          serverFeeTransferred: costs.serverFee,
-          totalDeducted: costs.totalCost
+
+      const latestBlockhash = await connection.getLatestBlockhash()
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      transaction.feePayer = fromPublicKey
+
+      let sendTransactionFn = typeof solanaWallet.sendTransaction === 'function'
+        ? solanaWallet.sendTransaction.bind(solanaWallet)
+        : null
+
+      if (!sendTransactionFn && typeof solanaWallet.getProvider === 'function') {
+        const provider = await solanaWallet.getProvider()
+        if (provider?.sendTransaction) {
+          sendTransactionFn = provider.sendTransaction.bind(provider)
         }
       }
-      
+
+      if (!sendTransactionFn) {
+        throw new Error('Unable to access signing capabilities for the connected Solana wallet.')
+      }
+
+      console.log('🔄 Processing Solana transaction via Privy...', {
+        lamports,
+        totalCostSol,
+        usdPerSol: inferredUsdPerSol,
+        walletAddress,
+        serverWallet: SERVER_WALLET_ADDRESS
+      })
+
+      const signature = await sendTransactionFn(transaction, connection, {
+        preflightCommitment: 'confirmed'
+      })
+
+      console.log('📝 Transaction submitted. Awaiting confirmation…', signature)
+
+      await connection.confirmTransaction({
+        signature,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+      }, 'confirmed')
+
+      console.log('✅ Solana transaction confirmed! Updating local balances…')
+
+      setWalletBalance(prev => {
+        const previousUsd = parseFloat(prev.usd || currentUsdBalance)
+        const previousSol = parseFloat(prev.sol || currentSolBalance)
+        const nextUsd = Math.max(0, previousUsd - costs.totalCost)
+        const nextSol = Math.max(0, previousSol - totalCostSol)
+
+        return {
+          ...prev,
+          usd: nextUsd.toFixed(2),
+          sol: nextSol.toFixed(6),
+          lastArenaSignature: signature,
+          lastArenaTransferLamports: lamports
+        }
+      })
+
+      const transactionDetails = {
+        userWallet: walletAddress,
+        serverWallet: SERVER_WALLET_ADDRESS,
+        entryFeeDeducted: costs.entryFee,
+        serverFeeTransferred: costs.serverFee,
+        totalDeductedUsd: costs.totalCost,
+        totalDeductedSol: totalCostSol,
+        lamports,
+        signature,
+        timestamp: new Date().toISOString()
+      }
+
+      try {
+        localStorage.setItem(`arena_entry_${Date.now()}`, JSON.stringify(transactionDetails))
+      } catch (storageError) {
+        console.log('⚠️ Unable to persist arena entry transaction locally:', storageError)
+      }
+
+      console.log('✅ Fees deducted successfully!', transactionDetails)
+
+      return {
+        success: true,
+        costs,
+        newBalance: Math.max(0, currentUsdBalance - costs.totalCost),
+        transactionDetails
+      }
+
     } catch (error) {
       console.error('❌ Fee deduction failed:', error)
       return {
@@ -108,6 +224,8 @@ export default function TurfLootTactical() {
         error: error.message,
         costs: calculateTotalCost(entryFee, feePercentageOverride)
       }
+    } finally {
+      setIsProcessingFee(false)
     }
   }
   
