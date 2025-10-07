@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
+import { usePrivy, useWallets, useFundWallet } from '../utils/privyClient'
 import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js'
-// NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
+// Privy hooks are wrapped by ../utils/privyClient to provide safe fallbacks when SDK hooks are unavailable
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {

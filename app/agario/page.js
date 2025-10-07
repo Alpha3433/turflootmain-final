@@ -1124,7 +1124,7 @@ const AgarIOGame = () => {
 
         // Try to get Privy user info if available
         try {
-          const { usePrivy } = await import('@privy-io/react-auth')
+          const { usePrivy } = await import('../../frontend/utils/privyClient')
           const { user } = usePrivy()
           privyUserId = user?.id || `anonymous_${Date.now()}`
           playerName = user?.username || user?.email?.split('@')[0] || null

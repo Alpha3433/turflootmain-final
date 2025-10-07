@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '../../utils/privyClient'
 import { v4 as uuidv4 } from 'uuid'
 import MissionPopupMobile from '../../components/missions/MissionPopupMobile'
 
