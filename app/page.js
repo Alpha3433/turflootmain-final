@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useFundWallet } from '@privy-io/react-auth/solana'
+import { useFundWallet, useSignAndSendTransaction, useSignTransaction } from '@privy-io/react-auth/solana'
 import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../lib/paid/feeManager'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -14,6 +14,8 @@ export default function TurfLootTactical() {
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
+  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
+  const { signTransaction: privySignTransaction } = useSignTransaction()
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
@@ -57,6 +59,19 @@ export default function TurfLootTactical() {
     []
   )
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
+  const SOLANA_CHAIN = useMemo(() => {
+    const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
+    if (network.startsWith('solana:')) {
+      return network
+    }
+    if (network === 'devnet') {
+      return 'solana:devnet'
+    }
+    if (network === 'testnet') {
+      return 'solana:testnet'
+    }
+    return 'solana:mainnet'
+  }, [])
 
   const resolveSolanaWallet = () => {
     if (wallets && wallets.length > 0) {
@@ -132,7 +147,10 @@ export default function TurfLootTactical() {
         rpcEndpoints: SOLANA_RPC_ENDPOINTS,
         usdPerSolFallback: USD_PER_SOL_FALLBACK,
         serverWalletAddress: SERVER_WALLET_ADDRESS,
-        logger: console
+        logger: console,
+        signAndSendTransactionFn: privySignAndSendTransaction,
+        signTransactionFn: privySignTransaction,
+        solanaChain: SOLANA_CHAIN
       })
 
       const resultCosts = deductionResult.costs || costs
