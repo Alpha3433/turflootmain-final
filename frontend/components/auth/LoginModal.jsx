@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '../../utils/privyClient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { X } from 'lucide-react'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '../../utils/privyClient'
 
 // Crypto polyfill for older browsers
 const generateId = () => {

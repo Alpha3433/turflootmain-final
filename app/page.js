@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useFundWallet } from '@privy-io/react-auth/solana'
+import { usePrivy, useWallets, useFundWallet } from '../frontend/utils/privyClient'
 import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 

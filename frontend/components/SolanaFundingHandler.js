@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '../utils/privyClient'
 
 // Client-only component to handle Solana funding
 export default function SolanaFundingHandler({ onFundWalletReady }) {

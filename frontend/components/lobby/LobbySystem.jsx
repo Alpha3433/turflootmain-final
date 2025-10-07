@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '../../utils/privyClient'
 import { Users, Plus, Globe, Lock, Crown, Check, X, MessageCircle, Play, Copy, RefreshCw, Wifi } from 'lucide-react'
 // Socket.IO removed - using native WebSocket implementation
 

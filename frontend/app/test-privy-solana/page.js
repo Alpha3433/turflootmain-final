@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { usePrivy, useWallets } from '../../utils/privyClient'
 
 function pickDefaultSolanaWallet(wallets) {
   return (

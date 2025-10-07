@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy } from '../../frontend/utils/privyClient'
 import { useRouter } from 'next/navigation'
 
 const TurfLootGame = () => {
