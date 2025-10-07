@@ -38,7 +38,10 @@ const AgarIOGame = () => {
   const [isMultiplayer, setIsMultiplayer] = useState(false)
   const [connectedPlayers, setConnectedPlayers] = useState(0)
   const [wsConnection, setWsConnection] = useState('disconnected')
+  const [pingMs, setPingMs] = useState(null)
   const wsRef = useRef(null)
+  const pingSentAtRef = useRef(null)
+  const pingIntervalRef = useRef(null)
   const inputSequenceRef = useRef(0)
   const lastInputRef = useRef({ dx: 0, dy: 0 })
   const serverStateRef = useRef(null)
@@ -150,6 +153,31 @@ const AgarIOGame = () => {
   }, [statsExpanded, isMobile])
 
   const playersRef = useRef(new Map()) // Store other players data
+
+  const getPingColor = (latency) => {
+    if (latency == null) return '#888888'
+    if (latency <= 60) return '#00ff88'
+    if (latency <= 120) return '#ffb400'
+    return '#ff4d4d'
+  }
+
+  const pingIndicatorColor = (() => {
+    if (wsConnection === 'connected') return getPingColor(pingMs)
+    if (wsConnection === 'connecting') return '#ffb400'
+    if (wsConnection === 'error') return '#ff4d4d'
+    return '#666666'
+  })()
+
+  const pingDisplayText = wsConnection === 'connected'
+    ? (pingMs == null ? 'Measuring…' : `${pingMs}ms`)
+    : (wsConnection === 'connecting' ? 'Connecting…' : 'No connection')
+
+  const pingSubtitle = (() => {
+    if (wsConnection === 'connecting') return 'Connecting…'
+    if (wsConnection === 'error') return 'Connection error'
+    if (wsConnection === 'disconnected') return 'Waiting for arena'
+    return pingMs == null ? 'Measuring latency' : ''
+  })()
 
   // ========================================
   // HATHORA-FIRST MULTIPLAYER INITIALIZATION
@@ -1031,12 +1059,30 @@ const AgarIOGame = () => {
   }, [gameStarted, getSessionTrackingInfo])
   // WebSocket connection for multiplayer Colyseus rooms
   useEffect(() => {
-    if (!gameStarted) return
+    if (!gameStarted) {
+      return
+    }
+
+    let isActive = true
+
+    const clearPingInterval = () => {
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
+        pingIntervalRef.current = null
+      }
+    }
+
+    const resetPingState = (shouldUpdateState) => {
+      pingSentAtRef.current = null
+      if (shouldUpdateState && isActive) {
+        setPingMs(null)
+      }
+    }
 
     const connectToColyseusRoom = async () => {
       try {
         console.log('🌐 Initializing Colyseus room connection...')
-        
+
         const urlParams = new URLSearchParams(window.location.search)
         const mode = urlParams.get('mode')
         const multiplayer = urlParams.get('multiplayer')
@@ -1047,19 +1093,35 @@ const AgarIOGame = () => {
         // Only connect to Colyseus for multiplayer rooms
         if (mode === 'local' || mode === 'practice' || server !== 'colyseus') {
           console.log('🚫 Not a Colyseus multiplayer room - skipping WebSocket connection')
+          clearPingInterval()
+          resetPingState(true)
+          if (isActive) {
+            setWsConnection('disconnected')
+          }
+          wsRef.current = null
+          return
+        }
+
+        if (wsRef.current) {
+          console.log('ℹ️ Existing Colyseus room connection detected, skipping re-initialization')
           return
         }
 
         setIsMultiplayer(true)
-        setConnectedPlayers(1) // At least the current player
+        if (isActive) {
+          setConnectedPlayers(1) // At least the current player
+          setWsConnection('connecting')
+          setPingMs(null)
+        }
+        pingSentAtRef.current = null
 
         // Import Colyseus client
         const { joinArena } = await import('../../lib/colyseus')
-        
+
         // Get Privy user ID for authentication
         let privyUserId = null
         let playerName = null
-        
+
         // Try to get Privy user info if available
         try {
           const { usePrivy } = await import('@privy-io/react-auth')
@@ -1075,33 +1137,42 @@ const AgarIOGame = () => {
 
         // Connect to Colyseus arena
         const room = await joinArena({ privyUserId, playerName })
-        
-        setWsConnection('connected')
+
+        if (!isActive) {
+          console.log('⚠️ Colyseus room resolved after unmount, leaving immediately')
+          try {
+            room.leave()
+          } catch (leaveErr) {
+            console.warn('⚠️ Error leaving stale Colyseus room:', leaveErr)
+          }
+          return
+        }
+
+        if (isActive) {
+          setWsConnection('connected')
+          setPingMs(null)
+        }
         console.log('✅ Connected to Colyseus arena')
 
         // Store room reference for sending inputs
         wsRef.current = room
-        
+
         // Set up state change listener
         room.onStateChange((state) => {
           if (!state) {
             console.log('📊 Colyseus state is null/undefined')
             return
           }
-          
+
           // Update connected player count with null checks
-          const playerCount = state.players ? 
+          const playerCount = state.players ?
             (state.players.size || Object.keys(state.players).length || 0) : 0
-          setConnectedPlayers(playerCount)
-          
+          if (isActive) {
+            setConnectedPlayers(playerCount)
+          }
+
           // Update local game state with server data
           if (gameRef.current && gameRef.current.updateFromServer) {
-            console.log('🔄 Calling updateFromServer with state:', {
-              hasPlayers: !!state.players,
-              playersCount: state.players?.size || 0,
-              hasCoins: !!state.coins,
-              hasViruses: !!state.viruses
-            })
             gameRef.current.updateFromServer(state)
           } else {
             console.log('❌ Game not ready or updateFromServer missing:', {
@@ -1116,12 +1187,16 @@ const AgarIOGame = () => {
           if (state && state.players) {
             state.players.onAdd((player, sessionId) => {
               console.log(`👋 Player joined: ${player.name || 'Unknown'}`)
-              setConnectedPlayers(prev => prev + 1)
+              if (isActive) {
+                setConnectedPlayers(prev => prev + 1)
+              }
             })
 
             state.players.onRemove((player, sessionId) => {
               console.log(`👋 Player left: ${sessionId}`)
-              setConnectedPlayers(prev => Math.max(0, prev - 1))
+              if (isActive) {
+                setConnectedPlayers(prev => Math.max(0, prev - 1))
+              }
             })
           }
         })
@@ -1129,38 +1204,78 @@ const AgarIOGame = () => {
         // Handle room errors
         room.onError((code, message) => {
           console.error('❌ Colyseus room error:', code, message)
-          setWsConnection('error')
+          clearPingInterval()
+          resetPingState(true)
+          if (isActive) {
+            setWsConnection('error')
+          }
         })
 
         // Handle disconnection
         room.onLeave((code) => {
           console.log('👋 Left Colyseus room:', code)
-          setWsConnection('disconnected')
+          clearPingInterval()
+          resetPingState(true)
+          if (isActive) {
+            setWsConnection('disconnected')
+          }
+          wsRef.current = null
         })
 
-        // Send ping every 5 seconds for latency measurement
-        const pingInterval = setInterval(() => {
-          if (room && room.connection && room.connection.readyState === WebSocket.OPEN) {
-            // Send ping message through Colyseus room
-            room.send("ping", { timestamp: Date.now() })
+        // Handle latency measurements
+        room.onMessage('pong', (message) => {
+          const now = Date.now()
+          const clientTimestamp = message?.clientTimestamp || pingSentAtRef.current
+          if (clientTimestamp) {
+            const latency = Math.max(0, Math.round(now - clientTimestamp))
+            if (isActive) {
+              setPingMs(latency)
+            }
           }
-        }, 5000)
+        })
 
-        // Cleanup on unmount
-        return () => {
-          clearInterval(pingInterval)
-          if (room) {
-            room.leave()
+        const sendPing = () => {
+          const websocket = room?.connection?.transport?.ws
+          const isOpen = websocket?.readyState === WebSocket.OPEN || room?.connection?.isConnected
+
+          if (isOpen) {
+            const timestamp = Date.now()
+            pingSentAtRef.current = timestamp
+            room.send('ping', { timestamp })
           }
         }
 
+        sendPing()
+        clearPingInterval()
+        pingIntervalRef.current = setInterval(sendPing, 2000)
+
       } catch (error) {
         console.error('❌ Failed to connect to Colyseus server:', error)
-        setWsConnection('error')
+        clearPingInterval()
+        resetPingState(true)
+        if (isActive) {
+          setWsConnection('error')
+        }
+        wsRef.current = null
       }
     }
 
     connectToColyseusRoom()
+
+    return () => {
+      isActive = false
+      clearPingInterval()
+      resetPingState(false)
+      const room = wsRef.current
+      if (room) {
+        try {
+          room.leave()
+        } catch (leaveErr) {
+          console.warn('⚠️ Error leaving Colyseus room during cleanup:', leaveErr)
+        }
+      }
+      wsRef.current = null
+    }
   }, [gameStarted])
 
   // Cycle through missions every 4 seconds
@@ -1341,8 +1456,10 @@ const AgarIOGame = () => {
       })
       
       // Store server state for rendering
+      this.previousServerState = this.serverState
       this.serverState = {
         players: [],
+        playersById: new Map(),
         coins: [],
         viruses: [],
         timestamp: serverState.timestamp || Date.now()
@@ -1351,7 +1468,12 @@ const AgarIOGame = () => {
       // Convert Colyseus MapSchema to arrays for easier processing
       if (serverState.players) {
         serverState.players.forEach((player, sessionId) => {
-          this.serverState.players.push({
+          const stake = typeof player.stake === 'number' && Number.isFinite(player.stake) ? Math.max(0, player.stake) : 0
+          const walletEarnings = typeof player.walletEarnings === 'number' && Number.isFinite(player.walletEarnings)
+            ? Math.max(0, player.walletEarnings)
+            : 0
+
+          const playerSnapshot = {
             sessionId,
             x: player.x,
             y: player.y,
@@ -1361,8 +1483,18 @@ const AgarIOGame = () => {
             color: player.color,
             score: player.score,
             alive: player.alive,
+            spawnProtection: player.spawnProtection,
+            spawnProtectionStart: player.spawnProtectionStart,
+            spawnProtectionTime: player.spawnProtectionTime,
+            stake,
+            walletEarnings,
+            ownerSessionId: player.ownerSessionId || '',
+            isSplitPiece: Boolean(player.isSplitPiece),
             isCurrentPlayer: sessionId === (wsRef.current?.sessionId)
-          })
+          }
+
+          this.serverState.players.push(playerSnapshot)
+          this.serverState.playersById.set(sessionId, playerSnapshot)
         })
       }
       
@@ -1402,6 +1534,25 @@ const AgarIOGame = () => {
         this.player.name = currentPlayer.name
         this.player.color = currentPlayer.color || this.player.color
         this.player.alive = currentPlayer.alive
+        this.player.spawnProtection = currentPlayer.spawnProtection ?? this.player.spawnProtection
+        this.player.spawnProtectionStart = currentPlayer.spawnProtectionStart ?? this.player.spawnProtectionStart
+        this.player.spawnProtectionTime = currentPlayer.spawnProtectionTime ?? this.player.spawnProtectionTime
+
+        if (typeof currentPlayer.stake === 'number' && Number.isFinite(currentPlayer.stake)) {
+          this.player.stake = Math.max(0, currentPlayer.stake)
+        } else if (typeof this.player.stake !== 'number') {
+          this.player.stake = 0
+        }
+
+        if (typeof currentPlayer.walletEarnings === 'number' && Number.isFinite(currentPlayer.walletEarnings)) {
+          this.player.walletEarnings = Math.max(0, currentPlayer.walletEarnings)
+        } else if (typeof this.player.walletEarnings !== 'number') {
+          this.player.walletEarnings = 0
+        }
+
+        if (currentPlayer.ownerSessionId) {
+          this.player.ownerSessionId = currentPlayer.ownerSessionId
+        }
         
         // Update UI state
         if (typeof setMass === 'function') setMass(Math.floor(currentPlayer.mass))
@@ -3278,12 +3429,94 @@ const AgarIOGame = () => {
       this.ctx.strokeStyle = '#FFB000'
       this.ctx.lineWidth = 2
       this.ctx.stroke()
-      
+
       // Draw $ symbol
       this.ctx.fillStyle = '#000000'
       this.ctx.font = 'bold 12px Arial'
       this.ctx.textAlign = 'center'
       this.ctx.fillText('$', coin.x, coin.y + 4)
+    }
+
+    drawRoundedRect(ctx, x, y, width, height, radius = 6) {
+      const clampedRadius = Math.max(0, Math.min(radius, width / 2, height / 2))
+      ctx.beginPath()
+      ctx.moveTo(x + clampedRadius, y)
+      ctx.lineTo(x + width - clampedRadius, y)
+      ctx.quadraticCurveTo(x + width, y, x + width, y + clampedRadius)
+      ctx.lineTo(x + width, y + height - clampedRadius)
+      ctx.quadraticCurveTo(x + width, y + height, x + width - clampedRadius, y + height)
+      ctx.lineTo(x + clampedRadius, y + height)
+      ctx.quadraticCurveTo(x, y + height, x, y + height - clampedRadius)
+      ctx.lineTo(x, y + clampedRadius)
+      ctx.quadraticCurveTo(x, y, x + clampedRadius, y)
+      ctx.closePath()
+    }
+
+    isMainPlayerEntity(entity) {
+      if (!entity) return false
+
+      if (entity === this.player || entity.isCurrentPlayer) {
+        return true
+      }
+
+      const primaryOwnerId = this.player?.ownerSessionId || this.player?.sessionId || this.player?.id || null
+      if (primaryOwnerId && (entity.ownerSessionId === primaryOwnerId || entity.sessionId === primaryOwnerId)) {
+        return true
+      }
+
+      if (entity.name && this.player?.name && entity.name === this.player.name) {
+        return true
+      }
+
+      return false
+    }
+
+    getEntityWagedBalance(entity) {
+      if (!entity) return null
+
+      const hasStake = typeof entity.stake === 'number' && Number.isFinite(entity.stake)
+      const hasWalletEarnings = typeof entity.walletEarnings === 'number' && Number.isFinite(entity.walletEarnings)
+
+      if (hasStake || hasWalletEarnings) {
+        const stakeValue = hasStake ? Math.max(0, entity.stake) : 0
+        const earningsValue = hasWalletEarnings ? Math.max(0, entity.walletEarnings) : 0
+        return stakeValue + earningsValue
+      }
+
+      const balanceKeys = ['wagedBalance', 'wageredBalance', 'wagerBalance', 'netWorth', 'net_worth', 'balance', 'score']
+      for (const key of balanceKeys) {
+        const value = entity[key]
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return value
+        }
+      }
+
+      if (entity === this.player || entity.isCurrentPlayer || this.isMainPlayerEntity(entity)) {
+        const totalMass = (this.player?.mass || 0) + this.playerPieces.reduce((sum, piece) => sum + (piece.mass || 0), 0)
+        if (Number.isFinite(totalMass)) {
+          return Math.max(0, totalMass - 20)
+        }
+      }
+
+      if (typeof entity.mass === 'number' && Number.isFinite(entity.mass)) {
+        return Math.max(0, entity.mass - 20)
+      }
+
+      return null
+    }
+
+    formatWagedBalance(value) {
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        return null
+      }
+
+      const normalized = Math.max(0, value)
+      const showCents = normalized < 1000
+
+      return `$${normalized.toLocaleString('en-US', {
+        minimumFractionDigits: showCents ? 2 : 0,
+        maximumFractionDigits: showCents ? 2 : 0
+      })}`
     }
 
     drawPlayer(player) {
@@ -3418,11 +3651,55 @@ const AgarIOGame = () => {
         }
       }
       
+      const nameBaselineY = player.y - player.radius - 15
+      const wagedBalanceValue = this.getEntityWagedBalance(player)
+      const balanceText = this.formatWagedBalance(wagedBalanceValue)
+
+      if (balanceText) {
+        const previousFont = this.ctx.font
+        const previousBaseline = this.ctx.textBaseline
+        const previousAlign = this.ctx.textAlign
+
+        this.ctx.font = 'bold 12px Arial'
+        this.ctx.textAlign = 'center'
+        this.ctx.textBaseline = 'middle'
+
+        const textMetrics = this.ctx.measureText(balanceText)
+        const paddingX = 8
+        const boxWidth = textMetrics.width + paddingX * 2
+        const boxHeight = 18
+        const boxX = player.x - boxWidth / 2
+        const boxY = nameBaselineY - boxHeight - 6
+        const isMainPlayerEntity = this.isMainPlayerEntity(player)
+
+        this.ctx.save()
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
+        this.ctx.shadowBlur = 6
+        this.ctx.fillStyle = 'rgba(3, 7, 18, 0.85)'
+        this.drawRoundedRect(this.ctx, boxX, boxY, boxWidth, boxHeight, 6)
+        this.ctx.fill()
+
+        this.ctx.shadowBlur = 0
+        this.ctx.lineWidth = 2
+        this.ctx.strokeStyle = isMainPlayerEntity ? '#FACC15' : 'rgba(52, 211, 153, 0.9)'
+        this.drawRoundedRect(this.ctx, boxX, boxY, boxWidth, boxHeight, 6)
+        this.ctx.stroke()
+
+        this.ctx.fillStyle = isMainPlayerEntity ? '#FACC15' : '#34d399'
+        this.ctx.fillText(balanceText, player.x, boxY + boxHeight / 2)
+        this.ctx.restore()
+
+        this.ctx.textBaseline = previousBaseline
+        this.ctx.textAlign = previousAlign
+        this.ctx.font = previousFont
+      }
+
       // Draw player name with bot type indicator
       this.ctx.fillStyle = '#ffffff'
       this.ctx.font = 'bold 14px Arial'
       this.ctx.textAlign = 'center'
-      
+      this.ctx.textBaseline = 'alphabetic'
+
       let displayName = player.name
       if (player.botType) {
         // Add emoji indicators for different bot types
@@ -3434,8 +3711,8 @@ const AgarIOGame = () => {
         }
         displayName = `${botEmojis[player.botType]} ${player.name}`
       }
-      
-      this.ctx.fillText(displayName, player.x, player.y - player.radius - 15)
+
+      this.ctx.fillText(displayName, player.x, nameBaselineY)
       
       // Draw black eyes
       const eyeRadius = Math.max(2, player.radius * 0.12) // Made eyes smaller
@@ -5098,30 +5375,56 @@ const AgarIOGame = () => {
           bottom: '10px',
           left: '10px',
           zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          border: '2px solid #333',
-          borderRadius: '4px',
-          padding: '6px 10px',
-          fontSize: '11px',
+          backgroundColor: 'rgba(0, 0, 0, 0.78)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '6px',
+          padding: '6px 9px',
+          fontSize: '10px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
-          fontWeight: '600'
+          fontWeight: '600',
+          minWidth: '90px',
+          backdropFilter: 'blur(6px)'
         }}>
-          <div style={{ 
-            color: '#00ff88', 
-            fontWeight: 'bold',
+          <div style={{
+            fontSize: '9px',
+            letterSpacing: '0.6px',
+            textTransform: 'uppercase',
+            color: 'rgba(255, 255, 255, 0.55)',
+            marginBottom: '3px'
+          }}>
+            Ping
+          </div>
+          <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '4px'
+            gap: '5px'
           }}>
-            <div style={{ 
-              width: '8px', 
-              height: '8px', 
-              backgroundColor: '#00ff88', 
-              borderRadius: '50%' 
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: pingIndicatorColor,
+              boxShadow: `0 0 8px ${pingIndicatorColor}`,
+              transition: 'background-color 0.2s ease, box-shadow 0.2s ease'
             }}></div>
-            <span>24ms</span>
+            <span style={{
+              color: '#ffffff',
+              fontSize: '12px',
+              fontWeight: '700',
+              textShadow: '0 0 6px rgba(0, 0, 0, 0.6)'
+            }}>{pingDisplayText}</span>
           </div>
+          {pingSubtitle && (
+            <div style={{
+              marginTop: '2px',
+              fontSize: '8px',
+              color: 'rgba(255, 255, 255, 0.6)',
+              letterSpacing: '0.4px'
+            }}>
+              {pingSubtitle}
+            </div>
+          )}
         </div>
 
         {/* Player Info Panel - Bottom Right (compact) */}
