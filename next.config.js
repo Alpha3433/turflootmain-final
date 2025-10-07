@@ -131,7 +131,7 @@ const nextConfig = {
       // Fix WalletConnect nested dependency issues
       '@walletconnect/universal-provider': path.resolve(__dirname, 'node_modules/@walletconnect/universal-provider/dist/index.umd.js'),
       '@walletconnect/ethereum-provider': path.resolve(__dirname, 'node_modules/@walletconnect/ethereum-provider/dist/index.umd.js'),
-      'rpc-websockets': false,
+      'rpc-websockets': path.resolve(__dirname, 'node_modules/rpc-websockets/dist/index.browser.mjs'),
       'require-addon': false,
       'bare-os': false,
       // Additional aliases for problematic modules
