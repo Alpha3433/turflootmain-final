@@ -50,7 +50,9 @@ export default function TurfLootTactical() {
         network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
         primary: process.env.NEXT_PUBLIC_SOLANA_RPC,
         list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
-        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
+        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS,
+        heliusRpcUrl: process.env.NEXT_PUBLIC_HELIUS_RPC || process.env.HELIUS_RPC_URL,
+        heliusApiKey: process.env.NEXT_PUBLIC_HELIUS_API_KEY || process.env.HELIUS_API_KEY
       }),
     []
   )
