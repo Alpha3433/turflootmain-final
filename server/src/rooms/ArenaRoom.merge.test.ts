@@ -13,7 +13,7 @@ room.setState(new GameState());
 room.worldSize = 1200;
 room.tickRate = 20;
 
-const deltaTime = 1 / room.tickRate;
+const deltaTime = 1 / 60; // mirrors ArenaRoom's fixed 60 Hz simulation timestep
 const mergeDelay = Date.now() + 100000;
 
 const owner = new Player();
@@ -62,7 +62,8 @@ room.state.players.set("owner", owner);
 room.state.players.set("near", nearSplit);
 room.state.players.set("far", farSplit);
 
-room.update();
+const ownedCells = room.getOwnedCells(owner.ownerSessionId);
+room.applySplitAttraction(ownedCells, deltaTime);
 
 const totalMass = owner.mass + nearSplit.mass + farSplit.mass;
 const centroidX = (
@@ -118,7 +119,7 @@ assert.ok(
 );
 
 assert.ok(
-  Math.abs(farSplit.momentumX) === MERGE_ATTRACTION_MAX * deltaTime,
+  Math.abs(Math.abs(farSplit.momentumX) - MERGE_ATTRACTION_MAX * deltaTime) < 1e-6,
   "Far fragment should be clamped at the merge attraction cap"
 );
 
