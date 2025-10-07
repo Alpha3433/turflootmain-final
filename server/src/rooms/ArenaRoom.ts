@@ -328,6 +328,49 @@ export class ArenaRoom extends Room<GameState> {
     loserClient?.send("wallet_debit", payload);
   }
 
+  private applyStakeWinToPlayer(
+    winner: Player | undefined,
+    winnerSessionOwnerId: string | undefined,
+    amount: number
+  ) {
+    if (!winner || amount <= 0) {
+      return;
+    }
+
+    const normalizedAmount = Math.max(0, amount);
+    const currentStake = typeof winner.stake === "number" && Number.isFinite(winner.stake)
+      ? Math.max(0, winner.stake)
+      : 0;
+    const currentEarnings = typeof winner.walletEarnings === "number" && Number.isFinite(winner.walletEarnings)
+      ? Math.max(0, winner.walletEarnings)
+      : 0;
+
+    const updatedStake = currentStake + normalizedAmount;
+    const updatedEarnings = currentEarnings + normalizedAmount;
+
+    winner.stake = updatedStake;
+    winner.walletEarnings = updatedEarnings;
+
+    const ownerId = winner.isSplitPiece && winner.ownerSessionId
+      ? winner.ownerSessionId
+      : winnerSessionOwnerId;
+
+    if (!ownerId) {
+      return;
+    }
+
+    this.state.players.forEach((candidate, candidateSessionId) => {
+      const candidateOwnerId = candidate.isSplitPiece && candidate.ownerSessionId
+        ? candidate.ownerSessionId
+        : candidateSessionId;
+
+      if (candidateOwnerId === ownerId) {
+        candidate.stake = updatedStake;
+        candidate.walletEarnings = updatedEarnings;
+      }
+    });
+  }
+
   onCreate() {
     console.log("🌍 Arena room initialized");
 
@@ -613,9 +656,15 @@ export class ArenaRoom extends Room<GameState> {
     splitPlayer.momentumY = dirY * SPEED_SPLIT;
     splitPlayer.noMergeUntil = now + NO_MERGE_MS;
     splitPlayer.lastSplitTime = now;
-    splitPlayer.stake = 0;
+    const parentStake = typeof player.stake === "number" && Number.isFinite(player.stake)
+      ? Math.max(0, player.stake)
+      : 0;
+    splitPlayer.stake = parentStake;
     splitPlayer.userId = player.userId;
-    splitPlayer.walletEarnings = 0;
+    const parentEarnings = typeof player.walletEarnings === "number" && Number.isFinite(player.walletEarnings)
+      ? Math.max(0, player.walletEarnings)
+      : 0;
+    splitPlayer.walletEarnings = parentEarnings;
 
     this.state.players.set(splitId, splitPlayer);
 
@@ -878,9 +927,7 @@ export class ArenaRoom extends Room<GameState> {
               loserName
             ).then((success) => {
               if (success) {
-                if (controllingWinner) {
-                  controllingWinner.walletEarnings += loserStake;
-                }
+                this.applyStakeWinToPlayer(controllingWinner, winnerSessionOwnerId, loserStake);
                 this.broadcastStakeTransfer(
                   loserStake,
                   winnerName,

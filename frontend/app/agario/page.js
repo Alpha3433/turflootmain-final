@@ -3590,6 +3590,15 @@ const AgarIOGame = () => {
     getEntityWagedBalance(entity) {
       if (!entity) return null
 
+      const hasStake = typeof entity.stake === 'number' && Number.isFinite(entity.stake)
+      const hasWalletEarnings = typeof entity.walletEarnings === 'number' && Number.isFinite(entity.walletEarnings)
+
+      if (hasStake || hasWalletEarnings) {
+        const stakeValue = hasStake ? Math.max(0, entity.stake) : 0
+        const earningsValue = hasWalletEarnings ? Math.max(0, entity.walletEarnings) : 0
+        return stakeValue + earningsValue
+      }
+
       const balanceKeys = ['wagedBalance', 'wageredBalance', 'wagerBalance', 'netWorth', 'net_worth', 'balance', 'score']
       for (const key of balanceKeys) {
         const value = entity[key]
@@ -5289,34 +5298,34 @@ const AgarIOGame = () => {
           bottom: '10px',
           left: '10px',
           zIndex: 1000,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: 'rgba(0, 0, 0, 0.78)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '6px',
-          padding: '8px 12px',
-          fontSize: '11px',
+          padding: '6px 9px',
+          fontSize: '10px',
           color: '#ccc',
           fontFamily: '"Rajdhani", sans-serif',
           fontWeight: '600',
-          minWidth: '110px',
+          minWidth: '90px',
           backdropFilter: 'blur(6px)'
         }}>
           <div style={{
-            fontSize: '10px',
+            fontSize: '9px',
             letterSpacing: '0.6px',
             textTransform: 'uppercase',
             color: 'rgba(255, 255, 255, 0.55)',
-            marginBottom: '4px'
+            marginBottom: '3px'
           }}>
             Ping
           </div>
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px'
+            gap: '5px'
           }}>
             <div style={{
-              width: '10px',
-              height: '10px',
+              width: '8px',
+              height: '8px',
               borderRadius: '50%',
               backgroundColor: pingIndicatorColor,
               boxShadow: `0 0 8px ${pingIndicatorColor}`,
@@ -5324,14 +5333,14 @@ const AgarIOGame = () => {
             }}></div>
             <span style={{
               color: '#ffffff',
-              fontSize: '14px',
+              fontSize: '12px',
               fontWeight: '700',
               textShadow: '0 0 6px rgba(0, 0, 0, 0.6)'
             }}>{pingDisplayText}</span>
           </div>
           <div style={{
-            marginTop: '4px',
-            fontSize: '10px',
+            marginTop: '3px',
+            fontSize: '9px',
             color: pingIndicatorColor,
             fontWeight: '600',
             opacity: 0.8
