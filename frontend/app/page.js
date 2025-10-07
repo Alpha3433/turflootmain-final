@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
-import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL, clusterApiUrl } from '@solana/web3.js'
+import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../../lib/paid/feeManager'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -35,62 +35,25 @@ export default function TurfLootTactical() {
   const calculateTotalCost = (entryFee, feePercentageOverride = null) => {
     const defaultFeePercentage = loyaltyData?.feePercentage ?? 10
     const feePercentage = feePercentageOverride ?? defaultFeePercentage
-    const serverFee = entryFee * (feePercentage / 100) // Dynamic server fee
-    const totalCost = entryFee + serverFee
+    const costs = calculatePaidRoomCosts(entryFee, feePercentage)
     return {
-      entryFee: entryFee,
-      serverFee: serverFee,
-      totalCost: totalCost,
-      feePercentage
+      entryFee: costs.entryFee,
+      serverFee: costs.serverFee,
+      totalCost: costs.totalCost,
+      feePercentage: costs.feePercentage
     }
   }
-  
-  // Server wallet address for 10% fees
-  const SERVER_WALLET_ADDRESS = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
-  const buildSolanaRpcEndpoints = () => {
-    const normalizeList = (value) =>
-      (value || '')
-        .split(/[,\s]+/)
-        .map((entry) => entry.trim())
-        .filter(Boolean)
 
-    const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').trim()
-    const candidateEndpoints = [process.env.NEXT_PUBLIC_SOLANA_RPC?.trim()]
-
-    candidateEndpoints.push(...normalizeList(process.env.NEXT_PUBLIC_SOLANA_RPC_LIST))
-    candidateEndpoints.push(...normalizeList(process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS))
-
-    try {
-      candidateEndpoints.push(clusterApiUrl(network))
-    } catch (error) {
-      console.warn('⚠️ Unable to derive Solana cluster RPC URL from network config:', error)
-    }
-
-    const defaultFallbacks =
-      network === 'mainnet-beta'
-        ? [
-            'https://api.mainnet-beta.solana.com',
-            'https://solana-api.projectserum.com',
-            'https://rpc.publicnode.com/solana',
-            'https://1rpc.io/solana'
-          ]
-        : [
-            'https://api.devnet.solana.com',
-            'https://rpc.publicnode.com/solana-devnet'
-          ]
-
-    candidateEndpoints.push(...defaultFallbacks)
-
-    return Array.from(
-      new Set(
-        candidateEndpoints.filter(
-          (endpoint) => typeof endpoint === 'string' && /^https?:\/\//.test(endpoint)
-        )
-      )
-    )
-  }
-
-  const SOLANA_RPC_ENDPOINTS = useMemo(() => buildSolanaRpcEndpoints(), [])
+  const SOLANA_RPC_ENDPOINTS = useMemo(
+    () =>
+      buildSolanaRpcEndpointList({
+        network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
+        primary: process.env.NEXT_PUBLIC_SOLANA_RPC,
+        list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
+        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
+      }),
+    []
+  )
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
 
   const resolveSolanaWallet = () => {
@@ -117,153 +80,85 @@ export default function TurfLootTactical() {
   }
 
   const deductRoomFees = async (entryFee, userWalletAddress, feePercentageOverride = null) => {
+    if (isProcessingFee) {
+      console.log('⏳ Fee deduction already in progress, ignoring duplicate request')
+      return { success: false, error: 'Transaction already in progress' }
+    }
+
+    const costs = calculateTotalCost(entryFee, feePercentageOverride)
+    const currentUsdBalance = parseFloat(walletBalance.usd || 0)
+    const currentSolBalance = parseFloat(walletBalance.sol || 0)
+
+    console.log('💰 Preparing paid room fee deduction:', {
+      entryFee,
+      feePercentage: costs.feePercentage,
+      serverFee: costs.serverFee,
+      totalCost: costs.totalCost,
+      currentUsdBalance: currentUsdBalance.toFixed(3),
+      currentSolBalance: currentSolBalance.toFixed(6)
+    })
+
+    if (currentUsdBalance < costs.totalCost) {
+      return {
+        success: false,
+        error: `Insufficient USD balance. Need $${costs.totalCost.toFixed(3)}, have $${currentUsdBalance.toFixed(2)}`,
+        costs
+      }
+    }
+
+    const solanaWallet = resolveSolanaWallet()
+
+    if (!solanaWallet) {
+      return {
+        success: false,
+        error: 'No Solana wallet available for fee deduction. Please connect a wallet and try again.',
+        costs
+      }
+    }
+
+    setIsProcessingFee(true)
+
     try {
-      if (isProcessingFee) {
-        console.log('⏳ Fee deduction already in progress, ignoring duplicate request')
-        return { success: false, error: 'Transaction already in progress' }
-      }
-
-      console.log(`💰 Deducting fees for paid room: Entry=$${entryFee}`)
-      setIsProcessingFee(true)
-
-      const costs = calculateTotalCost(entryFee, feePercentageOverride)
-      console.log(`📊 Fee breakdown:`)
-      console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
-      console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): $${costs.serverFee.toFixed(3)}`)
-      console.log(`   Total Cost: $${costs.totalCost.toFixed(3)}`)
-
-      const currentUsdBalance = parseFloat(walletBalance.usd || 0)
-      if (currentUsdBalance < costs.totalCost) {
-        throw new Error(`Insufficient USD balance. Need $${costs.totalCost.toFixed(3)}, have $${currentUsdBalance.toFixed(2)}`)
-      }
-
-      const currentSolBalance = parseFloat(walletBalance.sol || 0)
-      const inferredUsdPerSol = currentSolBalance > 0
-        ? Math.max(0.0001, currentUsdBalance / currentSolBalance)
-        : USD_PER_SOL_FALLBACK
-
-      const totalCostSol = costs.totalCost / inferredUsdPerSol
-
-      if (currentSolBalance > 0 && currentSolBalance < totalCostSol) {
-        throw new Error(`Insufficient SOL balance. Need ${totalCostSol.toFixed(6)} SOL, have ${currentSolBalance.toFixed(6)} SOL`)
-      }
-
-      const solanaWallet = resolveSolanaWallet()
-
-      if (!solanaWallet) {
-        throw new Error('No Solana wallet available for fee deduction. Please connect a wallet and try again.')
-      }
-
-      const walletAddress = solanaWallet.address || userWalletAddress
-
-      if (!walletAddress) {
-        throw new Error('Connected Solana wallet is missing an address.')
-      }
-
-      const lamports = Math.round(totalCostSol * LAMPORTS_PER_SOL)
-
-      if (!Number.isFinite(lamports) || lamports <= 0) {
-        throw new Error(`Invalid transfer amount calculated (${lamports} lamports).`)
-      }
-
-      let connection = null
-      let latestBlockhash = null
-      let rpcEndpointUsed = null
-      const rpcErrors = []
-
-      for (const endpoint of SOLANA_RPC_ENDPOINTS) {
-        try {
-          const candidateConnection = new Connection(endpoint, 'confirmed')
-          const candidateBlockhash = await candidateConnection.getLatestBlockhash()
-          connection = candidateConnection
-          latestBlockhash = candidateBlockhash
-          rpcEndpointUsed = endpoint
-          break
-        } catch (rpcError) {
-          console.error(`⚠️ RPC endpoint failed (${endpoint}):`, rpcError)
-          rpcErrors.push(`${endpoint}: ${rpcError?.message || rpcError}`)
-        }
-      }
-
-      if (!connection || !latestBlockhash) {
-        throw new Error(`Unable to connect to Solana RPC endpoint. Tried: ${rpcErrors.join(' | ')}`)
-      }
-
-      console.log('🌐 Using Solana RPC endpoint:', rpcEndpointUsed)
-      const fromPublicKey = new PublicKey(walletAddress)
-      const toPublicKey = new PublicKey(SERVER_WALLET_ADDRESS)
-
-      const transaction = new Transaction()
-      transaction.add(SystemProgram.transfer({
-        fromPubkey: fromPublicKey,
-        toPubkey: toPublicKey,
-        lamports
-      }))
-
-      transaction.recentBlockhash = latestBlockhash.blockhash
-      transaction.feePayer = fromPublicKey
-
-      let sendTransactionFn = typeof solanaWallet.sendTransaction === 'function'
-        ? solanaWallet.sendTransaction.bind(solanaWallet)
-        : null
-
-      if (!sendTransactionFn && typeof solanaWallet.getProvider === 'function') {
-        const provider = await solanaWallet.getProvider()
-        if (provider?.sendTransaction) {
-          sendTransactionFn = provider.sendTransaction.bind(provider)
-        }
-      }
-
-      if (!sendTransactionFn) {
-        throw new Error('Unable to access signing capabilities for the connected Solana wallet.')
-      }
-
-      console.log('🔄 Processing Solana transaction via Privy...', {
-        lamports,
-        totalCostSol,
-        usdPerSol: inferredUsdPerSol,
-        walletAddress,
-        serverWallet: SERVER_WALLET_ADDRESS
+      const deductionResult = await deductPaidRoomFee({
+        entryFeeUsd: entryFee,
+        feePercentage: costs.feePercentage,
+        walletBalance,
+        solanaWallet,
+        privyUser,
+        walletAddress: userWalletAddress,
+        rpcEndpoints: SOLANA_RPC_ENDPOINTS,
+        usdPerSolFallback: USD_PER_SOL_FALLBACK,
+        serverWalletAddress: SERVER_WALLET_ADDRESS,
+        logger: console
       })
 
-      const signature = await sendTransactionFn(transaction, connection, {
-        preflightCommitment: 'confirmed'
-      })
+      const resultCosts = deductionResult.costs || costs
 
-      console.log('📝 Transaction submitted. Awaiting confirmation…', signature)
-
-      await connection.confirmTransaction({
-        signature,
-        blockhash: latestBlockhash.blockhash,
-        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
-      }, 'confirmed')
-
-      console.log('✅ Solana transaction confirmed! Updating local balances…')
-
-      setWalletBalance(prev => {
-        const previousUsd = parseFloat(prev.usd || currentUsdBalance)
-        const previousSol = parseFloat(prev.sol || currentSolBalance)
-        const nextUsd = Math.max(0, previousUsd - costs.totalCost)
-        const nextSol = Math.max(0, previousSol - totalCostSol)
+      setWalletBalance((prev) => {
+        const previousUsd = parseFloat(prev?.usd ?? currentUsdBalance)
+        const previousSol = parseFloat(prev?.sol ?? currentSolBalance)
+        const nextUsd = Math.max(0, previousUsd - resultCosts.totalCost)
+        const nextSol = Math.max(0, previousSol - deductionResult.totalCostSol)
 
         return {
           ...prev,
           usd: nextUsd.toFixed(2),
           sol: nextSol.toFixed(6),
-          lastArenaSignature: signature,
-          lastArenaTransferLamports: lamports
+          lastArenaSignature: deductionResult.signature,
+          lastArenaTransferLamports: deductionResult.lamports
         }
       })
 
       const transactionDetails = {
-        userWallet: walletAddress,
-        serverWallet: SERVER_WALLET_ADDRESS,
-        entryFeeDeducted: costs.entryFee,
-        serverFeeTransferred: costs.serverFee,
-        totalDeductedUsd: costs.totalCost,
-        totalDeductedSol: totalCostSol,
-        lamports,
-        signature,
+        userWallet: deductionResult.walletAddress,
+        serverWallet: deductionResult.serverWallet,
+        entryFeeDeducted: resultCosts.entryFee,
+        serverFeeTransferred: resultCosts.serverFee,
+        totalDeductedUsd: resultCosts.totalCost,
+        totalDeductedSol: deductionResult.totalCostSol,
+        lamports: deductionResult.lamports,
+        signature: deductionResult.signature,
+        rpcEndpoint: deductionResult.rpcEndpoint,
         timestamp: new Date().toISOString()
       }
 
@@ -273,21 +168,20 @@ export default function TurfLootTactical() {
         console.log('⚠️ Unable to persist arena entry transaction locally:', storageError)
       }
 
-      console.log('✅ Fees deducted successfully!', transactionDetails)
+      console.log('✅ Fees deducted successfully via Privy transfer!', transactionDetails)
 
       return {
         success: true,
-        costs,
-        newBalance: Math.max(0, currentUsdBalance - costs.totalCost),
+        costs: resultCosts,
+        newBalance: Math.max(0, currentUsdBalance - resultCosts.totalCost),
         transactionDetails
       }
-
     } catch (error) {
       console.error('❌ Fee deduction failed:', error)
       return {
         success: false,
         error: error.message,
-        costs: calculateTotalCost(entryFee, feePercentageOverride)
+        costs
       }
     } finally {
       setIsProcessingFee(false)
@@ -330,7 +224,7 @@ export default function TurfLootTactical() {
     
     console.log(`💰 Validating paid room access for ${actionName}:`)
     console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
-    console.log(`   Server Fee (10%): $${costs.serverFee.toFixed(3)}`)
+    console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): $${costs.serverFee.toFixed(3)}`)
     console.log(`   Total Required: $${costs.totalCost.toFixed(3)}`)
     console.log(`   Current Balance: $${currentBalance.toFixed(3)}`)
     
@@ -338,7 +232,7 @@ export default function TurfLootTactical() {
       console.log(`❌ Insufficient funds: Need $${costs.totalCost.toFixed(3)}, have $${currentBalance.toFixed(3)}`)
       
       // Enhanced notification showing fee breakdown
-      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room:\n• Entry Fee: $${costs.entryFee.toFixed(3)}\n• Server Fee (10%): +$${costs.serverFee.toFixed(3)}\n• Total Cost: $${costs.totalCost.toFixed(3)}\n\nYour Balance: $${currentBalance.toFixed(3)}\nShortfall: $${(costs.totalCost - currentBalance).toFixed(3)}\n\nPlease deposit more funds to play.`
+      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room:\n• Entry Fee: $${costs.entryFee.toFixed(3)}\n• Server Fee (${costs.feePercentage.toFixed(2)}%): +$${costs.serverFee.toFixed(3)}\n• Total Cost: $${costs.totalCost.toFixed(3)}\n\nYour Balance: $${currentBalance.toFixed(3)}\nShortfall: $${(costs.totalCost - currentBalance).toFixed(3)}\n\nPlease deposit more funds to play.`
       
       alert(message)
       return false
