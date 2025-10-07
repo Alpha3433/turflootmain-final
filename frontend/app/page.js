@@ -47,7 +47,12 @@ export default function TurfLootTactical() {
   
   // Server wallet address for 10% fees
   const SERVER_WALLET_ADDRESS = 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
-  const SOLANA_RPC_ENDPOINT = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
+  const SOLANA_RPC_ENDPOINTS = Array.from(new Set([
+    process.env.NEXT_PUBLIC_SOLANA_RPC?.trim(),
+    'https://api.mainnet-beta.solana.com',
+    'https://rpc.ankr.com/solana',
+    'https://solana.public-rpc.com'
+  ].filter(Boolean)))
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
 
   const resolveSolanaWallet = () => {
@@ -123,7 +128,30 @@ export default function TurfLootTactical() {
         throw new Error(`Invalid transfer amount calculated (${lamports} lamports).`)
       }
 
-      const connection = new Connection(SOLANA_RPC_ENDPOINT, 'confirmed')
+      let connection = null
+      let latestBlockhash = null
+      let rpcEndpointUsed = null
+      const rpcErrors = []
+
+      for (const endpoint of SOLANA_RPC_ENDPOINTS) {
+        try {
+          const candidateConnection = new Connection(endpoint, 'confirmed')
+          const candidateBlockhash = await candidateConnection.getLatestBlockhash()
+          connection = candidateConnection
+          latestBlockhash = candidateBlockhash
+          rpcEndpointUsed = endpoint
+          break
+        } catch (rpcError) {
+          console.error(`⚠️ RPC endpoint failed (${endpoint}):`, rpcError)
+          rpcErrors.push(`${endpoint}: ${rpcError?.message || rpcError}`)
+        }
+      }
+
+      if (!connection || !latestBlockhash) {
+        throw new Error(`Unable to connect to Solana RPC endpoint. Tried: ${rpcErrors.join(' | ')}`)
+      }
+
+      console.log('🌐 Using Solana RPC endpoint:', rpcEndpointUsed)
       const fromPublicKey = new PublicKey(walletAddress)
       const toPublicKey = new PublicKey(SERVER_WALLET_ADDRESS)
 
@@ -134,7 +162,6 @@ export default function TurfLootTactical() {
         lamports
       }))
 
-      const latestBlockhash = await connection.getLatestBlockhash()
       transaction.recentBlockhash = latestBlockhash.blockhash
       transaction.feePayer = fromPublicKey
 
