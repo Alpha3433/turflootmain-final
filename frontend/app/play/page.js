@@ -369,11 +369,42 @@ const TurfLootGame = () => {
               }
               
               // Player name and mass
+              const hasStake = typeof player.stake === 'number' && Number.isFinite(player.stake)
+              const stakeValue = hasStake ? Math.max(0, player.stake) : 0
+              const stakeFontSize = Math.max(12, Math.min(20, radius * 0.35))
+              const stakeYOffset = radius + Math.max(30, radius * 0.6)
+
+              if (stakeValue > 0) {
+                const formattedStake = stakeValue >= 1
+                  ? stakeValue.toFixed(2)
+                  : stakeValue >= 0.1
+                    ? stakeValue.toFixed(2)
+                    : stakeValue.toFixed(3)
+
+                const stakeText = this.add.text(
+                  player.x,
+                  player.y - stakeYOffset,
+                  `${formattedStake} SOL`,
+                  {
+                    fontSize: `${stakeFontSize}px`,
+                    color: isMe ? '#34d399' : '#fbbf24',
+                    stroke: '#111827',
+                    strokeThickness: 4,
+                    fontStyle: 'bold',
+                    align: 'center'
+                  }
+                )
+                stakeText.setOrigin(0.5, 0.5)
+                stakeText.setDepth(11)
+
+                this.time.delayedCall(50, () => stakeText.destroy())
+              }
+
               const nameText = this.add.text(
-                player.x, 
-                player.y - radius - 20, 
-                `${player.nickname} (${Math.floor(player.mass)})`, 
-                { 
+                player.x,
+                player.y - radius - 20,
+                `${player.nickname} (${Math.floor(player.mass)})`,
+                {
                   fontSize: `${Math.max(12, Math.min(18, radius * 0.3))}px`, 
                   color: '#ffffff',
                   stroke: '#000000',
