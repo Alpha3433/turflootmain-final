@@ -269,9 +269,22 @@ export default function TurfLootTactical() {
         chainType: a.chainType,
         address: a.address
       })))
+      
+      // Check if wallet exists in linkedAccounts
+      const linkedSolana = privyUser?.linkedAccounts?.find(
+        account => account?.type === 'wallet' && account?.chainType === 'solana'
+      )
+      
+      if (linkedSolana) {
+        return {
+          success: false,
+          error: 'Your wallet is still initializing. Please wait 2-3 seconds and try again.'
+        }
+      }
+      
       return {
         success: false,
-        error: 'Solana wallet not ready. Please wait a moment and try again.'
+        error: 'No Solana wallet found. Please refresh the page to create one.'
       }
     }
 
