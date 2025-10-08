@@ -129,11 +129,18 @@ export default function TurfLootTactical() {
   // Debug what these hooks return
   useEffect(() => {
     if (typeof window !== 'undefined' && authenticated) {
+      const signTxKeys = signTransaction ? Object.keys(signTransaction) : []
+      const signAndSendKeys = signAndSendTransaction ? Object.keys(signAndSendTransaction) : []
+      
       console.log('🔍 Privy Hooks Debug:', {
         signTransactionType: typeof signTransaction,
         signAndSendTransactionType: typeof signAndSendTransaction,
-        signTransactionKeys: signTransaction ? Object.keys(signTransaction) : null,
-        signAndSendKeys: signAndSendTransaction ? Object.keys(signAndSendTransaction) : null
+        signTransactionKeys: signTxKeys,
+        signAndSendKeys: signAndSendKeys,
+        signTransactionFirstKey: signTxKeys[0],
+        signAndSendFirstKey: signAndSendKeys[0],
+        signTransactionFn: signTransaction?.[signTxKeys[0]],
+        signAndSendFn: signAndSendTransaction?.[signAndSendKeys[0]]
       })
     }
   }, [signTransaction, signAndSendTransaction, authenticated])
