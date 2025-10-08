@@ -131,9 +131,9 @@ export default function TurfLootTactical() {
     
     const addresses = []
     
-    // Add addresses from wallets array
-    if (wallets) {
-      wallets
+    // Add addresses from Solana wallets array
+    if (solanaWallets) {
+      solanaWallets
         .map(wallet => getWalletAddress(wallet))
         .filter(Boolean)
         .forEach(addr => addresses.push(addr))
@@ -148,7 +148,7 @@ export default function TurfLootTactical() {
     
     // Remove duplicates and join
     return [...new Set(addresses)].join('|')
-  }, [wallets, privyUser])
+  }, [solanaWallets, privyUser])
   
   // For Solana embedded wallet signing
   const { signAndSendTransaction } = useSignAndSendTransaction()
