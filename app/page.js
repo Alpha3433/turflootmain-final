@@ -429,6 +429,10 @@ export default function TurfLootTactical() {
 
         signOptions.address = signingAddress
 
+        if (!privySignAndSendTransaction) {
+          throw new Error('Privy signAndSendTransaction function not available for external wallet')
+        }
+
         const result = await privySignAndSendTransaction(signOptions)
         signature = result?.signature || result
       }
