@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets, useSendTransaction } from '@privy-io/react-auth'
-import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
+import { usePrivy } from '@privy-io/react-auth'
+import { useFundWallet, useSignAndSendTransaction, useWallets } from '@privy-io/react-auth/solana'
+import bs58 from 'bs58'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
@@ -11,14 +12,12 @@ export default function TurfLootTactical() {
   
   // Privy hooks - restored for authentication
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
-  const { wallets } = useWallets()
+  const { wallets: solanaWallets = [] } = useWallets()
+  const wallets = solanaWallets
   const { fundWallet } = useFundWallet()
   
   // For Solana external wallets (in wallets array)
   const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
-  
-  // For embedded wallets (base Privy hook)
-  const { sendTransaction: privySendTransaction } = useSendTransaction()
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
@@ -75,8 +74,8 @@ export default function TurfLootTactical() {
     }
 
     // Check external wallets (useWallets array)
-    if (wallets && wallets.length > 0) {
-      const prioritized = wallets.filter(w => w?.chainType === 'solana')
+    if (solanaWallets && solanaWallets.length > 0) {
+      const prioritized = solanaWallets.filter(w => w?.chainType === 'solana')
       if (prioritized.length > 0) {
         console.log('✅ Found external Solana wallet in useWallets():', {
           address: prioritized[0].address,
@@ -110,8 +109,8 @@ export default function TurfLootTactical() {
 
     // Debug: Log all available wallet sources
     console.log('🔍 Wallet sources:', {
-      walletsArray: wallets.map(w => ({ address: w.address, type: w.walletClientType })),
-      walletsCount: wallets.length,
+      walletsArray: solanaWallets.map(w => ({ address: w.address, type: w.walletClientType })),
+      walletsCount: solanaWallets.length,
       linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
         type: a.type, 
         address: a.address, 
@@ -133,20 +132,22 @@ export default function TurfLootTactical() {
     })
 
     // Check if wallet is in useWallets() array (external wallets)
-    const walletFromArray = wallets.find(w => w.address === solanaWallet.address)
-    const isEmbeddedWallet = !walletFromArray
-    
-    if (walletFromArray) {
-      console.log('✅ External wallet found in useWallets() array:', {
-        address: walletFromArray.address,
-        type: walletFromArray.walletClientType
-      })
-    } else {
-      console.log('✅ Using Privy embedded wallet from linkedAccounts:', {
-        address: solanaWallet.address,
-        chainType: solanaWallet.chainType
-      })
+    const walletFromArray = solanaWallets.find(
+      w => w.address === solanaWallet.address || w.address === userWalletAddress
+    )
+
+    if (!walletFromArray) {
+      console.error('❌ No connected Privy Solana wallet available in useWallets() array')
+      return {
+        success: false,
+        error: 'Unable to access your Privy wallet. Please reconnect and try again.'
+      }
     }
+
+    console.log('✅ Using connected Privy wallet from useWallets():', {
+      address: walletFromArray.address,
+      type: walletFromArray.walletClientType
+    })
 
     // Validate Privy hook
     if (!privySignAndSendTransaction) {
@@ -179,47 +180,17 @@ export default function TurfLootTactical() {
       console.log('✅ Transaction built, signing with Privy 3.0...')
 
       // Step 3: Sign and send with Privy 3.0
-      let signature
-      if (isEmbeddedWallet) {
-        // For embedded wallets: Use base sendTransaction hook
-        console.log('🔐 Signing with embedded wallet via useSendTransaction...')
+      console.log('🔐 Signing with Privy wallet via useSignAndSendTransaction...')
 
-        // Privy base hook expects serialized transaction
-        const serializedTx = transaction.toString('base64')
+      const result = await privySignAndSendTransaction({
+        wallet: walletFromArray,
+        transaction,
+        chain: SOLANA_CHAIN
+      })
 
-        console.log('🔍 Sending transaction:', {
-          txLength: transaction.length,
-          base64Length: serializedTx.length,
-          chain: 'solana:mainnet'
-        })
-
-        const sendRequest = {
-          transaction: serializedTx,
-          chain: SOLANA_CHAIN
-        }
-
-        // Privy expects either walletId or address for embedded wallets
-        if (solanaWallet?.id) {
-          sendRequest.walletId = solanaWallet.id
-        } else if (solanaWallet?.address) {
-          sendRequest.address = solanaWallet.address
-        }
-
-        const result = await privySendTransaction(sendRequest)
-
-        console.log('✅ Transaction result:', result)
-        signature = result?.transactionHash || result?.signature || result
-      } else {
-        // For external wallets: Use Solana-specific hook
-        console.log('🔐 Signing with external wallet via useSignAndSendTransaction...')
-        
-        const result = await privySignAndSendTransaction({
-          wallet: walletFromArray,
-          transaction,
-          chain: SOLANA_CHAIN
-        })
-        
-        signature = result?.signature || result
+      let signature = result?.signature || result
+      if (signature instanceof Uint8Array) {
+        signature = bs58.encode(signature)
       }
 
       console.log('✅ Transaction sent! Signature:', signature)
