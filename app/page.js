@@ -137,12 +137,19 @@ export default function TurfLootTactical() {
       })
 
       console.log('✅ Transaction built, signing with Privy 3.0...')
+      console.log('🔍 Wallet info:', {
+        address: wallet.address,
+        hasSignMethod: typeof wallet.signAndSendTransaction,
+        walletType: wallet.walletClientType,
+        isFromWalletsArray: wallets.some(w => w.address === wallet.address)
+      })
 
       // Step 3: Sign and send with Privy 3.0
+      // For embedded wallets, Privy handles wallet selection automatically
       const { signature } = await privySignAndSendTransaction({
-        wallet,
         transaction,
         chain: 'solana:mainnet'
+        // Note: No wallet parameter - Privy uses authenticated wallet automatically
       })
 
       console.log('✅ Transaction sent! Signature:', signature)
