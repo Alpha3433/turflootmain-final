@@ -281,6 +281,15 @@ export default function TurfLootTactical() {
       if (!privyEmbeddedWallet) {
         console.error('❌ Privy embedded wallet not found in useWallets()')
         console.error('🔍 Available wallets:', wallets)
+        console.error('🔍 Wallets array:', JSON.stringify(wallets, null, 2))
+        console.error('🔍 Wallet details:', wallets?.map(w => ({
+          address: w.address,
+          walletClientType: w.walletClientType,
+          connectorType: w.connectorType,
+          name: w.name,
+          chainType: w.chainType,
+          allKeys: Object.keys(w)
+        })))
         return { success: false, error: 'Wallet initializing. Please wait a moment and try again.' }
       }
       
