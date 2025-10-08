@@ -649,7 +649,7 @@ export default function TurfLootTactical() {
 
     console.log('🔍 Looking for Solana wallet address...')
 
-    // Privy 3.0: Check embedded wallets first (linkedAccounts)
+    // Privy 3.0: Check embedded wallets in linkedAccounts (embedded wallets don't appear in useWallets)
     const linkedSolana = privyUser?.linkedAccounts?.find(
       account => account?.type === 'wallet' && account?.chainType === 'solana'
     )
@@ -659,41 +659,13 @@ export default function TurfLootTactical() {
       return linkedSolana.address
     }
 
-    // Check external wallets (useWallets array)
-    if (wallets?.length > 0) {
-      const solanaWallet = wallets.find(wallet =>
-        isSolanaChain(wallet.chainType) && isSolanaAddress(getWalletAddress(wallet))
-      )
-
-      if (solanaWallet) {
-        const address = getWalletAddress(solanaWallet)
-        if (address) {
-          console.log('✅ Found external Solana wallet via Privy hooks:', address)
-          return address
-        }
-      }
-    }
-
-    // Fallback to legacy wallet property
-    if (privyUser?.wallet?.chainType === 'solana' && privyUser?.wallet?.address) {
-      console.log('✅ Found Solana wallet in privyUser.wallet:', privyUser.wallet.address)
-      return privyUser.wallet.address
-    }
-
     console.log('❌ No Solana wallet available')
     console.log('🧪 Debug info:', {
       linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
         type: a.type, 
         chainType: a.chainType, 
         address: a.address 
-      })),
-      walletsArray: wallets?.map(wallet => ({
-        chainType: wallet.chainType,
-        walletClientType: wallet.walletClientType,
-        connectorType: wallet.connectorType,
-        address: getWalletAddress(wallet)
-      })),
-      legacyWallet: privyUser?.wallet
+      }))
     })
     return null
   }
