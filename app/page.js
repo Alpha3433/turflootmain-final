@@ -52,21 +52,7 @@ export default function TurfLootTactical() {
     return calculatePaidRoomCosts(entryFee, feePercentage, options)
   }
 
-  const SOLANA_RPC_ENDPOINTS = useMemo(
-    () =>
-      buildSolanaRpcEndpointList({
-        network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
-        privateRpc:
-          process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC ||
-          process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC ||
-          process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE ||
-          process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS,
-        primary: process.env.NEXT_PUBLIC_SOLANA_RPC,
-        list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
-        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
-      }),
-    []
-  )
+  // Removed SOLANA_RPC_ENDPOINTS - now handled by Helius in cleanFeeManager
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
   const SOLANA_CHAIN = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
