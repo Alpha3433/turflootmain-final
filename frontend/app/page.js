@@ -10,10 +10,10 @@ import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
   const router = useRouter()
-  
+
   // Privy hooks - using useFundWallet from main auth module (working approach)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
-  const { wallets } = useWallets()
+  const { wallets: privyWalletsFromHook = [] } = useWallets()
   const { fundWallet } = useFundWallet()
   const signAndSendTransactionResponse = useSignAndSendTransaction()
   const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
@@ -77,12 +77,36 @@ export default function TurfLootTactical() {
   const isSolanaAddress = (address) =>
     typeof address === 'string' && !address.toLowerCase().startsWith('0x') && address.length >= 32
 
+  const isPrivyEmbeddedWallet = (wallet) => {
+    if (!wallet) {
+      return false
+    }
+
+    const clientType = (wallet.walletClientType || wallet.type || '').toLowerCase()
+    if (clientType.includes('privy')) {
+      return true
+    }
+
+    if (!wallet.connectorType && clientType === 'embedded') {
+      return true
+    }
+
+    return false
+  }
+
+  const embeddedWallets = useMemo(
+    () => privyWalletsFromHook.filter(isPrivyEmbeddedWallet),
+    [privyWalletsFromHook]
+  )
+
   const resolveSolanaWallet = () => {
-    if (wallets && wallets.length > 0) {
-      const prioritized = wallets.filter(w => isSolanaChain(w?.chainType))
+    if (embeddedWallets && embeddedWallets.length > 0) {
+      const prioritized = embeddedWallets.filter(w => isSolanaChain(w?.chainType))
       if (prioritized.length > 0) {
         return prioritized[0]
       }
+
+      return embeddedWallets[0]
     }
 
     if (isSolanaChain(privyUser?.wallet?.chainType) && isSolanaAddress(privyUser?.wallet?.address)) {
@@ -549,9 +573,9 @@ export default function TurfLootTactical() {
     console.log('🧪 Privy user object:', JSON.stringify(privyUser, null, 2))
     
     // Method 1: Check useWallets hook
-    if (wallets?.length > 0) {
-      console.log('🔍 Checking useWallets hook:', wallets)
-      const solanaWallet = wallets.find(w => isSolanaChain(w.chainType) && isSolanaAddress(w.address))
+    if (embeddedWallets?.length > 0) {
+      console.log('🔍 Checking useWallets hook:', embeddedWallets)
+      const solanaWallet = embeddedWallets.find(w => isSolanaChain(w.chainType) && isSolanaAddress(w.address))
       if (solanaWallet?.address && isSolanaAddress(solanaWallet.address)) {
         console.log('✅ Found Solana wallet via useWallets:', solanaWallet.address)
         return solanaWallet.address
@@ -579,7 +603,7 @@ export default function TurfLootTactical() {
     // Method 4: Check for any wallet with valid Solana address format
     const allWallets = [
       ...(privyUser.linkedAccounts || []),
-      ...(wallets || []),
+      ...(embeddedWallets || []),
       privyUser.wallet
     ].filter(Boolean)
 
@@ -592,7 +616,7 @@ export default function TurfLootTactical() {
     
     console.log('❌ No Solana wallet found')
     console.log('🧪 Available wallets:', {
-      useWallets: wallets,
+      useWallets: embeddedWallets,
       privyWallet: privyUser.wallet,
       linkedAccounts: privyUser.linkedAccounts
     })
@@ -658,7 +682,7 @@ export default function TurfLootTactical() {
         console.log('🧹 Cleaned up balance interval on unmount')
       }
     }
-  }, [ready, authenticated, privyUser, wallets])
+  }, [ready, authenticated, privyUser, embeddedWallets])
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
       console.log('🔧 Privy v2.24.0 - Debug Info (fundWallet from usePrivy):', {
@@ -666,8 +690,8 @@ export default function TurfLootTactical() {
         authenticated,
         hasFundWallet: typeof fundWallet === 'function',
         fundWalletSource: 'usePrivy hook (test approach)',
-        walletsCount: wallets?.length || 0,
-        walletsArray: wallets,
+        walletsCount: embeddedWallets?.length || 0,
+        walletsArray: embeddedWallets,
         privyUser: privyUser ? {
           id: privyUser.id,
           wallets: privyUser.linkedAccounts?.filter(account => account.type === 'wallet'),
@@ -705,7 +729,7 @@ export default function TurfLootTactical() {
         })
       }
     }
-  }, [ready, authenticated, fundWallet, privyUser, wallets])
+  }, [ready, authenticated, fundWallet, privyUser, embeddedWallets])
   
   // Real-time Solana balance tracking
   const [selectedStake, setSelectedStake] = useState('$0.01')
@@ -2652,14 +2676,14 @@ export default function TurfLootTactical() {
       let walletSource = null
       
       // Method 1: Check useWallets() hook (primary method)
-      if (wallets && wallets.length > 0) {
-        console.log('🔍 Checking wallets from useWallets():', wallets.map(w => ({ 
-          chainType: w.chainType, 
+      if (embeddedWallets && embeddedWallets.length > 0) {
+        console.log('🔍 Checking wallets from useWallets():', embeddedWallets.map(w => ({
+          chainType: w.chainType,
           address: w.address?.slice(0, 8) + '...',
-          connectorType: w.connectorType 
+          connectorType: w.connectorType
         })))
-        
-        solanaWallet = wallets.find(w => isSolanaChain(w.chainType) && isSolanaAddress(w.address))
+
+        solanaWallet = embeddedWallets.find(w => isSolanaChain(w.chainType) && isSolanaAddress(w.address))
         if (solanaWallet) {
           walletSource = 'useWallets'
         }
@@ -2705,7 +2729,7 @@ export default function TurfLootTactical() {
       if (!solanaWallet) {
         console.log('❌ No Solana wallet found in any source')
         console.log('Available sources checked:', {
-          useWalletsCount: wallets?.length || 0,
+          useWalletsCount: embeddedWallets?.length || 0,
           hasEmbeddedWallet: !!privyUser?.wallet,
           embeddedWalletAddress: privyUser?.wallet?.address,
           linkedAccountsCount: privyUser?.linkedAccounts?.length || 0,

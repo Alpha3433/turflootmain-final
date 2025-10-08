@@ -1,7 +1,6 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
-import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
 import { Component, useState, useEffect, useMemo } from 'react'
 
 // Error boundary for Privy-related errors
@@ -151,10 +150,10 @@ export default function PrivyAuthProvider({ children }) {
       showWalletUIs: true
     },
 
-    // 🎯 PRIVY 3.0: External Wallets - leverage Wallet Standard connectors
+    // ❌ Disable all external wallet connectors – embedded wallets only
     externalWallets: {
       solana: {
-        connectors: toSolanaWalletConnectors({ shouldAutoConnect: false })
+        connectors: []
       }
     },
 
