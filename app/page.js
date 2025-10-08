@@ -123,21 +123,35 @@ export default function TurfLootTactical() {
   } = usePrivy()
   const { wallets: privyHookWallets = [] } = useWallets()
   const wallets = useMemo(() => {
-    const deduped = new Map()
-    for (const wallet of [...privyWallets, ...privyHookWallets]) {
-      if (!isPrivyEmbeddedWallet(wallet)) {
-        continue
+    const deduped = []
+    const seenKeys = new Set()
+
+    const registerWallet = (wallet) => {
+      if (!wallet) {
+        return
       }
+
       const address = getWalletAddress(wallet)
-      if (!address) {
-        continue
+      const normalizedAddress = normalizeAddress(address)
+      const candidateKeys = [wallet?.walletId, wallet?.id, normalizedAddress, address].filter(Boolean)
+
+      if (candidateKeys.length === 0) {
+        return
       }
-      if (!deduped.has(address)) {
-        deduped.set(address, wallet)
+
+      const alreadyRegistered = candidateKeys.some((key) => seenKeys.has(key))
+      if (alreadyRegistered) {
+        return
       }
+
+      candidateKeys.forEach((key) => seenKeys.add(key))
+      deduped.push(wallet)
     }
-    return Array.from(deduped.values())
-  }, [privyWallets, privyHookWallets])
+
+    ;[...privyHookWallets, ...privyWallets].forEach(registerWallet)
+
+    return deduped
+  }, [privyHookWallets, privyWallets])
   const solanaWallets = useMemo(
     () =>
       wallets.filter(wallet =>
@@ -315,30 +329,27 @@ export default function TurfLootTactical() {
     console.log('💰 Starting Privy 3.0 fee deduction:', { entryFee, userWalletAddress })
 
     // Debug: Log all available wallet sources
+    const summariseWallets = (list) =>
+      list.map(wallet => ({
+        address: getWalletAddress(wallet),
+        chainType: wallet?.chainType,
+        walletClientType: wallet?.walletClientType,
+        connectorType: wallet?.connectorType,
+        walletId: wallet?.walletId || wallet?.id
+      }))
+
     console.log('🔍 Wallet sources:', {
-      privyWallets: privyWallets
-        .filter(isPrivyEmbeddedWallet)
-        .map(wallet => ({
-        address: getWalletAddress(wallet),
-        chainType: wallet.chainType,
-        walletClientType: wallet.walletClientType
-      })),
-      privyHookWallets: privyHookWallets
-        .filter(isPrivyEmbeddedWallet)
-        .map(wallet => ({
-          address: getWalletAddress(wallet),
-          chainType: wallet.chainType,
-          walletClientType: wallet.walletClientType
-        })),
-      solanaWallets: solanaWallets.map(wallet => ({
-        address: getWalletAddress(wallet),
-        chainType: wallet.chainType,
-        walletClientType: wallet.walletClientType
-      })),
+      privyWallets: summariseWallets(privyWallets),
+      privyHookWallets: summariseWallets(privyHookWallets),
+      embeddedWallets: summariseWallets(
+        [...privyWallets, ...privyHookWallets].filter(isPrivyEmbeddedWallet)
+      ),
+      solanaWallets: summariseWallets(solanaWallets),
       linkedAccounts: privyUser?.linkedAccounts?.map(a => ({
         type: a.type,
         address: a.address,
-        chainType: a.chainType
+        chainType: a.chainType,
+        walletId: a.walletId
       }))
     })
 
@@ -2434,8 +2445,15 @@ export default function TurfLootTactical() {
       if (paidRoomConfig) {
         console.log('💰 Paid room detected. Applying wallet validation rules:', paidRoomConfig)
 
-        if (!authenticated) {
-          alert('Please log in with your TurfLoot account before joining paid rooms.')
+        if (!ready || !authenticated) {
+          console.log('🔐 Privy session not ready for paid room entry, opening login modal.')
+          if (typeof login === 'function') {
+            try {
+              login()
+            } catch (loginError) {
+              console.warn('⚠️ Failed to trigger Privy login flow automatically:', loginError)
+            }
+          }
           return
         }
 
@@ -2448,7 +2466,14 @@ export default function TurfLootTactical() {
 
         const userWalletAddress = findWalletAddress()
         if (!userWalletAddress) {
-          alert('A linked Solana wallet is required to join paid rooms. Please connect your wallet and try again.')
+          console.log('👛 No Solana wallet detected, prompting Privy modal for wallet linking.')
+          if (typeof login === 'function') {
+            try {
+              login()
+            } catch (loginError) {
+              console.warn('⚠️ Failed to trigger Privy login flow for wallet linking:', loginError)
+            }
+          }
           return
         }
 
