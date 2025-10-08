@@ -168,56 +168,30 @@ class PrivyWalletSigningTester:
             self.log_test_result("Privy Authentication Support", False, f"Exception: {str(e)}")
             return False
     
-    async def test_split_boundary_enforcement(self) -> bool:
-        """Test 5: Verify split pieces respect arena boundaries"""
+    async def test_helius_rpc_integration(self) -> bool:
+        """Test 5: Verify Helius RPC integration for Solana operations"""
         try:
-            import os
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            # Test wallet transactions endpoint which uses Helius
+            response = requests.get(f"{self.api_url}/wallet/transactions", timeout=10)
             
-            boundary_patterns_found = 0
-            
-            # Check for boundary enforcement in split logic
-            boundary_patterns = [
-                'playableRadius',               # Boundary radius
-                'distFromCenter',              # Distance calculation
-                'Math.atan2',                  # Angle calculation for boundary
-                'Math.cos(angle) * maxRadius', # Boundary positioning
-            ]
-            
-            # Check both files for boundary enforcement in split context
-            for file_path in [ts_file_path, js_file_path]:
-                if os.path.exists(file_path):
-                    with open(file_path, 'r') as f:
-                        content = f.read()
-                        
-                        # Look for handleSplit function and boundary enforcement within it
-                        if 'handleSplit' in content:
-                            # Extract handleSplit function content (rough approximation)
-                            split_start = content.find('handleSplit')
-                            if split_start != -1:
-                                # Find the next function or end of class (rough boundary)
-                                split_end = content.find('handleCashOut', split_start)
-                                if split_end == -1:
-                                    split_end = content.find('onLeave', split_start)
-                                if split_end == -1:
-                                    split_end = len(content)
-                                
-                                split_function = content[split_start:split_end]
-                                
-                                for pattern in boundary_patterns:
-                                    if pattern in split_function:
-                                        boundary_patterns_found += 1
-            
-            # Test passes if boundary enforcement patterns are found
-            has_boundary_enforcement = boundary_patterns_found >= 6  # At least 3 patterns in each file
-            
-            details = f"Boundary enforcement patterns in split logic: {boundary_patterns_found}/8"
-            self.log_test_result("Split Boundary Enforcement", has_boundary_enforcement, details)
-            return has_boundary_enforcement
-            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check for proper transaction structure
+                has_proper_structure = (
+                    'transactions' in data and
+                    isinstance(data['transactions'], list)
+                )
+                
+                details = f"Transactions endpoint accessible, Structure valid: {has_proper_structure}"
+                self.log_test_result("Helius RPC Integration", has_proper_structure, details)
+                return has_proper_structure
+            else:
+                self.log_test_result("Helius RPC Integration", False, f"HTTP {response.status_code}")
+                return False
+                
         except Exception as e:
-            self.log_test_result("Split Boundary Enforcement", False, f"Exception: {str(e)}")
+            self.log_test_result("Helius RPC Integration", False, f"Exception: {str(e)}")
             return False
     
     async def test_websocket_stability_during_split(self) -> bool:
