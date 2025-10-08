@@ -105,10 +105,16 @@ export default function TurfLootTactical() {
     const derivedUsdPerSol = currentSolBalance > 0.000001
       ? currentUsdBalance / currentSolBalance
       : USD_PER_SOL_FALLBACK
+    const estimatedNetworkFeeLamports = 10000 // ~0.00001 SOL buffer for network fees
+    const estimatedNetworkFeeSol = estimatedNetworkFeeLamports / 1_000_000_000
     const costs = calculateTotalCost(entryFee, feePercentageOverride, {
       currency: 'SOL',
       usdPerSol: derivedUsdPerSol
     })
+
+    const totalCostSol = costs.totalCostSol ?? costs.totalCost
+    const totalCostUsd = costs.totalCostUsd ?? (totalCostSol * derivedUsdPerSol)
+    const totalRequiredSol = totalCostSol + estimatedNetworkFeeSol
 
     console.log('💰 Preparing paid room fee deduction:', {
       entryFee,
@@ -119,13 +125,16 @@ export default function TurfLootTactical() {
       serverFeeUsd: costs.serverFeeUsd,
       totalCostUsd: costs.totalCostUsd,
       currentUsdBalance: currentUsdBalance.toFixed(3),
-      currentSolBalance: currentSolBalance.toFixed(6)
+      currentSolBalance: currentSolBalance.toFixed(6),
+      estimatedNetworkFeeSol: estimatedNetworkFeeSol.toFixed(6),
+      totalRequiredSol: totalRequiredSol.toFixed(6)
     })
 
-    if (costs.currency === 'SOL' && currentSolBalance < costs.totalCost) {
+    if (currentSolBalance < totalRequiredSol) {
       return {
         success: false,
-        error: `Insufficient SOL balance. Need ${costs.totalCost.toFixed(4)} SOL, have ${currentSolBalance.toFixed(4)} SOL`,
+        error:
+          `Insufficient SOL balance. Need ${totalRequiredSol.toFixed(6)} SOL (including network fees), have ${currentSolBalance.toFixed(6)} SOL. Top up at least ${(totalRequiredSol - currentSolBalance).toFixed(6)} SOL.`,
         costs
       }
     }
@@ -182,12 +191,16 @@ export default function TurfLootTactical() {
       const totalCostSol = resultCosts.totalCostSol ?? (resultCosts.currency === 'SOL'
         ? resultCosts.totalCost
         : resultCosts.totalCost / derivedUsdPerSol)
+      const networkFeeSol = deductionResult.networkFeeSol ?? estimatedNetworkFeeSol
+      const networkFeeUsd = networkFeeSol * derivedUsdPerSol
+      const totalCostUsdWithFees = totalCostUsd + networkFeeUsd
+      const totalCostSolWithFees = totalCostSol + networkFeeSol
 
       setWalletBalance((prev) => {
         const previousUsd = parseFloat(prev?.usd ?? currentUsdBalance)
         const previousSol = parseFloat(prev?.sol ?? currentSolBalance)
-        const nextUsd = Math.max(0, previousUsd - totalCostUsd)
-        const nextSol = Math.max(0, previousSol - totalCostSol)
+        const nextUsd = Math.max(0, previousUsd - totalCostUsdWithFees)
+        const nextSol = Math.max(0, previousSol - totalCostSolWithFees)
 
         return {
           ...prev,
@@ -204,11 +217,14 @@ export default function TurfLootTactical() {
         entryFeeDeducted: resultCosts.entryFee,
         serverFeeTransferred: resultCosts.serverFee,
         totalDeductedCurrency: resultCosts.currency,
-        totalDeductedUsd: totalCostUsd,
-        totalDeductedSol: totalCostSol,
+        totalDeductedUsd: totalCostUsdWithFees,
+        totalDeductedSol: totalCostSolWithFees,
         lamports: deductionResult.lamports,
         signature: deductionResult.signature,
         rpcEndpoint: deductionResult.rpcEndpoint,
+        networkFeeSol,
+        networkFeeUsd,
+        networkFeeLamports: deductionResult.networkFeeLamports,
         timestamp: new Date().toISOString()
       }
 
@@ -223,7 +239,7 @@ export default function TurfLootTactical() {
       return {
         success: true,
         costs: resultCosts,
-        newBalance: Math.max(0, currentUsdBalance - totalCostUsd),
+        newBalance: Math.max(0, currentUsdBalance - totalCostUsdWithFees),
         transactionDetails
       }
     } catch (error) {
