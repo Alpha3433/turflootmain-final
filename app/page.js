@@ -277,22 +277,23 @@ export default function TurfLootTactical() {
       
       console.log('✅ Transaction built successfully')
 
-      // Step 3: Get Solana provider for embedded wallet
-      console.log('🔐 Getting Solana provider for embedded wallet...')
-      const provider = await window.privy.solana.getProvider()
+      // Step 3: Sign and send transaction with Privy embedded wallet
+      console.log('🔐 Sending transaction with Privy useSendTransaction hook...')
       
-      if (!provider) {
-        console.error('❌ Failed to get Solana provider from Privy')
-        return { success: false, error: 'Wallet provider unavailable. Please refresh.' }
+      if (!sendTransaction) {
+        console.error('❌ sendTransaction hook not available')
+        return { success: false, error: 'Privy transaction hook unavailable. Please refresh.' }
       }
       
-      console.log('✅ Got Solana provider:', provider)
-      
-      // Step 4: Sign and send transaction using provider
+      // useSendTransaction expects a serialized transaction
       const transactionBytes = transaction instanceof Uint8Array ? transaction : new Uint8Array(transaction)
-      console.log('🔐 Signing and sending transaction via Privy provider...')
       
-      const signature = await provider.sendTransaction(transaction, connection)
+      const result = await sendTransaction({
+        transaction: transactionBytes,
+        chain: SOLANA_CHAIN
+      })
+      
+      const signature = result?.signature || result
       console.log('✅ Transaction sent! Signature:', signature)
 
       // Step 5: Update local balance
