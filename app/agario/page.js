@@ -288,6 +288,11 @@ const AgarIOGame = () => {
     const maxPlayers = parseInt(urlParams.get('maxPlayers')) || 50
     const gameName = urlParams.get('name') || 'TurfLoot Arena'
     const regionId = urlParams.get('regionId') || 'au-syd'
+    const endpointFromQuery = urlParams.get('endpoint')
+    const fallbackEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
+    const resolvedEndpoint = endpointFromQuery && endpointFromQuery.trim() !== ''
+      ? endpointFromQuery
+      : fallbackEndpoint
     
     console.log('📊 Authoritative game configuration:', {
       roomId,
@@ -297,7 +302,8 @@ const AgarIOGame = () => {
       maxPlayers,
       gameName,
       isAuthoritative: true,
-      serverSide: 'Colyseus Cloud'
+      serverSide: 'Colyseus Cloud',
+      endpoint: resolvedEndpoint
     })
     
     // 🔥 CRITICAL: Connect to Colyseus arena room
@@ -327,9 +333,11 @@ const AgarIOGame = () => {
         walletAddress: urlWalletAddress
       })
       
-      const room = await joinArena({ 
+      const room = await joinArena({
         privyUserId: realPrivyUserId,
-        playerName: realPlayerName
+        playerName: realPlayerName,
+        specificRoomId: roomId,
+        endpoint: resolvedEndpoint
       })
       
       console.log('🎮 Connected with player name:', realPlayerName, 'and ID:', realPrivyUserId)
@@ -385,7 +393,7 @@ const AgarIOGame = () => {
       return {
         success: true,
         roomId: room.id,
-        serverEndpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT,
+        serverEndpoint: resolvedEndpoint,
         gameMode: fee > 0 ? 'cash-game' : 'practice',
         region: region,
         maxPlayers: maxPlayers
