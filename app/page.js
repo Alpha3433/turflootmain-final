@@ -213,6 +213,7 @@ export default function TurfLootTactical() {
         address: getWalletAddress(solanaWallets[0])
       })
       setWalletInitializing(false)
+      setWalletExportAttempted(false)
       return
     }
     
@@ -223,9 +224,29 @@ export default function TurfLootTactical() {
     
     if (linkedSolana) {
       console.log('⚠️ Embedded wallet exists in linkedAccounts but not in useWallets yet')
-      console.log('⏳ Setting wallet initializing state...')
-      setWalletInitializing(true)
-      // The wallet should appear in useWallets() automatically - this effect will re-run when it does
+      
+      // Try to export the wallet to make it available in useWallets
+      if (!walletExportAttempted && exportWallet) {
+        console.log('🔓 Attempting to export embedded wallet...')
+        setWalletExportAttempted(true)
+        setWalletInitializing(true)
+        
+        exportWallet()
+          .then(() => {
+            console.log('✅ Wallet export initiated - should appear in useWallets soon')
+            // Give it a moment to populate
+            setTimeout(() => {
+              setWalletInitializing(false)
+            }, 2000)
+          })
+          .catch(error => {
+            console.error('❌ Failed to export wallet:', error)
+            console.log('⏳ Wallet may still initialize automatically...')
+            setWalletInitializing(false)
+          })
+      } else {
+        setWalletInitializing(true)
+      }
       return
     }
     
@@ -245,7 +266,7 @@ export default function TurfLootTactical() {
           setWalletInitializing(false)
         })
     }
-  }, [authenticated, privyUser, ready, walletsReady, solanaWallets, createWallet, walletInitializing])
+  }, [authenticated, privyUser, ready, walletsReady, solanaWallets, createWallet, walletInitializing, exportWallet, walletExportAttempted])
 
   // 🚀 Privy 3.0 + Helius: Clean fee deduction (embedded wallet only)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
