@@ -118,40 +118,11 @@ export default function TurfLootTactical() {
     authenticated,
     user: privyUser,
     login,
-    logout,
-    wallets: privyWallets = []
+    logout
   } = usePrivy()
-  const { wallets: privyHookWallets = [] } = useWallets()
-  const wallets = useMemo(() => {
-    const deduped = []
-    const seenKeys = new Set()
-
-    const registerWallet = (wallet) => {
-      if (!wallet) {
-        return
-      }
-
-      const address = getWalletAddress(wallet)
-      const normalizedAddress = normalizeAddress(address)
-      const candidateKeys = [wallet?.walletId, wallet?.id, normalizedAddress, address].filter(Boolean)
-
-      if (candidateKeys.length === 0) {
-        return
-      }
-
-      const alreadyRegistered = candidateKeys.some((key) => seenKeys.has(key))
-      if (alreadyRegistered) {
-        return
-      }
-
-      candidateKeys.forEach((key) => seenKeys.add(key))
-      deduped.push(wallet)
-    }
-
-    ;[...privyHookWallets, ...privyWallets].forEach(registerWallet)
-
-    return deduped
-  }, [privyHookWallets, privyWallets])
+  const { wallets = [] } = useWallets()
+  const { createWallet } = useCreateWallet()
+  
   const solanaWallets = useMemo(
     () =>
       wallets.filter(wallet =>
