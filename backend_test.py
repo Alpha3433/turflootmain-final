@@ -194,44 +194,40 @@ class PrivyWalletSigningTester:
             self.log_test_result("Helius RPC Integration", False, f"Exception: {str(e)}")
             return False
     
-    async def test_websocket_stability_during_split(self) -> bool:
-        """Test 6: Verify WebSocket connections remain stable during split operations"""
+    async def test_solana_wallet_resolution_logic(self) -> bool:
+        """Test 6: Verify wallet resolution logic in frontend code"""
         try:
-            # This test simulates what would happen during split operations
-            # We test the server's ability to handle split messages without disconnection
-            
-            # First, verify the split message structure is properly defined
             import os
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
+            page_file_path = "/app/app/page.js"
             
-            websocket_stability_indicators = 0
+            resolution_patterns_found = 0
             
-            if os.path.exists(ts_file_path):
-                with open(ts_file_path, 'r') as f:
+            if os.path.exists(page_file_path):
+                with open(page_file_path, 'r') as f:
                     content = f.read()
                     
-                    # Look for proper error handling and message validation
-                    stability_patterns = [
-                        'try {',                    # Error handling
-                        'catch (error',            # Exception catching
-                        'typeof targetX',          # Input validation
-                        'typeof targetY',          # Input validation
-                        'console.log',             # Logging for debugging
+                    # Look for updated wallet resolution patterns
+                    resolution_patterns = [
+                        'resolveSolanaWallet',                    # Function name
+                        'linkedAccounts?.find',                   # Check linkedAccounts first
+                        'chainType === \'solana\'',              # Solana chain type check
+                        'wallets.filter(w => w?.chainType',      # External wallet filtering
+                        'SOLANA_CHAIN',                          # Chain configuration variable
                     ]
                     
-                    for pattern in stability_patterns:
+                    for pattern in resolution_patterns:
                         if pattern in content:
-                            websocket_stability_indicators += 1
+                            resolution_patterns_found += 1
             
-            # Test passes if proper error handling and validation is present
-            has_stability_features = websocket_stability_indicators >= 4
+            # Test passes if wallet resolution logic is properly implemented
+            has_resolution_logic = resolution_patterns_found >= 4
             
-            details = f"WebSocket stability indicators: {websocket_stability_indicators}/5"
-            self.log_test_result("WebSocket Stability During Split", has_stability_features, details)
-            return has_stability_features
+            details = f"Wallet resolution patterns found: {resolution_patterns_found}/5"
+            self.log_test_result("Solana Wallet Resolution Logic", has_resolution_logic, details)
+            return has_resolution_logic
             
         except Exception as e:
-            self.log_test_result("WebSocket Stability During Split", False, f"Exception: {str(e)}")
+            self.log_test_result("Solana Wallet Resolution Logic", False, f"Exception: {str(e)}")
             return False
     
     async def test_split_state_synchronization(self) -> bool:
