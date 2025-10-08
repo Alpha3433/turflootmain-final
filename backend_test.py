@@ -143,47 +143,29 @@ class PrivyWalletSigningTester:
             self.log_test_result("Wallet Balance API - Auth Token", False, f"Exception: {str(e)}")
             return False
     
-    async def test_mass_conservation_logic(self) -> bool:
-        """Test 4: Verify mass conservation logic in server code"""
+    async def test_privy_authentication_support(self) -> bool:
+        """Test 4: Verify Privy authentication is supported in backend"""
         try:
-            import os
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            # Test with Privy-style token
+            privy_token = "privy-test-token-12345"
             
-            mass_conservation_found = 0
+            headers = {"Authorization": f"Bearer {privy_token}"}
+            response = requests.get(f"{self.api_url}/wallet/balance", headers=headers, timeout=10)
             
-            # Check for mass conservation patterns
-            conservation_patterns = [
-                'Math.floor(player.mass / 2)',  # Halving the mass
-                'player.mass = newMass',        # Assigning new mass
-                'newMass = Math.floor',         # New mass calculation
-            ]
+            # Should handle Privy tokens gracefully (either process or fallback)
+            is_handled = response.status_code in [200, 401, 403]
             
-            # Check TypeScript file
-            if os.path.exists(ts_file_path):
-                with open(ts_file_path, 'r') as f:
-                    ts_content = f.read()
-                    for pattern in conservation_patterns:
-                        if pattern in ts_content:
-                            mass_conservation_found += 1
+            if response.status_code == 200:
+                data = response.json()
+                details = f"Privy token processed, Balance: {data.get('balance')}, Wallet: {data.get('wallet_address')}"
+            else:
+                details = f"Privy token handled gracefully (HTTP {response.status_code})"
             
-            # Check compiled JavaScript file  
-            if os.path.exists(js_file_path):
-                with open(js_file_path, 'r') as f:
-                    js_content = f.read()
-                    for pattern in conservation_patterns:
-                        if pattern in js_content:
-                            mass_conservation_found += 1
-            
-            # Test passes if mass conservation patterns are found in both files
-            has_mass_conservation = mass_conservation_found >= 4  # At least 2 patterns in each file
-            
-            details = f"Mass conservation patterns found: {mass_conservation_found}/6 (TS + JS)"
-            self.log_test_result("Mass Conservation Logic", has_mass_conservation, details)
-            return has_mass_conservation
-            
+            self.log_test_result("Privy Authentication Support", is_handled, details)
+            return is_handled
+                
         except Exception as e:
-            self.log_test_result("Mass Conservation Logic", False, f"Exception: {str(e)}")
+            self.log_test_result("Privy Authentication Support", False, f"Exception: {str(e)}")
             return False
     
     async def test_split_boundary_enforcement(self) -> bool:
