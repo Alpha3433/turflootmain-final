@@ -86,11 +86,16 @@ export default function PrivyAuthProvider({ children }) {
     // Authentication methods
     loginMethods: ['google', 'email', 'wallet'],
     
+    // 🎯 PRIVY 3.0: Supported chains (required when using defaultChain)
+    supportedChains: ['solana'],
+    
+    // 🎯 PRIVY 3.0: Default chain
+    defaultChain: 'solana',
+    
     // 🎯 PRIVY 3.0: Embedded Wallets - Create Solana wallet on login
     embeddedWallets: {
       createOnLogin: 'users-without-wallets',
       requireUserPasswordOnCreate: false,
-      // Explicitly disable Ethereum
       noPromptOnSignature: false
     },
     
@@ -100,9 +105,6 @@ export default function PrivyAuthProvider({ children }) {
         connectors: ['phantom', 'solflare']
       }
     },
-    
-    // 🎯 PRIVY 3.0: Default chain
-    defaultChain: 'solana',
     
     // Security & MFA
     mfa: {
