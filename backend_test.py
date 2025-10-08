@@ -406,7 +406,7 @@ class PrivyWalletSigningTester:
 
 async def main():
     """Main test execution function"""
-    tester = ArenaModeSplitTester()
+    tester = PrivyWalletSigningTester()
     results = await tester.run_comprehensive_test()
     
     # Print detailed results
