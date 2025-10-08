@@ -353,7 +353,7 @@ export default function TurfLootTactical() {
 
       console.log('✅ Transaction built, signing with Privy 3.0 embedded wallet...')
 
-      // Step 3: Sign and send with Privy 3.0 (this will show Privy's modal)
+      // Step 3: Sign and send with Privy 3.0 (no wallet object needed - uses authenticated user's embedded wallet)
       const transactionBytes = transaction instanceof Uint8Array
         ? transaction
         : (() => {
@@ -367,9 +367,8 @@ export default function TurfLootTactical() {
             return Uint8Array.from(transaction || [])
           })()
 
-      console.log('🔐 Calling signAndSendTransaction with wallet object...')
+      console.log('🔐 Calling signAndSendTransaction (Privy 3.0 - uses embedded wallet automatically)...')
       const result = await signAndSendTransaction({
-        wallet: solanaWallet,
         transaction: transactionBytes,
         chain: SOLANA_CHAIN,
         uiOptions: {
