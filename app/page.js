@@ -86,11 +86,26 @@ export default function TurfLootTactical() {
 
     console.log('💰 Starting Privy 3.0 fee deduction:', { entryFee, userWalletAddress })
 
-    // Validate Privy wallet
-    const wallet = wallets.find(w => w.address === userWalletAddress)
+    // Resolve Solana wallet (checks multiple sources)
+    const solanaWallet = resolveSolanaWallet()
+    if (!solanaWallet) {
+      console.error('❌ No Solana wallet found')
+      return { success: false, error: 'No Solana wallet connected. Please login.' }
+    }
+
+    console.log('✅ Resolved wallet:', {
+      address: solanaWallet.address,
+      chainType: solanaWallet.chainType,
+      walletClientType: solanaWallet.walletClientType
+    })
+
+    // For Privy 3.0, try to find wallet in wallets array, or construct one
+    let wallet = wallets.find(w => w.address === solanaWallet.address)
+    
+    // If not in wallets array (embedded wallet), construct wallet object
     if (!wallet) {
-      console.error('❌ Wallet not found in useWallets()')
-      return { success: false, error: 'Wallet not found. Please reconnect.' }
+      console.log('⚠️ Wallet not in useWallets() array, using resolved wallet')
+      wallet = solanaWallet
     }
 
     // Validate Privy hook
