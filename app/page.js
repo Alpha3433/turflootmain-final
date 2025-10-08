@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
-import { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress, getHeliusConnection } from '../lib/paid/cleanFeeManager'
+// Dynamic import to avoid SSR issues with Solana Web3.js
+// import { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress, getHeliusConnection } from '../lib/paid/cleanFeeManager'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
