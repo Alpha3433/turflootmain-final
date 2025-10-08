@@ -167,15 +167,22 @@ export default function TurfLootTactical() {
         // For embedded wallets: Use base sendTransaction hook
         console.log('🔐 Signing with embedded wallet via useSendTransaction...')
         
-        // Convert Uint8Array to base64 for base Privy hook
-        const base64Transaction = Buffer.from(transaction).toString('base64')
+        // Privy base hook expects serialized transaction
+        const serializedTx = transaction.toString('base64')
         
-        const result = await privySendTransaction({
-          transaction: base64Transaction,
-          chain: 'solana:mainnet',
-          address: userWalletAddress
+        console.log('🔍 Sending transaction:', {
+          txLength: transaction.length,
+          base64Length: serializedTx.length,
+          chain: 'solana:mainnet'
         })
         
+        // Don't pass address - let Privy auto-detect from authenticated user
+        const result = await privySendTransaction({
+          transaction: serializedTx,
+          chain: 'solana:mainnet'
+        })
+        
+        console.log('✅ Transaction result:', result)
         signature = result?.transactionHash || result?.signature || result
       } else {
         // For external wallets: Use Solana-specific hook
