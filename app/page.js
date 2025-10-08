@@ -6,7 +6,7 @@ import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 // Dynamic import to avoid SSR issues with Solana Web3.js
 // import { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress, getHeliusConnection } from '../lib/paid/cleanFeeManager'
-// import ServerBrowserModal from '../components/ServerBrowserModalNew'
+import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
   const router = useRouter()
