@@ -387,18 +387,20 @@ class PrivyWalletSigningTester:
         }
         
         logger.info("=" * 80)
-        logger.info(f"🎯 ARENA MODE SPLIT MECHANIC FIX TESTING COMPLETED")
+        logger.info(f"🎯 PRIVY EMBEDDED WALLET SIGNING FIX TESTING COMPLETED")
         logger.info(f"📊 Results: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}% success rate)")
         logger.info(f"⏱️ Duration: {duration:.2f} seconds")
         
-        if success_rate >= 87.5:  # 7/8 tests or better
-            logger.info("🎉 ARENA MODE SPLIT MECHANIC FIX IS WORKING EXCELLENTLY")
-        elif success_rate >= 75:   # 6/8 tests or better
-            logger.info("✅ ARENA MODE SPLIT MECHANIC FIX IS WORKING WELL")
-        elif success_rate >= 62.5: # 5/8 tests or better
-            logger.info("⚠️ ARENA MODE SPLIT MECHANIC FIX HAS SOME ISSUES")
+        if success_rate >= 88.9:  # 8/9 tests or better
+            logger.info("🎉 PRIVY EMBEDDED WALLET SIGNING FIX IS WORKING PERFECTLY")
+        elif success_rate >= 77.8: # 7/9 tests or better
+            logger.info("✅ PRIVY EMBEDDED WALLET SIGNING FIX IS WORKING EXCELLENTLY")
+        elif success_rate >= 66.7: # 6/9 tests or better
+            logger.info("✅ PRIVY EMBEDDED WALLET SIGNING FIX IS WORKING WELL")
+        elif success_rate >= 55.6: # 5/9 tests or better
+            logger.info("⚠️ PRIVY EMBEDDED WALLET SIGNING FIX HAS SOME ISSUES")
         else:
-            logger.info("❌ ARENA MODE SPLIT MECHANIC FIX HAS CRITICAL ISSUES")
+            logger.info("❌ PRIVY EMBEDDED WALLET SIGNING FIX HAS CRITICAL ISSUES")
         
         return summary
 
