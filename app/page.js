@@ -102,7 +102,7 @@ const isPrivyEmbeddedWallet = (wallet) => {
     return true
   }
 
-  if (!wallet.connectorType && clientType === 'embedded') {
+  if (!wallet.connectorType && clientType.includes('embedded')) {
     return true
   }
 
