@@ -276,51 +276,24 @@ export default function TurfLootTactical() {
     }
 
     console.log('💰 Starting Privy 3.0 fee deduction:', { entryFee, userWalletAddress })
-    console.log('🔍 Available wallets:', {
-      walletsCount: wallets.length,
-      solanaWalletsCount: solanaWallets.length,
-      walletAddresses: solanaWallets.map(w => getWalletAddress(w))
-    })
-
-    // Step 1: Find the embedded Solana wallet object from useWallets
-    const solanaWallet = solanaWallets.find(wallet => {
-      const address = getWalletAddress(wallet)
-      return address === userWalletAddress
-    }) || solanaWallets[0]
-
-    if (!solanaWallet) {
-      console.error('❌ No Solana wallet found in useWallets()')
-      console.error('🔍 Debug - linkedAccounts:', privyUser?.linkedAccounts?.map(a => ({
-        type: a.type,
-        chainType: a.chainType,
-        address: a.address
-      })))
-      console.error('🔍 walletInitializing:', walletInitializing)
-      console.error('🔍 walletsReady:', walletsReady)
-      
-      // Check if wallet exists in linkedAccounts
-      const linkedSolana = privyUser?.linkedAccounts?.find(
-        account => account?.type === 'wallet' && account?.chainType === 'solana'
-      )
-      
-      if (linkedSolana || walletInitializing) {
-        return {
-          success: false,
-          error: 'Your wallet is still initializing. Please wait 3-5 seconds and try again.'
-        }
-      }
-      
+    
+    // Privy 3.0: No need to find wallet object - signAndSendTransaction uses embedded wallet automatically
+    // Just verify the user has an embedded wallet address
+    const linkedSolana = privyUser?.linkedAccounts?.find(
+      account => account?.type === 'wallet' && account?.chainType === 'solana'
+    )
+    
+    if (!linkedSolana) {
+      console.error('❌ No Solana wallet in linkedAccounts')
       return {
         success: false,
         error: 'No Solana wallet found. Please refresh the page to create one.'
       }
     }
-
-    const walletAddress = getWalletAddress(solanaWallet)
-    console.log('✅ Using Solana wallet:', {
-      address: walletAddress,
-      chainType: solanaWallet?.chainType,
-      walletClientType: solanaWallet?.walletClientType
+    
+    console.log('✅ Using embedded Solana wallet from linkedAccounts:', {
+      address: linkedSolana.address,
+      chainType: linkedSolana.chainType
     })
 
     // Validate signing function
