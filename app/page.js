@@ -2,9 +2,17 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets, useSendTransaction } from '@privy-io/react-auth'
-import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
-// Dynamic import for SSR safety
+import dynamic from 'next/dynamic'
+
+// Dynamic imports for SSR safety
+const { usePrivy, useWallets, useSendTransaction } = typeof window !== 'undefined' 
+  ? require('@privy-io/react-auth') 
+  : { usePrivy: () => ({}), useWallets: () => ({}), useSendTransaction: () => ({}) }
+
+const { useFundWallet, useSignAndSendTransaction } = typeof window !== 'undefined'
+  ? require('@privy-io/react-auth/solana')
+  : { useFundWallet: () => ({}), useSignAndSendTransaction: () => ({}) }
+
 const bs58 = typeof window !== 'undefined' ? require('bs58') : null
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
