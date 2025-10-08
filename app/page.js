@@ -158,6 +158,9 @@ export default function TurfLootTactical() {
   // For Solana external wallets (in wallets array)
   const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
   
+  // For embedded wallets (base Privy hook)
+  const { sendTransaction: privySendTransaction } = useSendTransaction()
+  
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
   const [tierUpgradeNotification, setTierUpgradeNotification] = useState(null)
