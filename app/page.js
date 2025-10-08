@@ -60,25 +60,42 @@ export default function TurfLootTactical() {
   }, [])
 
   const resolveSolanaWallet = () => {
-    if (wallets && wallets.length > 0) {
-      const prioritized = wallets.filter(w => w?.chainType === 'solana')
-      if (prioritized.length > 0) {
-        return prioritized[0]
-      }
-    }
-
-    if (privyUser?.wallet?.chainType === 'solana') {
-      return privyUser.wallet
-    }
-
+    // Privy 3.0: Check embedded wallets first (linkedAccounts)
     const linkedSolana = privyUser?.linkedAccounts?.find(
       account => account?.type === 'wallet' && account?.chainType === 'solana'
     )
 
     if (linkedSolana) {
+      console.log('✅ Found embedded Solana wallet in linkedAccounts:', {
+        address: linkedSolana.address,
+        type: linkedSolana.type,
+        chainType: linkedSolana.chainType
+      })
       return linkedSolana
     }
 
+    // Check external wallets (useWallets array)
+    if (wallets && wallets.length > 0) {
+      const prioritized = wallets.filter(w => w?.chainType === 'solana')
+      if (prioritized.length > 0) {
+        console.log('✅ Found external Solana wallet in useWallets():', {
+          address: prioritized[0].address,
+          type: prioritized[0].walletClientType
+        })
+        return prioritized[0]
+      }
+    }
+
+    // Fallback to legacy wallet property
+    if (privyUser?.wallet?.chainType === 'solana') {
+      console.log('✅ Found Solana wallet in privyUser.wallet:', {
+        address: privyUser.wallet.address,
+        chainType: privyUser.wallet.chainType
+      })
+      return privyUser.wallet
+    }
+
+    console.log('❌ No Solana wallet found in any source')
     return null
   }
 
