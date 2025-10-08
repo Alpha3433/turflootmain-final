@@ -377,16 +377,25 @@ export default function TurfLootTactical() {
         })
 
         try {
-          // Use fundWallet for embedded wallet transactions
-          const result = await fundWallet({
-            chain: SOLANA_CHAIN,
-            transaction: serializedTx,
+          // Use fundWallet for embedded wallet transactions with correct Privy 3.0 structure
+          const fundWalletParams = {
+            solana: {
+              transaction: serializedTx
+            },
             uiOptions: {
               header: 'Join TurfLoot Arena',
               description: `Pay ${fees.entrySol.toFixed(4)} SOL entry fee + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total)`,
               buttonText: 'Confirm & Join'
             }
+          }
+
+          console.log('🔍 Calling fundWallet with params:', {
+            hasTransaction: !!serializedTx,
+            txLength: serializedTx.length,
+            chain: SOLANA_CHAIN
           })
+          
+          const result = await fundWallet(fundWalletParams)
           
           console.log('✅ Embedded wallet fundWallet result:', result)
           signature = result?.transactionHash || result?.signature || result
