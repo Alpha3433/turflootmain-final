@@ -264,26 +264,39 @@ export default function TurfLootTactical() {
   const validatePaidRoom = (actionName = 'join paid room') => {
     // Get currently selected stake amount
     const entryFee = parseStakeAmount(selectedStake)
-    const costs = calculateTotalCost(entryFee)
-    const currentBalance = parseFloat(walletBalance.usd) || 0
-    
+    const currentUsdBalance = parseFloat(walletBalance.usd || 0)
+    const currentSolBalance = parseFloat(walletBalance.sol || 0)
+    const derivedUsdPerSol = currentSolBalance > 0.000001
+      ? currentUsdBalance / currentSolBalance
+      : USD_PER_SOL_FALLBACK
+    const costs = calculateTotalCost(entryFee, null, {
+      currency: 'SOL',
+      usdPerSol: derivedUsdPerSol
+    })
+    const currentBalance = costs.currency === 'SOL' ? currentSolBalance : currentUsdBalance
+    const formatAmount = (value, currency = costs.currency) =>
+      currency === 'SOL'
+        ? `${value.toFixed(4)} SOL`
+        : `$${value.toFixed(3)}`
+
     console.log(`💰 Validating paid room access for ${actionName}:`)
-    console.log(`   Entry Fee: $${costs.entryFee.toFixed(3)}`)
-    console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): $${costs.serverFee.toFixed(3)}`)
-    console.log(`   Total Required: $${costs.totalCost.toFixed(3)}`)
-    console.log(`   Current Balance: $${currentBalance.toFixed(3)}`)
-    
+    console.log(`   Entry Fee: ${formatAmount(costs.entryFee)}`)
+    console.log(`   Server Fee (${costs.feePercentage.toFixed(2)}%): ${formatAmount(costs.serverFee)}`)
+    console.log(`   Total Required: ${formatAmount(costs.totalCost)}`)
+    console.log(`   Current Balance: ${formatAmount(currentBalance)}`)
+
     if (currentBalance < costs.totalCost) {
-      console.log(`❌ Insufficient funds: Need $${costs.totalCost.toFixed(3)}, have $${currentBalance.toFixed(3)}`)
-      
+      const shortfall = Math.max(0, costs.totalCost - currentBalance)
+      console.log(`❌ Insufficient funds: Need ${formatAmount(costs.totalCost)}, have ${formatAmount(currentBalance)}`)
+
       // Enhanced notification showing fee breakdown
-      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room:\n• Entry Fee: $${costs.entryFee.toFixed(3)}\n• Server Fee (${costs.feePercentage.toFixed(2)}%): +$${costs.serverFee.toFixed(3)}\n• Total Cost: $${costs.totalCost.toFixed(3)}\n\nYour Balance: $${currentBalance.toFixed(3)}\nShortfall: $${(costs.totalCost - currentBalance).toFixed(3)}\n\nPlease deposit more funds to play.`
-      
+      const message = `💰 Insufficient Balance\n\nRequired for ${selectedStake} room:\n• Entry Fee: ${formatAmount(costs.entryFee)}\n• Server Fee (${costs.feePercentage.toFixed(2)}%): +${formatAmount(costs.serverFee)}\n• Total Cost: ${formatAmount(costs.totalCost)}\n\nYour Balance: ${formatAmount(currentBalance)}\nShortfall: ${formatAmount(shortfall)}\n\nPlease deposit more funds to play.`
+
       alert(message)
       return false
     }
-    
-    console.log(`✅ Sufficient funds for ${actionName}: $${currentBalance.toFixed(3)} >= $${costs.totalCost.toFixed(3)}`)
+
+    console.log(`✅ Sufficient funds for ${actionName}: ${formatAmount(currentBalance)} >= ${formatAmount(costs.totalCost)}`)
     return true
   }
   const processFeeTransaction = async (depositAmount, userWalletAddress) => {
