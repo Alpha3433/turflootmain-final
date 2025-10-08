@@ -141,9 +141,6 @@ export default function TurfLootTactical() {
     return [...new Set(addresses)].join('|')
   }, [privyUser])
   
-  // For Solana embedded wallet signing
-  const { signAndSendTransaction } = useSignAndSendTransaction()
-  
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
   const [tierUpgradeNotification, setTierUpgradeNotification] = useState(null)
