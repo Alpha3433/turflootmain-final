@@ -198,26 +198,55 @@ export default function TurfLootTactical() {
   }, [])
 
   const resolveSolanaWallet = () => {
-    if (!solanaWallets.length) {
-      console.log('❌ No Solana wallets available from Privy hooks')
-      return null
+    // Privy 3.0: Check embedded wallets first (linkedAccounts)
+    const linkedSolana = privyUser?.linkedAccounts?.find(
+      account => account?.type === 'wallet' && account?.chainType === 'solana'
+    )
+
+    if (linkedSolana?.address) {
+      console.log('✅ Found embedded Solana wallet in linkedAccounts:', {
+        address: linkedSolana.address,
+        type: linkedSolana.type,
+        chainType: linkedSolana.chainType
+      })
+      return { wallet: linkedSolana, address: linkedSolana.address }
     }
 
-    const wallet = solanaWallets[0]
-    const address = getWalletAddress(wallet)
+    // Check external wallets (Privy hooks)
+    if (solanaWallets.length > 0) {
+      const wallet = solanaWallets[0]
+      const address = getWalletAddress(wallet)
 
-    if (!address) {
-      console.log('❌ Unable to resolve address for detected Solana wallet')
-      return null
+      if (address) {
+        console.log('✅ Found external Solana wallet from Privy hooks:', {
+          address,
+          walletClientType: wallet.walletClientType,
+          connectorType: wallet.connectorType
+        })
+        return { wallet, address }
+      }
     }
 
-    console.log('✅ Using Privy Solana wallet from hooks:', {
-      address,
-      walletClientType: wallet.walletClientType,
-      connectorType: wallet.connectorType
+    // Fallback to legacy wallet property
+    if (privyUser?.wallet?.chainType === 'solana' && privyUser?.wallet?.address) {
+      console.log('✅ Found Solana wallet in privyUser.wallet:', {
+        address: privyUser.wallet.address,
+        chainType: privyUser.wallet.chainType
+      })
+      return { wallet: privyUser.wallet, address: privyUser.wallet.address }
+    }
+
+    console.log('❌ No Solana wallet found in any source')
+    console.log('🧪 Debug info:', {
+      linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
+        type: a.type, 
+        chainType: a.chainType, 
+        address: a.address 
+      })),
+      solanaWalletsCount: solanaWallets.length,
+      legacyWallet: privyUser?.wallet
     })
-
-    return { wallet, address }
+    return null
   }
 
   // 🚀 Privy 3.0 + Helius: Clean fee deduction (no fallbacks)
