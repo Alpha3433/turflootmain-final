@@ -3047,7 +3047,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Agario-Style Split Functionality Comprehensive Testing"
+    - "Privy Embedded Wallet Signing Fix for Paid Room Entry Fees"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
