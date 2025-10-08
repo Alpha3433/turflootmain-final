@@ -119,8 +119,10 @@ export default function TurfLootTactical() {
     login,
     logout
   } = usePrivy()
-  const { wallets = [] } = useWallets()
+  const { wallets = [], ready: walletsReady } = useWallets()
   const { createWallet } = useCreateWallet()
+  
+  const [walletInitializing, setWalletInitializing] = useState(false)
   
   const solanaWallets = useMemo(
     () =>
