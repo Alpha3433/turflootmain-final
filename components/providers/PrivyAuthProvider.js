@@ -2,7 +2,6 @@
 
 import { PrivyProvider } from '@privy-io/react-auth'
 import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
-import { createSolanaRpc, createSolanaRpcSubscriptions } from '@solana/kit'
 import { Component, useState, useEffect, useMemo } from 'react'
 
 // Error boundary for Privy-related errors
@@ -133,19 +132,10 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: Solana RPC configuration using @solana/kit helpers
+    // 🎯 PRIVY 3.0: Solana RPC configuration
     solana: {
       rpcs: {
-        [solanaChain]: {
-          rpc: createSolanaRpc(solanaRpcUrl),
-          rpcSubscriptions: createSolanaRpcSubscriptions(solanaWsUrl),
-          blockExplorerUrl:
-            solanaChain === 'solana:devnet'
-              ? 'https://explorer.solana.com?cluster=devnet'
-              : solanaChain === 'solana:testnet'
-                ? 'https://explorer.solana.com?cluster=testnet'
-                : 'https://explorer.solana.com'
-        }
+        [solanaChain]: solanaRpcUrl
       }
     },
 

@@ -22,7 +22,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://serverfix.preview.emergentagent.com"
+BASE_URL = "https://privy-gameroom.preview.emergentagent.com"
 API_BASE = f"{BASE_URL}/api"
 
 class HathoraWebSocketTester:

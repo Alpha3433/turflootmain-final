@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { usePrivy, useWallets, useSendTransaction } from '@privy-io/react-auth'
 import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -13,7 +13,12 @@ export default function TurfLootTactical() {
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
+  
+  // For Solana external wallets (in wallets array)
   const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
+  
+  // For embedded wallets (base Privy hook)
+  const { sendTransaction: privySendTransaction } = useSendTransaction()
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
@@ -55,25 +60,42 @@ export default function TurfLootTactical() {
   }, [])
 
   const resolveSolanaWallet = () => {
-    if (wallets && wallets.length > 0) {
-      const prioritized = wallets.filter(w => w?.chainType === 'solana')
-      if (prioritized.length > 0) {
-        return prioritized[0]
-      }
-    }
-
-    if (privyUser?.wallet?.chainType === 'solana') {
-      return privyUser.wallet
-    }
-
+    // Privy 3.0: Check embedded wallets first (linkedAccounts)
     const linkedSolana = privyUser?.linkedAccounts?.find(
       account => account?.type === 'wallet' && account?.chainType === 'solana'
     )
 
     if (linkedSolana) {
+      console.log('✅ Found embedded Solana wallet in linkedAccounts:', {
+        address: linkedSolana.address,
+        type: linkedSolana.type,
+        chainType: linkedSolana.chainType
+      })
       return linkedSolana
     }
 
+    // Check external wallets (useWallets array)
+    if (wallets && wallets.length > 0) {
+      const prioritized = wallets.filter(w => w?.chainType === 'solana')
+      if (prioritized.length > 0) {
+        console.log('✅ Found external Solana wallet in useWallets():', {
+          address: prioritized[0].address,
+          type: prioritized[0].walletClientType
+        })
+        return prioritized[0]
+      }
+    }
+
+    // Fallback to legacy wallet property
+    if (privyUser?.wallet?.chainType === 'solana') {
+      console.log('✅ Found Solana wallet in privyUser.wallet:', {
+        address: privyUser.wallet.address,
+        chainType: privyUser.wallet.chainType
+      })
+      return privyUser.wallet
+    }
+
+    console.log('❌ No Solana wallet found in any source')
     return null
   }
 
@@ -110,20 +132,21 @@ export default function TurfLootTactical() {
       walletClientType: solanaWallet.walletClientType
     })
 
-    // For Privy 3.0, we MUST use a wallet from the wallets array
-    const wallet = wallets.find(w => w.address === solanaWallet.address)
+    // Check if wallet is in useWallets() array (external wallets)
+    const walletFromArray = wallets.find(w => w.address === solanaWallet.address)
+    const isEmbeddedWallet = !walletFromArray
     
-    if (!wallet) {
-      console.error('❌ Wallet not in useWallets() array - Privy 3.0 requires this')
-      console.error('This usually means the embedded wallet was not created on login')
-      return { success: false, error: 'Wallet setup incomplete. Please logout and login again.' }
+    if (walletFromArray) {
+      console.log('✅ External wallet found in useWallets() array:', {
+        address: walletFromArray.address,
+        type: walletFromArray.walletClientType
+      })
+    } else {
+      console.log('✅ Using Privy embedded wallet from linkedAccounts:', {
+        address: solanaWallet.address,
+        chainType: solanaWallet.chainType
+      })
     }
-    
-    console.log('✅ Found wallet in useWallets():', {
-      address: wallet.address,
-      type: wallet.walletClientType,
-      hasSignMethod: typeof wallet.signAndSendTransaction !== 'undefined'
-    })
 
     // Validate Privy hook
     if (!privySignAndSendTransaction) {
@@ -154,20 +177,42 @@ export default function TurfLootTactical() {
       })
 
       console.log('✅ Transaction built, signing with Privy 3.0...')
-      console.log('🔍 Wallet info:', {
-        address: wallet.address,
-        hasSignMethod: typeof wallet.signAndSendTransaction,
-        walletType: wallet.walletClientType,
-        isFromWalletsArray: wallets.some(w => w.address === wallet.address)
-      })
 
       // Step 3: Sign and send with Privy 3.0
-      // For embedded wallets, Privy handles wallet selection automatically
-      const { signature } = await privySignAndSendTransaction({
-        transaction,
-        chain: 'solana:mainnet'
-        // Note: No wallet parameter - Privy uses authenticated wallet automatically
-      })
+      let signature
+      if (isEmbeddedWallet) {
+        // For embedded wallets: Use base sendTransaction hook
+        console.log('🔐 Signing with embedded wallet via useSendTransaction...')
+        
+        // Privy base hook expects serialized transaction
+        const serializedTx = transaction.toString('base64')
+        
+        console.log('🔍 Sending transaction:', {
+          txLength: transaction.length,
+          base64Length: serializedTx.length,
+          chain: 'solana:mainnet'
+        })
+        
+        // Don't pass address - let Privy auto-detect from authenticated user
+        const result = await privySendTransaction({
+          transaction: serializedTx,
+          chain: SOLANA_CHAIN
+        })
+        
+        console.log('✅ Transaction result:', result)
+        signature = result?.transactionHash || result?.signature || result
+      } else {
+        // For external wallets: Use Solana-specific hook
+        console.log('🔐 Signing with external wallet via useSignAndSendTransaction...')
+        
+        const result = await privySignAndSendTransaction({
+          wallet: walletFromArray,
+          transaction,
+          chain: SOLANA_CHAIN
+        })
+        
+        signature = result?.signature || result
+      }
 
       console.log('✅ Transaction sent! Signature:', signature)
 
@@ -194,13 +239,23 @@ export default function TurfLootTactical() {
 
     } catch (error) {
       console.error('❌ Fee deduction failed:', error)
+      console.error('❌ Error details:', {
+        message: error?.message,
+        name: error?.name,
+        stack: error?.stack,
+        code: error?.code,
+        fullError: error
+      })
       
       // User-friendly error messages
       let errorMessage = 'Transaction failed. Please try again.'
-      if (error.message?.includes('User rejected')) {
+      if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
         errorMessage = 'Transaction cancelled by user.'
       } else if (error.message?.includes('insufficient')) {
         errorMessage = 'Insufficient SOL balance.'
+      } else if (error.message) {
+        // Show actual error message for debugging
+        errorMessage = `Transaction failed: ${error.message}`
       }
       
       return {

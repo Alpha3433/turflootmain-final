@@ -21,7 +21,7 @@ from typing import Dict, List, Tuple, Any
 
 class SpacebarSplitDiagnosticTester:
     def __init__(self):
-        self.base_url = "https://serverfix.preview.emergentagent.com"
+        self.base_url = "https://privy-gameroom.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
         self.test_results = []
         self.total_tests = 0
