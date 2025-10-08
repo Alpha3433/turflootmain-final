@@ -200,9 +200,9 @@ export default function TurfLootTactical() {
     return 'solana:mainnet'
   }, [])
 
-  // 🚀 Privy 3.0 Embedded Wallet: Create wallet if doesn't exist
+  // 🚀 Privy 3.0 Embedded Wallet: Create wallet if doesn't exist and handle initialization
   useEffect(() => {
-    if (!authenticated || !privyUser || !ready) return
+    if (!authenticated || !privyUser || !ready || !walletsReady) return
     
     // Check if user has embedded Solana wallet in useWallets
     if (solanaWallets.length > 0) {
@@ -210,6 +210,7 @@ export default function TurfLootTactical() {
         count: solanaWallets.length,
         address: getWalletAddress(solanaWallets[0])
       })
+      setWalletInitializing(false)
       return
     }
     
@@ -220,29 +221,29 @@ export default function TurfLootTactical() {
     
     if (linkedSolana) {
       console.log('⚠️ Embedded wallet exists in linkedAccounts but not in useWallets yet')
-      console.log('⏳ Waiting for wallet to initialize in useWallets hook...')
-      // The wallet should appear in useWallets() automatically after a brief delay
-      // If it doesn't appear within a few seconds, user may need to refresh
+      console.log('⏳ Setting wallet initializing state...')
+      setWalletInitializing(true)
+      // The wallet should appear in useWallets() automatically - this effect will re-run when it does
       return
     }
     
     // No wallet found, create one
-    console.log('🔨 No Solana wallet found, creating embedded wallet...')
-    createWallet({ chainType: 'solana' })
-      .then(wallet => {
-        console.log('✅ Created embedded Solana wallet:', {
-          address: wallet?.address,
-          chainType: wallet?.chainType
+    if (!walletInitializing) {
+      console.log('🔨 No Solana wallet found, creating embedded wallet...')
+      setWalletInitializing(true)
+      createWallet({ chainType: 'solana' })
+        .then(wallet => {
+          console.log('✅ Created embedded Solana wallet:', {
+            address: wallet?.address,
+            chainType: wallet?.chainType
+          })
         })
-        // Force a small delay to allow the wallet to populate in useWallets
-        setTimeout(() => {
-          console.log('🔄 Checking if wallet appeared in useWallets...')
-        }, 1000)
-      })
-      .catch(error => {
-        console.error('❌ Failed to create embedded wallet:', error)
-      })
-  }, [authenticated, privyUser, ready, solanaWallets, createWallet])
+        .catch(error => {
+          console.error('❌ Failed to create embedded wallet:', error)
+          setWalletInitializing(false)
+        })
+    }
+  }, [authenticated, privyUser, ready, walletsReady, solanaWallets, createWallet, walletInitializing])
 
   // 🚀 Privy 3.0 + Helius: Clean fee deduction (embedded wallet only)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
