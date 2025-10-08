@@ -12,12 +12,22 @@ import { useRouter } from 'next/navigation'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - using Solana-specific useFundWallet helper
-  const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
-  const { wallets } = useWallets()
-  const { fundWallet } = useFundWallet()
-  const signAndSendTransactionResponse = useSignAndSendTransaction()
-  const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
+  // Privy hooks - using Solana-specific useFundWallet helper (temporarily commented out)
+  // const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
+  // const { wallets } = useWallets()
+  // const { fundWallet } = useFundWallet()
+  // const signAndSendTransactionResponse = useSignAndSendTransaction()
+  // const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
+  
+  // Temporary mock values to prevent errors
+  const ready = true
+  const authenticated = false
+  const privyUser = null
+  const login = () => {}
+  const logout = () => {}
+  const wallets = []
+  const fundWallet = () => {}
+  const privySignAndSendTransaction = null
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
