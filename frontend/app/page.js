@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
-import { useSignAndSendTransaction, useSignTransaction } from '@privy-io/react-auth/solana'
+import { useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../../lib/paid/feeManager'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
@@ -17,8 +17,6 @@ export default function TurfLootTactical() {
   const { fundWallet } = useFundWallet()
   const signAndSendTransactionResponse = useSignAndSendTransaction()
   const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
-  const signTransactionResponse = useSignTransaction()
-  const privySignTransaction = signTransactionResponse?.signTransaction
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
@@ -151,7 +149,6 @@ export default function TurfLootTactical() {
         serverWalletAddress: SERVER_WALLET_ADDRESS,
         logger: console,
         signAndSendTransactionFn: privySignAndSendTransaction,
-        signTransactionFn: privySignTransaction,
         solanaChain: SOLANA_CHAIN
       })
 
