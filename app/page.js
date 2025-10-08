@@ -123,8 +123,8 @@ export default function TurfLootTactical() {
   } = usePrivy()
   const { createWallet } = useCreateWallet()
   const { wallets } = useWallets()
-  const signTransaction = useSignTransaction()
-  const signAndSendTransaction = useSignAndSendTransaction()
+  const { signTransaction } = useSignTransaction()
+  const { signAndSendTransaction } = useSignAndSendTransaction()
   
   // Debug what these hooks return
   useEffect(() => {
