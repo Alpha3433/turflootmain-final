@@ -155,10 +155,10 @@ export default function TurfLootTactical() {
   }, [wallets, privyUser])
   const { fundWallet } = useFundWallet()
   
-  // For Solana external wallets (in wallets array)
-  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
+  // For Solana external wallets (in wallets array) - may be undefined for embedded-only users
+  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction() || {}
   
-  // Note: For embedded wallets, we use privyUser.sendTransaction directly
+  // Note: For embedded wallets, Privy 3.0 uses the fundWallet function for transactions
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
