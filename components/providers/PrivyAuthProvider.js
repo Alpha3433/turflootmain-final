@@ -24,7 +24,7 @@ class PrivyErrorBoundary extends Component {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2>Wallet Service Error</h2>
           <p>Please refresh the page to reconnect your wallet.</p>
-          <button onClick={() => window.location.reload()}>Refresh Page</button>
+          <button onClick={() => typeof window !== 'undefined' && window.location.reload()}>Refresh Page</button>
         </div>
       )
     }
@@ -73,7 +73,7 @@ export default function PrivyAuthProvider({ children }) {
 
   console.log('🔧 Initializing Privy with App ID:', appId.substring(0, 10) + '...')
 
-  // SOLANA-ONLY Privy Configuration - UPDATED for v2.24.0 fundWallet compatibility
+  // 🚀 Privy 3.0 Configuration - SOLANA ONLY
   const config = {
     // UI Appearance
     appearance: {
@@ -86,68 +86,29 @@ export default function PrivyAuthProvider({ children }) {
     // Authentication methods
     loginMethods: ['google', 'email', 'wallet'],
     
-    // 🎯 CRITICAL: Embedded Wallets - SOLANA ONLY
+    // 🎯 PRIVY 3.0: Supported chains (required when using defaultChain)
+    supportedChains: ['solana'],
+    
+    // 🎯 PRIVY 3.0: Default chain
+    defaultChain: 'solana',
+    
+    // 🎯 PRIVY 3.0: Embedded Wallets - Create Solana wallet on login
     embeddedWallets: {
-      // ❌ EXPLICITLY DISABLE all Ethereum/EVM embedded wallets
-      ethereum: {
-        createOnLogin: 'off'
-      },
-      // ✅ ENABLE ONLY Solana embedded wallets for new users
-      solana: {
-        createOnLogin: 'users-without-wallets'
-      }
+      createOnLogin: 'users-without-wallets',
+      requireUserPasswordOnCreate: false,
+      noPromptOnSignature: false
     },
     
-    // 🎯 CRITICAL: External Wallets - SOLANA ONLY  
+    // 🎯 PRIVY 3.0: External Wallets - SOLANA ONLY  
     externalWallets: {
-      // ✅ ONLY Solana external wallet connectors
       solana: {
-        wallets: ['phantom', 'solflare']
+        connectors: ['phantom', 'solflare']
       }
-      // ❌ NO ethereum section = no MetaMask, WalletConnect, etc.
     },
-    
-    // 🎯 CRITICAL: supportedChains for v2.24.0 fundWallet compatibility
-    supportedChains: [
-      {
-        id: 101, // Solana Mainnet chain ID
-        name: 'Solana',
-        network: 'mainnet-beta',
-        nativeCurrency: {
-          name: 'Solana',
-          symbol: 'SOL',
-          decimals: 9,
-        },
-        rpcUrls: {
-          default: {
-            http: [process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com']
-          }
-        }
-      }
-    ],
-    
-    // 🎯 CRITICAL: Solana Network Configuration (keeping for backward compatibility)
-    solanaClusters: [
-      {
-        name: 'mainnet-beta',
-        rpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
-      }
-    ],
     
     // Security & MFA
     mfa: {
       noPromptOnMfaRequired: false,
-    },
-    
-    // 🎯 CRITICAL: Explicitly disable Smart Wallets (they're EVM-based)
-    smartWallets: {
-      enabled: false
-    },
-    
-    // 🎯 CRITICAL: Default chain should be Solana
-    defaultChain: {
-      id: 101,
-      name: 'Solana'
     }
   }
 

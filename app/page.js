@@ -4,18 +4,16 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
-import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../lib/paid/feeManager'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - using Solana-specific useFundWallet helper
+  // Privy hooks - restored for authentication
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets } = useWallets()
   const { fundWallet } = useFundWallet()
-  const signAndSendTransactionResponse = useSignAndSendTransaction()
-  const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
+  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
@@ -40,21 +38,7 @@ export default function TurfLootTactical() {
     return calculatePaidRoomCosts(entryFee, feePercentage, options)
   }
 
-  const SOLANA_RPC_ENDPOINTS = useMemo(
-    () =>
-      buildSolanaRpcEndpointList({
-        network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
-        privateRpc:
-          process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC ||
-          process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC ||
-          process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE ||
-          process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS,
-        primary: process.env.NEXT_PUBLIC_SOLANA_RPC,
-        list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
-        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
-      }),
-    []
-  )
+  // Removed SOLANA_RPC_ENDPOINTS - now handled by Helius in cleanFeeManager
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
   const SOLANA_CHAIN = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
@@ -93,146 +77,135 @@ export default function TurfLootTactical() {
     return null
   }
 
-  // Deduct entry fee + server fee when joining paid room
-  const deductRoomFees = async (entryFee, userWalletAddress, feePercentageOverride = null) => {
+  // 🚀 Privy 3.0 + Helius: Clean fee deduction (no fallbacks)
+  const deductRoomFees = async (entryFee, userWalletAddress) => {
     if (isProcessingFee) {
-      console.log('⏳ Fee deduction already in progress, ignoring duplicate request')
-      return { success: false, error: 'Transaction already in progress' }
+      console.log('⚠️ Fee processing already in progress')
+      return { success: false, error: 'Processing another transaction...' }
     }
 
-    const currentUsdBalance = parseFloat(walletBalance.usd || 0)
-    const currentSolBalance = parseFloat(walletBalance.sol || 0)
-    const derivedUsdPerSol = currentSolBalance > 0.000001
-      ? currentUsdBalance / currentSolBalance
-      : USD_PER_SOL_FALLBACK
-    const costs = calculateTotalCost(entryFee, feePercentageOverride, {
-      currency: 'SOL',
-      usdPerSol: derivedUsdPerSol
+    console.log('💰 Starting Privy 3.0 fee deduction:', { entryFee, userWalletAddress })
+
+    // Debug: Log all available wallet sources
+    console.log('🔍 Wallet sources:', {
+      walletsArray: wallets.map(w => ({ address: w.address, type: w.walletClientType })),
+      walletsCount: wallets.length,
+      linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
+        type: a.type, 
+        address: a.address, 
+        chainType: a.chainType 
+      }))
     })
 
-    console.log('💰 Preparing paid room fee deduction:', {
-      entryFee,
-      currency: costs.currency,
-      feePercentage: costs.feePercentage,
-      serverFee: costs.serverFee,
-      totalCost: costs.totalCost,
-      serverFeeUsd: costs.serverFeeUsd,
-      totalCostUsd: costs.totalCostUsd,
-      currentUsdBalance: currentUsdBalance.toFixed(3),
-      currentSolBalance: currentSolBalance.toFixed(6)
-    })
-
-    if (costs.currency === 'SOL' && currentSolBalance < costs.totalCost) {
-      return {
-        success: false,
-        error: `Insufficient SOL balance. Need ${costs.totalCost.toFixed(4)} SOL, have ${currentSolBalance.toFixed(4)} SOL`,
-        costs
-      }
-    }
-
-    if (costs.currency !== 'SOL' && currentUsdBalance < costs.totalCost) {
-      return {
-        success: false,
-        error: `Insufficient USD balance. Need $${costs.totalCost.toFixed(3)}, have $${currentUsdBalance.toFixed(2)}`,
-        costs
-      }
-    }
-
+    // Resolve Solana wallet (checks multiple sources)
     const solanaWallet = resolveSolanaWallet()
-
     if (!solanaWallet) {
-      return {
-        success: false,
-        error: 'No Solana wallet available for fee deduction. Please connect a wallet and try again.',
-        costs
-      }
+      console.error('❌ No Solana wallet found')
+      return { success: false, error: 'No Solana wallet connected. Please login.' }
     }
 
-    if (typeof privySignAndSendTransaction !== 'function') {
-      return {
-        success: false,
-        error: 'Privy transaction signing is not available. Please reconnect your wallet and try again.',
-        costs
-      }
+    console.log('✅ Resolved wallet:', {
+      address: solanaWallet.address,
+      chainType: solanaWallet.chainType,
+      walletClientType: solanaWallet.walletClientType
+    })
+
+    // For Privy 3.0, we MUST use a wallet from the wallets array
+    const wallet = wallets.find(w => w.address === solanaWallet.address)
+    
+    if (!wallet) {
+      console.error('❌ Wallet not in useWallets() array - Privy 3.0 requires this')
+      console.error('This usually means the embedded wallet was not created on login')
+      return { success: false, error: 'Wallet setup incomplete. Please logout and login again.' }
+    }
+    
+    console.log('✅ Found wallet in useWallets():', {
+      address: wallet.address,
+      type: wallet.walletClientType,
+      hasSignMethod: typeof wallet.signAndSendTransaction !== 'undefined'
+    })
+
+    // Validate Privy hook
+    if (!privySignAndSendTransaction) {
+      console.error('❌ Privy signAndSendTransaction not available')
+      return { success: false, error: 'Signing service unavailable. Please refresh.' }
     }
 
     setIsProcessingFee(true)
 
     try {
-      const deductionResult = await deductPaidRoomFee({
-        entryAmount: entryFee,
-        entryCurrency: costs.currency,
-        feePercentage: costs.feePercentage,
-        walletBalance,
-        solanaWallet,
-        privyUser,
-        walletAddress: userWalletAddress,
-        rpcEndpoints: SOLANA_RPC_ENDPOINTS,
-        usdPerSolFallback: derivedUsdPerSol,
-        serverWalletAddress: SERVER_WALLET_ADDRESS,
-        logger: console,
-        signAndSendTransactionFn: privySignAndSendTransaction,
-        solanaChain: SOLANA_CHAIN
+      // Dynamic import to avoid SSR issues
+      const { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress } = await import('../lib/paid/cleanFeeManager')
+
+      // Step 1: Calculate fees
+      const USD_PER_SOL = 150
+      const fees = calculateFees(entryFee, USD_PER_SOL)
+      console.log('✅ Fees calculated:', fees)
+
+      // Step 2: Build transaction using Helius
+      const SERVER_WALLET = getServerWalletAddress()
+      console.log('🔨 Building transaction via Helius...')
+      
+      const { transaction, connection } = await buildEntryFeeTransaction({
+        entryFeeUsd: entryFee,
+        userWalletAddress,
+        serverWalletAddress: SERVER_WALLET,
+        usdPerSol: USD_PER_SOL
       })
 
-      const resultCosts = deductionResult.costs || costs
-      const totalCostUsd = resultCosts.totalCostUsd ?? (resultCosts.currency === 'SOL'
-        ? resultCosts.totalCost * derivedUsdPerSol
-        : resultCosts.totalCost)
-      const totalCostSol = resultCosts.totalCostSol ?? (resultCosts.currency === 'SOL'
-        ? resultCosts.totalCost
-        : resultCosts.totalCost / derivedUsdPerSol)
-
-      setWalletBalance((prev) => {
-        const previousUsd = parseFloat(prev?.usd ?? currentUsdBalance)
-        const previousSol = parseFloat(prev?.sol ?? currentSolBalance)
-        const nextUsd = Math.max(0, previousUsd - totalCostUsd)
-        const nextSol = Math.max(0, previousSol - totalCostSol)
-
-        return {
-          ...prev,
-          usd: nextUsd.toFixed(2),
-          sol: nextSol.toFixed(6),
-          loading: false,
-          lastArenaSignature: deductionResult.signature,
-          lastArenaTransferLamports: deductionResult.lamports
-        }
+      console.log('✅ Transaction built, signing with Privy 3.0...')
+      console.log('🔍 Wallet info:', {
+        address: wallet.address,
+        hasSignMethod: typeof wallet.signAndSendTransaction,
+        walletType: wallet.walletClientType,
+        isFromWalletsArray: wallets.some(w => w.address === wallet.address)
       })
 
-      const transactionDetails = {
-        userWallet: deductionResult.walletAddress,
-        serverWallet: deductionResult.serverWallet,
-        entryFeeDeducted: resultCosts.entryFee,
-        serverFeeTransferred: resultCosts.serverFee,
-        totalDeductedCurrency: resultCosts.currency,
-        totalDeductedUsd: totalCostUsd,
-        totalDeductedSol: totalCostSol,
-        lamports: deductionResult.lamports,
-        signature: deductionResult.signature,
-        rpcEndpoint: deductionResult.rpcEndpoint,
-        timestamp: new Date().toISOString()
-      }
+      // Step 3: Sign and send with Privy 3.0
+      // For embedded wallets, Privy handles wallet selection automatically
+      const { signature } = await privySignAndSendTransaction({
+        transaction,
+        chain: 'solana:mainnet'
+        // Note: No wallet parameter - Privy uses authenticated wallet automatically
+      })
 
-      try {
-        localStorage.setItem(`arena_entry_${Date.now()}`, JSON.stringify(transactionDetails))
-      } catch (storageError) {
-        console.log('⚠️ Unable to persist arena entry transaction locally:', storageError)
-      }
+      console.log('✅ Transaction sent! Signature:', signature)
 
-      console.log('✅ Fees deducted successfully via Privy transfer!', transactionDetails)
+      // Step 4: Confirm on Solana
+      await confirmTransaction(connection, signature)
+      console.log('✅ Transaction confirmed on Solana!')
+
+      // Step 5: Update local balance
+      if (walletBalance?.usd && walletBalance?.sol) {
+        const newUsdBalance = parseFloat(walletBalance.usd) - fees.totalUsd
+        const newSolBalance = parseFloat(walletBalance.sol) - fees.totalSol
+        setWalletBalance({
+          usd: Math.max(0, newUsdBalance).toFixed(2),
+          sol: Math.max(0, newSolBalance).toFixed(6)
+        })
+        console.log('✅ Balance updated locally')
+      }
 
       return {
         success: true,
-        costs: resultCosts,
-        newBalance: Math.max(0, currentUsdBalance - totalCostUsd),
-        transactionDetails
+        signature,
+        fees
       }
+
     } catch (error) {
       console.error('❌ Fee deduction failed:', error)
+      
+      // User-friendly error messages
+      let errorMessage = 'Transaction failed. Please try again.'
+      if (error.message?.includes('User rejected')) {
+        errorMessage = 'Transaction cancelled by user.'
+      } else if (error.message?.includes('insufficient')) {
+        errorMessage = 'Insufficient SOL balance.'
+      }
+      
       return {
         success: false,
-        error: error.message,
-        costs
+        error: errorMessage
       }
     } finally {
       setIsProcessingFee(false)
@@ -1042,6 +1015,7 @@ export default function TurfLootTactical() {
         }
 
         // Show notification toast
+        if (typeof document === 'undefined') return
         const notification = document.createElement('div')
         notification.style.cssText = `
           position: fixed;
@@ -1074,7 +1048,9 @@ export default function TurfLootTactical() {
           </div>
         `
         
-        document.body.appendChild(notification)
+        if (typeof document !== 'undefined') {
+          document.body.appendChild(notification)
+        }
         
         // Auto-remove after 5 seconds
         setTimeout(() => {
@@ -1727,8 +1703,10 @@ export default function TurfLootTactical() {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
 
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('mousemove', handleMouseMove)
+      return () => window.removeEventListener('mousemove', handleMouseMove)
+    }
   }, [])
 
   // Eye tracking scroll effect for mobile CUSTOMIZE panel
@@ -1736,8 +1714,8 @@ export default function TurfLootTactical() {
     if (!isMobile) return
 
     const handleScroll = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
+      const scrollY = typeof window !== 'undefined' ? window.scrollY : 0
+      const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 0
       const scrollProgress = Math.min(scrollY / (windowHeight * 0.5), 1)
       
       // Calculate eye movement based on scroll position
@@ -1748,8 +1726,10 @@ export default function TurfLootTactical() {
       setEyePosition({ x: eyeX, y: Math.max(-maxEyeMovement, Math.min(maxEyeMovement, eyeY)) })
     }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      return () => window.removeEventListener('scroll', handleScroll)
+    }
   }, [isMobile])
 
   // Improved orientation detection function
