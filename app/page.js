@@ -419,7 +419,6 @@ export default function TurfLootTactical() {
         signature = result?.signature || result
       }
 
-      let signature = result?.signature || result
       if (signature instanceof Uint8Array) {
         signature = bs58.encode(signature)
       }
