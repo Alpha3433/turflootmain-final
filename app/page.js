@@ -121,22 +121,34 @@ export default function TurfLootTactical() {
     logout
   } = usePrivy()
   const { createWallet } = useCreateWallet()
+  const { wallets } = useWallets()
+  const { signAndSendTransaction } = useSignAndSendTransaction()
   
-  // Privy Solana signing - get the hook result
-  const solanaSigningHook = useSignAndSendTransaction()
-  const signAndSendTransaction = solanaSigningHook?.signAndSendTransaction
+  // Get embedded Privy wallet from useWallets
+  const privyEmbeddedWallet = useMemo(() => {
+    return wallets?.find(w => w.walletClientType === 'privy' || w.connectorType === 'embedded')
+  }, [wallets])
   
   // Debug log
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      console.log('🔍 Privy Solana Hook Debug:', {
-        hookResult: solanaSigningHook,
-        signAndSendType: typeof signAndSendTransaction,
-        authenticated,
-        ready
+    if (typeof window !== 'undefined' && authenticated) {
+      console.log('🔍 Privy Wallet Debug:', {
+        walletsCount: wallets?.length,
+        wallets: wallets?.map(w => ({
+          name: w.name,
+          walletClientType: w.walletClientType,
+          connectorType: w.connectorType,
+          address: w.address
+        })),
+        privyEmbeddedWallet: privyEmbeddedWallet ? {
+          address: privyEmbeddedWallet.address,
+          walletClientType: privyEmbeddedWallet.walletClientType
+        } : null,
+        ready,
+        authenticated
       })
     }
-  }, [solanaSigningHook, signAndSendTransaction, authenticated, ready])
+  }, [wallets, privyEmbeddedWallet, authenticated, ready])
   const walletAddressesSignature = useMemo(() => {
     // SSR safety check
     if (typeof window === 'undefined') {
