@@ -1,21 +1,28 @@
 #!/usr/bin/env python3
 """
-Privy Embedded Wallet Signing Fix Backend Testing
-Testing the Privy embedded wallet signing fix for paid room entry fees.
+Comprehensive Privy Embedded Wallet Integration Fix Backend Testing
+Testing the complete Privy embedded wallet integration fix for paid room entry fees.
 
-CRITICAL FIX DETAILS:
-1. Updated resolveSolanaWallet() function now checks privyUser.linkedAccounts first (for embedded wallets)
-2. Fixed chain parameter to use SOLANA_CHAIN variable instead of hardcoded 'solana:mainnet'
-3. Enhanced logging for wallet detection and transaction signing process
-4. Proper wallet resolution logic prioritizes linkedAccounts over wallets array
-5. Fee deduction system works with both embedded and external wallets
+REVIEW REQUEST FOCUS:
+1. Test updated wallet resolution in deductRoomFees function - verify resolveSolanaWallet() detects embedded wallets from linkedAccounts
+2. Test dual-path transaction signing logic (embedded vs external wallets)
+3. Verify wallet detection correctly identifies embedded wallets and uses useSendTransaction
+4. Test external wallets use useSignAndSendTransaction
+5. Verify all Privy authentication and wallet balance APIs are operational
 
-TESTING FOCUS:
-- Backend API health and Privy authentication support
-- Wallet balance APIs with Helius integration
-- Solana transaction processing capabilities
-- Authentication flow for wallet operations
-- Error handling for wallet-related operations
+KEY CHANGES TO TEST:
+- Updated resolveSolanaWallet() to check privyUser.linkedAccounts first for embedded wallets
+- Added useSendTransaction hook for embedded wallet signing
+- Fixed isEmbeddedWallet detection logic in deductRoomFees
+- Dual-path signing: embedded wallets use privySendTransaction, external wallets use privySignAndSendTransaction
+- Enhanced logging for wallet type detection and signing process
+
+EXPECTED RESULTS:
+- Embedded Solana wallets should be detected from privyUser.linkedAccounts
+- System should correctly identify wallet type (embedded vs external)
+- Appropriate signing method should be used based on wallet type
+- Fee deduction should work for authenticated users with embedded wallets
+- All backend APIs should remain operational
 """
 
 import asyncio
@@ -23,17 +30,21 @@ import json
 import time
 import requests
 import logging
+import os
 from typing import Dict, Any, List, Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class PrivyWalletSigningTester:
+class PrivyEmbeddedWalletTester:
     def __init__(self):
-        self.base_url = "http://localhost:3000"
+        # Use environment variable for base URL, fallback to localhost for development
+        self.base_url = os.getenv('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000')
         self.api_url = f"{self.base_url}/api"
         self.test_results = []
+        self.total_tests = 0
+        self.passed_tests = 0
         
     def log_test_result(self, test_name: str, passed: bool, details: str = ""):
         """Log test result with details"""
