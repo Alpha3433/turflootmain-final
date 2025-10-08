@@ -183,43 +183,33 @@ export default function TurfLootTactical() {
     return 'solana:mainnet'
   }, [])
 
-  // 🚀 Privy 3.0 Embedded Wallet: Create wallet if doesn't exist
-  // Note: Embedded wallets appear in linkedAccounts, NOT in useWallets() - this is expected Privy 3.0 behavior
+  // 🚀 Privy 3.0: Auto-create embedded Solana wallet on login
   useEffect(() => {
     if (!authenticated || !privyUser || !ready) return
     
-    // Check if user has embedded wallet in linkedAccounts
-    const linkedSolana = privyUser?.linkedAccounts?.find(
-      account => account?.type === 'wallet' && account?.chainType === 'solana'
+    // Check if user already has embedded Solana wallet
+    const hasSolanaWallet = privyUser.linkedAccounts?.some(
+      account => account.type === 'wallet' && account.chainType === 'solana'
     )
     
-    if (linkedSolana) {
-      console.log('✅ Embedded Solana wallet exists:', {
-        address: linkedSolana.address,
-        chainType: linkedSolana.chainType
-      })
-      setWalletInitializing(false)
+    if (hasSolanaWallet) {
+      const wallet = privyUser.linkedAccounts.find(
+        account => account.type === 'wallet' && account.chainType === 'solana'
+      )
+      console.log('✅ Privy embedded Solana wallet ready:', wallet.address)
       return
     }
     
-    // No wallet found, create one
-    if (!walletInitializing) {
-      console.log('🔨 No Solana wallet found in linkedAccounts, creating embedded wallet...')
-      setWalletInitializing(true)
-      createWallet({ chainType: 'solana' })
-        .then(wallet => {
-          console.log('✅ Created embedded Solana wallet:', {
-            address: wallet?.address,
-            chainType: wallet?.chainType
-          })
-          setWalletInitializing(false)
-        })
-        .catch(error => {
-          console.error('❌ Failed to create embedded wallet:', error)
-          setWalletInitializing(false)
-        })
-    }
-  }, [authenticated, privyUser, ready, createWallet, walletInitializing])
+    // Create embedded Solana wallet
+    console.log('🔨 Creating Privy embedded Solana wallet...')
+    createWallet({ chainType: 'solana' })
+      .then(wallet => {
+        console.log('✅ Embedded wallet created:', wallet.address)
+      })
+      .catch(error => {
+        console.error('❌ Failed to create wallet:', error)
+      })
+  }, [authenticated, privyUser, ready, createWallet])
 
   // 🚀 Privy 3.0 + Helius: Clean fee deduction (embedded wallet only)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
