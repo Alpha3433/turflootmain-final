@@ -162,25 +162,33 @@ export default function TurfLootTactical() {
       console.log('✅ Transaction built, signing with Privy 3.0...')
 
       // Step 3: Sign and send with Privy 3.0
-      let result
+      let signature
       if (isEmbeddedWallet) {
-        // For embedded wallets: Privy auto-detects the wallet, don't pass it
-        console.log('🔐 Signing with embedded wallet (auto-detected by Privy)...')
-        result = await privySignAndSendTransaction({
-          transaction,
-          chain: 'solana:mainnet'
+        // For embedded wallets: Use base sendTransaction hook
+        console.log('🔐 Signing with embedded wallet via useSendTransaction...')
+        
+        // Convert Uint8Array to base64 for base Privy hook
+        const base64Transaction = Buffer.from(transaction).toString('base64')
+        
+        const result = await privySendTransaction({
+          transaction: base64Transaction,
+          chain: 'solana:mainnet',
+          address: userWalletAddress
         })
+        
+        signature = result?.transactionHash || result?.signature || result
       } else {
-        // For external wallets: Must pass wallet from useWallets() array
-        console.log('🔐 Signing with external wallet...')
-        result = await privySignAndSendTransaction({
+        // For external wallets: Use Solana-specific hook
+        console.log('🔐 Signing with external wallet via useSignAndSendTransaction...')
+        
+        const result = await privySignAndSendTransaction({
           wallet: walletFromArray,
           transaction,
           chain: 'solana:mainnet'
         })
+        
+        signature = result?.signature || result
       }
-      
-      const { signature } = result
 
       console.log('✅ Transaction sent! Signature:', signature)
 
