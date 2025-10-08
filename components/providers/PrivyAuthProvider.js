@@ -126,6 +126,15 @@ export default function PrivyAuthProvider({ children }) {
     [solanaChain, solanaRpcUrl, solanaWsUrl]
   )
 
+  const emptySolanaConnectors = useMemo(
+    () => ({
+      onMount: () => {},
+      onUnmount: () => {},
+      get: () => []
+    }),
+    []
+  )
+
   const config = {
     // UI Appearance
     appearance: {
@@ -153,7 +162,7 @@ export default function PrivyAuthProvider({ children }) {
     // ❌ Disable all external wallet connectors – embedded wallets only
     externalWallets: {
       solana: {
-        connectors: []
+        connectors: emptySolanaConnectors
       }
     },
 
