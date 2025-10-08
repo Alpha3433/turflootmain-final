@@ -773,7 +773,7 @@ export default function TurfLootTactical() {
         })
       }
     }
-  }, [ready, authenticated, fundWallet, privyUser, wallets])
+  }, [ready, authenticated, privyUser, wallets])
   
   // Real-time Solana balance tracking
   const [selectedStake, setSelectedStake] = useState('$0.01')
