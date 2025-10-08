@@ -86,6 +86,17 @@ export default function TurfLootTactical() {
 
     console.log('💰 Starting Privy 3.0 fee deduction:', { entryFee, userWalletAddress })
 
+    // Debug: Log all available wallet sources
+    console.log('🔍 Wallet sources:', {
+      walletsArray: wallets.map(w => ({ address: w.address, type: w.walletClientType })),
+      walletsCount: wallets.length,
+      linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
+        type: a.type, 
+        address: a.address, 
+        chainType: a.chainType 
+      }))
+    })
+
     // Resolve Solana wallet (checks multiple sources)
     const solanaWallet = resolveSolanaWallet()
     if (!solanaWallet) {
@@ -99,14 +110,20 @@ export default function TurfLootTactical() {
       walletClientType: solanaWallet.walletClientType
     })
 
-    // For Privy 3.0, try to find wallet in wallets array, or construct one
-    let wallet = wallets.find(w => w.address === solanaWallet.address)
+    // For Privy 3.0, we MUST use a wallet from the wallets array
+    const wallet = wallets.find(w => w.address === solanaWallet.address)
     
-    // If not in wallets array (embedded wallet), construct wallet object
     if (!wallet) {
-      console.log('⚠️ Wallet not in useWallets() array, using resolved wallet')
-      wallet = solanaWallet
+      console.error('❌ Wallet not in useWallets() array - Privy 3.0 requires this')
+      console.error('This usually means the embedded wallet was not created on login')
+      return { success: false, error: 'Wallet setup incomplete. Please logout and login again.' }
     }
+    
+    console.log('✅ Found wallet in useWallets():', {
+      address: wallet.address,
+      type: wallet.walletClientType,
+      hasSignMethod: typeof wallet.signAndSendTransaction !== 'undefined'
+    })
 
     // Validate Privy hook
     if (!privySignAndSendTransaction) {
