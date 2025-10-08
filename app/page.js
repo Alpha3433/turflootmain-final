@@ -93,146 +93,93 @@ export default function TurfLootTactical() {
     return null
   }
 
-  // Deduct entry fee + server fee when joining paid room
-  const deductRoomFees = async (entryFee, userWalletAddress, feePercentageOverride = null) => {
+  // 🚀 Privy 3.0 + Helius: Clean fee deduction (no fallbacks)
+  const deductRoomFees = async (entryFee, userWalletAddress) => {
     if (isProcessingFee) {
-      console.log('⏳ Fee deduction already in progress, ignoring duplicate request')
-      return { success: false, error: 'Transaction already in progress' }
+      console.log('⚠️ Fee processing already in progress')
+      return { success: false, error: 'Processing another transaction...' }
     }
 
-    const currentUsdBalance = parseFloat(walletBalance.usd || 0)
-    const currentSolBalance = parseFloat(walletBalance.sol || 0)
-    const derivedUsdPerSol = currentSolBalance > 0.000001
-      ? currentUsdBalance / currentSolBalance
-      : USD_PER_SOL_FALLBACK
-    const costs = calculateTotalCost(entryFee, feePercentageOverride, {
-      currency: 'SOL',
-      usdPerSol: derivedUsdPerSol
-    })
+    console.log('💰 Starting Privy 3.0 fee deduction:', { entryFee, userWalletAddress })
 
-    console.log('💰 Preparing paid room fee deduction:', {
-      entryFee,
-      currency: costs.currency,
-      feePercentage: costs.feePercentage,
-      serverFee: costs.serverFee,
-      totalCost: costs.totalCost,
-      serverFeeUsd: costs.serverFeeUsd,
-      totalCostUsd: costs.totalCostUsd,
-      currentUsdBalance: currentUsdBalance.toFixed(3),
-      currentSolBalance: currentSolBalance.toFixed(6)
-    })
-
-    if (costs.currency === 'SOL' && currentSolBalance < costs.totalCost) {
-      return {
-        success: false,
-        error: `Insufficient SOL balance. Need ${costs.totalCost.toFixed(4)} SOL, have ${currentSolBalance.toFixed(4)} SOL`,
-        costs
-      }
+    // Validate Privy wallet
+    const wallet = wallets.find(w => w.address === userWalletAddress)
+    if (!wallet) {
+      console.error('❌ Wallet not found in useWallets()')
+      return { success: false, error: 'Wallet not found. Please reconnect.' }
     }
 
-    if (costs.currency !== 'SOL' && currentUsdBalance < costs.totalCost) {
-      return {
-        success: false,
-        error: `Insufficient USD balance. Need $${costs.totalCost.toFixed(3)}, have $${currentUsdBalance.toFixed(2)}`,
-        costs
-      }
-    }
-
-    const solanaWallet = resolveSolanaWallet()
-
-    if (!solanaWallet) {
-      return {
-        success: false,
-        error: 'No Solana wallet available for fee deduction. Please connect a wallet and try again.',
-        costs
-      }
-    }
-
-    if (typeof privySignAndSendTransaction !== 'function') {
-      return {
-        success: false,
-        error: 'Privy transaction signing is not available. Please reconnect your wallet and try again.',
-        costs
-      }
+    // Validate Privy hook
+    if (!privySignAndSendTransaction) {
+      console.error('❌ Privy signAndSendTransaction not available')
+      return { success: false, error: 'Signing service unavailable. Please refresh.' }
     }
 
     setIsProcessingFee(true)
 
     try {
-      const deductionResult = await deductPaidRoomFee({
-        entryAmount: entryFee,
-        entryCurrency: costs.currency,
-        feePercentage: costs.feePercentage,
-        walletBalance,
-        solanaWallet,
-        privyUser,
-        walletAddress: userWalletAddress,
-        rpcEndpoints: SOLANA_RPC_ENDPOINTS,
-        usdPerSolFallback: derivedUsdPerSol,
-        serverWalletAddress: SERVER_WALLET_ADDRESS,
-        logger: console,
-        signAndSendTransactionFn: privySignAndSendTransaction,
-        solanaChain: SOLANA_CHAIN
+      // Step 1: Calculate fees
+      const USD_PER_SOL = 150
+      const fees = calculateFees(entryFee, USD_PER_SOL)
+      console.log('✅ Fees calculated:', fees)
+
+      // Step 2: Build transaction using Helius
+      const SERVER_WALLET = getServerWalletAddress()
+      console.log('🔨 Building transaction via Helius...')
+      
+      const { transaction, connection } = await buildEntryFeeTransaction({
+        entryFeeUsd: entryFee,
+        userWalletAddress,
+        serverWalletAddress: SERVER_WALLET,
+        usdPerSol: USD_PER_SOL
       })
 
-      const resultCosts = deductionResult.costs || costs
-      const totalCostUsd = resultCosts.totalCostUsd ?? (resultCosts.currency === 'SOL'
-        ? resultCosts.totalCost * derivedUsdPerSol
-        : resultCosts.totalCost)
-      const totalCostSol = resultCosts.totalCostSol ?? (resultCosts.currency === 'SOL'
-        ? resultCosts.totalCost
-        : resultCosts.totalCost / derivedUsdPerSol)
+      console.log('✅ Transaction built, signing with Privy 3.0...')
 
-      setWalletBalance((prev) => {
-        const previousUsd = parseFloat(prev?.usd ?? currentUsdBalance)
-        const previousSol = parseFloat(prev?.sol ?? currentSolBalance)
-        const nextUsd = Math.max(0, previousUsd - totalCostUsd)
-        const nextSol = Math.max(0, previousSol - totalCostSol)
-
-        return {
-          ...prev,
-          usd: nextUsd.toFixed(2),
-          sol: nextSol.toFixed(6),
-          loading: false,
-          lastArenaSignature: deductionResult.signature,
-          lastArenaTransferLamports: deductionResult.lamports
-        }
+      // Step 3: Sign and send with Privy 3.0
+      const { signature } = await privySignAndSendTransaction({
+        wallet,
+        transaction,
+        chain: 'solana:mainnet'
       })
 
-      const transactionDetails = {
-        userWallet: deductionResult.walletAddress,
-        serverWallet: deductionResult.serverWallet,
-        entryFeeDeducted: resultCosts.entryFee,
-        serverFeeTransferred: resultCosts.serverFee,
-        totalDeductedCurrency: resultCosts.currency,
-        totalDeductedUsd: totalCostUsd,
-        totalDeductedSol: totalCostSol,
-        lamports: deductionResult.lamports,
-        signature: deductionResult.signature,
-        rpcEndpoint: deductionResult.rpcEndpoint,
-        timestamp: new Date().toISOString()
-      }
+      console.log('✅ Transaction sent! Signature:', signature)
 
-      try {
-        localStorage.setItem(`arena_entry_${Date.now()}`, JSON.stringify(transactionDetails))
-      } catch (storageError) {
-        console.log('⚠️ Unable to persist arena entry transaction locally:', storageError)
-      }
+      // Step 4: Confirm on Solana
+      await confirmTransaction(connection, signature)
+      console.log('✅ Transaction confirmed on Solana!')
 
-      console.log('✅ Fees deducted successfully via Privy transfer!', transactionDetails)
+      // Step 5: Update local balance
+      if (walletBalance?.usd && walletBalance?.sol) {
+        const newUsdBalance = parseFloat(walletBalance.usd) - fees.totalUsd
+        const newSolBalance = parseFloat(walletBalance.sol) - fees.totalSol
+        setWalletBalance({
+          usd: Math.max(0, newUsdBalance).toFixed(2),
+          sol: Math.max(0, newSolBalance).toFixed(6)
+        })
+        console.log('✅ Balance updated locally')
+      }
 
       return {
         success: true,
-        costs: resultCosts,
-        newBalance: Math.max(0, currentUsdBalance - totalCostUsd),
-        transactionDetails
+        signature,
+        fees
       }
+
     } catch (error) {
       console.error('❌ Fee deduction failed:', error)
+      
+      // User-friendly error messages
+      let errorMessage = 'Transaction failed. Please try again.'
+      if (error.message?.includes('User rejected')) {
+        errorMessage = 'Transaction cancelled by user.'
+      } else if (error.message?.includes('insufficient')) {
+        errorMessage = 'Insufficient SOL balance.'
+      }
+      
       return {
         success: false,
-        error: error.message,
-        costs
+        error: errorMessage
       }
     } finally {
       setIsProcessingFee(false)
