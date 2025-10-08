@@ -316,7 +316,26 @@ export default function TurfLootTactical() {
       console.log('✅ Embedded wallet found for signing:', embeddedWallet.address)
 
       // Step 4: Sign and send transaction with Privy (this will show Privy modal)
-      console.log('🔐 Calling signAndSendTransaction...')
+      console.log('🔐 About to call signAndSendTransaction...')
+      console.log('🔍 signAndSendTransaction type:', typeof signAndSendTransaction)
+      console.log('🔍 signAndSendTransaction value:', signAndSendTransaction)
+      console.log('🔍 Is function?', typeof signAndSendTransaction === 'function')
+      
+      if (typeof signAndSendTransaction !== 'function') {
+        console.error('❌ signAndSendTransaction is not a function!')
+        console.error('🔍 Actual value:', signAndSendTransaction)
+        return { 
+          success: false, 
+          error: 'Transaction signing unavailable. Please refresh and try again.'
+        }
+      }
+      
+      console.log('✅ Calling signAndSendTransaction with params:', {
+        walletAddress: embeddedWallet.address,
+        walletClientType: embeddedWallet.walletClientType,
+        chain: SOLANA_CHAIN
+      })
+      
       const result = await signAndSendTransaction({
         wallet: embeddedWallet,
         transaction,
