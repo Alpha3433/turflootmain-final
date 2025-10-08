@@ -230,41 +230,41 @@ class PrivyWalletSigningTester:
             self.log_test_result("Solana Wallet Resolution Logic", False, f"Exception: {str(e)}")
             return False
     
-    async def test_split_state_synchronization(self) -> bool:
-        """Test 7: Verify split state is properly synchronized to all clients"""
+    async def test_fee_deduction_system(self) -> bool:
+        """Test 7: Verify fee deduction system implementation"""
         try:
             import os
-            ts_file_path = "/app/src/rooms/ArenaRoom.ts"
-            js_file_path = "/app/build/rooms/ArenaRoom.js"
+            page_file_path = "/app/app/page.js"
             
-            sync_patterns_found = 0
+            fee_system_patterns_found = 0
             
-            # Check for state synchronization patterns
-            sync_patterns = [
-                '@type("number") mass',        # Mass field in schema
-                '@type("number") radius',      # Radius field in schema  
-                'player.mass =',               # Mass updates
-                'player.radius =',             # Radius updates
-            ]
+            if os.path.exists(page_file_path):
+                with open(page_file_path, 'r') as f:
+                    content = f.read()
+                    
+                    # Look for fee deduction system patterns
+                    fee_patterns = [
+                        'deductRoomFees',                         # Main function
+                        'isEmbeddedWallet',                       # Wallet type detection
+                        'privySendTransaction',                   # Embedded wallet signing
+                        'privySignAndSendTransaction',            # External wallet signing
+                        'buildEntryFeeTransaction',               # Transaction building
+                        'confirmTransaction',                     # Transaction confirmation
+                    ]
+                    
+                    for pattern in fee_patterns:
+                        if pattern in content:
+                            fee_system_patterns_found += 1
             
-            # Check both TypeScript and JavaScript files
-            for file_path in [ts_file_path, js_file_path]:
-                if os.path.exists(file_path):
-                    with open(file_path, 'r') as f:
-                        content = f.read()
-                        for pattern in sync_patterns:
-                            if pattern in content:
-                                sync_patterns_found += 1
+            # Test passes if fee deduction system is properly implemented
+            has_fee_system = fee_system_patterns_found >= 5
             
-            # Test passes if synchronization patterns are found
-            has_state_sync = sync_patterns_found >= 6  # At least 3 patterns in each file
-            
-            details = f"State synchronization patterns: {sync_patterns_found}/8"
-            self.log_test_result("Split State Synchronization", has_state_sync, details)
-            return has_state_sync
+            details = f"Fee deduction patterns found: {fee_system_patterns_found}/6"
+            self.log_test_result("Fee Deduction System", has_fee_system, details)
+            return has_fee_system
             
         except Exception as e:
-            self.log_test_result("Split State Synchronization", False, f"Exception: {str(e)}")
+            self.log_test_result("Fee Deduction System", False, f"Exception: {str(e)}")
             return False
     
     async def test_backend_api_integration(self) -> bool:
