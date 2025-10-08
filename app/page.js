@@ -357,40 +357,67 @@ export default function TurfLootTactical() {
       console.log('✅ Transaction built, signing with Privy 3.0...')
 
       // Step 3: Sign and send with Privy 3.0
-      console.log('🔐 Signing with Privy wallet via useSignAndSendTransaction...')
+      let signature
 
-      const transactionBytes = transaction instanceof Uint8Array
-        ? transaction
-        : (() => {
-            try {
-              if (transaction?.buffer) {
-                return new Uint8Array(transaction.buffer, transaction.byteOffset || 0, transaction.byteLength || transaction.length)
+      if (isEmbeddedWallet) {
+        // For embedded wallets: Use base sendTransaction hook
+        console.log('🔐 Signing with embedded wallet via useSendTransaction...')
+        
+        // Privy base hook expects serialized transaction
+        const serializedTx = transaction.toString('base64')
+        
+        console.log('🔍 Sending transaction:', {
+          txLength: transaction.length,
+          base64Length: serializedTx.length,
+          chain: SOLANA_CHAIN
+        })
+        
+        // Don't pass address - let Privy auto-detect from authenticated user
+        const result = await privySendTransaction({
+          transaction: serializedTx,
+          chain: SOLANA_CHAIN
+        })
+        
+        console.log('✅ Transaction result:', result)
+        signature = result?.transactionHash || result?.signature || result
+      } else {
+        // For external wallets: Use Solana-specific hook
+        console.log('🔐 Signing with external wallet via useSignAndSendTransaction...')
+
+        const transactionBytes = transaction instanceof Uint8Array
+          ? transaction
+          : (() => {
+              try {
+                if (transaction?.buffer) {
+                  return new Uint8Array(transaction.buffer, transaction.byteOffset || 0, transaction.byteLength || transaction.length)
+                }
+              } catch (bufferError) {
+                console.warn('⚠️ Unable to slice transaction buffer, falling back to Uint8Array.from', bufferError)
               }
-            } catch (bufferError) {
-              console.warn('⚠️ Unable to slice transaction buffer, falling back to Uint8Array.from', bufferError)
-            }
-            return Uint8Array.from(transaction || [])
-          })()
+              return Uint8Array.from(transaction || [])
+            })()
 
-      const signOptions = {
-        wallet: walletForSigning,
-        transaction: transactionBytes,
-        chain: SOLANA_CHAIN,
-        options: {
-          uiOptions: {
-            description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
-            transactionInfo: {
-              title: 'Arena Entry Fee',
-              action: `Join paid arena`
-            },
-            isCancellable: true
+        const signOptions = {
+          wallet: walletForSigning,
+          transaction: transactionBytes,
+          chain: SOLANA_CHAIN,
+          options: {
+            uiOptions: {
+              description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
+              transactionInfo: {
+                title: 'Arena Entry Fee',
+                action: `Join paid arena`
+              },
+              isCancellable: true
+            }
           }
         }
+
+        signOptions.address = signingAddress
+
+        const result = await privySignAndSendTransaction(signOptions)
+        signature = result?.signature || result
       }
-
-      signOptions.address = signingAddress
-
-      const result = await privySignAndSendTransaction(signOptions)
 
       let signature = result?.signature || result
       if (signature instanceof Uint8Array) {
