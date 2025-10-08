@@ -1037,7 +1037,9 @@ export default function TurfLootTactical() {
           </div>
         `
         
-        document.body.appendChild(notification)
+        if (typeof document !== 'undefined') {
+          document.body.appendChild(notification)
+        }
         
         // Auto-remove after 5 seconds
         setTimeout(() => {
