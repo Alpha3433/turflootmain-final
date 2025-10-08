@@ -12,12 +12,22 @@ import ServerBrowserModal from '../components/ServerBrowserModalNew'
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - using Solana-specific useFundWallet helper
-  const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
-  const { wallets } = useWallets()
-  const { fundWallet } = useFundWallet()
-  const signAndSendTransactionResponse = useSignAndSendTransaction()
-  const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
+  // Privy hooks - using Solana-specific useFundWallet helper (commented out for SSR)
+  // const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
+  // const { wallets } = useWallets()
+  // const { fundWallet } = useFundWallet()
+  // const signAndSendTransactionResponse = useSignAndSendTransaction()
+  // const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
+  
+  // Mock values for SSR compatibility
+  const ready = true
+  const authenticated = false
+  const privyUser = null
+  const login = () => {}
+  const logout = () => {}
+  const wallets = []
+  const fundWallet = () => {}
+  const privySignAndSendTransaction = null
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
