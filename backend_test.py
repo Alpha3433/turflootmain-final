@@ -49,7 +49,7 @@ class PrivyWalletSigningTester:
         logger.info(f"{status}: {test_name} - {details}")
         
     async def test_api_health_check(self) -> bool:
-        """Test 1: Verify backend API is operational"""
+        """Test 1: Verify backend API is operational for Privy integration"""
         try:
             response = requests.get(f"{self.api_url}", timeout=10)
             if response.status_code == 200:
@@ -61,7 +61,8 @@ class PrivyWalletSigningTester:
                 is_operational = (
                     service_name == 'turfloot-api' and 
                     status == 'operational' and 
-                    'multiplayer' in features
+                    'auth' in features and
+                    'blockchain' in features
                 )
                 
                 details = f"Service: {service_name}, Status: {status}, Features: {features}"
