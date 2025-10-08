@@ -123,15 +123,42 @@ export default function TurfLootTactical() {
     [wallets]
   )
   const walletAddressesSignature = useMemo(() => {
-    return wallets
-      .map(wallet => getWalletAddress(wallet))
-      .filter(Boolean)
-      .join('|')
-  }, [wallets])
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      return ''
+    }
+    
+    const addresses = []
+    
+    // Add addresses from external wallets array
+    if (wallets) {
+      wallets
+        .map(wallet => getWalletAddress(wallet))
+        .filter(Boolean)
+        .forEach(addr => addresses.push(addr))
+    }
+    
+    // Add addresses from embedded wallets (linkedAccounts)
+    if (privyUser?.linkedAccounts) {
+      privyUser.linkedAccounts
+        .filter(account => account?.type === 'wallet' && account?.address)
+        .forEach(account => addresses.push(account.address))
+    }
+    
+    // Add legacy wallet address
+    if (privyUser?.wallet?.address) {
+      addresses.push(privyUser.wallet.address)
+    }
+    
+    // Remove duplicates and join
+    return [...new Set(addresses)].join('|')
+  }, [wallets, privyUser])
   const { fundWallet } = useFundWallet()
   
-  // For Solana external wallets (in wallets array)
-  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
+  // For Solana external wallets (in wallets array) - may be undefined for embedded-only users
+  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction() || {}
+  
+  // Note: For embedded wallets, Privy 3.0 uses the fundWallet function for transactions
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
@@ -173,26 +200,55 @@ export default function TurfLootTactical() {
   }, [])
 
   const resolveSolanaWallet = () => {
-    if (!solanaWallets.length) {
-      console.log('❌ No Solana wallets available from Privy hooks')
-      return null
+    // Privy 3.0: Check embedded wallets first (linkedAccounts)
+    const linkedSolana = privyUser?.linkedAccounts?.find(
+      account => account?.type === 'wallet' && account?.chainType === 'solana'
+    )
+
+    if (linkedSolana?.address) {
+      console.log('✅ Found embedded Solana wallet in linkedAccounts:', {
+        address: linkedSolana.address,
+        type: linkedSolana.type,
+        chainType: linkedSolana.chainType
+      })
+      return { wallet: linkedSolana, address: linkedSolana.address }
     }
 
-    const wallet = solanaWallets[0]
-    const address = getWalletAddress(wallet)
+    // Check external wallets (Privy hooks)
+    if (solanaWallets.length > 0) {
+      const wallet = solanaWallets[0]
+      const address = getWalletAddress(wallet)
 
-    if (!address) {
-      console.log('❌ Unable to resolve address for detected Solana wallet')
-      return null
+      if (address) {
+        console.log('✅ Found external Solana wallet from Privy hooks:', {
+          address,
+          walletClientType: wallet.walletClientType,
+          connectorType: wallet.connectorType
+        })
+        return { wallet, address }
+      }
     }
 
-    console.log('✅ Using Privy Solana wallet from hooks:', {
-      address,
-      walletClientType: wallet.walletClientType,
-      connectorType: wallet.connectorType
+    // Fallback to legacy wallet property
+    if (privyUser?.wallet?.chainType === 'solana' && privyUser?.wallet?.address) {
+      console.log('✅ Found Solana wallet in privyUser.wallet:', {
+        address: privyUser.wallet.address,
+        chainType: privyUser.wallet.chainType
+      })
+      return { wallet: privyUser.wallet, address: privyUser.wallet.address }
+    }
+
+    console.log('❌ No Solana wallet found in any source')
+    console.log('🧪 Debug info:', {
+      linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
+        type: a.type, 
+        chainType: a.chainType, 
+        address: a.address 
+      })),
+      solanaWalletsCount: solanaWallets.length,
+      legacyWallet: privyUser?.wallet
     })
-
-    return { wallet, address }
+    return null
   }
 
   // 🚀 Privy 3.0 + Helius: Clean fee deduction (no fallbacks)
@@ -249,23 +305,25 @@ export default function TurfLootTactical() {
       return { success: false, error: 'Unable to resolve your Privy wallet address.' }
     }
 
+    // Check if wallet is in solanaWallets array (external wallets) or embedded
     const walletForSigning = solanaWallets.find(
       wallet => getWalletAddress(wallet) === signingAddress
     )
-
-    if (!walletForSigning) {
-      console.error('❌ Solana wallet not available from Privy hooks for signing')
-      return {
-        success: false,
-        error: 'Unable to access your Privy wallet. Please reconnect and try again.'
-      }
+    
+    const isEmbeddedWallet = !walletForSigning
+    
+    if (walletForSigning) {
+      console.log('✅ Using external Solana wallet for signing:', {
+        address: signingAddress,
+        walletClientType: walletForSigning.walletClientType,
+        connectorType: walletForSigning.connectorType
+      })
+    } else {
+      console.log('✅ Using embedded Solana wallet for signing:', {
+        address: signingAddress,
+        chainType: signingWallet.chainType
+      })
     }
-
-    console.log('✅ Using Privy wallet from hooks for signing:', {
-      address: signingAddress,
-      walletClientType: walletForSigning.walletClientType,
-      connectorType: walletForSigning.connectorType
-    })
 
     // Validate Privy hook
     if (!privySignAndSendTransaction) {
@@ -298,42 +356,96 @@ export default function TurfLootTactical() {
       console.log('✅ Transaction built, signing with Privy 3.0...')
 
       // Step 3: Sign and send with Privy 3.0
-      console.log('🔐 Signing with Privy wallet via useSignAndSendTransaction...')
+      let signature
 
-      const transactionBytes = transaction instanceof Uint8Array
-        ? transaction
-        : (() => {
-            try {
-              if (transaction?.buffer) {
-                return new Uint8Array(transaction.buffer, transaction.byteOffset || 0, transaction.byteLength || transaction.length)
-              }
-            } catch (bufferError) {
-              console.warn('⚠️ Unable to slice transaction buffer, falling back to Uint8Array.from', bufferError)
-            }
-            return Uint8Array.from(transaction || [])
-          })()
+      if (isEmbeddedWallet) {
+        // For embedded wallets: Use Privy's fundWallet function for transactions
+        console.log('🔐 Signing with embedded wallet via fundWallet...')
+        
+        if (!fundWallet) {
+          throw new Error('Privy fundWallet function not available for embedded wallet transaction')
+        }
+        
+        // Privy embedded wallets use fundWallet with serialized transaction
+        const serializedTx = transaction.toString('base64')
+        
+        console.log('🔍 Sending transaction via embedded wallet fundWallet:', {
+          txLength: transaction.length,
+          base64Length: serializedTx.length,
+          chain: SOLANA_CHAIN,
+          walletAddress: signingAddress
+        })
 
-      const signOptions = {
-        wallet: walletForSigning,
-        transaction: transactionBytes,
-        chain: SOLANA_CHAIN,
-        options: {
-          uiOptions: {
-            description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
-            transactionInfo: {
-              title: 'Arena Entry Fee',
-              action: `Join paid arena`
+        try {
+          // Use fundWallet for embedded wallet transactions with correct Privy 3.0 structure
+          const fundWalletParams = {
+            solana: {
+              transaction: serializedTx
             },
-            isCancellable: true
+            uiOptions: {
+              header: 'Join TurfLoot Arena',
+              description: `Pay ${fees.entrySol.toFixed(4)} SOL entry fee + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total)`,
+              buttonText: 'Confirm & Join'
+            }
+          }
+
+          console.log('🔍 Calling fundWallet with params:', {
+            hasTransaction: !!serializedTx,
+            txLength: serializedTx.length,
+            chain: SOLANA_CHAIN
+          })
+          
+          const result = await fundWallet(fundWalletParams)
+          
+          console.log('✅ Embedded wallet fundWallet result:', result)
+          signature = result?.transactionHash || result?.signature || result
+        } catch (fundError) {
+          console.error('❌ fundWallet failed:', fundError)
+          throw new Error(`Embedded wallet transaction failed: ${fundError.message}`)
+        }
+      } else {
+        // For external wallets: Use Solana-specific hook
+        console.log('🔐 Signing with external wallet via useSignAndSendTransaction...')
+
+        const transactionBytes = transaction instanceof Uint8Array
+          ? transaction
+          : (() => {
+              try {
+                if (transaction?.buffer) {
+                  return new Uint8Array(transaction.buffer, transaction.byteOffset || 0, transaction.byteLength || transaction.length)
+                }
+              } catch (bufferError) {
+                console.warn('⚠️ Unable to slice transaction buffer, falling back to Uint8Array.from', bufferError)
+              }
+              return Uint8Array.from(transaction || [])
+            })()
+
+        const signOptions = {
+          wallet: walletForSigning,
+          transaction: transactionBytes,
+          chain: SOLANA_CHAIN,
+          options: {
+            uiOptions: {
+              description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
+              transactionInfo: {
+                title: 'Arena Entry Fee',
+                action: `Join paid arena`
+              },
+              isCancellable: true
+            }
           }
         }
+
+        signOptions.address = signingAddress
+
+        if (!privySignAndSendTransaction) {
+          throw new Error('Privy signAndSendTransaction function not available for external wallet')
+        }
+
+        const result = await privySignAndSendTransaction(signOptions)
+        signature = result?.signature || result
       }
 
-      signOptions.address = signingAddress
-
-      const result = await privySignAndSendTransaction(signOptions)
-
-      let signature = result?.signature || result
       if (signature instanceof Uint8Array) {
         signature = bs58.encode(signature)
       }
@@ -674,8 +786,18 @@ export default function TurfLootTactical() {
     }
 
     console.log('🔍 Looking for Solana wallet address...')
-    console.log('🧪 Privy user object:', JSON.stringify(privyUser, null, 2))
 
+    // Privy 3.0: Check embedded wallets first (linkedAccounts)
+    const linkedSolana = privyUser?.linkedAccounts?.find(
+      account => account?.type === 'wallet' && account?.chainType === 'solana'
+    )
+
+    if (linkedSolana?.address) {
+      console.log('✅ Found embedded Solana wallet in linkedAccounts:', linkedSolana.address)
+      return linkedSolana.address
+    }
+
+    // Check external wallets (useWallets array)
     if (wallets?.length > 0) {
       const solanaWallet = wallets.find(wallet =>
         isSolanaChain(wallet.chainType) && isSolanaAddress(getWalletAddress(wallet))
@@ -684,19 +806,33 @@ export default function TurfLootTactical() {
       if (solanaWallet) {
         const address = getWalletAddress(solanaWallet)
         if (address) {
-          console.log('✅ Found Solana wallet via Privy hooks:', address)
+          console.log('✅ Found external Solana wallet via Privy hooks:', address)
           return address
         }
       }
     }
 
-    console.log('❌ No Solana wallet available from Privy hooks')
-    console.log('🧪 Available wallets from hooks:', wallets?.map(wallet => ({
-      chainType: wallet.chainType,
-      walletClientType: wallet.walletClientType,
-      connectorType: wallet.connectorType,
-      address: getWalletAddress(wallet)
-    })))
+    // Fallback to legacy wallet property
+    if (privyUser?.wallet?.chainType === 'solana' && privyUser?.wallet?.address) {
+      console.log('✅ Found Solana wallet in privyUser.wallet:', privyUser.wallet.address)
+      return privyUser.wallet.address
+    }
+
+    console.log('❌ No Solana wallet available')
+    console.log('🧪 Debug info:', {
+      linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
+        type: a.type, 
+        chainType: a.chainType, 
+        address: a.address 
+      })),
+      walletsArray: wallets?.map(wallet => ({
+        chainType: wallet.chainType,
+        walletClientType: wallet.walletClientType,
+        connectorType: wallet.connectorType,
+        address: getWalletAddress(wallet)
+      })),
+      legacyWallet: privyUser?.wallet
+    })
     return null
   }
 
