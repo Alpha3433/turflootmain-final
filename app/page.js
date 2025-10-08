@@ -123,11 +123,29 @@ export default function TurfLootTactical() {
     [wallets]
   )
   const walletAddressesSignature = useMemo(() => {
-    return wallets
+    const addresses = []
+    
+    // Add addresses from external wallets array
+    wallets
       .map(wallet => getWalletAddress(wallet))
       .filter(Boolean)
-      .join('|')
-  }, [wallets])
+      .forEach(addr => addresses.push(addr))
+    
+    // Add addresses from embedded wallets (linkedAccounts)
+    if (privyUser?.linkedAccounts) {
+      privyUser.linkedAccounts
+        .filter(account => account?.type === 'wallet' && account?.address)
+        .forEach(account => addresses.push(account.address))
+    }
+    
+    // Add legacy wallet address
+    if (privyUser?.wallet?.address) {
+      addresses.push(privyUser.wallet.address)
+    }
+    
+    // Remove duplicates and join
+    return [...new Set(addresses)].join('|')
+  }, [wallets, privyUser])
   const { fundWallet } = useFundWallet()
   
   // For Solana external wallets (in wallets array)
