@@ -303,23 +303,25 @@ export default function TurfLootTactical() {
       return { success: false, error: 'Unable to resolve your Privy wallet address.' }
     }
 
+    // Check if wallet is in solanaWallets array (external wallets) or embedded
     const walletForSigning = solanaWallets.find(
       wallet => getWalletAddress(wallet) === signingAddress
     )
-
-    if (!walletForSigning) {
-      console.error('❌ Solana wallet not available from Privy hooks for signing')
-      return {
-        success: false,
-        error: 'Unable to access your Privy wallet. Please reconnect and try again.'
-      }
+    
+    const isEmbeddedWallet = !walletForSigning
+    
+    if (walletForSigning) {
+      console.log('✅ Using external Solana wallet for signing:', {
+        address: signingAddress,
+        walletClientType: walletForSigning.walletClientType,
+        connectorType: walletForSigning.connectorType
+      })
+    } else {
+      console.log('✅ Using embedded Solana wallet for signing:', {
+        address: signingAddress,
+        chainType: signingWallet.chainType
+      })
     }
-
-    console.log('✅ Using Privy wallet from hooks for signing:', {
-      address: signingAddress,
-      walletClientType: walletForSigning.walletClientType,
-      connectorType: walletForSigning.connectorType
-    })
 
     // Validate Privy hook
     if (!privySignAndSendTransaction) {
