@@ -34,16 +34,10 @@ export default function TurfLootTactical() {
   }
   
   // Calculate total cost including dynamic server fee based on loyalty tier
-  const calculateTotalCost = (entryFee, feePercentageOverride = null) => {
+  const calculateTotalCost = (entryFee, feePercentageOverride = null, options = {}) => {
     const defaultFeePercentage = loyaltyData?.feePercentage ?? 10
     const feePercentage = feePercentageOverride ?? defaultFeePercentage
-    const costs = calculatePaidRoomCosts(entryFee, feePercentage)
-    return {
-      entryFee: costs.entryFee,
-      serverFee: costs.serverFee,
-      totalCost: costs.totalCost,
-      feePercentage: costs.feePercentage
-    }
+    return calculatePaidRoomCosts(entryFee, feePercentage, options)
   }
 
   const SOLANA_RPC_ENDPOINTS = useMemo(
@@ -101,20 +95,37 @@ export default function TurfLootTactical() {
       return { success: false, error: 'Transaction already in progress' }
     }
 
-    const costs = calculateTotalCost(entryFee, feePercentageOverride)
     const currentUsdBalance = parseFloat(walletBalance.usd || 0)
     const currentSolBalance = parseFloat(walletBalance.sol || 0)
+    const derivedUsdPerSol = currentSolBalance > 0.000001
+      ? currentUsdBalance / currentSolBalance
+      : USD_PER_SOL_FALLBACK
+    const costs = calculateTotalCost(entryFee, feePercentageOverride, {
+      currency: 'SOL',
+      usdPerSol: derivedUsdPerSol
+    })
 
     console.log('💰 Preparing paid room fee deduction:', {
       entryFee,
+      currency: costs.currency,
       feePercentage: costs.feePercentage,
       serverFee: costs.serverFee,
       totalCost: costs.totalCost,
+      serverFeeUsd: costs.serverFeeUsd,
+      totalCostUsd: costs.totalCostUsd,
       currentUsdBalance: currentUsdBalance.toFixed(3),
       currentSolBalance: currentSolBalance.toFixed(6)
     })
 
-    if (currentUsdBalance < costs.totalCost) {
+    if (costs.currency === 'SOL' && currentSolBalance < costs.totalCost) {
+      return {
+        success: false,
+        error: `Insufficient SOL balance. Need ${costs.totalCost.toFixed(4)} SOL, have ${currentSolBalance.toFixed(4)} SOL`,
+        costs
+      }
+    }
+
+    if (costs.currency !== 'SOL' && currentUsdBalance < costs.totalCost) {
       return {
         success: false,
         error: `Insufficient USD balance. Need $${costs.totalCost.toFixed(3)}, have $${currentUsdBalance.toFixed(2)}`,
@@ -144,14 +155,15 @@ export default function TurfLootTactical() {
 
     try {
       const deductionResult = await deductPaidRoomFee({
-        entryFeeUsd: entryFee,
+        entryAmount: entryFee,
+        entryCurrency: costs.currency,
         feePercentage: costs.feePercentage,
         walletBalance,
         solanaWallet,
         privyUser,
         walletAddress: userWalletAddress,
         rpcEndpoints: SOLANA_RPC_ENDPOINTS,
-        usdPerSolFallback: USD_PER_SOL_FALLBACK,
+        usdPerSolFallback: derivedUsdPerSol,
         serverWalletAddress: SERVER_WALLET_ADDRESS,
         logger: console,
         signAndSendTransactionFn: privySignAndSendTransaction,
@@ -159,12 +171,18 @@ export default function TurfLootTactical() {
       })
 
       const resultCosts = deductionResult.costs || costs
+      const totalCostUsd = resultCosts.totalCostUsd ?? (resultCosts.currency === 'SOL'
+        ? resultCosts.totalCost * derivedUsdPerSol
+        : resultCosts.totalCost)
+      const totalCostSol = resultCosts.totalCostSol ?? (resultCosts.currency === 'SOL'
+        ? resultCosts.totalCost
+        : resultCosts.totalCost / derivedUsdPerSol)
 
       setWalletBalance((prev) => {
         const previousUsd = parseFloat(prev?.usd ?? currentUsdBalance)
         const previousSol = parseFloat(prev?.sol ?? currentSolBalance)
-        const nextUsd = Math.max(0, previousUsd - resultCosts.totalCost)
-        const nextSol = Math.max(0, previousSol - deductionResult.totalCostSol)
+        const nextUsd = Math.max(0, previousUsd - totalCostUsd)
+        const nextSol = Math.max(0, previousSol - totalCostSol)
 
         return {
           ...prev,
@@ -181,8 +199,9 @@ export default function TurfLootTactical() {
         serverWallet: deductionResult.serverWallet,
         entryFeeDeducted: resultCosts.entryFee,
         serverFeeTransferred: resultCosts.serverFee,
-        totalDeductedUsd: resultCosts.totalCost,
-        totalDeductedSol: deductionResult.totalCostSol,
+        totalDeductedCurrency: resultCosts.currency,
+        totalDeductedUsd: totalCostUsd,
+        totalDeductedSol: totalCostSol,
         lamports: deductionResult.lamports,
         signature: deductionResult.signature,
         rpcEndpoint: deductionResult.rpcEndpoint,
@@ -200,7 +219,7 @@ export default function TurfLootTactical() {
       return {
         success: true,
         costs: resultCosts,
-        newBalance: Math.max(0, currentUsdBalance - resultCosts.totalCost),
+        newBalance: Math.max(0, currentUsdBalance - totalCostUsd),
         transactionDetails
       }
     } catch (error) {
@@ -6089,13 +6108,17 @@ export default function TurfLootTactical() {
                         }
                         
                         console.log(`✅ Fees deducted successfully!`)
-                        console.log(`💰 Entry Fee: $${feeResult.costs.entryFee.toFixed(3)}`)
-                        console.log(`🏦 Server Fee: $${feeResult.costs.serverFee.toFixed(3)} → ${SERVER_WALLET_ADDRESS}`)
-                        console.log(`💳 Total Deducted: $${feeResult.costs.totalCost.toFixed(3)}`)
+                        const feeCurrency = feeResult.costs.currency === 'SOL' ? 'SOL' : 'USD'
+                        const formatAmount = (value, currency) =>
+                          currency === 'SOL' ? `${value.toFixed(4)} SOL` : `$${value.toFixed(3)}`
+
+                        console.log(`💰 Entry Fee: ${formatAmount(feeResult.costs.entryFee, feeCurrency)}`)
+                        console.log(`🏦 Server Fee: ${formatAmount(feeResult.costs.serverFee, feeCurrency)} → ${SERVER_WALLET_ADDRESS}`)
+                        console.log(`💳 Total Deducted: ${formatAmount(feeResult.costs.totalCost, feeCurrency)}`)
                         console.log(`💵 New Balance: $${feeResult.newBalance.toFixed(3)}`)
-                        
+
                         // Show Hathora room creation result to user
-                        const message = `🆕 Created new Hathora room - you're the first player!\n💰 Paid: $${feeResult.costs.totalCost.toFixed(3)} (entry + server fee)`
+                        const message = `🆕 Created new Hathora room - you're the first player!\n💰 Paid: ${formatAmount(feeResult.costs.totalCost, feeCurrency)} (entry + server fee)`
                         
                         // Brief notification showing payment confirmation
                         console.log(`🎯 ${message}`)
