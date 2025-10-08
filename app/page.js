@@ -123,7 +123,13 @@ export default function TurfLootTactical() {
   } = usePrivy()
   const { createWallet } = useCreateWallet()
   const { wallets } = useWallets()
-  // Note: For embedded wallets, we'll use sendSolanaTransaction from privyUser instead of hooks
+  const { signTransaction } = useSignTransaction()
+  const { signAndSendTransaction } = useSignAndSendTransaction()
+  
+  // Get embedded Privy wallet
+  const embeddedWallet = useMemo(() => {
+    return wallets?.find(w => w.walletClientType === 'privy')
+  }, [wallets])
   
   // Get embedded Privy wallet from useWallets
   const privyEmbeddedWallet = useMemo(() => {
