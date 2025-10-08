@@ -208,7 +208,7 @@ export default function TurfLootTactical() {
         const result = await privySignAndSendTransaction({
           wallet: walletFromArray,
           transaction,
-          chain: 'solana:mainnet'
+          chain: SOLANA_CHAIN
         })
         
         signature = result?.signature || result
