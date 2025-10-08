@@ -92,6 +92,23 @@ const isSolanaChain = (chainType) =>
 const isSolanaAddress = (address) =>
   typeof address === 'string' && !address.toLowerCase().startsWith('0x') && address.length >= 32
 
+const isPrivyEmbeddedWallet = (wallet) => {
+  if (!wallet) {
+    return false
+  }
+
+  const clientType = (wallet.walletClientType || wallet.type || '').toLowerCase()
+  if (clientType.includes('privy')) {
+    return true
+  }
+
+  if (!wallet.connectorType && clientType === 'embedded') {
+    return true
+  }
+
+  return false
+}
+
 export default function TurfLootTactical() {
   const router = useRouter()
 
@@ -104,10 +121,13 @@ export default function TurfLootTactical() {
     logout,
     wallets: privyWallets = []
   } = usePrivy()
-  const { wallets: externalWallets = [] } = useWallets()
+  const { wallets: privyHookWallets = [] } = useWallets()
   const wallets = useMemo(() => {
     const deduped = new Map()
-    for (const wallet of [...privyWallets, ...externalWallets]) {
+    for (const wallet of [...privyWallets, ...privyHookWallets]) {
+      if (!isPrivyEmbeddedWallet(wallet)) {
+        continue
+      }
       const address = getWalletAddress(wallet)
       if (!address) {
         continue
@@ -117,7 +137,7 @@ export default function TurfLootTactical() {
       }
     }
     return Array.from(deduped.values())
-  }, [privyWallets, externalWallets])
+  }, [privyWallets, privyHookWallets])
   const solanaWallets = useMemo(
     () =>
       wallets.filter(wallet =>
@@ -296,16 +316,20 @@ export default function TurfLootTactical() {
 
     // Debug: Log all available wallet sources
     console.log('🔍 Wallet sources:', {
-      privyWallets: privyWallets.map(wallet => ({
+      privyWallets: privyWallets
+        .filter(isPrivyEmbeddedWallet)
+        .map(wallet => ({
         address: getWalletAddress(wallet),
         chainType: wallet.chainType,
         walletClientType: wallet.walletClientType
       })),
-      externalWallets: externalWallets.map(wallet => ({
-        address: getWalletAddress(wallet),
-        chainType: wallet.chainType,
-        walletClientType: wallet.walletClientType
-      })),
+      privyHookWallets: privyHookWallets
+        .filter(isPrivyEmbeddedWallet)
+        .map(wallet => ({
+          address: getWalletAddress(wallet),
+          chainType: wallet.chainType,
+          walletClientType: wallet.walletClientType
+        })),
       solanaWallets: solanaWallets.map(wallet => ({
         address: getWalletAddress(wallet),
         chainType: wallet.chainType,
