@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
@@ -113,6 +113,12 @@ export default function TurfLootTactical() {
     () => wallets.filter(wallet => wallet?.chainType === 'solana'),
     [wallets]
   )
+  const walletAddressesSignature = useMemo(() => {
+    return wallets
+      .map(wallet => getWalletAddress(wallet))
+      .filter(Boolean)
+      .join('|')
+  }, [wallets])
   const { fundWallet } = useFundWallet()
   
   // For Solana external wallets (in wallets array)
@@ -683,66 +689,88 @@ export default function TurfLootTactical() {
     return null
   }
 
-  // STEP 3: Refresh periodically - Main authentication watcher
+  // STEP 3: Watch authentication and wallet availability
   useEffect(() => {
-    console.log('🔄 Authentication state changed:', { 
-      ready, 
-      authenticated, 
-      hasUser: !!privyUser 
+    console.log('🔄 Authentication state changed:', {
+      ready,
+      authenticated,
+      hasUser: !!privyUser,
+      walletAddressesSignature
     })
-    
-    // Clear any existing interval
-    if (balanceInterval.current) {
-      clearInterval(balanceInterval.current)
-      balanceInterval.current = null
-      console.log('🧹 Cleared existing balance interval')
-    }
-    
+
     if (!ready) {
       console.log('⏳ Privy not ready yet')
+      resetWalletBalance()
+      setPreviousBalance(prev => (prev === 0 ? prev : 0))
+      if (currentWalletAddress !== null) {
+        setCurrentWalletAddress(null)
+      }
       return
     }
-    
+
     if (!authenticated || !privyUser) {
       console.log('👛 User not authenticated - setting default balance')
-      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-      setCurrentWalletAddress(null)
+      resetWalletBalance()
+      setPreviousBalance(prev => (prev === 0 ? prev : 0))
+      if (currentWalletAddress !== null) {
+        setCurrentWalletAddress(null)
+      }
       return
     }
-    
-    // Find wallet address
+
     const walletAddress = findWalletAddress()
-    
+
     if (!walletAddress) {
       console.log('❌ No Solana wallet found')
-      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
-      setCurrentWalletAddress(null)
+      resetWalletBalance()
+      setPreviousBalance(prev => (prev === 0 ? prev : 0))
+      if (currentWalletAddress !== null) {
+        setCurrentWalletAddress(null)
+      }
       return
     }
-    
-    console.log('✅ Starting balance monitoring for:', walletAddress)
-    setCurrentWalletAddress(walletAddress)
-    
-    // Initial balance check
-    fetchWalletBalance()
-    
-    // Set up periodic balance checking every 60 seconds (optimized for Helius API usage)
+
+    if (walletAddress !== currentWalletAddress) {
+      console.log('✅ Starting balance monitoring for:', walletAddress)
+      setCurrentWalletAddress(walletAddress)
+    }
+  }, [
+    ready,
+    authenticated,
+    privyUser,
+    walletAddressesSignature,
+    currentWalletAddress,
+    resetWalletBalance
+  ])
+
+  // STEP 3b: Refresh periodically once we know the active wallet
+  useEffect(() => {
+    if (!currentWalletAddress) {
+      if (balanceInterval.current) {
+        clearInterval(balanceInterval.current)
+        balanceInterval.current = null
+        console.log('🧹 Cleared balance interval (no active wallet)')
+      }
+      return
+    }
+
+    console.log('🔄 Balance monitoring active for wallet:', currentWalletAddress)
+    setPreviousBalance(prev => (prev === 0 ? prev : 0))
+    fetchWalletBalance(currentWalletAddress)
+
     balanceInterval.current = setInterval(() => {
       console.log('⏰ Periodic balance check triggered (60s interval)')
-      fetchWalletBalance()
-    }, 60000) // Changed from 10000ms (10s) to 60000ms (60s)
-    
-    console.log('🔄 Balance monitoring started (60s interval - Helius API optimized)')
-    
-    // Cleanup function
+      fetchWalletBalance(currentWalletAddress)
+    }, 60000)
+
     return () => {
       if (balanceInterval.current) {
         clearInterval(balanceInterval.current)
         balanceInterval.current = null
-        console.log('🧹 Cleaned up balance interval on unmount')
+        console.log('🧹 Cleaned up balance interval')
       }
     }
-  }, [ready, authenticated, privyUser, wallets])
+  }, [currentWalletAddress])
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
       console.log('🔧 Privy v2.24.0 - Debug Info (fundWallet from usePrivy):', {
@@ -2601,13 +2629,21 @@ export default function TurfLootTactical() {
   // State for wallet balance display
   const [walletBalance, setWalletBalance] = useState({
     usd: '0.00',
-    sol: '0.0000', 
+    sol: '0.0000',
     loading: false
   })
-  
+  const resetWalletBalance = useCallback(() => {
+    setWalletBalance(prev => {
+      if (prev.usd === '0.00' && prev.sol === '0.0000' && prev.loading === false) {
+        return prev
+      }
+      return { usd: '0.00', sol: '0.0000', loading: false }
+    })
+  }, [setWalletBalance])
+
   // Balance check interval reference
   const balanceInterval = useRef(null)
-  
+
   // Current wallet address being monitored
   const [currentWalletAddress, setCurrentWalletAddress] = useState(null)
   
@@ -2621,41 +2657,41 @@ export default function TurfLootTactical() {
   const [insufficientFundsNotification, setInsufficientFundsNotification] = useState(null)
 
   // STEP 4: Expose balance to the page
-  const fetchWalletBalance = async () => {
+  const fetchWalletBalance = async (addressOverride = null) => {
     console.log('💰 fetchWalletBalance called')
-    
-    const walletAddress = findWalletAddress()
-    
+
+    const walletAddress = addressOverride || currentWalletAddress
+
     if (!walletAddress) {
       console.log('👛 No wallet found - setting default balance')
-      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+      resetWalletBalance()
       return
     }
-    
+
     console.log('🚀 Fetching balance for:', walletAddress)
-    
+
     // Set loading state
     setWalletBalance(prev => ({ ...prev, loading: true }))
-    
+
     try {
       // Get SOL balance from blockchain
       const solBalance = await checkSolanaBalance(walletAddress)
-      
+
       // Convert to USD (rough estimate)
       const usdBalance = (solBalance * 150).toFixed(2)
-      
+
       // Update UI state
       setWalletBalance({
         sol: solBalance.toFixed(4),
         usd: usdBalance,
         loading: false
       })
-      
+
       console.log('✅ Balance updated:', { sol: solBalance, usd: usdBalance })
-      
+
     } catch (error) {
       console.error('❌ Error in fetchWalletBalance:', error)
-      setWalletBalance({ usd: '0.00', sol: '0.0000', loading: false })
+      resetWalletBalance()
     }
   }
 
@@ -2674,7 +2710,7 @@ export default function TurfLootTactical() {
       }
       
       // Trigger immediate balance refresh
-      fetchWalletBalance()
+      fetchWalletBalance(currentWalletAddress)
     }
   }
 
@@ -2710,7 +2746,7 @@ export default function TurfLootTactical() {
   // Handle balance refresh
   const handleBalanceRefresh = () => {
     console.log('🔄 Manual balance refresh triggered')
-    fetchWalletBalance()
+    fetchWalletBalance(currentWalletAddress)
   }
 
   // Copy wallet address to clipboard
