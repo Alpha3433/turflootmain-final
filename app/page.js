@@ -211,125 +211,88 @@ export default function TurfLootTactical() {
       })
   }, [authenticated, privyUser, ready, createWallet])
 
-  // 🚀 Privy 3.0 + Helius: Clean fee deduction (embedded wallet only)
+  // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet only, no fallbacks)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
-    if (isProcessingFee) {
-      console.log('⚠️ Fee processing already in progress')
-      return { success: false, error: 'Processing another transaction...' }
-    }
+    console.log('💰 Privy 3.0 Transaction Flow Started')
+    console.log('📋 Entry Fee:', entryFee, 'USD')
+    console.log('📋 User Wallet:', userWalletAddress)
 
-    console.log('💰 Starting Privy 3.0 fee deduction:', { entryFee, userWalletAddress })
-    
-    // Privy 3.0: No need to find wallet object - signAndSendTransaction uses embedded wallet automatically
-    // Just verify the user has an embedded wallet address
-    const linkedSolana = privyUser?.linkedAccounts?.find(
-      account => account?.type === 'wallet' && account?.chainType === 'solana'
+    // Step 1: Verify embedded Solana wallet exists
+    const embeddedWallet = privyUser?.linkedAccounts?.find(
+      account => account.type === 'wallet' && account.chainType === 'solana'
     )
     
-    if (!linkedSolana) {
-      console.error('❌ No Solana wallet in linkedAccounts')
-      return {
-        success: false,
-        error: 'No Solana wallet found. Please refresh the page to create one.'
-      }
+    if (!embeddedWallet) {
+      console.error('❌ No embedded Solana wallet found')
+      return { success: false, error: 'No Solana wallet. Please refresh to create one.' }
     }
     
-    console.log('✅ Using embedded Solana wallet from linkedAccounts:', {
-      address: linkedSolana.address,
-      chainType: linkedSolana.chainType
-    })
+    console.log('✅ Embedded wallet found:', embeddedWallet.address)
 
-    // Validate signing function
-    if (!signAndSendTransaction) {
-      console.error('❌ signAndSendTransaction hook not available')
-      return { success: false, error: 'Wallet signing unavailable. Please refresh the page.' }
-    }
-
-    setIsProcessingFee(true)
-
+    // Step 2: Build Solana transaction with Helius
     try {
-      // Dynamic import to avoid SSR issues
-      const { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress } = await import('../lib/paid/cleanFeeManager')
-
-      // Step 1: Calculate fees
+      const { buildEntryFeeTransaction, calculateFees, getServerWalletAddress } = await import('../lib/paid/cleanFeeManager')
+      
       const USD_PER_SOL = 150
       const fees = calculateFees(entryFee, USD_PER_SOL)
-      console.log('✅ Fees calculated:', fees)
-
-      // Step 2: Build transaction using Helius
       const SERVER_WALLET = getServerWalletAddress()
-      console.log('🔨 Building transaction via Helius...')
+      
+      console.log('🔨 Building transaction...')
+      console.log('💵 Fees:', {
+        entry: `${fees.entrySol.toFixed(4)} SOL`,
+        platform: `${fees.serverSol.toFixed(4)} SOL`,
+        total: `${fees.totalSol.toFixed(4)} SOL`
+      })
       
       const { transaction, connection } = await buildEntryFeeTransaction({
         entryFeeUsd: entryFee,
-        userWalletAddress,
+        userWalletAddress: embeddedWallet.address,
         serverWalletAddress: SERVER_WALLET,
         usdPerSol: USD_PER_SOL
       })
+      
+      console.log('✅ Transaction built successfully')
 
-      console.log('✅ Transaction built, signing with Privy 3.0 embedded wallet...')
-
-      // Step 3: Sign and send with Privy 3.0 (no wallet object needed - uses authenticated user's embedded wallet)
-      const transactionBytes = transaction instanceof Uint8Array
-        ? transaction
-        : (() => {
-            try {
-              if (transaction?.buffer) {
-                return new Uint8Array(transaction.buffer, transaction.byteOffset || 0, transaction.byteLength || transaction.length)
-              }
-            } catch (bufferError) {
-              console.warn('⚠️ Unable to slice transaction buffer, falling back to Uint8Array.from', bufferError)
-            }
-            return Uint8Array.from(transaction || [])
-          })()
-
-      console.log('🔐 Calling signAndSendTransaction (Privy 3.0 - uses embedded wallet automatically)...')
+      // Step 3: Sign and send with Privy (automatically uses embedded wallet)
+      const transactionBytes = transaction instanceof Uint8Array ? transaction : new Uint8Array(transaction)
+      
+      console.log('🔐 Signing transaction with Privy embedded wallet...')
       const result = await signAndSendTransaction({
         transaction: transactionBytes,
         chain: SOLANA_CHAIN,
         uiOptions: {
-          description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
+          description: `Entry fee: ${fees.entrySol.toFixed(4)} SOL + Platform fee: ${fees.serverSol.toFixed(4)} SOL`,
           transactionInfo: {
-            title: 'Arena Entry Fee',
+            title: 'Arena Entry Payment',
             action: 'Join Paid Arena'
           }
         }
       })
 
+      // Step 4: Process signature
       let signature = result?.signature || result
       if (signature instanceof Uint8Array) {
         const bs58 = (await import('bs58')).default
         signature = bs58.encode(signature)
       }
 
-      console.log('✅ Transaction sent! Signature:', signature)
-
-      // Step 4: Confirm on Solana
-      await confirmTransaction(connection, signature)
-      console.log('✅ Transaction confirmed on Solana!')
+      console.log('✅ Transaction signed! Signature:', signature)
 
       // Step 5: Update local balance
       if (walletBalance?.usd && walletBalance?.sol) {
-        const newUsdBalance = parseFloat(walletBalance.usd) - fees.totalUsd
-        const newSolBalance = parseFloat(walletBalance.sol) - fees.totalSol
         setWalletBalance({
-          usd: Math.max(0, newUsdBalance).toFixed(2),
-          sol: Math.max(0, newSolBalance).toFixed(6)
+          usd: Math.max(0, parseFloat(walletBalance.usd) - fees.totalUsd).toFixed(2),
+          sol: Math.max(0, parseFloat(walletBalance.sol) - fees.totalSol).toFixed(6)
         })
-        console.log('✅ Balance updated locally')
       }
 
-      return {
-        success: true,
-        signature,
-        fees
-      }
+      return { success: true, signature, fees }
 
     } catch (error) {
-      console.error('❌ Fee deduction failed:', error)
-      console.error('❌ Error details:', {
-        message: error?.message,
-        name: error?.name,
+      console.error('❌ Transaction failed:', error)
+      return {
+        success: false,
+        error: error?.message || 'Transaction failed. Please try again.'
         stack: error?.stack,
         code: error?.code,
         fullError: error
