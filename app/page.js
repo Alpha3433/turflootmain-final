@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy } from '@privy-io/react-auth'
-import { useFundWallet, useSignAndSendTransaction, useWallets } from '@privy-io/react-auth/solana'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 import bs58 from 'bs58'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -12,8 +12,9 @@ export default function TurfLootTactical() {
   
   // Privy hooks - restored for authentication
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
-  const { wallets: solanaWallets = [] } = useWallets()
-  const wallets = solanaWallets
+  const { wallets: connectedWallets = [] } = useWallets()
+  const wallets = connectedWallets
+  const solanaWallets = connectedWallets.filter(w => w?.chainType === 'solana')
   const { fundWallet } = useFundWallet()
   
   // For Solana external wallets (in wallets array)
@@ -182,11 +183,36 @@ export default function TurfLootTactical() {
       // Step 3: Sign and send with Privy 3.0
       console.log('🔐 Signing with Privy wallet via useSignAndSendTransaction...')
 
-      const result = await privySignAndSendTransaction({
+      const transactionBytes = transaction instanceof Uint8Array
+        ? transaction
+        : (() => {
+            try {
+              if (transaction?.buffer) {
+                return new Uint8Array(transaction.buffer, transaction.byteOffset || 0, transaction.byteLength || transaction.length)
+              }
+            } catch (bufferError) {
+              console.warn('⚠️ Unable to slice transaction buffer, falling back to Uint8Array.from', bufferError)
+            }
+            return Uint8Array.from(transaction || [])
+          })()
+
+      const signOptions = {
         wallet: walletFromArray,
-        transaction,
-        chain: SOLANA_CHAIN
-      })
+        transaction: transactionBytes,
+        chain: SOLANA_CHAIN,
+        options: {
+          uiOptions: {
+            description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
+            transactionInfo: {
+              title: 'Arena Entry Fee',
+              action: `Join paid arena`
+            },
+            isCancellable: true
+          }
+        }
+      }
+
+      const result = await privySignAndSendTransaction(signOptions)
 
       let signature = result?.signature || result
       if (signature instanceof Uint8Array) {
