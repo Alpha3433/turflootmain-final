@@ -290,31 +290,18 @@ export default function TurfLootTactical() {
 
     } catch (error) {
       console.error('❌ Transaction failed:', error)
-      return {
-        success: false,
-        error: error?.message || 'Transaction failed. Please try again.'
-        stack: error?.stack,
-        code: error?.code,
-        fullError: error
-      })
       
       // User-friendly error messages
       let errorMessage = 'Transaction failed. Please try again.'
       if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
-        errorMessage = 'Transaction cancelled by user.'
+        errorMessage = 'Transaction cancelled.'
       } else if (error.message?.includes('insufficient')) {
         errorMessage = 'Insufficient SOL balance.'
       } else if (error.message) {
-        // Show actual error message for debugging
-        errorMessage = `Transaction failed: ${error.message}`
+        errorMessage = error.message
       }
       
-      return {
-        success: false,
-        error: errorMessage
-      }
-    } finally {
-      setIsProcessingFee(false)
+      return { success: false, error: errorMessage }
     }
   }
   
