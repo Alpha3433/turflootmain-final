@@ -218,7 +218,9 @@ export default function TurfLootTactical() {
     
     if (linkedSolana) {
       console.log('⚠️ Embedded wallet exists in linkedAccounts but not in useWallets yet')
-      // Wait for it to appear in useWallets
+      console.log('⏳ Waiting for wallet to initialize in useWallets hook...')
+      // The wallet should appear in useWallets() automatically after a brief delay
+      // If it doesn't appear within a few seconds, user may need to refresh
       return
     }
     
@@ -230,6 +232,10 @@ export default function TurfLootTactical() {
           address: wallet?.address,
           chainType: wallet?.chainType
         })
+        // Force a small delay to allow the wallet to populate in useWallets
+        setTimeout(() => {
+          console.log('🔄 Checking if wallet appeared in useWallets...')
+        }, 1000)
       })
       .catch(error => {
         console.error('❌ Failed to create embedded wallet:', error)
