@@ -359,47 +359,41 @@ export default function TurfLootTactical() {
       let signature
 
       if (isEmbeddedWallet) {
-        // For embedded wallets: Use Solana-specific hook WITHOUT wallet parameter
-        console.log('🔐 Signing with embedded wallet via useSignAndSendTransaction (no wallet param)...')
+        // For embedded wallets: Use Privy's fundWallet function for transactions
+        console.log('🔐 Signing with embedded wallet via fundWallet...')
         
-        // For embedded wallets, call without wallet parameter - Privy auto-detects
-        const transactionBytes = transaction instanceof Uint8Array
-          ? transaction
-          : (() => {
-              try {
-                if (transaction?.buffer) {
-                  return new Uint8Array(transaction.buffer, transaction.byteOffset || 0, transaction.byteLength || transaction.length)
-                }
-              } catch (bufferError) {
-                console.warn('⚠️ Unable to slice transaction buffer, falling back to Uint8Array.from', bufferError)
-              }
-              return Uint8Array.from(transaction || [])
-            })()
-
-        const embeddedSignOptions = {
-          // NO wallet parameter for embedded wallets - Privy auto-detects
-          transaction: transactionBytes,
+        if (!fundWallet) {
+          throw new Error('Privy fundWallet function not available for embedded wallet transaction')
+        }
+        
+        // Privy embedded wallets use fundWallet with serialized transaction
+        const serializedTx = transaction.toString('base64')
+        
+        console.log('🔍 Sending transaction via embedded wallet fundWallet:', {
+          txLength: transaction.length,
+          base64Length: serializedTx.length,
           chain: SOLANA_CHAIN,
-          options: {
+          walletAddress: signingAddress
+        })
+
+        try {
+          // Use fundWallet for embedded wallet transactions
+          const result = await fundWallet({
+            chain: SOLANA_CHAIN,
+            transaction: serializedTx,
             uiOptions: {
               header: 'Join TurfLoot Arena',
               description: `Pay ${fees.entrySol.toFixed(4)} SOL entry fee + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total)`,
               buttonText: 'Confirm & Join'
             }
-          }
+          })
+          
+          console.log('✅ Embedded wallet fundWallet result:', result)
+          signature = result?.transactionHash || result?.signature || result
+        } catch (fundError) {
+          console.error('❌ fundWallet failed:', fundError)
+          throw new Error(`Embedded wallet transaction failed: ${fundError.message}`)
         }
-
-        console.log('🔍 Sending transaction via embedded wallet:', {
-          txLength: transactionBytes.length,
-          chain: SOLANA_CHAIN,
-          walletAddress: signingAddress,
-          hasWalletParam: false
-        })
-
-        const result = await privySignAndSendTransaction(embeddedSignOptions)
-        
-        console.log('✅ Embedded wallet transaction result:', result)
-        signature = result?.signature || result
       } else {
         // For external wallets: Use Solana-specific hook
         console.log('🔐 Signing with external wallet via useSignAndSendTransaction...')
