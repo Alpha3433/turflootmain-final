@@ -121,7 +121,22 @@ export default function TurfLootTactical() {
     logout
   } = usePrivy()
   const { createWallet } = useCreateWallet()
-  const { signAndSendTransaction } = useSignAndSendTransaction()
+  
+  // Privy Solana signing - get the hook result
+  const solanaSigningHook = useSignAndSendTransaction()
+  const signAndSendTransaction = solanaSigningHook?.signAndSendTransaction
+  
+  // Debug log
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('🔍 Privy Solana Hook Debug:', {
+        hookResult: solanaSigningHook,
+        signAndSendType: typeof signAndSendTransaction,
+        authenticated,
+        ready
+      })
+    }
+  }, [solanaSigningHook, signAndSendTransaction, authenticated, ready])
   const walletAddressesSignature = useMemo(() => {
     // SSR safety check
     if (typeof window === 'undefined') {
