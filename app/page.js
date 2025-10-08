@@ -272,16 +272,18 @@ export default function TurfLootTactical() {
         chainType: a.chainType,
         address: a.address
       })))
+      console.error('🔍 walletInitializing:', walletInitializing)
+      console.error('🔍 walletsReady:', walletsReady)
       
       // Check if wallet exists in linkedAccounts
       const linkedSolana = privyUser?.linkedAccounts?.find(
         account => account?.type === 'wallet' && account?.chainType === 'solana'
       )
       
-      if (linkedSolana) {
+      if (linkedSolana || walletInitializing) {
         return {
           success: false,
-          error: 'Your wallet is still initializing. Please wait 2-3 seconds and try again.'
+          error: 'Your wallet is still initializing. Please wait 3-5 seconds and try again.'
         }
       }
       
