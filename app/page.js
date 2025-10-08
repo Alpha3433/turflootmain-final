@@ -305,9 +305,9 @@ export default function TurfLootTactical() {
         usdPerSol: USD_PER_SOL
       })
 
-      console.log('✅ Transaction built, signing with Privy 3.0...')
+      console.log('✅ Transaction built, signing with Privy 3.0 embedded wallet...')
 
-      // Step 3: Sign and send with Privy 3.0
+      // Step 3: Sign and send with Privy 3.0 (this will show Privy's modal)
       const transactionBytes = transaction instanceof Uint8Array
         ? transaction
         : (() => {
@@ -321,31 +321,21 @@ export default function TurfLootTactical() {
             return Uint8Array.from(transaction || [])
           })()
 
-      const signOptions = {
-        wallet: walletForSigning,
+      console.log('🔐 Calling signAndSendTransaction with wallet object...')
+      const result = await signAndSendTransaction({
+        wallet: solanaWallet,
         transaction: transactionBytes,
         chain: SOLANA_CHAIN,
-        options: {
-          uiOptions: {
-            description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
-            transactionInfo: {
-              title: 'Arena Entry Fee',
-              action: `Join paid arena`
-            },
-            isCancellable: true
+        uiOptions: {
+          description: `Pay ${fees.entrySol.toFixed(4)} SOL entry + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total).`,
+          transactionInfo: {
+            title: 'Arena Entry Fee',
+            action: 'Join Paid Arena'
           }
         }
-      }
+      })
 
-      signOptions.address = signingAddress
-
-      if (!privySignAndSendTransaction) {
-        throw new Error('Privy signAndSendTransaction function not available for Solana wallet')
-      }
-
-      const result = await privySignAndSendTransaction(signOptions)
       let signature = result?.signature || result
-
       if (signature instanceof Uint8Array) {
         signature = bs58.encode(signature)
       }
