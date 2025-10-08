@@ -119,6 +119,9 @@ export default function TurfLootTactical() {
     setIsProcessingFee(true)
 
     try {
+      // Dynamic import to avoid SSR issues
+      const { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress } = await import('../lib/paid/cleanFeeManager')
+
       // Step 1: Calculate fees
       const USD_PER_SOL = 150
       const fees = calculateFees(entryFee, USD_PER_SOL)
