@@ -82,9 +82,11 @@ const nextConfig = {
     if (isServer) {
       config.externals = config.externals || [];
       config.externals.push('@privy-io/react-auth');
+      config.externals.push('@privy-io/react-auth/solana');
       config.externals.push('lit');
       config.externals.push({
         '@privy-io/react-auth': 'commonjs @privy-io/react-auth',
+        '@privy-io/react-auth/solana': 'commonjs @privy-io/react-auth/solana',
         'lit': 'commonjs lit',
         '@solana-program/token': 'commonjs @solana-program/token',
         '@solana-program/token-2022': 'commonjs @solana-program/token-2022',
