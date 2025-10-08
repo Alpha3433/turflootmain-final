@@ -31,9 +31,8 @@ logger = logging.getLogger(__name__)
 
 class PrivyWalletSigningTester:
     def __init__(self):
-        self.base_url = "https://privy-gameroom.preview.emergentagent.com"
+        self.base_url = "http://localhost:3000"
         self.api_url = f"{self.base_url}/api"
-        self.colyseus_endpoint = "wss://au-syd-ab3eaf4e.colyseus.cloud"
         self.test_results = []
         
     def log_test_result(self, test_name: str, passed: bool, details: str = ""):
