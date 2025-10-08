@@ -303,9 +303,45 @@ class PrivyWalletSigningTester:
             self.log_test_result("Transaction Signing Paths", False, f"Exception: {str(e)}")
             return False
     
+    async def test_enhanced_logging_system(self) -> bool:
+        """Test 9: Verify enhanced logging for wallet detection and signing"""
+        try:
+            import os
+            page_file_path = "/app/app/page.js"
+            
+            logging_patterns_found = 0
+            
+            if os.path.exists(page_file_path):
+                with open(page_file_path, 'r') as f:
+                    content = f.read()
+                    
+                    # Look for enhanced logging patterns
+                    logging_patterns = [
+                        'console.log(\'✅ Found embedded Solana wallet',  # Embedded wallet detection
+                        'console.log(\'✅ Found external Solana wallet',  # External wallet detection
+                        'console.log(\'🔐 Signing with embedded wallet', # Embedded signing log
+                        'console.log(\'🔐 Signing with external wallet', # External signing log
+                        'console.log(\'✅ Transaction sent!',             # Success logging
+                    ]
+                    
+                    for pattern in logging_patterns:
+                        if pattern in content:
+                            logging_patterns_found += 1
+            
+            # Test passes if enhanced logging is implemented
+            has_enhanced_logging = logging_patterns_found >= 4
+            
+            details = f"Enhanced logging patterns found: {logging_patterns_found}/5"
+            self.log_test_result("Enhanced Logging System", has_enhanced_logging, details)
+            return has_enhanced_logging
+            
+        except Exception as e:
+            self.log_test_result("Enhanced Logging System", False, f"Exception: {str(e)}")
+            return False
+
     async def run_comprehensive_test(self) -> Dict[str, Any]:
-        """Run all arena mode split mechanic tests"""
-        logger.info("🚀 Starting Arena Mode Split Mechanic Fix Backend Testing")
+        """Run all Privy embedded wallet signing tests"""
+        logger.info("🚀 Starting Privy Embedded Wallet Signing Fix Backend Testing")
         logger.info("=" * 80)
         
         start_time = time.time()
@@ -313,13 +349,14 @@ class PrivyWalletSigningTester:
         # Run all tests
         test_functions = [
             self.test_api_health_check,
-            self.test_colyseus_server_availability,
-            self.test_split_message_handler_backend,
-            self.test_mass_conservation_logic,
-            self.test_split_boundary_enforcement,
-            self.test_websocket_stability_during_split,
-            self.test_split_state_synchronization,
-            self.test_backend_api_integration,
+            self.test_wallet_balance_api_guest,
+            self.test_wallet_balance_api_with_auth,
+            self.test_privy_authentication_support,
+            self.test_helius_rpc_integration,
+            self.test_solana_wallet_resolution_logic,
+            self.test_fee_deduction_system,
+            self.test_transaction_signing_paths,
+            self.test_enhanced_logging_system,
         ]
         
         results = []
