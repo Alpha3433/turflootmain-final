@@ -24,7 +24,7 @@ class PrivyErrorBoundary extends Component {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2>Wallet Service Error</h2>
           <p>Please refresh the page to reconnect your wallet.</p>
-          <button onClick={() => window.location.reload()}>Refresh Page</button>
+          <button onClick={() => typeof window !== 'undefined' && window.location.reload()}>Refresh Page</button>
         </div>
       )
     }
