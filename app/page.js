@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
+// Temporarily commenting out to isolate HTMLElement error
+// import { usePrivy, useWallets } from '@privy-io/react-auth'
+// import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 // Dynamic import to avoid SSR issues with Solana Web3.js
 // import { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress, getHeliusConnection } from '../lib/paid/cleanFeeManager'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
