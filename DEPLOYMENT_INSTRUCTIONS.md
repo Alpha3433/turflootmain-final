@@ -36,7 +36,10 @@ This project has been restructured for independent deployment:
    NEXT_PUBLIC_COLYSEUS_ENDPOINT=wss://<your-colyseus-app-id>.colyseus.cloud
    NEXT_PUBLIC_PRIVY_APP_ID=cmdycgltk007ljs0bpjbjqx0a
    NEXT_PUBLIC_SOLANA_RPC=https://api.mainnet-beta.solana.com
-   NEXT_PUBLIC_HELIUS_RPC=https://mainnet.helius-rpc.com/?api-key=gameloop-migrate
+   # Optional private RPC (e.g. Helius) that will be tried before public endpoints
+   NEXT_PUBLIC_SOLANA_PRIVATE_RPC=https://mainnet.helius-rpc.com/?api-key=your-helius-key
+   # Optional comma separated list of extra priority RPC URLs
+   NEXT_PUBLIC_SOLANA_RPC_PRIORITY_LIST=https://rpc.backup1.com,https://rpc.backup2.com
    ```
 
 ### Files Structure
