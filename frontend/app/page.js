@@ -53,9 +53,7 @@ export default function TurfLootTactical() {
         network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
         primary: process.env.NEXT_PUBLIC_SOLANA_RPC,
         list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
-        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS,
-        heliusRpcUrl: process.env.NEXT_PUBLIC_HELIUS_RPC || process.env.HELIUS_RPC_URL,
-        heliusApiKey: process.env.NEXT_PUBLIC_HELIUS_API_KEY || process.env.HELIUS_API_KEY
+        fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
       }),
     []
   )
@@ -130,6 +128,14 @@ export default function TurfLootTactical() {
       return {
         success: false,
         error: 'No Solana wallet available for fee deduction. Please connect a wallet and try again.',
+        costs
+      }
+    }
+
+    if (typeof privySignAndSendTransaction !== 'function') {
+      return {
+        success: false,
+        error: 'Privy transaction signing is not available. Please reconnect your wallet and try again.',
         costs
       }
     }
