@@ -44,12 +44,38 @@ function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
     console.log('📋 App ID:', appId ? `${appId.substring(0, 10)}...` : 'MISSING')
     console.log('📋 Solana RPC:', debugInfo.solanaRpcUrl)
     console.log('📋 Solana WS:', debugInfo.solanaWsUrl)
-    console.log('📋 Config:', JSON.stringify({
-      appearance: config.appearance,
-      embeddedWallets: config.embeddedWallets,
-      externalWallets: config.externalWallets,
-      solanaChains: Object.keys(config.solana?.rpcs || {})
-    }, null, 2))
+
+    try {
+      const { appearance, embeddedWallets, externalWallets = {}, solana } = config || {}
+
+      const safeExternalWallets = Object.fromEntries(
+        Object.entries(externalWallets).map(([chain, walletConfig = {}]) => {
+          const connectors = walletConfig.connectors
+
+          if (Array.isArray(connectors)) {
+            return [
+              chain,
+              connectors.map((connector) => connector?.name || connector?.id || 'custom-connector')
+            ]
+          }
+
+          if (connectors && typeof connectors === 'object') {
+            return [chain, Object.keys(connectors)]
+          }
+
+          return [chain, []]
+        })
+      )
+
+      console.log('📋 Config:', JSON.stringify({
+        appearance,
+        embeddedWallets,
+        externalWallets: safeExternalWallets,
+        solanaChains: Object.keys(solana?.rpcs || {})
+      }, null, 2))
+    } catch (error) {
+      console.warn('⚠️ Unable to serialize Privy config for logging:', error)
+    }
   }, [config, appId, debugInfo])
 
   // Simple hydration check - no delays
