@@ -29,7 +29,7 @@ from typing import Dict, Any, List, Optional
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class ArenaModeSplitTester:
+class PrivyWalletSigningTester:
     def __init__(self):
         self.base_url = "https://privy-gameroom.preview.emergentagent.com"
         self.api_url = f"{self.base_url}/api"
