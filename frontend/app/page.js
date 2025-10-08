@@ -45,6 +45,11 @@ export default function TurfLootTactical() {
     () =>
       buildSolanaRpcEndpointList({
         network: process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta',
+        privateRpc:
+          process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC ||
+          process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC ||
+          process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE ||
+          process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS,
         primary: process.env.NEXT_PUBLIC_SOLANA_RPC,
         list: process.env.NEXT_PUBLIC_SOLANA_RPC_LIST,
         fallbacks: process.env.NEXT_PUBLIC_SOLANA_RPC_FALLBACKS
@@ -404,47 +409,52 @@ export default function TurfLootTactical() {
     
     console.log('🔍 Checking Solana balance for:', walletAddress)
     
-    // OPTION 1: Try Helius RPC provider first (now with working API key)
-    const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC
-    
-    if (heliusRpc) {
-      try {
-        console.log('🚀 Using Helius RPC for real-time balance')
-        
-        const response = await fetch(heliusRpc, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: 1,
-            method: 'getBalance', 
-            params: [walletAddress]
-          }),
-          signal: AbortSignal.timeout(5000)
-        })
-        
-        if (response.ok) {
-          const data = await response.json()
-          if (data.result?.value !== undefined) {
-            const solBalance = data.result.value / 1000000000
-            console.log(`✅ Real balance from Helius:`, solBalance, 'SOL')
-            
-            // DEPOSIT DETECTION: Check for balance increases
-            await detectDepositAndProcessFee(solBalance, walletAddress)
-            
-            return solBalance
+    // OPTION 1: Try private RPC provider first (Helius, Triton, etc.)
+    const privateRpcEndpoint =
+      process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC ||
+      process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC ||
+      process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE ||
+      process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS ||
+      process.env.NEXT_PUBLIC_HELIUS_RPC
+
+      if (privateRpcEndpoint) {
+        try {
+          console.log('🚀 Using private Solana RPC for real-time balance')
+
+          const response = await fetch(privateRpcEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'getBalance',
+              params: [walletAddress]
+            }),
+            signal: AbortSignal.timeout(5000)
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            if (data.result?.value !== undefined) {
+              const solBalance = data.result.value / 1000000000
+              console.log(`✅ Real balance from private RPC:`, solBalance, 'SOL')
+
+              // DEPOSIT DETECTION: Check for balance increases
+              await detectDepositAndProcessFee(solBalance, walletAddress)
+
+              return solBalance
+            }
+          } else {
+            console.log('❌ Private RPC failed:', response.status)
           }
-        } else {
-          console.log('❌ Helius RPC failed:', response.status)
+        } catch (error) {
+          console.log('❌ Private RPC error:', error.message)
         }
-      } catch (error) {
-        console.log('❌ Helius RPC error:', error.message)
       }
-    }
-    
+
     // OPTION 2: Fallback to other RPC providers
     const fallbackEndpoints = [
       'https://api.mainnet-beta.solana.com',
