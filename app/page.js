@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
-import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../lib/paid/feeManager'
+import { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress, getHeliusConnection } from '../lib/paid/cleanFeeManager'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
