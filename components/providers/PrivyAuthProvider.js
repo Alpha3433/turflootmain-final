@@ -150,19 +150,10 @@ export default function PrivyAuthProvider({ children }) {
 
     // 🎯 PRIVY 3.0: Embedded Wallets configuration scoped per chain
     embeddedWallets: {
-      ethereum: {
-        createOnLogin: 'off'
-      },
-      solana: {
-        createOnLogin: 'users-without-wallets'
-      },
-      showWalletUIs: true
-    },
-
-    // ❌ Disable all external wallet connectors – embedded wallets only
-    externalWallets: {
-      solana: {
-        connectors: emptySolanaConnectors
+      createOnLogin: 'users-without-wallets',
+      requireUserPasswordOnCreate: false,
+      priceDisplay: {
+        primary: 'native-token'
       }
     },
 
