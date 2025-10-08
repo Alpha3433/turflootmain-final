@@ -119,10 +119,18 @@ export default function TurfLootTactical() {
     login,
     logout
   } = usePrivy()
-  const { wallets: solanaWallets = [], ready: walletsReady } = useSolanaWallets()
+  const { wallets = [], ready: walletsReady } = useWallets()
   const { createWallet } = useCreateWallet()
   
   const [walletInitializing, setWalletInitializing] = useState(false)
+  
+  const solanaWallets = useMemo(
+    () =>
+      wallets.filter(wallet =>
+        isSolanaChain(wallet?.chainType) && isSolanaAddress(getWalletAddress(wallet))
+      ),
+    [wallets]
+  )
   const walletAddressesSignature = useMemo(() => {
     // SSR safety check
     if (typeof window === 'undefined') {
