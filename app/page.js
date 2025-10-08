@@ -700,13 +700,9 @@ export default function TurfLootTactical() {
 
   useEffect(() => {
     if (ready && typeof window !== 'undefined') {
-      console.log('🔧 Privy v2.24.0 - Debug Info (fundWallet from usePrivy):', {
+      console.log('🔧 Privy 3.0 - Debug Info (Embedded Wallets):', {
         ready,
         authenticated,
-        hasFundWallet: typeof fundWallet === 'function',
-        fundWalletSource: 'usePrivy hook (test approach)',
-        walletsCount: wallets?.length || 0,
-        walletsArray: wallets,
         privyUser: privyUser ? {
           id: privyUser.id,
           wallets: privyUser.linkedAccounts?.filter(account => account.type === 'wallet'),
