@@ -110,19 +110,20 @@ export default function TurfLootTactical() {
       walletClientType: solanaWallet.walletClientType
     })
 
-    // Try to find wallet in wallets array (for external wallets)
-    let wallet = wallets.find(w => w.address === solanaWallet.address)
+    // Check if wallet is in useWallets() array (external wallets)
+    const walletFromArray = wallets.find(w => w.address === solanaWallet.address)
+    const isEmbeddedWallet = !walletFromArray
     
-    if (wallet) {
-      console.log('✅ Found wallet in useWallets() array:', {
-        address: wallet.address,
-        type: wallet.walletClientType
+    if (walletFromArray) {
+      console.log('✅ External wallet found in useWallets() array:', {
+        address: walletFromArray.address,
+        type: walletFromArray.walletClientType
       })
     } else {
-      console.log('⚠️ Wallet not in useWallets() array - using embedded wallet from linkedAccounts')
-      console.log('This is normal for Privy embedded wallets')
-      // For embedded wallets, we'll pass the wallet from linkedAccounts
-      wallet = solanaWallet
+      console.log('✅ Using Privy embedded wallet from linkedAccounts:', {
+        address: solanaWallet.address,
+        chainType: solanaWallet.chainType
+      })
     }
 
     // Validate Privy hook
@@ -156,12 +157,25 @@ export default function TurfLootTactical() {
       console.log('✅ Transaction built, signing with Privy 3.0...')
 
       // Step 3: Sign and send with Privy 3.0
-      // Pass the wallet object directly (works for both external and embedded)
-      const { signature } = await privySignAndSendTransaction({
-        wallet,
-        transaction,
-        chain: 'solana:mainnet'
-      })
+      let result
+      if (isEmbeddedWallet) {
+        // For embedded wallets: Privy auto-detects the wallet, don't pass it
+        console.log('🔐 Signing with embedded wallet (auto-detected by Privy)...')
+        result = await privySignAndSendTransaction({
+          transaction,
+          chain: 'solana:mainnet'
+        })
+      } else {
+        // For external wallets: Must pass wallet from useWallets() array
+        console.log('🔐 Signing with external wallet...')
+        result = await privySignAndSendTransaction({
+          wallet: walletFromArray,
+          transaction,
+          chain: 'solana:mainnet'
+        })
+      }
+      
+      const { signature } = result
 
       console.log('✅ Transaction sent! Signature:', signature)
 
