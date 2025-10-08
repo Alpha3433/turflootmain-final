@@ -235,26 +235,26 @@ export default function TurfLootTactical() {
       })
   }, [authenticated, privyUser, ready, createWallet])
 
-  // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet only, no fallbacks)
+  // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet using Solana provider)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
     console.log('💰 Privy 3.0 Transaction Flow Started')
     console.log('📋 Entry Fee:', entryFee, 'USD')
     console.log('📋 User Wallet:', userWalletAddress)
 
-    // Step 1: Verify embedded Solana wallet exists
+    // Step 1: Verify embedded Solana wallet exists in linkedAccounts
     const embeddedWallet = privyUser?.linkedAccounts?.find(
       account => account.type === 'wallet' && account.chainType === 'solana'
     )
     
     if (!embeddedWallet) {
-      console.error('❌ No embedded Solana wallet found')
+      console.error('❌ No embedded Solana wallet found in linkedAccounts')
       return { success: false, error: 'No Solana wallet. Please refresh to create one.' }
     }
     
-    console.log('✅ Embedded wallet found:', embeddedWallet.address)
+    console.log('✅ Embedded wallet found in linkedAccounts:', embeddedWallet.address)
 
-    // Step 2: Build Solana transaction with Helius
     try {
+      // Step 2: Build Solana transaction with Helius
       const { buildEntryFeeTransaction, calculateFees, getServerWalletAddress } = await import('../lib/paid/cleanFeeManager')
       
       const USD_PER_SOL = 150
@@ -277,52 +277,23 @@ export default function TurfLootTactical() {
       
       console.log('✅ Transaction built successfully')
 
-      // Step 3: Get Privy embedded wallet object
-      if (!privyEmbeddedWallet) {
-        console.error('❌ Privy embedded wallet not found in useWallets()')
-        console.error('🔍 Available wallets:', wallets)
-        console.error('🔍 Wallets array:', JSON.stringify(wallets, null, 2))
-        console.error('🔍 Wallet details:', wallets?.map(w => ({
-          address: w.address,
-          walletClientType: w.walletClientType,
-          connectorType: w.connectorType,
-          name: w.name,
-          chainType: w.chainType,
-          allKeys: Object.keys(w)
-        })))
-        return { success: false, error: 'Wallet initializing. Please wait a moment and try again.' }
+      // Step 3: Get Solana provider for embedded wallet
+      console.log('🔐 Getting Solana provider for embedded wallet...')
+      const provider = await window.privy.solana.getProvider()
+      
+      if (!provider) {
+        console.error('❌ Failed to get Solana provider from Privy')
+        return { success: false, error: 'Wallet provider unavailable. Please refresh.' }
       }
       
-      console.log('✅ Using Privy embedded wallet for signing:', {
-        address: privyEmbeddedWallet.address,
-        walletClientType: privyEmbeddedWallet.walletClientType
-      })
+      console.log('✅ Got Solana provider:', provider)
       
-      // Step 4: Sign and send with Privy
+      // Step 4: Sign and send transaction using provider
       const transactionBytes = transaction instanceof Uint8Array ? transaction : new Uint8Array(transaction)
+      console.log('🔐 Signing and sending transaction via Privy provider...')
       
-      console.log('🔐 Signing transaction with Privy...')
-      const result = await signAndSendTransaction({
-        wallet: privyEmbeddedWallet,
-        transaction: transactionBytes,
-        chain: SOLANA_CHAIN,
-        uiOptions: {
-          description: `Entry fee: ${fees.entrySol.toFixed(4)} SOL + Platform fee: ${fees.serverSol.toFixed(4)} SOL`,
-          transactionInfo: {
-            title: 'Arena Entry Payment',
-            action: 'Join Paid Arena'
-          }
-        }
-      })
-
-      // Step 4: Process signature
-      let signature = result?.signature || result
-      if (signature instanceof Uint8Array) {
-        const bs58 = (await import('bs58')).default
-        signature = bs58.encode(signature)
-      }
-
-      console.log('✅ Transaction signed! Signature:', signature)
+      const signature = await provider.sendTransaction(transaction, connection)
+      console.log('✅ Transaction sent! Signature:', signature)
 
       // Step 5: Update local balance
       if (walletBalance?.usd && walletBalance?.sol) {
@@ -339,7 +310,7 @@ export default function TurfLootTactical() {
       
       // User-friendly error messages
       let errorMessage = 'Transaction failed. Please try again.'
-      if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
+      if (error.message?.includes('User rejected') || error.message?.includes('rejected') || error.message?.includes('cancelled')) {
         errorMessage = 'Transaction cancelled.'
       } else if (error.message?.includes('insufficient')) {
         errorMessage = 'Insufficient SOL balance.'
