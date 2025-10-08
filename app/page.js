@@ -130,32 +130,6 @@ export default function TurfLootTactical() {
       ),
     [wallets]
   )
-  const findWalletByAddress = useCallback(
-    (address) => {
-      const normalizedTarget = normalizeAddress(address)
-      if (!normalizedTarget) {
-        return null
-      }
-
-      const matchedWallet = solanaWallets.find(wallet => {
-        const walletAddress = getWalletAddress(wallet)
-        return normalizeAddress(walletAddress) === normalizedTarget
-      })
-
-      if (matchedWallet) {
-        return matchedWallet
-      }
-
-      // Try matching by wallet identifiers (embedded wallets expose walletId/id)
-      return (
-        wallets.find(wallet =>
-          (wallet?.walletId && wallet.walletId === address) ||
-          (wallet?.id && wallet.id === address)
-        ) || null
-      )
-    },
-    [solanaWallets, wallets]
-  )
   const walletAddressesSignature = useMemo(() => {
     // SSR safety check
     if (typeof window === 'undefined') {
@@ -164,7 +138,7 @@ export default function TurfLootTactical() {
     
     const addresses = []
     
-    // Add addresses from external wallets array
+    // Add addresses from wallets array
     if (wallets) {
       wallets
         .map(wallet => getWalletAddress(wallet))
@@ -179,20 +153,12 @@ export default function TurfLootTactical() {
         .forEach(account => addresses.push(account.address))
     }
     
-    // Add legacy wallet address
-    if (privyUser?.wallet?.address) {
-      addresses.push(privyUser.wallet.address)
-    }
-    
     // Remove duplicates and join
     return [...new Set(addresses)].join('|')
   }, [wallets, privyUser])
-  const { fundWallet } = useFundWallet()
   
-  // For Solana external wallets (in wallets array) - may be undefined for embedded-only users
-  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction() || {}
-  
-  // Note: Embedded and external wallets both sign via Privy's signAndSendTransaction helper
+  // For Solana embedded wallet signing
+  const { signAndSendTransaction } = useSignAndSendTransaction()
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
