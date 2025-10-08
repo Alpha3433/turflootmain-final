@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-Arena Mode Split Mechanic Fix Backend Testing
-Testing the critical fix where split function now actually splits the player in half 
-instead of creating additional mass, implementing proper mass conservation like agario.
+Privy Embedded Wallet Signing Fix Backend Testing
+Testing the Privy embedded wallet signing fix for paid room entry fees.
 
 CRITICAL FIX DETAILS:
-1. Mass Conservation: When a player with mass 100 splits, they become mass 50 + a new piece with mass 50 (total stays 100)
-2. Previously: Was keeping the main player at full mass and adding extra pieces
-3. Now: Implements proper mass conservation like agario
-4. Key Changes: The split function now actually splits the player in half instead of creating additional mass
+1. Updated resolveSolanaWallet() function now checks privyUser.linkedAccounts first (for embedded wallets)
+2. Fixed chain parameter to use SOLANA_CHAIN variable instead of hardcoded 'solana:mainnet'
+3. Enhanced logging for wallet detection and transaction signing process
+4. Proper wallet resolution logic prioritizes linkedAccounts over wallets array
+5. Fee deduction system works with both embedded and external wallets
 
 TESTING FOCUS:
-- Backend API health and availability  
-- Colyseus server availability and split handling
-- Split piece state management on server side
-- Mass conservation validation (total mass before = total mass after)
-- WebSocket stability during split operations
+- Backend API health and Privy authentication support
+- Wallet balance APIs with Helius integration
+- Solana transaction processing capabilities
+- Authentication flow for wallet operations
+- Error handling for wallet-related operations
 """
 
 import asyncio
