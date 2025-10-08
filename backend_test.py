@@ -420,7 +420,7 @@ class PrivyEmbeddedWalletTester:
 
 async def main():
     """Main test execution function"""
-    tester = PrivyWalletSigningTester()
+    tester = PrivyEmbeddedWalletTester()
     results = await tester.run_comprehensive_test()
     
     # Print detailed results
