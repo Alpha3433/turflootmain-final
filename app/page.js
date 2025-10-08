@@ -7,8 +7,7 @@ import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/s
 import bs58 from 'bs58'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
-// Memoized function to prevent infinite loops
-const getWalletAddress = useCallback((wallet) => {
+const getWalletAddress = (wallet) => {
   if (!wallet) {
     return undefined
   }
@@ -82,7 +81,7 @@ const getWalletAddress = useCallback((wallet) => {
   }
 
   return undefined
-}, [])
+}
 
 const isSolanaChain = (chainType) =>
   typeof chainType === 'string' && chainType.toLowerCase().startsWith('solana')
