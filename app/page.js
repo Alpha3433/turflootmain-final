@@ -284,17 +284,28 @@ export default function TurfLootTactical() {
       
       console.log('✅ Transaction built successfully')
 
-      // Step 3: Since Privy hooks don't work, manually sign using Solana web3.js
-      console.log('🔐 Manual signing approach - Privy embedded wallets require user interaction')
-      console.error('❌ CRITICAL ISSUE: Privy 3.0 embedded Solana wallets cannot be accessed programmatically')
-      console.error('💡 Root cause: useWallets() returns empty array, all signing hooks undefined')
-      console.error('💡 Embedded wallet exists in linkedAccounts but not accessible for signing')
-      console.error('💡 This appears to be a Privy 3.0 limitation or configuration issue')
-      
-      return { 
-        success: false, 
-        error: 'Embedded wallet signing unavailable. Privy 3.0 embedded Solana wallets may require additional configuration or user action to enable transaction signing. Please contact support.'
+      // Step 3: Check if embedded wallet is available in useWallets
+      if (!embeddedWallet) {
+        console.error('❌ Embedded wallet not found in useWallets()')
+        console.error('🔍 Wallets:', wallets)
+        return { 
+          success: false, 
+          error: 'Wallet initializing. Please wait a few seconds and try again.'
+        }
       }
+      
+      console.log('✅ Embedded wallet found for signing:', embeddedWallet.address)
+
+      // Step 4: Sign and send transaction with Privy (this will show Privy modal)
+      console.log('🔐 Calling signAndSendTransaction...')
+      const result = await signAndSendTransaction({
+        wallet: embeddedWallet,
+        transaction,
+        chain: SOLANA_CHAIN
+      })
+      
+      const signature = result?.signature || result
+      console.log('✅ Transaction sent! Signature:', signature)
 
       // Step 5: Update local balance
       if (walletBalance?.usd && walletBalance?.sol) {
