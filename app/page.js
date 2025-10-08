@@ -123,8 +123,20 @@ export default function TurfLootTactical() {
   } = usePrivy()
   const { createWallet } = useCreateWallet()
   const { wallets } = useWallets()
-  const { signTransaction } = useSignTransaction()
-  const { signAndSendTransaction } = useSignAndSendTransaction()
+  const signTransaction = useSignTransaction()
+  const signAndSendTransaction = useSignAndSendTransaction()
+  
+  // Debug what these hooks return
+  useEffect(() => {
+    if (typeof window !== 'undefined' && authenticated) {
+      console.log('🔍 Privy Hooks Debug:', {
+        signTransactionType: typeof signTransaction,
+        signAndSendTransactionType: typeof signAndSendTransaction,
+        signTransactionKeys: signTransaction ? Object.keys(signTransaction) : null,
+        signAndSendKeys: signAndSendTransaction ? Object.keys(signAndSendTransaction) : null
+      })
+    }
+  }, [signTransaction, signAndSendTransaction, authenticated])
   
   // Get embedded Privy wallet
   const embeddedWallet = useMemo(() => {
