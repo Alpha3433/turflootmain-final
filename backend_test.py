@@ -48,6 +48,10 @@ class PrivyEmbeddedWalletTester:
         
     def log_test_result(self, test_name: str, passed: bool, details: str = ""):
         """Log test result with details"""
+        self.total_tests += 1
+        if passed:
+            self.passed_tests += 1
+        
         status = "✅ PASSED" if passed else "❌ FAILED"
         result = {
             "test": test_name,
