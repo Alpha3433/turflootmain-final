@@ -202,57 +202,28 @@ export default function TurfLootTactical() {
     return 'solana:mainnet'
   }, [])
 
-  // 🚀 Privy 3.0 Embedded Wallet: Create wallet if doesn't exist and handle initialization
+  // 🚀 Privy 3.0 Embedded Wallet: Create wallet if doesn't exist
+  // Note: Embedded wallets appear in linkedAccounts, NOT in useWallets() - this is expected Privy 3.0 behavior
   useEffect(() => {
-    if (!authenticated || !privyUser || !ready || !walletsReady) return
+    if (!authenticated || !privyUser || !ready) return
     
-    // Check if user has embedded Solana wallet in useWallets
-    if (solanaWallets.length > 0) {
-      console.log('✅ Solana wallet already exists in useWallets:', {
-        count: solanaWallets.length,
-        address: getWalletAddress(solanaWallets[0])
-      })
-      setWalletInitializing(false)
-      setWalletExportAttempted(false)
-      return
-    }
-    
-    // Check if user has embedded wallet in linkedAccounts but not in useWallets
+    // Check if user has embedded wallet in linkedAccounts
     const linkedSolana = privyUser?.linkedAccounts?.find(
       account => account?.type === 'wallet' && account?.chainType === 'solana'
     )
     
     if (linkedSolana) {
-      console.log('⚠️ Embedded wallet exists in linkedAccounts but not in useWallets yet')
-      
-      // Try to export the wallet to make it available in useWallets
-      if (!walletExportAttempted && exportWallet) {
-        console.log('🔓 Attempting to export embedded wallet...')
-        setWalletExportAttempted(true)
-        setWalletInitializing(true)
-        
-        exportWallet()
-          .then(() => {
-            console.log('✅ Wallet export initiated - should appear in useWallets soon')
-            // Give it a moment to populate
-            setTimeout(() => {
-              setWalletInitializing(false)
-            }, 2000)
-          })
-          .catch(error => {
-            console.error('❌ Failed to export wallet:', error)
-            console.log('⏳ Wallet may still initialize automatically...')
-            setWalletInitializing(false)
-          })
-      } else {
-        setWalletInitializing(true)
-      }
+      console.log('✅ Embedded Solana wallet exists:', {
+        address: linkedSolana.address,
+        chainType: linkedSolana.chainType
+      })
+      setWalletInitializing(false)
       return
     }
     
     // No wallet found, create one
     if (!walletInitializing) {
-      console.log('🔨 No Solana wallet found, creating embedded wallet...')
+      console.log('🔨 No Solana wallet found in linkedAccounts, creating embedded wallet...')
       setWalletInitializing(true)
       createWallet({ chainType: 'solana' })
         .then(wallet => {
@@ -260,13 +231,14 @@ export default function TurfLootTactical() {
             address: wallet?.address,
             chainType: wallet?.chainType
           })
+          setWalletInitializing(false)
         })
         .catch(error => {
           console.error('❌ Failed to create embedded wallet:', error)
           setWalletInitializing(false)
         })
     }
-  }, [authenticated, privyUser, ready, walletsReady, solanaWallets, createWallet, walletInitializing, exportWallet, walletExportAttempted])
+  }, [authenticated, privyUser, ready, createWallet, walletInitializing])
 
   // 🚀 Privy 3.0 + Helius: Clean fee deduction (embedded wallet only)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
