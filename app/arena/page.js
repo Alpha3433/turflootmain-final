@@ -1320,6 +1320,10 @@ const MultiplayerArena = () => {
     const componentId = componentIdRef.current
     console.log(`🔗 [${componentId}] Connection attempt started for user:`, privyUserId)
 
+    const queryEndpoint = searchParams?.get('endpoint')
+    const fallbackEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
+    const endpoint = queryEndpoint && queryEndpoint.trim() !== '' ? queryEndpoint : fallbackEndpoint
+
     clearPingInterval()
     resetPingState(true)
 
@@ -1384,11 +1388,11 @@ const MultiplayerArena = () => {
       console.log('🚀 Creating dedicated Colyseus client for this arena...')
       setConnectionStatus('connecting')
       
-      // Get the endpoint from environment or fallback
-      const endpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'wss://au-syd-ab3eaf4e.colyseus.cloud'
+      // Use the resolved endpoint from query parameters when available
       console.log('🎯 Colyseus endpoint:', endpoint)
       console.log('🎯 Environment check:', {
-        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT,
+        fallbackEndpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT,
+        endpointFromQuery: queryEndpoint,
         playerName,
         privyUserId,
         roomId
@@ -1619,7 +1623,8 @@ const MultiplayerArena = () => {
       console.error(`❌ [${componentId}] Error details:`, {
         message: error.message,
         stack: error.stack,
-        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT
+        endpoint,
+        endpointFromQuery: queryEndpoint
       })
       setConnectionStatus('failed')
       

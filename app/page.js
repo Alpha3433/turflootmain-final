@@ -2122,9 +2122,13 @@ export default function TurfLootTactical() {
     console.log('📊 Server details:', serverData)
     
     try {
-      // Colyseus server configuration
+      // Colyseus server configuration – always prefer the endpoint provided by the
+      // server browser payload so we join the exact deployment the user selected.
+      const fallbackEndpoint = process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'ws://localhost:2567'
+      const resolvedEndpoint = serverData.endpoint || fallbackEndpoint
+
       const colyseusServerInfo = {
-        endpoint: process.env.NEXT_PUBLIC_COLYSEUS_ENDPOINT || 'ws://localhost:2567',
+        endpoint: resolvedEndpoint,
         roomType: 'arena',
         region: serverData.region || 'global'
       }
@@ -2292,6 +2296,10 @@ export default function TurfLootTactical() {
         privyUserId: privyUserData.privyUserId,
         playerName: encodeURIComponent(privyUserData.playerName),
         walletAddress: privyUserData.walletAddress || ''
+      }
+
+      if (serverData.endpoint) {
+        queryParams.endpoint = serverData.endpoint
       }
 
       if (appliedFeePercentage !== null && feeResult) {
