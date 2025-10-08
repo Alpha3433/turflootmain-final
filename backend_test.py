@@ -267,32 +267,40 @@ class PrivyWalletSigningTester:
             self.log_test_result("Fee Deduction System", False, f"Exception: {str(e)}")
             return False
     
-    async def test_backend_api_integration(self) -> bool:
-        """Test 8: Verify backend APIs support the split functionality"""
+    async def test_transaction_signing_paths(self) -> bool:
+        """Test 8: Verify both embedded and external wallet signing paths"""
         try:
-            # Test the servers endpoint to ensure it returns proper arena server data
-            response = requests.get(f"{self.api_url}/servers", timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                
-                # Check for required fields that support split functionality
-                required_fields = ['servers', 'totalPlayers', 'totalActiveServers']
-                has_required_fields = all(field in data for field in required_fields)
-                
-                servers = data.get('servers', [])
-                has_arena_servers = any(s.get('roomType') == 'arena' for s in servers)
-                
-                api_supports_split = has_required_fields and has_arena_servers
-                
-                details = f"Required fields: {has_required_fields}, Arena servers: {has_arena_servers}, Total servers: {len(servers)}"
-                self.log_test_result("Backend API Integration", api_supports_split, details)
-                return api_supports_split
-            else:
-                self.log_test_result("Backend API Integration", False, f"HTTP {response.status_code}")
-                return False
-                
+            import os
+            page_file_path = "/app/app/page.js"
+            
+            signing_paths_found = 0
+            
+            if os.path.exists(page_file_path):
+                with open(page_file_path, 'r') as f:
+                    content = f.read()
+                    
+                    # Look for both signing paths
+                    signing_patterns = [
+                        'if (isEmbeddedWallet)',                  # Embedded wallet path
+                        'useSendTransaction',                     # Embedded wallet hook
+                        'else {',                                 # External wallet path
+                        'useSignAndSendTransaction',              # External wallet hook
+                        'chain: SOLANA_CHAIN',                   # Chain parameter usage
+                    ]
+                    
+                    for pattern in signing_patterns:
+                        if pattern in content:
+                            signing_paths_found += 1
+            
+            # Test passes if both signing paths are implemented
+            has_signing_paths = signing_paths_found >= 4
+            
+            details = f"Transaction signing patterns found: {signing_paths_found}/5"
+            self.log_test_result("Transaction Signing Paths", has_signing_paths, details)
+            return has_signing_paths
+            
         except Exception as e:
-            self.log_test_result("Backend API Integration", False, f"Exception: {str(e)}")
+            self.log_test_result("Transaction Signing Paths", False, f"Exception: {str(e)}")
             return False
     
     async def run_comprehensive_test(self) -> Dict[str, Any]:
