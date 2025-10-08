@@ -166,14 +166,10 @@ export default function PrivyAuthProvider({ children }) {
       }
     },
 
-    // 🎯 PRIVY 3.0: Solana RPC configuration  
-    defaultChain: solanaChain,
-    supportedChains: [solanaChain],
+    // 🎯 PRIVY 3.0: Solana RPC configuration
     solana: {
       rpcs: {
-        [solanaChain]: {
-          rpc: solanaRpcUrl
-        }
+        [solanaChain]: solanaRpcUrl
       }
     },
 
