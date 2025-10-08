@@ -278,22 +278,26 @@ export default function TurfLootTactical() {
       
       console.log('✅ Transaction built successfully')
 
-      // Step 3: Use Privy's sendSolanaTransaction method for embedded wallets
-      console.log('🔐 Signing and sending with Privy embedded wallet...')
+      // Step 3: Try using Privy's solana RPC method
+      console.log('🔐 Attempting to sign with Privy...')
+      console.log('🔍 PrivyUser wallet object:', privyUser?.wallet)
       
-      if (!privyUser?.sendSolanaTransaction) {
-        console.error('❌ privyUser.sendSolanaTransaction not available')
-        console.error('🔍 Available methods:', Object.keys(privyUser || {}))
-        return { success: false, error: 'Wallet signing method unavailable. Please try again.' }
+      // Check if we can get a provider from the Privy instance
+      const { solana } = usePrivy()
+      console.log('🔍 Privy solana object:', solana)
+      
+      if (!solana) {
+        console.error('❌ Privy solana object not available')
+        console.error('💡 This suggests Privy Solana provider is not initialized')
+        console.error('💡 Embedded wallets in Privy 3.0 may require user to "export" wallet first')
+        return { 
+          success: false, 
+          error: 'Privy Solana provider not available. This is a configuration issue - embedded wallets may need to be manually connected/exported in Privy 3.0. Please contact support.' 
+        }
       }
       
-      // Privy's sendSolanaTransaction handles both signing and sending
-      const signature = await privyUser.sendSolanaTransaction({
-        transaction,
-        address: embeddedWallet.address,
-        chain: SOLANA_CHAIN
-      })
-      
+      console.log('✅ Got Privy solana object, attempting to send transaction...')
+      const signature = await solana.sendTransaction(transaction, connection)
       console.log('✅ Transaction sent! Signature:', signature)
 
       // Step 5: Update local balance
