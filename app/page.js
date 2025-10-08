@@ -2,32 +2,18 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-// TODO: Privy imports cause SSR issues - need to be made dynamic
-// import { usePrivy, useWallets } from '@privy-io/react-auth'
-// import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
-// Dynamic import to avoid SSR issues with Solana Web3.js
-// import { buildEntryFeeTransaction, confirmTransaction, calculateFees, getServerWalletAddress, getHeliusConnection } from '../lib/paid/cleanFeeManager'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 export default function TurfLootTactical() {
   const router = useRouter()
   
-  // Privy hooks - using Solana-specific useFundWallet helper (commented out for SSR)
-  // const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
-  // const { wallets } = useWallets()
-  // const { fundWallet } = useFundWallet()
-  // const signAndSendTransactionResponse = useSignAndSendTransaction()
-  // const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
-  
-  // Mock values for SSR compatibility
-  const ready = true
-  const authenticated = false
-  const privyUser = null
-  const login = () => {}
-  const logout = () => {}
-  const wallets = []
-  const fundWallet = () => {}
-  const privySignAndSendTransaction = null
+  // Privy hooks - restored for authentication
+  const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
+  const { wallets } = useWallets()
+  const { fundWallet } = useFundWallet()
+  const { signAndSendTransaction: privySignAndSendTransaction } = useSignAndSendTransaction()
   
   // LOYALTY SYSTEM STATE
   const [loyaltyData, setLoyaltyData] = useState(null)
