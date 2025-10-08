@@ -110,20 +110,20 @@ export default function TurfLootTactical() {
       walletClientType: solanaWallet.walletClientType
     })
 
-    // For Privy 3.0, we MUST use a wallet from the wallets array
-    const wallet = wallets.find(w => w.address === solanaWallet.address)
+    // Try to find wallet in wallets array (for external wallets)
+    let wallet = wallets.find(w => w.address === solanaWallet.address)
     
-    if (!wallet) {
-      console.error('❌ Wallet not in useWallets() array - Privy 3.0 requires this')
-      console.error('This usually means the embedded wallet was not created on login')
-      return { success: false, error: 'Wallet setup incomplete. Please logout and login again.' }
+    if (wallet) {
+      console.log('✅ Found wallet in useWallets() array:', {
+        address: wallet.address,
+        type: wallet.walletClientType
+      })
+    } else {
+      console.log('⚠️ Wallet not in useWallets() array - using embedded wallet from linkedAccounts')
+      console.log('This is normal for Privy embedded wallets')
+      // For embedded wallets, we'll pass the wallet from linkedAccounts
+      wallet = solanaWallet
     }
-    
-    console.log('✅ Found wallet in useWallets():', {
-      address: wallet.address,
-      type: wallet.walletClientType,
-      hasSignMethod: typeof wallet.signAndSendTransaction !== 'undefined'
-    })
 
     // Validate Privy hook
     if (!privySignAndSendTransaction) {
@@ -154,19 +154,13 @@ export default function TurfLootTactical() {
       })
 
       console.log('✅ Transaction built, signing with Privy 3.0...')
-      console.log('🔍 Wallet info:', {
-        address: wallet.address,
-        hasSignMethod: typeof wallet.signAndSendTransaction,
-        walletType: wallet.walletClientType,
-        isFromWalletsArray: wallets.some(w => w.address === wallet.address)
-      })
 
       // Step 3: Sign and send with Privy 3.0
-      // For embedded wallets, Privy handles wallet selection automatically
+      // Pass the wallet object directly (works for both external and embedded)
       const { signature } = await privySignAndSendTransaction({
+        wallet,
         transaction,
         chain: 'solana:mainnet'
-        // Note: No wallet parameter - Privy uses authenticated wallet automatically
       })
 
       console.log('✅ Transaction sent! Signature:', signature)
