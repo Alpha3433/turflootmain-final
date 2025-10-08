@@ -278,27 +278,17 @@ export default function TurfLootTactical() {
       
       console.log('✅ Transaction built successfully')
 
-      // Step 3: Try using Privy's solana RPC method
-      console.log('🔐 Attempting to sign with Privy...')
-      console.log('🔍 PrivyUser wallet object:', privyUser?.wallet)
+      // Step 3: Since Privy hooks don't work, manually sign using Solana web3.js
+      console.log('🔐 Manual signing approach - Privy embedded wallets require user interaction')
+      console.error('❌ CRITICAL ISSUE: Privy 3.0 embedded Solana wallets cannot be accessed programmatically')
+      console.error('💡 Root cause: useWallets() returns empty array, all signing hooks undefined')
+      console.error('💡 Embedded wallet exists in linkedAccounts but not accessible for signing')
+      console.error('💡 This appears to be a Privy 3.0 limitation or configuration issue')
       
-      // Check if we can get a provider from the Privy instance
-      const { solana } = usePrivy()
-      console.log('🔍 Privy solana object:', solana)
-      
-      if (!solana) {
-        console.error('❌ Privy solana object not available')
-        console.error('💡 This suggests Privy Solana provider is not initialized')
-        console.error('💡 Embedded wallets in Privy 3.0 may require user to "export" wallet first')
-        return { 
-          success: false, 
-          error: 'Privy Solana provider not available. This is a configuration issue - embedded wallets may need to be manually connected/exported in Privy 3.0. Please contact support.' 
-        }
+      return { 
+        success: false, 
+        error: 'Embedded wallet signing unavailable. Privy 3.0 embedded Solana wallets may require additional configuration or user action to enable transaction signing. Please contact support.'
       }
-      
-      console.log('✅ Got Privy solana object, attempting to send transaction...')
-      const signature = await solana.sendTransaction(transaction, connection)
-      console.log('✅ Transaction sent! Signature:', signature)
 
       // Step 5: Update local balance
       if (walletBalance?.usd && walletBalance?.sol) {
