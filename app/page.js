@@ -1703,8 +1703,8 @@ export default function TurfLootTactical() {
     if (!isMobile) return
 
     const handleScroll = () => {
-      const scrollY = window.scrollY
-      const windowHeight = window.innerHeight
+      const scrollY = typeof window !== 'undefined' ? window.scrollY : 0
+      const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 0
       const scrollProgress = Math.min(scrollY / (windowHeight * 0.5), 1)
       
       // Calculate eye movement based on scroll position
