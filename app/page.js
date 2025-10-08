@@ -123,13 +123,20 @@ export default function TurfLootTactical() {
     [wallets]
   )
   const walletAddressesSignature = useMemo(() => {
+    // SSR safety check
+    if (typeof window === 'undefined') {
+      return ''
+    }
+    
     const addresses = []
     
     // Add addresses from external wallets array
-    wallets
-      .map(wallet => getWalletAddress(wallet))
-      .filter(Boolean)
-      .forEach(addr => addresses.push(addr))
+    if (wallets) {
+      wallets
+        .map(wallet => getWalletAddress(wallet))
+        .filter(Boolean)
+        .forEach(addr => addresses.push(addr))
+    }
     
     // Add addresses from embedded wallets (linkedAccounts)
     if (privyUser?.linkedAccounts) {
