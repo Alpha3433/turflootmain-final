@@ -1004,6 +1004,7 @@ export default function TurfLootTactical() {
         }
 
         // Show notification toast
+        if (typeof document === 'undefined') return
         const notification = document.createElement('div')
         notification.style.cssText = `
           position: fixed;
