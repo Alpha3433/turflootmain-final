@@ -112,6 +112,7 @@ export default function TurfLootTactical() {
   const router = useRouter()
 
   // Privy hooks - restored for authentication
+  // Privy 3.0 hooks
   const {
     ready,
     authenticated,
@@ -120,8 +121,7 @@ export default function TurfLootTactical() {
     logout
   } = usePrivy()
   const { createWallet } = useCreateWallet()
-  
-  const [walletInitializing, setWalletInitializing] = useState(false)
+  const { signAndSendTransaction } = useSignAndSendTransaction()
   const walletAddressesSignature = useMemo(() => {
     // SSR safety check
     if (typeof window === 'undefined') {
