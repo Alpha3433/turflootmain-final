@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets, useCreateWallet } from '@privy-io/react-auth'
-import { useSignAndSendTransaction } from '@privy-io/react-auth/solana'
+import { usePrivy, useCreateWallet } from '@privy-io/react-auth'
+import { useSignAndSendTransaction, useSolanaWallets } from '@privy-io/react-auth/solana'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 const getWalletAddress = (wallet) => {
