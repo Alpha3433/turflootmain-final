@@ -83,6 +83,12 @@ const getWalletAddress = (wallet) => {
   return undefined
 }
 
+const isSolanaChain = (chainType) =>
+  typeof chainType === 'string' && chainType.toLowerCase().startsWith('solana')
+
+const isSolanaAddress = (address) =>
+  typeof address === 'string' && !address.toLowerCase().startsWith('0x') && address.length >= 32
+
 export default function TurfLootTactical() {
   const router = useRouter()
 
@@ -110,7 +116,10 @@ export default function TurfLootTactical() {
     return Array.from(deduped.values())
   }, [privyWallets, externalWallets])
   const solanaWallets = useMemo(
-    () => wallets.filter(wallet => wallet?.chainType === 'solana'),
+    () =>
+      wallets.filter(wallet =>
+        isSolanaChain(wallet?.chainType) && isSolanaAddress(getWalletAddress(wallet))
+      ),
     [wallets]
   )
   const walletAddressesSignature = useMemo(() => {
@@ -668,7 +677,9 @@ export default function TurfLootTactical() {
     console.log('🧪 Privy user object:', JSON.stringify(privyUser, null, 2))
 
     if (wallets?.length > 0) {
-      const solanaWallet = wallets.find(wallet => wallet.chainType === 'solana')
+      const solanaWallet = wallets.find(wallet =>
+        isSolanaChain(wallet.chainType) && isSolanaAddress(getWalletAddress(wallet))
+      )
 
       if (solanaWallet) {
         const address = getWalletAddress(solanaWallet)
@@ -719,8 +730,10 @@ export default function TurfLootTactical() {
       
       // Check if wallet exists in linked accounts
       if (privyUser?.linkedAccounts) {
-        const solanaAccounts = privyUser.linkedAccounts.filter(acc => 
-          acc.type === 'wallet' && (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+        const solanaAccounts = privyUser.linkedAccounts.filter(acc =>
+          acc.type === 'wallet' &&
+          (isSolanaChain(acc.chainType) || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') &&
+          isSolanaAddress(acc.address)
         )
         console.log('🔍 Solana accounts found in linkedAccounts:', solanaAccounts)
       }
@@ -2849,7 +2862,7 @@ export default function TurfLootTactical() {
           connectorType: w.connectorType 
         })))
         
-        solanaWallet = wallets.find(w => w.chainType === 'solana')
+        solanaWallet = wallets.find(w => isSolanaChain(w.chainType) && isSolanaAddress(getWalletAddress(w)))
         if (solanaWallet) {
           walletSource = 'useWallets'
         }
@@ -2865,7 +2878,7 @@ export default function TurfLootTactical() {
         
         // Check if embedded wallet is the Solana wallet we're looking for
         if (privyUser.wallet.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG' ||
-            privyUser.wallet.chainType === 'solana') {
+            isSolanaChain(privyUser.wallet.chainType)) {
           solanaWallet = {
             address: privyUser.wallet.address,
             chainType: 'solana',
@@ -2883,9 +2896,10 @@ export default function TurfLootTactical() {
           chainType: acc.chainType
         })))
         
-        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc => 
-          acc.type === 'wallet' && 
-          (acc.chainType === 'solana' || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG')
+        const linkedSolanaWallet = privyUser.linkedAccounts.find(acc =>
+          acc.type === 'wallet' &&
+          (isSolanaChain(acc.chainType) || acc.address === 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG') &&
+          isSolanaAddress(acc.address)
         )
         
         if (linkedSolanaWallet) {

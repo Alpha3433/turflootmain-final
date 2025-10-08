@@ -3,10 +3,14 @@
 import React, { useMemo, useState } from 'react'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 
+function isSolanaChain(chainType) {
+  return typeof chainType === 'string' && chainType.toLowerCase().startsWith('solana')
+}
+
 function pickDefaultSolanaWallet(wallets) {
   return (
-    wallets.find(w => w.chainType === 'solana' && w.walletClientType === 'privy') ||
-    wallets.find(w => w.chainType === 'solana') ||
+    wallets.find(w => isSolanaChain(w.chainType) && w.walletClientType === 'privy') ||
+    wallets.find(w => isSolanaChain(w.chainType)) ||
     null
   )
 }
@@ -20,7 +24,7 @@ export default function TestPrivySolana() {
   const { wallets } = useWallets()
 
   const solWallets = useMemo(
-    () => wallets.filter(w => w.chainType === 'solana'),
+    () => wallets.filter(w => isSolanaChain(w.chainType)),
     [wallets]
   )
 
