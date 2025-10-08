@@ -76,38 +76,34 @@ class PrivyWalletSigningTester:
             self.log_test_result("API Health Check", False, f"Exception: {str(e)}")
             return False
     
-    async def test_colyseus_server_availability(self) -> bool:
-        """Test 2: Verify Colyseus arena servers are running"""
+    async def test_wallet_balance_api_guest(self) -> bool:
+        """Test 2: Verify wallet balance API works for guest users"""
         try:
-            response = requests.get(f"{self.api_url}/servers", timeout=10)
+            response = requests.get(f"{self.api_url}/wallet/balance", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                servers = data.get('servers', [])
-                colyseus_enabled = data.get('colyseusEnabled', False)
-                colyseus_endpoint = data.get('colyseusEndpoint', '')
                 
-                # Find arena servers
-                arena_servers = [s for s in servers if s.get('serverType') == 'colyseus' and s.get('roomType') == 'arena']
+                # Check for required fields in guest response
+                required_fields = ['balance', 'sol_balance', 'wallet_address']
+                has_required_fields = all(field in data for field in required_fields)
                 
-                is_available = (
-                    colyseus_enabled and 
-                    colyseus_endpoint and 
-                    len(arena_servers) > 0
+                # Guest should have 0 balance and "Not connected" wallet
+                is_guest_response = (
+                    data.get('balance') == 0 and
+                    data.get('wallet_address') == 'Not connected'
                 )
                 
-                details = f"Colyseus enabled: {colyseus_enabled}, Endpoint: {colyseus_endpoint}, Arena servers: {len(arena_servers)}"
-                if arena_servers:
-                    arena_server = arena_servers[0]
-                    details += f", Sample server: {arena_server.get('name', 'Unknown')} (Max: {arena_server.get('maxPlayers', 0)})"
+                is_valid = has_required_fields and is_guest_response
                 
-                self.log_test_result("Colyseus Server Availability", is_available, details)
-                return is_available
+                details = f"Balance: {data.get('balance')}, SOL: {data.get('sol_balance')}, Wallet: {data.get('wallet_address')}"
+                self.log_test_result("Wallet Balance API - Guest", is_valid, details)
+                return is_valid
             else:
-                self.log_test_result("Colyseus Server Availability", False, f"HTTP {response.status_code}")
+                self.log_test_result("Wallet Balance API - Guest", False, f"HTTP {response.status_code}")
                 return False
                 
         except Exception as e:
-            self.log_test_result("Colyseus Server Availability", False, f"Exception: {str(e)}")
+            self.log_test_result("Wallet Balance API - Guest", False, f"Exception: {str(e)}")
             return False
     
     async def test_split_message_handler_backend(self) -> bool:
