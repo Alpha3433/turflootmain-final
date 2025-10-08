@@ -360,25 +360,35 @@ export default function TurfLootTactical() {
       let signature
 
       if (isEmbeddedWallet) {
-        // For embedded wallets: Use base sendTransaction hook
-        console.log('🔐 Signing with embedded wallet via useSendTransaction...')
+        // For embedded wallets: Use Privy user's sendTransaction method directly
+        console.log('🔐 Signing with embedded wallet via privyUser.sendTransaction...')
         
-        // Privy base hook expects serialized transaction
+        if (!privyUser?.sendTransaction) {
+          throw new Error('Embedded wallet sendTransaction method not available. Please ensure wallet is properly initialized.')
+        }
+        
+        // Privy embedded wallet expects serialized transaction
         const serializedTx = transaction.toString('base64')
         
-        console.log('🔍 Sending transaction:', {
+        console.log('🔍 Sending transaction via embedded wallet:', {
           txLength: transaction.length,
           base64Length: serializedTx.length,
-          chain: SOLANA_CHAIN
+          chain: SOLANA_CHAIN,
+          walletAddress: signingAddress
         })
         
-        // Don't pass address - let Privy auto-detect from authenticated user
-        const result = await privySendTransaction({
+        // Use the embedded wallet's sendTransaction method
+        const result = await privyUser.sendTransaction({
           transaction: serializedTx,
-          chain: SOLANA_CHAIN
+          chain: SOLANA_CHAIN,
+          uiOptions: {
+            header: 'Join TurfLoot Arena',
+            description: `Pay ${fees.entrySol.toFixed(4)} SOL entry fee + ${fees.serverSol.toFixed(4)} SOL platform fee (${fees.totalSol.toFixed(4)} SOL total)`,
+            buttonText: 'Confirm & Join'
+          }
         })
         
-        console.log('✅ Transaction result:', result)
+        console.log('✅ Embedded wallet transaction result:', result)
         signature = result?.transactionHash || result?.signature || result
       } else {
         // For external wallets: Use Solana-specific hook
