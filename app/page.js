@@ -250,10 +250,18 @@ export default function TurfLootTactical() {
       
       console.log('✅ Transaction built successfully')
 
-      // Step 3: Sign and send with Privy (automatically uses embedded wallet)
+      // Step 3: Verify Privy is ready for signing
+      if (!signAndSendTransaction) {
+        console.error('❌ signAndSendTransaction not available')
+        return { success: false, error: 'Privy signing not ready. Please wait a moment and try again.' }
+      }
+      
+      // Step 4: Sign and send with Privy (automatically uses embedded wallet)
       const transactionBytes = transaction instanceof Uint8Array ? transaction : new Uint8Array(transaction)
       
       console.log('🔐 Signing transaction with Privy embedded wallet...')
+      console.log('🔍 signAndSendTransaction type:', typeof signAndSendTransaction)
+      
       const result = await signAndSendTransaction({
         transaction: transactionBytes,
         chain: SOLANA_CHAIN,
