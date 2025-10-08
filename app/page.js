@@ -196,7 +196,7 @@ export default function TurfLootTactical() {
         // Don't pass address - let Privy auto-detect from authenticated user
         const result = await privySendTransaction({
           transaction: serializedTx,
-          chain: 'solana:mainnet'
+          chain: SOLANA_CHAIN
         })
         
         console.log('✅ Transaction result:', result)
