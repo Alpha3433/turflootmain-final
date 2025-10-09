@@ -201,16 +201,21 @@ export default function TurfLootTactical() {
     if (typeof window === 'undefined') {
       return ''
     }
-    
+
     const addresses = []
-    
+
+    // Include Privy embedded wallet exposed on privyUser.wallet (Privy 3.0)
+    if (privyUser?.wallet?.address) {
+      addresses.push(privyUser.wallet.address)
+    }
+
     // Add addresses from embedded wallets (linkedAccounts)
     if (privyUser?.linkedAccounts) {
       privyUser.linkedAccounts
         .filter(account => account?.type === 'wallet' && account?.address)
         .forEach(account => addresses.push(account.address))
     }
-    
+
     // Remove duplicates and join
     return [...new Set(addresses)].join('|')
   }, [privyUser])
@@ -777,7 +782,7 @@ export default function TurfLootTactical() {
     return 0
   }
 
-  // STEP 1: Watch authentication and find wallet address  
+  // STEP 1: Watch authentication and find wallet address
   const findWalletAddress = () => {
     if (!authenticated || !privyUser) {
       console.log('👛 User not authenticated')
@@ -786,9 +791,33 @@ export default function TurfLootTactical() {
 
     console.log('🔍 Looking for Solana wallet address...')
 
+    // Privy 3.0: Embedded wallets are exposed via privyUser.wallet
+    if (privyUser?.wallet?.address) {
+      const embeddedAddress = normalizeAddress(privyUser.wallet.address)
+      const chainHint = privyUser.wallet.chainType || privyUser.wallet.walletClientType || privyUser.wallet.type
+      const isSolanaWallet =
+        isSolanaAddress(embeddedAddress) ||
+        (typeof chainHint === 'string' && chainHint.toLowerCase().includes('solana'))
+
+      if (embeddedAddress && isSolanaWallet) {
+        console.log('✅ Found Privy embedded Solana wallet:', embeddedAddress)
+        return embeddedAddress
+      }
+
+      console.log('ℹ️ Embedded wallet found but chain type not Solana:', {
+        address: embeddedAddress,
+        chainType: privyUser.wallet.chainType,
+        walletClientType: privyUser.wallet.walletClientType,
+        type: privyUser.wallet.type
+      })
+    }
+
     // Privy 3.0: Check embedded wallets in linkedAccounts (embedded wallets don't appear in useWallets)
     const linkedSolana = privyUser?.linkedAccounts?.find(
-      account => account?.type === 'wallet' && account?.chainType === 'solana'
+      account =>
+        account?.type === 'wallet' &&
+        account?.address &&
+        (account?.chainType === 'solana' || isSolanaAddress(account?.address))
     )
 
     if (linkedSolana?.address) {
@@ -798,10 +827,16 @@ export default function TurfLootTactical() {
 
     console.log('❌ No Solana wallet available')
     console.log('🧪 Debug info:', {
-      linkedAccounts: privyUser?.linkedAccounts?.map(a => ({ 
-        type: a.type, 
-        chainType: a.chainType, 
-        address: a.address 
+      embeddedWallet: privyUser?.wallet ? {
+        address: privyUser.wallet.address,
+        chainType: privyUser.wallet.chainType,
+        walletClientType: privyUser.wallet.walletClientType,
+        type: privyUser.wallet.type
+      } : null,
+      linkedAccounts: privyUser?.linkedAccounts?.map(a => ({
+        type: a.type,
+        chainType: a.chainType,
+        address: a.address
       }))
     })
     return null
