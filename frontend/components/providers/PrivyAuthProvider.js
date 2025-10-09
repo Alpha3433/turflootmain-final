@@ -1,7 +1,8 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
-import { Component, useState, useEffect } from 'react'
+import { useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
+import { Component, useState, useEffect, useMemo } from 'react'
 
 // Error boundary for Privy-related errors
 class PrivyErrorBoundary extends Component {
@@ -24,7 +25,7 @@ class PrivyErrorBoundary extends Component {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2>Wallet Service Error</h2>
           <p>Please refresh the page to reconnect your wallet.</p>
-          <button onClick={() => window.location.reload()}>Refresh Page</button>
+          <button onClick={() => typeof window !== 'undefined' && window.location.reload()}>Refresh Page</button>
         </div>
       )
     }
@@ -34,20 +35,49 @@ class PrivyErrorBoundary extends Component {
 }
 
 // Client-side wrapper for Privy to prevent SSR issues
-function ClientOnlyPrivyProvider({ children, appId, config }) {
+function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
     console.log('🔧 Privy Solana-Only Configuration Loading...')
     console.log('📋 App ID:', appId ? `${appId.substring(0, 10)}...` : 'MISSING')
-    console.log('📋 Solana RPC:', process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com')
-    console.log('📋 Config:', JSON.stringify({
-      embeddedWallets: config.embeddedWallets,
-      externalWallets: config.externalWallets,
-      solanaClusters: config.solanaClusters
-    }, null, 2))
-  }, [config, appId])
+    console.log('📋 Solana RPC:', debugInfo.solanaRpcUrl)
+    console.log('📋 Solana WS:', debugInfo.solanaWsUrl)
+
+    try {
+      const { appearance, embeddedWallets, externalWallets = {}, solana, funding } = config || {}
+
+      const safeExternalWallets = Object.fromEntries(
+        Object.entries(externalWallets).map(([chain, walletConfig = {}]) => {
+          const connectors = walletConfig.connectors
+
+          if (Array.isArray(connectors)) {
+            return [
+              chain,
+              connectors.map((connector) => connector?.name || connector?.id || 'custom-connector')
+            ]
+          }
+
+          if (connectors && typeof connectors === 'object') {
+            return [chain, Object.keys(connectors)]
+          }
+
+          return [chain, []]
+        })
+      )
+
+      console.log('📋 Config:', JSON.stringify({
+        appearance,
+        embeddedWallets,
+        externalWallets: safeExternalWallets,
+        solanaChains: Object.keys(solana?.rpcs || {}),
+        solanaFunding: funding?.solana
+      }, null, 2))
+    } catch (error) {
+      console.warn('⚠️ Unable to serialize Privy config for logging:', error)
+    }
+  }, [config, appId, debugInfo])
 
   useEffect(() => {
     if (!isClient) return
@@ -131,14 +161,54 @@ function ClientOnlyPrivyProvider({ children, appId, config }) {
 
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
-  
+  useSolanaFundingPlugin()
+
+  const solanaChain = useMemo(() => {
+    const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
+    if (network.startsWith('solana:')) return network
+    if (network === 'mainnet' || network === 'mainnet-beta') return 'solana:mainnet'
+    if (network === 'devnet') return 'solana:devnet'
+    if (network === 'testnet') return 'solana:testnet'
+    return 'solana:mainnet'
+  }, [])
+
+  const solanaRpcUrl =
+    process.env.NEXT_PUBLIC_SOLANA_RPC ||
+    process.env.NEXT_PUBLIC_HELIUS_RPC ||
+    'https://api.mainnet-beta.solana.com'
+
+  const solanaWsUrl =
+    process.env.NEXT_PUBLIC_SOLANA_WS ||
+    process.env.NEXT_PUBLIC_HELIUS_WS ||
+    solanaRpcUrl.replace(/^http/, 'ws')
+
+  const solanaFundingConfig = useMemo(
+    () => ({
+      chain: solanaChain,
+      asset: 'native-currency',
+      defaultFundingMethod: 'exchange',
+      uiConfig: {
+        receiveFundsTitle: 'Receive SOL',
+        receiveFundsSubtitle: 'Top up your TurfLoot balance with Solana',
+        landing: {
+          title: 'Choose how you would like to fund your wallet'
+        }
+      }
+    }),
+    [solanaChain]
+  )
+
   // Validate required environment variables
   if (!appId) {
     console.error('❌ NEXT_PUBLIC_PRIVY_APP_ID is required')
     return <div>Error: Privy App ID not configured</div>
   }
 
-  // SOLANA-ONLY Privy Configuration - UPDATED for v2.24.0 fundWallet compatibility
+  const debugInfo = useMemo(
+    () => ({ solanaChain, solanaRpcUrl, solanaWsUrl }),
+    [solanaChain, solanaRpcUrl, solanaWsUrl]
+  )
+
   const config = {
     // UI Appearance
     appearance: {
@@ -146,77 +216,41 @@ export default function PrivyAuthProvider({ children }) {
       accentColor: '#14F195', // TurfLoot green
       logo: undefined,
       showWalletLoginFirst: false,
+      walletChainType: 'solana-only'
     },
-    
+
     // Authentication methods
     loginMethods: ['google', 'email', 'wallet'],
-    
-    // 🎯 CRITICAL: Embedded Wallets - SOLANA ONLY
+
+    // Embedded wallet configuration
     embeddedWallets: {
-      // ❌ EXPLICITLY DISABLE all Ethereum/EVM embedded wallets
-      ethereum: {
-        createOnLogin: 'off'
-      },
-      // ✅ ENABLE ONLY Solana embedded wallets for new users
-      solana: {
-        createOnLogin: 'users-without-wallets'
+      createOnLogin: 'users-without-wallets',
+      requireUserPasswordOnCreate: false,
+      priceDisplay: {
+        primary: 'native-token'
       }
     },
-    
-    // ❌ Disable all external wallet connectors – embedded only
-    externalWallets: {
-      solana: {
-        wallets: []
+
+    // Solana RPC configuration
+    solana: {
+      rpcs: {
+        [solanaChain]: solanaRpcUrl
       }
     },
-    
-    // 🎯 CRITICAL: supportedChains for v2.24.0 fundWallet compatibility
-    supportedChains: [
-      {
-        id: 101, // Solana Mainnet chain ID
-        name: 'Solana',
-        network: 'mainnet-beta',
-        nativeCurrency: {
-          name: 'Solana',
-          symbol: 'SOL',
-          decimals: 9,
-        },
-        rpcUrls: {
-          default: {
-            http: [process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com']
-          }
-        }
-      }
-    ],
-    
-    // 🎯 CRITICAL: Solana Network Configuration (keeping for backward compatibility)
-    solanaClusters: [
-      {
-        name: 'mainnet-beta',
-        rpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com'
-      }
-    ],
-    
+
+    funding: {
+      solana: solanaFundingConfig
+    },
+
     // Security & MFA
     mfa: {
       noPromptOnMfaRequired: false,
-    },
-    
-    // 🎯 CRITICAL: Explicitly disable Smart Wallets (they're EVM-based)
-    smartWallets: {
-      enabled: false
-    },
-    
-    // 🎯 CRITICAL: Default chain should be Solana
-    defaultChain: {
-      id: 101,
-      name: 'Solana'
     }
   }
 
   return (
     <PrivyErrorBoundary>
-      <ClientOnlyPrivyProvider appId={appId} config={config}>
+      <ClientOnlyPrivyProvider appId={appId} config={config} debugInfo={debugInfo}>
         {children}
       </ClientOnlyPrivyProvider>
     </PrivyErrorBoundary>
