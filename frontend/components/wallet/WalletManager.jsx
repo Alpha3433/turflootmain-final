@@ -382,49 +382,55 @@ const WalletManager = ({ onBalanceUpdate }) => {
       }
 
       const amountString = amountValue.toString()
-      const asset = addFundsForm.currency === 'SOL' ? 'native-currency' : addFundsForm.currency.toLowerCase()
+      const asset = addFundsForm.currency === 'SOL' ? 'native-currency' : 'USDC'
+      const chain = 'solana:mainnet'
+
+      const buildFundingOptions = (overrides = {}) => {
+        const options = {
+          chain,
+          amount: amountString,
+          defaultFundingMethod: 'exchange',
+          ...(asset ? { asset } : {}),
+          uiConfig: {
+            receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
+            receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
+          },
+          ...overrides,
+        }
+
+        if (options.defaultFundingMethod === undefined) {
+          delete options.defaultFundingMethod
+        }
+
+        return options
+      }
 
       console.log('🚀 Attempting to open Privy native funding modal for:', {
         address: walletAddress,
         walletId,
         walletSource,
         amount: amountString,
-        asset
+        asset,
+        chain,
       })
 
       try {
         await fundWallet({
           address: walletAddress,
-          options: {
-            cluster: { name: 'mainnet-beta' },
-            amount: amountString,
-            defaultFundingMethod: 'exchange',
-            ...(asset ? { asset } : {}),
-            uiConfig: {
-              receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
-              receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
-            },
-          },
+          options: buildFundingOptions(),
         })
-        console.log('✅ Privy funding modal opened with cluster configuration')
+        console.log('✅ Privy funding modal opened with mainnet chain configuration')
       } catch (primaryError) {
         console.error('❌ Primary fundWallet attempt failed:', primaryError)
-        console.log('🔄 Trying fallback Solana chain configuration...')
+        console.log('🔄 Trying fallback Solana configuration without default funding method...')
 
         await fundWallet({
           address: walletAddress,
-          options: {
-            chain: { id: 101, name: 'Solana' },
-            asset: asset || 'native-currency',
-            amount: amountString,
-            defaultFundingMethod: 'exchange',
-            uiConfig: {
-              receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
-              receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
-            },
-          },
+          options: buildFundingOptions({
+            defaultFundingMethod: undefined,
+          }),
         })
-        console.log('✅ Privy funding modal opened with chain fallback configuration')
+        console.log('✅ Privy funding modal opened with fallback configuration')
       }
 
       setShowAddFunds(false)
