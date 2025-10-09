@@ -2,8 +2,14 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useCreateWallet, useWallets } from '@privy-io/react-auth'
-import { useSignTransaction, useSignAndSendTransaction, useFundWallet, useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
+import { usePrivy, useCreateWallet } from '@privy-io/react-auth'
+import {
+  useWallets as useSolanaWallets,
+  useSignTransaction,
+  useSignAndSendTransaction,
+  useFundWallet,
+  useSolanaFundingPlugin
+} from '@privy-io/react-auth/solana'
 import { Connection, VersionedTransaction } from '@solana/web3.js'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -122,7 +128,7 @@ export default function TurfLootTactical() {
     logout
   } = usePrivy()
   const { createWallet } = useCreateWallet()
-  const { wallets, ready: walletsReady } = useWallets()
+  const { wallets, ready: walletsReady } = useSolanaWallets()
   const { signTransaction } = useSignTransaction()
   const { signAndSendTransaction } = useSignAndSendTransaction()
   useSolanaFundingPlugin()
