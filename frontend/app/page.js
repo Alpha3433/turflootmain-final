@@ -153,7 +153,7 @@ export default function TurfLootTactical() {
     return null
   }
 
-  const deductRoomFees = async (entryFee, userWalletAddress, feePercentageOverride = null) => {
+  const deductRoomFees = async (entryFeeUsd, userWalletAddress, feePercentageOverride = null) => {
     if (isProcessingFee) {
       console.log('⏳ Fee deduction already in progress, ignoring duplicate request')
       return { success: false, error: 'Transaction already in progress' }
@@ -166,17 +166,21 @@ export default function TurfLootTactical() {
       : USD_PER_SOL_FALLBACK
     const estimatedNetworkFeeLamports = 10000 // ~0.00001 SOL buffer for network fees
     const estimatedNetworkFeeSol = estimatedNetworkFeeLamports / 1_000_000_000
-    const costs = calculateTotalCost(entryFee, feePercentageOverride, {
+    const entryFeeSol = entryFeeUsd / derivedUsdPerSol
+    const costs = calculateTotalCost(entryFeeSol, feePercentageOverride, {
       currency: 'SOL',
       usdPerSol: derivedUsdPerSol
     })
 
     const totalCostSol = costs.totalCostSol ?? costs.totalCost
     const totalCostUsd = costs.totalCostUsd ?? (totalCostSol * derivedUsdPerSol)
+    const networkFeeUsd = estimatedNetworkFeeSol * derivedUsdPerSol
     const totalRequiredSol = totalCostSol + estimatedNetworkFeeSol
+    const totalRequiredUsd = totalCostUsd + networkFeeUsd
 
     console.log('💰 Preparing paid room fee deduction:', {
-      entryFee,
+      entryFeeUsd,
+      entryFeeSol,
       currency: costs.currency,
       feePercentage: costs.feePercentage,
       serverFee: costs.serverFee,
@@ -186,22 +190,16 @@ export default function TurfLootTactical() {
       currentUsdBalance: currentUsdBalance.toFixed(3),
       currentSolBalance: currentSolBalance.toFixed(6),
       estimatedNetworkFeeSol: estimatedNetworkFeeSol.toFixed(6),
-      totalRequiredSol: totalRequiredSol.toFixed(6)
+      estimatedNetworkFeeUsd: networkFeeUsd.toFixed(2),
+      totalRequiredSol: totalRequiredSol.toFixed(6),
+      totalRequiredUsd: totalRequiredUsd.toFixed(2)
     })
 
     if (currentSolBalance < totalRequiredSol) {
       return {
         success: false,
         error:
-          `Insufficient SOL balance. Need ${totalRequiredSol.toFixed(6)} SOL (including network fees), have ${currentSolBalance.toFixed(6)} SOL. Top up at least ${(totalRequiredSol - currentSolBalance).toFixed(6)} SOL.`,
-        costs
-      }
-    }
-
-    if (costs.currency !== 'SOL' && currentUsdBalance < costs.totalCost) {
-      return {
-        success: false,
-        error: `Insufficient USD balance. Need $${costs.totalCost.toFixed(3)}, have $${currentUsdBalance.toFixed(2)}`,
+          `Insufficient SOL balance. Need ${totalRequiredSol.toFixed(6)} SOL (~$${totalRequiredUsd.toFixed(2)}) including network fees, have ${currentSolBalance.toFixed(6)} SOL. Top up at least ${(totalRequiredSol - currentSolBalance).toFixed(6)} SOL.`,
         costs
       }
     }
@@ -228,7 +226,8 @@ export default function TurfLootTactical() {
 
     try {
       const deductionResult = await deductPaidRoomFee({
-        entryAmount: entryFee,
+        entryAmount: entryFeeSol,
+        entryFeeUsd,
         entryCurrency: costs.currency,
         feePercentage: costs.feePercentage,
         walletBalance,
@@ -274,6 +273,7 @@ export default function TurfLootTactical() {
         userWallet: deductionResult.walletAddress,
         serverWallet: deductionResult.serverWallet,
         entryFeeDeducted: resultCosts.entryFee,
+        entryFeeUsd,
         serverFeeTransferred: resultCosts.serverFee,
         totalDeductedCurrency: resultCosts.currency,
         totalDeductedUsd: totalCostUsdWithFees,
