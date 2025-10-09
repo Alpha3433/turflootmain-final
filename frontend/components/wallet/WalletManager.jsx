@@ -262,24 +262,57 @@ const WalletManager = ({ onBalanceUpdate }) => {
     }
   }, [authenticated, user])
 
-  // Handle Add Funds with Privy
-  const handleAddFunds = async () => {
+  const openAddFundsModal = () => {
     if (!authenticated) {
       alert('Please login first')
+      if (typeof login === 'function') {
+        login().catch(() => {})
+      }
+      return
+    }
+
+    setShowAddFunds(true)
+  }
+
+  // Handle Add Funds with Privy
+  const handleAddFunds = async (event) => {
+    event?.preventDefault?.()
+
+    if (!authenticated) {
+      alert('Please login first')
+      if (typeof login === 'function') {
+        login().catch(() => {})
+      }
+      return
+    }
+
+    const amountValue = parseFloat(addFundsForm.amount)
+    if (!amountValue || Number.isNaN(amountValue)) {
+      alert('Please enter a valid deposit amount before continuing.')
+      return
+    }
+
+    const minDeposit = addFundsForm.currency === 'SOL' ? 0.01 : 1
+    if (amountValue < minDeposit) {
+      alert(`Minimum deposit is ${minDeposit.toFixed(2)} ${addFundsForm.currency}.`)
       return
     }
 
     try {
+      setLoading(true)
+
       console.log('🎯 Attempting to open Privy wallet funding modal')
-      console.log('🔍 Debug info:', { 
-        fundWallet: typeof fundWallet, 
+      console.log('🔍 Debug info:', {
+        fundWallet: typeof fundWallet,
         fundWalletAvailable: !!fundWallet,
         walletsCount: wallets?.length || 0,
         userWallet: user?.wallet?.address,
         authenticated,
-        userId: user?.id
+        userId: user?.id,
+        amount: amountValue,
+        currency: addFundsForm.currency
       })
-      
+
       // Get user's Solana wallet, preserving Privy wallet metadata
       let solanaWallet = null
       let walletSource = null
@@ -323,13 +356,12 @@ const WalletManager = ({ onBalanceUpdate }) => {
           await connectWallet()
           console.log('✅ Wallet connection initiated')
           return
-        } else {
-          console.log('⚠️ No wallet connection available, showing custom modal')
-          setShowAddFunds(true)
-          return
         }
+
+        console.log('⚠️ No wallet connection available, keeping manual modal open')
+        return
       }
-      
+
       const walletId = solanaWallet.walletId ?? solanaWallet.id
 
       if (!walletId) {
@@ -342,50 +374,68 @@ const WalletManager = ({ onBalanceUpdate }) => {
         return
       }
 
-      // Try to use Privy's native funding modal
-      if (typeof fundWallet === 'function') {
-        console.log('🚀 Attempting to open Privy native funding modal for:', {
-          walletId,
-          address: solanaWallet.address,
-          walletSource
-        })
-
-        try {
-          await fundWallet({
-            walletId,
-            options: {
-              uiConfig: {
-                receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
-                receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
-              },
-            },
-          })
-          console.log('✅ Privy funding modal should have opened')
-          return
-        } catch (privyError) {
-          console.error('❌ Privy fundWallet failed:', privyError)
-          console.log('📋 Error details:', {
-            message: privyError.message,
-            name: privyError.name,
-            stack: privyError.stack?.substring(0, 200)
-          })
-          throw privyError
-        }
-      } else {
+      if (typeof fundWallet !== 'function') {
         console.log('⚠️ fundWallet function not available, type:', typeof fundWallet)
-        console.log('🔄 Falling back to custom modal')
-        setShowAddFunds(true)
+        alert('Funding functionality is not available right now. Please try again later or refresh the page.')
+        return
       }
-      
-    } catch (error) {
-      console.error('❌ Error opening Privy funding modal:', error)
-      console.log('📋 Full error details:', {
-        message: error.message,
-        name: error.name,
-        cause: error.cause
+
+      const amountString = amountValue.toString()
+      const asset = addFundsForm.currency === 'SOL' ? 'native-currency' : addFundsForm.currency.toLowerCase()
+
+      console.log('🚀 Attempting to open Privy native funding modal for:', {
+        walletId,
+        address: solanaWallet.address,
+        walletSource,
+        amount: amountString,
+        asset
       })
-      console.log('🔄 Falling back to custom modal')
-      setShowAddFunds(true)
+
+      try {
+        await fundWallet({
+          walletId,
+          options: {
+            cluster: { name: 'mainnet-beta' },
+            amount: amountString,
+            defaultFundingMethod: 'exchange',
+            ...(asset ? { asset } : {}),
+            uiConfig: {
+              receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
+              receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
+            },
+          },
+        })
+        console.log('✅ Privy funding modal opened with cluster configuration')
+      } catch (primaryError) {
+        console.error('❌ Primary fundWallet attempt failed:', primaryError)
+        console.log('🔄 Trying fallback Solana chain configuration...')
+
+        await fundWallet({
+          walletId,
+          options: {
+            chain: { id: 101, name: 'Solana' },
+            asset: asset || 'native-currency',
+            amount: amountString,
+            defaultFundingMethod: 'exchange',
+            uiConfig: {
+              receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',
+              receiveFundsSubtitle: 'Choose a method to add funds and start playing.',
+            },
+          },
+        })
+        console.log('✅ Privy funding modal opened with chain fallback configuration')
+      }
+
+      setShowAddFunds(false)
+      setAddFundsForm(prev => ({ ...prev, amount: '' }))
+      await fetchBalance()
+      fetchTransactions()
+
+    } catch (error) {
+      console.error('❌ Error opening funding modal:', error)
+      alert(`Unable to open the funding modal. Please try again.\n\nDetails: ${error.message || 'Unknown error'}`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -605,8 +655,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
       
       {/* Action Buttons */}
       <div className="space-y-3">
-        <button 
-          onClick={handleAddFunds}
+        <button
+          onClick={openAddFundsModal}
           className="w-full py-3 bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 rounded-xl text-green-400 font-bold text-sm transition-all hover:scale-105"
         >
           Add Funds
