@@ -8,8 +8,12 @@ import {
   buildSolanaRpcEndpointList,
   calculatePaidRoomCosts,
   deductPaidRoomFee,
+  autoSweepEmbeddedWallet,
+  AUTO_SWEEP_MINIMUM_LAMPORTS,
   SERVER_WALLET_ADDRESS
 } from '../../lib/paid/feeManager'
+
+const DEFAULT_SITE_SWEEP_WALLET = 'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -410,112 +414,142 @@ export default function TurfLootTactical() {
   }
   const processFeeTransaction = async (depositAmount, userWalletAddress) => {
     if (isProcessingFee) {
-      console.log('⚠️ Fee processing already in progress')
+      console.log('⚠️ Auto sweep already in progress')
       return false
     }
-    
+
+    if (!depositAmount || depositAmount <= 0) {
+      console.log('⚠️ Auto sweep skipped due to invalid deposit amount:', depositAmount)
+      return false
+    }
+
+    if (!privyUser || !authenticated) {
+      console.log('❌ User not authenticated for auto sweep processing')
+      return false
+    }
+
+    const solanaWallet = resolveSolanaWallet()
+    if (!solanaWallet) {
+      console.log('❌ No Solana wallet available for auto sweep transfer')
+      return false
+    }
+
+    if (typeof privySignAndSendTransaction !== 'function') {
+      console.log('❌ Privy signAndSendTransaction function unavailable for auto sweep')
+      return false
+    }
+
+    const siteWallet =
+      process.env.NEXT_PUBLIC_SITE_FEE_WALLET ||
+      process.env.NEXT_PUBLIC_SITE_PRIVY_WALLET ||
+      DEFAULT_SITE_SWEEP_WALLET
+
+    const configuredMinLamports = Number(
+      process.env.NEXT_PUBLIC_AUTO_SWEEP_MIN_LAMPORTS ||
+        process.env.AUTO_SWEEP_MIN_LAMPORTS ||
+        process.env.AUTO_SWEEP_MINIMUM_LAMPORTS
+    )
+    const minimumLamports = Number.isFinite(configuredMinLamports)
+      ? Math.max(0, Math.floor(configuredMinLamports))
+      : AUTO_SWEEP_MINIMUM_LAMPORTS
+
     setIsProcessingFee(true)
-    
+
     try {
-      const feePercentage = parseFloat(process.env.NEXT_PUBLIC_DEPOSIT_FEE_PERCENTAGE) || 10
-      const feeAmount = depositAmount * (feePercentage / 100)
-      const siteWallet = process.env.NEXT_PUBLIC_SITE_FEE_WALLET
-      
-      console.log(`💰 Processing ${feePercentage}% deposit fee:`, {
-        depositAmount: depositAmount.toFixed(4),
-        feeAmount: feeAmount.toFixed(4),
+      console.log('🏦 Initiating auto sweep for embedded wallet deposit:', {
+        depositAmount: depositAmount.toFixed(6),
         siteWallet,
         userWallet: userWalletAddress
       })
-      
-      // Check if we have enough balance for the fee (user needs to have deposited)
-      if (depositAmount < feeAmount) {
-        console.log('⚠️ Deposit amount too small for fee processing')
-        return false
+
+      const sweepMemo = {
+        type: 'turfloot:auto-sweep',
+        depositAmountSol: Number(depositAmount.toFixed(6)),
+        destination: siteWallet,
+        source: userWalletAddress,
+        triggeredAt: new Date().toISOString(),
+        userId: privyUser?.id || privyUser?.userId || privyUser?.privyId || privyUser?.email || 'unknown'
       }
-      
-      // Get the user's wallet from Privy to send the transaction
-      if (!privyUser || !authenticated) {
-        console.log('❌ User not authenticated for fee processing')
-        return false
-      }
-      
-      // Show user notification about fee processing
-      console.log(`🏦 Collecting ${feePercentage}% deposit fee (${feeAmount.toFixed(4)} SOL) for site operations`)
-      
-      // For now, let's create the transaction data that would be sent
-      const feeTransactionData = {
-        from: userWalletAddress,
-        to: siteWallet,
-        amount: feeAmount,
-        depositAmount: depositAmount,
-        feePercentage: feePercentage,
-        timestamp: new Date().toISOString(),
-        status: 'pending'
-      }
-      
-      console.log('📄 Fee transaction prepared:', feeTransactionData)
-      
-      // Store fee transaction record in localStorage for now
-      const feeKey = `fee_transaction_${Date.now()}`
-      localStorage.setItem(feeKey, JSON.stringify(feeTransactionData))
-      
-      // In production, this is where you would:
-      // 1. Use Privy's sendTransaction method to send SOL to site wallet
-      // 2. Wait for transaction confirmation
-      // 3. Update user's balance to reflect the fee deduction
-      // 4. Store the transaction record in your database
-      
-      console.log('✅ Fee processing completed (simulated)')
-      
-      // Update the user's displayed balance to reflect the fee
-      const netBalance = depositAmount - feeAmount
-      const usdBalance = (netBalance * 150).toFixed(2) // Rough conversion
-      
-      setWalletBalance({
-        sol: netBalance.toFixed(4),
-        usd: usdBalance,
-        loading: false
+
+      const sweepResult = await autoSweepEmbeddedWallet({
+        solanaWallet,
+        privyUser,
+        signAndSendTransactionFn: privySignAndSendTransaction,
+        rpcEndpoints: SOLANA_RPC_ENDPOINTS,
+        solanaChain: SOLANA_CHAIN,
+        sourceAddress: userWalletAddress,
+        destinationAddress: siteWallet,
+        minimumLamports,
+        memo: sweepMemo,
+        logger: console
       })
-      
-      // Show success message to user
-      const feeMessage = `Deposit successful! ${feePercentage}% fee (${feeAmount.toFixed(4)} SOL) collected for site operations. Net balance: ${netBalance.toFixed(4)} SOL`
-      console.log('💡', feeMessage)
-      
-      return true
-      
+
+      if (sweepResult?.swept) {
+        console.log('✅ Auto sweep complete:', sweepResult)
+
+        try {
+          localStorage.setItem(
+            `auto_sweep_${Date.now()}`,
+            JSON.stringify({
+              ...sweepResult,
+              depositAmount,
+              recordedAt: new Date().toISOString()
+            })
+          )
+        } catch (storageError) {
+          console.log('⚠️ Unable to persist auto sweep record:', storageError)
+        }
+
+        setWalletBalance((prev) => ({
+          ...prev,
+          sol: '0.0000',
+          usd: '0.00',
+          loading: false,
+          lastAutoSweepSignature: sweepResult.signature,
+          lastAutoSweepLamports: sweepResult.lamports
+        }))
+
+        return true
+      }
+
+      console.log('ℹ️ Auto sweep skipped or not required:', sweepResult)
+      return false
     } catch (error) {
-      console.error('❌ Error processing deposit fee:', error)
+      console.error('❌ Auto sweep failed:', error)
       return false
     } finally {
       setIsProcessingFee(false)
     }
   }
   
-  // DEPOSIT DETECTION SYSTEM
+  // DEPOSIT DETECTION SYSTEM WITH AUTO SWEEP
   const detectDepositAndProcessFee = async (newBalance, walletAddress) => {
     if (previousBalance === 0) {
       // First balance check, just store the balance
       setPreviousBalance(newBalance)
       return
     }
-    
+
+    let nextPreviousBalance = newBalance
+
     if (newBalance > previousBalance) {
       const depositAmount = newBalance - previousBalance
       console.log(`💸 DEPOSIT DETECTED! Amount: ${depositAmount.toFixed(4)} SOL`)
       console.log(`📊 Balance change: ${previousBalance.toFixed(4)} → ${newBalance.toFixed(4)} SOL`)
-      
-      // Only process fee for deposits above a minimum threshold (e.g., 0.001 SOL)
+
       if (depositAmount >= 0.001) {
-        console.log('🎯 Processing deposit fee...')
-        await processFeeTransaction(depositAmount, walletAddress)
+        console.log('🎯 Initiating auto sweep for detected deposit...')
+        const sweepSuccess = await processFeeTransaction(depositAmount, walletAddress)
+        if (sweepSuccess) {
+          nextPreviousBalance = Math.max(0, previousBalance)
+        }
       } else {
-        console.log('⚠️ Deposit too small for fee processing (< 0.001 SOL)')
+        console.log('⚠️ Deposit too small for auto sweep (< 0.001 SOL)')
       }
     }
-    
+
     // Update previous balance for next comparison
-    setPreviousBalance(newBalance)
+    setPreviousBalance(nextPreviousBalance)
   }
   // STEP 2: Fetch the on-chain balance (with deposit detection and fee processing)
   const checkSolanaBalance = async (walletAddress) => {
