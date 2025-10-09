@@ -10,7 +10,7 @@ import {
   useFundWallet,
   useSolanaFundingPlugin
 } from '@privy-io/react-auth/solana'
-import { Connection, VersionedTransaction } from '@solana/web3.js'
+import bs58 from 'bs58'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 const getWalletAddress = (wallet) => {
@@ -113,6 +113,30 @@ const isPrivyEmbeddedWallet = (wallet) => {
   }
 
   return false
+}
+
+const normaliseSignature = (value) => {
+  if (!value) {
+    return null
+  }
+
+  if (typeof value === 'string') {
+    return value
+  }
+
+  if (value instanceof Uint8Array) {
+    return bs58.encode(value)
+  }
+
+  if (Array.isArray(value)) {
+    return bs58.encode(Uint8Array.from(value))
+  }
+
+  if (typeof value === 'object' && value.signature) {
+    return normaliseSignature(value.signature)
+  }
+
+  return null
 }
 
 export default function TurfLootTactical() {
@@ -394,7 +418,12 @@ export default function TurfLootTactical() {
 
     try {
       // Step 2: Build Solana transaction with Helius
-      const { buildEntryFeeTransaction, calculateFees, getServerWalletAddress } = await import('../lib/paid/cleanFeeManager')
+      const {
+        buildEntryFeeTransaction,
+        calculateFees,
+        getServerWalletAddress,
+        confirmTransaction
+      } = await import('../lib/paid/cleanFeeManager')
 
       const USD_PER_SOL = 150
       const estimatedFees = calculateFees(entryFee, USD_PER_SOL)
@@ -407,7 +436,7 @@ export default function TurfLootTactical() {
         total: `${estimatedFees.totalSol.toFixed(4)} SOL`
       })
 
-      const { transaction, fees: calculatedFees, connection } = await buildEntryFeeTransaction({
+      const { serialized, fees: calculatedFees, connection } = await buildEntryFeeTransaction({
         entryFeeUsd: entryFee,
         userWalletAddress: embeddedWalletAccount.address,
         serverWalletAddress: SERVER_WALLET,
@@ -449,12 +478,22 @@ export default function TurfLootTactical() {
 
       const result = await signAndSendTransaction({
         wallet: signingWallet,
-        transaction,
+        transaction: serialized,
         chain: SOLANA_CHAIN
       })
-      
-      const signature = result?.signature || result
+
+      const signature = normaliseSignature(result?.signature ?? result)
+
+      if (!signature) {
+        throw new Error('Privy wallet did not return a valid transaction signature.')
+      }
       console.log('✅ Transaction sent! Signature:', signature)
+
+      try {
+        await confirmTransaction(connection, signature)
+      } catch (confirmationError) {
+        console.warn('⚠️ Transaction confirmation encountered an issue:', confirmationError)
+      }
 
       // Step 5: Update local balance
       if (walletBalance?.usd && walletBalance?.sol) {
