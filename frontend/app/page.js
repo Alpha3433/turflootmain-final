@@ -2794,18 +2794,19 @@ export default function TurfLootTactical() {
         return
       }
       
+      const walletAddress = solanaWallet.address
       const walletId = solanaWallet.walletId ?? solanaWallet.id
 
       console.log('✅ Solana wallet found via:', walletSource, {
-        address: solanaWallet.address,
+        address: walletAddress,
         connectorType: solanaWallet.connectorType,
         chainType: solanaWallet.chainType,
         walletId
       })
 
-      if (!walletId) {
-        console.error('❌ Solana wallet is missing walletId/id. Cannot open funding modal.')
-        alert('Unable to identify the selected Solana wallet. Please reconnect your wallet and try again.')
+      if (!walletAddress) {
+        console.error('❌ Solana wallet is missing an address. Cannot open funding modal.')
+        alert('Unable to identify the selected Solana wallet address. Please reconnect your wallet and try again.')
         return
       }
       
@@ -2831,7 +2832,7 @@ export default function TurfLootTactical() {
       try {
         console.log('🧪 APPROACH 1: Solana cluster format with exchange method')
         await fundWallet({
-          walletId,
+          address: walletAddress,
           options: {
             cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
             amount: '0.1',                        // ✅ SOL amount
@@ -2853,7 +2854,7 @@ export default function TurfLootTactical() {
       try {
         console.log('🧪 APPROACH 2: Simplified Solana cluster format')
         await fundWallet({
-          walletId,
+          address: walletAddress,
           options: {
             cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
             amount: '0.1'                         // ✅ SOL amount
@@ -2871,7 +2872,7 @@ export default function TurfLootTactical() {
       try {
         console.log('🧪 APPROACH 3: Working chain ID format (reliable fallback)')
         await fundWallet({
-          walletId,
+          address: walletAddress,
           options: {
             chain: {
               id: 101, // Solana Mainnet chain ID
