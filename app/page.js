@@ -268,16 +268,45 @@ export default function TurfLootTactical() {
     console.log('📋 User Wallet:', userWalletAddress)
 
     // Step 1: Verify embedded Solana wallet exists in linkedAccounts
-    const embeddedWallet = privyUser?.linkedAccounts?.find(
+    const embeddedWalletAccount = privyUser?.linkedAccounts?.find(
       account => account.type === 'wallet' && account.chainType === 'solana'
     )
-    
-    if (!embeddedWallet) {
+
+    if (!embeddedWalletAccount) {
       console.error('❌ No embedded Solana wallet found in linkedAccounts')
       return { success: false, error: 'No Solana wallet. Please refresh to create one.' }
     }
-    
-    console.log('✅ Embedded wallet found in linkedAccounts:', embeddedWallet.address)
+
+    console.log('✅ Embedded wallet found in linkedAccounts:', embeddedWalletAccount.address)
+
+    const signingWallet = wallets?.find(wallet => {
+      if (!wallet) {
+        return false
+      }
+
+      const clientType = (wallet.walletClientType || wallet.type || '').toLowerCase()
+      const isEmbeddedClient = clientType.includes('privy') || clientType.includes('embedded')
+      const isSameAddress = wallet.address === embeddedWalletAccount.address
+
+      return isEmbeddedClient && isSameAddress
+    })
+
+    if (!signingWallet) {
+      console.error('❌ Embedded wallet not available in useWallets() for signing', {
+        walletAddresses: wallets?.map(w => w?.address),
+        expectedAddress: embeddedWalletAccount.address
+      })
+      return {
+        success: false,
+        error: 'Wallet initializing. Please wait a few seconds and try again.'
+      }
+    }
+
+    console.log('✅ Embedded wallet ready for signing via useWallets:', {
+      address: signingWallet.address,
+      walletClientType: signingWallet.walletClientType,
+      connectorType: signingWallet.connectorType
+    })
 
     try {
       // Step 2: Build Solana transaction with Helius
@@ -296,7 +325,7 @@ export default function TurfLootTactical() {
       
       const { transaction, connection } = await buildEntryFeeTransaction({
         entryFeeUsd: entryFee,
-        userWalletAddress: embeddedWallet.address,
+        userWalletAddress: embeddedWalletAccount.address,
         serverWalletAddress: SERVER_WALLET,
         usdPerSol: USD_PER_SOL
       })
@@ -304,16 +333,7 @@ export default function TurfLootTactical() {
       console.log('✅ Transaction built successfully')
 
       // Step 3: Check if embedded wallet is available in useWallets
-      if (!embeddedWallet) {
-        console.error('❌ Embedded wallet not found in useWallets()')
-        console.error('🔍 Wallets:', wallets)
-        return { 
-          success: false, 
-          error: 'Wallet initializing. Please wait a few seconds and try again.'
-        }
-      }
-      
-      console.log('✅ Embedded wallet found for signing:', embeddedWallet.address)
+      console.log('✅ Embedded wallet found for signing:', signingWallet.address)
 
       // Step 4: Sign and send transaction with Privy (this will show Privy modal)
       console.log('🔐 About to call signAndSendTransaction...')
@@ -331,13 +351,13 @@ export default function TurfLootTactical() {
       }
       
       console.log('✅ Calling signAndSendTransaction with params:', {
-        walletAddress: embeddedWallet.address,
-        walletClientType: embeddedWallet.walletClientType,
+        walletAddress: signingWallet.address,
+        walletClientType: signingWallet.walletClientType,
         chain: SOLANA_CHAIN
       })
-      
+
       const result = await signAndSendTransaction({
-        wallet: embeddedWallet,
+        wallet: signingWallet,
         transaction,
         chain: SOLANA_CHAIN
       })
