@@ -362,15 +362,16 @@ const WalletManager = ({ onBalanceUpdate }) => {
         return
       }
 
+      const walletAddress = solanaWallet.address
       const walletId = solanaWallet.walletId ?? solanaWallet.id
 
-      if (!walletId) {
-        console.error('❌ Selected wallet is missing walletId/id. Cannot open funding modal.', {
+      if (!walletAddress) {
+        console.error('❌ Selected wallet is missing an address. Cannot open funding modal.', {
           walletSource,
-          address: solanaWallet.address,
-          chainType: solanaWallet.chainType
+          chainType: solanaWallet.chainType,
+          walletId
         })
-        alert('Unable to open the funding modal because the wallet ID is missing. Please reconnect your wallet and try again.')
+        alert('Unable to open the funding modal because the wallet address is missing. Please reconnect your wallet and try again.')
         return
       }
 
@@ -384,8 +385,8 @@ const WalletManager = ({ onBalanceUpdate }) => {
       const asset = addFundsForm.currency === 'SOL' ? 'native-currency' : addFundsForm.currency.toLowerCase()
 
       console.log('🚀 Attempting to open Privy native funding modal for:', {
+        address: walletAddress,
         walletId,
-        address: solanaWallet.address,
         walletSource,
         amount: amountString,
         asset
@@ -393,7 +394,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
 
       try {
         await fundWallet({
-          walletId,
+          address: walletAddress,
           options: {
             cluster: { name: 'mainnet-beta' },
             amount: amountString,
@@ -411,7 +412,7 @@ const WalletManager = ({ onBalanceUpdate }) => {
         console.log('🔄 Trying fallback Solana chain configuration...')
 
         await fundWallet({
-          walletId,
+          address: walletAddress,
           options: {
             chain: { id: 101, name: 'Solana' },
             asset: asset || 'native-currency',
