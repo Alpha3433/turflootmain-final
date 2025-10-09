@@ -4,7 +4,12 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
 import { useSignAndSendTransaction, useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
-import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../../lib/paid/feeManager'
+import {
+  buildSolanaRpcEndpointList,
+  calculatePaidRoomCosts,
+  deductPaidRoomFee,
+  SERVER_WALLET_ADDRESS
+} from '../../lib/paid/feeManager'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -74,16 +79,24 @@ export default function TurfLootTactical() {
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
   const SOLANA_CHAIN = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
+
     if (network.startsWith('solana:')) {
       return network
     }
+
+    if (network === 'mainnet' || network === 'mainnet-beta') {
+      return 'solana:mainnet-beta'
+    }
+
     if (network === 'devnet') {
       return 'solana:devnet'
     }
+
     if (network === 'testnet') {
       return 'solana:testnet'
     }
-    return 'solana:mainnet'
+
+    return `solana:${network}`
   }, [])
 
   const isSolanaChain = (chainType) =>
