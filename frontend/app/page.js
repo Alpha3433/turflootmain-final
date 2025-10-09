@@ -14,7 +14,20 @@ export default function TurfLootTactical() {
   // Privy hooks - using useFundWallet from main auth module (working approach)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets: privyWalletsFromHook = [] } = useWallets()
-  const { fundWallet } = useFundWallet()
+
+  // Handle both legacy (object-returning) and current (function-returning) useFundWallet signatures
+  const fundWalletHook = useFundWallet()
+  const fundWallet = useMemo(() => {
+    if (typeof fundWalletHook === 'function') {
+      return fundWalletHook
+    }
+
+    if (fundWalletHook && typeof fundWalletHook.fundWallet === 'function') {
+      return fundWalletHook.fundWallet
+    }
+
+    return undefined
+  }, [fundWalletHook])
   const signAndSendTransactionResponse = useSignAndSendTransaction()
   const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
   
