@@ -390,26 +390,33 @@ export default function TurfLootTactical() {
     try {
       // Step 2: Build Solana transaction with Helius
       const { buildEntryFeeTransaction, calculateFees, getServerWalletAddress } = await import('../lib/paid/cleanFeeManager')
-      
+
       const USD_PER_SOL = 150
-      const fees = calculateFees(entryFee, USD_PER_SOL)
+      const estimatedFees = calculateFees(entryFee, USD_PER_SOL)
       const SERVER_WALLET = getServerWalletAddress()
-      
+
       console.log('🔨 Building transaction...')
       console.log('💵 Fees:', {
-        entry: `${fees.entrySol.toFixed(4)} SOL`,
-        platform: `${fees.serverSol.toFixed(4)} SOL`,
-        total: `${fees.totalSol.toFixed(4)} SOL`
+        entry: `${estimatedFees.entrySol.toFixed(4)} SOL`,
+        platform: `${estimatedFees.serverSol.toFixed(4)} SOL`,
+        total: `${estimatedFees.totalSol.toFixed(4)} SOL`
       })
-      
-      const { transaction, connection } = await buildEntryFeeTransaction({
+
+      const { transaction, fees: calculatedFees, connection } = await buildEntryFeeTransaction({
         entryFeeUsd: entryFee,
         userWalletAddress: embeddedWalletAccount.address,
         serverWalletAddress: SERVER_WALLET,
         usdPerSol: USD_PER_SOL
       })
-      
+
       console.log('✅ Transaction built successfully')
+
+      const fees = {
+        ...calculatedFees,
+        totalCost: calculatedFees.totalUsd,
+        entryFee: calculatedFees.entryFeeUsd,
+        serverFee: calculatedFees.serverFeeUsd
+      }
 
       // Step 3: Check if embedded wallet is available in useWallets
       console.log('✅ Embedded wallet found for signing:', signingWallet.address)
@@ -452,21 +459,45 @@ export default function TurfLootTactical() {
         })
       }
 
-      return { success: true, signature, fees }
+      return {
+        success: true,
+        signature,
+        fees,
+        costs: {
+          entryFee: fees.entryFee,
+          serverFee: fees.serverFee,
+          totalCost: fees.totalCost
+        }
+      }
 
     } catch (error) {
       console.error('❌ Transaction failed:', error)
       
       // User-friendly error messages
+      const normalizedMessage = (error?.message || error?.toString?.() || '').toLowerCase()
+      const userCancelled =
+        normalizedMessage.includes('user rejected') ||
+        normalizedMessage.includes('rejected') ||
+        normalizedMessage.includes('cancelled') ||
+        normalizedMessage.includes('failed to connect to wallet') ||
+        normalizedMessage.includes('close the modal') ||
+        normalizedMessage.includes('closed the modal')
+
+      if (userCancelled) {
+        return {
+          success: false,
+          cancelled: true,
+          error: 'Transaction cancelled.'
+        }
+      }
+
       let errorMessage = 'Transaction failed. Please try again.'
-      if (error.message?.includes('User rejected') || error.message?.includes('rejected') || error.message?.includes('cancelled')) {
-        errorMessage = 'Transaction cancelled.'
-      } else if (error.message?.includes('insufficient')) {
+      if (normalizedMessage.includes('insufficient')) {
         errorMessage = 'Insufficient SOL balance.'
-      } else if (error.message) {
+      } else if (error?.message) {
         errorMessage = error.message
       }
-      
+
       return { success: false, error: errorMessage }
     }
   }
@@ -2400,6 +2431,11 @@ export default function TurfLootTactical() {
         )
 
         if (!feeResult.success) {
+          if (feeResult.cancelled) {
+            console.log('🚫 Paid room fee flow cancelled by user.')
+            return
+          }
+
           console.error('❌ Paid room fee deduction failed:', feeResult.error)
           alert(`Failed to process room entry fee: ${feeResult.error}`)
           return
