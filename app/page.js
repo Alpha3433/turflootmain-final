@@ -2,9 +2,14 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useCreateWallet, useWallets } from '@privy-io/react-auth'
-import { useSignTransaction, useSignAndSendTransaction, useFundWallet, useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
-import { Connection, VersionedTransaction } from '@solana/web3.js'
+import { usePrivy, useCreateWallet } from '@privy-io/react-auth'
+import {
+  useWallets as useSolanaWallets,
+  useSignTransaction,
+  useSignAndSendTransaction,
+  useFundWallet,
+  useSolanaFundingPlugin
+} from '@privy-io/react-auth/solana'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
 const getWalletAddress = (wallet) => {
@@ -122,7 +127,7 @@ export default function TurfLootTactical() {
     logout
   } = usePrivy()
   const { createWallet } = useCreateWallet()
-  const { wallets, ready: walletsReady } = useWallets()
+  const { wallets, ready: walletsReady } = useSolanaWallets()
   const { signTransaction } = useSignTransaction()
   const { signAndSendTransaction } = useSignAndSendTransaction()
   useSolanaFundingPlugin()
@@ -396,43 +401,64 @@ export default function TurfLootTactical() {
         total: `${fees.totalSol.toFixed(4)} SOL`
       })
       
-      const { transaction, connection } = await buildEntryFeeTransaction({
+      const { transaction, connection, latestBlockhash } = await buildEntryFeeTransaction({
         entryFeeUsd: entryFee,
         userWalletAddress: embeddedWalletAccount.address,
         serverWalletAddress: SERVER_WALLET,
         usdPerSol: USD_PER_SOL
       })
-      
-      console.log('✅ Transaction built successfully')
+
+      console.log('✅ Transaction built successfully', {
+        byteLength: transaction?.byteLength,
+        latestBlockhash
+      })
 
       // Step 3: Check if embedded wallet is available in useWallets
       console.log('✅ Embedded wallet found for signing:', signingWallet.address)
+      console.log('🔍 Wallet signAndSendTransaction type:', typeof signingWallet?.signAndSendTransaction)
 
       // Step 4: Sign and send transaction with Privy (this will show Privy modal)
       console.log('🔐 About to call signAndSendTransaction...')
       console.log('🔍 signAndSendTransaction type:', typeof signAndSendTransaction)
       console.log('🔍 signAndSendTransaction value:', signAndSendTransaction)
       console.log('🔍 Is function?', typeof signAndSendTransaction === 'function')
-      
+
       if (typeof signAndSendTransaction !== 'function') {
         console.error('❌ signAndSendTransaction is not a function!')
         console.error('🔍 Actual value:', signAndSendTransaction)
-        return { 
-          success: false, 
+        return {
+          success: false,
           error: 'Transaction signing unavailable. Please refresh and try again.'
         }
       }
-      
+
+      const transactionBytes =
+        transaction instanceof Uint8Array ? transaction : new Uint8Array(transaction ?? [])
+
+      if (!transactionBytes?.byteLength) {
+        console.error('❌ Serialized transaction is empty or invalid')
+        return {
+          success: false,
+          error: 'Unable to build transaction. Please try again.'
+        }
+      }
+
       console.log('✅ Calling signAndSendTransaction with params:', {
         walletAddress: signingWallet.address,
         walletClientType: signingWallet.walletClientType,
-        chain: SOLANA_CHAIN
+        chain: SOLANA_CHAIN,
+        byteLength: transactionBytes.byteLength
       })
 
       const result = await signAndSendTransaction({
         wallet: signingWallet,
-        transaction,
-        chain: SOLANA_CHAIN
+        transaction: transactionBytes,
+        chain: SOLANA_CHAIN,
+        address: signingWallet.address,
+        options: {
+          preflightCommitment: 'confirmed',
+          skipPreflight: false
+        }
       })
       
       const signature = result?.signature || result
