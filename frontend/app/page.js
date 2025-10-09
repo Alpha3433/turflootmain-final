@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
-import { useSignAndSendTransaction } from '@privy-io/react-auth/solana'
+import { useSignAndSendTransaction, useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
 import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../../lib/paid/feeManager'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
@@ -14,6 +14,8 @@ export default function TurfLootTactical() {
   // Privy hooks - using useFundWallet from main auth module (working approach)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets: privyWalletsFromHook = [] } = useWallets()
+
+  useSolanaFundingPlugin()
 
   // Handle both legacy (object-returning) and current (function-returning) useFundWallet signatures
   const fundWalletHook = useFundWallet()
