@@ -4,7 +4,12 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
 import { useSignAndSendTransaction, useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
-import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../../lib/paid/feeManager'
+import {
+  buildSolanaRpcEndpointList,
+  calculatePaidRoomCosts,
+  deductPaidRoomFee,
+  SERVER_WALLET_ADDRESS
+} from '../../lib/paid/feeManager'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -74,16 +79,24 @@ export default function TurfLootTactical() {
   const USD_PER_SOL_FALLBACK = parseFloat(process.env.NEXT_PUBLIC_USD_PER_SOL || '150')
   const SOLANA_CHAIN = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
+
     if (network.startsWith('solana:')) {
       return network
     }
+
+    if (network === 'mainnet' || network === 'mainnet-beta') {
+      return 'solana:mainnet-beta'
+    }
+
     if (network === 'devnet') {
       return 'solana:devnet'
     }
+
     if (network === 'testnet') {
       return 'solana:testnet'
     }
-    return 'solana:mainnet'
+
+    return `solana:${network}`
   }, [])
 
   const isSolanaChain = (chainType) =>
@@ -110,6 +123,18 @@ export default function TurfLootTactical() {
     }
 
     return false
+  }
+
+  const normaliseServerEntryFeeUsd = (value) => {
+    if (typeof value !== 'number' || Number.isNaN(value) || value <= 0) {
+      return null
+    }
+
+    if (value >= 100) {
+      return value / 100
+    }
+
+    return value
   }
 
   const embeddedWallets = useMemo(
@@ -181,14 +206,14 @@ export default function TurfLootTactical() {
       : USD_PER_SOL_FALLBACK
     const estimatedNetworkFeeLamports = 10000 // ~0.00001 SOL buffer for network fees
     const estimatedNetworkFeeSol = estimatedNetworkFeeLamports / 1_000_000_000
-    const entryFeeSol = entryFeeUsd / derivedUsdPerSol
-    const costs = calculateTotalCost(entryFeeSol, feePercentageOverride, {
-      currency: 'SOL',
+    const costs = calculateTotalCost(entryFeeUsd, feePercentageOverride, {
+      currency: 'USD',
       usdPerSol: derivedUsdPerSol
     })
 
-    const totalCostSol = costs.totalCostSol ?? costs.totalCost
-    const totalCostUsd = costs.totalCostUsd ?? (totalCostSol * derivedUsdPerSol)
+    const entryFeeSol = costs.entryFeeSol ?? (entryFeeUsd / derivedUsdPerSol)
+    const totalCostUsd = costs.totalCostUsd ?? costs.totalCost
+    const totalCostSol = costs.totalCostSol ?? (totalCostUsd / derivedUsdPerSol)
     const networkFeeUsd = estimatedNetworkFeeSol * derivedUsdPerSol
     const totalRequiredSol = totalCostSol + estimatedNetworkFeeSol
     const totalRequiredUsd = totalCostUsd + networkFeeUsd
@@ -241,9 +266,9 @@ export default function TurfLootTactical() {
 
     try {
       const deductionResult = await deductPaidRoomFee({
-        entryAmount: entryFeeSol,
+        entryAmount: entryFeeUsd,
         entryFeeUsd,
-        entryCurrency: costs.currency,
+        entryCurrency: 'USD',
         feePercentage: costs.feePercentage,
         walletBalance,
         solanaWallet,
@@ -286,7 +311,8 @@ export default function TurfLootTactical() {
 
       const transactionDetails = {
         userWallet: deductionResult.walletAddress,
-        serverWallet: deductionResult.serverWallet,
+        prizeVault: deductionResult.prizeVault,
+        feeVault: deductionResult.feeVault,
         entryFeeDeducted: resultCosts.entryFee,
         entryFeeUsd,
         serverFeeTransferred: resultCosts.serverFee,
@@ -299,6 +325,7 @@ export default function TurfLootTactical() {
         networkFeeSol,
         networkFeeUsd,
         networkFeeLamports: deductionResult.networkFeeLamports,
+        usdPerSolUsed: resultCosts.usdPerSolUsed ?? resultCosts.usdPerSol,
         timestamp: new Date().toISOString()
       }
 
@@ -2108,15 +2135,15 @@ export default function TurfLootTactical() {
       {
         idMatches: ['turfloot-au-5'],
         nameMatches: ['Turfloot $5 Room - Australia'],
-        entryFee: 0.05,
-        minBalance: 0.05,
+        entryFee: 5,
+        minBalance: 5,
         feePercentage: 10
       },
       {
         idMatches: ['turfloot-au-20'],
         nameMatches: ['Turfloot $20 Room - Australia'],
-        entryFee: 0.10,
-        minBalance: 0.10,
+        entryFee: 20,
+        minBalance: 20,
         feePercentage: 10
       }
     ]
@@ -2133,10 +2160,47 @@ export default function TurfLootTactical() {
         return
       }
 
+      const feePercentage = paidRoomConfig.feePercentage ?? 10
+      let entryFeeUsd = paidRoomConfig.entryFee ?? null
+      let minBalanceUsd = paidRoomConfig.minBalance ?? entryFeeUsd
+
+      const serverEntryFeeUsd = normaliseServerEntryFeeUsd(serverData?.entryFee)
+      if (serverEntryFeeUsd) {
+        entryFeeUsd = serverEntryFeeUsd
+        if (!minBalanceUsd) {
+          minBalanceUsd = serverEntryFeeUsd
+        }
+      }
+
+      if (!entryFeeUsd) {
+        const nameMatch = typeof serverData?.name === 'string'
+          ? serverData.name.match(/\$(\d+(?:\.\d+)?)/)
+          : null
+
+        if (nameMatch) {
+          const parsed = parseFloat(nameMatch[1])
+          if (!Number.isNaN(parsed) && parsed > 0) {
+            entryFeeUsd = parsed
+            if (!minBalanceUsd) {
+              minBalanceUsd = parsed
+            }
+          }
+        }
+      }
+
+      if (!entryFeeUsd) {
+        alert('Unable to determine the entry fee for this paid room. Please try again later.')
+        return
+      }
+
+      if (!minBalanceUsd) {
+        minBalanceUsd = entryFeeUsd
+      }
+
       const currentBalance = parseFloat(walletBalance.usd || 0)
-      if (currentBalance < paidRoomConfig.minBalance) {
-        const shortfall = Math.max(0, paidRoomConfig.minBalance - currentBalance)
-        alert(`Insufficient balance for this room.\n\nRequired: $${paidRoomConfig.minBalance.toFixed(2)}\nAvailable: $${currentBalance.toFixed(2)}\nShortfall: $${shortfall.toFixed(2)}\n\nPlease top up your wallet to join.`)
+      if (currentBalance < minBalanceUsd) {
+        const shortfall = Math.max(0, minBalanceUsd - currentBalance)
+        alert(`Insufficient balance for this room.\n\nRequired: $${minBalanceUsd.toFixed(2)}\nAvailable: $${currentBalance.toFixed(2)}\nShortfall: $${shortfall.toFixed(2)}\n\nPlease top up your wallet to join.`)
         return
       }
 
@@ -2147,9 +2211,9 @@ export default function TurfLootTactical() {
       }
 
       const feeResult = await deductRoomFees(
-        paidRoomConfig.entryFee,
+        entryFeeUsd,
         userWalletAddress,
-        paidRoomConfig.feePercentage
+        feePercentage
       )
 
       if (!feeResult.success) {
@@ -2158,10 +2222,18 @@ export default function TurfLootTactical() {
         return
       }
 
-      serverData.entryFee = paidRoomConfig.entryFee
-      serverData.totalCost = feeResult.costs.totalCost
-      serverData.feePercentage = paidRoomConfig.feePercentage
-      serverData.minBalance = paidRoomConfig.minBalance
+      const totalCostUsd = feeResult.costs.totalCostUsd ?? feeResult.costs.totalCost
+      const usdPerSolUsed = feeResult.costs.usdPerSolUsed ?? feeResult.costs.usdPerSol ?? (feeResult.costs.totalCostSol
+        ? totalCostUsd / feeResult.costs.totalCostSol
+        : null)
+
+      serverData.entryFee = entryFeeUsd
+      serverData.entryFeeSol = feeResult.costs.entryFeeSol ?? (usdPerSolUsed ? entryFeeUsd / usdPerSolUsed : undefined)
+      serverData.totalCost = totalCostUsd
+      serverData.totalCostSol = feeResult.costs.totalCostSol ?? (usdPerSolUsed ? totalCostUsd / usdPerSolUsed : undefined)
+      serverData.usdPerSol = usdPerSolUsed ?? undefined
+      serverData.feePercentage = feePercentage
+      serverData.minBalance = minBalanceUsd
       serverData.paidRoom = true
 
       console.log('✅ Paid room fee processed successfully:', feeResult)
