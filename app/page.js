@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useCreateWallet, useWallets } from '@privy-io/react-auth'
-import { useSignTransaction, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
+import { useSignTransaction, useSignAndSendTransaction, useFundWallet } from '@privy-io/react-auth/solana'
 import { Connection, VersionedTransaction } from '@solana/web3.js'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -125,6 +125,7 @@ export default function TurfLootTactical() {
   const { wallets, ready: walletsReady } = useWallets()
   const { signTransaction } = useSignTransaction()
   const { signAndSendTransaction } = useSignAndSendTransaction()
+  const { fundWallet } = useFundWallet()
 
   const walletsRef = useRef([])
   const walletsReadyRef = useRef(false)
@@ -2913,9 +2914,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY v2.24.0 SOLANA DEPOSIT - PROPER useFundWallet HOOK IMPLEMENTATION ✅
+  // PRIVY 3.0 SOLANA DEPOSIT - PROPER useFundWallet HOOK IMPLEMENTATION ✅
   const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - using proper useFundWallet hook v2.24.0!')
+    console.log('💰 DEPOSIT SOL clicked - using Privy 3.0 useFundWallet hook!')
     
     try {
       // Ensure user is authenticated first
