@@ -165,11 +165,12 @@ export default function PrivyAuthProvider({ children }) {
 
   const solanaChain = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
+
     if (network.startsWith('solana:')) return network
-    if (network === 'mainnet' || network === 'mainnet-beta') return 'solana:mainnet'
+    if (network === 'mainnet' || network === 'mainnet-beta') return 'solana:mainnet-beta'
     if (network === 'devnet') return 'solana:devnet'
     if (network === 'testnet') return 'solana:testnet'
-    return 'solana:mainnet'
+    return `solana:${network}`
   }, [])
 
   const solanaRpcUrl =
@@ -227,7 +228,8 @@ export default function PrivyAuthProvider({ children }) {
       createOnLogin: 'users-without-wallets',
       requireUserPasswordOnCreate: false,
       priceDisplay: {
-        primary: 'native-token'
+        primary: 'native-token',
+        secondary: 'fiat-currency'
       }
     },
 
