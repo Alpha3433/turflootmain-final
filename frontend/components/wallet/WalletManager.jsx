@@ -7,7 +7,9 @@ import { usePrivy, useWallets, useFundWallet } from '@/components/MockPrivyProvi
 const WalletManager = ({ onBalanceUpdate }) => {
   const { authenticated, user, login, connectWallet } = usePrivy()
   const { wallets } = useWallets()
-  const { fundWallet } = useFundWallet()
+
+  const fundWalletHook = useFundWallet()
+  const fundWallet = typeof fundWalletHook === 'function' ? fundWalletHook : fundWalletHook?.fundWallet
   const [balance, setBalance] = useState({ balance: 0, sol_balance: 0, usdc_balance: 0 })
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(false)
@@ -328,29 +330,27 @@ const WalletManager = ({ onBalanceUpdate }) => {
         }
       }
       
-      const walletId = solanaWallet.walletId ?? solanaWallet.id
+      const walletAddress = solanaWallet.address
 
-      if (!walletId) {
-        console.error('❌ Selected wallet is missing walletId/id. Cannot open funding modal.', {
+      if (!walletAddress) {
+        console.error('❌ Selected wallet is missing an address. Cannot open funding modal.', {
           walletSource,
-          address: solanaWallet.address,
           chainType: solanaWallet.chainType
         })
-        alert('Unable to open the funding modal because the wallet ID is missing. Please reconnect your wallet and try again.')
+        alert('Unable to open the funding modal because the wallet address is missing. Please reconnect your wallet and try again.')
         return
       }
 
       // Try to use Privy's native funding modal
       if (typeof fundWallet === 'function') {
         console.log('🚀 Attempting to open Privy native funding modal for:', {
-          walletId,
-          address: solanaWallet.address,
+          address: walletAddress,
           walletSource
         })
 
         try {
           await fundWallet({
-            walletId,
+            address: walletAddress,
             options: {
               uiConfig: {
                 receiveFundsTitle: 'Add Funds to Your TurfLoot Wallet',

@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { usePrivy, useWallets, useFundWallet } from '@privy-io/react-auth'
-import { useSignAndSendTransaction } from '@privy-io/react-auth/solana'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { useFundWallet, useSignAndSendTransaction } from '@privy-io/react-auth/solana'
 import { buildSolanaRpcEndpointList, calculatePaidRoomCosts, deductPaidRoomFee, SERVER_WALLET_ADDRESS } from '../../lib/paid/feeManager'
 // NOTE: Should be '@privy-io/react-auth/solana' per docs, but causes compatibility issues
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
@@ -14,6 +14,7 @@ export default function TurfLootTactical() {
   // Privy hooks - using useFundWallet from main auth module (working approach)
   const { ready, authenticated, user: privyUser, login, logout } = usePrivy()
   const { wallets: privyWalletsFromHook = [] } = useWallets()
+
   const { fundWallet } = useFundWallet()
   const signAndSendTransactionResponse = useSignAndSendTransaction()
   const privySignAndSendTransaction = signAndSendTransactionResponse?.signAndSendTransaction
@@ -2779,101 +2780,45 @@ export default function TurfLootTactical() {
         return
       }
       
-      const walletId = solanaWallet.walletId ?? solanaWallet.id
-
       console.log('✅ Solana wallet found via:', walletSource, {
         address: solanaWallet.address,
         connectorType: solanaWallet.connectorType,
-        chainType: solanaWallet.chainType,
-        walletId
+        chainType: solanaWallet.chainType
       })
 
-      if (!walletId) {
-        console.error('❌ Solana wallet is missing walletId/id. Cannot open funding modal.')
+      const walletAddress = solanaWallet.address
+
+      if (!walletAddress) {
+        console.error('❌ Solana wallet is missing an address. Cannot open funding modal.')
         alert('Unable to identify the selected Solana wallet. Please reconnect your wallet and try again.')
         return
       }
-      
+
       // Check if fundWallet is available from useFundWallet hook
       if (!fundWallet || typeof fundWallet !== 'function') {
         console.error('❌ fundWallet not available from useFundWallet hook')
         alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
         return
       }
-      
-      console.log('🔧 Using HYBRID approach: Working useFundWallet with Solana cluster format...')
-      
-      // Check if fundWallet is available from useFundWallet hook
-      if (!fundWallet || typeof fundWallet !== 'function') {
-        console.error('❌ fundWallet not available from useFundWallet hook')
-        alert('Funding functionality not available. Please check Privy configuration or try refreshing the page.')
-        return
-      }
-      
-      console.log('✅ fundWallet is available, trying Solana cluster format with exchange method...')
-      
-      // APPROACH 1: Use Solana cluster format with exchange method (per documentation)
-      try {
-        console.log('🧪 APPROACH 1: Solana cluster format with exchange method')
-        await fundWallet({
-          walletId,
-          options: {
-            cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
-            amount: '0.1',                        // ✅ SOL amount
-            defaultFundingMethod: 'exchange',     // ✅ Force exchange transfer to show
-            card: {
-              preferredProvider: 'coinbase'       // ✅ Coinbase for exchange
-            }
+
+      const fundingRequest = {
+        address: walletAddress,
+        options: {
+          chain: SOLANA_CHAIN,
+          asset: 'native-currency',
+          defaultFundingMethod: 'exchange',
+          uiConfig: {
+            receiveFundsTitle: 'Deposit SOL to TurfLoot',
+            receiveFundsSubtitle: 'Use Privy\'s on-ramps or transfer SOL from another wallet.'
           }
-        })
-        
-        console.log('✅ SUCCESS: Solana cluster format with exchange method worked!')
-        return
-      } catch (error) {
-        console.log('❌ APPROACH 1 (Solana cluster + exchange) failed:', error.message)
-        console.log('🔄 Trying simplified Solana approach...')
+        }
       }
 
-      // APPROACH 2: Simplified Solana cluster format
-      try {
-        console.log('🧪 APPROACH 2: Simplified Solana cluster format')
-        await fundWallet({
-          walletId,
-          options: {
-            cluster: { name: 'mainnet-beta' },    // ✅ Correct Solana format per docs
-            amount: '0.1'                         // ✅ SOL amount
-          }
-        })
-        
-        console.log('✅ SUCCESS: Simplified Solana cluster format worked!')
-        return
-      } catch (error) {
-        console.log('❌ APPROACH 2 (Solana cluster) failed:', error.message)
-        console.log('🔄 Trying working chain ID approach...')
-      }
+      console.log('✅ fundWallet is available, opening Privy funding modal with options:', fundingRequest)
 
-      // APPROACH 3: Working chain ID format (reliable fallback)
-      try {
-        console.log('🧪 APPROACH 3: Working chain ID format (reliable fallback)')
-        await fundWallet({
-          walletId,
-          options: {
-            chain: {
-              id: 101, // Solana Mainnet chain ID
-              name: 'Solana'
-            },
-            asset: 'native-currency' // SOL
-          }
-        })
-        
-        console.log('✅ SUCCESS: Working chain ID format succeeded!')
-        return
-      } catch (error) {
-        console.log('❌ APPROACH 3 (chain ID) failed:', error.message)
-        throw error // Re-throw to trigger error handling
-      }
-      
-      console.log('✅ SUCCESS! Privy funding modal opened with proper useFundWallet hook!')
+      await fundWallet(fundingRequest)
+
+      console.log('✅ SUCCESS! Privy funding modal opened with proper Solana configuration!')
       
     } catch (error) {
       console.error('❌ Solana funding error details:', {
