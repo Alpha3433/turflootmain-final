@@ -173,11 +173,16 @@ export default function PrivyAuthProvider({ children }) {
       requireUserPasswordOnCreate: false,
       priceDisplay: {
         primary: 'native-token'
+      },
+      solana: {
+        createOnLogin: 'users-without-wallets'
       }
     },
 
     // 🎯 PRIVY 3.0: Solana RPC configuration
     solana: {
+      defaultChain: solanaChain,
+      chains: [solanaChain],
       rpcs: {
         [solanaChain]: solanaRpcUrl
       }
