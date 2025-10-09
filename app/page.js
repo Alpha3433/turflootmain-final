@@ -10,6 +10,13 @@ import {
   useFundWallet,
   useSolanaFundingPlugin
 } from '@privy-io/react-auth/solana'
+import {
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  SystemProgram,
+  Transaction
+} from '@solana/web3.js'
 import bs58 from 'bs58'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -373,6 +380,202 @@ export default function TurfLootTactical() {
     [resolveEmbeddedWalletFromHook]
   )
 
+  const getPreferredSolanaRpcEndpoints = useCallback(() => {
+    return [
+      process.env.NEXT_PUBLIC_SOLANA_PRIVATE_RPC,
+      process.env.NEXT_PUBLIC_SOLANA_HELIUS_RPC,
+      process.env.NEXT_PUBLIC_SOLANA_RPC_PRIVATE,
+      process.env.NEXT_PUBLIC_SOLANA_RPC_HELIUS,
+      process.env.NEXT_PUBLIC_HELIUS_RPC,
+      'https://api.mainnet-beta.solana.com',
+      'https://rpc.ankr.com/solana'
+    ].filter(Boolean)
+  }, [])
+
+  const transferDepositToPlatform = useCallback(
+    async ({ depositAmount, feeAmount = 0, userWalletAddress }) => {
+      try {
+        const normalizedUserWallet = normalizeAddress(userWalletAddress)
+
+        if (!authenticated || !privyUser || !normalizedUserWallet) {
+          console.log('⚠️ Skipping deposit transfer - missing authentication or wallet information')
+          return null
+        }
+
+        const platformWalletAddress = normalizeAddress(
+          process.env.NEXT_PUBLIC_PLATFORM_SOLANA_WALLET ||
+          process.env.NEXT_PUBLIC_SITE_FEE_WALLET ||
+          'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG'
+        )
+
+        if (!platformWalletAddress) {
+          console.error('❌ No platform Solana wallet configured for deposit transfer')
+          return null
+        }
+
+        if (platformWalletAddress === normalizedUserWallet) {
+          console.log('ℹ️ Platform wallet matches user wallet - nothing to transfer')
+          return null
+        }
+
+        const depositLamports = Math.max(0, Math.floor(depositAmount * LAMPORTS_PER_SOL))
+        const requestedFeeLamports = Math.max(0, Math.floor(feeAmount * LAMPORTS_PER_SOL))
+
+        if (depositLamports === 0 && requestedFeeLamports === 0) {
+          console.log('⚠️ Deposit amount too small to transfer to platform wallet')
+          return null
+        }
+
+        if (depositLamports < 5_000 && requestedFeeLamports === 0) {
+          console.log('⚠️ Deposit below minimum lamports threshold for transfer')
+          return null
+        }
+
+        const embeddedWalletAccount = privyUser?.linkedAccounts?.find(
+          account => account.type === 'wallet' && account.chainType === 'solana'
+        )
+
+        const expectedWalletAddress = normalizeAddress(
+          embeddedWalletAccount?.address ||
+          privyUser?.wallet?.address ||
+          normalizedUserWallet
+        )
+
+        let signingWallet = resolveEmbeddedWalletFromHook(expectedWalletAddress)
+
+        if (!signingWallet) {
+          signingWallet = await waitForEmbeddedWalletFromHook(expectedWalletAddress)
+        }
+
+        if (!signingWallet) {
+          console.error('❌ Unable to resolve embedded wallet for deposit transfer')
+          return null
+        }
+
+        if (typeof signAndSendTransaction !== 'function') {
+          console.error('❌ signAndSendTransaction not available for deposit transfer')
+          return null
+        }
+
+        const rpcEndpoints = getPreferredSolanaRpcEndpoints()
+        let connection = null
+        let rpcEndpointUsed = null
+
+        for (const endpoint of rpcEndpoints) {
+          try {
+            const testConnection = new Connection(endpoint, 'confirmed')
+            await testConnection.getLatestBlockhash()
+            connection = testConnection
+            rpcEndpointUsed = endpoint
+            break
+          } catch (rpcError) {
+            console.warn(`⚠️ Unable to use RPC endpoint ${endpoint}:`, rpcError?.message || rpcError)
+          }
+        }
+
+        if (!connection || !rpcEndpointUsed) {
+          console.error('❌ No Solana RPC endpoint available for deposit transfer')
+          return null
+        }
+
+        const feeWalletConfigured = normalizeAddress(process.env.NEXT_PUBLIC_SITE_FEE_WALLET)
+        let lamportsForFee = Math.min(requestedFeeLamports, depositLamports)
+        let lamportsForPlatform = depositLamports - lamportsForFee
+
+        const feeWalletAddress = feeWalletConfigured && feeWalletConfigured !== platformWalletAddress
+          ? feeWalletConfigured
+          : platformWalletAddress
+
+        if (feeWalletAddress === platformWalletAddress) {
+          lamportsForPlatform += lamportsForFee
+          lamportsForFee = 0
+        }
+
+        if (lamportsForPlatform <= 0 && lamportsForFee <= 0) {
+          console.log('⚠️ Nothing to transfer after fee calculations')
+          return null
+        }
+
+        const fromPublicKey = new PublicKey(normalizedUserWallet)
+        const transaction = new Transaction()
+
+        if (lamportsForPlatform > 0) {
+          transaction.add(SystemProgram.transfer({
+            fromPubkey: fromPublicKey,
+            toPubkey: new PublicKey(platformWalletAddress),
+            lamports: lamportsForPlatform
+          }))
+        }
+
+        if (lamportsForFee > 0) {
+          transaction.add(SystemProgram.transfer({
+            fromPubkey: fromPublicKey,
+            toPubkey: new PublicKey(feeWalletAddress),
+            lamports: lamportsForFee
+          }))
+        }
+
+        const latestBlockhash = await connection.getLatestBlockhash()
+        transaction.recentBlockhash = latestBlockhash.blockhash
+        transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight
+        transaction.feePayer = fromPublicKey
+
+        const serializedTransaction = transaction.serialize({ requireAllSignatures: false })
+
+        const response = await signAndSendTransaction({
+          wallet: signingWallet,
+          transaction: serializedTransaction,
+          chain: SOLANA_CHAIN
+        })
+
+        const signature = normaliseSignature(response?.signature ?? response)
+
+        if (!signature) {
+          throw new Error('Privy did not return a transaction signature for deposit transfer')
+        }
+
+        console.log('✅ Deposit transfer submitted to Solana:', {
+          signature,
+          rpcEndpoint: rpcEndpointUsed,
+          lamportsForPlatform,
+          lamportsForFee
+        })
+
+        try {
+          await connection.confirmTransaction({
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+          }, 'confirmed')
+          console.log('✅ Deposit transfer confirmed on Solana network')
+        } catch (confirmationError) {
+          console.warn('⚠️ Deposit transfer confirmation issue:', confirmationError)
+        }
+
+        return {
+          signature,
+          rpcEndpoint: rpcEndpointUsed,
+          platformWallet: platformWalletAddress,
+          feeWallet: feeWalletAddress,
+          lamportsForPlatform,
+          lamportsForFee
+        }
+      } catch (error) {
+        console.error('❌ Failed to transfer deposit to platform wallet:', error)
+        return null
+      }
+    },
+    [
+      SOLANA_CHAIN,
+      authenticated,
+      getPreferredSolanaRpcEndpoints,
+      privyUser,
+      resolveEmbeddedWalletFromHook,
+      signAndSendTransaction,
+      waitForEmbeddedWalletFromHook
+    ]
+  )
+
   // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet using Solana provider)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
     console.log('💰 Privy 3.0 Transaction Flow Started')
@@ -634,7 +837,6 @@ export default function TurfLootTactical() {
       // Show user notification about fee processing
       console.log(`🏦 Collecting ${feePercentage}% deposit fee (${feeAmount.toFixed(4)} SOL) for site operations`)
       
-      // For now, let's create the transaction data that would be sent
       const feeTransactionData = {
         from: userWalletAddress,
         to: siteWallet,
@@ -644,35 +846,52 @@ export default function TurfLootTactical() {
         timestamp: new Date().toISOString(),
         status: 'pending'
       }
-      
+
       console.log('📄 Fee transaction prepared:', feeTransactionData)
-      
-      // Store fee transaction record in localStorage for now
+
+      const transferResult = await transferDepositToPlatform({
+        depositAmount,
+        feeAmount,
+        userWalletAddress
+      })
+
+      if (transferResult) {
+        feeTransactionData.status = 'completed'
+        feeTransactionData.signature = transferResult.signature
+        feeTransactionData.rpcEndpoint = transferResult.rpcEndpoint
+        feeTransactionData.platformWallet = transferResult.platformWallet
+        feeTransactionData.feeWallet = transferResult.feeWallet
+        feeTransactionData.lamportsForPlatform = transferResult.lamportsForPlatform
+        feeTransactionData.lamportsForFee = transferResult.lamportsForFee
+        console.log('✅ Deposit moved to platform wallet:', transferResult)
+      } else {
+        console.warn('⚠️ Deposit transfer to platform wallet did not complete. Funds remain in embedded wallet.')
+      }
+
       const feeKey = `fee_transaction_${Date.now()}`
       localStorage.setItem(feeKey, JSON.stringify(feeTransactionData))
-      
-      // In production, this is where you would:
-      // 1. Use Privy's sendTransaction method to send SOL to site wallet
-      // 2. Wait for transaction confirmation
-      // 3. Update user's balance to reflect the fee deduction
-      // 4. Store the transaction record in your database
-      
-      console.log('✅ Fee processing completed (simulated)')
-      
-      // Update the user's displayed balance to reflect the fee
-      const netBalance = depositAmount - feeAmount
-      const usdBalance = (netBalance * 150).toFixed(2) // Rough conversion
-      
+
+      if (!transferResult) {
+        return false
+      }
+
+      console.log('✅ Fee processing completed and recorded')
+
+      const netBalance = Math.max(depositAmount - feeAmount, 0)
+      const usdBalance = (netBalance * 150).toFixed(2)
+
       setWalletBalance({
         sol: netBalance.toFixed(4),
         usd: usdBalance,
         loading: false
       })
-      
-      // Show success message to user
+
       const feeMessage = `Deposit successful! ${feePercentage}% fee (${feeAmount.toFixed(4)} SOL) collected for site operations. Net balance: ${netBalance.toFixed(4)} SOL`
       console.log('💡', feeMessage)
-      
+
+      // Trigger a fresh balance fetch so UI reflects on-chain transfer
+      await fetchWalletBalance(userWalletAddress)
+
       return true
       
     } catch (error) {
