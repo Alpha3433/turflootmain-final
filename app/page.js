@@ -122,9 +122,12 @@ export default function TurfLootTactical() {
     logout
   } = usePrivy()
   const { createWallet } = useCreateWallet()
-  const { wallets } = useWallets()
+  const { wallets, ready: walletsReady } = useWallets()
   const { signTransaction } = useSignTransaction()
   const { signAndSendTransaction } = useSignAndSendTransaction()
+
+  const walletsRef = useRef([])
+  const walletsReadyRef = useRef(false)
   
   // Debug what these hooks return
   useEffect(() => {
@@ -154,7 +157,15 @@ export default function TurfLootTactical() {
   const privyEmbeddedWallet = useMemo(() => {
     return wallets?.find(w => w.walletClientType === 'privy' || w.connectorType === 'embedded')
   }, [wallets])
-  
+
+  useEffect(() => {
+    walletsRef.current = Array.isArray(wallets) ? [...wallets] : []
+  }, [wallets])
+
+  useEffect(() => {
+    walletsReadyRef.current = !!walletsReady
+  }, [walletsReady])
+
   // Debug log
   useEffect(() => {
     if (typeof window !== 'undefined' && authenticated) {
@@ -171,10 +182,11 @@ export default function TurfLootTactical() {
           walletClientType: privyEmbeddedWallet.walletClientType
         } : null,
         ready,
+        walletsReady,
         authenticated
       })
     }
-  }, [wallets, privyEmbeddedWallet, authenticated, ready])
+  }, [wallets, privyEmbeddedWallet, authenticated, ready, walletsReady])
   const walletAddressesSignature = useMemo(() => {
     // SSR safety check
     if (typeof window === 'undefined') {
@@ -261,6 +273,68 @@ export default function TurfLootTactical() {
       })
   }, [authenticated, privyUser, ready, createWallet])
 
+  const resolveEmbeddedWalletFromHook = useCallback(
+    (expectedAddress, walletList) => {
+      const normalizedExpected = normalizeAddress(expectedAddress)
+      if (!normalizedExpected) {
+        return null
+      }
+
+      const list = Array.isArray(walletList) ? walletList : walletsRef.current
+
+      for (const wallet of list) {
+        if (!wallet) {
+          continue
+        }
+
+        const walletAddress = normalizeAddress(getWalletAddress(wallet))
+        if (!walletAddress || walletAddress !== normalizedExpected) {
+          continue
+        }
+
+        if (isPrivyEmbeddedWallet(wallet) || !wallet.connectorType || isSolanaChain(wallet.chainType)) {
+          return wallet
+        }
+      }
+
+      return null
+    },
+    []
+  )
+
+  const waitForEmbeddedWalletFromHook = useCallback(
+    async (expectedAddress, { timeoutMs = 7000, intervalMs = 250 } = {}) => {
+      const normalizedExpected = normalizeAddress(expectedAddress)
+      if (!normalizedExpected) {
+        return null
+      }
+
+      const startedAt = Date.now()
+      let attempt = 0
+
+      while (Date.now() - startedAt < timeoutMs) {
+        const resolvedWallet = resolveEmbeddedWalletFromHook(normalizedExpected)
+        if (resolvedWallet) {
+          return resolvedWallet
+        }
+
+        if (attempt === 0) {
+          if (!walletsReadyRef.current) {
+            console.log('⏳ Waiting for Privy wallets to initialize...')
+          } else {
+            console.log('⏳ Embedded wallet not yet available in useWallets, retrying...')
+          }
+        }
+
+        attempt += 1
+        await new Promise(resolve => setTimeout(resolve, intervalMs))
+      }
+
+      return null
+    },
+    [resolveEmbeddedWalletFromHook]
+  )
+
   // 🚀 Privy 3.0 + Helius: Room entry fee deduction (embedded wallet using Solana provider)
   const deductRoomFees = async (entryFee, userWalletAddress) => {
     console.log('💰 Privy 3.0 Transaction Flow Started')
@@ -279,22 +353,18 @@ export default function TurfLootTactical() {
 
     console.log('✅ Embedded wallet found in linkedAccounts:', embeddedWalletAccount.address)
 
-    const signingWallet = wallets?.find(wallet => {
-      if (!wallet) {
-        return false
-      }
+    let signingWallet = resolveEmbeddedWalletFromHook(embeddedWalletAccount.address, wallets)
 
-      const clientType = (wallet.walletClientType || wallet.type || '').toLowerCase()
-      const isEmbeddedClient = clientType.includes('privy') || clientType.includes('embedded')
-      const isSameAddress = wallet.address === embeddedWalletAccount.address
-
-      return isEmbeddedClient && isSameAddress
-    })
+    if (!signingWallet) {
+      signingWallet = await waitForEmbeddedWalletFromHook(embeddedWalletAccount.address)
+    }
 
     if (!signingWallet) {
       console.error('❌ Embedded wallet not available in useWallets() for signing', {
-        walletAddresses: wallets?.map(w => w?.address),
-        expectedAddress: embeddedWalletAccount.address
+        walletAddresses: walletsRef.current.map(w => normalizeAddress(getWalletAddress(w))),
+        expectedAddress: embeddedWalletAccount.address,
+        walletsReady: walletsReadyRef.current,
+        linkedAccountCount: privyUser?.linkedAccounts?.length || 0
       })
       return {
         success: false,
