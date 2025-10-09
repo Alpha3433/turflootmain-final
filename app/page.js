@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePrivy, useCreateWallet, useWallets } from '@privy-io/react-auth'
-import { useSignTransaction, useSignAndSendTransaction, useFundWallet } from '@privy-io/react-auth/solana'
+import { useSignTransaction, useSignAndSendTransaction, useFundWallet, useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
 import { Connection, VersionedTransaction } from '@solana/web3.js'
 import ServerBrowserModal from '../components/ServerBrowserModalNew'
 
@@ -125,6 +125,8 @@ export default function TurfLootTactical() {
   const { wallets, ready: walletsReady } = useWallets()
   const { signTransaction } = useSignTransaction()
   const { signAndSendTransaction } = useSignAndSendTransaction()
+  useSolanaFundingPlugin()
+
   const { fundWallet } = useFundWallet()
 
   const walletsRef = useRef([])

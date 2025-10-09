@@ -1,6 +1,7 @@
 'use client'
 
 import { PrivyProvider } from '@privy-io/react-auth'
+import { useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
 import { Component, useState, useEffect, useMemo } from 'react'
 
 // Error boundary for Privy-related errors
@@ -45,7 +46,7 @@ function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
     console.log('📋 Solana WS:', debugInfo.solanaWsUrl)
 
     try {
-      const { appearance, embeddedWallets, externalWallets = {}, solana } = config || {}
+      const { appearance, embeddedWallets, externalWallets = {}, solana, funding } = config || {}
 
       const safeExternalWallets = Object.fromEntries(
         Object.entries(externalWallets).map(([chain, walletConfig = {}]) => {
@@ -70,7 +71,8 @@ function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
         appearance,
         embeddedWallets,
         externalWallets: safeExternalWallets,
-        solanaChains: Object.keys(solana?.rpcs || {})
+        solanaChains: Object.keys(solana?.rpcs || {}),
+        solanaFunding: funding?.solana
       }, null, 2))
     } catch (error) {
       console.warn('⚠️ Unable to serialize Privy config for logging:', error)
@@ -92,6 +94,7 @@ function ClientOnlyPrivyProvider({ children, appId, config, debugInfo }) {
 
 export default function PrivyAuthProvider({ children }) {
   const appId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
+  useSolanaFundingPlugin()
 
   const solanaChain = useMemo(() => {
     const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta').toLowerCase()
@@ -111,6 +114,22 @@ export default function PrivyAuthProvider({ children }) {
     process.env.NEXT_PUBLIC_SOLANA_WS ||
     process.env.NEXT_PUBLIC_HELIUS_WS ||
     solanaRpcUrl.replace(/^http/, 'ws')
+
+  const solanaFundingConfig = useMemo(
+    () => ({
+      chain: solanaChain,
+      asset: 'native-currency',
+      defaultFundingMethod: 'exchange',
+      uiConfig: {
+        receiveFundsTitle: 'Receive SOL',
+        receiveFundsSubtitle: 'Top up your TurfLoot balance with Solana',
+        landing: {
+          title: 'Choose how you would like to fund your wallet'
+        }
+      }
+    }),
+    [solanaChain]
+  )
 
   // Validate required environment variables
   if (!appId) {
@@ -162,6 +181,10 @@ export default function PrivyAuthProvider({ children }) {
       rpcs: {
         [solanaChain]: solanaRpcUrl
       }
+    },
+
+    funding: {
+      solana: solanaFundingConfig
     },
 
     // Security & MFA
