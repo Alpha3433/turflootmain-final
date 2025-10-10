@@ -260,22 +260,20 @@ const submitPrivyTransaction = async ({
 
   console.log('📤 Transaction serialized to bytes:', transactionBytes.length, 'bytes')
 
-  // For embedded wallets with direct signAndSendTransaction
-  if (typeof signingWallet.signAndSendTransaction === 'function') {
-    console.log('📤 Using wallet.signAndSendTransaction with serialized bytes')
-    // Privy expects a single options object with transaction property
-    return signingWallet.signAndSendTransaction({
-      transaction: transactionBytes,
+  // Prefer using the hook-based signing for embedded wallets (more reliable in Privy 3.0)
+  if (typeof signAndSendTransactionHook === 'function') {
+    console.log('📤 Using signAndSendTransaction HOOK with serialized bytes (Privy 3.0)')
+    return signAndSendTransactionHook(transactionBytes, {
+      address: signingWallet.address,
       chain,
       ...options
     })
   }
 
-  // For hook-based signing
-  if (typeof signAndSendTransactionHook === 'function') {
-    console.log('📤 Using signAndSendTransaction hook with serialized bytes')
-    return signAndSendTransactionHook({
-      wallet: signingWallet,
+  // Fallback to direct wallet method
+  if (typeof signingWallet.signAndSendTransaction === 'function') {
+    console.log('📤 Using wallet.signAndSendTransaction with serialized bytes')
+    return signingWallet.signAndSendTransaction({
       transaction: transactionBytes,
       chain,
       ...options
