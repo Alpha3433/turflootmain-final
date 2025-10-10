@@ -2759,7 +2759,7 @@ export default function TurfLootTactical() {
       
       // Connect to Solana via Helius
       const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 
-                        'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+                        'https://mainnet.helius-rpc.com/?api-key=privy-arena'
       const connection = new Connection(heliusRpc, 'confirmed')
       
       // Get real balance
