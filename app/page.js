@@ -211,26 +211,6 @@ const extractSolAmountFromFundingResult = (result) => {
   return null
 }
 
-const ensureTransactionBytes = (value) => {
-  if (!value) {
-    return null
-  }
-
-  if (value instanceof Uint8Array) {
-    return value
-  }
-
-  if (ArrayBuffer.isView(value)) {
-    return new Uint8Array(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength))
-  }
-
-  if (Array.isArray(value)) {
-    return Uint8Array.from(value)
-  }
-
-  return null
-}
-
 const submitPrivyTransaction = async ({
   signingWallet,
   signAndSendTransactionHook,
@@ -242,28 +222,41 @@ const submitPrivyTransaction = async ({
     throw new Error('No signing wallet provided for transaction submission')
   }
 
-  // Serialize Transaction object to bytes if needed
-  let transactionBytes
-  if (transaction && typeof transaction.serialize === 'function') {
-    console.log('📦 Serializing Solana Transaction object to bytes...')
-    transactionBytes = transaction.serialize({
-      requireAllSignatures: false,
-      verifySignatures: false
-    })
-  } else {
-    transactionBytes = ensureTransactionBytes(transaction)
+  const { connection, sendOptions, ...forwardedOptions } = options || {}
+
+  const resolveTransactionBytes = (value) => {
+    if (!value) {
+      return null
+    }
+
+    if (value instanceof Uint8Array) {
+      return value
+    }
+
+    if (ArrayBuffer.isView(value)) {
+      return new Uint8Array(value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength))
+    }
+
+    if (Array.isArray(value)) {
+      return Uint8Array.from(value)
+    }
+
+    return null
   }
 
-  if (!transactionBytes) {
+  const isTransactionObject =
+    transaction && typeof transaction === 'object' && typeof transaction.serialize === 'function'
+
+  const transactionForSigning = isTransactionObject ? transaction : resolveTransactionBytes(transaction)
+
+  if (!transactionForSigning) {
     throw new Error('Invalid transaction format supplied for signing')
   }
 
-  console.log('📤 Transaction serialized to bytes:', transactionBytes.length, 'bytes')
-
-  // Debug what's available
   console.log('🔍 Transaction signing methods available:', {
     hasSignAndSendHook: typeof signAndSendTransactionHook === 'function',
     hasWalletSignAndSend: typeof signingWallet?.signAndSendTransaction === 'function',
+    hasWalletSignTransaction: typeof signingWallet?.signTransaction === 'function',
     walletAddress: signingWallet?.address
   })
 
@@ -271,10 +264,10 @@ const submitPrivyTransaction = async ({
   if (typeof signAndSendTransactionHook === 'function') {
     console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
     try {
-      return await signAndSendTransactionHook(transactionBytes, {
+      return await signAndSendTransactionHook(transactionForSigning, {
         address: signingWallet.address,
         chain,
-        ...options
+        ...forwardedOptions
       })
     } catch (hookError) {
       console.error('❌ Hook-based signing failed:', hookError)
@@ -285,11 +278,35 @@ const submitPrivyTransaction = async ({
   // Fallback to direct wallet method
   if (typeof signingWallet?.signAndSendTransaction === 'function') {
     console.log('📤 Using wallet.signAndSendTransaction (fallback)')
-    return await signingWallet.signAndSendTransaction({
-      transaction: transactionBytes,
+    return await signingWallet.signAndSendTransaction(transactionForSigning, {
       chain,
-      ...options
+      ...forwardedOptions
     })
+  }
+
+  // Manual signing fallback when hook methods are unavailable
+  if (typeof signingWallet?.signTransaction === 'function' && isTransactionObject) {
+    if (!connection) {
+      throw new Error('No Solana connection available to send signed transaction.')
+    }
+
+    console.log('✍️ Using manual signTransaction fallback')
+    const signedTransaction = await signingWallet.signTransaction(transaction)
+    const signedBytes = signedTransaction?.serialize
+      ? signedTransaction.serialize()
+      : resolveTransactionBytes(signedTransaction)
+
+    if (!signedBytes) {
+      throw new Error('Failed to serialize signed transaction for submission')
+    }
+
+    const signature = await connection.sendRawTransaction(signedBytes, sendOptions)
+
+    if (forwardedOptions?.commitment) {
+      await connection.confirmTransaction(signature, forwardedOptions.commitment)
+    }
+
+    return signature
   }
 
   throw new Error('Transaction signing unavailable. Neither hook nor wallet method is available. Please refresh and try again.')
@@ -628,9 +645,11 @@ export default function TurfLootTactical() {
       const result = await submitPrivyTransaction({
         signingWallet,
         signAndSendTransactionHook: signAndSendTransaction,
-        transaction: transaction, // Will be serialized inside submitPrivyTransaction
+        transaction: transaction,
         chain: SOLANA_CHAIN,
         options: {
+          connection,
+          sendOptions: { skipPreflight: false },
           commitment: 'confirmed',
           uiOptions: {
             showWalletUIs: false,
