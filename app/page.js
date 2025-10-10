@@ -597,14 +597,16 @@ export default function TurfLootTactical() {
       }).add(transferInstruction)
       
       console.log('✅ Transaction built successfully')
+      console.log('   • Blockhash:', blockhash)
+      console.log('   • Fee Payer:', fromPubkey.toString())
 
-      // Step 3: Sign and send transaction with Privy (pass raw Transaction object for embedded wallets)
+      // Step 3: Sign and send transaction with Privy
       console.log('🔐 Signing transaction with Privy wallet...')
 
       const result = await submitPrivyTransaction({
         signingWallet,
         signAndSendTransactionHook: signAndSendTransaction,
-        transaction: transaction, // Pass raw Transaction object, not serialized bytes
+        transaction: transaction, // Will be serialized inside submitPrivyTransaction
         chain: SOLANA_CHAIN,
         options: {
           commitment: 'confirmed',
