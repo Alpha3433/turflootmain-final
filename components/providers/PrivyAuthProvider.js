@@ -115,21 +115,19 @@ export default function PrivyAuthProvider({ children }) {
     process.env.NEXT_PUBLIC_HELIUS_WS ||
     solanaRpcUrl.replace(/^http/, 'ws')
 
-  const solanaFundingConfig = useMemo(
-    () => ({
-      chain: solanaChain,
-      asset: 'native-currency',
-      defaultFundingMethod: 'exchange',
-      uiConfig: {
-        receiveFundsTitle: 'Receive SOL',
-        receiveFundsSubtitle: 'Top up your TurfLoot balance with Solana',
-        landing: {
-          title: 'Choose how you would like to fund your wallet'
-        }
+  // Removed useMemo to avoid SSR issues
+  const solanaFundingConfig = {
+    chain: solanaChain,
+    asset: 'native-currency',
+    defaultFundingMethod: 'exchange',
+    uiConfig: {
+      receiveFundsTitle: 'Receive SOL',
+      receiveFundsSubtitle: 'Top up your TurfLoot balance with Solana',
+      landing: {
+        title: 'Choose how you would like to fund your wallet'
       }
-    }),
-    [solanaChain]
-  )
+    }
+  }
 
   // Validate required environment variables
   if (!appId) {
