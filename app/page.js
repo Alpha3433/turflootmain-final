@@ -506,7 +506,7 @@ export default function TurfLootTactical() {
 
   // 🚀 Simple Room Entry: Deduct SOL from embedded wallet
   const deductRoomFees = async (entryFeeUsd, userWalletAddress) => {
-    console.log('💰 Room Entry Transaction Started')
+    console.log('💰 Room Entry SOL Transaction Started')
     console.log('📋 Entry Fee: $', entryFeeUsd, 'USD')
     console.log('📋 User Wallet:', userWalletAddress)
 
@@ -548,65 +548,68 @@ export default function TurfLootTactical() {
     })
 
     try {
-      // Step 2: Build Solana transaction with Helius
-      const {
-        buildEntryFeeTransaction,
-        calculateFees,
-        getServerWalletAddress,
-        confirmTransaction
-      } = await import('../lib/paid/cleanFeeManager')
+      // Step 2: Build simple SOL transfer transaction
+      const { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } = await import('@solana/web3.js')
+      
+      // Get Helius RPC connection
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      console.log('🌐 Connected to Solana via Helius')
 
+      // Platform wallet address from env
+      const platformWalletAddress = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      
+      // Convert USD entry fee to SOL (assuming $150/SOL)
       const USD_PER_SOL = 150
-      const estimatedFees = calculateFees(entryFee, USD_PER_SOL)
-      const SERVER_WALLET = getServerWalletAddress()
-
-      console.log('🔨 Building transaction...')
-      console.log('💵 Fees:', {
-        entry: `${estimatedFees.entrySol.toFixed(4)} SOL`,
-        platform: `${estimatedFees.serverSol.toFixed(4)} SOL`,
-        total: `${estimatedFees.totalSol.toFixed(4)} SOL`
+      const entryFeeSol = entryFeeUsd / USD_PER_SOL
+      const lamportsToSend = Math.floor(entryFeeSol * LAMPORTS_PER_SOL)
+      
+      console.log('💵 SOL Transfer Details:', {
+        entryFeeUsd: `$${entryFeeUsd}`,
+        entryFeeSol: `${entryFeeSol.toFixed(6)} SOL`,
+        lamports: lamportsToSend,
+        platformWallet: platformWalletAddress
       })
 
-      const { serialized, fees: calculatedFees, connection } = await buildEntryFeeTransaction({
-        entryFeeUsd: entryFee,
-        userWalletAddress: embeddedWalletAccount.address,
-        serverWalletAddress: SERVER_WALLET,
-        usdPerSol: USD_PER_SOL
+      // Create transfer instruction
+      const fromPubkey = new PublicKey(embeddedWalletAccount.address)
+      const toPubkey = new PublicKey(platformWalletAddress)
+      
+      const transferInstruction = SystemProgram.transfer({
+        fromPubkey,
+        toPubkey,
+        lamports: lamportsToSend
       })
 
+      // Build transaction
+      const { blockhash } = await connection.getLatestBlockhash('confirmed')
+      const transaction = new Transaction({
+        recentBlockhash: blockhash,
+        feePayer: fromPubkey
+      }).add(transferInstruction)
+
+      // Serialize transaction for Privy
+      const serializedTx = transaction.serialize({
+        requireAllSignatures: false,
+        verifySignatures: false
+      })
+      
       console.log('✅ Transaction built successfully')
 
-      const fees = {
-        ...calculatedFees,
-        totalCost: calculatedFees.totalUsd,
-        entryFee: calculatedFees.entryFeeUsd,
-        serverFee: calculatedFees.serverFeeUsd
-      }
-
-      // Step 3: Check if embedded wallet is available in useWallets
-      console.log('✅ Embedded wallet found for signing:', signingWallet.address)
-
-      // Step 4: Sign and send transaction with Privy (this will show Privy modal)
-      const directSupport = typeof signingWallet.signAndSendTransaction === 'function'
-      const hookSupport = typeof signAndSendTransaction === 'function'
-
-      console.log('🔐 Preparing to submit transaction...', {
-        walletSupportsDirect: directSupport,
-        hookAvailable: hookSupport,
-        chain: SOLANA_CHAIN
-      })
+      // Step 3: Sign and send transaction with Privy
+      console.log('🔐 Signing transaction with Privy wallet...')
 
       const result = await submitPrivyTransaction({
         signingWallet,
         signAndSendTransactionHook: signAndSendTransaction,
-        transaction: serialized,
+        transaction: serializedTx,
         chain: SOLANA_CHAIN,
         options: {
           commitment: 'confirmed',
           uiOptions: {
             showWalletUIs: false,
             isCancellable: false,
-            description: 'Submitting arena entry fee to TurfLoot'
+            description: `Submitting ${entryFeeSol.toFixed(6)} SOL arena entry fee`
           }
         }
       })
@@ -618,28 +621,35 @@ export default function TurfLootTactical() {
       }
       console.log('✅ Transaction sent! Signature:', signature)
 
+      // Step 4: Confirm transaction
       try {
-        await confirmTransaction(connection, signature)
+        await connection.confirmTransaction(signature, 'confirmed')
+        console.log('✅ Transaction confirmed on-chain')
       } catch (confirmationError) {
-        console.warn('⚠️ Transaction confirmation encountered an issue:', confirmationError)
+        console.warn('⚠️ Transaction confirmation issue:', confirmationError)
       }
 
       // Step 5: Update local balance
-      if (walletBalance?.usd && walletBalance?.sol) {
+      if (walletBalance?.sol) {
+        const newSolBalance = Math.max(0, parseFloat(walletBalance.sol) - entryFeeSol)
         setWalletBalance({
-          usd: Math.max(0, parseFloat(walletBalance.usd) - fees.totalUsd).toFixed(2),
-          sol: Math.max(0, parseFloat(walletBalance.sol) - fees.totalSol).toFixed(6)
+          sol: newSolBalance.toFixed(6),
+          usd: (newSolBalance * USD_PER_SOL).toFixed(2)
         })
       }
 
       return {
         success: true,
         signature,
-        fees,
+        fees: {
+          entrySol: entryFeeSol,
+          totalSol: entryFeeSol,
+          entryUsd: entryFeeUsd,
+          totalUsd: entryFeeUsd
+        },
         costs: {
-          entryFee: fees.entryFee,
-          serverFee: fees.serverFee,
-          totalCost: fees.totalCost
+          entryFee: entryFeeUsd,
+          totalCost: entryFeeUsd
         }
       }
 
