@@ -2744,11 +2744,40 @@ export default function TurfLootTactical() {
     setMockBalanceState(nextSol)
   }, [readMockBalanceFromStorage, setMockBalanceState])
 
-  const checkSolanaBalance = useCallback(async () => {
-    const mockSolBalance = readMockBalanceFromStorage()
-    console.log('💰 Returning mock TurfLoot balance from storage:', mockSolBalance, 'SOL')
-    return mockSolBalance
-  }, [readMockBalanceFromStorage])
+  const checkSolanaBalance = useCallback(async (walletAddress = null) => {
+    try {
+      // Get wallet address
+      const address = walletAddress || currentWalletAddress
+      
+      if (!address) {
+        console.log('⚠️ No wallet address available')
+        return 0
+      }
+      
+      console.log('🔍 Fetching REAL SOL balance from blockchain for:', address)
+      
+      // Import Solana web3.js
+      const { Connection, PublicKey } = await import('@solana/web3.js')
+      
+      // Connect to Solana via Helius
+      const heliusRpc = process.env.NEXT_PUBLIC_HELIUS_RPC || 
+                        'https://mainnet.helius-rpc.com/?api-key=9ce7937c-f2a5-4759-8d79-dd8f9ca63fa5'
+      const connection = new Connection(heliusRpc, 'confirmed')
+      
+      // Get real balance
+      const publicKey = new PublicKey(address)
+      const lamports = await connection.getBalance(publicKey)
+      const solBalance = lamports / 1_000_000_000
+      
+      console.log('✅ Real blockchain balance:', solBalance, 'SOL')
+      
+      return solBalance
+      
+    } catch (error) {
+      console.error('❌ Error fetching real balance:', error)
+      return 0
+    }
+  }, [currentWalletAddress])
 
   // Balance check interval reference
   const balanceInterval = useRef(null)
