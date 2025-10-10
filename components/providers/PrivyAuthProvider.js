@@ -167,15 +167,13 @@ export default function PrivyAuthProvider({ children }) {
     // Authentication methods
     loginMethods: ['google', 'email', 'wallet'],
 
-    // 🎯 PRIVY 3.0: Embedded Wallets configuration scoped per chain
+    // 🎯 PRIVY 3.0: Embedded Wallets configuration - DISABLED
+    // Users deposit directly to platform wallet, no embedded wallets needed
     embeddedWallets: {
-      createOnLogin: 'users-without-wallets',
+      createOnLogin: 'off', // Disabled - users don't need embedded wallets
       requireUserPasswordOnCreate: false,
       priceDisplay: {
         primary: 'native-token'
-      },
-      solana: {
-        createOnLogin: 'users-without-wallets'
       }
     },
 
