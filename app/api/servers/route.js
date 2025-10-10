@@ -40,22 +40,17 @@ export async function GET(request) {
       canJoin: true
     }
 
-    // Define cash room templates with direct room costs ($1, $5, $10)
+    // Define cash room templates with SOL room costs for testing ($0.02, $0.05)
     const cashRoomConfigs = [
       {
-        stake: 1,
-        idSuffix: '1',
-        description: 'Entry level TurfLoot arena - $1 room cost'
+        stake: 0.02,
+        idSuffix: '002',
+        description: 'Entry level TurfLoot arena - $0.02 SOL room cost'
       },
       {
-        stake: 5,
-        idSuffix: '5',
-        description: 'Mid stakes TurfLoot arena - $5 room cost'
-      },
-      {
-        stake: 10,
-        idSuffix: '10',
-        description: 'High stakes TurfLoot arena - $10 room cost'
+        stake: 0.05,
+        idSuffix: '005',
+        description: 'Mid stakes TurfLoot arena - $0.05 SOL room cost'
       }
     ]
 
