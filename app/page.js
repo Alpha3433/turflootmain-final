@@ -2759,7 +2759,7 @@ export default function TurfLootTactical() {
   // Paid rooms system state
   const [insufficientFundsNotification, setInsufficientFundsNotification] = useState(null)
 
-  // STEP 4: Expose balance to the page
+  // STEP 4: Expose balance to the page - Real SOL balance only
   const fetchWalletBalance = useCallback(async () => {
     console.log('💰 fetchWalletBalance called')
 
@@ -2767,16 +2767,23 @@ export default function TurfLootTactical() {
     setWalletBalance(prev => ({ ...prev, loading: true }))
 
     try {
+      // Get real SOL balance from blockchain
       const solBalance = await checkSolanaBalance()
+
+      // Convert to USD (rough estimate: $150 per SOL)
       const usdBalance = (solBalance * 150).toFixed(2)
 
+      // Update UI state with REAL balance only
       setWalletBalance({
         sol: solBalance.toFixed(4),
         usd: usdBalance,
         loading: false
       })
 
-      console.log('✅ Balance updated:', { sol: solBalance, usd: usdBalance })
+      console.log('✅ Real balance updated:', { 
+        sol: solBalance, 
+        usd: usdBalance 
+      })
 
     } catch (error) {
       console.error('❌ Error in fetchWalletBalance:', error)
