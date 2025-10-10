@@ -248,41 +248,6 @@ const submitPrivyTransaction = async ({
     return cloned
   }
 
-  const forwardedOptions = (() => {
-    const restClone = cloneRestOptions()
-    const sendClone = cloneSendOptions()
-
-    if (!restClone && !sendClone) {
-      return undefined
-    }
-
-    const merged = restClone ? { ...restClone } : {}
-
-    if (sendClone) {
-      const { skipPreflight, maxRetries, preflightCommitment, minContextSlot } = sendClone
-
-      if (typeof skipPreflight !== 'undefined' && typeof merged.skipPreflight === 'undefined') {
-        merged.skipPreflight = skipPreflight
-      }
-
-      if (typeof maxRetries !== 'undefined' && typeof merged.maxRetries === 'undefined') {
-        merged.maxRetries = maxRetries
-      }
-
-      if (typeof preflightCommitment !== 'undefined' && typeof merged.preflightCommitment === 'undefined') {
-        merged.preflightCommitment = preflightCommitment
-      }
-
-      if (typeof minContextSlot !== 'undefined' && typeof merged.minContextSlot === 'undefined') {
-        merged.minContextSlot = minContextSlot
-      }
-
-      merged.sendOptions = sendClone
-    }
-
-    return Object.keys(merged).length > 0 ? merged : undefined
-  })()
-
   const resolveTransactionBytes = (value) => {
     if (!value) {
       return null
@@ -304,60 +269,39 @@ const submitPrivyTransaction = async ({
       return Uint8Array.from(value)
     }
 
+    if (typeof value === 'object' && typeof value.serialize === 'function') {
+      try {
+        const serialised = value.serialize({ requireAllSignatures: false, verifySignatures: false })
+
+        if (serialised instanceof Uint8Array) {
+          return serialised
+        }
+
+        if (typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(serialised)) {
+          return new Uint8Array(serialised)
+        }
+
+        if (ArrayBuffer.isView(serialised)) {
+          return new Uint8Array(
+            serialised.buffer.slice(serialised.byteOffset, serialised.byteOffset + serialised.byteLength)
+          )
+        }
+
+        if (Array.isArray(serialised)) {
+          return Uint8Array.from(serialised)
+        }
+      } catch (error) {
+        console.error('❌ Failed to serialize transaction object for Privy submission:', error)
+        return null
+      }
+    }
+
     return null
   }
 
-  const isTransactionObject =
-    transaction && typeof transaction === 'object' && typeof transaction.serialize === 'function'
+  const transactionBytes = resolveTransactionBytes(transaction)
 
-  const serializeTransactionObject = (value) => {
-    if (!value || typeof value.serialize !== 'function') {
-      return null
-    }
-
-    try {
-      const serialized = value.serialize({ requireAllSignatures: false, verifySignatures: false })
-
-      if (serialized instanceof Uint8Array) {
-        return serialized
-      }
-
-      if (typeof Buffer !== 'undefined' && Buffer.isBuffer && Buffer.isBuffer(serialized)) {
-        return new Uint8Array(serialized)
-      }
-
-      if (ArrayBuffer.isView(serialized)) {
-        return new Uint8Array(
-          serialized.buffer.slice(serialized.byteOffset, serialized.byteOffset + serialized.byteLength)
-        )
-      }
-
-      if (Array.isArray(serialized)) {
-        return Uint8Array.from(serialized)
-      }
-
-      return null
-    } catch (error) {
-      console.error('❌ Failed to serialize transaction object for Privy submission:', error)
-      return null
-    }
-  }
-
-  const transactionBytes = isTransactionObject
-    ? serializeTransactionObject(transaction)
-    : resolveTransactionBytes(transaction)
-
-  const transactionPayloads = []
-
-  if (transactionBytes) {
-    transactionPayloads.push({ type: 'bytes', value: transactionBytes })
-  }
-
-  if (isTransactionObject) {
-    transactionPayloads.push({ type: 'transaction', value: transaction })
-  }
-
-  if (transactionPayloads.length === 0) {
+  if (!transactionBytes) {
     throw new Error('Invalid transaction format supplied for signing')
   }
 
@@ -368,229 +312,84 @@ const submitPrivyTransaction = async ({
     walletAddress: signingWallet?.address
   })
 
-  // Try hook-based signing first (Privy 3.0 recommended approach)
-  const cloneForwardedOptions = () => {
-    if (!forwardedOptions) {
-      return undefined
-    }
-
-    const cloned = { ...forwardedOptions }
-
-    if (forwardedOptions.uiOptions && typeof forwardedOptions.uiOptions === 'object') {
-      cloned.uiOptions = { ...forwardedOptions.uiOptions }
-    }
-
-    if (forwardedOptions.sendOptions && typeof forwardedOptions.sendOptions === 'object') {
-      cloned.sendOptions = { ...forwardedOptions.sendOptions }
-    }
-
-    return cloned
+  if (typeof signAndSendTransactionHook !== 'function') {
+    throw new Error('Transaction signing unavailable. Privy signAndSendTransaction hook is required for arena entry transactions.')
   }
 
-  const buildStructuredPayload = (value) => {
-    const payload = {
-      transaction: value,
-      wallet: signingWallet,
-      chain
-    }
-
-    if (connection) {
-      payload.connection = connection
-    }
-
-    const sendClone = cloneSendOptions()
-    if (sendClone) {
-      payload.sendOptions = sendClone
-    }
-
-    return payload
+  const requestPayload = {
+    transaction: transactionBytes,
+    wallet: signingWallet,
+    chain
   }
 
-  const buildPositionalOptions = () => {
-    const positional = { chain }
-
-    if (connection) {
-      positional.connection = connection
-    }
-
-    const sendClone = cloneSendOptions()
-    if (sendClone) {
-      positional.sendOptions = sendClone
-    }
-
-    return positional
+  const normalizedAddress = normalizeAddress(getWalletAddress(signingWallet))
+  if (normalizedAddress) {
+    requestPayload.address = normalizedAddress
   }
 
-  const invokeSignAndSend = async (fn, label) => {
-    if (typeof fn !== 'function') {
-      return null
-    }
-
-    let lastError = null
-
-    for (const { type, value } of transactionPayloads) {
-      const payload = buildStructuredPayload(value)
-      const clonedOptions = cloneForwardedOptions()
-      if (clonedOptions) {
-        payload.options = clonedOptions
-        if (typeof clonedOptions.commitment !== 'undefined' && typeof payload.commitment === 'undefined') {
-          payload.commitment = clonedOptions.commitment
-        }
-
-        if (typeof clonedOptions.uiOptions !== 'undefined' && typeof payload.uiOptions === 'undefined') {
-          payload.uiOptions = clonedOptions.uiOptions
-        }
-
-        if (typeof clonedOptions.skipPreflight !== 'undefined' && typeof payload.skipPreflight === 'undefined') {
-          payload.skipPreflight = clonedOptions.skipPreflight
-        }
-
-        if (typeof clonedOptions.maxRetries !== 'undefined' && typeof payload.maxRetries === 'undefined') {
-          payload.maxRetries = clonedOptions.maxRetries
-        }
-
-        if (
-          typeof clonedOptions.preflightCommitment !== 'undefined' &&
-          typeof payload.preflightCommitment === 'undefined'
-        ) {
-          payload.preflightCommitment = clonedOptions.preflightCommitment
-        }
-
-        if (typeof clonedOptions.minContextSlot !== 'undefined' && typeof payload.minContextSlot === 'undefined') {
-          payload.minContextSlot = clonedOptions.minContextSlot
-        }
-      }
-
-      try {
-        console.log(`📨 Attempting ${label} with ${type} payload`)
-        return await fn(payload)
-      } catch (error) {
-        console.error(`❌ ${label} structured ${type} payload failed:`, error)
-        lastError = error
-      }
-    }
-
-    for (const { type, value } of transactionPayloads) {
-      const positionalOptions = buildPositionalOptions()
-      const clonedOptions = cloneForwardedOptions()
-      if (clonedOptions) {
-        Object.assign(positionalOptions, clonedOptions)
-      }
-
-      try {
-        console.log(`📨 Attempting ${label} legacy ${type} invocation`)
-        return await fn(value, positionalOptions)
-      } catch (legacyError) {
-        console.error(`❌ ${label} legacy ${type} invocation failed:`, legacyError)
-        lastError = legacyError
-      }
-    }
-
-    if (lastError) {
-      throw lastError
-    }
-
-    throw new Error(`${label} could not be executed. No payload formats succeeded.`)
+  if (signingWallet?.id) {
+    requestPayload.walletId = signingWallet.id
   }
 
-  if (typeof signAndSendTransactionHook === 'function') {
-    console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
-    try {
-      return await invokeSignAndSend(signAndSendTransactionHook, 'Hook-based signing')
-    } catch (hookError) {
-      console.error('❌ Hook-based signing failed:', hookError)
-      // Continue to fallback chain
+  if (connection) {
+    requestPayload.connection = connection
+  }
+
+  const sendClone = cloneSendOptions()
+  if (sendClone) {
+    requestPayload.sendOptions = sendClone
+  }
+
+  const clonedOptions = cloneRestOptions()
+  if (clonedOptions) {
+    requestPayload.options = clonedOptions
+
+    if (typeof clonedOptions.commitment !== 'undefined' && typeof requestPayload.commitment === 'undefined') {
+      requestPayload.commitment = clonedOptions.commitment
+    }
+
+    if (typeof clonedOptions.skipPreflight !== 'undefined' && typeof requestPayload.skipPreflight === 'undefined') {
+      requestPayload.skipPreflight = clonedOptions.skipPreflight
+    }
+
+    if (typeof clonedOptions.maxRetries !== 'undefined' && typeof requestPayload.maxRetries === 'undefined') {
+      requestPayload.maxRetries = clonedOptions.maxRetries
+    }
+
+    if (
+      typeof clonedOptions.preflightCommitment !== 'undefined' &&
+      typeof requestPayload.preflightCommitment === 'undefined'
+    ) {
+      requestPayload.preflightCommitment = clonedOptions.preflightCommitment
+    }
+
+    if (typeof clonedOptions.minContextSlot !== 'undefined' && typeof requestPayload.minContextSlot === 'undefined') {
+      requestPayload.minContextSlot = clonedOptions.minContextSlot
+    }
+
+    if (
+      typeof clonedOptions.uiOptions !== 'undefined' &&
+      typeof requestPayload.uiOptions === 'undefined' &&
+      clonedOptions.uiOptions &&
+      typeof clonedOptions.uiOptions === 'object'
+    ) {
+      requestPayload.uiOptions = { ...clonedOptions.uiOptions }
     }
   }
 
-  if (typeof signingWallet?.signAndSendTransaction === 'function') {
-    console.log('📤 Using wallet.signAndSendTransaction (fallback)')
-    try {
-      return await invokeSignAndSend(signingWallet.signAndSendTransaction.bind(signingWallet), 'Wallet signAndSendTransaction')
-    } catch (walletError) {
-      console.error('❌ wallet.signAndSendTransaction fallback failed:', walletError)
+  console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
+
+  try {
+    return await signAndSendTransactionHook(requestPayload)
+  } catch (hookError) {
+    console.error('❌ Hook-based signing failed:', hookError)
+
+    if (hookError instanceof Error) {
+      throw hookError
     }
+
+    throw new Error('Hook-based signing failed. Please verify your wallet connection and try again.')
   }
-
-  // Manual signing fallback when hook methods are unavailable
-  if (typeof signingWallet?.signTransaction === 'function' && isTransactionObject) {
-    if (!connection) {
-      throw new Error('No Solana connection available to send signed transaction.')
-    }
-
-    console.log('✍️ Using manual signTransaction fallback')
-
-    const attemptSignTransaction = async (fn) => {
-      try {
-        return await fn({
-          transaction,
-          wallet: signingWallet,
-          chain,
-          options: forwardedOptions
-        })
-      } catch (structuredError) {
-        console.warn('⚠️ signTransaction structured payload failed, retrying legacy call...', structuredError)
-        return await fn(transaction)
-      }
-    }
-
-    const signFn = signingWallet.signTransaction.bind(signingWallet)
-    const signedTransactionResult = await attemptSignTransaction(signFn)
-
-    const extractSignedTransaction = value => {
-      if (!value) {
-        return null
-      }
-
-      if (typeof value.serialize === 'function') {
-        return value
-      }
-
-      if (Array.isArray(value)) {
-        return extractSignedTransaction(value[0])
-      }
-
-      if (typeof value === 'object') {
-        if (typeof value.signedTransaction?.serialize === 'function') {
-          return value.signedTransaction
-        }
-
-        if (typeof value.transaction?.serialize === 'function') {
-          return value.transaction
-        }
-
-        if (value.rawTransaction) {
-          return value.rawTransaction
-        }
-
-        if (value.serializedTransaction) {
-          return value.serializedTransaction
-        }
-      }
-
-      return value
-    }
-
-    const normalizedSignedTransaction = extractSignedTransaction(signedTransactionResult)
-
-    const signedBytes = normalizedSignedTransaction?.serialize
-      ? normalizedSignedTransaction.serialize()
-      : resolveTransactionBytes(normalizedSignedTransaction)
-
-    if (!signedBytes) {
-      throw new Error('Failed to serialize signed transaction for submission')
-    }
-
-    const signature = await connection.sendRawTransaction(signedBytes, sendOptions)
-
-    if (forwardedOptions?.commitment) {
-      await connection.confirmTransaction(signature, forwardedOptions.commitment)
-    }
-
-    return signature
-  }
-
-  throw new Error('Transaction signing unavailable. Neither hook nor wallet method is available. Please refresh and try again.')
 }
 
 export default function TurfLootTactical() {
