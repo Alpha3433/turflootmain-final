@@ -493,104 +493,23 @@ const submitPrivyTransaction = async ({
     throw new Error(`${label} could not be executed. No payload formats succeeded.`)
   }
 
-  if (typeof signAndSendTransactionHook === 'function') {
-    console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
-    try {
-      return await invokeSignAndSend(signAndSendTransactionHook, 'Hook-based signing')
-    } catch (hookError) {
-      console.error('❌ Hook-based signing failed:', hookError)
-      // Continue to fallback chain
-    }
+  if (typeof signAndSendTransactionHook !== 'function') {
+    throw new Error('Transaction signing unavailable. Privy signAndSendTransaction hook is required for arena entry transactions.')
   }
 
-  if (typeof signingWallet?.signAndSendTransaction === 'function') {
-    console.log('📤 Using wallet.signAndSendTransaction (fallback)')
-    try {
-      return await invokeSignAndSend(signingWallet.signAndSendTransaction.bind(signingWallet), 'Wallet signAndSendTransaction')
-    } catch (walletError) {
-      console.error('❌ wallet.signAndSendTransaction fallback failed:', walletError)
+  console.log('📤 Using signAndSendTransaction HOOK (Privy 3.0)')
+
+  try {
+    return await invokeSignAndSend(signAndSendTransactionHook, 'Hook-based signing')
+  } catch (hookError) {
+    console.error('❌ Hook-based signing failed:', hookError)
+
+    if (hookError instanceof Error) {
+      throw hookError
     }
+
+    throw new Error('Hook-based signing failed. Please verify your wallet connection and try again.')
   }
-
-  // Manual signing fallback when hook methods are unavailable
-  if (typeof signingWallet?.signTransaction === 'function' && isTransactionObject) {
-    if (!connection) {
-      throw new Error('No Solana connection available to send signed transaction.')
-    }
-
-    console.log('✍️ Using manual signTransaction fallback')
-
-    const attemptSignTransaction = async (fn) => {
-      try {
-        return await fn({
-          transaction,
-          wallet: signingWallet,
-          chain,
-          options: forwardedOptions
-        })
-      } catch (structuredError) {
-        console.warn('⚠️ signTransaction structured payload failed, retrying legacy call...', structuredError)
-        return await fn(transaction)
-      }
-    }
-
-    const signFn = signingWallet.signTransaction.bind(signingWallet)
-    const signedTransactionResult = await attemptSignTransaction(signFn)
-
-    const extractSignedTransaction = value => {
-      if (!value) {
-        return null
-      }
-
-      if (typeof value.serialize === 'function') {
-        return value
-      }
-
-      if (Array.isArray(value)) {
-        return extractSignedTransaction(value[0])
-      }
-
-      if (typeof value === 'object') {
-        if (typeof value.signedTransaction?.serialize === 'function') {
-          return value.signedTransaction
-        }
-
-        if (typeof value.transaction?.serialize === 'function') {
-          return value.transaction
-        }
-
-        if (value.rawTransaction) {
-          return value.rawTransaction
-        }
-
-        if (value.serializedTransaction) {
-          return value.serializedTransaction
-        }
-      }
-
-      return value
-    }
-
-    const normalizedSignedTransaction = extractSignedTransaction(signedTransactionResult)
-
-    const signedBytes = normalizedSignedTransaction?.serialize
-      ? normalizedSignedTransaction.serialize()
-      : resolveTransactionBytes(normalizedSignedTransaction)
-
-    if (!signedBytes) {
-      throw new Error('Failed to serialize signed transaction for submission')
-    }
-
-    const signature = await connection.sendRawTransaction(signedBytes, sendOptions)
-
-    if (forwardedOptions?.commitment) {
-      await connection.confirmTransaction(signature, forwardedOptions.commitment)
-    }
-
-    return signature
-  }
-
-  throw new Error('Transaction signing unavailable. Neither hook nor wallet method is available. Please refresh and try again.')
 }
 
 export default function TurfLootTactical() {
