@@ -2746,15 +2746,13 @@ export default function TurfLootTactical() {
 
   const checkSolanaBalance = useCallback(async (walletAddress = null) => {
     try {
-      // Get wallet address
-      const address = walletAddress || currentWalletAddress
-      
-      if (!address) {
-        console.log('⚠️ No wallet address available')
+      // Wallet address must be passed as parameter
+      if (!walletAddress) {
+        console.log('⚠️ No wallet address provided')
         return 0
       }
       
-      console.log('🔍 Fetching REAL SOL balance from blockchain for:', address)
+      console.log('🔍 Fetching REAL SOL balance from blockchain for:', walletAddress)
       
       // Import Solana web3.js
       const { Connection, PublicKey } = await import('@solana/web3.js')
@@ -2765,7 +2763,7 @@ export default function TurfLootTactical() {
       const connection = new Connection(heliusRpc, 'confirmed')
       
       // Get real balance
-      const publicKey = new PublicKey(address)
+      const publicKey = new PublicKey(walletAddress)
       const lamports = await connection.getBalance(publicKey)
       const solBalance = lamports / 1_000_000_000
       
@@ -2777,7 +2775,7 @@ export default function TurfLootTactical() {
       console.error('❌ Error fetching real balance:', error)
       return 0
     }
-  }, [currentWalletAddress])
+  }, [])
 
   // Balance check interval reference
   const balanceInterval = useRef(null)
