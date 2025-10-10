@@ -242,23 +242,22 @@ const submitPrivyTransaction = async ({
     throw new Error('No signing wallet provided for transaction submission')
   }
 
-  // For embedded wallets, pass raw Transaction object
-  // For external wallets via hooks, convert to bytes
+  // For embedded wallets with direct signAndSendTransaction, pass raw Transaction object
   if (typeof signingWallet.signAndSendTransaction === 'function') {
     console.log('📤 Using wallet.signAndSendTransaction with raw Transaction object')
-    return signingWallet.signAndSendTransaction({
-      transaction: transaction, // Pass raw Transaction object
+    return signingWallet.signAndSendTransaction(transaction, {
       chain,
       ...options
     })
   }
 
   // For hook-based signing, convert to bytes
+  const transactionBytes = ensureTransactionBytes(transaction)
+  if (!transactionBytes) {
+    throw new Error('Invalid transaction format supplied for signing')
+  }
+
   if (typeof signAndSendTransactionHook === 'function') {
-    const transactionBytes = ensureTransactionBytes(transaction)
-    if (!transactionBytes) {
-      throw new Error('Invalid transaction format supplied for signing')
-    }
     console.log('📤 Using signAndSendTransaction hook with serialized bytes')
     return signAndSendTransactionHook({
       wallet: signingWallet,
