@@ -242,8 +242,18 @@ const submitPrivyTransaction = async ({
     throw new Error('No signing wallet provided for transaction submission')
   }
 
-  // Always serialize the transaction to bytes for Privy
-  const transactionBytes = ensureTransactionBytes(transaction)
+  // Serialize Transaction object to bytes if needed
+  let transactionBytes
+  if (transaction && typeof transaction.serialize === 'function') {
+    console.log('📦 Serializing Solana Transaction object to bytes...')
+    transactionBytes = transaction.serialize({
+      requireAllSignatures: false,
+      verifySignatures: false
+    })
+  } else {
+    transactionBytes = ensureTransactionBytes(transaction)
+  }
+
   if (!transactionBytes) {
     throw new Error('Invalid transaction format supplied for signing')
   }
