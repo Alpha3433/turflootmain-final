@@ -2787,8 +2787,18 @@ export default function TurfLootTactical() {
   const [insufficientFundsNotification, setInsufficientFundsNotification] = useState(null)
 
   // STEP 4: Expose balance to the page - Real SOL balance only
-  const fetchWalletBalance = useCallback(async () => {
+  const fetchWalletBalance = useCallback(async (addressOverride = null) => {
     console.log('💰 fetchWalletBalance called')
+
+    const walletAddress = addressOverride || currentWalletAddress
+
+    if (!walletAddress) {
+      console.log('👛 No wallet found - setting default balance')
+      resetWalletBalance()
+      return
+    }
+
+    console.log('🚀 Fetching real SOL balance for:', walletAddress)
 
     // Set loading state
     setWalletBalance(prev => ({ ...prev, loading: true }))
@@ -2816,7 +2826,7 @@ export default function TurfLootTactical() {
       console.error('❌ Error in fetchWalletBalance:', error)
       resetWalletBalance()
     }
-  }, [checkSolanaBalance, resetWalletBalance])
+  }, [currentWalletAddress, checkSolanaBalance, resetWalletBalance])
 
   // STEP 3: Watch authentication and wallet availability
   useEffect(() => {
