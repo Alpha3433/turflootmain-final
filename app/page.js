@@ -508,9 +508,10 @@ export default function TurfLootTactical() {
 
   // 🚀 Paid Room Entry: Deduct SOL from embedded wallet based on room cost
   const deductRoomFees = async (roomCostUsd, userWalletAddress) => {
-    console.log('💰 Room Entry SOL Transaction Started')
-    console.log('📋 Room Cost: $', roomCostUsd, 'USD')
+    console.log('💰 🔗 SOLANA BLOCKCHAIN TRANSACTION STARTING 🔗')
+    console.log('📋 Room Cost (USD denomination): $', roomCostUsd, 'USD')
     console.log('📋 User Wallet:', userWalletAddress)
+    console.log('⛓️ Payment Method: SOLANA (SOL) via Privy Embedded Wallet')
 
     // Step 1: Verify embedded Solana wallet exists in linkedAccounts
     const embeddedWalletAccount = privyUser?.linkedAccounts?.find(
