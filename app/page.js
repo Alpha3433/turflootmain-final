@@ -224,38 +224,63 @@ const submitPrivyTransaction = async ({
 
   const { connection, sendOptions, ...restOptions } = options || {}
 
-  const forwardedOptions = (() => {
-    if (!restOptions && !sendOptions) {
+  const cloneSendOptions = () => {
+    if (!sendOptions || typeof sendOptions !== 'object') {
       return undefined
     }
 
-    const cloned = restOptions ? { ...restOptions } : {}
+    return {
+      ...sendOptions
+    }
+  }
+
+  const cloneRestOptions = () => {
+    if (!restOptions || typeof restOptions !== 'object' || Object.keys(restOptions).length === 0) {
+      return undefined
+    }
+
+    const cloned = { ...restOptions }
 
     if (cloned.uiOptions && typeof cloned.uiOptions === 'object') {
       cloned.uiOptions = { ...cloned.uiOptions }
     }
 
-    if (sendOptions && typeof sendOptions === 'object') {
-      const { skipPreflight, maxRetries, preflightCommitment, minContextSlot } = sendOptions
+    return cloned
+  }
 
-      if (typeof skipPreflight !== 'undefined' && typeof cloned.skipPreflight === 'undefined') {
-        cloned.skipPreflight = skipPreflight
-      }
+  const forwardedOptions = (() => {
+    const restClone = cloneRestOptions()
+    const sendClone = cloneSendOptions()
 
-      if (typeof maxRetries !== 'undefined' && typeof cloned.maxRetries === 'undefined') {
-        cloned.maxRetries = maxRetries
-      }
-
-      if (typeof preflightCommitment !== 'undefined' && typeof cloned.preflightCommitment === 'undefined') {
-        cloned.preflightCommitment = preflightCommitment
-      }
-
-      if (typeof minContextSlot !== 'undefined' && typeof cloned.minContextSlot === 'undefined') {
-        cloned.minContextSlot = minContextSlot
-      }
+    if (!restClone && !sendClone) {
+      return undefined
     }
 
-    return Object.keys(cloned).length > 0 ? cloned : undefined
+    const merged = restClone ? { ...restClone } : {}
+
+    if (sendClone) {
+      const { skipPreflight, maxRetries, preflightCommitment, minContextSlot } = sendClone
+
+      if (typeof skipPreflight !== 'undefined' && typeof merged.skipPreflight === 'undefined') {
+        merged.skipPreflight = skipPreflight
+      }
+
+      if (typeof maxRetries !== 'undefined' && typeof merged.maxRetries === 'undefined') {
+        merged.maxRetries = maxRetries
+      }
+
+      if (typeof preflightCommitment !== 'undefined' && typeof merged.preflightCommitment === 'undefined') {
+        merged.preflightCommitment = preflightCommitment
+      }
+
+      if (typeof minContextSlot !== 'undefined' && typeof merged.minContextSlot === 'undefined') {
+        merged.minContextSlot = minContextSlot
+      }
+
+      merged.sendOptions = sendClone
+    }
+
+    return Object.keys(merged).length > 0 ? merged : undefined
   })()
 
   const resolveTransactionBytes = (value) => {
@@ -355,7 +380,45 @@ const submitPrivyTransaction = async ({
       cloned.uiOptions = { ...forwardedOptions.uiOptions }
     }
 
+    if (forwardedOptions.sendOptions && typeof forwardedOptions.sendOptions === 'object') {
+      cloned.sendOptions = { ...forwardedOptions.sendOptions }
+    }
+
     return cloned
+  }
+
+  const buildStructuredPayload = (value) => {
+    const payload = {
+      transaction: value,
+      wallet: signingWallet,
+      chain
+    }
+
+    if (connection) {
+      payload.connection = connection
+    }
+
+    const sendClone = cloneSendOptions()
+    if (sendClone) {
+      payload.sendOptions = sendClone
+    }
+
+    return payload
+  }
+
+  const buildPositionalOptions = () => {
+    const positional = { chain }
+
+    if (connection) {
+      positional.connection = connection
+    }
+
+    const sendClone = cloneSendOptions()
+    if (sendClone) {
+      positional.sendOptions = sendClone
+    }
+
+    return positional
   }
 
   const invokeSignAndSend = async (fn, label) => {
@@ -366,11 +429,36 @@ const submitPrivyTransaction = async ({
     let lastError = null
 
     for (const { type, value } of transactionPayloads) {
-      const payload = {
-        transaction: value,
-        wallet: signingWallet,
-        chain,
-        options: cloneForwardedOptions()
+      const payload = buildStructuredPayload(value)
+      const clonedOptions = cloneForwardedOptions()
+      if (clonedOptions) {
+        payload.options = clonedOptions
+        if (typeof clonedOptions.commitment !== 'undefined' && typeof payload.commitment === 'undefined') {
+          payload.commitment = clonedOptions.commitment
+        }
+
+        if (typeof clonedOptions.uiOptions !== 'undefined' && typeof payload.uiOptions === 'undefined') {
+          payload.uiOptions = clonedOptions.uiOptions
+        }
+
+        if (typeof clonedOptions.skipPreflight !== 'undefined' && typeof payload.skipPreflight === 'undefined') {
+          payload.skipPreflight = clonedOptions.skipPreflight
+        }
+
+        if (typeof clonedOptions.maxRetries !== 'undefined' && typeof payload.maxRetries === 'undefined') {
+          payload.maxRetries = clonedOptions.maxRetries
+        }
+
+        if (
+          typeof clonedOptions.preflightCommitment !== 'undefined' &&
+          typeof payload.preflightCommitment === 'undefined'
+        ) {
+          payload.preflightCommitment = clonedOptions.preflightCommitment
+        }
+
+        if (typeof clonedOptions.minContextSlot !== 'undefined' && typeof payload.minContextSlot === 'undefined') {
+          payload.minContextSlot = clonedOptions.minContextSlot
+        }
       }
 
       try {
@@ -383,7 +471,11 @@ const submitPrivyTransaction = async ({
     }
 
     for (const { type, value } of transactionPayloads) {
-      const positionalOptions = { chain, ...(cloneForwardedOptions() || {}) }
+      const positionalOptions = buildPositionalOptions()
+      const clonedOptions = cloneForwardedOptions()
+      if (clonedOptions) {
+        Object.assign(positionalOptions, clonedOptions)
+      }
 
       try {
         console.log(`📨 Attempting ${label} legacy ${type} invocation`)
