@@ -109,7 +109,7 @@ export async function GET(request) {
     arenaServer.lastUpdated = timestamp
     arenaServer.timestamp = timestamp
 
-    // Build dedicated cash rooms for $0.02 and $0.05 wagers
+    // Build dedicated cash rooms for $1, $5, $10
     const cashRooms = cashRoomConfigs.map(config => ({
       id: `colyseus-cash-${config.idSuffix}-au`,
       roomType: 'cash',
