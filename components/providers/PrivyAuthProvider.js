@@ -2,7 +2,7 @@
 
 import { PrivyProvider } from '@privy-io/react-auth'
 import { useSolanaFundingPlugin } from '@privy-io/react-auth/solana'
-import { Component, useState, useEffect, useMemo } from 'react'
+import { Component, useState, useEffect } from 'react'
 
 // Error boundary for Privy-related errors
 class PrivyErrorBoundary extends Component {
