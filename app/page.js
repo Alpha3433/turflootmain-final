@@ -2975,9 +2975,9 @@ export default function TurfLootTactical() {
     }
   }
 
-  // DIRECT DEPOSIT - Show deposit instructions modal
+  // DIRECT DEPOSIT - Privy modal to platform wallet
   const handleDeposit = async (amountUsd = null) => {
-    console.log('💰 DIRECT DEPOSIT clicked - showing deposit instructions!')
+    console.log('💰 DEPOSIT SOL clicked - opening Privy modal for platform wallet!')
     
     try {
       // Ensure user is authenticated
@@ -2998,49 +2998,28 @@ export default function TurfLootTactical() {
         return
       }
       
-      const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 
-                            'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
-      
-      // Show deposit instructions
-      const message = `
-💰 DEPOSIT INSTRUCTIONS
-
-To add funds to your TurfLoot balance:
-
-1️⃣ Send SOL to this address:
-${platformWallet}
-
-2️⃣ Your balance will be automatically credited within 30 seconds
-
-3️⃣ Minimum: $1 USD
-    Recommended: $10-$50 USD
-
-📱 You can use:
-• Phantom Wallet
-• Solflare
-• Any Solana wallet
-• Moonpay/Ramp (buy & send)
-
-⚠️ IMPORTANT: 
-• Send from your connected wallet: ${userWallet.substring(0, 8)}...
-• We track deposits by sender address
-• Only send SOL (not tokens)
-
-Would you like to copy the platform wallet address?
-      `.trim()
-      
-      if (confirm(message)) {
-        // Copy to clipboard
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(platformWallet)
-          alert('✅ Platform wallet address copied to clipboard!')
+      // Check if fundWallet is available
+      if (!fundWallet || typeof fundWallet !== 'function') {
+        console.error('❌ fundWallet not available')
+        // Fallback to manual instructions
+        const platformWallet = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 
+                              'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+        
+        const message = `Please send SOL to the platform wallet:\n\n${platformWallet}\n\nYour balance will be credited automatically within 30 seconds.`
+        
+        if (confirm(message + '\n\nCopy address to clipboard?')) {
+          if (navigator.clipboard) {
+            await navigator.clipboard.writeText(platformWallet)
+            alert('✅ Address copied!')
+          }
         }
+        return
       }
       
-      // Create pending deposit record
       console.log('📝 Creating pending deposit record...')
       
-      await fetch('/api/deposits/pending', {
+      // Create pending deposit to track this user's deposit
+      const pendingResponse = await fetch('/api/deposits/pending', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3049,11 +3028,47 @@ Would you like to copy the platform wallet address?
         })
       })
       
-      console.log('✅ Pending deposit created - waiting for blockchain confirmation')
+      const pendingData = await pendingResponse.json()
+      console.log('✅ Pending deposit created:', pendingData.deposit._id)
+      
+      const platformWallet = pendingData.platformWallet || 
+                            process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || 
+                            'GrYLV9QSnkDwEQ3saypgM9LLHwE36QPZrYCRJceyQfTa'
+      
+      console.log('🚀 Opening Privy funding modal...')
+      console.log('📍 Target: Platform Wallet:', platformWallet)
+      
+      // Configure fundWallet to deposit to platform wallet
+      const fundingConfig = {
+        address: platformWallet,
+        chain: 'solana:mainnet',
+        config: {
+          header: 'Deposit to TurfLoot',
+          description: 'Add funds to your TurfLoot balance',
+          showWalletUIs: true
+        }
+      }
+      
+      console.log('📋 Funding config:', fundingConfig)
+      
+      // Open Privy funding modal targeting platform wallet
+      const result = await fundWallet(fundingConfig)
+      
+      console.log('✅ Privy funding flow completed!', result)
+      console.log('⏳ Waiting for Helius webhook to credit your balance...')
+      
+      // Show success message
+      alert('✅ Deposit initiated! Your balance will update automatically within 30 seconds.')
       
     } catch (error) {
-      console.error('❌ Error showing deposit instructions:', error)
-      alert(`Error: ${error.message}`)
+      console.error('❌ Error opening funding modal:', error)
+      
+      // User-friendly error handling
+      if (error?.message?.includes('User') || error?.message?.includes('cancel')) {
+        console.log('ℹ️ User cancelled deposit')
+      } else {
+        alert(`Error: ${error.message}`)
+      }
     }
   }
   const handleWithdraw = async () => {
