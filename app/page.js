@@ -2975,104 +2975,54 @@ export default function TurfLootTactical() {
     }
   }
 
-  // PRIVY 3.0 SOLANA DEPOSIT - PROPER useFundWallet HOOK IMPLEMENTATION ✅
-  const handleDeposit = async () => {
-    console.log('💰 DEPOSIT SOL clicked - platform wallet funding flow')
-
+  // DIRECT DEPOSIT - Users deposit to platform wallet via Privy
+  const handleDeposit = async (amountUsd = null) => {
+    console.log('💰 DIRECT DEPOSIT clicked - depositing to platform wallet!')
+    
     try {
-      if (!authenticated || !privyUser) {
-        console.log('⚠️ User not authenticated, triggering login first')
-        if (typeof login === 'function') {
-          await login()
-        } else {
-          alert('Please log in to deposit funds.')
-        }
+      // Ensure user is authenticated
+      if (!authenticated) {
+        console.log('⚠️ User not authenticated')
+        await login()
         return
       }
-
-      if (!fundWallet || typeof fundWallet !== 'function') {
-        console.error('❌ fundWallet not available from useFundWallet hook')
-        alert('Funding functionality not available. Please refresh the page or check Privy configuration.')
+      
+      // Get user wallet address for tracking
+      const userWallet = privyUser?.linkedAccounts?.find(
+        acc => acc.type === 'wallet'
+      )?.address || privyUser?.id
+      
+      if (!userWallet) {
+        console.error('❌ No wallet address found for user')
+        alert('Please connect a wallet first')
         return
       }
-
-      const platformWalletAddress = normalizeAddress(
-        process.env.NEXT_PUBLIC_PLATFORM_SOLANA_WALLET ||
-        process.env.NEXT_PUBLIC_SITE_FEE_WALLET ||
-        'F7zDew151bya8KatZiHF6EXDBi8DVNJvrLE619vwypvG'
-      )
-
-      if (!platformWalletAddress) {
-        console.error('❌ No platform Solana wallet configured for deposits')
-        alert('Deposit wallet is not configured. Please contact support.')
-        return
-      }
-
-      const fundingRequest = {
-        address: platformWalletAddress,
-        options: {
-          chain: SOLANA_CHAIN,
-          asset: 'native-currency',
-          defaultFundingMethod: 'exchange',
-          uiConfig: {
-            receiveFundsTitle: 'Deposit to TurfLoot',
-            receiveFundsSubtitle: 'Funds go directly to the TurfLoot platform wallet.',
-            landing: {
-              title: 'Choose how you would like to deposit funds'
-            }
-          }
-        }
-      }
-
-      console.log('🚀 Opening Privy funding modal for platform wallet deposit:', fundingRequest)
-
-      const result = await fundWallet(fundingRequest)
-
-      console.log('✅ Privy funding flow completed:', result)
-
-      let depositedSol = extractSolAmountFromFundingResult(result)
-
-      if (!depositedSol || depositedSol <= 0) {
-        console.warn('⚠️ Unable to infer deposit amount from Privy response. Prompting user for confirmation.')
-        if (typeof window !== 'undefined') {
-          const manualAmount = window.prompt(
-            'Deposit complete! Enter the amount of SOL you added so we can update your TurfLoot balance:'
-          )
-          const parsedAmount = manualAmount ? parseFloat(manualAmount) : NaN
-          if (Number.isFinite(parsedAmount) && parsedAmount > 0) {
-            depositedSol = parsedAmount
-          }
-        }
-      }
-
-      if (depositedSol && depositedSol > 0) {
-        console.log(`💸 Recording mock deposit of ${depositedSol.toFixed(4)} SOL`)
-        incrementMockBalance(depositedSol)
-        await fetchWalletBalance()
-        alert(`Deposit successful! ${depositedSol.toFixed(4)} SOL has been added to your TurfLoot balance.`)
-      } else {
-        console.warn('⚠️ Deposit completed but amount was not provided. Balance was not changed automatically.')
-        await fetchWalletBalance()
-        alert('Deposit completed. If your balance did not update automatically, please refresh it or enter the amount manually.')
-      }
-
-    } catch (error) {
-      console.error('❌ Solana funding error details:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-        fundWalletAvailable: typeof fundWallet === 'function'
+      
+      console.log('📝 Creating pending deposit record...')
+      
+      // Create pending deposit to track this user's deposit
+      const pendingResponse = await fetch('/api/deposits/pending', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userWallet,
+          amountUsd: amountUsd || 10 // Default $10 if not specified
+        })
       })
-
-      if (error?.message?.includes('not enabled') || error?.message?.includes('not available')) {
-        alert('Wallet funding is not enabled for your account. Please contact support or check your Privy dashboard settings.')
-      } else if (error?.message?.includes('unsupported') || error?.message?.includes('chain')) {
-        alert('Solana funding may not be supported. Please check your Privy dashboard configuration.')
-      } else if (error?.message?.includes('User rejected') || error?.message?.includes('cancelled')) {
-        console.log('ℹ️ User cancelled the funding process')
-      } else {
-        alert(`Unable to open funding modal: ${error?.message || 'Please check browser console for details'}`)
-      }
+      
+      const pendingData = await pendingResponse.json()
+      console.log('✅ Pending deposit created:', pendingData.deposit._id)
+      
+      // Open Privy funding modal
+      // Note: Privy will handle the deposit to platform wallet
+      await fundWallet()
+      
+      console.log('✅ Fund wallet modal opened - deposit to platform wallet!')
+      console.log(`💡 Platform Wallet: ${pendingData.platformWallet}`)
+      
+    } catch (error) {
+      console.error('❌ Error opening deposit modal:', error)
+      alert(`Error: ${error.message}`)
     }
   }
   const handleWithdraw = async () => {
